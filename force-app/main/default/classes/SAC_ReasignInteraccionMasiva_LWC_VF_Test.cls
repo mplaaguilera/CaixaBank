@@ -6,14 +6,16 @@ public with sharing class SAC_ReasignInteraccionMasiva_LWC_VF_Test {
 
         Id recordTypeRecla = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
 
-        User usuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarios);
+        User usuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];    
+        SAC_DatabaseDML.insertDML(usuarios, false);  
+        //Database.insert(usuarios);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarios.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarios){
        //grupo colaborador
@@ -27,7 +29,8 @@ public with sharing class SAC_ReasignInteraccionMasiva_LWC_VF_Test {
         grupo.SAC_Email3__c = 'correo3@test.com';
         grupo.SAC_Externo__c = true;
         grupo.SAC_DeveloperName__c   = 'AJ';
-        Database.insert(grupo);
+        SAC_DatabaseDML.insertDML(grupo, false);  
+        //Database.insert(grupo);
 
         CC_Grupo_Colaborador__c grupo2 = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
         grupo2.Name = 'grupoTest';
@@ -38,15 +41,18 @@ public with sharing class SAC_ReasignInteraccionMasiva_LWC_VF_Test {
         grupo2.SAC_Email2__c = 'correo2@test.com';
         grupo2.SAC_Email3__c = 'correo3@test.com';
         grupo2.SAC_DeveloperName__c   = 'CDMX';
-        Database.insert(grupo2);
+        SAC_DatabaseDML.insertDML(grupo2, false);  
+        //Database.insert(grupo2);
 
         //grupo colaborador contact
         CC_Grupo_Colaborador_Contact__c grupoColabContact = SAC_TestDataFactory.crearColaboradorContact(usuarios.Id, grupo.id);
-        Database.insert(grupoColabContact);
+        SAC_DatabaseDML.insertDML(grupoColabContact, false);  
+        //Database.insert(grupoColabContact);
 
         //grupo colaborador contact 2
         CC_Grupo_Colaborador_Contact__c grupoColabContact2 = SAC_TestDataFactory.crearColaboradorContact(usuarios.Id, grupo2.id);
-        Database.insert(grupoColabContact2);
+        SAC_DatabaseDML.insertDML(grupoColabContact2, false);  
+        //Database.insert(grupoColabContact2);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -57,7 +63,8 @@ public with sharing class SAC_ReasignInteraccionMasiva_LWC_VF_Test {
         camposRecl.put('OwnerId', usuarios.Id);
 
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);  
+        //Database.insert(casoReclamacion);
 
         //Reclamacion
         Map<String, Object> camposRecl2 = new Map<String, Object>();
@@ -68,7 +75,8 @@ public with sharing class SAC_ReasignInteraccionMasiva_LWC_VF_Test {
         camposRecl2.put('SAC_CasoEspecial__c', 'SAC_Presidencia');
 
         Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
-        Database.insert(casoReclamacion2);
+        SAC_DatabaseDML.insertDML(casoReclamacion2, false);  
+        //Database.insert(casoReclamacion2);
 
         //Interaccion Escalado
         List<SAC_Interaccion__c> listaInteracciones = new List<SAC_Interaccion__c>();
@@ -112,7 +120,8 @@ public with sharing class SAC_ReasignInteraccionMasiva_LWC_VF_Test {
         SAC_Interaccion__c escalado3 = SAC_TestDataFactory.crearInteraccion('Escalado',camposEsc3);
         listaInteracciones.add(escalado3);
 
-        Database.insert(listaInteracciones);
+        SAC_DatabaseDML.insertListDML(listaInteracciones, false);  
+        //Database.insert(listaInteracciones);
         
         //Interaccion Consulta
         Map<String, Object> camposCons = new Map<String, Object>();
@@ -125,7 +134,8 @@ public with sharing class SAC_ReasignInteraccionMasiva_LWC_VF_Test {
         camposCons.put('OwnerId', usuarios.Id);
         
         SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
-        Database.insert(consulta);
+        SAC_DatabaseDML.insertDML(consulta, false);  
+        //Database.insert(consulta);
 
         // //Interaccion Consulta
         // Map<String, Object> camposCons2 = new Map<String, Object>();
@@ -152,7 +162,8 @@ public with sharing class SAC_ReasignInteraccionMasiva_LWC_VF_Test {
         
         SAC_Interaccion__c reescalado = SAC_TestDataFactory.crearInteraccion('Escalado',camposRe);
 
-        Database.insert(reescalado);        
+        SAC_DatabaseDML.insertDML(reescalado, false);  
+        //Database.insert(reescalado);        
         }
     }
 

@@ -4,14 +4,16 @@ public with sharing class SAC_CaseControllerVF_Test {
     static void makeData(){
 
         //Usuario SAC General
-		User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuario);
+		User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+        SAC_DatabaseDML.insertDML(usuario, false);       
+        //Database.insert(usuario);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario){
             //Reclamacion
@@ -20,7 +22,8 @@ public with sharing class SAC_CaseControllerVF_Test {
             camposRecl.put('Status', 'SAC_001');
 
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false); 
+            //Database.insert(reclamacion);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -47,7 +50,8 @@ public with sharing class SAC_CaseControllerVF_Test {
             List<Case> pretensiones = new List<Case>();
             pretensiones.add(pretension);
             pretensiones.add(pretension2);
-            Database.insert(pretensiones);
+            SAC_DatabaseDML.insertListDML(pretensiones, false);
+            //Database.insert(pretensiones);
         }
     }
 

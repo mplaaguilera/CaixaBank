@@ -16,14 +16,14 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
         usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
         listaUsuarios.add(usuarioAdmin);    
 
-        Database.insert(listaUsuarios);
+        SAC_DatabaseDML.insertListDML(listaUsuarios, false);
 
         System.runAs(usuarioAdmin) {
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
         
         //System.runAs(usuarioGeneral){
@@ -41,12 +41,12 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
             listaCuentas[0].OwnerId = usuarioGeneral.id;
             listaCuentas[0].recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
             listaCuentas.add(cuenta);
-            Database.insert(listaCuentas);
+            SAC_DatabaseDML.insertListDML(listaCuentas, false);
 
 
             //Entitlement
             Entitlement entitle = SAC_TestDataFactory.crearEntitlement(cuenta.id);
-            Database.insert(entitle);
+            SAC_DatabaseDML.insertDML(entitle, false);
             
             //Reclamacion
             Map<String, Object> camposRecl = new Map<String, Object>();
@@ -59,7 +59,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
 
 
             Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);
             //Consulta
             Map<String, Object> camposCons = new Map<String, Object>();
             camposCons.put('Subject', 'TestCons');
@@ -67,7 +67,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
             camposCons.put('AccountId', cuenta.id);
 
             Case casoConsulta = SAC_TestDataFactory.crearCaso('Reclamacion',camposCons);
-            Database.insert(casoConsulta);
+            SAC_DatabaseDML.insertDML(casoConsulta, false);
             
             Test.stopTest();    
 
@@ -80,7 +80,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
             camposPret.put('SAC_Case_esPsd2__c', true);
 
             Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(casoPretension); 
+            SAC_DatabaseDML.insertDML(casoPretension, false);
 
 
             //Grupos
@@ -88,7 +88,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
             grupoColaborador.SAC_PermiteConsultas__c = true;
             grupoColaborador.SAC_Externo__c = true;
             grupoColaborador.SAC_Email__c = 'test@emailSAC0304.com';
-            Database.insert(grupoColaborador);
+            SAC_DatabaseDML.insertDML(grupoColaborador, false);
             
 
             //Interaccion Consulta
@@ -109,7 +109,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
             
             SAC_Interaccion__c consulta2 = SAC_TestDataFactory.crearInteraccion('Consulta',camposIntCons2);
             listConsultas.add(consulta2);
-            Database.insert(listConsultas);
+            SAC_DatabaseDML.insertListDML(listConsultas, false);
 
             //Parametrizacion escalado
             Map<String, Object> camposParams = new Map<String, Object>();
@@ -122,14 +122,14 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
             camposParams.put('SAC_validarImporte__c', false);
             
             SAC_ParametrizacionEscalado__c parametrizacionEscalado = SAC_TestDataFactory.crearParamEsc(camposParams);
-            Database.insert(parametrizacionEscalado);
+            SAC_DatabaseDML.insertDML(parametrizacionEscalado, false);
 
             //Email Backlist
             SAC_MaestroTemas__c maestroTema = new SAC_MaestroTemas__c();
             maestroTema.Name ='emailtest@prueba.com';
             maestroTema.SAC_Activo__c = true;
             maestroTema.RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SAC_BlackListEmails').getRecordTypeId();
-            Database.insert(maestroTema);
+            SAC_DatabaseDML.insertDML(maestroTema, false);
 
 
             //ContentVersion
@@ -139,14 +139,14 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
             List<ContentVersion> listaCV = new List<ContentVersion>();
             listaCV.add(cv);
             listaCV.add(cv2);
-            Database.insert(listaCV);
+            SAC_DatabaseDML.insertListDML(listaCV, false);
 
             EmailMessage em  = new EmailMessage();
             em.relatedtoId = consulta2.Id;
             em.Subject = 'emTest Consulta externa';
             em.ToAddress = 'test@test.com';
             em.MessageDate = System.now();
-            Database.insert(em);
+            SAC_DatabaseDML.insertDML(em, false);
 
             System.runAs(usuarioAdmin){
                 EmailTemplate validEmailTemplate = new EmailTemplate(
@@ -158,7 +158,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
                     Body = 'Texted', 
                     FolderId = usuarioAdmin.id
                 );
-                Database.insert(validEmailTemplate);  
+                SAC_DatabaseDML.insertDML(validEmailTemplate, false);
                 
                 SAC_PlantillaRedaccion__c plantilla = new SAC_PlantillaRedaccion__c();
                 plantilla.SAC_TipoPlantilla__c = 'SAC_AvisoResolucion';
@@ -167,7 +167,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
                 plantilla.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
                 plantilla.RecordTypeId = Schema.SObjectType.SAC_PlantillaRedaccion__c.getRecordTypeInfosByDeveloperName().get('SAC_Redaccion').getRecordTypeId();
                 plantilla.Name = 'testPlantilla';
-                Database.insert(plantilla);
+                SAC_DatabaseDML.insertDML(plantilla, false);
             }
         //}            
  
@@ -178,7 +178,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
     static void enviarEmailTest(){
         Test.startTest();
         Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestCons' LIMIT 1];
-        List<EmailMessage> listaEmailMsg = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];
+        Integer emailMsgCnt = [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY];
+
         //ContentVersion y serializar
         List<ContentVersion> listaCV = [SELECT Id, ContentDocumentId FROM ContentVersion WHERE Title = 'ABC Test'];
         List<String> listaIds = new List<String>();
@@ -192,8 +193,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
             SAC_LCMP_GestionEmails.enviarEmail(reclamacion.Id, 'lmesa@viewnext.com; luis.mesa@ibm.com', 'lmesa@viewnext.com; luis.mesa@ibm.com', 'lmesa@viewnext.com; luis.mesa@ibm.com', 'cuerpo prueba', 'Asunto', idsAdjuntos, null);
         }
 
-        List<EmailMessage> listaEmailMsgFinal  = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];        
-        Assert.areNotEqual(listaEmailMsg.size(), listaEmailMsgFinal.size(), 'No se ha podido efectuar el envío de email');
+        Assert.areNotEqual(emailMsgCnt, [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY], 'No se ha podido efectuar el envío de email');
         Test.stopTest();
     }
 
@@ -201,7 +201,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
     static void enviarResolucionEmailTest(){
         Test.startTest();
         Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRec' LIMIT 1];
-        List<EmailMessage> listaEmailMsg = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];
+        Integer emailMsgCnt = [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY];
+
         //ContentVersion y serializar
         List<ContentVersion> listaCV = [SELECT Id FROM ContentVersion WHERE Title = 'ABC Test'];
 
@@ -216,8 +217,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
             SAC_LCMP_GestionEmails.finalizarRedaccion(reclamacion.Id, 'lmesa@viewnext.com; luis.mesa@ibm.com', 'lmesa@viewnext.com; luis.mesa@ibm.com', 'lmesa@viewnext.com; luis.mesa@ibm.com', 'cuerpo prueba', 'Asunto', idsAdjuntos);
         }
 
-        List<EmailMessage> listaEmailMsgFinal  = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];
-        Assert.areNotEqual(listaEmailMsg.size(), listaEmailMsgFinal.size(), 'No se ha podido efectuar el envío de email');
+        Assert.areNotEqual(emailMsgCnt, [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY], 'No se ha podido efectuar el envío de email');
         Test.stopTest();
     }
 
@@ -230,8 +230,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
        
         reclamacion.OwnerId = usuario.id; 
         cv.OwnerId = usuario.id; 
-        Database.update(reclamacion);
-        Database.update(cv);
+        SAC_DatabaseDML.updateDML(reclamacion, false);
+        SAC_DatabaseDML.updateDML(cv, false);
 
         System.runAs(usuario){
             ContentVersion[] resultado = SAC_LCMP_GestionEmails.obtieneAdjuntos(reclamacion.id);
@@ -244,14 +244,15 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
     static void eliminaRegistroTest(){
         Test.startTest();
         List<ContentVersion> cv = [SELECT Id FROM ContentVersion WHERE Title = 'ABC Test'];
+        Integer cvCnt = [SELECT Count() FROM ContentVersion WHERE Title = 'ABC Test'];
+
         
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         System.runAs(usuario){
             SAC_LCMP_GestionEmails.eliminaRegistro(cv[0].Id);
         }
         
-        List<ContentVersion> sinCV = [SELECT Id FROM ContentVersion WHERE Title='ABC Test'];
-        Assert.areNotEqual(cv.size(), sinCV.size(), 'No ha funcionado correctamente la eliminación de archivos adjuntos.');
+        Assert.areNotEqual(cvCnt, [SELECT Count() FROM ContentVersion WHERE Title='ABC Test'], 'No ha funcionado correctamente la eliminación de archivos adjuntos.');
         Test.stopTest();
     }
 
@@ -288,7 +289,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
 
         System.runAs(usuario){
             ContentVersion[] resultado = SAC_LCMP_GestionEmails.recuperaAdjuntos(null);
-            Assert.areEqual(resultado.size(), 0, 'No ha recogido el adjunto correctamente.');
+            Assert.areEqual(resultado.isEmpty(), true, 'No ha recogido el adjunto correctamente.');
         }
         Test.stopTest();
     }
@@ -299,14 +300,14 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
         Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRec' LIMIT 1];
         ContentVersion cv = [SELECT Id, ContentDocumentId FROM ContentVersion WHERE FirstPublishLocationId =: reclamacion.Id LIMIT 1];
         ContentDocument cd = [SELECT Id FROM ContentDocument WHERE Id =: cv.ContentDocumentId LIMIT 1];
-        List<ContentDocument> toCompare = [SELECT Id FROM ContentDocument];
+        Integer cdCnt = [SELECT Count() FROM ContentDocument];
         
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         System.runAs(usuario){
             SAC_LCMP_GestionEmails.eliminaContentDocument(cd.Id); 
         }
-        List<ContentDocument> toComparev2 = [SELECT Id FROM ContentDocument];
-        Assert.areNotEqual(toComparev2.size(), toCompare.size(), 'No ha eliminado el documento correctamente.');
+        
+        Assert.areNotEqual(cdCnt, [SELECT Count() FROM ContentDocument], 'No ha eliminado el documento correctamente.');
         Test.stopTest();
     }
 
@@ -314,7 +315,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
     static void enviarEmailInteraccionTest(){
         Test.startTest();
         SAC_Interaccion__c consulta = [SELECT Id FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'consulta' LIMIT 1];
-        List<EmailMessage> listaEmailMsg = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];
+        Integer emailMsgCnt = [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY];
+
         //ContentVersion y serializar
         List<ContentVersion> listaCV = [SELECT Id FROM ContentVersion WHERE Title = 'ABC Test'];
         List<String> listaIds = new List<String>();
@@ -327,8 +329,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
         System.runAs(usuario){
             SAC_LCMP_GestionEmails.enviarEmail(consulta.Id, 'lmesa@viewnext.com; luis.mesa@ibm.com', 'lmesa@viewnext.com; luis.mesa@ibm.com', 'lmesa@viewnext.com; luis.mesa@ibm.com', 'cuerpo prueba', 'Asunto', idsAdjuntos, null);
         }
-        List<EmailMessage> listaEmailMsgFinal  = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];        
-        Assert.areNotEqual(listaEmailMsg.size(), listaEmailMsgFinal.size(), 'No se ha podido efectuar el envío de email');
+        Assert.areNotEqual(emailMsgCnt, [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY], 'No se ha podido efectuar el envío de email');
         Test.stopTest();
     }
 
@@ -336,7 +337,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
     static void enviarEmailInteraccionTest2(){
         Test.startTest();
         SAC_Interaccion__c consulta = [SELECT Id FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'consulta2test' LIMIT 1];
-        List<EmailMessage> listaEmailMsg = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];
+        Integer emailMsgCnt = [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY];
+
         //ContentVersion y serializar
         List<ContentVersion> listaCV = [SELECT Id FROM ContentVersion WHERE Title = 'ABC Test'];
         List<String> listaIds = new List<String>();
@@ -349,8 +351,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
         System.runAs(usuario){
             SAC_LCMP_GestionEmails.enviarEmail(consulta.Id, 'test@testsac.com; test@testsac2.com', 'test@testsac.com; test@testsac2.com', 'test@testsac.com; test@testsac2.com', 'cuerpo prueba', 'Asunto prueba', idsAdjuntos, null);
         }
-        List<EmailMessage> listaEmailMsgFinal  = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];        
-        Assert.areNotEqual(listaEmailMsg.size(), listaEmailMsgFinal.size(), 'No se ha podido efectuar el envío de email');
+        Assert.areNotEqual(emailMsgCnt, [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY], 'No se ha podido efectuar el envío de email');
         Test.stopTest();
     }
 
@@ -364,8 +365,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
         
         reclamacion.OwnerId = usuario.id; 
         cv.OwnerId = usuario.id; 
-        Database.update(reclamacion);
-        Database.update(cv);
+        SAC_DatabaseDML.updateDML(reclamacion, false);
+        SAC_DatabaseDML.updateDML(cv, false);
         
         System.runAs(usuario){
             List<contentVersion> resultado = SAC_LCMP_GestionEmails.getDocumentRedaccion(reclamacion.id);
@@ -384,7 +385,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
     static void prorrogarCasoTest(){
         Test.startTest();
         Case reclamacion = [SELECT Id, Status,SAC_Prorrogado__c FROM Case WHERE Subject = 'TestRec'];
-        List<EmailMessage> listaEmailMsg = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];
+        Integer emailMsgCnt = [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY];
+
         //ContentVersion y serializar
         List<ContentVersion> listaCV = [SELECT Id FROM ContentVersion WHERE Title = 'ABC Test'];
         List<String> listaIds = new List<String>();
@@ -401,8 +403,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
         reclamacion = [SELECT Id, SAC_Prorrogado__c FROM Case WHERE Subject = 'TestRec'];
         
         Assert.areEqual(reclamacion.SAC_Prorrogado__c, true,'No se ha prorrogado. Falla parte 1'); 
-        List<EmailMessage> listaEmailMsgFinal  = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];        
-        Assert.areNotEqual(listaEmailMsg.size(), listaEmailMsgFinal.size(), 'No se ha podido efectuar el envío de email. Falla parte 2'); 
+
+        Assert.areNotEqual(emailMsgCnt, [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY], 'No se ha podido efectuar el envío de email. Falla parte 2'); 
         Test.stopTest();  
     }
 
@@ -420,8 +422,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
        
         pretension.OwnerId = usuario.id; 
         listaCV[0].OwnerId = usuario.id; 
-        Database.update(pretension);
-        Database.update(listaCV);
+        SAC_DatabaseDML.updateDML(pretension, false);
+        SAC_DatabaseDML.updateListDML(listaCV, false);
 
         System.runAs(usuario){
             SAC_LCMP_GestionEmails.rellenarUltimaModFichero(pretension.Id, listaIdsFicheros, false);
@@ -447,8 +449,8 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
        
         pretension.OwnerId = usuario.id; 
         listaCV[0].OwnerId = usuario.id; 
-        Database.update(pretension);
-        Database.update(listaCV);
+        SAC_DatabaseDML.updateDML(pretension, false);
+        SAC_DatabaseDML.updateListDML(listaCV, false);
 
         System.runAs(usuario){
             SAC_LCMP_GestionEmails.actualizarSACBloqueField(listaIdsFicheros[0]);
@@ -485,7 +487,7 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         ContentVersion cv = [SELECT Id, Title, ContentDocumentId, SAC_ValidadoCV__c, FirstPublishLocationId, SAC_Bloque__c FROM ContentVersion WHERE Title = 'ABC Test' LIMIT 1];
         cv.SAC_ValidadoCV__c = false;
-        Database.update(cv);
+        SAC_DatabaseDML.updateDML(cv, false);
         System.runAs(usuario){
         SAC_LCMP_GestionEmails.validarFichero(cv.ContentDocumentId);
         }
@@ -493,6 +495,51 @@ public with sharing class SAC_LCMP_GestionEmails_Test {
         ContentVersion cv2 = [SELECT Id, Title, ContentDocumentId, SAC_ValidadoCV__c, FirstPublishLocationId, SAC_Bloque__c FROM ContentVersion WHERE Id = :cv.Id LIMIT 1];
         System.assertEquals(cv2.SAC_ValidadoCV__c, true, 'No coincide');
         Test.stopTest();
+    }
 
+    @isTest
+    static void checkAdjuntoConsultaTest() {
+        
+        Test.startTest();
+
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        SAC_Interaccion__c consulta = [SELECT Id FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'consulta2test' LIMIT 1];
+        ContentVersion cv = [SELECT Id, Title, ContentDocumentId, SAC_ValidadoCV__c, FirstPublishLocationId, SAC_Bloque__c FROM ContentVersion WHERE Title = 'ABC Test' LIMIT 1];
+
+        System.runAs(usuario){
+            SAC_LCMP_GestionEmails.checkAdjuntoConsulta(consulta.Id, cv.ContentDocumentId);
+        }
+        Test.stopTest();
+
+        List<ContentDocumentLink> cdl = [SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :consulta.Id LIMIT 1];
+
+        Assert.areNotEqual(null, cdl, 'No se ha podido linkar el adjunto a la consulta');
+    }
+
+    @isTest
+    static void deleteFileConsultaTest() {
+        
+        Test.startTest();
+
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        SAC_Interaccion__c consulta = [SELECT Id FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'consulta2test' LIMIT 1];
+        ContentVersion cv = [SELECT Id, Title, ContentDocumentId, SAC_ValidadoCV__c, FirstPublishLocationId, SAC_Bloque__c FROM ContentVersion WHERE Title = 'ABC Test' LIMIT 1];
+
+        System.runAs(usuario){
+            ContentDocumentLink newLink = new ContentDocumentLink(
+                ContentDocumentId = cv.ContentDocumentId,
+                LinkedEntityId = consulta.Id,
+                ShareType = 'V' 
+            );
+
+            SAC_DatabaseDML.insertDML(newLink, true);
+
+            SAC_LCMP_GestionEmails.deleteFileConsulta(consulta.Id, cv.ContentDocumentId);
+        }
+        Test.stopTest();
+
+        List<ContentDocumentLink> cdl = [SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :consulta.Id LIMIT 1];
+
+        Assert.areNotEqual(false, cdl.isEmpty(), 'No se ha podido desvincular el adjunto a la consulta');
     }
 }

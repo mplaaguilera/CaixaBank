@@ -10,7 +10,7 @@
  * 1.0             --             Nicolás García  06/04/22     Creación
 *****************************************************************/
 @RestResource(urlMapping='/SAC_GGH/*')
-global without sharing class SAC_WS_GGH {
+global without sharing class SAC_WS_GGH extends CBK_HttpServiceIntegration_Abstract{
     private static final Id RECTYPEPRETENSION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
     private static final Id RECTYPEMAESTRO = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SAC_MaestroDeTareas').getRecordTypeId();
 
@@ -553,7 +553,8 @@ global without sharing class SAC_WS_GGH {
                                 totalImportesAbonados = totalImportesAbonados + iData.impAbonTasacion;
                             }
                             tarea.OwnerId = pretension.OwnerId;
-                            Database.SaveResult srList = Database.update(tarea, false);
+                            SAC_DatabaseDML.updateDML(tarea, false);  
+                            //Database.SaveResult srList = Database.update(tarea, false);
                             //System.debug(srList);
                             
                             //DE80978 31/07/23
@@ -566,7 +567,8 @@ global without sharing class SAC_WS_GGH {
                                 }
                             }
                             pretension.CC_Importe_Abonado__c = totalImportesAbonados;
-                            Database.SaveResult srPretension = Database.update(pretension, false);
+                            SAC_DatabaseDML.updateDML(pretension, false);  
+                            //Database.SaveResult srPretension = Database.update(pretension, false);
                         }
                         else{
                             oResponse.sCodError = 'El estado del registro no es "En Gestión" o en "Pendiente revisión".';
@@ -587,7 +589,8 @@ global without sharing class SAC_WS_GGH {
             // Actualizar trazas hijas.
             if (oTraza != null && !oTraza.isEmpty())
             {
-                Database.SaveResult[] oResUp = Database.insert(oTraza, false);
+                SAC_DatabaseDML.insertListDML(oTraza, false);  
+                //Database.SaveResult[] oResUp = Database.insert(oTraza, false);
             }
 
 

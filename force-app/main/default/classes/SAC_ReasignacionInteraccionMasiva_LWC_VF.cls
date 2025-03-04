@@ -41,7 +41,8 @@ public with sharing class SAC_ReasignacionInteraccionMasiva_LWC_VF {
                     lstInteraccionToUpdate.add(i);    
                 }
 
-                Database.update(lstInteraccionToUpdate);
+                SAC_DatabaseDML.updateListDML(lstInteraccionToUpdate, true);
+                //Database.update(lstInteraccionToUpdate);
                 return 'SUCCCES';
             }
 

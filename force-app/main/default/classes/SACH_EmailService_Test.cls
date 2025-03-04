@@ -31,6 +31,33 @@ public with sharing class SACH_EmailService_Test {
         grupoColaborador.OS_Negocio__c = 'CC';
         grupoColaborador.Name = 'Oficina01';
         insert grupoColaborador;
+
+        List <String> owaEmails = new List<String>{('Atención Empleados Contact Center IT Grupo CaixaBank')};
+
+        List <OrgWideEmailAddress> owa = new List <OrgWideEmailAddress>([SELECT Id, Address FROM OrgWideEmailAddress WHERE DisplayName IN : owaEmails]);
+
+        HDT_Parametros__c params1 = new HDT_Parametros__c();
+        params1.Name = 'HDT_Email_Respuesta_Empleados_New';
+        params1.HDT_Configuracion_1__c = owa[0].Address;
+        params1.HDT_Configuracion_2__c = owa[0].Address;
+        insert params1;
+
+
+        SACH_Parametros__c params = new SACH_Parametros__c();
+        params.Name = 'SACH_Promor';
+        params.SACH_Parametro_1__c = 'https://pro01.tf7.lacaixa.es/CA.OFI/ExpedienteRiesgoGesExternalizada/verDocumento.tf7?_flowId=verDocumento-flow&_flowRType=FR&aplicacionInv=PJU&aplicacionExpedienteX=PJU';
+        insert params;
+
+        SACH_Parametros__c params2 = new SACH_Parametros__c();
+        params2.Name = 'Solucion_705';
+        params2.SACH_Parametro_1__c = 'Petición autorización solicitud subasta al SACH en análisis (705)';
+        insert params2;
+
+        SACH_Parametros__c params3 = new SACH_Parametros__c();
+        params3.Name = 'Solucion_715';
+        params3.SACH_Parametro_1__c = 'Suspensión actuaciones por instrucción del SACH (715)';
+        insert params3;
+
     }
 
     @isTest
@@ -263,13 +290,21 @@ public with sharing class SACH_EmailService_Test {
         attachmenttext.mimeTypeSubType = 'texttwo/plain';
         email.textAttachments =   new Messaging.inboundEmail.TextAttachment[] { attachmenttext };
         
+        
+
+       
+
+        
+
+
         System.runAs(usuario){
 
         Test.startTest();
         //Ejecución de la prueba
         SACH_EmailService_Utils.gestionAdjuntos(email, caso, 'test@test.com');
         SACH_EmailService_Utils.gestionAdjuntosNew(email, caso, 'test@test.com');
-    
+        
+
         Test.stopTest();
         
         ContentDocumentLink contentDocument = [Select id, ShareType from ContentDocumentLink where LinkedEntityId = :caso.Id limit 1];
@@ -278,7 +313,18 @@ public with sharing class SACH_EmailService_Test {
         System.assert(contentDocument.Id != null, 'Content document creado.');
         System.assertEquals('I', contentDocument.ShareType, 'Tipo de documento correcto.');
 
+        ContentVersion contentVersionTest = new ContentVersion(
+            Title = 'Archivo de prueba',
+            VersionData = Blob.valueOf('Contenido de prueba'),
+            PathOnClient = 'prueba.txt'
+        );
+        insert contentVersionTest;
+
+        Set<Id> listaContentVersionId = new Set<Id>{ contentVersionTest.Id };
         EmailMessage emailGenerado = [Select id from EmailMessage where ParentId = :caso.Id limit 1];
+        
+        SACH_EmailService_Utils.crearContentDocumentLink(listaContentVersionId, emailGenerado, caso);
+
 
         //Comprobar el email
         System.assert(emailGenerado.Id != null,'Email generado.');

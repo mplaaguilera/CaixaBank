@@ -245,11 +245,7 @@ public with sharing class CC_NotifSegCaso {
         if (!oCasoOrig.isEmpty()) {
             oCaseCase = getCaseCasosSeguimiento (oCasoOrig, oCfgOrigen, sProceso);
         }
-        
-        // Recuperar los casos asociados a las tareas.
-        //if (!oIDs.isEmpty())
-        //    oTaskCase = getPotCasosSeguimiento (oIDs);
-        
+     
         // Map para creación de contactos temporales.
         Map<String,String> oTempCont = new Map<String,String>();
         
@@ -1328,6 +1324,7 @@ public with sharing class CC_NotifSegCaso {
 
             for(EmailTemplate emailp : emailPlantillas)
             {
+                system.debug('1111111' + emailp.DeveloperName);
                 if(emailp.DeveloperName == 'Enquesta_Offline_Notificacion'){
                     mapIdIdiomaPlantilla.put('ca', emailp.Id);
                 }else{
@@ -1337,6 +1334,7 @@ public with sharing class CC_NotifSegCaso {
             
             for(EmailTemplate emailp : plantillasNoEdG)
             {
+                system.debug('2222222' + emailp.DeveloperName);
                 if(emailp.DeveloperName == 'HDT_Enquesta_Offline_Notificacion_CA'){
                     mapIdIdiomaPlantillaHDT.put('ca', emailp.Id);
                 }else if(emailp.DeveloperName == 'HDT_Encuesta_Offline_Notificacion_ES'){
@@ -1348,6 +1346,7 @@ public with sharing class CC_NotifSegCaso {
 
             for(EmailTemplate emailp : plantillasEdG)
             {
+                system.debug('3333333' + emailp.DeveloperName);
                 if(emailp.DeveloperName == 'HDT_Encuesta_Offline_Notificacion_EDG_CA'){
                     mapIdIdiomaPlantillaHDT.put('ca_edg', emailp.Id);
                 }else if(emailp.DeveloperName == 'HDT_Encuesta_Offline_Notificacion_EDG_ES'){

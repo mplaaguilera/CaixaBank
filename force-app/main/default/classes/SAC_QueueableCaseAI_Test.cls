@@ -4,7 +4,7 @@ public with sharing class SAC_QueueableCaseAI_Test {
     static void makeData(){
         //usuario a usar
         List<User> usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertListDML(usuario, false);   
 
         //Clasificación rápida   
         Map<String, Object> camposClasR = new Map<String, Object>();
@@ -16,7 +16,7 @@ public with sharing class SAC_QueueableCaseAI_Test {
         camposClasR.put('SAC_MotivoDescarte__c', 'SAC_Otros');
         
         SEG_ClasificacionRapida__c clasR = SAC_TestDataFactory.crearClasificacionRapida(camposClasR);
-        Database.insert(clasR);
+        SAC_DatabaseDML.insertDML(clasR, false);   
         
         //Reglas de clasificación
         Map<String, Object> camposReglas = new Map<String, Object>();
@@ -27,7 +27,7 @@ public with sharing class SAC_QueueableCaseAI_Test {
         camposReglas.put('SEG_ClasificacionRapida__c', clasR.Id);
         
         SEG_Regladeclasificacion__c reglas = SAC_TestDataFactory.crearReglasClasificacion(clasR.Id, camposReglas);
-        Database.insert(reglas);
+        SAC_DatabaseDML.insertDML(reglas, false);   
 
         //Casos
         List<Case> listaCasos = new List<Case>();
@@ -41,7 +41,7 @@ public with sharing class SAC_QueueableCaseAI_Test {
         mapaCamposCaso.put('OS_ReglaUtilizada__c', reglas.Id);
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Consulta', mapaCamposCaso);
         listaCasos.add(casoReclamacion);
-        Database.insert(listaCasos);
+        SAC_DatabaseDML.insertListDML(listaCasos, false);
     }
 
     @isTest
@@ -54,11 +54,20 @@ public with sharing class SAC_QueueableCaseAI_Test {
 
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);  
 
         Test.startTest();
         System.runAs(usuario) {
-            System.enqueueJob(new SAC_QueueableCaseAI(listaCasos, listaCasosReglaClasif, mapaDatosCasosActualizar));
+            DateTime dt = DateTime.now();
+            Long dateInMilliseconds = dt.getTime();
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+            .addId(listaCasos.get(0).Id)
+            .addString(String.valueOf(dateInMilliseconds))
+            .build();
+            try {
+                System.enqueueJob(new SAC_QueueableCaseAI(listaCasos, listaCasosReglaClasif, mapaDatosCasosActualizar), options);    
+            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
         }
         Test.stopTest();
 

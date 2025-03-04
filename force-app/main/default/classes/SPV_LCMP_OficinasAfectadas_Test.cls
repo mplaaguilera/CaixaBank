@@ -5,6 +5,9 @@
  * Proposito: Test de los métodos de la clase correspondiente
  * 
 ****************************************************************/ 
+    /**
+	 * @description     Test de los métodos de la clase correspondiente
+	 */
 
 @isTest
 public with sharing class SPV_LCMP_OficinasAfectadas_Test {
@@ -25,7 +28,7 @@ public with sharing class SPV_LCMP_OficinasAfectadas_Test {
         }
 
         //RecordTypes
-        Id RECTYPEOFICINAS = Schema.SObjectType.SAC_ImagenDocumento__c.getRecordTypeInfosByDeveloperName().get('SPV_OficinaAfectada').getRecordTypeId();
+        Id recTypeOficinas = Schema.SObjectType.SAC_ImagenDocumento__c.getRecordTypeInfosByDeveloperName().get('SPV_OficinaAfectada').getRecordTypeId();
 
         //Reclamaciones
         List<Case> listaReclamaciones = new List<Case>();
@@ -75,7 +78,7 @@ public with sharing class SPV_LCMP_OficinasAfectadas_Test {
 
 
     @isTest
-    static void getOficinasAfectadas_Test(){
+    static void getOficinasAfectadasTest(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRecCrearRec1' LIMIT 1];
 
@@ -96,7 +99,7 @@ public with sharing class SPV_LCMP_OficinasAfectadas_Test {
 
 
     @isTest
-    static void eliminarOficinaAfectada_Test(){
+    static void eliminarOficinaAfectadaTest(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Case reclamacion = [SELECT Id, OwnerId FROM Case WHERE Subject = 'TestRecCrearRec1' LIMIT 1];
         SAC_ImagenDocumento__c objIntermedio = [SELECT Id FROM SAC_ImagenDocumento__c WHERE SAC_Caso__c = :reclamacion.Id LIMIT 1];

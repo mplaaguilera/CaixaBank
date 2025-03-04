@@ -67,18 +67,7 @@ public without sharing class SAC_GeneracionCartas {
         }
         else{
             
-            body = pageRef.getContentAsPDF();
-            //  try {
-            //      System.debug('1');
-            //      body = pageRef.getContentAsPDF();
-            //      System.debug('body1 '+ body);
-            //  }
-            //  catch (Exception e) {
-            //      System.debug('mensaje ' + e.getMessage());
-            //     body = Blob.valueOf(e.getMessage());
-            //      System.debug('body2 '+ body);
-            //  }    
-            
+            body = pageRef.getContentAsPDF();            
         }
 
         String redaccion = 'carta postal ' + procedencia;
@@ -92,8 +81,9 @@ public without sharing class SAC_GeneracionCartas {
                 idsCD.add(cv.ContentDocumentId);
             }
             List<ContentDocument> cds = [SELECT Id FROM ContentDocument WHERE Id IN: idsCD];
+            List<ContentDocument> cdsCnt = cds;
             //delete cds;
-            contador = String.valueOf(cds.size() + 1);
+            contador = String.valueOf(cdsCnt.size() + 1);
         }
         ContentVersion cv = new ContentVersion(
             Title = numCaso + ' Carta postal ' + procedencia + ' (' + contador + ')', 

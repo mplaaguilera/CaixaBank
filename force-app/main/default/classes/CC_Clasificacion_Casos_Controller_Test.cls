@@ -389,11 +389,28 @@ public class CC_Clasificacion_Casos_Controller_Test {
             casos.add(casoEmpCSI);        
             insert casos;
 
+            List<CC_Settings__c > listCustomSetting = new List<CC_Settings__c >();
             CC_Settings__c configuracion = new CC_Settings__c();
             configuracion.CC_Activa__c = true;
             configuracion.Name = 'CC_OperativaOficinaGuardar';
             configuracion.CC_Configuracion_1__c = 'true';
-            insert configuracion;
+            listCustomSetting.add(configuracion);
+
+            CC_Settings__c  customSetting6 = new CC_Settings__c ();
+            customSetting6.Name = 'CC_Agrupador_CIC_Asignacion_Casos';
+            customSetting6.CC_Activa__c = true;
+            listCustomSetting.add(customSetting6);
+
+            CC_Settings__c  customSetting7 = new CC_Settings__c ();
+            customSetting7.Name = 'CC_Agrupador_CI_Asignacion_Casos';
+            customSetting7.CC_Activa__c = true;
+            listCustomSetting.add(customSetting7);
+
+            CC_Settings__c  customSetting8 = new CC_Settings__c ();
+            customSetting8.Name = 'CC_Agrupador_CIM_Asignacion_Casos';
+            customSetting8.CC_Activa__c = true;
+            listCustomSetting.add(customSetting8);
+            insert listCustomSetting;
         }
     }    
     

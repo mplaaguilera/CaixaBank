@@ -10,7 +10,7 @@
  * VERSION        USER_STORY       AUTHOR         DATE         Description
  * 1.0            US204755         Carlos Solis   31/05/21      Creación
 *****************************************************************/
-public without sharing class SAC_LCMP_EnvioReclamante {
+public with sharing class SAC_LCMP_EnvioReclamante {
     /*****************************************************************
      * Proposito: Comprueba si existen acciones asociadas a la reclamación
      * y devuelve la lista de acciones para ser tratada en el .js
@@ -35,10 +35,10 @@ public without sharing class SAC_LCMP_EnvioReclamante {
                         and (RecordTypeId = :recTypeMaestroTareas or RecordTypeId = :recTypeOtrasTareas)];
         }
 
-        if(listaTareas.size()>0){
+        if(!listaTareas.isEmpty()){
             tmesTareas=[SELECT id, SAC_Accion__c, name FROM SAC_TMECaso__c WHERE SAC_Accion__c IN: listaTareas AND RecordTypeId =:recTypeTMETarea AND name = 'Resolución de la tarea'];
 
-            if(tmesTareas.size()==0){
+            if(tmesTareas.isEmpty()){
                 for(SAC_Accion__c tarea : listaTareas){
                     SAC_TMECaso__c tme = new SAC_TMECaso__c();
                     tme.name = 'Resolución de la tarea'; // TME de resolución: se inicia cuando se hace el envío al reclamante

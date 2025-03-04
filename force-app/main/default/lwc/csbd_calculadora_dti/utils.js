@@ -5,6 +5,7 @@ import OPPTY_TIPO_OPERACION from '@salesforce/schema/Opportunity.CSBD_TipoOperac
 import OPPTY_USO_VIVIENDA from '@salesforce/schema/Opportunity.CSBD_UsoVivienda2__c';
 import OPPTY_TIPO_CONSTRUCCION from '@salesforce/schema/Opportunity.CSBD_TipoConstruccion2__c';
 import OPPTY_CIRBE_SOLICITADO from '@salesforce/schema/Opportunity.CSBD_OC_Cirbe_Solicitado__c';
+import OPPTY_IMPORTE_CIRBE from '@salesforce/schema/Opportunity.CSBD_ImporteCirbe__c';
 import OPPTY_PRECIO_INMUEBLE from '@salesforce/schema/Opportunity.CSBD_PrecioInmueble__c';
 import OPPTY_AMOUNT from '@salesforce/schema/Opportunity.Amount';
 import OPPTY_NOW_PLAZO from '@salesforce/schema/Opportunity.CSBD_Now_Plazo__c';
@@ -43,6 +44,7 @@ export const MENSAJES_INFO = [
 
 export const CAMPOS_OPORTUNIDAD = [
 	{ref: 'cirbeSolicitado', field: OPPTY_CIRBE_SOLICITADO, bool: true},
+	{ref: 'importeCirbe', field: OPPTY_IMPORTE_CIRBE},
 	{ref: 'importeCompraventa', field: OPPTY_PRECIO_INMUEBLE},
 	{ref: 'importeHipoteca', field: OPPTY_AMOUNT},
 	{ref: 'plazo', field: OPPTY_NOW_PLAZO},

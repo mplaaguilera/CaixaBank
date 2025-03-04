@@ -4,17 +4,21 @@ public with sharing class SEG_Case_BU_TRHan_Test {
     @testSetup
     static void testSetup() {
         System.runAs ( new User(Id = UserInfo.getUserId()) ) {
-            Profile perfil = [SELECT Id FROM Profile WHERE Name='SEG_Usuario_CaixaBank'];
-            UserRole rol = [SELECT Id FROM UserRole WHERE Name='Segmentos + FFEE'];
-            User thisUser = new User(alias = 'tsegmen', email='testSEGBI@acme.com',
+            Profile perfil = [SELECT Id FROM Profile WHERE Name='System Administrator'];
+            UserRole rol = [SELECT Id FROM UserRole WHERE Name='Sistemática Comercial'];
+            String orgId = UserInfo.getOrganizationId();
+            String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
+            Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
+            String uniqueName = orgId + dateString + randomInt;
+            User thisUser = new User(alias = 'user2', email='testSEGBI2@acme.com',
                 emailencodingkey='UTF-8', lastname='Smith',
                 languagelocalekey='en_US',
                 localesidkey='en_US', profileid = perfil.Id, userroleid = rol.Id,
                 timezonesidkey='America/Los_Angeles',
-                username='testSEGBI@acme.com');
+                Username = uniqueName + '@test' + orgId + '.org');
             insert thisUser;
             List<PermissionSetAssignment> listPermissionSetAssignment = new List<PermissionSetAssignment>();
-            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('SEG_Operativo','SEG_Supervisor')]){
+            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('CBK_Framework_Login','CBK_Framework_Admin')]){
                 PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
                 nuevoPermiso.PermissionSetId = permisoUnitario.PermissionSetId;
                 nuevoPermiso.AssigneeId = thisUser.id;
@@ -22,6 +26,25 @@ public with sharing class SEG_Case_BU_TRHan_Test {
             }
             if (listPermissionSetAssignment.isEmpty()){
                 insert listPermissionSetAssignment;
+            }
+            Profile perfil2 = [SELECT Id FROM Profile WHERE Name='SEG_Usuario_CaixaBank'];
+            UserRole rol2 = [SELECT Id FROM UserRole WHERE Name='Segmentos + FFEE'];
+            User thisUser2 = new User(alias = 'tsegmen', email='testSEGBI@acme.com',
+                emailencodingkey='UTF-8', lastname='Smith',
+                languagelocalekey='en_US',
+                localesidkey='en_US', profileid = perfil2.Id, userroleid = rol2.Id,
+                timezonesidkey='America/Los_Angeles',
+                username='testSEGBI@acme.com');
+            insert thisUser2;
+            List<PermissionSetAssignment> listPermissionSetAssignment2 = new List<PermissionSetAssignment>();
+            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('SEG_Operativo','SEG_Supervisor')]){
+                PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
+                nuevoPermiso.PermissionSetId = permisoUnitario.PermissionSetId;
+                nuevoPermiso.AssigneeId = thisUser.id;
+                listPermissionSetAssignment2.add(nuevoPermiso);
+            }
+            if (listPermissionSetAssignment2.isEmpty()){
+                insert listPermissionSetAssignment2;
             }
         }
 
@@ -344,6 +367,7 @@ public with sharing class SEG_Case_BU_TRHan_Test {
         regla1.Name = 'CR1';
         regla1.SEG_Tematica__c = mccTematica.Id;
         regla1.SEG_Producto__c = mccProducto.Id;
+        regla1.SEG_Organizacion__c = 'Banca Corporativa';
         regla1.SEG_Motivo__c = mccMotivo.Id;
         regla1.SEG_Detalle__c = mccDetalle.Id;
         regla1.SEG_TPMV__c = String.valueOf(mccTematica.Id).right(15)+String.valueOf(mccProducto.Id).right(15)+String.valueOf(mccMotivo.Id).right(15)+String.valueOf(mccDetalle.Id).right(15);
@@ -359,6 +383,25 @@ public with sharing class SEG_Case_BU_TRHan_Test {
         regla2.SEG_TPMV__c = String.valueOf(mccTematica2.Id).right(15)+String.valueOf(mccProducto2.Id).right(15)+String.valueOf(mccMotivo2.Id).right(15)+String.valueOf(mccDetalle2.Id).right(15);
         regla2.CBK_Negocio__c = 'Segmentos';
         lstReglas.add(regla2);
+
+        SEG_ClasificacionRapida__c regla9 = new SEG_ClasificacionRapida__c();
+        regla9.Name = 'CR9';
+        regla9.SEG_Tematica__c = mccTematica.Id;
+        regla9.SEG_Producto__c = mccProducto.Id;
+        regla9.SEG_Organizacion__c = 'Banca Corporativa';
+        regla9.CBK_Negocio__c = 'Segmentos';
+        lstReglas.add(regla9);
+
+        SEG_ClasificacionRapida__c regla10 = new SEG_ClasificacionRapida__c();
+        regla10.Name = 'CR10';
+        regla10.SEG_Tematica__c = mccTematica.Id;
+        regla10.SEG_Producto__c = mccProducto.Id;
+        regla10.SEG_Motivo__c = mccMotivo.Id;
+        regla10.SEG_Detalle__c = null;
+        regla10.SEG_Organizacion__c = 'Banca Corporativa';
+        regla10.CBK_Negocio__c = 'Segmentos';
+        lstReglas.add(regla10);
+
         insert lstReglas;
 
         //Crear reclamaciones
@@ -696,7 +739,7 @@ public with sharing class SEG_Case_BU_TRHan_Test {
             Test.startTest();
             
                 caso.SEG_ClasificacionRapida__c = regla2.Id;
-                caso.CC_MCC_Tematica__c = null;
+                //caso.CC_MCC_Tematica__c = null;
                 update caso;
             Test.stopTest();
 
@@ -1244,5 +1287,70 @@ public with sharing class SEG_Case_BU_TRHan_Test {
         System.assertEquals('Contratos',casoUpdates.SEG_SRContratos__c);
         System.assertEquals(true,casoUpdates.SEG_Check_Contratos__c);
 		System.assertEquals(null,casoUpdates2.SEG_SRContratos__c);
+    }
+
+    @isTest
+    public static void modificacionMCCs(){
+ 
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
+
+        //Creamos el caso 
+        Case caso = new Case();
+        caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
+        caso.Subject = 'Prueba primer caso';
+        caso.Status = 'Pendiente';
+        caso.SEG_Organizacion__c = 'Banca Corporativa';
+        caso.SEG_Zona__c = 'Corporativa';
+        caso.OwnerId = usuarioTest.Id;
+        caso.SEG_SRContratos__c ='Prueba';
+        insert caso;
+
+        Id idDetalle;
+        Id idTematica;
+        Id idMotivo;
+        Id idProducto;
+
+        List<CC_MCC__c> mccs = [SELECT id, recordType.DeveloperName FROM CC_MCC__c WHERE Name IN ('Detalle1','Motivo1','Producto1','Tematica1')];
+        for (CC_MCC__c mcc : mccs) {
+            switch on mcc.recordType.DeveloperName {
+                when 'SEG_Detalle' {
+                    idDetalle = mcc.Id;
+                }
+                when 'CC_Tematica' {
+                    idTematica = mcc.Id;
+                }
+                when 'CC_Producto_Servicio' {
+                    idProducto = mcc.Id;
+                }
+                when else {
+                    idMotivo = mcc.Id;
+                }
+            }
+        }
+
+        Case primerUpdate;
+        Case segundoUpdate;
+        Case tercerUpdate;
+        
+        Test.startTest();
+            System.runAs(usuarioTest) { 
+                caso.CC_MCC_Tematica__c = idTematica;
+                caso.CC_MCC_ProdServ__c = idProducto;
+                caso.CC_MCC_Motivo__c = idMotivo;
+                caso.SEG_Detalle__c = idDetalle;
+                update caso;
+                primerUpdate = [SELECT SEG_ClasificacionRapida__r.Name FROM Case  WHERE Subject  = 'Prueba primer caso' LIMIT 1];
+                caso.SEG_Detalle__c = null;
+                update caso;
+                segundoUpdate = [SELECT SEG_ClasificacionRapida__r.Name FROM Case  WHERE Subject  = 'Prueba primer caso' LIMIT 1];
+                caso.CC_MCC_Motivo__c = null;
+                update caso;
+                tercerUpdate = [SELECT SEG_ClasificacionRapida__r.Name FROM Case  WHERE Subject  = 'Prueba primer caso' LIMIT 1];
+            }
+        Test.stopTest();
+
+        System.assertEquals('CR1',primerUpdate.SEG_ClasificacionRapida__r.Name, 'La clasificacion rapida no coincide');
+        System.assertEquals('CR10',segundoUpdate.SEG_ClasificacionRapida__r.Name, 'La clasificacion rapida no coincide');
+        System.assertEquals('CR9',tercerUpdate.SEG_ClasificacionRapida__r.Name, 'La clasificacion rapida no coincide');
     }
 }

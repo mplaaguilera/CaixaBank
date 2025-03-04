@@ -1,8 +1,9 @@
 import {LightningElement, api, wire} from 'lwc';
 import {getRecord, getFieldValue, updateRecord} from 'lightning/uiRecordApi';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
+import {errorApex} from 'c/csbd_lwcUtils';
 
-import {getSubetapas, mensajeErrorGetRecord} from './cSBD_Hipoteca_Path_Constantes.js';
+import {getSubetapas} from './cSBD_Hipoteca_Path_Constantes.js';
 
 import OPP_ID from '@salesforce/schema/Opportunity.Id';
 import OPP_IDENTIFICADOR from '@salesforce/schema/Opportunity.CSBD_Identificador__c';
@@ -11,16 +12,9 @@ import OPP_STAGENAME from '@salesforce/schema/Opportunity.StageName';
 import OPP_MOTIVO_PENDIENTE_INTERNO from '@salesforce/schema/Opportunity.CSBD_Motivo_Pendiente_Interno__c';
 import OPP_CLIENTE_INTERNACIONAL from '@salesforce/schema/Opportunity.CSBD_Cliente_Internacional__c';
 
-const OPP_FIELDS = [
-	OPP_IDENTIFICADOR,
-	OPP_ISCLOSED,
-	OPP_STAGENAME,
-	OPP_MOTIVO_PENDIENTE_INTERNO,
-	OPP_CLIENTE_INTERNACIONAL
-];
+const OPP_FIELDS = [OPP_IDENTIFICADOR, OPP_ISCLOSED, OPP_STAGENAME, OPP_MOTIVO_PENDIENTE_INTERNO, OPP_CLIENTE_INTERNACIONAL];
 
-//eslint-disable-next-line camelcase
-export default class csbd_Hipoteca_Path extends LightningElement {
+export default class csbdHipotecaPath extends LightningElement {
 
 	@api recordId;
 
@@ -41,6 +35,7 @@ export default class csbd_Hipoteca_Path extends LightningElement {
 	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS})
 	wiredRecord({error, data}) {
 		if (data) {
+			const getRecordInicial = !this.oportunidad;
 			this.oportunidad = data;
 			this.internacionalSeleccionado = getFieldValue(data, OPP_CLIENTE_INTERNACIONAL);
 			this.etapaSeleccionada = getFieldValue(data, OPP_STAGENAME);
@@ -52,17 +47,22 @@ export default class csbd_Hipoteca_Path extends LightningElement {
 
 			//Oculta las etapas finales excepto aquella cuyo data-etapa-value coincida con StageName
 			this.template.querySelectorAll('.etapaFinal').forEach(subetapaFinal => {
-                if (subetapaFinal.dataset.etapaValue !== (oportunidadCerrada ? getFieldValue(data, OPP_STAGENAME) : 'Cerrada')) {
-                    subetapaFinal.classList.add('slds-hide');
-                }else{
-                    subetapaFinal.classList.remove('slds-hide');
-                }
-            });
-            this.template.querySelectorAll('.toggleInternacional, .botonActualizar').forEach(item => item.disabled = oportunidadCerrada);
+				if (subetapaFinal.dataset.etapaValue !== (oportunidadCerrada ? getFieldValue(data, OPP_STAGENAME) : 'Cerrada')) {
+					subetapaFinal.classList.add('slds-hide');
+				} else {
+					subetapaFinal.classList.remove('slds-hide');
+				}
+			});
+			this.template.querySelectorAll('.toggleInternacional, .botonActualizar').forEach(item => item.disabled = oportunidadCerrada);
+
+			//Scroll automático a la subetapa seleccionada
+			getRecordInicial && window.setTimeout(() => {
+				const stepSubetapaSeleccionada = this.template.querySelector(`lightning-progress-step[data-value="${this.subetapaSeleccionada}"]`);
+				stepSubetapaSeleccionada && stepSubetapaSeleccionada.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+			}, 300);
 
 		} else if (error) {
-			console.error(error);
-			this.mostrarToast('error', 'Problema obteniendo los datos de la oportunidad', mensajeErrorGetRecord(error));
+			errorApex(this, error, 'Problema obteniendo los datos de la oportunidad');
 		}
 	}
 
@@ -100,8 +100,7 @@ export default class csbd_Hipoteca_Path extends LightningElement {
 
 		if (!this.subetapaSeleccionadaOnLastClick) {
 			this.mostrarToast('info', 'Es necesario seleccionar una subetapa', '');
-		}
-		else {
+		} else {
 			botonActualizar.disabled = true;
 			const fields = {};
 			fields[OPP_ID.fieldApiName] = this.recordId;
@@ -111,10 +110,8 @@ export default class csbd_Hipoteca_Path extends LightningElement {
 			const recordInput = {fields};
 			updateRecord(recordInput)
 			.then(() => this.mostrarToast('success', 'Se actualizó Oportunidad', 'Se actualizó correctamente la etapa de la oportunidad ' + getFieldValue(this.oportunidad, OPP_IDENTIFICADOR)))
-			.catch(error => {
-				console.error(error);
-				this.mostrarToast('error', 'Error actualizando la oportunidad', mensajeErrorGetRecord(error));
-			}).finally(() => botonActualizar.disabled = false);
+			.catch(error => errorApex(this, error, 'Problema actualizando la oportunidad'))
+			.finally(() => botonActualizar.disabled = false);
 		}
 	}
 

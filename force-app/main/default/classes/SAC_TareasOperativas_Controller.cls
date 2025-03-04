@@ -71,7 +71,8 @@ public without sharing class SAC_TareasOperativas_Controller {
                             SAC_EstadoGestoria__c, SAC_ImpResueltoGestoria__c, SAC_EstadoRegistro__c, SAC_ImpResueltoRegistros__c, SAC_EstadoTasacion__c, 
                             SAC_ImpResueltoTasacion__c, SAC_NumeroContrato__c, SAC_NCuentaAbono__c, SAC_Comentarios__c, SAC_ImporteResuelto__c, SAC_ImporteAbonar__c,
                             SAC_MaestroAccionesReclamacion__r.SAC_tipo_formulario__c, SAC_ImpResueltoInteresesLegales__c, SAC_MaestroAccionesReclamacion__r.Name,
-                            SAC_Oficina__r.CC_Email__c, SAC_IndexedThreadId__c, SAC_Antecedentes_Revisados__c, SAC_Reclamacion__r.SEG_Grupo__c, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Grupo__c
+                            SAC_Oficina__r.CC_Email__c, SAC_IndexedThreadId__c, SAC_Antecedentes_Revisados__c, SAC_Reclamacion__r.SEG_Grupo__c, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Grupo__c,
+                            SAC_Reclamacion__r.SAC_SentidoResolucion__c
                     FROM SAC_Accion__c 
                     WHERE id = :tareaId LIMIT 1]; 
         return tarea; 
@@ -100,7 +101,8 @@ public without sharing class SAC_TareasOperativas_Controller {
                     tarea.OwnerId = ownerId;
                     tarea.SAC_Estado__c = 'SAC_EnGestion';
                     refrescar = true;
-                    Database.update(tarea);
+                    SAC_DatabaseDML.updateDML(tarea, false); 
+                    //Database.update(tarea);
                 }
             }
         }
@@ -127,7 +129,8 @@ public without sharing class SAC_TareasOperativas_Controller {
             tarea.SAC_Estado__c = 'SAC_EnGestion';
         }
         
-        Database.update(tarea);
+        SAC_DatabaseDML.updateDML(tarea, false); 
+        //Database.update(tarea);
      
     }
      
@@ -145,19 +148,21 @@ public without sharing class SAC_TareasOperativas_Controller {
         SAC_Accion__c tarea = recuperarTarea(tareaId);
 		List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PendienteAsignar' LIMIT 1];
         
-        if(cola.size() == 1){ 
+        if(!cola.isEmpty()){ 
             tarea.OwnerId = cola[0].id;
             tarea.SAC_Estado__c='SAC_PendienteAsignar';
         }
 		if(Schema.sObjectType.Case.isUpdateable()){   
-			Database.update(tarea);
+            SAC_DatabaseDML.updateDML(tarea, false);    
+			//Database.update(tarea);
             List<SAC_Accion__Share> accionesShare = new List<SAC_Accion__Share>();
                     accionesShare.add(new SAC_Accion__Share(
                             ParentId = tarea.Id,
                             UserOrGroupId = userInfo.getUserId(),
                             AccessLevel = 'Edit'
                         ));
-            Database.insert(accionesShare);
+            SAC_DatabaseDML.insertListDML(accionesShare, true); 
+            //Database.insert(accionesShare);
 
 		}else{
 			throw new AuraHandledException('No tienes permisos');
@@ -194,8 +199,19 @@ public without sharing class SAC_TareasOperativas_Controller {
         }
         
         try {
-            Database.update(tarea);
-            
+            SAC_DatabaseDML.updateDML(tarea, false); 
+            // Database.update(tarea);
+
+            List<Profile> profiles = [SELECT Name FROM Profile WHERE Id =: UserInfo.getProfileId() LIMIT 1];
+            if (!profiles.isEmpty() && profiles[0].Name.equals('AV_Usuario_CaixaBank')) {
+                List<SAC_Accion__Share> accionesShare = new List<SAC_Accion__Share>();
+                accionesShare.add(new SAC_Accion__Share(
+                        ParentId = tarea.Id,
+                        UserOrGroupId = userInfo.getUserId(),
+                        AccessLevel = 'Read'
+                    ));
+                SAC_DatabaseDML.insertListDML(accionesShare, true); 
+            }
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }        
@@ -334,11 +350,17 @@ public without sharing class SAC_TareasOperativas_Controller {
      * -------
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US204745        Marcela Neira   15/07/21      Creación
+     * 1.1             US1100360       Raúl Santos     20/01/2025    Modificación: Cuando una tarea va a pasar a estado Finalizado o Finalizado incompleta y esta tiene informado el campo SAC_ImporteAbonar__c,
+     *                                                                             debemos validar que la reclamacion no tiene sentido de resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento"
     *****************************************************************/
     @AuraEnabled
     public static void finalizarTarea(Id tareaId, Id idUser, String observaciones){
         SAC_Accion__c tarea = recuperarTarea(tareaId);
         List<SAC_TMECaso__c> tmesTarea = [SELECT ID, SAC_Accion__c FROM SAC_TMECaso__c WHERE SAC_Accion__c =: tareaId];
+
+        if(tarea.SAC_ImporteAbonar__c != null && tarea.SAC_ImporteAbonar__c != 0 && (tarea.SAC_Reclamacion__r.SAC_SentidoResolucion__c == 'SAC_001' || tarea.SAC_Reclamacion__r.SAC_SentidoResolucion__c == 'SAC_004' || tarea.SAC_Reclamacion__r.SAC_SentidoResolucion__c == 'SAC_005')){
+            throw new AuraHandledException('Revise el sentido de la resolución de la reclamación. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" e informar un importe abonado.');
+        }
 
         if(tarea.SAC_Estado__c == 'SAC_PendienteEnviar' || tarea.SAC_Estado__c == 'SAC_PendienteAsignar' || tarea.SAC_Estado__c == 'SAC_Devuelta'){
             tomarPropiedadTarea(tareaId, idUser);
@@ -357,12 +379,17 @@ public without sharing class SAC_TareasOperativas_Controller {
      * -------
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US204745        Luis Mesa      13/04/22      Creación
+     * 1.1             US1100360       Raúl Santos    20/01/2025    Modificación: Cuando una tarea va a pasar a estado Finalizado o Finalizado incompleta y esta tiene informado el campo SAC_ImporteAbonar__c,
+     *                                                                            debemos validar que la reclamacion no tiene sentido de resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento"
     *****************************************************************/
     @AuraEnabled
     public static void finalizarTareaObservacion(Id tareaId, Id idUser, String observaciones, String estado){
 
         SAC_Accion__c tarea = recuperarTarea(tareaId);
-        //List<SAC_TMECaso__c> tmesTarea = [SELECT ID, SAC_Accion__c FROM SAC_TMECaso__c WHERE SAC_Accion__c =: tareaId];
+        
+        if(tarea.SAC_ImporteAbonar__c != null && tarea.SAC_ImporteAbonar__c != 0 && estado != 'SAC_Descartada' && (tarea.SAC_Reclamacion__r.SAC_SentidoResolucion__c == 'SAC_001' || tarea.SAC_Reclamacion__r.SAC_SentidoResolucion__c == 'SAC_004' || tarea.SAC_Reclamacion__r.SAC_SentidoResolucion__c == 'SAC_005')){
+            throw new AuraHandledException('Revise el sentido de la resolución de la reclamación. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" e informar un importe abonado.');
+        }
 
         if(tarea.SAC_Estado__c == 'SAC_PendienteEnviar' || tarea.SAC_Estado__c == 'SAC_PendienteAsignar' || tarea.SAC_Estado__c == 'SAC_Devuelta'){
             tomarPropiedadTarea(tareaId, idUser);
@@ -533,7 +560,8 @@ public without sharing class SAC_TareasOperativas_Controller {
             tarea.OwnerId = pendiente.Id;
         }
         
-        Database.update(tarea);
+        SAC_DatabaseDML.updateDML(tarea, false); 
+        //Database.update(tarea);
 
         // Recuperar las tareas 'GENERAL PARA OFICINAS' para preparar el envio de correo electronico a la oficina
         if(tarea.SAC_MaestroAccionesReclamacion__r.Name == 'GENERAL PARA OFICINAS'){
@@ -611,7 +639,8 @@ public without sharing class SAC_TareasOperativas_Controller {
             }
         }  
         
-        Database.update(listAcciones);
+        SAC_DatabaseDML.updateListDML(listAcciones, true); 
+        //Database.update(listAcciones);
     }
 
     /**************************************************************************
@@ -852,7 +881,8 @@ public without sharing class SAC_TareasOperativas_Controller {
     
         tarea.SAC_Comentarios2__c = (tarea.SAC_Comentarios2__c != null) ? tarea.SAC_Comentarios2__c + observaciones: observaciones;
         tarea.SAC_Estado__c = 'SAC_Finalizada';
-        Database.update(tarea);
+        SAC_DatabaseDML.updateDML(tarea, false); 
+        //Database.update(tarea);
         
         
     }
@@ -869,18 +899,19 @@ public without sharing class SAC_TareasOperativas_Controller {
     @future
     public static void finalizarTareaFutureObservacion(Id tareaid, Id idUser, String observaciones, String estado){
         SAC_Accion__c tarea = recuperarTarea(tareaId);      
-        
+
         //Si el estado es descartada, se rellena un campo de observaciones distinto
         if (estado == 'SAC_Descartada') {
             tarea.SAC_MotivoDescarte__c = observaciones.replaceAll('<[/a-zAZ0-9]*>','');
             tarea.SAC_MotivoDescarte__c = tarea.SAC_MotivoDescarte__c.left(255);
             tarea.SAC_Estado__c = estado;
-        } else { //De lo contrario se procede normalmente
+        } else { //De lo contrario se procede normalmente            
             tarea.SAC_Comentarios2__c =  observaciones;
             tarea.SAC_Estado__c = estado;
         }
         
-        Database.update(tarea);
+        SAC_DatabaseDML.updateDML(tarea, false); 
+        //Database.update(tarea);
         
     }
 
@@ -955,7 +986,8 @@ public without sharing class SAC_TareasOperativas_Controller {
             feeds.add(feedPretension);
         }
 
-        Database.insert(feeds);
+        SAC_DatabaseDML.insertListDML(feeds, true); 
+        //Database.insert(feeds);
     }  
     
     /*****************************************************************
@@ -972,7 +1004,8 @@ public without sharing class SAC_TareasOperativas_Controller {
         feedTarea.ParentId = tareaId;
         feedtarea.Body = titulo + ' : ' + mensaje;
 
-        Database.insert(feedTarea);
+        SAC_DatabaseDML.insertDML(feedTarea, false); 
+        //Database.insert(feedTarea);
     }
     
     /*****************************************************************
@@ -995,7 +1028,8 @@ public without sharing class SAC_TareasOperativas_Controller {
 
         SAC_Accion__C tarea = new SAC_Accion__C(Id = tareaId, SAC_Estado__c = 'SAC_PendienteAsignar');
         try {
-            Database.update(tarea);
+            SAC_DatabaseDML.updateDML(tarea, false); 
+            //Database.update(tarea);
         } catch (Exception e) { 
             String errorMsg = e.getMessage();
             String pureErrorMsg = errorMsg.substringAfter('_EXCEPTION,');
@@ -1011,7 +1045,8 @@ public without sharing class SAC_TareasOperativas_Controller {
     @AuraEnabled
     public static void finalizarTareaGGH(Id tareaId){
         SAC_Accion__C tarea = new SAC_Accion__C(Id = tareaId, SAC_Estado__c = 'SAC_Finalizada');
-        Database.update(tarea);               
+        SAC_DatabaseDML.updateDML(tarea, true); 
+        //Database.update(tarea);               
     }
 
     /*****************************************************************

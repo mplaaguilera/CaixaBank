@@ -17,8 +17,8 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos {
     * 1.0            US1013702     Sergio Martín    11/09/24        Creación
     *****************************************************************************/
     @AuraEnabled
-    public static void enviarDocOrganismos(String caseId, Boolean enviarReclamante, Boolean enviarOrganismos, String organismo, string estado, string subestado) {
-        List<ContentVersion> listaAdjuntos = obtieneAdjuntosEnvio(caseId);
+    public static void enviarDocOrganismos(String caseId, Boolean enviarReclamante, Boolean enviarOrganismos, String organismo, string estado, string subestado, List<string> listaSeleccionados) {
+        List<ContentVersion> listaAdjuntos = obtieneAdjuntosEnvio(caseId, listaSeleccionados);
         if(enviarReclamante) {
             generarTareaReclamante(caseId, listaAdjuntos);
         }
@@ -82,14 +82,27 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos {
             }
     
             List<ContentDocumentLink> listaAdjuntosTarea = new List<ContentDocumentLink>();
+            List<SAC_DocumentoEnvio__c> listaDocs = new List<SAC_DocumentoEnvio__c>();
             for(ContentVersion cv : listaAdjuntos) {
+
                 ContentDocumentLink cdl = new ContentDocumentLink();
+                SAC_DocumentoEnvio__c docEnvio = new SAC_DocumentoEnvio__c();
+
                 cdl.ContentDocumentId = cv.ContentDocumentId;
                 cdl.LinkedEntityId = tarea.Id;
                 cdl.ShareType = 'I';
                 listaAdjuntosTarea.add(cdl);
+
+                // Se crea un registro en SAC_DocumentoEnvio__c para controlar los elementos que hemos enviado en el caso
+                docEnvio.SAC_Documento__c = 'Reclamante';
+                docEnvio.SAC_TipoDocumento__c = cv.SAC_TipoAdjunto__r.Name;
+                docEnvio.Name = cv.Title;
+                docEnvio.SAC_Caso__c = caseId;
+                listaDocs.add(docEnvio);
             }
             SPV_DatabaseDML.insertListDML(listaAdjuntosTarea, true);
+            SPV_DatabaseDML.insertListDML(listaDocs, true);
+
         }
     }
 
@@ -133,14 +146,27 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos {
                 CBK_log.error(e);
             }
             List<ContentDocumentLink> listaAdjuntosTarea = new List<ContentDocumentLink>();
+            List<SAC_DocumentoEnvio__c> listaDocs = new List<SAC_DocumentoEnvio__c>();
+            String organismoLabel = organismo.replace('SPV_', '');
+
             for(ContentVersion cv : listaAdjuntos) {
+
                 ContentDocumentLink cdl = new ContentDocumentLink();
+                SAC_DocumentoEnvio__c docEnvio = new SAC_DocumentoEnvio__c();
+
                 cdl.ContentDocumentId = cv.ContentDocumentId;
                 cdl.LinkedEntityId = tarea.Id;
                 cdl.ShareType = 'I';
                 listaAdjuntosTarea.add(cdl);
+
+                docEnvio.SAC_Documento__c = organismoLabel;
+                docEnvio.SAC_TipoDocumento__c = cv.SAC_TipoAdjunto__r.Name;
+                docEnvio.Name = cv.Title;
+                docEnvio.SAC_Caso__c = caseId;
+                listaDocs.add(docEnvio);
             }
             SPV_DatabaseDML.insertListDML(listaAdjuntosTarea, true);
+            SPV_DatabaseDML.insertListDML(listaDocs, true);
         }
     }
 
@@ -153,9 +179,14 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            US1013702     Sergio Martín    11/09/24        Creación
     *****************************************************************************/
-    public static ContentVersion[] obtieneAdjuntosEnvio(String caseId){
+    public static ContentVersion[] obtieneAdjuntosEnvio(String caseId, List<string> listaSeleccionados){
         ContentVersion[] resultado =  new List<ContentVersion>();
         List<Id> idsDocumentLink = new List<Id>();
+        List<Id> idsSeleccionados = new List<Id>();
+
+        for(String idDoc: listaSeleccionados){
+            idsSeleccionados.add(idDoc);
+        }
         
         List<ContentDocumentLink> cdL = [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.Title FROM ContentDocumentLink WHERE LinkedEntityId =: caseId];  
 
@@ -163,14 +194,57 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos {
             idsDocumentLink.add(recordCdL.ContentDocumentId);
         }
 
-        List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_TipoAdjunto__r.SAC_DeveloperName__c FROM ContentVersion WHERE ContentDocumentId IN: idsDocumentLink ORDER BY CreatedDate ASC];
-
+        List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_TipoAdjunto__r.SAC_DeveloperName__c FROM ContentVersion WHERE ContentDocumentId IN: idsDocumentLink AND Id IN: idsSeleccionados ORDER BY CreatedDate ASC];
         for(ContentVersion record : cv){
-            if((record.SAC_TipoAdjunto__r.SAC_DeveloperName__c == 'SPV_Alegaciones' || record.SAC_TipoAdjunto__r.SAC_DeveloperName__c == 'SPV_Allanamiento') && record.SAC_Bloque__c == 'SAC_Respuesta' && record.SAC_ValidadoCV__c == true) {
+            if(record.SAC_Bloque__c.contains('SAC_Respuesta') && record.SAC_ValidadoCV__c == true) {
                 resultado.add(record);
             }
         }
 
         return resultado;
     }
+
+    
+    /*****************************************************************************
+    * Proposito: Obtiene los adjuntos validados 
+    * 
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0                             Carlos Gómez     25/10/25        Creación
+    *****************************************************************************/
+
+    @AuraEnabled(cacheable=true)
+    public static List<ContentVersion> getDocumentosValidados(String caseId){
+        Map<Id, Boolean> contentOculto = new Map<Id, Boolean>();
+        List<Id> idsDocumentLink = new List<Id>();
+
+        try {
+        List<ContentDocumentLink> cdL = [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.Title FROM ContentDocumentLink WHERE LinkedEntityId =: caseId AND ContentDocument.FileType != 'SNOTE'];  
+        
+
+            for(ContentDocumentLink recordCdL : cdL){
+
+                idsDocumentLink.add(recordCdL.ContentDocumentId);
 }
+            List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, SAC_Oculto__c, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_Numero_Prestamo__c FROM ContentVersion WHERE SAC_ValidadoCV__c = true AND ContentDocumentId IN: idsDocumentLink ORDER BY CreatedDate ASC];
+
+            for(ContentVersion recordCv : cv){
+                contentOculto.put(recordCv.id, recordCv.SAC_Oculto__c);
+            }
+
+            ContentVersion[] resultado =  new List<ContentVersion>();
+            for(ContentDocumentLink record : cdL){
+
+                if(contentOculto.get(record.id) != null){
+
+                    resultado.add(new ContentVersion (ContentDocumentId=record.ContentDocumentId, Title=record.ContentDocument.Title, SAC_Oculto__c=contentOculto.get(record.id)));
+
+                }else{resultado.add(new ContentVersion (ContentDocumentId=record.ContentDocumentId, Title=record.ContentDocument.Title, SAC_Oculto__c=false));}
+            }
+
+            return cv;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }        
+    }}

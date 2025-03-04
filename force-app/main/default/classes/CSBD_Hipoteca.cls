@@ -6,7 +6,6 @@ public with sharing class CSBD_Hipoteca {
                                             FROM Opportunity WHERE Id IN :idOportunidades AND CSBD_Canal__c != 'Plataformas Hipotecarias Digitales'];
 
         for (Opportunity hipoteca : descartarNoHipotecas(oportunidades)) {
-
             //Para cada solicitud de hipotca
             if (hipoteca.CSBD_Now_Num_Oficina__c != 4223 && hipoteca.CSBD_Empresa_Proveedora__c != 'imaginBank') {
                 //La oficina NO es la 4223 (CSBD) y la empresa proveedora no es imaginBank,
@@ -30,7 +29,7 @@ public with sharing class CSBD_Hipoteca {
                 //Envío de correo solicitando documentación al cliente
                 try {
                     String operativa = '';
-                    if(hipoteca.CSBD_Empresa_Proveedora__c == 'imaginBank'){
+                    if (hipoteca.CSBD_Empresa_Proveedora__c == 'imaginBank') {
                         operativa = 'Solicitud de doc hipoteca - Imagin';
                     } else {
                         operativa = 'Solicitud de documentación hipoteca';
@@ -39,10 +38,7 @@ public with sharing class CSBD_Hipoteca {
                         hipoteca.Id,
                         hipoteca.CSBD_Empresa_Proveedora__c == 'imaginBank' ? 'CSBD - ImaginBank' : 'CSBD - CaixaBank',
                         CSBD_EmailMessage.plantillaOperativaId(operativa, hipoteca.CSBD_Idioma_Solicitud__c),
-                        new Map<String, List<String>>{
-                            'Para' => new List<String>{hipoteca.CSBD_Email_Solicitud__c},
-                            'CC' => new List<String>()
-                        }
+                        new Map<String, List<String>>{'Para' => new List<String>{hipoteca.CSBD_Email_Solicitud__c}, 'CC' => new List<String>()}
                     );
                 } catch (Exception e) {
                     CSBD_Activity.crearActividad(hipoteca.Id, 'Error enviando solicitud de documentación', 'Completed', 'Error enviando solicitud de documentación', e.getMessage());
@@ -70,10 +66,9 @@ public with sharing class CSBD_Hipoteca {
         correo.setTemplateId(plantillaId);
         List<Opportunity> contactoOportunidad = [SELECT CSBD_Contact__c FROM Opportunity WHERE Id =: whatId LIMIT 1];
         Id contactId;
-        if(!contactoOportunidad.isEmpty() && contactoOportunidad[0].CSBD_Contact__c != null) {
+        if (!contactoOportunidad.isEmpty() && contactoOportunidad[0].CSBD_Contact__c != null) {
             contactId = contactoOportunidad[0].CSBD_Contact__c;
-        }
-        else {
+        }  else {
             contactId = [SELECT Id FROM Contact WHERE Email != NULL LIMIT 1].Id;
         }
         correo.setTargetObjectId(contactId);
@@ -152,7 +147,7 @@ public with sharing class CSBD_Hipoteca {
 
                 if (oportunidad.CSBD_Datos_Calculo_DTI__c != null) {
                     CSBD_DatosEntrevistaHipoteca datosEntrevista = new CSBD_DatosEntrevistaHipoteca(oportunidad);
-                    
+
                     Decimal total = 0;
                     if(datosEntrevista.primerTitular != null ){
                         total += datosEntrevista.primerTitular?.totalIngresosNomina + ((datosEntrevista.primerTitular.IngresosNetosIrpf?.neto ?? 0) / 12);

@@ -19,11 +19,61 @@ public class SEG_Case_Operativas_Controller_2_Test {
         Id autoSegId = Schema.SObjectType.CC_Grupo_Colaborador__C.getRecordTypeInfosByDeveloperName().get('SEG_GrupoAutomaticoSegmentos').getRecordTypeId();
         Id recordAsig = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Asignacion').getRecordTypeId();
         Id recordTexto = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
+
+
+        Id recordTypeIdTematica = tematicaId;
+        CC_MCC__c mccTematicaSEGTOS = new CC_MCC__c();
+		mccTematicaSEGTOS.Name = 'Segmentos';
+        mccTematicaSEGTOS.CC_Tipo_Cliente__c = 'Segmentos';
+        mccTematicaSEGTOS.CC_Fecha_Vigencia_Inicio__c = date.today();
+        mccTematicaSEGTOS.RecordTypeId = recordTypeIdTematica;
+        mccTematicaSEGTOS.CC_Codigo_Externo__c = 'TE-100008';
+        insert mccTematicaSEGTOS;
+
+        Id recordTypeIdProducto = productoId;
+        CC_MCC__c mccProductoSEGTOS = new CC_MCC__c();
+        mccProductoSEGTOS.Name = 'No procede';
+        mccProductoSEGTOS.CC_Tipo_Cliente__c = 'Segmentos';
+        mccProductoSEGTOS.CC_Fecha_Vigencia_Inicio__c = date.today();
+        mccProductoSEGTOS.RecordTypeId = recordTypeIdProducto;
+        mccProductoSEGTOS.CC_Tematica__c = mccTematicaSEGTOS.Id;
+        mccProductoSEGTOS.CC_Codigo_Externo__c = 'PR-100008'; 
         
-        SEG_ClasificacionRapida__c classR = new SEG_ClasificacionRapida__c(
-            Name = 'No procede'
-        );
-        insert classR;
+        insert mccProductoSEGTOS; 
+        
+        Id recordTypeIdMotivo = motivoId;
+       	CC_MCC__c mccMotivoSEGTOS = new CC_MCC__c();
+        mccMotivoSEGTOS.Name = 'No procede';
+        mccMotivoSEGTOS.CC_Tipo_Cliente__c = 'Segmentos';
+        mccMotivoSEGTOS.CC_Fecha_Vigencia_Inicio__c = date.today();
+        mccMotivoSEGTOS.RecordTypeId = recordTypeIdMotivo;
+        mccMotivoSEGTOS.CC_Tematica__c = mccTematicaSEGTOS.Id;
+        mccMotivoSEGTOS.CC_Producto_Servicio__c = mccProductoSEGTOS.Id;
+        mccMotivoSEGTOS.CC_Codigo_Externo__c = 'MO-100008';
+        insert mccMotivoSEGTOS;
+
+        Id recordTypeIdDetalle = idDetalle;
+       	CC_MCC__c mccDetalleSEGTOS = new CC_MCC__c();
+        mccDetalleSEGTOS.Name = 'No procede';
+        mccDetalleSEGTOS.CC_Tipo_Cliente__c = 'Segmentos';
+        mccDetalleSEGTOS.CC_Fecha_Vigencia_Inicio__c = date.today();
+        mccDetalleSEGTOS.RecordTypeId = recordTypeIdDetalle;
+        mccDetalleSEGTOS.CC_Tematica__c = mccTematicaSEGTOS.Id;
+        mccDetalleSEGTOS.CC_Producto_Servicio__c = mccProductoSEGTOS.Id;
+        mccDetalleSEGTOS.CC_Motivo__c = mccMotivoSEGTOS.Id;
+        mccDetalleSEGTOS.CC_Codigo_Externo__c = 'DE-100008';
+        insert mccDetalleSEGTOS;
+
+        SEG_ClasificacionRapida__c regla3 = new SEG_ClasificacionRapida__c();
+        regla3.Name = 'No procede';
+        regla3.SEG_Tematica__c = mccTematicaSEGTOS.Id;
+        regla3.SEG_Producto__c = mccProductoSEGTOS.Id;
+        regla3.SEG_Motivo__c = mccMotivoSEGTOS.Id;
+        regla3.SEG_Detalle__c = mccDetalleSEGTOS.Id;
+        regla3.SEG_CRContratos__c  = false;
+        regla3.CBK_Negocio__c = 'Segmentos';
+        regla3.SEG_CRAuditoria__c = false;
+        insert regla3;
 
         List<CC_Grupo_Colaborador__c> grupos = new List<CC_Grupo_Colaborador__c>();
         CC_Grupo_Colaborador__c grupoCol1 = new CC_Grupo_Colaborador__c(
@@ -287,15 +337,15 @@ public class SEG_Case_Operativas_Controller_2_Test {
         recl2.SEG_PlazoLlamada__c = 1;
         insert recl2;
 
-        SEG_ClasificacionRapida__c regla3 = new SEG_ClasificacionRapida__c();
-        regla3.Name = 'CR3';
-        regla3.SEG_Tematica__c = mccTematicaSEG.Id;
-        regla3.SEG_Producto__c = mccProductoSEG.Id;
-        regla3.SEG_Motivo__c = mccMotivoSEG.Id;
-        regla3.SEG_Detalle__c = mccDetalleSEG.Id;
-        regla3.SEG_CRContratos__c  = false;
-        regla3.CBK_Negocio__c = 'Segmentos';
-        insert regla3;
+        SEG_ClasificacionRapida__c regla3TOS = new SEG_ClasificacionRapida__c();
+        regla3TOS.Name = 'CR3';
+        regla3TOS.SEG_Tematica__c = mccTematicaSEG.Id;
+        regla3TOS.SEG_Producto__c = mccProductoSEG.Id;
+        regla3TOS.SEG_Motivo__c = mccMotivoSEG.Id;
+        regla3TOS.SEG_Detalle__c = mccDetalleSEG.Id;
+        regla3TOS.SEG_CRContratos__c  = false;
+        regla3TOS.CBK_Negocio__c = 'Segmentos';
+        insert regla3TOS;
 
         // Creación cuentas a tratar.
         Account cuentaSEG1 = new Account();

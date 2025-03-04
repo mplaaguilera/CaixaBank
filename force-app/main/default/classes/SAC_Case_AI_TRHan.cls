@@ -39,6 +39,7 @@ public without sharing class SAC_Case_AI_TRHan extends CC_TriggerHandlerBase {
         List<Case> listaRecOrigenEmail = new List<Case>();
         List<Case> listaPretenConPadre = new List<Case>();
         List<Case> listaCasosReglaClasif = new List<Case>();
+        List<Case> listaPretensionesCreadasCerradas = new List<Case>();
         List<Id> listaIdsCuentas = new List<Id>();
         List<Id> listaIDsReclamacionGlobal = new List<Id>();
         Map<Id, Case> mapaDatosCasosActualizar = new Map<Id, Case>();
@@ -51,6 +52,9 @@ public without sharing class SAC_Case_AI_TRHan extends CC_TriggerHandlerBase {
                 if(caso.SAC_Reclamacion__c != null){
                     listaIDsReclamacionGlobal.add(caso.SAC_Reclamacion__c);
                     listaPretenConPadre.add(caso);
+                }
+                if(caso.Status == 'SAC_003') {
+                    listaPretensionesCreadasCerradas.add(caso);
                 }
             }
             else if(caso.RecordTypeId == recTypeReclamacion){
@@ -112,11 +116,22 @@ public without sharing class SAC_Case_AI_TRHan extends CC_TriggerHandlerBase {
         }
         if (!listaRecPretCons.isEmpty()) {
             SAC_AsignarTMEs.changeSLA(listaRecPretCons);
+            SAC_HandlerMethods.creacionCaseExtension(listaRecPretCons);
         }
         //Llamada queueable para poner thread id, cambiar estados del caso cuando traen una regla de clasificación, y enviar el acuse de recibo
         //Añadida la condición '!System.isQueueable()' para evitar el error al copiar reclamaciones con origen email
         if ((!listaRecOrigenEmail.isEmpty() || !listaCasosReglaClasif.isEmpty()) && !System.isQueueable()) {
-            System.enqueueJob(new SAC_QueueableCaseAI(listaRecOrigenEmail, listaCasosReglaClasif, mapaDatosCasosActualizar));
+            DateTime dt = DateTime.now();
+            Long dateInMilliseconds = dt.getTime();
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds)).build();
+            try {
+                System.enqueueJob(new SAC_QueueableCaseAI(listaRecOrigenEmail, listaCasosReglaClasif, mapaDatosCasosActualizar), options);    
+            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 }    
+        }
+
+        if (!listaPretensionesCreadasCerradas.isEmpty()) {
+            SAC_HandlerMethods.insertarCaseSharePretensionCerrada(listaPretensionesCreadasCerradas);
         }
 
         if(!mapaDatosCasosActualizar.isEmpty()){

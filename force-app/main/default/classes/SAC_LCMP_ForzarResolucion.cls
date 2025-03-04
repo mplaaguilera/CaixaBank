@@ -136,7 +136,8 @@ public without sharing class SAC_LCMP_ForzarResolucion {
         listaCasosUpdatear.add(caso);
 
         if (!Schema.sObjectType.Case.isUpdateable()) { throw new AuraHandledException( 'No tienes permisos para realziar esta accion.' ); }
-        Database.update(listaCasosUpdatear);  
+        SAC_DatabaseDML.updateListDML(listaCasosUpdatear, true);
+        //Database.update(listaCasosUpdatear);  
     }
 
     @AuraEnabled
@@ -147,7 +148,8 @@ public without sharing class SAC_LCMP_ForzarResolucion {
         }
 
         if (!Schema.sObjectType.SAC_Interaccion__c.isUpdateable()) { throw new AuraHandledException( 'No tienes permisos para realziar esta accion.' ); }
-        Database.update(listaEscalados);
+        SAC_DatabaseDML.updateListDML(listaEscalados, true);
+        //Database.update(listaEscalados);
     }
 
     @AuraEnabled
@@ -159,7 +161,8 @@ public without sharing class SAC_LCMP_ForzarResolucion {
         }
 
         if (!Schema.sObjectType.SAC_Interaccion__c.isUpdateable()) { throw new AuraHandledException( 'No tienes permisos para realziar esta accion.' ); }
-        Database.update(listaConsultas);
+        SAC_DatabaseDML.updateListDML(listaConsultas, true);
+        //Database.update(listaConsultas);
     }
 
     @AuraEnabled
@@ -171,6 +174,7 @@ public without sharing class SAC_LCMP_ForzarResolucion {
         }
 
         if (!Schema.sObjectType.SAC_Accion__c.isUpdateable()) { throw new AuraHandledException( 'No tienes permisos para realziar esta accion.' ); }
-        Database.update(listaTareas);
+        SAC_DatabaseDML.updateListDML(listaTareas, true);
+        //Database.update(listaTareas);
     }
 }

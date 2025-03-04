@@ -10,7 +10,7 @@
  * 1.0             --             Nicolás García   28/07/21     Creación
 *****************************************************************/
 @RestResource(urlMapping='/SAC_FormularioCasos/*')
-global with sharing class SAC_WS_FormularioCasos {
+global with sharing class SAC_WS_FormularioCasos extends CBK_HttpServiceIntegration_Abstract{
 
     private static Set<String> objetos = new Set<String>{'Account', 'Contact', 'Case'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
@@ -207,9 +207,15 @@ global with sharing class SAC_WS_FormularioCasos {
 
         return 'OK';
     }
-    /* *****************************
-	* ********GGH*******************
-	* *****************************/
+
+    /*****************************************************************
+     * Propósito: Creación de Formularios GGH
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            --              Iria ANPC     01/10/24        Creación
+    *****************************************************************/
     public static void createFormularioGGH(List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oDatosList, String caseId){
         Pattern nonNumericPattern = Pattern.compile('[^0-9]');
         String prodServRecordType = 'CC_Producto_Servicio';
@@ -319,9 +325,14 @@ global with sharing class SAC_WS_FormularioCasos {
             insert products;
         }
     }
-	/* *****************************
-	* ********FRAUDE****************
-	* *****************************/
+    /*****************************************************************
+     * Propósito: Creación de Formularios FRAUDE
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            --              Iria ANPC     01/10/24        Creación
+    *****************************************************************/
     public static void createFormularioFraude(List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oDatosList, String caseId){
         List<SPV_Formulario__c> formularios = new List<SPV_Formulario__c>();
         for(SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input oDatos: oDatosList){
@@ -428,9 +439,7 @@ global with sharing class SAC_WS_FormularioCasos {
 
                 //Lista adjuntos
                 List<ContentVersion> contents = new List<ContentVersion>();
-				/* *****************************
-				 * ********GGH Y FRAUDE*********
-				 * *****************************/
+				// Nuevos Formularios: GGH Y FRAUDE
                 if(oForm.aplicacion == 'FORMGGH' || oForm.aplicacion == 'FORMFRAUDE'){
                     if(oForm.repLegal == true && oForm.representanteLegal != null){
                         //Campo rep legal
@@ -762,9 +771,6 @@ global with sharing class SAC_WS_FormularioCasos {
                     if(colaSpliteada.size() == 2){
                         oCaso.SAC_GenialEstado__c = 'SAC_005';
                     }
-
-                    system.debug('id cola = ' + colas[0].QueueId);
-                    system.debug('oCaso.OwnerId = ' + oCaso.OwnerId);
                 }
                 
                 oCaso.RecordTypeId = RECTYPERECLAMACION;
@@ -924,9 +930,59 @@ global with sharing class SAC_WS_FormularioCasos {
         List<Account> oContAuxNoAFL = new List<Account>();
 
         Boolean bConfidencial = false;
-
-        List<Account> oAccounts = [SELECT Id, CC_Numero_Documento__c, CC_NumPerso__c FROM Account WHERE RecordTypeId IN (:RECTYPECLIENTEPA, :RECTYPENOCLIENTEPA, :RECTYPECLIENTE, :RECTYPENOCLIENTE, :RECTYPECENTRO) AND CC_Numero_Documento__c IN :oContactos.keySet() ORDER BY CreatedDate ASC];
-
+		
+        //List<Account> oAccounts = [SELECT Id, CC_Numero_Documento__c, CC_NumPerso__c FROM Account WHERE RecordTypeId IN (:RECTYPECLIENTEPA, :RECTYPENOCLIENTEPA, :RECTYPECLIENTE, :RECTYPENOCLIENTE, :RECTYPECENTRO) AND CC_Numero_Documento__c IN :oContactos.keySet() ORDER BY CreatedDate ASC];
+		
+        Boolean esConfidencial = false;
+        List<Account> oAccounts = new List<Account>();
+        Map<String, Account> oAccountsMap = new Map<String, Account>();
+        List<Account> confidencialAccounts = new List<Account>();
+        List<Account> blankAccountsToInsert = new List<Account>();
+        List<Contact> blankContactToInsert = new List<Contact>();
+        // Obtener todas las accounts (incluyendo AV_Confidencial__c = true)
+        List<Account> allAccounts = SAC_MetodosSinSharing.listaDeClientesPorDoc(oContactos.keySet());
+        for(Account acc: allAccounts){
+            if(acc.AV_Confidencial__c){
+                // La cuenta es confidencial
+                confidencialAccounts.add(acc);
+                esConfidencial = true;
+            }else{
+                // La cuenta no es confidencial
+                // Si ambas listas están informadas significa que existe la cuenta AV_Confidencial__c = true y la cuenta Name = 'CONFIDENCIAL'
+                oAccounts.add(acc);
+                oAccountsMap.put(acc.CC_Numero_Documento__c, acc);
+            }
+        }
+        for(Account acc :confidencialAccounts){
+            // Si es AV_Confidencial__c pero no existe en el mapa, significa que Name = 'CONFIDENCIAL' todavía no está creada
+            if(!oAccountsMap.containsKey(acc.CC_Numero_Documento__c)){
+                Account confAccount = new Account();
+                confAccount.recordTypeId = RECTYPECLIENTE;
+                confAccount.Name = 'CONFIDENCIAL';
+                confAccount.CC_NumPerso__c = acc.AV_NumPerso__c;
+                confAccount.CC_Confidencial__c = true; // Identificar que es cuenta artificial
+                confAccount.CC_Numero_Documento__c = acc.CC_Numero_Documento__c;
+                blankAccountsToInsert.add(confAccount);
+            }
+        }
+        // Insertar cuenta Name = 'CONFIDENCIAL'
+        if(!blankAccountsToInsert.isEmpty()){
+            insert blankAccountsToInsert;
+        }
+        // Crear contacto relacionado con cuenta Name = 'CONFIDENCIAL'
+        for(Account acc: blankAccountsToInsert){
+            oAccounts.add(acc);
+            Contact con = new Contact();
+            con.AccountId = acc.Id;
+            con.LastName = 'CONFIDENCIAL';
+            con.CC_Numero_Documento__c = acc.CC_Numero_Documento__c;
+            blankContactToInsert.add(con);
+        }
+        // Insertar contacto relacionado con cuenta Name = 'CONFIDENCIAL'
+        if(!blankContactToInsert.isEmpty()){
+            insert blankContactToInsert;
+        }
+        
         for(Account cliente : oAccounts){
             if(cliente.CC_NumPerso__c != '' || cliente.CC_NumPerso__c <> NULL){
                 oContAux.add(cliente);
@@ -952,7 +1008,6 @@ global with sharing class SAC_WS_FormularioCasos {
 
 
         if(!oContAuxNoAFL.isEmpty()){
-
             for (Account noAFL : oContAuxNoAFL)
             {
                 if (oCuentas.get(noAFL.CC_Numero_Documento__c) == null)
@@ -1010,7 +1065,7 @@ global with sharing class SAC_WS_FormularioCasos {
             }
             // Comprobar que hay que crear Cuenta y Contacto. Datos no encontrados.
             String sDoc = oForms.get(sClave).NIF;
-            if (oCuentas.get(sDoc) == null && oCuentasDup.get(sDoc) == null)
+            if ((oCuentas.get(sDoc) == null && oCuentasDup.get(sDoc) == null) || esConfidencial)
             {
                 // Crear cuenta + contacto.
                 bCrear = true;
@@ -1105,8 +1160,9 @@ global with sharing class SAC_WS_FormularioCasos {
                         if (oForms.get(sClave).EMAIL != null){
                             oNew.CC_Email__c = oForms.get(sClave).EMAIL.trim().unescapeHtml4();
                         }
-
-                        oNewAcc.add(oNew);
+                        if(!esConfidencial){
+                            oNewAcc.add(oNew);
+                        }
                     }
                 }
             }
@@ -1119,7 +1175,7 @@ global with sharing class SAC_WS_FormularioCasos {
             oCuentasDup
                 -> Cuentas encontradas por NIF y sin NumPer (existen duplicados). Nos quedamos con el último creado.
         */
-        if (!oNewAcc.isEmpty())
+            if (!oNewAcc.isEmpty())
         {
             Database.SaveResult[] oResIn = Database.insert(oNewAcc, false);
             for (Integer i = 0; i < oResIn.size(); i++)
@@ -1136,7 +1192,7 @@ global with sharing class SAC_WS_FormularioCasos {
             }
         }
         oNewAcc = null;
-
+		
         // Buscar los contactos de esas cuentas.
         Set<String> oSearch = new Set<String>();
         if (!oCuentasId.isEmpty()){
@@ -1145,13 +1201,11 @@ global with sharing class SAC_WS_FormularioCasos {
         if (!oCuentasDupId.isEmpty()){
             oSearch.addAll(oCuentasDupId.keySet());
         }
-
         Map<String, List<Contact>> oAccContacts = new Map<String, List<Contact>>();
 
         if (!oSearch.isEmpty())
         {
             List<Contact> oContAcc = [SELECT Id, Name, CC_Numero_Documento__c, CC_NumPerso__c, AccountId FROM Contact WHERE AccountId IN :oSearch];
-
             for (Contact oCAux : oContAcc)
             {
                 if (oAccContacts.get(oCAux.AccountId) != null)
@@ -1168,7 +1222,6 @@ global with sharing class SAC_WS_FormularioCasos {
                 }
             }
         }
-
         oSearch = null;
         oCuentasId = null;
         oCuentasDupId = null;
@@ -1360,7 +1413,6 @@ global with sharing class SAC_WS_FormularioCasos {
             String sDoc = oForms.get(sClave).NIF;
             if (sDoc != null)
             {
-
                 if (oContactos.get(sDoc) != null)
                 {
                     // Actualizar el ContactId.
@@ -1394,12 +1446,25 @@ global with sharing class SAC_WS_FormularioCasos {
             }
         }
 
-
-        ID jobID = System.enqueueJob(new SAC_QueueableCrearCanalesComunicacion('EMAIL', oContMailAct, oMailCont, oDatosCont));
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds)).build();
+        ID jobID;
+        try {
+            jobID = System.enqueueJob(new SAC_QueueableCrearCanalesComunicacion('EMAIL', oContMailAct, oMailCont, oDatosCont), options);    
+        } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
         oMailCont =  null;
         oDatosCont = null;
 
-        ID jobID2 = System.enqueueJob(new SAC_QueueableCrearCanalesComunicacion('TELEFONO', oContMailAct, oTelCont, oDatosContTel));
+        DateTime dt2 = DateTime.now();
+        Long dateInMilliseconds2 = dt2.getTime();
+        AsyncOptions options2 = new AsyncOptions();
+        options2.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds2)).build();
+        ID jobID2;
+        try {
+            jobID2 = System.enqueueJob(new SAC_QueueableCrearCanalesComunicacion('TELEFONO', oContMailAct, oTelCont, oDatosContTel), options2);    
+        } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
         oTelCont = null;
         oDatosContTel = null;
 
@@ -1981,9 +2046,6 @@ global with sharing class SAC_WS_FormularioCasos {
                 //si la reclamacion esta en database correctamente enviar a IA
                 List<String> idReclamacionesIA = new List<String>();
                 for (Database.UpsertResult resultado : oResUp){
-                    system.debug('entra en el for de Database.UpsertResult');
-                    system.debug('resultado.isSuccess() = ' + resultado.isSuccess());
-                    system.debug('resultado.isCreated() = ' + resultado.isCreated());
                     if (resultado.isSuccess() && resultado.isCreated()){
                         idReclamacionesIA.add(resultado.getId());
                     }
@@ -1992,13 +2054,9 @@ global with sharing class SAC_WS_FormularioCasos {
                 String nombreCola = 'SAC_GenialPdteIA';
                 QueueSobject colaIA = [SELECT QueueId FROM QueueSobject WHERE queue.DeveloperName = : nombreCola AND SobjectType = 'Case' LIMIT 1];
                 for (Case recResult : reclamacionesIA){
-                    system.debug('entra en el for de case');
-                    system.debug('recResult.OwnerId = ' + recResult.OwnerId);
-                    system.debug('id cola = ' + colaIA.QueueId);
                     if (recResult.OwnerId == colaIA.QueueId || recResult.SAC_GenialEstado__c == 'SAC_005'){
                         //SAC_GenialSendAzure.sendToIA(recResult.Id, recResult.Description);
                         SAC_GenialUtils.balanceador(recResult.Id, 'SAC_Formulario', recResult.Description);
-                        System.debug('***');
                     }
                 }
             }
@@ -2033,7 +2091,6 @@ global with sharing class SAC_WS_FormularioCasos {
 
                 if (!oCasosIdent.isEmpty())
                 {
-                    System.debug('***');
                     // Identificación asíncrona y por lotes de los casos generados.
                     CC_IdentCliente_Future.identificarClientesAsync (oCasosIdent);
 
@@ -2044,10 +2101,9 @@ global with sharing class SAC_WS_FormularioCasos {
 
             // Actualizar trazas hijas.
             if (oTraza != null)
-            {	System.debug('***');
+            {	
                 if (!oTraza.isEmpty())
                 {
-                    System.debug('***');
                     Database.SaveResult[] oResUp = Database.insert(oTraza, false);
                 }
             }
@@ -2057,9 +2113,7 @@ global with sharing class SAC_WS_FormularioCasos {
 
             // Trazar error.
             bTrazaOk = false;
-            System.debug('***');
             sErrGen = 'Error en la ejecución del proceso SAC_WS_FormularioCasos. ' + e.getMessage();
-			System.debug('***');
             SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output oAux = new SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output();
             oAux.sCodError = '9999';
             oAux.sDetalleError = sErrGen;

@@ -1,31 +1,15 @@
-/**********************************************************************************************************************
-Name:     CSBD_OTPChat_Test
-Copyright © 2022  CaixaBank
-=======================================================================================================================
-Proposito: Clase test de la clase CSBD_OTPChat
-=======================================================================================================================
-Historial
----------------------
-VERSION     USER_STORY      AUTHOR              DATE                Description
-1.0         App CSBD        Esperanza Conde	    31/01/2022          Init version
-***********************************************************************************************************************/
 @isTest
-public with sharing class CSBD_OTPChat_Test {
-    
-    @testSetup static void setup() { 
+public class CSBD_OTPChat_Test {
+
+    @testSetup
+    private static void setup() {
         User usuarioGestor = CSBD_Usuarios.usuarioGestor();
 
-        Id rt = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Cliente Particular').getRecordTypeId();
-        Id rtListaValores = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByName().get('Lista de valores').getRecordTypeId();
-        Id rtValores = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByName().get('Valor').getRecordTypeId();
-        
-        Account cliente = new Account(
-            FirstName = 'OLGA',
-            LastName = 'ROBLES GEA',
-            RecordTypeId = rt,
-            CC_NumPerso__c = '16849239'
-        );
-        
+        Account cliente = new Account();
+        cliente.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Cliente Particular').getRecordTypeId();
+        cliente.FirstName = 'OLGA';
+        cliente.LastName = 'ROBLES GEA';
+        cliente.CC_NumPerso__c = '16849239';
         insert cliente;
 
         AccountShare acshare = new AccountShare();
@@ -35,15 +19,18 @@ public with sharing class CSBD_OTPChat_Test {
         acshare.OpportunityAccessLevel = 'Edit';
         acshare.CaseAccessLevel = 'Edit';
         insert acshare;
-        
+
         //Insertamos la lista de valores
+        Id rtListaValores = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         CC_Lista_Valores__c listValoresHorario = new CC_Lista_Valores__c();
-        listValoresHorario.Name = 'CSBD: Relación de valores Now - Salesforce: Turno';
-        listValoresHorario.CC_Activa__c = true;
         listValoresHorario.RecordTypeId = rtListaValores;
-        
-        insert listValoresHorario;
-        
+        listValoresHorario.Name = 'CSBD: Relación de valores Now - Salesforce: Turno';
+        CC_Lista_Valores__c listValoresProducto = new CC_Lista_Valores__c();
+        listValoresProducto.RecordTypeId = rtListaValores;
+        listValoresProducto.Name = 'CSBD: Relación de valores Now - Salesforce: Empresa, familia y producto';
+        insert new List<CC_Lista_Valores__c>{listValoresHorario, listValoresProducto};
+
+        Id rtValores = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
         CC_Lista_Valores__c valoresHorario = new CC_Lista_Valores__c();
         valoresHorario.Name = '08-10h';
         valoresHorario.RecordTypeId = rtValores;
@@ -51,17 +38,6 @@ public with sharing class CSBD_OTPChat_Test {
         valoresHorario.CC_Valor__c = 'Mañana';
         valoresHorario.CC_Valor2__c = '08:00 - 10:00';
         valoresHorario.CC_Valor2__c = '8';
-        
-        insert valoresHorario;
-        
-        //Insertamos la lista de valores
-        CC_Lista_Valores__c listValoresProducto = new CC_Lista_Valores__c();
-        listValoresProducto.Name = 'CSBD: Relación de valores Now - Salesforce: Empresa, familia y producto';
-        listValoresProducto.CC_Activa__c = true;
-        listValoresProducto.RecordTypeId = rtListaValores;
-        
-        insert listValoresProducto;
-        
         CC_Lista_Valores__c valoresProducto = new CC_Lista_Valores__c();
         valoresProducto.Name = 'Prestamo Online';
         valoresProducto.RecordTypeId = rtValores;
@@ -70,72 +46,58 @@ public with sharing class CSBD_OTPChat_Test {
         valoresProducto.CC_Valor2__c = 'Genérico';
         valoresProducto.CC_Valor2__c = 'CaixaBank';
         valoresProducto.CC_Activa__c = true;
-        
-        insert valoresProducto;
+        insert new List<CC_Lista_Valores__c>{valoresHorario, valoresProducto};
     }
-    
-    /** 
-	* Probamos el OK de la consulta
-	*/
-    @isTest static void testConsultaOTPOK(){
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
 
-        Account cliente = [Select Id, personContactId, CC_NumPerso__c from Account where  CC_NumPerso__c = '16849239' limit 1];
-        Contact contacto = [Select Id, CC_NumPerso__c from Contact where Id = :cliente.PersonContactId];
+    @isTest
+    private static void testConsultaOTPOK() {
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+            Account cliente = [SELECT PersonContactId, CC_NumPerso__c FROM Account WHERE CC_NumPerso__c = '16849239' LIMIT 1];
 
-        contacto.CC_NumPerso__c = '16849239';
-        update contacto;
+            Contact contacto = [SELECT CC_NumPerso__c FROM Contact WHERE Id = :cliente.PersonContactId];
+            contacto.CC_NumPerso__c = '16849239';
+            update contacto;
 
-        RestRequest req         = new RestRequest();
-        RestResponse res        = new RestResponse();
-        
-        req.requestURI          = '/services/apexrest/ConsultaOTP';
-        req.httpMethod          = 'POST';
-        
-        RestContext.request     = req;
-        RestContext.response    = res;
-        
-        String jsonConsulta = '{"consultaWrapper": {"NUMPERSO": "01011957","IDIOMA": "es","CANAL": "Web","EMAILCLIENTE": "ramame69@hotmail.com","TELEFONOCLIENTE": "prueba2.txt","NOMBRESOLICITANTE": "RAQUEL","APELLIDO1": "Martos","APELLIDO2": "Medina","NIFSOLICITANTE": "46636883J","NOMBREPRODUCTO": "Prestamo Online","HORARIOCONTACTO": "08-10h"}}';
-        req.requestBody = Blob.valueOf(jsonConsulta);
-        
-        System.runAs (CSBD_Usuarios.usuarioAdministrador()) {
-            Test.startTest();           
-            CSBD_OTPChat.getOPT();
-            Test.stopTest();
-    
-            CBK_OTP_Generado__c otpGenerado = [Select CBK_Codigo_OTP__c, CBK_Oportunidad__c from CBK_OTP_Generado__c];
-            
-            system.assert(otpGenerado != null, 'Comprobamos se crea el registro del OTP');
-            system.assert(otpGenerado.CBK_Codigo_OTP__c != null, 'Comprobamos se asocia un sessionId al registro OTP');
-            system.assert(otpGenerado.CBK_Oportunidad__c != null, 'Comprobamos se asocia una oportunidad al registro OTP');
-        }
-        
-    }
-    
-    /** 
-	* Probamos el KO de la integracion
-	*/
-    @isTest static void testConsultaOTP1KO(){
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+            String jsonConsulta = '{"consultaWrapper": {"NUMPERSO": "01011957","IDIOMA": "es","CANAL": "Web","EMAILCLIENTE": "ramame69@hotmail.com","TELEFONOCLIENTE": "prueba2.txt","NOMBRESOLICITANTE": "RAQUEL","APELLIDO1": "Martos","APELLIDO2": "Medina","NIFSOLICITANTE": "46636883J","NOMBREPRODUCTO": "Prestamo Online","HORARIOCONTACTO": "08-10h"}}';
+            RestRequest req = new RestRequest();
+            req.requestURI = '/services/apexrest/ConsultaOTP';
+            req.httpMethod = 'POST';
+            req.requestBody = Blob.valueOf(jsonConsulta);
+            RestContext.request = req;
 
-        RestRequest req         = new RestRequest();
-        RestResponse res        = new RestResponse();
-        
-        req.requestURI          = '/services/apexrest/ConsultaOTP';
-        req.httpMethod          = 'POST';
-        
-        RestContext.request     = req;
-        RestContext.response    = res;
-        String jsonConsulta = '{"consultaWrapper": {"NUMPERSO": "","IDIOMA": "es","CANAL": "Web","EMAILCLIENTE": "ramame69@hotmail.com","TELEFONOCLIENTE": "prueba2.txt","NOMBRESOLICITANTE": "RAQUEL","APELLIDO1": "Martos","APELLIDO2": "Medina","NIFSOLICITANTE": "46636883J","NOMBREPRODUCTO": "Prestamo Online","HORARIOCONTACTO": "08-10h"}}';
-        req.requestBody = Blob.valueOf(jsonConsulta);
+            RestResponse res = new RestResponse();
+            RestContext.response = res;
 
-        System.runAs (usuarioGestor) {
             Test.startTest();
             CSBD_OTPChat.getOPT();
             Test.stopTest();
-            
-            system.assert(res.statusCode == 400, 'Comprobamos el error de la integración');
-        }        
+
+            CBK_OTP_Generado__c otpGenerado = [SELECT CBK_Codigo_OTP__c, CBK_Oportunidad__c FROM CBK_OTP_Generado__c];
+
+            System.assert(otpGenerado != null, 'Comprobamos se crea el registro del OTP');
+            System.assert(otpGenerado.CBK_Codigo_OTP__c != null, 'Comprobamos se asocia un sessionId al registro OTP');
+            System.assert(otpGenerado.CBK_Oportunidad__c != null, 'Comprobamos se asocia una oportunidad al registro OTP');
+        }
     }
 
+    @isTest
+    private static void testConsultaOTP1KO() {
+        String jsonConsulta = '{"consultaWrapper": {"NUMPERSO": "","IDIOMA": "es","CANAL": "Web","EMAILCLIENTE": "ramame69@hotmail.com","TELEFONOCLIENTE": "prueba2.txt","NOMBRESOLICITANTE": "RAQUEL","APELLIDO1": "Martos","APELLIDO2": "Medina","NIFSOLICITANTE": "46636883J","NOMBREPRODUCTO": "Prestamo Online","HORARIOCONTACTO": "08-10h"}}';
+        RestRequest req = new RestRequest();
+        req.requestURI = '/services/apexrest/ConsultaOTP';
+        req.httpMethod = 'POST';
+        req.requestBody = Blob.valueOf(jsonConsulta);
+        RestContext.request = req;
+
+        RestResponse res = new RestResponse();
+        RestContext.response = res;
+
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+            Test.startTest();
+            CSBD_OTPChat.getOPT();
+            Test.stopTest();
+
+            System.assert(res.statusCode == 400, 'Comprobamos el error de la integración');
+        }
+    }
 }

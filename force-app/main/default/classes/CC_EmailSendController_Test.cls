@@ -1,6 +1,6 @@
 @isTest
 public class CC_EmailSendController_Test {
-        
+
     @TestSetup
     static void makeData() {
         Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
@@ -9,7 +9,7 @@ public class CC_EmailSendController_Test {
         PermissionSet psOperadorCliente = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_Cliente'];
         PermissionSet ps3 = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Tercer_Nivel_CBKNow'];
         List<User> userList = new List<User>();
-         List<PermissionSetAssignment> insertPSAss = new List<PermissionSetAssignment>();
+        List<PermissionSetAssignment> insertPSAss = new List<PermissionSetAssignment>();
         List<PermissionSetAssignment> insertPSAssAdmin = new List<PermissionSetAssignment>();
         User usuario1 = new User();
         usuario1.ProfileId = profileId;
@@ -59,7 +59,7 @@ public class CC_EmailSendController_Test {
         userList.add(usuario3);
 
         Id roleCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center'].Id;
-        User usuarioAdmin = new User();        
+        User usuarioAdmin = new User();
         usuarioAdmin.profileId = profileAdmin;
         usuarioAdmin.UserRoleId = roleCC;
         usuarioAdmin.FirstName = '';
@@ -73,7 +73,7 @@ public class CC_EmailSendController_Test {
         usuarioAdmin.EmailEncodingKey = 'UTF-8';
         usuarioAdmin.LanguageLocaleKey = 'es';
         usuarioAdmin.LocaleSidKey = 'es_ES';
-        userList.add(usuarioAdmin);		
+        userList.add(usuarioAdmin);
         insert userList;
 
         System.runAs(usuarioAdmin) {
@@ -88,12 +88,12 @@ public class CC_EmailSendController_Test {
             customSetting.Name = 'CC_HubGestion';
             customSetting.CC_Activa__c = true;
             listCustomSetting.add(customSetting);
-            
+
             CC_Settings__c  customSetting2 = new CC_Settings__c ();
             customSetting2.Name = 'CC_HubSales';
             customSetting2.CC_Activa__c = true;
             listCustomSetting.add(customSetting2);
-            
+
             CC_Settings__c  customSetting3 = new CC_Settings__c ();
             customSetting3.Name = 'CC_ToastTareaGestor';
             customSetting3.CC_Activa__c = true;
@@ -101,13 +101,13 @@ public class CC_EmailSendController_Test {
             customSetting3.CC_Configuracion_2__c = 'test';
             customSetting3.CC_Configuracion_3__c = 'test';
             listCustomSetting.add(customSetting3);
-            
+
             CC_Settings__c  customSetting4 = new CC_Settings__c ();
             customSetting4.Name = 'CC_OperativaTrasladarRemitir';
             customSetting4.CC_Activa__c = true;
             customSetting4.CC_Configuracion_1__c = 'true';
             listCustomSetting.add(customSetting4);
-            
+
             CC_Settings__c  customSetting5 = new CC_Settings__c ();
             customSetting5.Name = 'CC_VisibilidadCitaTareaGestor';
             customSetting5.CC_Activa__c = true;
@@ -131,12 +131,12 @@ public class CC_EmailSendController_Test {
             listCustomSetting.add(customSetting8);
 
             insert listCustomSetting;
-            
+
             Group groupTransfer = new Group(Name='Cons Form Buildingcenter', Type='Queue');
             insert groupTransfer;
             QueuesObject queueTransfer = new QueueSObject(QueueID = groupTransfer.id, SObjectType = 'Case');
             insert queueTransfer;
-            User operador = new User();        
+            User operador = new User();
             operador.profileId = profileId;
             operador.UserRoleId = roleCC;
             operador.FirstName = '';
@@ -149,11 +149,11 @@ public class CC_EmailSendController_Test {
             operador.TimeZoneSidKey = 'Europe/Paris';
             operador.EmailEncodingKey = 'UTF-8';
             operador.LanguageLocaleKey = 'es';
-            operador.LocaleSidKey = 'es_ES';        
+            operador.LocaleSidKey = 'es_ES';
             insert operador;
             PermissionSetAssignment psaAdmin1 = new PermissionSetAssignment(AssigneeId = operador.Id, PermissionSetId = psOperadorCliente.Id);
 			insertPSAssAdmin.add(psaAdmin1);
-            User operadorEmpleado = new User();        
+            User operadorEmpleado = new User();
             operadorEmpleado.profileId = profileId;
             operadorEmpleado.UserRoleId = roleCC;
             operadorEmpleado.FirstName = '';
@@ -167,7 +167,7 @@ public class CC_EmailSendController_Test {
             operadorEmpleado.TimeZoneSidKey = 'Europe/Paris';
             operadorEmpleado.EmailEncodingKey = 'UTF-8';
             operadorEmpleado.LanguageLocaleKey = 'es';
-            operadorEmpleado.LocaleSidKey = 'es_ES';        
+            operadorEmpleado.LocaleSidKey = 'es_ES';
             insert operadorEmpleado;
             PermissionSetAssignment psaAdmin2 = new PermissionSetAssignment(AssigneeId = operadorEmpleado.Id, PermissionSetId = psOperadorEmpleado.Id);
             insertPSAssAdmin.add(psaAdmin2);
@@ -191,32 +191,29 @@ public class CC_EmailSendController_Test {
             valorUmbralSiguientesAvisos.CC_Lista__c = lovAvisosSobreAgrupadores.Id;
             valorUmbralSiguientesAvisos.Name = CC_MetodosUtiles.getRecordTypeNameFromDeveloperName('CC_Agrupador__c', recordTypeDeveloperName) + ' - Umbral siguientes avisos';
             valorUmbralSiguientesAvisos.CC_Valor__c = '50';
-            insert valorUmbralSiguientesAvisos;       
+            insert valorUmbralSiguientesAvisos;
             Id recordTypeIdGrupo = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
             CC_Grupo_Colaborador__c grupo = new CC_Grupo_Colaborador__c(Name = 'Grupo Test 3',CC_External__c = 'GC-00097',RecordTypeId = recordTypeIdGrupo);
             insert grupo;
-        }   
-        
+        }
+
         PermissionSetAssignment psa1 = new PermissionSetAssignment(AssigneeId = usuarioAdmin.Id, PermissionSetId = psOperadorEmpleado.Id);
         insertPSAss.add(psa1);
         PermissionSetAssignment psa2 = new PermissionSetAssignment(AssigneeId = usuarioAdmin.Id, PermissionSetId = psOperadorCliente.Id);
         insertPSAss.add(psa2);
-        PermissionSetAssignment psa3 = new PermissionSetAssignment(AssigneeId = usuarioAdmin.Id, PermissionSetId = ps3.Id);   
+        PermissionSetAssignment psa3 = new PermissionSetAssignment(AssigneeId = usuarioAdmin.Id, PermissionSetId = ps3.Id);
         insertPSAss.add(psa3);
-        
+
         Database.insert(insertPSAss);
-        
+
         EmailTemplate plantilla = new EmailTemplate();
         plantilla.name = 'plantilla1';
         plantilla.FolderId = UserInfo.getUserId();
         plantilla.DeveloperName='plantilla1';
         plantilla.TemplateType = 'Text';
         insert plantilla;
-
-        
-
     }
-    
+
     //Test para el método datosCaso
     @isTest
     public static void obtenerDatosCaso() {
@@ -236,7 +233,7 @@ public class CC_EmailSendController_Test {
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             insert nuevoCaso;
         }
-        
+
         //Comprobamos que el método obtienen bien los campos
         Case caso = CC_EmailSendController.datosCaso(nuevoCaso.Id);
         Test.stopTest();
@@ -260,25 +257,26 @@ public class CC_EmailSendController_Test {
             Name = 'Grupo Test 1',
             CC_External__c = 'GC-00001',
             RecordTypeId = grupoColaboradorRecordTypeId,
-            OS_Negocio__c = 'CC'
+            OS_Negocio__c = 'CC',
+            CC_Tipo__c = 'Traslados y Remitidos'
         );
         groupList.add(grupo1);
         CC_Grupo_Colaborador__c grupo2 = new CC_Grupo_Colaborador__c(
             Name = 'Grupo Test 2',
             CC_External__c = 'GC-00002',
             RecordTypeId = grupoColaboradorRecordTypeId,
-            OS_Negocio__c = 'CC'
+            OS_Negocio__c = 'CC',
+            CC_Tipo__c = 'Traslados y Remitidos'
         );
         groupList.add(grupo2);
 		System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
-            
-        insert groupList;
+            insert groupList;
         }
-		
+
         //Comprobamos que la búsqueda nos devuelve los grupos creados
-        List<CC_Grupo_Colaborador__c> resultadoBusqueda = CC_EmailSendController.buscarGruposColaboradores('Grupo', 'CC');
+        List<CC_Grupo_Colaborador__c> resultadoBusqueda = CC_EmailSendController.buscarGruposColaboradores('Grupo', 'CC', true, 'CC_Cliente');
         Test.stopTest();
-        System.assertEquals(3, resultadoBusqueda.size());
+        System.assertEquals(2, resultadoBusqueda.size());
         resultadoBusqueda.sort();
         List<String> nombresEntrada = new List<String>{grupo1.Name, grupo2.Name};
         List<String> nombresSalida = new List<String>{resultadoBusqueda[0].Name, resultadoBusqueda[1].Name};
@@ -290,7 +288,7 @@ public class CC_EmailSendController_Test {
         Test.startTest();
         Id colaboradorRecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
         //Creamos una cuenta y un grupo asociado a ésta, además creamos y asignamos un contacto a dicho grupo
-        
+
         //Contacto para añadir a EAP/Gestor del Account
         Contact contactoEmpleadoGestor = new Contact(
             FirstName = 'Contacto',
@@ -299,7 +297,7 @@ public class CC_EmailSendController_Test {
             Email = 'contactoempleadogestor@test.com'
         );
         insert contactoEmpleadoGestor;
-        
+
 		List<Account> accountList = new List<Account>();
         Account cuenta = new Account(
             Name = 'Cuenta Test',
@@ -335,7 +333,7 @@ public class CC_EmailSendController_Test {
             CC_Idioma__c = 'es',
             CC_Canal_Respuesta__c = 'Email',
             CC_Canal_Procedencia__c = 'Atención al Cliente',
-            AccountId = cuenta.Id 
+            AccountId = cuenta.Id
         );
         insert nuevoCaso;
 
@@ -359,26 +357,26 @@ public class CC_EmailSendController_Test {
             insert colaborador;
         }
 
-        
+
 
         //System.debug(colaborador);
 
         //Comprobamos que obtenemos el mapa con el mail y el Para/CC del colaborador
-        
+
         Map<String, String> idMapContactoDevuelto = CC_EmailSendController.buscarColaboradorGestor(grupoColaborador.Id, nuevoCaso.Id);
         Map<String, String> idMapContactoDevueltoSoloColaboradores = CC_EmailSendController.buscarColaborador(grupoColaborador.Id);
         System.assert(idMapContactoDevuelto.containsKey(contacto.Email));
         System.assert(idMapContactoDevueltoSoloColaboradores.containsKey(contacto.Email));
         System.assertEquals('Para', idMapContactoDevuelto.get(contacto.Email));
         System.assertEquals('Para', idMapContactoDevueltoSoloColaboradores.get(contacto.Email));
-        
+
         //Comprobamos que obtenemos el Email del Empleado Gestor.
         //System.assertNotEquals('', correoEmpleadoGestor[0].CC_Cuenta__r.AV_EAPGestor__r.Email);
         //System.assertNotEquals(null , correoEmpleadoGestor[0].CC_Cuenta__r.AV_EAPGestor__r.Email);
-        
+
         System.assertEquals(contactoEmpleadoGestor.Email,[SELECT Account.AV_EAPGestor__r.Email FROM Case WHERE Id = :nuevoCaso.Id LIMIT 1].Account.AV_EAPGestor__r.Email);
         System.assertEquals('CC', idMapContactoDevuelto.get(contactoEmpleadoGestor.Email));
-        
+
         Test.stopTest();
 
     }
@@ -389,7 +387,7 @@ public class CC_EmailSendController_Test {
         //Realizamos la búsqueda con el String 'Grupo', ya que actualmente tenemos dos registros de cmt de Grupos de 3N,
         //quizá se deba modificar entre entornos el String de búsqueda en test ya que no se puede insertar mdt en clases de test
         //Comprobamos que se encuentran grupos de 3N en la entidad
-        
+
         Test.startTest();
         Id recordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Tercer_Nivel').getRecordTypeId();
 
@@ -398,7 +396,7 @@ public class CC_EmailSendController_Test {
             CC_Queue_Traslado__c = 'CC_3N_CaixaBank_Now',
             RecordTypeId = recordTypeId
         );
-        
+
         insert grupo3N;
         List<CC_Grupo_Colaborador__c> grupos3N = CC_EmailSendController.buscarGrupos3N('3N de CaixaBank Now');
         Test.stopTest();
@@ -410,7 +408,7 @@ public class CC_EmailSendController_Test {
         Test.startTest();
         //Si no existe el caso
         String resultado = CC_EmailSendController.buscarCorreoContacto(null);
-    
+
         System.assertEquals('', resultado);
 
         //Creamos el caso inicialmente con los campos de SuppliedEmail y CC_MailTelfNotif__c vacío para cubrir el
@@ -433,14 +431,14 @@ public class CC_EmailSendController_Test {
         //Comprobamos que el mail obtenido es el de contacto
         resultado = CC_EmailSendController.buscarCorreoContacto(caso.Id);
         System.assertEquals(contacto.Email, resultado);
-        
+
         //Informamos el campo CC_MailTelfNotif__c para ver que ahora se obtiene ese mail al no encontar informado SuppliedEmail
         caso.CC_MailTelfNotif__c = 'mailtelf@test.com';
         update caso;
-        
+
         resultado = CC_EmailSendController.buscarCorreoContacto(caso.Id);
         System.assertEquals(caso.CC_MailTelfNotif__c, resultado);
-        
+
         //Por último comprobamos que se obtenga SuppliedEmail si éste está informado
         caso.SuppliedEmail = 'supplied@test.com';
         update caso;
@@ -558,20 +556,20 @@ public class CC_EmailSendController_Test {
         //caso.CC_Owner_Anterior__c = idAnteriorPropietario;
         caso.CC_Canal_Procedencia__c = 'Formulario Web';
         caso.Origin = 'Email';
-        insert caso; 
-		
+        insert caso;
+
         CC_EmailSendController.cambiarPropietario('Grupo Test', 'CC_3N_CaixaBank_Now', caso.Id.toString(), 'Se traslada a 3N',grupoId.toString());
         Case casoActualizado = [SELECT Id, CC_Resolucion__c FROM Case WHERE Id = :caso.Id];
-        
+
         //Devolvemos a primer nivel
         casoActualizado.CC_Resolucion__c = 'Resuelto';
-        
+
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             update casoActualizado;
         }
-        
+
         CC_EmailSendController.devolver(casoActualizado.Id, 'Se devuelve a primer nivel', 'devolver', false);
-        
+
         List<Case> listCasos = [SELECT CC_En_Tercer_Nivel__c, CC_Grupo_3N__c, Status, OwnerId FROM Case WHERE Id = :casoActualizado.Id];
         System.assertEquals(1, listCasos.size());
         System.assertEquals('Activo', listCasos[0].Status);
@@ -595,21 +593,21 @@ public class CC_EmailSendController_Test {
         caso.CC_Canal_Procedencia__c = 'Formulario web';
         caso.Origin = 'Email';
         //caso.CC_Owner_Anterior__c = idAnteriorPropietario;
-        insert caso; 
+        insert caso;
         CC_EmailSendController.cambiarPropietario('Grupo Test', 'CC_3N_CaixaBank_Now', caso.Id.toString(), 'Se traslada a 3N',grupoId.toString());
         Case casoActualizado = [SELECT Id, CC_Resolucion__c FROM Case WHERE Id = :caso.Id];
-        
+
         //Devolvemos a primer nivel
         casoActualizado.CC_Resolucion__c = 'Resuelto';
-        
+
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             update casoActualizado;
         }
-        
-        
+
+
         CC_EmailSendController.devolver(casoActualizado.Id, 'Se devuelve a primer nivel', 'rechazar', false);
-        
-        
+
+
         List<Case> listCasos = [SELECT CC_En_Tercer_Nivel__c, CC_Grupo_3N__c, Status, OwnerId FROM Case WHERE Id = :caso.Id];
         System.assertEquals(1, listCasos.size());
         System.assertEquals('Activo', listCasos[0].Status);
@@ -617,7 +615,7 @@ public class CC_EmailSendController_Test {
         System.assertEquals(idPropietario, listCasos[0].OwnerId);
         Test.stopTest();
     }
-    
+
     //Test para el método createActivityTraslados
     @isTest
     public static void actividadesTraslados() {
@@ -682,10 +680,10 @@ public class CC_EmailSendController_Test {
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             String subject = CC_EmailSendController.obtenerSubjectEmailTemplate(plantilla.Id);
             Test.stopTest();
-            
+
         System.assertEquals(plantilla.Subject, subject);
         }
-        
+
     }
     //Test para los métodos mostrarBotonesPendienteColaborador, mostrarBotonesPendienteInterno y mostrarBotonesPendienteCliente
     @isTest
@@ -705,22 +703,22 @@ public class CC_EmailSendController_Test {
         Boolean visible = CC_EmailSendController.mostrarBotonesPendienteColaborador(caso.Id);
 
         System.assertEquals(true, visible);
- 
+
         visible = CC_EmailSendController.mostrarBotonesPendienteInterno(caso.Id);
-     
+
         System.assertEquals(true, visible);
-     
+
         visible = CC_EmailSendController.mostrarBotonesPendienteCliente(caso.Id);
-      
+
         System.assertEquals(true, visible);
 
         //Caso estado pendiente interno
         caso.Status = 'Pendiente Interno';
         update caso;
         //Comprobamos que los botones no son visibles
-     
+
         visible = CC_EmailSendController.mostrarBotonesPendienteInterno(caso.Id);
- 
+
         System.assertEquals(false, visible);
         caso.Status = 'Activo';
         update caso;
@@ -729,7 +727,7 @@ public class CC_EmailSendController_Test {
         caso.Status = 'Pendiente Cliente';
         update caso;
         //Comprobamos que los botones no son visibles
-    
+
         visible = CC_EmailSendController.mostrarBotonesPendienteCliente(caso.Id);
 
         System.assertEquals(false, visible);
@@ -792,10 +790,10 @@ public class CC_EmailSendController_Test {
         System.assertEquals(permisos.get('CC_OTP'), FeatureManagement.checkPermission('CC_OTP'));
         System.assertEquals(permisos.get('CC_Envio_Notificacion_Push'), FeatureManagement.checkPermission('CC_Envio_Notificacion_Push'));
         System.assertEquals(permisos.get('CC_GDPR'), FeatureManagement.checkPermission('CC_GDPR'));
-        
+
         //Invocación al método con grupo de 3N NO habilitado
         permisos = CC_EmailSendController.getCustomPermissions(nombreGrupoNoHabilitado, caso);
-        
+
         System.assertEquals(permisos.get('CC_Devolver_1N_LOV'), false);
         Test.stopTest();
     }
@@ -809,27 +807,27 @@ public class CC_EmailSendController_Test {
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
         	List<CC_EmailSendController.picklistWrapper> plantillaListTrasladar = CC_EmailSendController.getPlantillaList('trasladar', null);
             System.assert(plantillaListTrasladar.size() > 0);
-            
+
             //Caso solicitar
-            
+
             List<CC_EmailSendController.picklistWrapper> plantillaListSolicitar = CC_EmailSendController.getPlantillaList('solicitar', null);
-            
+
             System.assert(plantillaListSolicitar.size() > 0);
             Test.stopTest();
         }
-        
+
     }
     //Test para los métodos getPlantillaGrupoList
     @isTest
     public static void obtenerListaPlantillasGrupo() {
         Test.startTest();
         Id recordTypeIdGrupo = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
-        
+
         CC_Grupo_Colaborador__c grupo = new CC_Grupo_Colaborador__c(
             Name = 'Grupo Test',
             CC_External__c = 'GC-00004',
             RecordTypeId = recordTypeIdGrupo
-            
+
         );
         insert grupo;
         List<EmailTemplate> plantillas = [SELECT Name, DeveloperName FROM EmailTemplate];
@@ -940,7 +938,7 @@ public class CC_EmailSendController_Test {
         //Comprobamos en el caso de que no haya plantillas asociadas
         List<CC_EmailSendController.picklistWrapper> plantillasList = CC_EmailSendController.getPlantillasResponder(caso.Id, 'CC_Responder_ca_informal');
         System.assert(plantillasList.size() > 0);
-        
+
         //Comprobamos en el caso de que haya alguna plantilla asociada
         EmailTemplate plantilla = [SELECT Name, DeveloperName FROM EmailTemplate WHERE Folder.DeveloperName = 'CC_Responder_es_informal' LIMIT 1];
         CC_MCC_Plantilla__c mccPlantilla = new CC_MCC_Plantilla__c(
@@ -950,14 +948,14 @@ public class CC_EmailSendController_Test {
             );
             insert mccPlantilla;
             //No perteneciente a la carpeta
-            
+
             plantillasList = CC_EmailSendController.getPlantillasResponder(caso.Id, 'CC_Responder_es_informal');
-            
+
             System.assert(plantillasList.size() > 0);
             //Perteneciente a la carpeta
-            
+
             plantillasList = CC_EmailSendController.getPlantillasResponder(caso.Id, 'CC_Responder_ca_informal');
-            
+
             System.assert(plantillasList.size() > 0);
             Test.stopTest();
     }
@@ -967,11 +965,11 @@ public class CC_EmailSendController_Test {
         Test.startTest();
         Boolean existeCarpeta = CC_EmailSendController.existeCarpeta('CC_Responder');
         System.assert(existeCarpeta, false);
-        
+
         //Caso de no dar carpeta raíz
         List<Folder> carpetas = CC_EmailSendController.getCarpetas(null,'CC_Responder');
         System.assert(carpetas.size() > 0);
-        
+
         //Caso de dar carpeta raíz
         carpetas = CC_EmailSendController.getCarpetas('CC_Operativas','CC_Responder');
         System.assert(carpetas.size() > 0);
@@ -983,7 +981,7 @@ public class CC_EmailSendController_Test {
         Test.startTest();
         Id recordTypeIdCentro = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         Id recordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
-        
+
         //Insertamos un grupo colaborador
         CC_Grupo_Colaborador__c grupoColaborador = new CC_Grupo_Colaborador__c(
             Name = 'Grupo Colaborador Test',
@@ -1035,8 +1033,8 @@ public class CC_EmailSendController_Test {
         CC_Grupo_Colaborador__c grupoTematica = new CC_Grupo_Colaborador__c(
             Name = 'Grupo Temática Test',
             CC_External__c = 'GC-00006',
-            RecordTypeId = recordTypeIdGrupo
-            
+            RecordTypeId = recordTypeIdGrupo,
+            CC_Tipo__c = 'Traslados y Remitidos'
         );
         insert grupoTematica;
         CC_MCC_Grupo_Colaborador__c mccGrupoTematica = new CC_MCC_Grupo_Colaborador__c(
@@ -1055,7 +1053,8 @@ public class CC_EmailSendController_Test {
         CC_Grupo_Colaborador__c grupoProducto = new CC_Grupo_Colaborador__c(
             Name = 'Grupo Producto Test',
             CC_External__c = 'GC-00007',
-            RecordTypeId = recordTypeIdGrupo
+            RecordTypeId = recordTypeIdGrupo,
+            CC_Tipo__c = 'Traslados y Remitidos'
         );
         insert grupoProducto;
         CC_MCC_Grupo_Colaborador__c mccGrupoProducto = new CC_MCC_Grupo_Colaborador__c(
@@ -1074,7 +1073,8 @@ public class CC_EmailSendController_Test {
         CC_Grupo_Colaborador__c grupoMotivo = new CC_Grupo_Colaborador__c(
             Name = 'Grupo Motivo Test',
             CC_External__c = 'GC-00007',
-            RecordTypeId = recordTypeIdGrupo
+            RecordTypeId = recordTypeIdGrupo,
+            CC_Tipo__c = 'Traslados y Remitidos'
         );
         insert grupoMotivo;
         CC_MCC_Grupo_Colaborador__c mccGrupoMotivo = new CC_MCC_Grupo_Colaborador__c(
@@ -1093,7 +1093,7 @@ public class CC_EmailSendController_Test {
         insert caso;
 
         //Comprobamos que obtenemos una lista con los tres grupos
-        List<CC_EmailSendController.picklistWrapperTraslados> listaGrupos = CC_EmailSendController.getMCCGrupoList(caso.Id, '');
+        List<CC_EmailSendController.picklistWrapperTraslados> listaGrupos = CC_EmailSendController.getMCCGrupoList(caso.Id, '', true);
         System.assertEquals(3, listaGrupos.size());
         Test.stopTest();
     }
@@ -1121,7 +1121,7 @@ public class CC_EmailSendController_Test {
     //Test para el método actualizarCaso
     @isTest
     public static void comprobarActualizacion() {
-        Test.startTest();        
+        Test.startTest();
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Comprobar actualizacion'];
 
         //Caso respuesta formal ca
@@ -1141,7 +1141,7 @@ public class CC_EmailSendController_Test {
         System.assert(casoFormalCa.CC_Referencia_Correo_Saliente__c != null);
         Test.stopTest();
     }
-    
+
     @isTest
     public static void comprobarActualizacion2() {
         Test.startTest();
@@ -1162,7 +1162,7 @@ public class CC_EmailSendController_Test {
         System.assert(casoInormalCa.CC_Referencia_Correo_Saliente__c != null);
         Test.stopTest();
     }
-    
+
     @isTest
     public static void comprobarActualizacion3() {
         Test.startTest();
@@ -1183,7 +1183,7 @@ public class CC_EmailSendController_Test {
         System.assert(casoFormalEs.CC_Referencia_Correo_Saliente__c != null);
         Test.stopTest();
     }
-    
+
     @isTest
     public static void comprobarActualizacion4() {
         Test.startTest();
@@ -1204,7 +1204,7 @@ public class CC_EmailSendController_Test {
         System.assert(casoInormalEs.CC_Referencia_Correo_Saliente__c != null);
         Test.stopTest();
     }
-    
+
     @isTest
     public static void comprobarActualizacion5() {
         Test.startTest();
@@ -1293,7 +1293,7 @@ public class CC_EmailSendController_Test {
         //Caso idioma cas
         String fromEng = CC_EmailSendController.obtenerEmailFrom('en');
         System.assert(fromEng != null);
-        
+
     }
     //Test para el método autoasignarmeCaso
     @isTest
@@ -1313,7 +1313,7 @@ public class CC_EmailSendController_Test {
         System.assertEquals(idUsuario, casoAutoasignado.OwnerId);
         System.assertEquals(true, casoAutoasignado.CC_Autoasignado_Coordinador__c);
     }
-        
+
     //Test para el método recuperaMailEmpleado
     @isTest
     public static void recuperaMailEmpleadoTest() {
@@ -1340,7 +1340,7 @@ public class CC_EmailSendController_Test {
         System.assertEquals(lCaso[0].Contact.Email, contactoSelect.Email);
         System.assertEquals(lCaso[0].Contact.Name, contactoSelect.Name);
     }
-    
+
         //Test para los métodos crearTaskWebCollab y updateTaskWebCollab
     @isTest
     public static void crearModificarTaskWebCollabTest() {
@@ -1386,7 +1386,7 @@ public class CC_EmailSendController_Test {
         // Utilizamos una plantilla con cuerpo en este ultimo test
         //String cuerpoMensaje = CC_EmailSendController.plantillaCuerpo('Acuse_Recibo_FORMWEB_CA_1561052736047', true);
         //System.assert(String.isNotBlank(cuerpoMensaje));
-        
+
     }
 
     @isTest
@@ -1414,7 +1414,7 @@ public class CC_EmailSendController_Test {
         Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
-        
+
         CC_MCC__c mccTematica = new CC_MCC__c();
         mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -1423,7 +1423,7 @@ public class CC_EmailSendController_Test {
         mccTematica.CC_Canal_Operativo__c = 'Cajero';
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
         insert mccTematica;
-        
+
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -1432,7 +1432,7 @@ public class CC_EmailSendController_Test {
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PR-000001';
         insert mccProducto;
-        
+
         CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -1485,8 +1485,8 @@ public class CC_EmailSendController_Test {
 
         insert groupList;
 
-        //Comprobamos que la búsqueda nos devuelve los grupos creados        
-            List<CC_Grupo_Colaborador__c> resultadoBusqueda = CC_EmailSendController.buscarGruposColaboradores('Grupo', 'CSI_Bankia');
+        //Comprobamos que la búsqueda nos devuelve los grupos creados
+        List<CC_Grupo_Colaborador__c> resultadoBusqueda = CC_EmailSendController.buscarGruposColaboradores('Grupo', 'CSI_Bankia', false, 'CC_Empleado');
         Test.stopTest();
 
         System.assertEquals(2, resultadoBusqueda.size());
@@ -1494,7 +1494,7 @@ public class CC_EmailSendController_Test {
         List<String> nombresSalida = new List<String>{resultadoBusqueda[0].Name, resultadoBusqueda[1].Name};
         System.assertEquals(nombresEntrada, nombresSalida);
     }
-    
+
     @isTest
     public static void validarCanalAutenticacionTest() {
         Test.startTest();
@@ -1503,7 +1503,7 @@ public class CC_EmailSendController_Test {
         listaAutenticacionCliente.CC_Activa__c = true;
         listaAutenticacionCliente.Name = 'CC_Autenticacion_Cliente';
         insert listaAutenticacionCliente;
-        
+
         CC_Lista_Valores__c valorTelefono = new CC_Lista_Valores__c();
         valorTelefono.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
         valorTelefono.CC_Activa__c = true;
@@ -1535,12 +1535,12 @@ public class CC_EmailSendController_Test {
             CC_Canal_Procedencia__c = 'App'
         );
         insert casoInvalido;
-        
+
         System.assertEquals(true,  CC_EmailSendController.validarCanalAutenticacion(caso.Id));
         System.assertEquals(false,  CC_EmailSendController.validarCanalAutenticacion(casoInvalido.Id));
         Test.stopTest();
     }
-    
+
     @isTest
     static void derivarAlSac() {
         Test.startTest();
@@ -1622,8 +1622,8 @@ public class CC_EmailSendController_Test {
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             insert casoCC;
             CC_EmailSendController.derivarCasoAlSAC(casoCC, 'Motivo derivar');
-        } 
- 
+        }
+
         List<Case> casoSAC = [SELECT Id, CC_Motivo__c   FROM Case WHERE ParentId = :casoCC.Id];
         Test.stopTest();
         System.assertEquals(1, casoSAC.size(), 'La creación de la reclamación desde CC no ha funcionado.');
@@ -1681,7 +1681,7 @@ public class CC_EmailSendController_Test {
             CC_Codigo_Externo__c = 'SO-000001'
         );
         insert solucion;
-        
+
         Account cuenta = new Account();
         cuenta.Name = 'cuentaTest';
         insert cuenta;
@@ -1716,7 +1716,7 @@ public class CC_EmailSendController_Test {
         casoCC.Status = 'Activo';
         casoCC.AccountId = cuenta.Id;
         casoCC.ContactId = contacto.Id;
-        casoCC.ParentId = casoSac.Id;        
+        casoCC.ParentId = casoSac.Id;
         casoCC.CC_Canal_Operativo__c = 'App BrokerNow';
         casoCC.CC_MCC_Tematica__c = tematica.Id;
         casoCC.CC_MCC_ProdServ__c = producto.Id;
@@ -1730,18 +1730,19 @@ public class CC_EmailSendController_Test {
         casoSac.SAC_StatusAuxiliar__c = 'SAC_003';
         update casoSac;
 
-        
+
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             Case casoCCAfter = [SELECT Id, RecordTypeId, ParentId, Status, SAC_MotivoReabrir__c, CC_Motivo__c FROM Case WHERE Subject = 'Caso de Contact Center para devolver al SAC' LIMIT 1];
+            System.debug('CASO AF ' + casoCCAfter.Id);
             CC_EmailSendController.devolverCasoAlSAC('Motivo devolución', casoCCafter);
         }
-        
+
         List<Case> casos = [SELECT Id, Status, CC_Motivo__c FROM Case WHERE Id = :casoSac.Id];
         Test.stopTest();
         System.assertEquals('Motivo devolución', casos.get(0).CC_Motivo__c);
         System.assertEquals('SAC_001', casos.get(0).Status);
     }
-    
+
     @isTest
     private static void crearTareaGestor() {
         Test.startTest();
@@ -1752,15 +1753,15 @@ public class CC_EmailSendController_Test {
         lista.Name = 'Gestor por defecto CC';
         lista.RecordTypeId = recordTypeLista;
         insert lista;
-        
+
         List<CC_Lista_Valores__c> valores = new List<CC_Lista_Valores__c>();
         CC_Lista_Valores__c valor1 = new CC_Lista_Valores__c ();
         valor1.Name = 'ExternalID';
         valor1.RecordTypeId = recordTypeValor;
         valor1.CC_Lista__c = lista.Id;
-        valor1.CC_Valor__c ='000000';        
+        valor1.CC_Valor__c ='000000';
         valores.add(valor1);
-        
+
         CC_Lista_Valores__c valor2 = new CC_Lista_Valores__c ();
         valor2.Name = 'Nombre';
         valor2.RecordTypeId = recordTypeValor;
@@ -1772,7 +1773,7 @@ public class CC_EmailSendController_Test {
         //Cuentas cliente
         List<Account> accountsInsert = new List<Account>();
         Account cuentaCliente = new Account();
-        cuentaCliente.LastName = 'Cliente Senior'; 
+        cuentaCliente.LastName = 'Cliente Senior';
         cuentaCliente.CC_NumPerso__c = '0000012';
         cuentaCliente.AV_IndicadoresClientes__c = '01';
         cuentaCliente.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
@@ -1800,7 +1801,7 @@ public class CC_EmailSendController_Test {
         Test.stopTest();
         System.assert(!tarea.isEmpty());
     }
-    
+
     @isTest
     private static void crearTareaGestorOficina() {
         Test.startTest();
@@ -1809,20 +1810,20 @@ public class CC_EmailSendController_Test {
         Id tematicaId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         Id productoId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         Id motivoId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
-        
+
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c ();
         lista.Name = 'Gestor por defecto CC';
         lista.RecordTypeId = recordTypeLista;
         insert lista;
-        
+
         List<CC_Lista_Valores__c> valores = new List<CC_Lista_Valores__c>();
         CC_Lista_Valores__c valor1 = new CC_Lista_Valores__c ();
         valor1.Name = 'ExternalID';
         valor1.RecordTypeId = recordTypeValor;
         valor1.CC_Lista__c = lista.Id;
-        valor1.CC_Valor__c ='000000';        
+        valor1.CC_Valor__c ='000000';
         valores.add(valor1);
-        
+
         CC_Lista_Valores__c valor2 = new CC_Lista_Valores__c ();
         valor2.Name = 'Nombre';
         valor2.RecordTypeId = recordTypeValor;
@@ -1830,7 +1831,7 @@ public class CC_EmailSendController_Test {
         valor2.CC_Valor__c ='Sin Gestor/EAP';
         valores.add(valor2);
         insert valores;
-        
+
         CC_MCC__c tematica = new CC_MCC__c(
             Name = 'Tematica Test',
             RecordTypeId = tematicaId,
@@ -1856,7 +1857,7 @@ public class CC_EmailSendController_Test {
             CC_AmbitoTareas__c = 'Oficina'
         );
         insert motivoOficina;
-        
+
         Account centro = new Account();
         centro.Name = 'Cliente Senior';
         centro.CC_Email__c = 'test@test.com';
@@ -1875,7 +1876,7 @@ public class CC_EmailSendController_Test {
         cuentaCliente.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
         accountsInsert.add(cuentaCliente);
         insert accountsInsert;
-        
+
         Case casoCCOficina = new Case();
         casoCCOficina.Subject = 'Caso de Contact Center';
         casoCCOficina.Description = 'Caso de Contact Center';
@@ -1897,7 +1898,7 @@ public class CC_EmailSendController_Test {
 
         System.assert(!tarea.isEmpty());
     }
-    
+
     @isTest
     private static void crearTareaGestorVenta() {
         Test.startTest();
@@ -1906,20 +1907,20 @@ public class CC_EmailSendController_Test {
         Id tematicaId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         Id productoId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         Id motivoId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
-        
+
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c ();
         lista.Name = 'Gestor por defecto CC';
         lista.RecordTypeId = recordTypeLista;
         insert lista;
-        
+
         List<CC_Lista_Valores__c> valores = new List<CC_Lista_Valores__c>();
         CC_Lista_Valores__c valor1 = new CC_Lista_Valores__c ();
         valor1.Name = 'ExternalID';
         valor1.RecordTypeId = recordTypeValor;
         valor1.CC_Lista__c = lista.Id;
-        valor1.CC_Valor__c ='000000';        
+        valor1.CC_Valor__c ='000000';
         valores.add(valor1);
-        
+
         CC_Lista_Valores__c valor2 = new CC_Lista_Valores__c ();
         valor2.Name = 'Nombre';
         valor2.RecordTypeId = recordTypeValor;
@@ -1927,7 +1928,7 @@ public class CC_EmailSendController_Test {
         valor2.CC_Valor__c ='Sin Gestor/EAP';
         valores.add(valor2);
         insert valores;
-        
+
         CC_MCC__c tematica = new CC_MCC__c(
             Name = 'Tematica Test',
             RecordTypeId = tematicaId,
@@ -1953,7 +1954,7 @@ public class CC_EmailSendController_Test {
             CC_AmbitoTareas__c = 'Ventas'
         );
         insert motivoVentas;
-        
+
         Account centro = new Account();
         centro.Name = 'Cliente Senior';
         centro.CC_Email__c = 'test@test.com';
@@ -1962,7 +1963,7 @@ public class CC_EmailSendController_Test {
         centro.CC_Tipo_Oficina__c = 'I';
         centro.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         insert centro;
-        
+
         Contact contactoEmple = new Contact();
         contactoEmple.LastName = 'Cliente Senior';
         contactoEmple.FirstName = 'Prueba empleado';
@@ -1985,7 +1986,7 @@ public class CC_EmailSendController_Test {
         cuentaCliente.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
         accountsInsert.add(cuentaCliente);
         insert accountsInsert;
-        
+
         Case casoCCVentas = new Case();
         casoCCVentas.Subject = 'Caso de Contact Center';
         casoCCVentas.Description = 'Caso de Contact Center';
@@ -2007,20 +2008,20 @@ public class CC_EmailSendController_Test {
 
         System.assert(!tarea.isEmpty());
     }
-    
+
      @isTest
     private static void buscarEmpleadoOficina() {
         Test.startTest();
         //Cuentas cliente
         List<Account> accountsInsert = new List<Account>();
         Account cuentaEmple = new Account();
-        cuentaEmple.Name = 'Cliente Senior'; 
+        cuentaEmple.Name = 'Cliente Senior';
         cuentaEmple.CC_NumPerso__c = '0000012';
         cuentaEmple.CC_Email__c = 'test@test.com';
         cuentaEmple.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         accountsInsert.add(cuentaEmple);
         insert accountsInsert;
-        
+
         List<Contact> contactInsert = new List<Contact>();
         Contact contactoEmple = new Contact();
         contactoEmple.LastName = 'Cliente Senior';
@@ -2049,37 +2050,37 @@ public class CC_EmailSendController_Test {
         casosInsert.add(casoCC);
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             insert casosInsert;
-        } 
-        
+        }
+
         List<Map<String,String>> listaResult = new List<Map<String,String>>();
 		List<Contact> listaEmpleados = new List<Contact>();
         List<Account> listaOficinas = new List<Account>();
-            
-        
+
+
         listaResult.add(CC_EmailSendController.buscarEmpleadoOficina(String.valueOf(cuentaEmple.Id), cuentaEmple.CC_Email__c, cuentaEmple.Name, true, contactoEmple.Id, null));
         listaResult.add(CC_EmailSendController.buscarEmpleadoOficina(String.valueOf(contactoEmple.Id), cuentaEmple.CC_Email__c, cuentaEmple.Name, false, contactoEmple.Id, null));
         listaEmpleados = CC_EmailSendController.buscarEmpleado('Prueba');
         listaOficinas = CC_EmailSendController.buscarOficina('Senior', '');
         Test.stopTest();
-        
+
         System.assertEquals(2, listaResult.size());
         /*System.assertEquals(1, listaEmpleados.size());
         System.assertEquals(1, listaOficinas.size());*/
-        
+
     }
-    
+
     @isTest
     private static void obtenerPlantillasOficina() {
         Test.startTest();
         Id recordTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         Id recordTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
-        
+
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c ();
         lista.Name = 'CC_Relacion_plantilla_Objeto';
-        lista.RecordTypeId=recordTypeLista; 
-        
+        lista.RecordTypeId=recordTypeLista;
+
         insert lista;
-        
+
         List<CC_Lista_Valores__c> valores = new List<CC_Lista_Valores__c>();
         CC_Lista_Valores__c valor1 = new CC_Lista_Valores__c ();
         valor1.Name = 'valor1';
@@ -2089,9 +2090,9 @@ public class CC_EmailSendController_Test {
         valor1.CC_Servicio__c = 'trasladar';
         valor1.CC_Valor2__c = 'CC_Empleado';
         valor1.CC_Valor__c ='CC_CentroCaixaBank';
-        
+
         valores.add(valor1);
-        
+
         CC_Lista_Valores__c valor2 = new CC_Lista_Valores__c ();
         valor2.Name = 'valor1';
         valor2.RecordTypeId = recordTypeValor;
@@ -2101,23 +2102,23 @@ public class CC_EmailSendController_Test {
         valor2.CC_Valor2__c = 'CC_Empleado';
         valor2.CC_Valor__c ='CC_CentroCaixaBank';
         insert valores;
-        
-        
+
+
         List<Account> accountsInsert = new List<Account>();
         Account cuentaEmple = new Account();
-        cuentaEmple.Name = 'Cliente Senior'; 
+        cuentaEmple.Name = 'Cliente Senior';
         cuentaEmple.CC_NumPerso__c = '0000012';
         cuentaEmple.CC_Email__c = 'test@test.com';
         cuentaEmple.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         accountsInsert.add(cuentaEmple);
-          
+
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             insert accountsInsert;
-        } 
-        
+        }
+
         List<Contact> contactInsert = new List<Contact>();
         Contact contactoEmple = new Contact();
-        contactoEmple.LastName = 'Cliente Senior'; 
+        contactoEmple.LastName = 'Cliente Senior';
         contactoEmple.Email = 'test@test.com';
         contactoEmple.AV_DescFuncion__c = 'DIRECCION';
         contactoEmple.RecordtypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
@@ -2140,20 +2141,20 @@ public class CC_EmailSendController_Test {
         casoCC.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         casosInsert.add(casoCC);
         insert casosInsert;
-        
+
         List<List<CC_EmailSendController.pickListWrapper>> listaResult = new List<List<CC_EmailSendController.pickListWrapper>>();
 
-            
-        
+
+
         listaResult.add(CC_EmailSendController.getPlantillaOficinaList(cuentaEmple.Id,'trasladar','CC_Empleado',Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId()));
         listaResult.add(CC_EmailSendController.getPlantillaEmpleadoList(cuentaEmple.Id,'trasladar','CC_Empleado',Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId()));
         Test.stopTest();
-        
-        
+
+
         System.assertEquals(2 , listaResult.size());
 
     }
-    
+
     @isTest
     private static void getCuentaConfidencial() {
         Test.startTest();
@@ -2164,20 +2165,20 @@ public class CC_EmailSendController_Test {
             CC_NumPerso__c = '123456'
         );
         cuentas.add(cuenta);
-        
+
         Account cuentaConfidencial = new Account(
             Name = 'Cuenta Test Confidencial AV',
             CC_Email__c = 'cuenta@test.com',
             AV_NumPerso__c = '123456'
         );
         cuentas.add(cuentaConfidencial);
-        
+
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             insert cuentas;
         }
-        
+
 		String accountId = [SELECT Id FROM Account WHERE Name = 'Cuenta Test Confidencial' LIMIT 1].Id;
-        
+
         Account cuentaFinal = new Account();
          cuentaFinal = CC_EmailSendController.getCuentaConfidencial(accountId);
          System.assertEquals(cuentaFinal.Id , cuentaFinal.Id);
@@ -2186,7 +2187,7 @@ public class CC_EmailSendController_Test {
 
     @isTest
     private static void llamadaEnvioPoseidon() {
-        
+
         List<CBK_IntegrationSetting__c> integracionSettings = new List<CBK_IntegrationSetting__c>();
         CBK_IntegrationSetting__c envio = new CBK_IntegrationSetting__c();
         envio.Name = 'CC_MCD_Envio_PUSH';
@@ -2204,17 +2205,17 @@ public class CC_EmailSendController_Test {
 
         List<Account> accountsInsert = new List<Account>();
         Account cuentaEmple = new Account();
-        cuentaEmple.Name = 'Cliente Senior'; 
+        cuentaEmple.Name = 'Cliente Senior';
         cuentaEmple.CC_NumPerso__c = '0000012';
         cuentaEmple.CC_Email__c = 'test@test.com';
         cuentaEmple.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         accountsInsert.add(cuentaEmple);
-          
+
         insert accountsInsert;
-        
+
         List<Contact> contactInsert = new List<Contact>();
         Contact contactoEmple = new Contact();
-        contactoEmple.LastName = 'Cliente Senior'; 
+        contactoEmple.LastName = 'Cliente Senior';
         contactoEmple.Email = 'test@test.com';
         contactoEmple.AV_DescFuncion__c = 'DIRECCION';
         contactoEmple.RecordtypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
@@ -2243,13 +2244,13 @@ public class CC_EmailSendController_Test {
         System.runAs ( new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             Test.startTest();
             Boolean resultadoPoseidon = CC_EmailSendController.envioPoseidon(casoCC.Id, 'IMAGIN', '12345', 'textoPublico', 'textoPrivado', 'asunto', 'deeplink', casoCC.CC_Idioma__c, 'titulo', 'sobreTitulo', 'textoBoton', '');
-            Test.stopTest();            
+            Test.stopTest();
             System.assertEquals(resultadoPoseidon, true, 'La solicitud del enrollment no ha funcionado como se esperaba.');
             //System.assertEquals();
         }
 
     }
-    
+
     @isTest
     private static void llamadaEnrollmentPoseidon() {
         Test.startTest();
@@ -2271,18 +2272,18 @@ public class CC_EmailSendController_Test {
 
         List<Account> accountsInsert = new List<Account>();
         Account cuentaEmple = new Account();
-        cuentaEmple.Name = 'Cliente Senior'; 
+        cuentaEmple.Name = 'Cliente Senior';
         cuentaEmple.CC_NumPerso__c = '0000012';
         cuentaEmple.CC_Email__c = 'test@test.com';
         cuentaEmple.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         accountsInsert.add(cuentaEmple);
-          
+
         insert accountsInsert;
-         
-        
+
+
         List<Contact> contactInsert = new List<Contact>();
         Contact contactoEmple = new Contact();
-        contactoEmple.LastName = 'Cliente Senior'; 
+        contactoEmple.LastName = 'Cliente Senior';
         contactoEmple.Email = 'test@test.com';
         contactoEmple.AV_DescFuncion__c = 'DIRECCION';
         contactoEmple.RecordtypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
@@ -2309,8 +2310,8 @@ public class CC_EmailSendController_Test {
 
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseErrorEnroll());
         System.runAs ( new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
-            List<CC_EmailSendController.CustomWrappedObj> resultadoEnrollment = CC_EmailSendController.validarEnrollment('12345');        
-            
+            List<CC_EmailSendController.CustomWrappedObj> resultadoEnrollment = CC_EmailSendController.validarEnrollment('12345');
+
             System.assertEquals(resultadoEnrollment[0].app == 'IMAGIN', false, 'La solicitud del enrollment no ha funcionado como se esperaba.');
         }
         Test.stopTest();
@@ -2335,24 +2336,24 @@ public class CC_EmailSendController_Test {
             return res;
         }
     }
-    
+
     @isTest
     private static void getDeeplinkTest() {
         Test.startTest();
         List<Account> accountsInsert = new List<Account>();
         Account cuentaEmple = new Account();
-        cuentaEmple.Name = 'Cliente Senior'; 
+        cuentaEmple.Name = 'Cliente Senior';
         cuentaEmple.CC_NumPerso__c = '0000012';
         cuentaEmple.CC_Email__c = 'test@test.com';
         cuentaEmple.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         accountsInsert.add(cuentaEmple);
-          
+
         insert accountsInsert;
-         
-        
+
+
         List<Contact> contactInsert = new List<Contact>();
         Contact contactoEmple = new Contact();
-        contactoEmple.LastName = 'Cliente Senior'; 
+        contactoEmple.LastName = 'Cliente Senior';
         contactoEmple.Email = 'test@test.com';
         contactoEmple.AV_DescFuncion__c = 'DIRECCION';
         contactoEmple.RecordtypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
@@ -2422,7 +2423,7 @@ public class CC_EmailSendController_Test {
 
             List<CC_EmailSendController.PickListWrapper> getDeeplinksResult = CC_EmailSendController.getDeeplinks(motivo.Id, casoCC.CC_Canal_Operativo__c, apps, 'es');
             Test.stopTest();
-            
+
             System.assertEquals(deeplink.CC_App__c, obtenerDatosSeleccionadoResult.CC_App__c, 'No se ha recuperado el registro específico que ha sido seleccionado.');
             System.assertEquals(getDeeplinksResult.size(), 1, 'No se han recuperado los registros del objeto CC_Deeplink__c');
         }
@@ -2454,13 +2455,13 @@ public class CC_EmailSendController_Test {
             Name = '16450 - OFICINAS DIGITALES',
             CC_Tipo_Centro__c = 'OF',
             RecordTypeId = recordTypeIdCentro,
-            CC_Numero_Oficina__c = '16450', 
+            CC_Numero_Oficina__c = '16450',
             CC_Numero_Oficina_Empresa__c = '001-16450'
         );
         insert cuentaGC;
 
         Account cuentaCliente = new Account();
-        cuentaCliente.LastName = 'Cliente Senior'; 
+        cuentaCliente.LastName = 'Cliente Senior';
         cuentaCliente.CC_NumPerso__c = '0000012';
         cuentaCliente.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
         cuentaCliente.AV_OficinaPrincipal__c = cuentaGC.Id;
@@ -2517,9 +2518,9 @@ public class CC_EmailSendController_Test {
         CC_EmailSendController.devolver(caso.Id, '', 'devolver', false);
         Case casoAct = [SELECT OwnerId, CC_En_Segundo_Nivel__c, CC_Grupo_Transfer__c FROM Case WHERE Id = :caso.Id LIMIT 1];
         Test.stopTest();
-        
+
         system.assertEquals(ownerLst[0].Id, casoAct.OwnerId, 'El OwnerId se ha actualizado correctamente');
-        
+
     }
 
     @isTest
@@ -2541,13 +2542,13 @@ public class CC_EmailSendController_Test {
         Test.stopTest();
         system.assertEquals(grupos.size() > 0, true, 'Ha encontrado resultados');
     }
-    
+
     @isTest
     public static void validacionParametroDeeplinkTest() {
         Test.startTest();
         User operador = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1];
         CC_EmailSendController.ParametrosDeeplinkWrapper parametross = new CC_EmailSendController.ParametrosDeeplinkWrapper(false, '', 0);
-        
+
         CC_Deeplink__c deeplink = new CC_Deeplink__c(
             CC_Asunto_Cas__c = 'Consulta activación tarjeta',
             CC_App__c = 'CaixaBank'
@@ -2619,20 +2620,20 @@ public class CC_EmailSendController_Test {
         CC_Canal_Procedencia__c = 'Formulario Consultas Operativas',
         RecordTypeId = recordTypeId
         );
-        
+
         System.runAs(operador) {
             insert caso;
         }
-        
+
         List<QueueSobject> listaColas = CC_EmailSendController.buscarColasTransfer('Build');
         CC_EmailSendController.cambiarPropietarioTransferApex(caso.Id, listaColas[0].QueueId);
         Case casoAct = [SELECT OwnerId FROM Case WHERE Id = :caso.Id LIMIT 1];
         Test.stopTest();
         System.assertEquals(casoAct.OwnerId, listaColas[0].QueueId, 'El proceso ha funcionado correctamente');
     }
-    
+
     @isTest
-    public static void devolverMensaje() {        
+    public static void devolverMensaje() {
         Test.startTest();
         User operador = [SELECT Id FROM User Where Name = 'Administrador de sistema' LIMIT 1];
         Id recordTypeIdCentro = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
@@ -2642,7 +2643,7 @@ public class CC_EmailSendController_Test {
             Name = '16450 - OFICINAS DIGITALES',
             CC_Tipo_Centro__c = 'OF',
             RecordTypeId = recordTypeIdCentro,
-            CC_Numero_Oficina__c = '16450', 
+            CC_Numero_Oficina__c = '16450',
             CC_Numero_Oficina_Empresa__c = '001-16450'
         );
         insert cuentaGC;
@@ -2661,19 +2662,19 @@ public class CC_EmailSendController_Test {
         }
         Test.stopTest();
     }
-    
+
     @isTest
-    public static void comprobarVisibilidadBotonTareaCitaGestor() {  
+    public static void comprobarVisibilidadBotonTareaCitaGestor() {
         Test.startTest();
         User operador = [SELECT Id FROM User Where Name = 'Administrador de sistema' LIMIT 1];
         System.runAs(operador) {
-                Map<String, Boolean> resultado = CC_EmailSendController.comprobarVisibilidadBotonTareaCitaGestor();        
+                Map<String, Boolean> resultado = CC_EmailSendController.comprobarVisibilidadBotonTareaCitaGestor();
                 System.assertEquals(true, resultado.get('botonCita'));
                 System.assertEquals(true, resultado.get('botonTarea'));
             }
             Test.stopTest();
     }
-     
+
     @isTest
     public static void reiniciarDerivar() {
         Test.startTest();
@@ -2687,17 +2688,17 @@ public class CC_EmailSendController_Test {
         insert caso;
         Case casoOriginal = [SELECT CC_Derivar__c FROM Case WHERE Id = :caso.Id];
         System.assertEquals(false, casoOriginal.CC_Derivar__c);
-        
+
         CC_EmailSendController.reiniciarDerivar(caso.Id);
-        
+
         Case casoActualizado = [SELECT CC_Derivar__c FROM Case WHERE Id = :caso.Id];
         System.assertEquals(true, casoActualizado.CC_Derivar__c);
-        
+
         Test.stopTest();
         }
     }
 
-    
+
     @isTest
     public static void mostrarToastPoseidon() {
         Test.startTest();
@@ -2741,10 +2742,10 @@ public class CC_EmailSendController_Test {
         	insert caso;
         }
 
-        CC_Deeplink__c deeplink = new CC_Deeplink__c( 
+        CC_Deeplink__c deeplink = new CC_Deeplink__c(
             CC_App__c = 'Imagin', CC_Asunto_Cas__c = 'AsuntoTest' ,
-            CC_Deeplink__c = 'testDeeplink', 
-            CC_TextoPrivado_Cas__c = 'txt privado', 
+            CC_Deeplink__c = 'testDeeplink',
+            CC_TextoPrivado_Cas__c = 'txt privado',
             CC_TextoPublico_Cas__c = 'txt publico',
             CC_TituloConsentimientoCliente__c = 'Título de consentimiento',
             CC_CuerpoConsentimientoCliente__c = 'Cuerpo de consentimiento'
@@ -2755,13 +2756,13 @@ public class CC_EmailSendController_Test {
             CC_MCC__c = caso.CC_MCC_Motivo__c, CC_Deeplink__c = deeplink.id
         );
         insert poseidon;
-        
+
         Map<String, String> resultado = CC_EmailSendController.mostrarToastPoseidon(caso.Id);
-        
+
         System.assertEquals('Título de consentimiento', resultado.get('titulo'));
         System.assertEquals('Cuerpo de consentimiento', resultado.get('cuerpo'));
         Test.stopTest();
-    
+
     }
 
     // Test para el método obtenerCCLink
@@ -2813,10 +2814,10 @@ public class CC_EmailSendController_Test {
        listaValores.Name = 'Test MCC';
        listaValores.CC_Valor__c = 'Valor Test';
        insert listaValores;
-        
+
         // Obtener el ID del MCC Motivo
         CC_MCC__c mccMotivo2 = [SELECT Id FROM CC_MCC__c WHERE Name = 'Motivo Test2' LIMIT 1];
-        
+
         // Llamar al método obtenerCCLink
         String link = CC_EmailSendController.obtenerCCLink(mccMotivo2.Id);
         Test.stopTest();

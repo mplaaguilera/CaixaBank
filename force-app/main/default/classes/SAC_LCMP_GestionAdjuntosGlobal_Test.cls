@@ -4,38 +4,46 @@ public with sharing class SAC_LCMP_GestionAdjuntosGlobal_Test {
     static void makeData(){
 
         List<User> usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
-        usuarioGeneral[0].Username = 'ustestesteo@test.com';       
-        Database.insert(usuarioGeneral);
+        usuarioGeneral[0].Username = 'ustestesteo@test.com';
+        SAC_DatabaseDML.insertListDML(usuarioGeneral, false);        
+        //Database.insert(usuarioGeneral);
 
         List<User> usuarioSPV = SPV_TestDataFactory.crearUsuarioAdministrador(1);
-        Database.insert(usuarioSPV);
+        SAC_DatabaseDML.insertListDML(usuarioSPV, false);
+        //Database.insert(usuarioSPV);
 
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
        
         Map<String, Object> camposRecl = new Map<String, Object>();
         camposRecl.put('Subject', 'TestRec');
         camposRecl.put('AccountId', cuenta.Id);
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
 
         Map<String, Object> camposRecSPV = new Map<String, Object>();
         camposRecSPV.put('Subject', 'TestRecSPV');
         camposRecSPV.put('Status', 'SAC_002');
         Case casoReclamacionSPV = SPV_TestDataFactory.crearCaso('Reclamacion',camposRecSPV);
-        Database.insert(casoReclamacionSPV);
+        SAC_DatabaseDML.insertDML(casoReclamacionSPV, false);
+        //Database.insert(casoReclamacionSPV);
 
         Map<String, Object> camposConl = new Map<String, Object>();
         camposConl.put('Subject', 'TestCons');
         Case casoConsulta = SAC_TestDataFactory.crearCaso('Consulta',camposConl);
-        Database.insert(casoConsulta);
+        SAC_DatabaseDML.insertDML(casoConsulta, false);
+        //Database.insert(casoConsulta);
 
         ContentVersion cv = SAC_TestDataFactory.crearContentVersion(casoReclamacion);
-        Database.insert(cv);
+        SAC_DatabaseDML.insertDML(cv, false);
+        //Database.insert(cv);
 
         List<SAC_MaestroTemas__c> maestrosTemas = SAC_TestDataFactory.crearMaestroTemas(1,'SAC_TipoAdjuntos');
         maestrosTemas[0].Name = 'TestMaestro';
-        Database.insert(maestrosTemas);
+        SAC_DatabaseDML.insertListDML(maestrosTemas, false);
+        //Database.insert(maestrosTemas);
     }
     
     @isTest
@@ -97,7 +105,8 @@ public with sharing class SAC_LCMP_GestionAdjuntosGlobal_Test {
 		System.runAs(usuario){
             Test.startTest();
             reclamacion.OwnerId = usuario.Id;
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
 
             resultado = SAC_LCMP_GestionAdjuntosGlobal.replicarAdjuntosCase(cv.ContentDocumentId, reclamacion.id, false, true);
             Test.stopTest();
@@ -242,14 +251,19 @@ public with sharing class SAC_LCMP_GestionAdjuntosGlobal_Test {
 
     @isTest
     static void cambiarClasificacionTest(){
+
+        Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRec' LIMIT 1];
         List<ContentVersion> cv = [SELECT Id,ContentDocumentId,SAC_Oculto__c,SAC_Bloque__c FROM ContentVersion WHERE Title='ABC Test' LIMIT 1];
+        List<String> listcdl = new List<String>();
+        listcdl.add(cv[0].ContentDocumentId);
+        
         List<String> listaValores = new List<String>{'SAC_Entrada', 'SAC_Respuesta'};
 
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true];
 
 		System.runAs(usuario){
             Test.startTest();
-            SAC_LCMP_GestionAdjuntosGlobal.cambiarClasificacion(cv[0].Id, listaValores);
+            SAC_LCMP_GestionAdjuntosGlobal.cambiarClasificacion(listcdl, listaValores, reclamacion.Id);
             Test.stopTest();      
         }
 

@@ -33,7 +33,7 @@ public without sharing class SAC_NuevaReclamacionVinculada implements Queueable 
             String idNuevaReclamacion;
             String idNuevaPretensionP;
             
-            List<Database.SaveResult> resultado = Database.insert(listaCasos);
+            List<Database.SaveResult> resultado = Database.insert(listaCasos, false);
 
             idNuevaReclamacion = (resultado[0].isSuccess()) ? resultado[0].getId() : null;
             idNuevaPretensionP = (resultado[1].isSuccess()) ? resultado[1].getId() : null;
@@ -42,11 +42,24 @@ public without sharing class SAC_NuevaReclamacionVinculada implements Queueable 
             listaIdAdjuntos.add(casoCerrado.Id);
             listaIdAdjuntos.add(casoCerrado.SAC_PretensionPrincipal__r.Id);
 
+            //Se le añade el despacho representante del caso cerrado a la reclamación nueva
+            List<Case> listaCasoNuevo = [SELECT Id,CBK_Case_Extension_Id__c FROM Case WHERE Id =: idNuevaReclamacion];
+
+            if(!listaCasoNuevo.isEmpty() && listaCasoNuevo[0].CBK_Case_Extension_Id__c!= null){
+                CBK_Case_Extension__c casoNuevoExtension = new CBK_Case_Extension__c();
+                casoNuevoExtension.Id = listaCasoNuevo[0].CBK_Case_Extension_Id__c;
+                casoNuevoExtension.SAC_DespachoRepresentante__c = casoCerrado.CBK_Case_Extension_Id__r.SAC_DespachoRepresentante__c;
+    
+                SAC_DatabaseDML.updateDML(casoNuevoExtension, false);  
+            }
+
+
             listaCasos.clear(); 
             Case casoRecla = new Case();
             casoRecla.id = idNuevaReclamacion;
             casoRecla.SAC_PretensionPrincipal__c = idNuevaPretensionP;
             // casoRecla.SAC_FechaRecepcion__c = null; //quitado, se rellena con el createdDate
+   
             casoRecla.OS_Fecha_Resolucion__c = null; //se vacia la fecha resolucion, porque esta en analisis
             casoRecla.SAC_AltaAutomatica__c = true;
             casoRecla.AccountId = casoCerrado.AccountId;
@@ -68,7 +81,8 @@ public without sharing class SAC_NuevaReclamacionVinculada implements Queueable 
             casoPretension.ContactId = casoCerrado.SAC_PretensionPrincipal__r.ContactId;
             listaCasos.add(casoPretension);
 
-            Database.update(listaCasos);   
+            SAC_DatabaseDML.updateListDML(listaCasos, true);  
+            //Database.update(listaCasos);   
             
             List<TopicAssignment> clasificacionCaso = [SELECT id, TopicId from TopicAssignment where EntityId =: casoCerrado.id];
             List<TopicAssignment> clasificacionCasoNuevo = new  List<TopicAssignment>();
@@ -80,7 +94,8 @@ public without sharing class SAC_NuevaReclamacionVinculada implements Queueable 
             }
             
             if (!clasificacionCasoNuevo.isEmpty()) {
-                Database.insert(clasificacionCasoNuevo);
+                SAC_DatabaseDML.insertListDML(clasificacionCasoNuevo, true);  
+                //Database.insert(clasificacionCasoNuevo);
             }
 
             try {            
@@ -104,7 +119,7 @@ public without sharing class SAC_NuevaReclamacionVinculada implements Queueable 
                         listaEmailMessParaNuevaRecla.add(emAux);
                     }  
 
-                    List<Database.SaveResult> resultadoEM = Database.insert(listaEmailMessParaNuevaRecla);
+                    List<Database.SaveResult> resultadoEM = Database.insert(listaEmailMessParaNuevaRecla, false);
 
                     Id idEM = (resultadoEM[0].isSuccess()) ? resultadoEM[0].getId() : null;
 
@@ -113,10 +128,12 @@ public without sharing class SAC_NuevaReclamacionVinculada implements Queueable 
                         attAux.ParentId = idEM;
                         listaAttachParaNuevaRecla.add(attAux);
                     }
-                    List<Database.SaveResult> resultadoAtt = Database.insert(listaAttachParaNuevaRecla);
+                    SAC_DatabaseDML.insertListDML(listaAttachParaNuevaRecla, true);  
+                    //List<Database.SaveResult> resultadoAtt = Database.insert(listaAttachParaNuevaRecla);
 
                     //Revisar cuando haya tiempo y hacerlo bien!!!!
-                    Database.delete(listaEmailMessParaNuevaRecla);
+                    SAC_DatabaseDML.deleteListDML(listaEmailMessParaNuevaRecla, true);  
+                    //Database.delete(listaEmailMessParaNuevaRecla);
                 }
 
                 List<ContentDocumentLink> contenidos = [SELECT LinkedEntityId, contentdocumentid   
@@ -132,9 +149,11 @@ public without sharing class SAC_NuevaReclamacionVinculada implements Queueable 
                     nuevosCDL.add(cdlAux);
                 } 
                 if (!nuevosCDL.isEmpty()) {
-                    Database.insert(nuevosCDL);
+                    SAC_DatabaseDML.insertListDML(nuevosCDL, true);  
+                    //Database.insert(nuevosCDL);
                     casoCerrado.CC_Detalles_Solucion__c =null;
-                    Database.update(casoCerrado);
+                    SAC_DatabaseDML.insertDML(casoCerrado, false);  
+                    //Database.update(casoCerrado);
                     
                     String linkCaso = URL.getSalesforceBaseUrl().toExternalForm() + '/' + idNuevaReclamacion;
 

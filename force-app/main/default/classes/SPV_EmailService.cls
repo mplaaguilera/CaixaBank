@@ -10,7 +10,6 @@ public with sharing class SPV_EmailService implements Messaging.InboundEmailHand
     final static String RECORDTYPEACCION = mapRTsObjects.get('SAC_Accion__c').get('SPV_MaestroDeTareas').getRecordTypeId();
     
     public Messaging.InboundEmailResult handleInboundEmail(Messaging.InboundEmail email, Messaging.InboundEnvelope envelope) {
-        
         // Trazabilidad para registrar la entrada del correo.
         try{
             CBK_Log.auditemail(email,envelope);
@@ -118,7 +117,7 @@ public with sharing class SPV_EmailService implements Messaging.InboundEmailHand
                 }
                 List<Case> listaCaso = [SELECT id, RecordTypeId, Status, CaseNumber, OwnerId, SAC_AlertasPtes__c, SAC_Reclamacion__c,
                                         SAC_PretensionPrincipal__r.OwnerId, SAC_Reclamacion__r.OwnerId, CC_SuppliedUser__c, Description, recordType.DeveloperName,
-                                        CC_SuppliedID__c, SuppliedEmail, Subject
+                                        CC_SuppliedID__c, SuppliedEmail, Subject, SEG_Subestado__c
                                         FROM Case WHERE RecordTypeId IN (:RECORDTYPERECLAMACION, :RECORDTYPEPRETENSION)
                                         AND CC_SuppliedID__c =: threadId LIMIT 1];
                 /*
@@ -131,12 +130,10 @@ public with sharing class SPV_EmailService implements Messaging.InboundEmailHand
                     casoConThreadId = listaCaso[0];
                 
                     //Preparar alerta de email entrante
-                    /*
                     List<SAC_WrapperAlerta> listaAlertas = prepararAlertas(casoConThreadId);
                     if (!listaAlertas.isEmpty()) {
                         SAC_EmailServiceNew.generarAlertasFuturo(JSON.serialize(listaAlertas));
                     }
-                    */
                     
                     /*Database.SaveResult resultado = null;
                     resultado = Database.update(casoConThreadId);*/
@@ -534,6 +531,40 @@ public with sharing class SPV_EmailService implements Messaging.InboundEmailHand
         wrapEmailRes.eMessage = conEmailMessage;
         
         return wrapEmailRes;
+    }
+
+    private static List<SAC_WrapperAlerta> prepararAlertas(Case casoAux) {
+        List<SAC_WrapperAlerta> listaAlertas = new List<SAC_WrapperAlerta>();
+        /*
+        Dependiendo del estado del caso, se mandará una alerta de:
+        Nuevo correo asociado a la reclamación
+        Respuesta a la negociación (SEG_Subestado__c = 'Negociacion')
+        */
+        if (casoAux.SEG_Subestado__c == 'Negociacion') {
+            //Si el campo SAC_Reclamacion__c está en blanco, significa que es una reclamación
+            if (String.isBlank(casoAux.SAC_Reclamacion__c)) {
+                SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(casoAux.Id, 'SPV_022', 'La reclamación ' + casoAux.CaseNumber +' ha recibido un correo.', casoAux.OwnerId, '', '', '');
+                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + casoAux.Id;
+                //Añadido. Si el CC_SuppliedUser__c es Let, la envio al letrado
+                if (String.isNotBlank(casoAux.CC_SuppliedUser__c) && casoAux.CC_SuppliedUser__c == 'Let' && String.isNotBlank(casoAux.SAC_PretensionPrincipal__r.OwnerId)) {
+                    wrapAlerta.idUsuarioDestinatario = casoAux.SAC_PretensionPrincipal__r.OwnerId;
+                }
+                listaAlertas.add(wrapAlerta);
+            }
+        } else {
+            //Si el campo SAC_Reclamacion__c está en blanco, significa que es una reclamación
+            if (String.isBlank(casoAux.SAC_Reclamacion__c)) {
+                SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(casoAux.Id, 'SPV_023', 'La reclamación ' + casoAux.CaseNumber +' ha recibido un correo.', casoAux.OwnerId, '', '', '');
+                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + casoAux.Id;
+                //Añadido. Si el CC_SuppliedUser__c es Let, la envio al letrado
+                if (String.isNotBlank(casoAux.CC_SuppliedUser__c) && casoAux.CC_SuppliedUser__c == 'Let' && String.isNotBlank(casoAux.SAC_PretensionPrincipal__r.OwnerId)) {
+                    wrapAlerta.idUsuarioDestinatario = casoAux.SAC_PretensionPrincipal__r.OwnerId;
+                }
+                listaAlertas.add(wrapAlerta);
+            }
+        }
+        
+        return listaAlertas;
     }
 
     public class WrapperEmailResult{

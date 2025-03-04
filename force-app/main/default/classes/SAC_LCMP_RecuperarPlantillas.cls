@@ -4,6 +4,9 @@ public with sharing class SAC_LCMP_RecuperarPlantillas {
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
+    private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
+    private static final Id RECTYPERECLAMACIONSPV = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
+
 
     /**
     Wrapper para retornar datos de la email template
@@ -105,30 +108,57 @@ public with sharing class SAC_LCMP_RecuperarPlantillas {
      * Historial
      * VERSION        USER_STORY            AUTHOR                DATE        Description
      * 1.0             US783324           Sergio Martín         02/02/24       Creación
+     * 1.1             US1005847            Álex Polo           31/10/24       Añadidos Footers de distitnos idiomas
+     * 1.2             US958301             Iria ANPC           28/12/24       Añadidos Footers y header de entidad M2P
      * *******************************************************************************************/
     @AuraEnabled
-    public static WrapperTemplate obtenerDatosTemplate(String idTemplate, String idObject){
+    public static WrapperTemplate obtenerDatosTemplate(String idTemplate, String idObject, String idioma, Id recordType, String entidadAfectada){
         EmailTemplate plantillaSeleccionada = new EmailTemplate();
         EmailTemplate plantillaHeader = new EmailTemplate();
         EmailTemplate plantillaFooter = new EmailTemplate();
         List<EmailTemplate> lstPlantillas = new List<EmailTemplate>();
+        Boolean esReclamacionSPV = false;
+        String headerSPV;
+        String footerSPV;
+
+        if(RECTYPERECLAMACIONSPV == recordType) {
+            esReclamacionSPV = true;
+            // Añadir logica si el header debe ser diferente según campo
+            headerSPV = 'SPV_Header';
+            footerSPV = 'SPV_Footer_' + idioma;
+        }
 
         if (Schema.sObjectType.EmailTemplate.isAccessible()){
-            lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName, Folder.DeveloperName FROM EmailTemplate WHERE Id =: idTemplate OR Developername IN ('SAC_Header','SAC_Footer')];
-        }
-        
+            lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName, Folder.DeveloperName FROM EmailTemplate 
+            WHERE Id =: idTemplate 
+            OR Developername IN ('SAC_Header','SAC_Footer', 'SAC_Footer_ENG', 'SAC_FOOTER_CAT', 'SAC_FOOTER_Valenciano', 'SAC_FOOTER_Gallego', 'SAC_FOOTER_Euskera', 'SAC_FOOTER_ES_MTP', 'SAC_FOOTER_ENG_MTP', 'SAC_FOOTER_CAT_MTP', 'SAC_FOOTER_VAL_MTP', 'SAC_FOOTER_GAL_MTP', 'SAC_FOOTER_EUSK_MTP', 'SAC_HEADER_MTP', :footerSPV, :headerSPV)];
+        }   
+
         if(lstPlantillas != null && !lstPlantillas.isEmpty()) {
             for(EmailTemplate em : lstPlantillas) {
-                if(em.id == idTemplate) {
-                    plantillaSeleccionada = em;
-                } else if(em.DeveloperName == 'SAC_Header') {
-                    plantillaHeader = em;
-                } else if(em.DeveloperName == 'SAC_Footer') {
-                    plantillaFooter = em;
+                if(esReclamacionSPV) {
+                    if(em.id == idTemplate) {
+                        plantillaSeleccionada = em;
+                    } else if(em.DeveloperName.contains('SPV_Header')) {
+                        plantillaHeader = em;
+                    } else if(em.DeveloperName.contains('SPV_Footer')) {
+                        plantillaFooter = em;
+                    }
+                } else {
+                    if(em.id == idTemplate) {
+                        plantillaSeleccionada = em;
+                    } else if((em.DeveloperName == 'SAC_HEADER_MTP' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_Header' && entidadAfectada != 'SAC_010')) {
+                        plantillaHeader = em;
+                    }else if((em.DeveloperName == 'SAC_FOOTER_ES_MTP' && idioma == 'es' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_ENG_MTP' && idioma == 'en' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_CAT_MTP' && idioma == 'ca' && entidadAfectada == 'SAC_010') || 
+                    (em.DeveloperName == 'SAC_FOOTER_VAL_MTP' && idioma == 'va' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_GAL_MTP' && idioma == 'ga' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_EUSK_MTP' && idioma == 'eu' && entidadAfectada == 'SAC_010') ||
+                    (em.DeveloperName == 'SAC_Footer' && idioma == 'es' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_Footer_ENG' && idioma == 'en' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_Footer_CAT' && idioma == 'ca' && entidadAfectada != 'SAC_010') || 
+                    (em.DeveloperName == 'SAC_FOOTER_Valenciano' && idioma == 'va' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_Gallego' && idioma == 'ga' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_Euskera' && idioma == 'eu' && entidadAfectada != 'SAC_010')) {
+                        plantillaFooter = em;
+                    }
                 }
             }
         }
-       
+
         List<String> body = new List<String>();
         body.add(plantillaSeleccionada.HtmlValue);
         String whoId = UserInfo.getUserId();
@@ -238,9 +268,11 @@ public with sharing class SAC_LCMP_RecuperarPlantillas {
                 if(folder.Id == idCarpeta || folder.ParentId == idCarpeta) {
                     // Se obtiene la email template relacionada con la Folder
                     EmailTemplate etEncontrado = mapIdForderEmailTemplate.get(folder.id);
-                    
+                    String rutaCarpeta;
                     // Se construye la ruta de carpetas de la plantilla
-                    String rutaCarpeta = mapIdTemplateRuta.get(etEncontrado.id);
+                    if(mapIdTemplateRuta.containsKey(etEncontrado.id)) {
+                        rutaCarpeta = mapIdTemplateRuta.get(etEncontrado.id);
+                    }
                     rutaCarpeta = rutaCarpeta + '\\' + folder.name +'\\' + nombreCarpeta;
 
                     List<Items> subniveles = new List<Items>();
@@ -250,15 +282,19 @@ public with sharing class SAC_LCMP_RecuperarPlantillas {
                 } else if(folder.ParentId != null) {
                     // Se elimina el registro del mapa que contiene la id de la carpeta hija sustituyendo por un registro con la carpeta padre
                     EmailTemplate etEncontrado = mapIdForderEmailTemplate.get(folder.id);
-                    mapIdForderEmailTemplate.remove(folder.id);
-                    mapIdForderEmailTemplate.put(folder.ParentId, etEncontrado);
-                    lstIdBusquedaRaiz.add(folder.ParentId);
+                    if(etEncontrado != null) {
+                        mapIdForderEmailTemplate.remove(folder.id);
+                        mapIdForderEmailTemplate.put(folder.ParentId, etEncontrado);
+                        lstIdBusquedaRaiz.add(folder.ParentId);
 
-                    // Se concatena la ruta de la email template con el nombre de la carpeta hija
-                    String rutaCarpeta = mapIdTemplateRuta.get(etEncontrado.id);
-                    mapIdTemplateRuta.clear();
-                    rutaCarpeta = rutaCarpeta + '\\' + folder.name;
-                    mapIdTemplateRuta.put(etEncontrado.id, rutaCarpeta);
+                        // Se concatena la ruta de la email template con el nombre de la carpeta hija
+                        if(mapIdTemplateRuta.containsKey(etEncontrado.id)) {
+                            String rutaCarpeta = mapIdTemplateRuta.get(etEncontrado.id);
+                            mapIdTemplateRuta.clear();
+                            rutaCarpeta = rutaCarpeta + '\\' + folder.name;
+                            mapIdTemplateRuta.put(etEncontrado.id, rutaCarpeta);
+                        }    
+                    }
                 }
             }
 

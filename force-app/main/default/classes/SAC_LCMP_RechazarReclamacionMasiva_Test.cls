@@ -20,13 +20,15 @@ public with sharing class SAC_LCMP_RechazarReclamacionMasiva_Test {
             user = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
             user.LastName = 'Administrator';
             user.Username = 'test@test.com' + System.currentTimeMillis();    
-            Database.insert(user);
+            SAC_DatabaseDML.insertDML(user, false);
+            //Database.insert(user);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = user.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
         }
 
         User user2;
@@ -34,24 +36,28 @@ public with sharing class SAC_LCMP_RechazarReclamacionMasiva_Test {
             user2 = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
             user2.LastName = 'COPSAJ';
             user2.Username = 'test@test.com' + System.currentTimeMillis();
-            user2.SAC_PerteneceCOPSAJ__c = true;  
-            Database.insert(user2);
+            user2.SAC_PerteneceCOPSAJ__c = true; 
+            SAC_DatabaseDML.insertDML(user2, false); 
+            //Database.insert(user2);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = user2.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+            //Database.insert(permiSetAssi);
         }
 
         CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor', 1)[0];
         grupoColaborador.SAC_PorcentajeAsignacion__c = 100;
         grupoColaborador.SAC_MaximoCasosDiarios__c = 15;
-        Database.insert(grupoColaborador);
+        SAC_DatabaseDML.insertDML(grupoColaborador, false);
+        //Database.insert(grupoColaborador);
 
         CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = SAC_TestDataFactory.crearColaboradorContact(user.id, grupoColaborador.id);
         grupoColaboradorContact.SAC_Administrador__c = true;
-        Database.insert(grupoColaboradorContact);
+        SAC_DatabaseDML.insertDML(grupoColaboradorContact, false);
+        //Database.insert(grupoColaboradorContact);
         
         List<Case> casesToInsert = new List<Case>();
         //Reclamacion
@@ -129,6 +135,7 @@ public with sharing class SAC_LCMP_RechazarReclamacionMasiva_Test {
 	private static void rechazarCasosFalloTest(){
 		User usr = [SELECT id FROM User WHERE LastName = 'Administrator' AND IsActive = true LIMIT 1];
         List<Case> lstCases =  [SELECT id FROM Case WHERE Subject LIKE 'testfallo%' LIMIT 2];
+        Boolean hayError = false;
 		
         List<string> lstId = new List<string>();
 
@@ -138,9 +145,14 @@ public with sharing class SAC_LCMP_RechazarReclamacionMasiva_Test {
 
         String result;
         System.runAs(usr) {
-		    result = SAC_LCMP_RechazarReclamacionMasiva.rechazarCasos('Otros', string.join(lstId, ','), 'Test');
+            try {
+                result = SAC_LCMP_RechazarReclamacionMasiva.rechazarCasos('Otros', string.join(lstId, ','), 'Test');
+            } catch (Exception e) {
+                hayError = true;
+            }  
         }
-		System.assertNotEquals(result, 'OK', 'No ha saltado la validacion correctamente');
+
+        Assert.areEqual(true, hayError, 'No ha saltado la validación de rechazar.');
 	}
     
     @isTest

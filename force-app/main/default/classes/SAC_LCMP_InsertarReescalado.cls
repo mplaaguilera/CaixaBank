@@ -115,7 +115,8 @@ public without sharing class SAC_LCMP_InsertarReescalado {
                     escaladoNv3.OwnerId = cola[0].Id;
                 }
     
-                Database.insert(escaladoNv3);
+                SAC_DatabaseDML.insertDML(escaladoNv3, false);
+                //Database.insert(escaladoNv3);
     
                 List<SAC_CloneDocuments> listaDocumentos = new List<SAC_CloneDocuments>();
                 SAC_CloneDocuments documentosClonados = new SAC_CloneDocuments(interaccionId, escaladoNv3.Id);
@@ -130,7 +131,8 @@ public without sharing class SAC_LCMP_InsertarReescalado {
                     escaladoNv2.SAC_EscaladoNV3__c = escaladoNv3.Id;
     
                     try {
-                        Database.update(escaladoNv2);
+                        SAC_DatabaseDML.updateDML(escaladoNv2, false);
+                        //Database.update(escaladoNv2);
                     } catch (Exception e) {
                         throw new AuraHandledException(e.getMessage());
                     }
@@ -222,7 +224,8 @@ public without sharing class SAC_LCMP_InsertarReescalado {
             }
 
             if (!listaCVAInsertar.isEmpty()) {
-                Database.insert(listaCVAInsertar);
+                SAC_DatabaseDML.insertListDML(listaCVAInsertar, true);
+                //Database.insert(listaCVAInsertar);
             }
             // Crear una nueva lista de ContentVersion con solo el campo SAC_Bloque__c actualizado
             List<ContentVersion> listaCVActualizados = new List<ContentVersion>();
@@ -233,7 +236,8 @@ public without sharing class SAC_LCMP_InsertarReescalado {
 
             // Actualizar la lista listaCVActualizados
             if (!listaCVActualizados.isEmpty()) {
-                Database.update(listaCVActualizados);
+                SAC_DatabaseDML.updateListDML(listaCVActualizados, true);
+                //Database.update(listaCVActualizados);
             }
         }
     }
@@ -324,11 +328,13 @@ public without sharing class SAC_LCMP_InsertarReescalado {
         respuestaEsc.OwnerId =  UserInfo.GetUserId();
         respuestaEsc.SAC_Estado__c = 'SAC_Finalizada';
         respuestaEsc.SAC_RespuestaEscalado__c = interaccionId;
-        Database.insert(respuestaEsc);
+        SAC_DatabaseDML.insertDML(respuestaEsc, false);
+        //Database.insert(respuestaEsc);
 
         try {
             //Actualización de la lista
-            Database.update(listaEscaladosActualizar);
+            SAC_DatabaseDML.updateListDML(listaEscaladosActualizar, true);
+            //Database.update(listaEscaladosActualizar);
 
             //Mandar notificación a el owner del escalado NV2 si hiciera falta
             if (notificarOwnerNV2) {
@@ -409,11 +415,13 @@ public without sharing class SAC_LCMP_InsertarReescalado {
         respuestaEsc.OwnerId =  UserInfo.GetUserId();
         respuestaEsc.SAC_Estado__c = 'SAC_Finalizada';
         respuestaEsc.SAC_RespuestaEscalado__c = interaccionId;
-        Database.insert(respuestaEsc);
+        SAC_DatabaseDML.insertDML(respuestaEsc, false);
+        //Database.insert(respuestaEsc);
 
         try {
             //Actualización de la lista
-            Database.update(listaEscaladosAGuardar);
+            SAC_DatabaseDML.updateListDML(listaEscaladosAGuardar, true);
+            //Database.update(listaEscaladosAGuardar);
 
         } catch (Exception e) { 
             String errorMsg = e.getMessage();
@@ -579,6 +587,7 @@ public without sharing class SAC_LCMP_InsertarReescalado {
         }
         listaInteraccionUpdatear.add(escaladoNV3);
 
-        Database.update(listaInteraccionUpdatear);
+        SAC_DatabaseDML.updateListDML(listaInteraccionUpdatear, true);
+        //Database.update(listaInteraccionUpdatear);
     }
 }

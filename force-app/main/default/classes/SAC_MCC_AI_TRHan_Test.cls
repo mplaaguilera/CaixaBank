@@ -29,33 +29,32 @@ public with sharing class SAC_MCC_AI_TRHan_Test {
         listaMCCs.add(mccTematica);
         listaMCCs.add(mccProdServ);
         listaMCCs.add(mccMotivo);
-        Database.insert(listaMCCs);
+        SAC_DatabaseDML.insertListDML(listaMCCs, false);
 
         User usuarioGeneral;
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
         }
     }
 
     @isTest
-    static void asignacionParametrizacionSLATME_Test() { 
+    static void asignacionParametrizacionSLATMETest() { 
         String recordTypeIdMCCDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
         Id rtMaestro = Schema.SObjectType.SAC_ParametrizacionSLATME__c.getRecordTypeInfosByDeveloperName().get('SAC_Maestro').getRecordTypeId();
 
-        CC_MCC__c mccMotivo = [SELECT id FROM CC_Mcc__c WHERE CC_Codigo_Externo__c='c' LIMIT 1];
         CC_MCC__c mccDetalle = new CC_MCC__c(Name='Banca Electrónica', CC_Codigo_Externo__c='d', RecordTypeId=recordTypeIdMCCDetalle, CC_Tipo_Cliente__c='SAC');
 
         Test.startTest();
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
 		PermissionSet ps = [select id from PermissionSet where PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
 
         PermissionSet ps2 = [select id from PermissionSet where PermissionSet.Label ='SAC_Administrador'];
         PermissionSetAssignment psa2 = new PermissionSetAssignment (PermissionSetId = ps2.id, AssigneeId = usuario.id);
-        Database.insert(psa2);
+        SAC_DatabaseDML.insertDML(psa2, false);
         
         System.runAs(usuario) {
             SAC_ParametrizacionSLATME__c parametrizacion1 = new SAC_ParametrizacionSLATME__c (Name = 'Test Regulatorio Junta Andalucía', SAC_Duracion__c = 10 , SAC_CanalProcedencia__c = 'Junta Andalucia', RecordTypeId = rtMaestro);
@@ -78,17 +77,13 @@ public with sharing class SAC_MCC_AI_TRHan_Test {
             listaParametrizaciones.add(parametrizacion7);
             listaParametrizaciones.add(parametrizacion8);
             listaParametrizaciones.add(parametrizacion9);
-            Database.insert(listaParametrizaciones);
+            SAC_DatabaseDML.insertListDML(listaParametrizaciones, false);
 
-            Database.insert(mccDetalle);
-            Database.update(mccDetalle);
+            SAC_DatabaseDML.insertDML(mccDetalle, false);
+            SAC_DatabaseDML.updateDML(mccDetalle, false);
         }   
         Test.stopTest();
-
-        List<SAC_ParametrizacionSLATME__c> lstParametrizaciones = [SELECT Id, name, SAC_Duracion__c, SAC_CanalProcedencia__c FROM SAC_ParametrizacionSLATME__c WHERE RecordType.id =: rtMaestro];
         
-        // Se comprueban si se han insertado las 9 parametrizaciones con Record Type "Maestro"
-        List<SAC_ParametrizacionSLATME__c> parametrizacionesInsertadas = [SELECT id FROM SAC_ParametrizacionSLATME__c WHERE SAC_MCC__c =: mccDetalle.id];
-        System.assertEquals(lstParametrizaciones.size(), parametrizacionesInsertadas.size(), 'No se han insertado todas la parametrizaciones.');      
+        System.assertEquals([SELECT Count() FROM SAC_ParametrizacionSLATME__c WHERE RecordType.id =: rtMaestro], [SELECT Count() FROM SAC_ParametrizacionSLATME__c WHERE SAC_MCC__c =: mccDetalle.id], 'No se han insertado todas la parametrizaciones.');      
     }
 }

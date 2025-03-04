@@ -52,7 +52,8 @@ public with sharing class CC_WS_Alta_Citas_Test {
             Name = 'CC_Configuracion_Cita_Rapida',
             CC_Activa__c = true,
             CC_Configuracion_1__c = 'true',
-            CC_Configuracion_2__c = 'TELEMATIC'
+            CC_Configuracion_2__c = 'TELEMATIC',
+            CC_Configuracion_6__c = '4'
         );
         settingsList.add(reservationType);
 
@@ -114,7 +115,7 @@ public with sharing class CC_WS_Alta_Citas_Test {
         System.runAs(usuario) {
             Test.startTest();
             Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
-            Map<String, Object> resultado = CC_WS_Alta_Citas.crearAltaCita('12345', '1345', '2024-12-04', '10:30 - 11:00', 'Cita gestor', recordId, '42');
+            Map<String, Object> resultado = CC_WS_Alta_Citas.crearAltaCita('123450', '134598', '2024-12-20', '10:30 - 11:00', 'Cita gestor', recordId, '42');
             Test.stopTest();
             System.assertEquals(false, resultado.size() == 0);
         }
@@ -140,11 +141,12 @@ public with sharing class CC_WS_Alta_Citas_Test {
 
     private class MockHttpResponseExito implements HttpCalloutMock {
         public HTTPResponse respond(HTTPRequest req) { 
-            String respuesta = '{"appointmentId":"0000000500002310"}';
+            String respuesta = '{"appointmentId":"0000000500002311"}';
             HttpResponse res = new HttpResponse();
             res.setHeader('Content-Type', 'application/json');
             res.setBody(respuesta);
             res.setStatusCode(200);
+            res.setStatus('OK');
             return res;
         }
     }
@@ -156,6 +158,7 @@ public with sharing class CC_WS_Alta_Citas_Test {
             res.setHeader('Content-Type', 'application/json');
             res.setBody(respuesta);
             res.setStatusCode(400);
+            res.setStatus('KO');
             return res;
         }
     }

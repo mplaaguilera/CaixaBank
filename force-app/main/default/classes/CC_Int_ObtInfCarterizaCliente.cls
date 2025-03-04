@@ -44,10 +44,8 @@ public with sharing class CC_Int_ObtInfCarterizaCliente {
                 salida = String.valueOf(respuesta.getBody());
                 if(String.isNotBlank(respuesta.getBody()) && respuesta.getStatusCode() == 200) {
                     RespuestaClienteDigital valoresCliente = (RespuestaClienteDigital) System.JSON.deserialize(respuesta.getBody(), RespuestaClienteDigital.class);
-                       if(valoresCliente.empleado1 != null) {  
-                        while (valoresCliente.empleado1.length() < 5) {
-                            valoresCliente.empleado1 = '0' +  valoresCliente.empleado1;
-                        }
+                    if(valoresCliente.empleado1 != null) {
+                        valoresCliente.empleado1 = valoresCliente.empleado1.leftPad(5, '0');
                         respuestaClienteDigital.put('empleado1', valoresCliente.empleado1);
                         respuestaClienteDigital.put('oficina1', valoresCliente.oficina1);
                         String matriculaGestor = 'U01' + valoresCliente.empleado1;

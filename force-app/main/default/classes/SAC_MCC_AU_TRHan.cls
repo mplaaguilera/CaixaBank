@@ -85,7 +85,8 @@ public without sharing class SAC_MCC_AU_TRHan extends CC_TriggerHandlerBase {
                 }
             }
             
-            Database.update(listaMccHijos);
+            SAC_DatabaseDML.updateListDML(listaMccHijos, true);
+            //Database.update(listaMccHijos);
 
         } catch (Exception e) {
             CBK_Log.error(e);

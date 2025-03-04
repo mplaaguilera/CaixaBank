@@ -38,7 +38,7 @@ public with sharing class CC_WS_Validacion_OTP {
 						HttpResponse httpResponse = new Http().send(getRequest(cfgIntegracion, requestBody));
 						traza.CC_FechaFin__c = Datetime.now();
 
-						// httpResponse.setStatusCode(200); //Comentar ////////////////////////////////////////////////////////
+						httpResponse.setStatusCode(500); //Comentar ////////////////////////////////////////////////////////
 
 						Boolean responseOk = httpResponse.getStatusCode() == 200;
 						traza.CC_FinOK__c = responseOk;
@@ -98,7 +98,7 @@ public with sharing class CC_WS_Validacion_OTP {
 		String requestBody = cfgIntegracion.CC_Body__c;
 		requestBody = requestBody.replace('##dateTime##', getTimestamp());
 		requestBody = requestBody.replace('##ticket##', autenticacion.CC_Ticket__c);
-		//requestBody = requestBody.replace('##ticket##', '0BCC00000353000'); //Comentar ////////////////////////////////////////////////////////
+		// requestBody = requestBody.replace('##ticket##', '0BCC00000353000'); //Comentar ////////////////////////////////////////////////////////
 		requestBody = requestBody.replace('##otpEncrypt##', codigoOtp); //autenticacion.CC_Codigo_OTPSMS__c);
 		requestBody = requestBody.replace('##personId##', numperso);
 		return requestBody;

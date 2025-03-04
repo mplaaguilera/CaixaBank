@@ -17,7 +17,8 @@ public with sharing class SAC_SetupSandbox_Test {
     static void parametrizacionDatosTest(){
         //Usuario Admin
         User userAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(userAdmin);
+        SAC_DatabaseDML.insertDML(userAdmin, false); 
+        //Database.insert(userAdmin);
         
         System.runAs(userAdmin){
             SAC_SetupSandbox.crearUsuarios();
@@ -35,7 +36,8 @@ public with sharing class SAC_SetupSandbox_Test {
     static void creacionPersonAccountTest(){
         //Usuario Admin
         User userAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(userAdmin);
+        SAC_DatabaseDML.insertDML(userAdmin, false); 
+        //Database.insert(userAdmin);
         
         Test.startTest();
         System.runAs(userAdmin){
@@ -50,7 +52,8 @@ public with sharing class SAC_SetupSandbox_Test {
     static void creacionCasoAntTest(){
         //Usuario Admin
         User userAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(userAdmin);
+        SAC_DatabaseDML.insertDML(userAdmin, false); 
+        //Database.insert(userAdmin);
         
         Test.startTest();
         System.runAs(userAdmin){

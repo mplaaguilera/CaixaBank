@@ -4,7 +4,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
     static void makeData(){
         User userAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
         userAdmin.Username = 'useradminpruebaredfinal@test.com.testdata';
-        Database.insert(userAdmin);
+        SAC_DatabaseDML.insertDML(userAdmin, false);
+        //Database.insert(userAdmin);
         
         //Grupo que se encarga de gestionar las tareas
         CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion', 1)[0];
@@ -13,7 +14,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         grupoColaborador.SAC_PermiteEscalado__c = true;
         grupoColaborador.SAC_PermiteTareas__c = true;
         grupoColaborador.SAC_Email__c = 'mneira@viewnext.com';
-        Database.insert(grupoColaborador);
+        SAC_DatabaseDML.insertDML(grupoColaborador, false);
+        //Database.insert(grupoColaborador);
 
         User usuarioGeneral;
         System.runAs(userAdmin) {
@@ -21,26 +23,29 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0]; 
             usuarioGeneral.Username = 'usergeneral@test.com'; 
             usuarioGeneral.SAC_GruposPerteneciente__c = grupoColaborador.id;   
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
 
             
         }
-        Test.startTest();
         //Account
         Account cuentaOficina = SAC_TestDataFactory.crearCuentasOficina(1)[0];
         cuentaOficina.CC_Email__c = 'test@test.com'; 
-        Database.insert(cuentaOficina);
+        SAC_DatabaseDML.insertDML(cuentaOficina, false);
+        //Database.insert(cuentaOficina);
 
         //Contact
         Contact contacto = SAC_TestDataFactory.crearContacto(1,null)[0];
         contacto.Email = 'test.t@t.t';
-        Database.insert(contacto);
+        SAC_DatabaseDML.insertDML(contacto, false);
+        //Database.insert(contacto);
 
         //Cuentas
         List<Account> cuentas = SAC_TestDataFactory.crearCuentas(2);
@@ -59,7 +64,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         cuentas[1].billingStreet  = 'Calle Mayor 55';
         cuentas[1].BillingCountry = 'España';
         cuentas[1].OwnerId = usuarioGeneral.id;
-        Database.insert(cuentas);
+        SAC_DatabaseDML.insertListDML(cuentas, false);
+        //Database.insert(cuentas);
 
         //MCC
         Id recTypeTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
@@ -74,7 +80,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         Name = 'Avales',
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-0101');
-        Database.insert(mccTematica1);
+        SAC_DatabaseDML.insertDML(mccTematica1, false);
+        //Database.insert(mccTematica1);
 
         CC_MCC__c mccProdServ1 = new CC_MCC__c(
         RecordTypeId = recTypeProdServ,
@@ -82,7 +89,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-010101',
         CC_Tematica__c = mccTematica1.id);
-        Database.insert(mccProdServ1);
+        SAC_DatabaseDML.insertDML(mccProdServ1, false);
+        //Database.insert(mccProdServ1);
 
         CC_MCC__c mccMotivo1 = new CC_MCC__c(
         RecordTypeId = recTypeMotivo,
@@ -90,7 +98,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Producto_Servicio__c = mccProdServ1.id,
         CC_Codigo_Externo__c = 'TEST-0102');
-        Database.insert(mccMotivo1);
+        SAC_DatabaseDML.insertDML(mccMotivo1, false);
+        //Database.insert(mccMotivo1);
 
         CC_MCC__c mccDetalle1 = new CC_MCC__c(
         RecordTypeId = recTypeDetalle,
@@ -98,8 +107,10 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-01010101',
         CC_Motivo__c = mccMotivo1.id);
-        Database.insert(mccDetalle1);
+        SAC_DatabaseDML.insertDML(mccDetalle1, false);
+        //Database.insert(mccDetalle1);
 
+        Test.startTest();
 
         //Reclamacion 1
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -218,6 +229,18 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
       
         Case reclamacion8 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl8);
        
+        Map<String, Object> camposReclVinc = new Map<String, Object>();
+        camposReclVinc.clear();
+        camposReclVinc.put('Subject', 'ComplementariaVinculada');
+        camposReclVinc.put('Origin', 'Otros');
+        camposReclVinc.put('Status', 'SAC_003');
+        camposReclVinc.put('SAC_TipoConsumidor__c', 'No');
+        camposReclVinc.put('SAC_Naturaleza__c', 'SAC_007');
+        camposReclVinc.put('CC_Importe_Abonado__c', 5.0);
+        camposReclVinc.put('OwnerId', usuarioGeneral.id);
+        Case casoReclamacion9 = SAC_TestDataFactory.crearCaso('Reclamacion', camposReclVinc);
+
+
         List<Case> reclamaciones = new List<Case>();
         reclamaciones.add(reclamacion);
         reclamaciones.add(reclamacion2);
@@ -227,8 +250,14 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         reclamaciones.add(reclamacion6);
         reclamaciones.add(reclamacion7);
         reclamaciones.add(reclamacion8);
-        Database.insert(reclamaciones);
+        reclamaciones.add(casoReclamacion9);
+        SAC_DatabaseDML.insertListDML(reclamaciones, false);
+        //Database.insert(reclamaciones);
         
+
+
+
+
         //Pretensiones
         //Pretension 1
         Map<String, Object> camposPret1 = new Map<String, Object>();
@@ -291,13 +320,15 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         pretensiones.add(pretension3);
         pretensiones.add(pretension4);
         pretensiones.add(pretension5);
-        Database.insert(pretensiones);
+        SAC_DatabaseDML.insertListDML(pretensiones, false);
+        //Database.insert(pretensiones);
         
         
         SAC_ProductCase__c producto  = new SAC_ProductCase__c();
         producto.SAC_Pretension__c = pretension.Id;
         producto.SAC_Descripcion__c = 'Descripcion test contrato test';
-        Database.insert(producto);
+        SAC_DatabaseDML.insertDML(producto, false);
+        //Database.insert(producto);
         
         
         
@@ -309,7 +340,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         maestro2.SAC_Prorroga__c = 30;
         maestro2.SAC_DeveloperName__c = 'GENERAL PARA OFICINAS';
         maestro2.SAC_Activo__c = true;
-        Database.insert(maestro2);
+        SAC_DatabaseDML.insertDML(maestro2, false);
+        //Database.insert(maestro2);
 
         List<SAC_Accion__c> listaTareas = new List<SAC_Accion__c>();
         SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1, reclamacion, false)[0];
@@ -334,7 +366,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         tarea2.SAC_NCuentaAbono__c = '1234567890';
         tarea2.SAC_Comentarios__c = 'Comentario prueba';
         listaTareas.add(tarea2);
-        Database.insert(listaTareas);
+        SAC_DatabaseDML.insertListDML(listaTareas, false);
+        //Database.insert(listaTareas);
         
         //ContentVersion
         List<ContentVersion> listaCV = new List<ContentVersion>();
@@ -356,7 +389,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         cv2.SAC_StringRedaccion_fileupload__c = 'ResolucionRedaccion';
         cv2.ownerId = usuarioGeneral.Id;
         listaCV.add(cv2);
-        Database.insert(listaCV);
+        SAC_DatabaseDML.insertListDML(listaCV, false);
+        //Database.insert(listaCV);
         
 
         //User de prueba
@@ -399,14 +433,16 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         List<SAC_Interaccion__c> escalados = new List<SAC_Interaccion__c>();
         escalados.add(escalado);
         escalados.add(escalado2);
-        Database.insert(escalados); 
+        SAC_DatabaseDML.insertListDML(escalados, false);
+        //Database.insert(escalados); 
 
         
 
         List<SAC_DocumentoEnvio__c> listDocumentoEnvio = SAC_TestDataFactory.crearDocumentoEnvio(2, reclamacion);
         listDocumentoEnvio[0].SAC_TipoDocumento__c = 'redaccion';
         listDocumentoEnvio[1].SAC_TipoDocumento__c = 'redacción';
-        Database.insert(listDocumentoEnvio);  
+        SAC_DatabaseDML.insertListDML(listDocumentoEnvio, false);
+        //Database.insert(listDocumentoEnvio);  
         Test.stopTest();
 
         //Parametrizaciones Escalado 1
@@ -439,7 +475,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         List<SAC_ParametrizacionEscalado__c> listaParametrizaciones = new List<SAC_ParametrizacionEscalado__c>();
         listaParametrizaciones.add(parametrizacionEscalado);
         listaParametrizaciones.add(parametrizacionEscalado2);
-        Database.insert(listaParametrizaciones);
+        SAC_DatabaseDML.insertListDML(listaParametrizaciones, false);
+        //Database.insert(listaParametrizaciones);
 
         List<SAC_PlantillaRedaccion__c> listaPlantillas = new List<SAC_PlantillaRedaccion__c>();
         SAC_PlantillaRedaccion__c plantilla1 = new SAC_PlantillaRedaccion__c();
@@ -456,7 +493,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         plantilla3.Name = 'plantilla3';
         plantilla3.SAC_TipoPlantilla__c = 'SAC_Inadmision';
         listaPlantillas.add(plantilla3);
-        Database.insert(listaPlantillas); 
+        SAC_DatabaseDML.insertListDML(listaPlantillas, false);
+        //Database.insert(listaPlantillas); 
 
         List<SAC_MaestroTemas__c> listaMaestro = new List<SAC_MaestroTemas__c>();
         SAC_MaestroTemas__c maestroT = new SAC_MaestroTemas__c(Name = 'SACMotivoDemoraTest', RecordTypeId = recTypeMotivoDemora);
@@ -467,14 +505,34 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
 
         SAC_MaestroTemas__c maestroT3 = new SAC_MaestroTemas__c(Name = 'ResolucionTest', RecordTypeId = recTypeTipoAdjuntos, SAC_DeveloperName__c = 'RESOLUCION');
         listaMaestro.add(maestroT3);
-        Database.insert(listaMaestro);
+        SAC_DatabaseDML.insertListDML(listaMaestro, false);
+        //Database.insert(listaMaestro);
 
         EmailMessage em  = new EmailMessage();
         em.relatedtoId = reclamacion.Id;
         em.Subject = 'emTestRedaccionFInal';
         em.SAC_EnvioRedaccion__c = 'primerenvioredaccion';
-        Database.insert(em);
+        SAC_DatabaseDML.insertDML(em, false);
+        //Database.insert(em);
     }
+
+
+    @isTest
+    public static void validarResolucionComplementariaTest(){
+        Case complementaria = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'ComplementariaVinculada'];
+        Boolean hayError = false;
+        User usuario = [SELECT Id FROM User WHERE Username = 'usergeneral@test.com' AND isActive = true];
+
+        Test.startTest();
+        System.runAs(usuario){
+            Boolean resultado = SAC_LCMP_RedaccionFinal.validarResolucionComplementaria(complementaria.Id);
+            Assert.areEqual(false, resultado, 'No ha saltado la validación de complementaria.');
+        }
+     
+        Test.stopTest();
+    }
+
+
 
     @isTest
     static void compruebaPDFsTest(){
@@ -568,7 +626,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         User usuarioAdmin = [SELECT Id FROM User WHERE Username = 'useradminpruebaredfinal@test.com.testdata' AND isActive = true LIMIT 1];
         Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec' LIMIT 1];
         reclamacion.OwnerId = usuarioGeneral.id;
-        Database.update(reclamacion);
+        SAC_DatabaseDML.updateDML(reclamacion, false);
+        //Database.update(reclamacion);
 
         //List<SAC_Accion__c> listTareas = [SELECT Id, OwnerId FROM SAC_Accion__c WHERE]
 
@@ -584,8 +643,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
             //validEmailTemplate.OwnerId = usuarioGeneral.id;
             Database.insert(validEmailTemplate);*/
 
-            Test.startTest();
-            SAC_LCMP_RedaccionFinal.finalizarRedaccion(reclamacion.Id, true);
+            Test.startTest(); 
+            SAC_LCMP_RedaccionFinal.finalizarRedaccion(reclamacion.Id, true, true);
             Test.stopTest();
         }
         Case reclamacion2 = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec' LIMIT 1];
@@ -599,7 +658,7 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         
         System.runAs(usuarioGeneral){
             Test.startTest();
-            SAC_LCMP_RedaccionFinal.finalizarRedaccion(reclamacion.Id, true);
+            SAC_LCMP_RedaccionFinal.finalizarRedaccion(reclamacion.Id, true, true);
             Test.stopTest();
         }
         Case reclamacion2 = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
@@ -680,7 +739,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         System.runAs(usuarioGeneral){
             Test.startTest();
             reclamacion.CC_Canal_Respuesta__c = 'Carta';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             informacion = SAC_LCMP_RedaccionFinal.obtenerDatosEmail(reclamacion.Id, false);
             Test.stopTest();
         }
@@ -780,7 +840,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         plantillaUno.SAC_PlantillaCastellanoId__c = plantillaUno.Id;
         plantillaUno.SAC_PlantillaCatalanId__c = plantillaDos.Id;
         plantillaUno.SAC_PlantillaInglesId__c = plantillaTres.Id;
-        Database.update(plantillaUno);
+        SAC_DatabaseDML.updateDML(plantillaUno, false);
+        //Database.update(plantillaUno);
 
         Id recordTypeRedaccion =  Schema.SObjectType.SAC_PlantillaRedaccion__c.getRecordTypeInfosByDeveloperName().get('SAC_Redaccion').getRecordTypeId();
         List<SAC_PlantillaRedaccion__c> listaPlantillas = new List<SAC_PlantillaRedaccion__c> ();
@@ -791,7 +852,8 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
                                                             SAC_PlantillaCatalanId__c = plantillaUno.Id, 
                                                             SAC_PlantillaInglesId__c =plantillaUno.Id);    
         listaPlantillas.add(plantillaCastellano);
-        Database.insert(listaPlantillas);
+        SAC_DatabaseDML.insertListDML(listaPlantillas, false);
+        //Database.insert(listaPlantillas);
         listaPlantillas = [SELECT id, Name, SAC_PlantillaCastellanoId__c,SAC_PlantillaCatalanId__c,SAC_PlantillaInglesId__c  FROM SAC_PlantillaRedaccion__c];
         User usuarioGeneral = [SELECT Id FROM User WHERE Username = 'usergeneral@test.com' AND isActive = true LIMIT 1];
 
@@ -933,7 +995,7 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
 
         System.runAs(usuarioGeneral){
             Test.startTest();
-            SAC_LCMP_RedaccionFinal.finalizarRedaccionNegociacion(reclamacion.id, null, pretensiones);
+            SAC_LCMP_RedaccionFinal.finalizarRedaccionNegociacion(reclamacion.id, true, pretensiones, true);
             Test.stopTest();
         }
         List<Case> pretensionesUpd = [SELECT Id, Status FROM Case WHERE SAC_Reclamacion__c =: reclamacion.Id];
@@ -983,11 +1045,11 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
     static void getContratoPretensionTest() {
         User usuarioGeneral = [SELECT Id FROM User WHERE Username = 'usergeneral@test.com' AND isActive = true LIMIT 1];
         Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRec' LIMIT 1];
-        Boolean tieneContratos = false;
+        Boolean withoutProducts = true;
 
         System.runAs(usuarioGeneral) {
-            tieneContratos = SAC_LCMP_RedaccionFinal.getContratoPretension(reclamacion.Id);
-            System.assertNotEquals(false, tieneContratos, 'No se han recuperado los contratos de pretension');
+            withoutProducts = SAC_LCMP_RedaccionFinal.getContratoPretension(reclamacion.Id);
+            System.assertEquals(true, withoutProducts, 'No se han recuperado los contratos de pretension');
         }
     }
 

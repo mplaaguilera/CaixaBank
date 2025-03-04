@@ -6,11 +6,13 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 		//Usuario con perfil SAC_General para ejecutar la acción
 		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
 		usuarioGeneral.Email = 'email@test.com';
-		Database.insert(usuarioGeneral);
+		SAC_DatabaseDML.insertDML(usuarioGeneral, false);
+		//Database.insert(usuarioGeneral);
 
 		PermissionSet ps = [select id from PermissionSet where PermissionSet.Label = 'SAC_General'];
 		PermissionSetAssignment psa = new PermissionSetAssignment(PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);
-		Database.insert(psa);
+		SAC_DatabaseDML.insertDML(psa, false);
+		//Database.insert(psa);
 
 	}
 
@@ -33,7 +35,8 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 			casoParaModificar.SAC_StatusAuxiliar__c = 'SAC_003';
 			SAC_Case_AU_TRHan.procesado=false;
 			Test.startTest();
-			Database.update(casoParaModificar);
+			SAC_DatabaseDML.updateDML(casoParaModificar, false);
+			//Database.update(casoParaModificar);
 			Test.stopTest();
 
 			reclamacion = [SELECT id, Status, SAC_Reclamacion__c FROM Case WHERE Subject = 'Reclamacion'];
@@ -61,7 +64,8 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 			casoParaModificar.SAC_SentidoResolucion__c = 'SAC_004';
 			SAC_Case_AU_TRHan.procesado=false;
 			Test.startTest();
-			Database.update(casoParaModificar);
+			SAC_DatabaseDML.updateDML(casoParaModificar, false);
+			//Database.update(casoParaModificar);
 			Test.stopTest();
 
 			reclamacion = [SELECT id, Status, SAC_Reclamacion__c FROM Case WHERE Subject = 'Reclamacion'];
@@ -102,11 +106,13 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 			casoParaModificar4 = [SELECT id, Subject, Status FROM Case WHERE Subject = 'Reclamacion'];
 			casoParaModificar4.SAC_PretensionPrincipal__c = casoParaModificar.id;
 			casosPreUpdate.add(casoParaModificar4);
-			Database.update(casosPreUpdate);
+			SAC_DatabaseDML.updateListDML(casosPreUpdate, false);
+			//Database.update(casosPreUpdate);
 
 			SAC_Case_AU_TRHan.procesado=false;
 			Test.startTest();
-			Database.update(casoParaModificar);
+			SAC_DatabaseDML.updateDML(casoParaModificar, false);
+			//Database.update(casoParaModificar);
 			Test.stopTest();
 
 			reclamacion = [SELECT id, Status, SAC_Reclamacion__c FROM Case WHERE Subject = 'Reclamacion'];
@@ -136,7 +142,8 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 
 			SAC_Case_AU_TRHan.procesado=false;
 			Test.startTest();
-			Database.update(casoParaModificar);
+			SAC_DatabaseDML.updateDML(casoParaModificar, false);
+			//Database.update(casoParaModificar);
 			Test.stopTest();
 
 			reclamacion = [SELECT id, Status, SAC_Reclamacion__c FROM Case WHERE Subject = 'Reclamacion'];
@@ -221,7 +228,8 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 			
 			SAC_Case_AU_TRHan.procesado=false;
 			Test.startTest();
-			Database.update(casoParaModificar);
+			SAC_DatabaseDML.updateDML(casoParaModificar, false);
+			//Database.update(casoParaModificar);
 			Test.stopTest();
 
 			reclamacion = [SELECT id, Status, SAC_Reclamacion__c FROM Case WHERE Subject = 'Reclamacion'];
@@ -250,7 +258,8 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 			
 			SAC_Case_AU_TRHan.procesado=false;
 			Test.startTest();
-			Database.update(casoParaModificar);
+			SAC_DatabaseDML.updateDML(casoParaModificar, false);
+			//Database.update(casoParaModificar);
 			Test.stopTest();
 
 			reclamacion = [SELECT id, Status, SAC_Reclamacion__c FROM Case WHERE Subject = 'Reclamacion'];
@@ -277,7 +286,8 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 
 			SAC_Case_AU_TRHan.procesado=false;
 			Test.startTest();
-			Database.update(casoParaModificar);
+			SAC_DatabaseDML.updateDML(casoParaModificar, false);
+			//Database.update(casoParaModificar);
 			Test.stopTest();
 
 			reclamacion = [SELECT id, Status, SAC_Reclamacion__c FROM Case WHERE Subject = 'Reclamacion'];
@@ -303,7 +313,8 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 
 			SAC_Case_AU_TRHan.procesado=false;
 			Test.startTest();
-			Database.update(casoParaModificar);
+			SAC_DatabaseDML.updateDML(casoParaModificar, false);
+			//Database.update(casoParaModificar);
 			Test.stopTest();
 
 			reclamacion = [SELECT id, Status, SAC_Reclamacion__c FROM Case WHERE Subject = 'Reclamacion'];
@@ -323,10 +334,12 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 		reclamacion.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
 		reclamacion.OwnerId = userId;
 		reclamacion.SAC_Naturaleza__c = 'SAC_004';
-		Database.insert(reclamacion);
+		SAC_DatabaseDML.insertDML(reclamacion, false);
+		//Database.insert(reclamacion);
 		
         CC_MCC__c mccDetalle = new CC_MCC__c(Name='Banca Electrónica', CC_Codigo_Externo__c='d', RecordTypeId=recordTypeIdMCCSAC, CC_Tipo_Cliente__c='SAC');
-        insert mccDetalle;
+		SAC_DatabaseDML.insertDML(mccDetalle, false);
+        //insert mccDetalle;
 
 		List<Case> lstPretensiones = new List<Case> ();
 		//Pretensiones
@@ -371,7 +384,8 @@ public with sharing class SAC_CaseActualizarEstado_Test {
 			lstPretensiones.add(pretension3);
 		}
 		if(lstPretensiones.size()>0){
-			Database.insert(lstPretensiones);
+			SAC_DatabaseDML.insertListDML(lstPretensiones, false);
+			//Database.insert(lstPretensiones);
 		}
 	}
 }

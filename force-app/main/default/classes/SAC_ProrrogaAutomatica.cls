@@ -11,6 +11,7 @@
  * 1.0            US568372      Raul y Sergio      18/05/2023      Creación
  * 1.1            US650149       Raul Santos       29/06/2023      Modificación: optimización del código
  * 1.2            US723742       Raúl Santos       05/03/2024      Modificación: añadir lógica envio emails blackList
+ * 1.3            US1114134     Sergio Martín      31/12/2024      Modificación: añadir lógica campo SAC_PendienteEnvioProrroga__c
 ***************************************************************************/
 public without sharing class SAC_ProrrogaAutomatica implements Database.batchable<sObject>{
 
@@ -53,7 +54,7 @@ public without sharing class SAC_ProrrogaAutomatica implements Database.batchabl
 
         setIdsPsd2.addAll(mapaReclamaciones.keySet());
 
-        return Database.getQueryLocator([SELECT Id, SAC_Prorrogado__c,SAC_FechaProrroga__c,SAC_FechaVencimientoSLA__c, recordTypeId, CC_Canal_Procedencia__c, OS_Alerta_Descripcion__c, OS_Email__c, CaseNumber, SAC_M2P__c
+        return Database.getQueryLocator([SELECT Id, SAC_Prorrogado__c,SAC_FechaProrroga__c,SAC_FechaVencimientoSLA__c, recordTypeId, CC_Canal_Procedencia__c, OS_Alerta_Descripcion__c, OS_Email__c, CaseNumber, SAC_M2P__c, CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c
                                                 FROM case 
                                                 WHERE recordTypeId =: RECTYPERECLAMACION 
                                                 AND id IN: setIdsPsd2
@@ -84,34 +85,58 @@ public without sharing class SAC_ProrrogaAutomatica implements Database.batchabl
                 reclamacionesConMilestones.put(milestone.caseID, milestone);
             }
             
-            List<Case> listaPretensiones = [SELECT Id, SAC_Reclamacion__c,SAC_Prorrogado__c, recordTypeId, OwnerId
+            List<Case> listaPretensiones = [SELECT Id, SAC_Reclamacion__c,SAC_Prorrogado__c, recordTypeId, OwnerId, CBK_Case_Extension_Id__c
                                             FROM Case
                                             WHERE SAC_Reclamacion__c IN: cases];                         
                                             
             List<Case> casosFinales = new List<Case>();
+            List<CBK_Case_Extension__c> listaUpdateExtension = new List<CBK_Case_Extension__c>();
 
             // Id ideBH = [SELECT Id, name FROM BusinessHours WHERE name ='SAC_Calendario'].id; 
 
             for (id rec : reclamacionesConMilestones.keyset()) {
                 // caseMilestone milestone = reclamacionesConMilestones.get(rec); 
                 case reclamacion = casos.get(rec);
-                reclamacion.SAC_Prorrogado__c = true;
-                reclamacion.SAC_FechaProrroga__c = system.now();
-                //reclamacion.SAC_FechaVencimientoSLA__c = BusinessHours.add(ideBH, milestone.TargetDate, SAC_AccionMetodos.cacularMilisegundos(15));
-                reclamacion.OS_Alerta_Descripcion__c = 'Prorrogado';
-                reclamacion.SAC_ProrrogaCounter__c = 1;
-                casosFinales.add(reclamacion);
-                casos.put(reclamacion.id,reclamacion);
+                if(reclamacion.OS_Email__c == null && reclamacion.CBK_Case_Extension_Id__c != null) {
+                    if(reclamacion.CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c == false) {
+                        reclamacion.CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c = true;
+                        CBK_Case_Extension__c extension = new CBK_Case_Extension__c();
+                        extension.id = reclamacion.CBK_Case_Extension_Id__c;
+                        extension.SAC_PendienteEnvioProrroga__c = true;
+                        listaUpdateExtension.add(extension); 
+                        casosFinales.add(reclamacion);
+                        casos.put(reclamacion.id,reclamacion);
+                    }
+                } else {
+                    reclamacion.SAC_Prorrogado__c = true;
+                    reclamacion.SAC_FechaProrroga__c = system.now();
+                    //reclamacion.SAC_FechaVencimientoSLA__c = BusinessHours.add(ideBH, milestone.TargetDate, SAC_AccionMetodos.cacularMilisegundos(15));
+                    reclamacion.OS_Alerta_Descripcion__c = 'Prorrogado';
+                    reclamacion.SAC_ProrrogaCounter__c = 1;  
+                    casosFinales.add(reclamacion);
+                    casos.put(reclamacion.id,reclamacion);
+                }
             }
 
             Map<Id, Case> mapaPretensiones = new Map<id,Case>();
             for (case pretension : listaPretensiones) {
                 case reclamacion = casos.get(pretension.SAC_Reclamacion__c);
-                pretension.SAC_Prorrogado__c = reclamacion.SAC_Prorrogado__c ;
-                pretension.SAC_FechaProrroga__c = reclamacion.SAC_FechaProrroga__c;
-                //pretension.SAC_FechaVencimientoSLA__c = reclamacion.SAC_FechaVencimientoSLA__c;
-                pretension.OS_Alerta_Descripcion__c = reclamacion.OS_Alerta_Descripcion__c;
-                casosFinales.add(pretension);  
+                if(reclamacion.OS_Email__c == null && reclamacion.CBK_Case_Extension_Id__c != null) {
+                    if(reclamacion.CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c == false) {
+                        reclamacion.CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c = true;
+                        CBK_Case_Extension__c extension = new CBK_Case_Extension__c();
+                        extension.id = pretension.CBK_Case_Extension_Id__c;
+                        extension.SAC_PendienteEnvioProrroga__c = true;
+                        listaUpdateExtension.add(extension); 
+                        casosFinales.add(pretension);  
+                    }
+                } else {
+                    pretension.SAC_Prorrogado__c = reclamacion.SAC_Prorrogado__c ;
+                    pretension.SAC_FechaProrroga__c = reclamacion.SAC_FechaProrroga__c;
+                    //pretension.SAC_FechaVencimientoSLA__c = reclamacion.SAC_FechaVencimientoSLA__c;
+                    pretension.OS_Alerta_Descripcion__c = reclamacion.OS_Alerta_Descripcion__c;
+                    casosFinales.add(pretension);  
+                }
 
                 if(!mapaPretensiones.containsKey(pretension.SAC_Reclamacion__c)) {
                     mapaPretensiones.put(pretension.SAC_Reclamacion__c, pretension);
@@ -129,12 +154,12 @@ public without sharing class SAC_ProrrogaAutomatica implements Database.batchabl
             List<SAC_MaestroTemas__c> listEmailsNoValidos = [SELECT Name FROM SAC_MaestroTemas__c WHERE RecordTypeId =: RECORDTYPEBLACKLIST AND SAC_Activo__c = true];
 
             Messaging.SingleEmailMessage[] messages =   new List<Messaging.SingleEmailMessage>{};
+            List<SAC_WrapperAlerta> listaWrapperAlerta = new List<SAC_WrapperAlerta>();
 
             // Crear fecha para posteriormente recoger el valor fecha actual de la plantilla (FECHAACTUAL) y sustituirlo por el System.Today
             // De esta manera sacamos la fecha ya que no es posible obtenerla en el Email Template con el mergeo de datos
             Datetime d = System.today();
             String formattedDate = d.day() + '-' + d.month()  + '-' + d.year();
-
             if(Case.SObjectType.getDescribe().isUpdateable()) {
                 Database.SaveResult[] lstResp = Database.update(casosFinales,false); 
                 for(Database.SaveResult res : lstResp) {
@@ -168,17 +193,24 @@ public without sharing class SAC_ProrrogaAutomatica implements Database.batchabl
                                 }
                                 messages.add(message);
                             }
-                        } else if(reclamacion.recordTypeId == RECTYPERECLAMACION && mapaPretensiones.containsKey(reclamacion.id) && reclamacion.OS_Email__c == null) {
-                            SAC_Notificacion.enviarNotificacion(mapaPretensiones.get(reclamacion.id).OwnerId, 
-                                                                reclamacion.Id, 
-                                                                'Prórroga pendiente de envío', 
-                                                                'La reclamación ' + reclamacion.CaseNumber + ' tiene una prórroga pendiente de enviar por correo postal');            
+                        } else if(reclamacion.recordTypeId == RECTYPERECLAMACION && mapaPretensiones.containsKey(reclamacion.id) && reclamacion.OS_Email__c == null && reclamacion.CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c == true) {
+                            SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(reclamacion.Id,'SAC_CasoPendienteEnvioProrroga','La reclamación ' + reclamacion.CaseNumber + ' tiene una prórroga pendiente de enviar.',mapaPretensiones.get(reclamacion.id).OwnerId,'','','');
+                            //Añadirla a la lista para posteriormente llamar al método
+                            listaWrapperAlerta.add(wrapAlerta);
                         }        
                     }
                 }
                 if(!messages.isEmpty()) {
                     Messaging.SendEmailResult[] results = Messaging.sendEmail(messages);
                 } 
+                //Si tenemos alertas que enviar, se llama al método que las envía
+                if (!listaWrapperAlerta.isEmpty()) {
+                    SAC_Alertas.generarAlertas(listaWrapperAlerta);
+                }
+
+                if(!listaUpdateExtension.isEmpty()) {
+                    SAC_DatabaseDML.updateListDML(listaUpdateExtension, true);  
+                }
             }  
         }  
     }

@@ -62,59 +62,55 @@ public with sharing class SPV_Documentos_Integration_ATR{
         if(!Test.isRunningTest()){
             request = CBK_HttpServiceIntegration.getRequest(reqWap);
             // Endpoint
-            String endpoint = request.getEndpoint().replace('{idReclamacion}', idReclamacion);
-            System.debug ('*endpoint '+endpoint);
+            String endpoint = '';
+            if(request.getEndpoint().contains('{idReclamacion}')){
+                endpoint = request.getEndpoint().replace('{idReclamacion}', idReclamacion);
+            }
             request.setEndpoint(endpoint);
         }
-        try {
-            // Mockup
-            String dataMockup = '';
-            //if(Test.isRunningTest()){
-            dataMockup = createMock();
-            // }
-            HTTPResponse resp = String.isNotBlank(dataMockup) ? getDataMockup(dataMockup) : CBK_HttpServiceIntegration.multiCallHttpService(request, idReclamacion, SPV_GET_TICKETEER);
-            String statusCode = String.valueOf(resp.getStatusCode());        
-            if(statusCode.equalsIgnoreCase('200')){
-                response.statusCode = statusCode;
-                String xmlResponse = resp.getBody();
-                System.debug('*XML ' + xmlResponse);            
-                // Parsear el XML
-                Dom.Document doc = new Dom.Document();
-                doc.load(xmlResponse);
-                // Extraer los valores del XML
-                Dom.XMLNode rootNode = doc.getRootElement();
-                Dom.XMLNode bodyNode = rootNode.getChildElement('Body', 'http://schemas.xmlsoap.org/soap/envelope/');
-                Dom.XMLNode returnNode = bodyNode.getChildElement('return', null);
-                Dom.XMLNode beanBodyNode = returnNode.getChildElement('BeanBodyOutDocReclamacionSE', null);
-                List<Documento> documentoList = new List<Documento>();
-                // Loop en lista
-                for (Dom.XMLNode listaDocumentosNode : beanBodyNode.getChildElements()) {
-                    if (listaDocumentosNode.getName() == 'listaDocumentos') {
-                        Documento docItem = new Documento();
-                        docItem.fechaRecepcion = listaDocumentosNode.getChildElement('fechaRecepcion', null).getText();
-                        docItem.nombreDocumento = listaDocumentosNode.getChildElement('nombreDocumento', null).getText();
-                        docItem.ticketEER = listaDocumentosNode.getChildElement('ticketEER', null).getText(); // TICKET EER
-                        docItem.tipologia = listaDocumentosNode.getChildElement('tipologia', null).getText();
-                        docItem.enviarBdE = listaDocumentosNode.getChildElement('enviarBdE', null).getText();
-                        docItem.idTipoDocumento = listaDocumentosNode.getChildElement('idTipoDocumento', null).getText();
-                        docItem.idDocumento = listaDocumentosNode.getChildElement('idDocumento', null).getText();
-                        documentoList.add(docItem);
-                    }
+        // Mockup
+        String dataMockup = '';
+        //if(Test.isRunningTest()){
+        dataMockup = createMock();
+        // }
+        HTTPResponse resp = String.isNotBlank(dataMockup) ? getDataMockup(dataMockup) : CBK_HttpServiceIntegration.multiCallHttpService(request, idReclamacion, SPV_GET_TICKETEER);
+        String statusCode = String.valueOf(resp.getStatusCode());        
+        if(statusCode.equalsIgnoreCase('200')){
+            response.statusCode = statusCode;
+            String xmlResponse = resp.getBody();
+            // Parsear el XML
+            Dom.Document doc = new Dom.Document();
+            doc.load(xmlResponse);
+            // Extraer los valores del XML
+            Dom.XMLNode rootNode = doc.getRootElement();
+            Dom.XMLNode bodyNode = rootNode.getChildElement('Body', 'http://schemas.xmlsoap.org/soap/envelope/');
+            Dom.XMLNode returnNode = bodyNode.getChildElement('return', null);
+            Dom.XMLNode beanBodyNode = returnNode.getChildElement('BeanBodyOutDocReclamacionSE', null);
+            List<Documento> documentoList = new List<Documento>();
+            // Loop en lista
+            for (Dom.XMLNode listaDocumentosNode : beanBodyNode.getChildElements()) {
+                if (listaDocumentosNode.getName() == 'listaDocumentos') {
+                    Documento docItem = new Documento();
+                    docItem.fechaRecepcion = listaDocumentosNode.getChildElement('fechaRecepcion', null).getText();
+                    docItem.nombreDocumento = listaDocumentosNode.getChildElement('nombreDocumento', null).getText();
+                    docItem.ticketEER = listaDocumentosNode.getChildElement('ticketEER', null).getText(); // TICKET EER
+                    docItem.tipologia = listaDocumentosNode.getChildElement('tipologia', null).getText();
+                    docItem.enviarBdE = listaDocumentosNode.getChildElement('enviarBdE', null).getText();
+                    docItem.idTipoDocumento = listaDocumentosNode.getChildElement('idTipoDocumento', null).getText();
+                    docItem.idDocumento = listaDocumentosNode.getChildElement('idDocumento', null).getText();
+                    documentoList.add(docItem);
                 }
-                response.lstDocumentos = documentoList;
-                response.statusCode = '200';
-                // Convertir JSON
-                String jsonResponse = JSON.serialize(documentoList);
-                System.debug('*JSON ' + jsonResponse);
-                
-            }else{
-                response.statusCode = statusCode;
-                response.errorCode = 'Error en el servicio.';
-                response.errorMessage = resp.getStatus() + ' (' + resp.getStatusCode() + ')'; 
-            } 
-        } catch (Exception e) {
-            System.debug('Error al realizar la llamada HTTP: ' + e.getMessage());
-        }
+            }
+            response.lstDocumentos = documentoList;
+            response.statusCode = '200';
+            // Convertir JSON
+            String jsonResponse = JSON.serialize(documentoList);
+            
+        }else{
+            response.statusCode = statusCode;
+            response.errorCode = 'Error en el servicio.';
+            response.errorMessage = resp.getStatus() + ' (' + resp.getStatusCode() + ')'; 
+        } 
         return response;
     }
     
@@ -124,9 +120,8 @@ public with sharing class SPV_Documentos_Integration_ATR{
         
         PostTicketResponse response = new PostTicketResponse();
         // Wrapper
-       	CC_InterfaceSettings__mdt confInterfaz = SAC_Utils.getInterfazConfigBody(SPV_POST_TICKETEER);
-        String body = confInterfaz.CC_Body__c.replace('****', 'TICKETEER'); 
-        System.debug('*body ' + body);
+        CC_InterfaceSettings__mdt confInterfaz = SAC_Utils.getInterfazConfigBody(SPV_POST_TICKETEER);
+        String body = confInterfaz.CC_Body__c.replace('****', ticketEER); 
         Map<String, String> mapHeader = new Map<String, String>();
         mapHeader.put(HEADER_CONTENT_TYPE, 'text/xml');
         CBK_HttpServiceIntegration.RequestWapper reqWap = new CBK_HttpServiceIntegration.RequestWapper();
@@ -134,62 +129,33 @@ public with sharing class SPV_Documentos_Integration_ATR{
         reqWap.intSetting = SPV_POST_TICKETEER;
         reqWap.method = 'POST';
         reqWap.mHeaders = mapHeader;
-        System.debug('*reqWap ' + reqWap);
         // Request
         HttpRequest request = new HttpRequest();
         if(!Test.isRunningTest()){
             request = CBK_HttpServiceIntegration.getRequest(reqWap);
-            System.debug('*request ' + request);
         }
-        try {
-            // Mockup
-            String dataMockup = '';
-            //if(Test.isRunningTest()){
-            dataMockup = createMock2();
-            // }
-            
-            HTTPResponse resp = String.isNotBlank(dataMockup) ? getDataMockup(dataMockup) : CBK_HttpServiceIntegration.callHttpService(request, ticketEER, SPV_POST_TICKETEER);
-            String statusCode = String.valueOf(resp.getStatusCode());
-            if(statusCode.equalsIgnoreCase('200') || statusCode.equalsIgnoreCase('201')){
-                System.debug('*resp.getbody() '+resp.getbody());
-                //response.documento = (SPV_Documentos_Integration_ATR.Documento)getBodyResponse(resp.getbody(), 'SPV_Documentos_Integration_ATR.Documento');
-                System.debug('*response.documento ' + response.documento);                
-                response.statusCode = statusCode;
-                String xmlResponse = resp.getBody();
-                System.debug('*XML ' + xmlResponse);            
-                // Parsear el XML
-                Dom.Document doc = new Dom.Document();
-                doc.load(xmlResponse);
-                // Extraer los valores del XML
-                Dom.XMLNode rootNode = doc.getRootElement();
-                Dom.XMLNode bodyNode = rootNode.getChildElement('Body', 'http://schemas.xmlsoap.org/soap/envelope/');
-                Dom.XMLNode returnNode = bodyNode.getChildElement('return', null);
-                Dom.XMLNode beanBodyNode = returnNode.getChildElement('BeanBodyOutDocReclamacionSE', null);
-                Documento docItem = new Documento();
-                docItem.fechaRecepcion = beanBodyNode.getChildElement('fechaRecepcion', null).getText();
-                docItem.nombreDocumento = beanBodyNode.getChildElement('nombreDocumento', null).getText();
-                docItem.ticketEER = beanBodyNode.getChildElement('ticketEER', null).getText(); // TICKET EER
-                docItem.tipologia = beanBodyNode.getChildElement('tipologia', null).getText();
-                docItem.enviarBdE = beanBodyNode.getChildElement('enviarBdE', null).getText();
-                docItem.idTipoDocumento = beanBodyNode.getChildElement('idTipoDocumento', null).getText();
-                docItem.idDocumento = beanBodyNode.getChildElement('idDocumento', null).getText();
-                
-                response.documento = docItem;
-                response.statusCode = '200';
-                // Convertir JSON
-                String jsonResponse = JSON.serialize(response);
-                System.debug('*JSON ' + jsonResponse);
-            }else{
-                response.statusCode = statusCode;
-                response.errorCode = 'Error en el servicio.';
-                response.errorMessage = resp.getStatus(); 
-            }
-        } catch (Exception e) {
-            System.debug('Error al realizar la llamada HTTP: ' + e.getMessage());
+        // Mockup
+        String dataMockup = '';
+        //if(Test.isRunningTest()){
+        dataMockup = createMock2();
+        // }
+        
+        HTTPResponse resp = String.isNotBlank(dataMockup) ? getDataMockup(dataMockup) : CBK_HttpServiceIntegration.callHttpService(request, ticketEER, SPV_POST_TICKETEER);
+        String statusCode = String.valueOf(resp.getStatusCode());
+        if(statusCode.equalsIgnoreCase('200') || statusCode.equalsIgnoreCase('201')){
+            System.debug('*resp.getbody() '+resp.getbody());
+            response.statusCode = statusCode;
+            // Convertir JSON
+            String jsonResponse = JSON.serialize(response);
+            System.debug('*JSON ' + jsonResponse);
+        }else{
+            response.statusCode = statusCode;
+            response.errorCode = 'Error en el servicio.';
+            response.errorMessage = resp.getStatus(); 
         }
         return response;
     }
-	    private static String createMock2(){
+    private static String createMock2(){
         String dataMockup = '';
         dataMockup +='<?xml version="1.0"?>';
         dataMockup += '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:atr="https://extcaastb1.lacaixa.es/AttReclamacionesBusquedaReclamac/v1/BusquedaReclamac142/busquedaReclam/">';
@@ -242,7 +208,7 @@ public with sharing class SPV_Documentos_Integration_ATR{
         dataMockup += '</soapenv:Envelope>';
         return dataMockup;
     }
-
+    
     
     /**
 * @description Generate the response for the mockup data
@@ -259,23 +225,23 @@ public with sharing class SPV_Documentos_Integration_ATR{
     /**
 * @description Convertir en objeto el json de la response
 */
-    private static Object getBodyResponse(String response, String clazzName){
-        Object result = parseJsonToObject(response, clazzName);
-        return result;
-    }
+    /*private static Object getBodyResponse(String response, String clazzName){
+Object result = parseJsonToObject(response, clazzName);
+return result;
+}*/
     
     /**
 * @description Convertir en objeto el json de la response
 */
-    private static Object parseJsonToObject(String jsonData, String jsonType){
-        Type typeClass = Type.forName(jsonType);
-        return System.JSON.deserializeStrict(jsonData, typeClass);
-    }
-    
-    static public List<String> extraerTicketEER (String sXMLData){        
-        
-        List<String> lstTicketEER = new List<String>();
-        
-        return lstTicketEER;
-    }
+    /*private static Object parseJsonToObject(String jsonData, String jsonType){
+Type typeClass = Type.forName(jsonType);
+return System.JSON.deserializeStrict(jsonData, typeClass);
+}
+
+static public List<String> extraerTicketEER (String sXMLData){        
+
+List<String> lstTicketEER = new List<String>();
+
+return lstTicketEER;
+}*/
 }

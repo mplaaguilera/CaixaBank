@@ -16,8 +16,6 @@ public with sharing class HDT_Case_AU_TRHan extends CC_TriggerHandlerBase {
         if (!lstCasesCC.isEmpty()) {
             actualizarEstadisticasComunicacionInformativa(mapOldObj, lstCasesCC);
             crearPlantillasAgrupadores(mapOldObj, lstCasesCC);
-
-            //Map<Id, CC_MCC__c> mapMCC = HDT_CaseTriggerHelper.obtencionMCCAplicacionesYServicios();
             HDT_CaseTriggerHelper.calcularNumAgrupadores(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.crearActividadCierreCC(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.crearActividadReactivacionCC(lstCasesCC, mapOldObj);
@@ -25,33 +23,17 @@ public with sharing class HDT_Case_AU_TRHan extends CC_TriggerHandlerBase {
             HDT_CaseTriggerHelper.desvinculacionAgrupadorAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.cambioPropietarioAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.cambioPropietarioActividades(lstCasesCC, mapOldObj);
-
             HDT_CaseTriggerHelper.estadoCerradoAU(lstCasesCC, mapOldObj);
-            //HDT_CaseTriggerHelper.revisarReclamacionesTwitterAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.modificaCausaDeCasoAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.enviarEncuestaAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.actualizarAgrupadorAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.asociaActivoAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.envioCorreoAcuseRecibo(lstCasesCC);
             HDT_CaseTriggerHelper.cierreCasoHDT1N(lstCasesCC, mapOldObj);
+            HDT_CaseTriggerHelper.cierreCasoAU(lstCasesCC, mapOldObj);
+            // HDT_CaseTriggerHelper.cierreCasoHDT2N(lstCasesCC, mapOldObj);
         }
-
-        /* Comentado por moises cano - NO APLICA
-        envioCorreoConsultasOperativasTrasladoAsignacionPropietario(mapOldObj, listNewObj); */
     }
-
-    /*
-    private void cambioEstadocasoActivo() {
-
-        Case caso = new Case();
-
-        //Ejecución de las actualizaciones de caso
-        if(Schema.sObjectType.Case.fields.Status.isUpdateable()){
-
-            update caso;
-        }
-
-    }*/
 
     @TestVisible
     private static void actualizarEstadisticasComunicacionInformativa(Map<Id, Case> mapOldObj, List<Case> listNewObj) {

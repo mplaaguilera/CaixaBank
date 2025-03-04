@@ -40,6 +40,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 				lstSal.add(correo);
 			}
 		}
+
 		if (lstSal.size() > 0) {
 			tratarSalida(lstSal,mapaCorreosOld, eventype);
 		}
@@ -51,8 +52,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 
 	public void tratarSalida(List<EmailMessage> correos, Map<Id, EmailMessage> mapaCorreosOld, CC_TriggerParameters.TriggerEvent eventype) {
 		Map<string, Map<String, List<EmailMessage>>> mSobjectInfo = new Map<string, Map<String, List<EmailMessage>>> ();
-		Map<String, CBK_TriggerHandlerParent__mdt> mcs = CBK_TriggerHandlerParent__mdt.getAll();
-
+		Map<Id, CBK_TriggerHandlerParent__mdt> mcs = new Map<Id, CBK_TriggerHandlerParent__mdt>([SELECT Id, DeveloperName, CBKL_TriggerEvent__c, CBK_Active__c, CBK_Email__c, CBK_HandlerClassName__c, CBK_ObjectAPIName__c, CBK_RecordType__c, CBK_Type__c, CBK_Order__c FROM CBK_TriggerHandlerParent__mdt WHERE CBK_Type__c = 'Salida' AND CBK_Active__c = true ORDER BY CBK_Order__c, DeveloperName ASC]);
 		//Mapa de Set de acumulación de Ids
 		Map<String, Set<String>> sObjectsIdsBySObjectType = new Map<String, Set<String>>();
 
@@ -110,8 +110,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 		CC_TriggerParameters tp;
 
 		//Ejecucion de handler clasificados por Objeto -> RecordType -> Lista de Emails
-		List<String> configHandlerSort = new List<String>(mcs.keySet());
-		configHandlerSort.sort();
+		List<Id> configHandlerSort = new List<Id>(mcs.keySet());
 		for (string mt : configHandlerSort){
 			rt = mcs.get(mt).CBK_RecordType__c;
 			objetoMT = mcs.get(mt).CBK_ObjectAPIName__c;
@@ -122,33 +121,42 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 			tp = new CC_TriggerParameters();
 
 			if (typeEm.toUpperCase() == String.valueOf('Salida').toUpperCase()) {
-				if (mSobjectInfo.containsKey(objetoMT) && eventtrigger == String.valueOf(eventype)) {
-					tp.newList = mSobjectInfo.get(objetoMT).get(rt);
-					tp.newMap = generateMap(mSobjectInfo.get(objetoMT).get(rt), eventype);
+				List<EmailMessage> emails = new List<EmailMessage>();
+				if(String.isNotBlank(objetoMT) && mSobjectInfo.containsKey(objetoMT) && mSobjectInfo.get(objetoMT).containsKey(rt)) {
+					emails = mSobjectInfo.get(objetoMT).get(rt);
+				} else if(String.isBlank(objetoMT)) {
+					emails = correos;
+				}
+
+				if (!emails.isEmpty() && eventtrigger == String.valueOf(eventype)) {
+					tp.newList = emails;
+					tp.newMap = generateMap(emails, eventype);
 					if (String.valueOf(eventype) == 'beforeDelete' || String.valueOf(eventype) == 'afterDelete'){
 						tp.newList = new List<EmailMessage>();
 						tp.newMap = new Map<Id,EmailMessage>();
-						tp.oldList = mSobjectInfo.get(objetoMT).get(rt);
-						tp.oldMap = generateMap(mSobjectInfo.get(objetoMT).get(rt), eventype);
+						tp.oldList = emails;
+						tp.oldMap = generateMap(emails, eventype);
 					}else if(String.valueOf(eventype) == 'beforeUpdate' || String.valueOf(eventype) == 'afterUpdate'){
 						tp.oldList =  generateOldList(tp.newList, mapaCorreosOld);
 						tp.oldMap = generateMap(tp.oldList, eventype);
 					}
-					
-					if (Test.isRunningTest()) {
-						active = true;
-					}
-					if (((tp.newList != null && tp.newList.size() > 0) || (tp.oldList != null && tp.oldList.size() > 0 ))  && active){
-						Type handlerClassType = Type.forName(className);
-						if(handlerClassType != null){
-							execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, eventype);
-						}else{
-							CBK_Log.addError(null, null, 'Trigger Handler Associations - No existe la clase: ' + className + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventype, new List <Object>(), null);
-						}
+				}
+				
+				if (Test.isRunningTest()) {
+					active = true;
+				}
+				if (((tp.newList != null && tp.newList.size() > 0) || (tp.oldList != null && tp.oldList.size() > 0 )) && active){
+					Type handlerClassType = Type.forName(className);
+					if(handlerClassType != null){
+						execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, eventype);
+					}else{
+						CBK_Log.addError(null, null, 'Trigger Handler Associations - No existe la clase: ' + className + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventype, new List <Object>(), null);
 					}
 				}
 			}
 		}
+
+		CBK_log.debug('Salida Map: ' + JSON.serialize(mSobjectInfo), LoggingLevel.INFO);
 		CBK_Config__mdt mc = CBK_Config__mdt.getInstance('Active_Execution');
 		//Ejecuccion normal para aquellos Emails no incluidos en mdt: Trigger Handlers Parent
 		for (string handlerClassName : getAssociatedHandlers(objectApiName, String.valueOf(eventype))) {
@@ -186,7 +194,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 
 	public void tratarEntrada(List<EmailMessage> correos, Map<Id, EmailMessage> mapaCorreosOld, CC_TriggerParameters.TriggerEvent eventype) {
 		Map<string, List<EmailMessage>> mSobjectInfo = new Map<string, List<EmailMessage>> ();
-		Map<String, CBK_TriggerHandlerParent__mdt> mcs = CBK_TriggerHandlerParent__mdt.getAll();
+		Map<Id, CBK_TriggerHandlerParent__mdt> mcs = new Map<Id, CBK_TriggerHandlerParent__mdt>([SELECT Id, DeveloperName, CBKL_TriggerEvent__c, CBK_Active__c, CBK_Email__c, CBK_HandlerClassName__c, CBK_ObjectAPIName__c, CBK_RecordType__c, CBK_Type__c, CBK_Order__c FROM CBK_TriggerHandlerParent__mdt WHERE CBK_Type__c = 'Entrada' AND CBK_Active__c = true ORDER BY CBK_Order__c, DeveloperName ASC]);
 
 		//get info Metadata
 		Map<String, Set<String>> mapInfoMdt = getInfoMdtEntrada(String.valueOf(eventype));
@@ -234,8 +242,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 		CC_TriggerParameters tp;
 		
 		//Ejecucion de handler clasificados por: Email Entrante -> Handler class 
-		List<String> configHandlerSort = new List<String>(mcs.keySet());
-		configHandlerSort.sort();
+		List<Id> configHandlerSort = new List<Id>(mcs.keySet());
 		for (string mt : configHandlerSort){
 			inEmail = String.isBlank(mcs.get(mt).CBK_Email__c) ? '' : mcs.get(mt).CBK_Email__c;
 			className = mcs.get(mt).CBK_HandlerClassName__c;
@@ -276,7 +283,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 				}
 			}
 		}
-		CBK_log.debug('entrada Map: ' + json.serialize(mSobjectInfo), LoggingLevel.INFO);
+		CBK_log.debug('entrada Map: ' + JSON.serialize(mSobjectInfo), LoggingLevel.INFO);
 		CBK_Config__mdt mc = CBK_Config__mdt.getInstance('Active_Execution');
 		//Ejecuccion fuera del FWK trigger
 		for (string handlerClassName : getAssociatedHandlers(objectApiName, String.valueOf(eventype))) {
@@ -318,7 +325,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 					active = true;
 				}
 
-				if (active && eventypeMdt == eventype) {
+				if (active && eventypeMdt == eventype && String.isNotBlank(mdt.CBK_ObjectAPIName__c)) {
 					if (mRTmdt.containsKey(mdt.CBK_ObjectAPIName__c)) {
 						lstRTmdt = new set<String> ();
 						lstRTmdt.add(mdt.CBK_RecordType__c);

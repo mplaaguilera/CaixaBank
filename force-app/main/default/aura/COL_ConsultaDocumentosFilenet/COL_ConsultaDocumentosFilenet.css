@@ -1,0 +1,6 @@
+.THIS div.datatableContainer {
+    border: solid var(--slds-g-sizing-border-1, 1px) var(--slds-g-color-neutral-base-80, #c9c9c9);
+    border-radius: 4px;
+    height: 240px;
+    overflow-y: auto;
+}

@@ -60,7 +60,8 @@ public without sharing class SAC_Accion_AI_TRHan  extends CC_TriggerHandlerBase 
             }
 
         }
-        Database.insert(tmeTareas); 
+         SAC_DatabaseDML.insertListDML(tmeTareas, true); 
+        //Database.insert(tmeTareas); 
 
         List<SAC_Accion__c> listaSelect = new List<SAC_Accion__c>();
         listaSelect = [SELECT Id, SAC_MaestroAccionesReclamacion__r.Name, SAC_IndexedThreadId__c FROM SAC_Accion__c WHERE RecordTypeId =: RECTYPEMAESTROTAREAS AND Id IN :listaIdsAcciones AND SAC_MaestroAccionesReclamacion__r.Name = 'GENERAL PARA OFICINAS'];

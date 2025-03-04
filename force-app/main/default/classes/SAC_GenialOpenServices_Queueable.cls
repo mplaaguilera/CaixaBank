@@ -78,10 +78,13 @@ public with sharing class SAC_GenialOpenServices_Queueable implements Queueable,
     public void execute(QueueableContext context) {
         //id generado por docIA proporcionado por Open Services
         SAC_GenialOpenServicesIntegracion.DocumentsInfo externoDocId;
+        system.debug('***externoDocId '+externoDocId);
         try{
             if(!this.bodyEnviado){
+                system.debug('***bodyEnviado ');
                 //enviar el body en formato txt como primer documento
                 externoDocId = SAC_GenialOpenServicesIntegracion.envioBody(this.reclamaId);
+                system.debug('***externoDocId '+externoDocId);
                 if(externoDocId != null) {
                     this.attachedDocuments.add(externoDocId);
                     this.bodyEnviado = true;

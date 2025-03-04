@@ -194,6 +194,166 @@ public class SAC_WS_FormularioCasos_Test {
         }   
     }
 
+        @isTest
+    static void crearFormularioConfidencial() {
+        
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        CC_MCC__c mccTematica = new CC_MCC__c();
+		mccTematica.Name = 'Ahorro a la vista';
+        mccTematica.CC_Tipo_Cliente__c = 'Cliente';
+        mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
+        mccTematica.RecordTypeId = recordTypeIdTematica;
+        mccTematica.CC_Codigo_Externo__c = 'TE-000001';
+        mccTematica.CC_Canal_Operativo__c = 'Oficina';
+        SAC_DatabaseDML.insertDML(mccTematica, false);
+        
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        CC_MCC__c mccProducto = new CC_MCC__c();
+        mccProducto.Name = 'Cuenta corriente';
+        mccProducto.CC_Tipo_Cliente__c = 'Cliente';
+        mccProducto.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
+        mccProducto.RecordTypeId = recordTypeIdProducto;
+        mccProducto.CC_Tematica__c = mccTematica.Id;
+        mccProducto.CC_Codigo_Externo__c = 'PR-000001';
+        mccProducto.CC_Canal_Operativo__c = 'Oficina';
+        SAC_DatabaseDML.insertDML(mccProducto, false);
+        
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+       	CC_MCC__c mccMotivo = new CC_MCC__c();
+        mccMotivo.Name = 'Apertura sin autorización';
+        mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
+        mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
+        mccMotivo.RecordTypeId = recordTypeIdMotivo;
+        mccMotivo.CC_Tematica__c = mccTematica.Id;
+        mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
+        mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
+        mccMotivo.CC_Canal_Operativo__c = 'Oficina';
+        SAC_DatabaseDML.insertDML(mccMotivo, false);
+        
+        Id recordTypeIdWeb = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
+       	CC_MCC__c mccConvWeb = new CC_MCC__c();
+        mccConvWeb.Name = 'Test';
+        mccConvWeb.CC_Tipo_Cliente__c = 'SAC';
+        mccConvWeb.CC_Equivalencia_Formulario__c = 'MC-001-001-001';
+        mccConvWeb.CC_Fecha_Vigencia_Inicio__c = Date.newInstance(2019,05,05);
+        mccConvWeb.RecordTypeId = recordTypeIdWeb;
+        mccConvWeb.CC_WebMCCTematica__c = mccTematica.Id;
+        mccConvWeb.CC_WebMCCProducto__c = mccProducto.Id; 
+        mccConvWeb.CC_WebMCCMotivo__c = mccMotivo.Id;
+        mccConvWeb.CC_MCCWeb_Origen__c = 'MC';
+        mccConvWeb.CC_MCCWeb_Motivo__c = '001';
+        mccConvWeb.CC_MCCWeb_Producto__c = '001';
+        mccConvWeb.CC_MCCWeb_Ambito__c = '001';
+        mccConvWeb.CC_Canal_Operativo__c = 'Oficina';
+        SAC_DatabaseDML.insertDML(mccConvWeb, false);
+        
+        // Crear cliente.
+        Account a = new Account();
+        a.Name = 'Cliente prueba 1';
+        a.AV_NumPerso__c = '999910559714';
+        a.CC_Numero_Documento__c = '23663942R';
+        a.AV_Confidencial__c = true;
+        SAC_DatabaseDML.insertDML(a, false);
+        
+        System.assertEquals([SELECT Count() FROM Account WHERE Name = 'Cliente prueba 1'], 1, 'Error al recuperar la cuenta');
+        
+        // Crear contacto.
+        Contact b = new Contact();
+        b.LastName = 'Contacto prueba 1';
+        b.CC_NumPerso__c = '999910559714';
+        b.CC_Numero_Documento__c = '23663942R';
+        b.AccountId = a.Id;
+        SAC_DatabaseDML.insertDML(b, false);
+        
+        System.assertEquals([SELECT Count() FROM Contact WHERE LastName = 'Contacto prueba 1'], 1, 'Error al recuperar el contacto');
+
+        
+        List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
+        
+        SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input oData = new SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input();
+        oData.Aplicacion = 'FORMWEB';
+        oData.id = 'X';
+        oData.entidad = 'X';
+        oData.Nombre = 'X';
+        oData.Apellido1 = 'X';
+        oData.Apellido2 = 'X';
+        oData.EMAIL = 'TEST@TEST.ES';
+        oData.Telefono = '900606060';
+        oData.NIF = '23663942R';
+        oData.Cliente = 'X';
+        oData.NumOf = 'X';
+        oData.ClienteLOE = 'X';
+        oData.Codiusu = 'X';
+        oData.Producto = '001';
+        oData.Ambito = '001';
+        oData.Motivo = '001';
+        oData.Idioma = 'es';
+        oData.Texto = 'X';
+        oData.CertificadoDigital = 'X';
+        oData.Origen = 'X';
+        oData.Referer = 'X';
+        oData.userAgent = 'X';
+        oData.IP = 'X';
+        oData.REFUSUARIO = '001-001';
+        oData.Tipo = 'X';
+        oData.Web = 'X';
+        oData.Servicio = 'X';
+        //oData.FicherosAdjuntos = 'X';
+        
+        oEntrada.add(oData);
+        oEntrada.add(oData); //Forzado duplicado.
+        
+        SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input oData2 = new SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input();
+        oData2.Aplicacion = 'FORMWEB';
+        oData2.id = 'X1';
+        oData2.entidad = 'X1';
+        oData2.Nombre = 'X1';
+        oData2.Apellido1 = 'X1';
+        oData2.Apellido2 = 'X1';
+        oData2.EMAIL = 'TEST@TEST.ES';
+        oData2.Telefono = '900606060';
+        oData2.NIF = '23663942R';
+        oData2.Cliente = 'X1';
+        oData2.NumOf = 'X1';
+        oData2.ClienteLOE = 'X1';
+        oData2.Codiusu = 'X1';
+        oData2.Producto = '001';
+        oData2.Ambito = '001';
+        oData2.Motivo = '001';
+        oData2.Idioma = 'es';
+        oData2.Texto = 'X1';
+        oData2.CertificadoDigital = 'X';
+        oData2.Origen = 'X';
+        oData2.Referer = 'X';
+        oData2.userAgent = 'X';
+        oData2.IP = 'X';
+        oData2.REFUSUARIO = '001-001';
+        oData2.Tipo = 'X';
+        oData2.Web = 'X';
+        oData2.Servicio = 'X';
+        
+        List<Sac_WS_FormularioCasos.WrapperAdjunto> ficherosAdjuntosAux = new List<Sac_WS_FormularioCasos.WrapperAdjunto>();
+        
+        Sac_WS_FormularioCasos.WrapperAdjunto fichero = new Sac_WS_FormularioCasos.WrapperAdjunto();
+        fichero.base64 = 'aaa';
+        fichero.extension = 'PDF';
+        fichero.nombreFichero = 'prueba';
+        
+        ficherosAdjuntosAux.add(fichero);
+        
+        oData2.FicherosAdjuntos = ficherosAdjuntosAux;
+        
+        oEntrada.add(oData2);
+        
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        System.runAs(usuario){
+            Test.startTest();
+            List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
+            Test.stopTest();
+        }   
+    }
+    
     @isTest
     static void crearFormularioWeb01() {
         

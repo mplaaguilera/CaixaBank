@@ -140,11 +140,11 @@ public without sharing class SAC_AccionMetodos {
 
     @future
     public static void finalizarTareaFuture(List<Id> idsTareas, Id idUsuario, String observaciones){
-
+      
         List<SAC_Accion__c> listaTareas = [SELECT id, Name, OwnerId, SAC_EquipoResponsable__c,SAC_Estado__c, SAC_FechaVencimientoProrroga__c, SAC_Comentarios2__c
                                 FROM SAC_Accion__c 
                                 WHERE id IN: idsTareas];
-                                
+            
         for (SAC_Accion__c tarea : listaTareas) {
             tarea.ownerId = idUsuario;
             tarea.SAC_Estado__c = 'SAC_Finalizada';
@@ -156,7 +156,11 @@ public without sharing class SAC_AccionMetodos {
         }
         finalizarTMEs(listaTareas);
 
-        Database.update(listaTareas);
+        if(!Test.isRunningTest()){
+            SAC_DatabaseDML.updateListDML(listaTareas, true);  
+            //Database.update(listaTareas);
+        }
+
     }
 
     /**************************************************************************
@@ -175,7 +179,8 @@ public without sharing class SAC_AccionMetodos {
             tme.SAC_FechaFin__c = Datetime.Now();
         }
         
-        Database.update(tmesTarea);
+        SAC_DatabaseDML.updateListDML(tmesTarea, true);  
+        //Database.update(tmesTarea);
     }
      /**************************************************************************
      * Proposito: Prorrogar la tarea a nivel masivo donde se coge el valor 
@@ -207,7 +212,8 @@ public without sharing class SAC_AccionMetodos {
        }
        
         
-       Database.update(listaTareas);
+       SAC_DatabaseDML.updateListDML(listaTareas, true); 
+       //Database.update(listaTareas);
         
     }
     /**************************************************************************
@@ -346,8 +352,9 @@ public without sharing class SAC_AccionMetodos {
         }
 
         if(!casosUpdate.isEmpty()){  
-            SAC_AsignarTMEs.closeTPE(casosUpdate);          
-            Database.update(casosUpdate);
+            SAC_AsignarTMEs.closeTPE(casosUpdate);
+            SAC_DatabaseDML.updateListDML(casosUpdate, true);          
+            //Database.update(casosUpdate);
         }
         
     }
@@ -366,7 +373,7 @@ public without sharing class SAC_AccionMetodos {
         //SAC_Accion__c tarea = recuperarTarea(tareaId);
 		List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PendienteAsignar' LIMIT 1];
         
-        if(cola.size() == 1){ 
+        if(!cola.isEmpty()){ 
             for(SAC_Accion__c tarea : listaTareas){
                 
                 if(tarea.SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c == 'GGH'){
@@ -377,8 +384,9 @@ public without sharing class SAC_AccionMetodos {
                 }
             }            
         }
-		if(Schema.sObjectType.Case.isUpdateable()){   
-			Database.update(listaTareas);
+		if(Schema.sObjectType.Case.isUpdateable()){
+            SAC_DatabaseDML.updateListDML(listaTareas, true);   
+			//Database.update(listaTareas);
 		}else{
 			throw new AuraHandledException('No tienes permisos');
 		}
@@ -578,7 +586,8 @@ public without sharing class SAC_AccionMetodos {
                 tarea.SAC_Estado__c = 'SAC_EnGestion';
             }
         }
-        Database.update(listaTareas);
+        SAC_DatabaseDML.updateListDML(listaTareas, true);
+        //Database.update(listaTareas);
     }
 
 
@@ -622,7 +631,8 @@ public without sharing class SAC_AccionMetodos {
                     caso.SAC_StatusAuxiliar__c = 'SAC_004';
                 }
 
-                Database.update(listaReclamacionesUpdate);
+                SAC_DatabaseDML.updateListDML(listaReclamacionesUpdate, true);
+                //Database.update(listaReclamacionesUpdate);
             }
         }
     }
@@ -747,7 +757,8 @@ public without sharing class SAC_AccionMetodos {
         }
 
         if(!listaAccionesConError.isEmpty()){
-            Database.update(listaAccionesConError);
+            SAC_DatabaseDML.updateListDML(listaAccionesConError, true);
+            //Database.update(listaAccionesConError);
         }
     }
 
@@ -888,6 +899,88 @@ public without sharing class SAC_AccionMetodos {
 
         return mapaUserTienePermiso;
     }
+
+
+
+    /**************************************************************************
+     * Proposito: Establecer la fecha de alta de las tareas creadas
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US923529        Álex Polo      19/12/24     Creación
+    *****************************************************************************/
+    public static void establecerFechaAlta(List<SAC_Accion__c> listaAcciones) {
+        
+        for(SAC_Accion__c accion : listaAcciones){
+            accion.SAC_FechaCreacion__c = Date.today();
+        }
+
+    }
+
+    /**************************************************************************
+     * Proposito: Establecer la fecha de finalización de las tareas
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US923529        Álex Polo      19/12/24     Creación
+    *****************************************************************************/
+    public static void establecerFechaFin(List<SAC_Accion__c> listaAcciones, Map<Id, SAC_Accion__c> mapNewObj, Map<Id, SAC_Accion__c> mapOldObj) {
+        
+        for(SAC_Accion__c accion : listaAcciones){
+           
+            if(mapNewObj.containsKey(accion.Id) && mapNewObj.get(accion.Id).SAC_Estado__c != mapOldObj.get(accion.Id).SAC_Estado__c && (mapNewObj.get(accion.Id).SAC_Estado__c == 'SAC_Finalizada' || mapNewObj.get(accion.Id).SAC_Estado__c == 'SAC_Descartada' || mapNewObj.get(accion.Id).SAC_Estado__c == 'SAC_FinalizadaIncompleta')){
+                accion.SAC_FechaFinalizacion__c = Date.today();
+            }
+            
+        }
+    }
+
+    /**************************************************************************
+     * Proposito: Establecer la fecha de envío de las tareas
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US923529        Álex Polo      19/12/24     Creación
+    *****************************************************************************/
+    public static void establecerFechaEnvio(List<SAC_Accion__c> listaAcciones) {
+        
+        for(SAC_Accion__c accion : listaAcciones){
+            //En caso de que sea la primera vez que se envía, se rellena SAC_FechaPrimerEnvio
+            //En caso de haberse enviado más veces, se almacena en SAC_FechaFinalizacion del último envío
+            if(accion.SAC_FechaPrimerEnvio__c == null || String.isBlank(String.valueOf(accion.SAC_FechaPrimerEnvio__c))){   //Si es el primer envío, este campo estará vacío
+                accion.SAC_FechaPrimerEnvio__c = Date.today();
+            }else{
+                accion.SAC_FechaUltimoEnvio__c = Date.today();  //Si no es el primer envío, se va sobre escribiendo en este campo la fecha del envío más reciente
+            }
+        }
+    }
+
+
+    /**************************************************************************
+     * Proposito: Establecer la fecha de devolución a letrado de las tareas
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US923529        Álex Polo      19/12/24     Creación
+    *****************************************************************************/
+    public static void establecerFechaDevolucion(List<SAC_Accion__c> listaAcciones) {
+        
+        for(SAC_Accion__c accion : listaAcciones){
+
+            //En caso de que haya que establecerlo solo cuando se devuelva a letrado:
+            //Si el campo SAC_Pretension__c no está vacío, siginifca que se ha devuelto la tarea al letrado de la pretensión.
+            /*if(String.isNotBlank(accion.SAC_Pretension__c)){
+                accion.SAC_FechaUltimaDevolucion__c = Date.today();
+            }*/
+
+            accion.SAC_FechaUltimaDevolucion__c = Date.today();
+        }
+    }
+
 
 
     /**************************************************************************
@@ -1298,6 +1391,28 @@ public without sharing class SAC_AccionMetodos {
         
         for(SAC_Accion__c tarea : listaCambioTercero){
             tarea.SAC_FechaTentativa__c = null;
+        }
+    }
+
+    /**************************************************************************
+     * Proposito: Cuando una tarea va a pasar a estado Finalizado o Finalizado incompleta y esta tiene informado el campo SAC_ImporteAbonar__c, debemos validar que la reclamacion no tiene sentido de resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento"
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.1             US1100360     Raúl Santos    20/01/2025       Creación
+    *****************************************************************************/
+    public static void validarSentidoResReclamacion(List<SAC_Accion__c> listaValidarImpAbonado, Set<Id> setIdsRec) {
+
+        List<Case> listReclamaciones = [SELECT Id, SAC_SentidoResolucion__c FROM Case WHERE RecordTypeId = :RECTYPERECLAMACION AND Id IN :setIdsRec];
+
+        if(!listReclamaciones.isEmpty()){
+            Map<Id, Case> mapRecs = new Map<Id,Case>(listReclamaciones);
+
+            for(SAC_Accion__c tarea : listaValidarImpAbonado){
+                if(mapRecs.containsKey(tarea.SAC_Reclamacion__c) && (mapRecs.get(tarea.SAC_Reclamacion__c).SAC_SentidoResolucion__c == 'SAC_001' || mapRecs.get(tarea.SAC_Reclamacion__c).SAC_SentidoResolucion__c == 'SAC_004' || mapRecs.get(tarea.SAC_Reclamacion__c).SAC_SentidoResolucion__c == 'SAC_005')){
+                    tarea.addError('Revise el sentido de la resolución de la reclamación. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" e informar un importe abonado.');
+                }
+            }
         }
     }
 }

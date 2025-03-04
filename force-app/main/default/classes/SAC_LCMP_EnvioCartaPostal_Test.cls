@@ -4,14 +4,16 @@ public with sharing class SAC_LCMP_EnvioCartaPostal_Test {
     @TestSetup
     static void makeData(){
 
-        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);  
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
 
         System.runAs(usuarioGeneral){ 
@@ -23,7 +25,8 @@ public with sharing class SAC_LCMP_EnvioCartaPostal_Test {
             camposRecl.put('SAC_NombreContacto__c', 'cuentaTest');
 
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+            //Database.insert(reclamacion);
             
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -32,19 +35,21 @@ public with sharing class SAC_LCMP_EnvioCartaPostal_Test {
             camposPret.put('SAC_Reclamacion__c', reclamacion.Id);
 
             Case pretension = SAC_TestDataFactory.crearCaso('Pretension', camposPret);
-            Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);
 
             // Plantilla
             EmailTemplate validEmailTemplate = new EmailTemplate(
                 isActive = true, 
                 Name = 'SAC_Redaccion',
-                //DeveloperName = 'SAC_Test',
+                DeveloperName = 'SAC_Testeo',
                 TemplateType = 'text', 
                 HtmlValue = '<p>htmlValue<p>', 
                 Body = 'Texted', 
                 FolderId = UserInfo.getUserId()
             );
-            Database.insert(validEmailTemplate); 
+            SAC_DatabaseDML.insertDML(validEmailTemplate, false);
+            //Database.insert(validEmailTemplate); 
         }
     }
 

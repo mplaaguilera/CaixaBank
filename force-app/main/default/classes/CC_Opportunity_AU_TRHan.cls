@@ -13,6 +13,11 @@ public with sharing class CC_Opportunity_AU_TRHan extends CC_TriggerHandlerBase 
             actualizarPropietarioOportunidadesHijas(listNewObj, mapOldObj);
             cerrarOportunidadesHijas(listNewObj, mapOldObj);
             sincronizarAccountHijas(listNewObj, mapOldObj);
+            
+            if (!CSBD_Bypass_Trigger.isBypassed('CC_Opportunity_AU_TRHan')) {
+                crearActividadesIdentificarCliente(listNewObj, mapOldObj);
+            }
+
             if(FeatureManagement.checkPermission('CSBD_UsuarioPromptsIA')){
                 CSBD_EinsteinUtils.comprobarUsoPromptsYResumenCierre(listNewObj, mapOldObj);
             }
@@ -30,13 +35,14 @@ public with sharing class CC_Opportunity_AU_TRHan extends CC_TriggerHandlerBase 
     private static void desactivarGestorOportunidadCambioPropietarioManual(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
         Set<Id> oportunidadesIds = new Set<Id>();
         for (Opportunity oportunidad: listNewObj) {
-            if(oportunidad.CSBD_Alta_omnichannel__c) { //Será true siempre que el estado del Gestor Oportunidad no sea inactivo
-                if(mapOldObj.get(oportunidad.Id).OwnerId != oportunidad.OwnerId) {
+            //CSBD_Alta_omnichannel__c será true siempre que el estado del Gestor Oportunidad no sea inactivo
+            if (oportunidad.CSBD_Alta_omnichannel__c && mapOldObj.get(oportunidad.Id).OwnerId != oportunidad.OwnerId) {
+                if (mapOldObj.get(oportunidad.Id).OwnerId != oportunidad.OwnerId) {
                     oportunidadesIds.add(oportunidad.Id);
                 }
             }
         }
-        if(!oportunidadesIds.isEmpty()) {
+        if (!oportunidadesIds.isEmpty()) {
             CSBD_GestorOportunidad.desactivarGestorOportunidad(oportunidadesIds);
         }
     }
@@ -113,14 +119,14 @@ public with sharing class CC_Opportunity_AU_TRHan extends CC_TriggerHandlerBase 
 
     //Cuando se actualiza el propietario de una oportunidad se sincroniza con todas sus oportunidades hijas de tipo acción comercial
     private static void actualizarPropietarioOportunidadesHijas(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
-        Map<Id, Opportunity> idOportunidad = new Map<Id, Opportunity>();
+        Map<Id, Opportunity> idOportunidades = new Map<Id, Opportunity>();
         for (Opportunity oportunidad: listNewObj) {
             if(mapOldObj.get(oportunidad.Id).OwnerId != oportunidad.OwnerId) {
-                idOportunidad.put(oportunidad.Id, oportunidad);
+                idOportunidades.put(oportunidad.Id, oportunidad);
             }
         }
-        if(!idOportunidad.isEmpty()) {
-            CSBD_ProductoOportunidadHija.actualizarPropietarioOportunidadesHijas(idOportunidad);
+        if (!idOportunidades.isEmpty()) {
+            CSBD_ProductoOportunidadHija.actualizarPropietarioOportunidadesHijas(idOportunidades);
         }
     }
 
@@ -203,4 +209,27 @@ public with sharing class CC_Opportunity_AU_TRHan extends CC_TriggerHandlerBase 
         }
     }
 
+    private static void crearActividadesIdentificarCliente(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
+        List<Opportunity> oportunidades = new List<Opportunity>();
+        for (Opportunity newOportunidad : listNewObj) {
+            if (newOportunidad.CSBD_Contact__c != mapOldObj.get(newOportunidad.Id).CSBD_Contact__c 
+                && newOportunidad.CSBD_Contact__c != null) {
+
+                oportunidades.add(newOportunidad);
+            }
+        }
+
+        Map<Id, Contact> contactos = new Map<Id, Contact>([SELECT Name, AV_NumPerso__c FROM Contact WHERE Id IN :CC_MetodosUtiles.listaCampo(oportunidades, 'CSBD_Contact__c')]);
+
+        List<Task> tareas = new List<Task>();
+        for(Opportunity opp: oportunidades){
+            Contact contacto = contactos.get(opp.CSBD_Contact__c);
+
+            tareas.add(CSBD_Activity.crearActividadReturn(new Task(), opp.Id, 'Identificación del cliente', 'Completed', 'Identificación manual del cliente', 'Identificación manual del cliente ' + contacto.Name + ' - ' + contacto.AV_NumPerso__c, null));
+        }
+
+        if(!tareas.isEmpty()) {
+            insert tareas;
+        }
+    }
 }

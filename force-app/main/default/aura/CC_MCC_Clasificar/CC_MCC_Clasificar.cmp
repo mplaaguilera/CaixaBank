@@ -15,7 +15,7 @@
 	<aura:attribute name="guardarCaso" type="Boolean" default="false"/>
 
 	<aura:attribute name="noCerrarFCO" type="Boolean" default="false"/>
-	
+
     <aura:attribute name="casoOrigen" type="Object"/>
 	<aura:attribute name="mostrarAvisoOperativaOficina" type="Boolean" default="false"/>
 	<aura:attribute name="mostrarComponenteOperativaDerivar" type="Boolean" default="false"/>
@@ -46,13 +46,13 @@
 
     <!--Permite saltos de línea en el cuerpo de los Toast-->
     <aura:html tag="style">.toastMessage.forceActionsText{white-space: pre-line !important;}</aura:html>
-    
+
     <force:recordData aura:id="recordData" recordId="{!v.recordId}" layoutType="COMPACT"
         fields="Status, CaseNumber, RecordTypeId, RecordType.Name, AccountId, RecordType.DeveloperName, IsClosed, CC_Canal_Procedencia__c,
 			CC_En_Tercer_Nivel__c, CC_Grupo_3N__c, CC_Canal_Operativo__c, CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name,
 			CC_MCC_ProdServ__c, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name, CC_MCC_Motivo__r.CC_No_autenticar_TF__c, CC_MCC_Motivo__r.CC_Tipo_Ficha_TF__c, CC_MCC_Causa__c, CC_MCC_Causa__r.Name, CC_MCC_Solucion__c, CC_MCC_Solucion__r.Name, CC_Tematica__c, CC_Producto_Servicio__c,
 			CC_Motivo__c, CC_Causa__c, CC_Solucion__c, Origin, CC_Campana__c, CC_Campana__r.Name, CC_Error_TF7__c,
-			CC_Canal_Resolucion__c, ContactId, CC_No_Identificado__c, Canal_del_Empleado__c, CC_Representante__c, 
+			CC_Canal_Resolucion__c, ContactId, CC_No_Identificado__c, Canal_del_Empleado__c, CC_Representante__c,
 			CBK_Case_Extension_Id__r.CC_FAQ__r.Name, CBK_Case_Extension_Id__r.CC_FAQ__r.CC_URL__c, CC_MCC_Solucion__r.CC_Agrupacion_Solucion__c"
         targetFields="{!v.caso}" recordUpdated="{!c.recordDataUpdated}" targetError="{!v.recordDataError}"/>
 
@@ -198,7 +198,7 @@
 										<lightning:inputField fieldName="CC_Resolucion__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
 									</div>
 								</aura:if>
-                                
+
                                 <aura:if isTrue="{! v.caso.Origin != 'Propuestas de mejora'}">
 									<div class="slds-col slds-col slds-size_1-of-2">
 										<lightning:inputField fieldName="CC_Resolucion2Nivel__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
@@ -213,7 +213,7 @@
 
 								<aura:if isTrue="{! and(v.caso.RecordType.DeveloperName == 'CC_Empleado',v.caso.CC_Canal_Procedencia__c == 'Oficina Feedback')}">
 									<div class="slds-col slds-size_1-of-2">
-                                        <!--FAQ: 
+                                        <!--FAQ:
                                         <lightning:formattedUrl value="{!v.caso.CBK_Case_Extension_Id__r.CC_FAQ__r.CC_URL__c}" label="{!v.caso.CBK_Case_Extension_Id__r.CC_FAQ__r.Name}"/>-->
 										<lightning:outputField fieldName="CC_URL_FAQ__c"/>
 									</div>
@@ -335,7 +335,7 @@
 										<lightning:input class="slds-form-element__control" style="padding-top: 2px; padding-left: 17.5rem;" type="checkbox" aura:id="cambiarEstadoPendienteColaborador" checked="{!v.cambiarEstadoPendienteColaborador}" disabled="true"/>
 									</div>
 								</div>
-								<!--Check de cambiar estado a Activo cuando el estado es pendiente cliente-->	
+								<!--Check de cambiar estado a Activo cuando el estado es pendiente cliente-->
 									<div class="slds-col slds-size_1-of-2">
 										<div class="slds-form-element slds-form-element_horizontal slds-form-element_1-col" >
 											<label class="slds-form-element__label" for="cambiarEstadoActivo" style="max-width: none;">
@@ -471,19 +471,14 @@
 			</header>
 			<!--Contenido del modal-->
 			<div class="slds-modal__content slds-var-p-around_medium" align="center">
-				<p>Nos consta que no has podido resolver la consulta del cliente. ¿Quieres ejecutar la operativa de derivar?</p>
+				<p>Nos consta que no has podido resolver la consulta del cliente.</p>
+				<p>¿Quieres ejecutar la operativa de derivar?</p>
 			</div>
 			<!--Pie del modal-->
 			<footer class="slds-modal__footer">
-				<div align="right">
-					<lightning:button aura:id="modalCerrarCasoOrigenCancelar" variant="brand" label="No" onclick="{!c.modalDerivarCerrar}" class="slds-var-m-left_small"/>
-					<!--<aura:if isTrue="{!v.cerrarCaso}">
-						<lightning:button aura:id="submitGuardarCerrar" variant="brand" label="No" onclick="{!c.gestionaGuardarCerrar}" class="slds-var-m-left_small"/>
-						<aura:set attribute="else">
-							<lightning:button aura:id="submitGuardar" variant="brand" label="No" onclick="{!c.gestionaGuardarCerrar}" class="slds-var-m-left_small"/>
-						</aura:set>
-					</aura:if>-->
+				<div align="center">
 					<lightning:button aura:id="modalCerrarCasoOrigenConfirmar" variant="brand" label="Si" onclick="{!c.handleModalDerivar}" class="slds-var-m-left_small"/>
+					<lightning:button aura:id="modalCerrarCasoOrigenCancelar" label="No" onclick="{!c.modalDerivarCerrar}" class="slds-var-m-left_small"/>
 				</div>
 			</footer>
 		</div>
@@ -514,7 +509,7 @@
                         </div>
                     </div>
                 </div>
-            </div> 
+            </div>
         </section>
     </aura:if>
 	-->

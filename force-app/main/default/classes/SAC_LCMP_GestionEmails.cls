@@ -14,11 +14,13 @@ public without sharing class SAC_LCMP_GestionEmails {
     /**
     * Proposito: Envio Mail + comunicacion equipos + mover estado caso + mover estado acciones
     * Modificación: US723742 - Raúl Santos - 05/03/2024 - Añadir lógica envio emails blackList
+    * Modificación: US776301 - Raúl Santos - 18/11/2024 - No enviar la comunicacion de resolución cuando no coincide el mail de correo web con el del caso si el web email es un correo de los dominios en la black list (SAC_BlacklistDominioEmail__mdt).
+    *                                                     Tampoco se tiene que enviar cuando en el canal de entrada o de respuesta esta indicado "carta postal".
+    *                                                     Sí enviar cuando el correo del caso este en blanco y el correo web cumplimentado se envié el aviso automático (si no esta en la blacklist de dominios)
     */
     @AuraEnabled
     public static void finalizarRedaccion(String id, String para, String copia, String copiaOculta, String cuerpo, String asunto, String idAdjuntos){
-
-        Case casoActual = [SELECT Id, SAC_FechaVencimientoSLA__c, SAC_MotivoDemora__c, SAC_ComentarioDemora__c, OS_Email__c, SuppliedEmail, CC_Idioma__c FROM Case WHERE Id = :id AND RecordTypeId = :RECTYPERECLAMACION LIMIT 1];
+        Case casoActual = [SELECT Id, SAC_FechaVencimientoSLA__c, SAC_MotivoDemora__c, SAC_ComentarioDemora__c, OS_Email__c, SuppliedEmail, CC_Idioma__c, Origin, CC_Canal_Respuesta__c FROM Case WHERE Id = :id AND RecordTypeId = :RECTYPERECLAMACION LIMIT 1];
 
         //Añadido comprobar el target date del caseMilestone en lugar del campo SAC_FechaVencimientoSLA__c del caso
         List<CaseMilestone> listaCM = [SELECT Id, TargetDate FROM CaseMilestone WHERE CaseId = :id AND MilestoneType.Name = 'SLA Regulatorio'];
@@ -26,11 +28,33 @@ public without sharing class SAC_LCMP_GestionEmails {
             throw new AuraHandledException( 'El SLA Regulatorio esta sobrepasado, debe informar los motivos de la demora mediante el botón "Resolver Reclamación" antes de continuar.' );
         }else{
             enviarEmail(id, para, copia, copiaOculta, cuerpo, asunto, idAdjuntos, 'primerenvioredaccion');
-            SAC_LCMP_RedaccionFinal.finalizarRedaccion(id, true);
+            SAC_LCMP_RedaccionFinal.finalizarRedaccion(id, true, false);
             
             // Si el email del caso es distinto al web email se tiene que enviar un email indicando que se ha enviado la resolución del caso al email del caso
-            if(casoActual.OS_Email__c != casoActual.SuppliedEmail && (String.isNotBlank(casoActual.SuppliedEmail) && String.isNotBlank(casoActual.OS_Email__c))) {
+            if(casoActual.OS_Email__c != casoActual.SuppliedEmail && String.isNotBlank(casoActual.SuppliedEmail) && casoActual.Origin != 'SAC_CartaPostal' && casoActual.CC_Canal_Respuesta__c != 'SAC_CartaPostal') {  
 
+                Boolean continuarProceso = true;
+
+                //Recuperar los dominios activos en el metadata SAC_BlacklistDominioEmail__mdt
+                List<SAC_BlacklistDominioEmail__mdt> listDominiosBloqueados = [SELECT SAC_DominioEmail__c FROM SAC_BlacklistDominioEmail__mdt WHERE SAC_DominioActivo__c = true];
+
+                if(!listDominiosBloqueados.isEmpty()){
+                    Set<String> dominiosBloqueados = new Set<String>();
+
+                    for(SAC_BlacklistDominioEmail__mdt dominio : listDominiosBloqueados) {
+                        dominiosBloqueados.add(dominio.SAC_DominioEmail__c);
+                    }
+
+                    String webEmail = casoActual.SuppliedEmail;
+                    String dominioWebEmail = '@' + webEmail.substringAfter('@');
+
+                    //Si el dominio del web email, esta contenido en los dominios activos de la blacklist de dominios, no se envia la comunicación
+                    if(dominiosBloqueados.contains(dominioWebEmail)){
+                        continuarProceso = false;
+                    }
+                }
+
+                if(continuarProceso){
                 //Recupero los emails no validos de envio (emails en la blackList)
                 List<SAC_MaestroTemas__c> listEmailsNoValidos = [SELECT Name FROM SAC_MaestroTemas__c WHERE RecordTypeId =: RECORDTYPEBLACKLIST AND SAC_Activo__c = true];
 
@@ -44,6 +68,7 @@ public without sharing class SAC_LCMP_GestionEmails {
                 }
             }
         }     
+    }
     }
 
 
@@ -89,7 +114,6 @@ public without sharing class SAC_LCMP_GestionEmails {
     */ 
     @AuraEnabled
     public static void enviarEmail(Id id, String para, String copia, String copiaOculta, String cuerpo, String asunto, String idAdjuntos, String tipoEnvio){
-
         Schema.SObjectType expectedCase = Schema.Case.getSObjectType();
         Schema.SObjectType expectedInteraccion = Schema.SAC_Interaccion__c.getSObjectType();
         Schema.SObjectType expectedAccion = Schema.SAC_Accion__c.getSObjectType();
@@ -132,12 +156,15 @@ public without sharing class SAC_LCMP_GestionEmails {
             }*/
 
             if(!idsAdjuntosFinal.isEmpty()){
-                lstCV = [SELECT Id, ContentDocumentId FROM ContentVersion WHERE ContentDocumentId IN: idsAdjuntosFinal];  
+                lstCV = [SELECT Id, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId IN: idsAdjuntosFinal AND SAC_BloqueoTotalVisibilidad__c = false];  
             }
        
             if(!lstCV.isEmpty()){
                 for(ContentVersion contentVersion :lstCV){
                     lstIdCV.add(contentVersion.Id);
+                    Blob versionDataBlob = contentVersion.VersionData;
+                    String versionData = EncodingUtil.base64Encode(versionDataBlob);
+                    system.debug('***versionData ' + versionData);
                 }
             }
         }
@@ -156,8 +183,11 @@ public without sharing class SAC_LCMP_GestionEmails {
 
         message.optOutPolicy = 'FILTER';
         message.Subject = asunto;
+
+        String cuerpoConcatenado = '';
+
         if(tipoObjeto == expectedCase){
-            message.HtmlBody = '<div style="display:none;">' + caso.CC_SuppliedID__c + ' </div>' + cuerpo;
+            cuerpoConcatenado = '<div style="display:none;">' + caso.CC_SuppliedID__c + ' </div>' + cuerpo;
         }
         else if(tipoObjeto == expectedInteraccion){
             if(interaccion.RecordTypeId == RECORDTYPECONSULTA && interaccion.SAC_GrupoColaborador__r.SAC_Externo__c == true){
@@ -169,14 +199,18 @@ public without sharing class SAC_LCMP_GestionEmails {
                     htmlArrastrarEmails = arrastrarEmailsFormato(listEmailMessages[0]);
                 }
 
-                message.HtmlBody = cuerpo + htmlArrastrarEmails;
+                cuerpoConcatenado = cuerpo + htmlArrastrarEmails;
             }else{
-                message.HtmlBody = cuerpo;
+                cuerpoConcatenado = cuerpo;
             }
         }
         else if(tipoObjeto == expectedAccion){
-            message.HtmlBody = cuerpo;
+            cuerpoConcatenado = cuerpo;
         }
+
+        //DE106853 - Raúl Santos - 20/11/2024 - Gestionar las imágenes que vienen inline.
+		String cuerpoFinal = SAC_Utils.gestionarImagenesInlineRedactarMail(cuerpoConcatenado);
+        message.setHtmlBody(cuerpoFinal);
 
         if(!lstIdCV.isEmpty()){
             message.setEntityAttachments(lstIdCV);
@@ -204,6 +238,7 @@ public without sharing class SAC_LCMP_GestionEmails {
         Messaging.SingleEmailMessage[] messages =   new List<Messaging.SingleEmailMessage> {message};
 
         try{
+            system.debug('***cuerpoFinal ' + cuerpoFinal);
             Messaging.SendEmailResult[] results = Messaging.sendEmail(messages);
             List<ContentDocumentLink> lstContentDocument = new List<ContentDocumentLink>();
             Date fechaActual = Date.today();
@@ -280,7 +315,7 @@ public without sharing class SAC_LCMP_GestionEmails {
     public static ContentVersion[] obtieneAdjuntos(String id){
         try {
             List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title FROM ContentVersion WHERE 
-                                    FirstPublishLocationId =: id];
+                                    FirstPublishLocationId =: id AND SAC_BloqueoTotalVisibilidad__c = false];
             
             ContentVersion[] resultado =  new List<ContentVersion>();
             for(ContentVersion record : cv){
@@ -297,7 +332,8 @@ public without sharing class SAC_LCMP_GestionEmails {
             ContentVersion cv = [SELECT Id, ContentDocumentId, FirstPublishLocationId FROM ContentVersion WHERE Id =: id LIMIT 1];
             ContentDocument cd = [SELECT Id FROM ContentDocument WHERE Id =: cv.ContentDocumentId LIMIT 1];
             Id casoId = cv.FirstPublishLocationId;
-            Database.delete(cd);
+            SAC_DatabaseDML.deleteDML(cd, false); 
+            //Database.delete(cd);
 
             List<ContentVersion> cvs = [SELECT Id, Title FROM ContentVersion WHERE 
                                     FirstPublishLocationId =: casoId];
@@ -320,7 +356,7 @@ public without sharing class SAC_LCMP_GestionEmails {
             ContentVersion[] resultado = new List<ContentVersion>();
 
             if(!String.isBlank(id)){
-                List<ContentDocumentLink> lstCDL = [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.Title, ContentDocument.LatestPublishedVersion.SAC_Bloque__c FROM ContentDocumentLink WHERE LinkedEntityId IN: idList];
+                List<ContentDocumentLink> lstCDL = [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.Title, ContentDocument.LatestPublishedVersion.SAC_Bloque__c FROM ContentDocumentLink WHERE LinkedEntityId IN: idList AND ContentDocument.LatestPublishedVersion.SAC_BloqueoTotalVisibilidad__c = false];
 
                 if(!lstCDL.isEmpty()){
                     for(ContentDocumentLink record : lstCDL){
@@ -338,7 +374,8 @@ public without sharing class SAC_LCMP_GestionEmails {
     public static void eliminaContentDocument(String id){
         try {
             ContentDocument cd = [SELECT Id FROM ContentDocument WHERE Id =: id LIMIT 1];
-            Database.delete(cd);
+            SAC_DatabaseDML.deleteDML(cd, false); 
+            //Database.delete(cd);
 
         } catch (Exception e) {throw new AuraHandledException(e.getMessage());}
     }
@@ -353,7 +390,25 @@ public without sharing class SAC_LCMP_GestionEmails {
 
     @AuraEnabled
     public static List<ContentVersion> getDocumentRedaccion(String id){
-        return [SELECT Id, Title, ContentDocumentId, SAC_ValidadoCV__c FROM ContentVersion WHERE SAC_Bloque__c INCLUDES ('SAC_Respuesta')  AND FirstPublishLocationId =: id]; //SAC_StringRedaccion_fileupload__c = 'ResolucionRedaccion'
+        // List<ContentVersion> documentos = [SELECT Id, Title, ContentDocumentId, SAC_ValidadoCV__c FROM ContentVersion WHERE SAC_Bloque__c INCLUDES ('SAC_Respuesta')  AND FirstPublishLocationId =: id];
+        // return documentos;
+
+        Map<Id, Boolean> contentOculto = new Map<Id, Boolean>();
+        List<Id> idsDocumentLink = new List<Id>();
+
+        try {
+            List<ContentDocumentLink> cdL = [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.Title FROM ContentDocumentLink WHERE LinkedEntityId =: id AND ContentDocument.FileType != 'SNOTE'];  
+
+            for(ContentDocumentLink recordCdL : cdL){
+                idsDocumentLink.add(recordCdL.ContentDocumentId);
+            }
+
+            List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, SAC_Oculto__c, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_Numero_Prestamo__c FROM ContentVersion WHERE SAC_Bloque__c INCLUDES ('SAC_Respuesta') AND ContentDocumentId IN: idsDocumentLink AND SAC_BloqueoTotalVisibilidad__c = false ORDER BY CreatedDate ASC];
+
+            return cv;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
     }
 
     /**
@@ -665,4 +720,47 @@ public without sharing class SAC_LCMP_GestionEmails {
         }
     }
 
+    @AuraEnabled
+    public static void linkFileToConsulta(String consultaId, List<String> fileIds){
+
+        List<ContentDocumentLink> newCdL = new List<ContentDocumentLink>();
+
+        if(!fileIds.isEmpty()){
+            for(String fileId : fileIds){
+                ContentDocumentLink newLink = new ContentDocumentLink(
+                    ContentDocumentId = fileId,
+                    LinkedEntityId = consultaId,
+                    ShareType = 'V' 
+                );
+
+                newCdL.add(newLink);
+            }
+        }
+
+        if(!newCdL.isEmpty()){
+            SAC_DatabaseDML.insertListDML(newCdL, true);
+        }
+    }
+
+    @AuraEnabled
+    public static void checkAdjuntoConsulta(String consultaId, String fileId){
+
+        List<ContentDocumentLink> cdL = [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.Title FROM ContentDocumentLink WHERE LinkedEntityId =:consultaId AND ContentDocument.FileType != 'SNOTE' AND ContentDocumentId = :fileId LIMIT 1];
+
+        if(cdL.isEmpty()){
+            List<String> listId = new List<String>();
+            listId.add(fileId);
+            linkFileToConsulta(consultaId, listId);
+        }
+    }
+
+    @AuraEnabled
+    public static void deleteFileConsulta(String consultaId, String fileId){
+
+        List<ContentDocumentLink> cdL = [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.Title FROM ContentDocumentLink WHERE LinkedEntityId =:consultaId AND ContentDocument.FileType != 'SNOTE' AND ContentDocumentId = :fileId LIMIT 1];
+
+        if(!cdL.isEmpty()){
+            SAC_DatabaseDML.deleteListDML(cdL, true);
+        }
+    }
 }

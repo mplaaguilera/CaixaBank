@@ -1,6 +1,6 @@
 public with sharing class SPV_CaseOperativas_Controller {
    
-    private static Set<String> objetos = new Set<String>{'CC_Grupo_Colaborador__c', 'Case', 'SAC_MaestroTemas__c'};
+    private static Set<String> objetos = new Set<String>{'CC_Grupo_Colaborador__c', 'Case', 'SAC_MaestroTemas__c', 'CBK_Case_Extension__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     //Rec type de Grupo Colaborador
@@ -15,21 +15,20 @@ public with sharing class SPV_CaseOperativas_Controller {
     private static final Id RECTYPETIPOADJUNTOS = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_TipoAdjuntos').getRecordTypeId();
 
 
-
     @AuraEnabled
     static public Case recuperarCaso(Id caseId){        
         String userId = UserInfo.getUserId();
         Case caseSR = new Case();
         //revisar si utilizaremos todos estos campos
         if (Schema.sObjectType.Case.isAccessible()) {
-            caseSR = [SELECT id, Status, SEG_Subestado__c, SEG_Grupo__c, SEG_Grupo__r.Name, OwnerId, AccountId, CaseNumber, Origin, RecordTypeId, SuppliedEmail, 
+            caseSR = [SELECT id, Status, SEG_Subestado__c, SEG_Grupo__c, SEG_Grupo__r.Name, OwnerId, AccountId, CaseNumber, Origin, RecordTypeId, SuppliedEmail, CBK_Case_Extension_Id__c, 
             CC_MCC_Motivo__c,CC_MCC_ProdServ__c,CC_MCC_Tematica__c, RecordType.Name, CC_Idioma__c, Priority, SEG_Detalle__c, Subject, SAC_PretensionPrincipal__c,
             SAC_Reclamacion__r.SAC_PretensionPrincipal__c, SAC_Motivo__c, RecordType.DeveloperName, CC_Canal_Respuesta__c, CC_No_Identificado__c, SAC_OrigenConsulta__c, SPV_ComunidadAutonoma__c,
             SAC_EsCliente__c, ContactId, OS_Email__c, SAC_NombreContacto__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_UsarDatos__c, SAC_PoblacionContacto__c, SAC_DireccionPostalNotificacion__c, CC_Importe_Reclamado__c, SAC_NPretensionesActivas__c,
             SAC_TipoDeRepresentante__c, SAC_DespachoRepresentante__c, SAC_TipoDeDocumento__c, SAC_NumeroDelDocumento__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c, SAC_NombreRepresentante__c, SAC_DireccionPostal__c,
             SAC_EmailRepresentante__c, SAC_TelefonoRepresentante__c, SAC_Naturaleza__c, SAC_CasoEspecial__c, SAC_CASE_esPSD2__c,SAC_DerivadoA__c, SAC_CasoRelacionado__c, SPV_Organismo__c,
             CC_Detalles_Solucion__c, SAC_UserElevoASupervisor__c, SAC_FechaRecepcion__c, SPV_ObservacionesVolverAnalisis__c, SAC_ObservacionesSupervisor__c, SAC_Prorrogado__c, SAC_Entidad_Afectada__c, SAC_EntidadProductora__c, Description, SAC_EsPrincipal__c, CC_SuppliedFiles__c,
-            SPV_ComplementariaOrganismo__c,
+            SPV_ComplementariaOrganismo__c, CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c,
 
             SAC_Reclamacion__c , SAC_Reclamacion__r.Status, 
 
@@ -231,7 +230,7 @@ public with sharing class SPV_CaseOperativas_Controller {
            List<Case> listaCasosActualizar = new List<Case>();
             Case caso = recuperarCaso(caseId);
     
-            if(caso.Status == 'SAC_001' || caso.Status == 'SAC_002'){   //Se puede pasar a Descartado desde alta y análisis
+            if(caso.Status == 'SAC_001'){   //Se puede pasar a Descartado desde alta y análisis
                 caso.Status = 'Descartado';
                 caso.SAC_MotivoRechazo__c = motivo;
                 listaCasosActualizar.add(caso);
@@ -264,7 +263,7 @@ public with sharing class SPV_CaseOperativas_Controller {
     public static void devolverReclamacionAlta(Id caseId){
 
         Case caseSR = recuperarCaso(caseId);
-        if(caseSR.Status == 'SAC_002'){
+        if(caseSR.Status == 'SPV_AnalisisDecision'){
             caseSR.Status = 'SAC_001';          //Se vuelve a poner el estado en alta
             caseSR.SEG_Subestado__c = null;
             caseSR.SPV_VueltaAlta__c = true;
@@ -277,7 +276,7 @@ public with sharing class SPV_CaseOperativas_Controller {
 
     }
 
-
+	/*
     @AuraEnabled
     static public void volverAnalisis(Id caseId, String observaciones){
 
@@ -292,7 +291,7 @@ public with sharing class SPV_CaseOperativas_Controller {
         }else{
             throw new AuraHandledException('No tienes permisos para realizar la operación.');
         }
-    }
+    }*/
 
     @AuraEnabled
     static public void establecerPretPpal(Id caseId){
@@ -387,11 +386,24 @@ public with sharing class SPV_CaseOperativas_Controller {
     @AuraEnabled
     public static void activarComplementariaEntidad(String idCaso){
         if (Schema.sObjectType.Case.isAccessible()) {
-        Case caso = [SELECT id, SPV_Complementaria_Entidad__c, status, SEG_Subestado__c FROM Case WHERE id =: idCaso];
+        Case caso = [SELECT id, SPV_Complementaria_Entidad__c, status, CBK_Case_Extension_Id__c, SEG_Subestado__c FROM Case WHERE id =: idCaso];
         if(caso.SPV_Complementaria_Entidad__c == true){
             caso.SPV_Complementaria_Entidad__c = false;
         }else{
+            //Añadido: Al activar la complementaria entidad, se almacena la fecha en el campo correspondiente
             caso.SPV_Complementaria_Entidad__c = true;
+
+            if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaComplementariaEntidad__c  = System.now();
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = caso.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaComplementariaEntidad__c  = System.now();
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
         } 
         SPV_DatabaseDML.updateDML(caso, true);
         }else{
@@ -403,12 +415,10 @@ public with sharing class SPV_CaseOperativas_Controller {
     public static void activarRectificacion(String idCaso){
         if (Schema.sObjectType.Case.isAccessible()) {
         Case casoActual = recuperarCaso(idCaso);   
-        if(casoActual.status == 'SPV_PendienteRespuestaOrganismos' && (casoActual.SEG_Subestado__c == 'Pendiente respuesta Organismos' || casoActual.SEG_Subestado__c == 'Ejecucion y Pendiente Respuesta Organismo' )){
             casoActual.status = 'SPV_Rectificacion';
-            casoActual.SEG_Subestado__c = 'SPV_AnalisisRectificacion';
+            //casoActual.SEG_Subestado__c = 'SPV_AnalisisRectificacion';
             casoActual.SPV_Rectificado__c = true;
 
-        }
         SPV_DatabaseDML.updateDML(casoActual, true);
         }else{
         throw new AuraHandledException('No tienes permisos para realizar la rectificación');
@@ -420,7 +430,7 @@ public with sharing class SPV_CaseOperativas_Controller {
     public static void prorrogarReclamacion(String idCaso){
         if (Schema.sObjectType.Case.isAccessible()) {
             Case casoActual = recuperarCaso(idCaso); 
-            List<ContentVersion> cv = [SELECT Id, SAC_TipoAdjunto__r.SAC_DeveloperName__c, ContentDocument.Id FROM ContentVersion WHERE FirstPublishLocationId =: idCaso];
+            List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_TipoAdjunto__r.SAC_DeveloperName__c  FROM ContentVersion WHERE FirstPublishLocationId =: idCaso];
             ContentVersion[] listaAdjuntos =  new List<ContentVersion>();
 
             for(ContentVersion record : cv){
@@ -450,7 +460,7 @@ public with sharing class SPV_CaseOperativas_Controller {
             }
 
             // Clasificar la prorroga si se realiza en fase de analisis (1) o en complementarias de organismos (2)
-            if(casoActual.status == 'SAC_002' && casoActual.SPV_ComplementariaOrganismo__c == false) {
+            if(casoActual.status == 'SPV_AnalisisDecision' && casoActual.SPV_ComplementariaOrganismo__c == false) {
                 casoActual.SAC_ProrrogaCounter__c = 1;
             } else if(casoActual.SPV_ComplementariaOrganismo__c){
                 casoActual.SAC_ProrrogaCounter__c = 2;
@@ -470,21 +480,19 @@ public with sharing class SPV_CaseOperativas_Controller {
 
     
     @AuraEnabled
-    public static void reabrirReclamacion(String idCaso, Boolean reaperturaComplementariaOrganismo, Boolean reaperturaRectificacion, String motivoReapertura){
+    public static void reabrirReclamacion(String idCaso, Boolean reaperturaRectificacion, String motivoReapertura){
 
         if (Schema.sObjectType.Case.isAccessible()) {
             Case casoActual = recuperarCaso(idCaso);   
 
-            if(reaperturaComplementariaOrganismo){
-                casoActual.Status = 'SPV_PendienteRespuestaOrganismos';
-                casoActual.SEG_Subestado__c = 'Pendiente respuesta Organismos';
-            }else if(reaperturaRectificacion){
+            if(!reaperturaRectificacion){
+                casoActual.Status = 'SPV_RecepcionResolucion';
+            }else{
                 casoActual.Status = 'SPV_Rectificacion';
-                casoActual.SEG_Subestado__c = 'SPV_AnalisisRectificacion';
                 casoActual.SPV_Rectificado__c = true;
             }
             casoActual.SAC_MotivoReabrir__c = motivoReapertura;
-            casoActual.CC_Rechazar_Reabrir_Caso__c = true;
+            // casoActual.CC_Rechazar_Reabrir_Caso__c = true;
             casoActual.CC_Fecha_Reapertura__c = System.now();
 
             SPV_DatabaseDML.updateDML(casoActual, true);
@@ -594,14 +602,144 @@ public with sharing class SPV_CaseOperativas_Controller {
         if (Schema.sObjectType.Case.isAccessible()) {
             Case casoActual = recuperarCaso(caseId);   
 
-            casoActual.Status = 'SAC_002';
-            casoActual.SEG_Subestado__c = 'SPV_AnalisisComplementaria';
+            casoActual.Status = 'SPV_AnalisisComplementariaOrganismo';
+            //casoActual.SEG_Subestado__c = 'SPV_AnalisisComplementaria';
             casoActual.SPV_ComplementariaOrganismo__c = true;
             casoActual.SPV_MotivoComplementariaOrganismo__c = motivoComplementaria;
+            //Añadido: Al activar la complementaria organismo, se rellena la fecha en su campo correspondiente
+            //casoActual.SPV_FechaComplementariaOrganismo__c = System.now();
 
+            if(casoActual.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaComplementariaOrganismo__c  = System.now();
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                casoActual.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = casoActual.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaComplementariaOrganismo__c  = System.now();
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
+            
             SPV_DatabaseDML.updateDML(casoActual, true);
         }else{
             throw new AuraHandledException('No tienes permisos para activar la complementaria organismo.');
         }
     } 
+
+    @AuraEnabled
+    public static void desactivarComplementariaOrganismo(String caseId){
+
+        if (Schema.sObjectType.Case.isAccessible()) {
+            Case casoActual = recuperarCaso(caseId);   
+
+            casoActual.Status = 'SPV_PendienteRespuestaOrganismo';
+            //casoActual.SEG_Subestado__c = 'SPV_PendienteRespuestaOrganismo';
+            casoActual.SPV_ComplementariaOrganismo__c = false;
+            casoActual.SPV_MotivoComplementariaOrganismo__c = null;
+            //Añadido: Al activar la complementaria organismo, se rellena la fecha en su campo correspondiente
+            //casoActual.SPV_FechaComplementariaOrganismo__c = null;
+
+            if(casoActual.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaComplementariaOrganismo__c  = null;
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                casoActual.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = casoActual.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaComplementariaOrganismo__c  =  null;
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
+            
+            SPV_DatabaseDML.updateDML(casoActual, true);
+        }else{
+            throw new AuraHandledException('No tienes permisos para desactivar la complementaria organismo.');
+        }
+    } 
+    
+    @AuraEnabled
+    static public void cambioEstado(Id caseId, String status){
+        Case caseSR = recuperarCaso(caseId);
+        caseSR.Status = status;
+        if(status == 'SPV_PendienteRespuestaOrganismo' && caseSR.SPV_ComplementariaOrganismo__c){
+            caseSR.SPV_ComplementariaOrganismo__c = false;
+        }
+        if(Schema.sObjectType.Case.isUpdateable()){  
+            SPV_DatabaseDML.updateDML(caseSR, true); 
+        }else{
+            throw new AuraHandledException('No tienes permisos para realizar la operación.');
+        }
+    }
+
+
+    /*************************************************************************************************
+     * Proposito: Marcar a true el campo SPV_CasoEnNegociacion__c para indicar que la reclamación
+     *               está en una negociación activa
+     *  
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR           DATE         Description
+     * 1.0            US1126342     Sergio Martín     03/02/25        Creación
+    *************************************************************************************************/
+    @AuraEnabled
+    static public void activarNegociacionReclamacion(Id caseId, List<Case> pretensionesNegociacion) {
+        List<CBK_Case_Extension__c> listaCasosExtensionUpdatear = [SELECT Id, SPV_CasoEnNegociacion__c FROM CBK_Case_Extension__c WHERE Case_Id__c =: caseId OR Case_Id__c IN: pretensionesNegociacion];
+        System.debug('listaCasosExtensionUpdatear ' + listaCasosExtensionUpdatear);
+        System.debug('caseId ' + caseId);
+
+        for(CBK_Case_Extension__c caseExtension : listaCasosExtensionUpdatear){
+            caseExtension.SPV_CasoEnNegociacion__c = true;
+        }
+        
+        if(Schema.sObjectType.CBK_Case_Extension__c.isUpdateable()){  
+            SPV_DatabaseDML.updateListDML(listaCasosExtensionUpdatear, true); 
+        }else{
+            throw new AuraHandledException('No tienes permisos para realizar la operación.');
+        }
+    }
+
+
+    /***************************************************************** 
+     * Proposito: Recuperar las pretensiones del caso 
+     *  
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR           DATE         Description
+     * 1.0            US1126342     Sergio Martín     03/02/25        Creación
+    *****************************************************************/
+    @AuraEnabled
+    public static List<Case> getPretensiones(String idCaso){
+        List<Case> pretensionesCaso = new List<Case>();
+        try {
+            pretensionesCaso = [SELECT Id, CC_MCC_Tematica__r.name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.name, SEG_Detalle__r.Name, CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c FROM Case 
+                                WHERE RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c =: idCaso AND (Status != 'SAC_009' AND Status != 'Cerrado')];
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+        return pretensionesCaso;
+    }
+
+    /*************************************************************************************************
+     * Proposito: Marcar a false el campo SPV_CasoEnNegociacion__c para indicar que la reclamación
+     *               ha finalizado la negociación
+     *  
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR           DATE         Description
+     * 1.0            US1126342     Sergio Martín     03/02/25        Creación
+    *************************************************************************************************/
+    @AuraEnabled
+    static public void finalizarNegociacionReclamacion(Id caseId){
+        Case caseSR = recuperarCaso(caseId);
+
+        if(Schema.sObjectType.CBK_Case_Extension__c.isUpdateable()){  
+            CBK_Case_Extension__c caseExtensionReclamacion = new CBK_Case_Extension__c();
+            caseExtensionReclamacion.id = caseSR.CBK_Case_Extension_Id__c;
+            caseExtensionReclamacion.SPV_CasoEnNegociacion__c = false;
+            SPV_DatabaseDML.updateDML(caseExtensionReclamacion, true); 
+        }else{
+            throw new AuraHandledException('No tienes permisos para realizar la operación.');
+        }
+    }
 }

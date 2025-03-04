@@ -26,17 +26,20 @@ public with sharing class SPV_CaseAITRHan extends CC_TriggerHandlerBase{
                 }else if(caso.RecordTypeId == RECTYPEPRETENSION){
                     lstPretensiones.add(caso);
                 }
+            }
+            
+            if(!lstReclamaciones.isEmpty()){
+                //Si se cambia el account o el contact
+                SPV_CaseHelper.createReclamanteRecord(lstReclamaciones, null);
+            }
 
-                if(!lstReclamaciones.isEmpty()){
-                    //Si se cambia el account o el contact
-                    SPV_CaseHelper.createReclamanteRecord(lstReclamaciones, null);
-                }
-
-                if(!lstPretensiones.isEmpty()){
-                    SPV_CaseHelper.insertarPermisosPretension(lstPretensiones);
-                    SPV_CaseHelper.asignarIdPretension(lstPretensiones);
-                }  
+            if(!lstPretensiones.isEmpty()){
+                SPV_CaseHelper.insertarPermisosPretension(lstPretensiones);
+                SPV_CaseHelper.asignarIdPretension(lstPretensiones);
             }  
+     
+            SPV_CaseHelper.creacionCaseExtension(listCasosSPV); //Al añadir un case, se crea un registro asociado del CBK_Case_Extension__c
+
         }     
     }
 }

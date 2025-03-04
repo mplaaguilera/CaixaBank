@@ -83,7 +83,6 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
                                             OR (SEG_Fecha_3_Reclamacion__c <= TODAY AND SEG_3a_Reclamacion_ejecutada_manualmente__c = false AND SEG_Fecha_3a_Reclamacion_Proceso__c = null)
                                             OR (SEG_Fecha_Envio_Gestor__c <= TODAY))
                                             ORDER BY SEG_SR_Seguimiento__c DESC];
-
 			//CBK_Log.debug('Dmls used on execute start ' + Limits.getQueries());
             if (scope.isEmpty()) {
                 return;
@@ -94,7 +93,6 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
             //Modificador para deshabilitar eltrigger
             SEG_Modificadores_Trigger.activarModificador('SEG_EmailMessage_AI_TRHan: bypass');
             //SEG_Modificadores_Trigger.activarModificador('AV_Task_BI_TRHan: bypass');
-
             Map<Id, SEG_Contratos__c> mapContratosUpd = new Map<Id, SEG_Contratos__c> ();
             List<FeedItem> lstFeedsInsert = new List<FeedItem> ();
             Map<Id, CaseWrapper> mapCaseContracts = new Map<Id, CaseWrapper> ();
@@ -183,6 +181,8 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 				Database.update(casosUpd, false);
 			}
 
+
+
         } catch (Exception e) {
             CBK_Log.error(String.valueOf(setCaseId),e);
         }
@@ -191,38 +191,39 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 	private void updateResultados(Map<String, List<SEG_Contratos__c>> mapContractsOk, Map<Id, SEG_Contratos__c> mapContratosUpd, List<FeedItem> lstFeedsInsert) {
         Date todayDate = date.today();
         //Actualizar fields Proceso de los contratos con la fecha de procesado
-            for (string plantila : mapContractsOk.keySet()) {
-                for (SEG_Contratos__c c : mapContractsOk.get(plantila)) {
-                    if (mapContratosUpd.containsKey(c.Id)) {
-                        mapContratosUpd.get(c.Id).put(mapPlantillaFields.get(plantila), todayDate);
-                    } else {
-                        c.put(mapPlantillaFields.get(plantila), todayDate);
-                        mapContratosUpd.put(c.Id, c);
-                    }
-                    if (mapContratosUpd.get(c.Id).SEG_Fecha_1a_Reclamacion_Proceso__c != null
-                        && mapContratosUpd.get(c.Id).SEG_Fecha_2a_Reclamacion_Proceso__c != null
-                        && mapContratosUpd.get(c.Id).SEG_Fecha_3a_Reclamacion_Proceso__c != null
-                        && mapContratosUpd.get(c.Id).SEG_Fecha_Envio_Gestor__c != null)
-                    {
-                        mapContratosUpd.get(c.Id).SEG_Estado__c = 'Reclamaciones agotadas';
-                    }
-                }
-            }
-            //DML Operations
-            //if (mapContratosUpd.size() > 0 || lstFeedsInsert.size() > 0 || mapCases.values().size() > 0){
-                if (mapContratosUpd.size() > 0 || lstFeedsInsert.size() > 0){    
-                // Actualizar los datos del caso, donde aligeramos la ejecución del trigger.
-                SEG_Case_BU_TRHan.procesado = true;
-                SEG_Modificadores_Trigger.desactivarModificador('SEG_Case_BU_TRHan: reejecutar lógica');
-                SEG_Modificadores_Trigger.activarModificador('SEG_Case_AU_TRHan: bypass');
-            }
-            
-            if (mapContratosUpd.size() > 0) {
-                Database.update(mapContratosUpd.values(), false);
-            }
-            if (lstFeedsInsert.size() > 0) {
-                Database.insert(lstFeedsInsert, false);
-            }        
+		for (string plantila : mapContractsOk.keySet()) {
+			for (SEG_Contratos__c c : mapContractsOk.get(plantila)) {
+				if (mapContratosUpd.containsKey(c.Id)) {
+					mapContratosUpd.get(c.Id).put(mapPlantillaFields.get(plantila), todayDate);
+				} else {
+					c.put(mapPlantillaFields.get(plantila), todayDate);
+					mapContratosUpd.put(c.Id, c);
+				}
+				if (mapContratosUpd.get(c.Id).SEG_Fecha_1a_Reclamacion_Proceso__c != null
+					&& mapContratosUpd.get(c.Id).SEG_Fecha_2a_Reclamacion_Proceso__c != null
+					&& mapContratosUpd.get(c.Id).SEG_Fecha_3a_Reclamacion_Proceso__c != null
+					&& mapContratosUpd.get(c.Id).SEG_Fecha_Envio_Gestor__c != null)
+				{
+					mapContratosUpd.get(c.Id).SEG_Estado__c = 'Reclamaciones agotadas';
+				}
+			}
+		}
+		//DML Operations
+		//if (mapContratosUpd.size() > 0 || lstFeedsInsert.size() > 0 || mapCases.values().size() > 0){
+			if (mapContratosUpd.size() > 0 || lstFeedsInsert.size() > 0){    
+			// Actualizar los datos del caso, donde aligeramos la ejecución del trigger.
+			SEG_Case_BU_TRHan.procesado = true;
+			SEG_Modificadores_Trigger.desactivarModificador('SEG_Case_BU_TRHan: reejecutar lógica');
+			SEG_Modificadores_Trigger.activarModificador('SEG_Case_AU_TRHan: bypass');
+		}
+		
+		if (!mapContratosUpd.isEmpty()) {
+			List<Database.SaveResult> updateResults = CBK_DMLUtility.updateRecords(mapContratosUpd.values(), false);
+		}
+
+		if (!lstFeedsInsert.isEmpty()) {
+			Database.insert(lstFeedsInsert, false);
+		}
     }
 
 	private Map<String, List<SEG_Contratos__c>> sendEmailsContracts(Map<Id, CaseWrapper> mapCaseContracts, List<FeedItem> lstFeedsInsert) {
@@ -243,23 +244,8 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 				contractW = mapCaseContracts.get(caseId).contractWrapperMap.get(plantilla);
 				lstContr = contractW.lstContractos;
 				sendOk = false;
-
 				if ((String.isNotEmpty(contractW.plantillaIdioma))||(plantilla == 'Reclamaciones agotadas')) {
-					//if (plantilla == 'Reclamaciones agotadas' && colaboradores != null) {
-						//for (String colaborador : colaboradores) {
-							//EmailWrapper datosEnvioMail = new EmailWrapper();
-							//datosEnvioMail.plantillaIdioma = contractW.plantillaIdioma;
-							//datosEnvioMail.caseId = caseId;
-							//datosEnvioMail.colabEmail= colaborador;
-                            //datosEnvioMail.contacto= cliente;
-							//datosEnvioMail.listaContratos = new List<SEG_Contratos__c>();
-							//datosEnvioMail.listaContratos.addall(lstContr);
-                            //datosEnvioMail.contentVersionData = new List<contentVersion>();
-							//datosEnvioMail.mapaBuzonesOrgaZona = mapaBuzonesOrgZona;
-							//datosEnviosEmailsAgotadas.add(datosEnvioMail);
-						//}
-						//sendOk = true;
-					//} else
+
                     if (plantilla != 'Reclamaciones agotadas') {
 						EmailWrapper datosEnvioMail = new EmailWrapper();
 						datosEnvioMail.plantillaIdioma = contractW.plantillaIdioma;
@@ -267,18 +253,11 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 						datosEnvioMail.contacto= cliente;
 						datosEnvioMail.listaContratos = new List<SEG_Contratos__c>();
 						datosEnvioMail.listaContratos.addall(lstContr);
-						//datosEnvioMail.attachments = new List<Messaging.EmailFileAttachment>();
-						//datosEnvioMail.attachments.addall(contractW.attachments);
 						datosEnvioMail.contentVersionData = new List<contentVersion>();
 						datosEnvioMail.contentVersionData.addall(contractW.contentVersionData);
 						datosEnvioMail.mapaBuzonesOrgaZona = mapaBuzonesOrgZona;
-						datosEnviosEmailsNoAgotadas.add(datosEnvioMail);
-						//sendOk = true;	
+						datosEnviosEmailsNoAgotadas.add(datosEnvioMail);	
                     } else {
-                        //Se marca como Ok. No se envía mail, pero si marca el registro como procesado
-                        //sendOk = true;
-                        //CBK_Log.debug('Reclamaciones agotadas sin colaboradores: ' + caseId, logginglevel.INFO);
-						//handlePostChatterListbyContract(lstFeedsInsert, lstContr, caseId);
 						if(!casosConError.contains(caseId)){
 							Case csSegumiento = new Case();
 							csSegumiento.id = caseId;

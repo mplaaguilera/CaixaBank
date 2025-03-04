@@ -45,9 +45,15 @@ public with sharing class SEG_AOR_Altapeticion {
                 // Crear HEADER
                 Map<String,string> mHeaders =  new  Map<String,string>();
                 mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-                
-                
-                HttpRequest request = CBK_HttpServiceIntegration.getRequest(jsonToCognitive, intSetting, 'PUT', mHeaders);
+
+                CBK_HttpServiceIntegration.RequestWapper rqwpr = new CBK_HttpServiceIntegration.RequestWapper();
+                rqwpr.body = jsonToCognitive;
+                rqwpr.intSetting = intSetting;
+                rqwpr.method = 'PUT';
+                rqwpr.mHeaders = mHeaders;
+                rqwpr.mUriParams = null;
+                rqwpr.mQueryParams = null;
+                HttpRequest request = CBK_HttpServiceIntegration.getRequest(rqwpr);
                 HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, intSetting, intSetting);
 
 
@@ -82,7 +88,7 @@ public with sharing class SEG_AOR_Altapeticion {
 
                         FeedItem feed = new FeedItem();
                         feed.ParentId = casoid; 
-                        feed.Body = 'Caso de Asesoría Jurídica generado: RITM - ' + casoSeg.SEG_Identificador_AOR__c; 
+                        feed.Body = 'Caso de Asesoría Jurídica generado: RITM - ' + casoSeg.SEG_Identificador_AOR__c + '\n Consulta : ' + casoSeg.SEG_Consulta_AOR__c; 
                         insert feed;
                         update casoSeg;                                                                            
                     }

@@ -171,7 +171,8 @@ public without sharing class SAC_MilestoneTimeCalculator implements Support.Mile
         }*/
         
         if(updatearCaso && String.isBlank(caso.SAC_GenialEstado__c)) {
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
         }
 
         return tiempoTotal;      
@@ -261,7 +262,6 @@ public without sharing class SAC_MilestoneTimeCalculator implements Support.Mile
     public static Integer minutosHastaMedianoche(DateTime fecha) {
         // Calcula la fecha de medianoche del día actual
         DateTime medianoche = DateTime.newInstance(fecha.year(), fecha.month(), fecha.day(), 23, 59, 59);
-        
         // Calcula la diferencia en minutos entre la fecha dada y medianoche
         Long diferenciaMinutos = (medianoche.getTime() - fecha.getTime()) / (1000 * 60);
         // Convierte la diferencia en minutos a un valor absoluto

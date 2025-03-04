@@ -1,8 +1,11 @@
+/**
+*   @description SPV_CaseHelper
+*/
 public with sharing class SPV_CaseHelper {
     
     public class SPVException extends Exception {}
 
-    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'CC_Grupo_Colaborador__c','SAC_Interaccion__c', 'Account'};
+    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'CC_Grupo_Colaborador__c','SAC_Interaccion__c', 'Account', 'SAC_ImagenDocumento__c', 'CBK_Case_Extension__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
@@ -13,12 +16,13 @@ public with sharing class SPV_CaseHelper {
     private static final Id RECTYPEGRUPOLETRADO = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SPV_GrupoLetrado').getRecordTypeId();
     private static final Id RECTYPEGRUPOTAREAS = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SPV_GrupoDeTareas').getRecordTypeId();
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
+    private static final Id RECTYPECASEEXTENSION = mapRTsObjects.get('CBK_Case_Extension__c').get('SPV_ReclamacionCaseExt').getRecordTypeId();
 
     //Obtener el record type de los no clientes
     private static final Id RECTYPENOCLIENTE = mapRTsObjects.get('Account').get('SAC_NoCliente_PA').getRecordTypeId();
 
     //RT del objeto intermedio reclamación-oficinas afectadas
-    //private static final Id RECTYPEOFICINAS = mapRTsObjects.get('SAC_ImagenDocumento__c').get('SPV_OficinaAfectada').getRecordTypeId();
+    private static final Id RECTYPEOFICINAS = mapRTsObjects.get('SAC_ImagenDocumento__c').get('SPV_OficinaAfectada').getRecordTypeId();
 
     private static final String ORIGEN_CNMV = 'SPV_CNMV';
     private static final String ORIGEN_DGS = 'SPV_DGS';
@@ -37,6 +41,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0               ---         Raúl Santos   21/05/2024        Creación
      *****************************************************************/
+    /**
+	 * @description    Filtrar los casos entrantes para quedarnos únicamente con los de SPV
+	 * @param lstCasos 
+	 */
     public static List<Case> filtrarCasosSPV(List<Case> lstCasos) {
 
         List<Case> casosSPV = new List<Case>();
@@ -59,6 +67,12 @@ public with sharing class SPV_CaseHelper {
 	 * VERSION        USER_STORY       AUTHOR         DATE         Description
 	 * 1.0              ---          Carlos Gómez   12/06/24     Creación
 	 *****************************************************************/
+        /**
+	 * @description    Método que comprueba si un Caso ha cambiado de Account y Contact y crea
+	 * un registro en el objeto reclamante en caso de que así sea.
+	 * @param listNewObj
+     * @param mapOldObj
+	 */
     public static void createReclamanteRecord(List<Case> listNewObj, Map<Id, Case> mapOldObj) {
 
         List<Case> listaCasosReclamante = new List<Case>();
@@ -143,6 +157,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION              USER_STORY       AUTHOR               DATE               Description
      * 1.0                   US963386       Álex Polo          28/08/2024               Creación
      * *********************************************************************************************************/
+            /**
+	 * @description    Cuando se actualiza el importe de una pretensión, se calculará el de la reclamación padre
+	 * @param listaCasosSPV
+     * @param mapOldObj
+     * @param mapaDatosCasosActualizar
+	 */
      public static void calcular(List<Case> listaCasosSPV, Map<Id, Case> mapOldObj, Map<Id,Case> mapaDatosCasosActualizar) {
  
 
@@ -224,6 +244,13 @@ public with sharing class SPV_CaseHelper {
      * VERSION              USER_STORY       AUTHOR               DATE               Description
      * 1.0                                  Álex Polo            22/10/2024               Creación
      * *********************************************************************************************************/
+    /**
+	 * @description    Al añadir una pretensión, se arrastran los datos del reclamante de la reclamación a las
+     * pretensiones añadidas.
+	 * @param listCasosSPV
+     * @param mapOldObj
+     * @param mapNewObj
+	 */
      public static void arrastrarReclamantePretension(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj){
         
         List<Case> listapretensiones = new List<Case>();
@@ -317,6 +344,13 @@ public with sharing class SPV_CaseHelper {
      * VERSION              USER_STORY       AUTHOR               DATE               Description
      * 1.0                                  Álex Polo            22/10/2024               Creación
      * *********************************************************************************************************/
+    /**
+	 * @description    Al actualizar alguno de los datos del reclamante en la reclamación, se deben actualizar de sus 
+     * pretensiones
+	 * @param listaReclaSPV
+     * @param mapOldObj
+     * @param mapaDatosCasosActualizar
+	 */
     public static void actualizarDatosReclamantePretensiones(List<Case> listaReclaSPV, Map<Id, Case> mapOldObj, Map<Id,Case> mapaDatosCasosActualizar){
 
         List<Case> listaPretensiones = new List<Case>();
@@ -394,6 +428,13 @@ public with sharing class SPV_CaseHelper {
      * VERSION              USER_STORY       AUTHOR               DATE               Description
      * 1.0                   US963386       Álex Polo          29/08/2024               Creación
      * *********************************************************************************************************/
+        /**
+	 * @description    Al asociar un AccountId (o actualizarlo) a una reclamación, se rellenan los campos DAN y
+     * Dirección Territorial (DT)
+	 * @param listCasosSPV
+     * @param mapOldObj
+     * @param mapNewObj
+	 */
      public static void asignarDTyDAN(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj){
 
         List<Case> listaReclamacionesCambiaAccount = new List<Case>();
@@ -470,7 +511,7 @@ public with sharing class SPV_CaseHelper {
 
 
 
-         /*****************************************************************
+    /*****************************************************************
      * Proposito: Cuando alguno de los campos del representante cambia, se comprueba primero si el check 'usar los datos de ALF' está activo.
      * Si es así, se traen los datos del Account de el caso. Si el email, la direccion postal o el teléfono del representante estan informados
      * con el check de usar datos de alf en false, se traen los valores a los campos de datos de contacto de la reclamación
@@ -480,6 +521,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0            US997670        Álex Polo      30/08/24      
     *****************************************************************/
+    /**
+	 * @description    Cuando alguno de los campos del representante cambia,, se realizan comprobaciones
+	 * @param listaCasosSPV
+     * @param mapOldObj
+	 */
     public static void camposRepresentanteValido(List<Case> listaCasosSPV, Map<Id, Case> mapOldObj) {
 
         List<Case> listaCasosSelect = new List<Case>();
@@ -730,7 +776,12 @@ public with sharing class SPV_CaseHelper {
          * VERSION        USER_STORY       AUTHOR         DATE         Description
          *1.0              US997670        Álex Polo      30/08/24      
         *****************************************************************/
-    
+        /**
+         * @description    Si cambia el account del caso y el check 'usar los datos de ALF' está activo,
+         * traer los datos de la nueva Account informada
+         * @param listCasesSPV
+         * @param mapOldObj
+         */
         public static void usarDatosDeAlf(List<Case> listCasesSPV, Map<Id, Case> mapOldObj) {
     
     
@@ -866,7 +917,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION              USER_STORY       AUTHOR               DATE               Description
      *                      US963386        Álex Polo           28/08/2024            
      * *********************************************************************************************************/
-
+    /**
+     * @description    Con el Set de Ides hacer una consulta de todas sus pretensiones para luego sumar los importes
+     * y rellenar el importe de la Reclamación padre
+     * @param mapListPretensiones
+     */
      private static List<Case> calcularImporte(Map<Id,List<Case>> mapListPretensiones){
 
         Map<Id, Decimal> mapaReclImporteParaActualizar = new Map<Id, Decimal>();
@@ -1004,7 +1059,7 @@ public with sharing class SPV_CaseHelper {
 
 
      /************************************************************************************************************
-     * Proposito:  sacar los sumatorios de las tareas que están directamente asociadas a la reclamación(no están
+     * Proposito:  Sacar los sumatorios de las tareas que están directamente asociadas a la reclamación(no están
      * asociadas a ninguna de sus pretensiones)
      *
      * Parameters: Set de ides
@@ -1013,11 +1068,18 @@ public with sharing class SPV_CaseHelper {
      * VERSION              USER_STORY       AUTHOR               DATE               Description
      *                       US963386        Álex Polo           28/08/2024     
      * *********************************************************************************************************/
-
+    /**
+     * @description    Sacar los sumatorios de las tareas que están directamente asociadas a la reclamación(no están
+     * asociadas a ninguna de sus pretensiones)
+     * @param recId
+     */
      public static map<id, list<decimal>> importeTareasDirectas(set<Id> recId) {
-        list<SAC_Accion__c> listaTareas = [SELECT Id, SAC_ImporteResuelto__c, SAC_ImporteAbonar__c, SAC_ImpResueltoInteresesLegales__c,
-                                            SAC_Reclamacion__c
-                                            FROM SAC_Accion__c WHERE SAC_Reclamacion__c IN : recId AND SAC_Pretension__c = null];
+        List<SAC_Accion__c> listaTareas = new List<SAC_Accion__c>();
+        if(SAC_Accion__c.SObjectType.getDescribe().isAccessible()){
+            listaTareas = [SELECT Id, SAC_ImporteResuelto__c, SAC_ImporteAbonar__c, SAC_ImpResueltoInteresesLegales__c,
+                            SAC_Reclamacion__c
+                            FROM SAC_Accion__c WHERE SAC_Reclamacion__c IN : recId AND SAC_Pretension__c = null];
+        }
         map<id, list<decimal>> importeTareasMap = new map<id, list<decimal>>();
         for(SAC_Accion__c acc : listaTareas) {
             if(!importeTareasMap.containsKey(acc.SAC_Reclamacion__c)){
@@ -1051,7 +1113,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US963386      Álex Polo     12/08/2024        Creación
      *****************************************************************/
-
+    /**
+     * @description    Actualizar el valor del campo SAC_Empresa__c
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
     public static void asignarEmpresaReclamacion ( List<Case> listCasosSPV, Map<Id, Case> mapOldObj ){
        
 
@@ -1137,6 +1203,13 @@ public with sharing class SPV_CaseHelper {
      * 1.0             US963386      Álex Polo     13/08/2024        Creación
      * 1.1             US1037919     Álex Polo     14/10/2024        Modificación
      *****************************************************************/
+    /**
+     * @description    Al modificar el subestado de un caso a Alegación o a Allanamiento,
+     * su fecha de allanamiento o su fecha de alegación cambiará según cuál haya
+     * sido cambiada
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
     public static void cambiarFechaAlegacionAllanamiento( List<Case> listCasosSPV, Map<Id, Case> mapOldObj ){
 
         List <Case> listReclamacionesCambiarFechaSubestado = new List <Case>();
@@ -1220,6 +1293,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US963386      Álex Polo     14/08/2024        Creación
      *****************************************************************/
+    /**
+     * @description    Al añadir una nueva reclamación, sele asigna unaa fecha Y además una cola
+     * de recepción
+     * @param listCasosSPV
+     * @param cola
+     */
     public static void asignarFechaRecepcionYColaReclamacion(List<Case> listCasosSPV, Group cola){
 
         List<Case> listaReclamaciones = new List<Case>();
@@ -1242,6 +1321,52 @@ public with sharing class SPV_CaseHelper {
     }
 
 
+    /*****************************************************************
+     * Proposito: Cuando la reclamación recibe un cambio en el sentido de resolución, se actualiza 
+     * la fecha en la que se ha obtenido la resolución
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1037919      Álex Polo     30/10/2024        Creación
+     *****************************************************************/
+    /**
+     * @description    Cuando la reclamación recibe un cambio en el sentido de resolución, se actualiza 
+     * la fecha en la que se ha obtenido la resolución
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
+    public static void rellenarFechaRecepcionResolucion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj){
+
+        List<Case> listaCambiarFechaRecepcionResolucion = new List<Case>();
+
+        for(Case caso : listCasosSPV){
+            //Se cambiará la fecha de aquellas reclamaciones cuyo sentido de resolución haya cambiado
+            if(caso.recordTypeId == RECTYPERECLAMACION && mapOldObj.containsKey(caso.Id) && caso.SAC_SentidoResolucion__c != mapOldObj.get(caso.Id).SAC_SentidoResolucion__c){
+                listaCambiarFechaRecepcionResolucion.add(caso);
+            }
+        }
+
+        if(!listaCambiarFechaRecepcionResolucion.isEmpty()){
+            for(Case reclamacion : listaCambiarFechaRecepcionResolucion){
+
+                /*if(reclamacion.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                    CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                    caseExtension.SPV_FechaRecepcionResolucion__c  = date.today();
+                    SPV_DatabaseDML.insertDML(caseExtension, false);
+                    reclamacion.CBK_Case_Extension_Id__c = caseExtension.Id;   
+                }else{          //Si ya lo tiene
+                    CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                    caseExtension.Id = reclamacion.CBK_Case_Extension_Id__c;
+                    caseExtension.SPV_FechaRecepcionResolucion__c  = date.today();
+                    SPV_DatabaseDML.updateDML(caseExtension, false);
+                }*/
+
+                reclamacion.SPV_FechaRecepcionResolucion__c = date.today();
+            }
+        }
+    }
+
 
     /*****************************************************************
      * Proposito: Al actualizar la fecha de recepción de una reclamacón, se actualizará la
@@ -1252,6 +1377,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US963386      Álex Polo     14/08/2024        Creación
     //  *****************************************************************/
+    /**
+     * @description    Al actualizar la fecha de recepción de una reclamacón, se actualizará la
+     * fehca de recepción de sus pretensiones hijas 
+     * @param listaCasosActualizar
+     * @param mapOldCase
+     */
      public static void  actualizarFechaRecepcionPretensiones(List <Case> listaCasosActualizar, Map<Id,Case> mapOldCase){
 
 
@@ -1310,6 +1441,13 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US912970      Raúl Santos   21/05/2024        Creación
      *****************************************************************/
+    /**
+     * @description    Añade permisos para que el gestor de la reclamación pueda modificar
+     * las pretensiones hijas.
+     * @param listReclamaciones
+     * @param listaSelect
+     * @param mapOldCase
+     */
     public static void permisosGestor(List<Case> listReclamaciones, List<Case> listaSelect, Map<Id, Case> mapOldCase) {
 
         Map<Id, Case> mapaNewCase = new Map<Id, Case>(listReclamaciones);
@@ -1365,8 +1503,9 @@ public with sharing class SPV_CaseHelper {
         }
 
         //Borrar CaseShare de antiguo owner
-        if (!setIdsPretensiones.isEmpty()) {
-            List<CaseShare> listaCSBorrar = [SELECT Id FROM CaseShare WHERE CaseId IN :setIdsPretensiones AND UserOrGroupId IN :setIdsOwners];
+        List<CaseShare> listaCSBorrar = new List<CaseShare>();
+        if (!setIdsPretensiones.isEmpty() && CaseShare.SObjectType.getDescribe().isAccessible()) {
+            listaCSBorrar = [SELECT Id FROM CaseShare WHERE CaseId IN :setIdsPretensiones AND UserOrGroupId IN :setIdsOwners];
 
             if (!listaCSBorrar.isEmpty()) {
                 SPV_DatabaseDML.deleteListDML(listaCSBorrar, false);
@@ -1385,6 +1524,13 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US912970      Raúl Santos   21/05/2024        Creación
      *****************************************************************/
+    /**
+     * @description    Añade permisos para que el letrado de la pretensión pueda modificar
+     * la reclamación padre.
+     * @param listPretensiones
+     * @param listaSelect
+     * @param mapOldCase
+     */
     public static void permisosLetrado(List<Case> listPretensiones, List<Case> listaSelect, Map<Id, Case> mapOldCase) {
 
         //Pasar lista de todo lo que traemos del select del trigger a mapa
@@ -1477,6 +1623,13 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US912970      Raúl Santos   21/05/2024        Creación
      *****************************************************************/
+    /**
+     * @description    Cuando actualizo el owner de una reclamación o pretensión, doy permisos sobre las tareas al nuevo owner y elimino los
+     * del owner anterior.
+     * @param listNewCases
+     * @param listaSelect
+     * @param mapOldCase
+     */
     public static void permisosTareas(List<Case> listNewCases, List<Case> listaSelect, Map<Id, Case> mapOldCase) {
 
         List<Id> idsCase = new List<Id>();
@@ -1550,6 +1703,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US912970      Raúl Santos   21/05/2024        Creación
      *****************************************************************/
+    /**
+     * @description    Al insertar una pretensión doy permisos sobre la pretensión al owner de la reclamación
+     * @param listNewCases
+     */
     public static void insertarPermisosPretension(List<Case> listNewCases) {
 
         
@@ -1596,6 +1753,13 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US909081      Raúl Santos    24/06/24        Creación
     ****************************************************************/ 
+    /**
+     * @description    Cuando la reclamacion pasa de estado 'Alta' a 'Analisis' se produce el balanceo letrado.
+     * @param listSelect
+     * @param listReclamaciones
+     * @param mapaDatosCasosActualizar
+     * @param cola
+     */
     public static void balanceoLetrado(List<Case> listSelect, List<Case> listReclamaciones, Map<Id, Case> mapaDatosCasosActualizar, Group cola) {
 
         Map<Id, Case> mapaReclamaciones = new Map<Id, Case>(listReclamaciones);
@@ -1662,6 +1826,13 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US909081      Raúl Santos    24/06/24        Creación
     ****************************************************************/ 
+    /**
+     * @description    Evalua y define el balanceo por detalle del MCC.
+     * @param reclamacion
+     * @param pretensiones
+     * @param mapaDatosCasosActualizar
+     * @param cola
+     */
     private static void balanceoPorMCC(Case reclamacion, List<Case> pretensiones, Map<Id, Case> mapaDatosCasosActualizar, Group cola) {
         
         Id mccPretensionPrincipal = null;
@@ -1756,7 +1927,14 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US909081      Raúl Santos    24/06/24        Creación
-    ****************************************************************/ 
+    ****************************************************************/
+    /**
+     * @description    ültimo paso del balanceo, tras el analisis previo aquí se asigna el grupo deseado a la pretension.
+     * @param pretensiones
+     * @param mapaDatosCasosActualizar
+     * @param grupoAsociado
+     * @param cola
+     */
     private static void balancearPretensiones(List<Case> pretensiones, Map<Id, Case> mapaDatosCasosActualizar, Id grupoAsociado, Group cola){
 
         for(Case pretension : pretensiones){
@@ -1825,7 +2003,12 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US909081      Raúl Santos    24/06/24        Creación
-    ****************************************************************/ 
+    ****************************************************************/
+    /**
+     * @description    Método para recuperar el numero total de casos que hay que tener en cuenta para los calculos de asignación
+     * @param mapGrupos
+     * @param listMccGrupos
+     */
     private static Integer recuperarTotalCasos(Map<Id, Integer> mapGrupos, List<CC_MCC_Grupo_Colaborador__c> listMccGrupos) {
         
         Integer totalCasos = 0;
@@ -1872,6 +2055,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US909081      Raúl Santos    24/06/24        Creación
     ****************************************************************/
+    /**
+     * @description    Método para recuperar el numero total de casos que hay que tener en cuenta para los calculos de asignación
+     * @param mapGrupos
+     * @param listMccGrupos
+     */
     private static Boolean compruebaGruposLlenos(Map<Id, Integer> mapGrupos, List<CC_MCC_Grupo_Colaborador__c> listMccGrupos) {
         Boolean resultado = false;
 
@@ -1898,6 +2086,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US909081      Raúl Santos    24/06/24        Creación
     ****************************************************************/
+        /**
+     * @description    Cuando una reclamación pasa de 'Alta' a 'Analisis' comprueba sus pretensiones hijas, si es unipretension esta pasa a ser la pretension principal
+     * @param listaCasos
+     * @param listaIdsRec
+     * @param listaRecCambioPretPrincipal
+     */
     public static void marcarPretensionPrincipal(List<Case> listaCasos, List<Id> listaIdsRec, List<Case> listaRecCambioPretPrincipal){
 
         List<Case> listaPretensionesHijas = [SELECT Id, SAC_Reclamacion__C, Status, SAC_Entidad_Afectada__c, SAC_EntidadProductora__c, CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Motivo__c, SEG_Detalle__c  FROM Case WHERE RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__C IN :listaIdsRec];
@@ -1940,6 +2134,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US909081      Raúl Santos    24/06/24        Creación
     ****************************************************************/
+    /**
+     * @description    Cuando una reclamación cambia de estado, se debe cambiar el estado de sus pretensiones hijas
+     * @param idsReclaCambiarEstado
+     * @param mapaDatosCasosActualizar
+     * @param listaFamilaRec
+     */
     public static void actualizarEstadosPretension(Set<Id> idsReclaCambiarEstado, Map<Id,Case> mapaDatosCasosActualizar, List<Case> listaFamilaRec){
         
 
@@ -1998,34 +2198,50 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US974485     Sergio Martín     17/07/24        Creación
+     * 1.1             US1037919    Álex Polo         24/10/2024      Añadido para tener en cuenta la fase de rectificación
     *****************************************************************/
+    /**
+     * @description    Comprobar que el campo SAC_ResultadoNegociacion__c de la reclamación se complete bien cuando se cambia el campo en la pretensión
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
     public static void comprobarResultadoNegociacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj) {
         List<Case> listaCambioResultadoNegociacion = new List<Case>();
         List<Case> listaCasosSelect = new List<Case>();
         Set<Id> setIdsCaso = new Set<Id>();
 
         for (case caso : listCasosSPV) {
-            if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).SAC_ResultadoNegociacion__c != caso.SAC_ResultadoNegociacion__c) {
+            if (mapOldObj.containsKey(caso.Id) && (mapOldObj.get(caso.Id).SAC_ResultadoNegociacion__c != caso.SAC_ResultadoNegociacion__c || mapOldObj.get(caso.Id).SAC_NegociacionFinalizada__c != caso.SAC_NegociacionFinalizada__c)) {
                 listaCambioResultadoNegociacion.add(caso);
                 setIdsCaso.add(caso.SAC_Reclamacion__c);
             }   
         }
         if(!listaCambioResultadoNegociacion.isEmpty()) {
             if(!setIdsCaso.isEmpty() && Schema.sObjectType.Case.isAccessible()){
-                listaCasosSelect = [SELECT Id, OwnerId, recordTypeId, SAC_Reclamacion__c, SAC_ResultadoNegociacion__c
+                listaCasosSelect = [SELECT Id, OwnerId, recordTypeId, SAC_Reclamacion__c, SAC_ResultadoNegociacion__c, SAC_NegociacionFinalizada__c, SPV_Rectificado__c
                                     FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION OR RecordTypeId = :RECTYPEPRETENSION) 
                                     AND ((RecordTypeId = :RECTYPERECLAMACION AND Id IN :setIdsCaso) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN :setIdsCaso))];
             }
 
             Set<String> resultados = new Set<String>();
+            Set<String> resultadosNegociacionFinalizada = new Set<String>();
+            Boolean reclamacionNegociacionFnalizada = false;
+
             String resultadoReclamacion; 
             Id idReclamacion;
+            Boolean casoRectificado;    //Añadido --v.1.1
         
             for (Case caso : listaCasosSelect) {
                 if(caso.recordTypeId == RECTYPERECLAMACION) {
                     idReclamacion = caso.id;
+                    casoRectificado = caso.SPV_Rectificado__c;  //Añadido --v.1.1
                 } else if(caso.recordTypeId == RECTYPEPRETENSION && caso.SAC_ResultadoNegociacion__c != null) {
                     resultados.add(caso.SAC_ResultadoNegociacion__c);
+                    //Añadido --v.1.1
+                    //Se añade a resultadosNegociacionFinalizada para comprobar si todas las pretensiones tienen negociación finalizada
+                    if(caso.SAC_NegociacionFinalizada__c != null){      
+                        resultadosNegociacionFinalizada.add(String.valueOf(caso.SAC_NegociacionFinalizada__c));
+                    }
                 }
             }
 
@@ -2050,11 +2266,43 @@ public with sharing class SPV_CaseHelper {
             } else if(resultados.contains('Acuerdo revocado') && resultados.contains('Sin acuerdo')) { // Si hay una pretension acuerdo revocado y otra sin acuerdo -> sin acuerdo
                 resultadoReclamacion = 'Sin acuerdo';
             }
+           
+            ////Añadido --v.1.1
+            //Comprobar sialguna pretensión NO ha finalizado la negociación. Si es así, la reclamación no ha finalizado la negociación
+            if(resultadosNegociacionFinalizada.contains('false')){
+                reclamacionNegociacionFnalizada = false;
+            }else{
+                reclamacionNegociacionFnalizada = true;
+            }
 
             if(Schema.sObjectType.Case.isUpdateable()) { 
                 Case rec = new Case();
                 rec.Id = idReclamacion;
-                rec.SAC_ResultadoNegociacion__c = resultadoReclamacion;
+                if(casoRectificado == true){    //Añadido --v.1.1
+
+                    if(rec.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                        CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                        caseExtension.SPV_ResultadoNegociacionRectificacion__c  = resultadoReclamacion;
+                        caseExtension.SPV_NegociacionFinalizadaRectificacion__c  = reclamacionNegociacionFnalizada;
+                        SPV_DatabaseDML.insertDML(caseExtension, false);
+                        rec.CBK_Case_Extension_Id__c = caseExtension.Id;   
+                    }else{          //Si ya lo tiene
+                        CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                        caseExtension.Id = rec.CBK_Case_Extension_Id__c;
+                        caseExtension.SPV_ResultadoNegociacionRectificacion__c  = resultadoReclamacion;
+                        caseExtension.SPV_NegociacionFinalizadaRectificacion__c  = reclamacionNegociacionFnalizada;
+                        SPV_DatabaseDML.updateDML(caseExtension, false);
+                    }
+
+                    //rec.SPV_ResultadoNegociacionRectificacion__c = resultadoReclamacion;
+                    //rec.SPV_NegociacionFinalizadaRectificacion__c = reclamacionNegociacionFnalizada;
+
+
+                }else{
+                    rec.SAC_ResultadoNegociacion__c = resultadoReclamacion;
+                    rec.SAC_NegociacionFinalizada__c = reclamacionNegociacionFnalizada;
+                }
+                
                 SPV_DatabaseDML.updateDML(rec, false);
             }
         }
@@ -2068,6 +2316,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US974485     Sergio Martín     17/07/24        Creación
     *******************************************************************************************/
+        /**
+     * @description   Actualizar el estado de la reclamación cuando se actualiza la pretensión
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
     public static void actualizarEstado(List<Case> listCasosSPV, Map<Id, Case> mapOldObj) {
         List<Case> listaEntradaNegociacion = new List<Case>();
         List<Case> listaSalidaNegociacion = new List<Case>();
@@ -2092,6 +2345,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US974485     Sergio Martín     17/07/24        Creación
     *******************************************************************************************/
+    /**
+     * @description   Actualizar el estado de la reclamación cuando se actualiza la pretensión
+     * @param listaSalidaNegociacion
+     * @param mapOldObj
+     * @param setIdsCaso
+     */
     public static void salidaFaseNegociacion(List<Case> listaSalidaNegociacion, Map<Id, Case> mapOldObj, Set<Id> setIdsCaso) {
         if(!listaSalidaNegociacion.isEmpty() && !setIdsCaso.isEmpty() && Schema.sObjectType.Case.isAccessible()) {
             List<Case> listaPretensionesHijas = [SELECT Id, OwnerId, recordTypeId, SAC_Reclamacion__c, SAC_Reclamacion__r.Status, Status, SAC_ResultadoNegociacion__c,CaseNumber, SAC_NegociacionFinalizada__c
@@ -2147,7 +2406,12 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US945746     Raúl Santos     23/07/24         Creación
-    **************************************************************************/  
+    **************************************************************************/
+        /**
+     * @description   Finaliza las consultas en estado pendiende de respuesta, sin grupo y sin pregunta informados de la reclamación cuando se cierra la reclamación
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
     public static void finalizarConsultasReclamacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj) {
 
         List<Case> listaReclamacionesConsultasAFinalizar = new List<Case>();
@@ -2195,12 +2459,20 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US974485     Sergio Martín     30/07/24        Creación
+     * 1.1             US1037919      Álex Polo       28/10/2024      Añadidas fechas de envío organismos
     *******************************************************************************************/
+    /**
+     * @description  Rellenar los campos del caso en el Trigger SPV_CaseBUTRHan
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
     public static void rellenarCampos(List<Case> listCasosSPV, Map<Id, Case> mapOldObj) {
         List<Case> listaEntradaNegociacion = new List<Case>();
         List<Case> listaEntradaAllanamiento = new List<Case>();
         List<Case> listaEntradaAlegaciones = new List<Case>();
         List<Case> listaEntradaDesistimiento = new List<Case>();
+        List<Case> listaEntraEnvioOrganismos = new List<Case>();
+        List<Case> listaEntraPteRespuestaOrganismos = new List<Case>();
 
         for (case caso : listCasosSPV) {
             //Si el caso pasa a subestado negociación y no habia estado nunca en subestado negociación (el check caso negociado no esta marcado)
@@ -2218,7 +2490,15 @@ public with sharing class SPV_CaseHelper {
             //Si el caso pasa a subestado desistimiento y no habia estado nunca en subestado desistimiento (el check caso allanado no esta marcado)
             if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).SEG_Subestado__c != caso.SEG_Subestado__c && (caso.SEG_Subestado__c == 'Desistimiento' && !caso.SPV_CasoDesistido__c)) {
                 listaEntradaDesistimiento.add(caso);
-            } 
+            }
+            //Añadido: Al pasar a envío organismos, se rellena el campo de fecha correspondiente
+            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_EnvioOrganismos'){
+                listaEntraEnvioOrganismos.add(caso);
+            }
+            //Añadido: Al pasar a Pendiente respuesta organismos, se rellena el campo de fecha correspondiente
+            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_PendienteRespuestaOrganismos'){
+                listaEntraPteRespuestaOrganismos.add(caso);
+            }
         }
         if(!listaEntradaNegociacion.isEmpty()) {
             rellenarCasoNegociado(listaEntradaNegociacion);
@@ -2232,6 +2512,72 @@ public with sharing class SPV_CaseHelper {
         if(!listaEntradaDesistimiento.isEmpty()) {
             rellenarCasoDesistido(listaEntradaDesistimiento);
         } 
+        //Añadido:
+        if(!listaEntraEnvioOrganismos.isEmpty()) {
+            rellenarFechaEnvioOrganismos(listaEntraEnvioOrganismos);
+        }
+        if(!listaEntraPteRespuestaOrganismos.isEmpty()) {
+            rellenarFechaPteRespuestaOrganismos(listaEntraPteRespuestaOrganismos);
+        } 
+    }
+
+
+
+    /***********************************************************************************************
+     * Proposito: Al pasar al estado "Envío Organismos", se rellena la fecha en la que esto ocurre
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1037919      Álex Polo     28/10/24        Creación
+     ***********************************************************************************************/
+    /**
+     * @description  Al pasar al estado "Envío Organismos", se rellena la fecha en la que esto ocurre
+     * @param listaCasoNegociacion
+     */
+    public static void rellenarFechaEnvioOrganismos(List<Case> listaCasoNegociacion) {
+        for (Case caso : listaCasoNegociacion) {
+
+            if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaEnvioOrganismos__c  = System.now();
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = caso.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaEnvioOrganismos__c  = System.now();
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
+        }
+    }
+
+    /***********************************************************************************************
+     * Proposito: Al pasar al estado "Pendiente Respuesta Organismos", se rellena la fecha en la que esto ocurre
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1037919      Álex Polo     28/10/24        Creación
+     ***********************************************************************************************/
+    /**
+     * @description  Al pasar al estado "Pendiente Respuesta Organismos", se rellena la fecha en la que esto ocurre
+     * @param listaCasoNegociacion
+     */
+    public static void rellenarFechaPteRespuestaOrganismos(List<Case> listaCasoNegociacion) {
+        for (Case caso : listaCasoNegociacion) {
+            if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaPteRespuestaOrganismo__c  = System.now();
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = caso.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaPteRespuestaOrganismo__c  = System.now();
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
+        }
     }
 
 
@@ -2243,6 +2589,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US974485     Sergio Martín     30/07/24        Creación
      ***********************************************************************************************/
+        /**
+     * @description  Marcar el check SAC_CasoNegociado__c cuando un caso pasa a estado negociación
+     * @param listaCasoNegociacion
+     */
     public static void rellenarCasoNegociado(List<Case> listaCasoNegociacion) {
         for (Case caso : listaCasoNegociacion) {
             caso.SAC_CasoNegociado__c = true;
@@ -2257,6 +2607,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR          DATE         Description
      * 1.0            US1013702     Sergio Martín    23/09/24        Creación
      ***********************************************************************************************/
+    /**
+     * @description  Marcar el check SPV_CasoAllanado__c cuando un caso pasa a subestado allanamiento
+     * @param listaEntradaAllanamiento
+     */
     public static void rellenarCasoAllanado(List<Case> listaEntradaAllanamiento) {
         for (Case caso : listaEntradaAllanamiento) {
             caso.SPV_CasoAllanado__c = true;
@@ -2271,6 +2625,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0            US1013702     Sergio Martín    23/09/24        Creación
      ***********************************************************************************************/
+        /**
+     * @description  Marcar el check SPV_CasoAlegado__c cuando un caso pasa a subestado alegaciones
+     * @param listaEntradaAlegaciones
+     */
     public static void rellenarCasoAlegado(List<Case> listaEntradaAlegaciones) {
         for (Case caso : listaEntradaAlegaciones) {
             caso.SPV_CasoAlegado__c = true;
@@ -2285,6 +2643,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0            US1013702     Sergio Martín    23/09/24        Creación
      ***********************************************************************************************/
+    /**
+     * @description  Marcar el check SPV_CasoDesistido__c cuando un caso pasa a subestado desistimiento
+     * @param listaEntradaDesistimiento
+     */
     public static void rellenarCasoDesistido(List<Case> listaEntradaDesistimiento) {
         for (Case caso : listaEntradaDesistimiento) {
             caso.SPV_CasoDesistido__c = true;
@@ -2301,6 +2663,12 @@ public with sharing class SPV_CaseHelper {
      * 1.0             US974485     Sergio Martín     19/08/24        Creación
      * 1.1             US1013904      Álex Polo         10/09/2024      Añadido alta-análisis
     *******************************************************************************************/
+    /**
+     * @description  Validar los cambios de estado en el Trigger SPV_CaseBUTRHan
+     * @param listCasosSPV
+     * @param mapOldObj
+     * @param mapNewObj
+     */
     public static void validarCambioEstado(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj) {
         List<Case> listaEntradaPretensionNegociacion = new List<Case>();
         Set<Id> setIdsCaso = new Set<Id>();
@@ -2338,7 +2706,15 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US1013904      Álex Polo       10/09/2024     Creación
+     * 1.1             US1037919      Álex Polo       23/10/2024     Cambio la forma de tratar las oficinas afectadas    
      ***********************************************************************************************/
+    /**
+     * @description  Comprobar que no se permite cambiar de alta a análisis si no están informados
+     * los campos requeridos
+     * @param listaCasos
+     * @param mapOldObj
+     * @param mapNewObj
+     */
     public static void validarCamposEntraAnalisisReclamacion(List<Case> listaCasos, Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj){
 
         List<Case> listaPretensiones = new List<Case>();
@@ -2347,8 +2723,8 @@ public with sharing class SPV_CaseHelper {
         Set<Id> setIdsReclamaciones = new Set<Id>();
         Set<Id> setIdsAccounts = new Set<Id>();
         List<Account> listaAccounts = new List<Account>();
-        Integer contadorPrets = 0;
-
+        
+        List<SAC_ImagenDocumento__c> listaOficinasAfectadas = new List<SAC_ImagenDocumento__c>();
 
         for(Case caso : listaCasos){
             setIdsReclamaciones.add(caso.Id);
@@ -2357,14 +2733,32 @@ public with sharing class SPV_CaseHelper {
 
         if(!setIdsReclamaciones.isEmpty()){
             listaPretensiones = [SELECT Id, SAC_Reclamacion__c, Status, SAC_EntidadProductora__c, SPV_ObservacionesReclamacion__c, SAC_EsPrincipal__c FROM Case WHERE SAC_Reclamacion__c IN :setIdsReclamaciones AND Status <> 'SAC_009'];
-        }
-       
-        //Se obtienen las cuentas que están asociadas a los casos
-        if(!setIdsAccounts.isEmpty()){
-            listaAccounts = [SELECT Id, RecordTypeId FROM Account WHERE Id IN :setIdsAccounts];
+     
+            //Obtener las oficinas afectadas relacionadas  -- v. 1.1
+            listaOficinasAfectadas = [SELECT Id, SAC_Caso__c FROM SAC_ImagenDocumento__c WHERE SAC_Caso__c IN :setIdsReclamaciones];
+
+
         }
 
-        //Ahora se construirá un mapa con las Account para poder acceder directamente a través de su Id
+            //Se obtienen las cuentas que están asociadas a los casos
+            listaAccounts = [SELECT Id, RecordTypeId FROM Account WHERE Id IN :setIdsAccounts];
+        
+
+    
+
+        //-- v. 1.1
+        //Se crea un mapa en el que se relaciona una reclamación con su oficina afectada (aunque tenga más de una), para controlar que tenga AL MENOS una oficina afectada
+        Map<Id, SAC_ImagenDocumento__c> mapaReclamacionOficinasAfectadas = new Map<Id, SAC_ImagenDocumento__c>();
+        if(!listaOficinasAfectadas.isEmpty()){
+            for(SAC_ImagenDocumento__c oficina : listaOficinasAfectadas){
+                if(!mapaReclamacionOficinasAfectadas.containsKey(oficina.SAC_Caso__c)){
+                    mapaReclamacionOficinasAfectadas.put(oficina.SAC_Caso__c, oficina);     //Con añadir la primera oficina es suficiente para las comprobaciones
+                }
+            }
+        }
+
+
+        //Ahora se construirá un mapa con las Account para poder acceder directamente a través de su Id 
         if(!listaAccounts.isEmpty()){
             for(Account cuenta : listaAccounts){
                 if(!mapaAccount.containsKey(cuenta.Id)){
@@ -2417,12 +2811,18 @@ public with sharing class SPV_CaseHelper {
                     caso.addError('No se puede pasar al estado de Análisis sin haber establecido el número de expediente de la reclamación.');
                 }
 
+                /*ANTES:
                 if(caso.CC_Oficina_Afectada_Lookup__c == null || String.isBlank(String.valueOf(caso.CC_Oficina_Afectada_Lookup__c))){
                     caso.addError('No se puede pasar al estado de Análisis sin haber establecido la oficina afectada de la reclamación.');
-                }
+                }*/
 
+                //-- v. 1.1
+                //Si el mapa no tiene una entrada con eset caso, es porque no tiene oficina afectada
+                if(!mapaReclamacionOficinasAfectadas.containsKey(caso.Id)){
+                    caso.addError('No se puede pasar al estado de Análisis sin haber establecido la oficina afectada de la reclamación.');
+                }
                 
-                
+
                 if(caso.SPV_FechaIniRegulador__c == null || String.isBlank(String.valueOf(caso.SPV_FechaIniRegulador__c ))){
                     caso.addError('No se puede pasar al estado de Análisis sin tener informado el campo Fecha Ini Regulador.');
                 }
@@ -2459,7 +2859,7 @@ public with sharing class SPV_CaseHelper {
 
                 //En caso de que todas las pretensiones tengan que tener observación de la reclamación:
                 if(mapaPretensiones.containsKey(caso.Id)){
-                    List<Case> listaPretensionesDeReclamacion = mapaPretensiones.get(caso.Id);   //Se obtienen las pretensiones de la reclamación actual (caso)
+                    //List<Case> listaPretensionesDeReclamacion = mapaPretensiones.get(caso.Id);   //Se obtienen las pretensiones de la reclamación actual (caso)
                     Boolean faltaObservacion = false;   //Si a alguna pretensión le falta observación, se marca a true
 
                     //DESCOMENTAR SI: hay que comprobar las observaciones en las pretensiones
@@ -2502,6 +2902,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US974485     Sergio Martín     19/08/24        Creación
      ***********************************************************************************************/
+        /**
+     * @description  Verificar que no se pase una pretensión a negociación sin tener la reclamación en ese estado
+     * @param listaEntradaPretensionNegociacion
+     * @param mapNewObj
+     */
     public static void validarPasoNegociacionPretension(List<Case> listaEntradaPretensionNegociacion, Map<Id, Case> mapNewObj) {
         for (Case caso : listaEntradaPretensionNegociacion) {
             //Si la pretensión pasa a estado negociación y su reclamación no está en el subestado de negociación
@@ -2519,6 +2924,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0                             Espe Conde     05/08/24        Creación
      ***********************************************************************************************/
+    /**
+     * @description  Atuomatismos que desencadena el cambio de owner de una reclamación
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
     public static void cambioOwnerReclamacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj) {
 
         List<Case> listaCambioOwnerReclamacion = new List<Case>();
@@ -2574,7 +2984,12 @@ public with sharing class SPV_CaseHelper {
         SPV_DatabaseDML.updateListDML(listaReclamantes, false);
     } 
 
-
+    /**
+     * @description  Cambio de estado de alta a análisis
+     * @param listCasosSPV
+     * @param mapOldObj
+     * @param mapaDatosCasosActualizar
+     */
     public static void cambioAltaAnalisisReclamacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar){
 
         Set<Id> idsReclaCambiarEstado = new Set<Id>();
@@ -2606,7 +3021,11 @@ public with sharing class SPV_CaseHelper {
                 actualizarEstadosPretension(idsReclaCambiarEstado, mapaDatosCasosActualizar, listaFamilaRec);
             }
             if(!listaBalanceoLetrado.isEmpty()){
-                Group colaPteAsignarSPV = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+                Group colaPteAsignarSPV = new Group();
+                if(Group.SObjectType.getDescribe().isAccessible()){
+                    colaPteAsignarSPV = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+                }
+
                 balanceoLetrado(listaFamilaRec, listaBalanceoLetrado, mapaDatosCasosActualizar, colaPteAsignarSPV);
             }
         }
@@ -2621,6 +3040,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0                             Espe Conde     06/08/24        Creación
      ***********************************************************************************************/
+    /**
+     * @description  Atuomatismos que desencadena el cambio de owner de una pretensión
+     * @param listCasosSPV
+     * @param mapOldObj
+     * @param mapaDatosCasosActualizar
+     */
     public static void cambioOwnerPretension(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar) {
 
         List<Case> lstPretensiones = new List<Case>();
@@ -2640,9 +3065,10 @@ public with sharing class SPV_CaseHelper {
                                     FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION AND Id IN :setIdsCaso) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN :setIdsCaso)];
         
             if(!listaCasosSelect.isEmpty()){
-                Group cola = new Group();
-                Group colaSupervisores = new Group();
-                Group colaPteAsignarSPV = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+                Group colaPteAsignarSPV = new Group();
+                if(Group.SObjectType.getDescribe().isAccessible()){
+                    colaPteAsignarSPV = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+                }
 
                 for(Case reclamacion : listaCasosSelect) {
                     if(setIdsCaso.contains(reclamacion.Id)) {
@@ -2675,6 +3101,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0            US963386        Álex Polo     26/08/24        Creación
      ***********************************************************************************************/
+        /**
+     * @description  Al actualizar la entidad productora de la pretensión pricipal, se cambia de su reclamación padre
+     * @param listCasosSPV
+     * @param mapOldObj
+     * @param mapaDatosCasosActualizar
+     */
     public static void actualizarEntidadProductoraReclamacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar){
         
         List <Case> listaPretensiones = new List<Case>();
@@ -2738,6 +3170,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US909081      Raúl Santos    24/06/24        Creación
     *****************************************************************/
+    /**
+     * @description  En caso de que la reclamación sea multipretensión, comprueba que haya una pretensión principal asignada.
+     * En caso de que no la haya, lanza un error de validación.
+     * @param listaCasos
+     * @param listaIdsRec
+     */
     public static void validarPretensionPrincipal(List<Case> listaCasos, List<Id> listaIdsRec){ //List<Case> listNewCase, Map<Id, Case> mapOldCase, List<Case> ListaCasoSelect, List<Id> listaIdsRec
 
         List<Case> listaPretensionesHijas = [SELECT Id, SAC_Reclamacion__c, Status FROM Case WHERE RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__C IN : listaIdsRec];
@@ -2771,6 +3209,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0            --               CS             23/08/24     Creacion
     *****************************************************************/
+    /**
+     * @description  Asigna un grupo a la reclamación dependiendo del grupo indicado en el metadata SPV_Configuraciones__mdt
+     * @param listaCasosNew
+     */
     public static void asignarGrupoReclamacion(List<Case> listaCasosNew) {
         //Almacenar los casos que sean reclamaciones
         List<Case> listaReclamacionesAsignarGrupo = new List<Case>();
@@ -2782,8 +3224,9 @@ public with sharing class SPV_CaseHelper {
 
         //Si se está insertando una reclamación, buscar el metadata con el grupo al que debemos balancear
         if (!listaReclamacionesAsignarGrupo.isEmpty()) {
-            List<SPV_Configuraciones__mdt> listaMetadata = [SELECT SPV_GrupoProveedorReclamaciones__c
-                                                            FROM SPV_Configuraciones__mdt LIMIT 1];
+
+            List<SPV_Configuraciones__mdt> listaMetadata = new List<SPV_Configuraciones__mdt>();
+            listaMetadata = [SELECT SPV_GrupoProveedorReclamaciones__c FROM SPV_Configuraciones__mdt LIMIT 1];
 
             if (!listaMetadata.isEmpty() && String.isNotBlank(listaMetadata[0].SPV_GrupoProveedorReclamaciones__c)) {
                 //Buscar el grupo indicado en el metadata
@@ -2807,6 +3250,10 @@ public with sharing class SPV_CaseHelper {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            --               CGomez         29/08/24     Creacion
    *****************************************************************/
+     /**
+     * @description  Asigna el idPretensión cuando se crea una nueva pretensión
+     * @param listaPretensionesNew
+     */
     public static void asignarIdPretension(List<Case> listaPretensionesNew){
         
         Map<Id, String> mapPreteIdNumExpediente = new Map<Id, String>();
@@ -2848,6 +3295,12 @@ public with sharing class SPV_CaseHelper {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            --              Álex Polo      19/09/24        Creacion
     *****************************************************************/
+    /**
+     * @description  Al actualizar el número de expediente de una reclamación, en las pretensiones se debe actualizar su id, pues es: numExpediente-caseNumberPretensión
+     * @param listaReclamacionesSPV
+     * @param mapOldObj
+     * @param mapaDatosCasosActualizar
+     */
     public static void actualizarIdPretension(List<Case> listaReclamacionesSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar){
 
         List<Case> listaPretensiones = new List<Case>();
@@ -2901,6 +3354,11 @@ public with sharing class SPV_CaseHelper {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            --               CS             02/09/24     Creacion
     *****************************************************************/
+    /**
+     * @description  Controlar el lanzamiento de alertas de Casos
+     * @param listaCasosSPV
+     * @param mapOldObj
+     */
     public static void lanzarAlertas(List<Case> listaCasosSPV, Map<Id, Case> mapOldObj) {
         List<SAC_WrapperAlerta> listaWrapperAlerta = new List<SAC_WrapperAlerta>();
         Boolean hacerQuery = false;
@@ -2940,9 +3398,11 @@ public with sharing class SPV_CaseHelper {
                                 FROM Case
                                 WHERE (RecordTypeId = :RECTYPEPRETENSION OR RecordTypeId = :RECTYPERECLAMACION) AND (Id = :setIdsReclamaciones OR SAC_Reclamacion__c IN :setIdsReclamaciones)];
 
-            cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+            if(Group.SObjectType.getDescribe().isAccessible()){
+                cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+            }
 
-            if(queryOldOwner){
+            if(queryOldOwner && User.SObjectType.getDescribe().isAccessible()){
                 listaUserSelect = [SELECT Id, Email FROM User WHERE Name IN :setNameOldOwner];
             }
             
@@ -3143,6 +3603,10 @@ public with sharing class SPV_CaseHelper {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            --             Raúl Santos    25/09/24         Creacion
     **************************************************************************/
+    /**
+     * @description  Crea un registro de pendingProcess para lanzar una clase schedulable al cabo de 7 dias.
+     * @param listNewRecPret
+     */
     public static void scheduleAlertaNegociacion(List<Case> listNewRecPret) {
         List<CBK_SCH_PendingProcess__c> listaPendingProcess = new List<CBK_SCH_PendingProcess__c>();
 
@@ -3167,6 +3631,11 @@ public with sharing class SPV_CaseHelper {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0               ---         Raúl Santos    18/09/24         Creacion
     *****************************************************************/
+    /**
+     * @description  Informar el MCC y las entidades de la pretension principal en la reclamación
+     * @param listaCasosSPV
+     * @param mapOldObj
+     */
     public static void actualizarMCCYEntidadRelamacion(List<Case> listaCasosSPV, Map<Id, Case> mapOldObj) {
 
         List<Case> listaRecCambioPretPrincipal = new List<Case>();
@@ -3210,6 +3679,13 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US1025762      Álex Polo     26/09/24        Creación
     **********************************************************************************************/
+    /**
+     * @description  Al tomar en propiedad una pretensión, se actualiza el Owner de todas las
+     *  pretensiones hermanas, y se actualiza el campo SAC_Letrado__c en la reclamación
+     * @param listaPretensiones
+     * @param mapOldObj
+     * @param mapaDatosCasosActualizar
+     */
     public static void actualizarOwnerPretensionesHermanas(List <Case> listaPretensiones, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar){
         
         //coger la reclamación y las pretensiones hermanas
@@ -3257,7 +3733,7 @@ public with sharing class SPV_CaseHelper {
         //Se recuperan los usuarios que son los nuevos owner
         List<User> listaUsuarios = new List<User>();
 
-        if(!idsUsuarios.isEmpty()){
+        if(!idsUsuarios.isEmpty() && User.SObjectType.getDescribe().isAccessible()){
             listaUsuarios = [SELECT Id, Name FROM User WHERE Id IN :idsUsuarios];
         }
         
@@ -3309,57 +3785,155 @@ public with sharing class SPV_CaseHelper {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            US1037919       Álex Polo      17/10/24         Creacion
     *****************************************************************/
-    /*public static void addOficinaAfectada(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar){
+        /**
+     * @description  Al seleccionar una oficina afectada en la reclamación, se crea un registro de SAC_ImagenDocumento
+    * donde se relaciona el caso con sus oficinas afectadas
+     * @param listCasosSPV
+     * @param mapOldObj
+     * @param mapaDatosCasosActualizar
+     */
+    public static void addOficinaAfectada(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar){
 
         Set<Id> listaIdsReclamaciones = new Set<Id>();
         List<Case> listaReclamacionesAddOficina = new List<Case>();
         Map<Id, Case> mapaReclamacionesAddOficina = new Map<Id, Case>();
 
+        Map<Id, List<Account>> mapaRecalmacionAccounts = new Map<Id, List<Account>>();
+        Set<Id> idsAccounts = new Set<Id>();
+
         
         //Obtener aquellas reclamaciones a las que se le hayan añadido una oficina afectada
         for(Case reclamacion : listCasosSPV){
             if(mapOldObj.containsKey(reclamacion.Id) && mapOldObj.get(reclamacion.Id).CC_Oficina_Afectada_Lookup__c == null && reclamacion.CC_Oficina_Afectada_Lookup__c != null){
-                System.debug('entra a oficina ' + reclamacion.CC_Oficina_Afectada_Lookup__c);
                 listaReclamacionesAddOficina.add(reclamacion);
+                listaIdsReclamaciones.add(reclamacion.Id);
                 if(!mapaReclamacionesAddOficina.containsKey(reclamacion.Id)){
                     mapaReclamacionesAddOficina.put(reclamacion.Id, reclamacion);
+                }
+                idsAccounts.add(reclamacion.CC_Oficina_Afectada_Lookup__c);
+            }
+        }
+
+        //Buscar todas las oficinas afectadas que ya tiene la reclamación para no añadir repetidos
+        Map<Id, Map<Id, Id>> mapaReclamacionOficinasYaExistentes = new Map<Id, Map<Id, Id>>();    //Mapa en el que cada id de reclamación se relaciona con los id de oficinas que tiene añadidas
+        List<SAC_ImagenDocumento__c> listaOficinasYaExistentes = new List<SAC_ImagenDocumento__c>();
+        
+            listaOficinasYaExistentes = [SELECT Id, SAC_Caso__c, SPV_OficinaAfectada_Lookup__c FROM SAC_ImagenDocumento__c WHERE SAC_Caso__c IN :listaIdsReclamaciones];
+        
+
+
+        //Se rellena un mapa en el que a cada reclamación se le relacciona con los ids de oficinas que tiene añadidas
+        if(!listaOficinasYaExistentes.isEmpty()){
+            for(SAC_ImagenDocumento__c objIntermedio : listaOficinasYaExistentes){
+                if(!mapaReclamacionOficinasYaExistentes.containsKey(objIntermedio.SAC_Caso__c)){
+                    mapaReclamacionOficinasYaExistentes.put(objIntermedio.SAC_Caso__c, new Map<Id, Id>());
+                    mapaReclamacionOficinasYaExistentes.get(objIntermedio.SAC_Caso__c).put(objIntermedio.SPV_OficinaAfectada_Lookup__c, objIntermedio.SPV_OficinaAfectada_Lookup__c);   //Se añade el id de Account como un Map para poder acceder haciendo .get y comprobar si está haciendo .containsKey
+                }else{
+                    mapaReclamacionOficinasYaExistentes.get(objIntermedio.SAC_Caso__c).put(objIntermedio.SPV_OficinaAfectada_Lookup__c, objIntermedio.SPV_OficinaAfectada_Lookup__c);
                 }
             }
         }
 
+        //Se recuperan los datos de las Account que se van a añadir como oficinas afectadas
+        Map<Id,Account> mapAccount = new Map<Id, Account>();
+        if(!idsAccounts.isEmpty()){
+            mapAccount = new Map<Id, Account>([SELECT Id, CC_Email__c,Name, CC_Tipo_Centro__c, ParentId, Parent.CC_Tipo_Centro__c, Parent.ParentId, 
+            Parent.Parent.CC_Tipo_Centro__c, Parent.Parent.ParentId, Parent.Parent.Parent.CC_Tipo_Centro__c, Parent.Parent.Parent.ParentId
+            FROM Account WHERE Id IN :idsAccounts]);
+        }
+
+        //Se rellena un mapa en el que se relacciona cada reclamación con un listado de las oficinas afectadas que se le van a añadir a ella
+        if(!listaReclamacionesAddOficina.isEmpty()){
+
+            for(Case reclamacion : listaReclamacionesAddOficina){
+
+                if(mapAccount.containsKey(reclamacion.CC_Oficina_Afectada_Lookup__c)){
+                    Account oficina = mapAccount.get(reclamacion.CC_Oficina_Afectada_Lookup__c);            //Se obtiene la oficina cuyo id se tiene en la reclamación, que se obtuvo en la query de Accounts
+    
+                    if(!mapaRecalmacionAccounts.containsKey(reclamacion.Id)){
+                        List<Account> listaOficinasRecla = new List<Account>();
+                        listaOficinasRecla.add(oficina);
+                        mapaRecalmacionAccounts.put(reclamacion.Id, listaOficinasRecla);
+                    }else{
+                        mapaRecalmacionAccounts.get(reclamacion.Id).add(oficina);
+                    }
+                }
+            }
+        }
+
+ 
         List<SAC_ImagenDocumento__c> listaReclaOficina = new List<SAC_ImagenDocumento__c>();
 
         //Para cada reclamación que haya añadido una oficina, se crea un objeto intermedio que indique la relación de esa oficina con la reclamación
-        for(Case reclamacion : listaReclamacionesAddOficina){
+        if(!listaReclamacionesAddOficina.isEmpty()){
+            for(Case reclamacion : listaReclamacionesAddOficina){
 
-            SAC_ImagenDocumento__c nuevoObjIntermedio = new SAC_ImagenDocumento__c();
-            nuevoObjIntermedio.SAC_Caso__c = reclamacion.Id;
-            nuevoObjIntermedio.SPV_OficinaAfectada_Lookup__c = reclamacion.CC_Oficina_Afectada_Lookup__c;
-            nuevoObjIntermedio.RecordTypeId = RECTYPEOFICINAS;
-
-            listaReclaOficina.add(nuevoObjIntermedio);
-
-            //Al crear el correspondiente objeto intermedio, vaciar de nuevo el campo oficina afectada de la reclamación para que si se desea puedan añadir más oficinas
-            if(!mapaDatosCasosActualizar.containskey(reclamacion.Id)){
-                Case nuevaReclamacion = new Case();
-                nuevaReclamacion.Id = reclamacion.Id;
-                nuevaReclamacion.CC_Oficina_Afectada_Lookup__c =null;
-                mapaDatosCasosActualizar.put(nuevaReclamacion.Id, nuevaReclamacion);
-            }else{
-                mapaDatosCasosActualizar.get(reclamacion.Id).CC_Oficina_Afectada_Lookup__c = null;
+                //Entra si va a añadir al menos una oficina, es decir, si la lista de oficinas a añadir para esa reclamación no está vacía 
+                if(mapaRecalmacionAccounts.containsKey(reclamacion.Id) && !mapaRecalmacionAccounts.get(reclamacion.Id).isEmpty()){
+    
+                    List<Account> listaOficinasAfectadasReclamacion = mapaRecalmacionAccounts.get(reclamacion.Id);
+                    
+                    for(Account oficina : listaOficinasAfectadasReclamacion){
+        
+                        //Comprobar si la reclamación ya tiene esta oficina añadida:
+                        Boolean esRepetida = false;
+                        //Si la reclamación está en el siguiente mapa, es que tiene oficinas añadidas. Ver si la que se quiere añadir no es repetida
+                        if(mapaReclamacionOficinasYaExistentes.containsKey(reclamacion.Id) && mapaReclamacionOficinasYaExistentes.get(reclamacion.Id).containsKey(oficina.Id)){
+                            esRepetida = true;  //Si es repetida, no se añadirá
+                        }
+        
+                        if(esRepetida == false){
+        
+                            SAC_ImagenDocumento__c nuevoObjIntermedio = new SAC_ImagenDocumento__c();
+                            nuevoObjIntermedio.SAC_Caso__c = reclamacion.Id;
+                            //nuevoObjIntermedio.SPV_OficinaAfectada_Lookup__c = reclamacion.CC_Oficina_Afectada_Lookup__c;
+                            nuevoObjIntermedio.SPV_OficinaAfectada_Lookup__c = oficina.Id;
+                            nuevoObjIntermedio.RecordTypeId = RECTYPEOFICINAS;
+                
+            
+                            //Añadirle el DAN de la oficina afectada
+                           
+                             if(oficina.Parent.CC_Tipo_Centro__c == 'GC'){
+                                    nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = oficina.ParentId;
+                                }else if(oficina.Parent.Parent.CC_Tipo_Centro__c == 'GC'){
+                                        nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = oficina.Parent.ParentId;
+                                }else if(oficina.Parent.Parent.Parent.CC_Tipo_Centro__c == 'GC'){
+                                            nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = oficina.Parent.Parent.ParentId;
+                                } else if(oficina.Parent.Parent.Parent.Parent.CC_Tipo_Centro__c == 'GC'){
+                                                nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = oficina.Parent.Parent.Parent.ParentId;
+                                }else{
+                                    nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = null;
+                                }
+            
+            
+                            listaReclaOficina.add(nuevoObjIntermedio);
+                
+                            //Al crear el correspondiente objeto intermedio, vaciar de nuevo el campo oficina afectada de la reclamación para que si se desea puedan añadir más oficinas
+                            if(!mapaDatosCasosActualizar.containskey(reclamacion.Id)){
+                                Case nuevaReclamacion = new Case();
+                                nuevaReclamacion.Id = reclamacion.Id;
+                                nuevaReclamacion.CC_Oficina_Afectada_Lookup__c =null;
+                                mapaDatosCasosActualizar.put(nuevaReclamacion.Id, nuevaReclamacion);
+                            }else{
+                                mapaDatosCasosActualizar.get(reclamacion.Id).CC_Oficina_Afectada_Lookup__c = null;
+                            }
+                        }else{
+                            reclamacion.addError('La oficina que se intenta añadir ya fue añadida.');
+                        }
+        
+                    }
+    
+                }
+    
             }
-
-
         }
 
-       
+
+
         if(!listaReclaOficina.isEmpty()){
             SPV_DatabaseDML.insertListDML(listaReclaOficina, false);
         }
-        System.debug('oficinas añadidas ' + listaReclaOficina);
-
-
-    }*/
+    }
 
 
 
@@ -3374,6 +3948,11 @@ public with sharing class SPV_CaseHelper {
     * 1.0            US1013702     Sergio Martín   20/09/24         Creacion
     * 1.1            US1036419      Álex Polo      09/10/24         Añadida vuelta a alta
     *****************************************************************/
+    /**
+     * @description  Arrastrar el estado de las pretensiones que no se encuentran en baja al estado en el que está la reclamación
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
     public static void arrastrarEstadoReclamacionPretension(List<Case> listCasosSPV, Map<Id, Case> mapOldObj){
 
         Set<Id> listaIdsReclamaciones = new Set<Id>();
@@ -3480,6 +4059,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0            US1013702     Sergio Martín   20/09/24         Creacion
     ****************************************************************/
+    /**
+     * @description  Cuando una reclamación cambia de estado, se debe cambiar el estado de sus pretensiones hijas activas
+     * @param idsReclaCambiarEstado
+     * @param listaFamilaRec
+     */
     public static void actualizarEstadosReclamacionPretension(Set<Id> idsReclaCambiarEstado, List<Case> listaFamilaRec){
         if(!listaFamilaRec.isEmpty()){
             Map<Id, List<Case>> mapaRecPretensiones = new Map<Id, List<Case>>();
@@ -3521,8 +4105,15 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US974485     Sergio Martín     30/07/24        Creación
     **********************************************************************************************/
+    /**
+     * @description  Cerrar una reclamación poniendo el subestado correcto según su case history
+     * @param casoACerrar
+     */
     public static Case cerrarReclamacion(Case casoACerrar){
-        List<CaseHistory> historial = [SELECT id, NewValue,OldValue,CreatedDate FROM CaseHistory WHERE CaseId =: casoACerrar.Id ORDER BY CreatedDate ASC];
+        List<CaseHistory> historial = new List<CaseHistory>();
+        if(CaseHistory.SObjectType.getDescribe().isAccessible()){
+            historial = [SELECT id, NewValue,OldValue,CreatedDate FROM CaseHistory WHERE CaseId =: casoACerrar.Id ORDER BY CreatedDate ASC];
+        } 
 
         for(CaseHistory h : historial){
             if(String.valueOf(h.NewValue) == 'Allanamiento'){
@@ -3564,6 +4155,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US942879     Sergio Martín   02/10/24     Creación
     **********************************************************************************************************************/
+    /**
+     * @description  Método para asignar un entitlement al caso y asi disponer del Entitlement Process en un caso
+     * @param listNewCase
+     */
     public static void asignarEntitlementProcess(List<Case> listNewCase) {
         if (Schema.sObjectType.Entitlement.isAccessible()) {
             List <Entitlement> entls = [SELECT id, SlaProcess.name FROM Entitlement WHERE SlaProcess.name = 'SPV_Process' ORDER BY LastModifiedDate desc limit 1]; 
@@ -3583,6 +4178,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0               ---         Raúl Santos      08/10/24        Creación
      ***********************************************************************************************/
+    /**
+     * @description  Validar que el campo 'SAC_EntidadAfectada__c' de la reclamación solo se puede modificar por usuarios de COPS o usuarios administradores del grupo gestor de la reclamación
+     * @param listNewCase
+     * @param mapOldObj
+     */
     public static void validarEntidadAfectadaReclamacion(List<Case> listNewCase, Map<Id, Case> mapOldObj) {
 
         List<Case> listRecCambioEntidad = new List<Case>();
@@ -3636,6 +4236,12 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US942879     Sergio Martín     11/10/24        Creación
      ***********************************************************************************************/
+    /**
+     * @description  Completar el SLA de asignacion a Letrado si se asigna un letrado a la pretensión
+     * @param listNewCase
+     * @param mapOldObj
+     * @param colaPendienteAsignar
+     */
     public static void cambioSLAAsignacionLetrado(List<Case> listNewCase, Map<Id, Case> mapOldObj, Group colaPendienteAsignar) {
         List<CaseMilestone> listaCaseMilestoneUpdatear = new List<CaseMilestone>();
         Set<Id> setIdRecCambioLetrado = new Set<Id>();
@@ -3670,6 +4276,11 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US942879     Sergio Martín     14/10/24        Creación
      ***********************************************************************************************/
+        /**
+     * @description  Desmarcar el campo SPV_EscaladoAJ__c cuando se cambia de estado en la reclamacion
+     * @param listaCasosSPV
+     * @param mapOldObj
+     */
     public static void desactivarEscaladoAJ(List<Case> listaCasosSPV, Map<Id, Case> mapOldObj){
         for(Case caso : listaCasosSPV){
             if (caso.RecordTypeId == RECTYPERECLAMACION && ((mapOldObj.get(caso.Id).SEG_Subestado__c != caso.SEG_Subestado__c && caso.Status == 'SAC_002') || mapOldObj.get(caso.Id).Status != caso.Status)) {
@@ -3690,6 +4301,11 @@ public with sharing class SPV_CaseHelper {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            US942879     Sergio Martín    16/10/24         Creacion
     ***********************************************************************************/
+    /**
+     * @description  Cerrar los SLA de la reclamación cuando se va cambiando de estado
+     * @param listCasosSPV
+     * @param mapOldObj
+     */
     public static void cerrarSLAReclamacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj){
 
         Set<Id> listaIdsReclamaciones = new Set<Id>();
@@ -3763,6 +4379,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US942879     Sergio Martín     16/10/24         Creacion
      ***********************************************************************************************/
+        /**
+     * @description  Cerrar los SLA internos de la reclamación cuando se sales de la fase
+     * @param setIdReclamaciones
+     */
     public static void cerrarSLAFasesReclamacion(Set<Id> setIdReclamaciones) {
         if(!setIdReclamaciones.isEmpty() && Schema.sObjectType.CaseMilestone.isAccessible()){
             List<CaseMilestone> listaCaseMilestone = [SELECT caseid, startdate, IsCompleted, CompletionDate, MilestoneType.Name FROM CaseMilestone WHERE caseId IN :setIdReclamaciones];
@@ -3788,6 +4408,10 @@ public with sharing class SPV_CaseHelper {
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US942879     Sergio Martín     09/10/24        Creación
      ***********************************************************************************************/
+    /**
+     * @description  Cerrar los SLA de la reclamación cuando se cierra o descarta una reclamación
+     * @param setIdReclamaciones
+     */
     public static void cerrarSLAActivosReclamacion(Set<Id> setIdReclamaciones) {
         if(!setIdReclamaciones.isEmpty() && Schema.sObjectType.CaseMilestone.isAccessible()){
             List<CaseMilestone> listaCaseMilestone = [SELECT caseid, startdate, IsCompleted, CompletionDate, MilestoneType.Name FROM CaseMilestone WHERE caseId IN :setIdReclamaciones];
@@ -3801,6 +4425,52 @@ public with sharing class SPV_CaseHelper {
             
             if(!listaCaseMilestoneUpdatear.isEmpty() && Schema.sObjectType.CaseMilestone.isUpdateable()) { 
                 SPV_DatabaseDML.updateListDML(listaCaseMilestoneUpdatear, false);
+            }
+        }
+    }
+
+
+    /*******************************************************************************************************************
+     * Proposito: Método para crear un registro asociado del CBK_Case_Extension__c a la reclamacion
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0                          Sergio Martín   02/10/24     Creación
+    **********************************************************************************************************************/
+    /**
+     * @description  Método para crear un registro asociado del CBK_Case_Extension__c a la reclamacion
+     * @param listCasosSPV
+     */
+    public static void creacionCaseExtension(List<Case> listCasosSPV) { 
+        List<CBK_Case_Extension__c> listaCaseExtension = new List<CBK_Case_Extension__c>();
+        List<Case> listaCase = new List<Case>();
+        Set<Id> idCasos = new Set<Id>();
+
+        for(Case caso : listCasosSPV) {
+            CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+            caseExtension.recordTypeId = RECTYPECASEEXTENSION;
+            caseExtension.Case_Id__c = caso.id;
+            listaCaseExtension.add(caseExtension);
+            idCasos.add(caso.id);
+        }
+
+        if (Schema.sObjectType.CBK_Case_Extension__c.isCreateable()) {    
+            SPV_DatabaseDML.insertListDML(listaCaseExtension, false);
+            List<Case> listaCaseActualizar = [SELECT Id FROM Case WHERE Id IN :idCasos];
+            if(!listaCaseActualizar.isEmpty()) {
+                for(Case caso : listaCaseActualizar) {
+                    for(CBK_Case_Extension__c extension : listaCaseExtension) {
+                        if(extension.Case_Id__c == caso.id) {
+                            caso.CBK_Case_Extension_Id__c = extension.id;
+                            listaCase.add(caso);
+                        }
+                    }
+                }
+
+                if (Schema.sObjectType.Case.isUpdateable()) {  
+                    SPV_DatabaseDML.updateListDML(listaCase, false);
+                }
             }
         }
     }

@@ -88,7 +88,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
             for(case casMil : [SELECT Id, Subject, RecordTypeId, SAC_FechaRecepcion__c, SAC_TipoConsumidor__c, CreatedDate, SAC_Prorrogado__c, isStopped, 
                             /*SAC_Stopped_Milestone__c,*/ SAC_TiempoSLARegulatorio__c, SAC_Reclamacion__c, SAC_Reclamacion__r.SAC_TipoConsumidor__c, 
                             SAC_FechaVencimientoSLA__c, SEG_Detalle__c, CC_Canal_Procedencia__c, SAC_TiempoSLALetradoAlta__c, SAC_Reclamacion__r.SAC_TipoSubsanacion__c, SAC_GenialEstado__c,
-                            SAC_TiempoParadaSubsanacion__c, SAC_Reclamacion__r.SAC_TiempoParadaSubsanacion__c
+                            SAC_TiempoParadaSubsanacion__c, SAC_Reclamacion__r.SAC_TiempoParadaSubsanacion__c, SAC_MinutosParadaSubsanacion__c, SAC_Reclamacion__r.SAC_MinutosParadaSubsanacion__c
                             FROM Case WHERE Id IN :listNewObjSAC OR SAC_Reclamacion__c IN :listNewObjSAC]) {
             	casesMap.put(casMil.Id, casMil);
                 if(casMil.SEG_Detalle__c != null) {
@@ -108,7 +108,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         }
     }
     private void processSAC(List<Case> listNewObj, Map<Id, Case> mapNewObj, List<Case> listOldObj, Map<Id, Case> mapOldObj) {
-
+        Boolean recalcularSharesPretensiones = false;
         List<SObject> objetos =new list<SObject>();
         List<Case> listaPretensiones = new List<Case>();
         List<Case> listaReclamaciones = new List<Case>();
@@ -148,7 +148,20 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         List<Case> listaCambioResultadoNegociacion = new List<Case>();
         List<Case> listaValidacionPretension = new List<Case>();
         List<Case> listaPretCambioArgumentario = new List<Case>();
+        List<Case> listaPretCambioResumenManual = new List<Case>();
         List<Case> listaRecCambioNaturaleza = new List<Case>();
+        List<Case> listaActualizarDatosContacto = new List<Case>();
+        Set<Id> idsComprobarDespachoRepresentante = new Set<Id>();
+        List<Case> listaComprobarDespachoRepresentante = new List<Case>();
+        Set<Id> idsCambiaVinculacion = new Set<Id>();
+        List<Case> listaReclaCambiaVinculacion = new List<Case>();
+        Set<Id> idsAddVinculacion = new Set<Id>();
+        List<Case> listaReclaAddVinculacion = new List<Case>();
+        Set<Id> idsComplementariasCambiaImporteAbonado = new Set<Id>();
+        List<Case> listaComplementariasCambiaImporteAbonado = new List<Case>();
+        Set<Id> idsCambiaNaturalezaComplementaria = new Set<Id>();
+        List<Case> listaCambiaNaturalezaComplementaria = new List<Case>();
+
         //List<CC_MCC_Grupo_Colaborador__c> listMccGrupos = new List<CC_MCC_Grupo_Colaborador__c>();
         List<Id> listaIdsCuentas = new List<Id>();        
         List<Id> listaVueltaDeSubsanacion  = new List<Id>(); 
@@ -162,7 +175,10 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         Set<Id> setIdRecCambioAnalisis = new Set<Id>();
         Set<Id> setIdPreCambioNegociacion = new Set<Id>();
         Set<Id> setReclaSubsanacion = new Set<Id>();
+        Set<Id> setChangeGrupoLetrado = new Set<Id>();
         List<Id> listaIdsCambioOwnerReclamacion = new List<Id>();
+        List<Id> listaIdsCambiaIdioma = new List<Id>();
+        List<Case> listaCasosCambiaIdioma = new List<Case>();
         Map<Id, Case> mapaDatosCasosActualizar = new Map<Id, Case>();
         Map<Id, Case> mapaReclamacionesNotificar = new Map<Id, Case>();
         Map<Id, Case> mapaReclamacionesCerradas = new Map<Id, Case>();
@@ -198,6 +214,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         for (case caso : listNewObj) { 
             //Pretensiones 
             if (caso.RecordTypeId == RECTYPEPRETENSION) {
+           
                 if (caso.OwnerId != mapOldObj.get(caso.Id).OwnerId && caso.AccountId != null 
                     && mapOldObj.get(caso.Id).OwnerId != colaSupervisores.Id
                     && caso.OwnerId != cola.Id && caso.OwnerId != colaSupervisores.Id ) {
@@ -234,6 +251,11 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 }
                 if (mapOldObj != null && caso.SAC_MotivoSentidoResolucion__c != mapOldObj.get(caso.Id).SAC_MotivoSentidoResolucion__c) {
                     listaPretCambioArgumentario.add(caso);
+                    idesReclaGlobal.add(caso.SAC_Reclamacion__c);
+                }
+                //Actualizar campo Resumen Manual si se modifica el Resumen Manual de sus pretensiones
+                if (mapOldObj != null && caso.SAC_ResumenManual__c != mapOldObj.get(caso.Id).SAC_ResumenManual__c) {
+                    listaPretCambioResumenManual.add(caso);
                     idesReclaGlobal.add(caso.SAC_Reclamacion__c);
                 }
                 if ((mapOldObj != null && caso.CC_Importe_Reclamado__c != mapOldObj.get(caso.Id).CC_Importe_Reclamado__c) || 
@@ -329,6 +351,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 listaCasos.add(caso);
             //Reclamaciones
             }else if(caso.RecordTypeId == RECTYPERECLAMACION){
+                
                 if (mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'SAC_008') { //Derivación
                     idesReclaGlobal.add(caso.Id);
                     mapaReclamacionesNotificar.put(caso.Id, caso);
@@ -341,6 +364,43 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                         listaReclamacionesConsultasAFinalizar.add(caso);
                     }
                 }
+
+                //Si el caso es de naturaleza: Complementaria y se le vincula otro caso, se debe arrastrar su importe abonado a la reclamación a la que se ha vinculado
+                //Entra en este al pulsar vincular sin ninguna anteriormente vinculada
+               if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).CC_CasoRelacionado__c != caso.CC_CasoRelacionado__c && caso.SAC_Naturaleza__c=='SAC_007' && mapOldObj.get(caso.Id).CC_CasoRelacionado__c == null && caso.CC_CasoRelacionado__c != null){
+                    listaReclaAddVinculacion.add(caso);
+                    idsAddVinculacion.add(caso.Id);
+                }
+
+                //Si el caso es de naturaleza: Complementaria y se le desvincula un caso, hay que eliminar su importe abonado de la reclamación que estaba vinculada
+                //Entra en este tanto al pulsar desVincular como al cambiar la reclamación vinculada por otra
+                if((mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).CC_CasoRelacionado__c != null && caso.SAC_Naturaleza__c=='SAC_007' && mapOldObj.get(caso.Id).CC_CasoRelacionado__c != caso.CC_CasoRelacionado__c)){
+                    listaReclaCambiaVinculacion.add(caso);
+                    idsCambiaVinculacion.add(caso.Id);
+                }
+
+                if(mapOldObj.containsKey(caso.Id) && caso.SAC_Naturaleza__c=='SAC_007' && mapOldObj.get(caso.Id).CC_Importe_Abonado__c != caso.CC_Importe_Abonado__c){
+                    idsComplementariasCambiaImporteAbonado.add(caso.Id);
+                    listaComplementariasCambiaImporteAbonado.add(caso);
+                }
+
+                //Si la naturaleza cambia de compolementaria a otra, o de otra a complementaria, hay que actualizar los importes abonados de su caso relacionado si tiene
+                if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).SAC_Naturaleza__c != caso.SAC_Naturaleza__c && (mapOldObj.get(caso.Id).SAC_Naturaleza__c == 'SAC_007' || caso.SAC_Naturaleza__c == 'SAC_007')){
+                    idsCambiaNaturalezaComplementaria.add(caso.Id);
+                    listaCambiaNaturalezaComplementaria.add(caso);
+                }
+
+                if(mapOldObj.containsKey(caso.Id) && caso.CC_Idioma__c != mapOldObj.get(caso.Id).CC_Idioma__c){
+                    listaIdsCambiaIdioma.add(caso.Id);
+                    listaCasosCambiaIdioma.add(caso);
+                }
+
+                //Si se cambia el tipo de representante hay que comprobar si se elimina el despacho representante del Case Extension relacionado
+                if(mapOldObj.containsKey(caso.Id) && caso.SAC_TipoDeRepresentante__c != mapOldObj.get(caso.Id).SAC_TipoDeRepresentante__c){
+                    idsComprobarDespachoRepresentante.add(caso.Id);
+                    listaComprobarDespachoRepresentante.add(caso);
+                }
+
                 if(mapOldObj.containsKey(caso.Id) && caso.CC_Canal_Procedencia__c != mapOldObj.get(caso.Id).CC_Canal_Procedencia__c){           
                     listaReclaPadreCanalProcedencia.add(caso);  
                     idesReclaGlobal.add(caso.Id);                  
@@ -351,6 +411,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                    && String.isBlank(caso.SAC_CasoRelacionado__c) ){
                         listaIdsCuentas.add(caso.AccountId);
                         listNewCaseAsignarCasosAlOwner.add(caso);
+                        recalcularSharesPretensiones = true;
                 }
                 if (mapOldObj.containsKey(caso.Id) && (caso.Status != mapOldObj.get(caso.Id).Status && (mapOldObj.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SAC_002') 
                     || (caso.Status != mapOldObj.get(caso.Id).Status && (caso.Status == 'SAC_005' || caso.Status == 'SAC_006' || caso.status == 'SAC_002' || caso.Status == 'SAC_001' || mapOldObj.get(caso.Id).Status == 'SAC_006')))) {
@@ -426,9 +487,18 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 if(mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SAC_014'){
                     listaRecPreFechaResolucion.add(caso);
                 }
+                if((mapOldObj != null && caso.OS_Email__c != mapOldObj.get(caso.Id).OS_Email__c) || 
+                (mapOldObj != null && caso.CC_Telefono_Contacto__c != mapOldObj.get(caso.Id).CC_Telefono_Contacto__c) ||
+                (mapOldObj != null && caso.SAC_DireccionPostalNotificacion__c != mapOldObj.get(caso.Id).SAC_DireccionPostalNotificacion__c)){
+                listaActualizarDatosContacto.add(caso);
+                idesReclaGlobal.add(caso.Id);  
+                }
+
+
                 listaReclamaciones.add(caso);
                 listaCasos.add(caso);
             }else if(caso.RecordTypeId == RECTYPECONSULTA){
+               
                 listaConsultas.add(caso);
                 listaCasos.add(caso);
                 if (caso.OwnerId != mapOldObj.get(caso.Id).OwnerId && caso.AccountId != null && caso.OwnerId != cola.Id) {
@@ -447,6 +517,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     idesReclaGlobal.add(mapOldObj.get(caso.Id).CC_CasoRelacionado__c);
                 }
             }else if(caso.RecordTypeId == RECTYPECONSULTASAC){
+           
                 listaCasos.add(caso);
                 if(mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.CC_CasoRelacionado__c != Null){
                     setIdesRecCheck.add(caso.CC_CasoRelacionado__c);
@@ -459,6 +530,12 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
 
                 if(mapOldObj.get(caso.Id).SAC_Naturaleza__c != caso.SAC_Naturaleza__c && caso.SAC_Naturaleza__c == 'SAC_005'){
                     listaRecCambioNaturaleza.add(caso);
+                   
+                }
+
+                //Si cambia el grupo letrado de la consulta SAC, el owner letrado tiene que pasar a 'Pte. Asignar'
+                if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).SAC_GrupoLetrado__c != caso.SAC_GrupoLetrado__c && mapOldObj.get(caso.Id).SAC_Letrado__c != 'Pte. Asignar') {
+                    setChangeGrupoLetrado.add(caso.Id);
                 }
             }
         }
@@ -466,18 +543,18 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         List<Case> listaCasosSelect = [SELECT Id, Subject, SEG_Detalle__c, SAC_Reclamacion__r.OwnerId, SAC_Reclamacion__r.SEG_Detalle__c, SAC_Reclamacion__r.SEG_Detalle__r.SAC_EndToEnd__c,
                                   OwnerId, SAC_Reclamacion__r.SEG_Grupo__c, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Detalle__c, SAC_TiempoSLALetradoAlta__c, 
                                       SAC_Reclamacion__r.SAC_PretensionPrincipal__r.OwnerId, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_Reclamacion__r.SEG_Grupo__r.SAC_EndToEnd__c,
-                                      SAC_SentidoResolucion__c, Status, SAC_StatusAuxiliar__c, SAC_Reclamacion__r.SAC_SentidoResolucion__c, CC_Importe_Reclamado__c, CaseNumber, 
+                                      SAC_SentidoResolucion__c, Status, SAC_StatusAuxiliar__c, SAC_Reclamacion__r.SAC_SentidoResolucion__c, CC_Importe_Reclamado__c, CaseNumber, OS_Email__c,CC_Telefono_Contacto__c, SAC_DireccionPostalNotificacion__c,
                                       SAC_Reclamacion__c, RecordTypeId, CC_Canal_Procedencia__c, AccountId, IsClosed, SAC_Reclamacion__r.Status, SAC_Reclamacion__r.SAC_StatusAuxiliar__c, SAC_TiempoSLARegulatorio__c, 
                                       SAC_PretensionPrincipal__c, SAC_Reclamacion__r.SAC_MotivoInadmision__c, CC_CasoRelacionado__c, SAC_Reclamacion__R.SAC_PretensionPrincipal__c,
                                       SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Detalle__r.SAC_EndToEnd__c, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.CC_MCC_Motivo__c, SEG_Grupo__c,
                                       SAC_Quebranto__c, SAC_TAE__c, SAC_Importe_Resuelto__c, CC_Importe_Abonado__c, SAC_Entidad_Afectada__c, recordType.Name, SAC_EntidadProductora__c, OS_Fecha_Resolucion__c, SAC_Reclamacion__r.CC_CasoRelacionado__c,
                                       SAC_Reclamacion__r.CC_CasoRelacionado__r.SEG_Grupo__c, SAC_Reclamacion__r.CC_CasoRelacionado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_Reclamacion__r.CC_CasoRelacionado__r.isClosed,
                                       SAC_Reclamacion__r.CC_CasoRelacionado__r.Status, SAC_Reclamacion__r.CC_CasoRelacionado__r.RecordTypeId, SAC_MotivoInadmision__c, Origin, SEG_Detalle__r.SAC_GenerarTaskMisClientes__c, SAC_FechaUltimaAsignacionLetrado__c,
-                                      CC_Oficina_Afectada_Lookup__r.CC_Numero_Oficina__c, CC_Oficina_Afectada_Lookup__r.AV_MatriculaResponsable1__r.CC_Matricula__c, CC_MCC_ProdServ__r.Name, SEG_Detalle__r.Name, SAC_MotivoSentidoResolucion__c,
+                                      CC_Oficina_Afectada_Lookup__r.CC_Numero_Oficina__c, CC_Oficina_Afectada_Lookup__r.AV_MatriculaResponsable1__r.CC_Matricula__c, CC_MCC_ProdServ__r.Name, SEG_Detalle__r.Name, SAC_MotivoSentidoResolucion__c, SAC_ResumenManual__C,
                                       SAC_RedaccionFinal__c, SAC_FamiliaMotivoBdE__c, SAC_ResultadoNegociacion__c, SEG_Detalle__r.SAC_ImporteDesdeMCC__c, SEG_Detalle__r.SAC_ImporteHastaMCC__c, SEG_Detalle__r.SAC_GrupoLetradoMCC__c,
-                                      CC_MCC_Motivo__r.SAC_ImporteDesdeMCC__c, CC_MCC_Motivo__r.SAC_ImporteHastaMCC__c, CC_MCC_Motivo__r.SAC_GrupoLetradoMCC__c, CC_MCC_ProdServ__r.SAC_ImporteDesdeMCC__c, CC_MCC_ProdServ__r.SAC_ImporteHastaMCC__c,
-                                      CC_MCC_ProdServ__r.SAC_GrupoLetradoMCC__c, CC_MCC_Tematica__r.SAC_ImporteDesdeMCC__c, CC_MCC_Tematica__r.SAC_ImporteHastaMCC__c, CC_MCC_Tematica__r.SAC_GrupoLetradoMCC__c, SAC_ValidacionMCC__c,
-                                      SAC_TipoSubsanacion__c, SAC_EsPrincipal__c, SAC_M2P__c, SAC_Reclamacion__r.SAC_M2P__c
+                                      CC_MCC_Motivo__r.SAC_ImporteDesdeMCC__c, CC_Idioma__c, CC_MCC_Motivo__r.SAC_ImporteHastaMCC__c, CC_MCC_Motivo__r.SAC_GrupoLetradoMCC__c, CC_MCC_ProdServ__r.SAC_ImporteDesdeMCC__c, CC_MCC_ProdServ__r.SAC_ImporteHastaMCC__c,
+                                      CC_MCC_ProdServ__r.SAC_GrupoLetradoMCC__c, CC_MCC_Tematica__r.SAC_ImporteDesdeMCC__c, CC_MCC_Tematica__r.SAC_ImporteHastaMCC__c, CC_MCC_Tematica__r.SAC_GrupoLetradoMCC__c, SAC_ValidacionMCC__c,SAC_CheckResumen__c,
+                                      SAC_TipoSubsanacion__c, SAC_EsPrincipal__c, SAC_M2P__c, SAC_Reclamacion__r.SAC_M2P__c, CBK_Case_Extension_Id__r.SAC_PretensionCreadaCerrada__c, CBK_Case_Extension_Id__c
                                   FROM Case
                                       WHERE (RecordTypeId  = :RECTYPERECLAMACION OR RecordTypeId = :RECTYPEPRETENSION OR RecordTypeId = :RECTYPECONSULTA OR RecordTypeId = :RECTYPECONSULTASAC)
                                        AND (
@@ -489,8 +566,11 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                                             AND (Status != 'SAC_008' OR Status != 'SAC_012' OR Status != 'SAC_013')) 
                                       OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN: listaReclamacionEspecial)
                                       OR (RecordTypeId = :RECTYPERECLAMACION AND (Id IN: setIdRecPadre OR Id IN: idesReclaGlobal))
+                                      OR (RecordTypeId = :RECTYPERECLAMACION AND  Id IN: listaIdsCambiaIdioma)
+                                      OR (RecordTypeId = :RECTYPERECLAMACION AND  Id IN: idsComprobarDespachoRepresentante)
+                                      OR (RecordTypeId = :RECTYPERECLAMACION AND  (Id IN: idsCambiaVinculacion OR Id IN: idsAddVinculacion OR Id IN: idsComplementariasCambiaImporteAbonado))
                                       )];
-        
+
         if (procesado && !segundoProcesado) {
             //Añadido metodo para calcular los importes de las pretensiones y añadirlos a la reclamación cuando la ultima acción del caso cierra el estado de la reclamación
             if (!setIdesRec.isEmpty()) {SAC_CaseCalcularImporte.calcular(listaCasosSelect, setIdesRec, mapaDatosCasosActualizar);}
@@ -505,20 +585,32 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 if (!reclIdsSentidoResolucion.isEmpty()) {SAC_CaseActualizarResolucion.actualizarResolucionReclamacion(listaCasosSelect, reclIdsSentidoResolucion, mapaDatosCasosActualizar);} 
                 
                 if (!listaPretCambioArgumentario.isEmpty()) {SAC_Reclamacion.actualizarArgumentarioResolucion(listaCasosSelect, listaPretCambioArgumentario, mapaDatosCasosActualizar);} 
-   
+
+                if (!listaPretCambioResumenManual.isEmpty()) {
+                    SAC_Reclamacion.actualizarResumenManual(listaCasosSelect, listaPretCambioResumenManual, mapaDatosCasosActualizar);
+                    SAC_Reclamacion.validarResumenManual(listaCasosSelect, listaPretCambioResumenManual, mapaDatosCasosActualizar);
+                } 
+
                 //Con las pretensiones llamamos a la clase SAC_CaseCalcularImporte le pasamos las pretensiones y que calcule el importe de Reclamación Padre
                 if (!setIdesRec.isEmpty()) {SAC_CaseCalcularImporte.calcular(listaCasosSelect, setIdesRec, mapaDatosCasosActualizar);}   
                 
                 //SAC_NotificacionProrrogaAutomatica.notificacionProrrogaAutomatica(listaPretensiones, mapOldObj);
                 compruebaPretensiones = true;
                 if (!listaPretensionControlarMilestone.isEmpty()) {
+                  
                     SAC_ComportamientoSLAs.cerrarMilestoneLetradoAltaBaja(listaPretensionControlarMilestone);
                 }
                 if (!listaCambioEntidadPrincipal.isEmpty()) {SAC_Reclamacion.entidadAfectadaPrincipal(listaCasosSelect, listaCambioEntidadPrincipal, mapaDatosCasosActualizar);}
 
                 //if (!listaCambioEntidadProductora.isEmpty()) {SAC_Reclamacion.entidadProductoraPrincipal(listaCasosSelect, listaCambioEntidadProductora, mapaDatosCasosActualizar);}
  
-                if(!listaRecalcularPreActivas.isEmpty() && !System.isQueueable()){SAC_Pretension.calcularPretensionesActivas(listaRecalcularPreActivas, listaCasosSelect, mapaDatosCasosActualizar);}
+                if(!listaRecalcularPreActivas.isEmpty() && !System.isQueueable()){
+                    SAC_Pretension.calcularPretensionesActivas(listaRecalcularPreActivas, listaCasosSelect, mapaDatosCasosActualizar);
+                    // si se da de baja o se deshace la baja el resumen de la reclamación se tiene que actualizar con lo que ocurra en esta pretension
+                    SAC_Reclamacion.actualizarResumenManual(listaCasosSelect, listaRecalcularPreActivas, mapaDatosCasosActualizar); 
+                    SAC_Reclamacion.validarResumenManual(listaCasosSelect, listaRecalcularPreActivas, mapaDatosCasosActualizar); 
+
+                }
 
                 if (!listaPretOwnerCola.isEmpty()) {SAC_Pretension.cambioLetrado(listaPretOwnerCola, mapaDatosCasosActualizar, cola);}
   
@@ -537,7 +629,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     SAC_Pretension.actualizarTAE(listaPretensionesCambiaTAE, mapaDatosCasosActualizar, listaCasosSelect);
 
                 }
-
                 //if (!listaBorrarMCC.isEmpty()) {
                     //SAC_Reclamacion.cambioMCCSiBajaPretension(listaCasosSelect, listaBorrarMCC, mapaDatosCasosActualizar);
                     //System.enqueueJob(new SAC_VaciarMCCReclamacion(listaCasosSelect, listaBorrarMCC));
@@ -580,6 +671,31 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 }
 
                 if (!mapaReclamacionesNotificar.isEmpty()) { SAC_Notificacion.derivacion(mapaReclamacionesNotificar, listaCasosSelect, mapaDatosCasosActualizar); }
+
+                if(!listaIdsCambiaIdioma.isEmpty()){
+                    SAC_Reclamacion.actualizarPlantillaLateral(listaCasosSelect, listaCasosCambiaIdioma);
+                }
+
+                if(!listaComprobarDespachoRepresentante.isEmpty()){
+                    SAC_Reclamacion.comprobarDespachoRepresentante(listaCasosSelect, listaComprobarDespachoRepresentante, mapOldObj);
+                }
+
+               if(!listaReclaAddVinculacion.isEmpty()){
+                    SAC_Reclamacion.arrastrarImporteReclamacionVinculada(listaCasosSelect, listaReclaAddVinculacion, mapaDatosCasosActualizar);
+                }
+
+                if(!listaReclaCambiaVinculacion.isEmpty()){
+                    SAC_Reclamacion.actualizarImporteCambioVinculacion(listaCasosSelect, mapOldObj, listaReclaCambiaVinculacion, mapaDatosCasosActualizar);
+                }
+
+                if(!listaComplementariasCambiaImporteAbonado.isEmpty()){
+                    SAC_Reclamacion.calcularNuevoImporteAbonado(listaCasosSelect, mapOldObj, listaComplementariasCambiaImporteAbonado, mapaDatosCasosActualizar);
+                }
+
+                if(!listaCambiaNaturalezaComplementaria.isEmpty()){
+                    SAC_Reclamacion.calcularNuevoImporteCambioNaturaleza(listaCambiaNaturalezaComplementaria, mapOldObj, mapaDatosCasosActualizar);
+                }
+
 
                 //US458927 Se elimina la alerta notificarCambioOwner
                 //if (!mapaReclamacionOwnerCambiado.isEmpty()) { SAC_Notificacion.notificarCambioOwner(mapaReclamacionOwnerCambiado, listaCasosSelect, mapaDatosCasosActualizar); }
@@ -640,6 +756,10 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     //future para cambiar owner a pretensiones hijas
                     SAC_FutureMethods.changeOwnerPretensionesHijas(listaIdCasoChangeOwnerPreten, setIdReclaOwner);
                 }
+
+                if(!listaActualizarDatosContacto.isEmpty()){  
+                    SAC_Pretension.actualizarDatosContacto(listaCasosSelect, listaActualizarDatosContacto, mapaDatosCasosActualizar);
+                }  
             }
                                
 
@@ -667,6 +787,9 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 if(!listaRecCambioNaturaleza.isEmpty()) {
                     SAC_Reclamacion.bajaPretensionesRechazo(listaRecCambioNaturaleza);
                 }
+                if(!setChangeGrupoLetrado.isEmpty()) {
+                    SAC_FutureMethods.eliminarPermisosOwnerLetrado(setChangeGrupoLetrado, mapOldObj);
+                }
             }          
             if(!listaOwnersCambiados.isEmpty()){
                 actualizaReclamantesAsociados(listaOwnersCambiados);
@@ -680,6 +803,9 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
 
         if(!mapaDatosCasosActualizar.isEmpty()){
             // Database.update(mapaDatosCasosActualizar.values());
+            if(recalcularSharesPretensiones){
+                SAC_Reclamacion.insertarCaseShareByReclamacion(mapaDatosCasosActualizar.values());
+            }
             SAC_DatabaseDML.updateListDML(mapaDatosCasosActualizar.values(), false);
         }
    

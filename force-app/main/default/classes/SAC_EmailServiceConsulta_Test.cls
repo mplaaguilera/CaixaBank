@@ -17,7 +17,7 @@ public without sharing class SAC_EmailServiceConsulta_Test {
 
         //Usuario SAC General
         User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertDML(usuario, false);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -27,7 +27,7 @@ public without sharing class SAC_EmailServiceConsulta_Test {
         camposRecl.put('SAC_StatusAuxiliar__c', 'SAC_001');
 
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false);
 
         //Interacción
         SAC_Interaccion__c interaccion = SAC_TestDataFactory.crearInteraccionn(1,reclamacion.id,null)[0];
@@ -35,8 +35,8 @@ public without sharing class SAC_EmailServiceConsulta_Test {
         interaccion.SAC_IndexedThreadId__c = 'ref:_threadId:ref';
         interaccion.SAC_FechaRespuesta__c = system.now();
         interaccion.SAC_EmailRespuesta__c = 'emailentrante@entrante.com';
-        interaccion.SAC_Estado__c = 'SAC_Resuelta'; 
-        Database.insert(interaccion);   
+        interaccion.SAC_Estado__c = 'SAC_Resuelta';
+        SAC_DatabaseDML.insertDML(interaccion, false);
     
     }
 
@@ -80,15 +80,13 @@ public without sharing class SAC_EmailServiceConsulta_Test {
         env.fromAddress = 'emailentrante@entrante.com';
         env.toAddress = 'emailentrante@entrante.com';
         
-        Messaging.InboundEmailResult result = new Messaging.InboundEmailResult();
-
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -98,7 +96,7 @@ public without sharing class SAC_EmailServiceConsulta_Test {
         }
         Test.stopTest();
 
-        System.assertNotEquals([SELECT ID FROM SAC_Interaccion__c].size(), 0, 'No se ha insertado el mail');
+        System.assertNotEquals([SELECT Count() FROM SAC_Interaccion__c], 0, 'No se ha insertado el mail');
 
     }
 
@@ -139,14 +137,13 @@ public without sharing class SAC_EmailServiceConsulta_Test {
         env.fromAddress = 'emailentranteentrante.com';
         env.toAddress = 'emailentrante@entrante.com';
 
-        Messaging.InboundEmailResult result = new Messaging.InboundEmailResult();
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         try {

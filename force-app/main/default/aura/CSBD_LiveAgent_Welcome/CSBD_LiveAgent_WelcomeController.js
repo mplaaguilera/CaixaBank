@@ -1,16 +1,15 @@
 ({
+	//Maneja las actualizaciones de datos del chat
 	chatDataUpdated: function(component, event) {
 		if (event.getParams().changeType === 'LOADED') {
-			//Cargar force:recordData de la oportunidad
-			//(tras 2s para asegurar que se ha acabado de crear)
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
+			//Recarga los datos de la oportunidad 3 segundos después de cargar el chat
 			window.setTimeout(() => component.find('opportunityData').reloadRecord(), 3000);
-
 		} else if (event.getParams().changeType === 'ERROR') {
 			console.error(component.get('v.errorLds'));
 		}
 	},
 
+	//Maneja las actualizaciones de datos de la oportunidad
 	opportunityDataUpdated: function(component, event) {
 		if (event.getParams().changeType === 'CHANGED') {
 			component.find('opportunityData').reloadRecord();
@@ -19,18 +18,20 @@
 		}
 	},
 
+	//Envía un mensaje de saludo automático al inicio del chat
 	enviarSaludoAuto: function(component, event, helper) {
 		let searchMessage = component.get('c.searchMessage');
 		searchMessage.setParams({recordId: component.get('v.recordId'), tipoMensaje: 'Saludo'});
 		searchMessage.setCallback(this, responseGetLiveChatSaludos => {
 			let result = responseGetLiveChatSaludos.getReturnValue();
 			component.set('v.timeout', result.timeOut);
+			//Si el saludo no se ha enviado y todo está correcto, lo envía
 			if (responseGetLiveChatSaludos.getState() === 'SUCCESS' && result.status === 'OK' && !result.enviadoWelcome) {
-				//eslint-disable-next-line @lwc/lwc/no-async-operation
 				window.setTimeout($A.getCallback(() =>
-					helper.sendMessage(component, result.mensaje, () => component.set('v.saludoAutoCompletado', true))), 2000); //dar tiempo a cargar el componente estandar de escritura del chat;
+					helper.sendMessage(component, result.mensaje, () => component.set('v.saludoAutoCompletado', true))), 2000);
 			} else {
 				component.set('v.saludoAutoCompletado', true);
+				//Manejo de errores en el envío del saludo
 				let mensajeError = '';
 				if (responseGetLiveChatSaludos.getState() === 'SUCCESS' && result.status === 'KO') {
 					mensajeError = result.mensaje;
@@ -44,38 +45,43 @@
 		$A.enqueueAction(searchMessage);
 	},
 
-	onNewMessage: function(component, event) { //Mensaje entrante del cliente
+	//Maneja la recepción de nuevos mensajes en el chat
+	onNewMessage: function(component, event) {
 		const recordIdAux = component.get('v.recordId').substring(0, 15);
 		if (event.getParam('recordId') === recordIdAux) {
-			if (!component.get('v.oportunidad.CSBD_PrimerContactoSLA__c')) {
-				component.set('v.oportunidad.CSBD_PrimerContactoSLA__c', new Date());
+			const oportunidad = component.get('v.oportunidad');
+			//Registra el primer contacto SLA si no existe
+			if (!oportunidad.CSBD_PrimerContactoSLA__c) {
+				oportunidad.CSBD_PrimerContactoSLA__c = new Date();
+				component.set('v.oportunidad', oportunidad);
 				component.find('opportunityData').saveRecord();
 			}
 		}
 	},
 
-	onAgentSend: function(component, event) { //Mensaje saliente del agente
+	//Maneja el envío de mensajes por parte del agente
+	onAgentSend: function(component, event) {
 		const recordIdAux = component.get('v.recordId').substring(0, 15);
 		if (event.getParam('recordId') === recordIdAux) {
-			//let oportunidad = component.get('v.oportunidad');
+			//Calcula el tiempo de primera respuesta del agente si no existe
 			if (component.get('v.oportunidad.CSBD_SLA_Primera_Respuesta__c') == null
 			&& component.get('v.saludoAutoCompletado')
 			&& component.get('v.oportunidad.CSBD_PrimerContactoSLA__c')
 			&& !component.get('v.primerMsgAgenteEnviado')) {
-				//Primer mensaje del agente (sin contar el saludo automático) tras hablar el cliente
 				component.set('v.primerMsgAgenteEnviado', true);
 
 				const fechaEntradaChat = component.get('v.oportunidad.CreatedDate');
 				const fecha1erMsgAgente = new Date();
-				const tiempoTranscurrido = Math.round((fecha1erMsgAgente - new Date(fechaEntradaChat)) / 60000); //en minutos
+				//Calcula el tiempo transcurrido en minutos
+				const tiempoTranscurrido = Math.round((fecha1erMsgAgente - new Date(fechaEntradaChat)) / 60000);
 
 				component.set('v.oportunidad.CSBD_SLA_Primera_Respuesta__c', tiempoTranscurrido);
-				//component.set('v.oportunidad', oportunidad);
 				component.find('opportunityData').saveRecord();
 			}
 		}
 	},
 
+	//Finaliza el chat enviando un mensaje de despedida
 	finalizarChat: function(component, event, helper) {
 		let getLiveChatFin = component.get('c.searchMessage');
 		getLiveChatFin.setParams({recordId: component.get('v.recordId'), tipoMensaje: 'Despedida'});
@@ -96,10 +102,11 @@
 		$A.enqueueAction(getLiveChatFin);
 	},
 
+	//Maneja el cierre del trabajo del agente
 	onCloseWork: function(component, event) {
 		const recordIdAux = component.get('v.recordId').substring(0, 15);
 		if (event.getParam('recordId') === recordIdAux) {
-
+			//Cierra el trabajo del agente en Omni-Channel
 			let omniToolkit = component.find('omniToolkit');
 			omniToolkit.getAgentWorks().then(result => {
 				const works = JSON.parse(result.works);
@@ -110,7 +117,7 @@
 				});
 			});
 
-			//Retrasar el envio para dar tiempo a cargar el componente estandar de escritura del chat;
+			//Procesa el cierre del chat después de 8 segundos
 			window.setTimeout($A.getCallback(() => {
 				let searchEvent = component.get('c.searchEventTranscript');
 				searchEvent.setParam('recordId', event.getParam('recordId'));
@@ -124,6 +131,7 @@
 								component.set('v.timeout', timeout);
 								$A.get('e.force:refreshView').fire();
 
+								//Calcula el tiempo total de atención si no existe
 								if (!component.get('v.oportunidad.CSBD_SLA_TGT__c') && component.get('v.oportunidad.CSBD_PrimerContactoSLA__c')) {
 									const tiempoAtencion = Math.round((new Date() - new Date(component.get('v.oportunidad.CSBD_PrimerContactoSLA__c'))) / 60000);
 									component.set('v.oportunidad.CSBD_SLA_TGT__c', tiempoAtencion);

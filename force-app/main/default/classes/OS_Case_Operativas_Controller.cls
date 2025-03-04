@@ -828,10 +828,12 @@ public without sharing class OS_Case_Operativas_Controller {
                 idsCorreos.add(eMessage.Id);
                 mapaTieneAdjuntos.put(eMessage.Id, false);
             }
-                
+            
+             if (!idsCorreos.isEmpty()){   
             for (ContentDocumentLink cdl : [SELECT LinkedEntityId, ContentDocumentId  FROM ContentDocumentLink WHERE LinkedEntityId IN :idsCorreos]) {
                 mapaTieneAdjuntos.put(cdl.LinkedEntityId,true);                                
             }
+             }
             correosElectronicos = listaCorreos;
         }
         List<CorreoElectronico> correos = new List<CorreoElectronico>();

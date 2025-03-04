@@ -13,6 +13,7 @@
 * 1.2            US927972       Alex Pérez       20/06/2024    Modificación para desviar casos que son prerechazados y evitar enviarlos a la IA
 *****************************************************************/
 public without sharing class SAC_EmailServiceNew implements Messaging.InboundEmailHandler {
+
     private static Set<String> objetos = new Set<String>{'Task','Case', 'CC_Grupo_Colaborador__c', 'SAC_Interaccion__c', 'SAC_Accion__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
     
@@ -54,16 +55,16 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            US219261         Nicolás G.   15/06/21     Creación
     *****************************************************************/
-    public Messaging.InboundEmailResult handleInboundEmail(Messaging.InboundEmail email, Messaging.InboundEnvelope envelope) {        
-        
-
+    public Messaging.InboundEmailResult handleInboundEmail(Messaging.InboundEmail email, Messaging.InboundEnvelope envelope) {     
+        String methodname = 'handleInboundEmail';
 
         // Trazabilidad para registrar la entrada del correo.
         try{
             CBK_Log.auditemail(email,envelope);
         }catch (Exception e){
             // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-            CBK_Log.error(e,'Error registrando entrada correo',email);
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+           
         }
         
         Messaging.InboundEmailResult result = new Messaging.InboundEmailresult();
@@ -75,7 +76,7 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
         List<SAC_Accion__c> lstAcciones = new List<SAC_Accion__c>();
         
         try{
-            
+
             String texto = email.htmlBody;
             if(String.isBlank(texto)){
                 texto = email.plainTextBody;
@@ -84,7 +85,6 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
             String threadId = '';
             Boolean encontradoThread = false;
             Boolean encontradoInteraccionTarea = false;
-            
             // US682922 - TA646298 - Guardar la fecha original del mensaje entrante
             Datetime emailDate = SAC_Utils.recuperarFechaEmail(email);
             
@@ -96,18 +96,17 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                 }
                 threadId = ('ref:_' + threadId + ':ref');
             }
-            
             if(encontradoThread){
                
                 lstInteracciones = [SELECT Id, SAC_Reclamacion__c,SAC_FechaRespuesta__c,SAC_EmailRespuesta__c,SAC_Estado__c,SAC_IndexedThreadId__c, RecordTypeId, SAC_Respuesta__c,
                                                           SAC_GrupoColaborador__r.SAC_DeveloperName__c
                                                           FROM SAC_Interaccion__c
                                                           WHERE RecordTypeId = :RECORDTYPEINTERACCION AND SAC_IndexedThreadId__c = :threadID LIMIT 1];
-                
+
                 lstAcciones = [SELECT Id, SAC_Reclamacion__c,SAC_Estado__c,SAC_IndexedThreadId__c, RecordTypeId
                                                 FROM SAC_Accion__c
                                                 WHERE RecordTypeId = :RECORDTYPEACCION AND SAC_IndexedThreadId__c = :threadID LIMIT 1];
-                
+
                 /* Comprobamos que la lista no este vacia, iteramos y assignamos los 
                 * campos necesarios y finalmente updateamos la lista.
                 */
@@ -198,7 +197,7 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                     } else if (String.isNotBlank(casoConThreadId.Id)) { //De lo contrario, y si la lista no está vacía, significa que ha encontrado un thread id y debe linkarse el email al caso
                         linkarEmailACasoExistente = true;
                     }
-                
+
                 if (abrirCasoNuevo) {
                     //Comprobar parametrizaciones de custom settings para saber si el email entrante debe crear un tipo de caso u otro (reclamación, consulta COPS)
                     SAC_EmailService__c parametrizacion = SAC_Utils.comprobarCustomSettings(email, 'SAC_Reclamacion');
@@ -229,11 +228,10 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                     if(Schema.sObjectType.QueueSobject.isAccessible() && 
                     Schema.sObjectType.QueueSobject.fields.QueueId.isAccessible() &&
                     Schema.sObjectType.Group.fields.DeveloperName.isAccessible()) {
-
                         colas = [SELECT QueueId, queue.DeveloperName FROM QueueSobject WHERE (queue.DeveloperName = : nombreCola OR queue.DeveloperName = 'SAC_PendienteAsignar') 
                                                 AND SobjectType = 'Case' LIMIT 2];
                     }
-                    
+
                     for(QueueSobject co : colas) {
                         if(nombreCola == co.queue.DeveloperName){
                             cola = co;
@@ -275,20 +273,31 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                         }
                         
                         //caso.CC_AcuseRecibo__c = '1'; esta linea se ha comentado para que no se quede el acuse de recibo en 1. Al no introducir un valor, manda el acuse de recibo y se updatea a 2 (dia 7/11/22)
-                        resultado = Database.insert(reclamacionNueva);
-                        
+                        SAC_DatabaseDML.insertDML(reclamacionNueva, false);
+                        //resultado = Database.insert(reclamacionNueva);
                         wrapEmRes = emailTask(reclamacionNueva.Id, email, RECORDTYPETAREA, '', reclamacionNueva.RecordTypeId);
                         Map<String,Boolean> mapaResultadoEmailTask = wrapEmRes.mapaResultado;
                         emailMess = wrapEmRes.eMessage;
                         
                         result.success= mapaResultadoEmailTask.get('resultado');
-                        reclamacionNueva.SourceId = [SELECT id FROM EmailMessage WHERE ParentId =: reclamacionNueva.id AND Incoming = true LIMIT 1].id;
+
+                        List<EmailMessage> listEM = [SELECT id FROM EmailMessage WHERE ParentId =: reclamacionNueva.id AND Incoming = true LIMIT 1];
+                        if(!listEM.isEmpty()){
+                            reclamacionNueva.SourceId = listEM[0].id;
+                        }
+                        
                         reclamacionNueva.SAC_UltimaModificacionFichero__c = (mapaResultadoEmailTask.get('tieneAttachments')) ? emailDate : null;
-                        resultado = Database.update(reclamacionNueva);
+                        SAC_DatabaseDML.updateDML(reclamacionNueva, false);
+                        //resultado = Database.update(reclamacionNueva, false);
 
                         //si la reclamacion esta en database correctamente enviar a IA
-                        if (resultado.isSuccess() && bIA){
+                        /*if (resultado.isSuccess() && bIA){
                             String idReclamacion = resultado.getId();
+                            //SAC_GenialSendAzure.sendToIA(idReclamacion, reclamacionNueva.Description);
+                            SAC_GenialUtils.balanceador(idReclamacion, 'Email', reclamacionNueva.Description);
+                        }*/
+                        if (bIA){
+                            String idReclamacion = reclamacionNueva.Id;
                             //SAC_GenialSendAzure.sendToIA(idReclamacion, reclamacionNueva.Description);
                             SAC_GenialUtils.balanceador(idReclamacion, 'Email', reclamacionNueva.Description);
                         }
@@ -312,25 +321,33 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                     //Añadido para recortar la description del caso
                     //listaCaso[0].Description = listaCaso[0].Description.left(32000);
                     Database.SaveResult resultado = null;
-                    resultado = Database.update(casoConThreadId);
+                    SAC_DatabaseDML.updateDML(casoConThreadId, false);
+                    //resultado = Database.update(casoConThreadId);
                     
                     wrapEmRes = emailTask(casoConThreadId.Id, email, RECORDTYPETAREA, statusLlegadaMail, casoConThreadId.RecordTypeId);
                     result.success = wrapEmRes.mapaResultado.get('resultado');
                     emailMess = wrapEmRes.eMessage;
                 }
-                
+
+                CBK_Log.ResultWrapper resultado = new CBK_Log.ResultWrapper();
+                resultado.Status = (result.success) ? 'OK' : 'KO';
+                resultado.Detail = (result.success) ? 'Envio correcto' : 'Error procesando el correo';
+                if (!lstInteracciones.isEmpty() || !lstAcciones.isEmpty()) {
+                    resultado.CaseId = emailMess.RelatedToId;
+                }else{
+                   resultado.CaseId = emailMess.ParentId; 
+                }
+                resultado.EmailMessageId = emailMess.Id;
+                CBK_Log.auditemailResult(resultado, email);
+
             }
         }catch(Exception e){
             // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-            CBK_Log.error(e,'Error procesando el correo entrante',email);
-        }
-        
-        // Trazabilidad para registrar el procesamiento del correo.
-        //Añadido US527358
-        try{
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
             CBK_Log.ResultWrapper resultado = new CBK_Log.ResultWrapper();
-            resultado.Status = (result.success) ? 'OK' : 'KO';
-            resultado.Detail = (result.success) ? 'Envio correcto' : 'Error procesando el correo';
+
+            resultado.Status = 'KO';
+            resultado.Detail = 'Error procesando el correo: ' + e.getMessage()?.left(225);
             if (!lstInteracciones.isEmpty() || !lstAcciones.isEmpty()) {
                 resultado.CaseId = emailMess.RelatedToId;
             }else{
@@ -338,10 +355,26 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
             }
             resultado.EmailMessageId = emailMess.Id;
             CBK_Log.auditemailResult(resultado, email);
-        }catch (Exception e){
-            // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-            CBK_Log.error(e,'Error registrando procesamiento correo',email);
         }
+        
+        // Trazabilidad para registrar el procesamiento del correo.
+        //Añadido US527358
+        // try{
+        //     CBK_Log.ResultWrapper resultado = new CBK_Log.ResultWrapper();
+        //     resultado.Status = (result.success) ? 'OK' : 'KO';
+        //     resultado.Detail = (result.success) ? 'Envio correcto' : 'Error procesando el correo';
+        //     if (!lstInteracciones.isEmpty() || !lstAcciones.isEmpty()) {
+        //         resultado.CaseId = emailMess.RelatedToId;
+        //     }else{
+        //        resultado.CaseId = emailMess.ParentId; 
+        //     }
+        //     resultado.EmailMessageId = emailMess.Id;
+        //     CBK_Log.auditemailResult(resultado, email);
+        // }catch (Exception e){
+        //     // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
+        //     CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + METHODNAME + ' - MSG ERROR: ' + e.getMessage(), email);
+      
+        // }
         
         return result;
         
@@ -356,7 +389,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
     * 1.0            US219270         Esteve Llaó    09/07/2021   Creación
     **************************************************************************/
     public static WrapperEmailResult emailConsulta(Id idConsulta, Messaging.InboundEmail email, Id idReclamacion ){
-        
+        final String methodname = 'emailConsulta';
+
         Boolean resultado = false;
         WrapperEmailResult wrappEmResult = new WrapperEmailResult();
         
@@ -414,7 +448,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                 SAC_DatabaseDML.insertDML(emr, false);
             }
         }catch(Exception e){
-            CBK_Log.error(e,'Error procesando el correo entrante',email);
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+      
         }
 
         //Guardamos los attachments si hubiese alguno
@@ -444,7 +479,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                     SAC_DatabaseDML.insertListDML(contentLinks, false);
                 }catch(Exception e){
                     // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-                    CBK_Log.error(e,'Error procesando el correo entrante',email);
+                    CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+        
                 }
                 
             }
@@ -476,7 +512,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                     resultado = true; 
                 }
             }catch(Exception e){
-                CBK_Log.error(e,'Error procesando el correo entrante',email);
+                CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+
             }
         }  
         wrappEmResult.result = resultado;
@@ -495,6 +532,9 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
     *****************************************************************/
     //public static WrapperEmailResult emailTask(ID casoid, Messaging.InboundEmail email, Id taskTR)
     public static WrapperEmailResult emailTask(ID casoid, Messaging.InboundEmail email, Id taskTR, String estadoCaso, Id casoRecordType){
+        String methodname = 'emailTask';
+
+
         Boolean resultado = false;
         Boolean tieneAttachments = false;
         Map<String,Boolean> mapaResultado = new Map<String,Boolean>();
@@ -553,7 +593,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
 
         resultado = true; 
         }catch(Exception e){
-            CBK_Log.error(e,'Error procesando el correo entrante',email);
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+  
         }
 
         // Add Email Message Relation for id of the sender
@@ -570,7 +611,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                 createTask(casoid, email.Subject, TaskTR);
             }
         }catch(Exception e){
-            CBK_Log.error(e,'Error procesando el correo entrante',email);
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+    
         }
 
         //Guardamos los attachments si hubiese alguno
@@ -601,7 +643,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                     SAC_DatabaseDML.insertListDML(contentLinks, false);
                 }catch(Exception e){
                     // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-                    CBK_Log.error(e,'Error procesando el correo entrante',email);
+                    CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+         
                 }
                 
             }
@@ -630,7 +673,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                     resultado = true; 
                 }
             }catch(Exception e){
-                CBK_Log.error(e,'Error procesando el correo entrante',email);
+                CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+     
             }
         } 
         
@@ -764,12 +808,13 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
     */
     @future
     public static void generarAlertasFuturo(String jsonAlertas) {
+        final String methodname = 'generarAlertasFuturo';
         List<SAC_WrapperAlerta> lstAlertas = (List<SAC_WrapperAlerta>)Json.deserialize(jsonAlertas,List<SAC_WrapperAlerta>.class);
         try{
             SAC_Alertas.generarAlertas(lstAlertas);
         } catch (Exception e) {
-            CBK_Log.error(e);
-        }  
+            List<Object> detalle = new List<Object> {'CLASSNAME: ' + CLASSNAME, 'METHODNAME: ' + methodname, 'MSG ERROR: ' + e.getMessage()};
+            CBK_Log.error(e,detalle);                }  
     }
     
     private static List<SAC_WrapperAlerta> prepararAlertas(Case casoAux) {

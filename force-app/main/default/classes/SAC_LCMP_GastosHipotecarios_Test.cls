@@ -18,26 +18,30 @@ public with sharing class SAC_LCMP_GastosHipotecarios_Test {
  
         //Usuario SAC General
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        usuarioGeneral.SAC_PerteneceCOPSAJ__c = true;      
-        Database.insert(usuarioGeneral);
+        usuarioGeneral.SAC_PerteneceCOPSAJ__c = true; 
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);     
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             //Grupo Colaborador
             CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
-            Database.insert(grupoColaborador);
+            SAC_DatabaseDML.insertDML(grupoColaborador, false); 
+            //Database.insert(grupoColaborador);
 
             //Reclamacion
             Map<String, Object> camposRecl = new Map<String, Object>();
             camposRecl.put('Subject', 'TestResolucion');
 
             Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);
+            //Database.insert(casoReclamacion);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -45,7 +49,8 @@ public with sharing class SAC_LCMP_GastosHipotecarios_Test {
             camposPret.put('SAC_Reclamacion__c', casoReclamacion.Id);
 
             Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(casoPretension); 
+            SAC_DatabaseDML.insertDML(casoPretension, false);
+            //Database.insert(casoPretension); 
     
             //Maestro acciones
             SAC_MaestroAccionesReclamacion__c maestro = SAC_TestDataFactory.crearMaestroAcciones(1, grupoColaborador.Id)[0];
@@ -54,14 +59,16 @@ public with sharing class SAC_LCMP_GastosHipotecarios_Test {
             maestro.SAC_PlazoMaximo__c = 4; 
             maestro.SAC_Prorroga__c= 4; 
             maestro.SAC_Activo__c = true;
-            Database.insert(maestro);
+            SAC_DatabaseDML.insertDML(maestro, false);
+            //Database.insert(maestro);
 
             //Tarea
             SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1, casoPretension, true)[0]; 
             tarea.SAC_MaestroAccionesReclamacion__c = maestro.id; 
             tarea.SAC_Estado__c = 'SAC_PendienteEnviar';
             tarea.SAC_Observaciones__c = 'TestTareaSACGH';
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
         }
     }
 

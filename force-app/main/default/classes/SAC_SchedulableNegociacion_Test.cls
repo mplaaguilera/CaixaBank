@@ -6,14 +6,16 @@ public with sharing class SAC_SchedulableNegociacion_Test {
         User usuarioGeneral;
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC Admin
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];  
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0]; 
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);   
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);   
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+            //Database.insert(permiSetAssi);   
         }
 
         //Reclamacion
@@ -22,7 +24,8 @@ public with sharing class SAC_SchedulableNegociacion_Test {
         camposRecl.put('OwnerId', usuarioGeneral.Id);
 
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false);  
+        //Database.insert(reclamacion);
     }
 
     @isTest
@@ -42,7 +45,8 @@ public with sharing class SAC_SchedulableNegociacion_Test {
             reclamacion.Status = 'SAC_007';
             reclamacion.SAC_StatusAuxiliar__c = reclamacion.Status;
             reclamacion.SAC_TipoConsumidor__c ='si';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false); 
+            //Database.update(reclamacion);
         }
 
         SAC_SchedulableNegociacion sch = new SAC_SchedulableNegociacion();

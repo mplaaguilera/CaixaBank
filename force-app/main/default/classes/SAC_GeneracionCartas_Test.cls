@@ -5,7 +5,8 @@ public with sharing class SAC_GeneracionCartas_Test {
 
         //Usuario SAC General
         User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertDML(usuario, false);
+        //Database.insert(usuario);
 
         //Reclamacion 1
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -26,16 +27,19 @@ public with sharing class SAC_GeneracionCartas_Test {
         reclamaciones.add(rec1);        
         reclamaciones.add(rec2);
 
-        Database.insert(reclamaciones);
+        SAC_DatabaseDML.insertListDML(reclamaciones, false);
+        //Database.insert(reclamaciones);
 
         SAC_DocumentoEnvio__c doc = SAC_TestDataFactory.crearDocumentoEnvio(1,rec1)[0];
         doc.SAC_CP__c = '12345';
         doc.SAC_TipoDocumento__c = 'docTest';
-        Database.insert(doc);
+        SAC_DatabaseDML.insertDML(doc, false);
+        //Database.insert(doc);
         
         Blob vd =  blob.valueOf('Unit.Test');
         ContentVersion cv = new ContentVersion(VersionData = vd, PathOnClient = 'SampleTitle.pdf' , Title = 'tituloTest', FirstPublishLocationId = rec1.Id, SAC_StringRedaccion_fileupload__c = 'carta postal docTest');
-        Database.insert(cv);
+        SAC_DatabaseDML.insertDML(cv, false);
+        //Database.insert(cv);
     }
 
     @isTest

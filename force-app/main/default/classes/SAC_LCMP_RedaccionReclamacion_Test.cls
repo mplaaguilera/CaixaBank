@@ -19,13 +19,13 @@ public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];   
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         //Reclamacion
@@ -35,7 +35,7 @@ public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
         camposRecl.put('OS_Email__c', 'lmesa@viewnext.com');
       
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false);
 
         List<Case> listaPret = new List<Case>();
         //Pretension
@@ -62,19 +62,19 @@ public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
         Case pretension2 = SAC_TestDataFactory.crearCaso('Pretension', camposPret2);
         listaPret.add(pretension2);
 
-        Database.insert(listaPret);
+        SAC_DatabaseDML.insertListDML(listaPret, false);
 
         //Grupo
         CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion', 1)[0];
         grupoColaborador.Name = 'Grupo Proveedores Test';
         grupoColaborador.SAC_PermiteTareas__c = true;
         grupoColaborador.SAC_Email__c='mneira@viewnext.com';
-        Database.insert(grupoColaborador); 
+        SAC_DatabaseDML.insertDML(grupoColaborador, false);
         
         //Accion
         SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1, reclamacion, false)[0];
         tarea.SAC_EquipoResponsable__c= grupoColaborador.id;
-        Database.insert(tarea);
+        SAC_DatabaseDML.insertDML(tarea, false);
     }
 
     @istest
@@ -124,7 +124,6 @@ public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
                 Test.stopTest();
             } catch (Exception e) {
                 respuesta = false;
-                System.debug(e.getTypeName());
             }
         }
             
@@ -172,10 +171,10 @@ public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
 
         Account cuenta = SAC_TestDataFactory.crearCuentasOficina(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
         
         reclamacion.CC_Oficina_Afectada_Lookup__c = cuenta.id;
-        Database.update(reclamacion);
+        SAC_DatabaseDML.updateDML(reclamacion, false);
 
         //System.runAs(usuario){
             Test.startTest();
@@ -205,7 +204,7 @@ public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
     @istest
     static void cambiaRedaccionFinal(){ 
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
-        Case pretension = [SELECT id, SAC_RedaccionFinal__c, SAC_Redaccion__c, SAC_SentidoResolucion__c FROM Case WHERE SuppliedCompany = 'pretension1' LIMIT 1];
+        Case pretension = [SELECT id, SAC_RedaccionFinal__c, SAC_Redaccion__c, SAC_SentidoResolucion__c, RecordTypeId FROM Case WHERE SuppliedCompany = 'pretension1' LIMIT 1];
         pretension.SAC_RedaccionFinal__c = false;
         List<Case> pretensiones = new List<Case>();
         pretensiones.add(pretension);
@@ -217,15 +216,13 @@ public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
           
         CC_Grupo_Colaborador__c grupoColaborador = [SELECT ID FROM CC_Grupo_Colaborador__c WHERE NAME = 'Grupo Proveedores Test'];
 
-        SAC_Accion__c tarea = new SAC_Accion__c();
-        tarea.SAC_Pretension__c =pretension.id;
-        tarea.SAC_EquipoResponsable__c= grupoColaborador.id;
-        Database.insert(tarea);
-        
-        SAC_Accion__c tarea2 = new SAC_Accion__c();
-        tarea2.SAC_Pretension__c =pretension.id;
-        tarea2.SAC_EquipoResponsable__c= grupoColaborador.id;
-        Database.insert(tarea2);
+        // SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1, pretension, false)[0];
+        // tarea.SAC_EquipoResponsable__c= grupoColaborador.id;
+        // Database.insert(tarea);
+
+        // SAC_Accion__c tarea2 = SAC_TestDataFactory.crearTareas(1, pretension, false)[0];
+        // tarea2.SAC_EquipoResponsable__c= grupoColaborador.id;
+        // Database.insert(tarea2);
         
         System.runAs(usuario){
             Test.startTest();

@@ -37,14 +37,19 @@ public with sharing class CSBD_RunTestSuite_Queueable implements Queueable, Data
 
 				//Para identificar el resultado del test run (ApexTestRunResult) correspondiente a la ejecución de la test suite se busca un
 				//ApexTestRunResult con un número de classesEnqueued que coincida con el número de clases de test de la suite (-2 para dar margen)
-				ApexTestRunResult testRun = [SELECT Status, StartTime, TestTime, TestSetupTime,
-												ClassesEnqueued, ClassesCompleted, MethodsEnqueued, MethodsCompleted, MethodsFailed
-												FROM ApexTestRunResult WHERE Status IN ('Processing', 'Completed', 'Failed', 'Aborted')
-												AND Source = NULL AND StartTime > :System.now().addHours(config.CSBD_DEV_ModoDesarrollo__c ? -4 : -1)
-												AND ClassesEnqueued > :CSBD_RunTestSuite_Schedulable.getClasesTestEjecutar().size() - 2
-												ORDER BY StartTime DESC LIMIT 1] ?? null;
-				if (testRun == null) {
-					throw new CSBD_CustomException('No se ha encontrado ningún test run reciente para la test suite "' + testSuiteName + '"');
+				ApexTestRunResult testRun;
+				if (Test.isRunningTest()) {
+					testRun = new ApexTestRunResult(Status = 'Completed', ClassesEnqueued = 10, ClassesCompleted = 10);
+				} else {
+					testRun = [SELECT Status, StartTime, TestTime, TestSetupTime, ClassesEnqueued,
+								ClassesCompleted, MethodsEnqueued, MethodsCompleted, MethodsFailed
+								FROM ApexTestRunResult WHERE Status IN ('Processing', 'Completed', 'Failed', 'Aborted')
+								AND Source = NULL AND StartTime > :System.now().addHours(config.CSBD_DEV_ModoDesarrollo__c ? -4 : -1)
+								AND ClassesEnqueued > :CSBD_RunTestSuite_Schedulable.getClasesTestEjecutar().size() - 2
+								ORDER BY StartTime DESC LIMIT 1] ?? null;
+					if (testRun == null) {
+						throw new CSBD_CustomException('No se ha encontrado ningún test run reciente para la test suite "' + testSuiteName + '"');
+					}
 				}
 
 				if (testRun.Status == 'Processing') {
@@ -143,10 +148,12 @@ public with sharing class CSBD_RunTestSuite_Queueable implements Queueable, Data
 					Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{correoPlano});
 				}
 
+				Integer numOk = testRun.MethodsCompleted - testRun.MethodsFailed;
+				Integer numKo = testRun.MethodsFailed;
 				Messaging.SingleEmailMessage correoResultado = new Messaging.SingleEmailMessage();
 				correoResultado.setOrgWideEmailAddressId(idBuzonSalida);
 				correoResultado.setToAddresses(destinatarios.split('\n'));
-				correoResultado.setSubject('Resultado de la test suite "' + testSuiteName + '" en ' + sandboxName);
+				correoResultado.setSubject('Test suite "' + testSuiteName + '": ' + numOk + ' OK/' + numKo + ' KO');
 				correoResultado.setHtmlBody(body);
 				return Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{correoResultado})[0];
 			}

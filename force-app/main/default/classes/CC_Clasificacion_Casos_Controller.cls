@@ -215,7 +215,7 @@ public with sharing class CC_Clasificacion_Casos_Controller {
     
     @AuraEnabled
     public static Map<String, Object> validarGuardarCerrar(Id recordId,boolean cerrar, String nuevoCanalRespuesta, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, String agrupacionComprobacion) {
-        Case caso = [SELECT RecordType.DeveloperName,CC_MCC_Causa__c,CC_MCC_Solucion__c, AccountId, ContactId FROM Case WHERE Id = :recordId];
+        Case caso = [SELECT RecordType.DeveloperName,CC_MCC_Causa__c,CC_MCC_Solucion__c, AccountId, ContactId, CC_Oportunidad_Creada__c FROM Case WHERE Id = :recordId];
         CC_Settings__c configuracionFuncionalidad = CC_Settings__c.getValues('CC_OperativaOficinaGuardar');
         Boolean tieneActividad = false;
         if(cerrar) {
@@ -248,8 +248,8 @@ public with sharing class CC_Clasificacion_Casos_Controller {
         }
 
         if (configuracionFuncionalidad.CC_Configuracion_1__c == 'true' && caso.AccountId != null && caso.ContactId != null && caso.RecordType.DeveloperName == 'CC_Cliente' && (agrupacionComprobacion == 'Derivar a oficina' || agrupacionComprobacion == 'Derivar a oficina: Limitación protocolo')) {
-            List<Task> tareas = [SELECT Id FROM Task WHERE AV_Case__c = :recordId AND Type = 'Tarea gestor'];
-            if(!tareas.isEmpty()) {
+            List<Task> tareas = [SELECT Id FROM Task WHERE AV_Case__c = :recordId AND Type IN ('Tarea gestor', 'Oportunidad CSBD')];
+            if(!tareas.isEmpty() || caso.CC_Oportunidad_Creada__c) {
                 tieneActividad = true;
             }                    
         } else {
@@ -429,14 +429,13 @@ public with sharing class CC_Clasificacion_Casos_Controller {
             CIBE_Link__mdt result = CIBE_Link__mdt.getInstance(cmtTraer);
             Case  datosCaso = new Case();
             // Creamos un try catch para capturar los errores
-            
                try{
-                datosCaso = [SELECT Id,Account.Name, Account.AV_NumPerso__c, Account.CC_Numero_Documento__c FROM Case WHERE Id = :recordId];        
+                datosCaso = [SELECT Id,Account.Name, Account.AV_NumPerso__c, Account.CC_Numero_Documento__c, Account.CC_NumPerso__c FROM Case WHERE Id = :recordId];        
                 if(String.isNotBlank(result.CIBE_Parameters__c)) { 
                     String identificadorAccount = String.isNotBlank(datosCaso.Account.CC_Numero_Documento__c) ? datosCaso.Account.CC_Numero_Documento__c : '';
-                    String numperAccount = String.isNotBlank(datosCaso.Account.AV_NumPerso__c) ? datosCaso.Account.AV_NumPerso__c : '';
+                    String numperAccount = !String.isEmpty(datosCaso.Account.AV_NumPerso__c) ? datosCaso.Account.AV_NumPerso__c : !String.isEmpty(datosCaso.Account.CC_NumPerso__c) ? datosCaso.Account.CC_NumPerso__c : '';
                     String nombre = String.isNotBlank(datosCaso.Account.Name) ? datosCaso.Account.Name : '';
-    
+
                     url=  result.CIBE_URL__C.replace('{numperso}',numperAccount ).replace('{nif}',identificadorAccount ).replace('{nombre}',nombre);
                     }
             

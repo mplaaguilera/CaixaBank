@@ -585,7 +585,7 @@ public class OS_EmailMessage_TRHan_Test {
         correoSaliente2.Subject = 'Prueba de envío de correo válido';
         correoSaliente2.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
         correoSaliente2.ToAddress = 'prueba@ibm.com';
-        correoSaliente2.BccAddress = 'contacto@prueba.com';
+        correoSaliente2.BccAddress = 'copiaocultaprueba@prueba.com';
         correoSaliente2.Incoming = false;
         correoSaliente2.ParentId = caso.Id;
         correoSaliente2.RelatedToId = caso.Id;

@@ -5,18 +5,20 @@ public with sharing class CC_WS_Alta_Citas {
             CBK_Log.error('Numperso no informado');
         } else {
             try {
-                CC_Settings__c reservationType = CC_Settings__c.getValues('CC_Configuracion_Cita_Rapida');
+                CC_Settings__c configuracion = CC_Settings__c.getValues('CC_Configuracion_Cita_Rapida');
                 Blob digest = Crypto.generateDigest('SHA-256', Blob.valueOf(numPer + 'asesorVentas1'));
                 String branchHashId = EncodingUtil.convertToHex(digest);
                 Map<String, String> requestHeaders = getRequestHeaders();
                 
+                asunto = (tipoCita == String.valueOf(42) ? ' Cita presencial' : ' Cita telefónica') + ' - ' + asunto;
                 Map<String, String> bodyRequest = new Map<String, String>();
                 bodyRequest.put('branchId', numOficina);
-                bodyRequest.put('reasonId', '001');
+                bodyRequest.put('reasonId', '999');
+                bodyRequest.put('reasonText', asunto);
                 bodyRequest.put('waitingRoomDate', fechaSeleccionada);
-                bodyRequest.put('device', '2');
+                bodyRequest.put('device', configuracion.CC_Configuracion_6__c);
                 bodyRequest.put('slotStartTime', franjaSeleccionada.substring(0, 5));
-                bodyRequest.put('reservationType', reservationType.CC_Configuracion_2__c);
+                bodyRequest.put('reservationType', configuracion.CC_Configuracion_2__c);
                 bodyRequest.put('customerInternalId', numPer);
                 bodyRequest.put('customerInternalHashId', branchHashId);
                 String jsonBody = JSON.serialize(bodyRequest);
@@ -29,13 +31,15 @@ public with sharing class CC_WS_Alta_Citas {
                 HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
 
                 HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, 'CC_WS_Alta_Citas', integracion.intSetting);
-                if(response.getStatusCode() != 200) {
+                
+                if(response.getStatusCode() != 200 && response.getStatusCode() != 201) {
                     Map<String, Object> parsedError = new Map<String, Object>();
-                    String detail = 'El servidor de Agendar Citas ha devuelvo un error';
+                    String detail = 'El servidor de Agendar Citas ha devuelto un error';
                     if (String.isNotBlank(response.getBody())) {
                         parsedError = (Map<String, Object>) JSON.deserializeUntyped(response.getbody());
-                        detail = parsedError.containsKey('detail') ? (String) parsedError.get('detail') : 'El servidor de Agendar Citas ha devuelvo un error';
+                        detail = parsedError.containsKey('detail') ? (String) parsedError.get('detail') : 'El servidor de Agendar Citas ha devuelto un error';
                     }
+                    CC_TrazaInt__c traza = CC_TrazaInt.generarTraza('CC_WS_Alta_Citas', request.getEndpoint(), String.valueOf(response.getStatusCode()), String.valueOf(request), detail, response.getBody(), false);
                     throw new AltaCitaCustomException(detail);
                 } else {
                     String fechaConvertida = String.valueOf(Date.valueOf(fechaSeleccionada).day()) + '-' + 
@@ -66,8 +70,11 @@ public with sharing class CC_WS_Alta_Citas {
                                 resultado.put('resultado', 'OK');
                             } catch (Exception e) {
                                 resultado.put('resultado', 'KO');
-                                resultado.put('resultadoMensaje', 'Ha habido un problema al mandar el correo');
+                                resultado.put('resultadoMensaje', 'Ha habido un problema al enviar el correo');
+                                CBK_Log.error(e);
                             }
+                        } else {
+                            resultado.put('resultado', 'OK');
                         }
                     } catch (Exception e) {
                         resultado.put('resultado', 'KO');
@@ -78,6 +85,7 @@ public with sharing class CC_WS_Alta_Citas {
                 }
             } catch (Exception e) {
                 resultado.put('resultado', 'KO');
+                resultado.put('resultadoMensaje', 'Ha habido un problema con la integración');
                 resultado.put('error', e);
                 CBK_Log.error(e);
                 throw new AuraException(e.getMessage());
@@ -127,7 +135,7 @@ public with sharing class CC_WS_Alta_Citas {
             Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(plantilla.Id, UserInfo.getUserId(), recordId);
             Messaging.SingleEmailMessage correo = new Messaging.SingleEmailMessage();
             String asuntoCorreo = renderStored.getSubject();
-            asuntoCorreo += ' ' + tipoCita == String.valueOf(42) ? ' Cita presencial' : ' Cita telefónica' + ' - ' + nombreCliente;
+            asuntoCorreo += ' ' + (tipoCita == String.valueOf(42) ? ' Cita presencial' : ' Cita telefónica') + ' - ' + nombreCliente;
             correo.Subject = asuntoCorreo;
             correo.setHtmlBody(plantilla.HTMLValue);
             correo.setSaveAsActivity(true);
@@ -139,7 +147,7 @@ public with sharing class CC_WS_Alta_Citas {
         }
 
         if (!correos.isEmpty()) {
-            if (!Test.isRunningTest()){
+            if (!Test.isRunningTest()) {
                 Messaging.sendEmail(correos, false);
             } else {
                 EmailMessage correoOrigen = new EmailMessage();
@@ -181,7 +189,7 @@ public with sharing class CC_WS_Alta_Citas {
     }
     
     private static Id getBuzonSalidaId() {
-        String buzonDefecto = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE Label = 'CC_Atencion_Cliente_ESP' AND CC_Activo__c = TRUE LIMIT 1]?.CC_Direccion_Correo__c;
+        String buzonDefecto = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE Label = 'Atención Cliente - ESP' AND CC_Activo__c = TRUE LIMIT 1]?.CC_Direccion_Correo__c;
         return [SELECT Id FROM OrgWideEmailAddress WHERE Address = :buzonDefecto LIMIT 1]?.Id;
     }
 

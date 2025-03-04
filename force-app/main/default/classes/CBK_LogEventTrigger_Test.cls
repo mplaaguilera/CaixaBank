@@ -13,6 +13,7 @@ public class CBK_LogEventTrigger_Test {
         currentEvent.txt_stacktrace__c = 'xxxxxxx'; 
         currentEvent.txt_Detail__c = string.join(values,'@Det@')?.left(32000);
         currentEvent.CBK_Category__c = 'test';
+        currentEvent.CBK_ApexClass__c = 'CBK_Test';
         
         Test.startTest();
     	Database.SaveResult sr = EventBus.publish(currentEvent);

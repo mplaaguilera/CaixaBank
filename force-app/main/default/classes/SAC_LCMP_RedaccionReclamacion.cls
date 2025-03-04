@@ -29,7 +29,7 @@ public with sharing class SAC_LCMP_RedaccionReclamacion {
             throw new AuraHandledException('No tienes privilegios para manipular la redacción.');
         }
         List<Case> pretensiones = [SELECT Id, SAC_RedaccionFinal__c, SAC_Redaccion__c FROM Case WHERE SAC_Reclamacion__c =: id];
-        if(pretensiones.size() > 0){
+        if(!pretensiones.isEmpty()){
             for(Case pretension : pretensiones){
                 if(!pretension.SAC_RedaccionFinal__c || String.isBlank(pretension.SAC_Redaccion__c)){
                     return false;
@@ -74,7 +74,7 @@ public with sharing class SAC_LCMP_RedaccionReclamacion {
         }
         List<Case> pretensiones = [SELECT Id, SAC_Redaccion__c FROM Case WHERE SAC_Reclamacion__c =: id];
 
-        if(pretensiones.size() > 0){
+        if(!pretensiones.isEmpty()){
             for(Case pretension : pretensiones){
                 result += pretension.SAC_Redaccion__c + '<br />' +'<br />';
             }
@@ -137,7 +137,7 @@ public with sharing class SAC_LCMP_RedaccionReclamacion {
         List<Case> pretensiones = [SELECT Id, SAC_Reclamacion__c FROM Case WHERE SAC_Reclamacion__c =: reclamacion.Id];
         List<SAC_Accion__c> tareas = [SELECT Id, SAC_Reclamacion__c, SAC_Pretension__c FROM SAC_Accion__c WHERE SAC_Reclamacion__c =: reclamacion.Id];
 
-        return tareas.size() > 0 ? true : false;
+        return !tareas.isEmpty() ? true : false;
     }
 
     @AuraEnabled
@@ -153,11 +153,11 @@ public with sharing class SAC_LCMP_RedaccionReclamacion {
         if(!Schema.sObjectType.Case.isAccessible() || !Schema.sObjectType.Case.isUpdateable()){
             throw new AuraHandledException('No tienes permisos para visualizar o actualizar el registro.');
         }
-        system.debug(id + '  ' + sentido + '  ' + argumento );
+
         Case casoActual = [SELECT Id, SAC_SentidoResolucion__c, SAC_MotivoSentidoResolucion__c FROM Case WHERE Id =: id LIMIT 1];
         casoActual.SAC_SentidoResolucion__c = sentido;
         casoActual.SAC_MotivoSentidoResolucion__c = argumento;
-        system.debug(casoActual);
+
         update casoActual;
     }
 
@@ -251,7 +251,7 @@ public with sharing class SAC_LCMP_RedaccionReclamacion {
 
         //falta crear el texto desde una plantilla
         EmailTemplate emailTemplate = [SELECT Id,Subject,Description,HtmlValue,DeveloperName,Body FROM EmailTemplate WHERE name = 'SAC Notificar equipo red'];
-        system.debug('prueba email template equipos ' + emailTemplate.Subject + '  ' + emailTemplate.Body);
+
 
         Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
         message.toAddresses = arrayAddress;
@@ -294,4 +294,5 @@ public with sharing class SAC_LCMP_RedaccionReclamacion {
             nombrePlantilla = nombre;
         }
     }
+
 }

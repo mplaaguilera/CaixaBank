@@ -46,10 +46,6 @@ public with sharing class SAC_VisualizacionPrestamos {
                 reclamantesNumPerso.add(reclamante.SAC_Account__r.CC_NumPerso__c);
             }
         }
-        // Check nulls
-        if(reclamacion.AccountId == null) {
-            return new Map<String, List<PrestamoWrapper>>();
-        }
         // Get Titulares records related to Account
         List<SAC_Prestamo__c> titularesList =  [SELECT Id, Name, RecordType.Name, RecordType.DeveloperName, CreatedDate,
                                                SAC_Baja_Persona__c, SAC_CNAE__c, SAC_Centro_gestor__c, SAC_Codigo_CNAE__c, SAC_Codigo_Contrato__c, SAC_Codigo_Contrato_Origen__c, SAC_Codigo_Contrato_TF7__c, 

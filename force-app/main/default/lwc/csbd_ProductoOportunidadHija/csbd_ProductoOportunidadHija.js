@@ -66,7 +66,7 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 		if (data) {
 			this.oportunidad = data;
 			this.habilitar2oTitular = !getFieldValue(data, CSBD_PARENTID);
-			this.obtenerOportunidadesHijas();
+			window.setTimeout(() => this.obtenerOportunidadesHijas(), 1500);
 		} else if (error) {
 			console.error(error);
 			this.mostrarToast('error', 'Problema obteniendo los datos de la oportunidad', '');

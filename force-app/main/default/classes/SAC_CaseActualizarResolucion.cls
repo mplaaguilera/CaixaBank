@@ -30,7 +30,7 @@ public without sharing class SAC_CaseActualizarResolucion {
 			mapListPretensiones.put(reclamacion, new List<Case>());		
 		}
 		for (Case csPre : listaCasosSelect) {
-			if(csPre.RecordTypeId == RECTYPEPRETENSION && csPre.Status != 'SAC_009'){
+			if(csPre.RecordTypeId == RECTYPEPRETENSION && csPre.Status != 'SAC_009' && !(csPre.Status == 'Cerrado' && csPre.CBK_Case_Extension_Id__r.SAC_PretensionCreadaCerrada__c == true)){
 				if (mapListPretensiones.containsKey(csPre.SAC_Reclamacion__c)) {
 					mapListPretensiones.get(csPre.SAC_Reclamacion__c).add(csPre);
 				} 

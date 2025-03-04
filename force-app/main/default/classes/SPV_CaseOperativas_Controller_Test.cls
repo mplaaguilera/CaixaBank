@@ -104,6 +104,7 @@ public with sharing class SPV_CaseOperativas_Controller_Test {
         caso3.Status = 'SPV_PendienteRespuestaOrganismos';
         caso3.SAC_StatusAuxiliar__c = caso.Status;
         caso3.SEG_Subestado__c = 'Pendiente respuesta Organismos';
+        caso3.SPV_Organismo__c = 'SPV_Consumo';
         caso3.SEG_Grupo__c = grupoColaborador.id;
         caso3.AccountId = cuenta.Id;
         caso3.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SPV_Reclamacion').getRecordTypeId();

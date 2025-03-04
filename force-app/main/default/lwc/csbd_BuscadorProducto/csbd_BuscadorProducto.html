@@ -1,0 +1,100 @@
+<template>
+	<div class="slds-form-element">
+		<div class="slds-form-element__control">
+			<div class="slds-combobox_container">
+				<div lwc:if={resultadoSeleccionado} class="seleccion slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+					<div class="slds-combobox__form-element slds-input-has-icon" role="none">
+						<div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+							<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+								<li role="presentation" class="slds-listbox__item" title={resultadoSeleccionado.title}>
+									<div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta slds-media_center" role="option">
+										<span class="slds-media__figure slds-listbox__option-icon">
+											<lightning-icon icon-name="standard:products" size="x-small" class="iconoProducto slds-is-relative" style="top: -1px;"></lightning-icon>
+										</span>
+										<span class="slds-media__body">
+											<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-xxx-small">
+												<div class="slds-col slds-grow-none slds-truncate">
+													<span class="resultadoBadge resultadoBadgeEmpresa slds-truncate">{resultadoSeleccionado.empresa}</span>
+												</div>
+												<div class="slds-col slds-grow-none">
+													<span class="resultadoFlecha">→</span>
+												</div>
+												<div class="slds-col slds-grow-none slds-truncate">
+													<span class="resultadoBadge resultadoBadgeFamilia slds-truncate">{resultadoSeleccionado.familia}</span>
+												</div>
+												<div class="slds-col slds-grow-none">
+													<span class="resultadoFlecha">→</span>
+												</div>
+												<div class="slds-col slds-truncate">
+													<span class="resultadoBadge resultadoBadgeProducto slds-truncate">{resultadoSeleccionado.producto}</span>
+												</div>
+											</div>
+										</span>
+									</div>
+								</li>
+							</ul>
+							<!-- <span class="slds-truncate">{resultadoSeleccionado.empresa} → {resultadoSeleccionado.familia} → {resultadoSeleccionado.producto}</span> -->
+						</div>
+						<!-- sldsValidatorIgnoreNextLine -->
+						<button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick={resultadoDeseleccionar}>
+							<lightning-icon icon-name="utility:close" size="xx-small" class="slds-is-relative" style="top: -1px;"></lightning-icon>
+						</button>
+					</div>
+				</div>
+				<div lwc:ref="buscador" class="buscador slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click sinBusqueda">
+					<!-- <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none"> -->
+						<lightning-input
+							lwc:ref="input" type="search" value={busqueda}
+							variant="label-hidden" placeholder="Empresa, familia de producto, producto..."
+							onchange={inputOnchange} onfocus={inputOnfocus} onblur={inputOnblur}
+						></lightning-input>
+					<!-- </div> -->
+					<div lwc:ref="dropdown" class="slds-dropdown slds-dropdown_fluid" role="listbox" tabindex="0">
+						<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+							<template for:each={resultados} for:item="resultado">
+								<li key={resultado.idResultado} role="presentation" class="slds-listbox__item" title={resultado.title}>
+									<div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta slds-media_center" role="option" onclick={resultadoSeleccionar} data-id-resultado={resultado.idResultado}>
+										<span class="slds-media__figure slds-listbox__option-icon">
+											<lightning-icon icon-name="standard:products" size="x-small" class="iconoProducto slds-is-relative" style="top: -1px;"></lightning-icon>
+										</span>
+										<span class="slds-media__body">
+											<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-xxx-small">
+												<div class="slds-col slds-grow-none slds-truncate">
+													<span class="resultadoBadge resultadoBadgeEmpresa slds-truncate">{resultado.empresa}</span>
+												</div>
+												<div class="slds-col slds-grow-none">
+													<span class="resultadoFlecha">→</span>
+												</div>
+												<div class="slds-col slds-grow-none slds-truncate">
+													<span class="resultadoBadge resultadoBadgeFamilia slds-truncate">{resultado.familia}</span>
+												</div>
+												<div class="slds-col slds-grow-none">
+													<span class="resultadoFlecha">→</span>
+												</div>
+												<div class="slds-col slds-truncate">
+													<span class="resultadoBadge resultadoBadgeProducto slds-truncate">{resultado.producto}</span>
+												</div>
+											</div>
+										</span>
+									</div>
+								</li>
+							</template>
+							<li class="liSinBusqueda slds-listbox__item" role="presentation">
+								<div class="slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+									<span>Escribe un mínimo de 2 caracteres para iniciar la búsqueda.</span>
+								</div>
+							</li>
+							<li class="liSinResultados slds-listbox__item" role="presentation">
+								<div class="slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+									<span>Sin resultados.</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div lwc:ref="backdrop" class="slds-backdrop"></div>
+</template>

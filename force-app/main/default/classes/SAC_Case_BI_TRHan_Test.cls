@@ -16,14 +16,17 @@ public with sharing class SAC_Case_BI_TRHan_Test {
     static void makeData() {
 
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
 
 
         Entitlement entitle = SAC_TestDataFactory.crearEntitlement(cuenta.id);
-        Database.insert(entitle);
+        SAC_DatabaseDML.insertDML(entitle, false);
+        //Database.insert(entitle);
 
         List<CC_MCC__c> mccs = SAC_TestDataFactory.crearMCCs();
-        Database.insert(mccs);
+        SAC_DatabaseDML.insertListDML(mccs, false);
+        //Database.insert(mccs);
 
         CC_MCC__c mccTematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'Tematica' LIMIT 1];
         
@@ -36,7 +39,8 @@ public with sharing class SAC_Case_BI_TRHan_Test {
         camposRecl.put('SAC_FechaRecepcion__c', system.today());
 
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
 
         //PRETENSION
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -47,11 +51,13 @@ public with sharing class SAC_Case_BI_TRHan_Test {
         camposPret.put('SAC_FechaRecepcion__c', system.today());
 
         Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(casoPretension);
+        SAC_DatabaseDML.insertDML(casoPretension, false);
+        //Database.insert(casoPretension);
 
         List<User> usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
-        usuarioGeneral[0].Username = 'ustestesteo@test.com';       
-        Database.insert(usuarioGeneral);
+        usuarioGeneral[0].Username = 'ustestesteo@test.com';
+        SAC_DatabaseDML.insertListDML(usuarioGeneral, false);       
+        //Database.insert(usuarioGeneral);
     }
 
     @isTest

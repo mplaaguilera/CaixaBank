@@ -1,5 +1,6 @@
-<aura:component implements="lightning:backgroundUtilityItem">
-    <lightning:conversationToolkitAPI aura:id="conversationKit" />
-	<aura:handler event="lightning:conversationChatEnded" action="{!c.onCloseWork}" />
-    <aura:handler name="init" value="this" action="{!c.doInit}" />
+<aura:component implements="lightning:backgroundUtilityItem" controller="CSBD_LiveAgent_BackgroundItemController" >
+
+    <aura:handler event="lightning:conversationChatEnded" action="{!c.onCloseWork}" />
+    <lightning:omniToolkitAPI aura:id="omniToolkit" />
+
 </aura:component>

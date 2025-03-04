@@ -11,10 +11,10 @@ public with sharing class CC_Task_AU_TRHan extends CC_TriggerHandlerBase {
      
     private void process(Map<Id, Task> newMap, Map<Id, Task> oldMap) {
         //Procesar las tareas de CC
-        Id recordTypeTask = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId();
+        Id recordTypeTask = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
         Id recordTypeTaskReadOnly = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_ReadOnly');
         //Procesar las tareas de OS
-        Id rtTaskOs = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('OS_Task').getRecordTypeId();
+        Id rtTaskOs = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task');
         //Set<Id> setTareas = new Set<Id>();
         Set<Task> setTareasUpdate = new Set<Task>();
         Set<Task> setTareasUpdateReadOnly = new Set<Task>();
@@ -53,6 +53,7 @@ public with sharing class CC_Task_AU_TRHan extends CC_TriggerHandlerBase {
             Task tareaUpdate = new Task();
             tareaUpdate.Id = tarea.Id;
             tareaUpdate.CC_Ultima_Actualizacion__c = tarea.LastModifiedDate;
+            //tareaUpdate.AV_Type__c = tarea.Type;
             tareasUpdate.add(tareaUpdate);
         }        
         update tareasUpdate;

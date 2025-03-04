@@ -6,17 +6,17 @@ public with sharing class SAC_EnvioResolucionCorreoPostal_Test {
     static void makeData(){  
         //Usuario SAC General
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         System.runAs(usuarioGeneral){
             Account acc = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
-            Database.insert(acc);
+            SAC_DatabaseDML.insertDML(acc, false);
 
             //Oficina
             // List<Account> listaCuentas = SAC_TestDataFactory.crearCuentas(2);
@@ -35,6 +35,9 @@ public with sharing class SAC_EnvioResolucionCorreoPostal_Test {
             camposRecl.put('Subject', 'testRec');
             camposRecl.put('Status', 'SAC_003');
             camposRecl.put('AccountId', acc.Id);
+            camposRecl.put('SuppliedEmail', 'test@enviaremailtest.invalid');
+            camposRecl.put('Origin', 'Email');
+            camposRecl.put('CC_Idioma__c', 'de');
             camposRecl.put('CC_Oficina_Afectada_Lookup__c',  acc.id);
             Case reclamacion1 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
 
@@ -46,12 +49,12 @@ public with sharing class SAC_EnvioResolucionCorreoPostal_Test {
 
             reclamaciones.add(reclamacion1);
             reclamaciones.add(reclamacion2);
-            Database.insert(reclamaciones);
+            SAC_DatabaseDML.insertListDML(reclamaciones, false);
 
             List<SAC_DocumentoEnvio__c> docEnv = SAC_TestDataFactory.crearDocumentoEnvio(1,reclamacion1);
             docEnv[0].SAC_TipoDocumento__c = 'redacción';
             docEnv[0].SAC_Direccion__c = 'direccionTest';
-            Database.insert(docEnv);
+            SAC_DatabaseDML.insertListDML(docEnv, false);
 
             Blob vd =  blob.valueOf('Unit.Test');
             List<ContentVersion> cvs = new List<ContentVersion>();
@@ -59,18 +62,56 @@ public with sharing class SAC_EnvioResolucionCorreoPostal_Test {
             cvs.add(cv);
             ContentVersion cv2 = new ContentVersion(VersionData = vd, PathOnClient = 'SampleTitle.pdf' , Title = 'tituloTest', FirstPublishLocationId = reclamacion2.Id, SAC_StringRedaccion_fileupload__c = 'ResolucionRedaccion');
             cvs.add(cv2);
-            Database.insert(cvs);
+            SAC_DatabaseDML.insertListDML(cvs, false);
 
             EmailTemplate validEmailTemplate = new EmailTemplate(
                 isActive = true, 
                 Name = 'SAC_Redaccion',
-                DeveloperName = 'SAC_Test',
+                DeveloperName = 'SAC_TareaOficina',
                 TemplateType = 'text', 
                 HtmlValue = '<p>htmlValue<p>', 
                 Body = 'Texted', 
                 FolderId = UserInfo.getUserId()
             );
-            Database.insert(validEmailTemplate);  
+            SAC_DatabaseDML.insertDML(validEmailTemplate, false);
+
+            //Email Backlist
+            SAC_MaestroTemas__c maestroTemaBL = new SAC_MaestroTemas__c();
+            maestroTemaBL.Name ='emailtestinvalido@prueba.com';
+            maestroTemaBL.SAC_Activo__c = true;
+            maestroTemaBL.RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SAC_BlackListEmails').getRecordTypeId();
+            SAC_DatabaseDML.insertDML(maestroTemaBL, true);
+
+            List<SAC_PlantillaRedaccion__c> plantillas = new List<SAC_PlantillaRedaccion__c>();
+            //Plantilla
+            SAC_PlantillaRedaccion__c plantilla = new SAC_PlantillaRedaccion__c();
+            plantilla.SAC_TipoPlantilla__c = 'SAC_AvisoResolucionCartaPostal';
+            plantilla.SAC_PlantillaCastellanoId__c = validEmailTemplate.Id;
+            plantilla.SAC_PlantillaCatalanId__c = validEmailTemplate.Id;
+            plantilla.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
+            plantilla.RecordTypeId = Schema.SObjectType.SAC_PlantillaRedaccion__c.getRecordTypeInfosByDeveloperName().get('SAC_Redaccion').getRecordTypeId();
+            plantilla.Name = 'testPlantilla';
+            plantillas.add(plantilla);
+
+            SAC_DatabaseDML.insertListDML(plantillas, false);
+
+            //grupo colaborador
+            List<CC_Grupo_Colaborador__c> listaGrupos = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1);
+            listaGrupos[0].Name = 'grupo de tareas';
+            listaGrupos[0].SAC_PermiteTareas__c = true;
+            listaGrupos[0].SAC_Email__c = 'test@test.com';
+            SAC_DatabaseDML.insertListDML(listaGrupos, true);
+
+            SAC_MaestroAccionesReclamacion__c maestroTema = SAC_TestDataFactory.crearMaestroAcciones(1,listaGrupos[0].Id)[0];
+            maestroTema.SAC_DeveloperName__c ='SAC_ImprimirCartasOrdinario';
+            SAC_DatabaseDML.insertDML(maestroTema, true);
+
+            //ContentVersion
+            ContentVersion adjunto = SAC_TestDataFactory.crearContentVersion(reclamacion1);
+            List<ContentVersion> listaCV = new List<ContentVersion>();
+            listaCV.add(adjunto);
+            SAC_DatabaseDML.insertListDML(listaCV, true);
+        
         }
     }
 
@@ -105,21 +146,31 @@ public with sharing class SAC_EnvioResolucionCorreoPostal_Test {
 
     @isTest
     static void finalizarRedaccionCartaPostal(){
-        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'testRec'];
-        List<FeedItem> listaPrevia = [SELECT Id FROM FeedItem];
-
+        Case reclamacion = [SELECT Id, Status, CC_Idioma__c FROM Case WHERE Subject = 'testRec'];
+        Integer feedItemCtn = [SELECT Count() FROM FeedItem];
+        List<SAC_MaestroTemas__c> emailsBlacklist = [SELECT Id, Name FROM SAC_MaestroTemas__c WHERE RecordType.DeveloperName = 'SAC_BlackListEmails' AND Name = 'emailtestinvalido@prueba.com' AND SAC_Activo__c = true LIMIT 1];
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         System.runAs(usuario){
             Test.startTest();
-            SAC_LCMP_EnvioResolucionCorreoPostal.finalizarRedaccionCartaPostal(reclamacion.Id, 'test@enviaremailtest.invalid', '', '', 'testCuerpo', 'testAsunto', '');
+            List <ContentVersion> seleccionados = [SELECT id FROM ContentVersion Limit 1];
+            String idSeleccionados;
+    
+            for(ContentVersion cv: seleccionados){
+                idSeleccionados = cv.id;
+            }
+            String idAdjuntosJson = '[ "' + idSeleccionados + '" ]'; 
+
+
+            reclamacion.CC_Canal_Respuesta__c = 'SAC_CartaPostal';
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            SAC_LCMP_EnvioResolucionCorreoPostal.finalizarRedaccionCartaPostal(reclamacion.Id, 'test@enviaremailtest.invalid', '', '', 'testCuerpo', 'testAsunto', idAdjuntosJson);
             Test.stopTest();
         }
 
         Case reclamacion2 = [SELECT Id, Status FROM Case WHERE Subject = 'testRec'];
-        List<FeedItem> listaPosterior = [SELECT Id FROM FeedItem];
 
         System.assertNotEquals(reclamacion.Status, reclamacion2.Status, 'El envío de carta ha fallado.');
-        System.assertNotEquals(listaPrevia.size(), listaPosterior.size(), 'La comunicación ha fallado.');
+        System.assertNotEquals(feedItemCtn, [SELECT Count() FROM FeedItem], 'La comunicación ha fallado.');
     }   
 
     @isTest
@@ -131,7 +182,7 @@ public with sharing class SAC_EnvioResolucionCorreoPostal_Test {
         System.runAs(usuarioGeneral){
             Test.startTest();
             reclamacion.CC_Canal_Respuesta__c = 'Carta';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
             informacion = SAC_LCMP_EnvioResolucionCorreoPostal.obtenerDatosEmail(reclamacion.Id, false);
             Test.stopTest();
         }

@@ -18,8 +18,9 @@ public with sharing class SAC_CaseCalcularImporte_Test {
     static void makeData(){
 
         //Usuario con perfil SAC_General para ejecutar la acción
-        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-        Database.insert(usuarioGeneral);
+        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);     
+        //Database.insert(usuarioGeneral);
 
         //Reclamación Padre
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -29,7 +30,8 @@ public with sharing class SAC_CaseCalcularImporte_Test {
         camposRecl.put('OwnerId', usuarioGeneral.id);
 
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false);
+        //Database.insert(reclamacion);
         Test.startTest();
         //Pretensiones
         List<Case> listaPretensiones = new List<Case>();
@@ -65,7 +67,8 @@ public with sharing class SAC_CaseCalcularImporte_Test {
         Case pretensionHija3 = SAC_TestDataFactory.crearCaso('Pretension',camposPretHija3);
         listaPretensiones.add(pretensionHija3);
 
-        Database.insert(listaPretensiones);
+        SAC_DatabaseDML.insertListDML(listaPretensiones, false);
+        //Database.insert(listaPretensiones);
 
         /*System.runAs(usuarioGeneral){
             SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1,reclamacion,false)[0];
@@ -85,8 +88,9 @@ public with sharing class SAC_CaseCalcularImporte_Test {
         User usuario = [SELECT id FROM User WHERE Email = 'email0@test.com' AND isActive = true];
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
+        SAC_DatabaseDML.insertDML(psa, false);       
+        //Database.insert(psa);
 
        Case reclamacion = [SELECT Id, RecordTypeId FROM Case WHERE Subject = 'Tarjeta'];
 
@@ -95,7 +99,8 @@ public with sharing class SAC_CaseCalcularImporte_Test {
             tarea.SAC_ImporteResuelto__c = 100;
             tarea.SAC_ImporteAbonar__c = 100;
             tarea.SAC_ImpResueltoInteresesLegales__c = 100;
-            Database.insert(tarea);      
+            SAC_DatabaseDML.insertDML(tarea, false);  
+            //Database.insert(tarea);      
             
             Case casoParaModificar = [SELECT id, SAC_Reclamacion__c, CC_Importe_Reclamado__c, SAC_Quebranto__c,CC_Importe_Abonado__c,SAC_Importe_Resuelto__c FROM Case WHERE SuppliedCompany = 'prueba'];
             casoParaModificar.CC_Importe_Reclamado__c=200;
@@ -106,7 +111,8 @@ public with sharing class SAC_CaseCalcularImporte_Test {
             casoParaModificar.SAC_StatusAuxiliar__c = 'SAC_001';
 
             Test.startTest();
-            Database.update(casoParaModificar); 
+            SAC_DatabaseDML.updateDML(casoParaModificar, false);  
+            //Database.update(casoParaModificar); 
             Test.stopTest();           
 
             List<Case> pretensiones = [SELECT id, SAC_Reclamacion__c, CC_Importe_Reclamado__c, SAC_Quebranto__c,SAC_Importe_Resuelto__c, CC_Importe_Abonado__c FROM Case WHERE RecordTypeId =:recorType ];            

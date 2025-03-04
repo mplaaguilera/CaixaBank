@@ -18,7 +18,7 @@ public with sharing class CSBD_Denegacion_Automatica_Oportunidades {
                         //La escala maestra es del contacto, si no es conocida la regla nunca se cumple (27/12: Excepción Denegada SIA)
                         if ((oportunidad?.CSBD_Contact__r?.CSBD_Escala_Maestra__c != null
                         && oportunidad.CSBD_Contact__r.CSBD_Escala_Maestra__c >= configDenegacionAutomatica.CSBD_Escala_Maestra_Desde__c
-                        && oportunidad.CSBD_Contact__r.CSBD_Escala_Maestra__c <= configDenegacionAutomatica.CSBD_Escala_Maestra_Hasta__c)  
+                        && oportunidad.CSBD_Contact__r.CSBD_Escala_Maestra__c <= configDenegacionAutomatica.CSBD_Escala_Maestra_Hasta__c)
                         //Si la escala maestra viene vacía y el scoring de riesgo es Denegada SIA --> Denegamos automáticamente
                         || (oportunidad?.CSBD_Contact__r?.CSBD_Escala_Maestra__c == null && oportunidad.CSBD_Scoring_Riesgo__c == 'Denegada SIA')){
                             //La oportunidad cumple la regla

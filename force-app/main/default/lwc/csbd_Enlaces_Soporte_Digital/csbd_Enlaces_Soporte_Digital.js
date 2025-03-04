@@ -18,13 +18,15 @@ export default class csbd_Enlaces_Soporte_Digital extends LightningElement {
 	@wire(getRecord, {recordId: '$recordId', fields: [OPP_PRODUCTO, OPP_NOW_ORIGEN]})
 	wiredRecord({error, data}) {
 		if (data && getFieldValue(data, OPP_PRODUCTO)) {
-			getEnlaces({nombreProducto: getFieldValue(data, OPP_PRODUCTO), origen: getFieldValue(data, OPP_NOW_ORIGEN)})
+			window.setTimeout(() => {
+				getEnlaces({nombreProducto: getFieldValue(data, OPP_PRODUCTO), origen: getFieldValue(data, OPP_NOW_ORIGEN)})
 				.then(enlaces => {
 					if (enlaces) {
 						this.enlaces = enlaces.map(enlace => ({...enlace, warning: enlace.label === 'Campañas'}));
 						this.template.querySelector('.botonExpandirContraer').classList.remove('slds-hide');
 					}
 				}).catch(errorApex => console.error(errorApex));
+			}, 3000);
 		} else if (error) {
 			console.error(error);
 		}

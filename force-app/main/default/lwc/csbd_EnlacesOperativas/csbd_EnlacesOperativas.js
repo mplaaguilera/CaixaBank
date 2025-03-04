@@ -1,6 +1,7 @@
 /*eslint-disable dot-notation */
 import {LightningElement, api, wire} from 'lwc';
 import {getRecord, getFieldValue, updateRecord} from 'lightning/uiRecordApi';
+import getOportunidadChat from '@salesforce/apex/CSBD_EnlacesOperativasController.getOportunidadChat';
 
 import OPP_ACCOUNT_ID from '@salesforce/schema/Opportunity.AccountId';
 import OPP_ACCOUNT_NUMPERSO from '@salesforce/schema/Opportunity.Account.CC_NumPerso__c';
@@ -14,6 +15,7 @@ import OPP_ID from '@salesforce/schema/Opportunity.Id';
 import OPP_CREATED_DATE from '@salesforce/schema/Opportunity.CreatedDate';
 import OPP_PRIMER_SLA from '@salesforce/schema/Opportunity.CSBD_PrimerContactoSLA__c';
 import OPP_PRIMERA_RESPUESTA_SLA from '@salesforce/schema/Opportunity.CSBD_SLA_Primera_Respuesta__c';
+import OPP_ANONIMIZADA from '@salesforce/schema/Opportunity.CSBD_Anonimizada__c';
 
 const OPP_FIELDS_GETRECORD = [
 	OPP_ACCOUNT_ID,
@@ -26,7 +28,8 @@ const OPP_FIELDS_GETRECORD = [
 	OPP_RECORDTYPE_DEVNAME,
 	OPP_CREATED_DATE,
 	OPP_PRIMER_SLA,
-	OPP_PRIMERA_RESPUESTA_SLA
+	OPP_PRIMERA_RESPUESTA_SLA,
+	OPP_ANONIMIZADA
 ];
 
 const URL_ENLACES = [
@@ -47,7 +50,11 @@ const URL_ENLACES = [
 
 export default class csbdEnalacesOperativas extends LightningElement {
 
-	@api recordId;
+    @api recordId;
+
+    @api objectApiName;
+
+	@api campoBusqueda;
 
 	oportunidad;
 
@@ -59,19 +66,37 @@ export default class csbdEnalacesOperativas extends LightningElement {
 
 	linkListVisible = true;
 
-	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS_GETRECORD})
+	recordIdCalculado;
+
+	connectedCallback() {
+		if (this.objectApiName !== 'Opportunity') {
+			getOportunidadChat({recordId: this.recordId, campoLookup: this.campoBusqueda, nombreObjeto: this.objectApiName})
+				.then(result => {
+					this.recordIdCalculado = result[this.campoBusqueda];
+				})
+				.catch(error => {
+					console.error(error);
+				});
+		} else {
+			this.recordIdCalculado = this.recordId;
+		}
+	}
+
+    @wire(getRecord, {recordId: '$recordIdCalculado', fields: OPP_FIELDS_GETRECORD})
 	wiredRecord({error, data}) {
-		if (data) {
+    	if (data) {
 			this.oportunidad = data;
 			let links = [];
 			URL_ENLACES.forEach((enlace, id) => {
 				const url = this.substituirParametros(enlace.url);
 				if (!url.includes('@@@')) {
 					const recordType = getFieldValue(this.oportunidad, OPP_RECORDTYPE_DEVNAME);
+					const anonimizada = getFieldValue(this.oportunidad, OPP_ANONIMIZADA);
 					//CIRBE solo aparece en Préstamo e Hipoteca. Nota simple y Tasaciones solo aparecen en Hipoteca
-					if (enlace.label !== 'CIRBE' && enlace.label !== 'Nota simple' && enlace.label !== 'Tasaciones'
-					|| enlace.label === 'CIRBE' && (recordType === 'CSBD_Prestamo' || recordType === 'CSBD_Hipoteca')
-					|| (enlace.label === 'Nota simple' || enlace.label === 'Tasaciones') && recordType === 'CSBD_Hipoteca') {
+					if (enlace.label !== 'CIRBE' && enlace.label !== 'Nota simple' && enlace.label !== 'Tasaciones' && enlace.label !== 'Documentación PHD'
+						|| enlace.label === 'CIRBE' && (recordType === 'CSBD_Prestamo' || recordType === 'CSBD_Hipoteca')
+						|| (enlace.label === 'Nota simple' || enlace.label === 'Tasaciones') && recordType === 'CSBD_Hipoteca'
+						|| enlace.label === 'Documentación PHD' && anonimizada === false) {
 						links.push({id, label: enlace.label, url});
 					}
 				}
@@ -79,57 +104,57 @@ export default class csbdEnalacesOperativas extends LightningElement {
 			this.links = links;
 			this.linksPares = links.filter((_, index) => index % 2 === 0);
 			this.linksImpares = links.filter((_, index) => index % 2 !== 0);
-		} else if (error) {
-			console.error(error);
-		}
+    	} else if (error) {
+    		console.error(error);
+    	}
 	}
 
-	substituirParametros(url) {
-		return url
-		.replace('@@@numperso@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_NUMPERSO) ?? '@@@ERROR@@@')
-		.replace('@@@nif@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_NUMDOC) ?? '@@@ERROR@@@')
-		.replace('@@@firstName@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_FIRSTNAME) ?? '@@@ERROR@@@')
-		.replace('@@@lastName@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_LASTNAME) ?? '@@@ERROR@@@')
-		.replace('@@@numSia@@@', getFieldValue(this.oportunidad, OPP_NUMSIA) ?? '@@@ERROR@@@')
-		.replace('@@@numExpSia@@@', getFieldValue(this.oportunidad, OPP_NUMEXPSIA) ?? '@@@ERROR@@@');
-		//.replace('@@@empContacto@@@', this.empContacto ?? '@@@ERROR@@@');
-	}
+    substituirParametros(url) {
+    	return url
+			.replace('@@@numperso@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_NUMPERSO) ?? '@@@ERROR@@@')
+			.replace('@@@nif@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_NUMDOC) ?? '@@@ERROR@@@')
+			.replace('@@@firstName@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_FIRSTNAME) ?? '@@@ERROR@@@')
+			.replace('@@@lastName@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_LASTNAME) ?? '@@@ERROR@@@')
+			.replace('@@@numSia@@@', getFieldValue(this.oportunidad, OPP_NUMSIA) ?? '@@@ERROR@@@')
+			.replace('@@@numExpSia@@@', getFieldValue(this.oportunidad, OPP_NUMEXPSIA) ?? '@@@ERROR@@@');
+    	    //.replace('@@@empContacto@@@', this.empContacto ?? '@@@ERROR@@@');
+    }
 
-	toggleLinkList() {
-		this.linkListVisible = !this.linkListVisible;
-		const botonExpandirContraer = this.template.querySelector('.botonExpandirContraer');
-		if (this.linkListVisible) {
-			botonExpandirContraer.classList.add('expandido');
-			botonExpandirContraer.querySelector('lightning-button-icon').title = 'Cerrar';
-		} else {
-			botonExpandirContraer.classList.remove('expandido');
-			botonExpandirContraer.querySelector('lightning-button-icon').title = 'Abrir';
-		}
-	}
+    toggleLinkList() {
+    	this.linkListVisible = !this.linkListVisible;
+    	const botonExpandirContraer = this.template.querySelector('.botonExpandirContraer');
+    	if (this.linkListVisible) {
+    		botonExpandirContraer.classList.add('expandido');
+    		botonExpandirContraer.querySelector('lightning-button-icon').title = 'Cerrar';
+    	} else {
+    		botonExpandirContraer.classList.remove('expandido');
+    		botonExpandirContraer.querySelector('lightning-button-icon').title = 'Abrir';
+    	}
+    }
 
-	abrirEnlace(event) {
-		//Abrir enlace en nueva ventana
-		let url = event.currentTarget.dataset.url;
-		window.open(url, '_blank', 'width=' + window.screen.availWidth, 'height=' + window.screen.availHeight);
+    abrirEnlace(event) {
+    	//Abrir enlace en nueva ventana
+    	let url = event.currentTarget.dataset.url;
+    	window.open(url, '_blank', 'width=' + window.screen.availWidth, 'height=' + window.screen.availHeight);
 
-		//En caso de acceder al enlace de OpenDesk, en Hipotecas o préstamos, se guarda la fecha en un campo de la oportunidad y se calcula el SLA
-		let label = event.currentTarget.dataset.label;
-		const recordType = getFieldValue(this.oportunidad, OPP_RECORDTYPE_DEVNAME);
-		const primerSlaString = getFieldValue(this.oportunidad, OPP_PRIMERA_RESPUESTA_SLA);
+    	//En caso de acceder al enlace de OpenDesk, en Hipotecas o préstamos, se guarda la fecha en un campo de la oportunidad y se calcula el SLA
+    	let label = event.currentTarget.dataset.label;
+    	const recordType = getFieldValue(this.oportunidad, OPP_RECORDTYPE_DEVNAME);
+    	const primerSlaString = getFieldValue(this.oportunidad, OPP_PRIMERA_RESPUESTA_SLA);
 
-		if (label === 'Opendesk' && !primerSlaString && (recordType === 'CSBD_Prestamo' || recordType === 'CSBD_Hipoteca')) {
-			const creacionOppString = getFieldValue(this.oportunidad, OPP_CREATED_DATE);
-			const tiempoActualString = new Date().toISOString();
+    	if (label === 'Opendesk' && !primerSlaString && (recordType === 'CSBD_Prestamo' || recordType === 'CSBD_Hipoteca')) {
+    		const creacionOppString = getFieldValue(this.oportunidad, OPP_CREATED_DATE);
+    		const tiempoActualString = new Date().toISOString();
 
-			const tiempoActual = new Date(tiempoActualString);
-			const creacionOpp = new Date(creacionOppString);
-			const tiempoTranscurrido = tiempoActual - creacionOpp;
+    		const tiempoActual = new Date(tiempoActualString);
+    		const creacionOpp = new Date(creacionOppString);
+    		const tiempoTranscurrido = tiempoActual - creacionOpp;
 
-			const fields = {};
-			fields[OPP_ID.fieldApiName] = this.recordId;
-			fields[OPP_PRIMER_SLA.fieldApiName] = tiempoActual.toISOString();
-			fields[OPP_PRIMERA_RESPUESTA_SLA.fieldApiName] = Math.round(tiempoTranscurrido / 60000);
-			updateRecord({fields}).catch(error => console.error(error));
-		}
-	}
+    		const fields = {};
+    		fields[OPP_ID.fieldApiName] = this.recordIdCalculado;
+    		fields[OPP_PRIMER_SLA.fieldApiName] = tiempoActual.toISOString();
+    		fields[OPP_PRIMERA_RESPUESTA_SLA.fieldApiName] = Math.round(tiempoTranscurrido / 60000);
+    		updateRecord({fields}).catch(error => console.error(error));
+    	}
+    }
 }

@@ -3,32 +3,34 @@ public class CSBD_Activity_Test {
 
     @TestSetup
     private static void altaDatosPrueba() {
-        User usuarioGestor = CSBD_Usuarios.usuarioGestor();
-
         //Alta de las parametrizaciones que necesita el trigger BI de oportunidades
-        CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
-        listaValores.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-        listaValores.Name = 'CSBD: Días cierre oportunidad por defecto';
-        listaValores.CC_Activa__c = true;
-        insert listaValores;
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+            CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
+            listaValores.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
+            listaValores.Name = 'CSBD: Días cierre oportunidad por defecto';
+            listaValores.CC_Activa__c = true;
+            insert listaValores;
 
-        CC_Lista_Valores__c valor = new CC_Lista_Valores__c();
-        valor.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
-        valor.CC_Lista__c = listaValores.Id;
-        valor.Name = 'Préstamo';
-        valor.CC_Valor__c = '1';
-        listaValores.CC_Activa__c = true;
-        insert valor;
-        
-        Pricebook2 listaPrecios = new Pricebook2();
-        listaPrecios.Name = 'Standard Price Book';
-        insert listaPrecios;
+            CC_Lista_Valores__c valor = new CC_Lista_Valores__c();
+            valor.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
+            valor.CC_Lista__c = listaValores.Id;
+            valor.Name = 'Préstamo';
+            valor.CC_Valor__c = '1';
+            listaValores.CC_Activa__c = true;
+            insert valor;
 
-        Pricebook2 listaPreciosCsbd = new Pricebook2();
-        listaPreciosCsbd.Name = 'CSBD Price Book';
-        listaPreciosCsbd.Description = 'CSBD Price Book';
-        listaPreciosCsbd.IsActive = true;
-        insert listaPreciosCsbd;
+            Pricebook2 listaPrecios = new Pricebook2();
+            listaPrecios.Name = 'Standard Price Book';
+            insert listaPrecios;
+
+            Pricebook2 listaPreciosCsbd = new Pricebook2();
+            listaPreciosCsbd.Name = 'CSBD Price Book';
+            listaPreciosCsbd.Description = 'CSBD Price Book';
+            listaPreciosCsbd.IsActive = true;
+            insert listaPreciosCsbd;
+        }
+
+        CSBD_TestDataFactory.usuarioGestor();
     }
 
     @isTest
@@ -36,7 +38,7 @@ public class CSBD_Activity_Test {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
 
         Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo');
-            
+
         OpportunityShare oppshare = new OpportunityShare();
         oppshare.UserOrGroupId = usuarioGestor.Id;
         oppshare.OpportunityId = oportunidad.Id;
@@ -63,18 +65,16 @@ public class CSBD_Activity_Test {
 
     @isTest
     public static void crearActividadReasignacion() {
-        Opportunity oportunidad1 = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo');
-        Opportunity oportunidad2 = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo');
+        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+        System.runAs(usuarioGestor) {
+            Opportunity oportunidad1 = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo');
+            Opportunity oportunidad2 = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo');
+            Set<Id> idOportunidades = new Set<Id>{oportunidad1.Id, oportunidad2.Id};
 
-        Set<Id> idOportunidades = new Set<Id>{oportunidad1.Id, oportunidad2.Id};
-
-        System.runAs (CSBD_Usuarios.usuarioAdministrador()) {
-            //Ejecución de la prueba
             Test.startTest();
             CSBD_Activity.crearActividadReasignacion(idOportunidades, 'Reasignación automática', '');
             Test.stopTest();
 
-            //Evaluación del resultado de la prueba
             Integer actividadesCreadas = [SELECT Count() FROM Task WHERE WhatId IN :idOportunidades AND Status = 'Completed'];
             System.assertEquals(2, actividadesCreadas, 'Deberían haberse creado 2 actividades');
         }

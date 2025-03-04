@@ -17,7 +17,8 @@ public with sharing class SAC_GrupoColaboradorContact_Test {
         
         //USUARIO SAC_General
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);
+        //Database.insert(usuarioGeneral);
 
         System.runAs(usuarioGeneral){
             List <CC_Grupo_Colaborador__c> listaGrupos = new List <CC_Grupo_Colaborador__c>();
@@ -40,7 +41,8 @@ public with sharing class SAC_GrupoColaboradorContact_Test {
            
             listaGrupos.addAll(gProveedores);
             listaGrupos.add(gTareas);
-            Database.insert(listaGrupos);
+            SAC_DatabaseDML.insertListDML(listaGrupos, false);
+            //Database.insert(listaGrupos);
         }
     }
 
@@ -55,10 +57,13 @@ public with sharing class SAC_GrupoColaboradorContact_Test {
         
         System.runAs(usuario){
             Test.startTest();
-            Database.insert(contact);
+            SAC_DatabaseDML.insertDML(contact, false);
+            //Database.insert(contact);
             contact.CC_Usuario__c = null;
-            Database.update(contact);
-            Database.delete(contact);
+            SAC_DatabaseDML.updateDML(contact, false);
+            //Database.update(contact);
+            SAC_DatabaseDML.deleteDML(contact, false);
+            //Database.delete(contact);
             Test.stopTest();
     
             gProveedor = [SELECT Id, SAC_TieneUsuariosActivos__c FROM CC_Grupo_Colaborador__c WHERE Name = 'Proveedor'];
@@ -81,10 +86,13 @@ public with sharing class SAC_GrupoColaboradorContact_Test {
         
         System.runAs(usuario){
             Test.startTest();
-            Database.insert(contact);
+            SAC_DatabaseDML.insertDML(contact, false);
+            //Database.insert(contact);
             contact.CC_Usuario__c = null;
-            Database.update(contact);
-            Database.delete(contact);
+            SAC_DatabaseDML.updateDML(contact, false);
+            //Database.update(contact);
+            SAC_DatabaseDML.deleteDML(contact, false);
+            //Database.delete(contact);
             Test.stopTest();
     
             gProveedor = [SELECT Id, SAC_TieneUsuariosActivos__c FROM CC_Grupo_Colaborador__c WHERE Name = 'COPS'];
@@ -105,10 +113,13 @@ public with sharing class SAC_GrupoColaboradorContact_Test {
         
         System.runAs(usuario){
             Test.startTest();
-            Database.insert(contact);
+            SAC_DatabaseDML.insertDML(contact, false);
+            //Database.insert(contact);
             contact.CC_Usuario__c = null;
-            Database.update(contact);
-            Database.delete(contact);
+            SAC_DatabaseDML.updateDML(contact, false);
+            //Database.update(contact);
+            SAC_DatabaseDML.deleteDML(contact, false);
+            //Database.delete(contact);
             Test.stopTest();
     
             gProveedor = [SELECT Id, SAC_TieneUsuariosActivos__c FROM CC_Grupo_Colaborador__c WHERE Name = 'Asesoría Jurídica'];
@@ -129,10 +140,13 @@ public with sharing class SAC_GrupoColaboradorContact_Test {
         
         System.runAs(usuario){
             Test.startTest();
-            Database.insert(contact);
+            SAC_DatabaseDML.insertDML(contact, false);
+            //Database.insert(contact);
             contact.CC_Usuario__c = null;
-            Database.update(contact);
-            Database.delete(contact);
+            SAC_DatabaseDML.updateDML(contact, false);
+            //Database.update(contact);
+            SAC_DatabaseDML.deleteDML(contact, false);
+            //Database.delete(contact);
             Test.stopTest();
     
             gProveedor = [SELECT Id, SAC_TieneUsuariosActivos__c FROM CC_Grupo_Colaborador__c WHERE Name = 'VidaCaixa'];
@@ -153,10 +167,13 @@ public with sharing class SAC_GrupoColaboradorContact_Test {
         
         System.runAs(usuario){
             Test.startTest();
-            Database.insert(contact);
+            SAC_DatabaseDML.insertDML(contact, false);
+            //Database.insert(contact);
             contact.CC_Usuario__c = null;
-            Database.update(contact);
-            Database.delete(contact);
+            SAC_DatabaseDML.updateDML(contact, false);
+            //Database.update(contact);
+            SAC_DatabaseDML.deleteDML(contact, false);
+            //Database.delete(contact);
             Test.stopTest();
     
             gProveedor = [SELECT Id, SAC_TieneUsuariosActivos__c FROM CC_Grupo_Colaborador__c WHERE Name = 'COPS'];

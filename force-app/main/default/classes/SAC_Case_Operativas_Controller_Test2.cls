@@ -11,13 +11,15 @@ public with sharing class SAC_Case_Operativas_Controller_Test2 {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
+            //Database.insert(usuarioGeneral);
         
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
         }
 
         /*User usuarioGeneral = new User();
@@ -49,7 +51,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test2 {
             grupoLetrado.name = 'letrado';
             grupoLetrado.RecordTypeId = recTypeLetrado; 
             listaGrupos.add(grupoLetrado);
-            Database.insert(listaGrupos);
+            SAC_DatabaseDML.insertListDML(listaGrupos, false);
+            //Database.insert(listaGrupos);
     
             CC_Grupo_Colaborador_Contact__c grupoColabContact = new CC_Grupo_Colaborador_Contact__c();
             grupoColabContact.CC_Grupo_Colaborador__c = grupoColaborador.id;
@@ -61,13 +64,15 @@ public with sharing class SAC_Case_Operativas_Controller_Test2 {
             grupoColabLetrado.CC_Usuario__c = usuarioGeneral.id;    
             listaGruposColab.add(grupoColabLetrado);
 
-            Database.insert(listaGruposColab);
+            SAC_DatabaseDML.insertListDML(listaGruposColab, false);
+            //Database.insert(listaGruposColab);
 
         }       
 
         Group colaSupervisores = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PteSupervisor' LIMIT 1];
         GroupMember miembroGrupo = new GroupMember(GroupId = colaSupervisores.id, UserOrGroupId = usuarioGeneral.Id);
-        Database.insert(miembroGrupo);
+        SAC_DatabaseDML.insertDML(miembroGrupo, false);
+        //Database.insert(miembroGrupo);
   
     }
 
@@ -80,7 +85,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test2 {
         System.runAs(usuarioGeneral) {
             Case reclamacion = new Case(RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId(),
                                     OwnerId = colaSupervisores.Id, Status = 'Alta', SAC_StatusAuxiliar__c = 'Alta', Subject = 'Reclamacion');
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+            //Database.insert(reclamacion);
             reclamacion = [SELECT id FROM Case WHERE Subject = 'Reclamacion'];
             SAC_Case_Operativas_Controller.tomarPropiedadCaso(reclamacion.id, usuarioGeneral.id);            
         }
@@ -100,7 +106,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test2 {
             Case casoConsulta1 = new Case(Status = 'Alta',SAC_StatusAuxiliar__c ='Alta' ,SEG_Grupo__c = grupoColaborador.Id, Subject = 'consultaSAC',
             RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_ConsultaSAC').getRecordTypeId(),OwnerId = usuarioGeneral.Id);
 
-            Database.insert(casoConsulta1);
+            SAC_DatabaseDML.insertDML(casoConsulta1, false);
+            //Database.insert(casoConsulta1);
             casoConsulta1 = [SELECT id FROM Case WHERE Subject = 'consultaSAC'];
             SAC_Case_Operativas_Controller.tomarPropiedadCasoConsulta(casoConsulta1.Id, usuarioGeneral.id);
         }
@@ -119,11 +126,13 @@ public with sharing class SAC_Case_Operativas_Controller_Test2 {
         System.runAs(usuarioGeneral) {
             Case reclamacion = new Case(RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId(),
                                     OwnerId = colaSupervisores.Id, Status = 'Alta', SAC_StatusAuxiliar__c = 'Alta', Subject = 'Pretension');
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+            //Database.insert(reclamacion);
 
             Case pretension = new Case(RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId(),
                                     OwnerId = colaSupervisores.Id, Status = 'Alta', SAC_StatusAuxiliar__c = 'Alta', SuppliedCompany = 'Pretension' , SAC_Reclamacion__c = reclamacion.Id);
-            Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);
             pretension = [SELECT id FROM Case WHERE SuppliedCompany = 'Pretension'];
             SAC_Case_Operativas_Controller.tomarPropiedadPretensionesApex(pretension.id, usuarioGeneral.id);            
         }
@@ -168,12 +177,14 @@ public with sharing class SAC_Case_Operativas_Controller_Test2 {
         System.runAs(usuarioGeneral) {
             Case reclamacion = new Case(RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId(),
                                     Status = 'Alta', SAC_StatusAuxiliar__c = 'Alta', Subject = 'Reclamacion');
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+            //Database.insert(reclamacion);
             reclamacion = [SELECT id FROM Case WHERE Subject = 'Reclamacion'];
 
             Case pretension = new Case(RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId(),
                                     Status = 'Alta', SAC_StatusAuxiliar__c = 'Alta', Subject = 'Pretension', SAC_Reclamacion__c = reclamacion.Id);
-            Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);
             pretension = [SELECT id FROM Case WHERE Subject = 'Pretension'];
             SAC_Case_Operativas_Controller.devolverPretensionesSupervisores(pretension.Id, 'test');
         }
@@ -194,7 +205,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test2 {
         camposRecl.put('OwnerId', usuarioGeneral.Id);
         
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false);
+        //Database.insert(reclamacion);
 
         //Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -202,7 +214,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test2 {
         camposPret.put('SAC_Reclamacion__c', reclamacion.id);
 
         Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(pretension);
+        SAC_DatabaseDML.insertDML(pretension, false);
+        //Database.insert(pretension);
 
         Case caso = [SELECT Id FROM Case WHERE Subject = 'TestRec' LIMIT 1];
         Case pret = [SELECT Id, SAC_ObservacionesSupervisor__c FROM Case WHERE SuppliedCompany = 'TestPret' AND SAC_Reclamacion__c =: caso.id LIMIT 1];

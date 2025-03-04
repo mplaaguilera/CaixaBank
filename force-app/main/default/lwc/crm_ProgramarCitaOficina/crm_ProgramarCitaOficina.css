@@ -91,7 +91,7 @@ div.divMensajeSeleccion.ocultar {
 lightning-icon.iconoMensajeSeleccion {
     position: relative;
     top: -1px;
-    margin-right: 6px;
+    margin-right: 8px;
     --sds-c-icon-color-foreground-default: #76aae4;
 }
 

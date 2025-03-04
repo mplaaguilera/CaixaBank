@@ -42,6 +42,8 @@ public with sharing class SPV_CaseBUTRHan extends CC_TriggerHandlerBase {
             SPV_CaseHelper.desactivarEscaladoAJ(listCasosSPV, mapOldObj);  //Si la reclamación cambia de estado se debe desactivar el campo SPV_EscaladoAJ__c de la reclamacion
        
            SPV_CaseHelper.arrastrarReclamantePretension(listCasosSPV, mapOldObj, new Map<Id, Case>()); //Al actualizar el AccountId una pretensión, se rellenan sus campso de reclamante con los de la reclamación
+        
+           SPV_CaseHelper.rellenarFechaRecepcionResolucion(listCasosSPV, mapOldObj);
         }
 
         //Recuperar las colas del cache

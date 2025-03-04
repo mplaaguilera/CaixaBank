@@ -19,47 +19,46 @@ public with sharing class SAC_MilestoneTimeCalculatorLetrado_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         //MCCs
         String mccDetalleRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
-        Id recTypeSLARegulatorio = Schema.SObjectType.SAC_ParametrizacionSLATME__c.getRecordTypeInfosByDeveloperName().get('SAC_SLARegulatorio').getRecordTypeId();
-        Id recTypeSLALetrado = Schema.SObjectType.SAC_ParametrizacionSLATME__c.getRecordTypeInfosByDeveloperName().get('SAC_SLALetrado').getRecordTypeId();
 
         CC_MCC__c mccDetalle = new CC_MCC__c(Name='Prueba', CC_Codigo_Externo__c='a', RecordTypeId=mccDetalleRecordTypeId, CC_Tipo_Cliente__c='SAC');
-        Database.upsert(mccDetalle);
+        SAC_DatabaseDML.upsertDML(mccDetalle, false);
         CC_MCC__c mccDetalle2 = new CC_MCC__c(Name='Prueba2', CC_Codigo_Externo__c='b', RecordTypeId=mccDetalleRecordTypeId, CC_Tipo_Cliente__c='SAC');
-        Database.upsert(mccDetalle);
+        SAC_DatabaseDML.upsertDML(mccDetalle, false);
 
         //PARAMETRIZACIONES MCC
         SAC_ParametrizacionSLATME__c parametrizacion1  = SAC_TestDataFactory.crearParamsSla('Regulatorio',1)[0];
         parametrizacion1.SAC_Duracion__c = 10;
         parametrizacion1.SAC_MCC__c = mccDetalle.Id;
         parametrizacion1.SAC_CanalProcedencia__c = ''; 
-        Database.upsert(parametrizacion1);
+        SAC_DatabaseDML.upsertDML(parametrizacion1, false);
 
         SAC_ParametrizacionSLATME__c parametrizacion2  = SAC_TestDataFactory.crearParamsSla('Letrado',1)[0];
         parametrizacion2.SAC_Duracion__c = 20;
         parametrizacion2.SAC_MCC__c = mccDetalle2.Id;
         parametrizacion2.SAC_CanalProcedencia__c = ''; 
-        Database.upsert(parametrizacion2);
+        SAC_DatabaseDML.upsertDML(parametrizacion2, false);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
         camposRecl.put('Subject', 'TestRec');
         camposRecl.put('Origin', 'Backoffice');
         camposRecl.put('SEG_Detalle__c', mccDetalle.id);
+        camposRecl.put('SAC_TiempoSLALetradoAlta__c', 1);
         camposRecl.put('OwnerId', usuarioGeneral.id);
       
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-        Database.insert(casoReclamacion);  
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
         
         //Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -70,7 +69,7 @@ public with sharing class SAC_MilestoneTimeCalculatorLetrado_Test {
         camposPret.put('OwnerId', usuarioGeneral.id);
 
         Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension', camposPret);
-        Database.insert(casoPretension);   
+        SAC_DatabaseDML.insertDML(casoPretension, false); 
     }
 
     @isTest
@@ -78,7 +77,7 @@ public with sharing class SAC_MilestoneTimeCalculatorLetrado_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
         MilestoneType[] listMilestoneType = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(listMilestoneType.size() == 0) { 
+        if(listMilestoneType.isEmpty()) { 
             return; 
         }
         MilestoneType mt = listMilestoneType[0];
@@ -93,8 +92,32 @@ public with sharing class SAC_MilestoneTimeCalculatorLetrado_Test {
             Test.stopTest();
         }
         
-        //SAC_ParametrizacionSLATME__c parametrizacion1 = [select id, SAC_Duracion__c from SAC_ParametrizacionSLATME__c where SAC_Duracion__c = 20];
+        System.assertNotEquals(0, actualTriggerTime, 'No se ha podido asociar un tiempo');
+    }
 
+    @isTest
+    static void calculateMilestoneTriggerTimeTest2() {
+        User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
+
+        MilestoneType[] listMilestoneType = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
+        if(listMilestoneType.isEmpty()) { 
+            return; 
+        }
+        MilestoneType mt = listMilestoneType[0];
+        
+        Case casoReclamacion = [SELECT id, RecordTypeId, SAC_FechaRecepcion__c FROM case WHERE Subject = 'TestRec'];
+        SAC_MilestoneTimeCalculatorLetrado calculator = new SAC_MilestoneTimeCalculatorLetrado();
+
+        Integer actualTriggerTime;
+        System.runAs(usuario){
+            Test.startTest();
+            casoReclamacion.SAC_FechaRecepcion__c = null;
+            SAC_DatabaseDML.updateDML(casoReclamacion, false);
+
+            actualTriggerTime = calculator.calculateMilestoneTriggerTime(casoReclamacion.Id, mt.Id);
+            Test.stopTest();
+        }
+        
         System.assertNotEquals(0, actualTriggerTime, 'No se ha podido asociar un tiempo');
     }
 }

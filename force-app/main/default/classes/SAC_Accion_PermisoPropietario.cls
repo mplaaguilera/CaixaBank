@@ -169,8 +169,9 @@ public without sharing class SAC_Accion_PermisoPropietario {
                     }    
                 }
             }
-
-            Database.delete(permisosBorrar,false);
+            
+            SAC_DatabaseDML.deleteListDML(permisosBorrar, false); 
+            //Database.delete(permisosBorrar,false);
         }
 
         //Creación y asiganción al nuevo propietario de las sharing rules
@@ -273,6 +274,7 @@ public without sharing class SAC_Accion_PermisoPropietario {
             }    
         }
 
-        Database.insert(accionesShare, false);
+        SAC_DatabaseDML.insertListDML(accionesShare, false); 
+        //Database.insert(accionesShare, false);
     }
 }

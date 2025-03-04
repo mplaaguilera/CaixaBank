@@ -96,8 +96,7 @@ global with sharing class CC_WS_Casos_HDT extends CBK_HttpServiceIntegration_Abs
                     CC_Tipo_Gestion_3N_Demanda__c, CC_Tipo_gesti_n_demanda__c, CC_Ultima_Operativa_Correo__c,
                     CC_Acepta_Condiciones_Contractuales__c, CC_Activacion_OK__c, CC_Cancelar_SmartScript__c,
                     CC_Created_1r_SocialPost__c, CC_DigitosTarjeta_Encriptado__c, CC_Digitos_Tarjeta__c,
-                    CC_Motivo_Llamada_Smart_Script__c, CC_Motivo_NOK_Tarjetas__c, CC_NotifCli__c, CC_NotifClienteEnv__c,
-                    CC_Numero_Contrato__c, CC_PAN_Encriptado__c, CC_PAN__c, CC_Politica_Seguridad_OK__c, 
+                    CC_Motivo_Llamada_Smart_Script__c, CC_Motivo_NOK_Tarjetas__c, CC_Numero_Contrato__c, CC_PAN_Encriptado__c, CC_PAN__c, CC_Politica_Seguridad_OK__c, 
                     CC_Primer_SocialPost_Id__c, CC_Resultado_Operativa_Tarjetas__c, CC_Error_TF7__c, CC_Motivo_NOK__c, 
                     CC_Tipo_Gestion__c, CC_Direccion_Territorial__c, CC_Fecha_Limite_Resolucion_Naranja__c,
                     CC_Fecha_Limite_Resolucion_Verde__c, CC_Fecha_Limite_Resolucion__c, CC_Nombre_Empresa__c, 
@@ -105,7 +104,7 @@ global with sharing class CC_WS_Casos_HDT extends CBK_HttpServiceIntegration_Abs
                     CC_Recipient_Modelo_Maquina__c, CC_Recipient_Numero_Empleado__c, CC_Recipient_Numero_Maquina__c, 
                     CC_Recipient_Numero_Serie__c, CC_SLA_Fecha_Limite_Resolucion__c, CC_Tipo_ChatTranscript__c, 
                     Canal_del_Empleado__c, CC_Numero_Pedido__c, CC_Oficina_Afectada_Lookup__c, CC_Recipient_Oficina_Gestora__c, 
-                    CC_Detalle_Solucion_Confidencial__c, CC_Estado_Reversion__c, CC_Fecha_Hora_Procesado__c, 
+                    CC_Detalle_Solucion_Confidencial__c, CC_Estado_Reversion__c,
                     CC_Gestor_Documental__c, CC_NIF__c, CC_Numero_Caso__c, CC_Plantilla_Motivo__c, CC_Provincia_Gestor__c, 
                     CC_Situacion_Caso__c, CC_Tarjeta_Activada__c, CC_Tarjeta_Anterior_Activada__c, CC_TipoCuentaCaso__c, 
                     CC_Tramo_TRZ__c, CC_URL_Encuesta_3N__c,CC_Info_Denegacion__c 

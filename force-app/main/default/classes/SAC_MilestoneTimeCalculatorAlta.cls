@@ -37,7 +37,7 @@ public without sharing class SAC_MilestoneTimeCalculatorAlta implements Support.
             if(SAC_Case_AU_TRHan.casesMap.containskey(caseId)) {
                 caso = SAC_Case_AU_TRHan.casesMap.get(caseId);
             } else {
-                caso = [SELECT Id, SEG_Detalle__c, CC_Canal_Procedencia__c, RecordTypeId, SAC_TiempoParadaSubsanacion__c FROM Case WHERE Id = :caseId];
+                caso = [SELECT Id, SEG_Detalle__c, CC_Canal_Procedencia__c, RecordTypeId, SAC_MinutosParadaSubsanacion__c FROM Case WHERE Id = :caseId];
                 necesitaQuery = true;
             }
             //Case caso = [SELECT Id, SEG_Detalle__c, CC_Canal_Procedencia__c, RecordTypeId FROM Case WHERE Id = :caseId];

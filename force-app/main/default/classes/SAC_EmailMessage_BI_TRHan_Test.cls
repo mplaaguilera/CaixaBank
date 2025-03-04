@@ -5,7 +5,8 @@ private class SAC_EmailMessage_BI_TRHan_Test{
 	static void testDummy(){
 
 		User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuario);
+		SAC_DatabaseDML.insertDML(usuario, false);
+        //Database.insert(usuario);
 	}
 
 	@isTest
@@ -16,7 +17,8 @@ private class SAC_EmailMessage_BI_TRHan_Test{
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+		SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -25,7 +27,8 @@ private class SAC_EmailMessage_BI_TRHan_Test{
 			caso.Origin = 'Email';
 			caso.Description = 'test1';
 			caso.RecordTypeId = rtId3;
-			Database.insert(caso);
+			SAC_DatabaseDML.insertDML(caso, false);
+			//Database.insert(caso);
 
 			EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'SAC_EmailService' LIMIT 1];
 			String headerValueSTR = headerValue.LocalPart + '@' + headerValue.EmailDomainName;
@@ -40,7 +43,8 @@ private class SAC_EmailMessage_BI_TRHan_Test{
 			correo.FromAddress = 'Test@test.com';
 			correo.ToAddress = 'prueba@ibm.com';
 			correo.Headers = '[{"value": "' + headerValueSTR + '","name": "X-SDFC-Original-RCPT"}]';
-			Database.insert(correo);	
+			SAC_DatabaseDML.insertDML(correo, false);
+			//Database.insert(correo);	
 			
 			System.assertNotEquals(null, correo.Subject, 'correo');
         }

@@ -30,6 +30,169 @@ public class CBK_Log_test {
     }
 
     @isTest
+    public static void testLogBuilder() {
+        User testUser = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
+        CBK_Log.DebugProcessConfigBuilder builder;
+
+        System.runAs ( testUser ) {
+            builder = new CBK_Log.DebugProcessConfigBuilder();
+            builder.setContextId('contextId');
+            builder.setMessage('message');
+            builder.setValues(new List<Object>());
+            builder.setLevel(LoggingLevel.INFO);
+            builder.setEmail(new Messaging.InboundEmail());
+            builder.setCategory('category');
+            builder.setForce(true);
+            builder.setTxtUser('userId');
+            builder.setTxtStacktrace('stacktrace');
+            builder.setTxtDetail('detail');
+            builder.setSfdcMessageId('messageId');
+            builder.setMessageException('messageException');
+            builder.setTxtFromAddress('fromAddress');
+            builder.setTxtToAddress('toAddress');
+            builder.setSfdcReplyTo('sfdcReplyTo');
+            builder.setSfdcType('sfdcType');
+            builder.setSfdcEmailMessageId('sfdcEmailMessageId');
+            builder.setSfdcCaseId('sfdcCaseId');
+            builder.setSfdcResultStatus('sfdcResultStatus');
+            builder.setSfdcResultDetail('sfdcResultDetail');
+            builder.setHdReturnPath('hdReturnPath');
+            builder.setHdResentMessageId('hdResentMessageId');
+            builder.setHdTo('hdTo');
+            builder.setHdMessageID('hdMessageID');
+            builder.setHdExchangeInboxRulesLoop('hdExchangeInboxRulesLoop');
+            builder.setHdResentFrom('hdResentFrom');
+            builder.setHdExchangeParentMessageId('hdExchangeParentMessageId');
+            builder.setHdSFDCOriginalRCPT('hdSFDCOriginalRCPT');
+            builder.setHdMSHasAttach('hdMSHasAttach');
+            builder.setHdDeliveredTo('hdDeliveredTo');
+            builder.setHdReference('hdReference');
+            builder.setHdInReplyTo('hdInReplyTo');
+            builder.setRecordTypeId('recordTypeId');
+            builder.setOwnerId('ownerId');
+            builder.setTransactionID('transaction_ID');
+            builder.setLogMessage('message');
+            builder.setLogMessageExt('message_Ext');
+            builder.setErrorCode('error_Code');
+            builder.setErrorType('error_Type');
+            builder.setCreatedBy('createdBy');
+            builder.setDetail('detail');
+            builder.setCreatedDate(datetime.now());
+            builder.setSystemModstamp(datetime.now());
+            builder.setState('state');
+            builder.setSfdcToAddress('sfdcToAddress');
+            builder.setSfdcFromAddress('sfdcFromAddress');
+            
+            builder.getContextId();
+            builder.getMessage();
+            builder.getValues();
+            builder.getLevel();
+            builder.getEmail();
+            builder.getCategory();
+            builder.getForce();
+            builder.getTxtUser();
+            builder.getTxtStacktrace();
+            builder.getTxtDetail();
+            builder.getSfdcMessageId();
+            builder.getMessageException();
+            builder.getTxtFromAddress();
+            builder.getTxtToAddress();
+            builder.getSfdcReplyTo();
+            builder.getSfdcType();
+            builder.getSfdcEmailMessageId();
+            builder.getSfdcCaseId();
+            builder.getSfdcResultStatus();
+            builder.getSfdcResultDetail();
+            builder.getHdReturnPath();
+            builder.getHdResentMessageId();
+            builder.getHdTo();
+            builder.getHdMessageID();
+            builder.getHdExchangeInboxRulesLoop();
+            builder.getHdResentFrom();
+            builder.getHdExchangeParentMessageId();
+            builder.getHdSFDCOriginalRCPT();
+            builder.getHdMSHasAttach();
+            builder.getHdDeliveredTo();
+            builder.getHdReference();
+            builder.getHdInReplyTo();
+            builder.getRecordTypeId();
+            builder.getOwnerId();
+            builder.getTransactionID();
+            builder.getLogMessage();
+            builder.getLogMessageExt();
+            builder.getErrorCode();
+            builder.getErrorType();
+            builder.getCreatedBy();
+            builder.getDetail();
+            builder.getCreatedDate();
+            builder.getSystemModstamp();
+            builder.getState();
+            builder.getSfdcToAddress();
+            builder.getSfdcFromAddress();
+        }
+
+        //Asserts
+        System.assertNotEquals(builder, null,'The Log builder Object has not been populated');
+    }
+
+    @isTest
+    public static void testDebugAdd() {
+        User testUser = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
+        Id recordTypeId = Schema.SObjectType.CBK_Log__c.getRecordTypeInfosByDeveloperName().get('Apex_Log').getRecordTypeId();
+
+        //Creación Custom Picklist
+        String sRecordTypeIdPicklist = Schema.SObjectType.CBK_PicklistValues__c.getRecordTypeInfosByDeveloperName().get('CBK_Picklist').getRecordTypeId();
+        String sRecordTypeIdPicklistValue = Schema.SObjectType.CBK_PicklistValues__c.getRecordTypeInfosByDeveloperName().get('CBK_PicklistValue').getRecordTypeId();
+        CBK_PicklistValues__c oCustomPicklist = new CBK_PicklistValues__c();
+        oCustomPicklist.Name = 'CBK_Category__c';
+        oCustomPicklist.CBK_Object__c = 'CBK_Log';
+        oCustomPicklist.RecordTypeId = sRecordTypeIdPicklist;
+        insert oCustomPicklist;
+        CBK_PicklistValues__c oCustomPicklistValue1 = new CBK_PicklistValues__c();
+        oCustomPicklistValue1.CBK_Picklist__c = oCustomPicklist.Id;
+        oCustomPicklistValue1.Name = 'test';
+        oCustomPicklistValue1.RecordTypeId = sRecordTypeIdPicklistValue;
+        insert oCustomPicklistValue1;
+
+        System.runAs (testUser) {
+
+            CBK_Log.DebugProcessConfigBuilder builder = new CBK_Log.DebugProcessConfigBuilder()
+                .setRecordTypeId(recordTypeId)
+                .setOwnerId(testuser.Id)
+                .setTransactionID(testuser.Id + '-' + String.valueof(DateTime.now().getTime()))
+                .setLogMessage('value1')
+                .setLogMessageExt('value1')
+                .setMessage('value1')
+                .setErrorCode('')
+                .setErrorType('')
+                .setTxtStacktrace('')
+                .setCreatedBy(testuser.Id)
+                .setDetail('@Det@')
+                .setMessageException('')
+                .setCreatedDate(System.now())
+                .setSystemModstamp(System.now())
+                .setLevel(LoggingLevel.INFO);
+            
+            builder.addLog();
+
+            // Insertar DML debug
+            CBK_Log.insertDML();
+
+            /// Output some confirmation
+            System.debug('Debug and DML debug executed successfully.');
+
+            // Since we can't query the event, use system logs to verify
+            System.debug('The debug process has been executed. Please check the event monitor for CBK_LogEvent__e.');
+        }
+
+        CBK_Log__c config = [SELECT Id, Log_Message__c, Log_Level__c FROM CBK_Log__c LIMIT 1];
+
+        // Assert the values are set correctly
+        System.assertEquals('value1', config.Log_Message__c,'El Message no coincide.');
+        System.assertEquals('INFO', config.Log_Level__c,'El Log Level no es identico');
+    }
+
+    @isTest
     public static void testNuevaFuncionalidad() {
         List<Object> detalle = new List<Object> {'Error 1', 'Error 2', 'Error 3'};
         
@@ -83,6 +246,7 @@ public class CBK_Log_test {
         CBK_Log.error(txtError, detalle);
         CBK_Log.error('Contexto','Test');
         CBK_Log.error('Contexto',txtError,detalle);
+        CBK_Log.error('Contexto',txtError,detalle);
     }
     
     @isTest
@@ -102,7 +266,6 @@ public class CBK_Log_test {
             CBK_Log.error('Contexto',e,'error');
             CBK_Log.error('Contexto',e,'error',detalle);
         }
-        
     }
 
     @isTest
@@ -178,19 +341,10 @@ public class CBK_Log_test {
     
     @isTest
     public static void Test_populateLocation() { 
-        CBK_Log__c logEvent = New CBK_Log__c();
-        logEvent.Log_Level__c='ERROR';
-        logEvent.Log_Message__c='Class.CBK_Log.emit: line 73, column 1\nClass.CBK_Log.error: line 64, column 1\nClass.CBK_Log.error: line 48, column 1\nAnonymousBlock: line 2, column 1\nAnonymousBlock: line 2, column 1';
+        CBK_LogEvent__e logEvent = New CBK_LogEvent__e();
+        logEvent.txt_Level__c='ERROR';
+        logEvent.txt_Message__c='Class.CBK_Log.emit: line 73, column 1\nClass.CBK_Log.error: line 64, column 1\nClass.CBK_Log.error: line 48, column 1\nAnonymousBlock: line 2, column 1\nAnonymousBlock: line 2, column 1';
         CBK_Log.populateLocation(logEvent);
-    }
-    
-    @isTest
-    public static void Test_populateLocation2() { 
-        CBK_Log__c logEvent = New CBK_Log__c();
-        logEvent.Log_Level__c='ERROR';
-        logEvent.Apex_Stack_Trace__c='Class.CBK_Log.emit: line 73, column 1\nClass.CBK_Log.error: line 64, column 1\nClass.CBK_Log.error: line 48, column 1\nAnonymousBlock: line 2, column 1\nAnonymousBlock: line 2, column 1';
-        CBK_Log.populateLocation(logEvent);
-
     }
 
     @isTest
@@ -278,11 +432,25 @@ public class CBK_Log_test {
             }
 
         //Query del registro insertado
-        CBK_Log__c listadoLogs = [SELECT Id,Transaction_ID__c FROM CBK_Log__c WHERE Transaction_ID__c = 'Contexto'];
+        CBK_Log__c listadoLogs = [SELECT Id,Transaction_ID__c FROM CBK_Log__c WHERE Transaction_ID__c = 'Contexto' LIMIT 1];
         
         //Comprobar los campos incluidos
         System.assertEquals('Contexto', listadoLogs.Transaction_ID__c,'No coincide el valor con el esperado');
 
         }
     }
+
+    @isTest
+    public static void testgetApexLimits() { 
+        User testUser = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
+        SObject evtLog;
+        System.runAs (testUser) {
+            evtLog = CBK_Log.getApexLimits(new CBK_Log__c());
+        }
+
+        //Asserts
+        System.assertNotEquals(evtLog, null,'The limit sObject has not been populated');
+        System.assertNotEquals(evtLog.get('CBK_AggregateQueries__c'), null,'A value inside the limit sObject has not been populated');
+    }
+
 }

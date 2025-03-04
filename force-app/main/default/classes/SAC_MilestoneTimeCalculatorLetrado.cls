@@ -33,7 +33,7 @@ public with sharing class SAC_MilestoneTimeCalculatorLetrado implements Support.
                 //caso = mapCase.get(caseId);
                 caso.add(SAC_Case_AU_TRHan.casesMap.get(caseId));
             } else {
-                caso = [SELECT id, RecordTypeId, Subject, Status,SAC_TiempoSLALetradoAlta__c, CC_Canal_Procedencia__c, SEG_Detalle__c, SAC_Reclamacion__c, SAC_FechaRecepcion__c, SAC_TiempoParadaSubsanacion__c 
+                caso = [SELECT id, RecordTypeId, Subject, Status,SAC_TiempoSLALetradoAlta__c, CC_Canal_Procedencia__c, SEG_Detalle__c, SAC_Reclamacion__c, SAC_FechaRecepcion__c, SAC_MinutosParadaSubsanacion__c 
                 FROM Case WHERE Id = :caseId];
             }
 
@@ -88,7 +88,6 @@ public with sharing class SAC_MilestoneTimeCalculatorLetrado implements Support.
 
         /** Se vuelven a cambiar las BBHH de 10 a 24 horas (Antes se tenia una horario de 8:00 - 18:00)*/
         slaTotal = (slaTotal * 1440);
-
         //Llamada al método calcularTiempoParadaSubsanacion para que le sume al tiempo total devuelto el tiempo de la parada de subsanación US959472
         slaTotal = SAC_Utils.calcularTiempoParadaSubsanacion(caso[0], slaTotal);
 

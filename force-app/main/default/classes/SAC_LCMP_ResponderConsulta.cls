@@ -29,7 +29,8 @@ public without sharing class SAC_LCMP_ResponderConsulta {
        
         consulta.SAC_Estado__c = 'SAC_Resuelta';
         consulta.SAC_FechaRespuesta__c = System.now();
-        Database.update(consulta);
+        SAC_DatabaseDML.updateDML(consulta, false); 
+        //Database.update(consulta);
         
         return respuesta;
     }
@@ -59,7 +60,8 @@ public without sharing class SAC_LCMP_ResponderConsulta {
             consulta.SAC_Motivo_Devolucion__c = motivo;
         }
 
-        Database.update(consulta);
+        SAC_DatabaseDML.updateDML(consulta, false); 
+        //Database.update(consulta);
   
         return respuesta;
     }
@@ -114,7 +116,8 @@ public without sharing class SAC_LCMP_ResponderConsulta {
                 newcont.FirstPublishLocationId = consulta.SAC_Reclamacion__c;
                 archivoInsertar.add(newcont);
             }
-            Database.insert(archivoInsertar);
+            SAC_DatabaseDML.insertListDML(archivoInsertar, true); 
+            //Database.insert(archivoInsertar);
         }
     }
 }

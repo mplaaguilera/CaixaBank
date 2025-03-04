@@ -311,6 +311,8 @@ public class OS_EmailService_Test {
         lstValor.CC_Activa__c = true;
         listaValores.add(lstValor);
         insert listaValores;
+       
+
     }
 
     @isTest

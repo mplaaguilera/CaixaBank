@@ -196,7 +196,7 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                     caso.SEG_Fecha_planificaci_n__c = null;
 
                     if(oSMailRelated){
-                        caso.SEG_Id_Related_Mail__c = email.messageId; // MGT
+                        caso.SEG_Id_Related_Mail__c = email.messageId;
                     }
                     
                 }
@@ -743,7 +743,7 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                 caso.SEG_Email_Generador__c = emailfrom?.left(200);
 
                 if(oSMailRelated){
-                    caso.SEG_Id_Related_Mail__c = email.messageId; // MGT
+                    caso.SEG_Id_Related_Mail__c = email.messageId;
                 }
 
                 try{
@@ -1028,6 +1028,7 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
             return false;
         }
     }
+
     public static List<Case> procesarReferencias(String[] semillas, String[] sNumbers, String organizacionBuzon, String zonaBuzon) {
         //JAV PARA PODER BUSCAR SEMILLAS EN CASOS FUSIONADOS A TRAVÉS DEL CAMPO SEG_Fusion_Semilla1__c
         List<Id> listIdRecordTypeSegmentos = new List<Id> ();
@@ -1036,18 +1037,41 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
         for (string semillaref : semillas) {
             filters.add('%' + semillaref + '%');
         }
-
+    
         recordTypeSEG = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
         recordTypeSeguimiento = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Seguimiento').getRecordTypeId();
-
+    
         listIdRecordTypeSegmentos.add(recordTypeSEG);
         listIdRecordTypeSegmentos.add(recordTypeSeguimiento);
-
+    
         List<Case> casosSemilla = [SELECT id, SEG_Case_Owner__c, SEG_OldSubStatus__c, Priority, SEG_OldStatus__c, SEG_Subestado__c, CreatedDate, CaseNumber, SEG_Detalle__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Tematica__c, AccountId, SEG_Zona__c, SEG_Organizacion__c, SEG_Grupo__c, SEG_Grupo_colaborador_Externo__c, Status FROM Case WHERE  (CreatedDate = LAST_N_MONTHS:6 OR CreatedDate = THIS_MONTH OR CreatedDate = TODAY) AND RecordTypeId IN :listIdRecordTypeSegmentos AND (SEG_SemillaId__c IN :semillas OR SEG_Fusion_Semilla1__c Like :filters) AND SEG_Organizacion__c = :organizacionBuzon AND SEG_Zona__c = :zonaBuzon  ORDER BY createdDate DESC LIMIT 1];
-        List<Case> casosNumber = new List<Case> ([SELECT id, SEG_Case_Owner__c, SEG_OldSubStatus__c, Priority, SEG_OldStatus__c, SEG_Subestado__c, CreatedDate, CaseNumber, SEG_Detalle__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Tematica__c, AccountId, SEG_Zona__c, SEG_Organizacion__c, SEG_Grupo__c, SEG_Grupo_colaborador_Externo__c, Status FROM Case WHERE (CreatedDate = LAST_N_MONTHS:6 OR CreatedDate = THIS_MONTH OR CreatedDate = TODAY) AND RecordTypeId IN :listIdRecordTypeSegmentos AND CaseNumber IN :sNumbers AND SEG_Organizacion__c = :organizacionBuzon AND SEG_Zona__c = :zonaBuzon ORDER BY createdDate DESC]);
+
+        List<Case> casosNumber = new List<Case> ([SELECT id, CC_CasoRelacionado__c, recordTypeId, SEG_Case_Owner__c, SEG_OldSubStatus__c, Priority, SEG_OldStatus__c, SEG_Subestado__c, CreatedDate, CaseNumber, SEG_Detalle__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Tematica__c, AccountId, SEG_Zona__c, SEG_Organizacion__c, SEG_Grupo__c, SEG_Grupo_colaborador_Externo__c, Status 
+        FROM Case 
+        WHERE (CreatedDate = LAST_N_MONTHS:6 OR CreatedDate = THIS_MONTH OR CreatedDate = TODAY) 
+        AND CaseNumber IN :sNumbers 
+        AND ((RecordTypeId IN :listIdRecordTypeSegmentos 
+        AND SEG_Organizacion__c = :organizacionBuzon 
+        AND SEG_Zona__c = :zonaBuzon) 
+        OR (RecordType.DeveloperName = 'OS_Cliente' 
+        AND CC_CasoRelacionado__c != NULL)) 
+        ORDER BY createdDate DESC]);
+
         Set<Case> setCasosUpdatear = new set<Case>();
         Set<Case> setCasosSemilla = new set<Case>();
         List<case> listaCasosUp = new List<Case>();
+
+        List<Case> casosNumFiltrados = new List<Case>();
+
+        for (Case casoEncontrado : casosNumber) {
+            if (casoEncontrado.RecordTypeId == recordTypeSEG || casoEncontrado.RecordTypeId == recordTypeSeguimiento) {
+                casosNumFiltrados.add(casoEncontrado);
+            } else {
+                Case casoSEG = new Case();
+                casoSEG.Id = casoEncontrado.CC_CasoRelacionado__c;
+                casosNumFiltrados.add(casoSEG);
+            }
+        }
         
         if(!casosSemilla.isEmpty()){
             casosSemilla[0].SEG_OldStatus__c = casosSemilla[0].status;
@@ -1056,7 +1080,7 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
             setCasosSemilla.add(casosSemilla[0]);
         }
         
-        for (Case casonum : casosNumber) {
+        for (Case casonum : casosNumFiltrados) {
             if (!setCasosSemilla.contains(casonum)){
                 casonum.SEG_OldStatus__c = casonum.status;
                 casonum.SEG_OldSubStatus__c = casonum.SEG_Subestado__c;
@@ -1068,15 +1092,15 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
             update listaCasosUp;
         }
 
-        if(!casosSemilla.isEmpty() && casosNumber.isEmpty()){
+        if(!casosSemilla.isEmpty() && casosNumFiltrados.isEmpty()){
             caseUpdate.add(casosSemilla[0]);
-        } else if(casosSemilla.isEmpty() && !casosNumber.isEmpty()){
-            for(Case caso : casosNumber){
+        } else if(casosSemilla.isEmpty() && !casosNumFiltrados.isEmpty()){
+            for(Case caso : casosNumFiltrados){
                 caseUpdate.add(caso);
             }
-        } else if(!casosSemilla.isEmpty() && !casosNumber.isEmpty()){
+        } else if(!casosSemilla.isEmpty() && !casosNumFiltrados.isEmpty()){
             Case casoReciente = casosSemilla[0];
-            for(Case caso : casosNumber){
+            for(Case caso : casosNumFiltrados){
                 if(caso.CreatedDate > casoReciente.CreatedDate){
                     casoReciente = caso;
                 }

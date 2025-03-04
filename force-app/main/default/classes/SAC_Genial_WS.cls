@@ -132,6 +132,7 @@ global with sharing class SAC_Genial_WS extends CBK_HttpServiceIntegration_Abstr
         public string jsonRequest;
         public Id idShadow;
         public DatosRecPrincipal datosRecPrincipal;
+        public Umbrales umbrales;
     }
 
     public class DatosReclamante {
@@ -154,6 +155,13 @@ global with sharing class SAC_Genial_WS extends CBK_HttpServiceIntegration_Abstr
         string provincia;
         string pais;
         string direccionNoti;
+    }
+    
+    public class Umbrales {
+        public Decimal tematica;
+        public Decimal producto;
+        public Decimal motivo;
+        public Decimal detalle;
     }
 
 }

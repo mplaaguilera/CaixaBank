@@ -163,7 +163,8 @@ public without sharing class SAC_ActualizacionUsuario {
             listaGroupMember.add(new GroupMember(UserOrGroupId = ide, GroupId = colaSupervisores.Id));
             listaGroupMember.add(new GroupMember(UserOrGroupId = ide, GroupId = grupoPublicoSupervisores.Id));
         }
-        Database.insert(listaGroupMember);
+        SAC_DatabaseDML.insertListDML(listaGroupMember, true);    
+        //Database.insert(listaGroupMember);
     }
 
     @future
@@ -201,10 +202,12 @@ public without sharing class SAC_ActualizacionUsuario {
             List<GroupMember> listaSupervisoresGPEliminar =[SELECT Id FROM GroupMember where Group.DeveloperName ='SAC_SupervisoresDeGrupos' AND UserOrGroupId IN :listaSupervisores];
             
             if(!listaSupervisoresEliminar.isEmpty()){
-                Database.delete(listaSupervisoresEliminar);
+                SAC_DatabaseDML.deleteListDML(listaSupervisoresEliminar, true);    
+                //Database.delete(listaSupervisoresEliminar);
             }
             if(!listaSupervisoresGPEliminar.isEmpty()){
-                Database.delete(listaSupervisoresGPEliminar);
+                SAC_DatabaseDML.deleteListDML(listaSupervisoresGPEliminar, true);    
+                //Database.delete(listaSupervisoresGPEliminar);
             }    
         }
              
@@ -277,7 +280,8 @@ public without sharing class SAC_ActualizacionUsuario {
             for (Id ide : listaAdministradores) {
                 listaGroupMember.add(new GroupMember(UserOrGroupId = ide, GroupId = grupoPublicoAdministradores.Id));
             }
-            Database.insert(listaGroupMember);
+            SAC_DatabaseDML.insertListDML(listaGroupMember, true);  
+            //Database.insert(listaGroupMember);
         }  
     }
 
@@ -296,7 +300,8 @@ public without sharing class SAC_ActualizacionUsuario {
             List<GroupMember> listaAdministradoresGPEliminar = [SELECT Id FROM GroupMember where Group.DeveloperName = 'SAC_GrupoAuditor' AND UserOrGroupId IN :listaAdministradores];
             
             if(!listaAdministradoresGPEliminar.isEmpty()){
-                Database.delete(listaAdministradoresGPEliminar);
+                SAC_DatabaseDML.deleteListDML(listaAdministradoresGPEliminar, true);  
+                //Database.delete(listaAdministradoresGPEliminar);
             }    
         }
              
@@ -352,7 +357,8 @@ public without sharing class SAC_ActualizacionUsuario {
             for (Id ide : listaUsuarios) {
                 listaGroupMember.add(new GroupMember(UserOrGroupId = ide, GroupId = grupoPublicoMoneyToPay.Id));
             }
-            Database.insert(listaGroupMember);
+            SAC_DatabaseDML.insertListDML(listaGroupMember, true);  
+            //Database.insert(listaGroupMember);
         }  
     }
 
@@ -388,7 +394,8 @@ public without sharing class SAC_ActualizacionUsuario {
             if(!listaUsuariosEliminar.isEmpty()) {
                 List<GroupMember> listaUsuariosGPEliminar = [SELECT Id FROM GroupMember where Group.DeveloperName = 'SAC_M2P' AND UserOrGroupId IN :listaUsuariosEliminar];
                 if(!listaUsuariosGPEliminar.isEmpty()){
-                    Database.delete(listaUsuariosGPEliminar);
+                    SAC_DatabaseDML.deleteListDML(listaUsuariosGPEliminar, true);  
+                    //Database.delete(listaUsuariosGPEliminar);
                 } 
             }
         }     

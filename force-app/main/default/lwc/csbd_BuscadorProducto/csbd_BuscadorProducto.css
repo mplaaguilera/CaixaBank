@@ -1,0 +1,125 @@
+div.slds-form-element {
+	z-index: 90;
+}
+
+div.slds-combobox_container.slds-has-selection > div.buscador {
+	display: none;
+}
+
+div.slds-combobox_container:not(.slds-has-selection) div.seleccion {
+	display: none;
+}
+
+
+span.resultadoBadge {
+	border: 1px solid rgb(219, 218, 218);
+	border-radius: 7px;
+	padding: 3px 6px;
+}
+
+span.resultadoBadge.resultadoBadgeEmpresa {
+	background-color: #fffcfe;
+}
+
+span.resultadoBadge.resultadoBadgeFamilia {
+	background-color: #fbfcff;
+}
+
+span.resultadoBadge.resultadoBadgeProducto {
+	background-color: #f5fbfe;
+}
+
+span.resultadoFlecha {
+	font-size: 15.5px;
+    font-weight: 100;
+    margin: 0 3px 0 2px;
+}
+
+ul.slds-listbox > li + li:not(.liSinResultados):not(.liSinBusqueda) {
+	border-top: solid 1px rgb(247, 247, 247);
+}
+
+ul.slds-listbox > li > div.slds-listbox__option {
+	padding: 4px 11px;
+	transition: background-color 90ms ease-out;
+}
+
+ul.slds-listbox > li > div.slds-listbox__option:hover {
+	background-color: #f1f5ff;
+}
+
+lightning-icon.iconoProducto {
+	--slds-c-icon-color-background: cadetblue;
+}
+
+ul.slds-listbox div.slds-col {
+	padding: 2px;
+}
+
+:host {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}
+
+div.slds-combobox div.slds-dropdown {
+	height: 400px;
+	display: block;
+	visibility: hidden;
+	opacity: 0;
+	max-height: 0;
+	overflow-y: auto;
+	will-change: visibility, opacity, max-height;
+	transition: visibility 150ms linear, opacity 150ms linear, max-height 150ms cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+div.slds-combobox.slds-is-open div.slds-dropdown {
+	visibility: visible;
+	opacity: 1;
+	max-height: 400px;
+	z-index: 90;
+}
+
+div.slds-combobox.sinResultados div.slds-dropdown,
+div.slds-combobox.sinBusqueda div.slds-dropdown {
+	overflow-y: hidden;
+}
+
+div.slds-combobox.slds-is-open.sinResultados div.slds-dropdown,
+div.slds-combobox.slds-is-open.sinBusqueda div.slds-dropdown {
+	max-height: 33px;
+}
+
+ul.slds-listbox > li.liSinResultados,
+ul.slds-listbox > li.liSinBusqueda {
+	/* height: 400px; */
+	display: none;
+	/* opacity: 0; */
+	transition: opacity 150ms linear;
+}
+
+ul.slds-listbox > li.liSinResultados > div.slds-listbox__option:hover,
+ul.slds-listbox > li.liSinBusqueda > div.slds-listbox__option:hover {
+	cursor: default;
+	background-color: unset;
+}
+
+div.slds-combobox.sinResultados ul.slds-listbox > li.liSinResultados,
+div.slds-combobox.sinBusqueda ul.slds-listbox > li.liSinBusqueda {
+	display: block;
+	opacity: 1;
+}
+
+div.slds-combobox.sinResultados ul.slds-listbox > li:not(.liSinResultados) {
+	display: none;
+}
+
+div.slds-combobox.sinBusqueda ul.slds-listbox > li:not(.liSinBusqueda) {
+	display: none;
+}
+
+div.slds-backdrop {
+	z-index: 89;
+	will-change: background-color;
+	background-color: rgba(24, 24, 24, 0.08);
+	transition-duration: 150ms !important;
+}
+

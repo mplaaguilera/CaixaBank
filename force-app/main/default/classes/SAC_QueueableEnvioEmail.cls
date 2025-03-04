@@ -42,7 +42,6 @@ public with sharing class SAC_QueueableEnvioEmail implements Queueable  {
 
         //Recupero los emails no validos de envio (emails en la blackList)
         List<SAC_MaestroTemas__c> listEmailsNoValidos = [SELECT Name FROM SAC_MaestroTemas__c WHERE RecordTypeId =: RECORDTYPEBLACKLIST AND SAC_Activo__c = true];
-
         Messaging.SingleEmailMessage[] messages =   new List<Messaging.SingleEmailMessage>{};
 
         //Recuperar caso

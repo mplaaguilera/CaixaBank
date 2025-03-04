@@ -20,17 +20,20 @@ public with sharing class SAC_AccionGGH_Test {
       System.runAs(new User(Id = Userinfo.getUserId())) {
          //Usuario SAC General
          usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-         Database.insert(usuarioGeneral);
+         SAC_DatabaseDML.insertDML(usuarioGeneral, false);  
+         //Database.insert(usuarioGeneral);
       
          PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
          PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
          permiSetAssi.AssigneeId = usuarioGeneral.Id;
          permiSetAssi.PermissionSetId = permiSet.Id;
-         Database.insert(permiSetAssi);
+         SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+         //Database.insert(permiSetAssi);
       }
 
       CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
-      Database.insert(grupoColaborador);
+      SAC_DatabaseDML.insertDML(grupoColaborador, false); 
+      //Database.insert(grupoColaborador);
 
       //Pretension
       Map<String, Object> camposPret = new Map<String, Object>();
@@ -38,7 +41,8 @@ public with sharing class SAC_AccionGGH_Test {
       camposPret.put('OwnerId', usuarioGeneral.id);
       
       Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-      Database.insert(pretension);    
+      SAC_DatabaseDML.insertDML(pretension, false);
+      //Database.insert(pretension);    
       
       
       SAC_MaestroAccionesReclamacion__c maestro = SAC_TestDataFactory.crearMaestroAcciones(1,grupoColaborador.Id)[0];
@@ -46,11 +50,13 @@ public with sharing class SAC_AccionGGH_Test {
       maestro.SAC_Descripcion__c = 'Maestro';  
       maestro.SAC_PlazoMaximo__c = 4; 
       maestro.SAC_Prorroga__c= 4;
-      Database.insert(maestro);
+      SAC_DatabaseDML.insertDML(maestro, false);
+      //Database.insert(maestro);
 
       SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1,pretension,true)[0];
       tarea.SAC_MaestroAccionesReclamacion__c = maestro.id;
-      Database.insert(tarea);
+      SAC_DatabaseDML.insertDML(tarea, false);
+      //Database.insert(tarea);
    }
 
    @isTest
@@ -62,14 +68,16 @@ public with sharing class SAC_AccionGGH_Test {
 
       try{
          SAC_Accion__c tarea = new SAC_Accion__c(RecordTypeId = recordTypeAccionMaestro, SAC_MaestroAccionesReclamacion__c = maestroGHH[0].id, SAC_Pretension__c = pretension.Id);
-         Database.insert(tarea);
+         SAC_DatabaseDML.insertDML(tarea, true);
+         //Database.insert(tarea);
       } catch (Exception e) {
          hayError = true;
       }
 
       User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
 		System.runAs(usuario){
-         Database.update(pretension);
+         SAC_DatabaseDML.updateDML(pretension, false);
+         //Database.update(pretension);
       }
       System.assertEquals(true, hayError, 'No ha saltado el error.');
    }

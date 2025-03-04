@@ -358,7 +358,10 @@ export async function purecloudConversationApi(interactionId, atributo, scope) {
 					const duracion = Math.round((performance.now() - timestampInicioLlamadaApi) / 100) / 10;
 					retorno = response?.body;
 					if (atributo) {
-						retorno = retorno.participants[0]?.attributes[atributo];
+						//retorno = retorno.participants[0]?.attributes[atributo];
+						retorno = (retorno.participants.find(participant => Object.keys(participant.attributes).length > 0) || {}).attributes;
+						console.log('retorno DPK -->', retorno);
+						
 					}
 					scope.logHistorial('API Purecloud', 'Respuesta PureCloud Conversation API (' + duracion + 's)', JSON.stringify(response.body, null, 3));
 				} else {

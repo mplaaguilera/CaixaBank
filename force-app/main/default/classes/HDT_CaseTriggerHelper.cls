@@ -194,39 +194,6 @@ public with sharing class HDT_CaseTriggerHelper {
         }
     }
 
-    /*
-     //Método creado a partir del traspaso de PB (cc_Case_Modificar_Account) a Trigger
-     @TestVisible
-     private static void AlfAux(List<Case> lstCasos, Set<Id> setIdCuentas, Boolean cambioDocumen) {
-
-        Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
-        Map<Id,Account> mapAccount = new Map<Id, Account>([SELECT Id, CC_Email__c, CC_NumPerso__c, CC_Numero_Documento__c, CC_OficinaGestoraId__c, CC_OficinaGestoraId__r.CC_Gerencia_Comercial__c,
-        CC_OficinaGestoraId__r.CC_Gerencia_Comercial__r.ParentId FROM Account WHERE Id IN :setIdCuentas]);
-
-
-        for (Case caso : lstCasos) {
-            if (mapAccount.containsKey(caso.AccountId)) {
-                if(cambioDocumen || (!cambioDocumen && caso.CC_Canal_Procedencia__c != 'Formulario web')){
-
-                    caso.CC_MailTelfNotif__c = mapAccount.get(caso.AccountId).CC_NumPerso__c;
-                    caso.CC_Numero_Documento__c = mapAccount.get(caso.AccountId).CC_Numero_Documento__c;
-                    if(!cambioDocumen && caso.CC_Canal_Procedencia__c != 'Formulario web'){
-                        caso.CC_NumPerso__c = mapAccount.get(caso.AccountId).CC_Numero_Documento__c;
-                    }
-                }
-                if (caso.RecordTypeId == rtCliente && mapAccount.get(caso.AccountId).CC_OficinaGestoraId__c != null) {
-                    if (mapAccount.get(caso.AccountId).CC_OficinaGestoraId__r.CC_Gerencia_Comercial__c != null){
-                        caso.CC_DAN__c = mapAccount.get(caso.AccountId).CC_OficinaGestoraId__r.CC_Gerencia_Comercial__c;
-                    }
-                    if (mapAccount.get(caso.AccountId).CC_OficinaGestoraId__r.CC_Gerencia_Comercial__r.ParentId != null){
-                        caso.CC_DG__c = mapAccount.get(caso.AccountId).CC_OficinaGestoraId__r.CC_Gerencia_Comercial__r.ParentId;
-                    }
-                }
-            }
-        }
-    }
-    */
-
 
     public static void tematicaInformadoBI(List<Case> lstCasos) {
         Set<Id> setIdMCC = new Set<Id>();
@@ -1129,6 +1096,13 @@ public with sharing class HDT_CaseTriggerHelper {
 			if (!plantillas.isEmpty() && !buzones.isEmpty()){
 							
             for (Case caso : casos) {
+
+                // Verificar si el caso tiene el campo ContactId informado
+                if (caso.ContactId == null) {
+                    // Opcional: añadir un log para identificar casos sin contacto
+                    continue; // Salta este caso y pasa al siguiente
+                }
+
                 //Se envía acuse si no existe ya uno para ese caso y contacto
                 if (!acusePrevio(tareasAcuse, caso.Id, caso.ContactId)) {
                     Messaging.SingleEmailMessage acuse = new Messaging.SingleEmailMessage();
@@ -1189,6 +1163,293 @@ public with sharing class HDT_CaseTriggerHelper {
         }
     }
 
+    public static void cierreCasoAU(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
+
+        List<Id> idsCasosC = new List<Id>();
+        
+        // Obtener la hora actual y calcular el límite de 15 minutos atrás
+        DateTime fechaHoraActual = DateTime.now();
+
+        // Recogemos el aviso del primer umbral para recoger los casos de los ultimos 15 mins.
+        String umbralTiempoCasos = [SELECT CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT - Aviso Comunicaciones Informativas' 
+        AND Name = 'Comunicación Informativa de Caso - Umbral de tiempo'].CC_Valor__c;
+
+         //Convertimos a numero para operar - de momento 15 mins por defecto pero es parametrizable
+         Integer umbralPrimerAviso = Integer.valueOf(umbralTiempoCasos);
+
+        // Calcular el límite de tiempo dinámico
+        DateTime limiteMinutos = fechaHoraActual.addMinutes(-umbralPrimerAviso);
+        List<Case> lstCasosConMismaCausa = new List<Case>();
+
+        for (Case caso : lstCasos) {
+            // Verificar que el caso fue creado dentro del límite dinámico y cumple con las demás condiciones
+            if (caso.CreatedDate >= limiteMinutos  
+                && caso.CC_MCC_Tematica__c != null 
+                && caso.CC_MCC_ProdServ__c != null 
+                && caso.CC_MCC_Motivo__c != null 
+                && caso.CC_MCC_Causa__c != null) {
+                    idsCasosC.add(caso.Id);    
+            }
+        }
+
+        if (!idsCasosC.isEmpty()) {
+
+            asociarCasosCausaAComunicacionInformativaNoFuture(idsCasosC);
+        }
+    }
+
+    public static void enviarCorreoNotificacion(List<Case> casosActualizar,String emailType) {
+
+        //*************************************************************** */
+        //Envio del correo electronico para el aviso 
+        //*************************************************************** */
+        // Obtener la hora actual y calcular el límite de 15 minutos atrás
+        DateTime fechaHoraActual = DateTime.now();
+        String tematicaCaso = '';
+        String productoCaso = '';
+        String motivoCaso = '';
+        String causaCaso = '';
+        Id idCaso = '';
+        
+    
+         // Recogemos el tiempo para validar cuando enviar el nuevo email pasado 15 mins.
+       String umbralTiempoEnvioNuevo = [SELECT CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT - Aviso Comunicaciones Informativas' 
+       AND Name = 'Comunicación Informativa de Caso - Umbral Envio de Emails'].CC_Valor__c;
+
+       //Convertimos a numero para operar. Por defecto son 3 casos.
+       Integer umbralTiempoEnvio = Integer.valueOf(umbralTiempoEnvioNuevo);
+
+       // Calcular el límite de tiempo dinámico
+       DateTime limiteMinutos = fechaHoraActual.addMinutes(-umbralTiempoEnvio);
+
+        // Verificar si se ha enviado un correo similar en los últimos 15 minutos
+        List<EmailMessage> recentEmails = [
+            SELECT Id, CreatedDate 
+            FROM EmailMessage 
+            WHERE SAC_EnvioRedaccion__c = :emailType 
+            AND CreatedDate >= :limiteMinutos
+        ];
+
+        if (!recentEmails.isEmpty()) {
+            return; // Salir sin enviar el correo
+        }
+
+        //String apiNamePlantillas = 'HDT_Comunicacion_Informativa';
+        if(!casosActualizar.isEmpty()){
+            
+            //Custom setting para los destinatarios donde se va a enviar el email
+            List<HDT_Parametros__c> emailsComunicacionInformativa =[SELECT  HDT_Configuracion_1__c, HDT_Configuracion_2__c,HDT_Configuracion_3__c FROM HDT_Parametros__c WHERE Name = 'HDT_Comuniciones_Informativas' LIMIT 1];
+            
+            String[] toAddresses = new String[] {};
+            if (!emailsComunicacionInformativa.isEmpty()) {
+                HDT_Parametros__c parametros = emailsComunicacionInformativa[0];
+                if (parametros.HDT_Configuracion_1__c != null) {
+                    toAddresses.add(parametros.HDT_Configuracion_1__c);
+                }
+                if (parametros.HDT_Configuracion_2__c != null) {
+                    toAddresses.add(parametros.HDT_Configuracion_2__c);
+                }
+                if (parametros.HDT_Configuracion_3__c != null) {
+                    toAddresses.add(parametros.HDT_Configuracion_3__c);
+                }
+            }
+
+            // Construcción del contenido del correo
+            String cuerpoEmail = '';
+            
+            for (Case caso : casosActualizar) {
+                idCaso = caso.Id;
+
+                String fechaHoraCreacion = caso.CreatedDate.format();
+                cuerpoEmail += 'Fecha / Hora del caso : ' + fechaHoraCreacion + '\n'
+                            + 'Número de Caso: ' + caso.CaseNumber + '\n\n';
+
+                tematicaCaso = String.valueOf(caso.CC_MCC_Tematica__r.Name);
+                productoCaso = String.valueOf(caso.CC_MCC_ProdServ__r.Name);
+                motivoCaso = String.valueOf(caso.CC_MCC_Motivo__r.Name);
+                causaCaso = String.valueOf(caso.CC_MCC_Causa__r.Name);
+                
+            }
+        
+    String cabecera = 'Se han identificado los siguientes casos de ';
+    cabecera = cabecera + tematicaCaso + ' / ' + productoCaso + ' / ' + motivoCaso + ' / ' + causaCaso + '\n\n';
+    cuerpoEmail = cabecera + cuerpoEmail + '\n\n';
+
+    // Construcción del correo electrónico
+     //Recogemos el Custom Setting para obtener las direcciones de correo de respuesta
+     HDT_Parametros__c emailRespuesta = HDT_Parametros__c.getInstance('HDT_Email_Respuesta_Empleados_New');
+
+    //Recogemos los Ids del remitente ordenadas alfabeticamente por la direccion (0: Catalan, 1 Castellano) en el caso de que existan los 2
+    List <OrgWideEmailAddress> remitentesId = [SELECT Id FROM OrgWideEmailAddress WHERE Address IN (: emailrespuesta.HDT_Configuracion_1__c, : emailrespuesta.HDT_Configuracion_2__c, : emailrespuesta.HDT_Configuracion_3__c) ORDER BY Address];
+
+    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+    mail.setSubject('Posible Masiva de ' +  tematicaCaso);
+    mail.setOrgWideEmailAddressId(remitentesId[0].Id); // Usa el remitente configurado
+    mail.setToAddresses(toAddresses); // Destinatarios
+    mail.setPlainTextBody(cuerpoEmail); // Cuerpo del mensaje
+    mail.setWhatId(idCaso);
+
+   
+    // Registrar el envío en EmailMessage
+    EmailMessage emailLog = new EmailMessage();
+    emailLog.Subject = ('Posible Masiva de' + tematicaCaso);
+    emailLog.SAC_EnvioRedaccion__c = emailType; // Usar el tipo de correo para identificarlo
+    emailLog.TextBody = cuerpoEmail;
+    insert emailLog;
+
+    try {
+        // Enviar el correo electrónico
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail }, false);
+    } catch (Exception e) {
+        CBK_Log.error(e, 'Error en el envío de email consolidado');
+    }
+
+        }
+        
+    }
+
+
+    public static void asociarCasosCausaAComunicacionInformativaNoFuture(List<Id> idsCasos) {
+
+        //Llega solo el id del caso o casos que se acaban de actualizar
+        Set<Id> idsCampanasNuevosAgrupadores = new Set<Id>();
+
+        List<Case> casosActualizar = new List<Case>();
+        List<Case> lstCasos = new List<Case>();
+        List<Case> lstCasosConMismaCausa = new List<Case>();
+        List<Case> lstCasosCombinados = new List<Case>();
+
+        String recordTypeDeveloperName = 'HDT_Comunicacion_Informativa';
+        String emailType ='';
+
+        // Recogemos el aviso del primer umbral para recoger los casos de los ultimos 15 mins.
+        String umbralTiempoCasos = [SELECT CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT - Aviso Comunicaciones Informativas' 
+        AND Name = 'Comunicación Informativa de Caso - Umbral de tiempo'].CC_Valor__c;
+
+         //Convertimos a numero para operar - de momento 15 mins por defecto pero es parametrizable
+         Integer umbralPrimerAviso = Integer.valueOf(umbralTiempoCasos);
+
+       // Recogemos el aviso del primer umbral. En este caso que sean más de 3 casos.
+       String umbralNumeroCasos = [SELECT CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT - Aviso Comunicaciones Informativas' 
+       AND Name = 'Comunicación Informativa de Caso - Umbral primer aviso'].CC_Valor__c;
+
+       //Convertimos a numero para operar. Por defecto son 3 casos.
+       Integer umbralCasos= Integer.valueOf(umbralNumeroCasos);
+
+        // Recogemos el tiempo para validar cuando enviar el nuevo email pasado 15 mins.
+       String umbralTiempoEnvioNuevo = [SELECT CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT - Aviso Comunicaciones Informativas' 
+       AND Name = 'Comunicación Informativa de Caso - Umbral Envio de Emails'].CC_Valor__c;
+
+       //Convertimos a numero para operar. Por defecto son 3 casos.
+       Integer umbralTiempoEnvio = Integer.valueOf(umbralTiempoEnvioNuevo);
+
+       // Obtener la hora actual y calcular el límite de 15 minutos atrás
+       DateTime fechaHoraActual = DateTime.now();
+
+
+        // Calcular el límite de tiempo dinámico
+        DateTime limiteMinutos = fechaHoraActual.addMinutes(-umbralPrimerAviso);
+
+        Set<String> causasSet = new Set<String>();
+        for (Case c : [SELECT CC_Causa__c FROM Case WHERE Id IN :idsCasos]) {
+            if (c.CC_Causa__c != null) {
+                causasSet.add(c.CC_Causa__c);
+            }
+        }
+       
+        //Recogemos el caso actual para tratarlo
+        if (!idsCasos.isEmpty()) {
+                // Recogemos los casos anteriores que no se haya enviado email
+            lstCasosConMismaCausa = [
+                SELECT 
+                    CC_MCC_ProdServ__r.Name,
+                    CC_MCC_Motivo__r.Name,
+                    CreatedDate,
+                    CC_Repetitivo__c,
+                    CaseNumber,
+                    CC_MCC_Tematica__r.Name,
+                    Status,
+                    ContactId,
+                    CC_MCC_Motivo__c,
+                    CC_MCC_ProdServ__c,
+                    CC_MCC_Tematica__c,
+                    CC_Causa__c,
+                    Id,
+                    CC_Comunicacion_Informativa__c,
+                    CC_Admin__c,
+                    CC_MCC_Causa__c,
+                    CC_MCC_Causa__r.Name,
+                    CC_Campana__c,
+                    CC_Campana__r.Name
+                FROM 
+                    Case 
+                WHERE
+                    CreatedDate >= :limiteMinutos 
+                    AND CC_MCC_Tematica__c != null 
+                    AND CC_MCC_Causa__c != null 
+                    AND CC_MCC_ProdServ__c != null 
+                    AND CC_MCC_Motivo__c != null 
+                    AND RecordType.DeveloperName = 'HDT_Empleado'
+                    AND CC_Causa__c IN :causasSet // Aquí se añade el filtro por las causas obtenidas
+            ];
+           /* //Recogemos los casos anteriores que no se haya enviado email
+            lstCasosConMismaCausa = [SELECT CC_MCC_ProdServ__r.Name,CC_MCC_Motivo__r.Name,CreatedDate,CC_Repetitivo__c,CaseNumber,CC_MCC_Tematica__r.Name,Status,ContactId,CC_MCC_Motivo__c,CC_MCC_ProdServ__c,CC_MCC_Tematica__c,CC_Causa__c,Id, CC_Comunicacion_Informativa__c, CC_Admin__c,CC_MCC_Causa__c,CC_MCC_Causa__r.Name,CC_Campana__c, CC_Campana__r.Name 
+            FROM Case 
+            WHERE   CreatedDate >= :limiteMinutos
+                    AND CC_MCC_Tematica__c != null 
+                    AND CC_MCC_Causa__c != null 
+                    AND CC_MCC_ProdServ__c != null 
+                    AND CC_MCC_Motivo__c != null 
+                    //AND Id NOT IN :idsCasos
+                    AND RecordType.DeveloperName = 'HDT_Empleado'];*/
+        
+         }
+ 
+        // Si esta vacio salimos
+        if(lstCasosConMismaCausa.isEmpty()){
+            return;
+        }
+
+        Map<String, List<Case>> mapCasosAgrupados = new Map<String, List<Case>>();
+        
+        
+        // Agrupar casos por la combinación de campos
+        for (Case caso : lstCasosConMismaCausa) {
+            String key = caso.CC_MCC_Tematica__c + '|' + 
+                         caso.CC_MCC_ProdServ__c + '|' + 
+                         caso.CC_MCC_Motivo__c + '|' + 
+                         caso.CC_MCC_Causa__c;
+            if (!mapCasosAgrupados.containsKey(key)) {
+                mapCasosAgrupados.put(key, new List<Case>());
+            }
+            mapCasosAgrupados.get(key).add(caso);
+        }
+
+
+        // Identificar grupos con 3 o más casos
+        for (String key : mapCasosAgrupados.keySet()) {
+            List<Case> casosGrupo = mapCasosAgrupados.get(key);
+            if (casosGrupo.size() >= umbralCasos) {
+                for (Case caso : casosGrupo) {
+                        emailType = String.valueOf(caso.CC_MCC_Causa__c);
+                        caso.CC_Repetitivo__c = true;
+                        casosActualizar.add(caso);
+                }
+            }
+        }
+
+
+        // Actualizar los casos en Salesforce
+        if (!casosActualizar.isEmpty()) {
+            update casosActualizar;
+        }
+
+        // Actualizar los casos en Salesforce
+        if (!casosActualizar.isEmpty()) {
+            enviarCorreoNotificacion(casosActualizar,emailType);
+        }
+    }
+
     private static Boolean acusePrevio(List<Task> tareasAcuse, Id idCaso, Id idContacto) {
         for (Task tareaAcuse : tareasAcuse) {
             if (tareaAcuse.WhatId == idCaso && tareaAcuse.WhoId == idContacto) {
@@ -1209,6 +1470,8 @@ public with sharing class HDT_CaseTriggerHelper {
                 canalesResolucion.add(resolucion.Name);
             }
         }
+
+
 
         List<Case> casos = new List<Case>();
         for (Case casoNew : mapNewObj.values()) {
@@ -1282,17 +1545,35 @@ public with sharing class HDT_CaseTriggerHelper {
 
         String apiNamePlantillas = 'HDT_Encuesta_1N_%';
         String apiNamePlantillasEdG = 'HDT_Encuesta_EdG_1N_%';
+
+
+        List<Case> casos = new List<Case>();
+        Boolean esAgrupadorMasivadeControl = false;
+        //Comprobamos que el agrupador NO sea de RT Masiva de Control
         
+        // Asegúrate de cargar el RecordType en la consulta SOQL de los casos
+        List<Case> casosFiltrados = [SELECT ContactId,CC_URL_Encuesta_3N__c,CC_MCC_Tematica__c,CaseNumber,CC_Matricula_Empleado__c,CC_Idioma__c,CC_Canal_Resolucion__c,Status,Origin,HDT_Resuelto_Primera_Llamada__c,Id, CC_Agrupador_Id__c, CC_Agrupador_Id__r.RecordType.DeveloperName 
+        FROM Case WHERE Id IN :oldMap.keySet()];
+
         List<Case> lstCasosHDT = new List<Case>();
 
-        for (Case caso : lstCasos) {
-            if(oldMap.containsKey(caso.Id)){
-                if (caso.HDT_Resuelto_Primera_Llamada__c && caso.Origin == 'Phone' && caso.Status =='Cerrado' 
-                    && oldMap.get(caso.Id).Status != 'Cerrado' 
-                    && (canalesResolucionPrimeros.contains(caso.CC_Canal_Resolucion__c) || canalesResolucionEdG.contains(caso.CC_Canal_Resolucion__c))) {
-                    lstCasosHDT.add(caso);
+        for (Case casoNew : casosFiltrados) {
+
+            if (casoNew.CC_Agrupador_Id__c != null && casoNew.CC_Agrupador_Id__r.RecordType != null){
+                String tipodeAgrupador = casoNew.CC_Agrupador_Id__r.RecordType.DeveloperName;
+                
+                if (tipodeAgrupador == 'CC_Masiva_Control'){
+                        esAgrupadorMasivadeControl = true;
+                }else{
+                        esAgrupadorMasivadeControl = false;
                 }
             }
+
+            if (casoNew.HDT_Resuelto_Primera_Llamada__c && casoNew.Origin == 'Phone' && casoNew.Status =='Cerrado' 
+                    && oldMap.get(casoNew.Id).Status != 'Cerrado' && !esAgrupadorMasivadeControl
+                    && (canalesResolucionPrimeros.contains(casoNew.CC_Canal_Resolucion__c) || canalesResolucionEdG.contains(casoNew.CC_Canal_Resolucion__c))) {
+                    lstCasosHDT.add(casoNew);
+                }
         }
 
         if(!lstCasosHDT.isEmpty()){
@@ -1306,7 +1587,9 @@ public with sharing class HDT_CaseTriggerHelper {
 
                 //Recogemos el Custom Setting para obtener las direcciones de correo de respuesta
                 HDT_Parametros__c emailRespuesta = HDT_Parametros__c.getInstance('HDT_Email_Respuesta_Empleados_New');
-
+                   // Contar los remitentes directamente en la consulta
+                   Integer remitentesCount = [SELECT COUNT() FROM OrgWideEmailAddress WHERE Address IN (:emailrespuesta.HDT_Configuracion_1__c, :emailrespuesta.HDT_Configuracion_2__c)];
+             
                 //Recogemos los Ids del remitente ordenadas alfabeticamente por la direccion (0: Catalan, 1 Castellano) en el caso de que existan los 2
                 List <OrgWideEmailAddress> remitentesId = [SELECT Id FROM OrgWideEmailAddress WHERE Address IN (: emailrespuesta.HDT_Configuracion_1__c, : emailrespuesta.HDT_Configuracion_2__c) ORDER BY Address];
 
@@ -1334,7 +1617,7 @@ public with sharing class HDT_CaseTriggerHelper {
                         }
                     }
 
-                    if(remitentesId.size() == 2){
+                    if (!remitentesId.isEmpty() && remitentesCount == 2) {
                         if(casoFiltrado.CC_Idioma__c == 'ca'){
                             mail.setTemplateId(plantillas[0].Id);
                             mail.setOrgWideEmailAddressId(remitentesId[0].Id);

@@ -4,26 +4,30 @@ public with sharing class SAC_HandlerMethods_Test {
 	static void makeData() {
 
 		User usuarioGeneral;
-        System.runAs(new User(Id = Userinfo.getUserId())) {
+		//Usuario Admin
+        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+
+        System.runAs(usuarioAdmin) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-            Database.insert(usuarioGeneral);
+			SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+			SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
 		Test.startTest();
 		//Account
 		Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-		Database.insert(cuenta);
+		SAC_DatabaseDML.insertDML(cuenta, false);
 
 		//Contact
 		Contact contacto = SAC_TestDataFactory.crearContacto(1,cuenta.id)[0];
-		Database.insert(contacto);
+		SAC_DatabaseDML.insertDML(contacto, false);
 
 		CC_Grupo_Colaborador__c grupoColaborador;
 		CC_Grupo_Colaborador_Contact__c grupoColaboradorContact;
@@ -32,12 +36,12 @@ public with sharing class SAC_HandlerMethods_Test {
 			grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor',1)[0];
 			grupoColaborador.SAC_PorcentajeAsignacion__c = 100;
 			grupoColaborador.SAC_MaximoCasosDiarios__c = 1;
-			Database.insert(grupoColaborador);
+			SAC_DatabaseDML.insertDML(grupoColaborador, false);
 
 			//Contact Grupo
 			grupoColaboradorContact = SAC_TestDataFactory.crearColaboradorContact(usuarioGeneral.Id, grupoColaborador.Id); 
 			grupoColaboradorContact.SAC_Administrador__c = true;
-			Database.insert(grupoColaboradorContact);
+			SAC_DatabaseDML.insertDML(grupoColaboradorContact, false);
 		}
 		//MCC
 		CC_MCC__c mcc = new CC_MCC__c();
@@ -46,7 +50,7 @@ public with sharing class SAC_HandlerMethods_Test {
 		mcc.SAC_EndToEnd__c = true;
 		mcc.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
 		mcc.SAC_GrupoColaborador__c = grupoColaborador.Id;
-		Database.insert(mcc);
+		SAC_DatabaseDML.insertDML(mcc, false);
 
 		//Reclamacion 1
 		List<Case> reclamaciones = new List<Case>();
@@ -70,7 +74,7 @@ public with sharing class SAC_HandlerMethods_Test {
 
 		Case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
 		reclamaciones.add(reclamacion2);
-		Database.insert(reclamaciones);
+		SAC_DatabaseDML.insertListDML(reclamaciones, false);
 
 		//Reclamantes
 		SAC_CaseReclamante__c reclamantePrincipal = SAC_TestDataFactory.crearReclamante(true, reclamacion1, cuenta.Id);
@@ -86,7 +90,7 @@ public with sharing class SAC_HandlerMethods_Test {
 		listaReclamantes.add(reclamantePrincipal);
 		listaReclamantes.add(reclamanteSecundario1);
 		listaReclamantes.add(reclamanteSecundario2);
-		Database.insert(listaReclamantes);
+		SAC_DatabaseDML.insertListDML(listaReclamantes, false);
 		Test.stopTest();
 
 		//Pretension 1
@@ -133,7 +137,7 @@ public with sharing class SAC_HandlerMethods_Test {
 
 		Case pretension4 = SAC_TestDataFactory.crearCaso('Pretension',camposPret4);
 		pretensiones.add(pretension4);
-		Database.insert(pretensiones);
+		SAC_DatabaseDML.insertListDML(pretensiones, false);
 		
 		
 	}
@@ -143,7 +147,6 @@ public with sharing class SAC_HandlerMethods_Test {
 
 		User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
 		Account cuenta = [SELECT Id FROM Account WHERE Name = 'cuentaTest0' LIMIT 1];
-		Contact contacto = [SELECT Id FROM Contact WHERE FirstName = 'Test0' AND LastName = 'Apellido' LIMIT 1];
 
 		Case casoReclamacion = new Case();
         casoReclamacion.Subject = 'TestRec';
@@ -157,7 +160,7 @@ public with sharing class SAC_HandlerMethods_Test {
 		
 		System.runAs(usuario){	
 			Test.startTest();
-			Database.insert(casoReclamacion);
+			SAC_DatabaseDML.insertDML(casoReclamacion, false);
 			Test.stopTest();
 		}
 		
@@ -166,7 +169,7 @@ public with sharing class SAC_HandlerMethods_Test {
 		                                               FROM SAC_CaseReclamante__c
 		                                               WHERE SAC_Case__c = :casoReclamacion.Id];
 
-		System.assertNotEquals(null,argumentoMetodo.size(), 'Error al recoger el reclamante');
+		System.assertNotEquals(false, !argumentoMetodo.isEmpty(), 'Error al recoger el reclamante');
 		System.assert(argumentoMetodo.get(0).SAC_ReclamantePrincipal__c, 'Error al recoger el reclamante principal');
 	}
 	
@@ -183,7 +186,7 @@ public with sharing class SAC_HandlerMethods_Test {
 		SAC_Case_AU_TRHan.procesado=false;
 		Test.startTest();
 		system.runAs(usuario){
-			Database.update(caso);
+			SAC_DatabaseDML.updateDML(caso, false);
 		}
 		
 		Test.stopTest();
@@ -192,7 +195,7 @@ public with sharing class SAC_HandlerMethods_Test {
 		                                               FROM SAC_CaseReclamante__c
 		                                               WHERE SAC_Case__c = :caso.Id];
 
-		System.assertNotEquals(null,argumentoMetodo.size(), 'Error al recoger el reclamante');
+		System.assertNotEquals(false, !argumentoMetodo.isEmpty(), 'Error al recoger el reclamante');
 		System.assert(argumentoMetodo.get(0).SAC_ReclamantePrincipal__c, 'Error al recoger el reclamante principal');
 	}
 
@@ -219,7 +222,7 @@ public with sharing class SAC_HandlerMethods_Test {
 
 		Test.startTest();
 		System.runAs(usuario){
-			Database.insert(pretensiones);
+			SAC_DatabaseDML.insertListDML(pretensiones, false);
 		}
 		Test.stopTest();
 
@@ -285,4 +288,20 @@ public with sharing class SAC_HandlerMethods_Test {
 
 		System.assertNotEquals(true, reclamacionE2E.SAC_E2E__c, 'Error balancear el campo E2E');
 	}
+
+	@isTest
+    static void insertarCaseSharePretensionCerradaTest(){
+        List<Case> pretension = [SELECT id, Status, Origin, CreatedById FROM Case WHERE SuppliedCompany = 'pret1' LIMIT 1];
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+
+        System.runAs(usuario){
+            Test.startTest();
+            SAC_HandlerMethods.insertarCaseSharePretensionCerrada(pretension);
+            Test.stopTest();
+        }
+
+		CaseShare csResult = [SELECT CaseId, UserOrGroupId FROM CaseShare WHERE UserOrGroupId = :usuario.Id LIMIT 1];
+
+        System.assertEquals(usuario.Id, csResult.UserOrGroupId , 'No se ha podido insertar el permiso');
+    }
 }

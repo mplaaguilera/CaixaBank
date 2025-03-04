@@ -19,13 +19,15 @@ public with sharing class SPV_Reclamaciones_IntegrationBatch_Test {
         Test.startTest();
 
         User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(usuarioAdmin);
+        SPV_DatabaseDML.insertDML(usuarioAdmin, false);
+        //Database.insert(usuarioAdmin);
     
         List<User> listUsuarios ;
     
         System.runAs(usuarioAdmin){
             listUsuarios  = SPV_TestDataFactory.crearUsuarioSPVGeneral(2);
-            Database.insert(listUsuarios );
+            SPV_DatabaseDML.insertListDML(listUsuarios, false);
+            //Database.insert(listUsuarios);
         }
 
         Test.stopTest();
@@ -33,7 +35,7 @@ public with sharing class SPV_Reclamaciones_IntegrationBatch_Test {
 
 
     @isTest
-    static void batchRclamacionesIntegration_Test(){
+    static void batchRclamacionesIntegrationTest(){
 
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
 
@@ -51,7 +53,7 @@ public with sharing class SPV_Reclamaciones_IntegrationBatch_Test {
     }
 
     @isTest
-    static void comprobarTrueFalse_Test(){
+    static void comprobarTrueFalseTest(){
 
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Test.startTest();
@@ -66,7 +68,7 @@ public with sharing class SPV_Reclamaciones_IntegrationBatch_Test {
     }
 
     @isTest
-    static void obtenerApiPicklist_Test(){
+    static void obtenerApiPicklistTest(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Test.startTest();
         String resultado = '';

@@ -408,7 +408,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
 	*/
     @AuraEnabled (cacheable=true)
     public static List<SAC_CaseReclamante__c> getReclamantes(Id reclamacionId){
-        List<SAC_CaseReclamante__c> reclamantes = [SELECT Id, SAC_Case__c, SAC_Account__r.CC_NumPerso__c, SAC_Account__r.CC_Numero_Documento__c
+        List<SAC_CaseReclamante__c> reclamantes = [SELECT Id, SAC_Case__c, SAC_Account__c, SAC_Account__r.CC_NumPerso__c, SAC_Account__r.CC_Numero_Documento__c
                                                    FROM SAC_CaseReclamante__c 
                                                    WHERE SAC_Case__c =: reclamacionId];
         return reclamantes;
@@ -461,7 +461,9 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         // Get reclamantes
         List<String> reclamantesNumPerso = new List<String>();
         for(SAC_CaseReclamante__c reclamante : getReclamantes(recId)){
-            reclamantesNumPerso.add(reclamante.SAC_Account__r.CC_NumPerso__c);
+            if(reclamante.SAC_Account__c != null && reclamante.SAC_Account__r.CC_NumPerso__c != null){
+                reclamantesNumPerso.add(reclamante.SAC_Account__r.CC_NumPerso__c);
+            }
         }
         // Get préstamos
         List<SAC_Prestamo__c> prestamoList =  getPrestamosbyReclamantes(reclamantesNumPerso);

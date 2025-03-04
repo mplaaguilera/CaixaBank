@@ -1,49 +1,66 @@
 public with sharing class CC_WS_Autenticacion_SAU {
-    public static Map<Boolean, String> CC_WS_Envio_Autenticacion(Boolean clienteImagin, String numPerso) {
-        String tipoBody;
-        Map<Boolean, String> mapRetorno = new Map<Boolean, String>();
+    /**
+     * @description <<Integración para comprobar si un cliente tiene contrato SAU o no, y si está bloqueado o no>>
+     * @param clienteImagin -> Boolean para saber si el cliente es imagin o no (Si el campo indicadores cliente de Account tiene 28, es Imagin)
+     * @param numPerso -> Numperso del cliente
+     * @param traza -> Boolean para controlar si la integración genera trazas o no (Debido a que un componente llama a esta integración no puede generar trazas, ya que es un método Cacheable=true)
+     * @return String -> El retorno es un string dependiendo de lo que devuelva la integración (error, datos, datos vacíos, etc)
+     */
+    public static String ccWsEnvioAutenticacion(Boolean clienteImagin, String numPerso, Boolean traza) {
+        String retorno;
         try {
-            tipoBody = clienteImagin ? 'CNI' : 'CNC';
-            numPerso = '030ED8F6'; // TEST
-            // Escenario OK CNC: 030ED8F6
-            // Escenario OK VACIO CNC: 0014A406
-            // Escenario OK CNI: 0CCAE285
-            // Escenario OK VACIO CNI: 03D65A81
+            // Numpersos de prueba
+            // Cliente Caixa con contrato: 51304694
+            // Cliente Caixa sin contrato: 1352710
+            // Cliente Imagin con contrato: 214622853
+            // Cliente Imagin sin contrato: 64379521
 
-            Http http = new Http();
-            HttpRequest request = new HttpRequest();
-            request.setEndpoint('https://api.tst.private.cer.caixabank.com/eChannels/eBranchManagement/customers/id/contracts/validation');
-            request.setMethod('POST');
-            request.setHeader('Content-Type', 'application/json;charset=UTF-8');
-            // request.setHeader('x-api-actor-simulated', 'CCSF');
-            request.setHeader('HTTP-HEADER-ACTOR', 'CBCCSF');
-            request.setBody('{"validationName": "' + tipoBody + '"}');
-            request.setHeader('x-absis-customerInternalId', numPerso);
-            request.setClientCertificateName('cc_camaleon');
-            HttpResponse response = http.send(request);
+            if (!String.isEmpty(numPerso)) {
+                String integracionElegida;
+                if(traza) {
+                    integracionElegida = 'CC_Autenticacion_SAU';
+                } else {
+                    integracionElegida = 'CC_Autenticacion_SAU_No_Traza';
+                }
+                String hex = CC_MetodosUtiles.decimalToHex(Decimal.valueOf(numPerso));
+                String numperHex = String.valueOf(hex).leftPad(8, '0');
+                
+                Map<String, String> mHeaders = new Map<String, String>();
+                mHeaders.put('x-absis-customerInternalId',  numperHex.toUpperCase());
+                mHeaders.put('HTTP-HEADER-ACTOR', 'CBCCSF'); // Solo DEV
+                // mHeaders.put('x-api-actor-simulated', 'CCSF'); // Solo DEV
+                
+                String tipoBody = clienteImagin ? 'CNI' : 'CNC';
+                String httpRequestBody = '{"validationName": "' + tipoBody + '"}';
 
-            if (response.getStatusCode() != 200) { //KO
-                System.debug('::: KO');
-                mapRetorno.put(false, 'error_KO');
-            } else { //OK
-                System.debug('::: OK');
-                String jsonResponse = response.getBody();
-                System.debug('::: jsonResponse: ' + jsonResponse);
-                Map<String, Object> jsonMap = (Map<String, Object>) JSON.deserializeUntyped(jsonResponse);
-                System.debug('::: jsonMap: ' + jsonMap);
-                String existContract = (String) jsonMap.get('existContract');
-                System.debug('::: existContract: ' + existContract);
-                // retorno = existContract.toLowerCase().contains('exist_contract') ? true : existContract.toLowerCase().contains('no_contract') ? false : retorno;
-                // System.debug('::: retorno: ' + retorno);
-                mapRetorno.put(
-                    existContract.toLowerCase().contains('exist_contract') ? true : false,
-                    existContract.toLowerCase().contains('exist_contract') ? 'existContrat' : 'no_contract'
-                );
-                System.debug('::: mapRetorno: ' + mapRetorno);
+                CBK_HttpServiceIntegration.RequestWapper integracion = new CBK_HttpServiceIntegration.RequestWapper();
+                integracion.body = httpRequestBody;
+                integracion.intSetting = integracionElegida;
+                integracion.mHeaders = mHeaders;
+                HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
+                HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, null, integracionElegida);
+
+                if (response.getStatusCode() != 200) { //KO
+                    retorno = 'Ha habido un problema con la integración';
+                } else { //OK
+                    String jsonResponse = response.getBody();
+
+                    Map<String, Object> jsonMap = (Map<String, Object>) JSON.deserializeUntyped(jsonResponse);
+                    
+                    // Validacion de si existContract no encuentra nada.
+                    if (jsonMap.containsKey('existContract')) {
+                        String existContract = (String) jsonMap.get('existContract');
+                        retorno = existContract.toLowerCase(); // Debe devolver -> EXIST_CONTRACT / NO_CONTRACT
+                    } else {
+                        retorno = 'Ha habido un problema con los datos';
+                    }
+                }
+            } else {
+                retorno = 'El numperso está vacío';
             }
         } catch (Exception e) {
             CBK_Log.error(e);
         }
-        return mapRetorno;
+        return retorno;
     }
 }

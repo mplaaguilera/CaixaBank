@@ -233,9 +233,10 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Estado__c', solicitud.estado);
 				campos.put('CSBD_TipoDiferencial__c', convertToDecimal2(solicitud.diferencialSimulacion));
 				campos.put('CSBD_InteresVariable__c', convertToDecimal2(solicitud.tasaIntVarSimulacion));
-				campos.put('CSBD_Empresa_Proveedora__c', 'CaixaBank');
-				campos.put('CSBD_Familia_Producto__c', 'Hipoteca PHD');
-				campos.put('CSBD_Producto__c', 'Hipoteca Click My Home');
+				informarEmpresaFamiliaProducto('productoPHD', campos);
+				// campos.put('CSBD_Empresa_Proveedora__c', 'CaixaBank');
+				// campos.put('CSBD_Familia_Producto__c', 'Hipoteca PHD');
+				// campos.put('CSBD_Producto__c', 'Hipoteca Click My Home');
 				campos.put('CSBD_Turno_Contacto__c', 'Cualquier hora');
 				campos.put('CSBD_Canal__c', 'Plataformas Hipotecarias Digitales');
 				campos.put('CSBD_Telefono_Solicitud__c', solicitud.prefijoTelefono1_1Tit + solicitud.telefono1_1Tit);
@@ -468,9 +469,10 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 					campos.put('CSBD_Now_Origen__c', 'Contratación pack imaginTeens');
 				}
 				campos.put('CSBD_Canal__c', solicitud.canal);
-				campos.put('CSBD_Empresa_Proveedora__c', 'CaixaBank');
-				campos.put('CSBD_Familia_Producto__c', 'Cuentas');
-				campos.put('CSBD_Producto__c', 'Cuenta menor');
+				informarEmpresaFamiliaProducto('productoSoporteDigital', campos);
+				// campos.put('CSBD_Empresa_Proveedora__c', 'CaixaBank');
+				// campos.put('CSBD_Familia_Producto__c', 'Cuentas');
+				// campos.put('CSBD_Producto__c', 'Cuenta menor');
 			}
 
 			when 'mac' {
@@ -480,6 +482,17 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Contact__c', solicitud.contactId);
 				campos.put('CSBD_Parent_Id__c', [SELECT Id FROM Opportunity WHERE CSBD_CasoOrigen__c = :solicitud.casoOrigen ORDER BY CreatedDate DESC LIMIT 1]?.Id);
 				campos.put('CSBD_Motivo_MAC__c', [SELECT CC_MCC_Motivo__r.Name FROM Case WHERE Id = :solicitud.casoOrigen LIMIT 1]?.CC_MCC_Motivo__r?.Name);
+				informarEmpresaFamiliaProducto(solicitud?.nombreProducto, campos);
+			}
+
+			when 'macCentralita' {
+				recordTypeDeveloperName = 'CSBD_MAC';
+				campos.put('CSBD_Telefono_Solicitud__c', solicitud.telefono);
+				campos.put('CSBD_Idioma_Solicitud__c', formatearIdioma(solicitud?.idioma, solicitud.canal));
+				campos.put('CSBD_Now_Nombre__c', solicitud.nombre);
+				campos.put('CSBD_Now_Apellido1__c', solicitud.apellidos);
+				campos.put('CSBD_Canal__c', solicitud.canal);
+				campos.put('CSBD_Now_Origen__c', solicitud.origen);
 				informarEmpresaFamiliaProducto(solicitud?.nombreProducto, campos);
 			}
 		}
@@ -567,7 +580,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 	public static void identificarCliente(CSBD_WS_AltaOportunidad_Input.Solicitud solicitud, Map<String, Object> campos, CSBD_WS_AltaOportunidad_Output.Respuesta respuesta) {
 		//Obtener cuenta y contacto a partir del NUMPERSO o NIF
 		Map<String, String> tipoIdentificacion = tipoIdentificacionCliente(solicitud);
-		if (!String.isEmpty(tipoIdentificacion.get('valorBusqueda')) || !String.isEmpty(tipoIdentificacion.get('tipoBusqueda'))) {
+		if (!String.isEmpty(tipoIdentificacion.get('valorBusqueda'))) {
 			List<Account> cuentas = new List<Account>();
 			List<Contact> contactos = new List<Contact>();
 			Boolean identificacionALF = identificacionAlfActiva();

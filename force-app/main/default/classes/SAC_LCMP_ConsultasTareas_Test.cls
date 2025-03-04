@@ -18,16 +18,19 @@ public with sharing class SAC_LCMP_ConsultasTareas_Test {
 
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
         cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
 
         User homeOficinas = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        homeOficinas.ProfileId = [SELECT Id FROM Profile WHERE Name = 'AV_Usuario_CaixaBank'].Id;      
-        Database.insert(homeOficinas);
+        homeOficinas.ProfileId = [SELECT Id FROM Profile WHERE Name = 'AV_Usuario_CaixaBank'].Id;
+        SAC_DatabaseDML.insertDML(homeOficinas, false);      
+        //Database.insert(homeOficinas);
         
         Contact contacto = SAC_TestDataFactory.crearContacto(1,null)[0];
         contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId(); 
         contacto.AV_UsuarioAsociado__c = homeOficinas.Id;
-        Database.insert(contacto);
+        SAC_DatabaseDML.insertDML(contacto, false);     
+        //Database.insert(contacto);
 
         SAC_Accion__c tareas = new SAC_Accion__c(
             RecordTypeId = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SAC_OtrasTareas').getRecordTypeId(), 

@@ -38,10 +38,12 @@ public without sharing class SAC_FinalizarTareaVF {
         String tareasMuertas = '';     
         String tareasSinPrivilegios= '';
         String tareasPteGGH = '';
+        String tareasImpAbonado = '';
         Set<Id> gruposResponsables = new Set<Id>();
         Set<Id> gruposUser = new Set<Id>();
         Map<Id,String> mapaGrupos = new Map<Id,String>(); 
-        listaTareas = [SELECT id, Name, OwnerId, SAC_EquipoResponsable__c,SAC_Estado__c, SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c, SAC_Reclamacion__r.SEG_Grupo__c, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Grupo__c
+        listaTareas = [SELECT id, Name, OwnerId, SAC_EquipoResponsable__c,SAC_Estado__c, SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c, SAC_Reclamacion__r.SEG_Grupo__c, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Grupo__c,
+                              SAC_Reclamacion__r.SAC_SentidoResolucion__c, SAC_ImporteAbonar__c
                                         FROM SAC_Accion__c 
                                         WHERE id = :listaAcciones ];
 
@@ -70,6 +72,9 @@ public without sharing class SAC_FinalizarTareaVF {
                 }      
                 if(tarea.SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c == 'GGH' && tarea.SAC_Estado__c == 'SAC_PendienteRevision'){
                     tareasPteGGH = tareasPteGGH + tarea.name + ', ';
+                }
+                if(tarea.SAC_ImporteAbonar__c != null && tarea.SAC_ImporteAbonar__c != 0 && (tarea.SAC_Reclamacion__r.SAC_SentidoResolucion__c == 'SAC_001' || tarea.SAC_Reclamacion__r.SAC_SentidoResolucion__c == 'SAC_004' || tarea.SAC_Reclamacion__r.SAC_SentidoResolucion__c == 'SAC_005')){
+                    tareasImpAbonado = tareasImpAbonado + tarea.Name + ', ';
                 }                                         
             }
             if(tareasMuertas != ''){ 
@@ -80,6 +85,9 @@ public without sharing class SAC_FinalizarTareaVF {
             }
             if(tareasPteGGH != ''){
                 mensaje = mensaje + tareasPteGGH + ' no se puede finalizar, está pendiente de otro sistema. ';
+            }
+            if(tareasImpAbonado != ''){
+                mensaje = mensaje + tareasImpAbonado + ' no se puede finalizar, revise el sentido de la resolución de la reclamación. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" e informar un importe abonado. ';
             }
             if(mensaje != '' ){
                 throw new MyException( mensaje); 

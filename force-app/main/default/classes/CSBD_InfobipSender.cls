@@ -3,9 +3,7 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
     final static Integer CALLOUT_LIMIT = 100;
     final static Integer TIEMPO_MAX = 2880;//48h en MINUTOS
     final static String  PLANTILLA_RCS_AUTOMATICO = 'Plantilla RCS Automatico';
-    final static String STATUS_ENVIADO = 'RCS Enviado';
-    final static String STATUS_ENVIOFALLIDO = 'RCS Envío Fallido';
-
+ 
 
     public List<Opportunity> oppsToHandle {private set;get;}
     public String sender {private set;get;}
@@ -24,6 +22,7 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
     
         Integer i = 0;
         List<Task> taskToInsert = new List<Task>();
+        List<Task> taskToUpsert = new List<Task>();
 
         //Controlar el limite de callout por transaccion
         while(i < CALLOUT_LIMIT && i< this.oppsToHandle.size()){
@@ -35,7 +34,7 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
                 //Si fue success, crear la tarea con el message Id que es el external Id
                 String messageId = (String)result.get('messageId');
                 String bodyResponse = (String)result.get('bodyMessage');
-                taskToInsert.add(CSBD_Activity.crearActividadReturn(
+                taskToUpsert.add(CSBD_Activity.crearActividadReturn(
                     new Task(), 
                     opp.Id, 
                     this.taskType, //La definida en el setting,
@@ -43,7 +42,7 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
                     'Envio de mensaje RCS - Enviado (Pendiente Entregar)', 
                     bodyResponse, 
                     new Map<String , String> {
-                        'CSBD_Evento_Estado__c' => STATUS_ENVIADO,
+                        'CSBD_Evento_Estado__c' => CSBD_InfobipController.STATUS_ENVIADO,
                         'AV_ExternalID__c' => messageId
                     }));
             }else{
@@ -57,7 +56,7 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
                     'Envío de mensaje RCS - Intento Fallido', 
                     errorMessage,  
                     new Map<String , String> {
-                        'CSBD_Evento_Estado__c' => STATUS_ENVIOFALLIDO                        
+                        'CSBD_Evento_Estado__c' => CSBD_InfobipController.STATUS_ENVIOFALLIDO                        
                     }));
             }
             i ++;
@@ -79,14 +78,15 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
             System.enqueueJob(
                 new CSBD_InfobipSender(this.oppsToHandle),
                 options
-            );
-          
+            );          
         }
 
         //Insertar las tareas al final del todo para evitar uncommited pending dml/callout exception
-        if(taskToInsert.size() > 0){
-            insert taskToInsert;
-        }
+        CSBD_InfobipController.InfobipDataWrapper info = new CSBD_InfobipController.InfobipDataWrapper();
+        info.origin = CSBD_InfobipController.ORIGIN_SENDER;
+        info.taskToInsert = taskToInsert;
+        info.taskToUpsert = taskToUpsert;
+        CSBD_InfobipController.upsertTask(info);
       
     }
 
@@ -107,18 +107,15 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
             
             HttpRequest httpRequest = CBK_HttpServiceIntegration.getRequest(httpRequestWrapper);//Se construye el request
             HttpResponse httpResponse = CBK_HttpServiceIntegration.callHttpService(httpRequest, 'CSBD_Infobip_Request-Message', httpRequestWrapper.intSetting);
-
        
-            if (httpResponse.getStatusCode() == 200) { 
-               
+            if (httpResponse.getStatusCode() == 200) {                
                 CSBD_Infobip_MessageResponse_DTO infobipResponse = CSBD_Infobip_MessageResponse_DTO.parse(httpResponse.getBody());
                 messageId = infobipResponse.messages[0].messageId;
                 bodyMessage = 'Título enviado : ' + newMessage.messages[0].content.content.title + '\n' +
                 'Mensaje enviado : ' + newMessage.messages[0].content.content.description.unescapeHtml4();//JSON.serializePretty(infobipResponse);
                 isSuccess = true;
             } else {
-                errorMessage = 'HTTP ERROR -' + httpResponse.getStatusCode() + ' Body - ' + JSON.serializePretty(httpResponse.getBody());
-             
+                errorMessage = 'HTTP ERROR -' + httpResponse.getStatusCode() + ' Body - ' + JSON.serializePretty(httpResponse.getBody());             
             }
         }catch(Exception ex){
             errorMessage = ex.getMessage();          
@@ -180,6 +177,8 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
             newMessage.messages[0].options.validityPeriod.amount = this.timeWait;
             newMessage.messages[0].options.validityPeriod.timeUnit = 'MINUTES';
         }
+
+        newMessage.messages[0].webhooks.callbackData = opp.Id;
   
 
         return newMessage;

@@ -6,8 +6,8 @@ public with sharing class SAC_LCMP_PretensionesRelacionTest {
     usuario.Username = 'ustestesteo@test.com';      
     
 
-
-    Database.insert(usuario);
+    SAC_DatabaseDML.insertDML(usuario, false);
+    //Database.insert(usuario);
 
      //RECLAMACION 1
      Map<String, Object> camposRecl = new Map<String, Object>();
@@ -18,7 +18,8 @@ public with sharing class SAC_LCMP_PretensionesRelacionTest {
      camposRecl.put('OwnerId', usuario.Id);
      
      Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-     Database.insert(casoReclamacion);
+     SAC_DatabaseDML.insertDML(casoReclamacion, false);
+     //Database.insert(casoReclamacion);
 
      //PRETENSION 1
      Map<String, Object> camposPrete = new Map<String, Object>();
@@ -28,12 +29,13 @@ public with sharing class SAC_LCMP_PretensionesRelacionTest {
 
 
      Case casoPrete = SAC_TestDataFactory.crearCaso('Pretension', camposPrete);
-     Database.insert(casoPrete);
+     SAC_DatabaseDML.insertDML(casoPrete, false);
+     //Database.insert(casoPrete);
 
     }
 
     @isTest
-    static void getPretensiones_Test(){
+    static void getPretensionesTest(){
         Test.startTest();
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
         Case caso = [SELECT id FROM Case WHERE Subject = 'TestRec' limit 1];
@@ -49,7 +51,7 @@ public with sharing class SAC_LCMP_PretensionesRelacionTest {
 
     }
     @isTest 
-    static void validarPretension_Test(){
+    static void validarPretensionTest(){
         Test.startTest();
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
         Case prete = [SELECT id, SAC_Reclamacion__c, SAC_ValidacionMCC__c FROM Case WHERE SuppliedCompany = 'TestPrete' limit 1];

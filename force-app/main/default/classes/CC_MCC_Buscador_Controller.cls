@@ -12,7 +12,9 @@ public with sharing class CC_MCC_Buscador_Controller {
 				  queryString += ' AND CC_Tipo_Cliente__c = \'CSI Bankia\' LIMIT ' + numResultados;
 			  } else if(nameTipoCliente == 'Cliente'){
 				  //if si nameTipoCliente ='Cliente' 
-				  Case[] canalOperativo = [SELECT CC_Canal_Operativo__c FROM Case WHERE Id=:objectId];
+				  Case[] canalOperativo = [SELECT CC_Canal_Operativo__c 
+				  						   FROM Case 
+										   WHERE Id=:objectId];
 				  if(!canalOperativo.isEmpty() && canalOperativo[0].CC_Canal_Operativo__c!=null){
 					  queryString += ' AND CC_Tipo_Cliente__c LIKE \'Cliente\' and CC_Producto_Servicio__r.CC_Tematica__r.CC_Canal_Operativo__c includes (\''+canalOperativo[0].CC_Canal_Operativo__c+'\')';
 			  } else {
@@ -37,7 +39,9 @@ public with sharing class CC_MCC_Buscador_Controller {
 			  queryString += ' AND CC_Tipo_Cliente__c IN (\'' + CC_MetodosUtiles.getRecordTypeNameFromId('Case', OT_Proyectos.getRecordTypeIdFromObjectId(objectId)) + '\', \'Cliente (COPS)/Empleado (COPS)\')';//' LIMIT ' + numResultados;
 		  
 			  String stringdepartamento;
-			  Case[] departamento = [SELECT OS_Departamento__c FROM Case WHERE Id=:objectId];
+			  Case[] departamento = [SELECT OS_Departamento__c 
+			  						 FROM Case 
+									 WHERE Id=:objectId];
 			  
 			  // Si hay departamento, añadimos al filtro
 			  if(!departamento.isEmpty() && departamento[0].OS_Departamento__c!=null){
@@ -60,7 +64,9 @@ public with sharing class CC_MCC_Buscador_Controller {
 			}
   
 	  } else if (prefijo == 'SEG') {
-		Case caso = [SELECT id, SEG_Organizacion__c FROM Case WHERE id = :objectId LIMIT 1];
+		Case caso = [SELECT id, SEG_Organizacion__c 
+					 FROM Case 
+					 WHERE id = :objectId LIMIT 1];
 		if (String.isNotBlank(caso?.SEG_Organizacion__c))
 		{
 		  queryString += ' AND SEG_Organizacion__c INCLUDES (\'' + caso.SEG_Organizacion__c + '\')';
@@ -79,7 +85,8 @@ public with sharing class CC_MCC_Buscador_Controller {
 	}
   
 	  private static String recuperarOrderBy() {
-		  if ([SELECT Count() FROM GroupMember
+		  if ([SELECT Count() 
+		  	  FROM GroupMember
 			  WHERE Group.DeveloperName = 'Cola_3N_CSBD' AND UserOrGroupId = :UserInfo.getUserId()] == 0) {
 			  return 'ORDER BY Name ASC';
 		  } else {
@@ -95,7 +102,9 @@ public with sharing class CC_MCC_Buscador_Controller {
 	
 		//Actividad de retipificación con la clasificación anterior
 		Case caso = [SELECT RecordTypeId, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name
-				FROM Case WHERE Id = :recordId];
+				FROM Case 
+				WHERE Id = :recordId];
+
 		CC_Case.crearActividadRetipificacion(caso.Id, caso.CC_MCC_Tematica__r.Name, caso.CC_MCC_ProdServ__r.Name, caso.CC_MCC_Motivo__r.Name);
 	
 		//Actualización del caso
@@ -115,7 +124,8 @@ public with sharing class CC_MCC_Buscador_Controller {
 	
 		//Refresco de los datos del caso para devolverlos al Aura
 		return [SELECT CaseNumber, RecordType.Name, OwnerId, Status, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name
-			FROM Case WHERE Id = :recordId];
+			FROM Case 
+			WHERE Id = :recordId];
 	  }
   
 	  @AuraEnabled
@@ -123,7 +133,8 @@ public with sharing class CC_MCC_Buscador_Controller {
 	
 		//Actividad de retipificación con la clasificación anterior
 		Case caso = [SELECT RecordTypeId, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name, SEG_Detalle__r.Name
-				FROM Case WHERE Id = :recordId];
+				FROM Case 
+				WHERE Id = :recordId];
 	
 		//Actualización del caso
 		CC_MCC__c nuevaClasificacion = [SELECT Name, RecordType.DeveloperName, CC_Producto_Servicio__r.Name, CC_Producto_Servicio__r.CC_Tematica__r.Name,
@@ -131,7 +142,8 @@ public with sharing class CC_MCC_Buscador_Controller {
 						CC_Motivo__r.CC_Producto_Servicio__r.Name, CC_Motivo__r.Id,
 						CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__r.Id, CC_Motivo__r.CC_Producto_Servicio__r.Id,
 						CC_Motivo__r.Name, CC_Tematica__r.Name, SAC_EntidadAfectada__c
-						FROM CC_MCC__c WHERE RecordType.DeveloperName = 'SAC_Detalle' AND Id = :idDetalle];
+						FROM CC_MCC__c 
+						WHERE RecordType.DeveloperName = 'SAC_Detalle' AND Id = :idDetalle];
 		
 		caso.CC_MCC_Tematica__c = nuevaClasificacion.CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__r.Id;
 		caso.CC_MCC_ProdServ__c = nuevaClasificacion.CC_Motivo__r.CC_Producto_Servicio__r.Id;
@@ -143,7 +155,8 @@ public with sharing class CC_MCC_Buscador_Controller {
 	
 		//Refresco de los datos del caso para devolverlos al Aura
 		return [SELECT CaseNumber, RecordType.Name, OwnerId, Status, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name
-			FROM Case WHERE Id = :recordId];
+			FROM Case 
+			WHERE Id = :recordId];
 	  }
   
 	  // INI INS - LMG - Equipo SAC: 03/05/2022
@@ -166,10 +179,7 @@ public with sharing class CC_MCC_Buscador_Controller {
 				  FROM Case
 				  WHERE SAC_Reclamacion__c =: casoActual.Id OR id = :casoActual.Id];
 		  }
-		  else if(casoActual.RecordTypeId == recPret){
-			  listaFamilia = [SELECT id, OwnerId
-				  FROM Case
-				  WHERE SAC_Reclamacion__c =: casoActual.SAC_Reclamacion__c OR id = :casoActual.SAC_Reclamacion__c];
+		  else if(casoActual.RecordTypeId == recPret){listaFamilia = [SELECT id, OwnerId FROM Case WHERE SAC_Reclamacion__c =: casoActual.SAC_Reclamacion__c OR id = :casoActual.SAC_Reclamacion__c];
 		  }
 		  // Comparamos el propietario de los registros de la familia con el usuario actual          
 		  if(!listaFamilia.isEmpty()){
@@ -187,7 +197,7 @@ public with sharing class CC_MCC_Buscador_Controller {
 	@AuraEnabled
 	public static Case actualizarCasoSEG(Id recordId, Id idMotivo) {
 	  // Recuperar los datos del caso.
-	  Case caso = [SELECT RecordTypeId, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name, SEG_Detalle__r.Name 
+	  Case caso = [SELECT RecordTypeId, SEG_Organizacion__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name, SEG_Detalle__r.Name 
 				   FROM Case WHERE Id = :recordId];
   
 	  // Recuperar los datos de la clasificación.
@@ -214,16 +224,37 @@ public with sharing class CC_MCC_Buscador_Controller {
 	  caso.CC_MCC_Solucion__c = null;
   
 	  // Buscar la posible CR asociada a la clasificación seleccionada.
-	  List<SEG_ClasificacionRapida__c> cRapida = [SELECT Id,SEG_Detalle__c,SEG_Motivo__c,SEG_Producto__c,SEG_Tematica__c 
+	  List<SEG_ClasificacionRapida__c> listCRapida = [SELECT Id,SEG_Detalle__c, SEG_Organizacion__c, SEG_Motivo__c,SEG_Producto__c,SEG_Tematica__c 
 							FROM SEG_ClasificacionRapida__c
-							WHERE SEG_Tematica__c = :tematicaMCC 
-							AND SEG_Producto__c = :productoMCC 
-							AND SEG_Motivo__c = :motivoMCC 
-							AND SEG_Detalle__c = :detalleMCC];
-	  if (cRapida.size() == 1)
-	  {
-		caso.SEG_ClasificacionRapida__c = cRapida[0].id;
-	  }
+							WHERE CBK_Negocio__c = 'Segmentos' AND SEG_Organizacion__c != null AND SEG_Inactiva__c = false
+							AND SEG_Tematica__c = :tematicaMCC 
+							AND (SEG_Producto__c = :productoMCC OR SEG_Producto__c = NULL)
+							AND (SEG_Motivo__c = :motivoMCC OR SEG_Motivo__c = NULL)
+							AND (SEG_Detalle__c = :detalleMCC OR SEG_Detalle__c = NULL)];
+
+		Id idCRFinal = null;
+		if (!listCRapida.isEmpty()) {
+			Integer nivelExactitud = 0;
+			for (SEG_ClasificacionRapida__c cRapida : listCRapida) {
+				if (caso.SEG_Organizacion__c != null && cRapida.SEG_Organizacion__c != null && cRapida.SEG_Organizacion__c.contains(caso.SEG_Organizacion__c)) {
+					if (cRapida.SEG_Detalle__c != null && nivelExactitud < 4) {
+						idCRFinal = cRapida.Id;
+						nivelExactitud = 4;
+					} else if (cRapida.SEG_Motivo__c != null && nivelExactitud < 3) {
+						idCRFinal = cRapida.Id;
+						nivelExactitud = 3;
+					} else if (cRapida.SEG_Producto__c != null && nivelExactitud < 2) {
+						idCRFinal = cRapida.Id;
+						nivelExactitud = 2;
+					} else if (cRapida.SEG_Tematica__c != null && nivelExactitud < 1) {
+						idCRFinal = cRapida.Id;
+						nivelExactitud = 1;
+					}
+				}
+			}
+		}
+		
+		caso.SEG_ClasificacionRapida__c = idCRFinal;
   
 	  // Actualizar los datos del caso.
 	  update caso;

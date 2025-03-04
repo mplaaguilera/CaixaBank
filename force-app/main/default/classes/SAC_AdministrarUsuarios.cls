@@ -362,7 +362,7 @@ public without sharing class SAC_AdministrarUsuarios {
                                                     (CC_Grupo_Colaborador__r.SAC_DeveloperName__c = 'COPS' OR CC_Grupo_Colaborador__r.SAC_DeveloperName__c = 'AJ' OR CC_Grupo_Colaborador__r.SAC_DeveloperName__c = 'SAC_AUDITORES')) 
                                                     AND CC_Usuario__c IN: lstUsers ];
             
-            if(colaboradoresDelUser.size() == 0){
+            if(colaboradoresDelUser.isEmpty()){
                 PermissionSet ps = getPermisionSet(PS_AUDITORIAS);
                 borrarPermisionSet(lstNuevosId, lstUsers, ps);
             }

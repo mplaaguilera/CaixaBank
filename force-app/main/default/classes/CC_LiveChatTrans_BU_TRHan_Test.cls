@@ -173,7 +173,7 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         //System.assertEquals(actividadChatbot.size(), 1);
         System.assertnotEquals(actividadChatbot.size(), 0);        
     }
-    
+
     @isTest
     static void test01ChatSR() {
         

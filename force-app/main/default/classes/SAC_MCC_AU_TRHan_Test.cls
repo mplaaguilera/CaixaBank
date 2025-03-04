@@ -21,8 +21,9 @@ public with sharing class SAC_MCC_AU_TRHan_Test {
         Id recTypeDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
 
         //Usuario SAC General
-        User usuarioAdm = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];      
-        Database.insert(usuarioAdm);
+        User usuarioAdm = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];  
+        SAC_DatabaseDML.insertDML(usuarioAdm, false);    
+        //Database.insert(usuarioAdm);
 
         List<CC_MCC__c> listaMCCs = new List<CC_MCC__c>();
         CC_MCC__c mccTematica1 = new CC_MCC__c(
@@ -32,7 +33,8 @@ public with sharing class SAC_MCC_AU_TRHan_Test {
             CC_Fecha_Vigencia_Inicio__c = System.now(),
             CC_Codigo_Externo__c = 'TEST-0101',
             SAC_EscaladoObligatorio__c = false);
-        Database.insert(mccTematica1);
+        SAC_DatabaseDML.insertDML(mccTematica1, false);   
+        //Database.insert(mccTematica1);
 
         CC_MCC__c mccProdServ1 = new CC_MCC__c(
             RecordTypeId = recTypeProdServ,
@@ -42,7 +44,8 @@ public with sharing class SAC_MCC_AU_TRHan_Test {
             CC_Codigo_Externo__c = 'TEST-010101',
             CC_Tematica__c = mccTematica1.id,
             SAC_EscaladoObligatorio__c = false);
-        Database.insert(mccProdServ1);
+        SAC_DatabaseDML.insertDML(mccProdServ1, false);  
+        //Database.insert(mccProdServ1);
 
         CC_MCC__c mccMotivo1 = new CC_MCC__c(
             RecordTypeId = recTypeMotivo,
@@ -52,7 +55,8 @@ public with sharing class SAC_MCC_AU_TRHan_Test {
             CC_Producto_Servicio__c = mccProdServ1.id,
             CC_Codigo_Externo__c = 'TEST-0102',
             SAC_EscaladoObligatorio__c = false);
-        Database.insert(mccMotivo1);
+        SAC_DatabaseDML.insertDML(mccMotivo1, false);  
+        //Database.insert(mccMotivo1);
 
         CC_MCC__c mccDetalle1 = new CC_MCC__c(
             RecordTypeId = recTypeDetalle,
@@ -62,7 +66,8 @@ public with sharing class SAC_MCC_AU_TRHan_Test {
             CC_Codigo_Externo__c = 'TEST-01010101',
             CC_Motivo__c = mccMotivo1.id,
             SAC_EscaladoObligatorio__c = false);
-        Database.insert(mccDetalle1);
+        SAC_DatabaseDML.insertDML(mccDetalle1, false);  
+        //Database.insert(mccDetalle1);
     }
 
     @isTest
@@ -73,7 +78,8 @@ public with sharing class SAC_MCC_AU_TRHan_Test {
         Test.startTest();
         System.runAs(usuario) {
             mccTematica.SAC_EscaladoObligatorio__c = true;
-            Database.update(mccTematica);
+            SAC_DatabaseDML.updateDML(mccTematica, false);  
+            //Database.update(mccTematica);
         }
         Test.stopTest();
 

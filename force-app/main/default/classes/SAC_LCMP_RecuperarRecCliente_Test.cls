@@ -5,20 +5,23 @@ public with sharing class SAC_LCMP_RecuperarRecCliente_Test {
         
         Test.startTest();
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];     
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+        //Database.insert(usuarioAdmin);
 
         User usuario;
         System.runAs(usuarioAdmin) {
             //Usuario SAC General
             usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-            usuario.Username = 'ustestesteo@test.com';      
-            Database.insert(usuario);
+            usuario.Username = 'ustestesteo@test.com';  
+            SAC_DatabaseDML.insertDML(usuario, false);    
+            //Database.insert(usuario);
         }
         Test.stopTest();
 
         //Cuentas
         Account cuentaA = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
-        Database.insert(cuentaA);
+        SAC_DatabaseDML.insertDML(cuentaA, false);  
+        //Database.insert(cuentaA);
         
         List<Case> listaReclamaciones = new List<Case>();
         //RECLAMACION 1
@@ -55,7 +58,8 @@ public with sharing class SAC_LCMP_RecuperarRecCliente_Test {
         casoConsulta4.AccountId = cuentaA.Id;
         listaReclamaciones.add(casoConsulta4);
 
-        Database.insert(listaReclamaciones);  
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false); 
+        //Database.insert(listaReclamaciones);  
 
         List<Case> listaPretensiones = new List<Case>();
         //PRETENSION 1
@@ -69,7 +73,8 @@ public with sharing class SAC_LCMP_RecuperarRecCliente_Test {
         
         Case casoPretension1 = SAC_TestDataFactory.crearCaso('Pretension',campsoPret1);
         listaPretensiones.add(casoPretension1);
-        Database.insert(listaPretensiones); 
+        SAC_DatabaseDML.insertListDML(listaPretensiones, false); 
+        //Database.insert(listaPretensiones); 
 
         //grupo colaborador nivel 2
         List<CC_Grupo_Colaborador__c> listaGrupos = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1);
@@ -83,7 +88,8 @@ public with sharing class SAC_LCMP_RecuperarRecCliente_Test {
         listaGrupos[0].SAC_PermiteConsultas__c = true;
         listaGrupos[0].SAC_TieneUsuariosActivos__c = true;
         listaGrupos[0].SAC_TienePropietario__c = true;
-        Database.insert(listaGrupos);
+        SAC_DatabaseDML.insertListDML(listaGrupos, false); 
+        //Database.insert(listaGrupos);
 
         //Interaccion escalado
         List<SAC_Interaccion__c> listaInteracciones = new List<SAC_Interaccion__c>();
@@ -109,12 +115,14 @@ public with sharing class SAC_LCMP_RecuperarRecCliente_Test {
         
         SAC_Interaccion__c interaccion = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
         listaInteracciones.add(interaccion);
-        Database.insert(listaInteracciones);
+        SAC_DatabaseDML.insertListDML(listaInteracciones, false); 
+        //Database.insert(listaInteracciones);
 
         //Tareas
         SAC_Accion__c accion1 = SAC_TestDataFactory.crearTareas(1,casoPretension1,false)[0];
         accion1.SAC_Reclamacion__C = casoReclamacion.Id;
-        Database.insert(accion1);
+        SAC_DatabaseDML.insertDML(accion1, false); 
+        //Database.insert(accion1);
     }
 
     @isTest

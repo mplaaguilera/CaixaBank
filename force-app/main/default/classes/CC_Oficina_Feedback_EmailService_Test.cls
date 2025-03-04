@@ -44,8 +44,34 @@ public with sharing class CC_Oficina_Feedback_EmailService_Test {
             operador.LocaleSidKey = 'es_ES';        
             insert operador;
             insert new PermissionSetAssignment(AssigneeId = operador.Id, PermissionSetId = psOperadorCliente.Id);
+
+            CC_Settings__c urlFAQ = new CC_Settings__c();
+            urlFAQ.Name = 'CC_UrlFAQ';
+            urlFAQ.CC_Configuracion_1__c = 'https://intcon.pro.ap.absiscloud.lacaixa.es/id/id?id=';
+            urlFAQ.CC_Activa__c = true;
+            String domain = URL.getOrgDomainURL().toExternalForm();
+            
+            CC_Settings__c emailAtencionEmpleadosCaixa = new CC_Settings__c();
+            emailAtencionEmpleadosCaixa.Name = 'CC_EmailAtencionEmpleadosCaixa';
+            emailAtencionEmpleadosCaixa.CC_Activa__c = true;
+            if (domain.contains('str')) {
+                emailAtencionEmpleadosCaixa.CC_Configuracion_1__c = 'Prueba_ES';
+            } else if (!domain.contains('sandbox')) {
+                emailAtencionEmpleadosCaixa.CC_Configuracion_1__c = 'Atención Empleados CaixaBank';
+            }  else if (domain.contains('staging')) {
+                emailAtencionEmpleadosCaixa.CC_Configuracion_1__c = 'Atención Empleados CaixaBank';
+            } else {
+                emailAtencionEmpleadosCaixa.CC_Configuracion_1__c = 'Correo Pruebas CC';
+            }
+            
+            insert emailAtencionEmpleadosCaixa;   
+
+            
         }
         Test.stopTest();
+
+        // List <String> owaEmails = new List<String>{('Atención Empleados CaixaBank')};
+        // List <OrgWideEmailAddress> owa = new List <OrgWideEmailAddress>([SELECT Id, Address FROM OrgWideEmailAddress WHERE DisplayName IN : owaEmails]);  
     }
 
     @isTest
@@ -108,7 +134,7 @@ public with sharing class CC_Oficina_Feedback_EmailService_Test {
         correo.textAttachments = new List<Messaging.inboundEmail.TextAttachment>{adjuntoTexto};
 
         Test.startTest();
-        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
             CC_Oficina_Feedback_EmailService emailServiceOficinaFeedback = new CC_Oficina_Feedback_EmailService();
             emailServiceOficinaFeedback.handleInboundEmail(correo, envelope);
         }

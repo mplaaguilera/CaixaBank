@@ -34,9 +34,11 @@ public with sharing class CC_Servicio_Genesys {
 	}
 
     public static String obtenerQueueId(String registroId, String tipoRegistro) {
+		System.debug('obtenerQueueId: ' + registroId + ' ' + tipoRegistro);
+
         String queueId = '';
 
-        if (tipoRegistro == 'Case'){
+        if (tipoRegistro == 'Case') {
             List<Case> casos = [SELECT CC_Canal_Procedencia__c, Recordtype.DeveloperName FROM Case WHERE Id = :registroId];
             List<CC_Servicio_Genesys__c> servicios = [SELECT KIN_Cola_Id_GC__c  FROM CC_Servicio_Genesys__c
 														WHERE CC_Canal_Procedencia__c = :casos[0].CC_Canal_Procedencia__c LIMIT 1];
@@ -58,32 +60,58 @@ public with sharing class CC_Servicio_Genesys {
 
         } else if (tipoRegistro == 'Opportunity') {
 			//Lógica CSBD
-			Opportunity oportunidad = [SELECT RecordType.Name, CSBD_Producto__c, CSBD_Now_Codigo_Producto__c
+			Opportunity oportunidad = [SELECT RecordType.Name, RecordType.DeveloperName, CSBD_Producto__c,
+										CSBD_Now_Codigo_Producto__c, CSBD_Producto_MIFID__c
 										FROM Opportunity WHERE Id = :registroId];
 
-			if (oportunidad.RecordType.Name == 'Llamada Servicio' && String.isNotBlank(oportunidad.CSBD_Now_Codigo_Producto__c)) {
-				return [SELECT KIN_Cola_Id_GC__c FROM CC_Servicio_Genesys__c
-						WHERE CSBD_Now_Codigo_Producto__c = :oportunidad.CSBD_Now_Codigo_Producto__c
-						LIMIT 1]?.KIN_Cola_Id_GC__c ?? queueIdServicioGenesysCsbd('NIS_GenesysCloudOutboundDefault');
-
-			} else if(oportunidad.RecordType.DeveloperName == 'CSBD_MAC'){
-				return [SELECT KIN_Cola_Id_GC__c FROM CC_Servicio_Genesys__c
-						WHERE CSBD_Tipos_de_Oportunidad__c = :oportunidad.RecordType.Name
-						LIMIT 1]?.KIN_Cola_Id_GC__c ?? queueIdServicioGenesysCsbd('NIS_GenesysCloudOutboundDefault');
-
-			} else if (String.isNotBlank(oportunidad.CSBD_Producto__c)) {
+			if (oportunidad.RecordType.Name == 'Llamada Servicio') {
+				if (String.isNotBlank(oportunidad.CSBD_Now_Codigo_Producto__c)) {
+					return [SELECT KIN_Cola_Id_GC__c FROM CC_Servicio_Genesys__c
+							WHERE CSBD_Now_Codigo_Producto__c = :oportunidad.CSBD_Now_Codigo_Producto__c
+							LIMIT 1]?.KIN_Cola_Id_GC__c ?? queueIdServicioGenesysCsbd('NIS_GenesysCloudOutboundDefault');
+				} else {
+					return queueIdServicioGenesysCsbd('NIS_GenesysCloudOutboundDefault');
+				}
+			} else {
 				//Se determina el servicio de salida según se define en la lista de valores "CSBD: Productos con grabación de llamadas salientes"
+				String recordType = oportunidad.RecordType.DeveloperName == 'CSBD_MAC' ? 'CSCC' : 'Otros';
+				String tipo = oportunidad.CSBD_Producto_MIFID__c ? 'MIFID' : 'Otros';
+
+				Map<String, String> servicios = new Map<String, Map<String, Map<String, String>>>{
+					'CSCC' => new Map<String, Map<String, String>>{
+						'MIFID' => new Map<String, String>{
+							'Sin grabación' => 'Saliente con grabación CSCC MIFID',
+							'Con grabación' => 'Saliente con grabación CSCC MIFID'
+						},
+						'Otros' => new Map<String, String>{
+							'Sin grabación' => 'Saliente sin grabación CSCC',
+							'Con grabación' => 'Saliente con grabación CSCC'
+						}
+					},
+					'Otros' => new Map<String, Map<String, String>>{
+						'MIFID' => new Map<String, String>{
+							'Sin grabación' => 'Saliente con grabación MIFID',
+							'Con grabación' => 'Saliente con grabación MIFID'
+						},
+						'Otros' => new Map<String, String>{
+							'Sin grabación' => 'Saliente sin grabación',
+							'Con grabación' => 'Saliente con grabación'
+						}
+					}
+				}.get(recordType).get(tipo);
+
+				String servicioPorDefecto;
 				if ([SELECT Id FROM CC_Lista_Valores__c WHERE CC_Activa__c = TRUE
 						AND CC_Lista__r.Name = 'CSBD: Productos con grabación de llamadas salientes'
 						AND CSBD_Tipo_de_oportunidad__c INCLUDES (:oportunidad.RecordType.Name)
 						AND Name = :oportunidad.CSBD_Producto__c LIMIT 1].isEmpty()) {
-					return queueIdServicioGenesysCsbd(CC_Listas_Valores.lookupValue('CSBD: Servicios Genesys por defecto', 'Saliente sin grabación'));
+					servicioPorDefecto = servicios.get('Sin grabación');
 				} else {
-					return queueIdServicioGenesysCsbd(CC_Listas_Valores.lookupValue('CSBD: Servicios Genesys por defecto', 'Saliente con grabación'));
+					servicioPorDefecto = servicios.get('Con grabación');
 				}
+				System.debug('servicioPorDefecto: ' + servicioPorDefecto);
+				return queueIdServicioGenesysCsbd(CC_Listas_Valores.lookupValue('CSBD: Servicios Genesys por defecto', servicioPorDefecto));
 			}
-
-			return queueIdServicioGenesysCsbd('NIS_GenesysCloudOutboundDefault');
         }
         return queueId;
 	}

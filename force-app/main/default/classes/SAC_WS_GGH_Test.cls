@@ -19,14 +19,16 @@ public with sharing class SAC_WS_GGH_Test {
         User usuarioGeneral;
         System.runAs(new User(Id = UserInfo.getUserId())) {
             //Usuario SAC General
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);        
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+            //Database.insert(permiSetAssi);
         }
 
         //Reclamacion
@@ -37,7 +39,8 @@ public with sharing class SAC_WS_GGH_Test {
         camposRecl1.put('SAC_StatusAuxiliar__c', 'SAC_001');
 
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl1);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false);  
+        //Database.insert(reclamacion);
 
         //Pretension
         Map<String, Object> camposPret1 = new Map<String, Object>();
@@ -47,13 +50,16 @@ public with sharing class SAC_WS_GGH_Test {
         camposPret1.put('SAC_Reclamacion__c', reclamacion.id);
 
         Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret1);
-        Database.insert(pretension);
+        SAC_DatabaseDML.insertDML(pretension, false);  
+        //Database.insert(pretension);
 
         //Tarea
         SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1,pretension,true)[0];
-        Database.insert(tarea);
+        SAC_DatabaseDML.insertDML(tarea, false);  
+        //Database.insert(tarea);
         tarea.SAC_Estado__c = 'SAC_PendienteAsignar';
-        Database.update(tarea);
+        SAC_DatabaseDML.updateDML(tarea, false);  
+        //Database.update(tarea);
     }
 
     @isTest
@@ -91,7 +97,8 @@ public with sharing class SAC_WS_GGH_Test {
         Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany = 'testPret' LIMIT 1];
         SAC_Accion__c tarea = [SELECT Id FROM SAC_Accion__c WHERE SAC_Pretension__c =: pretension.id LIMIT 1];
         tarea.SAC_Estado__c = 'SAC_EnGestion';
-        Database.update(tarea);
+        SAC_DatabaseDML.updateDML(tarea, false);  
+        //Database.update(tarea);
 
         SAC_WS_GGH.SAC_WS_GGH_Input input = new SAC_WS_GGH.SAC_WS_GGH_Input();
         input.idPretension = 'pretension.Id';
@@ -123,7 +130,8 @@ public with sharing class SAC_WS_GGH_Test {
         Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany = 'testPret' LIMIT 1];
         SAC_Accion__c tarea = [SELECT Id FROM SAC_Accion__c WHERE SAC_Pretension__c =: pretension.id LIMIT 1];
         tarea.SAC_Estado__c = 'SAC_EnGestion';
-        Database.update(tarea);
+        SAC_DatabaseDML.updateDML(tarea, false);  
+        //Database.update(tarea);
 
         SAC_WS_GGH.SAC_WS_GGH_Input input = new SAC_WS_GGH.SAC_WS_GGH_Input();
         input.idPretension = pretension.Id;
@@ -395,7 +403,8 @@ public with sharing class SAC_WS_GGH_Test {
         Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany = 'testPret' LIMIT 1];
         SAC_Accion__c tarea = [SELECT Id FROM SAC_Accion__c WHERE SAC_Pretension__c =: pretension.id LIMIT 1];
         tarea.SAC_Estado__c = 'SAC_EnGestion';
-        Database.update(tarea);
+        SAC_DatabaseDML.updateDML(tarea, false);  
+        //Database.update(tarea);
 
         SAC_WS_GGH.SAC_WS_GGH_Input input = new SAC_WS_GGH.SAC_WS_GGH_Input();
         input.idTarea = tarea.Id;

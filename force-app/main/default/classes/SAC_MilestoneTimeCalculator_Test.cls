@@ -17,13 +17,13 @@ public with sharing class SAC_MilestoneTimeCalculator_Test {
         //Usuario SAC Admin
 		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
         usuarioGeneral.Username = 'usertestadmin@test.com.testSetup';      
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         System.runAs(usuarioGeneral){
             List<Case> listaReclamaciones = new List<Case>();
@@ -51,7 +51,7 @@ public with sharing class SAC_MilestoneTimeCalculator_Test {
             Case reclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRec3);
             listaReclamaciones.add(reclamacion3);
 
-            Database.insert(listaReclamaciones);
+            SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
 
 
             List<Case> pretensiones = new List<Case>();
@@ -62,7 +62,7 @@ public with sharing class SAC_MilestoneTimeCalculator_Test {
             Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
             pretensiones.add(pretension);
 
-            Database.insert(pretensiones);
+            SAC_DatabaseDML.insertListDML(pretensiones, false);
         } 
     }
 
@@ -70,7 +70,7 @@ public with sharing class SAC_MilestoneTimeCalculator_Test {
     static void calculateMilestoneTriggerTimeTest() {
         User usuarioGeneral = [SELECT id, name, UserRole.name FROM user WHERE Username = 'usertestadmin@test.com.testSetup' AND IsActive = true LIMIT 1];
         MilestoneType[] listMilestoneType = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(listMilestoneType.size() == 0) { return; }
+        if(listMilestoneType.isEmpty()) { return; }
         MilestoneType mt = listMilestoneType[0];
         
         Case casoReclamacion = [SELECT id, RecordTypeId FROM case WHERE subject = 'TestRec'];
@@ -91,7 +91,7 @@ public with sharing class SAC_MilestoneTimeCalculator_Test {
     static void calculateMilestoneTriggerTime3Test() {
         User usuarioGeneral = [SELECT id, name, UserRole.name FROM user WHERE Username = 'usertestadmin@test.com.testSetup' AND IsActive = true LIMIT 1];
         MilestoneType[] listMilestoneType = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(listMilestoneType.size() == 0) { return; }
+        if(listMilestoneType.isEmpty()) { return; }
         MilestoneType mt = listMilestoneType[0];
         
         Case casoReclamacion = [SELECT id, RecordTypeId, SAC_TiempoSLARegulatorio__c, SAC_Prorrogado__c FROM case WHERE subject = 'TestRec3'];

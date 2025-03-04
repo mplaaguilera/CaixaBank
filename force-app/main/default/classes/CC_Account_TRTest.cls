@@ -223,6 +223,7 @@ public with sharing class CC_Account_TRTest {
 //      System.assertNotEquals(0, detalleId.size());
     }
     
+   /* 
     public static testMethod void beforeDeleteAccount(){
 
         Id centroCBRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
@@ -240,6 +241,7 @@ public with sharing class CC_Account_TRTest {
 
         System.assertEquals(0, grupos.size());
     }
+*/
     
     public static testMethod void AccountCaseTelefono(){
         

@@ -22,7 +22,7 @@ public with sharing class SAC_QueueableEnvioEmail_Test {
         usuario.isActive = true;
         usuario.userRole = uRole;
 
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertDML(usuario, false);
 
 
         Case reclamacion3 = new Case();
@@ -30,7 +30,7 @@ public with sharing class SAC_QueueableEnvioEmail_Test {
         reclamacion3.Status = 'SAC_001';
         reclamacion3.SuppliedCompany = 'testCaso3';
         reclamacion3.Subject = 'testrec3';
-        Database.insert(reclamacion3);
+        SAC_DatabaseDML.insertDML(reclamacion3, false);
 
 
         CC_Grupo_Colaborador__c grupoTareas = new CC_Grupo_Colaborador__c();
@@ -39,13 +39,13 @@ public with sharing class SAC_QueueableEnvioEmail_Test {
         grupoTareas.SAC_PermiteTareas__c = true;
         grupoTareas.SAC_DeveloperName__c = 'COPS';
         grupoTareas.SAC_Email__c = 'test@test.com';
-        Database.insert(grupoTareas);
+        SAC_DatabaseDML.insertDML(grupoTareas, false);
 
         Account oficina = new Account();
         oficina.CC_Email__c = 'test@test.com';
         oficina.Name = 'Oficina1';
         oficina.RecordTypeId = recTypeOficina;
-        Database.insert(oficina);
+        SAC_DatabaseDML.insertDML(oficina, false);
 
         List<SAC_Accion__c> listaTareas = new List<SAC_Accion__c>();
         SAC_Accion__c tarea = new SAC_Accion__c(); 
@@ -71,7 +71,7 @@ public with sharing class SAC_QueueableEnvioEmail_Test {
         tarea2.recordTypeId = recTypeOtrasTareas;
         listaTareas.add(tarea2);
 
-        Database.insert(listaTareas);
+        SAC_DatabaseDML.insertListDML(listaTareas, false);
 
     }
 
@@ -91,17 +91,25 @@ public with sharing class SAC_QueueableEnvioEmail_Test {
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         permisos.add(permiSetAssi2);
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
 
         Test.startTest();
         System.runAs(usuario) {
 
             mapTareas.put(false, listaTarea);
-            System.enqueueJob(new SAC_QueueableEnvioEmail(mapTareas, caso.CaseNumber));
+            DateTime dt = DateTime.now();
+            Long dateInMilliseconds = dt.getTime();
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+            .addString(String.valueOf(dateInMilliseconds))
+            .build();
+            try {
+                System.enqueueJob(new SAC_QueueableEnvioEmail(mapTareas, caso.CaseNumber), options);    
+            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
         }
         Test.stopTest();
 
-        System.assertNotEquals(null, listaTarea.size(), 'Lista tareas correcta');
+        System.assertNotEquals(false, !listaTarea.isEmpty(), 'Lista tareas correcta');
     }
 
     @istest
@@ -120,16 +128,24 @@ public with sharing class SAC_QueueableEnvioEmail_Test {
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         permisos.add(permiSetAssi2);
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
 
         Test.startTest();
         System.runAs(usuario) {
 
             mapTareas.put(true, listaTarea);
-            System.enqueueJob(new SAC_QueueableEnvioEmail(mapTareas, caso.CaseNumber));
+            DateTime dt = DateTime.now();
+            Long dateInMilliseconds = dt.getTime();
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+            .addString(String.valueOf(dateInMilliseconds))
+            .build();
+            try {
+                System.enqueueJob(new SAC_QueueableEnvioEmail(mapTareas, caso.CaseNumber), options);    
+            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
         }
         Test.stopTest();
 
-        System.assertNotEquals(null, listaTarea.size(), 'Lista tareas correcta');
+        System.assertNotEquals(false, !listaTarea.isEmpty(), 'Lista tareas correcta');
     }
 }

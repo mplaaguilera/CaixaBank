@@ -18,14 +18,16 @@ public with sharing class SAC_LCMP_InsertarEscalado_Test {
         User usuario;
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
-            usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuario);
+            usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            SAC_DatabaseDML.insertDML(usuario, false);     
+            //Database.insert(usuario);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);    
+            //Database.insert(permiSetAssi);
         }
 
         List<CC_Grupo_Colaborador__c> listagrupos = new List<CC_Grupo_Colaborador__c>();
@@ -52,13 +54,15 @@ public with sharing class SAC_LCMP_InsertarEscalado_Test {
             listagrupos[2].SAC_Email__c = 'testing@test.test';
             listagrupos[2].SAC_DeveloperName__c = 'FYRLEGAL';
             
-            Database.insert(listagrupos);
+            SAC_DatabaseDML.insertListDML(listagrupos, false);    
+            //Database.insert(listagrupos);
             grupo = listagrupos[0];
 
             // Colaborador contact
             CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = SAC_TestDataFactory.crearColaboradorContact(usuario.Id, grupo.Id); 
             grupoColaboradorContact.SAC_Administrador__c = true;
-            Database.insert(grupoColaboradorContact);
+            SAC_DatabaseDML.insertDML(grupoColaboradorContact, false);   
+            //Database.insert(grupoColaboradorContact);
 
             // Reclamacion
 
@@ -180,7 +184,8 @@ public with sharing class SAC_LCMP_InsertarEscalado_Test {
         Case casoReclamacion10 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl10);
         listaReclamaciones.add(casoReclamacion10);
 
-        Database.insert(listaReclamaciones); 
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
+        //Database.insert(listaReclamaciones); 
         
 
             //Interaccion Consulta
@@ -195,7 +200,8 @@ public with sharing class SAC_LCMP_InsertarEscalado_Test {
             camposEsc.put('SAC_ImporteAutorizado__c', 20);
             
             SAC_Interaccion__c escalado = SAC_TestDataFactory.crearInteraccion('Escalado',camposEsc);
-            Database.insert(escalado); 
+            SAC_DatabaseDML.insertDML(escalado, false);
+            //Database.insert(escalado); 
         }
 
 
@@ -212,7 +218,8 @@ public with sharing class SAC_LCMP_InsertarEscalado_Test {
         camposParam.put('SAC_validarImporte__c', false);
         
         SAC_ParametrizacionEscalado__c parametrizacionEscalado = SAC_TestDataFactory.crearParamEsc(camposParam);
-        Database.insert(parametrizacionEscalado);
+        SAC_DatabaseDML.insertDML(parametrizacionEscalado, false);
+        //Database.insert(parametrizacionEscalado);
 
  
     }
@@ -293,7 +300,8 @@ public with sharing class SAC_LCMP_InsertarEscalado_Test {
             newcont2.FirstPublishLocationId  = caso.id;
             adjuntos.add(newcont2);
 
-            Database.insert(adjuntos);
+            SAC_DatabaseDML.insertListDML(adjuntos, false);
+            //Database.insert(adjuntos);
                 
             SAC_LCMP_InsertarEscalado.insertarAdjuntoCaso(caso.Id, 2);
         }
@@ -337,7 +345,8 @@ public with sharing class SAC_LCMP_InsertarEscalado_Test {
         List<Id> listaIdsCasosRetornar = new List<Id>();
 
         Test.startTest();
-        Database.update(caso);
+        SAC_DatabaseDML.insertDML(caso, false);
+        //Database.update(caso);
 		system.runAs(usuario) {
         	caso = SAC_LCMP_InsertarEscalado.recuperarCaso(caso.Id);
         }
@@ -372,7 +381,8 @@ public with sharing class SAC_LCMP_InsertarEscalado_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true];
 
         ContentVersion cv = SAC_TestDataFactory.crearContentVersion(reclamacion);
-        Database.insert(cv);
+        SAC_DatabaseDML.insertDML(cv, false);
+        //Database.insert(cv);
         ContentVersion[] resultado;
 		System.runAs(usuario){
             Test.startTest();

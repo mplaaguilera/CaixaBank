@@ -57,13 +57,9 @@ public with sharing class CBK_PurgeProcess_Utils {
                     planificacion.Activo__c = true;
                     planificacion.BatchSize__c = purgeProcess.CBK_BatchSize__c;
                     planificacion.Calc_NextExec__c = 'SCHED';
-                    
-                    CBK_Framework_Batch_Apex__mdt conf = new CBK_Framework_Batch_Apex__mdt();
-                    planificacion.Proyecto__c = CBK_BatchJob_Helper.findProject('CBK_PurgeRecordsBatch',conf);
-            
+                    planificacion.Proyecto__c = CBK_BatchJob_Helper.findProjectName('CBK_PurgeRecordsBatch');
                     planificacion.Notif__c= purgeProcess.CBK_Notif__c;
                     planificacion.Email_Notif__c = purgeProcess.CBK_Email_Notif__c;
-        
                     planificacion.LastExec_Sched__c = purgeProcess.CBK_LastExec_Sched__c;
                     planificacion.Lunes__c = purgeProcess.CBK_Lunes__c;
                     planificacion.Martes__c = purgeProcess.CBK_Martes__c;
@@ -75,6 +71,7 @@ public with sharing class CBK_PurgeProcess_Utils {
                     planificacion.Periodicidad__c = purgeProcess.CBK_Periodicidad__c;
                     planificacion.Priority__c = 1;
                     planificacion.Tipo__c = 'Periodico';
+                    planificacion.UsuarioContexto__c = 'OT';
                     planificacion.Tipo_de_periodicidad__c = 'Dias';
                     planificacion.params__c = '{"idRecordPurgeProcess":"'+purgeProcess.Id+'"}';
 

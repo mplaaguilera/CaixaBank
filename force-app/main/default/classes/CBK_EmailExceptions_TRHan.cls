@@ -10,7 +10,7 @@ public class CBK_EmailExceptions_TRHan {
             for (EmailMessage em : emList) {
                 if(em.Incoming){
                     CBK_EmailMessage__e peLog = new CBK_EmailMessage__e();
-                    peLog.Project__c = CBK_BatchJob_Helper.findProject(handlerClassType)?.left(30);
+                    peLog.Project__c = CBK_BatchJob_Helper.findProjectName(handlerClassType)?.left(30);
                     peLog.Log_Message__c = e.getMessage()?.left(2000);
                     peLog.Exception__c = e.getStackTraceString()?.left(2000);
                     peLog.Subject__c = em.Subject?.left(3000);

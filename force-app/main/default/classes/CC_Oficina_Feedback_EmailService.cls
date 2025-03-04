@@ -71,7 +71,12 @@ public with sharing class CC_Oficina_Feedback_EmailService implements Messaging.
                 }
            
                 //campoIDFAQ = body.substringBetween('ID FAQ:', '\n').deleteWhitespace();
-                campoUrlFAQ = body.substringBetween('ID FAQ:', '\n').deleteWhitespace();
+                List <CC_Settings__c> urlFAQ = [SELECT Name, CC_Configuracion_1__c FROM CC_Settings__c WHERE Name = 'CC_UrlFAQ' AND CC_Activa__c = true LIMIT 1];
+                if(!urlFAQ.isEmpty()){
+                    campoUrlFAQ = urlFAQ[0].CC_Configuracion_1__c + body.substringBetween('ID FAQ:', '\n').deleteWhitespace();
+                } else{
+                    CBK_Log.debug('No se ha encontrado la URL');
+                }
                 //Identificación del cliente si hay una sola cuenta y contacto con el email remitente
                 Id accountId = null;
                 Id contactId = null;
@@ -326,7 +331,11 @@ public with sharing class CC_Oficina_Feedback_EmailService implements Messaging.
         
         List<Messaging.SingleEmailMessage> correosInsertar = new List<Messaging.SingleEmailMessage>();
         Messaging.SingleEmailMessage correo = new Messaging.SingleEmailMessage();
-        correo.setOrgWideEmailAddressId([SELECT Id, displayname, Address FROM OrgWideEmailAddress WHERE displayname = 'Atención Empleados CaixaBank' LIMIT 1].Id);
+        CC_Settings__c values = CC_Settings__c.getValues('CC_EmailAtencionEmpleadosCaixa');
+
+        //correo.setOrgWideEmailAddressId([SELECT Id, displayname, Address FROM OrgWideEmailAddress WHERE displayname = 'Correo Pruebas CC' LIMIT 1].Id);
+        //correo.setOrgWideEmailAddressId([SELECT Id, displayname, Address FROM OrgWideEmailAddress WHERE displayname = 'Atención Empleados CaixaBank' LIMIT 1].Id);
+        correo.setOrgWideEmailAddressId([SELECT Id, displayname, Address FROM OrgWideEmailAddress WHERE displayname = :values.CC_Configuracion_1__c LIMIT 1].Id);
         correo.setToAddresses(new List<String>{email});
         correo.setTreatBodiesAsTemplate(true);
         correo.setSubject(plantilla.Subject);
@@ -339,7 +348,7 @@ public with sharing class CC_Oficina_Feedback_EmailService implements Messaging.
         List<Messaging.SendEmailResult> resultadoEnvio = Messaging.sendEmail(correosInsertar);
         for (Messaging.SendEmailResult result : resultadoEnvio) {
             if (!result.success) {
-                System.debug('No se pudo enviar el correo: ' + result.errors[0].message);
+                CBK_Log.debug('No se pudo enviar el correo: ' + result.errors[0].message);
             } 
         }
     }

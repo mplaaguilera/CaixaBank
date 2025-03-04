@@ -16,15 +16,17 @@ public with sharing class SAC_GenialView_Controller_Test {
     @TestSetup
     static void makeData(){
         //Usuario SAC General
-        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0]; 
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);     
+        //Database.insert(usuarioGeneral);
 
         List<PermissionSet> permiSets = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSet permiSet = permiSets[0];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             //Reclamacion
@@ -40,7 +42,8 @@ public with sharing class SAC_GenialView_Controller_Test {
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
             reclamacion.SAC_NumeroDelDocumento__c = '86645006G';
             reclamacion.SAC_EmailRepresentante__c = 'rec@invalid.com';
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false); 
+            //Database.insert(reclamacion);
 
             //Pretension
             Map<String, Object> camposPretl = new Map<String, Object>();
@@ -49,7 +52,8 @@ public with sharing class SAC_GenialView_Controller_Test {
             Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPretl);
             pretension.SAC_NumeroDelDocumento__c = '86645006G';
             pretension.SAC_EmailRepresentante__c = 'pret@invalid.com';
-            Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(pretension, false); 
+            //Database.insert(pretension);
 
             String recResRT = Schema.SObjectType.SAC_Genial_Resultado__c.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion_IA').getRecordTypeId();
             String pretResRT = Schema.SObjectType.SAC_Genial_Resultado__c.getRecordTypeInfosByDeveloperName().get('SAC_Pretension_IA').getRecordTypeId();
@@ -69,7 +73,8 @@ public with sharing class SAC_GenialView_Controller_Test {
                 SAC_Naturaleza__c = 'SAC_001',
                 recordTypeId = recResRT
             );
-            Database.insert(genRes);
+            SAC_DatabaseDML.insertDML(genRes, false); 
+            //Database.insert(genRes);
 
             //Resultado genial Pretension
             SAC_Genial_Resultado__c genResPret;
@@ -81,7 +86,8 @@ public with sharing class SAC_GenialView_Controller_Test {
                 SAC_EmailRepresentante__c = 'diferente@invalid.com',
                 recordTypeId = pretResRT
             );
-            Database.insert(genResPret);
+            SAC_DatabaseDML.insertDML(genResPret, false); 
+            //Database.insert(genResPret);
         }
     }
 
@@ -167,7 +173,8 @@ public with sharing class SAC_GenialView_Controller_Test {
             SAC_NombreContacto__c = 'Nombre Test',
             recordTypeId = recSecResRT
         );
-        Database.insert(genResRecSec);
+        SAC_DatabaseDML.insertDML(genResRecSec, false);
+        //Database.insert(genResRecSec);
 
         list<SAC_Genial_Resultado__c> resultado = new list<SAC_Genial_Resultado__c>();
 
@@ -238,7 +245,8 @@ public with sharing class SAC_GenialView_Controller_Test {
             Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPretl);
             pretension.SAC_NumeroDelDocumento__c = '86645006G';
             pretension.SAC_EmailRepresentante__c = 'pretensiontest@invalid.com';
-            Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);
 
         
         // Crear un registro de resultado genial con el record type obtenido y asociarlo al caso
@@ -279,7 +287,8 @@ public with sharing class SAC_GenialView_Controller_Test {
             SAC_EmailRepresentante__c = 'diferente2@invalid.com',
             recordTypeId = reclaResRT
         );
-        Database.insert(genResPret);
+        SAC_DatabaseDML.insertDML(genResPret, false);
+        //Database.insert(genResPret);
         
         
         System.runAs(usuario){

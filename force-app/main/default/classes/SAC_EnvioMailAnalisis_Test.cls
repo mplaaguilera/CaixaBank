@@ -6,7 +6,8 @@ public with sharing class SAC_EnvioMailAnalisis_Test {
         //Usuario SAC General
         User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
         usuario.Username = 'sacacuserecibo@test.com';
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertDML(usuario, false);
+        //Database.insert(usuario);
 
         //Reclamacion
         List<Case> listaCasos = new List<Case>(); 
@@ -15,6 +16,7 @@ public with sharing class SAC_EnvioMailAnalisis_Test {
         camposRecl.put('Origin', 'Backoffice');
         camposRecl.put('SAC_TipoConsumidor__c', 'Si');
         camposRecl.put('OS_Email__c', 'testsac@testsac.testsac');
+        camposRecl.put('SAC_CheckResumen__c', true);
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
         listaCasos.add(casoReclamacion);
 
@@ -23,13 +25,16 @@ public with sharing class SAC_EnvioMailAnalisis_Test {
         camposRecl.put('Subject', 'TestRec2');
         camposRecl.put('Origin', 'Backoffice');
         camposRecl.put('SAC_TipoConsumidor__c', 'Si');
+        camposRecl.put('SAC_CheckResumen__c', true);
         Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
         listaCasos.add(casoReclamacion2);
 
-        Database.insert(listaCasos);
+        SAC_DatabaseDML.insertListDML(listaCasos, false);
+        //Database.insert(listaCasos);
 
         List<CC_Grupo_Colaborador__c> listaGrupos = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion', 1);
-        Database.insert(listaGrupos);
+        SAC_DatabaseDML.insertListDML(listaGrupos, false);
+        //Database.insert(listaGrupos);
 
         SAC_MaestroAccionesReclamacion__c maestroTareas = SAC_TestDataFactory.crearMaestroAcciones(1, listaGrupos[0].Id)[0];
         maestroTareas.Name = 'IMPRIMIR CARTAS ORDINARIO';
@@ -38,8 +43,9 @@ public with sharing class SAC_EnvioMailAnalisis_Test {
         maestroTareas.SAC_PlazoMaximo__c = 3;
         maestroTareas.SAC_Prorroga__c = 3;
         maestroTareas.SAC_Activo__c = true;
-        Database.insert(maestroTareas);
-
+        SAC_DatabaseDML.insertDML(maestroTareas, false);
+        //Database.insert(maestroTareas);
+        
         System.runAs(usuario){
             EmailTemplate validEmailTemplate = new EmailTemplate();
             validEmailTemplate.isActive = true;
@@ -50,7 +56,8 @@ public with sharing class SAC_EnvioMailAnalisis_Test {
             validEmailTemplate.Body = 'Texted';
             validEmailTemplate.FolderId = usuario.Id;
     
-            Database.insert(validEmailTemplate);
+            SAC_DatabaseDML.insertDML(validEmailTemplate, false);
+            //Database.insert(validEmailTemplate);
 
             //SAC_Plantilla
             SAC_PlantillaRedaccion__c plantillaSAC = new SAC_PlantillaRedaccion__c();
@@ -58,7 +65,8 @@ public with sharing class SAC_EnvioMailAnalisis_Test {
             plantillaSAC.RecordTypeId = Schema.SObjectType.SAC_PlantillaRedaccion__c.getRecordTypeInfosByDeveloperName().get('SAC_Redaccion').getRecordTypeId();
             plantillaSAC.SAC_PlantillaCastellanoId__c = validEmailTemplate.Id;
             plantillaSAC.SAC_TipoPlantilla__c = 'SAC_CartaAutomatica';
-            Database.insert(plantillaSAC);
+            SAC_DatabaseDML.insertDML(plantillaSAC, false);
+            //Database.insert(plantillaSAC);
 
             //Maestro temas
             SAC_MaestroTemas__c maestroTema = new SAC_MaestroTemas__c();
@@ -67,7 +75,8 @@ public with sharing class SAC_EnvioMailAnalisis_Test {
             maestroTema.SAC_Dias__c = 1;
             maestroTema.SAC_Plantilla__c = plantillaSAC.Id;
             maestroTema.SAC_Activo__c = true;
-            Database.insert(maestroTema);
+            SAC_DatabaseDML.insertDML(maestroTema, false);
+            //Database.insert(maestroTema);
         }
     }
 
@@ -80,7 +89,8 @@ public with sharing class SAC_EnvioMailAnalisis_Test {
         recla.SAC_StatusAuxiliar__c = 'SAC_002';
         recla.CC_No_Identificado__c = true;
         recla.SAC_FechaRecepcion__c = System.now().addDays(-2);
-        Database.update(recla);
+        SAC_DatabaseDML.updateDML(recla, false);
+        //Database.update(recla);
 
         Test.startTest();
         system.runAs(usuario) {
@@ -102,7 +112,8 @@ public with sharing class SAC_EnvioMailAnalisis_Test {
         recla.CC_No_Identificado__c = true;
         recla.SAC_FechaRecepcion__c = System.now().addDays(-2);
         recla.CC_Canal_Respuesta__c = 'SAC_CartaPostal';
-        Database.update(recla);
+        SAC_DatabaseDML.updateDML(recla, false);
+        //Database.update(recla);
 
         Test.startTest();
         system.runAs(usuario) {

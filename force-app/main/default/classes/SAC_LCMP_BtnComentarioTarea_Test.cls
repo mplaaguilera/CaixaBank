@@ -17,13 +17,15 @@ public with sharing class SAC_LCMP_BtnComentarioTarea_Test {
 
         //Usuario SAC_General
         User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertDML(usuario, false);
+        //Database.insert(usuario);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario){
             //Reclamacion
@@ -31,17 +33,19 @@ public with sharing class SAC_LCMP_BtnComentarioTarea_Test {
             camposRecl.put('Subject', 'reclamacion');
             
             Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);
+            //Database.insert(casoReclamacion);
 
             SAC_Accion__C tarea = SAC_TestDataFactory.crearTareas(1,casoReclamacion,false)[0];
             tarea.SAC_Comentarios__c ='comentarios 1'; 
             tarea.SAC_Comentarios2__c = 'comentarios 2';
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
         }
     }
 
     @istest
-    static void getComentarios1_Test() {
+    static void getComentarios1Test() {
         SAC_Accion__C tarea = [SELECT Id FROM SAC_Accion__C ];
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         
@@ -55,7 +59,7 @@ public with sharing class SAC_LCMP_BtnComentarioTarea_Test {
     }
     
     @istest
-    static void getComentarios2_Test() {
+    static void getComentarios2Test() {
         SAC_Accion__C tarea = [SELECT Id FROM SAC_Accion__C ];
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         
@@ -85,7 +89,7 @@ public with sharing class SAC_LCMP_BtnComentarioTarea_Test {
     }
 
     @istest 
-    static void guardarComentario2Apex_Test() {
+    static void guardarComentario2ApexTest() {
         SAC_Accion__C tarea = [SELECT Id FROM SAC_Accion__C ];
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         

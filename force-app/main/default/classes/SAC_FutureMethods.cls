@@ -18,6 +18,7 @@ public without sharing class SAC_FutureMethods {
     
         private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
         private static final Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
+        private static final Id RECTYPECONSAC = mapRTsObjects.get('Case').get('SAC_ConsultaSAC').getRecordTypeId();
     
         public static void gestionMetodosFuturos(List<Case> newListCase, Map<Id, Case> mapOldCase/*, List<Case> familia*/){
         /*****************************************************************
@@ -356,7 +357,8 @@ public without sharing class SAC_FutureMethods {
                 }
     
                 //Insertar los permisos omitiendo los repetidos
-                Database.insert(listaCaseShareNuevos, false);
+                SAC_DatabaseDML.insertListDML(listaCaseShareNuevos, false);
+                //Database.insert(listaCaseShareNuevos, false);
             }
         }
     
@@ -407,7 +409,8 @@ public without sharing class SAC_FutureMethods {
             }
     
             if (!listaCSNuevos.isEmpty()) {
-                Database.insert(listaCSNuevos, false);
+                SAC_DatabaseDML.insertListDML(listaCSNuevos, false);
+                //Database.insert(listaCSNuevos, false);
             }
         }
 
@@ -639,5 +642,50 @@ public without sharing class SAC_FutureMethods {
             caso.CC_AcuseRecibo__c = '2';
             SAC_DatabaseDML.updateDML(caso, true);
 
+        }
+
+        /*****************************************************************
+        * @description Procesar la consulta SAC que se ha cambiado el grupo letrado
+        * VERSION        USER_STORY       AUTHOR            DATE         Description
+        * 1.0             US683740      Raúl Santos    09/01/25        Creación
+        *****************************************************************/
+        public static void eliminarPermisosOwnerLetrado(Set<Id> setIdConsultaSAC, Map<Id, Case> mapOldCase){
+
+            List<Case> listConsultasSAC = [SELECT SAC_Letrado__c FROM Case WHERE RecordTypeId = :RECTYPECONSAC AND Id IN :setIdConsultaSAC];
+
+            Set<String> nameUserLetrado = new Set<String>();
+            if(!listConsultasSAC.isEmpty()){
+                for(Case caso : listConsultasSAC){
+                    if(mapOldCase.get(caso.Id).SAC_Letrado__c != 'Pte. Asignar'){
+                        nameUserLetrado.add(mapOldCase.get(caso.Id).SAC_Letrado__c);
+                    }
+                }
+            }
+
+            if(!nameUserLetrado.isEmpty()){
+                eliminarCaseShareConsulta(setIdConsultaSAC, nameUserLetrado);
+            }            
+        }
+
+        /*****************************************************************
+        * @description Eliminar los permisos de edicción del owner letrado sobre la consulta SAC
+        * VERSION        USER_STORY       AUTHOR            DATE         Description
+        * 1.0             US683740      Raúl Santos    09/01/25        Creación
+        *****************************************************************/
+        @future
+        public static void eliminarCaseShareConsulta(Set<Id> setIdConsultaSAC, Set<String> nombreUsuario){
+
+            //Quitar permisos sobre el registro al propietario letrado
+            List<User> usuarios = [SELECT Id FROM User WHERE Name IN :nombreUsuario];
+
+            if(!usuarios.isEmpty()){
+                List<CaseShare> eliminarCS = [SELECT Id FROM CaseShare WHERE CaseId IN :setIdConsultaSAC AND UserOrGroupId IN :usuarios];
+            
+                if(Schema.sObjectType.Case.isUpdateable() && !eliminarCS.isEmpty()){  
+                    SAC_DatabaseDML.deleteListDML(eliminarCS, true); 
+                }else{
+                    throw new AuraHandledException('No tienes permisos');
+                }
+            }
         }
     }

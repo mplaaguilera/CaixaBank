@@ -210,7 +210,8 @@ public without sharing class SAC_LCMP_HomeOficina {
                             UserOrGroupId = userInfo.getUserId(),
                             AccessLevel = 'Edit'
                         ));
-        Database.insert(accionesShare, false);
+        SAC_DatabaseDML.insertListDML(accionesShare, false);
+        //Database.insert(accionesShare, false);
     }
 
     @AuraEnabled
@@ -222,7 +223,8 @@ public without sharing class SAC_LCMP_HomeOficina {
                             UserOrGroupId = userInfo.getUserId(),
                             AccessLevel = 'Edit'
                         ));
-        Database.insert(interaccionesShare, false);
+        SAC_DatabaseDML.insertListDML(interaccionesShare, false);
+        //Database.insert(interaccionesShare, false);
     }
 
     @AuraEnabled
@@ -245,7 +247,8 @@ public without sharing class SAC_LCMP_HomeOficina {
                 accShare.CaseAccessLevel = 'Edit'; //Necesario para la creación del caso. Una vez creado, se devuelve a none.
             }
 
-            Database.update(listaAccountShare);
+            SAC_DatabaseDML.updateListDML(listaAccountShare, true);
+            //Database.update(listaAccountShare);
         }
     }
 
@@ -261,7 +264,8 @@ public without sharing class SAC_LCMP_HomeOficina {
                 accShare.CaseAccessLevel = 'None'; //Se quita el permiso Edit dado anteriormente para poder crear el caso
             }
 
-            Database.update(listaAccountShare);
+            SAC_DatabaseDML.updateListDML(listaAccountShare, true);
+            //Database.update(listaAccountShare);
         }
     }
 

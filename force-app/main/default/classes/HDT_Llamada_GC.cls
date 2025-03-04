@@ -40,7 +40,7 @@ public with sharing class HDT_Llamada_GC {
 			CC_Perfil__c = inputLlamada.perfil,
 			KIN_Genesys_Cloud_URL_Grabacion__c = inputLlamada.urlGrabacion
 			);
-			
+
 			List<String> valoresPermitidosCanalEmpleado = new List<String>();
 			for (Schema.PicklistEntry picklistEntry : CC_Llamada__c.CC_Canal_del_Empleado__c.getDescribe().getPicklistValues()) {
 				valoresPermitidosCanalEmpleado.add(picklistEntry.getValue());
@@ -397,7 +397,7 @@ public with sharing class HDT_Llamada_GC {
 			CC_Id_Cognitivo__c = llamada.CC_Id_Cognitivo__c,
 			CC_Status_Autorizacion__c = llamada.CC_Status_Autorizacion__c
 			);
-			
+
 		List<String> valoresPermitidos = new List<String>();
 		for (Schema.PicklistEntry picklistEntry : Case.Canal_del_Empleado__c.getDescribe().getPicklistValues()) {
 			valoresPermitidos.add(picklistEntry.getValue());

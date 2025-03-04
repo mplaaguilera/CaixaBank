@@ -18,19 +18,19 @@ public with sharing class SAC_Grupo_Colaborador_BU_TRHan_Test {
         //USUARIO SAC_Administrador
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
         usuarioAdmin.Username = 'admin123436@caixatest.com';     
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
         //GRUPO COLABORADOR
         CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor',1)[0];
         grupoColaborador.SAC_PorcentajeAsignacion__c=100;
         grupoColaborador.SAC_MaximoCasosDiarios__c = 15;
         grupoColaborador.OwnerId = usuarioAdmin.id;
-        Database.insert(grupoColaborador);
+        SAC_DatabaseDML.insertDML(grupoColaborador, false);
 
         //USUARIO SAC_General
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
         usuarioGeneral.SAC_GruposPerteneciente__c = grupoColaborador.id;      
-        Database.insert(usuarioGeneral);   
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);
     }
 
     @isTest
@@ -39,15 +39,15 @@ public with sharing class SAC_Grupo_Colaborador_BU_TRHan_Test {
         User usuarioAdministrador = [SELECT id From User Where Username = 'admin123436@caixatest.com' AND isActive = true Limit 1];
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_Administrador'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioAdministrador.id);       
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
 
         system.runAs(usuarioAdministrador){
             gc.name='Grupo modificado';
             Test.startTest();
-            Database.update(gc);
+            SAC_DatabaseDML.updateDML(gc, false);
             Test.stopTest();  
         }  
-        List<CC_Grupo_Colaborador__c> listarGrupos = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'Grupo modificado'];     
-        system.assertEquals(listarGrupos.size() , 1, 'No se ha modificado la lista.');
+        
+        system.assertEquals([SELECT Count() FROM CC_Grupo_Colaborador__c WHERE Name = 'Grupo modificado'] , 1, 'No se ha modificado la lista.');
     }   
 }

@@ -1,0 +1,15 @@
+<template>
+    <div class="buttons">
+        <lightning-button label="Petit" onclick={handleSmall}></lightning-button>
+        <lightning-button label="Gran" onclick={handleLarge}></lightning-button>
+        <lightning-button label="Mitjà" onclick={handleMedium}></lightning-button>
+    </div>
+
+    <div class="modal-container">
+        <div class="modal" lwc:ref="modal">
+            <div class="content" lwc:ref="content">
+                <p>{modalText}</p>
+            </div>
+        </div>
+    </div>
+</template>

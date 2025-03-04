@@ -84,7 +84,7 @@ global with sharing class CC_CAU_Bankia_EmailService implements Messaging.Inboun
                     if (!idProblema.equals('') && !usuarioCaixa.equals(''))
                     {
                         //Almacenamos el código del problema pasado por CAU Bankia
-                        newCase.CC_Id_CAU_Bankia__c = idProblema;
+                        //newCase.CC_Id_CAU_Bankia__c = idProblema;
                         
                         //Búqueda de contacto por U01
                         if (usuarioCaixa!='') {

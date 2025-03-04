@@ -150,4 +150,30 @@ public without sharing class SAC_LCMP_DesvincularReclamacion {
         return mensajeDesvinculacion;
     }
 
+
+    /***********************************************************************************************************
+    * Proposito: Validar si se permite desvincular una reclamación. No se permite si es una complementaria y ya ha sido resuelta
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0             US1094159      Álex Polo     22/01/25        Creación
+    ***********************************************************************************************************/ 
+    @AuraEnabled
+    public static Boolean validarDesvincularComplementaria(Id idCaso) {
+        Case reclamacion = new Case();
+        List<Case> listaCasos = [SELECT Id, SAC_Naturaleza__c, OS_Fecha_Resolucion__c FROM Case WHERE Id = :idCaso];
+        if(!listaCasos.isEmpty()){
+            reclamacion = listaCasos[0];
+            if(reclamacion.SAC_Naturaleza__c == 'SAC_007' && reclamacion.OS_Fecha_Resolucion__c != null){
+                return false;   //Si es complementaria y SÍ ha sido resuelta (tiene fecha resolución), no se puede desvincular ni vincular
+            }else{
+                return true;        //Si no es complementaria o si sí lo es pero no está resuelta (no tiene fecha de resolución), sí se puede desvincular y vincular
+            }
+
+        }else{
+            return false;
+        }
+    }
+
 }

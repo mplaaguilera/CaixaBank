@@ -41,8 +41,8 @@ private class CSBD_MacRelatedList_Apex_Test {
             CSBD_MacRelatedListApex.crearTareaVinculacion(oppCentralita.Id, identificadorPadre);
 			Test.stopTest();
 
-            List<Task> tareasVinculacion = [SELECT Id FROM Task WHERE WhatId = :oppCentralita.Id AND Type = 'Vinculación a oportunidad padre' LIMIT 2];
-			System.assertEquals(1, tareasVinculacion.size(), 'Debería haberse creado 1 tarea de tipo "Vinculación a oportunidad padre"');
+            Integer numtareasVinculacion = [SELECT COUNT() FROM Task WHERE WhatId = :oppCentralita.Id AND Type = 'Vinculación a oportunidad padre' LIMIT 2];
+			System.assertEquals(1, numtareasVinculacion, 'Debería haberse creado 1 tarea de tipo "Vinculación a oportunidad padre"');
 		}
 	}
 }

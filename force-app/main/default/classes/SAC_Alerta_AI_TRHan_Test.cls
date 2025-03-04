@@ -4,14 +4,16 @@ public with sharing class SAC_Alerta_AI_TRHan_Test {
     static void makeData(){
 
         //Usuario SAC General
-		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             //Reclamacion
@@ -19,7 +21,8 @@ public with sharing class SAC_Alerta_AI_TRHan_Test {
             camposRecl.put('Subject', 'TestRec');
 
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false); 
+            //Database.insert(reclamacion);
         }
     }
     @isTest
@@ -30,7 +33,8 @@ public with sharing class SAC_Alerta_AI_TRHan_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
 		System.runAs(usuario){
             Test.startTest();
-            Database.insert(alerta);
+            SAC_DatabaseDML.insertDML(alerta, false); 
+            //Database.insert(alerta);
             Test.stopTest();
         }
 

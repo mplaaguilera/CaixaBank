@@ -5,7 +5,7 @@
 			if (response.getState() === 'SUCCESS') {
 				const esMiembroCola3n = response.getReturnValue().esMiembroCola3n;
 				component.set('v.esMiembroCola3n', esMiembroCola3n);
-				//component.set('v.esAdmin', response.getReturnValue().esAdmin);
+				component.set('v.esAdmin', response.getReturnValue().esAdmin);
 				component.set('v.resaltar', !response.getReturnValue().esAdmin);
 
 				if (esMiembroCola3n) {
@@ -15,7 +15,7 @@
 				}
 			}
 		});
-		$A.enqueueAction(isMemberQueue);
+		window.setTimeout($A.getCallback(() => $A.enqueueAction(isMemberQueue)), 10000);
 	},
 
 

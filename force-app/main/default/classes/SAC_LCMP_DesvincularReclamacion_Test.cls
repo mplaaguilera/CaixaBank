@@ -16,13 +16,15 @@ public with sharing class SAC_LCMP_DesvincularReclamacion_Test {
     static void makeData(){
 
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false); 
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
 
         List<Case> listaReclamaciones = new List<Case>();
@@ -51,7 +53,20 @@ public with sharing class SAC_LCMP_DesvincularReclamacion_Test {
             Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
             listaReclamaciones.add(casoReclamacion2);
 
-            Database.insert(listaReclamaciones);
+            Map<String, Object> camposReclVinc = new Map<String, Object>();
+            camposReclVinc.clear();
+            camposReclVinc.put('Subject', 'ComplementariaVinculada');
+            camposReclVinc.put('Origin', 'Otros');
+            camposReclVinc.put('Status', 'SAC_003');
+            camposReclVinc.put('SAC_TipoConsumidor__c', 'No');
+            camposReclVinc.put('SAC_Naturaleza__c', 'SAC_007');
+            camposReclVinc.put('CC_Importe_Abonado__c', 5.0);
+            camposReclVinc.put('OwnerId', usuarioGeneral.id);
+            Case casoReclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion', camposReclVinc);
+            listaReclamaciones.add(casoReclamacion3);
+
+            SAC_DatabaseDML.insertListDML(listaReclamaciones, false); 
+            //Database.insert(listaReclamaciones);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -72,7 +87,8 @@ public with sharing class SAC_LCMP_DesvincularReclamacion_Test {
             Case consulta = SAC_TestDataFactory.crearCaso('Consulta',camposConsulta);
             listaPretConsultas.add(consulta);
 
-            Database.insert(listaPretConsultas);
+            SAC_DatabaseDML.insertListDML(listaPretConsultas, false); 
+            //Database.insert(listaPretConsultas);
 
 
             //Id recTypeTareas = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SAC_GrupoResponsableAccion').getRecordTypeId();
@@ -81,6 +97,20 @@ public with sharing class SAC_LCMP_DesvincularReclamacion_Test {
         }
     }
  
+    @isTest
+    static void validarDesvincularComplementariaTest(){
+        Test.startTest(); 
+        Case complementaria = [SELECT Id FROM Case WHERE subject = 'ComplementariaVinculada'];
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        
+        System.runAs(usuario){        
+            Boolean testResultado = SAC_LCMP_DesvincularReclamacion.validarDesvincularComplementaria(complementaria.Id);  
+            Assert.areEqual(true, testResultado, 'No se ha realizado la comprobación correctamente.');
+        }
+        Test.stopTest();
+    }
+
+
     @isTest
     static void reclamacionesVinculadasTest() {
         User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];

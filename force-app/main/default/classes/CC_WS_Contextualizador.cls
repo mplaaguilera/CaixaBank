@@ -37,7 +37,8 @@ public with sharing class CC_WS_Contextualizador {
     }
 
   public static Map<String, Object> obtenerDenegacionLlamada(String idCuenta, String idObjeto){
-    List<Account> numPerson = [SELECT CC_NumPerso__c FROM Account WHERE Id = :idCuenta];
+    List<Account> numPerson = [SELECT CC_NumPerso__c, AV_NumPerso__c FROM Account WHERE Id = :idCuenta LIMIT 1];
+    String numPer = !String.isEmpty(numPerson[0].AV_NumPerso__c) ? numPerson[0].AV_NumPerso__c : numPerson[0].CC_NumPerso__c;
     String numPersonHexa;
     List <Case> caso = new List <Case>();
     List <CC_Llamada__c> llamada = [SELECT CC_Info_Denegacion__c FROM CC_Llamada__c where id = :idObjeto];
@@ -47,8 +48,8 @@ public with sharing class CC_WS_Contextualizador {
     if(!idCase.isEmpty()){
       caso = [SELECT CC_Info_Denegacion__c FROM Case WHERE Id =: idCase[0].WhatId];
     }
-      if(!String.isEmpty(idCuenta) && !numperson.isEmpty() && !String.isEmpty(numPerson[0].CC_NumPerso__c)){
-        numPersonHexa = CC_MetodosUtiles.decimalToHex(decimal.valueOf(numPerson[0].CC_NumPerso__c));
+      if(!String.isEmpty(idCuenta) && !String.isEmpty(numPer)){
+        numPersonHexa = CC_MetodosUtiles.decimalToHex(decimal.valueOf(numPer));
       } else{
         mapReturn.put('Error al obtener numperson', 'Error al obtener numperson');
         return mapReturn;
@@ -78,15 +79,21 @@ public with sharing class CC_WS_Contextualizador {
 
   public static Map<String, Object> llamadaServicio(String numPersonHexa){
     Map < String, Object > mapReturn = new Map < String, Object > ();
+    HTTPResponse response;
     try {
       Map < String, String > mHeaders = new Map < String, String > ();
       mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
       //Descomentar esta linea SOLO PARA DEV  para que no falle el llamado. 
       //mHeaders.put('HTTP-HEADER-ACTOR', 'CBCCSF');
       mHeaders.put('x-absis-customerInternalId', numPersonHexa);
-      HttpRequest req = CBK_HttpServiceIntegration.getRequest(null, 'CC_Contextualizador', 'GET', mHeaders);
-  
-      HTTPResponse response = CBK_HttpServiceIntegration.callHttpService(req, null, 'CC_Contextualizador');
+
+      CBK_HttpServiceIntegration.RequestWapper integracion = new CBK_HttpServiceIntegration.RequestWapper();
+				integracion.method = 'GET';
+				integracion.intSetting = 'CC_Contextualizador';
+				integracion.body = null;
+				integracion.mHeaders = mHeaders;
+				HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
+				response = CBK_HttpServiceIntegration.callHttpService(request, numPersonHexa, 'CC_Contextualizador');
       // Parse the JSON response
       if (response.getStatusCode() != 200) {
        mapReturn.put('Error', 'La llamada al servicio fallo');

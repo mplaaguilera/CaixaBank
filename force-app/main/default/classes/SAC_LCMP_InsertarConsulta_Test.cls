@@ -3,6 +3,7 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
     
     @TestSetup
     static void makeData() { 
+        
         List<User> usuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(3);
         //usuario
         usuarios[0].Username = 'ustestesteo@test.com';
@@ -10,8 +11,9 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
         //usuario 2
         usuarios[1].Username = 'ustestesteo2@test.com';
         usuarios[1].Alias = 'alias2';
-        usuarios[1].ProfileId = [SELECT Id FROM Profile WHERE Name = 'System Administrator' OR Name = 'Administrador del sistema'].Id;        
-        Database.insert(usuarios);
+        usuarios[1].ProfileId = [SELECT Id FROM Profile WHERE Name = 'System Administrator' OR Name = 'Administrador del sistema'].Id; 
+        SAC_DatabaseDML.insertListDML(usuarios, false);       
+        //Database.insert(usuarios);
 
         //grupo colaborador nivel 2
         List<CC_Grupo_Colaborador__c> listaGrupos = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1);
@@ -28,12 +30,16 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
         listaGrupos[0].SAC_DeveloperName__c = 'Test';
         listaGrupos[0].SAC_TieneUsuariosActivos__c = true;
         listaGrupos[0].SAC_TienePropietario__c = true;
-        Database.insert(listaGrupos);
+        SAC_DatabaseDML.insertListDML(listaGrupos, false);
+        //Database.insert(listaGrupos);
 
+        Test.startTest();
         CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = SAC_TestDataFactory.crearColaboradorContact(usuarios[1].id,listaGrupos[0].id);
-        Database.insert(grupoColaboradorContact);
+        SAC_DatabaseDML.insertDML(grupoColaboradorContact, false);
+        //Database.insert(grupoColaboradorContact);
         CC_Grupo_Colaborador_Contact__c grupoColaboradorContact2 = SAC_TestDataFactory.crearColaboradorContact(usuarios[0].id,listaGrupos[0].id);
-        Database.insert(grupoColaboradorContact2);
+        SAC_DatabaseDML.insertDML(grupoColaboradorContact2, false);
+        //Database.insert(grupoColaboradorContact2);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -44,7 +50,8 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
         camposRecl.put('OwnerId', usuarios[0].Id);
 
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
 
         //Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -55,7 +62,8 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
         camposPret.put('OwnerId', usuarios[0].Id);
 
         Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(casoPretension);  
+        SAC_DatabaseDML.insertDML(casoPretension, false);
+        //Database.insert(casoPretension);  
 
         //Interaccion consulta
         Map<String, Object> camposCons = new Map<String, Object>();
@@ -66,16 +74,20 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
         camposCons.put('OwnerId', usuarios[0].Id);
         
         SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
-        Database.insert(consulta);
+        SAC_DatabaseDML.insertDML(consulta, false);
+        //Database.insert(consulta);
 
         //Tarea
         List<SAC_Accion__c> listaTareas = SAC_TestDataFactory.crearTareas(1,casoReclamacion, false);
         listaTareas[0].SAC_EquipoResponsable__c = listaGrupos[0].Id; 
-        Database.insert(listaTareas);
+        SAC_DatabaseDML.insertListDML(listaTareas, false);
+        //Database.insert(listaTareas);
+        Test.stopTest();
     }
 
     @isTest
     static void insertarConsultaTest() {
+        Test.startTest();
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
         Case caso = [SELECT Id,Subject FROM Case WHERE subject = 'TestConsulta' LIMIT 1];
 
@@ -83,12 +95,13 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         String idRec = caso.Id; 
         Case consultaInsertada;
 
-        Test.startTest();
+        
         System.runAs(usuario) {
             SAC_LCMP_InsertarConsulta.insertarConsulta(idRec);
             consultaInsertada = [SELECT Id,Subject FROM Case WHERE subject = 'TestConsulta' LIMIT 1];
@@ -101,6 +114,7 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
 
     @isTest
     static void insertarConsultaTestFail() {
+        Test.startTest();
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
         Case caso = [SELECT Id,Subject FROM Case WHERE subject = 'TestConsulta' LIMIT 1];
 
@@ -110,9 +124,10 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
-        Test.startTest();
+        
         System.runAs(usuario) {
             try{
                 SAC_LCMP_InsertarConsulta.insertarConsulta(idRec); 
@@ -126,6 +141,7 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
 
     @isTest 
     static void tienePermisosGrupoTest() {
+        Test.startTest();
         SAC_LCMP_InsertarConsulta.PermisosUsuariosWrapper  respuestaWrapper;
 
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo2@test.com' AND isActive = true Limit 1];
@@ -135,9 +151,10 @@ public with sharing class SAC_LCMP_InsertarConsulta_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
-        Test.startTest();
+        
         System.runAs(usuario) {                                         
             respuestaWrapper = SAC_LCMP_InsertarConsulta.tienePermisosGrupo(casoReclamacion.id);
         }

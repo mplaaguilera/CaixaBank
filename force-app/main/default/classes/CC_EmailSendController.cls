@@ -3,13 +3,13 @@ public with sharing class CC_EmailSendController {
     @AuraEnabled
     public static Case datosCaso(Id recordId) {
         return [SELECT Description, CC_Detalles_Consulta__c, Contact.Email, Contact.Name, Contact.RecordTypeId, RecordTypeId,
-                RecordType.DeveloperName, Account.CC_Email__c, ContactId,  Account.CC_NumPerso__c, Account.AV_EAPGestor__r.Name,
+                RecordType.DeveloperName, Account.CC_Email__c, ContactId,  Account.CC_NumPerso__c, Account.AV_NumPerso__c, Account.AV_EAPGestor__r.Name,
                 Account.AV_EAPGestor__r.AccountId, Account.AV_EAPGestor__c, Account.Name, AccountId, Account.AV_OficinaPrincipal__c,
                 Account.AV_OficinaPrincipal__r.RecordTypeId, Account.AV_OficinaPrincipal__r.CC_Email__c,
                 Account.AV_OficinaPrincipal__r.Name, Account.PersonEmail, Account.RecordType.DeveloperName, Account.RecordTypeId,
-                Account.CC_Marca_senior__c, CC_Tipo_Cliente__c, CC_Canal_Procedencia__c, Contact.Phone, CC_Tipo_Cliente_Formula__c,
+                Account.CC_MarcaSenior__c, CC_Tipo_Cliente__c, CC_Canal_Procedencia__c, Contact.Phone, CC_Tipo_Cliente_Formula__c,
                 CC_MCC_Motivo__c, Origin, Status, Subject, CreatedDate, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, CC_Grupo_3N__c,
-                CC_No_Identificado__c, CC_En_Segundo_Nivel__c, CC_Traslado_2N__c, CC_En_Tercer_Nivel__c, CC_Canal_Operativo__c, 
+                CC_No_Identificado__c, CC_En_Segundo_Nivel__c, CC_Traslado_2N__c, CC_En_Tercer_Nivel__c, CC_Canal_Operativo__c,
                 CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c,CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c , CC_MCC_Causa__c,
                 CC_MCC_Solucion__c,CC_Oportunidad_Creada__c,ParentId, Parent.RecordType.DeveloperName, CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_Representante__c
                 FROM Case WHERE Id = :recordId];
@@ -69,20 +69,31 @@ public with sharing class CC_EmailSendController {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<CC_Grupo_Colaborador__c> buscarGruposColaboradores(String cadenaBusqueda, String negocio) {
-        //Se buscan grupos de colaborador de tipo grupo colaborador o centro CaixaBank
-        return [SELECT Name FROM CC_Grupo_Colaborador__c
-                WHERE Name LIKE :('%' + cadenaBusqueda + '%') AND
-                RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador__c', 'CC_Grupo_Colaborador')
-                AND OS_Negocio__c = :negocio
-                AND CC_Queue_Traslado__c = null
-                LIMIT 30];
+    public static List<CC_Grupo_Colaborador__c> buscarGruposColaboradores(String cadenaBusqueda, String negocio, Boolean remitir, String tipoCaso) {
+        if(tipoCaso == 'CC_Cliente') {
+            //Se buscan grupos de colaborador de tipo grupo colaborador o centro CaixaBank
+            List<String> tipo = (remitir ? new List<String>{'Remitidos','Traslados y Remitidos'} : new List<String>{'Traslados','Traslados y Remitidos'});
+            return [SELECT Name FROM CC_Grupo_Colaborador__c
+                    WHERE Name LIKE :('%' + cadenaBusqueda + '%') AND
+                    RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador__c', 'CC_Grupo_Colaborador')
+                    AND OS_Negocio__c = :negocio
+                    AND CC_Queue_Traslado__c = null
+                    AND CC_Tipo__c IN :tipo
+                    LIMIT 30];
+        } else {
+            return [SELECT Name FROM CC_Grupo_Colaborador__c
+                    WHERE Name LIKE :('%' + cadenaBusqueda + '%') AND
+                    RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador__c', 'CC_Grupo_Colaborador')
+                    AND OS_Negocio__c = :negocio
+                    AND CC_Queue_Traslado__c = null
+                    LIMIT 30];
+        }
     }
 
     @AuraEnabled(cacheable=true)
     public static List<Contact> buscarEmpleado(String cadenaBusqueda) {
         //Se buscan grupos de colaborador de tipo grupo colaborador o centro CaixaBank
-                return [FIND :cadenaBusqueda RETURNING Contact(name, Email where RecordType.DeveloperName = 'CC_Empleado' AND CC_Inactivo__c = false)][0];
+        return [FIND :cadenaBusqueda RETURNING Contact(name, Email where RecordType.DeveloperName = 'CC_Empleado' AND CC_Inactivo__c = false)][0];
     }
 
     @AuraEnabled(cacheable=true)
@@ -898,8 +909,8 @@ public with sharing class CC_EmailSendController {
     @AuraEnabled(cacheable=true)
     public static List<pickListWrapper> getGrupoList() {
         List<pickListWrapper> optionsGrupos = new List<pickListWrapper>();
-        Id recordTypeIdCentro = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-        Id recordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+        Id recordTypeIdCentro = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador__c', 'CC_CentroCaixaBank');
+        Id recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador__c', 'CC_Grupo_Colaborador');
 
         List<CC_Grupo_Colaborador__c> grupos = [SELECT Name FROM CC_Grupo_Colaborador__c
                                                 WHERE (RecordTypeId = :recordTypeIdCentro
@@ -916,12 +927,16 @@ public with sharing class CC_EmailSendController {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<PickListWrapperTraslados> getMCCGrupoList(String recordId, String tipoGrupo) {
-
-        List<Case> casos = [SELECT CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Motivo__c, CC_Canal_Operativo__c FROM Case WHERE Id = :recordId LIMIT 1];
+    public static List<PickListWrapperTraslados> getMCCGrupoList(String recordId, String tipoGrupo, Boolean remitir) {
+        System.debug('recordId MMC ' + recordId);
+        System.debug('tipoGrupo MMC ' + tipoGrupo);
+        System.debug('REMITIR MMC ' + remitir);
+        List<Case> casos = [SELECT CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Motivo__c, CC_Canal_Operativo__c, RecordTypeId FROM Case WHERE Id = :recordId LIMIT 1];
         String tematica;
         String prodServicio;
         String motivo;
+        List<String> trasladarORemitir = (remitir ? new List<String>{'Remitidos','Traslados y Remitidos'} : new List<String>{'Traslados','Traslados y Remitidos'});
+        Id recordTypecaso;
 
         Set<String> idsMCC = new Set<String>();
         if (!casos.isEmpty()) {
@@ -942,6 +957,7 @@ public with sharing class CC_EmailSendController {
                 idsMCC.add(motivo);
             }
 
+            recordTypecaso = caso.RecordTypeId;
 
         }
 
@@ -950,13 +966,15 @@ public with sharing class CC_EmailSendController {
         Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
         Id recordTypeIdGrupo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador__c', 'CC_Grupo_Tercer_Nivel');
         Id recordTypeIdGrupo2N = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador__c', 'CC_Grupo_Segundo_Nivel');
+        Id recordTypeIdCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+
         List<CC_MCC_Grupo_Colaborador__c> grupos = new List<CC_MCC_Grupo_Colaborador__c>();
 
         List<PickListWrapperTraslados> optionsGrupos = new List<PickListWrapperTraslados>();
         List<String> nombreGrupo = new List<String>();
 
         if(tipoGrupo == '3N'){
-        	grupos = [SELECT CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id
+        	grupos = [SELECT CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
                       FROM CC_MCC_Grupo_Colaborador__c
                       WHERE CC_MCC__c IN :idsMCC
                       AND CC_Grupo_Colaborador__r.RecordtypeId = :recordTypeIdGrupo
@@ -970,7 +988,7 @@ public with sharing class CC_EmailSendController {
                 }
             }
         }else if (tipoGrupo == '2N') {
-        	grupos = [SELECT CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id
+        	grupos = [SELECT CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
                       FROM CC_MCC_Grupo_Colaborador__c
                       WHERE CC_MCC__c IN :idsMCC
                       AND CC_Grupo_Colaborador__r.RecordtypeId = :recordTypeIdGrupo2N
@@ -984,11 +1002,19 @@ public with sharing class CC_EmailSendController {
                 }
             }
         } else {
-            grupos = [SELECT CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id
+            if(recordTypecaso != null && recordTypecaso == recordTypeIdCliente){
+                grupos = [SELECT CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
                       FROM CC_MCC_Grupo_Colaborador__c
                       WHERE CC_MCC__c IN :idsMCC
-                      AND CC_Grupo_Colaborador__r.RecordtypeId != :recordTypeIdGrupo
+                      AND CC_Grupo_Colaborador__r.RecordtypeId != :recordTypeIdGrupo AND CC_Grupo_Colaborador__r.CC_Tipo__c IN :trasladarORemitir
                       ORDER BY Name ASC];
+            } else {
+                grupos = [SELECT CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
+                    FROM CC_MCC_Grupo_Colaborador__c
+                    WHERE CC_MCC__c IN :idsMCC
+                    AND CC_Grupo_Colaborador__r.RecordtypeId != :recordTypeIdGrupo
+                    ORDER BY Name ASC];
+            }
           	for (CC_MCC_Grupo_Colaborador__c grupo : grupos) {
                 PickListWrapperTraslados wrap = new PickListWrapperTraslados(grupo.CC_Grupo_Colaborador__r.Name, grupo.CC_Grupo_Colaborador__r.Id, grupo.CC_Grupo_Colaborador__r.Id);
                 if (!nombreGrupo.contains(grupo.CC_Grupo_Colaborador__r.Name)) {
@@ -997,9 +1023,6 @@ public with sharing class CC_EmailSendController {
                 }
             }
         }
-
-
-
         return optionsGrupos;
     }
 
@@ -1025,7 +1048,7 @@ public with sharing class CC_EmailSendController {
             String bodyCabecera;
             String bodyPie;
 
-            if (operativa == 'responder') {
+            if (operativa == 'responder' || operativa == 'responderClienteDerivar') {
                 List<CC_Plantillas_Canal_Procedencia__mdt> mdts = new List<CC_Plantillas_Canal_Procedencia__mdt>();
                 mdts = [SELECT CC_Nombre_plantilla_cabecera__c, CC_Nombre_plantilla_pie__c
                         FROM CC_Plantillas_Canal_Procedencia__mdt
@@ -1054,7 +1077,7 @@ public with sharing class CC_EmailSendController {
             if (plantilla != null) {
                 caso.CC_MCC_Plantilla__c = plantilla;
                 String tipoPlantilla = [SELECT DeveloperName FROM EmailTemplate WHERE Id = :plantilla].DeveloperName;
-                if (operativa == 'responder' && tipoPlantilla.startsWith('Personalizada')) {
+                if ((operativa == 'responder' || operativa == 'responderClienteDerivar') && tipoPlantilla.startsWith('Personalizada')) {
                     caso.CC_Respuesta_Personalizada__c = true;
                 }
             }
@@ -1435,7 +1458,7 @@ public with sharing class CC_EmailSendController {
 
     @AuraEnabled
     public static void devolverCasoAlSAC(String motivo, Case casoContactCenter){
-        CC_Revincular_Caso_Controller.devolverCasoAlSAC(motivo, casoContactCenter);
+        CC_Revincular_Caso_Controller.f3(motivo, casoContactCenter);
     }
 
     @AuraEnabled

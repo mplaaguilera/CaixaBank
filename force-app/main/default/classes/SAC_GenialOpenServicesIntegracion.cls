@@ -134,11 +134,12 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
                                 WHERE ContentDocumentId = : doculink.ContentDocumentId and IsLatest = true
                                 WITH SECURITY_ENFORCED];
 
+        String pathOnClient = limpiarCaracteresEspeciales(docu.PathOnClient);
         //convertimos la cabecera a binario y luego a hexadecimal para poder concatenarlo con el fichero                        
         /*blob cabecera =  blob.valueOf(boundary + crlf +
             'Content-Disposition: form-data; name="file"; filename="' + docu.title + '"' + crlf);*/
         string cabecera = '--' + boundary + crlf +
-            'Content-Disposition: form-data; name="Documents"; filename="' + docu.PathOnClient + '"';
+            'Content-Disposition: form-data; name="Documents"; filename="' + pathOnClient + '"';
          string cabeceraString = EncodingUtil.Base64Encode(
             blob.valueOf(cabecera + crlf + crlf)
         );
@@ -306,4 +307,102 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
         public string title;
         public string detail;
     }*/
+    
+   /*****************************************************************************************
+    * @description : Convertir PathOnClient - Caracteres no aceptados por OpenServices
+    * 
+    * Inputs: 
+    *    @param input -> PathOnClient
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR                 DATE         Description
+    * 1.0            ---------       Iria ANPC             22/01/21         Creación     
+    *****************************************************************/
+    public static String limpiarCaracteresEspeciales(String input) {
+        if (String.isEmpty(input)) {
+            return input;
+        }
+        // Reemplazar las vocales con tildes/diéresis por su versión sin tilde
+        input = input.replaceAll('á', 'a');
+        input = input.replaceAll('é', 'e');
+        input = input.replaceAll('í', 'i');
+        input = input.replaceAll('ó', 'o');
+        input = input.replaceAll('ú', 'u');
+        input = input.replaceAll('Á', 'A');
+        input = input.replaceAll('É', 'E');
+        input = input.replaceAll('Í', 'I');
+        input = input.replaceAll('Ó', 'O');
+        input = input.replaceAll('Ú', 'U');
+        input = input.replaceAll('à', 'a');
+        input = input.replaceAll('è', 'e');
+        input = input.replaceAll('ì', 'i');
+        input = input.replaceAll('ò', 'o');
+        input = input.replaceAll('ú', 'u');
+        input = input.replaceAll('À', 'A');
+        input = input.replaceAll('È', 'E');
+        input = input.replaceAll('Ì', 'I');
+        input = input.replaceAll('Ò', 'O');
+        input = input.replaceAll('Ù', 'U');
+        input = input.replaceAll('ä', 'a');
+        input = input.replaceAll('ë', 'e');
+        input = input.replaceAll('ï', 'i');
+        input = input.replaceAll('ö', 'o');
+        input = input.replaceAll('ü', 'u');
+        input = input.replaceAll('Ä', 'A');
+        input = input.replaceAll('Ë', 'E');
+        input = input.replaceAll('Ï', 'I');
+        input = input.replaceAll('Ö', 'O');
+        input = input.replaceAll('Ü', 'U');
+        
+        // Reemplazar la ñ y Ñ
+        input = input.replaceAll('ñ', 'n');
+        input = input.replaceAll('Ñ', 'N');
+        
+        // Reemplazar la ç y Ç
+        input = input.replaceAll('ç', 'c');
+        input = input.replaceAll('Ç', 'C');
+        
+        // Reemplazar otros caracteres especiales
+        input = input.replaceAll('[^\\x00-\\x7F]', ''); // Eliminar caracteres no ASCII
+        input = input.replaceAll('€', 'E'); // Eliminar símbolo €
+        input = input.replaceAll('$', ''); // Eliminar símbolo €
+        input = input.replaceAll('@', 'at'); // Eliminar símbolo @
+        input = input.replaceAll('&', 'and'); // Eliminar símbolo &
+        input = input.replaceAll('\\+', ''); // Eliminar símbolo +
+        input = input.replaceAll('-', ''); // Eliminar símbolo -
+        input = input.replaceAll('\\*', ''); // Eliminar símbolo *
+        input = input.replaceAll('\\/', ''); // Eliminar símbolo /
+        input = input.replaceAll('=', ''); // Eliminar símbolo =
+        input = input.replaceAll('%', ''); // Eliminar símbolo %
+        input = input.replaceAll('\\(', ''); // Eliminar símbolo (
+        input = input.replaceAll('\\)', ''); // Eliminar símbolo )
+        input = input.replaceAll('\\?', ''); // Eliminar símbolo ?
+        input = input.replaceAll('\\¿', ''); // Eliminar símbolo ¿
+        input = input.replaceAll('º', 'o'); // Eliminar símbolo º
+        input = input.replaceAll('ª', 'a'); // Eliminar símbolo ª
+        input = input.replaceAll('!', ''); // Eliminar símbolo !
+        input = input.replaceAll('¡', ''); // Eliminar símbolo ¡
+        input = input.replaceAll('|', ''); // Eliminar símbolo |
+        input = input.replaceAll('\\\\', ''); // Eliminar símbolo \
+        input = input.replaceAll('\'', ''); // Eliminar símbolo '
+        input = input.replaceAll('"', ''); // Eliminar símbolo "
+        input = input.replaceAll('·', ''); // Eliminar símbolo ·
+        input = input.replaceAll('#', ''); // Eliminar símbolo #
+        input = input.replaceAll('\\[', ''); // Eliminar símbolo [
+        input = input.replaceAll('\\]', ''); // Eliminar símbolo ]
+        input = input.replaceAll('\\{', ''); // Eliminar símbolo {
+        input = input.replaceAll('\\}', ''); // Eliminar símbolo }
+        input = input.replaceAll('_', ''); // Eliminar símbolo _
+        input = input.replaceAll('´', ''); // Eliminar símbolo ´
+        input = input.replaceAll('<', ''); // Eliminar símbolo <
+        input = input.replaceAll('>', ''); // Eliminar símbolo >
+        input = input.replaceAll('\\^', ''); // Eliminar símbolo ^
+        input = input.replaceAll('\\.', ''); // Eliminar símbolo .
+        input = input.replaceAll(',', ''); // Eliminar símbolo ,
+        input = input.replaceAll(':', ''); // Eliminar símbolo :
+        input = input.replaceAll(';', ''); // Eliminar símbolo ;
+        
+        return input;
+    }
 }

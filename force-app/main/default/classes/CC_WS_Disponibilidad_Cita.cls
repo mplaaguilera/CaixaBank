@@ -5,7 +5,7 @@ public with sharing class CC_WS_Disponibilidad_Cita {
             CBK_Log.error('Número de oficina no informado');
         } else {
             try {
-                CC_Settings__c reservationType = CC_Settings__c.getValues('CC_Configuracion_Cita_Rapida');
+                CC_Settings__c configuracion = CC_Settings__c.getValues('CC_Configuracion_Cita_Rapida');
                 Map<String, String> requestHeaders = getRequestHeaders();
                 Blob digest = Crypto.generateDigest('SHA-256', Blob.valueOf(numOficina + 'asesorVentas1'));
                 String branchHashId = EncodingUtil.convertToHex(digest);
@@ -20,8 +20,8 @@ public with sharing class CC_WS_Disponibilidad_Cita {
 
                 integracion.mQueryParams = new Map<String, String>{
                     'slotDate' => fecha,
-                    'device' => '2',
-                    'slotType' => reservationType.CC_Configuracion_2__c,
+                    'device' => configuracion.CC_Configuracion_4__c,
+                    'reservationType' => configuracion.CC_Configuracion_2__c,
                     'branchHashId' => branchHashId
                 };
 
@@ -32,17 +32,18 @@ public with sharing class CC_WS_Disponibilidad_Cita {
                     CBK_Log.debug('::: Error Status Code: ' + httpResponse.getStatusCode());
                 } else {
                     List<Object> responseList = (List<Object>) JSON.deserializeUntyped(httpResponse.getBody());
-
                     for (Object diaObj : responseList) {
                         // Cada elemento en responseList es un día con un mapa de slots
                         Map<String, Object> diaMap = (Map<String, Object>) diaObj;
-                        List<Object> slots = (List<Object>) diaMap.get('Slots');
-                        for (Object slotObj : slots) {
-                            Map<String, Object> slotMap = (Map<String, Object>) slotObj;                            
-                            if ((Boolean) slotMap.get('isAvailable')) {
-                                String startTime = (String) slotMap.get('starTimeSlot');
-                                String endTime = (String) slotMap.get('endTimeSlot');
-                                horariosDisponibles.add(startTime + ' - ' + endTime);
+                        if(diaMap.get('slotDate') == fecha) {
+                            List<Object> slots = (List<Object>) diaMap.get('Slots');
+                            for (Object slotObj : slots) {
+                                Map<String, Object> slotMap = (Map<String, Object>) slotObj;
+                                if ((Boolean) slotMap.get('isAvailable')) {
+                                    String startTime = (String) slotMap.get('starTimeSlot');
+                                    String endTime = (String) slotMap.get('endTimeSlot');
+                                    horariosDisponibles.add(startTime + ' - ' + endTime);
+                                }
                             }
                         }
                     }

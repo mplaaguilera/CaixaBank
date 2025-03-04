@@ -35,60 +35,73 @@ public with sharing class SAC_Case_AU_TRHan_Test {
 
             usuarioGeneral = usuarios[0];
             usuarioGeneral2 = usuarios[1];
-            Database.insert(usuarioGeneral);
-            Database.insert(usuarioGeneral2);     
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
+            //Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral2, false);
+            //Database.insert(usuarioGeneral2);     
 
             //Usuario SAC Admin
             usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
-            Database.insert(usuarioAdmin);
+            SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+            //Database.insert(usuarioAdmin);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
 
             SetupEntityAccess sea = new SetupEntityAccess();
             sea.ParentId = permiSet.Id;
             sea.SetupEntityId = [SELECT Id FROM CustomPermission WHERE DeveloperName = 'SAC_ByPass'].Id;
-            Database.insert(sea);
+            SAC_DatabaseDML.insertDML(sea, false);
+            //Database.insert(sea);
 
             PermissionSet permiSet2 = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi2 = new PermissionSetAssignment();
             permiSetAssi2.AssigneeId = usuarioAdmin.Id;
             permiSetAssi2.PermissionSetId = permiSet2.Id;
-            Database.insert(permiSetAssi2);
+            SAC_DatabaseDML.insertDML(permiSetAssi2, false);
+            //Database.insert(permiSetAssi2);
 
             PermissionSet permiSet3 = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi3 = new PermissionSetAssignment();
             permiSetAssi3.AssigneeId = usuarioGeneral2.Id;
             permiSetAssi3.PermissionSetId = permiSet3.Id;
-            Database.insert(permiSetAssi3);
+            SAC_DatabaseDML.insertDML(permiSetAssi3, false);
+            //Database.insert(permiSetAssi3);
         }
 
         //Cuentas
         List<Account> cuentas = SAC_TestDataFactory.crearCuentas(2);
         cuentas[0].name = 'cuentaTest';
         cuentas[1].name = 'cuentaTest2';
-        Database.insert(cuentas);
+        SAC_DatabaseDML.insertListDML(cuentas, false);
+        //Database.insert(cuentas);
 
         //Grupos
         Group grupo = SAC_TestDataFactory.crearGrupo(1)[0];
         grupo.name = 'grupoTest';
-        Database.insert(grupo);
+        SAC_DatabaseDML.insertDML(grupo, false);
+        //Database.insert(grupo);
 
         //MCCs
         CC_MCC__c mccTematica = new CC_MCC__c(Name='Tematica', CC_Codigo_Externo__c='a', RecordTypeId=mccTematicaRecordTypeId, CC_Tipo_Cliente__c='Empleado');
-        Database.insert(mccTematica);
+        SAC_DatabaseDML.insertDML(mccTematica, false);
+        //Database.insert(mccTematica);
 
         CC_MCC__c mccProdServ = new CC_MCC__c(Name='ProdServ',CC_Tematica__c = mccTematica.id , CC_Codigo_Externo__c='b', RecordTypeId=mccProdServRecordTypeId, CC_Tipo_Cliente__c='Cliente');
-        Database.insert(mccProdServ);
+        SAC_DatabaseDML.insertDML(mccProdServ, false);
+        //Database.insert(mccProdServ);
 
         CC_MCC__c mccMotivo = new CC_MCC__c(Name='Motivo',CC_Producto_Servicio__c = mccProdServ.id, CC_Codigo_Externo__c='c', RecordTypeId=mccMotivoRecordTypeId, CC_Tipo_Cliente__c='Cliente');
-        Database.insert(mccMotivo);
+        SAC_DatabaseDML.insertDML(mccMotivo, false);
+        //Database.insert(mccMotivo);
 
         CC_MCC__c mccDetalle = new CC_MCC__c(Name='Detalle',CC_Motivo__c = mccMotivo.id, CC_Codigo_Externo__c='d', RecordTypeId=mccDetalleRecordTypeId, CC_Tipo_Cliente__c='Cliente');
-        Database.insert(mccDetalle);
+        SAC_DatabaseDML.insertDML(mccDetalle, false);
+        //Database.insert(mccDetalle);
 		
 
         Test.startTest();
@@ -166,7 +179,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         Case casoReclamacion5 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl5);
         listaReclamaciones.add(casoReclamacion5);
 
-        Database.insert(listaReclamaciones);
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
+        //Database.insert(listaReclamaciones);
 
 
         List<Case> listaPretensiones = new List<Case>();
@@ -200,15 +214,18 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         Case pretensionSecundaria = SAC_TestDataFactory.crearCaso('Pretension', camposPret2);
         listaPretensiones.add(pretensionSecundaria);
 
-        Database.insert(listaPretensiones);  
+        SAC_DatabaseDML.insertListDML(listaPretensiones, false);
+        //Database.insert(listaPretensiones);  
 		Test.stopTest();
 
         SAC_CaseReclamante__c reclamantePrin = SAC_TestDataFactory.crearReclamante(true, casoReclamacion, cuentas[0].id);
-        Database.insert(reclamantePrin);
+        SAC_DatabaseDML.insertDML(reclamantePrin, false);
+        //Database.insert(reclamantePrin);
 
         System.runAs(usuarioGeneral){
         casoReclamacion.SAC_PretensionPrincipal__c = pretensionPrincipal.Id;
-        Database.update(casoReclamacion);
+        SAC_DatabaseDML.updateDML(casoReclamacion, false);
+        //Database.update(casoReclamacion);
         }
     }
 
@@ -222,7 +239,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
 
@@ -242,7 +260,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
 
@@ -255,6 +274,7 @@ public with sharing class SAC_Case_AU_TRHan_Test {
     @isTest
     static void testActualizarMcc() {
         Id recType = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
+        User usuario = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         
         Case prete = [SELECT Id FROM Case WHERE SuppliedCompany = 'TestPret'];
         Account acc = [SELECT Id FROM Account WHERE Name = 'cuentaTest'];
@@ -275,10 +295,10 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         List<Case> pretensiones = [SELECT id FROM Case WHERE RecordTypeId =: recType];
         Map<id,case> casosAct = new Map<Id,Case>();
 
-        User usuario = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(prete);
+            SAC_DatabaseDML.updateDML(prete, false);
+            //Database.update(prete);
             Test.stopTest();
         }
         prete = [SELECT Id, CC_MCC_Tematica__c FROM Case WHERE SuppliedCompany = 'TestPret'];
@@ -296,7 +316,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         Id recordTypeConsulta = [SELECT Id, RecordTypeId FROM Case WHERE Subject = 'TestRec'].recordTypeId;
@@ -315,8 +336,10 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(pretension);
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(pretension, false);
+            //Database.update(pretension);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.SAC_SentidoResolucion__c, caso.SAC_SentidoResolucion__c, 'No se ha cambiado el sentido de la resolución.');
@@ -336,7 +359,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(pret);
+            SAC_DatabaseDML.updateDML(pret, false);
+            //Database.update(pret);
             Test.stopTest();
         }
         System.assertNotEquals(pretOld.CC_Importe_Abonado__c, pret.CC_Importe_Abonado__c, 'No se ha cambiado el importe.');
@@ -354,7 +378,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.Status, caso.Status, 'No se ha cambiado el estado de la reclamación.');
@@ -371,7 +396,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(pret);
+            SAC_DatabaseDML.updateDML(pret, false);
+            //Database.update(pret);
             Test.stopTest();
         }
         System.assertNotEquals(pretOld.Status, pret.Status, 'No se ha cambiado el estado de la pretensión.');
@@ -388,7 +414,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(pret);
+            SAC_DatabaseDML.updateDML(pret, false);
+            //Database.update(pret);
             Test.stopTest();
         }
         System.assertNotEquals(pretOld.Status, pret.Status, 'No se ha cambiado el estado de la pretensión.');
@@ -403,15 +430,18 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         caso.SAC_StatusAuxiliar__c = 'Cerrado';
 
         Account cuenta = SAC_TestDataFactory.crearCuentasOficina(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
         
         caso.CC_Oficina_Afectada_Lookup__c = cuenta.id;
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
+        //Database.update(caso);
 
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.Status, caso.Status, 'No se ha cerrado la reclamación.');
@@ -428,7 +458,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.Status, caso.Status, 'No se ha pasado la reclamación a derivación.');
@@ -446,7 +477,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.Status, caso.Status, 'No se ha cambiado el estado de la reclamación.');
@@ -463,7 +495,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.Status, caso.Status, 'La reclamación no se ha pasado a negociación.');
@@ -481,7 +514,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.Status, caso.Status, 'No se ha rechazado la reclamación.');
@@ -498,7 +532,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.Status, caso.Status, 'La reclamación no ha vuelto a subsanación.');
@@ -515,7 +550,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.Status, caso.Status, 'La reclamación no ha vuelto a subsanación.');
@@ -536,7 +572,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         System.assertNotEquals(casoOld.Status, caso.Status, 'La reclamación no ha cambiado de estado.');
@@ -556,7 +593,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         Case pretension = [SELECT Id, OwnerId FROM Case WHERE SAC_Reclamacion__c = :caso.Id LIMIT 1];

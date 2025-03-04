@@ -19,13 +19,13 @@ public with sharing class SAC_LCMP_ListadoEmailsConsulta_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         //RECLAMACION
@@ -37,7 +37,7 @@ public with sharing class SAC_LCMP_ListadoEmailsConsulta_Test {
         camposRecl.put('OwnerId', usuarioGeneral.Id);
 
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
 
         //Interaccion Consulta
         Map<String, Object> camposCons = new Map<String, Object>();
@@ -45,7 +45,7 @@ public with sharing class SAC_LCMP_ListadoEmailsConsulta_Test {
         camposCons.put('OwnerId', usuarioGeneral.id);
         
         SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
-        Database.insert(consulta);
+        SAC_DatabaseDML.insertDML(consulta, false);
 
         //Mensaje
         EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'SAC_EmailServiceConsulta' LIMIT 1];
@@ -58,7 +58,7 @@ public with sharing class SAC_LCMP_ListadoEmailsConsulta_Test {
         email.HtmlBody = 'probemos el indexed thread id  ref:_DoceCatorce_ref';
         email.Headers = '[{"value": "' + headerValueSTR + '","name": "X-SDFC-Original-RCPT"}]';
 
-        Database.insert(email);
+        SAC_DatabaseDML.insertDML(email, false);
     }
 
     @isTest
@@ -68,7 +68,7 @@ public with sharing class SAC_LCMP_ListadoEmailsConsulta_Test {
         String indice = consulta.SAC_IndexedThreadId__c;
         EmailMessage mensaje= [SELECT Id, Subject FROM EmailMessage WHERE subject = 'Consulta1'LIMIT 1];
         mensaje.HtmlBody = indice;
-        Database.update(mensaje);
+        SAC_DatabaseDML.updateDML(mensaje, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -77,8 +77,6 @@ public with sharing class SAC_LCMP_ListadoEmailsConsulta_Test {
         }
         Test.stopTest();
 
-        List<EmailMessage> mensajes = [SELECT id FROM EmailMessage WHERE FromAddress = 'test@mail.com'];
-
-        System.assertEquals(mensajes.size(), 1, 'Correcto');
+        System.assertEquals([SELECT Count() FROM EmailMessage WHERE FromAddress = 'test@mail.com'], 1, 'Correcto');
     }
 }

@@ -18,8 +18,9 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         List<User> usuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
         //usuario
         usuarios[0].Username = 'ustestesteo@test.com';
-        usuarios[0].Alias = 'alias';     
-        Database.insert(usuarios);
+        usuarios[0].Alias = 'alias'; 
+        SAC_DatabaseDML.insertListDML(usuarios, false);     
+        //Database.insert(usuarios);
 
         //grupo colaborador
         List<CC_Grupo_Colaborador__c> listagrupos = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1);
@@ -30,7 +31,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         listagrupos[0].SAC_DeveloperName__c = 'OFICINA';
         listagrupos[0].SAC_PeriodoConsulta__c = 12;
         listagrupos[0].SAC_TieneUsuariosActivos__c = true;
-        Database.insert(listagrupos[0]);
+        SAC_DatabaseDML.insertDML(listagrupos[0], false); 
+        //Database.insert(listagrupos[0]);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -41,7 +43,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         camposRecl.put('OwnerId', usuarios[0].Id);
 
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+        //Database.insert(casoReclamacion);
         
         List<SAC_Interaccion__c> listaConsultas = new List<SAC_Interaccion__c>();
         //Interaccion consulta
@@ -73,7 +76,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         SAC_Interaccion__c consulta3 = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons3);
         listaConsultas.add(consulta3);
         
-        Database.insert(listaConsultas);
+        SAC_DatabaseDML.insertListDML(listaConsultas, false); 
+        //Database.insert(listaConsultas);
     }
 
 
@@ -86,7 +90,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         String comprobacion;
         test.startTest();
@@ -106,7 +111,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         String comprobacion2;
         test.startTest();
@@ -126,7 +132,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         String comprobacion;
         test.startTest();
@@ -146,7 +153,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         String comprobacion;
         test.startTest();
@@ -166,7 +174,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         String comprobacion;
         test.startTest();
@@ -187,7 +196,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -198,7 +208,8 @@ public with sharing class SAC_LCMP_ResponderConsulta_Test {
             Blob b=Blob.valueOf('This is version data');
             newcont.VersionData = EncodingUtil.base64Decode('Unit Test Attachment Body');
             newcont.FirstPublishLocationId  = consulta.id;
-            Database.insert(newcont); 
+            SAC_DatabaseDML.insertDML(newcont, false); 
+            //Database.insert(newcont); 
 
             SAC_LCMP_ResponderConsulta.insertarAdjuntoCaso(consulta.Id, 1);
         }

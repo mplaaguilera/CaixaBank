@@ -9,7 +9,7 @@ public with sharing class CBK_BatchJob_Helper {
     public class BatchJob {
         public String jobId;
         public String batchName;
-        public String classNane;
+        public String className;
         public String project;
         public String tipo;
         public String dependencia;
@@ -45,6 +45,7 @@ public with sharing class CBK_BatchJob_Helper {
                                             WHERE Id =:batchJobId];*/
         
         DateTime nextExec;
+        
         try {
             DateTime lastExec =DateTime.now();
             switch on batchJob.Calc_NextExec__c {
@@ -126,38 +127,31 @@ public with sharing class CBK_BatchJob_Helper {
      * @param apexClass
 	 * @return Proyecto
 	 */    
-    public static String findProject(String apexClass) {
-        return findProject(apexClass, New CBK_Framework_Batch_Apex__mdt());
+    public static String findProjectName(String apexClass) {
+        return findProject(apexClass)?.proyecto__c;
     }
 
     /**
      * @description Detección de Proyecto a partir de la Clase Apex
      * @param apexClass
-     * @param conf - > Datos del metadata CBK_Framework_Batch_Apex__mdt
      * @return Proyecto
 	 */    
-    public static String findProject(String apexClass,CBK_Framework_Batch_Apex__mdt conf) {    
-        String proyecto = '';
-        Map<String,CBK_Framework_Batch_Apex__mdt > mapPrj = New Map<String,CBK_Framework_Batch_Apex__mdt >();
-        for(CBK_Framework_Batch_Apex__mdt  prj :[select label,proyecto__c, Email_Notif__c, Notif__c,Max__c from CBK_Framework_Batch_Apex__mdt ])
-        {
+    public static CBK_Framework_Batch_Apex__mdt findProject(String apexClass) {
+        Map<String,CBK_Framework_Batch_Apex__mdt > mapPrj = new Map<String,CBK_Framework_Batch_Apex__mdt >();
+        for(CBK_Framework_Batch_Apex__mdt  prj : [SELECT label,proyecto__c, Email_Notif__c, Notif__c,Max__c FROM CBK_Framework_Batch_Apex__mdt ]) {
             mapPrj.put(prj.label, prj);
         }
         
-        conf = mapPrj.get(apexClass);
-        if (conf != null){
-            proyecto = conf.proyecto__c;
-        } else if (apexClass?.indexOf('_')>0) {
-            conf=mapPrj.get(apexClass.substring(0,apexClass.indexOf('_')+1)+'*');
-            if (conf != null){
-                proyecto = conf.proyecto__c;
-            }
+        CBK_Framework_Batch_Apex__mdt conf = mapPrj.get(apexClass);
+        if (conf == null && apexClass?.indexOf('_')>0) {
+            conf = mapPrj.get(apexClass.substring(0,apexClass.indexOf('_')+1)+'*');
         }
+
         if (conf == null) {
             conf = mapPrj.get('Sin catalogar');
         }
 
-        return proyecto;
+        return conf;
     }
     
     
@@ -263,6 +257,12 @@ public with sharing class CBK_BatchJob_Helper {
         }
     }
         
-    
+    /**
+     * @description Formateo de fecha-hora
+     * @return fecha hora en text
+     **/
+    public static String timestamp() {
+		return String.valueof(DateTime.now().getTime());
+	}
     
 }

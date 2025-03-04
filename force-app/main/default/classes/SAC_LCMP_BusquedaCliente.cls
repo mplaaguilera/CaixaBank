@@ -329,7 +329,8 @@ public without sharing class SAC_LCMP_BusquedaCliente {
             sCuentaId = sID;
 
             List<Contact> oContactos = [SELECT Id, Account.CC_Idioma__pc, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.AccountId FROM Contact WHERE AccountId = :sID];
-            if (oContactos.size() == 1) {
+            List<Contact> oContactosFinal = oContactos;
+            if (oContactosFinal.size() == 1) {
                 sContactId = oContactos[0].Id;
                 sIdioma = oContactos[0].Account.CC_Idioma__pc;
                 sOficina = oContactos[0].Account.AV_EAPGestor__r.AccountId;
@@ -424,7 +425,8 @@ public without sharing class SAC_LCMP_BusquedaCliente {
             sCuentaId = sID;
 
             List<Contact> oContactos = [SELECT Id FROM Contact WHERE AccountId = :sID];
-            if (oContactos.size() == 1) {
+            List<Contact> oContactosFinal = oContactos;
+            if (oContactosFinal.size() == 1) {
                 sContactId = oContactos[0].Id;
             }
         }
@@ -463,9 +465,17 @@ public without sharing class SAC_LCMP_BusquedaCliente {
         Id usuarioActual = UserInfo.getUserId();
         String tipoRegistro = getTipoRegistro(recordId);
         if (tipoRegistro == 'Caso') {
-            caso = [SELECT OwnerId, SAC_PretensionPrincipal__r.OwnerId FROM Case WHERE RecordTypeId IN (:RECORDTYPERECLAMACION, :RECORDTYPECONSULTA, :RECORDTYPECONSULTASAC, :RECORDTYPEPRETENSION) AND Id = :recordId];
+            caso = [SELECT OwnerId, SAC_PretensionPrincipal__r.OwnerId, SAC_Letrado__c, RecordTypeId FROM Case WHERE RecordTypeId IN (:RECORDTYPERECLAMACION, :RECORDTYPECONSULTA, :RECORDTYPECONSULTASAC, :RECORDTYPEPRETENSION) AND Id = :recordId];
         }
-        return (caso.OwnerId == usuarioActual || caso.SAC_PretensionPrincipal__r.OwnerId == usuarioActual) ? true : false;
+
+        if(caso.RecordTypeId == RECORDTYPECONSULTASAC){
+
+            String userName = UserInfo.getName();
+
+            return (caso.OwnerId == usuarioActual || caso.SAC_PretensionPrincipal__r.OwnerId == usuarioActual || caso.SAC_Letrado__c == userName) ? true : false;
+        }else{
+            return (caso.OwnerId == usuarioActual || caso.SAC_PretensionPrincipal__r.OwnerId == usuarioActual) ? true : false;
+        }
 	}
     
     @AuraEnabled
@@ -503,7 +513,7 @@ public without sharing class SAC_LCMP_BusquedaCliente {
         Group pendienteAsignar = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PendienteAsignar' LIMIT 1];
         List<Case> casosExistentes = [SELECT Id FROM Case WHERE RecordTypeId =: RECORDTYPERECLAMACION AND Status NOT IN ('Cerrado', 'Rechazado', 'SAC_008', 'SAC_009', 'SAC_012', 'SAC_013', 'SAC_014') AND OwnerId <>: pendienteAsignar.Id AND ((AccountId <> NULL AND AccountId =: accountId) OR (ContactId <> null AND ContactId=:contactId)) AND OwnerId <>: userId];
 
-        return (casosExistentes.size()>0);
+        return (!casosExistentes.isEmpty());
 	}
 
     @AuraEnabled

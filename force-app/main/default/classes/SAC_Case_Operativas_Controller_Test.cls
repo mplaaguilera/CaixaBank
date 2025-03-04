@@ -20,7 +20,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         Account cuenta = new Account();
         cuenta.Name = 'cuentaTest';
         cuenta.CC_Tipo_Centro__c = 'DT';
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
 
         Id cops = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SAC_GrupoResponsableAccion').getRecordTypeId();
         Id recType = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SAC_GrupoProveedores').getRecordTypeId();
@@ -58,7 +59,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         grupoDXC.SAC_DeveloperName__c = 'DXC Zaragoza';
         grupos.add(grupoDXC);
 
-        Database.insert(grupos);
+        SAC_DatabaseDML.insertListDML(grupos, false);
+        //Database.insert(grupos);
 
         // Usuarios a usar en las test
         User usuario1 = new User();
@@ -133,7 +135,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         listadoUsuarios.add(usuarioFallo);
         listadoUsuarios.add(usuario2);
 
-        Database.insert(listadoUsuarios);
+        SAC_DatabaseDML.insertListDML(listadoUsuarios, false);
+        //Database.insert(listadoUsuarios);
 
         List<CC_Grupo_Colaborador_Contact__c> listaColaboradores = new List<CC_Grupo_Colaborador_Contact__c>();
         CC_Grupo_Colaborador_Contact__c grupoColabContact = new CC_Grupo_Colaborador_Contact__c();
@@ -165,7 +168,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         listaColaboradores.add(grupoColabContact2);
         listaColaboradores.add(grupoColabContactLetrado);
         listaColaboradores.add(grupoColabContactLetrado2);
-        Database.insert(listaColaboradores);
+        SAC_DatabaseDML.insertListDML(listaColaboradores, false);
+        //Database.insert(listaColaboradores);
         
 		Test.startTest();
 
@@ -344,12 +348,14 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         casoConsulta4.Status = 'SAC_011';
         casoConsulta4.SAC_StatusAuxiliar__c = casoConsulta4.Status;
         casoConsulta4.SEG_Grupo__c = grupoColaborador.Id;
+        casoConsulta4.SAC_GrupoLetrado__c = grupoColaboradorLetrado.Id;
         casoConsulta4.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_ConsultaSAC').getRecordTypeId();
         casoConsulta4.OwnerId = usuario1.Id;
         casoConsulta4.AccountId = cuenta.Id;
         listaReclamaciones.add(casoConsulta4);
 
-        Database.insert(listaReclamaciones);
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
+        //Database.insert(listaReclamaciones);
 		Test.stopTest();
                    
         //PRETENSION 1 -
@@ -431,7 +437,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         casosAInsertar.add(casoPretension5);
         casosAInsertar.add(casoPretension6);
         casosAInsertar.add(casoPretension7);
-        Database.insert(casosAInsertar);
+        SAC_DatabaseDML.insertListDML(casosAInsertar, false);
+        //Database.insert(casosAInsertar);
 
         //List Custom Setting
         List<SAC_EmailService__c> customSetting = new List<SAC_EmailService__c>();
@@ -441,13 +448,16 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         csMailS.Name = 'DXC_Zaragoza';
         csMailS.SAC_EmailEntrante__c = 'dx@zar.com';
         customSetting.add(csMailS);
-        Database.insert(customSetting);
+        SAC_DatabaseDML.insertListDML(customSetting, false);
+        //Database.insert(customSetting);
 
         Topic  t = new Topic(Name = 'Topic');
-        Database.insert(t);
+        SAC_DatabaseDML.insertDML(t, false);
+        //Database.insert(t);
 
         TopicAssignment topicAssig = new TopicAssignment(TopicId=t.Id, EntityId=casoReclamacion.Id);
-        Database.insert(topicAssig);
+        SAC_DatabaseDML.insertDML(topicAssig, false);
+        //Database.insert(topicAssig);
 
         Blob body = blob.valueOf('Unit.Test');
         ContentVersion cv = new ContentVersion(
@@ -457,7 +467,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
             FirstPublishLocationId = testRecCC.Id,
             SAC_StringRedaccion_fileupload__c = 'redaccion'
         );
-        Database.insert(cv);
+        SAC_DatabaseDML.insertDML(cv, false);
+        //Database.insert(cv);
 
         /*EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'SAC_EmailService' LIMIT 1];
         String headerValueSTR = headerValue.LocalPart + '@' + headerValue.EmailDomainName;
@@ -479,7 +490,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario1.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
         }
 
         System.runAs(usuario1){
@@ -492,7 +504,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
                 Body = 'Texted', 
                 FolderId = usuario1.Id
             );
-            Database.insert(validEmailTemplate);  
+            SAC_DatabaseDML.insertDML(validEmailTemplate, false);
+            //Database.insert(validEmailTemplate);  
             
             List<SAC_PlantillaRedaccion__c> plantillas = new List<SAC_PlantillaRedaccion__c>();
             //Plantilla
@@ -517,7 +530,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
             plantilla2.Name = 'testPlantilla2';
             plantillas.add(plantilla2);
 
-            Database.insert(plantillas);
+            SAC_DatabaseDML.insertListDML(plantillas, false);
+            //Database.insert(plantillas);
         }  
     }
 
@@ -532,7 +546,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario) {
             SAC_Case_Operativas_Controller.tomarPropiedadCaso(caso.id, usuario.id);
@@ -550,7 +565,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         try {
             Test.startTest();
             System.runAs(usuario) {
@@ -572,7 +588,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario) {
             SAC_Case_Operativas_Controller.autoasignarPropiedadCaso(caso.Id, usuario.Id);
@@ -677,7 +694,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario) {
             SAC_Case_Operativas_Controller.devolverCaso(caso.id, null);
@@ -699,7 +717,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 		Map<String, String> mapMotivos;
 
         System.runAs(usuario) {
@@ -719,7 +738,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario) {
             SAC_Case_Operativas_Controller.postOnChatter(caso.id, 'Observación ejemplo', null);
@@ -741,7 +761,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario) {
             SAC_Case_Operativas_Controller.postOnChatterDescartar(caso.id, 'Observación ejemplo', null);
@@ -765,9 +786,25 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario) {
+            EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'SAC_EmailService' LIMIT 1];
+            String headerValueSTR = headerValue.LocalPart + '@' + headerValue.EmailDomainName;
+
+            EmailMessage em = new EmailMessage(ParentId = caso.id, 
+                        SAC_EnvioRedaccion__c = 'testenvioSACtest2511',
+                        FromAddress = 'email@email.com.invalid',
+                        ToAddress = 'test06-03-2024-10-24@test1.com.invalid', 
+                        CcAddress = 'test06-03-2024-10-24@test2.com.invalid', 
+                        BccAddress = 'test06-03-2024-10-24@test3.com.invalid', 
+                        Subject = 'Asunto test',
+                        Incoming = true,
+                        Headers = '[{"value": "' + headerValueSTR + '","name": "X-SFDC-Original-RCPT"}]');
+
+            SAC_DatabaseDML.insertDML(em, true);
+
             SAC_Case_Operativas_Controller.derivarACC(caso.id);
         }
         Test.stopTest();
@@ -788,7 +825,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario) {
             resultado = SAC_Case_Operativas_Controller.tienePretensiones(caso.id);
@@ -908,7 +946,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usergeneral11111@test.com' AND isActive = true Limit 1];
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
 
         Case caso = [SELECT id, Status, OwnerId, AccountId FROM Case WHERE subject = 'TestRec' LIMIT 1];
         Test.startTest();
@@ -926,7 +965,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usergeneral11111@test.com' AND isActive = true Limit 1];
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
 
         Case caso = [SELECT id, Status, OwnerId, AccountId FROM Case WHERE subject = 'TestCons3' LIMIT 1];
         Test.startTest();
@@ -944,7 +984,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usergeneral11111@test.com' AND isActive = true Limit 1];
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
 
         Case caso = [SELECT id, Status, OwnerId, AccountId FROM Case WHERE subject = 'TestCons4' LIMIT 1];
         Test.startTest();
@@ -969,7 +1010,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         Blob bodyBlob2=Blob.valueOf('Unit Test ContentVersion Body'); 
         content.VersionData=bodyBlob2; 
         content.origin = 'H';
-        Database.insert(content);
+        SAC_DatabaseDML.insertDML(content, false);
+        //Database.insert(content);
 
         ContentDocumentLink contentlink=new ContentDocumentLink();
         contentlink.LinkedEntityId = reclamacion.id;
@@ -977,7 +1019,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         contentlink.ShareType = 'I';
         contentlink.Visibility = 'AllUsers';        
         
-        Database.insert(contentlink);
+        SAC_DatabaseDML.insertDML(contentlink, false);
+        //Database.insert(contentlink);
 
         
         Case reclamacion2 = [SELECT id, Status, OwnerId, AccountId FROM Case WHERE subject = 'TestRec3' LIMIT 1];
@@ -1071,7 +1114,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         
         reclamacion.Status = 'SAC_005';
         reclamacion.SAC_StatusAuxiliar__c = 'SAC_005';
-        Database.update(reclamacion);
+        SAC_DatabaseDML.updateDML(reclamacion, false);
+        //Database.update(reclamacion);
 
         String motivo = 'test';
         system.runAs(usuario) {
@@ -1094,23 +1138,27 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         system.runAs(usuario) {
             Case pretension = new Case();
             pretension.SAC_Reclamacion__c = reclamacion.Id;
             pretension.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
             pretension.Status = 'Cerrado';
-            Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);
 
             SAC_Accion__c tarea = new SAC_Accion__c();
             tarea.SAC_Observaciones__c='test observacion test'; 
             tarea.SAC_PlazoMaximo__c = 10;
             tarea.SAC_Reclamacion__c = reclamacion.id;
             tarea.RecordTypeId = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SAC_OtrasTareas').getRecordTypeId();
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
             
             tarea.SAC_Estado__c = 'SAC_PendienteAsignar';
-            Database.update(tarea);
+            SAC_DatabaseDML.updateDML(tarea, false);
+            //Database.update(tarea);
 
             String motivo = 'test';
     
@@ -1132,7 +1180,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec5'];
 
@@ -1143,14 +1192,16 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
             pretension.Status = 'SAC_001';
             pretension.SAC_StatusAuxiliar__c = 'SAC_001';
             pretension.SAC_Reclamacion__c = reclamacion.id;
-            Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);
 
             Case pretensionOld = [SELECT Id, Status, SAC_StatusAuxiliar__c, RecordTypeId, SAC_Reclamacion__c
                                   FROM Case WHERE SuppliedCompany = 'prueba2'];
 
             pretension.Status = 'SAC_009';
             pretension.SAC_StatusAuxiliar__c = pretension.Status;
-            Database.update(pretension);
+            SAC_DatabaseDML.updateDML(pretension, false);
+            //Database.update(pretension);
         
             String motivo = 'test';
             
@@ -1171,7 +1222,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         Test.startTest();
         reclamacion.SAC_PretensionPrincipal__c = pretension.id;        
 
-        Database.update(reclamacion);
+        SAC_DatabaseDML.updateDML(reclamacion, false);
+        //Database.update(reclamacion);
 		system.runAs(usuario) {
         	reclamacion = SAC_Case_Operativas_Controller.recuperarCaso(reclamacion.Id);
         }
@@ -1204,7 +1256,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
                             Subject = 'Asunto',
                             Incoming = true,
                             Headers = '[{"value": "' + headerValueSTR + '","name": "X-SFDC-Original-RCPT"}]');
-        Database.insert(em);
+        SAC_DatabaseDML.insertDML(em, false);
+        //Database.insert(em);
 
         EmailMessage em2 = [SELECT id FROM EmailMessage WHERE ParentId =: reclamacion.Id];
 
@@ -1214,7 +1267,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
     	attach.body = bodyBlob;
         attach.ParentId = em2.id;       
 
-        Database.insert(attach);
+        SAC_DatabaseDML.insertDML(attach, false);
+        //Database.insert(attach);
 
                
         ContentVersion content=new ContentVersion(); 
@@ -1223,7 +1277,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         Blob bodyBlob2=Blob.valueOf('Unit Test ContentVersion Body'); 
         content.VersionData=bodyBlob2; 
         content.origin = 'H';
-        Database.insert(content);
+        SAC_DatabaseDML.insertDML(content, false);
+        //Database.insert(content);
 
         ContentDocumentLink contentlink=new ContentDocumentLink();
         contentlink.LinkedEntityId = reclamacion.id;
@@ -1231,7 +1286,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         contentlink.ShareType = 'I';
         contentlink.Visibility = 'AllUsers';        
         
-        Database.insert(contentlink);
+        SAC_DatabaseDML.insertDML(contentlink, false);
+        //Database.insert(contentlink);
 
         List<Id> listaIdCasos = new List<Id>();
         listaIdCasos.add(nuevaReclamacion.id);
@@ -1257,7 +1313,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
 		PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
 
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Test.startTest();
         system.runAs(usuario) {
@@ -1292,7 +1349,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
 
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Boolean resultado;
         system.runAs(usuario) {
@@ -1311,7 +1369,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
 
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Test.startTest();
         system.runAs(usuario) {
@@ -1333,7 +1392,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'Name124@test.com' AND isActive = true Limit 1];
         Case reclamacion = [SELECT id, Status FROM Case WHERE subject = 'TestRec'];
         SAC_DocumentoEnvio__c carta = new SAC_DocumentoEnvio__c(SAC_Provincia__c = 'pruebaTest', SAC_TipoDocumento__c = 'resolución consulta', SAC_Caso__c = reclamacion.Id);
-        Database.insert(carta);
+        SAC_DatabaseDML.insertDML(carta, false);
+        //Database.insert(carta);
         
         Test.startTest();
         System.runAs(usuario) {
@@ -1366,7 +1426,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         permisos.add(permiSetAssi2);
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
+        //Database.insert(permisos);
         
         Case reclamacion = [SELECT id FROM Case WHERE subject = 'TestRec'];
         CC_Grupo_Colaborador__c grupoLetrado = [SELECT id FROM CC_Grupo_Colaborador__c WHERE Name = 'grupoColaboradorTestLetrado'];
@@ -1393,7 +1454,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario) {
             Test.startTest();
@@ -1415,7 +1477,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Case reclamacion = [SELECT id FROM Case WHERE subject = 'TestRec'];
 
@@ -1435,7 +1498,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Case reclamacion = [SELECT id FROM Case WHERE subject = 'Caso PSD2 Email'];
         
@@ -1454,14 +1518,16 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Case reclamacion = [SELECT id, Subject, CC_Canal_Respuesta__c FROM Case WHERE subject = 'Caso PSD2 Postal'];
         
         Test.startTest();
         System.runAs(usuario) {
             reclamacion.CC_Canal_Respuesta__c = 'SAC_CartaPostal';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
     		stringFinal = SAC_Case_Operativas_Controller.rellenarCampoCuerpoMensajeProrroga(reclamacion.id);
         }
         Test.stopTest();
@@ -1475,7 +1541,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Case reclamacion = [SELECT id FROM Case WHERE subject = 'TestRec'];
 
@@ -1495,7 +1562,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Case reclamacion = [SELECT id FROM Case WHERE subject = 'Caso PSD2 Email'];
 
@@ -1515,7 +1583,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Case reclamacion = [SELECT id, Subject, CC_Canal_Respuesta__c FROM Case WHERE subject = 'Caso PSD2 Postal'];
 
@@ -1523,7 +1592,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         Test.startTest();
         System.runAs(usuario) {
             reclamacion.CC_Canal_Respuesta__c = 'SAC_CartaPostal';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
     		stringFinal = SAC_Case_Operativas_Controller.rellenarCampoSubjectMensajeProrroga(reclamacion.id);
         }
         Test.stopTest();
@@ -1537,7 +1607,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Case reclamacion = [SELECT id, Subject, CC_Canal_Respuesta__c FROM Case WHERE subject = 'Caso PSD2'];
 
@@ -1545,7 +1616,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         Test.startTest();
         System.runAs(usuario) {
             reclamacion.CC_Canal_Respuesta__c = 'Phone';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
     		stringFinal = SAC_Case_Operativas_Controller.rellenarCampoSubjectMensajeProrroga(reclamacion.id);
         }
         Test.stopTest();
@@ -1559,7 +1631,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
         PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
         
         Case reclamacion = [SELECT id, Subject, CC_Canal_Respuesta__c FROM Case WHERE subject = 'Caso PSD2'];
 
@@ -1567,7 +1640,8 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         Test.startTest();
         System.runAs(usuario) {
             reclamacion.CC_Canal_Respuesta__c = 'Phone';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
     		stringFinal = SAC_Case_Operativas_Controller.rellenarCampoCuerpoMensajeProrroga(reclamacion.id);
         }
         Test.stopTest();
@@ -1575,4 +1649,67 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
        	System.assertNotEquals(null, stringFinal, 'El campo HTML de la consulta es nulo');        
     }
 
+    @isTest
+    static void postOnChatterDevolverLetradoTest() {
+        User usuario = [SELECT id FROM User WHERE Username = 'usergeneral11111@test.com' AND isActive = true Limit 1];
+        PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
+        SAC_DatabaseDML.insertDML(psa, true);
+
+        Case caso = [SELECT id, Status, OwnerId, AccountId FROM Case WHERE subject = 'TestCons4' LIMIT 1];
+        Test.startTest();
+        system.runAs(usuario) {
+        	SAC_Case_Operativas_Controller.postOnChatterDevolverLetrado(caso.Id, 'Test observacion', null);
+        }
+        
+        Test.stopTest();
+
+        List<FeedItem> feeds = [SELECT Id, Body FROM FeedItem WHERE ParentId =:caso.Id];
+        Assert.areNotEqual(null, feeds[0].Body, 'Error al hacer post de los motivos de devolucion letrado');
+    }
+
+    @isTest
+    static void devolverLetradoConsultaTest() {
+        User usuario = [SELECT id FROM User WHERE Username = 'usergeneral11111@test.com' AND isActive = true Limit 1];
+        PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
+        SAC_DatabaseDML.insertDML(psa, true);
+
+        Case caso = [SELECT id FROM Case WHERE subject = 'TestCons4' LIMIT 1];
+        Test.startTest();
+        system.runAs(usuario) {
+            CaseShare nuevoCS = new CaseShare();
+            nuevoCS.CaseId = caso.Id;
+            nuevoCS.UserOrGroupId = usuario.Id;
+            nuevoCS.CaseAccessLevel='Edit';
+
+            SAC_DatabaseDML.insertDML(nuevoCS, true); 
+            
+        	SAC_Case_Operativas_Controller.devolverLetradoConsulta(caso.Id, 'Test motivo devolver');
+        }
+        
+        Test.stopTest();
+
+        Case casoAct = [SELECT id, SAC_Letrado__c FROM Case WHERE subject = 'TestCons4' LIMIT 1];
+        Assert.areEqual('Pte. Asignar', casoAct.SAC_Letrado__c, 'Error al devolver el letrado de la consulta');
+    }
+
+    @isTest
+    static void tomarPropiedadLetradoConsulta() {
+        User usuario = [SELECT id, Name FROM User WHERE Username = 'usergeneral11111@test.com' AND isActive = true Limit 1];
+        PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
+        SAC_DatabaseDML.insertDML(psa, true);
+
+        Case caso = [SELECT id FROM Case WHERE subject = 'TestCons4' LIMIT 1];
+        Test.startTest();
+        system.runAs(usuario) {
+        	SAC_Case_Operativas_Controller.tomarPropiedadLetradoConsulta(caso.Id, usuario.Id);
+        }
+        
+        Test.stopTest();
+
+        Case casoAct = [SELECT id, SAC_Letrado__c FROM Case WHERE subject = 'TestCons4' LIMIT 1];
+        Assert.areEqual(usuario.Name, casoAct.SAC_Letrado__c, 'Error al tomar propiedad letrado de la consulta');
+    }
 }

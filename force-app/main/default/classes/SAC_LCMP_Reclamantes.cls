@@ -64,12 +64,23 @@ public without sharing class SAC_LCMP_Reclamantes {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            NaN              Carlos Solis   02/02/22     Creación
     * 1.1            US826290         Raúl Santos    28/05/24     Modificación: actualizar el campo SAC_ReclamantesConDatosNoAlf__c del caso si es necesario
+    * 1.2            US683740         Raúl Santos    04/11/24     Modificación: en consultas SAC, también puede realizar la operativa el letrado
     *****************************************************************/
     @AuraEnabled
     public static void eliminarReclaSecu(String idCaso, String ownerId, String pretPrincipalownerId, String reclamanteId){
-        //Compruebo si el que ejecuta la acción es el owner
+
+        Case caso = [SELECT Id, RecordTypeId, SAC_Letrado__c FROM Case WHERE Id = :idCaso LIMIT 1];
+
+        if(caso.RecordTypeId == RECTYPECONSULTASAC){
+            String userName = UserInfo.getName();
+
+            if (!esPropietarioCaso(ownerId, pretPrincipalownerId) && !(caso.SAC_Letrado__c == userName)) {
+                throw new AuraHandledException('Debes ser el propietario del caso o propietario letrado para poder realizar la acción');
+            }
+        }else{
         if (!esPropietarioCaso(ownerId, pretPrincipalownerId)) {
             throw new AuraHandledException('Debes ser el propietario del caso para poder realizar la acción');
+        }
         }
 
         //Recupero los reclamantes del caso
@@ -105,13 +116,25 @@ public without sharing class SAC_LCMP_Reclamantes {
     * -------
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            NaN              Carlos Solis   03/02/22     Creación
+    * 1.1            US683740         Raúl Santos    04/11/24     Modificación: en consultas SAC, también puede realizar la operativa el letrado
     *****************************************************************/
     @AuraEnabled
-    public static Boolean comprobarMultiplesCasosCliente(String ownerId, String pretPrincipalownerId, String reclamanteId){
-        //Compruebo si el que ejecuta la acción es el owner
+    public static Boolean comprobarMultiplesCasosCliente(String caseId, String ownerId, String pretPrincipalownerId, String reclamanteId){
+
+        Case caso = [SELECT Id, RecordTypeId, SAC_Letrado__c FROM Case WHERE Id = :caseId LIMIT 1];
+
+        if(caso.RecordTypeId == RECTYPECONSULTASAC){
+            String userName = UserInfo.getName();
+
+            if (!esPropietarioCaso(ownerId, pretPrincipalownerId) && !(caso.SAC_Letrado__c == userName)) {
+                throw new AuraHandledException('Debes ser el propietario del caso o propietario letrado para poder realizar la acción');
+            }
+        }else{
         if (!esPropietarioCaso(ownerId, pretPrincipalownerId)) {
             throw new AuraHandledException('Debes ser el propietario del caso para poder realizar la acción');
         }
+        }
+        
         //Recupero el account y el contact del reclamante
         SAC_CaseReclamante__c reclamante = [SELECT Id, SAC_Account__c, SAC_Contact__c FROM SAC_CaseReclamante__c WHERE Id = :reclamanteId];
         //Compruebo si existen casos y lo devuelvo en forma de booleano
@@ -148,11 +171,15 @@ public without sharing class SAC_LCMP_Reclamantes {
             reclamanteActualizar.SAC_ReclamantePrincipal__c = true;
             SAC_DatabaseDML.updateDML(reclamanteActualizar, true); 
 
-            List<Case> casos = [SELECT Id, AccountId, ContactId, RecordTypeId FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION, :RECTYPECONSULTASAC, :RECTYPECONSULTACOPS) AND (SAC_Reclamacion__c =: reclamanteActualizar.SAC_Case__c OR Id =: reclamanteActualizar.SAC_Case__c)];
+            List<Case> casos = [SELECT Id, AccountId, ContactId, RecordTypeId, SAC_Reclamacion__r.OS_Email__c, SAC_Reclamacion__r.CC_Telefono_Contacto__c, SAC_Reclamacion__r.SAC_DireccionPostalNotificacion__c FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION, :RECTYPECONSULTASAC, :RECTYPECONSULTACOPS) AND (SAC_Reclamacion__c =: reclamanteActualizar.SAC_Case__c OR Id =: reclamanteActualizar.SAC_Case__c)];
             for(Case caso : casos) {
                 if(caso.RecordTypeId == RECTYPEPRETENSION) {
                     caso.AccountId = reclamanteActualizar.SAC_Account__c;
                     caso.ContactId = reclamanteActualizar.SAC_Contact__c;
+                    caso.CC_Telefono_Contacto__c = caso.SAC_Reclamacion__r.CC_Telefono_Contacto__c; 
+                    caso.OS_Email__c = caso.SAC_Reclamacion__r.OS_Email__c;
+                    caso.SAC_DireccionPostalNotificacion__c = caso.SAC_Reclamacion__r.SAC_DireccionPostalNotificacion__c;
+
                 } else if(caso.RecordTypeId == RECTYPERECLAMACION) {
                     // caso.CC_Idioma__c = reclamanteActualizar.SAC_Account__r.CC_Idioma__pc;
                     caso.CC_Oficina__c = reclamanteActualizar.SAC_Account__r.AV_EAPGestor__r.AccountId;
@@ -245,11 +272,15 @@ public without sharing class SAC_LCMP_Reclamantes {
 
         SAC_CaseReclamante__c reclamanteActualizar = [SELECT Id, SAC_Account__c, SAC_Contact__c, SAC_Account__r.CC_Idioma__pc, SAC_Account__r.AV_EAPGestor__r.AccountId FROM SAC_CaseReclamante__c WHERE Id = :idReclamanteCambiarAPrincipal LIMIT 1];
 
-        List<Case> casos = [SELECT Id, AccountId, ContactId, RecordTypeId FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND (SAC_Reclamacion__c =: caseId OR Id =: caseId)];
+        List<Case> casos = [SELECT Id, AccountId, ContactId, RecordTypeId, SAC_Reclamacion__r.OS_Email__c, SAC_Reclamacion__r.CC_Telefono_Contacto__c, SAC_Reclamacion__r.SAC_DireccionPostalNotificacion__c  FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND (SAC_Reclamacion__c =: caseId OR Id =: caseId)];
         for(Case caso : casos) {
             if(caso.RecordTypeId == RECTYPEPRETENSION) {
                 caso.AccountId = reclamanteActualizar.SAC_Account__c;
                 caso.ContactId = reclamanteActualizar.SAC_Contact__c;
+                caso.CC_Telefono_Contacto__c = caso.SAC_Reclamacion__r.CC_Telefono_Contacto__c; 
+                caso.OS_Email__c = caso.SAC_Reclamacion__r.OS_Email__c;
+                caso.SAC_DireccionPostalNotificacion__c = caso.SAC_Reclamacion__r.SAC_DireccionPostalNotificacion__c;
+
             } else if(caso.RecordTypeId == RECTYPERECLAMACION) {
                 // caso.CC_Idioma__c = reclamanteActualizar.SAC_Account__r.CC_Idioma__pc;
                 caso.CC_Oficina__c = reclamanteActualizar.SAC_Account__r.AV_EAPGestor__r.AccountId;
@@ -273,12 +304,22 @@ public without sharing class SAC_LCMP_Reclamantes {
     * -------
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            NaN              Carlos Solis   03/02/22     Creación
+    * 1.1            US683740         Raúl Santos    04/11/24     Modificación: en consultas SAC, también puede realizar la operativa el letrado
     *****************************************************************/
     @AuraEnabled
     public static Boolean tieneReclamanteSecundario(String caseId, String ownerId, String pretPrincipalownerId){
-        //Compruebo si el que ejecuta la acción es el owner
+        Case caso = [SELECT Id, RecordTypeId, SAC_Letrado__c FROM Case WHERE Id = :caseId LIMIT 1];
+
+        if(caso.RecordTypeId == RECTYPECONSULTASAC){
+            String userName = UserInfo.getName();
+
+            if (!esPropietarioCaso(ownerId, pretPrincipalownerId) && !(caso.SAC_Letrado__c == userName)) {
+                throw new AuraHandledException('Debes ser el propietario del caso o propietario letrado para poder realizar la acción');
+            }
+        }else{
         if (!esPropietarioCaso(ownerId, pretPrincipalownerId)) {
             throw new AuraHandledException('Debes ser el propietario del caso para poder realizar la acción');
+        }
         }
 
         List<SAC_CaseReclamante__c> listaReclamantesSecundarios = [SELECT Id, SAC_Account__r.Name, SAC_ReclamantePrincipal__c, SAC_Pretension__c 

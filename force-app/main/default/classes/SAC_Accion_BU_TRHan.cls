@@ -34,9 +34,13 @@ public without sharing class SAC_Accion_BU_TRHan extends CC_TriggerHandlerBase {
         List<SAC_Accion__c> listaTareasCompletadas = new list<SAC_Accion__c>();
         List<SAC_Accion__c> listaCambioOwner = new List<SAC_Accion__c>();
         List<SAC_Accion__c> listaCambioTercero = new List<SAC_Accion__c>();
+        List<SAC_Accion__c> listaTareasEnviadas = new List<SAC_Accion__c>();
+        List<SAC_Accion__c> listaTareasDevueltas = new List<SAC_Accion__c>();
+        List<SAC_Accion__c> listaValidarImpAbonado = new List<SAC_Accion__c>();
         List<Task> listaTasks = new List<Task>();
         List<Id> reclamacionesParaCerrar = new List<Id>();
         Set<Id> listaIdsCasosGlobal = new Set<Id>();
+        Set<Id> idsRecTarea = new Set<Id>();
         Map<Id, Case> mapCasosSelect = new Map<Id, Case>();
         List<Case> listaCasosSelect = new List<Case>();
         Set<Id> listIdCasosRelated = new Set<Id>();
@@ -79,6 +83,22 @@ public without sharing class SAC_Accion_BU_TRHan extends CC_TriggerHandlerBase {
                 if (accion.SAC_MaestroAccionesReclamacion__c != mapOldObj.get(accion.Id).SAC_MaestroAccionesReclamacion__c){
                     listaTareas.add(accion);
                 }
+
+                //Se envía si:
+                //1- Pasa de Pte. Enviar a Pte- Asignar o En Gestión
+                //2- Pasa de Devuelta a Pte- Asignar o En Gestión
+                if(accion.SAC_Estado__c != mapOldObj.get(accion.Id).SAC_Estado__c &&
+                 (mapOldObj.get(accion.Id).SAC_Estado__c == 'SAC_PendienteEnviar' && (accion.SAC_Estado__c == 'SAC_PendienteAsignar'|| accion.SAC_Estado__c == 'SAC_EnGestion')  ||
+                 mapOldObj.get(accion.Id).SAC_Estado__c == 'SAC_Devuelta' && (accion.SAC_Estado__c == 'SAC_PendienteAsignar'|| accion.SAC_Estado__c == 'SAC_EnGestion') ) ){
+                    listaTareasEnviadas.add(accion);
+                }
+
+                //Si pasa al estado SAC_Devuelta, se está devolviendo a gestor/letrado
+                if(mapOldObj.get(accion.Id).SAC_Estado__c != accion.SAC_Estado__c && accion.SAC_Estado__c == 'SAC_Devuelta'){
+                    listaTareasDevueltas.add(accion);
+                }
+
+
                 if( accion.SAC_Estado__c != mapOldObj.get(accion.Id).SAC_Estado__c && accion.SAC_Estado__c == 'SAC_PendienteAsignar' ){
                     tareasPendientesAsignar.add(accion);
                 }
@@ -92,6 +112,11 @@ public without sharing class SAC_Accion_BU_TRHan extends CC_TriggerHandlerBase {
                     }
             
                     reclamacionTareasMap.get(accion.SAC_Reclamacion__c).add(accion);
+
+                    if(accion.SAC_ImporteAbonar__c != null && accion.SAC_ImporteAbonar__c != 0 && (accion.SAC_Estado__c == 'SAC_Finalizada' || accion.SAC_Estado__c == 'SAC_FinalizadaIncompleta')){
+                        listaValidarImpAbonado.add(accion);
+                        idsRecTarea.add(accion.SAC_Reclamacion__c);
+                    }
                 }
                 //US458927 eliminar notificaciones de tarea finalizada completa y añadir el envío del email al grupo de el caso si este está en pendiente de asignar
                 if(/*accion.SAC_Estado__c == 'SAC_Finalizada' || */(mapOldObj.get(accion.Id).SAC_Estado__c != accion.SAC_Estado__c) && (accion.SAC_Estado__c == 'SAC_FinalizadaIncompleta'
@@ -125,12 +150,21 @@ public without sharing class SAC_Accion_BU_TRHan extends CC_TriggerHandlerBase {
             SAC_AccionMetodos.comprobarNuevoOwner(listaCambioOwner, mapCasosRelated, cola, colaSupervisores, mapOldObj);
         }
 
+        //Si la tarea pasa a estado finalizada o finalizada incompleta y tiene informado el campo SAC_ImporteAbonar__c, tenemos que validar el sentido de resolución de la reclamación
+        if(!listaValidarImpAbonado.isEmpty()){
+            SAC_AccionMetodos.validarSentidoResReclamacion(listaValidarImpAbonado, idsRecTarea);
+        }
+
         if(!tareasFinalizadas.isEmpty()){
             SAC_AccionMetodos.rellenarFechaEjecucion(tareasFinalizadas); //Rellenar fecha de ejecución cuando se finaliza la tarea
         }
         SAC_CargarDatosMaestro.cargarDatos(listaTareas);
         SAC_AccionMetodos.finalizarTMEs(tareasParaFinalizarTMEs);
         SAC_AccionMetodos.calcularFechaVencimientoInicial(listNewObj);
+
+        //Se establece la fecha de fin de las acciones
+        SAC_AccionMetodos.establecerFechaFin(listNewObj, mapNewObj, mapOldObj);
+
         if (!listaTasks.isEmpty()) {
             insert listaTasks;
         }
@@ -142,6 +176,16 @@ public without sharing class SAC_Accion_BU_TRHan extends CC_TriggerHandlerBase {
             SAC_AccionMetodos.envioGGH(JSON.serialize(tareasPendientesAsignar));
             //SAC_TareasOperativas_Controller.crearThreadId(tareasPendientesAsignar);
         }
+
+        if(!listaTareasEnviadas.isEmpty()){
+            SAC_AccionMetodos.establecerFechaEnvio(listaTareasEnviadas);
+        }
+
+        if(!listaTareasDevueltas.isEmpty()){
+            SAC_AccionMetodos.establecerFechaDevolucion(listaTareasDevueltas);
+        }
+
+
 
         if (!listaTareasCompletadas.isEmpty()) {
             SAC_Notificacion.notificarTareasFinalizadas(listaTareasCompletadas, listaCasosSelect, cola);

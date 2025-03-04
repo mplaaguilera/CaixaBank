@@ -1,7 +1,8 @@
 <template>
-	<lightning-card onclick={stopPropagation}>
-		<div class="seccion slds-section slds-is-open">
-			<h3 class="label slds-truncate slds-var-p-around_small slds-theme_shade" style="border-radius: 4px;" onclick={tituloSeccionOnclick}>
+	<lightning-card lwc:ref="cardComponente" class="cardComponente slds-is-relative" onclick={cardComponenteOnclick}>
+
+		<div lwc:ref="seccion" class="seccion slds-section slds-is-relative section-layout-container slds-is-open">
+			<h3 class="label slds-truncate slds-var-p-around_small slds-theme_shade" onclick={tituloSeccionOnclick}>
 				<button aria-expanded="true" class="slds-button slds-section__title-action">
 					<lightning-icon icon-name="utility:chevrondown" size="x-small" class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon-utility-switch slds-icon_container"></lightning-icon>
 					<span class="slds-truncate" title="Información del producto" style="font-size: 14px;">Información del producto</span>
@@ -9,14 +10,14 @@
 			</h3>
 			<div class="slds-section__content section-content-grid slds-is-relative">
 				<div lwc:if={spinner} align="center">
-					<lightning-spinner size="small" variant="neutral" style="position: absolute;" alternative-text="Guardando..."></lightning-spinner>
+					<lightning-spinner style="position: absolute;" alternative-text="Guardando..."></lightning-spinner>
 				</div>
 				<div class="slds-form" role="list">
 					<div class="slds-form__row">
 						<div class="slds-form__item" role="listitem">
 							<template lwc:if={editando}>
 								<div class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
-									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer}></lightning-button-icon>
+									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer} data-campo="empresaProveedora"></lightning-button-icon>
 									<label class="slds-form-element__label">Empresa proveedora</label>
 									<div class="slds-form-element__control">
 										<lightning-combobox class="comboboxEmpresas" options={opcionesEmpresaProveedora} value={empresaProveedora.value} onchange={comboboxEmpresasOnchange} onfocus={comboboxEmpresasOnfocus}> </lightning-combobox>
@@ -42,7 +43,7 @@
 									</template>
 								</div>
 							</div>
-                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
 								<label class="slds-form-element__label">Origen</label>
 								<div class="slds-form-element__control">
 									<div class="slds-form-element__static slds-truncate" title={origen}>{origen}</div>
@@ -58,7 +59,7 @@
                         <div class="slds-form__item" role="listitem">
 							<template lwc:if={editando}>
 								<div class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
-									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer}></lightning-button-icon>
+									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer} data-campo="familiaProducto"></lightning-button-icon>
 									<label class="slds-form-element__label">Familia de producto</label>
 									<div  class="slds-form-element__control">
 										<lightning-combobox class="comboboxFamilias" options={opcionesFamiliaProducto} value={familiaProducto.value} onchange={comboboxFamiliasProductoOnchange} onfocus={comboboxFamiliasProductoOnfocus}></lightning-combobox>
@@ -80,7 +81,7 @@
 									<div class="slds-form-element__static">{canal}</div>
 								</div>
 							</div>
-                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
 								<label class="slds-form-element__label">Canal</label>
 								<div class="slds-form-element__control">
 									<div class="slds-form-element__static">{canal}</div>
@@ -92,7 +93,7 @@
                         <div class="slds-form__item" role="listitem">
 							<template lwc:if={editando}>
 								<div class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
-									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer}></lightning-button-icon>
+									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer} data-campo="producto"></lightning-button-icon>
 									<label class="slds-form-element__label">Producto</label>
 									<div lwc:if={editando} class="slds-form-element__control">
 										<lightning-combobox class="comboboxProductos" options={opcionesProducto} value={producto.value} onchange={comboboxProductosOnchange} onfocus={comboboxProductosOnfocus}></lightning-combobox>
@@ -113,15 +114,15 @@
 						<div class="slds-form__item" role="listitem"  lwc:if={mostrar.motivoMac} >
 							<template lwc:if={editando}>
 								<div class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
-									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer}></lightning-button-icon>
-									<label class="slds-form-element__label">Motivo MAC</label>
+									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer} data-campo="motivoMac"></lightning-button-icon>
+									<label class="slds-form-element__label">Motivo CSCC</label>
 									<div lwc:if={editando} class="slds-form-element__control">
 										<lightning-combobox class="comboboxMotivosMac" options={opcionesMotivoMac} value={motivoMac.value} onchange={comboboxMotivosMacOnchange} onfocus={comboboxMotivosMacOnfocus}></lightning-combobox>
 									</div>
 								</div>
 							</template>
                             <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
-                                <label class="slds-form-element__label">Motivo MAC</label>
+                                <label class="slds-form-element__label">Motivo CSCC</label>
 								<div class="slds-form-element__control">
 									<div class="slds-form-element__static">{motivoMac.labelNoEdit}</div>
 									<lightning-button-icon icon-name="utility:edit" variant= "bare" onclick={inicioEditando}></lightning-button-icon>
@@ -139,7 +140,7 @@
 										<div class="slds-form-element__static">{detalleProducto}</div>
 									</div>
 								</div>
-								<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+								<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
 									<label class="slds-form-element__label">Detalle producto</label>
 									<div class="slds-form-element__control">
 										<div class="slds-form-element__static">{detalleProducto}</div>
@@ -157,7 +158,7 @@
 										<div class="slds-form-element__static">{vehiculo}</div>
 									</div>
 								</div>
-								<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+								<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
 									<label class="slds-form-element__label">Vehículo</label>
 									<div class="slds-form-element__control">
 										<div class="slds-form-element__static">{vehiculo}</div>
@@ -175,7 +176,7 @@
 										<div class="slds-form-element__static">{finalidad}</div>
 									</div>
 								</div>
-								<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+								<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
 									<label class="slds-form-element__label">Finalidad</label>
 									<div class="slds-form-element__control">
 										<div class="slds-form-element__static">{finalidad}</div>
@@ -250,6 +251,41 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="slds-docked-form-footer footerEditando slds-is-relative" onclick={stopPropagation}>
+				<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small">
+					<div class="slds-col colBotonError">
+						<lightning-button-icon icon-name="utility:error" variant="bare" size="large" class="slds-icon-text-error" onclick={botonErrorOnclick}></lightning-button-icon>
+					</div>
+					<div class="slds-col">
+						<lightning-button label="Cancelar" onclick={cancelar}></lightning-button>
+						<lightning-button label="Guardar" variant="brand" class="slds-var-m-left_small" onclick={guardar}></lightning-button>
+					</div>
+				</div>
+
+				<section lwc:ref="popoverError" class="popoverError slds-popover slds-popover_error slds-nubbin_bottom-left slds-is-relative" role="dialog" onclick={stopPropagation}>
+					<button class="slds-button slds-button_icon slds-button_icon-small slds-float_right slds-popover__close slds-button_icon-inverse">
+						<lightning-button-icon icon-name="utility:close" variant="bare-inverse" size="small" onclick={cerrarPopoverError}></lightning-button-icon>
+					</button>
+					<header class="slds-popover__header">
+						<div class="slds-media slds-media_center slds-has-flexi-truncate">
+							<div class="slds-media__figure">
+								<lightning-icon icon-name="utility:error" variant="inverse" size="x-small"></lightning-icon>
+							</div>
+							<div class="slds-media__body">
+								<h2 class="slds-truncate slds-text-heading_small">Se produjo un problema.</h2>
+							</div>
+						</div>
+					</header>
+					<div class="slds-popover__body">
+						<p>{mensajeError}</p>
+					</div>
+				</section>
+			</div>
+
 		</div>
 	</lightning-card>
+
+
+
 </template>

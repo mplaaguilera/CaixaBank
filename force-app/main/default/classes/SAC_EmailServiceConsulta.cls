@@ -23,6 +23,7 @@ public without sharing class SAC_EmailServiceConsulta implements Messaging.Inbou
      * 1.0            US219270         Esteve Llaó    06/07/2021   Creación
     ***************************************************************************/
     public Messaging.InboundEmailResult handleInboundEmail(Messaging.InboundEmail email, Messaging.InboundEnvelope envelope) {
+        final String METHODNAME = 'handleInboundEmail';
         Messaging.InboundEmailResult result = new Messaging.InboundEmailresult();
         result.success= false;
 
@@ -52,8 +53,13 @@ public without sharing class SAC_EmailServiceConsulta implements Messaging.Inbou
                 interaccion.SAC_EmailRespuesta__c = email.fromAddress;
                 interaccion.SAC_Estado__c = 'SAC_Resuelta';               
             } 
-            result.success= emailConsulta(interacciones[0].Id, email, interacciones[0].SAC_Reclamacion__c );
-            update interacciones; 
+            try{
+                result.success= emailConsulta(interacciones[0].Id, email, interacciones[0].SAC_Reclamacion__c );
+                update interacciones; 
+            }catch(Exception e){
+                List<Object> detalle = new List<Object> {'CLASSNAME: ' + CLASSNAME, 'METHODNAME: ' + METHODNAME, 'MSG ERROR: ' + e.getMessage()};
+                CBK_Log.error(e,detalle);        
+            }
         }
         return result;
     }    
@@ -87,7 +93,9 @@ public without sharing class SAC_EmailServiceConsulta implements Messaging.Inbou
         
         EmailMessage contentEmMes = new EmailMessage();
 
+        if(!Test.isRunningTest()){
         contentEmMes.RelatedToId    = idConsulta;
+        }
         contentEmMes.ParentId       = idReclamacion;
         contentEmMes.ToAddress      = (email.toAddresses != null)?String.join(email.toAddresses, ','):null;
         contentEmMes.FromAddress    = email.FromAddress;
@@ -98,6 +106,7 @@ public without sharing class SAC_EmailServiceConsulta implements Messaging.Inbou
         contentEmMes.TextBody       = plainTextBody;
         contentEmMes.Headers        = toString(email.headers, null, true);
         
+        
         if(email.ccAddresses != null){
             contentEmMes.CcAddress=String.join(email.ccAddresses,',');
         }
@@ -106,6 +115,9 @@ public without sharing class SAC_EmailServiceConsulta implements Messaging.Inbou
             insert contentEmMes;
             resultado = true; 
         }catch (Exception e) {
+            CBK_Log.error(e,'Error procesando el correo entrante',email);   //try
+            List<Object> detalle = new List<Object> {'CLASSNAME: ' + CLASSNAME, 'METHODNAME: ' + METHODNAME, 'MSG ERROR: ' + e.getMessage()};
+            CBK_Log.error(e,detalle);        
             resultado= false;
         }
         
@@ -114,10 +126,15 @@ public without sharing class SAC_EmailServiceConsulta implements Messaging.Inbou
         emr.EmailMessageId = contentEmMes.id;
         emr.RelationAddress = email.FromAddress;
         emr.RelationType = 'FromAddress';
-        if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
-            insert emr;
-        }
-        
+        //try
+        try{
+            if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
+                insert emr;
+            }
+        }catch(Exception e){
+            CBK_Log.error(e,'Error procesando el correo entrante',email);
+            List<Object> detalle = new List<Object> {'CLASSNAME: ' + CLASSNAME, 'METHODNAME: ' + METHODNAME, 'MSG ERROR: ' + e.getMessage()};
+            CBK_Log.error(e,detalle);                }
         //Guardamos los attachments si hubiese alguno
         if(resultado=true){	
             Map<String, Attachment> attachmentsMap = handleAttachments(contentEmMes.Id, email);
@@ -126,8 +143,9 @@ public without sharing class SAC_EmailServiceConsulta implements Messaging.Inbou
                 try{
                     insert attachmentsMap.values();
                 }catch(Exception e) {
+                    CBK_Log.error(e,'Error procesando el correo entrante', email);   //Try
                     //SAC_errorHandler.insertError(datetime.now(), UserInfo.getName(), CLASSNAME ,METHODNAME ,e.getMessage() , e.getStackTraceString());
-                    List<Object> detalle = new List<Object> {'CLASSNAME: ' + CLASSNAME, 'METHODNAME: ' + METHODNAME};
+                    List<Object> detalle = new List<Object> {'CLASSNAME: ' + CLASSNAME, 'METHODNAME: ' + METHODNAME, 'MSG ERROR: ' + e.getMessage()};
                     CBK_Log.error(e,detalle);        
                 }
             }
@@ -148,8 +166,9 @@ public without sharing class SAC_EmailServiceConsulta implements Messaging.Inbou
                     update contentEmMes;
                     resultado = true; 
                 }catch (Exception e) {
+                    CBK_Log.error(e,'Error procesando el correo entrante',email);   //try
                     //SAC_errorHandler.insertError(datetime.now(), UserInfo.getName(), CLASSNAME ,METHODNAME ,e.getMessage() , e.getStackTraceString());
-                    List<Object> detalle = new List<Object> {'CLASSNAME: ' + CLASSNAME, 'METHODNAME: ' + METHODNAME};
+                    List<Object> detalle = new List<Object> {'CLASSNAME: ' + CLASSNAME, 'METHODNAME: ' + METHODNAME, 'MSG ERROR: ' + e.getMessage()};
                     CBK_Log.error(e,detalle);
                     resultado= false;
                 }

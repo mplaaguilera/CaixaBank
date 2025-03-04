@@ -8,25 +8,16 @@ public with sharing class CSBD_AgentWork_BU_TRHan extends CC_TriggerHandlerBase 
         restringirTransferenciaOportunidades(listNewObj, mapOldObj);
     }
 
-    public static void restringirTransferenciaOportunidades(List<AgentWork> listNewObj, Map<Id, AgentWork> mapOldObj) {
-
-        List<AgentWork> registrosTransferidos = new List<AgentWork>();
-        
-        for(AgentWork registroAsignacion: listNewObj) {
-            if(mapOldObj.containsKey(registroAsignacion.Id) && mapOldObj.get(registroAsignacion.Id).Status != registroAsignacion.Status && registroAsignacion.Status == 'Transferred') {
-                registrosTransferidos.add(registroAsignacion);
-            }
-        }
-
-        if(Test.isRunningTest()) {
-        	registrosTransferidos.addAll(listNewObj);
-        }
-
-        if(!registrosTransferidos.isEmpty()) {
-            List<AgentWork> registrosAsignacionGestorOportunidad = [SELECT Id FROM AgentWork WHERE Id = :registrosTransferidos AND ServiceChannel.DeveloperName = 'CSBD_Gestor_Oportunidad_Service_Channel'];
-
-            for(AgentWork regstroAsignacionGestor: registrosAsignacionGestorOportunidad) { 
-                regstroAsignacionGestor.addError('La oportunidad no puede ser transferida.');
+    private static void restringirTransferenciaOportunidades(List<AgentWork> agentWorks, Map<Id, AgentWork> mapOldObj) {
+        Id idServiceChannel = [SELECT Id
+                                FROM ServiceChannel
+                                WHERE DeveloperName = 'CSBD_Gestor_Oportunidad_Service_Channel']?.Id;
+        for (AgentWork agentWork : agentWorks) {
+            AgentWork oldAgentWork = mapOldObj.get(agentWork.Id);
+            if (oldAgentWork?.Status != 'Transferred'
+            && agentWork.Status == 'Transferred'
+            && agentWork.ServiceChannelId == idServiceChannel) {
+                agentWork.addError('La oportunidad no puede ser transferida.');
             }
         }
     }

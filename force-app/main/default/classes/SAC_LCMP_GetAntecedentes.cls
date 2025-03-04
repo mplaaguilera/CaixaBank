@@ -95,7 +95,6 @@ public with sharing class SAC_LCMP_GetAntecedentes {
 
         SAC_WS_Promor_RQ.RequestWrapper reqWrapperPromor = new SAC_WS_Promor_RQ.RequestWrapper(clientes);
         List<SAC_WS_Promor_RP.ClaimWrapper> promorResponses = SAC_WS_Promor.sendRequest(reqWrapperPromor, profileName);
-
         if(Test.isRunningTest() || (promorResponses != null && !promorResponses.isEmpty() && promorResponses[0].getClaimCode() != null)){
             for(SAC_WS_Promor_RP.ClaimWrapper reclamacion : promorResponses){
 
@@ -165,7 +164,8 @@ public with sharing class SAC_LCMP_GetAntecedentes {
             }
         }
 
-        Database.insert(antecedentes);
+        SAC_DatabaseDML.insertListDML(antecedentes, true);   
+        //Database.insert(antecedentes);
 
         Map<String, String> mapAntecedentesHistoricos = new Map<String, String>();
         for (SAC_Antecedentes__c antecedente : antecedentes){
@@ -223,7 +223,8 @@ public with sharing class SAC_LCMP_GetAntecedentes {
             }
         }
 
-        Database.insert(adjuntos);
+        SAC_DatabaseDML.insertListDML(adjuntos, true);   
+        //Database.insert(adjuntos);
 
         List<CC_TrazaInt__c> trazas = new List<CC_TrazaInt__c>();
         if(proespResponses != null && !proespResponses.isEmpty()){
@@ -261,7 +262,8 @@ public with sharing class SAC_LCMP_GetAntecedentes {
         
             Case caso = [SELECT id, SAC_FechaUltimaSolicitud__c FROM Case WHERE (RecordType.DeveloperName LIKE 'SAC_%' OR RecordType.DeveloperName LIKE 'SPV_%') AND Id =: caseId LIMIT 1];
             caso.SAC_FechaUltimaSolicitud__c = Datetime.now();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);   
+            //Database.update(caso);
         
             SAC_Utils.insertTrazas(jsonTrazas); //<------
 
@@ -297,7 +299,8 @@ public with sharing class SAC_LCMP_GetAntecedentes {
         Case caso = [SELECT Id FROM Case WHERE Id = :caseId LIMIT 1];
         caso.SAC_Antecedentes_Revisados__c = revisados;
 
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);  
+        //Database.update(caso);
     }
 
     public class WrapperInfo{        

@@ -11,6 +11,14 @@
  * 1.1            US248481         Luis Mesa      14/07/21     Adición metodo validarListoParaEnviar
 *****************************************************************/
 public without sharing class SAC_Validaciones {
+
+    private static Set<String> objetos = new Set<String>{'SAC_MaestroTemas__c', 'Case'};
+    private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
+
+    private static final Id RECTYPECONTROLALTAS = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_ControlAltas').getRecordTypeId();
+    private static final Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
+    private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
+
     /*****************************************************************
      * Proposito: Comprueba que el MCC esté informado si la pretensión pasa de estado alta a análisis. No se tienen 
      * en cuenta las pretensiones en estado baja.
@@ -172,7 +180,7 @@ public without sharing class SAC_Validaciones {
 
         Map<Id, List<SAC_Accion__c>> mapPretTarea = new Map<Id, List<SAC_Accion__c>>();
 
-        if(tareas.size() > 0){
+        if(!tareas.isEmpty()){
 
             for(SAC_Accion__c tarea : tareas){
                 List<SAC_Accion__c> misAcciones = new List<SAC_Accion__c>();
@@ -286,6 +294,7 @@ public without sharing class SAC_Validaciones {
     * -------
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            US337252        Daniel Benito   01/03/2022   Creación
+    * 1.1            US1100360       Raúl Santos     13/01/2025   Modificación: Cuando se vaya a rechazar y tenga importe abonado informado bloqueante y que no permita el rechazo
     **************************************************************************/
 
     public static void validarAltaAnalisisRechazar(List<Case> listNewCase, Map<Id, Case> mapOldCase) {
@@ -303,6 +312,8 @@ public without sharing class SAC_Validaciones {
                 if (reclamacion.Status == 'Rechazado' &&  (mapOldCase.get(reclamacion.Id).Status != 'SAC_001' && mapOldCase.get(reclamacion.Id).Status != 'SAC_002')) {
 
                     reclamacion.addError('No se puede rechazar un caso si no está en estado de Alta o Análisis.');
+                }else if(reclamacion.Status == 'Rechazado' && reclamacion.CC_Importe_Abonado__c != null && reclamacion.CC_Importe_Abonado__c != 0){
+                    reclamacion.addError('Revise el campo Importe abonado. No es posible rechazar con importe abonado informado.');
                 }
             }
         }
@@ -371,8 +382,9 @@ public without sharing class SAC_Validaciones {
         for (Case caso : listaReclaAnalisis) {
             if (mapaRecPretensiones.containsKey(caso.Id)) {
                 for (Case pret : mapaRecPretensiones.get(caso.Id)) {
-                    if ( pret.SEG_Detalle__r.SAC_esGGH__c && (pret.SAC_ImpReclamadoGestoria__c == null  && pret.SAC_ImpReclamadoInteresesLegales__c == null  
-                    && pret.SAC_ImpReclamadoNotaria__c == null  && pret.SAC_ImpReclamadoRegistros__c == null  && pret.SAC_ImpReclamadoTasacion__c == null ) ){
+                    if ( pret.SEG_Detalle__r.SAC_esGGH__c && ((pret.SAC_ImpReclamadoGestoria__c == null  && pret.SAC_ImpReclamadoInteresesLegales__c == null  
+                    && pret.SAC_ImpReclamadoNotaria__c == null  && pret.SAC_ImpReclamadoRegistros__c == null  && pret.SAC_ImpReclamadoTasacion__c == null) || 
+                    (pret.SAC_TasacionReclamado__c == null || pret.SAC_RegistrosReclamado__c == null || pret.SAC_NotariaReclamado__c == null || pret.SAC_GestoriaReclamado__c == null))){
                         mapaReclamacionNoValida.put(caso.Id, pret.CaseNumber + ', ');
                     }
                 }
@@ -707,6 +719,282 @@ public without sharing class SAC_Validaciones {
             }
         }
     }
+
+    /***********************************************************************************************************
+    * Proposito: Valida que la reclamación tiene marcados los campos de control de altas
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0            US1100463     Raúl Santos     03/01/25        Creación
+    ***********************************************************************************************************/
+    public static void validarControlAlta(List<Case> listaValidarControlAlta, Boolean procesoAutomatico) {
+
+        Set<Id> setIdsReclamacion = new Set<Id>();
+        Map<Id, Integer> mapCasoMarcas = new Map<Id, Integer>();
+        Integer numControlesAlta = 0;
+        Boolean saltaValidacion = false;
+
+        for (Case caso : listaValidarControlAlta) {
+            setIdsReclamacion.add(caso.Id);
+        }
+
+        if(!setIdsReclamacion.isEmpty()){
+            numControlesAlta = [SELECT Count() FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPECONTROLALTAS AND SAC_Seccion__c <> null AND SAC_Activo__c = true];
+
+            if(numControlesAlta > 0){
+                List<SAC_Marca_Case__c> listMarcasCaso = [SELECT Id, SAC_Case__c FROM SAC_Marca_Case__c WHERE SAC_Marca__r.RecordTypeId = : RECTYPECONTROLALTAS AND SAC_Case__c IN :setIdsReclamacion];
+                if(!listMarcasCaso.isEmpty()){
+                    for(SAC_Marca_Case__c marca : listMarcasCaso){
+                        if(!mapCasoMarcas.containsKey(marca.SAC_Case__c)){
+                            mapCasoMarcas.put(marca.SAC_Case__c, 1);
+                        }else{
+                            Integer currentValue = mapCasoMarcas.get(marca.SAC_Case__c);
+                            mapCasoMarcas.put(marca.SAC_Case__c, currentValue + 1);
+                        }
+                    }
+                }else{
+                    saltaValidacion = true;
+                }  
+            }
+        }
+
+        if(procesoAutomatico){
+            for (Case caso : listaValidarControlAlta) {
+                if(saltaValidacion || (mapCasoMarcas.containsKey(caso.Id) && mapCasoMarcas.get(caso.Id) != numControlesAlta)){
+                    caso.addError('Es necesario marcar el check de todos los campos de control de altas.');
+                }
+            }
+        }else{
+            for (Case caso : listaValidarControlAlta) {
+                if(saltaValidacion || (mapCasoMarcas.containsKey(caso.Id) && mapCasoMarcas.get(caso.Id) != numControlesAlta)){
+                    throw new AuraHandledException('Es necesario marcar el check de todos los campos de control de altas.');
+                }
+            }
+        }
+    }
+
+    /**************************************************************************
+     * Proposito: Importe abonado: añadir validación con sentido resolución
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.1             US1100360     Raúl Santos    20/01/2025       Creación
+    *****************************************************************************/
+    public static void validarImporteAbonado(List<Case> listaValidarImpAbonado, List<Case> listCasos, Map<Id, Case> mapOldCase) {
+
+        Map<Id, Case> mapCasos = new Map<Id,Case>(listCasos);
+
+        for(Case caso : listaValidarImpAbonado){
+           
+            if(caso.RecordTypeId == RECTYPERECLAMACION){
+                //Si cambia el sentido de resolución como "Favorable a la entidad" "Inadmisión" o "Desistimiento" y el campo "Importe abonado" de la reclamación sea distinto de cero
+                if(mapOldCase.containsKey(caso.Id) && caso.SAC_SentidoResolucion__c != mapOldCase.get(caso.Id).SAC_SentidoResolucion__c && caso.CC_Importe_Abonado__c != null && caso.CC_Importe_Abonado__c != 0 && (
+                        caso.SAC_SentidoResolucion__c == 'SAC_001' || caso.SAC_SentidoResolucion__c == 'SAC_004' || caso.SAC_SentidoResolucion__c == 'SAC_005')){
+                    caso.addError('Revise el campo Importe abonado. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" con importe abonado informado.');
+                }
+
+                //Si el caso ha pasado a estado derivación (SAC_008) y tiene importe abonado informado
+                if(mapOldCase.containsKey(caso.Id) && caso.Status != mapOldCase.get(caso.Id).Status && caso.CC_Importe_Abonado__c != null && caso.CC_Importe_Abonado__c != 0 && caso.Status == 'SAC_008'){
+                    caso.addError('Revise el campo Importe abonado. No es posible derivar con importe abonado informado');
+                }
+            }
+
+            if(caso.RecordTypeId == RECTYPEPRETENSION){
+
+                //Si el sentido de la resolución ya esta informado en la pretensión y/o reclamación como  "Favorable a la entidad" "Inadmisión" o "Desistimiento"
+                if(mapOldCase.containsKey(caso.Id) && caso.CC_Importe_Abonado__c != mapOldCase.get(caso.Id).CC_Importe_Abonado__c && 
+                   ((caso.SAC_SentidoResolucion__c == 'SAC_001' || caso.SAC_SentidoResolucion__c == 'SAC_004' || caso.SAC_SentidoResolucion__c == 'SAC_005') || (mapCasos.containsKey(caso.SAC_Reclamacion__c) && (mapCasos.get(caso.SAC_Reclamacion__c).SAC_SentidoResolucion__c == 'SAC_001' || 
+                    mapCasos.get(caso.SAC_Reclamacion__c).SAC_SentidoResolucion__c == 'SAC_004' || mapCasos.get(caso.SAC_Reclamacion__c).SAC_SentidoResolucion__c == 'SAC_005')))){ 
+                    caso.addError('Revise el sentido de la resolución de la pretensión y/o reclamación. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" e informar un importe abonado.');
+                }
+
+                //Si el sentido resolución se informa como "Favorable a la entidad" "Inadmisión" o "Desistimiento" y el campo "Importe abonado" de la pretensión es distinto de cero
+                if(mapOldCase.containsKey(caso.Id) && caso.SAC_SentidoResolucion__c != mapOldCase.get(caso.Id).SAC_SentidoResolucion__c && caso.CC_Importe_Abonado__c != null && caso.CC_Importe_Abonado__c != 0 && (caso.SAC_SentidoResolucion__c == 'SAC_001' || caso.SAC_SentidoResolucion__c == 'SAC_004' || caso.SAC_SentidoResolucion__c == 'SAC_005')){
+                    caso.addError('Revise el campo Importe abonado. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" con importe abonado informado.');
+                } 
+
+            }
+        }
+    }
+
+    /***********************************************************************************************************
+    * Proposito: Valida que la reclamación tiene marcado el campo SAC_ValidacionOficinaAfectada__c al salir de análisis
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0            US1117935     Sergio Martín    15/01/25        Creación
+    ***********************************************************************************************************/
+    public static void validarOficinaAfectada(List<Case> listaValidarOficinaAfectada, List<Case> listCasos, Map<Id, Case> mapOldCase) {
+        Map<Id, Case> mapCasos = new Map<Id,Case>(listCasos);
+
+        for(Case caso : listaValidarOficinaAfectada){
+            if(caso.RecordTypeId == RECTYPERECLAMACION){
+                //Si el caso sale de analisis a negociacion, resolucion o inadmision sin tener el campo validacion oficina informado 
+                if(mapOldCase.containsKey(caso.Id) && caso.Status != mapOldCase.get(caso.Id).Status && caso.SAC_ValidacionOficinaAfectada__c == false && ((mapOldCase.get(caso.Id).Status == 'SAC_002' && (caso.Status == 'SAC_003' || caso.Status == 'SAC_007'))
+                                                                                                                                                        || (mapOldCase.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SAC_003')
+                                                                                                                                                        || (mapOldCase.get(caso.Id).Status == 'SAC_006' && caso.Status == 'SAC_003'))) {
+                    caso.addError('Revise el campo Validación oficina afectada. No es posible salir de la fase de análisis sin tener el campo informado.');
+                }
+
+                //Si el caso sale de analisis a negociacion, resolucion o inadmision sin tener el campo validacion oficina informado pero no la oficina afectada
+                if(mapOldCase.containsKey(caso.Id) && caso.Status != mapOldCase.get(caso.Id).Status && caso.SAC_ValidacionOficinaAfectada__c == true && caso.CC_Oficina_Afectada_Lookup__c == null && ((mapOldCase.get(caso.Id).Status == 'SAC_002' && (caso.Status == 'SAC_003' || caso.Status == 'SAC_007'))
+                                                                                                                                                        || (mapOldCase.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SAC_003')
+                                                                                                                                                        || (mapOldCase.get(caso.Id).Status == 'SAC_006' && caso.Status == 'SAC_003'))) {
+                    caso.addError('Revise el campo oficina afectada. No es posible salir de la fase de análisis sin tener el campo informado.');
+                }
+            }
+
+            if(caso.RecordTypeId == RECTYPEPRETENSION){
+                //Si el caso sale de analisis a negociacion, resolucion o inadmision sin tener el campo validacion oficina de la reclamacion informado pero no la oficina afectada
+                if(mapOldCase.containsKey(caso.Id) && caso.Status != mapOldCase.get(caso.Id).Status && mapCasos.get(caso.SAC_Reclamacion__c).SAC_ValidacionOficinaAfectada__c == false && ((mapOldCase.get(caso.Id).Status == 'SAC_002' && (caso.Status == 'SAC_003' || caso.Status == 'SAC_007'))
+                                                                                                                                                                                            || (mapOldCase.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SAC_003')
+                                                                                                                                                                                            || (mapOldCase.get(caso.Id).Status == 'SAC_006' && caso.Status == 'SAC_003'))) {
+                    caso.addError('Revise el campo Validación oficina afectada de la reclamación. No es posible salir de la fase de análisis sin tener el campo informado.');
+                }
+
+                //Si el caso sale de analisis a negociacion, resolucion o inadmision teniendo el campo validacion oficina de la reclamacion informado pero no la oficina afectada
+                if(mapOldCase.containsKey(caso.Id) && caso.Status != mapOldCase.get(caso.Id).Status && mapCasos.get(caso.SAC_Reclamacion__c).SAC_ValidacionOficinaAfectada__c == true && mapCasos.get(caso.SAC_Reclamacion__c).CC_Oficina_Afectada_Lookup__c == null && ((mapOldCase.get(caso.Id).Status == 'SAC_002' && (caso.Status == 'SAC_003' || caso.Status == 'SAC_007'))
+                                                                                                                                                                                            || (mapOldCase.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SAC_003')
+                                                                                                                                                                                            || (mapOldCase.get(caso.Id).Status == 'SAC_006' && caso.Status == 'SAC_003'))) {
+                    caso.addError('Revise el campo oficina afectada de la reclamación. No es posible salir de la fase de análisis sin tener el campo informado.');
+                }
+            }
+        }
+    }
+
+    /***********************************************************************************************************
+    * Proposito: Valida que la complementaria tiene una reclamación vinculada antes de cambiar de determinados estados
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0             US1094159      Álex Polo     20/01/25        Creación
+    ***********************************************************************************************************/
+    public static void validarComplementariaVinculada(Map<Id, Case> mapOldObj, List<Case> listaValidarComplementaria) {
+
+        for(Case complementaria : listaValidarComplementaria){
+            
+            //Para pasar de Alta a Análisis, debe de estar vinculada a una reclamación
+            if(mapOldObj.containsKey(complementaria.Id) && complementaria.CC_CasoRelacionado__c== null && mapOldObj.get(complementaria.Id).Status != complementaria.Status && mapOldObj.get(complementaria.Id).Status == 'SAC_001' && complementaria.Status == 'SAC_002'){
+                complementaria.addError('No es posible pasar a estado de Análisis sin haber vinculado una reclamación.');
+            }
+        }
+    
+
+    }
+
+    /***********************************************************************************************************
+    * Proposito: Valida que la complementaria tiene una reclamación vinculada antes de que todas las pretensiones pasen a resolución para que la reclamación
+    *   pase a resolución
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0             US1094159      Álex Polo     21/01/25        Creación
+    ***********************************************************************************************************/
+    public static void validarComplementariaAnalisisResolucion(List<Case> listaPretensionesValidar, Map<Id, Case> mapOldObj){
+
+        Set<Id> idsReclamacionesPadre = new Set<Id>();
+        List<Case> listaReclamacionesPadre = new List<Case>();
+        Map<Id, List<Case>> mapaReclamacionPretensiones = new Map<Id, List<Case>>();        //Mapa que relaciona cada reclamación con una lista de sus pretensiones
+        Map <Id, Case> mapaReclamaciones = new Map<Id, Case>();                             //Id reclamación padre - Case reclamación padre
+
+        for(Case pretension : listaPretensionesValidar){
+            idsReclamacionesPadre.add(pretension.SAC_Reclamacion__c);
+        }
+
+        //Obtengo tanto la reclamación principal como las pretensiones hermanas (y la propia que se actualiza)
+        List<Case> listaCasos = [SELECT Id, Status, CC_CasoRelacionado__c, RecordTypeId, SAC_Naturaleza__c, SAC_Reclamacion__c FROM Case WHERE (Id IN :idsReclamacionesPadre OR SAC_Reclamacion__c IN :idsReclamacionesPadre)];
+
+        //Se monta el mapa que relaciona cada reclamación con sus pretensiones, y a su vez el mapa que relaciona un ID de reclamación con su case
+        for(Case caso : listaCasos){
+            if(caso.RecordTypeId == RECTYPERECLAMACION){
+                if(!mapaReclamacionPretensiones.containsKey(caso.Id)){
+                    mapaReclamacionPretensiones.put(caso.Id, new List<Case>());
+                }
+                if(!mapaReclamaciones.containsKey(caso.Id)){
+                    mapaReclamaciones.put(caso.Id, caso);
+                }
+            }else{          //Es pretension
+                if(!mapaReclamacionPretensiones.containsKey(caso.SAC_Reclamacion__c)){
+                    List<Case> listaPretensiones = new List<Case>();
+                    listaPretensiones.add(caso);
+                    mapaReclamacionPretensiones.put(caso.SAC_Reclamacion__c, listaPretensiones);
+                }else{
+                    mapaReclamacionPretensiones.get(caso.SAC_Reclamacion__c).add(caso); //Se añade la pretensión a la lista de pretensiones
+                }
+            }
+        }
+
+        //La pretensionActualizada es la que está pasando a resolución (o baja) (porque ha entrado a este método), asique solo habrá que comprobar que el resto de sus pretensiones hermanas esté en resolución o baja
+        for(Case pretensionActualizada : listaPretensionesValidar){
+
+            List<Case> listaPretHermanas = mapaReclamacionPretensiones.get(pretensionActualizada.SAC_Reclamacion__c);
+            Boolean todasPretResolucion = true;
+
+            for(Case pret : listaPretHermanas){
+
+                //Se compruebaa que las demás pretensiones que no sean la que se esta cambiando ahora a esos estados, ver si están ya en resolución o baja
+                if(pret.Id != pretensionActualizada.Id && pret.Status != 'SAC_003' && pret.Status != 'SAC_009'){
+                    todasPretResolucion = false;    //Si alguna que no es la actual no está en resolución, con el cambio de la actual entonces la recla. no pasará a resolución
+                }
+            }
+
+            //En caso de que todas estén en resolución o baja, pasará a resolución la reclamación (complementaria)
+            //Se permite unicamente si la reclamación (complementaria) tiene una reclamación vinculada
+            if(todasPretResolucion == true){
+                if(mapaReclamaciones.containsKey(pretensionActualizada.SAC_Reclamacion__c) && mapaReclamaciones.get(pretensionActualizada.SAC_Reclamacion__c).CC_CasoRelacionado__c == null && mapaReclamaciones.get(pretensionActualizada.SAC_Reclamacion__c).SAC_Naturaleza__c == 'SAC_007'){
+                    pretensionActualizada.addError('No es posible pasar a estado de Resolución sin haber vinculado una reclamación.');
+                }
+            }
+
+
+        }
+    }
+
+
+    /***********************************************************************************************************
+    * Proposito: Validar si se permite resolver una reclamación complementaria en función de su sentido de resolución y de 
+    *   si tiene una reclamación vinculada
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0             US1094159      Álex Polo     21/01/25        Creación
+    ***********************************************************************************************************/
+    public static void validarResolverComplementarias(List<Case> listaComplementariasResueltas, Map<Id, Case> mapOldObj) {
+
+        for(Case complementaria : listaComplementariasResueltas){
+            //No se permite resolver si no tiene una reclamación vinculada
+            //Si el sentido de resolución es Inadmisión, se permite resolver aunque no tenga reclamación vinculada
+
+            if(complementaria.SAC_Naturaleza__c == 'SAC_007' && complementaria.SAC_SentidoResolucion__c != 'SAC_004' && complementaria.CC_CasoRelacionado__c == null){
+                complementaria.addError('No es posible resolver sin una reclamación vinculada.');
+            }
+        }
+    }
+
+
+    /***********************************************************************************************************
+    * Proposito: Validar si ya está resuelta, no se puede cambiar la naturaleza a complementaria, 
+    *   o de complementaria a otra (Ya que sería como vincular o desvincular una complementaria después de resolver y eso no se permite)
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0             US1094159      Álex Polo     22/01/25         Creación
+    ***********************************************************************************************************/
+    public static void validarCambioNaturalezaComplementariaResuelta(List<Case> listaCambioNaturalezaComplementarias, Map<Id, Case> mapOldObj) {
+
+        for(Case complementaria : listaCambioNaturalezaComplementarias){
+            if(mapOldObj.containsKey(complementaria.Id) && complementaria.OS_Fecha_Resolucion__c != null){
+                complementaria.addError('No es posible modificar la naturaleza: Complementaria tras haber resuelto.');
+            }
+        }
+    }
+
 
     /**************************************************************************
      * Proposito: 

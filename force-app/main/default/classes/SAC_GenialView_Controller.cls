@@ -176,12 +176,12 @@ public with sharing class SAC_GenialView_Controller {
 
     @AuraEnabled(cacheable=true)
     public static string getValorResumen(Id casoId){
-        SAC_Genial_Resultado__c resultadoGenial = [SELECT SAC_ValoracionResumen__c 
+        List<SAC_Genial_Resultado__c> resultadoGenial = [SELECT SAC_ValoracionResumen__c 
                                                          FROM SAC_Genial_Resultado__c 
                                                          WHERE SAC_Pretension__c = :casoId AND recordType.developerName = 'SAC_Pretension_IA'
                                                          WITH SECURITY_ENFORCED LIMIT 1];
         //por si devuelve sobject vacio por el security enforced
-        return (resultadoGenial != null && resultadoGenial.SAC_ValoracionResumen__c != null) ? resultadoGenial.SAC_ValoracionResumen__c : null;
+        return (!resultadoGenial.isEmpty() && resultadoGenial[0] != null && resultadoGenial[0].SAC_ValoracionResumen__c != null) ? resultadoGenial[0].SAC_ValoracionResumen__c : null;
     }
     @AuraEnabled
     public static void guardarValorResumen(Id casoId, String valoracion){

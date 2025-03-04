@@ -13,11 +13,18 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
             CC_Tipo_Cliente__c = 'SAC',
             SAC_esGGH__c = true
         );
-        Database.insert(mcc);
+        SAC_DatabaseDML.insertDML(mcc, false);
+        //Database.insert(mcc);
 
         //Cuenta
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-		Database.insert(cuenta);
+        Account ofi = SAC_TestDataFactory.crearCuentasOficina(1)[0];
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        
+        List<Account> listaCuentas = new List<Account>();
+        listaCuentas.add(cuenta);
+        listaCuentas.add(ofi);
+        SAC_DatabaseDML.insertListDML(listaCuentas, false);
 
         //Usuarios
         List<User> lstUser = new List<User>();
@@ -28,7 +35,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
         //Usuario Admin
         usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
         usuarioAdmin.Username = 'admin1234pret@caixatest.com';   
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+        //Database.insert(usuarioAdmin);
 
         System.runAs(usuarioAdmin) {
             //Usuario SAC General
@@ -40,7 +48,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
             usuarioGeneral2 = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
             usuarioGeneral2.Username = 'usergeneral2@test.com';   
             lstUser.add(usuarioGeneral2);
-            Database.insert(lstUser);
+            SAC_DatabaseDML.insertListDML(lstUser, false);
+            //Database.insert(lstUser);
 
             //Permisos
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
@@ -54,7 +63,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
             permiSetAssi2.AssigneeId = usuarioGeneral2.Id;
             permiSetAssi2.PermissionSetId = permiSet2.Id;
             permisos.add(permiSetAssi2);
-            Database.insert(permisos);
+            SAC_DatabaseDML.insertListDML(permisos, false);
+            //Database.insert(permisos);
         }
         Test.stopTest();
 
@@ -64,11 +74,15 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
         camposRecl.put('AccountId', cuenta.id);
         camposRecl.put('OwnerId', usuarioGeneral.Id);
         camposRecl.put('Status', 'SAC_001');
+        camposRecl.put('CC_Oficina_Afectada_Lookup__c', ofi.Id);
+        camposRecl.put('SAC_ValidacionOficinaAfectada__c', true);
         camposRecl.put('SAC_SentidoResolucion__c', 'SAC_003');
+        camposRecl.put('SAC_MotivoSentidoResolucion__c', 'Test motivo');
         camposRecl.put('SAC_RedaccionFinal__c', true);
         
         Case reclamacionTest = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-        Database.insert(reclamacionTest);  
+        SAC_DatabaseDML.insertDML(reclamacionTest, false);
+        //Database.insert(reclamacionTest);  
 
         //Pretensiones
         List<Case> pretensiones = new List<Case>();
@@ -146,13 +160,15 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
         Case pretension5Test = SAC_TestDataFactory.crearCaso('Pretension', camposPret5);
         pretensiones.add(pretension5Test);
 
-        Database.insert(pretensiones);
+        SAC_DatabaseDML.insertListDML(pretensiones, false);
+        //Database.insert(pretensiones);
 
         //Grupo colaborador
         CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion', 1)[0];
 
-        System.runAs(usuarioGeneral){           
-            Database.insert(grupoColaborador);
+        System.runAs(usuarioGeneral){    
+            SAC_DatabaseDML.insertDML(grupoColaborador, false);       
+            //Database.insert(grupoColaborador);
         }
 
         //Maestro Acciones
@@ -170,7 +186,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
         registroTareaMaestro[1].SAC_Prorroga__c = 2;
         registroTareaMaestro[1].SAC_Activo__c=true;
         registroTareaMaestro[1].SAC_DeveloperName__c='FE';
-        Database.insert(registroTareaMaestro);  
+        SAC_DatabaseDML.insertListDML(registroTareaMaestro, false);
+        //Database.insert(registroTareaMaestro);  
     }
     
     @isTest
@@ -188,7 +205,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
                 FolderId = usuarioAdmin.id,
                 TemplateType = 'text'
             );
-            Database.insert(emTemplate);
+            SAC_DatabaseDML.insertDML(emTemplate, false);
+            //Database.insert(emTemplate);
 
             String idTemplate = emTemplate.Id;
             SAC_PlantillaRedaccion__c template = new SAC_PlantillaRedaccion__c(
@@ -197,7 +215,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
                 SAC_PlantillaCastellanoId__c = idTemplate,
                 SAC_TipoPlantilla__c = 'SAC_Redaccion'
             );
-            Database.insert(template);
+            SAC_DatabaseDML.insertDML(template, false);
+            //Database.insert(template);
         }
         
         Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany = 'prueba'];
@@ -223,7 +242,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
                 FolderId = usuarioAdmin.id,
                 TemplateType = 'text'
             );
-            Database.insert(emTemplate);
+            SAC_DatabaseDML.insertDML(emTemplate, false);
+            //Database.insert(emTemplate);
 
             String idTemplate = emTemplate.Id;
             SAC_PlantillaRedaccion__c template = new SAC_PlantillaRedaccion__c(
@@ -232,7 +252,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
                 SAC_PlantillaCastellanoId__c = idTemplate,
                 SAC_TipoPlantilla__c = 'SAC_Redaccion'
             );
-            Database.insert(template);
+            SAC_DatabaseDML.insertDML(template, false);
+            //Database.insert(template);
         }
         
         Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany = 'prueba2'];
@@ -258,7 +279,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
                 FolderId = usuarioAdmin.id,
                 TemplateType = 'text'
             );
-            Database.insert(emTemplate);
+            SAC_DatabaseDML.insertDML(emTemplate, false);
+            //Database.insert(emTemplate);
 
             String idTemplate = emTemplate.Id;
             SAC_PlantillaRedaccion__c template = new SAC_PlantillaRedaccion__c(
@@ -267,7 +289,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
                 SAC_PlantillaCastellanoId__c = idTemplate,
                 SAC_TipoPlantilla__c = 'SAC_Redaccion'
             );
-            Database.insert(template);
+            SAC_DatabaseDML.insertDML(template, false);
+            //Database.insert(template);
         }
         
         Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany = 'prueba3'];
@@ -294,7 +317,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
                 TemplateType = 'text',
                 HtmlValue = '<p>prueba html value</p>'
             );
-            Database.insert(emTemplate);
+            SAC_DatabaseDML.insertDML(emTemplate, false);
+            //Database.insert(emTemplate);
 
             SAC_PlantillaRedaccion__c template = new SAC_PlantillaRedaccion__c(
                 SAC_MCC__c = mcc.Id, 
@@ -302,7 +326,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
                 SAC_PlantillaCastellanoId__c = emTemplate.Id,
                 SAC_TipoPlantilla__c = 'SAC_Redaccion'
             );
-            Database.insert(template);
+            SAC_DatabaseDML.insertDML(template, false);
+            //Database.insert(template);
         }
 
         SAC_PlantillaRedaccion__c plantilla = [SELECT Id, SAC_PlantillaCastellano__c, SAC_PlantillaCastellanoId__c FROM SAC_PlantillaRedaccion__c WHERE SAC_PlantillaCastellano__c = 'nombreTemplate'];
@@ -401,7 +426,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
                 FolderId = usuarioAdmin.id,
                 TemplateType = 'text'
             );
-            Database.insert(emTemplate);
+            SAC_DatabaseDML.insertDML(emTemplate, false);
+            //Database.insert(emTemplate);
 
             String idTemplate = emTemplate.Id;
             List<SAC_PlantillaRedaccion__c> listaPlantillas = new List<SAC_PlantillaRedaccion__c>();
@@ -424,7 +450,8 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
             listaPlantillas.add(template2);
             listaPlantillas.add(template3);
             
-            Database.insert(listaPlantillas);
+            SAC_DatabaseDML.insertListDML(listaPlantillas, false);
+            //Database.insert(listaPlantillas);
         }
         
         Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany = 'prueba5'];
@@ -472,6 +499,19 @@ public with sharing class SAC_LCMP_RedaccionPretension_Test {
             resultado = SAC_LCMP_RedaccionPretension.argumentarioPrete(caso.Id);
             Test.stopTest();
             system.assertNotEquals(resultado, null, 'No se ha devuelto la información');
+        } 
+    }
+
+    @isTest
+    static void getPickListSentidoResolucionTest(){
+        User usuario = [SELECT Id, Username FROM User WHERE Username = 'usergeneral@test.com' AND isActive = true];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'TestRec'];
+        List<String> resultado;
+        System.runAs(usuario){
+            Test.startTest();
+            resultado = SAC_LCMP_RedaccionPretension.getPickListSentidoResolucion(caso.Id);
+            Test.stopTest();
+            system.assertNotEquals(resultado[0], null, 'No se ha devuelto la información');
         } 
     }
 }

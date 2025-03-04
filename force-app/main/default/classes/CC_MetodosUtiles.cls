@@ -720,4 +720,13 @@ public with sharing class CC_MetodosUtiles {
 
         return horarioDia;
     }
+//Metodo para encriptar en SHA
+    static public String encriptarSHA (String tipoSha, String key){
+    String result = '';
+    if(String.isNotEmpty(tipoSha) && String.isNotEmpty(key) ){
+        Blob digest = Crypto.generateDigest(tipoSha, Blob.valueOf(key));
+        result = EncodingUtil.convertToHex(digest);
+    }
+        return result;
+    }
 }

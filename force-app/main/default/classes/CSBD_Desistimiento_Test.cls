@@ -4,7 +4,7 @@ public class CSBD_Desistimiento_Test {
     @TestSetup
     static void testSetup() {
         User usuarioGestor = CSBD_TestDataFactory.usuarioGestor();
-        System.runAs(CSBD_Usuarios.usuarioAdministrador()) {
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
             Account oficinaGestora = new Account();
             oficinaGestora.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
             oficinaGestora.Name = 'test centro';

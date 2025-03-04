@@ -1145,6 +1145,7 @@ global with sharing class SEG_wsRoboticsCasosPut_v2 {
         auditoriaCaso.SEG_FechaAuditoria__c = fechaAuditoriaDate;
         auditoriaCaso.SEG_Resultado__c = datosEntrada.estadoAuditoria;
         auditoriaCaso.RecordTypeId = recordTypeSEG;
+        auditoriaCaso.SEG_Motivo_Error__c = datosEntrada.motivoErrorAuditoria;
 
         if (!(String.isBlank(datosEntrada.auditoriaId)))
         {
@@ -1217,6 +1218,7 @@ global with sharing class SEG_wsRoboticsCasosPut_v2 {
                 
                 // Crear el comentario de chatter.
                 SEG_Case_Operativas_Controller.postOnChatter (datosEntrada.casoId, textoTarea, 'Comunicación Macros', null);
+                
             }
     
             return;

@@ -2,7 +2,6 @@ public with sharing class CSBD_SIR {
 
     public static Map<String, Object> sirCalcLimites(String numperso, String presolicitud) {
         CC_InterfaceSettings__mdt parametrosInterfaz = obtenerParametrosIntegracion('CSBD_SIR_CalcLimites');
-        System.debug('parametrosInterfaz '+parametrosInterfaz);
         if (parametrosInterfaz == null) {
             return new Map<String, Integer>();
         } else {
@@ -18,18 +17,16 @@ public with sharing class CSBD_SIR {
             cuerpo += '<canalInvocante>P</canalInvocante>';
             cuerpo += '<indicadorBureaus>N</indicadorBureaus>';
             cuerpo += '<numeroPersona>' + numperso + '</numeroPersona>';
-            if(presolicitud != null ) cuerpo += '<numeroSolicitud>' + presolicitud + '</numeroSolicitud>';
+            if (presolicitud != null) {
+                cuerpo += '<numeroSolicitud>' + presolicitud + '</numeroSolicitud>';
+            }
             cuerpo += '<tipoConsulta>A</tipoConsulta>';
             cuerpo += '<tipoLimite>1</tipoLimite>';
             cuerpo += '</externalInputTO></sir:CalcLim></soapenv:Body>';
             cuerpo += '</soapenv:Envelope>';
             req.setBody(cuerpo);
-            System.debug('cuerpo:' + cuerpo);
 
-            Http http = new Http();
-            HTTPResponse response = http.send(req);
-
-            System.debug('response.getBody():' + response.getBody());
+            HttpResponse response = new Http().send(req);
             return parsearRespuestaSirCalcLimites(response.getBody());
         }
     }
@@ -90,12 +87,10 @@ public with sharing class CSBD_SIR {
     }
 
     private static Map<String, Object> parsearRespuestaSirCalcLimites(String respuesta) {
-        System.debug('entro en parsear con respuesta: '+respuesta);
         Map<String, Object> resultado = new Map<String, Object>();
         DOM.Document docXML = new DOM.Document();
         docXML.load(respuesta);
         DOM.XmlNode root = docXML.getRootElement();
-        System.debug('root '+root);
         if (root.getNodeType() == DOM.XMLNodeType.ELEMENT) {
             for (DOM.XmlNode nodoRoot : root.getChildElements()) {
                 if (nodoRoot.getName() == 'Body') {
@@ -125,7 +120,6 @@ public with sharing class CSBD_SIR {
                 break;
             }
         }
-        System.debug('resultado parsear '+resultado);
         return resultado;
     }
 
@@ -133,9 +127,6 @@ public with sharing class CSBD_SIR {
 
         Map<Id, List<Opportunity>> idContactoOportunidadesMap = new Map<Id, List<Opportunity>>();
         idContactoOportunidadesMap.put(idContacto, new List<Opportunity>{oportunidad});
-
-        System.debug('actualizarDatosRiesgoCliente unitario: '+idContactoOportunidadesMap);
-
         actualizarDatosRiesgoCliente(new List<Id>{idContacto}, idContactoOportunidadesMap);
     }
 
@@ -146,18 +137,12 @@ public with sharing class CSBD_SIR {
         Set<Id> idsContactos = new Set<Id>(idContactos);
         List<Opportunity> oportunidadesContactoList = new List<Opportunity>();
         List<Contact> contactos = [SELECT CC_NumPerso__c FROM Contact WHERE Id IN :idsContactos];
-        System.debug('contactos '+contactos);
-        System.debug('actualizarDatosRiesgoCliente dentro actualizarRiesgo: '+idContactoOportunidadesMap);
         for (Contact contacto : contactos) {
-            if(String.isNotBlank(contacto.CC_NumPerso__c) && idContactoOportunidadesMap.containsKey(contacto.Id)){
-                System.debug('Map containsID');
+            if (String.isNotBlank(contacto.CC_NumPerso__c) && idContactoOportunidadesMap.containsKey(contacto.Id)) {
                 oportunidadesContactoList = idContactoOportunidadesMap.get(contacto.Id);
-                System.debug('Lista oportunidades '+oportunidadesContactoList);
-                for(Opportunity oportunidad: oportunidadesContactoList){
-                    System.debug('Entro en lista de oportunidades');
+                for (Opportunity oportunidad: oportunidadesContactoList) {
                     //Invocación al servicio de consulta de importes preconcedidos
                     Map<String, Object> respuestaLimites = sirCalcLimites(contacto.CC_NumPerso__c, oportunidad.CSBD_Now_Presolicitud__c);
-                    System.debug('respuestaLimites '+respuestaLimites);
                     /*
                     //Invocación al servicio de consulta de scoring
                     Map<String, Integer> respuestaScoring = sirConsultaScorings(contacto.CC_NumPerso__c);
@@ -176,7 +161,6 @@ public with sharing class CSBD_SIR {
                         contacto.CSBD_Ultima_Actualizacion_SIR__c = System.now();
 
                         retorno.put(contacto.Id, respuestaLimites);
-                        System.debug('retorno '+ retorno);
                     }
 
                     /*
@@ -205,7 +189,7 @@ public with sharing class CSBD_SIR {
         Map<Id, List<Opportunity>> idContactoOportunidadesMap = new Map<Id, List<Opportunity>>();
         List<Opportunity> oportunidadesContactoList = new List<Opportunity>();
 
-        for (Opportunity oportunidad:  oportunidades) {
+        for (Opportunity oportunidad : oportunidades) {
             if (!idContactoOportunidadesMap.containsKey(oportunidad.CSBD_Contact__c)) {
                 idContactoOportunidadesMap.put(oportunidad.CSBD_Contact__c, new List<Opportunity>());
             }

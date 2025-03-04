@@ -7,19 +7,22 @@ public with sharing class SAC_GetOwnerCases_Test {
         User usuarioGeneral;
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);     
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+            //Database.insert(permiSetAssi);
         }
 
         //Cuenta a utilizar tipo test
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);  
+        //Database.insert(cuenta);
 
         //RECLAMACION 1 - NECESITO SU ID PARA EJECUTAR EL METODO 1
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -58,7 +61,8 @@ public with sharing class SAC_GetOwnerCases_Test {
         reclamacionesAInsertar.add(casoReclamacion);
         reclamacionesAInsertar.add(casoReclamacion2);
         reclamacionesAInsertar.add(casoReclamacion3);
-        Database.insert(reclamacionesAInsertar);
+        SAC_DatabaseDML.insertListDML(reclamacionesAInsertar, false); 
+        //Database.insert(reclamacionesAInsertar);
 
         //PRETENSION 1 - ESTA PRETENSION SE TIENE QUE MOSTRAR COMO PRETENSION ASOCIADA Y QUE SE PUEDA MANIPULAR EN EL METODO 1 bucle entra al else
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -84,7 +88,8 @@ public with sharing class SAC_GetOwnerCases_Test {
         List<Case> pretensionesAInsertar = new List<Case>();
         pretensionesAInsertar.add(casoPretension);
         pretensionesAInsertar.add(casoPretension2);
-        Database.insert(pretensionesAInsertar);
+        SAC_DatabaseDML.insertListDML(pretensionesAInsertar, false);
+        //Database.insert(pretensionesAInsertar);
         
     }
 

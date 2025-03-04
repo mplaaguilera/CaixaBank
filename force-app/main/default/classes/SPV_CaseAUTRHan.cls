@@ -52,7 +52,7 @@ public with sharing class SPV_CaseAUTRHan extends CC_TriggerHandlerBase{
             SPV_CaseHelper.cerrarSLAReclamacion(listCasosSPV, mapOldObj);
 
             //Si se actualiza la ofician afectada de la reclamacion, añadir un registro del objeto intermedio que relaciona reclaamción-Oficinas Afectadas
-            //SPV_CaseHelper.addOficinaAfectada(lstReclamaciones, mapOldObj, mapaDatosCasosActualizar);
+            SPV_CaseHelper.addOficinaAfectada(lstReclamaciones, mapOldObj, mapaDatosCasosActualizar);
 
             //Si se actualiza algún dato del reclamante de una reclamación, se debe actualizar de cada una de sus pretensiones
             SPV_CaseHelper.actualizarDatosReclamantePretensiones(lstReclamaciones, mapOldObj, mapaDatosCasosActualizar);

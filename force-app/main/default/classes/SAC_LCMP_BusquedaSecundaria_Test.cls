@@ -8,17 +8,16 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             // Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         // Crear cuentas
-		Id recordTypeIdCliente = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         List<Account> cuentas = SAC_TestDataFactory.crearCuentas(5);
         cuentas[0].name = 'Test01';
         cuentas[0].CC_Numero_Documento__c = '12345678Z';
@@ -36,7 +35,7 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
         cuentas[4].CC_Numero_Documento__c = '15197951B'; 
         cuentas[4].CC_TipoPersona__c = 'J';
         cuentas[4].CC_NumPerso__c = '99999997';                                      
-        Database.insert(cuentas);
+        SAC_DatabaseDML.insertListDML(cuentas, false);
         
         // Crear contactos
         List<Contact> contactos = new List<Contact>();
@@ -60,7 +59,7 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
         contactos.add(contacto3);
         contactos.add(contacto4);
         contactos.add(contacto5);                       
-        Database.insert(contactos);
+        SAC_DatabaseDML.insertListDML(contactos, false);
     
         // Crear casos
         List<Case> reclamaciones = new List<Case>();
@@ -167,7 +166,7 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
 
         Case reclamacion7 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl7);
         reclamaciones.add(reclamacion7); 
-        Database.insert(reclamaciones);
+        SAC_DatabaseDML.insertListDML(reclamaciones, false);
     }
     
     @isTest
@@ -185,7 +184,7 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
         Case caso = [SELECT Id FROM Case WHERE Subject='Test01'];
         Case caso4 = [SELECT Id FROM Case WHERE RecordTypeId=:sPretensionRecordType];
         caso4.AccountId = [SELECT Id FROM Account WHERE Name='Test07'].Id;
-        Database.update(caso4);
+        SAC_DatabaseDML.updateDML(caso4, false);
         Contact cont = [SELECT ID FROM Contact WHERE CC_NumPerso__c = '99999991' LIMIT 1];
 
         Test.startTest();
@@ -195,8 +194,7 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
                 SAC_LCMP_BusquedaCliente.crearReclamanteSecundario(cont.Id, 'Representante', caso.Id);
             }
             catch(exception e){
-                List<SAC_CaseReclamante__c> listReclamantes = [SELECT Id FROM SAC_CaseReclamante__c];
-                System.assertNotEquals(0,listReclamantes.size(),'No se ha insertado el reclamante');
+                System.assertNotEquals(0, [SELECT Count() FROM SAC_CaseReclamante__c],'No se ha insertado el reclamante');
             }
         }
         Test.stopTest();
@@ -215,8 +213,7 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
         }
         Test.stopTest();
 
-        List<SAC_CaseReclamante__c> listReclamantes = [SELECT Id FROM SAC_CaseReclamante__c];
-        System.assertNotEquals(0, listReclamantes.size(),'No se ha insertado el reclamante');
+        System.assertNotEquals(0, [SELECT Count() FROM SAC_CaseReclamante__c],'No se ha insertado el reclamante');
     }
 
     @isTest
@@ -232,8 +229,7 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
         }
         Test.stopTest();
 
-        List<SAC_CaseReclamante__c> listReclamantes = [SELECT Id FROM SAC_CaseReclamante__c];
-        System.assertNotEquals(0,listReclamantes.size(), 'No se ha insertado el reclamante');
+        System.assertNotEquals(0,[SELECT Count() FROM SAC_CaseReclamante__c], 'No se ha insertado el reclamante');
     }
 
     @isTest
@@ -352,12 +348,8 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
     }
 
     @isTest
-    public static void actualizarReclamanteNoCliente_Test() {            
-        Account ac = [SELECT Id FROM Account WHERE name = 'Test01'];
+    public static void actualizarReclamanteNoClienteTest() {            
 
-        Contact con = [SELECT Id FROM Contact WHERE LastName = 'Test01'];
-        
-        Id recordTypeIdReclamacion = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
         Case caso1 =  [SELECT Id FROM Case WHERE Subject = 'Test01' LIMIT 1];
         Case caso2 = [SELECT Id FROM Case WHERE Subject = 'Test06' LIMIT 1];
 
@@ -369,14 +361,12 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
             LastName = 'NoCliente',
             RecordTypeId = recordTypeIdCliente
         );
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
 
-        List<SAC_CaseReclamante__c> reclamantes1 = [SELECT Id FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: caso1.Id];
-        List<SAC_CaseReclamante__c> reclamantes2 = [SELECT Id FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: caso2.Id];
+        Integer contadorReclamantes1 = [SELECT Count() FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: caso1.Id];
+        Integer contadorReclamantes2 = [SELECT Count() FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: caso2.Id];
 
         String idRecordType = '';
-
-        List<SAC_CaseReclamante__c> reclamantes1v2 = new List<SAC_CaseReclamante__c>();
 
         Test.startTest();
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
@@ -387,12 +377,8 @@ public with sharing class SAC_LCMP_BusquedaSecundaria_Test {
         }
         Test.stopTest();
         
-        reclamantes1v2 = [SELECT Id FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: caso1.Id];
-        
-        List<SAC_CaseReclamante__c> reclamantes2v2 = [SELECT Id FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: caso2.Id];
-
-        System.assertNotEquals(reclamantes1.size(), reclamantes1v2.size(), 'No se ha insertado reclamantes 1');
-        System.assertNotEquals(reclamantes2.size(), reclamantes2v2.size(), 'No se ha insertado reclamantes 2');
+        System.assertNotEquals(contadorReclamantes1, [SELECT Count() FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: caso1.Id], 'No se ha insertado reclamantes 1');
+        System.assertNotEquals(contadorReclamantes2, [SELECT Count() FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: caso2.Id], 'No se ha insertado reclamantes 2');
         System.assertNotEquals('', idRecordType, 'No se ha devuelto el id del recordType');
     }
 }

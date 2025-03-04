@@ -2,14 +2,16 @@
 public with sharing class SAC_QueueableCerrarMilestoneLetrado_Test {
     @TestSetup
     static void makeData(){
-        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-        Database.insert(usuarioGeneral);
+        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];    
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false); 
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             //Reclamacion 1
@@ -23,7 +25,8 @@ public with sharing class SAC_QueueableCerrarMilestoneLetrado_Test {
         
             List<Case> listaReclamaciones = new List<Case>();
             listaReclamaciones.add(reclamacion1);
-            Database.insert(listaReclamaciones);
+            SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
+            //Database.insert(listaReclamaciones);
         }
     }
 

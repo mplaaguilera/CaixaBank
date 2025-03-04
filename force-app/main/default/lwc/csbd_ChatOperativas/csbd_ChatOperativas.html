@@ -1,0 +1,15 @@
+<template>
+
+	<article class="slds-card" style="box-shadow: none;">
+		<div class="slds-card__body" align="center" style="min-height: 34px;">
+			<div class="divBotones">
+				<lightning-button label="Copiar NIF" icon-name="utility:identity" onclick={copiarNifAlPortapapeles} disabled={botonesDisabled.copiarNifAlPortapapeles}></lightning-button>
+				<lightning-button label="Derivar a gestor" icon-name="utility:workforce_engagement" onclick={abrirModal} data-modal="modalDerivarGestor" disabled={botonesDisabled.derivarGestor} class="slds-var-m-left_small"></lightning-button>
+				<lightning-button label="Cerrar" icon-name="action:close" onclick={abrirModal} data-modal="modalCerrarOportunidad" disabled={botonesDisabled.cerrarOportunidad} class="slds-var-m-left_small"></lightning-button>
+			</div>
+		</div>
+	</article>
+
+	<c-csbd_-derivar-gestor lwc:if={modalesVisibles.modalDerivarGestor} lwc:ref="modalDerivarGestor" record-id={idOportunidad} onmodalcerrado={cerrarModal}></c-csbd_-derivar-gestor>
+	<c-csbd_-cerrar-oportunidad lwc:elseif={modalesVisibles.modalCerrarOportunidad} lwc:ref="modalCerrarOportunidad" record-id={idOportunidad} onmodalcerrado={cerrarModal}></c-csbd_-cerrar-oportunidad>
+</template>

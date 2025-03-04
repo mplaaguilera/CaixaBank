@@ -14,14 +14,16 @@ public with sharing class SAC_WS_Promor_Test {
         User usuarioGeneral;
         System.runAs(new User(Id = UserInfo.getUserId())) {
             //Usuario SAC General
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);   
+            //Database.insert(permiSetAssi);
         }
     }
     
@@ -33,7 +35,8 @@ public with sharing class SAC_WS_Promor_Test {
         CBK_IntegrationSetting__c csPromo= new CBK_IntegrationSetting__c();
         csPromo.Name = 'SAC_Promor';
         csPromo.NamedCredential__c = 'callout:API_GWT_PRE/corporateServices/legalCompliance/debtClaims/request';
-        Database.insert(csPromo);
+        SAC_DatabaseDML.insertDML(csPromo, false); 
+        //Database.insert(csPromo);
 
         Test.setMock(HttpCalloutMock.class, new SAC_MockHttpResponseGenerator(200, 'OK', null, null));
         
@@ -80,7 +83,8 @@ public with sharing class SAC_WS_Promor_Test {
         CBK_IntegrationSetting__c csPromo= new CBK_IntegrationSetting__c();
         csPromo.Name = 'SAC_Promor';
         csPromo.NamedCredential__c = 'callout:API_GWT_PRE/corporateServices/legalCompliance/debtClaims/request';
-        Database.insert(csPromo);
+        SAC_DatabaseDML.insertDML(csPromo, false);
+        //Database.insert(csPromo);
 
         Test.setMock(HttpCalloutMock.class, new SAC_MockHttpResponseGenerator(404, 'KO', null, null));
 

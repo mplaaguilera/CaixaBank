@@ -49,7 +49,7 @@ public with sharing class HDT_LiveChatTranscript_BI_TRHan extends CC_TriggerHand
         List<LiveChatTranscript> oListChat = new List<LiveChatTranscript>();
         for (LiveChatTranscript oChat : listNewObj) {
 
-            if (oChat.CC_Tipo__c != 'Chatbot' && oChat.CC_Tipo__c != 'Whatsapp' ){
+            if (oChat.CC_Tipo__c != 'Chatbot' ){
                 oListChat.add(oChat);
             }
         }

@@ -37,7 +37,8 @@ public with sharing class SAC_LCMP_InsertarConsulta {
         consulta.SAC_Reclamacion__c = consultaId;
 
         try {
-            Database.insert(consulta);
+            SAC_DatabaseDML.insertDML(consulta, false);
+            //Database.insert(consulta);
             return consulta.Id;
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());

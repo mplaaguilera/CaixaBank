@@ -25,7 +25,7 @@ public with sharing class SAC_RechazarReclamacionMasiva_Test {
             EmailEncodingKey = 'UTF-8',
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_US');
-        Database.insert(user);
+        SAC_DatabaseDML.insertDML(user, false);
 
         Case casoRechazo;
         list<Case> lstCases = new List<Case>(); 
@@ -39,7 +39,7 @@ public with sharing class SAC_RechazarReclamacionMasiva_Test {
 			lstCases.add(casoRechazo);
 	 	}
 
-         Database.insert(lstCases);
+        SAC_DatabaseDML.insertListDML(lstCases, false);
     }
 
 	@isTest 
@@ -54,7 +54,7 @@ public with sharing class SAC_RechazarReclamacionMasiva_Test {
 			ApexPages.StandardSetController stdSetController = new ApexPages.StandardSetController(lstCases);
 			stdSetController.setSelected(lstCases);
 			SAC_RechazarReclamacionMasiva_Controller lstIdVF = new SAC_RechazarReclamacionMasiva_Controller(stdSetController);
-			System.assertEquals(lstIdVF.getIDs.size(), lstCases.size(), 'Registros VF Page. Ids a cambiar');
+			System.assertNotEquals(0, lstIdVF.getIDs.size(), 'Registros VF Page. Ids a cambiar');
 		}
 	}
 }

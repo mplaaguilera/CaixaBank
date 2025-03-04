@@ -17,8 +17,9 @@
     static void makeData(){
 
         List<User> usuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(2);
-        usuarios[1].ProfileId = [SELECT Id FROM Profile WHERE Name = 'Standard User' OR Name = 'Usuario estándar'].Id; 
-        Database.insert(usuarios);
+        usuarios[1].ProfileId = [SELECT Id FROM Profile WHERE Name = 'Standard User' OR Name = 'Usuario estándar'].Id;
+        SAC_DatabaseDML.insertListDML(usuarios, false);   
+        //Database.insert(usuarios);
 
         //Reclamación Padre
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -26,7 +27,8 @@
         camposRecl.put('OwnerId', usuarios[0].id);
         
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false);   
+        //Database.insert(reclamacion);
 
         //Reclamacion con Ficheros Adjuntos
         Map<String, Object> camposRecl2 = new Map<String, Object>();
@@ -34,7 +36,8 @@
         camposRecl2.put('OwnerId', usuarios[0].id);
         
         Case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
-        Database.insert(reclamacion2);
+        SAC_DatabaseDML.insertDML(reclamacion2, false); 
+        //Database.insert(reclamacion2);
 
         
         ContentVersion contentVersionInsert = new ContentVersion(
@@ -42,14 +45,16 @@
                                                     PathOnClient = 'Test.jpg',
                                                     VersionData = Blob.valueOf('Test Content Data'),
                                                     IsMajorVersion = true);
-        Database.insert(contentVersionInsert);
+        SAC_DatabaseDML.insertDML(contentVersionInsert, false); 
+        //Database.insert(contentVersionInsert);
  
         List<ContentDocument> documents = [SELECT Id, Title, LatestPublishedVersionId FROM ContentDocument];
         
         ContentDocumentLink documentoLink = new ContentDocumentLink();
         documentoLink.LinkedEntityId = reclamacion2.id ;        
         documentoLink.ContentDocumentId=documents[0].Id;
-        Database.insert(documentoLink);
+        SAC_DatabaseDML.insertDML(documentoLink, false); 
+        //Database.insert(documentoLink);
 
     }
 
@@ -60,7 +65,8 @@
         User usuario = [SELECT id FROM User WHERE Email = 'email0@test.com'];
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);       
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false); 
+        //Database.insert(psa);
 
        
 
@@ -71,7 +77,8 @@
 
             Test.startTest();
             try{
-                Database.update(casoParaModificar);
+                SAC_DatabaseDML.updateDML(casoParaModificar, true); 
+                //Database.update(casoParaModificar);
             }catch(Exception e){
                 tenemosError = true;
             }             
@@ -85,8 +92,9 @@
       
         User usuario = [SELECT id FROM User WHERE Email = 'email0@test.com'];
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);  
+        SAC_DatabaseDML.insertDML(psa, false);      
+        //Database.insert(psa);
 
         system.runAs(usuario){  
 
@@ -96,7 +104,8 @@
             
             Test.startTest();
             try{
-                Database.update(casoConAdjuntos);
+                SAC_DatabaseDML.updateDML(casoConAdjuntos, true); 
+                //Database.update(casoConAdjuntos);
             }catch(Exception e){
                 tenemosError = true;
             }             
@@ -119,8 +128,9 @@
             Boolean tenemosError = false;
 
             Test.startTest();
-            try{                
-                Database.update(casoParaModificar);
+            try{           
+                SAC_DatabaseDML.updateDML(casoParaModificar, true);      
+                //Database.update(casoParaModificar);
             }catch(Exception e){
                 tenemosError = true;
             }             

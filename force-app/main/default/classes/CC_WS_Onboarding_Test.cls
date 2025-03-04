@@ -2,61 +2,83 @@
 public class CC_WS_Onboarding_Test {
     @TestSetup
     static void makeData() {
-        Id profileAdmin = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
-        Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
-        Id roleCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center'].Id;
-        Id roleDirectorioCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center_sin_acceso_a_Directorio'].Id;
-        PermissionSet psOperadorCliente = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_Cliente'];
-        PermissionSet psClasses = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Classes'];
-        List<User> userList = new List<User>();
-        List<PermissionSetAssignment> insertPSAssOperadores = new List<PermissionSetAssignment>();
-        List<CC_MCC__c> mccCreado = new List<CC_MCC__c>();
-        List<CC_MCC__Share> totalPermisosMCC = new List<CC_MCC__Share>();
-
-        User usuarioAdmin = new User();
-        usuarioAdmin.profileId = profileAdmin;
-        usuarioAdmin.UserRoleId = roleCC;        
-        usuarioAdmin.FirstName = '';
-        usuarioAdmin.LastName = 'Administrador de sistema';
-        usuarioAdmin.Email = 'tuser000@amamama.com';
-        usuarioAdmin.Username = 'tuser000@amama.com' + System.currentTimeMillis();
-        usuarioAdmin.CompanyName = 'MST';
-        usuarioAdmin.Title = 'title';
-        usuarioAdmin.Alias = 'alias';
-        usuarioAdmin.TimeZoneSidKey = 'Europe/Paris';
-        usuarioAdmin.EmailEncodingKey = 'UTF-8';
-        usuarioAdmin.LanguageLocaleKey = 'es';
-        usuarioAdmin.LocaleSidKey = 'es_ES';
-        userList.add(usuarioAdmin);
-
-        User operadorCliente = new User();
-        operadorCliente.profileId = profileId;
-        operadorCliente.UserRoleId = roleDirectorioCC;
-        operadorCliente.AV_ExternalID__c = 'U0124112';
-        operadorCliente.FirstName = 'Operador';
-        operadorCliente.LastName = 'Operador Cliente';
-        operadorCliente.Email = 'tuser000@amamama.com';
-        operadorCliente.Username = 'tuser000@amamama.com' + System.currentTimeMillis();
-        operadorCliente.CompanyName = 'MST';
-        operadorCliente.Title = 'title';
-        operadorCliente.Alias = 'alias';
-        operadorCliente.TimeZoneSidKey = 'Europe/Paris';
-        operadorCliente.EmailEncodingKey = 'UTF-8';
-        operadorCliente.LanguageLocaleKey = 'es';
-        operadorCliente.LocaleSidKey = 'es_ES';
-        userList.add(operadorCliente);
-        insert userList;
-
-        PermissionSetAssignment psaOperadorCliente = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psOperadorCliente.Id);
-        insertPSAssOperadores.add(psaOperadorCliente);
-
-        PermissionSetAssignment psaOperadorClasses = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psClasses.Id);
-        insertPSAssOperadores.add(psaOperadorClasses);
-
-        Database.insert(insertPSAssOperadores);
+        User usuarioAdmin = CC_TestDataFactory.insertUserAdmin();
 
         System.runAs(usuarioAdmin) {
-            //Crear datos de prueba
+            User operador = CC_TestDataFactory.insertUserOperadorCliente('');
+
+            Account cuenta = new Account();
+            cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
+            cuenta.FirstName = 'Cuenta';
+            cuenta.LastName = 'Prueba';
+            cuenta.CC_Numero_Documento__c = '29785500D';
+            insert cuenta;
+
+            CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+            insert caseExtension;
+
+            Case caso = new Case();
+            caso.AccountId = cuenta.Id;
+            caso.Subject = 'Caso Prueba';
+            caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            // caso.CBK_Case_Extension_Id__c = caseExtension.Id;
+            insert caso;
+
+            Case caso2 = new Case();
+            caso2.AccountId = cuenta.Id;
+            caso2.Subject = 'Caso Prueba 2';
+            caso2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            caso2.CBK_Case_Extension_Id__c = caseExtension.Id;
+            insert caso2;
+
+            CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
+            customSetting.Name = 'CC_Onboarding';
+            customSetting.NamedCredential__c = 'callout:API_GWT_TST/assetProductsBackofficeOperations/cbpo02/v1/teamworks/webservices/GDS707A/ConsultaEstadoSolicitud.tws';
+            customSetting.RegistroTrazaIntegracion__c = true;
+            insert customSetting;
         }
+    }
+
+    @isTest
+    public static void testOK() {
+        Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Onboarding(200));
+        String mensajeIntegracion;
+        System.runAs(CC_TestDataFactory.getUserOperadorCliente()) {
+            Case caso = [SELECT Id, Account.CC_Numero_Documento__c FROM Case WHERE Subject = 'Caso Prueba' LIMIT 1];
+            Test.startTest();
+                mensajeIntegracion = CC_WS_Onboarding.recuperarClienteOnboarding(caso.Id, caso.Account.CC_Numero_Documento__c);
+            Test.stopTest();
+        }
+        System.assertNotEquals('El cliente no esta en proceso de Onboarding', mensajeIntegracion);
+    }
+
+    @isTest
+    public static void testOK2() {
+        Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Onboarding(200));
+        String mensajeIntegracion;
+        System.runAs(CC_TestDataFactory.getUserOperadorCliente()) {
+            Case caso = [SELECT Id, Account.CC_Numero_Documento__c FROM Case WHERE Subject = 'Caso Prueba 2' LIMIT 1];
+            Test.startTest();
+                mensajeIntegracion = CC_WS_Onboarding.recuperarClienteOnboarding(caso.Id, '77788590F');
+            Test.stopTest();
+        }
+        System.assertNotEquals('El cliente no esta en proceso de Onboarding', mensajeIntegracion);
+    }
+
+    @isTest
+    public static void matrizTest() {
+        List<String> lstString = new List<String>();
+        System.runAs(CC_TestDataFactory.getUserOperadorCliente()) {
+            Test.startTest();
+                lstString.add(CC_WS_Onboarding.matrizOnboarding('Validación Vídeo Desasistida','Espera Validación Vídeo Desasistida',''));
+                lstString.add(CC_WS_Onboarding.matrizOnboarding('Alta Cliente','Incidencia Alta Cliente',''));
+                lstString.add(CC_WS_Onboarding.matrizOnboarding('Alta Contratos','Incidencia Alta Contratos',''));
+                lstString.add(CC_WS_Onboarding.matrizOnboarding('Revisión Documentación','Ver Error Envío NIF',''));
+                lstString.add(CC_WS_Onboarding.matrizOnboarding('Espera Firma o Iberpay o Señales','Gestión Productos Adicionales',''));
+                lstString.add(CC_WS_Onboarding.matrizOnboarding('Finalizado OK','Revisión Alta S214',''));
+
+            Test.stopTest();
+        }
+        System.assertEquals(true, lstString.size() > 0, '');
     }
 }

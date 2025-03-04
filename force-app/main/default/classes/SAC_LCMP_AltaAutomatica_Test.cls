@@ -16,14 +16,16 @@ public with sharing class SAC_LCMP_AltaAutomatica_Test {
         User usuarioGeneral;
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];  
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);       
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);    
+            //Database.insert(permiSetAssi);
         }
 
         System.runAs(usuarioGeneral) {
@@ -31,7 +33,8 @@ public with sharing class SAC_LCMP_AltaAutomatica_Test {
             Map<String, Object> camposRecl = new Map<String, Object>();            
             camposRecl.put('Subject', 'TestRecl');
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false); 
+            //Database.insert(reclamacion);
 
             //Reclamacion relacionada
             camposRecl.clear();
@@ -41,7 +44,8 @@ public with sharing class SAC_LCMP_AltaAutomatica_Test {
             camposRecl.put('SAC_M2P__c', true);
             camposRecl.put('SAC_Entidad_Afectada__c', 'SAC_009');
             Case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion2);
+            SAC_DatabaseDML.insertDML(reclamacion2, false);
+            //Database.insert(reclamacion2);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -50,7 +54,8 @@ public with sharing class SAC_LCMP_AltaAutomatica_Test {
             camposPret.put('SAC_Entidad_Afectada__c', 'SAC_009');
 
             Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(casoPretension);
+            SAC_DatabaseDML.insertDML(casoPretension, false);
+            //Database.insert(casoPretension);
         }
     }
 

@@ -18,26 +18,30 @@ public with sharing class SAC_CloneDocuments_Test {
 
             System.runAs(new User(Id = Userinfo.getUserId())) {
                 //Usuario SAC General
-                User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];       
-                Database.insert(usuarioAdmin);
+                User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+                SAC_DatabaseDML.insertDML(usuarioAdmin, false);       
+                //Database.insert(usuarioAdmin);
 
                 PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
                 PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
                 permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
                 permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-                Database.insert(permiSetAssiAdmin);
+                SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false);
+                //Database.insert(permiSetAssiAdmin);
             
                 System.runAs(usuarioAdmin){
                     // create accounts
                     List<Account> acctList = SAC_TestDataFactory.crearCuentasNoClientePA(4);
-                    Database.insert(acctList);
+                    SAC_DatabaseDML.insertListDML(acctList, false);
+                    //Database.insert(acctList);
             
                     // create ContentVersions
                     list<ContentVersion> cvList = new list<ContentVersion>();
                     cvList.add( new ContentVersion(Title = 'test1',PathOnClient = 'Test1.txt',VersionData = Blob.valueOf('test data 1'), IsMajorVersion = true) );
                     cvList.add( new ContentVersion(Title = 'test2',PathOnClient = 'Test2.txt',VersionData = Blob.valueOf('test data 2'), IsMajorVersion = true) );
                     cvList.add( new ContentVersion(Title = 'test3',PathOnClient = 'Test3.txt',VersionData = Blob.valueOf('test data 3'), IsMajorVersion = true) );
-                    Database.insert(cvList);
+                    SAC_DatabaseDML.insertListDML(cvList, false);
+                    //Database.insert(cvList);
             
                     // retrieve Ids for ContentDocuments created on insert of ContentVersions
                     list<Id> cdIdList = new list<Id>();
@@ -56,7 +60,8 @@ public with sharing class SAC_CloneDocuments_Test {
                     cdlList.add(new ContentDocumentLink(ContentDocumentId=cdIdList[0], LinkedEntityId=acctList[0].Id, ShareType='V'));
                     cdlList.add(new ContentDocumentLink(ContentDocumentId=cdIdList[1], LinkedEntityId=acctList[0].Id, ShareType='V'));
                     cdlList.add(new ContentDocumentLink(ContentDocumentId=cdIdList[2], LinkedEntityId=acctList[1].Id, ShareType='V'));
-                    Database.insert(cdlList); 
+                    SAC_DatabaseDML.insertListDML(cdlList, false);
+                    //Database.insert(cdlList); 
                 }
             }
         }

@@ -38,7 +38,7 @@ public with sharing class CC_WS_Autenticacion {
 				HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
 				response = CBK_HttpServiceIntegration.callHttpService(request, autenticacionId, 'CC_Autenticacion_Robusta');
 
-				// response.setStatusCode(200); //DPK comentar
+				response.setStatusCode(200); //DPK comentar
 
 				CC_Comunicaciones__c autenticacion = new CC_Comunicaciones__c(Id = autenticacionId);
 				autenticacion.CC_Fecha_Envio__c = Datetime.now();
@@ -109,14 +109,14 @@ public with sharing class CC_WS_Autenticacion {
 		//Account, representant y teléfono
 		String tipoObjeto = recordId.getSObjectType().getDescribe().getName();
 		if (tipoObjeto == 'Case') {
-			caso = [SELECT Account.RecordType.DeveloperName, Account.CC_NumPerso__c,
+			caso = [SELECT Account.RecordType.DeveloperName, Account.CC_NumPerso__c, Account.AV_NumPerso__c,
 					CC_Representante__r.RecordType.DeveloperName,
 					CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
 					CC_Telefono_Contacto__c FROM Case WHERE Id = :recordId];
 
 			datos = new Map<String, Object>{
 				'accountRecordType' => caso.Account?.RecordType.DeveloperName,
-				'accountNumperso' => caso.Account.CC_NumPerso__c,
+				'accountNumperso' => !String.isEmpty(caso.Account.AV_NumPerso__c) ? caso.Account.AV_NumPerso__c : caso.Account.CC_NumPerso__c,
 				'representanteRecordType' => caso.CC_Representante__r?.RecordType.DeveloperName,
 				'representanteNumperso' => caso.CC_Representante__r?.CC_Representante__r?.CC_NumPerso__c,
 				'telefono' => caso.CC_Telefono_Contacto__c
@@ -160,11 +160,12 @@ public with sharing class CC_WS_Autenticacion {
 		if (datos.get('representanteRecordType') != null) { //PENDIENTE
 			datos.put('tipoPersona', 'F');
 			datos.put('numperso', datos.get('representanteNumperso'));
-		} else if (datos.get('accountRecordType') == 'CC_Cliente' || datos.get('accountRecordType') == 'CC_ClientePA'
-		|| datos.get('representanteRecordType') == 'CC_Cliente') {
+		} else if (datos.get('accountRecordType') == 'CC_Cliente' || datos.get('representanteRecordType') == 'CC_Cliente') {
 			datos.put('tipoPersona', 'J');
 			datos.put('numperso', String.valueOf(datos.get('accountNumperso')));
-
+		} else {
+			datos.put('tipoPersona', 'F');
+			datos.put('numperso', datos.get('accountNumperso'));
 		}
 
 		return new Map<String, Object>{
@@ -213,9 +214,9 @@ public with sharing class CC_WS_Autenticacion {
 			//HttpResponse responseConsulta = httpConsulta.send(requestConsulta);
 
 			HttpResponse responseConsulta = CBK_HttpServiceIntegration.callHttpService(request, idAutenticacion, 'CC_Autenticacion_Robusta_Estado');
-			// responseConsulta.setStatusCode(200);//DPK comentar
-			//String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"APPROVED"}';
-			//responseConsulta.setBody(body);//DPK comentar
+			responseConsulta.setStatusCode(200);//DPK comentar
+			String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"EXPIRED"}';
+			responseConsulta.setBody(body);//DPK comentar
 
 			if (tipoObjeto == 'Case') {
 				caso = new Case(Id = recordId);
@@ -233,7 +234,10 @@ public with sharing class CC_WS_Autenticacion {
 				} else if (tipoObjeto == 'Opportunity') {
 					oportunidad.CSBD_EstadoAutenticacion__c = 'ERROR';
 				}
-
+				
+				if (responseConsulta.getStatusCode() == 504 || responseConsulta.getStatusCode() == 0) {
+					resultado = resultado + '(timeout)';
+				}
 			} else {
 				Map<String, Object> mapRespuesta = (Map<String, Object>)JSON.deserializeUntyped(responseConsulta.getBody());
 				String statusConsulta = JSON.serialize(mapRespuesta.get('status')).replaceAll('"', '');
@@ -242,7 +246,6 @@ public with sharing class CC_WS_Autenticacion {
 				// Map<String, Object> mapRespuestaConsulta = (Map<String, Object>) listaConsulta[0];
 				// String statusConsulta = JSON.serialize(mapRespuestaConsulta.get('status'));
 				// //JSON.serialize(mapRespuestaConsulta.get('status'));
-
 				Map<String, Map<String, String>> infoEstadosValidacion = getInfoEstadosValidacion();
 				String statusAux = esValorPicklist('Case', 'CC_Status_Autorizacion__c', statusConsulta) ? statusConsulta : 'SIN ESTADO';
 				if (infoEstadosValidacion.containsKey(statusConsulta)) {
@@ -261,7 +264,6 @@ public with sharing class CC_WS_Autenticacion {
 					} else if (tipoObjeto == 'Opportunity') {
 						oportunidad.CSBD_EstadoAutenticacion__c = statusAux;
 					}
-
 					resultado = infoEstadosValidacion.get(statusConsulta).get('CC_Detalle__c');
 				} else {
 					resultado = 'Estado desconocido';
@@ -319,7 +321,7 @@ public with sharing class CC_WS_Autenticacion {
 				headers.put(lov.Name, lov.CC_Valor__c);
 			}
 		}
-        system.debug('DPK headers' + headers);
+        // system.debug('DPK headers' + headers);
 		return headers;
 	}
 }

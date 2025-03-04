@@ -19,15 +19,17 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         //Usuario Admin
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
         usuarioAdmin.SAC_PerteneceCOPSAJ__c = true;
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);  
+        //Database.insert(usuarioAdmin);
 
         User usuario = new User();
 
         System.RunAs(usuarioAdmin) {
             usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
             usuario.Username = 'ustestesteo@test.com'; 
-            usuario.UserRoleId = uRole.id;      
-            Database.insert(usuario);
+            usuario.UserRoleId = uRole.id; 
+            SAC_DatabaseDML.insertDML(usuario, false);      
+            //Database.insert(usuario);
         }
         Test.stopTest();
 
@@ -42,7 +44,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         Name = 'Avales MCC Clase Test',
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-0101');
-        Database.insert(mccTematica1);
+        SAC_DatabaseDML.insertDML(mccTematica1, false);  
+        //Database.insert(mccTematica1);
 
         CC_MCC__c mccProdServ1 = new CC_MCC__c(
         RecordTypeId = recTypeProdServ,
@@ -50,7 +53,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-010101',
         CC_Tematica__c = mccTematica1.id);
-        Database.insert(mccProdServ1);
+        SAC_DatabaseDML.insertDML(mccProdServ1, false);
+       //Database.insert(mccProdServ1);
 
         CC_MCC__c mccMotivo1 = new CC_MCC__c(
         RecordTypeId = recTypeMotivo,
@@ -58,7 +62,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Producto_Servicio__c = mccProdServ1.id,
         CC_Codigo_Externo__c = 'TEST-0102');
-        Database.insert(mccMotivo1);
+        SAC_DatabaseDML.insertDML(mccMotivo1, false);
+       // Database.insert(mccMotivo1);
 
         CC_MCC__c mccDetalle2 = new CC_MCC__c(
         RecordTypeId = recTypeDetalle,
@@ -67,7 +72,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         CC_Codigo_Externo__c = 'TEST-010101012',
         CC_Motivo__c = mccMotivo1.id,
         SAC_GenerarTaskMisClientes__c = true);
-        Database.insert(mccDetalle2);
+        SAC_DatabaseDML.insertDML(mccDetalle2, false);
+        //Database.insert(mccDetalle2);
 
         //GRUPOS
         List<CC_Grupo_Colaborador__c> listGrupos = new List<CC_Grupo_Colaborador__c>();
@@ -78,7 +84,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         CC_Grupo_Colaborador__c grupo2 = SAC_TestDataFactory.crearGrupoColaborador('GrupoLetrados', 1)[0];
         grupo2.OwnerId = usuario.id;
         listGrupos.add(grupo2);
-        Database.insert(listGrupos);
+        SAC_DatabaseDML.insertListDML(listGrupos, false);
+        //Database.insert(listGrupos);
        
         //RECLAMACION 1
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -100,7 +107,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         camposRecl.put('SEG_Detalle__c', mccDetalle2.Id);
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
 
 
         //PRETENSION 1
@@ -117,7 +125,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         camposPret.put('SEG_Detalle__c', mccDetalle2.Id);
         
         Case casoPretension1 = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(casoPretension1);
+        SAC_DatabaseDML.insertDML(casoPretension1, false);
+        //Database.insert(casoPretension1);
 
 
         //AUDITORIA
@@ -166,7 +175,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         auditoriaAutomatica2.SAC_MCCDetalle__c = mccDetalle2.Id;
         listAuditorias.add(auditoriaAutomatica2);
 
-        Database.insert(listAuditorias);
+        SAC_DatabaseDML.insertListDML(listAuditorias, false);
+        //Database.insert(listAuditorias);
     }
 
     @isTest
@@ -177,7 +187,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
             Test.startTest();
             SEG_Auditoria__c auditoriaAuto = [SELECT Id, SAC_FechaCierre__c, SAC_NombreAuditoria__c FROM SEG_Auditoria__c WHERE SAC_NombreAuditoria__c = 'AuditoriaAutomaticaClaseTest' LIMIT 1];
             auditoriaAuto.SAC_Activo__c = true;
-            Database.update(auditoriaAuto);
+            SAC_DatabaseDML.updateDML(auditoriaAuto, false);
+            //Database.update(auditoriaAuto);
             
             Id batchId = Database.executeBatch(new SAC_AuditoriaAutomatica(), 1);
 
@@ -195,7 +206,8 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
 
             SEG_Auditoria__c auditoriaAuto = [SELECT Id, SAC_FechaCierre__c, SAC_NombreAuditoria__c FROM SEG_Auditoria__c WHERE SAC_NombreAuditoria__c = 'AuditoriaAutomaticaClaseTest2' LIMIT 1];
             auditoriaAuto.SAC_Activo__c = true;
-            Database.update(auditoriaAuto);
+            SAC_DatabaseDML.updateDML(auditoriaAuto, false);
+            //Database.update(auditoriaAuto);
                 
             Id batchId = Database.executeBatch(new SAC_AuditoriaAutomatica(), 1);
 

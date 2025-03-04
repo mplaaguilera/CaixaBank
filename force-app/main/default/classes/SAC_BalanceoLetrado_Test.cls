@@ -19,7 +19,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
  
 		//Account
 		Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-		Database.insert(cuenta);
+		SAC_DatabaseDML.insertDML(cuenta, false); 
+		//Database.insert(cuenta);
 
 		//Grupos
 		List<CC_Grupo_Colaborador__c> listaGrupos = new List<CC_Grupo_Colaborador__c> ();
@@ -45,11 +46,13 @@ public without sharing class SAC_BalanceoLetrado_Test {
 		gruposLetrados[2].SAC_EndToEnd__c = true;
 		listaGrupos.add(gruposLetrados[2]);
 
-		Database.insert(listaGrupos);
+		SAC_DatabaseDML.insertListDML(listaGrupos, false); 
+		//Database.insert(listaGrupos);
 
 		//Usuarios
 		List<User> lstUser = SAC_TestDataFactory.crearUsuarioSACGeneral(3);
-		Database.insert(lstUser);
+		SAC_DatabaseDML.insertListDML(lstUser, false); 
+		//Database.insert(lstUser);
 		
 		//Contacts grupos
 		List<CC_Grupo_Colaborador_Contact__c> lstCol = new List<CC_Grupo_Colaborador_Contact__c>();
@@ -74,7 +77,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 		mccTematica.SAC_ImporteDesdeMCC__c = 4000;
 		mccTematica.SAC_ImporteHastaMCC__c = 5000;
 		mccTematica.SAC_GrupoLetradoMCC__c = listaGrupos[1].Id;
-		Database.insert(mccTematica);
+		SAC_DatabaseDML.insertDML(mccTematica, false); 
+		//Database.insert(mccTematica);
 
 		CC_MCC__c mccProducto = new CC_MCC__c();
 		mccProducto.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
@@ -85,7 +89,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 		mccProducto.SAC_ImporteDesdeMCC__c = 3000;
 		mccProducto.SAC_ImporteHastaMCC__c = 4000;
 		mccProducto.SAC_GrupoLetradoMCC__c = listaGrupos[1].Id;
-		Database.insert(mccProducto);
+		SAC_DatabaseDML.insertDML(mccProducto, false); 
+		//Database.insert(mccProducto);
 
 		CC_MCC__c mccMotivo = new CC_MCC__c();
 		mccMotivo.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
@@ -96,7 +101,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 		mccMotivo.SAC_ImporteDesdeMCC__c = 2000;
 		mccMotivo.SAC_ImporteHastaMCC__c = 3000;
 		mccMotivo.SAC_GrupoLetradoMCC__c = listaGrupos[1].Id;
-		Database.insert(mccMotivo);
+		SAC_DatabaseDML.insertDML(mccMotivo, false); 
+		//Database.insert(mccMotivo);
 
 		List<CC_MCC__c> detalles = new List<CC_MCC__c>();
 		CC_MCC__c mccDetalle = new CC_MCC__c();
@@ -139,7 +145,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 		mccDetalle4.SAC_GrupoLetradoMCC__c = listaGrupos[1].Id;
 		detalles.add(mccDetalle4);
 
-		Database.insert(detalles);
+		SAC_DatabaseDML.insertListDML(detalles, false); 
+		//Database.insert(detalles);
 
 		//Grupo MCCs
 		List<CC_MCC_Grupo_Colaborador__c> relacionesMccGrupos = new List<CC_MCC_Grupo_Colaborador__c>();
@@ -162,7 +169,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 		relacionMCCGrupo2.SPV_Tipo_Cliente__c = 'SAC';
 		relacionesMccGrupos.add(relacionMCCGrupo2);
 
-		Database.insert(relacionesMccGrupos);
+		SAC_DatabaseDML.insertListDML(relacionesMccGrupos, false); 
+		//Database.insert(relacionesMccGrupos);
 		
 
 		//Reclamaciones
@@ -249,7 +257,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 		reclamaciones.add(casoReclamacion3);
 		reclamaciones.add(casoReclamacion4);
 		reclamaciones.add(casoReclamacion5);
-		Database.insert(reclamaciones);
+		SAC_DatabaseDML.insertListDML(reclamaciones, false); 
+		//Database.insert(reclamaciones);
 
 		//Pretensiones
 		List<Case> pretensiones = new List<Case>();
@@ -359,7 +368,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 
         Case casoPretension7 = SAC_TestDataFactory.crearCaso('Pretension',camposPret7);
 		pretensiones.add(casoPretension7);
-		Database.insert(pretensiones);
+		SAC_DatabaseDML.insertListDML(pretensiones, false); 
+		//Database.insert(pretensiones);
 
 		Test.startTest();
 		List<Case> reclamacionesUpd = new List<Case>();
@@ -367,13 +377,15 @@ public without sharing class SAC_BalanceoLetrado_Test {
 		casoReclamacion2.SAC_PretensionPrincipal__c = casoPretension4.Id;
 		reclamacionesUpd.add(casoReclamacion);
 		reclamacionesUpd.add(casoReclamacion2);
-		Database.update(reclamacionesUpd);
+		SAC_DatabaseDML.updateListDML(reclamacionesUpd, false);
+		//Database.update(reclamacionesUpd);
 
 		List<SAC_MaestroTemas__c>  marca = SAC_TestDataFactory.crearMaestroTemas(2, 'SAC_Temas');
 		marca[0].SAC_GrupoLetrado__c = gruposLetrados[0].Id;
 		marca[0].SAC_OrdenPrelacion__c = 5;
 		marca[1].SAC_GrupoLetrado__c = gruposLetrados[0].Id;
-		Database.insert(marca);
+		SAC_DatabaseDML.insertListDML(marca, false);
+		//Database.insert(marca);
 
 		List <SAC_Marca_Case__c> listMarcas = new List<SAC_Marca_Case__c>();
 		SAC_Marca_Case__c marcaAsociada = new SAC_Marca_Case__c();
@@ -391,7 +403,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 		marcaAsociada3.SAC_Marca__c = marca[1].id;
 		listMarcas.add(marcaAsociada3);
 
-		Database.insert(listMarcas);
+		SAC_DatabaseDML.insertListDML(listMarcas, false);
+		//Database.insert(listMarcas);
 
 		Test.stopTest();
 	}
@@ -419,12 +432,14 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			cs.Status = 'SAC_002';
 			cs.SAC_StatusAuxiliar__c = cs.Status;
 					
-			Database.update(cs);
+			SAC_DatabaseDML.updateDML(cs, false);
+			//Database.update(cs);
 
 			cs2.Status = 'SAC_002';
 			cs2.SAC_StatusAuxiliar__c = cs2.Status;
 
-			Database.update(cs2);
+			SAC_DatabaseDML.updateDML(cs2, false);
+			//Database.update(cs2);
 			Test.stopTest();
 		}
 
@@ -458,7 +473,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			listaCasos.add(cs);
 			listaCasos.add(caso2);
 
-			Database.update(listaCasos);
+			SAC_DatabaseDML.updateListDML(listaCasos, false);
+			//Database.update(listaCasos);
 			Test.stopTest();
 		}
 			
@@ -482,7 +498,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			cs.Status = 'SAC_002';
 			cs.SAC_StatusAuxiliar__c = cs.Status;
 
-			Database.update(cs);
+			SAC_DatabaseDML.updateDML(cs, false);
+			//Database.update(cs);
 			Test.stopTest();
 		}
 
@@ -507,7 +524,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			List<Case> listaCasos = new List<Case>();
 			listaCasos.add(cs);
 
-			Database.update(listaCasos);
+			SAC_DatabaseDML.updateListDML(listaCasos, false);
+			//Database.update(listaCasos);
 			Test.stopTest();	
 		}
 		
@@ -534,7 +552,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			List<Case> listaCasos = new List<Case>();
 			listaCasos.add(cs);
 
-			Database.update(listaCasos);
+			SAC_DatabaseDML.updateListDML(listaCasos, false);
+			//Database.update(listaCasos);
 			Test.stopTest();
 		}
 		
@@ -562,7 +581,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			List<Case> listaCasos = new List<Case>();
 			listaCasos.add(cs);
 
-			Database.update(listaCasos);
+			SAC_DatabaseDML.updateListDML(listaCasos, false);
+			//Database.update(listaCasos);
 			Test.stopTest();
 		}
 		
@@ -590,7 +610,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			List<Case> listaCasos = new List<Case>();
 			listaCasos.add(cs);
 
-			Database.update(listaCasos);
+			SAC_DatabaseDML.updateListDML(listaCasos, false);
+			//Database.update(listaCasos);
 			Test.stopTest();
 		}
 
@@ -618,7 +639,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			List<Case> listaCasos = new List<Case>();
 			listaCasos.add(cs);
 
-			Database.update(listaCasos);
+			SAC_DatabaseDML.updateListDML(listaCasos, false);
+			//Database.update(listaCasos);
 			Test.stopTest();
 		}
 		
@@ -646,7 +668,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			List<Case> listaCasos = new List<Case>();
 			listaCasos.add(cs);
 
-			Database.update(listaCasos);
+			SAC_DatabaseDML.updateListDML(listaCasos, false);
+			//Database.update(listaCasos);
 			Test.stopTest();
 		}
 		
@@ -674,7 +697,8 @@ public without sharing class SAC_BalanceoLetrado_Test {
 			List<Case> listaCasos = new List<Case>();
 			listaCasos.add(cs);
 
-			Database.update(listaCasos);
+			SAC_DatabaseDML.updateListDML(listaCasos, false);
+			//Database.update(listaCasos);
 			Test.stopTest();
 		}
 		

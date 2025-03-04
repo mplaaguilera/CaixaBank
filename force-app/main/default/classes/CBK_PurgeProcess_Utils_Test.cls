@@ -17,7 +17,7 @@ Historial
     **/
     @testSetup
     static void setup()
-    {
+    {       
         User user = new User(
             ProfileId = [SELECT Id FROM Profile WHERE Name = 'System Administrator' OR Name = 'Administrador del sistema'].Id,
             LastName = 'LastNameTest',
@@ -46,6 +46,7 @@ Historial
         System.runAs (usr ) {
             CBK_PurgeProcess__c procesoPurgado = new CBK_PurgeProcess__c();
             procesoPurgado.CBK_objetoPurgado__c = 'Account';
+            procesoPurgado.CBK_Project__c = generateProjectId();
             procesoPurgado.CBK_RTsDevNames__c = 'CC_Cliente,CC_CentroCaixaBank';
             procesoPurgado.CBK_diasAntiguedadMaxima__c = null;
             procesoPurgado.CBK_diasAntiguedadMinima__c = 365;
@@ -86,6 +87,7 @@ Historial
         System.runAs (usr ) {
             CBK_PurgeProcess__c procesoPurgado = new CBK_PurgeProcess__c();
             procesoPurgado.CBK_objetoPurgado__c = 'Account';
+            procesoPurgado.CBK_Project__c = generateProjectId();
             procesoPurgado.CBK_RTsDevNames__c = 'CC_Cliente,CC_CentroCaixaBank';
             procesoPurgado.CBK_diasAntiguedadMaxima__c = null;
             procesoPurgado.CBK_diasAntiguedadMinima__c = 365;
@@ -129,6 +131,7 @@ Historial
         System.runAs (usr ) {
             CBK_PurgeProcess__c procesoPurgado = new CBK_PurgeProcess__c();
             procesoPurgado.CBK_objetoPurgado__c = 'Account';
+            procesoPurgado.CBK_Project__c = generateProjectId();
             procesoPurgado.CBK_RTsDevNames__c = 'CC_Cliente,CC_CentroCaixaBank';
             procesoPurgado.CBK_diasAntiguedadMaxima__c = null;
             procesoPurgado.CBK_diasAntiguedadMinima__c = 365;
@@ -170,6 +173,7 @@ Historial
         System.runAs (usr ) {
             CBK_PurgeProcess__c procesoPurgado = new CBK_PurgeProcess__c();
             procesoPurgado.CBK_objetoPurgado__c = 'Account';
+            procesoPurgado.CBK_Project__c = generateProjectId();
             procesoPurgado.CBK_RTsDevNames__c = 'CC_Cliente,CC_CentroCaixaBank';
             procesoPurgado.CBK_diasAntiguedadMaxima__c = null;
             procesoPurgado.CBK_diasAntiguedadMinima__c = 365;
@@ -211,8 +215,11 @@ Historial
         User usr = [SELECT id FROM User WHERE LastName = 'LastNameTest' LIMIT 1];
         Test.startTest();
         System.runAs (usr) {
+            String sProjectId = generateProjectId();
+            
             CBK_PurgeProcess__c procesoPurgado = new CBK_PurgeProcess__c();
             procesoPurgado.CBK_objetoPurgado__c = 'Account';
+            procesoPurgado.CBK_Project__c = sProjectId;
             procesoPurgado.CBK_RTsDevNames__c = 'CC_Cliente,CC_CentroCaixaBank';
             procesoPurgado.CBK_diasAntiguedadMaxima__c = null;
             procesoPurgado.CBK_diasAntiguedadMinima__c = 365;
@@ -238,6 +245,7 @@ Historial
             lstPlanificacionesActivas = [SELECT id FROM CBK_Framework_Batch__c WHERE Activo__c = true];
             CBK_PurgeProcess__c procesoPurgadoDependiente = new CBK_PurgeProcess__c();
             procesoPurgadoDependiente.CBK_objetoPurgado__c = 'Account';
+            procesoPurgadoDependiente.CBK_Project__c = sProjectId;
             procesoPurgadoDependiente.CBK_RTsDevNames__c = 'CC_Cliente,CC_CentroCaixaBank';
             procesoPurgadoDependiente.CBK_diasAntiguedadMaxima__c = null;
             procesoPurgadoDependiente.CBK_diasAntiguedadMinima__c = 365;
@@ -268,5 +276,11 @@ Historial
             system.AssertEquals(planifPadre.Id,planifHija.Dependencia__c,'No coincide el número de resultados esperados con el valor recuperado.');  
        }
         Test.stopTest();
+    }
+    
+    private static String generateProjectId(){
+        copado__Project__c project = New copado__Project__c(Name='TestProyecto');
+        insert project;
+        return project.Id;
     }
 }

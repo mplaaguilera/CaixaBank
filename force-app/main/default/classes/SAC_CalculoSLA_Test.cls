@@ -20,13 +20,15 @@ public with sharing class SAC_CalculoSLA_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-            Database.insert(usuario);
+            SAC_DatabaseDML.insertDML(usuario, false); 
+            //Database.insert(usuario);
         
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+            //Database.insert(permiSetAssi);
         }
 
         List<Case> listaReclamaciones = new List<Case>();
@@ -34,11 +36,13 @@ public with sharing class SAC_CalculoSLA_Test {
 
         //Account
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
 
         //MCCs
         List<CC_MCC__c> mcc = SAC_TestDataFactory.crearMCCs();
-        Database.insert(mcc);
+        SAC_DatabaseDML.insertListDML(mcc, false);
+        //Database.insert(mcc);
 
         Id recType = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
         CC_MCC__c mccDetalle = [SELECT Id FROM CC_MCC__c WHERE RecordTypeId =: recType LIMIT 1];
@@ -47,12 +51,14 @@ public with sharing class SAC_CalculoSLA_Test {
         SAC_ParametrizacionSLATME__c parametrizacionRegulatorio = SAC_TestDataFactory.crearParamsSla('Regulatorio',1)[0];
         parametrizacionRegulatorio.SAC_MCC__c = mccDetalle.id;
         parametrizacionRegulatorio.SAC_Duracion__c = 15;
-        Database.insert(parametrizacionRegulatorio);
+        SAC_DatabaseDML.insertDML(parametrizacionRegulatorio, false);
+        //Database.insert(parametrizacionRegulatorio);
 
         SAC_ParametrizacionSLATME__c parametrizacionLetrado = SAC_TestDataFactory.crearParamsSla('Letrado',1)[0];
         parametrizacionLetrado.SAC_MCC__c = mccDetalle.id;
         parametrizacionLetrado.SAC_Duracion__c = 15;
-        Database.insert(parametrizacionLetrado);
+        SAC_DatabaseDML.insertDML(parametrizacionLetrado, false);
+        //Database.insert(parametrizacionLetrado);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -75,8 +81,9 @@ public with sharing class SAC_CalculoSLA_Test {
         camposRecl2.put('OwnerId', usuario.id);
         
         Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
-        listaReclamaciones.add(casoReclamacion2); 
-        Database.insert(listaReclamaciones);
+        listaReclamaciones.add(casoReclamacion2);
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false); 
+        //Database.insert(listaReclamaciones);
 
         //Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -117,7 +124,8 @@ public with sharing class SAC_CalculoSLA_Test {
         
         Case casoPretension4 = SAC_TestDataFactory.crearCaso('Pretension',camposPret4);
         listaPretensiones.add(casoPretension4);
-        Database.insert(listaPretensiones);
+        SAC_DatabaseDML.insertListDML(listaPretensiones, false);
+        //Database.insert(listaPretensiones);
     }
 
     @istest
@@ -145,7 +153,8 @@ public with sharing class SAC_CalculoSLA_Test {
             casoPadre.SAC_StatusAuxiliar__c = 'SAC_002';
             casoPadre.SAC_CasoEspecial__c = 'SAC_Sensible';
             casoPadre.SAC_PretensionPrincipal__c = casoHijo.Id;
-            Database.update(casoPadre);
+            SAC_DatabaseDML.updateDML(casoPadre, false);
+            //Database.update(casoPadre);
             //List<Case> listaFamlia2 = SAC_CalculoSLA.buscarParametrizacionMCC(listaFamilia);
             Test.stopTest();
         }

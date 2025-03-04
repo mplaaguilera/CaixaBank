@@ -20,13 +20,15 @@ public with sharing class SAC_LCMP_RepresentanteValido_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);   
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+            //Database.insert(permiSetAssi);
         }
 
         /*PersonEmail, BillingStreet, BillingPostalCode, 
@@ -50,7 +52,8 @@ public with sharing class SAC_LCMP_RepresentanteValido_Test {
         cuentas[1].BillingCountry = 'testCountry';
         cuentas[1].PersonMobilePhone = '777777777';
         
-        Database.insert(cuentas);
+        SAC_DatabaseDML.insertListDML(cuentas, false);  
+        //Database.insert(cuentas);
 
         //Cases
         //Reclamacion
@@ -110,7 +113,8 @@ public with sharing class SAC_LCMP_RepresentanteValido_Test {
         listaReclamaciones.add(reclamacion3);
         listaReclamaciones.add(reclamacion4);
         listaReclamaciones.add(reclamacion5);
-        Database.insert(listaReclamaciones);
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false);  
+        //Database.insert(listaReclamaciones);
 
         CC_Caracteristica__c caracteristica2 = new CC_Caracteristica__c(
             Name = 'Caracteristica tipo representante Test SAC',
@@ -192,7 +196,8 @@ public with sharing class SAC_LCMP_RepresentanteValido_Test {
             listaCasos.add(caso2); //El caso 2 pasa por el if de cuando solo está activo el check SAC_UsarDatos__c
             listaCasos.add(caso3);
             listaCasos.add(caso5);
-            Database.update(listaCasos);
+            SAC_DatabaseDML.updateListDML(listaCasos, false);  
+            //Database.update(listaCasos);
             Test.stopTest();
         }
 
@@ -238,7 +243,8 @@ public with sharing class SAC_LCMP_RepresentanteValido_Test {
             List<Case> listaCasos = new List<Case>();
             listaCasos.add(caso3);
             listaCasos.add(caso4);
-            Database.update(listaCasos);
+            SAC_DatabaseDML.updateListDML(listaCasos, false);  
+            //Database.update(listaCasos);
             Test.stopTest();
         }
         Case caso3Result = [SELECT Id, OS_Email__c, CC_Telefono_Contacto__c, SAC_DireccionPostalNotificacion__c FROM Case WHERE Subject = 'testRec3'];

@@ -13,9 +13,13 @@
 public with sharing class SAC_TareasOperativas_Controller_Test {
  @TestSetup
  static void makeData(){
+
+    User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];     
+    SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+
     Account cuentaOficina = SAC_TestDataFactory.crearCuentasOficina(1)[0];
     cuentaOficina.CC_Email__c = 'test@test.com';
-    Database.insert(cuentaOficina);
+    SAC_DatabaseDML.insertDML(cuentaOficina, false);
 
     List<CC_Grupo_Colaborador__c> gruposColaboradores = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',3);
     gruposColaboradores[0].Name = 'grupo de tareas';
@@ -30,7 +34,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
     gruposColaboradores[2].SAC_DeveloperName__c = 'COPS AJ';
     gruposColaboradores[2].SAC_NivelGrupo__c= 'SAC_Nivel3';
 
-    Database.insert(gruposColaboradores);
+    SAC_DatabaseDML.insertListDML(gruposColaboradores, false);
 
     //Usuarios SAC General
     List<User> usuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(4);
@@ -53,9 +57,9 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
     usuarios[3].Email = 'dani@test.com';
     usuarios[3].LastName = 'usuarioDani Test';
     usuarios[3].Alias = 'dani';
-    Database.insert(usuarios);
+    SAC_DatabaseDML.insertListDML(usuarios, false);
 
-    Test.startTest();
+    
     //Contactos colaboradores
     List<CC_Grupo_Colaborador_Contact__c> contactoscolab = new List<CC_Grupo_Colaborador_Contact__c>();
     CC_Grupo_Colaborador_Contact__c grupoTareas1 = SAC_TestDataFactory.crearColaboradorContact(usuarios[0].id, gruposColaboradores[0].id);
@@ -69,7 +73,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
 
     CC_Grupo_Colaborador_Contact__c grupoTareas4 = SAC_TestDataFactory.crearColaboradorContact(usuarios[3].id, gruposColaboradores[2].id);
     contactoscolab.add(grupoTareas4) ;
-    Database.insert(contactoscolab);
+    SAC_DatabaseDML.insertListDML(contactoscolab, false);
 
     //Reclamacion
     Map<String, Object> camposRecl = new Map<String, Object>();
@@ -79,7 +83,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
     camposRecl.put('Origin', 'Otros');
 
     Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-    Database.insert(reclamacion);
+    SAC_DatabaseDML.insertDML(reclamacion, false);
 
     //Pretension
     Map<String, Object> camposPret = new Map<String, Object>();
@@ -90,7 +94,9 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
     camposPret.put('SAC_Reclamacion__c', reclamacion.id);
 
     Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-    Database.insert(pretension);
+    SAC_DatabaseDML.insertDML(pretension, false);
+
+    Test.startTest();
 
     SAC_MaestroAccionesReclamacion__c maestro = SAC_TestDataFactory.crearMaestroAcciones(1,gruposColaboradores[0].Id)[0];
     maestro.name = 'GENERAL PARA OFICINAS';
@@ -100,7 +106,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
     maestro.SAC_DeveloperName__c = 'GENERAL PARA OFICINAS';
     maestro.SAC_EquipoResponsable__c = gruposColaboradores[0].id;
     maestro.SAC_Activo__c = true;
-    Database.insert(maestro);
+    SAC_DatabaseDML.insertDML(maestro, false);
 
     List<SAC_Accion__c> tareas = new List<SAC_Accion__c>();
 
@@ -139,7 +145,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
     listaDeTareasMaestro[0].SAC_NCuentaAbono__c = '1234567890';
     listaDeTareasMaestro[0].SAC_Comentarios__c = 'Comentario prueba';
     tareas.addAll(listaDeTareasMaestro);
-    Database.insert(tareas);
+    SAC_DatabaseDML.insertListDML(tareas, false);
      
     Test.stopTest();
  }  
@@ -179,17 +185,17 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
         User usuario = [select id, name from user where Username = 'usergeneral@test.com' AND isActive = true];
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);       
-        Database.insert(psa); 
+        SAC_DatabaseDML.insertDML(psa, false);
 
         SAC_Accion__c tarea = [SELECT id
                                 FROM   SAC_Accion__c 
                                 WHERE SAC_Observaciones__c='tarea'    
                                 LIMIT 1]; 
         
-        User usr = [Select id from User where Id = :UserInfo.getUserId() AND isActive = true];
+        User usr = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         System.RunAs(usr){   
             tarea.SAC_Estado__c='SAC_PendienteAsignar';
-            Database.update(tarea); 
+            SAC_DatabaseDML.updateDML(tarea, false);
         }
 
         System.runAs(usuario) {
@@ -220,7 +226,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
         PermissionSet ps2 = [select id from PermissionSet where  PermissionSet.Label ='SAC_Letrados'];
         PermissionSetAssignment psa2 = new PermissionSetAssignment (PermissionSetId = ps2.id, AssigneeId = usuario.id);    
         permisos.add(psa2);   
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
 
         SAC_Accion__c tarea = [SELECT id
                                     FROM   SAC_Accion__c
@@ -250,7 +256,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
         permisos.add(psa);  
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
         
         SAC_Accion__c tarea = [SELECT id, ownerId, SAC_EquipoResponsable__c
                                                     FROM   SAC_Accion__c
@@ -284,7 +290,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
         permisos.add(psa);  
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
         
         SAC_Accion__c tarea = [SELECT id, ownerId, SAC_EquipoResponsable__c
                                                     FROM   SAC_Accion__c
@@ -319,7 +325,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
         permisos.add(psa);  
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
         
         SAC_Accion__c tarea = [SELECT id, ownerId, SAC_EquipoResponsable__c
                                                     FROM   SAC_Accion__c
@@ -354,7 +360,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
         permisos.add(psa);  
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
         
         SAC_Accion__c tarea = [SELECT id, ownerId, SAC_EquipoResponsable__c
                                                     FROM   SAC_Accion__c
@@ -380,31 +386,29 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
                                                     FROM   SAC_Accion__c
                                                     WHERE SAC_Observaciones__c = 'Llamar'     
                                                     LIMIT 1];
-        List<FeedItem> antes = [SELECT Id FROM FeedItem];
+        Integer feedItemCnt = [SELECT Count() FROM FeedItem];
 
-        User usr = [Select id from User where Id = :UserInfo.getUserId() AND isActive = true];
+        User usr = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
 
         System.RunAs(usr){   
             
             SAC_TareasOperativas_Controller.postOnChatter(tarea.Id, 'cuerpo de la notifiación');
             
         }
-           
-         List<FeedItem> despues = [SELECT Id FROM FeedItem];
 
-        System.assertNotEquals(antes.size(), despues.size(), 'No se ha insertado el feed.');
+        System.assertNotEquals(feedItemCnt, [SELECT Count() FROM FeedItem], 'No se ha insertado el feed.');
         Test.stopTest();  
     }
 
     @isTest
-    static void notificarPropietarioAccion_Test(){
+    static void notificarPropietarioAccionTest(){
         Test.startTest();
         SAC_Accion__c tarea = [SELECT id, ownerId, Name, SAC_EquipoResponsable__c, SAC_Reclamacion__C, SAC_Pretension__c
                                                     FROM   SAC_Accion__c
                                                     WHERE SAC_Observaciones__c = 'Llamar'     
                                                     LIMIT 1];
 
-        User usr = [Select id from User where Id = :UserInfo.getUserId() AND isActive = true];
+        User usr = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Boolean resultado;
 
         System.RunAs(usr){   
@@ -419,7 +423,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
     }
 
     @isTest
-    static void envioTarea_Test(){
+    static void envioTareaTest(){
         Test.startTest();
         SAC_Accion__c tarea = [SELECT id, ownerId, Name, SAC_EquipoResponsable__c, SAC_Reclamacion__C, SAC_Pretension__c
                                                 FROM   SAC_Accion__c
@@ -428,7 +432,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
                                                 
         List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PendienteAsignar' LIMIT 1];
 
-        User usr = [Select id from User where Id = :UserInfo.getUserId() AND isActive = true];
+        User usr = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
 
         System.RunAs(usr){   
             
@@ -448,7 +452,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
 
 
     @isTest
-    static void envioTarea2_Test(){
+    static void envioTarea2Test(){
         Test.startTest();
         SAC_Accion__c tarea = [SELECT id, ownerId, Name, SAC_EquipoResponsable__c, SAC_Reclamacion__C, SAC_Pretension__c
                                                 FROM   SAC_Accion__c
@@ -476,7 +480,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
     }
 
     @isTest
-    static void cargarComentarios2_Test(){
+    static void cargarComentarios2Test(){
         Test.startTest();
         SAC_Accion__c tarea = [SELECT id, ownerId, Name, SAC_EquipoResponsable__c, SAC_Reclamacion__C, SAC_Pretension__c
                                                     FROM   SAC_Accion__c
@@ -484,7 +488,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
                                                     LIMIT 1];
         
 
-        User usr = [Select id from User where Id = :UserInfo.getUserId() AND isActive = true];
+        User usr = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         String resultado;
 
         System.RunAs(usr){   
@@ -545,12 +549,12 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
                                                 WHERE SAC_Observaciones__c = 'Llamar'     
                                                 LIMIT 1];
 
-        User usr = [Select id from User where Id = :UserInfo.getUserId() AND isActive = true];
+        User usr = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
 
         System.RunAs(usr){   
             
             tarea.SAC_Estado__c = 'SAC_Devuelta';
-            Database.update(tarea);
+            SAC_DatabaseDML.updateDML(tarea, false);
             SAC_TareasOperativas_Controller.enviarTarea(tarea.Id);
             
         }                                        
@@ -572,7 +576,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
                                                 WHERE SAC_Observaciones__c = 'Llamar'     
                                                 LIMIT 1];
 
-        User usr = [Select id from User where Id = :UserInfo.getUserId() AND isActive = true];
+        User usr = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Boolean resultado;
 
         System.RunAs(usr){   
@@ -595,7 +599,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
                                                 WHERE SAC_Observaciones__c = 'Llamar'     
                                                 LIMIT 1];
 
-        User usr = [Select id from User where Id = :UserInfo.getUserId() AND isActive = true];
+        User usr = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
 
         System.RunAs(usr){   
             try {
@@ -637,7 +641,7 @@ public with sharing class SAC_TareasOperativas_Controller_Test {
     */
 
     @isTest
-    static void devolverAntecedentesRevisados_Test(){
+    static void devolverAntecedentesRevisadosTest(){
         Test.startTest();
         SAC_Accion__c tarea = [SELECT id, ownerId, Name, SAC_EquipoResponsable__c, SAC_Reclamacion__C, SAC_Pretension__c, SAC_Antecedentes_Revisados__c
                                                     FROM   SAC_Accion__c

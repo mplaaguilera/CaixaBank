@@ -187,7 +187,7 @@ public with sharing class CBK_Framework_Batch_Object {
                 jobDef.params__c = JSON.serialize(myInstance.getParametros());
                 
                 CBK_Framework_Batch_Apex__mdt conf =new CBK_Framework_Batch_Apex__mdt();
-                jobDef.proyecto__c = CBK_BatchJob_Helper.findProject(myInstance.getClassName(),conf);
+                jobDef.proyecto__c = CBK_BatchJob_Helper.findProjectName(myInstance.getClassName());
                 if (conf!=null) {
                     jobDef.Notif__c= conf.Notif__c;
                     jobDef.Email_Notif__c= conf.Email_Notif__c;

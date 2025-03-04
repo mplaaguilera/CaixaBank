@@ -155,10 +155,11 @@ public without sharing class SAC_LCMP_RechazarReclamacionMasiva {
                 return result;
             }
             // Recuperar la lista de casos de los que se han seleccionado que pertencen a los grupos del usuario
-            if(!Schema.sObjectType.Case.isAccessible()){throw new AuraHandledException( 'No tienes permisos para realizar esta acción.' ); }
+            if(!Schema.sObjectType.Case.isAccessible()){ throw new AuraHandledException( 'No tienes permisos para realizar esta acción.' ); }
             casosSeleccionados = [SELECT Id, status, SAC_StatusAuxiliar__c, SAC_MotivoDescarte__c, CC_Rechazar_Reabrir_Caso__c, SAC_OrigenConsulta__c FROM Case WHERE Id IN :lstRecordsId AND SEG_Grupo__c IN :lstGruposId AND RecordTypeId =: RECTYPECONSULTACOPS];
             if(!casosSeleccionados.isEmpty()) {
                 for(Case caso : casosSeleccionados) {
+                    
                     if(caso.SAC_OrigenConsulta__c == null || caso.SAC_OrigenConsulta__c == ''){
                         result =  'KO ORIGEN';
                 		return result;
@@ -208,7 +209,7 @@ public without sharing class SAC_LCMP_RechazarReclamacionMasiva {
     }
 
     public static Database.SaveResult[] actualizar(List<Case> casosActualizar) {
-        Database.SaveResult[] lstResp = Database.update(casosActualizar, false);
+        Database.SaveResult[] lstResp = Database.update(casosActualizar, true);
 
         return lstResp;
     }
@@ -270,7 +271,8 @@ public without sharing class SAC_LCMP_RechazarReclamacionMasiva {
             for(Id caso : lstRecord) {
                 lstChatterPost.add(new FeedItem(ParentId = caso, Body = mensaje));
             }
-            Database.insert(lstChatterPost);
+            SAC_DatabaseDML.insertListDML(lstChatterPost, true);
+            //Database.insert(lstChatterPost);
         }         
     }    
 }

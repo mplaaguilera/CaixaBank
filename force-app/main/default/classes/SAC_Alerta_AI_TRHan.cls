@@ -31,6 +31,13 @@ public without sharing class SAC_Alerta_AI_TRHan extends CC_TriggerHandlerBase{
     }
 
     public static void sumarContadorAlertaPendiente(List<Case> listaReclamaciones) {
-        ID jobID = System.enqueueJob(new SAC_QueueableContadorAlertas(listaReclamaciones));
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds)).build();
+        ID jobID;
+        try {
+            jobID = System.enqueueJob(new SAC_QueueableContadorAlertas(listaReclamaciones), options);    
+        } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
     }
 }

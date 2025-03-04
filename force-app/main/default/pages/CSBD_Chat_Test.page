@@ -1,0 +1,327 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+<html>
+
+    <head>
+        <title>CSBD Chat Test</title>
+        <style>
+            body {
+                margin-top: 30px;
+                font-family: -apple-system, "system-ui", "Segoe UI", Roboto;
+                font-size: 13px;
+            }
+
+            form {
+                border: 1px solid rgb(201, 201, 201);
+                border-radius: 4px;
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);
+                width: 370px;
+                font-family: inherit;
+                top: -20px;
+                opacity: 0;
+                transition: opacity 350ms ease, top 350ms ease-out;
+                will-change: top;
+            }
+
+            form.visible {
+                position: relative;
+                top: 0px;
+                opacity: 1;
+            }
+
+            form>header {
+                font-size: 15px;
+                font-weight: 600;
+                padding: 12px 16px 12px 15px;
+                border-bottom: 1px solid rgb(201, 201, 201);
+            }
+
+            form>div.formBody {
+                color: rgb(24, 24, 24);
+                font-family: inherit;
+                font-size: 13px;
+                margin-top: 8px;
+                padding: 12px 18px 2px 18px;
+            }
+
+            form div.formElement {
+                margin-bottom: 8px;
+                font-family: inherit;
+            }
+
+            form div.formElement>label {
+                display: inline-block;
+                width: 125px;
+                font-size: 12px;
+                color: rgb(68, 68, 68);
+            }
+
+            form div.formElement>label>abbr.labelRequired {
+                font-family: -apple-system, "system-ui", "Segoe UI", Roboto;
+                font-size: 12px;
+                color: rgb(186, 5, 23);
+                margin: 0px 2px;
+            }
+
+            form div.formElement>input {
+                width: 177px;
+                color: #181818;
+                border: 1px solid rgb(201, 201, 201);
+                border-radius: 4px;
+                line-height: 30px;
+                padding: 0 1rem 0 10px;
+                font-size: 13px;
+                font-family: inherit;
+                letter-spacing: 0.2px;
+            }
+
+            form div.formElement>input:disabled {
+                background-color: rgb(247, 247, 247);
+            }
+
+            form div.formElement>input.invalid:focus-within {
+                outline-color: rgb(197, 41, 41);
+            }
+
+            form button {
+                background-color: white;
+                margin-left: 6px;
+                padding: 0 16px;
+                border: 1px solid rgb(201, 201, 201);
+                border-radius: 4px;
+                color: rgb(33, 97, 134);
+                line-height: 30px;
+                font-size: 13px;
+                transition: border-color 80ms linear, background-color 130ms ease;
+            }
+
+            form button:hover {
+                background-color: rgb(243, 243, 243);
+                border: 1px solid rgb(113, 125, 131);
+                cursor: pointer;
+            }
+
+            form button.buttonBrand {
+                background-color: #0176d3;
+                color: white;
+                border: 1px solid rgb(1, 118, 211);
+            }
+
+            form button.buttonBrand:hover {
+                background-color: rgb(1, 68, 134);
+                cursor: pointer;
+            }
+
+            form button.buttonDestructive {
+                color: rgb(142, 3, 15);
+            }
+
+            form button.buttonDestructive:hover {
+                border: 1px solid rgb(131, 113, 113);
+            }
+
+            form div.selectContainer {
+                position: relative;
+                display: inline-block;
+                width: 205px;
+            }
+
+            form div.selectContainer select {
+                appearance: none;
+                padding-left: 0.5rem;
+                padding-right: 1.5rem;
+                letter-spacing: 0.2px;
+            }
+
+            form div.selectContainer>select {
+                height: calc(1.875rem + 2px);
+                width: 100%;
+                border: 1px solid rgb(201, 201, 201);
+                border-radius: 4px;
+                background-color: white;
+                color: rgb(24, 24, 24);
+                box-shadow: none;
+                padding-left: 10px;
+            }
+
+            form div.selectContainer::after {
+                content: "▼";
+                font-size: 10px;
+                top: 11px;
+                right: 12px;
+                position: absolute;
+                pointer-events: none;
+                color: rgb(124, 124, 124);
+            }
+
+            form div.selectContainer>select:disabled {
+                background-color: rgb(247, 247, 247);
+            }
+
+            form>footer {
+                border-top: 1px solid rgb(201, 201, 201);
+                margin-top: 12px;
+                padding: 12px 18px 12px 18px;
+                text-align: end;
+                min-height: 32px;
+            }
+
+            form>footer>span {
+                line-height: 32px;
+            }
+
+            form>footer>span.infoSinAgentes {
+                font-weight: 500;
+                color: rgb(142, 3, 15);
+            }
+
+            form>footer>span.infoConAgentes {
+                font-weight: 500;
+                color: #2d844a;
+            }
+
+            form>footer>span.refrescando {
+                margin-left: 3px;
+                font-style: italic;
+                color: rgb(94, 94, 94);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div align="center">
+            <form id="formulario" align="left">
+                <header style="background-color: #f3f3f3;">Simular chat de cliente</header>
+                <div class="formBody">
+                    <div class="formElement">
+                        <label for="entorno">Org de Salesforce<abbr class="labelRequired">*</abbr></label>
+                        <div class="selectContainer">
+                            <select id="entorno" value="devservice">
+                                <option value="devservice">DEVSERVICE</option>
+                                <option value="str4">STR4</option>
+                                <option value="str5">STR5</option>
+                                <option value="str">STR</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="formElement">
+                        <label for="otp">Clave OTP<abbr class="labelRequired">*</abbr></label>
+                        <input id="otp" name="otp" value="a7HHWGQzz06JRwcYAG" required="true" spellcheck="false" style="font-family: monospace;" autofocus="true"/>
+                    </div>
+                </div>
+
+                <footer class="slds-card__footer">
+                    <span id="infoSinAgentes" class="infoSinAgentes" style="display: none;">Sin agentes disponibles.</span>
+                    <span id="infoConAgentes" class="infoConAgentes" style="display: none;">Agentes disponibles.</span>
+                    <span id="refrescando" class="refrescando" style="display: none;">Refrescando la página...</span>
+                    <!-- <button id="iniciarSesion" class="buttonBrand" onclick="Init(); return false;">Iniciar chat</button> -->
+                </footer>
+            </form>
+        </div>
+        <div id="chatContainer"></div>
+
+        <script type='text/javascript' src='https://service.force.com/embeddedservice/5.0/esw.min.js'></script>
+        <script type='text/javascript'>
+            const ENTORNOS = {
+                devservice: {
+                    url: 'https://d.la3-c1cs-fra.salesforceliveagent.com/chat',
+                    orgId: '5721t000000LHZG', chatButtonId: '00DKN0000000yy5'
+                },
+                str4: {
+                    url: 'https://d.la3-c1cs-fra.salesforceliveagent.com/chat',
+                    orgId: '5721t000000LHZG', chatButtonId: '00D5r000000H85C'
+                },
+                str5: {
+                    url: 'https://d.la3-c1cs-fra.salesforceliveagent.com/chat',
+                    orgId: '5721t000000LHZG', chatButtonId: '00DKN0000008aJv'
+                },
+                str: {
+                    url: 'https://d.la1-c1cs-am3.salesforceliveagent.com/chat',
+                    orgId: '5721t000000LHZG', chatButtonId: '00DKJ000000GyYX'
+                }
+            };
+
+            var initESW = function (gslbBaseURL) {
+                embedded_svc.settings.displayHelpButton = true; //Or false
+                embedded_svc.settings.language = 'es'; //For example, enter 'en' or 'en-US'
+                embedded_svc.settings.defaultMinimizedText = 'Hablar con un agente';
+                embedded_svc.settings.disabledMinimizedText = 'Sin agentes disponibles';
+                embedded_svc.settings.loadingText = 'Cargando...';
+
+                embedded_svc.settings.fallbackRouting = []; //An array of button IDs, user IDs, or userId_buttonId
+                //embedded_svc.settings.offlineSupportMinimizedText = '...'; //(Defaults to Contact Us)
+
+                // embedded_svc.settings.prepopulatedPrechatFields = {
+                //     CC_Tipo__c: 'CSBD',
+                //     CSBD_OTP_Chat__c: document.getElementById('otp').value.trim()
+                // };
+
+                embedded_svc.settings.enabledFeatures = ['LiveAgent'];
+                embedded_svc.settings.entryFeature = 'LiveAgent';
+                embedded_svc.settings.storageDomain = 'force.com';
+                var referrerUri = 'CSBD0a7HHWGQzz06JRwcYAG';
+                embedded_svc.settings.extraPrechatFormDetails = [
+                    {
+                        label: "ReferrerUri",
+                        value: 'csbd.a7HHWGQzz06JRwcYAG',
+                        displayToAgent: true,
+                        transcriptFields: ["ReferrerUri"]
+                    }
+                ];
+                /*
+                    {
+                        "label": "Tipo",
+                        // "value": "CSBD",
+                        "displayToAgent": false,
+                        "transcriptFields": ["CC_Tipo__c"]
+                    }
+                    // {
+                    //     "label": "OTP Chat",
+                    //     // "value": document.getElementById('otp').value.trim(),
+                    //     "displayToAgent": false,
+                    //     "transcriptFields": ["CSBD_OTP_Chat__c"]
+                    // }
+                ];
+                */
+
+                embedded_svc.init(
+                    'https://caixabankcc--devservice.sandbox.my.salesforce.com',
+                    'https://caixabankcc--devservice.sandbox.my.salesforce-sites.com/liveAgentSetupFlow',
+                    gslbBaseURL,
+                    '00DKN0000000yy5',
+                    'CSBD_Chat_ES',
+                    {
+                        baseLiveAgentContentURL: 'https://c.la1-c1cs-am3.salesforceliveagent.com/content',
+                        deploymentId: '5721t000000LHZG',
+                        buttonId: '5736M00000003HT',
+                        baseLiveAgentURL: 'https://d.la1-c1cs-am3.salesforceliveagent.com/chat',
+                        eswLiveAgentDevName: 'EmbeddedServiceLiveAgent_Parent04I6M000000wk2pUAA_18794edeae2',
+                        isOfflineSupportEnabled: false
+                    }
+                );
+            };
+
+
+
+            window.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('entorno').value = window.sessionStorage.getItem("entorno") ?? Object.keys(ENTORNOS)[0];
+                document.getElementById('otp').value = window.sessionStorage.getItem("otp");
+                document.getElementById('entorno').addEventListener('change', () => document.getElementById('otp').focus());
+                document.getElementById('formulario').classList.add('visible');
+
+                if (!window.embedded_svc) {
+                    var s = document.createElement('script');
+                    s.setAttribute('src', 'https://caixabankcc--devservice.sandbox.my.salesforce.com/embeddedservice/5.0/esw.min.js');
+                    s.onload = function () {
+                        initESW(null);
+                    };
+                    document.body.appendChild(s);
+                } else {
+                    initESW('https://service.force.com');
+                }
+            });
+        </script>
+    </body>
+
+    </html>
+</apex:page>

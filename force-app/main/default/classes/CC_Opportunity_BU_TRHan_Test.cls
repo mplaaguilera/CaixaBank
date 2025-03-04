@@ -10,7 +10,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         Account cuenta1 = crearCuentaContacto('14628118A');
         Account cuenta2 = crearCuentaContacto('32179537F');
         Account cuenta3 = crearCuentaRTCliente('94160903F');
-        CSBD_TestDataFactory.crearCuentaContacto('12345678N');
+        CSBD_TestDataFactory.crearCuentaContacto('46979396X');
 
         List<AccountShare> totalPermisos = new List<AccountShare>();
         AccountShare acshare = new AccountShare();
@@ -38,7 +38,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         totalPermisos.add(acshare3);
 
         insert totalPermisos;
-        
+
         Product2 productoAuto = new Product2(Name = 'Auto', Family = 'Auto', isActive = true, AV_ExternalID__c = '2220000');
         productoAuto.RecordTypeId = Schema.SObjectType.Product2.getRecordTypeInfosByDeveloperName().get('AV_PF').getRecordTypeId();
         insert productoAuto;
@@ -56,7 +56,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         valor.Name = 'Hipoteca';
         valor.CC_Valor__c = '1';
         insert valor;
-        
+
         CC_Lista_Valores__c listaValores2 = new CC_Lista_Valores__c();
         listaValores2.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         listaValores2.Name = 'CSBD: Oportunidades importe obligatorio formalizar';
@@ -69,7 +69,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         valor2.Name = 'CMB';
         valor2.CC_Valor__c = '1';
         insert valor2;
-        
+
         CC_Lista_Valores__c listaValores3 = new CC_Lista_Valores__c();
         listaValores3.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         listaValores3.Name = 'CSBD: Relación de valores Now - Salesforce: Empresa, familia y producto';
@@ -83,7 +83,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         valor3.Name = 'Hipoteca';
         valor3.CC_Valor2__c = 'Hipoteca';
         insert valor3;
-        
+
         CC_Lista_Valores__c listaValores4 = new CC_Lista_Valores__c();
         listaValores4.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         listaValores4.Name = 'CSBD: Horarios comerciales por tipología';
@@ -96,7 +96,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         valor4.CC_Valor__c = 'CSBD: Horario comercial Hipoteca';
         valor4.Name = 'Hipoteca';
         insert valor4;
-        
+
         CC_Lista_Valores__c valor5 = new CC_Lista_Valores__c();
         valor5.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
         valor5.CC_Lista__c = listaValores4.Id;
@@ -126,7 +126,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
     }
 
     public static Account crearCuentaContacto(String nif) {
-        
+
         // Genera un número entero aleatorio
         Integer numeroAleatorio = (Integer)Math.floor(Math.random() * 100); // Cambia 100 al valor máximo deseado
 
@@ -143,7 +143,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
     }
 
     public static Account crearCuentaRTCliente(String nif) {
-        
+
         // Genera un número entero aleatorio
         Integer numeroAleatorio = (Integer)Math.floor(Math.random() * 100); // Cambia 100 al valor máximo deseado
 
@@ -186,12 +186,12 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         insert oppshare;
 
         System.runAs (usuarioGestor) {
-            Test.startTest();            
-            hipoteca.OwnerId = usuarioGestor.Id;            
+            Test.startTest();
+            hipoteca.OwnerId = usuarioGestor.Id;
             hipoteca.StageName = 'Documentación';
             hipoteca.CSBD_IWD__c = true;
             hipoteca.CSBD_Estado__c = 'Pendiente Cita';
-            hipoteca.CSBD_Empresa_Proveedora__c = 'imaginBank';        
+            hipoteca.CSBD_Empresa_Proveedora__c = 'imaginBank';
             hipoteca.AccountId = cuenta2.Id;
             hipoteca.CSBD_Contact__c = contacto2.Id;
             hipoteca.CSBD_Telefono_Solicitud__c = null;
@@ -201,7 +201,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             Test.stopTest();
 
             Task[] tareaCambioEmpresa = [SELECT Id FROM Task WHERE Subject =: 'Cambio empresa proveedora'];
-            
+
             System.assert(!tareaCambioEmpresa.isEmpty());
         }
     }
@@ -221,18 +221,18 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         campos.put('CSBD_Empresa_Proveedora__c', 'inTouch');
         campos.put('CSBD_Contact__c',contacto1.Id);
         campos.put('Amount',1);
-        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_CMB', campos);    
-        
+        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_CMB', campos);
+
         CMB.OwnerId = usuarioGestor.Id;
         update CMB;
-        
+
         System.runAs (usuarioGestor) {
             Test.startTest();
             CMB.CSBD_Estado__c = 'Cerrada';
             CMB.StageName = 'Formalizada';
             update CMB;
             Test.stopTest();
- 
+
 			List<Opportunity> opp = [SELECT CSBD_Equipo__c from Opportunity where id =:CMB.Id];
             System.AssertEquals(opp[0].CSBD_Equipo__c, usuarioGestor.Department);
             System.Assert([SELECT Count() FROM EmailMessage WHERE CSBD_Oportunidad_Id__c =: CMB.Id]>0, 'No se ha enviado ningún email');
@@ -253,8 +253,8 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         campos.put('CSBD_Telefono_Solicitud__c', '666666668');
         campos.put('CSBD_Empresa_Proveedora__c', 'inTouch');
         campos.put('CSBD_Contact__c',contacto1.Id);
-        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_CMB', campos);  
-     
+        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_CMB', campos);
+
         CMB.OwnerId = usuarioGestor.Id;
         update CMB;
 
@@ -294,25 +294,24 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             CMB.StageName = 'Formalizada';
             try {
                	update CMB;
-            }
-            catch(Exception e) {
-                System.assert(e.getMessage().contains('No se puede formalizar una oportunidad que tiene un importe 0'));
+            } catch (Exception e) {
+                System.assert(e.getMessage().contains('No se puede formalizar una oportunidad con importe 0€'));
             }
             Test.stopTest();
-            
+
             Opportunity oportunidadNoForm = [SELECT Id, StageName FROM Opportunity WHERE Id =:CMB.Id];
 
             System.assertEquals(oportunidadNoForm.StageName, 'Solicitud');
         }
         System.Assert([SELECT Count() FROM EmailMessage WHERE CSBD_Oportunidad_Id__c =: CMB.Id]>0, 'No se ha enviado ningún email');
     }
-    
+
     @isTest
     public static void importeObligatorioCerrarOportunidadTestOK() {
         Account cuenta1 = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '14628118A'];
         Contact contacto1 = [SELECT Id FROM Contact WHERE AccountId =: cuenta1.Id];
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-        
+
         Map<String, Object> campos2 = new Map<String, Object>();
         campos2.put('AccountId', cuenta1.Id);
         campos2.put('CSBD_Now_NIF__c', cuenta1.CC_Numero_Documento__c);
@@ -324,7 +323,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         Opportunity CMBSiActualiza = CSBD_Opportunity.crearOportunidad('CSBD_CMB', campos2);
         CMBSiActualiza.OwnerId = usuarioGestor.Id;
         update CMBSiActualiza;
-        
+
         System.runAs (usuarioGestor) {
             Test.startTest();
             CMBSiActualiza.CSBD_Estado__c = 'Cerrada';
@@ -336,13 +335,13 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
                 System.assert(e.getMessage().contains('No se puede formalizar una oportunidad que tiene un importe 0'));
             }
             Test.stopTest();
-            
+
             Opportunity oportunidadForm = [SELECT Id, StageName FROM Opportunity WHERE Id =:CMBSiActualiza.Id];
 
             System.assertEquals(oportunidadForm.StageName, 'Formalizada');
         }
     }
-    
+
     @isTest
     public static void actualizarProducto() {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
@@ -357,8 +356,8 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         campos.put('CSBD_Telefono_Solicitud__c', '666666662');
         campos.put('CSBD_Contact__c',contacto1.Id);
         campos.put('Amount',1);
-        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_CMB', campos);    
-        
+        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_CMB', campos);
+
         CMB.OwnerId = usuarioGestor.Id;
         update CMB;
 
@@ -367,13 +366,13 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             CMB.CSBD_Producto__c = 'Hipoteca';
             update CMB;
             Test.stopTest();
-            
+
             Opportunity oportunidadActualizada = [SELECT Id, CSBD_Producto__c FROM Opportunity WHERE Id =:CMB.Id];
 
             System.assertEquals(oportunidadActualizada.CSBD_Producto__c, 'Hipoteca');
         }
     }
-    
+
     @isTest
     public static void scheduleReclamacionesCliente() {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
@@ -388,8 +387,8 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         campos.put('CSBD_Telefono_Solicitud__c', '666666662');
         campos.put('CSBD_Contact__c',contacto1.Id);
         campos.put('Amount',1);
-        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_CMB', campos);    
-        
+        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_CMB', campos);
+
         CMB.OwnerId = usuarioGestor.Id;
         update CMB;
 
@@ -398,7 +397,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             CMB.CSBD_Estado__c = 'Pendiente Cliente';
             update CMB;
             Test.stopTest();
-            
+
             List<CBK_SCH_PendingProcess__c> reclamaciones = [SELECT Id, ClassName__c FROM CBK_SCH_PendingProcess__c WHERE RecordId__c = :CMB.Id];
             Opportunity oportunidadActualizada = [SELECT Id, CSBD_Estado__c FROM Opportunity WHERE Id =:CMB.Id];
 
@@ -423,9 +422,9 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         campos.put('CSBD_Contact__c',null);
         campos.put('Amount',1);
         campos.put('CSBD_No_Identificado__c',true);
-        
-        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);    
-        
+
+        Opportunity CMB = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
+
         CMB.OwnerId = usuarioGestor.Id;
         update CMB;
 
@@ -434,14 +433,14 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             CMB.AccountId = cuenta1.Id;
             update CMB;
             Test.stopTest();
-    
+
             Opportunity oportunidadActualizada = [SELECT Id, CSBD_No_Identificado__c FROM Opportunity WHERE Id =:CMB.Id];
 
             System.assertEquals(oportunidadActualizada.CSBD_No_Identificado__c, false);
-            
+
         }
     }
-    
+
      @isTest
     public static void sincronizarAccountHijasTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
@@ -456,9 +455,9 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         campos.put('CSBD_Contact__c',null);
         campos.put('Amount',1);
         campos.put('OwnerId',usuarioGestor.Id);
-        
-        Opportunity Opp = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos); 
-        
+
+        Opportunity Opp = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
+
         Map<String, Object> campos2= new Map<String, Object>();
         campos.put('AccountId', null);
         campos.put('CSBD_Email_Solicitud__c', 'test1@test.com');
@@ -467,23 +466,23 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         campos.put('Amount',1);
         campos.put('CSBD_Parent_Id__c',Opp.Id);
         campos.put('OwnerId',usuarioGestor.Id);
-        
-        Opportunity OppHija = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial', campos); 
-       
-   
+
+        Opportunity OppHija = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial', campos);
+
+
         System.runAs (usuarioGestor) {
             Test.startTest();
             Opp.AccountId = cuenta1.Id;
             update Opp;
             Test.stopTest();
-            
+
             Opportunity oportunidadHijaActualizada = [SELECT Id, AccountId FROM Opportunity WHERE CSBD_Parent_Id__c =:Opp.Id];
 
             System.assertEquals(oportunidadHijaActualizada.AccountId, cuenta1.Id);
-            
+
         }
     }
-    
+
      @isTest
     public static void calcularTMOTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
@@ -499,21 +498,21 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         campos.put('Amount',1);
         campos.put('OwnerId',usuarioGestor.Id);
         campos.put('CSBD_PrimerContactoSLA__c', System.now().addMinutes(-5));
-        
-        
-        Opportunity Opp = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos); 
-        
+
+
+        Opportunity Opp = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
+
         System.runAs (usuarioGestor) {
             Test.startTest();
             Opp.CSBD_Estado__c = 'Rechazada';
             Opp.StageName = 'Rechazada';
             update Opp;
             Test.stopTest();
-            
+
             Opportunity oportunidadHijaActualizada = [SELECT Id, AccountId,CSBD_PrimerContactoSLA__c, CSBD_SLA_TMO__c FROM Opportunity WHERE id =:Opp.Id];
 
             System.assertEquals(oportunidadHijaActualizada.CSBD_SLA_TMO__c, 5);
-            
+
         }
     }
 
@@ -539,8 +538,8 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         Opportunity hipoteca1 = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
 
         System.runAs (usuarioGestor) {
-            Test.startTest();            
-            hipoteca1.OwnerId = usuarioGestor.Id;            
+            Test.startTest();
+            hipoteca1.OwnerId = usuarioGestor.Id;
             hipoteca1.AccountId = cuenta2.Id;
             hipoteca1.CSBD_Contact__c = contacto2.Id;
             hipoteca1.CSBD_Telefono_Solicitud__c = '';
@@ -568,7 +567,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             Test.startTest();
             Map<String, Object> campos = new Map<String, Object>();
        		Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
-                  
+
             hipoteca.AccountId = cuentaPA.Id;
             update hipoteca;
 
@@ -578,18 +577,18 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             System.assertNotEquals('', opp[0].CSBD_ContactoTitular1__c, 'La cuenta no tiene titular');
         }
     }
-    
+
     @isTest
     public static void actualizarCuentaClienteCC() {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-  
+
         Account cuentaCliente = [SELECT Id, Name, CC_Numero_Documento__c, RecordTypeId FROM Account WHERE CC_Numero_Documento__c = '94160903F'];
 
         System.runAs (usuarioGestor) {
             Test.startTest();
             Map<String, Object> campos = new Map<String, Object>();
        		Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
-                  
+
             hipoteca.AccountId = cuentaCliente.Id;
             update hipoteca;
 
@@ -599,11 +598,11 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             System.assertNotEquals('', opp[0].CSBD_ContactoTitular1__c, 'La cuenta no tiene titular');
         }
     }
-    
+
      @isTest
     public static void horarioComercialSiNoTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-  
+
         Account cuentaCliente = [SELECT Id, Name, CC_Numero_Documento__c, RecordTypeId FROM Account WHERE CC_Numero_Documento__c = '94160903F'];
 
         System.runAs (usuarioGestor) {
@@ -613,7 +612,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
 
             Map<String, Object> campos = new Map<String, Object>();
        		Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
-            Opportunity prestamo = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo', campos);    
+            Opportunity prestamo = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo', campos);
             hipoteca.AccountId = cuentaCliente.Id;
             prestamo.AccountId = cuentaCliente.Id;
             update hipoteca;
@@ -630,8 +629,8 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
     @isTest
     public static void informarCampoPrioridad() {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-  
-        Account cuenta = [SELECT Id, Name FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
+
+        Account cuenta = [SELECT Id, Name FROM Account WHERE CC_Numero_Documento__c = '46979396X'];
         Contact contacto = [SELECT Id FROM Contact WHERE AccountId =: cuenta.Id];
 
         System.runAs (usuarioGestor) {
@@ -694,7 +693,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
                 ' }\n' +
             '}';
 
-       		Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca');  
+       		Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca');
             hipoteca.AccountId = cuenta.Id;
             hipoteca.CSBD_ContactoTitular1__c = contacto.Id;
             hipoteca.CSBD_Tasacion__c = 1000;
@@ -713,6 +712,141 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             Test.stopTest();
 
             System.assertEquals('13', oppHipoteca[0].CSBD_OC_Prioridad__c, 'Error');
+        }
+    }
+
+    @isTest
+    public static void crearActividadesIdentificarCliente() {
+        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+
+        Account cuenta = [SELECT Id, Name FROM Account WHERE CC_Numero_Documento__c = '46979396X'];
+        Contact contacto = [SELECT Id FROM Contact WHERE AccountId =: cuenta.Id];
+
+        System.runAs (usuarioGestor) {
+            Test.startTest();
+
+       		Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca');
+            hipoteca.AccountId = cuenta.Id;
+            hipoteca.CSBD_Contact__c = contacto.Id;
+            update hipoteca;
+
+            Test.stopTest();
+
+            Task[] tareaIdentificacion = [SELECT Id FROM Task WHERE Type =: 'Identificación del cliente'];
+            System.assert(!tareaIdentificacion.isEmpty());
+        }
+    }
+
+    @isTest
+    public static void crearAccountTitularHipotecaTest() {
+        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+
+        Account cuenta = [SELECT Id, Name FROM Account WHERE CC_Numero_Documento__c = '46979396X'];
+        Contact contacto = [SELECT Id FROM Contact WHERE AccountId =: cuenta.Id];
+        System.runAs (usuarioGestor) {
+            Test.startTest();
+            List<Contact> contactosTitularInsert = new List<Contact>();
+            Contact titular1 = new Contact();
+            titular1.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
+            titular1.FirstName = 'Prueba';
+            titular1.LastName = 'Test';
+            contactosTitularInsert.add(titular1);
+
+            Contact titular2 = new Contact();
+            titular2.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
+            titular2.FirstName = 'Prueba';
+            titular2.LastName = 'Test';
+            contactosTitularInsert.add(titular2);
+
+            insert contactosTitularInsert;
+
+       		Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca');
+            hipoteca.AccountId = cuenta.Id;
+            hipoteca.CSBD_ContactoTitular1__c = titular1.Id;
+            hipoteca.CSBD_ContactoTitular2__c = titular2.Id;
+            update hipoteca;
+            Test.stopTest();
+
+            Contact contactoTitular1 = [SELECT id, accountId from contact where id =:titular1.Id];
+            Contact contactoTitular2 = [SELECT id, accountId from contact where id =:titular2.Id];
+            System.assert(contactoTitular1.AccountId != null);
+            System.assert(contactoTitular2.AccountId != null);
+        }
+    }
+
+     @isTest
+    public static void crearAccountTitularHipotecaTest2() {
+        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+
+        Account cuenta = [SELECT Id, Name FROM Account WHERE CC_Numero_Documento__c = '46979396X'];
+        Contact contacto = [SELECT Id FROM Contact WHERE AccountId =: cuenta.Id];
+        System.runAs (usuarioGestor) {
+            Test.startTest();
+            List<Contact> contactosTitularInsert = new List<Contact>();
+            Contact titular1 = new Contact();
+            titular1.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
+            titular1.FirstName = 'Prueba';
+            titular1.LastName = 'Test';
+            contactosTitularInsert.add(titular1);
+
+            Contact titular2 = new Contact();
+            titular2.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
+            titular2.FirstName = 'Prueba';
+            titular2.LastName = 'Test';
+            titular2.AccountId = cuenta.Id;
+            contactosTitularInsert.add(titular2);
+
+            insert contactosTitularInsert;
+
+       		Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca');
+            hipoteca.AccountId = cuenta.Id;
+            hipoteca.CSBD_ContactoTitular1__c = titular1.Id;
+            hipoteca.CSBD_ContactoTitular2__c = titular2.Id;
+            update hipoteca;
+            Test.stopTest();
+
+            Contact contactoTitular1 = [SELECT id, accountId from contact where id =:titular1.Id];
+            Contact contactoTitular2 = [SELECT id, accountId from contact where id =:titular2.Id];
+            System.assert(contactoTitular1.AccountId != null);
+            System.assert(contactoTitular1.AccountId == contactoTitular2.AccountId);
+        }
+    }
+
+     @isTest
+    public static void crearAccountTitularHipotecaTest3() {
+        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+
+        Account cuenta = [SELECT Id, Name FROM Account WHERE CC_Numero_Documento__c = '46979396X'];
+        Contact contacto = [SELECT Id FROM Contact WHERE AccountId =: cuenta.Id];
+        System.runAs (usuarioGestor) {
+            Test.startTest();
+            List<Contact> contactosTitularInsert = new List<Contact>();
+            Contact titular1 = new Contact();
+            titular1.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
+            titular1.FirstName = 'Prueba';
+            titular1.LastName = 'Test';
+            titular1.AccountId = cuenta.Id;
+            contactosTitularInsert.add(titular1);
+
+            Contact titular2 = new Contact();
+            titular2.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
+            titular2.FirstName = 'Prueba';
+            titular2.LastName = 'Test';
+            contactosTitularInsert.add(titular2);
+
+            insert contactosTitularInsert;
+
+       		Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca');
+            hipoteca.AccountId = cuenta.Id;
+            hipoteca.CSBD_ContactoTitular1__c = titular1.Id;
+            hipoteca.CSBD_ContactoTitular2__c = titular2.Id;
+            update hipoteca;
+            Test.stopTest();
+
+            Contact contactoTitular1 = [SELECT id, accountId from contact where id =:titular1.Id];
+            Contact contactoTitular2 = [SELECT id, accountId from contact where id =:titular2.Id];
+            System.assert(contactoTitular2.AccountId != null);
+            System.assert(contactoTitular1.AccountId == contactoTitular2.AccountId);
         }
     }
 }

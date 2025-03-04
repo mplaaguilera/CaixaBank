@@ -14,14 +14,16 @@ public with sharing class SAC_WS_Gescon_Test {
         User usuarioGeneral;
         System.runAs(new User(Id = UserInfo.getUserId())) {
             //Usuario SAC General
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];  
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);     
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);    
+            //Database.insert(permiSetAssi);
         }
     }
     
@@ -35,7 +37,8 @@ public with sharing class SAC_WS_Gescon_Test {
         CBK_IntegrationSetting__c csGescon = new CBK_IntegrationSetting__c();
         csGescon.Name = 'SAC_Gescon';
         csGescon.NamedCredential__c = 'callout:API_GWT_PRE/nonITAndNonHREnterpriseServices/legalCompliance/bankruptcyProcs/request/bulk';
-        Database.insert(csGescon);
+        SAC_DatabaseDML.insertDML(csGescon, false);    
+        //Database.insert(csGescon);
 
         List<String> customerIds = new List<String>();
         customerIds.add('34534W');
@@ -75,7 +78,8 @@ public with sharing class SAC_WS_Gescon_Test {
         CBK_IntegrationSetting__c csGescon = new CBK_IntegrationSetting__c();
         csGescon.Name = 'SAC_Gescon';
         csGescon.NamedCredential__c = 'callout:API_GWT_PRE/nonITAndNonHREnterpriseServices/legalCompliance/bankruptcyProcs/request/bulk';
-        Database.insert(csGescon);
+        SAC_DatabaseDML.insertDML(csGescon, false);    
+        //Database.insert(csGescon);
 
         List<String> customerIds = new List<String>();
         customerIds.add('34534W');

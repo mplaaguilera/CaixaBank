@@ -358,5 +358,174 @@ public with sharing class CSBD_DatosEntrevistaHipoteca {
 		return valor != null ? valor.setScale(2, RoundingMode.HALF_UP) : 0;
 	}
 
+	/*
+	public with sharing class CSBD_CalculoTae {
+
+		final static Decimal FIJO30_TIPO = 0.032;
+		final static Integer FIJO30_PAGOS_ANYO = 12;
+		final static Integer FIJO30_ANYOS = 30;
+		final static Decimal FIJO30_GASTOS_INICIALES = -622.1;
+
+		public static Decimal tae(Decimal importeHipoteca) {
+			//El TAE será el que haga que se cumpla la siguiente ecuación:
+			//	(Importe de compraventa + TIR) ^ 2 = 0
+
+					final Decimal TOLERANCIA_RESULTADO = 40; //Margen de error tolerado
+			final Integer MAX_ITERACIONES = 500; //Límite máximo de iteraciones
+
+			List<Decimal> cuotasTotales = getCuotasTotales(importeHipoteca);
+			Decimal tir;
+			Decimal tae = 0.02; //Valor inicial
+
+			for (Integer i = 0; i < MAX_ITERACIONES; i++) {
+				tir = sumaProducto(cuotasTotales, getDescuentos(tae));
+				Decimal formula = (tir + importeHipoteca).pow(2);
+
+				//Comprueba si el resultado de la fórmula está lo suficientemente cerca de cero
+				if (Math.abs(formula) <= TOLERANCIA_RESULTADO) {
+					//Resultado dentro del margen de error tolerado, se retorna redondeado con 2 decimales
+					return tae.setScale(5, RoundingMode.HALF_UP);
+				}
+
+				//Resultado fuera del margen de error tolerado, se ajusta el tae en función de la dirección del error
+				Decimal divisor = (tir + importeHipoteca) / 1000000;
+				if (Math.abs(divisor) < 0.00000000001) {
+					throw new MathException('División por valor cercano a 0 al calcular el TAE');
+				}
+				Decimal incremento = formula / divisor;
+				tae -= Math.min(Math.max(incremento, -0.0005), 0.00003);
+				System.debug(tae);
+			}
+
+			//Si el cálculo no converge tras el máximo de iteraciones se lanza una excepción
+			throw new MathException('El cálculo del TAE no convergió tras ' + MAX_ITERACIONES + ' iteraciones');
+		}
+
+		private static List<Decimal> getCuotasTotales(Decimal importeHipoteca) {
+			//Las cuotas totales son las sumas de las cuotas de:
+			//	Cuotas préstamo + Cuotas seguro hogar + Cuotas tarjeta + Cuotas alarma Securitas
+
+			List<Decimal> cuotasPrestamo = getCuotasPrestamo(importeHipoteca);
+			List<Decimal> cuotasHogar = getCuotasHogar();
+			List<Decimal> cuotasTarjetaCuenta = getCuotasTarjetaCuenta();
+			List<Decimal> cuotasAlarma = getCuotasAlarma();
+
+			List<Decimal> cuotasTotales = new List<Decimal>{FIJO30_GASTOS_INICIALES};
+			for (Integer i = 0; i < 360; i++) {
+				Decimal total = cuotasPrestamo[i] + cuotasHogar[i] + cuotasTarjetaCuenta[i] + cuotasAlarma[i];
+				cuotasTotales.add(total);
+			}
+			return cuotasTotales;
+		}
+
+		private static List<Decimal> getCuotasPrestamo(Decimal importeHipoteca) {
+			Decimal tasa = (FIJO30_TIPO - 0.0075) / FIJO30_PAGOS_ANYO;
+			Integer periodos = FIJO30_ANYOS * FIJO30_PAGOS_ANYO;
+			Decimal cuotaPrestamo = redondear(pago(tasa, periodos, importeHipoteca), 2);
+
+			List<Decimal> cuotasPrestamo = new List<Decimal>();
+			for (Integer i = 1; i <= 360; i++) {
+				cuotasPrestamo.add(cuotaPrestamo);
+			}
+			return cuotasPrestamo;
+		}
+
+		private static List<Decimal> getCuotasHogar() {
+			List<Decimal> cuotasHogarAnyo = new List<Decimal>{
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -317
+			};
+			List<Decimal> cuotasHogarUltimoAnyo = new List<Decimal>{
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+			};
+
+			List<Decimal> cuotasHogar = new List<Decimal>();
+			for (Integer i = 1; i <= FIJO30_ANYOS - 1; i++) {
+				cuotasHogar.addAll(cuotasHogarAnyo);
+			}
+			cuotasHogar.addAll(cuotasHogarUltimoAnyo);
+			return cuotasHogar;
+		}
+
+		private static List<Decimal> getCuotasTarjetaCuenta() {
+			List<Decimal> cuotasTarjetaCuentaAnyo = new List<Decimal>{
+				0, 0, -15, 0, 0, -15, 0, 0, -15, 0, 0, -51
+			};
+
+			List<Decimal> cuotasTarjetaCuenta = new List<Decimal>();
+			for (Integer i = 1; i <= FIJO30_ANYOS; i++) {
+				cuotasTarjetaCuenta.addAll(cuotasTarjetaCuentaAnyo);
+			}
+			cuotasTarjetaCuenta[cuotasTarjetaCuenta.size() - 1] = 0;
+			return cuotasTarjetaCuenta;
+		}
+
+		private static List<Decimal> getCuotasAlarma() {
+			final Decimal IMPORTE_MENSUAL_ALARMA = -0;
+			List<Decimal> cuotasAlarma = new List<Decimal>();
+			for (Integer i = 0; i < 360; i++) {
+				cuotasAlarma.add(IMPORTE_MENSUAL_ALARMA);
+			}
+			return cuotasAlarma;
+		}
+
+		private static List<Decimal> getDescuentos(Decimal tae) {
+			Decimal factor = 1 + tae;
+			List<Decimal> descuentos = new List<Decimal>();
+			for (Integer i = 0; i < 361; i++) {
+				Double exponent = -((Double)i / 12);
+				Decimal descuento = Decimal.valueOf(Math.pow(factor.doubleValue(), exponent));
+				descuentos.add(descuento);
+			}
+			return descuentos;
+		}
+
+		private static Decimal pago(Decimal tasa, Integer nper, Decimal va, Decimal vf, Integer tipo) {
+			//Replica la función de Excel PAGO(Tasa, Nper, Va, Vf, Tipo)
+			if (vf == null) {
+				vf = 0;
+			}
+			if (tipo == null) {
+				tipo = 0;
+			}
+
+			if (tasa == 0) {
+				return -(va + vf) / nper;
+			}
+			Decimal factor = (1 + tasa).pow(nper);
+			Decimal pago = (tasa * (va * factor + vf)) / ((1 + tasa * tipo) * (factor - 1));
+			return -pago;
+		}
+
+		private static Decimal pago(Decimal tasa, Integer nper, Decimal va) {
+			return pago(tasa, nper, va, 0, 0);
+		}
+
+		private static Decimal redondear(Decimal num, Integer numDecimales) {
+			//Replica la función de Excel REDONDEAR(Número, Núm_decimales)
+			if (numDecimales == null || numDecimales < 0) {
+				throw new IllegalArgumentException('El número de decimales debe ser un número entero igual o mayor que 0');
+			}
+			return num.setScale(numDecimales, RoundingMode.HALF_UP);
+		}
+
+		private static Decimal sumaProducto(List<Decimal> lista1, List<Decimal> lista2) {
+			//Replica la función de Excel SUMAPRODUCTO(Matriz1, Matriz2, ...MatrizN)
+			if (lista1 == null || lista1.isEmpty() || lista2 == null || lista2.isEmpty()) {
+				throw new IllegalArgumentException('Ambas listas deben tener elementos');
+			}
+			Integer listaSize = lista2.size();
+			if (listaSize != lista2.size()) {
+				throw new IllegalArgumentException('Ambas listas deben tener el mismo número de elementos');
+			}
+
+			Decimal suma = 0;
+			for (Integer i = 0; i < listaSize; i++) {
+				suma += lista1[i] * lista2[i];
+			}
+			return suma;
+		}
+	}
+	*/
+
 	private class CustomException extends Exception {}
 }

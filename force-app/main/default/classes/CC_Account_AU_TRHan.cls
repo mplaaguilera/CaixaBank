@@ -4,7 +4,13 @@ public with sharing class CC_Account_AU_TRHan extends CC_TriggerHandlerBase {
 	private static Id centroGenericoRecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Generico').getRecordTypeId();
 
     public override void mainEntry(CC_TriggerParameters tp) {
+		if(UserInfo.getProfileId() != null ){
+        String perfilUtilizado = null;
+		perfilUtilizado = [SELECT Name FROM Profile WHERE Id = :UserInfo.getProfileId()].Name;
+		if(perfilUtilizado != 'SEG_Usuario_CaixaBank'){
 		process((List<Account>)tp.newList, (Map<Id,Account>)tp.oldMap) ;
+		}
+		}
 	}
 
     private void process(List<Account> cuentas, Map<Id,Account> cuentasViejas) {

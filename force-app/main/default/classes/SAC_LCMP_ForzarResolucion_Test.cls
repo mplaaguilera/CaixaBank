@@ -18,14 +18,16 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
         
         //Usuario SAC General
 		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        usuarioGeneral.SAC_PerteneceCOPSAJ__c = true;      
-        Database.insert(usuarioGeneral);
+        usuarioGeneral.SAC_PerteneceCOPSAJ__c = true;
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         
         //Grupos
         List<CC_Grupo_Colaborador__c> listaGrupos = new List<CC_Grupo_Colaborador__c>();
@@ -48,7 +50,8 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
         listaGrupos.add(grupoTareas);
 
         System.runAs(usuarioGeneral){
-            Database.insert(listaGrupos);
+            SAC_DatabaseDML.insertListDML(listaGrupos, false);
+            //Database.insert(listaGrupos);
 
             //Reclamacion
             Map<String, Object> camposRecl = new Map<String, Object>();
@@ -59,7 +62,8 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
             camposRecl.put('OwnerId', usuarioGeneral.Id);
 
             Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);
+            //Database.insert(casoReclamacion);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -71,7 +75,8 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
             camposPret.put('OwnerId', usuarioGeneral.Id);
 
             Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(casoPretension); 
+            SAC_DatabaseDML.insertDML(casoPretension, false);
+            //Database.insert(casoPretension); 
             
             
             List<SAC_Interaccion__c> listaInteracciones = new List<SAC_Interaccion__c>();
@@ -101,14 +106,16 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
             SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
             listaInteracciones.add(consulta);
 
-            Database.insert(listaInteracciones);
+            SAC_DatabaseDML.insertListDML(listaInteracciones, false);
+            //Database.insert(listaInteracciones);
             
             //Tarea
             SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1, casoReclamacion, false)[0];
             tarea.SAC_EquipoResponsable__c = grupoTareas.id;
             tarea.SAC_Observaciones__c = 'tarea'; 
 
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
         }  
     }
 
@@ -122,7 +129,8 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
 		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
 		if(psas.isEmpty()){
 			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-			Database.insert(psa,false);
+            SAC_DatabaseDML.insertDML(psa, false);
+			//Database.insert(psa,false);
 		}
 
         System.RunAs(usuario){   
@@ -145,7 +153,8 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
 		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
 		if(psas.isEmpty()){
 			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-			Database.insert(psa,false);
+            SAC_DatabaseDML.insertDML(psa, false);
+			//Database.insert(psa,false);
 		}
 
         System.RunAs(usuario){   
@@ -168,7 +177,9 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
 		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
 		if(psas.isEmpty()){
 			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-            Database.insert(psa,false);		}
+            SAC_DatabaseDML.insertDML(psa, false);
+            //Database.insert(psa,false);		
+            }
 
         System.RunAs(usuario){   
             Test.startTest();
@@ -190,7 +201,9 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
 		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
 		if(psas.isEmpty()){
 			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-            Database.insert(psa,false);		}
+            SAC_DatabaseDML.insertDML(psa, false);
+            //Database.insert(psa,false);		
+            }
 
         System.RunAs(usuario){   
             Test.startTest();
@@ -218,7 +231,9 @@ public with sharing class SAC_LCMP_ForzarResolucion_Test {
 		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
 		if(psas.isEmpty()){
 			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-            Database.insert(psa,false);		}
+            SAC_DatabaseDML.insertDML(psa, false);
+            //Database.insert(psa,false);		
+        }
 
         System.RunAs(usuario){   
             Test.startTest();

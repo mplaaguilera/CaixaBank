@@ -41,29 +41,34 @@ public with sharing class SAC_Pretension_Test {
         listaMCCs.add(mccServicio2);
         listaMCCs.add(mccMotivo2);
         listaMCCs.add(mccDetalle2);
-        Database.upsert(listaMCCs);
+        SAC_DatabaseDML.upsertListDML(listaMCCs, false);
+        //Database.upsert(listaMCCs);
 
         Test.startTest();
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];  
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+        //Database.insert(usuarioAdmin);
 
         User usuarioGeneral;
         System.runAs(usuarioAdmin) {
             //Usuario SAC Admin
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];  
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
 
             PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
             PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
             permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
             permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-            Database.insert(permiSetAssiAdmin);
+            SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false);
+            //Database.insert(permiSetAssiAdmin);
         }
         Test.stopTest();
         
@@ -82,7 +87,8 @@ public with sharing class SAC_Pretension_Test {
         listaCuentas[1].billingStreet  = 'Calle Mayor 55';
         listaCuentas[1].BillingCountry = 'España';
         listaCuentas[1].CC_Numero_Documento__c = '12345678C';
-        Database.insert(listaCuentas);
+        SAC_DatabaseDML.insertListDML(listaCuentas, false);
+        //Database.insert(listaCuentas);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -134,7 +140,8 @@ public with sharing class SAC_Pretension_Test {
         reclamaciones.add(casoReclamacion2);
         reclamaciones.add(casoReclamacion3);
         reclamaciones.add(casoReclamacion4);
-        Database.insert(reclamaciones);
+        SAC_DatabaseDML.insertListDML(reclamaciones, false);
+        //Database.insert(reclamaciones);
 
         //Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -207,7 +214,8 @@ public with sharing class SAC_Pretension_Test {
         pretensiones.add(casoPretension3);
         pretensiones.add(casoPretension4);
         pretensiones.add(casoPretension5);
-        Database.insert(pretensiones);
+        SAC_DatabaseDML.insertListDML(pretensiones, false);
+        //Database.insert(pretensiones);
 
         /*SAC_CaseReclamante__c caseRecl1 = new SAC_CaseReclamante__c();
 		caseRecl1.SAC_Case__c = casoReclamacion2.Id;
@@ -244,7 +252,8 @@ public with sharing class SAC_Pretension_Test {
         User usuario = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' and IsActive = true limit 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(pretension);
+            SAC_DatabaseDML.updateDML(pretension, false);
+            //Database.update(pretension);
             Test.stopTest();
         }
 
@@ -264,7 +273,8 @@ public with sharing class SAC_Pretension_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
 
@@ -288,7 +298,8 @@ public with sharing class SAC_Pretension_Test {
             pretension.SAC_TAE__c = 'SAC_235_24';
             lista.add(caso);
             lista.add(pretension);
-            Database.update(lista);
+            SAC_DatabaseDML.updateListDML(lista, false);
+            //Database.update(lista);
         }
 
         Case reclamacion2 = [SELECT Id, SAC_TAE__c FROM Case WHERE Subject = 'TestRec4' LIMIT 1];
@@ -309,7 +320,8 @@ public with sharing class SAC_Pretension_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
 
@@ -325,7 +337,8 @@ public with sharing class SAC_Pretension_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(pretension);
+            SAC_DatabaseDML.updateDML(pretension, false);
+            //Database.update(pretension);
             Test.stopTest();
         }
 
@@ -342,7 +355,8 @@ public with sharing class SAC_Pretension_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -351,29 +365,34 @@ public with sharing class SAC_Pretension_Test {
     }
     
     @isTest
-    static void comprobarNegocioAnalisis_Test(){
+    static void comprobarNegocioAnalisisTest(){
         Case pretension = [SELECT id, Status, SAC_ResultadoNegociacion__c, SAC_DetalleResultadoNegociacion__c, CC_Importe_Reclamado__c, SAC_Importe_Resuelto__c FROM CASE WHERE SuppliedCompany = 'testPretNegocio2' LIMIT 1];
 		pretension.Status = 'SAC_002';
         pretension.SAC_StatusAuxiliar__c = 'SAC_002';
-        
+        pretension.CC_Importe_Reclamado__c = 1.0;
+        pretension.SAC_Importe_Resuelto__c = 1.0;
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.SaveResult resultado = Database.update(pretension, false);
+            SAC_DatabaseDML.updateDML(pretension, false);
+            //Database.SaveResult resultado = Database.update(pretension, false);
             Test.stopTest();
-            Assert.areNotEqual(null, resultado, 'No se ha podido modificar el estado');
+            Case pretensionResult = [SELECT id, Status, SAC_ResultadoNegociacion__c, SAC_DetalleResultadoNegociacion__c, CC_Importe_Reclamado__c, SAC_Importe_Resuelto__c FROM CASE WHERE SuppliedCompany = 'testPretNegocio2' LIMIT 1];
+            Assert.areEqual(pretensionResult.Status, 'SAC_002', 'No se ha podido modificar el estado');
+            //Assert.areNotEqual(null, resultado, 'No se ha podido modificar el estado');
         }    
     }
     
     @isTest
-    static void rellenarImporteResultadoNegocio_Test(){
+    static void rellenarImporteResultadoNegocioTest(){
         Case pretension = [SELECT id, Status, SAC_ResultadoNegociacion__c, SAC_DetalleResultadoNegociacion__c, CC_Importe_Reclamado__c, SAC_Importe_Resuelto__c FROM CASE WHERE SuppliedCompany = 'testPretNegocio' LIMIT 1];
         pretension.SAC_Importe_Resuelto__c = 75;
         
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(pretension);
+            SAC_DatabaseDML.updateDML(pretension, false);
+            //Database.update(pretension);
             Test.stopTest();
         }
         
@@ -382,7 +401,7 @@ public with sharing class SAC_Pretension_Test {
     }
     
     @isTest
-    static void rellenarReclamanteConforme_Test(){
+    static void rellenarReclamanteConformeTest(){
         Case caso = [SELECT id  FROM CASE WHERE Subject = 'TestRec' LIMIT 1];
         Case pretension = [SELECT id, SAC_ReclamanteConformeNegociacion__c FROM CASE WHERE SuppliedCompany = 'testPret' LIMIT 1];
         caso.SAC_ReclamanteConformeNegociacion__c = true;
@@ -390,7 +409,8 @@ public with sharing class SAC_Pretension_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
         Case pretension2 = [SELECT id, SAC_ReclamanteConformeNegociacion__c FROM CASE WHERE SuppliedCompany = 'testPret' LIMIT 1];
@@ -398,7 +418,7 @@ public with sharing class SAC_Pretension_Test {
     }
     
     @isTest
-    static void rellenarCodigosExternosMCC_Test(){
+    static void rellenarCodigosExternosMCCTest(){
         
         CC_MCC__c mcc = [SELECT id FROM CC_MCC__c WHERE Name = 'Banca Electrónica2' LIMIT 1];
         Case pretension = [SELECT id, CC_Codigo_Externo_Tematica__c, CC_Tematica__c FROM CASE WHERE SuppliedCompany = 'testPret' LIMIT 1];
@@ -407,7 +427,8 @@ public with sharing class SAC_Pretension_Test {
         User usuario = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' and IsActive = true limit 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(pretension);
+            SAC_DatabaseDML.updateDML(pretension, false);
+            //Database.update(pretension);
             Test.stopTest();
         }
         
@@ -417,7 +438,7 @@ public with sharing class SAC_Pretension_Test {
     }
     
     @isTest
-    static void insertarPermisosPretension_Test(){
+    static void insertarPermisosPretensionTest(){
         
         Case reclamacion = [SELECT id FROM CASE WHERE Subject = 'TestRec3' LIMIT 1];
         
@@ -431,7 +452,8 @@ public with sharing class SAC_Pretension_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.insert(casoPretensionPermisos);
+            SAC_DatabaseDML.insertDML(casoPretensionPermisos, false);
+            //Database.insert(casoPretensionPermisos);
             Test.stopTest();
         }
         
@@ -447,7 +469,8 @@ public with sharing class SAC_Pretension_Test {
         System.runAs(usuario){
             Test.startTest();
             reclamacion.SAC_CasoEspecial__c = 'SAC_Presidencia';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -479,7 +502,8 @@ public with sharing class SAC_Pretension_Test {
             Test.startTest();
             pretension1.OwnerId = usuario.Id;
             pretension2.OwnerId = cola.Id;
-            Database.update(pretensionesUpdatear);
+            SAC_DatabaseDML.updateListDML(pretensionesUpdatear, false);
+            //Database.update(pretensionesUpdatear);
             Test.stopTest();
         }
 
@@ -509,7 +533,8 @@ public with sharing class SAC_Pretension_Test {
             Case pret = new Case();
             pret.SAC_Reclamacion__c = reclamacion.Id;
             pret.RecordTypeId = recordTypePret;
-            Database.insert(pret);
+            SAC_DatabaseDML.insertDML(pret, false);
+            //Database.insert(pret);
             Test.stopTest();
         }
 
@@ -518,6 +543,25 @@ public with sharing class SAC_Pretension_Test {
         Assert.areEqual(reclamacion.Owner.Name, reclamacionResult.SAC_Letrado__c, 'No se ha podido recuperar el nombre del letrado');
     }
 
+    @isTest
+    static void actualizarDatosContactoTest() {
+
+        Case reclamacion = [SELECT id, OwnerId, Owner.Name, SuppliedCompany, CC_Telefono_Contacto__c, OS_Email__c, SAC_DireccionPostalNotificacion__c FROM Case WHERE Subject = 'TestRec3'];   
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        System.runAs(usuario){
+            Test.startTest();
+            Case caso = new Case();
+            caso.CC_Telefono_Contacto__c = 'Test';
+            caso.OS_Email__c = 'Test';
+            caso.SAC_DireccionPostalNotificacion__c = 'Test';
+            SAC_DatabaseDML.insertDML(caso, false);
+            Test.stopTest();
+        }
+
+        Case reclamacionResult = [SELECT id, CC_Telefono_Contacto__c, OS_Email__c, SAC_DireccionPostalNotificacion__c FROM Case WHERE subject = 'TestRec3'];
+        
+        Assert.areEqual(reclamacion.CC_Telefono_Contacto__c, reclamacionResult.CC_Telefono_Contacto__c, 'No se ha actualizado');
+    }
     /*
     @isTest
     static void cambiarOwnersPretsHermanasTest() {

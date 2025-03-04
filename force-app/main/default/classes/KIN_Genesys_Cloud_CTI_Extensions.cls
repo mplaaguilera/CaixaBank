@@ -11,25 +11,29 @@ global with sharing class KIN_Genesys_Cloud_CTI_Extensions implements purecloud.
 			clickToDialData.put('queueId', CC_Servicio_Genesys.obtenerQueueId(recordId, sObjectType));
 
 			//Custom attributes
+			//clickToDial y casoId
 			Map<String, Object> interactionAttributes = new Map<String, Object>{
 				'clickToDial' => false, 'casoId' => recordId //casoId puede ser un id de caso o de oportunidad
 			};
 			if (sObjectType == 'Opportunity') {
-				Opportunity oportunidad = [SELECT RecordType.DeveloperName FROM Opportunity WHERE Id = :recordId];
+				Opportunity oportunidad = [SELECT RecordType.DeveloperName, CSBD_Contact__r.AV_NumPerso__c FROM Opportunity WHERE Id = :recordId];
+				//clickToDial y llamadaRecordType
 				interactionAttributes.put('clickToDial', true);
 				interactionAttributes.put('llamadaRecordType', oportunidad.RecordType.DeveloperName);
 
 				if (oportunidad.RecordType.DeveloperName.startsWith('CSBD_')) {
+					//Numperso
+					interactionAttributes.put('numPerso', oportunidad.CSBD_Contact__r.AV_NumPerso__c);
+
+					//llamadaId
 					CC_Llamada_Input inputLlamadaSaliente = new CC_Llamada_Input();
 					inputLlamadaSaliente.casoId = recordId;
 					inputLlamadaSaliente.dnis = String.valueOf(clickToDialData.get('number'));
-
-					CC_Llamada__c llamadaSaliente = (CC_Llamada__c)CSBD_Llamada_GC.registrarLlamadaSaliente(inputLlamadaSaliente).get('llamada');
-					interactionAttributes.put('llamadaId', llamadaSaliente.Id);
+					Map<String, Object> llamadaSaliente = CSBD_Llamada_GC.registrarLlamadaSaliente(inputLlamadaSaliente);
+					interactionAttributes.put('llamadaId', ((CC_Llamada__c)llamadaSaliente.get('llamada')).Id);
 				}
 			}
 			clickToDialData.put('interactionAttributes', interactionAttributes);
-
 			return JSON.serialize(clickToDialData);
 		}
 	}

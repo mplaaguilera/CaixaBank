@@ -16,14 +16,16 @@ public with sharing class SAC_LCMP_DesmarcarNotificacion_Test {
     static void makeData(){
 
         //Usuario SAC General
-		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];  
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);    
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);    
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             //Reclamacion 1
@@ -33,7 +35,8 @@ public with sharing class SAC_LCMP_DesmarcarNotificacion_Test {
             camposRecl1.put('SAC_NotificacionSinLeer__c', true);
 
             Case reclamacion1 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl1);
-            Database.insert(reclamacion1);
+            SAC_DatabaseDML.insertDML(reclamacion1, false); 
+            //Database.insert(reclamacion1);
 
             //Reclamacion 2
             Map<String, Object> camposRecl2 = new Map<String, Object>();
@@ -42,7 +45,8 @@ public with sharing class SAC_LCMP_DesmarcarNotificacion_Test {
             camposRecl2.put('SAC_NotificacionSinLeer__c', false);
 
             Case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
-            Database.insert(reclamacion2);
+            SAC_DatabaseDML.insertDML(reclamacion2, false); 
+            //Database.insert(reclamacion2);
         }
    
     }

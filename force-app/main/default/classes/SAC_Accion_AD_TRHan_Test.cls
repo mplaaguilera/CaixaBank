@@ -16,34 +16,46 @@ public with sharing class SAC_Accion_AD_TRHan_Test {
     static void makeData(){
 
         //Usuario SAC General
-		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         //Usuario SAC Admin
 		User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';      
-        Database.insert(usuarioAdmin);
+        usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';     
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);  
+        //Database.insert(usuarioAdmin);
 
         PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
         PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
         permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
         permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-        Database.insert(permiSetAssiAdmin);
+        SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false); 
+
+        PermissionSet permiSetAdmin2 = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_SystemAdmin'];
+        PermissionSetAssignment permiSetAssiAdmin2 = new PermissionSetAssignment();
+        permiSetAssiAdmin2.AssigneeId = usuarioAdmin.Id;
+        permiSetAssiAdmin2.PermissionSetId = permiSetAdmin2.Id;
+        SAC_DatabaseDML.insertDML(permiSetAssiAdmin2, false); 
+        //Database.insert(permiSetAssiAdmin);
 
         System.runAs(usuarioAdmin){
             //Grupo Colaborador
             List<CC_Grupo_Colaborador__c> grupoColab = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1);
-            Database.insert(grupoColab);
+            SAC_DatabaseDML.insertListDML(grupoColab, false); 
+            //Database.insert(grupoColab);
 
             //Maestro Acciones
             List<SAC_MaestroAccionesReclamacion__c> maestroAcciones = SAC_TestDataFactory.crearMaestroAcciones(1,grupoColab[0].id);
-            Database.insert(maestroAcciones);
+            SAC_DatabaseDML.insertListDML(maestroAcciones, false); 
+            //Database.insert(maestroAcciones);
         }
         
         System.runAs(usuarioGeneral){
@@ -54,7 +66,8 @@ public with sharing class SAC_Accion_AD_TRHan_Test {
             camposRecl.put('CC_Importe_Abonado__c', 400.0);
 
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false); 
+            //Database.insert(reclamacion);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -64,7 +77,8 @@ public with sharing class SAC_Accion_AD_TRHan_Test {
             camposPret.put('CC_Importe_Abonado__c', 400.0);
 
             Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(casoPretension);  
+            SAC_DatabaseDML.insertDML(casoPretension, false); 
+            //Database.insert(casoPretension);  
 
             List<SAC_Accion__c> tareas = SAC_TestDataFactory.crearTareas(2,casoPretension,false);
             tareas[0].SAC_ImporteResuelto__c = 100.0;
@@ -73,7 +87,8 @@ public with sharing class SAC_Accion_AD_TRHan_Test {
             tareas[1].SAC_ImporteResuelto__c = 100.0;
             tareas[1].SAC_ImpResueltoInteresesLegales__c = 100.0;
             tareas[1].SAC_ImporteAbonar__c = 200.0;
-            Database.insert(tareas);
+            SAC_DatabaseDML.insertListDML(tareas, false); 
+            //Database.insert(tareas);
         }
     }
     @istest
@@ -81,10 +96,11 @@ public with sharing class SAC_Accion_AD_TRHan_Test {
         list<SAC_Accion__c> tareas = [SELECT Id, SAC_ImporteResuelto__c, SAC_ImpResueltoInteresesLegales__c, 
                                      SAC_ImporteAbonar__c, SAC_Pretension__c, SAC_Reclamacion__c FROM SAC_Accion__c];
 
-        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        User usuario = [SELECT id FROM User WHERE Username = 'usertestadmin@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             test.startTest();
-            Database.delete(tareas);
+            SAC_DatabaseDML.deleteListDML(tareas, false); 
+            //Database.delete(tareas);
             test.stopTest();
         }
         Case reclUpd = [SELECT Id, SAC_Importe_Resuelto__c, CC_Importe_Abonado__c FROM Case Where Id =: tareas[0].SAC_Pretension__c]; 

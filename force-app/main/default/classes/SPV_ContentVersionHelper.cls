@@ -19,12 +19,14 @@ public with sharing class SPV_ContentVersionHelper {
         Set<Id> setId = new Set<Id>();
 
         for (ContentVersion cv : listNewObj) {
-            
-            Schema.SObjectType tipoObjeto = cv.FirstPublishLocationId.getsobjecttype();
 
-            if(tipoObjeto == expectedCase){
-                setIdRec.add(cv.FirstPublishLocationId);  
-            } 
+            if(String.isNotBlank(cv.FirstPublishLocationId) && cv.FirstPublishLocationId != null){
+                Schema.SObjectType tipoObjeto = cv.FirstPublishLocationId.getsobjecttype();
+
+                if(tipoObjeto == expectedCase){
+                    setIdRec.add(cv.FirstPublishLocationId);  
+                } 
+            }
         }
 
         if(!setIdRec.isEmpty()){
@@ -47,34 +49,6 @@ public with sharing class SPV_ContentVersionHelper {
         }
 
         return listCVSPV;
-    }
-
-    public static void envioEER(List<ContentVersion> listNewObj) {
-
-        List<ContentVersion> listCVToSend = new List<ContentVersion>();
-        List<Id> lstCVToSendIds = new List<Id>();
-
-        for (ContentVersion cv : listNewObj) {
-
-            if(cv.SAC_IdEER__c == null){
-                listCVToSend.add(cv);
-                lstCVToSendIds.add(cv.Id);
-            } 
-        }
-
-        // if(!listCVToSend.isEmpty()){
-        //     AsyncOptions options = new AsyncOptions();
-        //     options.DuplicateSignature = QueueableDuplicateSignature.Builder()
-        //     .addId(UserInfo.getUserId())
-        //     .addString('lstCVToSendIds')
-        //     .build();
-        //     try {
-        //         System.enqueueJob(new SPV_QueueableSendCVToEER(listCVToSend), options);    
-        //     } catch (DuplicateMessageException ex) { 
-        //         CBK_Log.error(ex); 
-        //     }                 
-        // }
-        
     }
 
     public static void alertaNuevaDocuReclamacion(List<ContentVersion> listNewObj, Map<Id, Case> mapaReclamaciones) {

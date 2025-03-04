@@ -7,6 +7,7 @@ public with sharing class CSBD_Infobip_Message_DTO {
 		public DestinationsDTO[] destinations;
 		public ContentDTO content;
 		public OptionDTO options;
+		public WebhookDTO webhooks;
 	}
 
 	
@@ -50,6 +51,10 @@ public with sharing class CSBD_Infobip_Message_DTO {
 		public String timeUnit;
 	}
 
+	public class WebhookDTO{
+		public String callbackData;
+	}
+
 	public CSBD_Infobip_Message_DTO(){
 		this.messages = new List<MessageDTO>();
 		MessageDTO message = new MessageDTO();
@@ -62,6 +67,7 @@ public with sharing class CSBD_Infobip_Message_DTO {
 		message.options = new OptionDTO();
 		message.options.smsFailover = new SMSFailoverDTO();
 		message.options.validityPeriod = new ValidityPeriodDTO();
+		message.webhooks = new WebhookDTO();
 
 		this.messages.add(message);
 	}

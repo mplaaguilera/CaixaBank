@@ -2,23 +2,31 @@ public inherited sharing class CSBD_Opportunity {
 
 	public class DefaultException extends Exception {}
 
-	public static Opportunity crearOportunidad(String recordTypeDeveloperName) {
-		return crearOportunidad(recordTypeDeveloperName, new Map<String, Object>());
+	public static List<Opportunity> crearOportunidad(String recordTypeDeveloperName, List<Map<String, Object>> listaCampos) {
+		Id idRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(recordTypeDeveloperName).getRecordTypeId();
+		List<Opportunity> oportunidades = new List<Opportunity>();
+		for (Map<String, Object> campos : listaCampos) {
+			Opportunity oportunidad = new Opportunity();
+			oportunidad.RecordTypeId = idRecordType;
+			oportunidad.Name = 'temp'; //Se sobreescribe en el trigger AI
+			oportunidad.CSBD_Estado__c = String.isNotBlank((String)campos.get('CSBD_Estado__c')) ? (String)campos.get('CSBD_Estado__c') : 'Nueva';
+			oportunidad.StageName = String.isNotBlank((String)campos.get('StageName')) ? (String)campos.get('StageName') : 'Solicitud';
+			oportunidad.CloseDate = System.today().addDays(diasFechaCierre(idRecordType));
+			for (String campo : campos.keySet()) {
+				oportunidad.put(campo, campos.get(campo));
+			}
+			oportunidades.add(oportunidad);
+		}
+		insert oportunidades;
+		return oportunidades;
 	}
 
 	public static Opportunity crearOportunidad(String recordTypeDeveloperName, Map<String, Object> campos) {
-		Id idRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(recordTypeDeveloperName).getRecordTypeId();
-		Opportunity oportunidad = new Opportunity();
-		oportunidad.RecordTypeId = idRecordType;
-		oportunidad.Name = 'temp'; //Se sobreescribe en el trigger AI
-		oportunidad.CSBD_Estado__c = String.isNotBlank((String)campos.get('CSBD_Estado__c')) ? (String)campos.get('CSBD_Estado__c') : 'Nueva';
-		oportunidad.StageName = String.isNotBlank((String)campos.get('StageName')) ? (String)campos.get('StageName') : 'Solicitud';
-		oportunidad.CloseDate = System.today().addDays(diasFechaCierre(idRecordType));
-		for (String campo : campos.keySet()) {
-			oportunidad.put(campo, campos.get(campo));
-		}
-		insert oportunidad;
-		return oportunidad;
+		return crearOportunidad(recordTypeDeveloperName, new List<Map<String, Object>>{campos})[0];
+	}
+
+	public static Opportunity crearOportunidad(String recordTypeDeveloperName) {
+		return crearOportunidad(recordTypeDeveloperName, new List<Map<String, Object>>{new Map<String, Object>()})[0];
 	}
 
 	public static void actualizarPropietarioOportunidadOmnichannel(Map<Id, Id> oportunidadIdOwnerId) {
@@ -168,7 +176,7 @@ public inherited sharing class CSBD_Opportunity {
 
 		for (Opportunity oportunidad : oportunidades) {
 			if (oportunidad.RecordType.DeveloperName == 'CSBD_MAC' && String.isBlank(oportunidad.CSBD_Motivo_MAC__c)) {
-				throw new DefaultException('No es posible cerrar una oportunidad AC si el campo "Motivo AC" no está informado.');
+				throw new DefaultException('No es posible cerrar una oportunidad CSCC si el campo "Motivo CSCC" no está informado.');
 			}
 
 			if (oportunidad.CSBD_Estado__c == 'Pendiente Cliente') {
@@ -314,7 +322,7 @@ public inherited sharing class CSBD_Opportunity {
 		oportunidad.CSBD_Estado__c = 'Activa';
 		oportunidad.CSBD_Resolucion__c = '';
 		oportunidad.Loss_Reason__c = '';
-		
+
 		return oportunidad;
 	}
 
@@ -408,14 +416,14 @@ public inherited sharing class CSBD_Opportunity {
 	}
 
 	public static Event programarCita(Id idOportunidad, Boolean asignacionAuto, Id idPropietario, Datetime startDateTime) {
-		return programarCita(idOportunidad, asignacionAuto, false, idPropietario, startDateTime, startDateTime.addMinutes(60));
+		return programarCita(idOportunidad, asignacionAuto, false, idPropietario, startDateTime, startDateTime.addMinutes(30));
 	}
 
 	public static Event programarCita(Id idOportunidad, Boolean asignacionAuto, Boolean comprobarContacto, Id idPropietario, Datetime startDateTime) {
-		return programarCita(idOportunidad, asignacionAuto, comprobarContacto, idPropietario, startDateTime, startDateTime.addMinutes(60));
+		return programarCita(idOportunidad, asignacionAuto, comprobarContacto, idPropietario, startDateTime, startDateTime.addMinutes(30));
 	}
 
-	public static Event programarCita(Id idOportunidad, Boolean asignacionAuto, Boolean comprobarContacto, Id idPropietario, Datetime startDateTime, Datetime endDateTime) {
+	private static Event programarCita(Id idOportunidad, Boolean asignacionAuto, Boolean comprobarContacto, Id idPropietario, Datetime startDateTime, Datetime endDateTime) {
 		Opportunity oportunidadAsociada = [SELECT Name, RecordType.DeveloperName FROM Opportunity WHERE Id = :idOportunidad];
 
 		Event nuevoEvento = new Event();
@@ -491,14 +499,27 @@ public inherited sharing class CSBD_Opportunity {
 		}
 		update eventosPendientes;
 
+		List<CSBD_Gestor_Oportunidad__c> gestoresOportunidad = [SELECT Id, OwnerId, CSBD_Estado__c, CSBD_Oportunidad__c FROM CSBD_Gestor_Oportunidad__c WHERE CSBD_Oportunidad__c  IN :mapaFinalizaciones.keySet()];
+		Map<Id, CSBD_Gestor_Oportunidad__c> mapaGestoresOportunidad = new Map<Id, CSBD_Gestor_Oportunidad__c>();
+
+		if(!gestoresOportunidad.isEmpty()) {
+			for (CSBD_Gestor_Oportunidad__c gestor : gestoresOportunidad) {
+			mapaGestoresOportunidad.put(gestor.CSBD_Oportunidad__c, gestor);}
+		}
+
 		//Actualizar oportunidades
 		List<Opportunity> oportunidadesAltaOmnichannel = new List<Opportunity>();
+
 		Set<Id> oportunidadesIds = new Set<Id>();
+
 		List<Opportunity> oportunidades = [SELECT Name, CSBD_Asignacion_Auto_Pendiente__c, CSBD_Empresa_Proveedora__c,
 											CSBD_Idioma_Solicitud__c, RecordtypeId, RecordType.Name, CSBD_Turno_Contacto__c,
 											CSBD_Familia_Producto__c, CSBD_Skill__c, CSBD_Horario_Contacto__c,
-											CSBD_Alta_omnichannel__c, CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c
+											CSBD_Alta_omnichannel__c, CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c,OwnerId
 											FROM Opportunity WHERE Id IN :mapaFinalizaciones.keySet()];
+
+		List<CSBD_Gestor_Oportunidad__c> gestoresOportunidadActualizar = new List<CSBD_Gestor_Oportunidad__c>();
+
 		for (Opportunity oportunidad : oportunidades) {
 			//La cita tiene lugar
 			if (!cancelacionManual) {
@@ -506,12 +527,20 @@ public inherited sharing class CSBD_Opportunity {
 				if (oportunidad.CSBD_Asignacion_Auto_Pendiente__c) {
 					oportunidadesAltaOmnichannel.add(oportunidad);
 					oportunidadesIds.add(oportunidad.Id);
+				} else {
+					CSBD_Gestor_Oportunidad__c gestor = mapaGestoresOportunidad.get(oportunidad.Id);
+					if (gestor != null) {
+						gestor.OwnerId = oportunidad.OwnerId;
+						gestor.CSBD_Estado__c = 'Activo';
+						gestoresOportunidadActualizar.add(gestor);
+					}
 				}
 			}
 			oportunidad.CSBD_Estado__c = 'Activa';
 			oportunidad.CSBD_Fecha_Cita__c = null;
 			oportunidad.CSBD_Asignacion_Auto_Pendiente__c = false;
 		}
+		update gestoresOportunidadActualizar;
 		update oportunidades;
 
 		//Para las oportunidades para las que ha tenido lugar la cita y se había solicitado reasignación automática en su reapertura -- alta omnichannel
@@ -659,6 +688,10 @@ public inherited sharing class CSBD_Opportunity {
 		oportunidadDestino.CSBD_Fecha_Firma__c = null;
 		insert oportunidadDestino;
 
+		if(oportunidadDestino.AccountId != null){
+			update crearTitularHipotecas(oportunidadDestino, oportunidadDestino.AccountId);
+		}
+
 		//Nueva actividad de oportunidad clonada en la nueva oportunidad hija
 		CSBD_Activity.crearActividad(
 			oportunidadDestino.Id,
@@ -668,5 +701,56 @@ public inherited sharing class CSBD_Opportunity {
 			'Oportunidad padre: ' + oportunidadOrigen.CSBD_Identificador__c
 		);
 		return oportunidadDestino;
+	}
+
+	public static List<Opportunity> crearTitularHipotecas(Opportunity oportunidadCrearTitular, Id idsCliente) {
+		return crearTitularHipotecas(new List<Opportunity>{oportunidadCrearTitular}, new Set<Id>{idsCliente});
+	}
+
+	public static List<Opportunity> crearTitularHipotecas(List<Opportunity> oportunidadesCrearTitular, Set<Id> idsCliente) {
+		Map<Id, Account> idClienteMap = new Map<Id, Account>([SELECT Id, FirstName, LastName, CC_Numero_Documento__c, Name, RecordTypeId FROM Account WHERE Id = :idsCliente]);
+
+		// Obtener los RecordTypeIds necesarios
+		Id recordTypeIdAccount = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
+		Id recordTypeIdAccountClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
+		Id recordTypeIdContact = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
+
+		List<Account> cuentasTitularInsert = new List<Account>();
+		List<Contact> contactosTitularInsert = new List<Contact>();
+
+		Map<Id, Account> idTitularMap = new Map<Id, Account>();
+		for(Opportunity oportunidad : oportunidadesCrearTitular) {
+			Account cuentaTitulares = new Account();
+			cuentaTitulares.RecordTypeId = recordTypeIdAccount;
+			cuentaTitulares.Name = 'Cuenta titulares petición ' + oportunidad.CSBD_Identificador__c;
+			cuentasTitularInsert.add(cuentaTitulares);
+			idTitularMap.put(oportunidad.Id, cuentaTitulares);
+		}
+
+		insert cuentasTitularInsert;
+
+		for(Opportunity oportunidad : oportunidadesCrearTitular) {
+			Account cliente = idClienteMap.get(oportunidad.AccountId);
+			Contact titular1 = new Contact();
+			titular1.AccountId = idTitularMap.get(oportunidad.Id).Id;
+			titular1.RecordTypeId = recordTypeIdContact;
+			titular1.CC_Numero_Documento__c = cliente.CC_Numero_Documento__c;
+			
+			if(cliente.RecordTypeId == recordTypeIdAccountClientePA) {
+				titular1.FirstName = cliente.FirstName;
+				titular1.LastName = cliente.LastName;
+			} else {
+				titular1.LastName = cliente.Name;
+			}
+			contactosTitularInsert.add(titular1);
+		}
+
+		insert contactosTitularInsert;
+
+		for(Opportunity oportunidad : oportunidadesCrearTitular) {
+			oportunidad.CSBD_ContactoTitular1__c = contactosTitularInsert[oportunidadesCrearTitular.indexOf(oportunidad)].Id;
+		}
+
+		return oportunidadesCrearTitular;
 	}
 }

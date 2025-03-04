@@ -157,12 +157,12 @@ public with sharing class SAC_CaseReclamanteHandler {
 
     public static void rellenarDatosCaseReclamante(List<SAC_CaseReclamante__c> listNewCaseReclamante){
         Set<Id> setIdsAccounts = new Set<Id>();
+		List<Case> casosUpdate = new List<Case>();
         for (SAC_CaseReclamante__c reclamante : listNewCaseReclamante) {
             setIdsAccounts.add(reclamante.SAC_Account__c);
         }
 
-        Map<Id, Account> mapaAccounts = new Map<Id, Account>([SELECT Id, Phone, CC_Email__c, PersonEmail, ShippingPostalCode, CC_Segmento__c, CC_SubSegmento__c, BillingPostalCode, BillingStreet, BillingCity, BillingState, CC_Edad__pc,CC_Gestor_InTouch__c, CC_FechaNac__pc FROM Account WHERE Id IN :setIdsAccounts]);
-
+        Map<Id, Account> mapaAccounts = new Map<Id, Account>([SELECT Id, Phone, CC_Email__c, PersonEmail, ShippingPostalCode, CC_Segmento__c, CC_SubSegmento__c, BillingPostalCode, BillingStreet, BillingCity, BillingState, CC_Edad__pc,CC_Gestor_InTouch__c, CC_FechaNac__pc, AV_EAPGestor__c, AV_EAPGestor__r.AccountId FROM Account WHERE Id IN :setIdsAccounts]);
         for (SAC_CaseReclamante__c reclamante : listNewCaseReclamante) {
             if (mapaAccounts.containsKey(reclamante.SAC_Account__c)) {
                 reclamante.SAC_Telefono__c = mapaAccounts.get(reclamante.SAC_Account__c).Phone;
@@ -180,6 +180,15 @@ public with sharing class SAC_CaseReclamanteHandler {
 				reclamante.SAC_PoblacionContacto__c = mapaAccounts.get(reclamante.SAC_Account__c).BillingCity;
 				reclamante.SAC_ProvinciaContacto__c = mapaAccounts.get(reclamante.SAC_Account__c).BillingState;
 				reclamante.SAC_CodigoPostalContacto__c = mapaAccounts.get(reclamante.SAC_Account__c).BillingPostalCode;
+				reclamante.SAC_CodigoPostalContacto__c = mapaAccounts.get(reclamante.SAC_Account__c).BillingPostalCode;
+
+				String sOficina = mapaAccounts.get(reclamante.SAC_Account__c).AV_EAPGestor__r.AccountId;
+				if(!String.isBlank(sOficina)) {
+					Case oCaseUpd = new Case();
+					oCaseUpd.id = reclamante.SAC_Case__c;
+					oCaseUpd.CC_Oficina__c = sOficina;
+					casosUpdate.add(oCaseUpd);
+				}
 
                 if(String.isNotBlank(mapaAccounts.get(reclamante.SAC_Account__c).CC_Gestor_InTouch__c)){
 
@@ -192,5 +201,9 @@ public with sharing class SAC_CaseReclamanteHandler {
                 }
             }
         }
+
+		if(!casosUpdate.isEmpty()) {
+			SAC_DatabaseDML.updateListDML(casosUpdate, false);
+		}
     }
 }

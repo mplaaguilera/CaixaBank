@@ -19,22 +19,22 @@ public with sharing class SAC_CargarDatosMaestro_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
-        Database.insert(grupoColaborador);
+        SAC_DatabaseDML.insertDML(grupoColaborador, false);
 
         List <SAC_MaestroAccionesReclamacion__c> registroTareaMaestro = SAC_TestDataFactory.crearMaestroAcciones(2,grupoColaborador.id);
         registroTareaMaestro[0].SAC_Descripcion__c = 'Llamar cliente';
         registroTareaMaestro[1].SAC_Descripcion__c = 'Rellenar Formulario';
-        Database.insert(registroTareaMaestro);
+        SAC_DatabaseDML.insertListDML(registroTareaMaestro, false);
 
         //PRETENSION
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -42,14 +42,14 @@ public with sharing class SAC_CargarDatosMaestro_Test {
         camposPret.put('OwnerId', usuarioGeneral.id);
 
         Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(pretension);
+        SAC_DatabaseDML.insertDML(pretension, false);
 
         SAC_Accion__c tareaParaModificar = SAC_TestDataFactory.crearTareas(1,pretension,false)[0];
         tareaParaModificar.SAC_EquipoResponsable__c = grupoColaborador.id;
         tareaParaModificar.SAC_MaestroAccionesReclamacion__c = registroTareaMaestro[1].id;
         tareaParaModificar.SAC_Estado__c = 'SAC_PendienteEnviar';
         tareaParaModificar.OwnerId = usuarioGeneral.id;
-        Database.insert(tareaParaModificar);
+        SAC_DatabaseDML.insertDML(tareaParaModificar, false);
     }
 
     @istest
@@ -64,13 +64,13 @@ public with sharing class SAC_CargarDatosMaestro_Test {
 
         SAC_Accion__c tareaRTMaestro = SAC_TestDataFactory.crearTareas(1, pretension, true)[0];
         tareaRTMaestro.SAC_MaestroAccionesReclamacion__c = maestroTarea.id;
-        Database.insert(tareaRTMaestro);
+        SAC_DatabaseDML.insertDML(tareaRTMaestro, false);
             
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
     
 		System.runAs(usuario){
             Test.startTest();
-            Database.update(pretension);
+            SAC_DatabaseDML.updateDML(pretension, false);
             Test.stopTest();
         }        
 
@@ -98,7 +98,7 @@ public with sharing class SAC_CargarDatosMaestro_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
 		System.runAs(usuario){
             Test.startTest();
-            Database.update(tareaParaModificar);
+            SAC_DatabaseDML.updateDML(tareaParaModificar, false);
             Test.stopTest(); 
         }       
 
@@ -112,7 +112,6 @@ public with sharing class SAC_CargarDatosMaestro_Test {
     @istest
     static void borrarTarea(){
        
-        Case pretension = [SELECT ID FROM CASE WHERE SuppliedCompany = 'TestPret' LIMIT 1];
         SAC_MaestroAccionesReclamacion__c maestroTarea = [SELECT id, SAC_Descripcion__c 
                                                             FROM SAC_MaestroAccionesReclamacion__c 
                                                             WHERE SAC_Descripcion__c = 'Llamar cliente' 
@@ -125,14 +124,10 @@ public with sharing class SAC_CargarDatosMaestro_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
 		System.runAs(usuario){
             Test.startTest();
-            Database.delete(tareaParaModificar);
+            SAC_DatabaseDML.deleteDML(tareaParaModificar, false);
             Test.stopTest(); 
         }       
-
-        List<SAC_Accion__c> tareaInsertada = [SELECT SAC_Descripcion__c 
-                                            FROM SAC_Accion__c 
-                                            WHERE SAC_MaestroAccionesReclamacion__c = :maestroTarea.id];
                                
-        System.assertEquals(tareaInsertada.size(), 0, 'No se ha borrado la tarea');            
+        System.assertEquals([SELECT Count() FROM SAC_Accion__c WHERE SAC_MaestroAccionesReclamacion__c = :maestroTarea.id], 0, 'No se ha borrado la tarea');            
     }
 }

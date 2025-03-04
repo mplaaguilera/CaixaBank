@@ -4,14 +4,16 @@ public without sharing class SAC_EmailServiceConsultaCOPS_Test {
     static void makeData(){
         //usuario a usar
         List<User> usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertListDML(usuario, false);
+        //Database.insert(usuario);
 
         System.runAs(new User(Id = Userinfo.getUserId())) {
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario[0].Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
         }
     }
 
@@ -63,6 +65,6 @@ public without sharing class SAC_EmailServiceConsultaCOPS_Test {
         }
         Test.stopTest();
 
-        System.assertNotEquals([SELECT ID FROM Case].size(), 0, 'No se ha insertado el mail');
+        System.assertNotEquals([SELECT Count() FROM Case], 0, 'No se ha insertado el mail');
     }
 }

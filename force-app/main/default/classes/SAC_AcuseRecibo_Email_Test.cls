@@ -5,29 +5,34 @@ public class SAC_AcuseRecibo_Email_Test {
     static void makeData() {
         
         Account cuentaA = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
-        Database.insert(cuentaA);
+        SAC_DatabaseDML.insertDML(cuentaA, false); 
+        //Database.insert(cuentaA);
        
         User usuario;
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
             usuario.Username = 'sacacuserecibo@test.com';
-            Database.insert(usuario);
+            SAC_DatabaseDML.insertDML(usuario, false); 
+            //Database.insert(usuario);
         
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+            //Database.insert(permiSetAssi);
         }
         
         //Account
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false); 
+        //Database.insert(cuenta);
 
         //Contact
 		Contact contacto = SAC_TestDataFactory.crearContacto(1,cuenta.id)[0];
-		Database.insert(contacto);
+        SAC_DatabaseDML.insertDML(contacto, false); 
+		//Database.insert(contacto);
         
         System.runAs(usuario){
             EmailTemplate validEmailTemplate = new EmailTemplate(
@@ -39,7 +44,8 @@ public class SAC_AcuseRecibo_Email_Test {
                 Body = 'Texted', 
                 FolderId = UserInfo.getUserId()
             );
-            Database.insert(validEmailTemplate);    
+            SAC_DatabaseDML.insertDML(validEmailTemplate, false); 
+            //Database.insert(validEmailTemplate);    
         }
     }
     
@@ -62,7 +68,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla.RecordTypeId = recordTypeRedaccion;
         plantilla.Name = 'testPlantilla';
-        Database.insert(plantilla);
+        SAC_DatabaseDML.insertDML(plantilla, false); 
+       //Database.insert(plantilla);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -76,7 +83,8 @@ public class SAC_AcuseRecibo_Email_Test {
         camposRecl.put('SAC_TipoConsumidor__c', 'Si');
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+        //Database.insert(casoReclamacion);
 
         System.RunAs(usuario){   
             Test.startTest();
@@ -107,7 +115,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla.RecordTypeId = recordTypeRedaccion;
         plantilla.Name = 'testPlantilla';
-        Database.insert(plantilla);
+        SAC_DatabaseDML.insertDML(plantilla, false); 
+        //Database.insert(plantilla);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -121,7 +130,8 @@ public class SAC_AcuseRecibo_Email_Test {
         camposRecl.put('SAC_TipoConsumidor__c', 'Si');
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+        //Database.insert(casoReclamacion);
 
         System.RunAs(usuario){   
             Test.startTest();
@@ -151,7 +161,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla2.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla2.RecordTypeId = recordTypeRedaccion;
         plantilla2.Name = 'testPlantilla2';
-        Database.insert(plantilla2);
+        SAC_DatabaseDML.insertDML(plantilla2, false); 
+        //Database.insert(plantilla2);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -165,7 +176,8 @@ public class SAC_AcuseRecibo_Email_Test {
         camposRecl.put('SAC_TipoConsumidor__c', 'Si');
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+        //Database.insert(casoReclamacion);
     
         System.RunAs(usuario){   
             Test.startTest();
@@ -195,7 +207,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla2.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla2.RecordTypeId = recordTypeRedaccion;
         plantilla2.Name = 'testPlantilla2';
-        Database.insert(plantilla2);
+        SAC_DatabaseDML.insertDML(plantilla2, false); 
+        //Database.insert(plantilla2);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -209,7 +222,8 @@ public class SAC_AcuseRecibo_Email_Test {
         camposRecl.put('SAC_TipoConsumidor__c', 'Si');
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+        //Database.insert(casoReclamacion);
     
         System.RunAs(usuario){   
             Test.startTest();
@@ -239,7 +253,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla4.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla4.RecordTypeId = recordTypeRedaccion;
         plantilla4.Name = 'testPlantilla4';
-        Database.insert(plantilla4);
+        SAC_DatabaseDML.insertDML(plantilla4, false); 
+        //Database.insert(plantilla4);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -253,7 +268,8 @@ public class SAC_AcuseRecibo_Email_Test {
         camposRecl.put('SAC_TipoConsumidor__c', 'Si');
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+        //Database.insert(casoReclamacion);
         
         System.RunAs(usuario){   
             Test.startTest();
@@ -282,7 +298,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla5.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla5.RecordTypeId = recordTypeRedaccion;
         plantilla5.Name = 'testPlantilla5';
-        Database.insert(plantilla5);
+        SAC_DatabaseDML.insertDML(plantilla5, false); 
+        //Database.insert(plantilla5);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -296,7 +313,8 @@ public class SAC_AcuseRecibo_Email_Test {
        
         System.RunAs(usuario){   
             Test.startTest();
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+            //Database.insert(casoReclamacion);
             SAC_LCMP_AcuseReciboCartaPostal.envioEmail(casoReclamacion);
             Test.stopTest();
         }
@@ -322,7 +340,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla6.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla6.RecordTypeId = recordTypeRedaccion;
         plantilla6.Name = 'testPlantilla6';
-        Database.insert(plantilla6);
+        SAC_DatabaseDML.insertDML(plantilla6, false); 
+        //Database.insert(plantilla6);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -337,7 +356,8 @@ public class SAC_AcuseRecibo_Email_Test {
 
         System.RunAs(usuario){   
             Test.startTest();
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+            //Database.insert(casoReclamacion);
             SAC_LCMP_AcuseReciboCartaPostal.envioEmail(casoReclamacion);
             Test.stopTest();
         }
@@ -363,7 +383,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla6.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla6.RecordTypeId = recordTypeRedaccion;
         plantilla6.Name = 'testPlantilla6';
-        Database.insert(plantilla6);
+        SAC_DatabaseDML.insertDML(plantilla6, false); 
+        //Database.insert(plantilla6);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -378,7 +399,8 @@ public class SAC_AcuseRecibo_Email_Test {
 
         System.RunAs(usuario){   
             Test.startTest();
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+            //Database.insert(casoReclamacion);
             SAC_LCMP_AcuseReciboCartaPostal.envioEmail(casoReclamacion);
             Test.stopTest();
         }
@@ -404,7 +426,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla6.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla6.RecordTypeId = recordTypeRedaccion;
         plantilla6.Name = 'testPlantilla7';
-        Database.insert(plantilla6);
+        SAC_DatabaseDML.insertDML(plantilla6, false); 
+        //Database.insert(plantilla6);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -419,8 +442,9 @@ public class SAC_AcuseRecibo_Email_Test {
         
         System.RunAs(usuario){   
             Test.startTest();
-            Database.insert(casoReclamacion);
-            SAC_LCMP_AcuseReciboCartaPostal.envioEmailManual(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+            //Database.insert(casoReclamacion);
+            SAC_LCMP_AcuseReciboCartaPostal.envioEmailManual(casoReclamacion, 'webEmail');
             Test.stopTest();
         }
         
@@ -445,7 +469,8 @@ public class SAC_AcuseRecibo_Email_Test {
         plantilla6.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
         plantilla6.RecordTypeId = recordTypeRedaccion;
         plantilla6.Name = 'testPlantilla7';
-        Database.insert(plantilla6);
+        SAC_DatabaseDML.insertDML(plantilla6, false); 
+        //Database.insert(plantilla6);
         
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -457,7 +482,8 @@ public class SAC_AcuseRecibo_Email_Test {
         camposRecl.put('CC_Idioma__c', 'gr');
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+        //Database.insert(casoReclamacion);
         
         System.RunAs(usuario){   
             Test.startTest();
@@ -471,5 +497,48 @@ public class SAC_AcuseRecibo_Email_Test {
         
         List<EmailMessage> listaEmailMsgFinal  = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];        
         System.assertNotEquals(null, listaEmailMsgFinal, 'No se ha podido efectuar el envío de email');    
+    }
+    
+    @isTest
+    static void envioAcuseReciboEmail11Test(){
+        Id recordTypeRedaccion = Schema.SObjectType.SAC_PlantillaRedaccion__c.getRecordTypeInfosByDeveloperName().get('SAC_Redaccion').getRecordTypeId();
+        
+        List<EmailMessage> listaEmailMsg = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];
+
+        User usuario = [SELECT Id, UserName FROM User WHERE UserName = 'sacacuserecibo@test.com' AND isActive = true LIMIT 1];
+        EmailTemplate validEmailTemplate = [SELECT Id FROM EmailTemplate WHERE DeveloperName = 'SAC_Test'];
+        
+        SAC_PlantillaRedaccion__c plantilla6 = new SAC_PlantillaRedaccion__c();
+        plantilla6.SAC_TipoPlantilla__c = 'SAC_AcuseDeRecibo';
+		plantilla6.SAC_Origen__c = 'SAC_Manual';
+        plantilla6.SAC_PlantillaCastellanoId__c = validEmailTemplate.Id;
+        plantilla6.SAC_PlantillaCatalanId__c = validEmailTemplate.Id;
+        plantilla6.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
+        plantilla6.RecordTypeId = recordTypeRedaccion;
+        plantilla6.Name = 'testPlantilla7';
+        SAC_DatabaseDML.insertDML(plantilla6, false); 
+        //Database.insert(plantilla6);
+        
+        //Reclamacion
+        Map<String, Object> camposRecl = new Map<String, Object>();
+        camposRecl.put('Subject', 'TestRec');
+        camposRecl.put('Origin', 'SAC_Manual');
+        camposRecl.put('Status', 'SAC_001');
+        camposRecl.put('OwnerId', usuario.id);
+        camposRecl.put('OS_Email__c', 'test@test.com');
+        camposRecl.put('CC_Idioma__c', 'va');
+        
+        Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
+        
+        System.RunAs(usuario){   
+            Test.startTest();
+            SAC_DatabaseDML.insertDML(casoReclamacion, false); 
+            //Database.insert(casoReclamacion);
+            SAC_LCMP_AcuseReciboCartaPostal.envioEmailManual(casoReclamacion, 'correoCaso');
+            Test.stopTest();
+        }
+        
+        List<EmailMessage> listaEmailMsgFinal  = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];        
+        Assert.areNotEqual(null, listaEmailMsgFinal, 'No se ha podido efectuar el envío de email');    
     }
 }

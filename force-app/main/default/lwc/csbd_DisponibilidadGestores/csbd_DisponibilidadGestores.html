@@ -1,0 +1,199 @@
+<template>
+
+    <article class="slds-card cardDisponibilidadGestores">
+        <div class="slds-card__body slds-card__body_inner" style="margin: 0; padding: 0;">
+            <!--Fin sección de fecha mostrada y lookup de gestor seleccionado-->
+            <div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small" style="margin-bottom: 5px;">
+                <div lwc:if={calendarViews} class="divSeleccionFecha slds-col slds-grow-none slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-gutters_xx-small slds-truncate">
+
+                    <!--Botón de día anterior-->
+                    <div class="slds-col slds-grow-none">
+                        <lightning-button-icon
+                            icon-name="utility:left"
+                            variant="bare"
+                            tooltip="Día anterior"
+                            onclick={diaAnteriorSiguienteOnclick}
+                            data-offset="-1">
+                        </lightning-button-icon>
+                    </div>
+
+                    <!--Fecha del día que se está mostrando actualmente-->
+                    <div class="slds-col slds-grow-none slds-is-relative slds-truncate" style="top: 3px;">
+                        <span title="Ver calendario" style="cursor: pointer;" onclick={verCalendario}>
+                            <lightning-icon
+                                icon-name="utility:date_input"
+                                size="x-small"
+                                class="slds-var-m-right_small slds-is-relative"
+                                style="top: -2px;">
+                            </lightning-icon>
+
+                            <span class="slds-text-link slds-is-relative" style="top: -1px;">
+                                <lightning-formatted-date-time
+                                    value={fecha}
+                                    year="numeric"
+                                    month="long"
+                                    day="numeric"
+                                    weekday="long">
+                                </lightning-formatted-date-time>
+                            </span>
+                        </span>
+                    </div>
+
+                    <!--Botón de día siguiente-->
+                    <div class="slds-col slds-grow-none">
+                        <lightning-button-icon
+                            class="diaSiguiente"
+                            icon-name="utility:right"
+                            variant="bare"
+                            tooltip="Día siguiente"
+                            onclick={diaAnteriorSiguienteOnclick} data-offset="1">
+                        </lightning-button-icon>
+                    </div>
+                </div>
+
+                <!--Botón de refrescar eventos-->
+                <div class="slds-col slds-grow-none" style="padding-right: 0px; text-align: right;">
+                    <button class="botonRefrescarEventos slds-button slds-button_icon slds-button_icon-bare" title="Actualizar eventos" onclick={botonRefrescarEventosOnclick}>
+                        <lightning-icon icon-name="utility:refresh" size="xx-small"></lightning-icon>
+                    </button>
+                </div>
+
+                <!--Lookup de gestor seleccionado-->
+                <div class="slds-col slds-shrink-none slds-truncate" style="text-align: right; overflow: visible; height: auto; position: static;">
+                    <label class="slds-form-element__label slds-is-relative" style="padding-right: 6px; top: 1px;">
+                        <abbr class="slds-required">*</abbr>Gestor
+                    </label>
+
+                    <lightning-helptext
+                        content="Para modificar el gestor seleccionado, programa la cita en una franja horaria de su calendario."
+                        class="slds-var-m-right_medium slds-is-relative"
+                        style="top: 5px;">
+                    </lightning-helptext>
+
+                    <lightning-record-picker
+                        label="Gestor"
+                        object-api-name="User"
+                        value={idGestor}
+                        variant="label-hidden"
+                        required
+                        style="display: inline-block; width: 230px; pointer-events: none;"
+                        disabled>
+                    </lightning-record-picker>
+                </div>
+
+            </div>
+            <!--Fin sección de fecha mostrada y lookup de gestor seleccionado-->
+
+            <!--Calendarios-->
+            <div lwc:if={calendarViews} lwc:ref="gridCalendariosContainer" class={componente.calendariosContainerClass}>
+
+                <!--Tabla para la fila de cabecera con el nombre de los calendarios-->
+                <div class="slds-grid gridCalendariosFilaCabecera">
+                    <div class="slds-col gridCalendariosColumnaHoras"></div>
+
+                    <template for:each={calendarViews} for:item="calendarView">
+                        <div key={calendarView.id}
+                            class="slds-col cabeceraColumnaCalendario slds-truncate"
+                            data-publisher-id={calendarView.publisherId}>
+
+                            <span title={calendarView.publisherName}>{calendarView.publisherName}</span>
+                        </div>
+                    </template>
+                </div>
+
+                <!--Tabla para las filas de los tramos-->
+                <div class="gridCalendarios slds-grid borderNone">
+
+                    <!--Primera columna con la hora inicial de cada tramo-->
+                    <div class="gridCalendariosColumnaHoras slds-col">
+                        <div class="slds-grid slds-grid_vertical">
+
+                            <!--Filas con la hora inicial de cada tramo-->
+                            <template for:each={fechaTramos} for:item="fechaTramo">
+                                <div lwc:if={fechaTramo.esHoraEnPunto}
+                                    class="gridCalendariosColumnaHorasTramo slds-col slds-align_absolute-center"
+                                    key={fechaTramo.key}
+                                    data-fecha={fechaTramo.label}
+                                    data-hora-en-punto={fechaTramo.horaEnPunto}
+                                    data-es-horario-laboral={fechaTramo.esHorarioLaboral}>
+                                    {fechaTramo.label}
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!--Columnas para cada uno de los calendarios mostrados-->
+                    <template for:each={calendarViews} for:item="calendarView">
+                        <div class="gridCalendariosColumnaCalendarView slds-col"
+                            key={calendarView.id}
+                            data-publisher-id={calendarView.publisherId}>
+
+                            <div class="slds-grid slds-grid_vertical">
+                                <!--Celdas (filas) para los tramos del calendario-->
+                                <template for:each={calendarView.tramos} for:item="calendarViewTramo">
+                                    <div key={calendarViewTramo.key}
+                                        class="slds-col calendarViewTramo"
+                                        style={calendarViewTramo.style}
+                                        onclick={calendarViewTramoOnclick}
+                                        onmouseenter={calendarViewTramoOnmouseenter}
+                                        onmouseleave={calendarViewTramoOnmouseleave}
+                                        data-key={calendarViewTramo.key}
+                                        data-publisher-id={calendarView.publisherId}
+                                        data-hora={calendarViewTramo.label}
+                                        data-sin-eventos={calendarViewTramo.sinEventos}
+                                        data-es-hora-en-punto={calendarViewTramo.esHoraEnPunto}
+                                        data-hora-en-punto={calendarViewTramo.horaEnPunto}
+                                        data-es-horario-laboral={calendarViewTramo.esHorarioLaboral}>
+
+                                        <!--Divisiones del ancho de la celda de tramo para cada uno de sus eventos (en caso de existir alguno)-->
+                                        <div lwc:if={calendarViewTramo.eventos.length} class="slds-grid">
+
+                                            <template for:each={calendarViewTramo.eventos} for:item="evento">
+                                                <div key={evento.Id}
+                                                    class="slds-col slds-truncate slds-align_absolute-center"
+                                                    style="position: relative;">
+
+                                                    <span class="evento slds-truncate"
+                                                        style={evento.positionStyle}
+                                                        title={evento.title}
+                                                        onmouseenter={eventoOnmouseenter}
+                                                        onmouseleave={eventoOnmouseleave}
+                                                        data-id={evento.Id}
+                                                        data-hora={calendarViewTramo.label}
+                                                        data-publisher-id={calendarView.publisherId}
+                                                        data-es-tramo-inicial={evento.esTramoInicial}
+                                                        data-es-tramo-intermedio={evento.esTramoIntermedio}
+                                                        data-es-tramo-final={evento.esTramoFinal}>
+
+                                                        <!--Nombre del evento (en caso de ser el tramo inicial del evento)-->
+                                                        <template lwc:if={mostrarDetallesEventos}>
+                                                            <span lwc:if={evento.esTramoInicial} class="slds-text-color_weak" onclick={eventoOnclick} data-id={evento.Id}>
+                                                                <lightning-icon icon-name="utility:event" size="xx-small" class="slds-is-relative slds-var-m-right_x-small" style="top: -2px;"></lightning-icon>
+                                                                {evento.Subject}
+                                                            </span>
+                                                        </template>
+                                                    </span>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        <!--Tooltip de crear nuevo evento (en caso de no existir ningún evento en el tramo)-->
+                                        <div lwc:else class="calendarViewTramoAñadir slds-align_absolute-center">
+                                            <lightning-icon icon-name="standard:event" size="xx-small" class="slds-var-m-right_x-small" style="opacity: 0.8;"></lightning-icon>
+                                            <span class="slds-is-relative">{calendarViewTramo.label}</span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <!--Fin de la tabla para las filas de los tramos-->
+
+            </div>
+            <!--Fin calendarios-->
+
+        </div>
+    </article>
+
+</template>

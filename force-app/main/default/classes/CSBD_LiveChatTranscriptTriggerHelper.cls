@@ -20,11 +20,11 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
 	 * @param listNews  	list of new records
 	*/
 	public static List<LiveChatTranscript> checkTipo(List<LiveChatTranscript> listTranscript){
-        
+
         List<LiveChatTranscript> listData = new List<LiveChatTranscript>();
-		
+
         for(LiveChatTranscript dataNew : listTranscript){
-			if(dataNew.CC_Tipo__c == 'CSBD'){
+			if (dataNew.CC_Tipo__c == 'CSBD') {
 				listData.add(dataNew);
 			}
 		}
@@ -38,7 +38,7 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
 	 * @param listNews  	list of new records
 	*/
 	public static void assignRTCSBD(List<LiveChatTranscript> listNews){
-        
+
         Id recordTypeCSBD;
 
         if(recordTypeCSBD == null){
@@ -47,26 +47,26 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
         for(LiveChatTranscript transcript : listNews){
             transcript.RecordTypeId = recordTypeCSBD;
         }
-        
+
 	}
-    
+
     /**
 	 * @description		 	Asigna el owner del transcript a la opp
 	 * @param listNews  	list of new records
 	*/
 	public static void asignarOwnerOpp(List<LiveChatTranscript> listNews){
-        
+
         Set<Id> setOppId = new Set<Id>();
         Map<Id, Id> mapOpportunityTranscript = new Map<Id, Id>();
         List<Opportunity> lstOpp = new List<Opportunity>();
-        
+
         for(LiveChatTranscript transcript : listNews){
             if(transcript.CSBD_OTP_Chat__c != null){
                 setOppId.add(transcript.CSBD_Oportunidad_Id__c);
-                mapOpportunityTranscript.put(transcript.CSBD_Oportunidad_Id__c, transcript.OwnerId); 
+                mapOpportunityTranscript.put(transcript.CSBD_Oportunidad_Id__c, transcript.OwnerId);
             }
         }
-        
+
 		List<Opportunity> lstOpportunity = [Select Id, OwnerId from Opportunity where Id in :setOppId];
 
         if(!lstOpportunity.isEmpty()){
@@ -77,7 +77,7 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
                 }
         	}
         }
-        
+
         if(!lstOpp.isEmpty()){
             Database.update(lstOpp);
         }
@@ -103,14 +103,14 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
         if(!setOTP.isEmpty()){
 
             List<CBK_OTP_Generado__c> lstOTPGenerado = [Select CBK_Codigo_OTP__c, CBK_Fecha_Codigo_OTP__c, CBK_Oportunidad__c, CBK_Oportunidad__r.Account.Name, CBK_Oportunidad__r.AccountId, CBK_Oportunidad__r.ContactId, CBK_Oportunidad__r.CSBD_Now_NUMPERSO__c, CBK_Oportunidad__r.CSBD_Idioma_Solicitud__c, CBK_Oportunidad__r.CSBD_Familia_Producto__c from CBK_OTP_Generado__c where CBK_Codigo_OTP__c in :setOTP];
-            
+
             if(!lstOTPGenerado.isEmpty()){
                 for(CBK_OTP_Generado__c otp : lstOTPGenerado){
                     if(otp.CBK_Codigo_OTP__c != null){
-                    	mapNumPersoOTP.put(otp.CBK_Codigo_OTP__c, otp);    
+                    	mapNumPersoOTP.put(otp.CBK_Codigo_OTP__c, otp);
                     }
-                }  
-                
+                }
+
                 //Si el chat viene sin el OTP entonces da error
                 //Si el tiempo transcurrido desde que se pidió la sessionId y el momento de la llamada al chat es superior a 30min entonces error.
                 for(LiveChatTranscript transcript : listNews){
@@ -121,7 +121,7 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
                    }else{
 
                        Long minPeticion = CSBD_AppUtilities.calculateTimeDifferences(mapNumPersoOTP.get(transcript.CSBD_OTP_Chat__c).CBK_Fecha_Codigo_OTP__c, dateAhora);
-                
+
                        if(minPeticion >= 10){
                            //Error
                            transcript.addError('Transcurrido el tiempo de validez de la sesión. Por favor, solicita de nuevo el SessionId.');
@@ -136,7 +136,7 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
                        }
 
                     }
-                   
+
                }
 
             }
@@ -145,7 +145,7 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
             for(LiveChatTranscript transcript : listNews){
                 //Error
                 transcript.addError('Es necesario obtener el sessionId para conectar.');
-            }    
+            }
         }
 
 	}
@@ -161,12 +161,12 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
 
         for(LiveChatTranscript transcript : listNews){
 
-            
-            if(transcript.CSBD_Oportunidad_Id__c != null && 
-                (mapOldObj == null || 
+
+            if(transcript.CSBD_Oportunidad_Id__c != null &&
+                (mapOldObj == null ||
                 (mapOldObj != null && transcript.CSBD_Oportunidad_Id__c != mapOldObj.get(transcript.Id).CSBD_Oportunidad_Id__c))){
-                lstTranscripciones.add(transcript);          
-            }    
+                lstTranscripciones.add(transcript);
+            }
         }
 
         if(!lstTranscripciones.isEmpty()){
@@ -183,7 +183,7 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
     */
 	@future(callout = true)
     public static void crearTarea(String jsonTranscripciones) {
-		
+
 		List<LiveChatTranscript> lstTranscripciones = (List<LiveChatTranscript>) JSON.deserialize(jsonTranscripciones, List<LiveChatTranscript>.class);
         List<Task> lstTask = new List<Task>();
 
@@ -194,7 +194,7 @@ public with sharing class CSBD_LiveChatTranscriptTriggerHelper {
                 task.ActivityDate = todaysDate;
                 task.Subject = 'Conversación con agente chat';
                 task.Description = 'Conversación con agente chat.';
-                task.Type = 'Automática'; 
+                task.Type = 'Automática';
                 task.Status = 'Completed';
                 task.WhatId = transcript.CSBD_Oportunidad_Id__c;
                 task.CC_LiveChatTranscript_Id__c = transcript.Id;

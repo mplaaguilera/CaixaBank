@@ -176,6 +176,10 @@ global with sharing class CSBD_WS_AltaOportunidad {
 
 					respuestaLog += 'Producto oportunidad: ' + producto + '. ';
 
+					//Solo se comprueba la lógica de traspasar si indInTouch == 'S' 
+
+					if (solicitud.indInTouch == 'S'){
+
 					//¿Es empresa imagin?  -- el producto está dado de alta en la lista de valores -- no tenemos en cuenta indInTouch = S/N
 					if (oportunidadNowInSales) {
 						//Evaluamos producto si es imagin o caixa
@@ -240,6 +244,7 @@ global with sharing class CSBD_WS_AltaOportunidad {
 						respuestaLog += '¿Está dentro de horario? ' + !oportunidadNowInSales + '. ';
 						respuestaLog += 'Fecha asignación: ' + fechaEfectiva.date() + '. ';
 						respuestaLog += 'Hora asignación: ' + fechaEfectiva.time() + '. ';
+					}
 					}
 				}
 				else {
@@ -308,7 +313,7 @@ global with sharing class CSBD_WS_AltaOportunidad {
 		if (!oportunidadesCreadas.isEmpty()) {
 			CSBD_WS_AltaOportunidad_NowInSales.ejecutarLogicaAsincrona(JSON.serialize(new CSBD_WS_AltaOportunidad_NowInSales.InputLogicaAsincrona(oportunidadesCreadas)));
 			//Envio de mensaje RCS
-			CSBD_InfobipController.sendInfobipMessage(JSON.serialize(new CSBD_WS_AltaOportunidad_NowInSales.InputLogicaAsincrona(oportunidadesCreadas)));
+			//CSBD_InfobipController.sendInfobipMessage(JSON.serialize(new CSBD_WS_AltaOportunidad_NowInSales.InputLogicaAsincrona(oportunidadesCreadas)));
 		}
 
 		informarIdentificadoresRespuesta(retorno);

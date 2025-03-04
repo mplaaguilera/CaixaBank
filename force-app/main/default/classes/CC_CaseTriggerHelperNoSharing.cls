@@ -11,16 +11,16 @@ public without sharing class CC_CaseTriggerHelperNoSharing {
 
         if (!lstCasosUpdt.isEmpty()) {
             update lstCasosUpdt;
-        }        
+        }
     }
-    
+
     public static void calcularNumAgrupadores(List<Case> lstCasesCC, Map<Id, Case> mapOldObj) {
 
         List<Id> lstIdsAgrupador = new List<Id>();
         Map<Id, List<Case>> mapaCasosAgrupados = new Map<Id, List<Case>>();
         List<CC_Agrupador__c> agrupadores = new List<CC_Agrupador__c>();
-               
-       
+
+
         for(Case caso : lstCasesCC){
             if(caso.CC_Agrupador_Id__c != mapOldObj.get(caso.Id).CC_Agrupador_Id__c){
               if(caso.CC_Agrupador_Id__c != null){
@@ -60,15 +60,15 @@ public without sharing class CC_CaseTriggerHelperNoSharing {
             }
         }
     }
-    
+
     @future
 	public static void actualizarAgrupador(String jsonString){
 
 		List<CC_Agrupador__c> lstAgrupador = (List<CC_Agrupador__c>)Json.deserialize(jsonString,List<CC_Agrupador__c>.class);
         Database.update(lstAgrupador);
     }
-    
-    
-    
-    
+
+
+
+
 }

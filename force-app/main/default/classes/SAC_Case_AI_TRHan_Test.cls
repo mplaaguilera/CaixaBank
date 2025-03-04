@@ -16,7 +16,8 @@ public with sharing class SAC_Case_AI_TRHan_Test {
     static void makeData(){
         
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
 
         //Test.startTest();
 
@@ -26,21 +27,25 @@ public with sharing class SAC_Case_AI_TRHan_Test {
         listaRecOrigenEmail[0].SlaStartDate = system.today();
         listaRecOrigenEmail[0].SAC_FechaRecepcion__c = system.today();
         listaRecOrigenEmail[0].AccountId = cuenta.Id;
-        Database.insert(listaRecOrigenEmail);
+        SAC_DatabaseDML.insertListDML(listaRecOrigenEmail, false);
+        //Database.insert(listaRecOrigenEmail);
         
         List<Case> listaConsultas = SAC_TestDataFactory.crearConsulta(1);
         listaConsultas[0].SlaStartDate = system.today();
         listaConsultas[0].SAC_FechaRecepcion__c = system.today();
         listaConsultas[0].AccountId = cuenta.Id;
-        Database.insert(listaConsultas);
+        SAC_DatabaseDML.insertListDML(listaConsultas, false);
+        //Database.insert(listaConsultas);
 
         List<Case> listaPretensiones = SAC_TestDataFactory.crearPretension(1,listaRecOrigenEmail[0].id);
         listaPretensiones[0].SAC_FechaRecepcion__c = system.today();
-        Database.insert(listaPretensiones);
+        SAC_DatabaseDML.insertListDML(listaPretensiones, false);
+        //Database.insert(listaPretensiones);
 
         List<User> usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
-        usuarioGeneral[0].Username = 'ustestesteo@test.com';       
-        Database.insert(usuarioGeneral);
+        usuarioGeneral[0].Username = 'ustestesteo@test.com';
+        SAC_DatabaseDML.insertListDML(usuarioGeneral, false);       
+        //Database.insert(usuarioGeneral);
 
         //Test.stopTest();
 
@@ -57,7 +62,8 @@ public with sharing class SAC_Case_AI_TRHan_Test {
         List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
         if(psas.isEmpty()){
             PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-            Database.insert(psa);
+            SAC_DatabaseDML.insertDML(psa, false);
+            //Database.insert(psa);
         }
 
         System.RunAs(usuario){   
@@ -67,7 +73,8 @@ public with sharing class SAC_Case_AI_TRHan_Test {
             listaRecOrigenEmail2[0].Origin = 'Email';
             listaRecOrigenEmail2[0].SlaStartDate = system.today();
             listaRecOrigenEmail2[0].SAC_FechaRecepcion__c = system.today();
-            Database.insert(listaRecOrigenEmail2);
+            SAC_DatabaseDML.insertListDML(listaRecOrigenEmail2, false);
+            //Database.insert(listaRecOrigenEmail2);
             Test.stopTest();
         }
 

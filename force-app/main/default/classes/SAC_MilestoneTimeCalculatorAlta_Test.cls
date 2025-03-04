@@ -19,27 +19,27 @@ public with sharing class SAC_MilestoneTimeCalculatorAlta_Test {
           System.runAs(new User(Id = Userinfo.getUserId())) {
                //Usuario SAC General
                usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-               Database.insert(usuarioGeneral);
+               SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
                PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
                PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
                permiSetAssi.AssigneeId = usuarioGeneral.Id;
                permiSetAssi.PermissionSetId = permiSet.Id;
-               Database.insert(permiSetAssi);
+               SAC_DatabaseDML.insertDML(permiSetAssi, false);
           }
 
           //MCC
           String mccDetalleRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
           
           CC_MCC__c mccDetalle = new CC_MCC__c(Name='Prueba', CC_Codigo_Externo__c='a', RecordTypeId=mccDetalleRecordTypeId, CC_Tipo_Cliente__c='SAC');
-          Database.upsert(mccDetalle); 
+          SAC_DatabaseDML.upsertDML(mccDetalle, false);
   
           //PARAMETRIZACIONES MCC
           SAC_ParametrizacionSLATME__c parametrizacion1  = SAC_TestDataFactory.crearParamsSla('SLAAlta',1)[0];
           parametrizacion1.SAC_Duracion__c = 10;
           parametrizacion1.SAC_MCC__c = mccDetalle.Id;
           parametrizacion1.SAC_CanalProcedencia__c = ''; 
-          Database.upsert(parametrizacion1);
+          SAC_DatabaseDML.upsertDML(parametrizacion1, false);
   
           //Pretension
           Map<String, Object> camposPret = new Map<String, Object>();
@@ -48,7 +48,7 @@ public with sharing class SAC_MilestoneTimeCalculatorAlta_Test {
           camposPret.put('SEG_Detalle__c', mccDetalle.id);
         
           Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension', camposPret);
-          Database.insert(casoPretension);
+          SAC_DatabaseDML.insertDML(casoPretension, false);
 
           //Reclamacion
           Map<String, Object> camposRecl = new Map<String, Object>();
@@ -58,7 +58,7 @@ public with sharing class SAC_MilestoneTimeCalculatorAlta_Test {
           camposRecl.put('SAC_PretensionPrincipal__c', casoPretension.id);
         
           Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-          Database.insert(casoReclamacion);  
+          SAC_DatabaseDML.insertDML(casoReclamacion, false);
      }
 
      @istest
@@ -66,7 +66,7 @@ public with sharing class SAC_MilestoneTimeCalculatorAlta_Test {
           User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
           MilestoneType[] listMilestoneType = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-          if(listMilestoneType.size() == 0) { 
+          if(listMilestoneType.isEmpty()) { 
                return; 
           }
 

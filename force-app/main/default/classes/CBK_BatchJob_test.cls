@@ -1,8 +1,11 @@
 @isTest
 private class CBK_BatchJob_test {
+
     @isTest 
     static void executeBatch1() {
-        Id res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch');
+        Test.startTest();
+        	Id res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch');
+        Test.stopTest();
         System.assertNotEquals(res, null);  
         List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
         System.assertEquals(lstJobs.size(), 1);        
@@ -10,17 +13,23 @@ private class CBK_BatchJob_test {
 
     @isTest 
     static void executeBatch2() {
-        Id res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',0);
-        System.assertNotEquals(res, null);  
+        Test.startTest();
+        	Id res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',0);
+        Test.stopTest();
+        System.assertNotEquals(res, null);
         List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
-        System.assertEquals(lstJobs.size(), 1);     }    
+        System.assertEquals(lstJobs.size(), 1);
+    }    
 
     @isTest 
     static void executeBatch3() {
-        Id res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',100,0);
+        Test.startTest();
+        	Id res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',100,0);
+        Test.stopTest();
         System.assertNotEquals(res, null);  
         List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
-        System.assertEquals(lstJobs.size(), 1);     }  
+        System.assertEquals(lstJobs.size(), 1);     
+    }  
     
     @isTest 
     static void executeBatch4() {
@@ -31,20 +40,94 @@ private class CBK_BatchJob_test {
         }
         params.put('idAgrupadores',idAgrupadores);
         Id res;
-        System.runAs(createUser()) {
-            res = CBK_BatchJob.executeBatch('CC_Agrupador_Batch', 100,params);
-        }
+        Test.startTest();
+            System.runAs(createUser()) {
+                res = CBK_BatchJob.executeBatch('CC_Agrupador_Batch', 100,params);
+        	}
+        Test.stopTest();
 		System.assertNotEquals(res, null);  
         List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
         System.assertEquals(lstJobs.size(), 1);     
     }  
 
     @isTest 
+    static void executeBatch5() {
+        map<String,Object> params = New map<String,Object>();
+        List<Id> idAgrupadores = new List<Id>();
+        for (Case a : [select Id from Case limit 1]){
+            idAgrupadores.add(a.id);
+        }
+        params.put('idAgrupadores',idAgrupadores);
+        Id res;
+        Test.startTest();
+            System.runAs(createUser()) {
+                res = CBK_BatchJob.executeBatch('CC_Agrupador_Batch', 100,params,1);
+            }
+        Test.stopTest();
+		System.assertNotEquals(res, null);  
+        List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
+        System.assertEquals(lstJobs.size(), 1);     
+    }  
+
+    @isTest 
+    static void executeBatch6() {
+        map<String,Object> params = New map<String,Object>();
+        List<Id> idAgrupadores = new List<Id>();
+        for (Case a : [select Id from Case limit 1]){
+            idAgrupadores.add(a.id);
+        }
+        params.put('idAgrupadores',idAgrupadores);
+        Id res;
+        Test.startTest();
+            System.runAs(createUser()) {
+                res = CBK_BatchJob.executeBatch('CC_Agrupador_Batch', 100,params,1,'OT');
+            }
+        Test.stopTest();
+		System.assertNotEquals(res, null);  
+        List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
+        System.assertEquals(lstJobs.size(), 1);     
+    }  
+
+    @isTest 
+    static void executeBatchFutur() {
+        map<String,Object> params = New map<String,Object>();
+        List<Id> idAgrupadores = new List<Id>();
+        for (Case a : [select Id from Case limit 1]){
+            idAgrupadores.add(a.id);
+        }
+        params.put('idAgrupadores',idAgrupadores);
+        Test.startTest();
+            System.runAs(createUser()) {
+                CBK_BatchJob.executeBatchFuture('CC_Agrupador_Batch', 100,JSON.serialize(params));
+            }
+        Test.stopTest();
+        System.assertEquals(params==null, false);
+    } 
+
+    @isTest 
+    static void executeBatchFuturContext() {
+        map<String,Object> params = New map<String,Object>();
+        List<Id> idAgrupadores = new List<Id>();
+        for (Case a : [select Id from Case limit 1]){
+            idAgrupadores.add(a.id);
+        }
+        params.put('idAgrupadores',idAgrupadores);
+        Test.startTest();
+            System.runAs(createUser()) {
+                CBK_BatchJob.executeBatchFutureContext('CC_Agrupador_Batch', 100,JSON.serialize(params),'OT');
+            }
+        Test.stopTest();
+        System.assertEquals(params==null, false);
+    }  
+
+    @isTest 
     static void executeBatchContext1() {
         Id res;
-        System.runAs(createUser()) {
-            res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch','OT');
-        }
+        Test.startTest();
+            System.runAs(createUser()) {
+                res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch','OT');
+            }
+        Test.stopTest();
         System.assertNotEquals(res, null);  
         List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
         System.assertEquals(lstJobs.size(), 1);        
@@ -53,9 +136,11 @@ private class CBK_BatchJob_test {
     @isTest 
     static void executeBatchContext2() {
         Id res;
-        System.runAs(createUser()) {
-            res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',0,'OT');
-        }
+        Test.startTest();
+            System.runAs(createUser()) {
+                res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',0,'OT');
+            }
+        Test.stopTest();
         System.assertNotEquals(res, null);  
         List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
         System.assertEquals(lstJobs.size(), 1);     }    
@@ -63,9 +148,11 @@ private class CBK_BatchJob_test {
     @isTest 
     static void executeBatchContext3() {
         Id res;
-        System.runAs(createUser()) {
-            res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',100,0,'OT');
-        }
+        Test.startTest();
+            System.runAs(createUser()) {
+                res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',100,0,'OT');
+            }
+        Test.stopTest();
         System.assertNotEquals(res, null);  
         List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
         System.assertEquals(lstJobs.size(), 1);     }  
@@ -74,9 +161,11 @@ private class CBK_BatchJob_test {
     static void executeBatchContext4() {
         map<String,Object> params = New map<String,Object>();
         List<Id> idAgrupadores = new List<Id>();
-        for (Case a : [select Id from Case limit 1]){
-            idAgrupadores.add(a.id);
-        }
+        Test.startTest();
+            for (Case a : [select Id from Case limit 1]){
+                idAgrupadores.add(a.id);
+            }
+        Test.stopTest();
         params.put('idAgrupadores',idAgrupadores);
         
         Id res;
@@ -106,7 +195,11 @@ private class CBK_BatchJob_test {
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='INI';
         jobDef.UsuarioContexto__c = 'OT';
-        insert jobDef; 
+        
+        Test.startTest();
+        	insert jobDef; 
+        Test.stopTest();
+        
         CBK_BatchJob.statusBatch();
         System.assertNotEquals(jobDef.Id, null);
     }    
@@ -126,14 +219,21 @@ private class CBK_BatchJob_test {
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='INI';
         jobDef.UsuarioContexto__c = 'OT';
-        insert jobDef; 
+        
+        Test.startTest();
+        	insert jobDef; 
+        Test.stopTest();
+        
         CBK_BatchJob.reschedulledJobs();
         System.assertNotEquals(jobDef.Id, null);
     }        
     
     @isTest 
     static void batchOrder() {
-        Id res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',1);
+        Test.startTest();
+        	Id res = CBK_BatchJob.executeBatch('CBK_MonitorJobs_Batch',1);
+        Test.stopTest();
+        
         CBK_BatchJob.batchOrder();
         CBK_BatchJob.cleanBatchOrder();
         System.assertNotEquals(res, null);
@@ -142,9 +242,10 @@ private class CBK_BatchJob_test {
     
     @isTest 
     static void schedulleBatch() {
-        Id res = CBK_BatchJob.schedulleBatch ('CBK_MonitorJobs_Batch', 'CBK_MonitorJobs_Batch', 100, New map<String,Object>(),system.Now());
+        Test.startTest();
+        	Id res = CBK_BatchJob.schedulleBatch ('CBK_MonitorJobs_Batch_' + CBK_BatchJob_Helper.timestamp(), 'CBK_MonitorJobs_Batch', 100, New map<String,Object>(),system.Now());
+        Test.stopTest();
         System.assertNotEquals(res, null);
-        
     }   
     
     
@@ -167,8 +268,12 @@ private class CBK_BatchJob_test {
         jobDef.NextExec__c=system.now()-1;
         jobDef.Calc_NextExec__c='INI';
         jobDef.UsuarioContexto__c = 'OT';
-        insert jobDef; 
-        CBK_BatchJob.runBatches();
+        
+        Test.startTest();
+            insert jobDef; 
+            CBK_BatchJob.runBatches();
+        Test.stopTest();
+        
         System.assertNotEquals(jobDef.Id, null);
     }
     
@@ -191,10 +296,12 @@ private class CBK_BatchJob_test {
         jobDef.NextExec__c=system.now()-1;
         jobDef.Calc_NextExec__c='INI';
         jobDef.UsuarioContexto__c='CC';
-        insert jobDef; 
-        System.runAs(createUser()) {
-        	CBK_BatchJob.runBatches();
-        }
+        Test.startTest();
+            insert jobDef; 
+            System.runAs(createUser()) {
+                CBK_BatchJob.runBatches();
+            }
+        Test.stopTest();
         System.assertNotEquals(jobDef.Id, null);
     }
     
@@ -213,12 +320,14 @@ private class CBK_BatchJob_test {
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='INI';
         jobDef.UsuarioContexto__c = 'OT';
-        insert jobDef; 
-        CBK_BatchJob.reschedulledJobs();
-        CBK_BatchJob.statusBatch();
-        CBK_BatchJob.cleanBatchOrder();
-        CBK_BatchJob.BatchOrder();
-        CBK_BatchJob.runBatches();
+        Test.startTest();
+            insert jobDef; 
+            CBK_BatchJob.reschedulledJobs();
+            CBK_BatchJob.statusBatch();
+            CBK_BatchJob.cleanBatchOrder();
+            CBK_BatchJob.BatchOrder();
+            CBK_BatchJob.runBatches();
+        Test.stopTest();
         System.assertNotEquals(jobDef.Id, null);
     }  
     @isTest
@@ -236,16 +345,78 @@ private class CBK_BatchJob_test {
         jobDef.Activo__c=true;
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='INI';
-        insert jobDef; 
-        System.runAs(createUser()) {
-            CBK_BatchJob.reschedulledJobs();
-            CBK_BatchJob.statusBatch();
-            CBK_BatchJob.cleanBatchOrder();
-            CBK_BatchJob.BatchOrder();
-            CBK_BatchJob.runBatches();
-        }
+        Test.startTest();
+        	insert jobDef; 
+            System.runAs(createUser()) {
+                CBK_BatchJob.reschedulledJobs();
+                CBK_BatchJob.statusBatch();
+                CBK_BatchJob.cleanBatchOrder();
+                CBK_BatchJob.BatchOrder();
+                CBK_BatchJob.runBatches();
+            }
+        Test.stopTest();
         System.assertNotEquals(jobDef.Id, null);
     }  
+
+    @isTest 
+    static void executeBatchWithBuilder() {
+        map<String,Object> params = New map<String,Object>();
+        List<Id> idAgrupadores = new List<Id>();
+        for (Case a : [select Id from Case limit 1]){
+            idAgrupadores.add(a.id);
+        }
+        params.put('idAgrupadores',idAgrupadores);
+		Test.startTest();
+        	Id res;
+        	System.runAs(createUser()) {
+                res = CBK_BatchJob.executeBatch(new CBK_BatchJob.BatchProcessConfigBuilder('CBK_MonitorJobs_Batch')
+                    .setClassName('CBK_MonitorJobs_Batch')    
+                    .setBatchSize(100)
+                    .setUserContext('OT')
+                    .setParams(JSON.serialize(params))
+                    .setPriority(1)
+                    .setNotifyErrors(true)
+                    .setProject('project')
+                    .setNotificationEmail('testBatchUser@caixabankcc.com')
+                    .setNextExec(DateTime.now())
+                    .setType('Puntual')
+                    .execute());
+            }
+        Test.stopTest();
+        System.assertNotEquals(res, null);
+        List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c where Id = :res];
+        System.assertEquals(lstJobs.size(), 1);
+    } 
+    
+    @isTest 
+    static void executeBatchWithBuilder2() {
+        map<String,Object> params = New map<String,Object>();
+        List<Id> idAgrupadores = new List<Id>();
+        for (Case a : [select Id from Case limit 1]){
+            idAgrupadores.add(a.id);
+        }
+        params.put('idAgrupadores',idAgrupadores);
+		Test.startTest();
+        	Id res;
+        	System.runAs(createUser()) {
+                new CBK_BatchJob.BatchProcessConfigBuilder('CBK_MonitorJobs_Batch')
+                    .setClassName('CBK_MonitorJobs_Batch')    
+                    .setBatchSize(100)
+                    .setUserContext('OT')
+                    .setParams(JSON.serialize(params))
+                    .setPriority(1)
+                    .setNotifyErrors(true)
+                    .setProject('project')
+                    .setNotificationEmail('testBatchUser@caixabankcc.com')
+                    .setNextExec(DateTime.now())
+                    .setType('Puntual')
+                    .execute();
+            }
+        Test.stopTest();
+        List<CBK_Framework_Batch__c> lstJobs =  [Select Id from CBK_Framework_Batch__c];
+        System.assertEquals(lstJobs.size(), 1);
+    } 
+
     private static user createUser() {
         String uniqueUserName = 'testBatchUser' + DateTime.now().getTime() + '@caixabankcc.com';
         Profile p = [SELECT Id FROM Profile WHERE Name='System Administrator'];

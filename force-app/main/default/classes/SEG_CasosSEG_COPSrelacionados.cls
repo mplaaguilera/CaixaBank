@@ -12,16 +12,16 @@ public with sharing class SEG_CasosSEG_COPSrelacionados implements Queueable{
     public void execute(QueueableContext context) {
         Id recordTypeTask=CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task');
         List<Task> tareasCOPS = new List<Task>();
-        List<Case> casos = [SELECT Id, CC_CasoRelacionado__c, RecordType.DeveloperName FROM Case WHERE Createddate = TODAY AND Recordtype.Developername IN ('SEG_Cliente','SEG_Seguimiento','OS_Cliente','OS_Empleado') AND SEG_Id_Related_Mail__c = :messageId ORDER BY CREATEDDATE DESC LIMIT 2];
-        if(casos.size()==2){
-            casos[0].CC_CasoRelacionado__c =casos[1].Id;
-            casos[1].CC_CasoRelacionado__c =casos[0].Id;
-            for(Case caso : casos){
-                /* if(caso.RecordType.DeveloperName.startsWith('SEG')){
-                    caso.Status = 'Pendiente';
-                    caso.SEG_Subestado__c='En gestión UAFE';
-                } else */
-                if(caso.RecordType.DeveloperName.startsWith('OS')){
+        List<Case> casos = [SELECT Id, CC_CasoRelacionado__c, RecordType.DeveloperName FROM Case WHERE Createddate = TODAY AND Recordtype.Developername IN ('SEG_Cliente','SEG_Seguimiento','OS_Cliente','OS_Empleado') AND SEG_Id_Related_Mail__c = :messageId ORDER BY CREATEDDATE DESC];
+        List<Case> casosUpdate = new List<Case>();
+        List<Case> lstCasoSeg = new List<Case>();
+        List<Case> lstCasoCops = new List<Case>();
+
+        if(!casos.isEmpty()){
+            for (Case caso : casos) {
+                if(caso.RecordType.DeveloperName.startsWith ('SEG_')){
+                    lstCasoSeg.add(caso);
+                }else {
                     Task tarea = new Task();
                     tarea.RecordTypeId = recordTypeTask;
                     tarea.Type = 'Relación Segmentos';
@@ -31,25 +31,40 @@ public with sharing class SEG_CasosSEG_COPSrelacionados implements Queueable{
                     tarea.Description = body;
                     tarea.WhatId = caso.Id; 
                     tareasCOPS.add(tarea);
-                }
-            }      
-            if(!tareasCOPS.isEmpty()){
-                try {
-                    List<Database.SaveResult> results = Database.insert(tareasCOPS, false); 
-                } catch (Exception e) {
-                    
-                    CBK_Log.error(e, 'Error en insertar tarea', tareasCOPS);
+
+                    lstCasoCops.add(caso);
                 }
             }
-            if(!casos.isEmpty()){
-                try {
-                    List<Database.SaveResult> results = Database.update(casos, false); 
-                } catch (Exception e) {
-                    
-                    CBK_Log.error(e, 'Error en actualizar casos', casos);
+
+            if(!lstCasoSeg.isEmpty() && !lstCasoCops.isEmpty()){
+                for (Case casoSeg : lstCasoSeg) {
+                    casoSeg.CC_CasoRelacionado__c = lstCasoCops[0].Id;
+                    casosUpdate.add(casoSeg);
+                }
+
+                for (Case casoCops : lstCasoCops) {
+                    casoCops.CC_CasoRelacionado__c = lstCasoSeg[0].Id;
+                    casosUpdate.add(casoCops);
+                }
+                        
+                if(!tareasCOPS.isEmpty()){
+                    try {
+                        List<Database.SaveResult> results = Database.insert(tareasCOPS, false); 
+                    } catch (Exception e) {
+                        
+                        CBK_Log.error(e, 'Error en insertar tarea', tareasCOPS);
+                    }
+                }
+
+                if(!casosUpdate.isEmpty()){
+                    try {
+                        List<Database.SaveResult> results = Database.update(casosUpdate, false); 
+                    } catch (Exception e) {
+                        
+                        CBK_Log.error(e, 'Error en actualizar casos', casosUpdate);
+                    }
                 }
             }
-            
-        }
+        } 
     }
 }

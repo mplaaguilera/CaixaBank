@@ -25,6 +25,7 @@ public with sharing class CC_Opportunity_BU_TRHan extends CC_TriggerHandlerBase 
             crearTitularHipotecas(listNewObj, mapOldObj);
             calcularTMO(listNewObj, mapOldObj);
             informarCampoPrioridad(listNewObj, mapOldObj);
+            crearAccountTitular2(listNewObj, mapOldObj);
         }
     }
 
@@ -327,7 +328,7 @@ public with sharing class CC_Opportunity_BU_TRHan extends CC_TriggerHandlerBase 
                 for (Opportunity oportunidadValidar: oportunidadesValidar) {
                     String recordtypeName = Schema.SObjectType.Opportunity.getRecordTypeInfosById().get(oportunidadValidar.RecordtypeId).getName();
                     if(tiposOportunidadActivos.contains(recordtypeName)) {
-                        oportunidadValidar.addError('No se puede formalizar una oportunidad que tiene un importe 0');
+                        oportunidadValidar.addError('No se puede formalizar una oportunidad con importe 0€');
                     }
                 }
             }
@@ -421,6 +422,64 @@ public with sharing class CC_Opportunity_BU_TRHan extends CC_TriggerHandlerBase 
         }
     }
 
+    private static void crearAccountTitular2(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
+        List<Opportunity> oportunidadesCrearAccount = new List<Opportunity>();
+        List<Contact> contactosAActualizar = new List<Contact>();
+        List<Account> cuentasTitularInsert = new List<Account>();
+        Set<Id> contactoTitularIds = new Set<Id>();
+        Id recordTypeIdAccount = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
+
+        for (Opportunity newOpportunity : listNewObj) {
+            if (newOpportunity.RecordtypeId == Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('CSBD_Hipoteca').getRecordTypeId() &&
+                ((newOpportunity.CSBD_ContactoTitular1__c != null && mapOldObj.get(newOpportunity.Id).CSBD_ContactoTitular1__c == null) ||
+                 (newOpportunity.CSBD_ContactoTitular2__c != null && mapOldObj.get(newOpportunity.Id).CSBD_ContactoTitular2__c == null))) {
+                if (newOpportunity.CSBD_ContactoTitular1__c != null) contactoTitularIds.add(newOpportunity.CSBD_ContactoTitular1__c);
+                if (newOpportunity.CSBD_ContactoTitular2__c != null) contactoTitularIds.add(newOpportunity.CSBD_ContactoTitular2__c);
+                oportunidadesCrearAccount.add(newOpportunity);
+            }
+        }
+
+        Map<Id, Contact> mapContactoTitular = new Map<Id, Contact>([SELECT Id, AccountId FROM Contact WHERE Id IN :contactoTitularIds]);
+        Map <Id, Account> mapContactoCuenta = new Map<Id, Account>();
+
+        for (Opportunity newOpportunity : oportunidadesCrearAccount) {
+            Contact contactoTitular1 = mapContactoTitular.get(newOpportunity.CSBD_ContactoTitular1__c);
+            Contact contactoTitular2 = mapContactoTitular.get(newOpportunity.CSBD_ContactoTitular2__c);
+
+            if (contactoTitular1?.AccountId == null && contactoTitular2?.AccountId == null) {
+                Account cuentaTitulares = new Account(RecordTypeId = recordTypeIdAccount, Name = 'Cuenta titulares petición ' + newOpportunity.CSBD_Identificador__c);
+                cuentasTitularInsert.add(cuentaTitulares);
+                if (contactoTitular1 != null) {
+                    contactosAActualizar.add(contactoTitular1);
+                    mapContactoCuenta.put(contactoTitular1.Id, cuentaTitulares);
+                }
+                if (contactoTitular2 != null) {
+                    contactosAActualizar.add(contactoTitular2);
+                    mapContactoCuenta.put(contactoTitular2.Id, cuentaTitulares);
+                }
+            } else if (contactoTitular1?.AccountId == null && contactoTitular2?.AccountId != null && contactoTitular1 != null) {
+                    contactoTitular1.AccountId = contactoTitular2.AccountId;
+                    contactosAActualizar.add(contactoTitular1);
+            } else if (contactoTitular1?.AccountId != null && contactoTitular2?.AccountId == null && contactoTitular2 != null) {
+                    contactoTitular2.AccountId = contactoTitular1.AccountId;
+                    contactosAActualizar.add(contactoTitular2);
+            }
+        }
+
+        if (!cuentasTitularInsert.isEmpty()) insert cuentasTitularInsert;
+
+        for (Contact contacto : contactosAActualizar) {
+            if (contacto.AccountId == null) {
+                Account cuentaTitular = mapContactoCuenta.get(contacto.Id);
+                if (cuentaTitular != null) {
+                    contacto.AccountId = cuentaTitular.Id;
+                }
+            }
+        }
+
+        if (!contactosAActualizar.isEmpty()) update contactosAActualizar;
+    }
+
     private static List<Opportunity> descartarOportunidadesNoCsbd(List<Opportunity> oportunidades) {
         List<Opportunity> oportunidadesCsbd = new List<Opportunity>();
         Map<Id, Schema.RecordTypeInfo> recordTypeInfos = Schema.SObjectType.Opportunity.getRecordTypeInfosById();
@@ -457,7 +516,7 @@ public with sharing class CC_Opportunity_BU_TRHan extends CC_TriggerHandlerBase 
                 || newOportunidad.CSBD_AportacionInicial__c != oldOportunidad.CSBD_AportacionInicial__c
                 || newOportunidad.CSBD_TipoOperacion2__c != oldOportunidad.CSBD_TipoOperacion2__c
                 || newOportunidad.CSBD_Datos_Calculo_DTI__c != oldOportunidad.CSBD_Datos_Calculo_DTI__c)) {
-                    
+
                 oportunidades.add(newOportunidad);
             }
         }

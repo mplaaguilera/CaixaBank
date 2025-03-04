@@ -13,42 +13,6 @@ public class HDT_Case_AU_TRHan_Test {
         params.HDT_Configuracion_2__c = owa[0].Address;
         insert params;
 
-        //crear usuarios CC
-        /*List<User> userList = new List<User>();
-        User usuario1 = new User();
-        usuario1.ProfileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
-        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO'];
-        usuario1.FirstName = 'first 1';
-        usuario1.LastName = 'last1';
-        usuario1.Email = 'tuser000@amamama.com';
-        usuario1.Username = 'tuser000@amamama.com' + System.currentTimeMillis();
-        usuario1.CompanyName = 'MST';
-        usuario1.Title = 'title';
-        usuario1.Alias = 'alias';
-        usuario1.TimeZoneSidKey = 'Europe/Paris';
-        usuario1.EmailEncodingKey = 'UTF-8';
-        usuario1.LanguageLocaleKey = 'es';
-        usuario1.LocaleSidKey = 'es_ES';
-        userList.add(usuario1);
-
-        User usuario2 = new User();
-        usuario2.ProfileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
-        usuario2.FirstName = 'first2';
-        usuario2.LastName = 'last2';
-        usuario2.Email = 'tuser000@amamama.com';
-        usuario2.Username = 'tuser001@amamama.com' + System.currentTimeMillis();
-        usuario2.CompanyName = 'DXC';
-        usuario2.Title = 'title';
-        usuario2.Alias = 'alias';
-        usuario2.TimeZoneSidKey = 'Europe/Paris';
-        usuario2.EmailEncodingKey = 'UTF-8';
-        usuario2.LanguageLocaleKey = 'es';
-        usuario2.LocaleSidKey = 'es_ES';
-        userList.add(usuario2);
-        insert userList;
-        insert new PermissionSetAssignment(AssigneeId = usuario1.Id, PermissionSetId = ps.Id);
-        insert new PermissionSetAssignment(AssigneeId = usuario2.Id, PermissionSetId = ps.Id);*/
-
         List<String> developerNamesPlantillas = new List<String>{'CC_ConsultasOperativasCanalFormulario_Traslado_CAS','CC_ConsultasOperativasCanalFormulario_Traslado_CAT','CC_ConsultasOperativasCanalFormulario_Asignacion_CAS','CC_ConsultasOperativasCanalFormulario_Asignacion_CAT'};
 		List<EmailTemplate> plantillas = [SELECT Id, Name FROM EmailTemplate WHERE DeveloperName IN :developerNamesPlantillas];
         List<EmailTemplate> plantillasAInsertar = new List<EmailTemplate>();
@@ -100,6 +64,41 @@ public class HDT_Case_AU_TRHan_Test {
             plantillasAInsertar.Add(plantilla2CAT);
             insert plantillasAInsertar;
         	}
+
+            CC_Lista_Valores__c lovAvisosSobreAgrupadores2 = new CC_Lista_Valores__c();
+        lovAvisosSobreAgrupadores2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+        lovAvisosSobreAgrupadores2.CC_Activa__c = true;
+        lovAvisosSobreAgrupadores2.Name = 'HDT - Aviso Comunicaciones Informativas';
+        insert lovAvisosSobreAgrupadores2;
+
+        CC_Lista_Valores__c valorUmbralSiguientesAvisosx = new CC_Lista_Valores__c();
+        valorUmbralSiguientesAvisosx.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralSiguientesAvisosx.CC_Activa__c = true;
+        valorUmbralSiguientesAvisosx.CC_Lista__c = lovAvisosSobreAgrupadores2.Id;
+        valorUmbralSiguientesAvisosx.Name = 'Comunicación Informativa de Caso - Umbral de tiempo';
+        valorUmbralSiguientesAvisosx.CC_Valor__c = '15';
+
+        CC_Lista_Valores__c valorUmbralSiguientesAvisosx1 = new CC_Lista_Valores__c();
+        valorUmbralSiguientesAvisosx1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralSiguientesAvisosx1.CC_Activa__c = true;
+        valorUmbralSiguientesAvisosx1.CC_Lista__c = lovAvisosSobreAgrupadores2.Id;
+        valorUmbralSiguientesAvisosx1.Name = 'Comunicación Informativa de Caso - Umbral Envio de Emails';
+        valorUmbralSiguientesAvisosx1.CC_Valor__c = '15';
+
+        CC_Lista_Valores__c valorUmbralSiguientesAvisosx2 = new CC_Lista_Valores__c();
+        valorUmbralSiguientesAvisosx2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralSiguientesAvisosx2.CC_Activa__c = true;
+        valorUmbralSiguientesAvisosx2.CC_Lista__c = lovAvisosSobreAgrupadores2.Id;
+        valorUmbralSiguientesAvisosx2.Name = 'Comunicación Informativa de Caso - Umbral primer aviso';
+        valorUmbralSiguientesAvisosx2.CC_Valor__c = '3';
+
+        List<CC_Lista_Valores__c> valorUmbralInsertx = new List<CC_Lista_Valores__c>();
+        valorUmbralInsertx.add(valorUmbralSiguientesAvisosx);
+        valorUmbralInsertx.add(valorUmbralSiguientesAvisosx1);
+        valorUmbralInsertx.add(valorUmbralSiguientesAvisosx2);
+        
+        insert valorUmbralInsertx;
+
     }
 
     private static void crearListaDeValores() {
@@ -126,6 +125,8 @@ public class HDT_Case_AU_TRHan_Test {
         valorUmbralInsert.add(valorUmbralPrimerAviso);
         valorUmbralInsert.add(valorUmbralSiguientesAvisos);
         insert valorUmbralInsert;
+
+        
     }
 
     @isTest

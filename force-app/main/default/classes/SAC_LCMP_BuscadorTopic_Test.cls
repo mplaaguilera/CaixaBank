@@ -17,7 +17,8 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
 
         //Usuario SAC_General
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);
+        //Database.insert(usuarioGeneral);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -28,21 +29,27 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         camposRecl.put('OwnerId', usuarioGeneral.id);
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
 
 
         Topic topic = new Topic(Name = 'SACTopic1');
-        Database.insert(topic);
+        SAC_DatabaseDML.insertDML(topic, false);
+        //Database.insert(topic);
         Topic topic2 = new Topic(Name = 'SACTopic2');
-        Database.insert(topic2);
+        SAC_DatabaseDML.insertDML(topic2, false);
+        //Database.insert(topic2);
 
         TopicAssignment topicAssig = new TopicAssignment(TopicId=topic.Id, EntityId=casoReclamacion.Id);
-        Database.insert(topicAssig);
+        SAC_DatabaseDML.insertDML(topicAssig, false);
+        //Database.insert(topicAssig);
 
         SAC_MaestroTemas__c maestroT= new SAC_MaestroTemas__c(Name = 'SACTopic1', SAC_OrdenPrelacion__c = 1);
-        Database.insert(maestroT);
+        SAC_DatabaseDML.insertDML(maestroT, false);
+        //Database.insert(maestroT);
         SAC_MaestroTemas__c maestroT2= new SAC_MaestroTemas__c(Name = 'SACTopic2', SAC_OrdenPrelacion__c = 2);
-        Database.insert(maestroT2);
+        SAC_DatabaseDML.insertDML(maestroT2, false);
+        //Database.insert(maestroT2);
 
     }
     @istest
@@ -54,7 +61,8 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         Test.startTest();
         System.runAs(usuario) {
             tw = SAC_LCMP_BuscadorTopic.cargarDatos(usuario.id, caso.id);
@@ -72,7 +80,8 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         Test.startTest();
         System.runAs(usuario) {
             maestroTemas = SAC_LCMP_BuscadorTopic.getResultados('Topic');
@@ -90,7 +99,8 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         Boolean insertado;
         Test.startTest();
         System.runAs(usuario) {
@@ -111,7 +121,8 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         Test.startTest();
         System.runAs(usuario) {
             try {

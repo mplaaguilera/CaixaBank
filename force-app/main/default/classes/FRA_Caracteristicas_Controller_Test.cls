@@ -3,6 +3,19 @@ public with sharing class FRA_Caracteristicas_Controller_Test {
     
     @TestSetup
 	private static void testSetup() {
+		Id idRtServicioGenesys = Schema.SObjectType.CC_Servicio_Genesys__c.getRecordTypeInfosByDeveloperName().get('CC_Servicio').getRecordTypeId();
+        CC_Servicio_Genesys__c s1 = new CC_Servicio_Genesys__c();
+		s1.RecordTypeId = idRtServicioGenesys;
+		s1.Name = 'Servicio 1';
+		s1.CC_Codigo__c = 'S1';
+		s1.CBK_Negocio__c = 'HDT';
+		s1.CC_VDN__c = '4444444';
+		s1.CC_Tipo__C = 'Servicio';
+		s1.CC_Canal_Procedencia__c = 'Teléfono FRAUDE Banca Internacional';
+		s1.CC_Prefijo__c = '0';
+		s1.CC_Tipo_Cliente__c = 'Empleado';
+
+        insert new List<CC_Servicio_Genesys__c>{s1};
         Id perfilAdministradorId = [SELECT Id FROM Profile
 									WHERE Name IN ('System Administrator', 'Administrador del sistema') LIMIT 1].Id;
 
@@ -70,7 +83,9 @@ public with sharing class FRA_Caracteristicas_Controller_Test {
         //Empleado y empleado gestor
 		Id idRecordTypeContactoEmpleado = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
        
+		Id idRecordTypeClientePersonal = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
 
+		
 		Account oficina = new Account(
 			RecordTypeId = idRecordTypeOficina,
 			Name = 'Cuenta',
@@ -87,8 +102,15 @@ public with sharing class FRA_Caracteristicas_Controller_Test {
             Name = 'Cuenta Otra',
             RecordTypeId = idRecordTypeContactoEmpleado
         );
+
+        // Crear cuenta con otro RecordType
+        Account cuentaPersonal = new Account(
+			LastName = 'asd',
+			RecordTypeId = idRecordTypeClientePersonal
+		);
+
        
-		insert new List<Account>{oficina, oficinaEmpleadoGestor,cuentaOtra};
+		insert new List<Account>{oficina, oficinaEmpleadoGestor,cuentaOtra,cuentaPersonal};
 
 		Id idRecordTypeEmpleado = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         Id idRecordTypeClienteCaso = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
@@ -152,7 +174,7 @@ public with sharing class FRA_Caracteristicas_Controller_Test {
 		caso2.CC_Canal_Procedencia__c = 'Teléfono FRAUDE Banca Internacional';
 		insert caso2;
 
-         //Caso
+        //Caso
 		Case caso3 = new Case();
 		caso3.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('FRA_Cliente').getRecordTypeId();
 		caso3.Subject = 'Caso Test';
@@ -164,10 +186,10 @@ public with sharing class FRA_Caracteristicas_Controller_Test {
 		caso3.CC_Canal_Procedencia__c = 'Teléfono FRAUDE Banca Internacional';
 		insert caso3;
 
-         //Caso
+        //Caso
 		Case caso4 = new Case();
 		caso4.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('FRA_Cliente').getRecordTypeId();
-		caso4.Subject = 'Caso Test';
+		caso4.Subject = 'Caso Test cliente';
         caso4.ContactId = clientec.Id;
 		caso4.Origin = 'Phone';
 		caso4.CC_Canal_Respuesta__c = 'Phone';
@@ -176,7 +198,31 @@ public with sharing class FRA_Caracteristicas_Controller_Test {
 		caso4.CC_Canal_Procedencia__c = 'Teléfono FRAUDE Banca Internacional';
 		insert caso4;
 
+        //Caso
+		 Case caso5 = new Case();
+		 caso5.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('FRA_Cliente').getRecordTypeId();
+		 caso5.Subject = 'Caso Test';
+		 caso5.AccountId = cuentaPersonal.Id;
+		 caso5.Origin = 'Phone';
+		 caso5.CC_Canal_Respuesta__c = 'Phone';
+		 caso5.CC_Tipo_Cliente__c = 'Empleado';
+		 caso5.CC_No_Identificado__c = true;
+		 caso5.CC_Canal_Procedencia__c = 'Teléfono FRAUDE Banca Internacional';
+		 insert caso5;
         
+		 CC_Canal_Com__c canalComunicacionEmpleado = new CC_Canal_Com__c();
+		 canalComunicacionEmpleado.RecordTypeId = Schema.SObjectType.CC_Canal_Com__c.getRecordTypeInfosByDeveloperName().get('CC_Telefono').getRecordTypeId();
+		 canalComunicacionEmpleado.CC_Clase_Com__c = '1';
+		 canalComunicacionEmpleado.CC_ContactoId__c = empleado.Id;
+		 canalComunicacionEmpleado.CC_Telefono__c = '555555555';
+ 
+		 CC_Canal_Com__c canalComunicacionGestor = new CC_Canal_Com__c();
+		 canalComunicacionGestor.RecordTypeId = Schema.SObjectType.CC_Canal_Com__c.getRecordTypeInfosByDeveloperName().get('CC_Telefono').getRecordTypeId();
+		 canalComunicacionGestor.CC_Clase_Com__c = '1';
+		 canalComunicacionGestor.CC_ContactoId__c = empleadoGestor.Id;
+		 canalComunicacionGestor.CC_Telefono__c = '777777777';
+		 insert new List<CC_Canal_Com__c>{canalComunicacionEmpleado, canalComunicacionGestor};
+
 		HDT_Parametros__c params = new HDT_Parametros__c();
         params.Name = 'HDT_Email_Respuesta_Empleados_New';
         params.HDT_Configuracion_1__c = 'pruebas.empleados.hdt.devser@gmail.com';
@@ -402,61 +448,34 @@ public with sharing class FRA_Caracteristicas_Controller_Test {
 
 		}
 	}
-	/*
+
 	@isTest
-	static void testAsociarCaracteristicaCuenta() {
+	static void testAsociarCaracteristicaCuenta(){
 		Id psAdministradorId = obtenerPSAdministrador();
-		User agenteConsulta = obtenerAgente1(psAdministradorId);
-	
-		Id idRecordTypeContactoEmpleado = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+		User agenteConsulta  = obtenerAgente1(psAdministradorId);
 
-		Account cuentaOtra = new Account(
-            Name = 'Cuenta Otra',
-            RecordTypeId = idRecordTypeContactoEmpleado
-        );
-		//Account idAccount= [SELECT Id FROM Account WHERE Name= 'Cuenta otra'LIMIT 1] ;
+		Case caso = [SELECT AccountId FROM Case WHERE AccountId != NULL AND RecordType.DeveloperName = 'FRA_Cliente' AND Account.RecordType.DeveloperName ='CC_ClientePA' LIMIT 1];
+		CC_Caracteristica__c caracteristica = [ SELECT Id FROM CC_Caracteristica__c WHERE OS_Negocio__c= 'FRA' AND RecordType.DeveloperName ='CC_Cliente_Cuenta' AND CC_Activo__c =true LIMIT 1];
 
-		// Crear un caso asociado a la cuenta
-
-	
 		System.runAs(agenteConsulta) {
 
-			Case caso = new Case(
-				AccountId = cuentaOtra.Id,
-				RecordTypeId = [SELECT Id FROM RecordType WHERE SObjectType = 'Case' AND DeveloperName = 'FRA_Cliente' LIMIT 1].Id,
-				Status = 'Nuevo',
-				Origin = 'Web'
-			);
-			insert caso;
-		
-			// Crear la característica necesaria
-			CC_Caracteristica__c caracteristica = new CC_Caracteristica__c(
-				Name = 'Característica Test',
-				CC_Descripcion__c = 'Esta es la descripción de la primera característica y ocupa más de cincuenta caracteres.',
-				OS_Negocio__c = 'FRA',
-				RecordTypeId = [SELECT Id FROM RecordType WHERE SObjectType = 'CC_Caracteristica__c' AND DeveloperName = 'CC_Cliente_Cuenta' LIMIT 1].Id);
-			insert caracteristica;
 
-			Test.startTest();
-			
-			FRA_Caracteristicas_Controller.asociarCaracteristicaCuenta(caso.Id, caracteristica.Id);
-			Test.stopTest();
-	
-			// Validar que se haya creado el detalle
-			List<CC_Caracteristica_Detalle__c> detalle = [SELECT Id FROM CC_Caracteristica_Detalle__c WHERE CC_Caracteristica__r.Id = :caracteristica.Id];
-			System.assertEquals(1, detalle.size());
+		Test.startTest();
+		FRA_Caracteristicas_Controller.asociarCaracteristicaCuenta(caso.id , caracteristica.Id);
+		Test.stopTest();
+
+		Integer detalle = [SELECT COUNT() FROM CC_Caracteristica_Detalle__c WHERE CC_Caracteristica__r.Id = :caracteristica.Id];
+		System.assertEquals(4, detalle, 'Tiene que haber 4 característica');
+
 		}
 	}
-	
 
-*/
-	
 	@isTest
 	static void testAsociarCaracteristicaContacto(){
 		Id psAdministradorId = obtenerPSAdministrador();
         User agenteConsulta  = obtenerAgente1(psAdministradorId);
 
-		Case caso = [SELECT AccountId FROM Case WHERE AccountId != NULL AND RecordType.DeveloperName = 'FRA_Cliente' LIMIT 1];
+		Case caso = [SELECT AccountId FROM Case WHERE AccountId != NULL AND RecordType.DeveloperName = 'FRA_Cliente' AND Subject= 'Caso Test cliente' LIMIT 1];
 		CC_Caracteristica__c caracteristica = [ SELECT Id FROM CC_Caracteristica__c WHERE OS_Negocio__c= 'FRA' AND RecordType.DeveloperName ='CC_Cliente_Contacto' AND CC_Activo__c =true LIMIT 1];
 
 		System.runAs(agenteConsulta) {
@@ -470,5 +489,61 @@ public with sharing class FRA_Caracteristicas_Controller_Test {
         System.assertEquals(1, detalle, 'Tiene que haber 1 característica');
 
 		}
+	}
+
+
+	@isTest
+	public static void cogerColgar() {
+		Id psAdministradorId = obtenerPSAdministrador();
+        User agenteConsulta  = obtenerAgente1(psAdministradorId);
+
+		System.runAs(agenteConsulta) {
+			CC_Creacion_Datos_Test.lovAvisosSobreAgrupadores();
+			CC_Servicio_Genesys__c s1 = [SELECT CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE Name = 'Servicio 1'];
+
+			Test.startTest();
+			//Entra la llamada
+			CC_Llamada_Input inputLlamada = obtenerInputLlamada(s1.CC_Codigo__c, '', '');
+			Map<String, Object> retornoRegistrarLlamadaEntrante = FRA_Llamada_GC.registrarLlamadaEntrante(inputLlamada);
+			CC_Llamada__c llamadaEntrante = (CC_Llamada__c)retornoRegistrarLlamadaEntrante.get('llamada');
+			System.assert(llamadaEntrante != null, 'La llamada no debería ser nula');
+
+			//Creamos caso manualmente y lo cerramos con actividades de llamada abiertas
+			Case caso = FRA_Llamada_GC.crearVincularCaso(llamadaEntrante, true);
+
+            // testConseguirCaracteristicaCuentaLlamada_CentroCaixaBank
+             // Llamar al método que se está probando
+            List<CC_Caracteristica_Detalle__c> caracteristicas = FRA_Caracteristicas_Controller.conseguirCaracteristicaCuentaLlamada(llamadaEntrante.Id);
+            List<CC_Caracteristica_Detalle__c> caracteristicas2 = FRA_Caracteristicas_Controller.conseguirCaracteristicaContactoLlamada(llamadaEntrante.Id);
+            // Verificar que se recupera la característica esperada
+			System.assertEquals(0, caracteristicas.size(), 'No coincide la cantidad de características asociadas a la cuenta');
+			System.assertEquals(0, caracteristicas2.size(), 'No coincide la cantidad de características asociadas al contacto');
+            
+            
+			Test.stopTest();
+
+			Task actividad = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaEntrante.Id AND Type = 'Llamada entrante' AND Status = 'Open' LIMIT 1];
+			System.assert(actividad != null);
+			HDT_Llamada_GC.finalizarLlamada(inputLlamada, 'Llamada finalizada');
+		} 
+	}
+
+	private static CC_Llamada_Input obtenerInputLlamada(String servicio, String llamadaId, String casoId) {
+		CC_Llamada_Input inputLlamada = new CC_Llamada_Input();
+		inputLlamada.usuario = '1218';
+		inputLlamada.connId = '12345678';
+		inputLlamada.ani = '555555555';
+		inputLlamada.dnis = '666666666';
+		inputLlamada.servicio = servicio;
+		inputLlamada.asunto = 'Asunto';
+		inputLlamada.idioma = 'Castellano';
+		inputLlamada.datos = 'Datos';
+		inputLlamada.connIdCognitivo = '87654321';
+		inputLlamada.casoId = casoId == null ? '' : casoId;
+		inputLlamada.salesforceParentId = null;
+		inputLlamada.statusAuto = 'APPROVED';
+		inputLlamada.perfil = 'EMPLEADOS';
+		inputLlamada.llamadaId = llamadaId == null ? '' : llamadaId;
+		return inputLlamada;
 	}
 }

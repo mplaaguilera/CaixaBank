@@ -83,7 +83,12 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 				//eslint-disable-next-line @lwc/lwc/no-async-operation
 				window.setTimeout(() => this.mostrarControles(), 400);
 				this.generarInteractionId();
-				this.template.querySelector('.bannerEstadoSuscripcion').focus();
+				window.setTimeout(() => {
+					const bannerEstadoSuscripcion = this.template.querySelector('.bannerEstadoSuscripcion');
+					if (bannerEstadoSuscripcion) {
+						bannerEstadoSuscripcion.focus();
+					}
+				}, 100);
 			}
 		} else if (error) {
 			console.error(error);
@@ -124,7 +129,7 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 				//Al iniciar consulta se añade un custom attribute para que al descolgar el agente destino de la consulta
 				//se pueda diferenciar una llamada entrante de una consulta entrante (ambos vienen con category: "connect")
 					await this.addCustomAttributes({estadoConsulta: 'iniciando', agenteOrigenId: USER_ID, agenteDestinoId: null});
-					
+
 				} else if (nombreMetodoApex === 'finalizarConsulta' || nombreMetodoApex === 'completarConsulta') {
 					await this.addCustomAttributes({estadoConsulta: null, agenteOrigenId: null, agenteDestinoId: null});
 				}
@@ -452,12 +457,12 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 		this.template.querySelector('.textareaJsonSimularEvento').value = JSON.stringify(plantilla, null, 3);
 	}
 
-	menuFiltrarHistorialItemOnclick(event) {
-		const menuItemName = event.currentTarget.dataset.name;
+	menuFiltrarHistorialItemOnclick({currentTarget: {dataset: {name: itemName}}}) {
 		for (const key in HISTORIAL_TIPOS) {
-			if (HISTORIAL_TIPOS[key].class === menuItemName) {
+			if (HISTORIAL_TIPOS[key].class === itemName) {
 				HISTORIAL_TIPOS[key].hide = !HISTORIAL_TIPOS[key].hide;
-				this.template.querySelector('lightning-menu-item.' + menuItemName).iconName = HISTORIAL_TIPOS[key].hide ? null : 'utility:check';
+				const itemIcon = this.template.querySelector('div.menuFiltrarHistorial li[data-name="' + itemName + '"] lightning-icon:last-child');
+				itemIcon.iconName = HISTORIAL_TIPOS[key].hide ? null : 'utility:check';
 				break;
 			}
 		}

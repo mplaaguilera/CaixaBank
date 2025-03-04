@@ -42,6 +42,8 @@ public with sharing class SAC_Accion_BI_TRHan extends CC_TriggerHandlerBase {
             SAC_AccionMetodos.calcularFechaVencimientoInicial(listaAcciones);
             SAC_Accionmetodos.tareaReclamacionCerrada(listaAcciones);
             
+            //Se establece la fecha de alta de las acciones
+            SAC_AccionMetodos.establecerFechaAlta(listaAcciones);
         }
 
         if(!listaTareasMaestro.isEmpty()){

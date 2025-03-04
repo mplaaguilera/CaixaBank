@@ -1665,6 +1665,86 @@ public class SEG_EmailService_Test{
         }
     }
 
+    @isTest
+    public static void procesarReferenciasCOPS() {
+
+        Set<String> objetos = new Set<String>{'Case','Contact','Account'};
+        Map<String,Map<String,Schema.RecordTypeInfo>> rtObjetos = SEG_GetRT.getRecordTypesObjects(objetos);
+        Id recordTypeSEG = rtObjetos.get('Case').get('SEG_Cliente').getRecordTypeId();
+        Id recordTypeSeguimiento = rtObjetos.get('Case').get('SEG_Seguimiento').getRecordTypeId();
+
+        List<Id> listIdRecordTypeSegmentos = new List<Id> ();
+
+        recordTypeSEG = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
+        recordTypeSeguimiento = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Seguimiento').getRecordTypeId();
+    
+        listIdRecordTypeSegmentos.add(recordTypeSEG);
+        listIdRecordTypeSegmentos.add(recordTypeSeguimiento);
+
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+        Id idRecordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
+        List<Case> casos = new List<Case>{
+            new Case(RecordTypeId = idRecordTypeCaso, 
+                    CC_Idioma__c = 'es', 
+                    SEG_Idioma__c = 'es', 
+                    SEG_Organizacion__c = 'Banca Corporativa',
+                    SEG_Zona__c = 'Corporativa')
+        };
+        insert casos;
+        List<String> lstSemillas = new List<String>();
+        List<String> lstCaseNumbers = new List<String>();
+        
+        Case casoNumber = [SELECT CaseNumber FROM Case WHERE Id =: casos[0].Id LIMIT 1];
+        lstCaseNumbers.add(casoNumber.CaseNumber);
+        
+        Case casoCOPS = new Case();
+        casoCOPS.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'OS_Cliente');
+        casoCOPS.Subject = 'Caso OS_EmailService_Test';
+        casoCOPS.Origin = 'Email';
+        casoCOPS.Status = 'Activo';
+        casoCOPS.CC_Idioma__c = 'es';
+        casoCOPS.CC_Detalles_Consulta__c = 'Detalles consulta';
+        casoCOPS.CC_Detalles_Solucion__c = 'Detalles solución';
+        casoCOPS.CC_Canal_Procedencia__c = 'Buzón CCI Holabank';
+        casoCOPS.CC_Tipo_Contacto__c = 'Asesoramiento';
+        insert casoCOPS;
+        
+        // Obtener el número de caso de COPS
+        List<Case> casosNumber = new List<Case> ([SELECT id, CC_CasoRelacionado__c, recordTypeId, SEG_Case_Owner__c, SEG_OldSubStatus__c, Priority, SEG_OldStatus__c, SEG_Subestado__c, CreatedDate, CaseNumber, SEG_Detalle__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Tematica__c, AccountId, SEG_Zona__c, SEG_Organizacion__c, SEG_Grupo__c, SEG_Grupo_colaborador_Externo__c, Status 
+        FROM Case 
+        WHERE (CreatedDate = LAST_N_MONTHS:6 OR CreatedDate = THIS_MONTH OR CreatedDate = TODAY) 
+        AND CaseNumber IN :lstCaseNumbers 
+        AND ((RecordTypeId IN :listIdRecordTypeSegmentos 
+        AND SEG_Organizacion__c = 'Banca Corporativa' 
+        AND SEG_Zona__c = 'Corporativa') 
+        OR (RecordType.DeveloperName = 'OS_Cliente' 
+        AND CC_CasoRelacionado__c != NULL)) 
+        ORDER BY createdDate DESC]);
+    
+        List<Case> casosNumFiltrados = new List<Case>();
+    
+        for (Case casoEncontrado : casosNumber) {
+            if (casoEncontrado.RecordTypeId == recordTypeSEG || casoEncontrado.RecordTypeId == recordTypeSeguimiento) {
+                casosNumFiltrados.add(casoEncontrado);
+            } else {
+                Case casoSEG = new Case();
+                casoSEG.Id = casoEncontrado.CC_CasoRelacionado__c;
+                casosNumFiltrados.add(casoSEG);
+            }
+        }
+    
+        if (!casosNumFiltrados.isEmpty()) {
+            String casoCOPSNumber = casosNumFiltrados[0].CaseNumber;
+            System.runAs (usuarioTest) {
+                Test.startTest();
+                List<Case> casosEncontrados = SEG_EmailService.procesarReferencias(lstSemillas, lstCaseNumbers, 'Banca Corporativa', 'Corporativa');
+                Test.stopTest();
+                System.assertNotEquals(casosEncontrados, null, 'No se ha encontrado el caso');  
+                System.assertEquals(casosEncontrados[0].CaseNumber, casoCOPSNumber, 'No se ha encontrado el caso de COPS');
+            }
+        }
+    }
+
     @IsTest
     public static void encontrarCasosExistentes() {
 

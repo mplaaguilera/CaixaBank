@@ -4,9 +4,10 @@ import currentUserId from '@salesforce/user/Id';
 
 import {formatCalculo} from './utils';
 
-import OPPTY_PRIORIDAD from '@salesforce/schema/Opportunity.CSBD_OC_Prioridad__c';
-import OPPTY_CANAL_ENTRADA from '@salesforce/schema/Opportunity.CSBD_OC_Canal_Entrada__c';
+//import OPPTY_PRIORIDAD from '@salesforce/schema/Opportunity.CSBD_OC_Prioridad__c';
+//import OPPTY_CANAL_ENTRADA from '@salesforce/schema/Opportunity.CSBD_OC_Canal_Entrada__c';
 import OPPTY_CIRBE_SOLICITADO from '@salesforce/schema/Opportunity.CSBD_OC_Cirbe_Solicitado__c';
+import OPPTY_IMPORTE_CIRBE from '@salesforce/schema/Opportunity.CSBD_ImporteCirbe__c';
 import OPPTY_PRECIO_INMUEBLE from '@salesforce/schema/Opportunity.CSBD_PrecioInmueble__c';
 import OPPTY_AMOUNT from '@salesforce/schema/Opportunity.Amount';
 import OPPTY_NOW_PLAZO from '@salesforce/schema/Opportunity.CSBD_Now_Plazo__c';
@@ -253,8 +254,8 @@ class Deuda {
 			//{id: 'deuda.totalCuota', label: 'Cuota mensual CaixaBank', primerTitular: this.cuotaPrimerTitular, segundoTitular: this.cuotaSegundoTitular, total: this.totalCuota, conceptoClass: 'verde negrita', valorClass: 'verde noEdit', totalClass: 'verde'},
 			{id: 'deuda.totalCuota', label: 'Cuota no bonificada', primerTitular: this.cuotaPrimerTitular, segundoTitular: this.cuotaSegundoTitular, total: this.totalCuota, conceptoClass: 'gris negrita', valorClass: 'azul noEdit', totalClass: 'azul noEdit'},
 			{id: 'deuda.totalDeuda', label: 'Deuda + cuota no bonificada', primerTitular: this.totalDeudaPrimerTitular, segundoTitular: this.totalDeudaSegundoTitular, total: this.totalDeuda, conceptoClass: 'verdeDisabled negrita', valorClass: 'verde negrita noEdit', totalClass: 'verde negrita noEdit'},
-			{id: 'deuda.totalCuota', label: 'Cuota bonificada', primerTitular: this.cuotaBonificadaPrimerTitular, segundoTitular: this.cuotaBonificadaSegundoTitular, total: this.totalCuotaBonificada, conceptoClass: 'gris negrita', valorClass: 'azul noEdit', totalClass: 'azul noEdit'},
-			{id: 'deuda.totalDeuda', label: 'Deuda + cuota bonificada', primerTitular: this.totalDeudaPrimerTitularBonificacion, segundoTitular: this.totalDeudaSegundoTitularBonificacion, total: this.totalDeudaBonificacion, conceptoClass: 'verdeDisabled negrita', valorClass: 'verde negrita noEdit', totalClass: 'verde negrita noEdit'}
+			{id: 'deuda.totalCuotaBonificada', label: 'Cuota bonificada', primerTitular: this.cuotaBonificadaPrimerTitular, segundoTitular: this.cuotaBonificadaSegundoTitular, total: this.totalCuotaBonificada, conceptoClass: 'gris negrita', valorClass: 'azul noEdit', totalClass: 'azul noEdit'},
+			{id: 'deuda.totalDeudaBonificada', label: 'Deuda + cuota bonificada', primerTitular: this.totalDeudaPrimerTitularBonificacion, segundoTitular: this.totalDeudaSegundoTitularBonificacion, total: this.totalDeudaBonificacion, conceptoClass: 'verdeDisabled negrita', valorClass: 'verde negrita noEdit', totalClass: 'verde negrita noEdit'}
 		];
 	}
 }
@@ -452,10 +453,12 @@ export class Data {
 
 		if (!nombreDatatable || nombreDatatable === 'general') {
 			datatableData.general1 = [
-				{id: 'prioridad', label: 'Prioridad / Canal de entrada', value: (getFieldValue(oportunidad, OPPTY_PRIORIDAD) ?? '?') + ' / ' + (getFieldValue(oportunidad, OPPTY_CANAL_ENTRADA) ?? '?'), conceptoClass: 'gris negrita', valorClass: 'noEditable noEdit'},
+				//{id: 'prioridad', label: 'Prioridad / Canal de entrada', value: (getFieldValue(oportunidad, OPPTY_PRIORIDAD) ?? '?') + ' / ' + (getFieldValue(oportunidad, OPPTY_CANAL_ENTRADA) ?? '?'), conceptoClass: 'gris negrita', valorClass: 'noEditable noEdit'},
+				{id: 'cirbeSolicitado', label: 'CIRBE solicitado', value: getFieldValue(oportunidad, OPPTY_CIRBE_SOLICITADO), conceptoClass: 'gris negrita', valorClass: 'amarillo'}
 			];
 			datatableData.general2 = [
-				{id: 'cirbeSolicitado', label: 'CIRBE solicitado', value: getFieldValue(oportunidad, OPPTY_CIRBE_SOLICITADO), conceptoClass: 'gris negrita', valorClass: 'amarillo'}
+				//{id: 'cirbeSolicitado', label: 'CIRBE solicitado', value: getFieldValue(oportunidad, OPPTY_CIRBE_SOLICITADO), conceptoClass: 'gris negrita', valorClass: 'amarillo'}
+				{id: 'importeCirbe', label: 'Importe CIRBE', value: getFieldValue(oportunidad, OPPTY_IMPORTE_CIRBE), conceptoClass: 'gris negrita', valorClass: 'amarillo'}
 			];
 		}
 
@@ -606,7 +609,7 @@ export class Data {
 				ingresosAlquiler: this.segundoTitular?.ingresosAlquiler
 			},
 			deuda: JSON.parse(JSON.stringify(this.deuda, eliminarPropiedad, null, 3))
-		});
+		}).replaceAll(/\u00a0/g, '');
 	}
 
 	actualizarDatosOportunidad(oportunidad) {
@@ -635,7 +638,7 @@ export const DATATABLE_COLUMNS = {
 		{label: 'Concepto', fieldName: 'label', fixedWidth: 194, hideDefaultActions: true, wrapText: true,
 			cellAttributes: {class: {fieldName: 'conceptoClass'}}
 		},
-		{label: 'Valor', fieldName: 'value', type: 'text', editable: true, hideDefaultActions: true,
+		{label: 'Valor', fieldName: 'value', type: 'boolean', editable: true, hideDefaultActions: true,
 			cellAttributes: {class: {fieldName: 'valorClass'}, alignment: 'right'}
 		}
 	],
@@ -643,8 +646,8 @@ export const DATATABLE_COLUMNS = {
 		{label: 'Concepto', fieldName: 'label', fixedWidth: 194, hideDefaultActions: true, wrapText: true,
 			cellAttributes: {class: {fieldName: 'conceptoClass'}}
 		},
-		{label: 'Valor', fieldName: 'value', type: 'boolean', editable: true, hideDefaultActions: true,
-			cellAttributes: {class: {fieldName: 'valorClass'}, alignment: 'right'}
+		{label: 'Valor', fieldName: 'value', type: 'currency', editable: true, hideDefaultActions: true,
+			cellAttributes: {class: {fieldName: 'valorClass'}}
 		}
 	],
 	importe: [

@@ -86,7 +86,6 @@ public with sharing class CC_Cierre_Automatico_Methods {
         
         
         List<Messaging.SingleEmailMessage> allmsg = new List<Messaging.SingleEmailMessage>();
-        List<Case> casosAct = new List<Case>();
         List<Case> oCasosAdmin = new List<Case>();
         List<Task> tasksCrear = new List<Task>();
         
@@ -184,15 +183,13 @@ public with sharing class CC_Cierre_Automatico_Methods {
                     casoAdmin.CC_Detalles_Solucion__c = 'Cierre automático por falta de respuesta del cliente.';
                 }
             }
-            oCasosAdmin.add(casoAdmin);            
+                     
             
             // Preparamos la actualización del caso
-            Case caso = new Case();
-            caso.Id = c.Id;
-            caso.CC_Fecha_Cierre_SolInf__c = null;
-            caso.CC_NoRespondido__c = true;
-            caso.status = 'Cerrado';
-            casosAct.add(caso);
+            casoAdmin.CC_Fecha_Cierre_SolInf__c = null;
+            casoAdmin.CC_NoRespondido__c = true;
+            casoAdmin.status = 'Cerrado';
+            oCasosAdmin.add(casoAdmin);   
             
             // Crear Tarea de Cierre Automatico Solicitud Informacion
             Date todaysDate = system.today();
@@ -210,12 +207,34 @@ public with sharing class CC_Cierre_Automatico_Methods {
             //task.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
             tasksCrear.add(task);
         }
+        String methodNameCase = 'executeEvent';
+        List<String> ListErrorsSolicInfor = new List<String>();
         //DataBase Update para la lista de Casos.
-        Database.SaveResult[] resultsCaseAdmin = Database.update(oCasosAdmin, false);
+        List<Database.SaveResult> resultsCaseAdmin = Database.update(oCasosAdmin, false);
         //Enviamos todos los mensajes
         Messaging.SendEmailResult [] r = Messaging.sendEmail(allmsg, false);
         //DataBase Update para la lista de Casos.
-        Database.SaveResult[] resultsCase = Database.update(casosAct, false);
-        Database.SaveResult[] resultsTask =  CC_Activity.crearActividades(tasksCrear, false);
+        List<Database.SaveResult> resultsTask =  CC_Activity.crearActividades(tasksCrear, false);
+
+        	for (Database.SaveResult sr : resultsCaseAdmin) {
+            	if (!sr.isSuccess()) {
+                    for(Database.Error err : sr.getErrors()) {
+                    ListErrorsSolicInfor.add('resultsCaseAdmin: ' + methodNameCase + 'Error: ' + err.getMessage());
+                    }
+            	}
+            }
+        
+        	for (Database.SaveResult sr : resultsTask) {
+            	if (!sr.isSuccess()) {
+                    for(Database.Error err : sr.getErrors()) {
+                    ListErrorsSolicInfor.add('resultsTask: ' + methodNameCase + 'Error: ' + err.getMessage());
+                    }
+            	}
+            }
+
+            if(!ListErrorsSolicInfor.isEmpty()) {
+                CBK_log.error('Metodo: '+methodNameCase+' ListErrorsSolicInfor: '+ListErrorsSolicInfor,ListErrorsSolicInfor);
+            }  
+           
     }
 }

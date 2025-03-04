@@ -19,7 +19,8 @@ public with sharing class SAC_LCMP_CaseParaContactCenter_Test {
         List<User> usuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(2);
         usuarios[0].Username = 'usergeneral@test.com';
         usuarios[1].Username = 'usuarioNoPropietario@test.com';
-        Database.insert(usuarios);
+        SAC_DatabaseDML.insertListDML(usuarios, false);
+        //Database.insert(usuarios);
        
         
         //Reclamacion
@@ -32,7 +33,8 @@ public with sharing class SAC_LCMP_CaseParaContactCenter_Test {
         camposRecl.put('OwnerId', usuarios[0].id);
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
 
         
         //Reclamacion con ParentId
@@ -43,7 +45,8 @@ public with sharing class SAC_LCMP_CaseParaContactCenter_Test {
         camposRecl2.put('ParentId', casoReclamacion.id);
         
         Case casoConParent = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
-        Database.insert(casoConParent);
+        SAC_DatabaseDML.insertDML(casoConParent, false);
+       //Database.insert(casoConParent);
 
 
         //Reclamacion sin ParentId
@@ -53,7 +56,8 @@ public with sharing class SAC_LCMP_CaseParaContactCenter_Test {
         camposRecl3.put('OwnerId', usuarios[1].id);
         
         Case casoSinParent = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl3);
-        Database.insert(casoSinParent);
+        SAC_DatabaseDML.insertDML(casoSinParent, false);
+        //Database.insert(casoSinParent);
     }
     @isTest
     static void crearCasoTest(){
@@ -62,8 +66,9 @@ public with sharing class SAC_LCMP_CaseParaContactCenter_Test {
         Case casoParaTest = [SELECT id, Status, OwnerId, Origin, RecordTypeId FROM Case WHERE Subject = 'Caso Reclamación'];
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);    
+        SAC_DatabaseDML.insertDML(psa, false);   
+        //Database.insert(psa);
         
 
         System.runAs(usuarioGeneral){
@@ -85,8 +90,9 @@ public with sharing class SAC_LCMP_CaseParaContactCenter_Test {
         Boolean respuesta;
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);
+        SAC_DatabaseDML.insertDML(psa, false);          
+        //Database.insert(psa);
         
 
         System.runAs(usuarioGeneral){
@@ -106,8 +112,9 @@ public with sharing class SAC_LCMP_CaseParaContactCenter_Test {
         Boolean respuesta;
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);
+        SAC_DatabaseDML.insertDML(psa, false);       
+        //Database.insert(psa);
         
 
         System.runAs(usuarioGeneral){
@@ -127,8 +134,9 @@ public with sharing class SAC_LCMP_CaseParaContactCenter_Test {
         Boolean respuesta;
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);
+        SAC_DatabaseDML.insertDML(psa, false);       
+        //Database.insert(psa);
         
 
         System.runAs(usuarioGeneral){

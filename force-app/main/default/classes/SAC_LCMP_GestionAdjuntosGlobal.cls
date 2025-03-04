@@ -10,7 +10,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
 
     @AuraEnabled
     public static oficinaWrapper recuperarDatos(String idRegistro, String fieldApiName, String objectApiName){
-    
+
         fieldApiName = fieldApiName + ', RecordType.DeveloperName';
     
         String globalObject = 'SELECT ' + String.escapeSingleQuotes(fieldApiName) + ' FROM ' + String.escapeSingleQuotes(objectApiName) + ' WHERE  id = :idRegistro';
@@ -37,7 +37,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                 )
             ];
     
-            if (customPermisos.size() > 0) {
+            if (!customPermisos.isEmpty()) {
                 for (CustomPermission customPermiso : customPermisos) {
                     String customPermisoNombre = customPermiso.DeveloperName;
                     if(customPermisoNombre == 'SAC_HabilitarFuncFicheros' || customPermisoNombre == 'SPV_HabilitarFuncFicheros'){
@@ -125,7 +125,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                             }
 
                         }else{ //Si lo mete el letrado, se mete en la seccion de 'Tramitacion'
-                    listaCV[0].SAC_Bloque__c = 'SAC_Tramitacion';
+                            listaCV[0].SAC_Bloque__c = 'SAC_Tramitacion';
                         }
                     }else{
                         listaCV[0].SAC_Bloque__c = 'SAC_Tramitacion';
@@ -134,7 +134,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                 }
             }
             // Fin añadido
-            
+
             if(alertaDocumentosGestorSPV){
 
                 List<SAC_WrapperAlerta> listaWrapperAlerta = new List<SAC_WrapperAlerta>();
@@ -147,7 +147,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                 if(String.isNotBlank(caso[0].SAC_PretensionPrincipal__r.Owner.Email)) {
                     listaEmails.add(caso[0].SAC_PretensionPrincipal__r.Owner.Email);
                 }
-
+            
                 //Se envia alerta el owner de las pretensiones y al grupo letrado
                 SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(caso[0].Id,
                                                 'SPV_017',
@@ -166,11 +166,11 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                 //Si tenemos alertas que enviar, se llama al método que las envía
                 if (!listaWrapperAlerta.isEmpty()) {
                     SAC_Alertas.generarAlertas(listaWrapperAlerta);
-            }
+                }
             }
 
             if(!soloActual){
-                ContentVersion cv = [SELECT Id, ContentDocumentId, Title FROM ContentVersion WHERE ContentDocumentId =: idDocument LIMIT 1]; 
+                ContentVersion cv = [SELECT Id, ContentDocumentId, Title FROM ContentVersion WHERE ContentDocumentId =: idDocument AND SAC_BloqueoTotalVisibilidad__c = false LIMIT 1]; 
                 ContentDocumentLink cdl = new ContentDocumentLink();
                 cdl.ContentDocumentId = cv.ContentDocumentId;
                 cdl.LinkedEntityId = id;
@@ -189,7 +189,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
         @AuraEnabled
         public static ContentVersion[] obtieneAdjuntos(String id){
             try {
-                List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title FROM ContentVersion WHERE FirstPublishLocationId =: id];
+                List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title FROM ContentVersion WHERE FirstPublishLocationId =: id AND SAC_BloqueoTotalVisibilidad__c = false];
     
                 ContentVersion[] resultado =  new List<ContentVersion>();
 
@@ -217,7 +217,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                     idsDocumentLink.add(recordCdL.ContentDocumentId);
                 }
     
-                List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, SAC_Oculto__c, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_Numero_Prestamo__c FROM ContentVersion WHERE ContentDocumentId IN: idsDocumentLink ORDER BY CreatedDate ASC];
+                List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, SAC_Oculto__c, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_Numero_Prestamo__c FROM ContentVersion WHERE ContentDocumentId IN: idsDocumentLink AND SAC_BloqueoTotalVisibilidad__c = false ORDER BY CreatedDate ASC];
 
                 for(ContentVersion recordCv : cv){
                     contentOculto.put(recordCv.id, recordCv.SAC_Oculto__c);
@@ -227,7 +227,6 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                 for(ContentDocumentLink record : cdL){
 
                     if(contentOculto.get(record.id) != null){
-
                         resultado.add(new ContentVersion (ContentDocumentId=record.ContentDocumentId, Title=record.ContentDocument.Title, SAC_Oculto__c=contentOculto.get(record.id)));
 
                     }else{resultado.add(new ContentVersion (ContentDocumentId=record.ContentDocumentId, Title=record.ContentDocument.Title, SAC_Oculto__c=false));}
@@ -318,14 +317,28 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
         }
 
         @AuraEnabled
-        public static void cambiarClasificacion(Id idAdjunto, List<String> listaValoresBloque){
+        public static void cambiarClasificacion(List<String> listIdAdjuntos, List<String> listaValoresBloque, String caseId){
             try {
-                List<ContentVersion> listaCV = [SELECT Id FROM ContentVersion WHERE id = :idAdjunto];
+                List<ContentDocumentLink> cdL = [SELECT Id, ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId =: caseId AND ContentDocumentId IN :listIdAdjuntos AND ContentDocument.FileType != 'SNOTE']; 
 
-                if (!listaCV.isEmpty()) {
-                    String valoresBloque = String.join(listaValoresBloque, ';');
-                    listaCV[0].SAC_Bloque__c = valoresBloque;
-                    SAC_DatabaseDML.updateListDML(listaCV, true);
+                if(!cdL.isEmpty()){
+                    Set<Id> idsDocumentLink = new Set<Id>();
+
+                    for(ContentDocumentLink recordCdL : cdL){
+                        idsDocumentLink.add(recordCdL.ContentDocumentId);
+                    }
+
+                    List<ContentVersion> listaCV = [SELECT Id FROM ContentVersion WHERE ContentDocumentId IN: idsDocumentLink AND SAC_BloqueoTotalVisibilidad__c = false];
+
+                    if (!listaCV.isEmpty()) {
+                        String valoresBloque = String.join(listaValoresBloque, ';');
+
+                        for(ContentVersion cv : listaCV){
+                            cv.SAC_Bloque__c = valoresBloque;
+                        }
+                       
+                        SAC_DatabaseDML.updateListDML(listaCV, true);
+                    }
                 }
             } catch (Exception e) {
                 throw new AuraHandledException(e.getMessage());
@@ -339,7 +352,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
             if(validadoCV == true){
                 if (!fichero.Title.startsWith(prefijo)) {
                     fichero.Title = prefijo + ' ' + fichero.Title;
-                    fichero.SAC_StringRedaccion_fileupload__c = 'ResolucionRedaccion';
+                    // fichero.SAC_StringRedaccion_fileupload__c = 'ResolucionRedaccion';
                 }            
             }else{
                 if (fichero.Title.startsWith(prefijo)) {

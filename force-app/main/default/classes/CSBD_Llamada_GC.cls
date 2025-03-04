@@ -1,7 +1,6 @@
 public with sharing class CSBD_Llamada_GC {
 
 	public static Map<String, Object> registrarLlamadaEntrante(CC_Llamada_Input inputLlamada) {
-
 		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Canal_Procedencia__c, CC_Tipo_Cliente__c, CC_Codigo__c, CSBD_Empresa_Proveedora__c,
 													CSBD_Familia_Producto__c, CSBD_Producto__c, CSBD_Now_Codigo_Producto__c, CSBD_Canal__c,
 													CSBD_Now_Origen__c, CC_Encuesta__r.CC_Codigo__c
@@ -36,28 +35,23 @@ public with sharing class CSBD_Llamada_GC {
 		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 		insert llamada;
 
-		//Se mapean los campos requeridos para el objeto oportunidad
-		Map<String, Object> campos = new Map<String, Object>();
-		campos.put('CSBD_Empresa_Proveedora__c', servicioGenesys.CSBD_Empresa_Proveedora__c);
-		campos.put('CSBD_Familia_Producto__c', servicioGenesys.CSBD_Familia_Producto__c);
-		campos.put('CSBD_Producto__c', servicioGenesys.CSBD_Producto__c);
-		campos.put('CSBD_Telefono_Solicitud__c', llamada.CC_ANI__c);
-		campos.put('CSBD_Now_Codigo_Producto__c', servicioGenesys.CSBD_Now_Codigo_Producto__c);
-		campos.put('CSBD_Canal__c', servicioGenesys.CSBD_Canal__c);
-		campos.put('CSBD_Now_Origen__c', servicioGenesys.CSBD_Now_Origen__c);
-		campos.put('CSBD_Estado__c', 'Activa');
-		campos.put('AccountId', llamada.CC_Cuenta__c);
-		campos.put('CSBD_Contact__c', llamada.CC_Contacto__c);
-		campos.put('CSBD_Idioma_Solicitud__c', inputLlamada.idioma);
-		campos.put('OwnerId', UserInfo.getUserId());
-		campos.put('CSBD_Turno_Contacto__c', llamada.CC_Fecha_Inicio__c.hour() < 15 ? 'Mañana': 'Tarde');
-
-		//Llamamos al método para crear la oportunidad
-		Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Llamada_Servicio', campos);
-		//Llamamos al método para crear la actividad
+		Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Llamada_Servicio', new Map<String, Object>{
+            'CSBD_Empresa_Proveedora__c' => servicioGenesys.CSBD_Empresa_Proveedora__c,
+            'CSBD_Familia_Producto__c' => servicioGenesys.CSBD_Familia_Producto__c,
+            'CSBD_Producto__c' => servicioGenesys.CSBD_Producto__c,
+            'CSBD_Telefono_Solicitud__c' => llamada.CC_ANI__c,
+            'CSBD_Now_Codigo_Producto__c' => servicioGenesys.CSBD_Now_Codigo_Producto__c,
+            'CSBD_Canal__c' => servicioGenesys.CSBD_Canal__c,
+            'CSBD_Now_Origen__c' => servicioGenesys.CSBD_Now_Origen__c,
+            'CSBD_Estado__c' => 'Activa',
+            'AccountId' => llamada.CC_Cuenta__c,
+            'CSBD_Contact__c' => llamada.CC_Contacto__c,
+            'CSBD_Idioma_Solicitud__c' => inputLlamada.idioma,
+            'OwnerId' => UserInfo.getUserId(),
+            'CSBD_Turno_Contacto__c' => llamada.CC_Fecha_Inicio__c.hour() < 15 ? 'Mañana': 'Tarde'
+        });
 		Id idTask = crearActividad(llamada, oportunidad.Id, 'Llamada entrante', servicioGenesys.Name);
 
-		//return oportunidad;
 		return new Map<String, Object>{
 			'className' => 'CSBD_Llamada_GC',
 			'llamada' => llamada,
@@ -68,7 +62,6 @@ public with sharing class CSBD_Llamada_GC {
 	}
 
 	public static Map<String, Object> registrarLlamadaSaliente(CC_Llamada_Input inputLlamada) {
-
 		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 		CC_Servicio_Genesys__c servicioGenesys = [SELECT Id FROM CC_Servicio_Genesys__c
 													WHERE CC_Codigo__c = 'NIS_GenesysCloudOutboundDefault' LIMIT 1];
@@ -77,7 +70,7 @@ public with sharing class CSBD_Llamada_GC {
 									RecordTypeId, CSBD_Fecha_ultimacita__c, CSBD_Fecha_Cita__c, CSBD_Proveedor__c, CSBD_SLA_Primera_Respuesta__c, Recordtype.DeveloperName, Recordtype.Name, CSBD_PrimerContactoSLA__c, IsClosed,
 									CSBD_Llamadas_Salientes__c
 									FROM Opportunity WHERE Id = :inputLlamada.casoId];
-        
+
         CC_Llamada__c llamada = new CC_Llamada__c(
 			RecordTypeId = Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('CSBD_Cliente').getRecordTypeId(),
 			KIN_Genesys_Cloud__c = true,

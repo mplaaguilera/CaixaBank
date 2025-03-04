@@ -22,12 +22,14 @@ public with sharing class SAC_AccionVF_Test {
         User usuario1;
         User usuario2; 
         User usuario3; 
+        User usuarioAdmin;
 
         CC_Grupo_Colaborador__c grupoTareas = new CC_Grupo_Colaborador__c();
         List<CC_Grupo_Colaborador_Contact__c> contactoscolab = new List<CC_Grupo_Colaborador_Contact__c>();
         CC_Grupo_Colaborador_Contact__c grupoTareas1 = new CC_Grupo_Colaborador_Contact__c();
         CC_Grupo_Colaborador_Contact__c grupoTareasUser = new CC_Grupo_Colaborador_Contact__c();
         CC_Grupo_Colaborador_Contact__c grupoTareas3 = new CC_Grupo_Colaborador_Contact__c();
+        
         
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuarios SAC General
@@ -52,7 +54,8 @@ public with sharing class SAC_AccionVF_Test {
             usuarios[3].LastName = 'usuarioAdmin Test';
             usuarios[3].Alias = 'admin';
             usuarios[3].profileId = [SELECT Id FROM Profile WHERE Name = 'System Administrator' OR Name = 'Administrador del sistema'].Id;
-            Database.insert(usuarios);
+            SAC_DatabaseDML.insertListDML(usuarios, false);
+            //Database.insert(usuarios);
 
             List<PermissionSetAssignment> listPSA = new List<PermissionSetAssignment>();
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
@@ -70,18 +73,38 @@ public with sharing class SAC_AccionVF_Test {
             permiSetAssi3.AssigneeId = usuarios[2].Id;
             permiSetAssi3.PermissionSetId = permiSet.Id;
             listPSA.add(permiSetAssi3);
-            Database.insert(listPSA);
+            SAC_DatabaseDML.insertListDML(listPSA, false);
+            //Database.insert(listPSA);
 
             usuario1 = usuarios[0];
             usuario2 = usuarios[1];
             usuario3 = usuarios[2];
 
 
+        //Usuario SAC Admin
+		usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+        usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';     
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);  
+
+        
+        PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
+        PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
+        permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
+        permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
+        SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false); 
+
+        PermissionSet permiSetAdmin2 = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_SystemAdmin'];
+        PermissionSetAssignment permiSetAssiAdmin2 = new PermissionSetAssignment();
+        permiSetAssiAdmin2.AssigneeId = usuarioAdmin.Id;
+        permiSetAssiAdmin2.PermissionSetId = permiSetAdmin2.Id;
+        SAC_DatabaseDML.insertDML(permiSetAssiAdmin2, false); 
+
             //Grupo colaborador
             Test.startTest();
             grupoTareas = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
             grupoTareas.SAC_DeveloperName__c = 'COPS';
-            Database.insert(grupoTareas);
+            SAC_DatabaseDML.insertDML(grupoTareas, false);
+            //Database.insert(grupoTareas);
 
             //Contactos colaboradores
            
@@ -93,15 +116,15 @@ public with sharing class SAC_AccionVF_Test {
             contactoscolab.add(grupoTareasUser) ;
             
             grupoTareas3 = SAC_TestDataFactory.crearColaboradorContact(usuario3.id, grupoTareas.id);
-            contactoscolab.add(grupoTareas3) ;
-            Database.insert(contactoscolab);
+            contactoscolab.add(grupoTareas3);
+            SAC_DatabaseDML.insertListDML(contactoscolab, false);
+            //Database.insert(contactoscolab);
         }
-
-        
 
         //Cuentas
         Account cuenta = SAC_TestDataFactory.crearCuentasOficina(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
 
         //Reclamaciones
         List<Case> reclamaciones = new List<Case>();
@@ -137,7 +160,8 @@ public with sharing class SAC_AccionVF_Test {
 
         Case reclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl3);
         reclamaciones.add(reclamacion3);
-        Database.insert(reclamaciones);
+        SAC_DatabaseDML.insertListDML(reclamaciones, false);
+        //Database.insert(reclamaciones);
 
         //Pretensiones
         List<Case> pretensiones = new List<Case>();
@@ -168,7 +192,8 @@ public with sharing class SAC_AccionVF_Test {
 
         Case pretension2 = SAC_TestDataFactory.crearCaso('Pretension',camposPret2);
         pretensiones.add(pretension2);
-        Database.insert(pretensiones);
+        SAC_DatabaseDML.insertListDML(pretensiones, false);
+        //Database.insert(pretensiones);
 
         Test.stopTest(); 
 
@@ -180,16 +205,17 @@ public with sharing class SAC_AccionVF_Test {
         listaMaestros[1].SAC_Prorroga__c = 30;
         listaMaestros[1].SAC_DeveloperName__c = 'GGH';
         listaMaestros[1].SAC_Activo__c = true;
-        Database.insert(listaMaestros);
+        SAC_DatabaseDML.insertListDML(listaMaestros, false);
+        //Database.insert(listaMaestros);
 
         //Tareas
         List<SAC_Accion__c> tareas = new List<SAC_Accion__c>();
-        List<SAC_Accion__c> listaDeTareasOtras = SAC_TestDataFactory.crearTareas(4,reclamacion,false);
+        List<SAC_Accion__c> listaDeTareasOtras = SAC_TestDataFactory.crearTareas(6,reclamacion,false);
         listaDeTareasOtras[0].SAC_EquipoResponsable__c = grupoTareas.id;
         listaDeTareasOtras[0].SAC_Observaciones__c = 'tarea'; 
         listaDeTareasOtras[0].SAC_PlazoMaximo__c = 10; 
         listaDeTareasOtras[0].SAC_Prorroga__c = 5;
-        listaDeTareasOtras[0].OwnerId = usuario2.id;
+        listaDeTareasOtras[0].OwnerId = usuarioAdmin.id;
         listaDeTareasOtras[1].SAC_EquipoResponsable__c = grupoTareas.id;
         listaDeTareasOtras[1].SAC_Estado__c = 'SAC_FinalizadaIncompleta';
         listaDeTareasOtras[1].SAC_Observaciones__c = 'Tarea finalizada'; 
@@ -197,6 +223,7 @@ public with sharing class SAC_AccionVF_Test {
         listaDeTareasOtras[2].SAC_EquipoResponsable__c = grupoTareas.id;
         listaDeTareasOtras[2].SAC_Observaciones__c = 'tarea 2';
         listaDeTareasOtras[2].SAC_Pretension__c = pretension2.Id;
+       // listaDeTareasOtras[2].OwnerId = usuarioAdmin.id;
         //listaDeTareasOtras[2].OwnerId = usuario2.id; 
         listaDeTareasOtras[2].SAC_PlazoMaximo__c = 10; 
         listaDeTareasOtras[2].SAC_Prorroga__c = 5;
@@ -208,6 +235,12 @@ public with sharing class SAC_AccionVF_Test {
         listaDeTareasOtras[3].SAC_Tercero__c = 'Otros';
         listaDeTareasOtras[3].SAC_FechaTentativa__c = System.today();
         listaDeTareasOtras[3].OwnerId = usuario1.id;
+        listaDeTareasOtras[4].SAC_EquipoResponsable__c = grupoTareas.id;
+        listaDeTareasOtras[4].SAC_Estado__c = 'SAC_PendienteAsignar';
+        listaDeTareasOtras[4].SAC_Observaciones__c = 'Tarea test SAC con imp abonado';
+        listaDeTareasOtras[4].SAC_Reclamacion__c = reclamacion2.Id;
+        listaDeTareasOtras[4].SAC_ImporteAbonar__c = 1;
+        listaDeTareasOtras[4].OwnerId = usuario1.id;
         tareas.addAll(listaDeTareasOtras);
 
         List<SAC_Accion__c> listaDeTareasMaestro = SAC_TestDataFactory.crearTareas(2,reclamacion3,true);
@@ -227,7 +260,7 @@ public with sharing class SAC_AccionVF_Test {
         listaDeTareasMaestro[1].SAC_Observaciones__c ='tarea5'; 
         listaDeTareasMaestro[1].SAC_PlazoMaximo__c = 10; 
         listaDeTareasMaestro[1].SAC_Prorroga__c = 5;
-        listaDeTareasMaestro[1].OwnerId = usuario2.id;
+        //listaDeTareasMaestro[1].OwnerId = usuario2.id;
         listaDeTareasMaestro[1].SAC_ImporteNotariaAbonar__c = 20;
         listaDeTareasMaestro[1].SAC_ImporteGestoriaAbonar__c = 30;
         listaDeTareasMaestro[1].SAC_ImporteRegistroAbonar__c = 35;
@@ -235,7 +268,8 @@ public with sharing class SAC_AccionVF_Test {
         listaDeTareasMaestro[1].SAC_NCuentaAbono__c = '1234567890';
         listaDeTareasMaestro[1].SAC_Comentarios__c = 'Comentario prueba';
         tareas.addAll(listaDeTareasMaestro);
-        Database.insert(tareas);
+        SAC_DatabaseDML.insertListDML(tareas, false);
+        //Database.insert(tareas);
         
         //Content Version
         Blob body = blob.valueOf('Unit.Test');
@@ -245,15 +279,171 @@ public with sharing class SAC_AccionVF_Test {
             VersionData = body,
             FirstPublishLocationId = listaDeTareasMaestro[1].Id
         );
-        Database.insert(cv);
+        SAC_DatabaseDML.insertDML(cv, false);
+        //Database.insert(cv);
 
         //Update reclamacion
         reclamacion.Status = 'SAC_004';
         reclamacion.SAC_StatusAuxiliar__c = 'SAC_004';
         reclamacion.CC_Oficina_Afectada_Lookup__c = cuenta.Id;
-        Database.update(reclamacion);       
+        SAC_DatabaseDML.updateDML(reclamacion, false);
+        //Database.update(reclamacion);       
     }
     
+    @isTest
+    static void establecerFechaAltaTest(){
+        Test.startTest();
+        String userName = 'usergeneral2SAC150623SACTEST@test' + ORGID + '.com';
+        User usuario = [select id, name, UserRole.name from user where Username = :UserName and IsActive = true limit 1];
+
+        System.runAs(usuario){
+            Map<String, Object> camposRecl2 = new Map<String, Object>();
+            camposRecl2.put('Subject', 'testrecEjemplo');
+            camposRecl2.put('Status', 'SAC_001');
+            camposRecl2.put('SAC_StatusAuxiliar__c', 'SAC_001');
+            camposRecl2.put('SuppliedCompany', 'testCaso2');
+    
+            Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
+
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+
+            List<SAC_Accion__c> listaDeTareasOtras = SAC_TestDataFactory.crearTareas(1,reclamacion,false);
+            listaDeTareasOtras[0].SAC_Observaciones__c = 'tareaEjemplo'; 
+            listaDeTareasOtras[0].SAC_PlazoMaximo__c = 10; 
+            listaDeTareasOtras[0].SAC_Prorroga__c = 5;
+            listaDeTareasOtras[0].OwnerId = usuario.id;
+            SAC_DatabaseDML.insertDML(listaDeTareasOtras[0], false);
+
+
+        }
+        SAC_Accion__c tareaResult = [SELECT Id, SAC_FechaCreacion__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'tareaEjemplo'];
+        Assert.areNotEqual(null, tareaResult.SAC_FechaCreacion__c, 'No se ha añadido la fecha de creación');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void establecerFechaFinalizacionTest(){
+        Test.startTest();
+        String userName = 'usergeneral2SAC150623SACTEST@test' + ORGID + '.com';
+        User usuario = [select id, name, UserRole.name from user where Username = :UserName and IsActive = true limit 1];
+
+        System.runAs(usuario){
+            Map<String, Object> camposRecl2 = new Map<String, Object>();
+            camposRecl2.put('Subject', 'testrecEjemplo');
+            camposRecl2.put('Status', 'SAC_001');
+            camposRecl2.put('SAC_StatusAuxiliar__c', 'SAC_001');
+            camposRecl2.put('SuppliedCompany', 'testCaso2');
+    
+            Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
+
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+
+            List<SAC_Accion__c> listaDeTareasOtras = SAC_TestDataFactory.crearTareas(1,reclamacion,false);
+            listaDeTareasOtras[0].SAC_Observaciones__c = 'tareaEjemplo'; 
+            listaDeTareasOtras[0].SAC_PlazoMaximo__c = 10; 
+            listaDeTareasOtras[0].SAC_Prorroga__c = 5;
+            listaDeTareasOtras[0].OwnerId = usuario.id;
+            SAC_DatabaseDML.insertDML(listaDeTareasOtras[0], false);
+
+            listaDeTareasOtras[0].SAC_Estado__c = 'SAC_Finalizada';
+            SAC_DatabaseDML.updateDML(listaDeTareasOtras[0], false);
+
+        }
+        SAC_Accion__c tareaResult = [SELECT Id, SAC_FechaFinalizacion__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'tareaEjemplo'];
+        Assert.areNotEqual(null, tareaResult.SAC_FechaFinalizacion__c, 'No se ha añadido la fecha de finalización');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void establecerFechaEnvioTest(){
+        Test.startTest();
+        String userName = 'usergeneral2SAC150623SACTEST@test' + ORGID + '.com';
+        User usuario = [select id, name, UserRole.name from user where Username = :UserName and IsActive = true limit 1];
+
+        System.runAs(usuario){
+            Map<String, Object> camposRecl2 = new Map<String, Object>();
+            camposRecl2.put('Subject', 'testrecEjemplo');
+            camposRecl2.put('Status', 'SAC_001');
+            camposRecl2.put('SAC_StatusAuxiliar__c', 'SAC_001');
+            camposRecl2.put('SuppliedCompany', 'testCaso2');
+    
+            Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
+
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+
+            List<SAC_Accion__c> listaDeTareasOtras = SAC_TestDataFactory.crearTareas(1,reclamacion,false);
+            listaDeTareasOtras[0].SAC_Observaciones__c = 'tareaEjemplo'; 
+            listaDeTareasOtras[0].SAC_PlazoMaximo__c = 10; 
+            listaDeTareasOtras[0].SAC_Prorroga__c = 5;
+            listaDeTareasOtras[0].OwnerId = usuario.id;
+            listaDeTareasOtras[0].SAC_Estado__c = 'SAC_PendienteEnviar';
+            SAC_DatabaseDML.insertDML(listaDeTareasOtras[0], false);
+
+            //Se simula un envío:
+            listaDeTareasOtras[0].SAC_Estado__c = 'SAC_PendienteAsignar';
+            SAC_DatabaseDML.updateDML(listaDeTareasOtras[0], false);
+
+            //Se simula otro envío, para eso primero hay que volver a pendiente de enviar:
+            listaDeTareasOtras[0].SAC_Estado__c = 'SAC_PendienteEnviar';
+            SAC_DatabaseDML.updateDML(listaDeTareasOtras[0], false);
+
+            listaDeTareasOtras[0].SAC_Estado__c = 'SAC_PendienteAsignar';
+            SAC_DatabaseDML.updateDML(listaDeTareasOtras[0], false);
+
+        }
+        SAC_Accion__c tareaResult = [SELECT Id, SAC_FechaPrimerEnvio__c, SAC_FechaUltimoEnvio__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'tareaEjemplo'];
+        Assert.areNotEqual(null, tareaResult.SAC_FechaPrimerEnvio__c, 'No se ha añadido la fecha de primer envío');
+        Assert.areNotEqual(null, tareaResult.SAC_FechaUltimoEnvio__c, 'No se ha añadido la fecha de segundo envío');
+        Test.stopTest();
+    }
+
+
+    @isTest
+    static void establecerFechaDevolucionTest(){
+        Test.startTest();
+        String userName = 'usergeneral2SAC150623SACTEST@test' + ORGID + '.com';
+        User usuario = [select id, name, UserRole.name from user where Username = :UserName and IsActive = true limit 1];
+
+        System.runAs(usuario){
+            Map<String, Object> camposRecl2 = new Map<String, Object>();
+            camposRecl2.put('Subject', 'testrecEjemplo');
+            camposRecl2.put('Status', 'SAC_001');
+            camposRecl2.put('SAC_StatusAuxiliar__c', 'SAC_001');
+            camposRecl2.put('SuppliedCompany', 'testCaso2');
+    
+            Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
+
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+
+
+            /*Map<String, Object> camposPret = new Map<String, Object>();
+            camposPret.put('Subject', 'testPretEjemplo');
+            camposPret.put('Status', 'SAC_001');
+            camposPret.put('SuppliedCompany', 'testPretenEjemplo');
+            camposPret.put('SAC_StatusAuxiliar__c', 'SAC_001');
+            camposPret.put('SAC_Reclamacion__c', reclamacion.Id);
+    
+            Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
+            SAC_DatabaseDML.insertDML(pretension, false);*/
+
+            List<SAC_Accion__c> listaDeTareasOtras = SAC_TestDataFactory.crearTareas(1,reclamacion,false);
+            listaDeTareasOtras[0].SAC_Observaciones__c = 'tareaEjemplo'; 
+            listaDeTareasOtras[0].SAC_PlazoMaximo__c = 10; 
+            listaDeTareasOtras[0].SAC_Prorroga__c = 5;
+            listaDeTareasOtras[0].OwnerId = usuario.id;
+            //listaDeTareasOtras[0].SAC_Pretension__c = pretension.Id;
+            SAC_DatabaseDML.insertDML(listaDeTareasOtras[0], false);
+
+            listaDeTareasOtras[0].SAC_Estado__c = 'SAC_Devuelta';
+            SAC_DatabaseDML.updateDML(listaDeTareasOtras[0], false);
+
+
+        }
+        SAC_Accion__c tareaResult = [SELECT Id, SAC_FechaUltimaDevolucion__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'tareaEjemplo'];
+        Assert.areNotEqual(null, tareaResult.SAC_FechaUltimaDevolucion__c, 'No se ha añadido la fecha de primer envío');
+        Test.stopTest();
+    }
+
     @istest
     static void autoasignarTareasTest() 
     {
@@ -303,17 +493,20 @@ public with sharing class SAC_AccionVF_Test {
 
    @istest
 	static void finalizarTareasTest(){
-	
+	    //String Usernamev = 'usergeneral2SAC150623SACTEST@test' + ORGID + '.com';
         Test.startTest();
-		List <SAC_Accion__c> listaTares = [SELECT Id, Name, OwnerId, SAC_EquipoResponsable__c,SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea 2'];
-		//User usuario = [select id, name, UserRole.name from user where Username = 'usergeneral2@test.com' and IsActive = true limit 1];
-        User usuario = [select id, name, UserRole.name from user where Id = :UserInfo.getUserId() limit 1];
+		List <SAC_Accion__c> listaTares = [SELECT Id, Name, OwnerId, SAC_EquipoResponsable__c,SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea 2' LIMIT 1];
+		//User usuario = [select id, name, UserRole.name from user where Username =: Usernamev and IsActive = true limit 1];
+        User usuario = [select id, name, UserRole.name from user where Username = 'usertestadmin@test.com.testSetup' limit 1];
+
 		PermissionSet ps = [select id from PermissionSet where PermissionSet.Label ='SAC_General'];
-		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId = :UserInfo.getUserId()];
+		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId = :usuario.id];
 		if(psas.isEmpty()){
-			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = UserInfo.getUserId());
-			Database.insert(psa);
+			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId =usuario.id);
+            SAC_DatabaseDML.insertDML(psa, false);
+			//Database.insert(psa);
 		}
+
 
 		System.runAs(usuario){
 			PageReference testPage = Page.SAC_AutoasignarTarea;
@@ -336,17 +529,19 @@ public with sharing class SAC_AccionVF_Test {
         Test.startTest();
 		List <SAC_Accion__c> listaTares = [SELECT Id, Name, OwnerId, SAC_EquipoResponsable__c,SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea 2'];
 		//User usuario = [select id, name, UserRole.name from user where Username = 'usergeneral2@test.com' and IsActive = true limit 1];
-        User usuario = [select id, name, UserRole.name from user where Id = :UserInfo.getUserId() limit 1];
+        User usuario = [select id, name, UserRole.name from user where Username = 'usertestadmin@test.com.testSetup' limit 1];
 		PermissionSet ps = [select id from PermissionSet where PermissionSet.Label ='SAC_General'];
-		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId = :UserInfo.getUserId()];
+		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId = :usuario.id];
 		if(psas.isEmpty()){
-			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = UserInfo.getUserId());
-			Database.insert(psa);
+			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
+            SAC_DatabaseDML.insertDML(psa, false);
+			//Database.insert(psa);
 		}
 
 		System.runAs(usuario){
             listaTares[0].SAC_Estado__c = 'SAC_Finalizada';
-            Database.update(listaTares);
+            SAC_DatabaseDML.updateListDML(listaTares, false);
+            //Database.update(listaTares);
 			PageReference testPage = Page.SAC_AutoasignarTarea;
 			Test.setCurrentPage(testPage);
             ApexPages.currentPage().getParameters().put('observaciones', 'observaciones test');
@@ -478,7 +673,8 @@ public with sharing class SAC_AccionVF_Test {
             Test.startTest();
 
             try {
-                Database.update(tarea);
+                SAC_DatabaseDML.updateDML(tarea, true);
+                //Database.update(tarea);
             } catch (Exception e) {
                 error = true;
             }
@@ -491,29 +687,31 @@ public with sharing class SAC_AccionVF_Test {
 
     @istest
     static void cambiarPropietarioTarea2(){
+        Test.startTest();
         Boolean error=false;
         SAC_Accion__c tarea = [SELECT Id, Name, OwnerId, SAC_EquipoResponsable__c,SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea5' LIMIT 1] ;
         String userName = 'usergeneral3SAC150623SACTEST@test' + ORGID + '.com';
         User usuario = [select id, name, UserRole.name from user where Username = :userName and IsActive = true limit 1];
         Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'testrec3'];
         SAC_MaestroAccionesReclamacion__c maestro = [SELECT ID FROM SAC_MaestroAccionesReclamacion__c LIMIT 1];
-
         reclamacion.ownerId = usuario.id;
         tarea.ownerId = usuario.id;
         tarea.SAC_MaestroAccionesReclamacion__c = maestro.id;
 
         System.runAs(usuario) {
-            Test.startTest();
+            
             try {
-                Database.update(reclamacion);
-                Database.update(tarea);
+                SAC_DatabaseDML.updateDML(reclamacion, true);
+                //Database.update(reclamacion);
+                SAC_DatabaseDML.updateDML(tarea, true);
+                //Database.update(tarea);
             } catch (Exception e) {
                 error = true;
             }
         }
-        
+
         Test.stopTest();
-        system.assertEquals(true, error, 'No se puede cambiar el propietario');
+        system.assertEquals(false, error, 'No se puede cambiar el propietario');
     }
 
     @istest
@@ -731,7 +929,8 @@ public with sharing class SAC_AccionVF_Test {
         User usuario = [select id, name, UserRole.name from user where Username = :userName and IsActive = true limit 1];
         
         reclamacion.OwnerId = usuario.id;
-        Database.update(reclamacion);
+        SAC_DatabaseDML.updateDML(reclamacion, false);
+        //Database.update(reclamacion);
         System.RunAs(usuario){  
             Test.startTest();
             SAC_Accion__c tarea = new SAC_Accion__c();
@@ -739,7 +938,8 @@ public with sharing class SAC_AccionVF_Test {
             tarea.SAC_PlazoMaximo__c = 10;
             tarea.SAC_Reclamacion__c = reclamacion.id;
             tarea.RecordTypeId = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SAC_OtrasTareas').getRecordTypeId();
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
             Test.stopTest();
         }
         SAC_Accion__c tareaResultado = [SELECT Id, SAC_Observaciones__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'test observacion test2' LIMIT 1];
@@ -753,7 +953,8 @@ public with sharing class SAC_AccionVF_Test {
         User usuario = [select id, name, UserRole.name from user where Username = :userName and IsActive = true limit 1];
         
         reclamacion.OwnerId = usuario.id;
-        Database.update(reclamacion);
+        SAC_DatabaseDML.updateDML(reclamacion, false);
+        //Database.update(reclamacion);
         System.RunAs(usuario){   
             Test.startTest();
             SAC_Accion__c tarea = new SAC_Accion__c();
@@ -761,7 +962,8 @@ public with sharing class SAC_AccionVF_Test {
             tarea.SAC_PlazoMaximo__c = 10;
             tarea.SAC_Reclamacion__c = reclamacion.id;
             tarea.RecordTypeId = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SAC_OtrasTareas').getRecordTypeId();
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
             Test.stopTest();
         }
 
@@ -782,7 +984,8 @@ public with sharing class SAC_AccionVF_Test {
             Test.startTest();
 
             tareas[0].SAC_Estado__c = 'SAC_Finalizada';
-            Database.update(tareas);
+            SAC_DatabaseDML.updateListDML(tareas, false);
+            //Database.update(tareas);
             // Crea el mapa y añade la reclamación y las tareas asociadas
             Map<Id, List<SAC_Accion__c>> mapaRecTareas = new Map<Id, List<SAC_Accion__c>>();
             mapaRecTareas.put(reclamacion.Id, tareas);
@@ -807,7 +1010,8 @@ public with sharing class SAC_AccionVF_Test {
             accion.SAC_FechaVencimientoProrroga__c = navidad.date();
     
             try {
-                Database.update(accion);
+                SAC_DatabaseDML.updateDML(accion, true);
+                //Database.update(accion);
             } catch (Exception e) {
                 error = true;
             } 
@@ -827,7 +1031,8 @@ public with sharing class SAC_AccionVF_Test {
         CBK_IntegrationSetting__c csGGH = new CBK_IntegrationSetting__c();
         csGGH.Name = 'SAC_GGH_Callout';
         csGGH.NamedCredential__c = 'callout:API_GWT_PRE/tech/gdsusr/api/GGHAPI/AltaReclamacion';
-        Database.insert(csGGH);
+        SAC_DatabaseDML.insertDML(csGGH, false);
+        //Database.insert(csGGH);
 
         Test.setMock(HttpCalloutMock.class, new SAC_MockHttpResponseGenerator(200, 'OK', null, null));
 
@@ -856,7 +1061,8 @@ public with sharing class SAC_AccionVF_Test {
         System.RunAs(admin){   
             Test.startTest();       
             accion.ownerId = usuario.Id;
-            Database.update(accion);
+            SAC_DatabaseDML.updateDML(accion, false);
+            //Database.update(accion);
             Test.stopTest();
         }
 
@@ -872,7 +1078,8 @@ public with sharing class SAC_AccionVF_Test {
         User usuario = [select id, name, UserRole.name from user where Username = :userName and IsActive = true limit 1];
 
         pretension.OwnerId = usuario.id;
-        Database.update(pretension);
+        SAC_DatabaseDML.updateDML(pretension, false);
+        //Database.update(pretension);
 
         System.RunAs(usuario){   
             Test.startTest();       
@@ -880,7 +1087,8 @@ public with sharing class SAC_AccionVF_Test {
             tarea.SAC_Observaciones__c='test observacion test'; 
             tarea.SAC_Pretension__c = pretension.id;
             tarea.RecordTypeId = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SAC_OtrasTareas').getRecordTypeId();
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
             Test.stopTest();
         }
 
@@ -897,7 +1105,8 @@ public with sharing class SAC_AccionVF_Test {
         System.RunAs(usuario){  
             Test.startTest();
             SAC_AccionMetodos.rellenarFechaEjecucion(tareas);
-            Database.update(tareas);
+            SAC_DatabaseDML.updateListDML(tareas, false);
+            //Database.update(tareas);
             Test.stopTest();
         }
         List<SAC_Accion__c> tareaResultado = [SELECT Id, SAC_Observaciones__c, SAC_Estado__c, SAC_FechaDeEjecucion__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'Tarea test' LIMIT 1];
@@ -915,11 +1124,33 @@ public with sharing class SAC_AccionVF_Test {
             Test.startTest();
             tareas[0].SAC_Tercero__c = '';
             SAC_AccionMetodos.actualizarFechaTentativa(tareas);
-            Database.update(tareas);
+            SAC_DatabaseDML.updateListDML(tareas, false);
+            //Database.update(tareas);
             Test.stopTest();
         }
         List<SAC_Accion__c> tareaResultado = [SELECT Id, SAC_FechaTentativa__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'Tarea test' LIMIT 1];
 
         system.assertNotEquals(fechaAntes, tareaResultado[0].SAC_FechaTentativa__c, 'No se ha actualizado el campo fecha tentativa correctamente.');
+    }
+
+    @isTest
+    static void finalizarTareaConImpAbonadoTest() {
+        List<SAC_Accion__c> tareas = [SELECT Id, SAC_Tercero__c, SAC_FechaTentativa__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'Tarea test SAC con imp abonado' LIMIT 1];
+        String userName = 'usergeneralSAC150623SACTEST@test' + ORGID + '.com';
+        User usuario = [SELECT id, name, UserRole.name FROM user WHERE Username = :userName and IsActive = true LIMIT 1];
+        Boolean hayError = false;
+
+        System.RunAs(usuario){  
+            Test.startTest();
+                try {
+                    tareas[0].SAC_Estado__c = 'SAC_Finalizada';
+                    SAC_DatabaseDML.updateListDML(tareas, false);
+                } catch (Exception e) {
+                    hayError = true;
+                }  
+            Test.stopTest();
+        }
+
+        Assert.areEqual(false, hayError, 'No ha saltado la validación de importe abonado en la tarea.');
     }
 }

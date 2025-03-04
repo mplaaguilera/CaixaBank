@@ -14,22 +14,24 @@ Historial
  * @description Método en el que se procesa un LoginEvent para evaluarse, solamente si es de ese tipo
  */
 public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.EventCondition{
-
     /**
      * @description Método de evaluación que solamente procesará las entradas de LoginEvent
      */
     public Boolean evaluate(SObject oEvent){
-        switch on oEvent {
-            when LoginEvent oLoginEvent {
-                return evaluateLoginEvent(oLoginEvent);
-            }
-            when null {
+        switch on oEvent{
+            when LoginEvent oLoginEvent{
+                if(!hasBypassIPRangeCustomPermission(oLoginEvent.UserId)){
+                    return evaluateLoginEvent(oLoginEvent);
+                }
                 return false;
             }
-            when else {
+            when null{
                 return false;
             }
-        }
+            when else{
+                return false;
+            }
+        } 
     }
 
     /**
@@ -39,12 +41,15 @@ public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.Eve
         //Se mira si viene informado la IP en el LoginEvent y si el estado fue 'Success'
         if(oLoginEvent.SourceIp != null && oLoginEvent.Status == 'Success'){
             //Se obtiene el rango de IPs permitidos desde el metadato CBK_RangoIPCyber
-            List<String> listIPRanges = getCyberIPRanges();
+            List<CBK_CyberIPRange__mdt> listIPRanges = getCyberIPRanges();
 
-            //En el caso de ser un test, se rellena la lista con una IP de ejemplo
+            //En el caso de ser un test, se rellena la lista con un rango IP de ejemplo
             if(Test.isRunningTest()){
-                listIPRanges = new List<String>{'31.149.131.115-31.149.131.115'};
-            }
+                CBK_CyberIPRange__mdt oTestIPRange = new CBK_CyberIPRange__mdt();
+                oTestIPRange.CBK_IPStartAddress__c = '31.149.131.115';
+                oTestIPRange.CBK_IPEndAddress__c = '31.149.131.115';
+                listIPRanges = new List<CBK_CyberIPRange__mdt>{oTestIPRange};
+            }  
 
             //Solamente se comprueba la IP en el caso que haya rangos configurados
             if(!listIPRanges.isEmpty()){
@@ -63,9 +68,9 @@ public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.Eve
                     listValues.add(JSON.serialize(oLoginEvent));
 
                     //Se genera el Builder
-                    CBK_Log_Debug_Builder.DebugProcessConfigBuilder oBuilder = new CBK_Log_Debug_Builder.DebugProcessConfigBuilder()
+                    CBK_Log.DebugProcessConfigBuilder oBuilder = new CBK_Log.DebugProcessConfigBuilder()
                     .setContextId(oLoginEvent.Id)
-                    .setMessage(new Map<String, String>{'IPRangeError' => 'Acceso fuera del rango de IPs de Cyber'})
+                    .setMessage('IPRangeError - Acceso fuera del rango de IPs de Cyber')
                     .setValues(listValues)
                     .setLevel(LoggingLevel.INFO)
                     .setforce(true)
@@ -74,9 +79,8 @@ public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.Eve
                     .setCategory('Login IP Out Of Range');
 
                     //Se inserta el Builder como CBK_Log
-                    CBK_Log_Debug_Builder.DebugProcessConfig oConfig = oBuilder.build();
-                    CBK_Log.addDebug(oConfig);
-                    CBK_Log.insertDMLDebug();
+                    oBuilder.addLog();
+                    CBK_Log.insertPlatformEvent();
                     return true;
                 }
             }
@@ -89,13 +93,13 @@ public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.Eve
     /**
      * @description Recuperar rangos de IP de Cyber guardados en el mdt CBK_CyberIPRanges
      */
-    private List<String> getCyberIPRanges(){
+    private List<CBK_CyberIPRange__mdt> getCyberIPRanges(){
         //Se recorren todos los rangos de IP para guardarlos en una forma procesable
-        List<String> listIPRanges = new List<String>();
+        List<CBK_CyberIPRange__mdt> listIPRanges = new List<CBK_CyberIPRange__mdt>();
         for(CBK_CyberIPRange__mdt oCyberIPRange : [SELECT CBK_IPStartAddress__c, CBK_IPEndAddress__c
                                                    FROM CBK_CyberIPRange__mdt])
         {
-            listIPRanges.add(oCyberIPRange.CBK_IPStartAddress__c + '-' + oCyberIPRange.CBK_IPEndAddress__c);
+            listIPRanges.add(oCyberIPRange);
         }
 
         //Retorno
@@ -108,29 +112,21 @@ public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.Eve
      * @param listIPRanges	-> Lista con los rangos de IP configurados
 	 * @return		        -> Boolean que indica si ha entrado en el rango o no
      */
-    private Boolean isIPInRangeList(String sSourceIP, List<String> listIPRanges){
+    private Boolean isIPInRangeList(String sSourceIP, List<CBK_CyberIPRange__mdt> listIPRanges){
+        //Se utilizará este RegEx para comprobar que las IPs a comprobar tienen el formato correcto
+        String sIPRegex = '^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$';
+
         //Se recorren todos los rangos de IP para guardarlos en una forma procesable
-        for(String sIPRange : listIPRanges){
-            List<String> listIPStartEndRange = sIPRange.split('-');
-            String sStartIP = listIPStartEndRange[0];
-            String sEndIP = listIPStartEndRange[1];
+        for(CBK_CyberIPRange__mdt oIPRange : listIPRanges){
+            String sStartIP = oIPRange.CBK_IPStartAddress__c;
+            String sEndIP = oIPRange.CBK_IPEndAddress__c;
 
             //Se revisa si las IPs de los rangos son válidas, y si es así, se revisa que la IP a validar esté en el rango
-            if(validateIPStringFormat(sStartIP) && validateIPStringFormat(sEndIP) && (convertIPStringToDouble(sSourceIP) >= convertIPStringToDouble(sStartIP)) && (convertIPStringToDouble(sSourceIP) <= convertIPStringToDouble(sEndIP))){
+            if(Pattern.matches(sIPRegex, sStartIP) && Pattern.matches(sIPRegex, sEndIP) && (convertIPStringToDouble(sSourceIP) >= convertIPStringToDouble(sStartIP)) && (convertIPStringToDouble(sSourceIP) <= convertIPStringToDouble(sEndIP))){
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * @description Revisar que una IP en String tenga el formato 'a.b.c.d'
-     * @param sIP   -> IP del intento de login
-	 * @return		-> Boolean que indica si la IP cumple con el formato
-     */
-    private Boolean validateIPStringFormat(String sIP){
-        String sIPRegex = '^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$';
-        return Pattern.matches(sIPRegex, sIP);
     }
 
     /**
@@ -144,5 +140,21 @@ public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.Eve
                Double.valueOf(listSegments[1]) * Math.pow(255, 2) +
                Double.valueOf(listSegments[2]) * Math.pow(255, 1) +
                Double.valueOf(listSegments[3]) * Math.pow(255, 0);
+    }
+
+    /**
+     * @description Comprobar si el usuario posee el PermissionSet 'CBK_ByPass_IP_Range'
+     * @param sUserId   -> ID del User del LoginEvent
+	 * @return		    -> Boolean indicando si tiene el PermissionSet asignado o no
+     */
+    private Boolean hasBypassIPRangeCustomPermission(Id sUserId){
+        List<PermissioNSetAssignment> listPermSetAssignments = [SELECT Id
+                                                                FROM PermissionSetAssignment
+                                                                WHERE Assignee.Id = :sUserId
+                                                                AND PermissionSet.Name = 'CBK_ByPass_IP_Range'];
+        if(listPermSetAssignments.isEmpty()){
+            return false;
+        }
+        return true;
     }
 }

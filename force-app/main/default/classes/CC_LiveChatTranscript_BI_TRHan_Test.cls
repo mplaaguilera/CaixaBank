@@ -131,16 +131,19 @@ public with sharing class CC_LiveChatTranscript_BI_TRHan_Test {
             liveChatTranscript.CaseId = caso.Id;
             update liveChatTranscript;
         Test.stopTest();
-        /* TODO: no se está verificando el envío a Siebel, se supone que tiene su propia clase de test */
+        // TODO: no se está verificando el envío a Siebel, se supone que tiene su propia clase de test 
         
-        /* Verificamos que cuando se informan cuenta, contacto y caso al chat del agente
-      se informan también para el chat de cognitivo */
+        // Verificamos que cuando se informan cuenta, contacto y caso al chat del agente se informan también para el chat de cognitivo 
         Id chatCognitivoId = [SELECT CC_ChatOrigen__c FROM LiveChatTranscript WHERE Id=:liveChatTranscript.Id].CC_ChatOrigen__c;
         LiveChatTranscript chatCognitivo = [SELECT AccountId, ContactId, CaseId FROM LiveChatTranscript WHERE Id=:chatCognitivoId];
         System.assertEquals(chatCognitivo.AccountId, liveChatTranscript.AccountId);
         System.assertEquals(chatCognitivo.ContactId, liveChatTranscript.ContactId);
         System.assertEquals(chatCognitivo.CaseId, liveChatTranscript.CaseId);
     }
+
+
+
+
 
     @isTest
     static void testEmployeeAgente() {

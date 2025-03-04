@@ -13,11 +13,11 @@ export default class crmProgramarCitaOficina extends LightningElement {
 
 	connectedCallback() {
 		const dias = [
-			{label: 'Dilluns', slots: ['12:00', '13:00', '16:00', '17:00']},
-			{label: 'Dimarts', slots: ['09:00', '10:00', '11:00', '12:00', '13:00']},
-			{label: 'Dimecres', slots: ['09:00', '12:00', '13:00', '16:00', '17:00']},
-			{label: 'Dijous', slots: ['09:00', '10:00', '11:00', '12:00', '13:00', '16:00', '17:00']},
-			{label: 'Divendres', slots: ['09:00', '11:00', '12:00', '13:00', '16:00', '17:00']},
+			{label: 'Lunes', slots: ['12:00', '13:00', '16:00', '17:00']},
+			{label: 'Martes', slots: ['09:00', '10:00', '11:00', '12:00', '13:00']},
+			{label: 'Miércoles', slots: ['09:00', '12:00', '13:00', '16:00', '17:00']},
+			{label: 'Jueves', slots: ['09:00', '10:00', '11:00', '12:00', '13:00', '16:00', '17:00']},
+			{label: 'Viernes', slots: ['09:00', '11:00', '12:00', '13:00', '16:00', '17:00']},
 		];
 
 		this.diasSemana = dias.map(dia => {
@@ -39,7 +39,7 @@ export default class crmProgramarCitaOficina extends LightningElement {
 			divMensajeSeleccion.classList.remove('mostrar');
 			divMensajeSeleccion.classList.add('ocultar');
 			window.setTimeout(()=> {
-				this.mensajeSeleccion = `${currentTarget.dataset.dia} a les ${currentTarget.dataset.hora}.`;
+				this.mensajeSeleccion = `${currentTarget.dataset.dia} a las ${currentTarget.dataset.hora}.`;
 				divMensajeSeleccion.classList.remove('ocultar');
 				divMensajeSeleccion.classList.add('mostrar');
 			}, 80);

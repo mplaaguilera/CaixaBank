@@ -72,8 +72,10 @@ public without sharing class SEG_Case_Operativas_Controller {
 		result.vControlarRT=isEmpleado;
 
 		//controlar que el Caso tenga la misma Organización y Zona que el Grupo asignado
-		if(caso.SEG_Grupo__r?.SEG_Organizacion__c == null || caso.SEG_Grupo__r?.SEG_Zona__c == null || !caso.SEG_Grupo__r?.SEG_Organizacion__c.contains(caso.SEG_Organizacion__c) || !caso.SEG_Grupo__r?.SEG_Zona__c.contains(caso.SEG_Zona__c)){
-			inOrgZona = true;
+		if(caso.SEG_Organizacion__c != null && caso.SEG_Zona__c != null && (caso.SEG_Grupo__r?.SEG_Organizacion__c == null || caso.SEG_Grupo__r?.SEG_Zona__c == null 
+			|| !caso.SEG_Grupo__r?.SEG_Organizacion__c.contains(caso.SEG_Organizacion__c) || !caso.SEG_Grupo__r?.SEG_Zona__c.contains(caso.SEG_Zona__c)))
+		{
+    		inOrgZona = true;
 		}
 
 		result.vControlarOrgZonaCaseGrupo = inOrgZona;

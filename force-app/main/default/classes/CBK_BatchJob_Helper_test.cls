@@ -13,6 +13,7 @@ private class CBK_BatchJob_Helper_test {
         jobDef.Activo__c=true;
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='INI';
+        jobDef.UsuarioContexto__c='OT';
         insert jobDef; 
         CBK_BatchJob_Helper.nextExecution(jobDef);
         system.assertNotEquals(jobDef.Id, null);
@@ -30,6 +31,7 @@ private class CBK_BatchJob_Helper_test {
         jobDef.Activo__c=true;
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='END';
+        jobDef.UsuarioContexto__c='OT';
         insert jobDef; 
         CBK_BatchJob_Helper.nextExecution(jobDef);
         system.assertNotEquals(jobDef.Id, null);
@@ -47,15 +49,22 @@ private class CBK_BatchJob_Helper_test {
         jobDef.Activo__c=true;
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='SCHED';
+        jobDef.UsuarioContexto__c='OT';
         insert jobDef; 
         CBK_BatchJob_Helper.nextExecution(jobDef);
         system.assertNotEquals(jobDef.Id, null);
     }
     
     @isTest 
-    static void findProject() {
-        String proyecto = CBK_BatchJob_Helper.findProject('CBK_BatchJob_Helper');
+    static void findProjectName() {
+        String proyecto = CBK_BatchJob_Helper.findProjectName('CBK_BatchJob_Helper');
         system.assertNotEquals(proyecto,null);
+    }
+
+    @isTest 
+    static void findProject() {
+        CBK_Framework_Batch_Apex__mdt conf = CBK_BatchJob_Helper.findProject('CBK_BatchJob_Helper');
+        system.assertNotEquals(conf,null);
     }
 
     @isTest 
@@ -71,7 +80,7 @@ private class CBK_BatchJob_Helper_test {
         CBK_BatchJob_Helper.batchJob running = new CBK_BatchJob_Helper.batchJob();
         running.jobId='xxxxxxx';
         running.batchName='CBK_Framework_Batch';
-        running.classNane='CBK_Framework_Batch';
+        running.className='CBK_Framework_Batch';
         running.project='Test';
         running.tipo='Puntual';
         lstRunning.add(running);

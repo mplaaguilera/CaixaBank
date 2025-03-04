@@ -5,13 +5,13 @@ public with sharing class SAC_LCMP_CopiaMasivaCasos_Test {
 
         //Usuario SAC General
 		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);   
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);   
 
         System.runAs(usuarioGeneral){
             //Reclamacion 1
@@ -35,7 +35,7 @@ public with sharing class SAC_LCMP_CopiaMasivaCasos_Test {
             List<Case> listaReclamaciones = new List<Case>();
             listaReclamaciones.add(reclamacion1);
             listaReclamaciones.add(reclamacion2);
-            Database.insert(listaReclamaciones);
+            SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
 
             //Pretension 1
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -44,7 +44,12 @@ public with sharing class SAC_LCMP_CopiaMasivaCasos_Test {
             camposPret.put('SAC_Reclamacion__c', reclamacion1.Id);
 
             Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(casoPretension);  
+            SAC_DatabaseDML.insertDML(casoPretension, false);  
+
+            Case updatePretensionPrincipal = new Case();
+            updatePretensionPrincipal.Id = reclamacion1.Id;
+            updatePretensionPrincipal.SAC_PretensionPrincipal__c = casoPretension.Id;
+            SAC_DatabaseDML.updateDML(updatePretensionPrincipal, false);
         
             //Copias
             //Reclamacion copia 1
@@ -72,11 +77,14 @@ public with sharing class SAC_LCMP_CopiaMasivaCasos_Test {
             List<Case> listaReclamacionesCopia = new List<Case>();
             listaReclamacionesCopia.add(reclamacionCopia1);
             listaReclamacionesCopia.add(reclamacionCopia2);
-            Database.insert(listaReclamacionesCopia);
+            SAC_DatabaseDML.insertListDML(listaReclamacionesCopia, false);
 
             //ContentVersion
             ContentVersion cv = SAC_TestDataFactory.crearContentVersion(reclamacion1);
-            Database.insert(cv);
+            SAC_DatabaseDML.insertDML(cv, false); 
+
+            ContentVersion cv2 = SAC_TestDataFactory.crearContentVersion(casoPretension);
+            SAC_DatabaseDML.insertDML(cv2, false); 
         }
     }
 
@@ -95,7 +103,6 @@ public with sharing class SAC_LCMP_CopiaMasivaCasos_Test {
 
         List<Case> listaCopias = [SELECT Id, SAC_CasoRelacionado__c FROM Case WHERE (RecordTypeId = :recordTypeReclamacion OR recordTypeId = :recordTypePretension)
                                 AND SAC_CasoRelacionado__c <> null];
-
         System.assertNotEquals(null, listaCopias, 'No se han podido insertar las copias');
     }
 
@@ -106,7 +113,16 @@ public with sharing class SAC_LCMP_CopiaMasivaCasos_Test {
 
         System.runAs(usuario){
             Test.startTest();
-            System.enqueueJob(new SAC_FinalizarProcesoCopia(listaCaso, false));
+            DateTime dt = DateTime.now();
+            Long dateInMilliseconds = dt.getTime();
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+            .addId(listaCaso.get(0).Id)
+            .addString(String.valueOf(dateInMilliseconds))
+            .build();
+            try {
+                System.enqueueJob(new SAC_FinalizarProcesoCopia(listaCaso, false), options);    
+            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 }    
             Test.stopTest();
         }
 

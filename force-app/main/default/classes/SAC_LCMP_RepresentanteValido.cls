@@ -28,7 +28,7 @@ public without sharing class SAC_LCMP_RepresentanteValido {
     public static Case getCase(String caseId){
         try {
             Case caso = [SELECT Id, SAC_TipoDeRepresentante__c, SAC_TipoDeDocumento__c, SAC_NombreRepresentante__c, SAC_EmailRepresentante__c,
-                        toLabel(SAC_DespachoRepresentante__c), SAC_NumeroDelDocumento__c, SAC_DireccionPostal__c, SAC_TelefonoRepresentante__c,
+                        toLabel(SAC_DespachoRepresentante__c), SAC_NumeroDelDocumento__c, CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SAC_DespachoRepresentante__c, SAC_DireccionPostal__c, SAC_TelefonoRepresentante__c,
                         SAC_NombreContacto__c, SAC_UsarDatos__c, SAC_DireccionRepresentante__c, SAC_CodigoPostalRepresentante__c, SAC_PoblacionRepresentante__c,
                         SAC_ProvinciaRepresentante__c, SAC_PaisRepresentante__c, SAC_PoderRepresentante__c, RecordType.DeveloperName 
                         FROM Case
@@ -165,7 +165,7 @@ public without sharing class SAC_LCMP_RepresentanteValido {
             }
             //Si alguno de los campos del representante está informado, hay que empezar con las validaciones
             if (String.isNotBlank(caso.SAC_TipoDeRepresentante__c) || String.isNotBlank(caso.SAC_TipoDeDocumento__c) || String.isNotBlank(caso.SAC_NombreRepresentante__c) ||
-                String.isNotBlank(caso.SAC_EmailRepresentante__c) || String.isNotBlank(caso.SAC_DespachoRepresentante__c) || String.isNotBlank(caso.SAC_NumeroDelDocumento__c) ||
+                String.isNotBlank(caso.SAC_EmailRepresentante__c) || String.isNotBlank(caso.SAC_DespachoRepresentante__c) || String.isNotBlank(caso.CBK_Case_Extension_Id__r.SAC_DespachoRepresentante__c) || String.isNotBlank(caso.SAC_NumeroDelDocumento__c) ||
                 String.isNotBlank(caso.SAC_DireccionPostal__c) || String.isNotBlank(caso.SAC_TelefonoRepresentante__c) || String.isNotBlank(caso.SAC_DireccionRepresentante__c) || 
                 String.isNotBlank(caso.SAC_CodigoPostalRepresentante__c) || String.isNotBlank(caso.SAC_PoblacionRepresentante__c) || String.isNotBlank(caso.SAC_ProvinciaRepresentante__c) || 
                 String.isNotBlank(caso.SAC_PaisRepresentante__c) ) {

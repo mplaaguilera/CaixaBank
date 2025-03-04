@@ -8,6 +8,8 @@ public with sharing class SAC_FormulariosGGHFraude {
     
 	private static String varYes = 'Sí';
     private static String varNo = 'No';
+    private static String varOriginFormulario = 'SAC_Formulario';
+    private static String varIntUser = 'SAC Integración';
     private static final Id RECTYPEPRETENSION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
     private static final Id RECTYPEFORMGGH = Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SAC_Formulario_GGH').getRecordTypeId();
     private static final Id RECTYPEFORMFRAUDE = Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SAC_Formulario_Fraude').getRecordTypeId();
@@ -38,10 +40,13 @@ public with sharing class SAC_FormulariosGGHFraude {
                             SuppliedName, CC_SuppliedApellido1__c, CC_SuppliedApellido2__c, SuppliedEmail, SuppliedPhone, CC_SuppliedOficina__c, CC_SuppliedMotivo__c, CC_SuppliedProducto__c, Description 
                             FROM Case WHERE Id =: recId LIMIT 1];
         List<SPV_Formulario__c> formularioList = [SELECT Id, RecordTypeId, RecordType.DeveloperName, SPV_Caso__c, SAC_Fechas__c, SAC_Provincia__c, SAC_Representante_Legal__c, SAC_Tipo_Documento__c FROM SPV_Formulario__c WHERE SPV_Caso__c =: recId];
-        for(Case pretension: [SELECT Id, CaseNumber, Subject, SAC_ImpReclamadoGestoria__c, SAC_ImpReclamadoNotaria__c, SAC_ImpReclamadoRegistros__c, SAC_Otros_gastos__c, CC_Importe_Reclamado__c, SAC_Reclamacion__c, SAC_Prestamo_seleccionado__c 
+        for(Case pretension: [SELECT Id, CaseNumber, Subject, SAC_ImpReclamadoGestoria__c, SAC_ImpReclamadoNotaria__c, SAC_ImpReclamadoRegistros__c, SAC_Otros_gastos__c, CC_Importe_Reclamado__c, SAC_Reclamacion__c, SAC_Prestamo_seleccionado__c, Origin, SAC_GenialEstado__c, CreatedBy.Name 
                               FROM Case 
                               WHERE RecordTypeId =: RECTYPEPRETENSION 
-                              AND SAC_Reclamacion__c =: reclamacion.Id]){
+                              AND SAC_Reclamacion__c =: reclamacion.Id
+                              AND Origin =: varOriginFormulario
+                              AND CreatedBy.Name =: varIntUser
+                              AND SAC_GenialEstado__c = null]){
             if(!mapPretensiones.containsKey(pretension.SAC_Reclamacion__c)){
                 List<Case> pretensionList = new List<Case>();
                 pretensionList.add(pretension);

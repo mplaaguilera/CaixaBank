@@ -15,29 +15,29 @@ public with sharing class SAC_CaracteristicaCarga_Test {
     @TestSetup
     static void makeData(){
 
-        Id clienteCuentaCaracteristicaRecordTypeId = Schema.getGlobalDescribe().get('CC_Caracteristica__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SAC_CaracteristicaClienteCuenta').getRecordTypeId();
-        Id clienteCuentaRecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        Id clienteCuentaCaracteristicaRecordTypeId = Schema.SObjectType.CC_Caracteristica__c.getRecordTypeInfosByDeveloperName().get('SAC_CaracteristicaClienteCuenta').getRecordTypeId();
+        Id clienteCuentaRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
         User usuarioAdmin;
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];     
-            Database.insert(usuarioAdmin);
+            SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioAdmin.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         //Account
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
 
         //Contact
 		Contact contacto = SAC_TestDataFactory.crearContacto(1, cuenta.Id)[0];
-		Database.insert(contacto);
+        SAC_DatabaseDML.insertDML(contacto, false);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -47,7 +47,7 @@ public with sharing class SAC_CaracteristicaCarga_Test {
         camposRecl.put('OwnerId', usuarioAdmin.id);
         
         Case reclamacion1 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-        Database.insert(reclamacion1);
+        SAC_DatabaseDML.insertDML(reclamacion1, false);
 
         //Reclamantes
         SAC_CaseReclamante__c reclamantePrincipal = SAC_TestDataFactory.crearReclamante(true, reclamacion1, cuenta.Id);
@@ -63,10 +63,10 @@ public with sharing class SAC_CaracteristicaCarga_Test {
         listaReclamantes.add(reclamantePrincipal);
         listaReclamantes.add(reclamanteSecundario1);
         listaReclamantes.add(reclamanteSecundario2);
-        Database.insert(listaReclamantes);
+        SAC_DatabaseDML.insertListDML(listaReclamantes, false);
 
         ContentVersion contentVersionInsert = SAC_TestDataFactory.crearContentVersion(reclamacion1);
-        Database.insert(contentVersionInsert);
+        SAC_DatabaseDML.insertDML(contentVersionInsert, false);
 
         ContentVersion contentVersion2 = new ContentVersion(
             Title = 'TestSAC2',
@@ -77,14 +77,14 @@ public with sharing class SAC_CaracteristicaCarga_Test {
                                         'nulo'),
             IsMajorVersion = true
         );
-        Database.insert(contentVersion2);
+        SAC_DatabaseDML.insertDML(contentVersion2, false);
 
         CC_Caracteristica__c caracteristica = new CC_Caracteristica__c(
             Name = 'Caracteristica tipo Cliente_Cuenta Test SAC',
             RecordTypeId = clienteCuentaCaracteristicaRecordTypeId,
             CC_Descripcion__c = 'PruebaSAC'
         );
-        Database.insert(caracteristica);
+        SAC_DatabaseDML.insertDML(caracteristica, false);
 
         CC_Caracteristica__c caracteristica2 = new CC_Caracteristica__c(
             Name = 'Caracteristica tipo representante Test SAC',
@@ -105,8 +105,7 @@ public with sharing class SAC_CaracteristicaCarga_Test {
             Test.stopTest();
         }
         
-        List<ContentDocument> contentDocumentList = [SELECT Id FROM ContentDocument WHERE Title = 'ABC Test'];
-        System.assertEquals(0, contentDocumentList.size(), 'No se ha podido eliminar el content document');
+        System.assertEquals(0, [SELECT Count() FROM ContentDocument WHERE Title = 'ABC Test'], 'No se ha podido eliminar el content document');
     }
 
     @isTest

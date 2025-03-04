@@ -3,7 +3,7 @@ public class CSBD_Reclamaciones_Prestamos_Test {
 
     @testSetup
     public static void altaDatosPrueba() {
-        System.runAs(CSBD_Usuarios.usuarioAdministrador()) {
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
             //Alta de las parametrizaciones que necesita el trigger BI de oportunidades
             CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
             listaValores.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();

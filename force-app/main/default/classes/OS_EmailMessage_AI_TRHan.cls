@@ -23,7 +23,6 @@ public with sharing class OS_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
         List<EmailMessage> newList = filtrarEmailMessageCaso(listNewObj);
         validarBuzonSalida(newList);
         //Se comprueba si el correo contiene algún fichero adjunto con un formato no permitido y, en tal caso, se impide su envío.
-        comprobarAnexosPermitidos(newList, mapNewObj);
         logicaEntradaCorreo(newList);
         limitarAdjuntos(newList);
 
@@ -339,33 +338,6 @@ public with sharing class OS_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
             htmlBody = [SELECT DeveloperName, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_Respuesta_Automatica_Cliente_ca' LIMIT 1].HtmlValue;
         } else {
             htmlBody = [SELECT DeveloperName, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_Respuesta_Automatica_Cliente_es' LIMIT 1].HtmlValue;
-        }
-    }
-
-    private void comprobarAnexosPermitidos(List<EmailMessage> listNewObj, Map<Id, EmailMessage> mapNewObj) {
-        
-        if (!listNewObj.isEmpty()) {
-            // Se recopilan los correos salientes que contienen anexo
-            List<Id> correosSalientes = new List<Id>();
-            for (EmailMessage correo : listNewObj) {
-                if (!correo.Incoming) {
-                    correosSalientes.add(correo.Id);
-                }
-            }
-            if (!correosSalientes.isEmpty()) {
-                //Se obtienen las extensiones permitidas para un anexo
-                List<String> extensionesPermitidas = new List<String>();
-                for (CC_ConfiguracionAnexoPermitido__mdt extensionPermitida : [SELECT CC_Extension__c FROM CC_ConfiguracionAnexoPermitido__mdt]) {
-                    extensionesPermitidas.add(extensionPermitida.CC_Extension__c);
-                }
-                // Se comprueban las extensiones de los anexos y se impide el envío del correo en caso de que contenga algún anexo con extensión no permitida.
-                for (ContentDocumentLink contentDocumentLink : [SELECT LinkedEntityId FROM ContentDocumentLink
-                                                                WHERE ContentDocument.FileExtension NOT IN :extensionesPermitidas
-                                                                AND LinkedEntityId IN :correosSalientes]) {           
-                    EmailMessage correoSalienteConAnexoProhibido = mapNewObj.get(contentDocumentLink.LinkedEntityId);
-                    correoSalienteConAnexoProhibido.addError('El correo tiene un adjunto con una extensión no petmitida.'); 
-                }
-            }
         }
     }
 

@@ -19,7 +19,7 @@ public with sharing class OS_Metodos_EmailServices {
         Set<String> referenciaSet = new Set<String>();
 
         if (correo.plainTextBody != null) {
-            Pattern p = Pattern.compile('\\#@[a-zA-Z0-9]{33}\\#');
+            Pattern p = Pattern.compile('\\#@[a-zA-Z0-9]{32,33}\\#');
             Matcher m = p.matcher(correo.plainTextBody.left(64000));
             while (m.find()) {
                 referenciaSet.add(m.group(0).substringBetween('#@', '#'));
@@ -27,7 +27,7 @@ public with sharing class OS_Metodos_EmailServices {
         }
         //En ocasiones el campo TextBody (sin formato) viene vacío, se busca en el campo HtmlBody
         if (referenciaSet.isEmpty() && correo.HtmlBody != null) {
-            Pattern p = Pattern.compile('\\#@[a-zA-Z0-9]{33}\\#');
+            Pattern p = Pattern.compile('\\#@[a-zA-Z0-9]{32,33}\\#');
             Matcher m = p.matcher(correo.HtmlBody.left(64000));
             while (m.find()) {
                 referenciaSet.add(m.group(0).substringBetween('#@', '#'));
@@ -290,6 +290,10 @@ public with sharing class OS_Metodos_EmailServices {
                 cv.PathOnClient = textAttachment.fileName;
                 cv.Origin = 'H';
                 cv.Title = textAttachment.fileName;
+                //Por si el adjunto llega con el body vacío
+                if(textAttachment.body == '' || textAttachment.body == null){
+                    textAttachment.body = ' ';
+                }
                 cv.VersionData = Blob.valueOf(textAttachment.body);
                 listaContentVersion.add(cv);
             }

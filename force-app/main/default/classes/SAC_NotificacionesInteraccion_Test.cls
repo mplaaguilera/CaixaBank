@@ -18,14 +18,16 @@ public with sharing class SAC_NotificacionesInteraccion_Test {
         User usuarioGeneral;
           System.runAs(new User(Id = Userinfo.getUserId())) {
                //Usuario SAC General
-               usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-               Database.insert(usuarioGeneral);
+               usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];    
+               SAC_DatabaseDML.insertDML(usuarioGeneral, false);   
+               //Database.insert(usuarioGeneral);
 
                PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
                PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
                permiSetAssi.AssigneeId = usuarioGeneral.Id;
                permiSetAssi.PermissionSetId = permiSet.Id;
-               Database.insert(permiSetAssi);
+               SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+               //Database.insert(permiSetAssi);
           }
 
         //grupo colaborador nivel 2
@@ -34,7 +36,8 @@ public with sharing class SAC_NotificacionesInteraccion_Test {
         grupo.SAC_PermiteEscalado__c = true;
         grupo.SAC_NivelGrupo__c = 'SAC_Nivel2';
         grupo.SAC_Email__c = 'etesting@test.test';
-        Database.insert(grupo);
+        SAC_DatabaseDML.insertDML(grupo, false);  
+        //Database.insert(grupo);
 
         //RECLAMACION 1
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -44,7 +47,8 @@ public with sharing class SAC_NotificacionesInteraccion_Test {
         camposRecl.put('OwnerId', usuarioGeneral.id);
     
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-        Database.insert(casoReclamacion);  
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);  
+        //Database.insert(casoReclamacion);  
 
         //Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -55,7 +59,8 @@ public with sharing class SAC_NotificacionesInteraccion_Test {
         camposPret.put('SAC_Reclamacion__c', casoReclamacion.id);
     
         Case pretension = SAC_TestDataFactory.crearCaso('Pretension', camposPret);
-        Database.insert(pretension);  
+        SAC_DatabaseDML.insertDML(pretension, false);  
+        //Database.insert(pretension);  
 
         //Interaccion escalado
         Map<String, Object> camposEsc = new Map<String, Object>();
@@ -68,7 +73,8 @@ public with sharing class SAC_NotificacionesInteraccion_Test {
         camposEsc.put('SAC_Estado__c', 'SAC_PendienteRespuesta');
         
         SAC_Interaccion__c escalado = SAC_TestDataFactory.crearInteraccion('Escalado',camposEsc);
-        Database.insert(escalado);
+        SAC_DatabaseDML.insertDML(escalado, false);  
+        //Database.insert(escalado);
 
         //Parametrizacion validación escalado
         Map<String, Object> camposParam = new Map<String, Object>();
@@ -76,7 +82,8 @@ public with sharing class SAC_NotificacionesInteraccion_Test {
         camposParam.put('SAC_Mensaje__c', 'mensaje test');
         
         SAC_ParametrizacionEscalado__c validacionAJ = SAC_TestDataFactory.crearParamEsc(camposParam);
-        Database.insert(validacionAJ);
+        SAC_DatabaseDML.insertDML(validacionAJ, false);  
+        //Database.insert(validacionAJ);
     }
 
     @isTest

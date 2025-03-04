@@ -141,9 +141,11 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                 when 4 {
                     //asignación de la pretensión principal
                     cbk_log.debug('logica pretensión principal');
-                    case pretension = [SELECT Id, SAC_Reclamacion__c FROM Case where Id = : genialRequest.reclamacion.SAC_PretensionPrincipal__c];
-                    cbk_log.debug('pretensión principal' +pretension);
-                    SAC_Case_Operativas_Controller.marcarPretensionPrincipal(pretension);
+                    List<Case> pretensionList = [SELECT Id, SAC_Reclamacion__c FROM Case where Id = : genialRequest.reclamacion.SAC_PretensionPrincipal__c LIMIT 1];
+                    cbk_log.debug('pretensión principal' +pretensionList); 
+                    if(!pretensionList.isEmpty()){
+                        SAC_Case_Operativas_Controller.marcarPretensionPrincipal(pretensionList[0]);
+                    }
 
                     //comprobar si hay reclamantes secundiarios para lanzar el queueableRecursivo
                     if(genialRequest.reclamantes != null){
@@ -425,12 +427,16 @@ public with sharing class SAC_GenialQueueable implements Queueable {
         AND RecordType.DeveloperName = 'SAC_Detalle']);
 
         //a revisar optimización del proceso(ya se recupera en la API REST)
-        case reclamacionActual = [SELECT Id, Origin, Status, AccountId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, ContactId, CC_SuppliedNIF__c FROM Case WHERE Id = : genialRequest.reclamacion.Id];
+        case reclamacionActual = [SELECT Id, Origin, Status, AccountId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, ContactId, CC_SuppliedNIF__c, OS_Email__c, CC_Telefono_Contacto__c, SAC_DireccionPostalNotificacion__c, SuppliedEmail FROM Case WHERE Id = : genialRequest.reclamacion.Id];
         
         //version 2 con el generador de SAC_LCMP_InsertarPretension
         for(case pretension : genialRequest.pretensiones) {
             if(string.isNotBlank(pretension.SEG_Detalle__c) && string.isNotBlank(pretension.CC_MCC_Motivo__c) 
             && string.isNotBlank(pretension.CC_MCC_ProdServ__c) && string.isNotBlank(pretension.CC_MCC_Tematica__c)){
+                /*if(cs.SAC_Umbral_Tematica__c <= pretension.SAC_Umbral_Tematica__c && cs.SAC_Umbral_Producto__c <= pretension.SAC_Umbral_Producto__c 
+                 * && cs.SAC_Umbral_Motivo__c <= pretension.SAC_Umbral_Motivo__c && cs.SAC_Umbral_Detalle__c <= pretension.SAC_Umbral_Detalle__c){
+                    
+                }*/
                 String asunto = mapaMcc.get(pretension.SEG_Detalle__c).CC_Motivo__r.CC_Producto_Servicio__r.Name + ' - ' + mapaMcc.get(pretension.SEG_Detalle__c).Name;
                 Case pretensionGenerada = SAC_LCMP_InsertarPretension.camposPretension(reclamacionActual, pretension.SEG_Detalle__c, pretension.CC_MCC_Motivo__c, pretension.CC_MCC_ProdServ__c, pretension.CC_MCC_Tematica__c, RECORDTYPEPRETENSION, asunto, mapaMcc);
                 Map<String, Object> camposPretGenerada = pretensionGenerada.getPopulatedFieldsAsMap();

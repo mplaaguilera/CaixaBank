@@ -240,13 +240,13 @@ public class CC_Case_BU_TRHan_Test {
     public static void generarURLLimeSurveyTest(){
         //Creación nueva cuenta
        Account cuenta = new Account();
-            cuenta.recordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+            cuenta.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
             cuenta.Name = 'Smith';
             cuenta.CC_Numero_Documento__c = '64850344G';
             insert cuenta;
             
             Contact contacto = new Contact();
-            contacto.recordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            contacto.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
             contacto.LastName = 'Smith';
             contacto.CC_Numero_Documento__c = '64850344G';
             contacto.AccountId = cuenta.Id;
@@ -257,7 +257,7 @@ public class CC_Case_BU_TRHan_Test {
         Id recordProd = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         Id recordMot = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
         CC_MCC__c mccTematica = new CC_MCC__c();
         mccTematica.Name = 'ImaginBank';
         mccTematica.CC_Tipo_Cliente__c = 'Empleado';
@@ -267,7 +267,7 @@ public class CC_Case_BU_TRHan_Test {
         mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Migración';
         mccProducto.CC_Tipo_Cliente__c = 'Empleado';
@@ -277,7 +277,7 @@ public class CC_Case_BU_TRHan_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
         CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Reversión';
         mccMotivo.CC_Tipo_Cliente__c = 'Empleado';
@@ -288,7 +288,7 @@ public class CC_Case_BU_TRHan_Test {
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         insert mccMotivo;
         
-        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        Id recordTypeIdCausa = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Causa');
         CC_MCC__c mccCausa = new CC_MCC__c();
         mccCausa.Name = 'Solicita reversión';
         mccCausa.CC_Tipo_Cliente__c = 'Empleado';
@@ -353,6 +353,7 @@ public class CC_Case_BU_TRHan_Test {
         caso.CC_Canal_Operativo__c = 'App Imagin';
         caso.CC_Detalles_Consulta__c = 'Detalles Consulta';
         caso.CC_Detalles_Solucion__c = 'Detalles Solución';
+        caso.CC_Grupo_Colaborador__c = 'Test';
         caso.CC_MCC_Tematica__c = mccTematica.Id;
         caso.CC_MCC_ProdServ__c = mccProducto.Id;
         caso.CC_MCC_Motivo__c = mccMotivo.Id;
@@ -411,7 +412,7 @@ public class CC_Case_BU_TRHan_Test {
     public static void estadoCerradoUpdateTest()
     {
         
-        Id recordTypeOficina = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        Id recordTypeOficina = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
         Account oficinaGestora = new Account(
             RecordTypeId = recordTypeOficina, 
             Name = 'Cuenta oficina gestora', 
@@ -484,7 +485,7 @@ public class CC_Case_BU_TRHan_Test {
         mcc4.CC_Codigo_Externo__c = 'SO-000001';
         insert mcc4;
         
-        Id rtEmpleado = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id rtEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
         
         Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' limit 1];
         Contact contacto = [SELECT id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' limit 1];
@@ -612,7 +613,7 @@ public class CC_Case_BU_TRHan_Test {
         
         // Alta de datos para la prueba
         Case caso = new Case();
-        caso.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Asunto';
         caso.Description = 'Descripción';
@@ -669,7 +670,7 @@ public class CC_Case_BU_TRHan_Test {
         
         // Alta de datos para la prueba
         Case caso = new Case();
-        caso.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Asunto';
         caso.Description = 'Descripción';
@@ -704,7 +705,7 @@ public class CC_Case_BU_TRHan_Test {
     @isTest
     public static void reversionImaginBank() {
         // Alta de datos para la prueba
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
         CC_MCC__c mccTematica = new CC_MCC__c();
         mccTematica.Name = 'ImaginBank';
         //mccTematica.CC_Canal_Operativo__c = 'App Imagin';
@@ -715,7 +716,7 @@ public class CC_Case_BU_TRHan_Test {
         mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Migración';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -725,7 +726,7 @@ public class CC_Case_BU_TRHan_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
         CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Reversión';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -736,7 +737,7 @@ public class CC_Case_BU_TRHan_Test {
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         insert mccMotivo;
         
-        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        Id recordTypeIdCausa = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Causa');
         CC_MCC__c mccCausa = new CC_MCC__c();
         mccCausa.Name = 'Solicita reversión';
         mccCausa.CC_Tipo_Cliente__c = 'Cliente';
@@ -769,7 +770,7 @@ public class CC_Case_BU_TRHan_Test {
         insert detalle;
         
         Case caso = new Case();
-        caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
         caso.Status = 'Activo';
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Asunto';
@@ -786,7 +787,7 @@ public class CC_Case_BU_TRHan_Test {
         insert caso;
         
         Case caso2 = new Case();
-        caso2.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        caso2.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
         caso2.Status = 'Cerrado';
         caso2.CC_Idioma__c = 'es';
         caso2.Subject = 'Asunto';
@@ -821,7 +822,7 @@ public class CC_Case_BU_TRHan_Test {
     @isTest
     public static void obtenerBuzon() {
         // Alta de datos para la prueba
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
         CC_MCC__c mccTematica = new CC_MCC__c();
         mccTematica.Name = 'ImaginBank';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -831,7 +832,7 @@ public class CC_Case_BU_TRHan_Test {
         mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Migración';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -841,7 +842,7 @@ public class CC_Case_BU_TRHan_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
         CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Reversión';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -852,7 +853,7 @@ public class CC_Case_BU_TRHan_Test {
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         insert mccMotivo;
         
-        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        Id recordTypeIdCausa = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Causa');
         CC_MCC__c mccCausa = new CC_MCC__c();
         mccCausa.Name = 'Solicita reversión';
         mccCausa.CC_Tipo_Cliente__c = 'Cliente';
@@ -874,7 +875,7 @@ public class CC_Case_BU_TRHan_Test {
         insert contacto;
         
         Case caso = new Case();
-        caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
         caso.Status = 'Activo';
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Asunto';
@@ -906,7 +907,7 @@ public class CC_Case_BU_TRHan_Test {
     
     @isTest
     public static void calcularSLA(){
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
         CC_MCC__c mccTematica = new CC_MCC__c();
         mccTematica.Name = 'ImaginBank';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -916,7 +917,7 @@ public class CC_Case_BU_TRHan_Test {
         mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Migración';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -926,7 +927,7 @@ public class CC_Case_BU_TRHan_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
         CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Reversión';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -937,7 +938,7 @@ public class CC_Case_BU_TRHan_Test {
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         insert mccMotivo;
         
-        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        Id recordTypeIdCausa = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Causa');
         CC_MCC__c mccCausa = new CC_MCC__c();
         mccCausa.Name = 'Solicita reversión';
         mccCausa.CC_Tipo_Cliente__c = 'Cliente';
@@ -959,7 +960,7 @@ public class CC_Case_BU_TRHan_Test {
         insert contacto;
         
         Case caso = new Case();
-        caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
         caso.Status = 'Activo';
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Asunto';
@@ -983,7 +984,7 @@ public class CC_Case_BU_TRHan_Test {
         
         List<Case> casos = new List<Case>();
         Case caso2 = new Case();
-        caso2.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        caso2.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
         caso2.Status = 'Activo';
         caso2.CC_Idioma__c = 'es';
         caso2.Subject = 'Asunto';
@@ -1098,7 +1099,7 @@ public class CC_Case_BU_TRHan_Test {
 
     @isTest
     public static void calcularSLASegundaParte(){
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
         CC_MCC__c mccTematica = new CC_MCC__c();
         mccTematica.Name = 'ImaginBank';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -1108,7 +1109,7 @@ public class CC_Case_BU_TRHan_Test {
         mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Migración';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -1118,7 +1119,7 @@ public class CC_Case_BU_TRHan_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
         CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Reversión';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -1129,7 +1130,7 @@ public class CC_Case_BU_TRHan_Test {
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         insert mccMotivo;
         
-        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        Id recordTypeIdCausa = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Causa');
         CC_MCC__c mccCausa = new CC_MCC__c();
         mccCausa.Name = 'Solicita reversión';
         mccCausa.CC_Tipo_Cliente__c = 'Cliente';
@@ -1151,7 +1152,7 @@ public class CC_Case_BU_TRHan_Test {
         insert contacto;
 
         Case caso3 = new Case();
-        caso3.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        caso3.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
         caso3.Status = 'Activo';
         caso3.CC_Idioma__c = 'es';
         caso3.Subject = 'Asunto';
@@ -1260,7 +1261,7 @@ public class CC_Case_BU_TRHan_Test {
         // if (caso.OwnerId != mapOldObj.get(caso.Id).OwnerId && caso.CC_Fecha_Reapertura__c == null && caso.CC_Fecha_Limite_Resolucion__c != null) {
             
             // Alta de datos para la prueba
-            Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+            Id recordTypeIdTematica = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
             CC_MCC__c mccTematica = new CC_MCC__c();
             mccTematica.Name = 'ImaginBank';
             mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -1270,7 +1271,7 @@ public class CC_Case_BU_TRHan_Test {
         	mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
             insert mccTematica;
             
-            Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+            Id recordTypeIdProducto = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
             CC_MCC__c mccProducto = new CC_MCC__c();
             mccProducto.Name = 'Migración';
             mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -1280,7 +1281,7 @@ public class CC_Case_BU_TRHan_Test {
             mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
             insert mccProducto; 
             
-            Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+            Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
             CC_MCC__c mccMotivo = new CC_MCC__c();
             mccMotivo.Name = 'Reversión';
             mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -1291,7 +1292,7 @@ public class CC_Case_BU_TRHan_Test {
             mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
             insert mccMotivo;
 
-            Id recordTypeIdTematicaAM = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+            Id recordTypeIdTematicaAM = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
             CC_MCC__c mccTematicaAM = new CC_MCC__c();
             mccTematicaAM.Name = 'ImaginBank';
             mccTematicaAM.CC_Tipo_Cliente__c = 'Cliente (CAM)/Empleado (CAM)';
@@ -1300,7 +1301,7 @@ public class CC_Case_BU_TRHan_Test {
             mccTematicaAM.CC_Codigo_Externo__c = 'TE-000002';
             insert mccTematicaAM;
             
-            Id recordTypeIdProductoAM = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+            Id recordTypeIdProductoAM = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
             CC_MCC__c mccProductoAM = new CC_MCC__c();
             mccProductoAM.Name = 'Migración';
             mccProductoAM.CC_Tipo_Cliente__c ='Cliente (CAM)/Empleado (CAM)';
@@ -1310,7 +1311,7 @@ public class CC_Case_BU_TRHan_Test {
             mccProductoAM.CC_Codigo_Externo__c = 'PR-000002'; 
             insert mccProductoAM; 
             
-            Id recordTypeIdMotivoAM = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+            Id recordTypeIdMotivoAM = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
             CC_MCC__c mccMotivoAM = new CC_MCC__c();
             mccMotivoAM.Name = 'Reversión';
             mccMotivoAM.CC_Tipo_Cliente__c = 'Cliente (CAM)/Empleado (CAM)';
@@ -1337,7 +1338,7 @@ public class CC_Case_BU_TRHan_Test {
             List<Case> casosAsignacionTRZ = new List<Case>();
             
             Case casoAsignacionTRZ = new Case();
-            casoAsignacionTRZ.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            casoAsignacionTRZ.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             casoAsignacionTRZ.Status = 'Activo';
             casoAsignacionTRZ.CC_Idioma__c = 'es';
             casoAsignacionTRZ.Subject = 'Asunto';
@@ -1441,7 +1442,7 @@ public class CC_Case_BU_TRHan_Test {
             
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1452,7 +1453,7 @@ public class CC_Case_BU_TRHan_Test {
             listadoCasos.add(caso);
 
             Case caso2 = new Case();
-            caso2.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso2.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso2.Status = 'Activo';
             caso2.CC_Idioma__c = 'es';
             caso2.Subject = 'Asunto';
@@ -1463,7 +1464,7 @@ public class CC_Case_BU_TRHan_Test {
             listadoCasos.add(caso2);
 
             Case caso3 = new Case();
-            caso3.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso3.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso3.Status = 'Activo';
             caso3.CC_Idioma__c = 'es';
             caso3.Subject = 'Asunto';
@@ -1474,7 +1475,7 @@ public class CC_Case_BU_TRHan_Test {
             listadoCasos.add(caso3);
 
             Case caso4 = new Case();
-            caso4.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso4.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso4.Status = 'Activo';
             caso4.CC_Idioma__c = 'es';
             caso4.Subject = 'Asunto';
@@ -1518,7 +1519,7 @@ public class CC_Case_BU_TRHan_Test {
             
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'AsuntoTest1234';
@@ -1544,7 +1545,7 @@ public class CC_Case_BU_TRHan_Test {
         @isTest
         public static void encryptPANs(){
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1557,7 +1558,7 @@ public class CC_Case_BU_TRHan_Test {
             
 
             Case caso2 = new Case();
-            caso2.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso2.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso2.Status = 'Activo';
             caso2.CC_Idioma__c = 'es';
             caso2.Subject = 'Asunto';
@@ -1586,7 +1587,7 @@ public class CC_Case_BU_TRHan_Test {
 
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1626,7 +1627,7 @@ public class CC_Case_BU_TRHan_Test {
 
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1708,7 +1709,7 @@ public class CC_Case_BU_TRHan_Test {
 
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1751,7 +1752,7 @@ public class CC_Case_BU_TRHan_Test {
 
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1779,7 +1780,7 @@ public class CC_Case_BU_TRHan_Test {
 
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1806,13 +1807,13 @@ public class CC_Case_BU_TRHan_Test {
             User usuario = [Select id from User where email = 'tuser0004@amamama.com' limit 1];
             
             Account cuenta = new Account();
-            cuenta.recordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+            cuenta.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
             cuenta.Name = 'Smith';
             cuenta.CC_Numero_Documento__c = '64850344G';
             insert cuenta;
             
             Contact contacto = new Contact();
-            contacto.recordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            contacto.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
             contacto.LastName = 'Smith';
             contacto.CC_Numero_Documento__c = '64850344G';
             contacto.AccountId = cuenta.Id;
@@ -1823,7 +1824,7 @@ public class CC_Case_BU_TRHan_Test {
         Id recordProd = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         Id recordMot = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
         CC_MCC__c mccTematica = new CC_MCC__c();
         mccTematica.Name = 'ImaginBank';
         mccTematica.CC_Tipo_Cliente__c = 'Empleado';
@@ -1833,7 +1834,7 @@ public class CC_Case_BU_TRHan_Test {
         mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Migración';
         mccProducto.CC_Tipo_Cliente__c = 'Empleado';
@@ -1843,7 +1844,7 @@ public class CC_Case_BU_TRHan_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
         CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Reversión';
         mccMotivo.CC_Tipo_Cliente__c = 'Empleado';
@@ -1854,7 +1855,7 @@ public class CC_Case_BU_TRHan_Test {
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         insert mccMotivo;
 
-        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        Id recordTypeIdCausa = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Causa');
         CC_MCC__c mccCausa = new CC_MCC__c();
         mccCausa.Name = 'Solicita reversión';
         mccCausa.CC_Tipo_Cliente__c = 'Empleado';
@@ -1872,7 +1873,7 @@ public class CC_Case_BU_TRHan_Test {
         insert solucion;
         
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1924,7 +1925,7 @@ public class CC_Case_BU_TRHan_Test {
 
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1950,7 +1951,7 @@ public class CC_Case_BU_TRHan_Test {
 
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -1977,7 +1978,7 @@ public class CC_Case_BU_TRHan_Test {
             List<Case> listadoCasos = new List<Case>();
             List<Group> colas = [SELECT Id, DeveloperName FROM Group WHERE Type = 'Queue' AND DeveloperName = 'CC_ConsForm_Tarjetas_Comercios']; 
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
@@ -2003,7 +2004,7 @@ public class CC_Case_BU_TRHan_Test {
         public static void testPruebaRobot(){
 
 
-            Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+            Id recordTypeIdTematica = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
             CC_MCC__c mccTematica = new CC_MCC__c();
             mccTematica.Name = 'Contactos erróneos';
             mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -2013,7 +2014,7 @@ public class CC_Case_BU_TRHan_Test {
         	mccTematica.CC_Canal_Operativo__c = 'Sin canal';
             insert mccTematica;
             
-            Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+            Id recordTypeIdProducto = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
             CC_MCC__c mccProducto = new CC_MCC__c();
             mccProducto.Name = 'Pruebas Salesforce';
             mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -2023,7 +2024,7 @@ public class CC_Case_BU_TRHan_Test {
             mccProducto.CC_Codigo_Externo__c = 'PR-001318'; 
             insert mccProducto; 
             
-            Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+            Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
             CC_MCC__c mccMotivo = new CC_MCC__c();
             mccMotivo.Name = 'Contacto de prueba';
             mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -2033,7 +2034,7 @@ public class CC_Case_BU_TRHan_Test {
             mccMotivo.CC_Codigo_Externo__c = 'MO-012087';
             insert mccMotivo;
 
-            Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+            Id recordTypeIdCausa = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Causa');
             CC_MCC__c mccCausa = new CC_MCC__c();
             mccCausa.Name = 'Pruebas/Validaciones';
             mccCausa.CC_Tipo_Cliente__c = 'Cliente';
@@ -2043,7 +2044,7 @@ public class CC_Case_BU_TRHan_Test {
             mccCausa.CC_Codigo_Externo__c = 'CA-015680'; 
             insert mccCausa; 
             
-            Id recordTypeIdSolucion = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+            Id recordTypeIdSolucion = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Solucion');
             CC_MCC__c mccSolucion = new CC_MCC__c();
             mccSolucion.Name = 'No aplica';
             mccSolucion.CC_Tipo_Cliente__c = 'Cliente';
@@ -2055,7 +2056,7 @@ public class CC_Case_BU_TRHan_Test {
 
             List<Case> listadoCasos = new List<Case>();
             Case caso = new Case(); 
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             caso.Status = 'Activo';
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Prueba Robot';

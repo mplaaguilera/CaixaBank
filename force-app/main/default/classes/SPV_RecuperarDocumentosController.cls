@@ -17,6 +17,7 @@ public with sharing class SPV_RecuperarDocumentosController {
     *****************************************************************/
     @AuraEnabled
     public static void recuperarTicketERR(Id caseId){
+        List<Case> casesToUpdate = new List<Case>();
         SPV_Documentos_Integration_ATR.TicketGetDocumentoResponse responseATR = new SPV_Documentos_Integration_ATR.TicketGetDocumentoResponse ();
         List <SPV_Documentos_Integration_ATR.Documento> listaTicketERR = new List<SPV_Documentos_Integration_ATR.Documento>();
         List<ContentVersion> listaContentVersions = new List<ContentVersion>();
@@ -33,8 +34,20 @@ public with sharing class SPV_RecuperarDocumentosController {
 			//Recuperar los adjunto cargados en el casoActual,y los que tengan el campo SAC_IdEER__c en la listaTicketERR quitarlos de esta lista (estos no se insertarán)
 			//
             //Para cada ticketERR de la reclamación, se generará su documento asociado
-            if(!listaTicketERR.isEmpty()){  //Sustituir esta lista listaTicketERR, por la nueva sin duplicados
-
+            //ESTE IF ESTABA DESCOMENTADO
+           // if(!listaTicketERR.isEmpty()){  //Sustituir esta lista listaTicketERR, por la nueva sin duplicados
+				/*String ticketEERConcat = '';
+                for(SPV_Documentos_Integration_ATR.Documento documento : listaTicketERR){ //Sustituir esta lista listaTicketERR, por la nueva sin duplicados
+                    ticketEERConcat += documento.ticketEER + ';';
+                }
+                for(Case rec: [SELECT Id, SPV_TicketEERList__c FROM Case WHERE Id =: caseId]){
+                    rec.SPV_TicketEERList__c = ticketEERConcat;
+                    casesToUpdate.add(rec);
+                }
+                if(!casesToUpdate.isEmpty()){
+                    update casesToUpdate;
+                }*/
+                /*
                 List<SAC_MaestroTemas__c> documentoOrganismo = [SELECT Id FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPETIPOADJUNTOS AND SAC_DeveloperName__c = 'SPV_DocumentacionOrganismo' LIMIT 1];
                 
                 for(SPV_Documentos_Integration_ATR.Documento documento : listaTicketERR){ //Sustituir esta lista listaTicketERR, por la nueva sin duplicados
@@ -58,14 +71,14 @@ public with sharing class SPV_RecuperarDocumentosController {
                     }else{  //Si la respuesta de la integración ERR no es 200
                         throw new AuraHandledException('No se han podido recuperar los documentos: ' + documentResponse.errorMessage);
                     }
-                }
+                }*/
 
-            }
+           // }
             
             //En caso de haber recuperado documentos, se llama al método para crear los adjuntos
-            if(!listaContentVersions.isEmpty()){
+            /*if(!listaContentVersions.isEmpty()){
                 generarAdjuntoDocument(listaContentVersions, caseId);
-            }
+            }*/
 
         }else{  //Si la respuesta de la integración ATR no es 200
             throw new AuraHandledException('No se han podido recuperar los documentos: ' + responseATR.errorMessage);

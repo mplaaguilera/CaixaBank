@@ -1,9 +1,8 @@
 @isTest
 public class CSBD_FamiliaProductoPicklist_Test {
- @TestSetup
-    private static void altaDatosPrueba() {
-        User usuarioGestor = CSBD_Usuarios.usuarioGestor();
 
+    @TestSetup
+    private static void altaDatosPrueba() {
         CC_Lista_Valores__c familia = new CC_Lista_Valores__c();
         familia.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Familias').getRecordTypeId();
         familia.Name = 'Familia prueba';
@@ -15,70 +14,66 @@ public class CSBD_FamiliaProductoPicklist_Test {
         empresa.Name = 'CaixaBank';
         empresa.CC_Activa__c = true;
         empresa.CSBD_Tipo_de_oportunidad__c = 'Hipoteca;Préstamo;Renting;TPV;PRO Automática;Llamada Servicio';
-		CC_Lista_Valores__c motivosMac = new CC_Lista_Valores__c();
-        motivosMac.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-        motivosMac.Name = 'CSBD: Motivos MAC';
-        motivosMac.CC_Activa__c = true;
-        insert new List<CC_Lista_Valores__c>{empresa, familia, motivosMac};
+		CC_Lista_Valores__c motivosAC = new CC_Lista_Valores__c();
+        motivosAC.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Motivos_CSCC').getRecordTypeId();
+        motivosAC.Name = 'Motivo AC 1';
+        motivosAC.CC_Activa__c = true;
+        insert new List<CC_Lista_Valores__c>{empresa, familia, motivosAC};
 
 		CC_Lista_Valores__c producto = new CC_Lista_Valores__c();
         producto.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
         producto.CC_Lista__c = familia.Id;
         producto.Name = 'Producto prueba';
         producto.CC_Activa__c = true;
-		CC_Lista_Valores__c motivoMac = new CC_Lista_Valores__c();
-        motivoMac.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
-		motivoMac.CC_Lista__c = motivosMac.Id;
-        motivoMac.Name = 'Motivo MAC 1';
-        motivoMac.CC_Activa__c = true;
-		insert new List<CC_Lista_Valores__c>{producto, motivoMac};
+		CC_Lista_Valores__c motivoAC = new CC_Lista_Valores__c();
+        motivoAC.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
+		motivoAC.CC_Lista__c = motivosAC.Id;
+        motivoAC.Name = 'Producto AC';
+        motivoAC.CC_Activa__c = true;
+		insert new List<CC_Lista_Valores__c>{producto, motivoAC};
     }
 
     @isTest
     public static void getEmpresasTest() {
-		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-        System.runAs(usuarioGestor) {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
             List<CC_Lista_Valores__c> empresas = CSBD_FamiliaProductoPicklistController.getEmpresas('Préstamo');
             Test.stopTest();
 
-            System.assertEquals(CC_MetodosUtiles.listaCampo(empresas, 'Name').contains('CaixaBank'), true);
+            System.assertEquals(CC_MetodosUtiles.listaCampo(empresas, 'Name').contains('CaixaBank'), true, 'Empresa no encontrada');
         }
     }
 
     @isTest
     public static void getFamiliasTest() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-        System.runAs(usuarioGestor) {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
             List<CC_Lista_Valores__c> familias = CSBD_FamiliaProductoPicklistController.getFamilias('Préstamo', 'CaixaBank');
             Test.stopTest();
 
-            System.assertEquals(CC_MetodosUtiles.listaCampo(familias, 'Name').contains('Familia prueba'), true);
+            System.assertEquals(CC_MetodosUtiles.listaCampo(familias, 'Name').contains('Familia prueba'), true, 'Familia no encontrada');
         }
     }
 
     @isTest
     public static void getProductosTest() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-        System.runAs(usuarioGestor) {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
-            List<CC_Lista_Valores__c> productos = CSBD_FamiliaProductoPicklistController.getProductos('Familia prueba', 'Hipoteca');
+            List<CC_Lista_Valores__c> productos = CSBD_FamiliaProductoPicklistController.getProductos('Familia prueba');
             Test.stopTest();
 
-            System.assertEquals(CC_MetodosUtiles.listaCampo(productos, 'Name').contains('Producto prueba'), true);
+            System.assertEquals(CC_MetodosUtiles.listaCampo(productos, 'Name').contains('Producto prueba'), true, 'Producto no encontrado');
         }
     }
 
 	@isTest
-    public static void getMotivosMacTest() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-        System.runAs(usuarioGestor) {
+    public static void getMotivosAcTest() {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
-            List<CC_Lista_Valores__c> motivosMac = CSBD_FamiliaProductoPicklistController.getMotivosMac();
+            List<CC_Lista_Valores__c> motivosAc = CSBD_FamiliaProductoPicklistController.getMotivosMac('Producto AC');
             Test.stopTest();
 
-            System.assertEquals(CC_MetodosUtiles.listaCampo(motivosMac, 'Name').contains('Motivo MAC 1'), true);
+            System.assertEquals(CC_MetodosUtiles.listaCampo(motivosAc, 'CC_Lista__r.Name').contains('Motivo AC 1'), true, 'Motivo no encontrado');
         }
     }
 }

@@ -16,8 +16,9 @@ public with sharing class SAC_CasosEnNegociacion_Test {
     static void makeData(){
  
         //Usuario SAC General
-        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];       
-        Database.insert(usuarioGeneral);
+        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);       
+        //Database.insert(usuarioGeneral);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -26,20 +27,24 @@ public with sharing class SAC_CasosEnNegociacion_Test {
         camposRecl.put('OwnerId', usuarioGeneral.id);
 
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false); 
+        //Database.insert(reclamacion);
 
         //Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
         camposPret.put('SuppliedCompany', 'TestPret');
         camposPret.put('SAC_Reclamacion__c', reclamacion.Id);
         camposPret.put('OwnerId', usuarioGeneral.id);
+        camposPret.put('Status', 'SAC_003');
+        
 
         Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(casoPretension);  
+        SAC_DatabaseDML.insertDML(casoPretension, false); 
+        //Database.insert(casoPretension);  
     }
 
     @istest
-    static void informarFechaResolucion_Test() {
+    static void informarFechaResolucionTest() {
         Case caso = [SELECT Id, OS_Fecha_Resolucion__c, SAC_Reclamacion__c FROM Case WHERE SuppliedCompany = 'TestPret'];
         caso.Status = 'SAC_007';
         caso.SAC_StatusAuxiliar__c = 'SAC_007';
@@ -47,7 +52,8 @@ public with sharing class SAC_CasosEnNegociacion_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true];
 		System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false); 
+            //Database.update(caso);
             Test.stopTest();
         }
 

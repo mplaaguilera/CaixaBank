@@ -127,12 +127,12 @@ public with sharing class CC_LiveChatTranscript_BU_TRHan extends CC_TriggerHandl
             // Desvinculamos el código para los chats de empleados.
             if (mapNewObj.get(key).RecordTypeId != Schema.getGlobalDescribe().get('LiveChatTranscript').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleados').getRecordTypeId())
             {
-                if ((mapNewObj.get(key).CC_Tipo__c == 'Agente' || mapNewObj.get(key).CC_Tipo__c == 'Hidden') && (mapNewObj.get(key).AccountId != mapOldObj.get(key).AccountId || 
-                mapNewObj.get(key).ContactId != mapOldObj.get(key).ContactId ||
-                mapNewObj.get(key).CaseId != mapOldObj.get(key).CaseId))
+                if ((mapNewObj.get(key).CC_Tipo__c == 'Agente' 
+                || mapNewObj.get(key).CC_Tipo__c == 'Hidden') 
+                && (mapNewObj.get(key).AccountId != mapOldObj.get(key).AccountId 
+                || mapNewObj.get(key).ContactId != mapOldObj.get(key).ContactId 
+                || mapNewObj.get(key).CaseId != mapOldObj.get(key).CaseId))
                 {
-                    
-                    
                     //idsCognitivo.add(chatActualizado.CC_ChatOrigen__c);
                     if (mapNewObj.get(key).CC_ChatOrigen__c != null)
                     {
@@ -251,11 +251,12 @@ public with sharing class CC_LiveChatTranscript_BU_TRHan extends CC_TriggerHandl
                 if (oChatOld.CaseId == null && oChatNew.CaseId != null) { //Agente
                     Case casoUpdt = new Case(Id = oChatNew.CaseId);
                     if(oChatNew.CC_Canal_Procedencia__c != null){
+
                         //Se da de baja whatsapp y se reemplaza por Chat Contáctanos App y Chat Contáctanos Web.
-                        if(oChatNew.CC_Aplicacion_Origen__c == 'Whatsapp'){  
-                            casoUpdt.CC_Canal_Procedencia__c = 'Chat NOA WhatsApp';
-                            casoUpdt.CC_Canal_Resolucion__c = 'Chat NOA WhatsApp';
-                        }
+                        //if(oChatNew.CC_Aplicacion_Origen__c == 'Whatsapp'){  
+                        //    casoUpdt.CC_Canal_Procedencia__c = 'Chat NOA WhatsApp';
+                        //    casoUpdt.CC_Canal_Resolucion__c = 'Chat NOA WhatsApp';
+                        //}
                         // US575560-START
                         // if(oChatNew.CC_Aplicacion_Origen__c == 'ContactaApp'){  
                         //     casoUpdt.CC_Canal_Procedencia__c = 'Chat Contáctanos App';
@@ -265,12 +266,13 @@ public with sharing class CC_LiveChatTranscript_BU_TRHan extends CC_TriggerHandl
                         //     casoUpdt.CC_Canal_Procedencia__c = 'Chat Contáctanos Web';
                         //     casoUpdt.CC_Canal_Resolucion__c = 'Chat Contáctanos Web';
                         // } // US575560-END
-                        else {
+                        //else {
                             casoUpdt.CC_Canal_Procedencia__c = oChatNew.CC_Canal_Procedencia__c;
                             casoUpdt.CC_Canal_Resolucion__c = oChatNew.CC_Canal_Procedencia__c;
-                        }
-                        
-                    }
+                        //}
+                    } 
+                
+                    // Asegurarte de que el caso se agrega a la lista para ser actualizado
                     if(oChatNew.CC_Canal_operativo__c != null) {
                         casoUpdt.CC_Canal_Operativo__c = oChatNew.CC_Canal_operativo__c;
                     }
@@ -297,10 +299,10 @@ public with sharing class CC_LiveChatTranscript_BU_TRHan extends CC_TriggerHandl
 
                     if(oChatNew.CC_Canal_Procedencia__c != null){
                          //Se da de baja whatsapp y se reemplaza por Chat Contáctanos App y Chat Contáctanos Web.
-                         if(oChatNew.CC_Aplicacion_Origen__c == 'Whatsapp'){  
-                             casoUpdt.CC_Canal_Procedencia__c = 'Chat NOA WhatsApp';
-                             casoUpdt.CC_Canal_Resolucion__c = 'Chat NOA WhatsApp';
-                            }
+                        //if(oChatNew.CC_Aplicacion_Origen__c == 'Whatsapp'){  
+                        //     casoUpdt.CC_Canal_Procedencia__c = 'Chat NOA WhatsApp';
+                        //     casoUpdt.CC_Canal_Resolucion__c = 'Chat NOA WhatsApp';
+                        //    }
                         // US575560-START
                         // if(oChatNew.CC_Aplicacion_Origen__c == 'ContactaApp'){  
                         //     casoUpdt.CC_Canal_Procedencia__c = 'Chat Contáctanos App';
@@ -310,15 +312,16 @@ public with sharing class CC_LiveChatTranscript_BU_TRHan extends CC_TriggerHandl
                         //     casoUpdt.CC_Canal_Procedencia__c = 'Chat Contáctanos Web';
                         //     casoUpdt.CC_Canal_Resolucion__c = 'Chat Contáctanos Web';
                         // } // US575560-END
-                        else {
+                        //else {
                             casoUpdt.CC_Canal_Procedencia__c = oChatNew.CC_Canal_Procedencia__c;
                             casoUpdt.CC_Canal_Resolucion__c = oChatNew.CC_Canal_Procedencia__c;
-                        }
+                        //}
                         
                     }
                     Id empleadoRecordType = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
                     if (mapCasos.get(oChatNew.CaseId).RecordTypeId == empleadoRecordType){
-                        if(mapCasos.get(oChatNew.CaseId).CC_Tipo_ChatTranscript__c == 'Hidden' || mapCasos.get(oChatNew.CaseId).CC_Tipo_ChatTranscript__c == 'Agente'){
+                        if(mapCasos.get(oChatNew.CaseId).CC_Tipo_ChatTranscript__c == 'Hidden' 
+                        || mapCasos.get(oChatNew.CaseId).CC_Tipo_ChatTranscript__c == 'Agente'){
                             casoUpdt.OwnerId = oChatNew.OwnerId;
                             casoUpdt.CC_Tipo_ChatTranscript__c = mapChats.get(oChatNew.Id).CC_Tipo__c;
                             if (mapCasos.get(oChatNew.CaseId).Status == 'Cerrado'){
@@ -372,11 +375,10 @@ public with sharing class CC_LiveChatTranscript_BU_TRHan extends CC_TriggerHandl
                 }
             }
         }
-        
         if (!casos.isEmpty()) { //update casos;   
             Database.SaveResult[] resultsCaso = Database.update(casos, false);
         }
-        
+
         if (!nuevasActividades.isEmpty()) { //insert actividades
             //insert nuevasActividades;
             CC_Activity.crearActividades(nuevasActividades);

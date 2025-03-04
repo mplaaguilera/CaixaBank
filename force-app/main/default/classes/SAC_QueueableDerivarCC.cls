@@ -13,7 +13,8 @@ public without sharing class SAC_QueueableDerivarCC implements Queueable{
         List<SObject> listadoAuxiliarRegistro = new List<SObject>();
         
         if(!lstCases.isEmpty()){
-            Database.insert(lstCases); 
+            SAC_DatabaseDML.insertListDML(lstCases, true);   
+            //Database.insert(lstCases); 
         } 
         
         //Obtencion de Cartas Postales y archivos adjuntos
@@ -22,7 +23,7 @@ public without sharing class SAC_QueueableDerivarCC implements Queueable{
         for(ContentDocumentLink cl:cdlist){
         	fileId.add(cl.ContentDocumentId);
         }
-        List<ContentVersion> adjuntosParaCC = [SELECT Id, Title, VersionData, PathOnClient, SAC_StringRedaccion_fileupload__c FROM ContentVersion WHERE ContentDocumentId IN: fileId];
+        List<ContentVersion> adjuntosParaCC = [SELECT Id, Title, VersionData, PathOnClient, SAC_StringRedaccion_fileupload__c FROM ContentVersion WHERE ContentDocumentId IN: fileId AND SAC_BloqueoTotalVisibilidad__c = false];
         
         
         if(!adjuntosParaCC.isEmpty()){
@@ -63,7 +64,8 @@ public without sharing class SAC_QueueableDerivarCC implements Queueable{
         } 
         
         if(!Test.isRunningTest()){
-            Database.insert(listadoAuxiliarRegistro);
+            SAC_DatabaseDML.insertListDML(listadoAuxiliarRegistro, true);  
+            //Database.insert(listadoAuxiliarRegistro);
         }
         
     }

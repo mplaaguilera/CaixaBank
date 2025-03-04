@@ -20,7 +20,8 @@ public with sharing class SAC_TMO_Global_Test {
         //System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC Admin
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];  
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
+            //Database.insert(usuarioGeneral);
 
             //PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             //PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
@@ -48,7 +49,8 @@ public with sharing class SAC_TMO_Global_Test {
         
         listaCasos.add(reclamacion);
         listaCasos.add(reclamacionSubsanacion);
-        Database.insert(listaCasos);
+        SAC_DatabaseDML.insertListDML(listaCasos, false);
+        //Database.insert(listaCasos);
 
         //Pretension subsanacion
         camposRecl2.clear();
@@ -59,11 +61,12 @@ public with sharing class SAC_TMO_Global_Test {
         camposRecl2.put('OwnerId', usuarioGeneral.Id);
 
         Case pretensionSubsanacion = SAC_TestDataFactory.crearCaso('Pretension',camposRecl2);
-        Database.insert(pretensionSubsanacion);
+        SAC_DatabaseDML.insertDML(pretensionSubsanacion, false);
+        //Database.insert(pretensionSubsanacion);
     }
 
     @IsTest
-    static void modificarFechaInicial_Test(){
+    static void modificarFechaInicialTest(){
         
         Case reclamacion = [SELECT Id FROM Case WHERE Subject= 'Reclamacion'];
         reclamacion.SAC_FechaRecepcion__c = DateTime.newInstance(2022, 6, 6, 3, 3, 3);
@@ -71,7 +74,8 @@ public with sharing class SAC_TMO_Global_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -81,7 +85,7 @@ public with sharing class SAC_TMO_Global_Test {
     }
 
     @IsTest
-    static void modificarFechaFinal_Test(){
+    static void modificarFechaFinalTest(){
         
         Case reclamacion = [SELECT Id FROM Case WHERE Subject= 'Reclamacion'];
         reclamacion.OS_Fecha_Resolucion__c = DateTime.newInstance(2022, 6, 6, 3, 3, 3);
@@ -89,7 +93,8 @@ public with sharing class SAC_TMO_Global_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
         
@@ -99,7 +104,7 @@ public with sharing class SAC_TMO_Global_Test {
     }
     
     @IsTest
-    static void crearNuevoTPE_Test(){
+    static void crearNuevoTPETest(){
         
         Case reclamacion = [SELECT Id FROM Case WHERE Subject= 'R Subsanacion'];
         reclamacion.Status = 'SAC_001';
@@ -108,7 +113,8 @@ public with sharing class SAC_TMO_Global_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -119,7 +125,7 @@ public with sharing class SAC_TMO_Global_Test {
     }
 
      @IsTest
-    static void tmoGlobal_Test(){
+    static void tmoGlobalTest(){
         
         Case reclamacion = [SELECT Id FROM Case WHERE Subject= 'R Subsanacion'];
         reclamacion.Status = 'SAC_001';
@@ -128,7 +134,8 @@ public with sharing class SAC_TMO_Global_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -138,7 +145,7 @@ public with sharing class SAC_TMO_Global_Test {
         
     }
     @isTest
-    static void filtrarListaSelect_Test(){
+    static void filtrarListaSelectTest(){
         List<Case> listaCasos = [SELECT id, Subject FROM Case];
         Set<Id> ideBusqueda = new Set<Id>();
 
@@ -164,7 +171,8 @@ public with sharing class SAC_TMO_Global_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(pretension);
+            SAC_DatabaseDML.updateDML(pretension, false);
+            //Database.update(pretension);
             Test.stopTest();
         }
 

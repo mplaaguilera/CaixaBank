@@ -100,7 +100,7 @@ public without sharing class SAC_CaseCalcularImporte {
                     if(mapaReclImporteParaActualizar.containsKey(key)){
                         importe = mapaReclImporteParaActualizar.get(key);
                         importe += pretension.CC_Importe_Reclamado__c;
-                        mapaReclImporteParaActualizar.put(key, importe);
+                        mapaReclImporteParaActualizar.put(key, importe.setScale(2, RoundingMode.HALF_UP));
                     }
                 }
             }
@@ -133,8 +133,8 @@ public without sharing class SAC_CaseCalcularImporte {
                 importeResuelto += importeTareasMap.get(key)[0];
                 importeAbonado += importeTareasMap.get(key)[1];
             }
-            mapaReclImporteResueltoParaActualizar.put(key, importeResuelto);
-            mapaReclImporteAbonadoParaActualizar.put(key, importeAbonado);
+            mapaReclImporteResueltoParaActualizar.put(key, importeResuelto.setScale(2, RoundingMode.HALF_UP));
+            mapaReclImporteAbonadoParaActualizar.put(key, importeAbonado.setScale(2, RoundingMode.HALF_UP));
 
             //Calculo quebranto -- Añadido
             Decimal importe2 = 0;
@@ -146,7 +146,7 @@ public without sharing class SAC_CaseCalcularImporte {
                     if(mapaReclQuebrantoParaActualizar.containsKey(key)){
                         importe2 = mapaReclQuebrantoParaActualizar.get(key);
                         importe2 += pretension.SAC_Quebranto__c;
-                        mapaReclQuebrantoParaActualizar.put(key, importe2);
+                        mapaReclQuebrantoParaActualizar.put(key, importe2.setScale(2, RoundingMode.HALF_UP));
                     }
                 }
             }

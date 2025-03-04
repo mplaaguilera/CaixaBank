@@ -8,6 +8,9 @@ public with sharing class SEG_Cognitive_FFEE {
         oTraza.CC_FechaInicio__c = datetime.now();
         oTraza.CC_FinOK__c = false;
 
+        //Trazabilidad a nivel de caso con el chatter
+        FeedItem feed;
+
         // Creacion del caso
         Case casoSeg = [SELECT id, SEG_ClasificacionRapida__c, SEG_ClasificacionRapida__r.Name,SEG_Case_Owner__c, Subject,Description,CreatedDate,SEG_Zona__c,SEG_Organizacion__c,CaseNumber, SEG_N_operaciones_del_caso__c, SEG_Email_Generador__c FROM Case WHERE id=:casoid LIMIT 1];
         
@@ -30,7 +33,7 @@ public with sharing class SEG_Cognitive_FFEE {
             sendCase.messageText = casoSeg.Description?.replaceAll('\r\n|\n|\r',' ');  
 
             // Adjuntos crear una propia meter el metodo con sus adjuntos
-            Integer total_attachEnviados = 0;
+            Integer totalAttachEnviados = 0;
             List<ContentVersion> listFiles = getFilesCase(casoid);
             List<ContenidoAttach> attach = new List<ContenidoAttach>();
 
@@ -41,12 +44,12 @@ public with sharing class SEG_Cognitive_FFEE {
                 attachmentFile.extension = String.valueOf(cv.FileExtension);
                 attachmentFile.size = String.valueOf(cv.ContentSize);
                 attach.add(attachmentFile);
-                total_attachEnviados++;
+                totalAttachEnviados++;
             } 
             sendCase.attachs = attach;
 
             // TotalAttach calcular yo despues de traer el metodo
-            sendCase.totalAttach = String.valueOf(total_attachEnviados);
+            sendCase.totalAttach = String.valueOf(totalAttachEnviados);
 
             // Serialización del JSON
             String jsonToCognitive = JSON.serialize(sendCase);
@@ -56,6 +59,7 @@ public with sharing class SEG_Cognitive_FFEE {
 
             // Custom Setting meter el nombre del que cree
             String intSetting = 'SEG_Cognitive_FFEE';
+            
             
             try {
                 // Crear HEADER
@@ -82,13 +86,15 @@ public with sharing class SEG_Cognitive_FFEE {
                     results = (ReceiveFromCognitive) System.JSON.deserialize(response.getBody(),ReceiveFromCognitive.class);
                 
                 }else{
-                    FeedItem feed = new FeedItem();
+                    feed = new FeedItem();
                     feed.ParentId = casoid; 
                     feed.Type = 'TextPost';
                     feed.Body = 'Cognitive: No se ha podido establecer conexión con Cognitive';
                     oTraza.CC_MensajeSalida__c = response.getBody();
-                    oTraza.CC_FinOK__c = true;
+                    oTraza.CC_FinOK__c = false;
                     oTraza.CC_MensajeEntrada__c = String.valueOf(request);
+                    oTraza.CC_TipoError__c = 'Error de conexión';
+                    oTraza.CC_DetalleError__c = 'No se ha podido establecer conexión con Cognitive';
                 }
 
                 oTraza.CC_FechaFin__c = datetime.now();
@@ -101,7 +107,7 @@ public with sharing class SEG_Cognitive_FFEE {
             }
         } else if(casoSeg != null){
             // Se inserta en chatter un registro indicando que el caso ya tenía clasificación al contactar con cognitive.
-            FeedItem feed = new FeedItem();
+            feed = new FeedItem();
             feed.ParentId = casoid; 
             feed.Type = 'TextPost';
             if(casoSeg.SEG_Case_Owner__c != 'SEG_BO'){
@@ -110,13 +116,15 @@ public with sharing class SEG_Cognitive_FFEE {
                 feed.Body = 'Cognitive: El caso ya se encontraba clasificado manualmente por lo que no se ha podido aplicar Cognitive.'; 
             }
 
-            insert feed;
-
             //Traza - No se asigna la clasificación al estar ya indicada manualmente.
             oTraza.CC_FechaFin__c = datetime.now();
             oTraza.CC_FinOK__c = true;
             oTraza.CC_TipoError__c = 'Excepcion de asignacion';
             oTraza.CC_DetalleError__c = 'El caso no ha sido clasificado por cognitive';
+        }
+        
+        if (feed != null) {
+            insert feed;
         }
         
         insert oTraza;

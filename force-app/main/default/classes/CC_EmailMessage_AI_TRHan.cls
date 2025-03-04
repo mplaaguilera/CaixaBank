@@ -290,7 +290,7 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
         update casosRechazadosUpdate;
     }
     
-    private List<EmailMessage> filtrarEmailMessageNoCC(List<EmailMessage> listNewObj) {
+    public static List<EmailMessage> filtrarEmailMessageNoCC(List<EmailMessage> listNewObj) {
         
         List<EmailMessage> newList = new List<EmailMessage> ();
         for (EmailMessage emailMessage : listNewObj) {
@@ -530,7 +530,14 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
     }
     
     private static void envioResponderCliente(EmailMessage correo, List<Case> casos, List<Task> actividadesTraslado) {
-        Case caso = [SELECT CC_Referencia_Correo_Saliente__c,  CC_MCC_Plantilla__c, Status FROM Case WHERE Id = :correo.ParentId ];
+        Case caso = [SELECT CC_Referencia_Correo_Saliente__c, CC_Derivar__c, Status, Account.AV_IndicadoresClientes__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c FROM Case WHERE Id = :correo.ParentId];
+
+        String ambitoMotivo;
+        if(caso.Account.AV_IndicadoresClientes__c != null && caso.Account.AV_IndicadoresClientes__c.contains('28')) {
+            ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c;
+        } else {
+            ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;
+        }
         
         Task actividadTraslado = new Task();
         actividadTraslado.Type = 'Responder a cliente';
@@ -543,7 +550,7 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
         actividadTraslado.CC_Correo_Asociado_Id__c = correo.Id;
         actividadTraslado.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
         actividadesTraslado.add(actividadTraslado);
-        
+
         caso.CC_Referencia_Correo_Saliente__c = '';
         casos.add(caso);
     }
@@ -702,9 +709,23 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
     }
     
     private static void respuestaSolicitudInfo(EmailMessage correo, List<Case> casos) {
-        Case caso = [SELECT Status, Subject, CC_Canal_Procedencia__c, Origin, CC_Autoasignado_Coordinador__c, CC_Cola_Procedencia__c, 
-        CC_En_Tercer_Nivel__c, CC_Grupo_3N__c, OwnerId, CC_Grupo_Transfer__c FROM Case WHERE Id = :correo.ParentId ];
+        Case caso = [SELECT Status, Subject, CC_Canal_Procedencia__c, Origin, CC_Autoasignado_Coordinador__c, CC_Cola_Procedencia__c, RecordTypeId, 
+        CC_En_Tercer_Nivel__c, CC_Grupo_3N__c, OwnerId, CC_Grupo_Transfer__c, Account.AV_IndicadoresClientes__c, CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, CBK_Case_Extension_Id__r.CC_Documentacion__c FROM Case WHERE Id = :correo.ParentId ];
         Boolean canviarPropietario = true;
+
+        Id recordTypeCasoCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+        String ambitoMotivo;
+        if(recordTypeCasoCliente == caso.RecordTypeId) {
+            if(caso.Account.AV_IndicadoresClientes__c != null && caso.Account.AV_IndicadoresClientes__c.contains('28')) {
+                ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c;
+            } else {
+                ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;
+            }
+            if(ambitoMotivo == 'Documentación' && !caso.CBK_Case_Extension_Id__r.CC_Documentacion__c) {
+                comprobarDocumentacionDerivar(caso);
+            }
+        }
+
         if (caso.Status == 'Pendiente Cliente') {
             // Si el caso viene de 3N debemos asignar el propietario del caso cuando se recibe la respuesta al último grupo de 3N
             if (caso.CC_En_Tercer_Nivel__c) {
@@ -762,7 +783,9 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
     public static void respuestaCliente(EmailMessage correo, List<Case> casos) {
         //Cuando un cliente responde a un email enviado desde la operativa reponder a cliente se envía un email automático
         Case caso = [SELECT Status, CC_Numero_Documento__c, CC_Idioma__c, AccountId, ContactId, OwnerId, CC_Canal_Resolucion__c, CC_Canal_Procedencia__c, CC_Autoasignado_Coordinador__c,
-        Origin,CC_Cola_Procedencia__c, RecordTypeId, Canal_del_Empleado__c FROM Case WHERE Id = :correo.ParentId ];
+        Origin,CC_Cola_Procedencia__c, RecordTypeId, Canal_del_Empleado__c, Account.AV_IndicadoresClientes__c, CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, 
+        CBK_Case_Extension_Id__r.CC_Documentacion__c
+        FROM Case WHERE Id = :correo.ParentId];
         Set<String> oLOVVal = new Set<String>();
         Set<String> oLOV = new Set<String>();
         
@@ -1227,4 +1250,39 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
      	return horasPasadas;
 	}
     	
+    public static void comprobarDocumentacionDerivar(Case caso) {
+        List<CC_Lista_Valores__c> textos = [SELECT Name, CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Textos operativa Derivar' AND CC_Activa__c = true];
+        Map<String, String> textosMap = new Map<String, String>();
+        List<Case> casos = new List<Case>();
+        Datetime today = Datetime.newInstance(System.today(), Time.newInstance(0, 0, 0, 0));
+        String todayFormated = today.format('yyyy-MM-dd');
+        for(CC_Lista_Valores__c texto : textos) {
+            textosMap.put(texto.Name, texto.CC_Mensajes_Mostrar__c);
+        }
+        CBK_Case_Extension__c extCaso = new CBK_Case_Extension__c(
+            CC_Documentacion__c = true
+        );
+        insert extCaso;
+        if(todayFormated < textosMap.get('Fecha documentacion respuesta cliente')) {
+            Id recordTypeCasoCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            Case casoDocumentacion = new Case();
+            casoDocumentacion.Origin = 'Email';
+            casoDocumentacion.CC_Canal_Procedencia__c = 'Atención al Cliente';
+            casoDocumentacion.RecordTypeId = recordTypeCasoCliente;
+            casoDocumentacion.CBK_Case_Extension_Id__c = extCaso.Id;
+            casoDocumentacion.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'CC_Inbound_Email_AC' LIMIT 1].Id;
+            casoDocumentacion.CC_CasoRelacionado__c = caso.Id;
+            insert casoDocumentacion;
+            caso.CC_CasoRelacionado__c = casoDocumentacion.Id;
+            casos.add(caso);
+        } else {
+            caso.Status = 'Activo';
+            caso.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName  = 'CC_Inbound_Email_AC' LIMIT 1].Id;
+            caso.CBK_Case_Extension_Id__c = extCaso.Id;
+            casos.add(caso);
+        }
+        if(!casos.isEmpty()) {
+            upsert casos;
+        }
+    }
 }

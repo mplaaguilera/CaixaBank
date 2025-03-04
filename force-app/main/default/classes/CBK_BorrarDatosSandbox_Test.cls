@@ -3,7 +3,7 @@ public with sharing class CBK_BorrarDatosSandbox_Test {
 
     @TestSetup
 	private static void testSetup() {
-        CSBD_Usuarios.usuarioAdministrador();
+        CSBD_TestDataFactory.usuarioAdministrador();
     }
 
 	@isTest

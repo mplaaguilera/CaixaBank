@@ -7,14 +7,16 @@ public with sharing class SAC_Asignacion_Plantillas_Test {
         User usuarioAdmin;
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC Admin
-            usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];   
-            Database.insert(usuarioAdmin);
+            usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+            SAC_DatabaseDML.insertDML(usuarioAdmin, false);     
+            //Database.insert(usuarioAdmin);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioAdmin.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+            //Database.insert(permiSetAssi);
         }
 
         /*Folder newFolder = new Folder(

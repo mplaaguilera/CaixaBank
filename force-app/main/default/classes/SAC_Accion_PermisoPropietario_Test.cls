@@ -25,20 +25,24 @@ public with sharing class SAC_Accion_PermisoPropietario_Test {
 
             usuarioGeneral = usuarios[0];
             usuarioGeneral2 = usuarios[1];
-            Database.insert(usuarioGeneral);
-            Database.insert(usuarioGeneral2);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
+            //Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral2, false);
+            //Database.insert(usuarioGeneral2);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
 
             PermissionSet permiSet2 = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi2 = new PermissionSetAssignment();
             permiSetAssi2.AssigneeId = usuarioGeneral2.Id;
             permiSetAssi2.PermissionSetId = permiSet2.Id;
-            Database.insert(permiSetAssi2);
+            SAC_DatabaseDML.insertDML(permiSetAssi2, false);
+            //Database.insert(permiSetAssi2);
         }
 
         //Reclamacion
@@ -58,7 +62,8 @@ public with sharing class SAC_Accion_PermisoPropietario_Test {
         List<Case> listaCasos = new List<Case>();
         listaCasos.add(reclamacion);
         listaCasos.add(pretension);
-        Database.insert(listaCasos);
+        SAC_DatabaseDML.insertListDML(listaCasos, false);
+        //Database.insert(listaCasos);
         
         List<SAC_Accion__c> acciones = new List<SAC_Accion__c>();
         SAC_Accion__c accion1 = SAC_TestDataFactory.crearTareas(1,pretension,false)[0];
@@ -77,7 +82,8 @@ public with sharing class SAC_Accion_PermisoPropietario_Test {
         acciones.add(accion4);
 
         System.runAs(usuarioGeneral){
-            Database.insert(acciones);
+            SAC_DatabaseDML.insertListDML(acciones, false);
+            //Database.insert(acciones);
         }           
     }
 
@@ -93,7 +99,8 @@ public with sharing class SAC_Accion_PermisoPropietario_Test {
 
         System.runAs(usuario2){
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
             Test.stopTest();
         }
 
@@ -112,7 +119,8 @@ public with sharing class SAC_Accion_PermisoPropietario_Test {
 
         caso.OwnerId = usuario2.id;
 
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
+        //Database.update(caso);
 
         Case casoNuevo = [SELECT id, OwnerId from Case WHERE subject = 'Reclamacion test'];
 
@@ -120,7 +128,8 @@ public with sharing class SAC_Accion_PermisoPropietario_Test {
 
         System.runAs(usuario){
             Test.startTest();
-            Database.update(casoNuevo);
+            SAC_DatabaseDML.updateDML(casoNuevo, false);
+            //Database.update(casoNuevo);
             Test.stopTest();
         }
         System.assertEquals(usuario.Id, casoNuevo.OwnerId, 'No se ha cambiado el owner por segunda vez');

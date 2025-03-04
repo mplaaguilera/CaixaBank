@@ -29,7 +29,7 @@ public with sharing class CSBD_LiveAgent_Welcome_Controller {
 			String horaMensaje;
 			if (tipoMensaje == 'Despedida') {
 				Integer horaActual = DateTime.now().hour();
-				if (horaActual > 0 && horaActual <= 13) {
+				if (horaActual >= 0 && horaActual <= 13) {
 					horaMensaje = 'Manana';
 				} else if (horaActual > 13 && horaActual <= 20) {
 					horaMensaje = 'Tarde';
@@ -81,6 +81,39 @@ public with sharing class CSBD_LiveAgent_Welcome_Controller {
 		}
 	}
 
+	@AuraEnabled
+	public static Response registrarMensajeAutomatico(String recordId) {
+		Response result = new Response();
+		try {
+			List<LiveChatTranscript> chatList = [
+				SELECT CSBD_Oportunidad_Id__c, CSBD_Welcome_Enviado__c, CSBD_Oportunidad_Id__r.CreatedDate
+				FROM LiveChatTranscript 
+				WHERE Id = :recordId
+			];
+			LiveChatTranscript chat = chatList.isEmpty() ? null : chatList[0];
+			if(chat != null && chat.CSBD_Oportunidad_Id__c != null && chat.CSBD_Welcome_Enviado__c){
+				
+				Datetime now = Datetime.now();
+				Datetime oppCreatedDate = chat.CSBD_Oportunidad_Id__r.CreatedDate;	
+				Decimal timeDiff = now.getTime() - oppCreatedDate.getTime();//milisecond	
+
+				Opportunity oportunidad = new Opportunity(Id = chat.CSBD_Oportunidad_Id__c);
+				oportunidad.CSBD_Respuesta_Mensaje_Automatico__c = now;	
+				//Calcular en minutos la primera respuesta automatica: - SLA antes
+				//Integer timeDiffMinutes = Math.round((now.getTime() - oppCreatedDate.getTime() ) / 60000); //minutos 
+				//Calcular en segundos las primera respuesta automatica - ha cambiado en la US1093071
+				oportunidad.CSBD_SLA_Primera_Respuesta__c = Math.round(timeDiff/1000);//segundos
+				update oportunidad;
+				result.status = 'OK';
+			}				
+				
+		} catch (Exception e) {
+			result.status = 'KO';
+		}
+
+		return result;
+	}
+
 	/**
 	* @description		 	Busca el custom metadata que guarda los mensajes automaticos del chat
 	* @param transcript		la transcripción
@@ -100,6 +133,7 @@ public with sharing class CSBD_LiveAgent_Welcome_Controller {
 				nombrePlantilla += 'Test';
 			}
 		}
+		System.debug('nombrePlantilla: ' + nombrePlantilla);
 		return [SELECT DeveloperName, HtmlValue FROM EmailTemplate WHERE DeveloperName = :nombrePlantilla];
 	}
 

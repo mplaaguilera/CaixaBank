@@ -18,7 +18,8 @@ public with sharing class SAC_LCMP_ComentariosSupervisor_Test {
 
         //Usuario Admin
         User userAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(userAdmin);
+        SAC_DatabaseDML.insertDML(userAdmin, false);
+        //Database.insert(userAdmin);
 
         CC_Grupo_Colaborador__c grupoCOPS;
         CC_Grupo_Colaborador__c grupoColaborador;
@@ -36,31 +37,37 @@ public with sharing class SAC_LCMP_ComentariosSupervisor_Test {
             grupoColaborador.SAC_MaximoCasosDiarios__c = 30;
             grupoColaborador.SAC_NivelGrupo__c = 'SAC_Nivel2';
             
-            Database.insert(grupoCOPS);
-            Database.insert(grupoColaborador);
+            SAC_DatabaseDML.insertDML(grupoCOPS, false);
+            //Database.insert(grupoCOPS);
+            SAC_DatabaseDML.insertDML(grupoColaborador, false);
+            //Database.insert(grupoColaborador);
 
             //Cuenta
             cuenta = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
-            Database.insert(cuenta);
+            SAC_DatabaseDML.insertDML(cuenta, false);
+            //Database.insert(cuenta);
 
             //Usuarios
             listadoUsuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(2);
             listadoUsuarios[0].SAC_PerteneceCOPSAJ__c = true;
             listadoUsuarios[0].SAC_GruposPerteneciente__c = grupoCOPS.id;
             listadoUsuarios[1].SAC_GruposPerteneciente__c = grupoColaborador.id;
-            Database.insert(listadoUsuarios);
+            SAC_DatabaseDML.insertListDML(listadoUsuarios, false);
+            //Database.insert(listadoUsuarios);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = listadoUsuarios[0].Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
 
             PermissionSet permiSet2 = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi2 = new PermissionSetAssignment();
             permiSetAssi2.AssigneeId = listadoUsuarios[1].Id;
             permiSetAssi2.PermissionSetId = permiSet2.Id;
-            Database.insert(permiSetAssi2);
+            SAC_DatabaseDML.insertDML(permiSetAssi2, false);
+            //Database.insert(permiSetAssi2);
 
             //Grupos Contact
             List<CC_Grupo_Colaborador_Contact__c> listaColaboradores = new List<CC_Grupo_Colaborador_Contact__c>();
@@ -74,7 +81,8 @@ public with sharing class SAC_LCMP_ComentariosSupervisor_Test {
             grupoColabContact.SAC_Administrador__c = true;
             listaColaboradores.add(grupoColabContact);
 
-            Database.insert(listaColaboradores);
+            SAC_DatabaseDML.insertListDML(listaColaboradores, false);
+            //Database.insert(listaColaboradores);
         }
 
         //Reclamacion
@@ -91,7 +99,8 @@ public with sharing class SAC_LCMP_ComentariosSupervisor_Test {
         camposRecl.put('SAC_FechaRecepcion__c', system.now());
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
     
         //Reclamacion 2
         Map<String, Object> camposRecl2 = new Map<String, Object>();
@@ -107,7 +116,8 @@ public with sharing class SAC_LCMP_ComentariosSupervisor_Test {
         camposRecl2.put('SAC_FechaRecepcion__c', system.now());
         
         Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
-        Database.insert(casoReclamacion2);
+        SAC_DatabaseDML.insertDML(casoReclamacion2, false);
+        //Database.insert(casoReclamacion2);
     
         //Reclamacion CC
         Map<String, Object> camposReclCC = new Map<String, Object>();
@@ -121,7 +131,8 @@ public with sharing class SAC_LCMP_ComentariosSupervisor_Test {
         camposReclCC.put('SAC_FechaRecepcion__c', system.now());
         
         Case testRecCC = SAC_TestDataFactory.crearCaso('Reclamacion',camposReclCC);
-        Database.insert(testRecCC);
+        SAC_DatabaseDML.insertDML(testRecCC, false);
+        //Database.insert(testRecCC);
     }
 
     @isTest

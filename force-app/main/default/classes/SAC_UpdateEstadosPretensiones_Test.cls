@@ -4,14 +4,16 @@ public with sharing class SAC_UpdateEstadosPretensiones_Test {
     @TestSetup
     static void makeData() {
         //Usuario SAC General
-		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);    
+        //Database.insert(permiSetAssi);
 
         List<Case> reclamaciones = new List<Case>();
         List<Case> pretensiones = new List<Case>();
@@ -45,7 +47,8 @@ public with sharing class SAC_UpdateEstadosPretensiones_Test {
             Case reclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl3);
             reclamaciones.add(reclamacion3);
 
-            Database.insert(reclamaciones);  
+            SAC_DatabaseDML.insertListDML(reclamaciones, false);  
+            //Database.insert(reclamaciones);  
 
             //Pretension
             Map<String, Object> camposPret1 = new Map<String, Object>();
@@ -94,7 +97,8 @@ public with sharing class SAC_UpdateEstadosPretensiones_Test {
             Case casoPretension5 = SAC_TestDataFactory.crearCaso('Pretension',camposPret5);
             pretensiones.add(casoPretension5);
 
-            Database.insert(pretensiones); 
+            SAC_DatabaseDML.insertListDML(pretensiones, false); 
+            //Database.insert(pretensiones); 
         }
         
     }
@@ -112,7 +116,8 @@ public with sharing class SAC_UpdateEstadosPretensiones_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
 		System.runAs(usuario){
             Test.StartTest();
-            Database.update(casosPrueba);
+            SAC_DatabaseDML.updateListDML(casosPrueba, false); 
+            //Database.update(casosPrueba);
             Test.stopTest();
         }
         List<Case> pretensionesv2 = [SELECT Id, Subject, Status FROM Case WHERE SuppliedCompany = 'prueba' OR SuppliedCompany = 'prueba3']; 
@@ -134,7 +139,8 @@ public with sharing class SAC_UpdateEstadosPretensiones_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
 		System.runAs(usuario){
             Test.StartTest();
-            Database.update(casosPrueba);
+            SAC_DatabaseDML.updateListDML(casosPrueba, false); 
+            //Database.update(casosPrueba);
             Test.stopTest();
         }
         List<Case> pretensionesv2 = [SELECT Id, Subject, Status FROM Case WHERE SuppliedCompany = 'prueba5']; 

@@ -5,7 +5,8 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
     static void makeData(){
         
         Account cuentaA = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
-        Database.insert(cuentaA);
+        SAC_DatabaseDML.insertDML(cuentaA, false);
+        //Database.insert(cuentaA);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -15,12 +16,14 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
         camposRecl.put('SuppliedEmail', 'sactest@sactest.sactest');
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
 
         List<User> usuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(2);
         usuarios[0].Username = 'sacacuserecibo@test.com';
         usuarios[1].Username = 'ustestesteo@test.com';
-        Database.insert(usuarios);
+        SAC_DatabaseDML.insertListDML(usuarios, false);
+        //Database.insert(usuarios);
         
         System.runAs(usuarios[0]){
             EmailTemplate validEmailTemplate = new EmailTemplate();
@@ -32,7 +35,8 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
             validEmailTemplate.Body = 'Texted';
             validEmailTemplate.FolderId = usuarios[0].Id;
 
-            Database.insert(validEmailTemplate);
+            SAC_DatabaseDML.insertDML(validEmailTemplate, false);
+            //Database.insert(validEmailTemplate);
         }
     }
 
@@ -45,7 +49,8 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
 		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
 		if(psas.isEmpty()){
 			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-			Database.insert(psa);
+            SAC_DatabaseDML.insertDML(psa, false);
+			//Database.insert(psa);
 		}
         
         System.RunAs((usuario)){   
@@ -57,7 +62,8 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
             camposRecl.put('Status', 'SAC_001');
             
             casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);
+            //Database.insert(casoReclamacion);
             myInfo = SAC_LCMP_AcuseReciboCartaPostal.getInfoInit(casoReclamacion.Id);
             Test.stopTest();
         }
@@ -78,7 +84,8 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
 		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
 		if(psas.isEmpty()){
 			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-			Database.insert(psa);
+            SAC_DatabaseDML.insertDML(psa, false);
+			//Database.insert(psa);
 		}
 
         System.RunAs((usuario)){   
@@ -105,7 +112,8 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
 		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
 		if(psas.isEmpty()){
 			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-			Database.insert(psa);
+            SAC_DatabaseDML.insertDML(psa, false);
+			//Database.insert(psa);
 		}
 
         System.RunAs((usuario)){   
@@ -132,12 +140,13 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
 		List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSetId = :ps.Id AND AssigneeId =: usuario.Id];
 		if(psas.isEmpty()){
 			PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.Id);
-			Database.insert(psa);
+            SAC_DatabaseDML.insertDML(psa, false);
+			//Database.insert(psa);
 		}
 
         System.RunAs((usuario)){   
             Test.startTest();
-            SAC_LCMP_AcuseReciboCartaPostal.envioEmailManual(c);
+            SAC_LCMP_AcuseReciboCartaPostal.envioEmailManual(c, 'webEmail');
             Test.stopTest();
         }
         

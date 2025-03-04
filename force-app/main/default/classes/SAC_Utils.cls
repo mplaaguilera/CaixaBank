@@ -86,6 +86,9 @@ public without sharing class SAC_Utils {
 					when 'CC_Caracteristica__c' {
                         mapObjectRT.put(objeto,Schema.SObjectType.CC_Caracteristica__c.getRecordTypeInfosByDeveloperName());
                     }
+					when 'CBK_Case_Extension__c' { 
+						mapObjectRT.put(objeto,Schema.SObjectType.CBK_Case_Extension__c.getRecordTypeInfosByDeveloperName());
+					}
                     when else {
                         mapObjectRT.put(objeto,Schema.getGlobalDescribe().get(objeto).getDescribe().getRecordTypeInfosByDeveloperName());
                     }
@@ -111,7 +114,9 @@ public without sharing class SAC_Utils {
     */
     static public CC_InterfaceSettings__mdt getInterfazConfigBody(String sInterfaz) {
         List<CC_InterfaceSettings__mdt> oConfig = [SELECT CC_Certificado__c, CC_EndPoint__c, CC_Body__c, CC_TimeOut__c, CC_TipoPeticion__c, CC_Activa__c, CC_ContentType__c, CC_TrazaActiva__c, CC_TrazaEntrada__c, CC_TrazaSalida__c FROM CC_InterfaceSettings__mdt WHERE DeveloperName = :sInterfaz AND CC_Activa__c = true];
-        if (oConfig.size() == 1 && oConfig[0] != null) {
+        List<CC_InterfaceSettings__mdt> cntConfig = oConfig;
+
+		if (cntConfig.size() == 1 && oConfig[0] != null) {
             return oConfig[0];
         } else {
             return null;
@@ -220,9 +225,9 @@ public without sharing class SAC_Utils {
 	{
 		//en base a los datos del correo  se busca la regla de clasificación pertinente
         WrapperReglaClasificacion wrapRCRetornar = new WrapperReglaClasificacion();
-		String remitenteUC = fromAddress.toUpperCase();
-		String asuntoUC = subject.toUpperCase();
-		String cuerpoUC = body.toUpperCase();
+		String remitenteUC = fromAddress?.toUpperCase();
+		String asuntoUC = subject?.toUpperCase();
+		String cuerpoUC = body?.toUpperCase();
 		String destinatariosUC = toAddresses?.toString().toUpperCase();
 		String destinatariosCcUc = ccAddresses?.toString().toUpperCase();
 		// Map<Id,id> clasificacionRapidaMap = new Map<id,id>();
@@ -664,7 +669,7 @@ public without sharing class SAC_Utils {
         casoNuevo.Origin = 'Email';
         casoNuevo.SuppliedEmail = email.fromAddress;
 
-		if(!email.toAddresses.isEmpty()){
+		if(email.toAddresses != null){
 			String direccionesToEmailStr = '';
 			Boolean variasDirecciones = false;
 
@@ -677,7 +682,7 @@ public without sharing class SAC_Utils {
 					direccionesToEmailStr = direccionesToEmailStr + ';' + direccion; 
 				}
 			}
-			casoNuevo.SAC_EmailTo__c = direccionesToEmailStr;
+			casoNuevo.SAC_EmailTo__c = direccionesToEmailStr.left(250);
 		}
 
 		if(email.ccAddresses != null){
@@ -693,7 +698,7 @@ public without sharing class SAC_Utils {
 					direccionesCCEmailStr = direccionesCCEmailStr + ';' + direccion; 
 				}
 			}
-			casoNuevo.SAC_EmailCC__c = direccionesCCEmailStr;
+			casoNuevo.SAC_EmailCC__c = direccionesCCEmailStr.left(250);
 		}
 
         if (String.isNotBlank(subjectRecortado)) {
@@ -701,10 +706,11 @@ public without sharing class SAC_Utils {
         }
 
         if(email.htmlBody != null){ 
-            casoNuevo.Description = email.htmlBody.left(32000).stripHtmlTags();
+            casoNuevo.Description = email.htmlBody.stripHtmlTags().left(32000);
         }else if(email.plainTextBody != null){ 
             casoNuevo.Description = email.plainTextBody.left(32000);
         }
+
 
         if (cola != null) {
             casoNuevo.OwnerId = cola.QueueId;
@@ -866,12 +872,225 @@ public without sharing class SAC_Utils {
 
 
 	/**
-	 * Método para calcular el tiempo que se tiene que restar al tiempo total del SLA regulatorio por la parada de subsanación
+	 * Método para calcular el tiempo que se tiene que sumar al tiempo total del SLA Alta y SLA Letrado por la parada de subsanación
 	 */
     public static Integer calcularTiempoParadaSubsanacion(Case caso, Integer tiempoTotal) {
-        if(caso.SAC_TiempoParadaSubsanacion__c != null) {
-            tiempoTotal = tiempoTotal + (Integer.ValueOf(caso.SAC_TiempoParadaSubsanacion__c) * 1440);
+        if(caso.SAC_MinutosParadaSubsanacion__c != null) {
+            tiempoTotal = tiempoTotal + Integer.ValueOf(caso.SAC_MinutosParadaSubsanacion__c);
 		}
 		return tiempoTotal;
+	}
+
+	/**
+	 * @description DE106853 - Raúl Santos - 20/11/2024 - Método para cambiar las imágenes inline privadas a URLs públicas
+	 * @param emailBody Cuerpo del mensaje
+	 * @return Nuevo cuerpo del mensaje con las imágenes inline en formato público.
+	 */
+	public static String gestionarImagenesInlineRedactarMail(String emailBody) {
+		String cuerpoEmailParseado = emailBody;
+		try{
+			if (String.isNotBlank(emailBody)) {
+				Pattern patronURLs = Pattern.compile('<img src=\\"https:\\/\\/caixabankcc([a-zA-Z0-9-=?&;%]|\\.|\\\\|:|\\/)+\\">');		
+				Pattern patronURLconDominio = Pattern.compile('<img src="(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/download\\/068[A-Za-z0-9]{12,15}">');
+				Pattern patronURLchatter = Pattern.compile('<img src="https:\\/\\/(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/renditionDownload.{0,200}">');
+
+				//Expresión regular para buscar el ID del ContentVersion de la URL.
+				Pattern patronCV = Pattern.compile('\\/068[a-zA-Z0-9]+\\?');
+				Pattern patronCVDominio = Pattern.compile('\\/068[a-zA-Z0-9]+');
+				Pattern patronChatter = Pattern.compile('068[a-zA-Z0-9]{12}');
+				
+				//Preparar mapa de URLs de reemplazo.
+				Map<String,String> mapaReemplazoUrls = new Map<String,String>();
+				Set<String> setContentVersions = new Set<String>();
+                String orgId = UserInfo.getOrganizationId();
+                orgId = orgId.substring(0,orgId.length()-3);
+
+				//Parsear el correo saliente.
+				//URL normal
+				parsearCorreo(emailBody, patronURLs, patronCV, mapaReemplazoUrls, setContentVersions, 'url');
+				//URL dominio
+				parsearCorreo(emailBody, patronURLconDominio, patronCVDominio, mapaReemplazoUrls, setContentVersions, 'dominio');
+				//URL chatter
+				parsearCorreo(emailBody, patronURLchatter, patronChatter, mapaReemplazoUrls, setContentVersions, 'chatter');
+
+				//Mapa final por cada fichero con su URL pública.
+				Map<String,String> mapaFilePublicURL = new Map<String,String>();
+
+				//Recuperar todos los links públicos, tanto los existentes como los generados en la transacción.
+				if (!setContentVersions.isEmpty()) {
+					List<ContentAsset> lstContentAsset = new List<ContentAsset>();
+					List<ContentVersion> lstContentVersion = new List<ContentVersion>();
+
+					List<ContentVersion> contestLimpios = new List<ContentVersion>();
+					List<ContentVersion> lstVersion = [SELECT Id, ContentDocumentId, ContentDocument.ContentAssetId, ContentDocument.ContentAsset.DeveloperName  FROM ContentVersion WHERE Id IN :setContentVersions];
+					Map<String, List<ContentVersion>> mapContentRepetidos = juntarRepeticiones(lstVersion);
+
+					for (String idContentVersion : mapContentRepetidos.keySet()) {
+						if (mapContentRepetidos.get(idContentVersion).size() == 1) {
+							contestLimpios.add(mapContentRepetidos.get(idContentVersion)[0]);
+						}
+					}
+
+					Map<String, Id> mapAssetDocument = new Map<String, Id>();
+					Map<String, String> mapAssetContentVer = new Map<String, String>();
+					
+					for(ContentVersion contentVersion : contestLimpios){
+						if(contentVersion.ContentDocumentId != null){
+							String developerNameFinal;
+							String idConVer = String.valueOf(contentVersion.Id);
+							if (contentVersion.ContentDocument.ContentAssetId == null ) {
+								String randomUuid = UUID.randomUUID().toString().remove('-').left(18);
+								developerNameFinal = 'SAC_' + contentVersion.id + randomUuid;
+								ContentAsset assetId = new ContentAsset();
+								assetId.DeveloperName = developerNameFinal;
+								assetId.IsVisibleByExternalUsers = true;
+								assetId.MasterLabel = developerNameFinal;
+								lstContentVersion.add(contentVersion);
+								lstContentAsset.add(assetId);
+								mapAssetContentVer.put(developerNameFinal,idConVer.substring(0,idConVer.length()-3));
+								mapAssetDocument.put(developerNameFinal, contentVersion.ContentDocumentId);
+							} else if(contentVersion.ContentDocument.ContentAsset.DeveloperName != null){
+								developerNameFinal = contentVersion.ContentDocument.ContentAsset.DeveloperName;
+								mapaFilePublicURL.put(idConVer.substring(0,idConVer.length()-3),'https://'+ DomainCreator.getContentHostname() + '/file-asset-public/' + developerNameFinal + '?oid=' + orgId);
+							}
+						}
+					}
+
+					if(!lstContentAsset.isEmpty()){
+						List<Database.SaveResult> resultadoInsercion = Database.insert(lstContentAsset,false);
+						for (Database.SaveResult resInser : resultadoInsercion) {
+							if (!resInser.isSuccess()) {
+								for(Database.Error err : resInser.getErrors()){
+									CBK_log.debug('SAC_Utils: Error en la inserción de ContentAsset: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+								}
+							}
+						}
+
+						List<ContentDocument> lstContentDocument = new List<ContentDocument>();
+
+						for (ContentAsset asset : lstContentAsset) {
+							if (asset.Id != null) {
+								mapaFilePublicURL.put(mapAssetContentVer.get(asset.DeveloperName),'https://'+ DomainCreator.getContentHostname() + '/file-asset-public/' + asset.DeveloperName + '?oid=' + orgId);
+								ContentDocument cntDocument = new ContentDocument();
+								cntDocument.Id = mapAssetDocument.get(asset.DeveloperName);
+								cntDocument.ContentAssetId = asset.Id;
+								lstContentDocument.add(cntDocument);
+							}
+						}
+
+						if(!lstContentDocument.isEmpty()){
+							List<Database.SaveResult> resultadoUpdate = Database.update(lstContentDocument,false);
+							for (Database.SaveResult resUpdt : resultadoUpdate) {
+								if (!resUpdt.isSuccess()) {
+									for(Database.Error err : resUpdt.getErrors()){
+										CBK_log.debug('SAC_Utils: Error en la actualización de ContentDocument: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+									}
+								}
+							}
+						}
+
+						//Actualizar el ContentVersion para que tenga el valor SAC_BloqueoTotalVisibilidad__c=true
+						if(!lstVersion.isEmpty()){
+							List<Database.SaveResult> resultadoCVUpdate = Database.update(lstVersion,false);
+							for (Database.SaveResult resUpdt : resultadoCVUpdate) {
+								if (!resUpdt.isSuccess()) {
+									for(Database.Error err : resUpdt.getErrors()){
+										CBK_log.debug('SAC_Utils: Error en la actualización de ContentVersion: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				//Reemplazar el contenido del email con los links públicos.
+				for (String urlPrivadaCorreo : mapaReemplazoUrls.keySet()) {
+					String ficheroURL;
+					String nuevaURL;
+					if (mapaReemplazoUrls.containsKey(urlPrivadaCorreo)) {
+						ficheroURL = mapaReemplazoUrls.get(urlPrivadaCorreo);
+					}
+					if (!String.isBlank(ficheroURL) && mapaFilePublicURL.containsKey(ficheroURL)) {
+						nuevaURL = mapaFilePublicURL.get(ficheroURL);
+					}
+					if (!String.isBlank(nuevaURL) && String.isNotBlank(nuevaURL)) {
+						emailBody = emailBody.replace(urlPrivadaCorreo, '<img src="' + nuevaURL + '">');
+					}
+				}
+
+				cuerpoEmailParseado = emailBody;
+			}
+		}catch (Exception e){
+			// Registramos error, pero no se impide la operativa del usuario.
+			CBK_Log.error(e);
+			cuerpoEmailParseado = emailBody;
+		}
+
+		return cuerpoEmailParseado;
+	}
+
+	/**
+	 * @description Devuelve el id de los CV a tratar
+	*/
+	private static Map<String, List<ContentVersion>> juntarRepeticiones (List<ContentVersion> listContent){
+
+		Map<String, List<ContentVersion>> mapContentRepetidos = new Map<String, List<ContentVersion>>();
+		for (ContentVersion contentVersion : listContent) {
+			String idString = String.valueOf(contentVersion.Id);
+			List<ContentVersion> lstContent = new List<ContentVersion>();
+			if (mapContentRepetidos.containsKey(idString.left(15))) {
+				lstContent = mapContentRepetidos.get(idString.left(15));
+				lstContent.add(contentVersion);
+				mapContentRepetidos.put(idString.left(15),lstContent);
+			} else {
+				lstContent.add(contentVersion);
+				mapContentRepetidos.put(idString.left(15),lstContent);
+			}
+
+			contentVersion.SAC_BloqueoTotalVisibilidad__c = true;
+		}
+		return mapContentRepetidos;
+	}
+
+	/**
+	 * @description Método obtener la id del CV de la imagen inline
+	*/
+	private static void parsearCorreo(String emailBody, Pattern patronURL, Pattern patronCV, Map<String,String> mapaReemplazoUrls, Set<String> setContentVersions, String tipo){
+
+		Matcher matcherCorreo = patronURL.matcher(emailBody);
+
+		while (matcherCorreo.find()) {
+			String urlImagen = matcherCorreo.group();
+
+			//Comprobar que no sea una URL pública.
+			//No ha de contener los valores que se generan como URL de descarga: /sfc/dist/version/download, oid=, ids=, &d=
+			Boolean urlPublica = false;
+			if (tipo != 'chatter' && urlImagen.contains('/sfc/dist/version/download') && urlImagen.contains('oid=') && urlImagen.contains('ids=') && urlImagen.contains('&d=')){
+				urlPublica = true;
+			}
+
+			//Assets públicos.
+			if (urlImagen.contains('/file-asset-public') && urlImagen.contains('oid=')){
+				urlPublica = true;
+			}
+			if (!urlPublica){
+				//Parsear la url privada para encontrar el Identificador del fichero.
+				Matcher matcherCV = patronCV.matcher(urlImagen);
+				if (matcherCV.find()) {							
+					String fileId = matcherCV.group();
+					
+					if(tipo == 'url'){
+						fileId = fileId.substring(1,fileId.length()-1);
+					}else if(tipo == 'dominio'){
+						fileId = fileId.substring(1,fileId.length()-3);
+					}else if(tipo == 'chatter'){
+						fileId = fileId.substring(0,fileId.length());
+					}
+					
+					mapaReemplazoUrls.put(urlImagen, fileId);
+					setContentVersions.add(fileId);
+				}
+			}
+		}
 	}
 }

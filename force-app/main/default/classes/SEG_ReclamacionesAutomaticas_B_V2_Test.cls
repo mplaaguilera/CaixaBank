@@ -315,7 +315,7 @@ public class SEG_ReclamacionesAutomaticas_B_V2_Test {
 
         ContentVersion cv=new Contentversion();
         cv.title='ABC';
-        cv.PathOnClient ='test';
+        cv.PathOnClient ='test.pdf';
 		cv.SEG_Firmado__c = false;
         Blob b=Blob.valueOf('Unit Test Attachment Body');
         cv.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body');
@@ -324,6 +324,7 @@ public class SEG_ReclamacionesAutomaticas_B_V2_Test {
             SELECT Id, Title, LatestPublishedVersionId 
             FROM ContentDocument
         ];
+
         //create ContentDocumentLink  record 
         ContentDocumentLink cdl = New ContentDocumentLink();
         cdl.LinkedEntityId = contrato1.Id;
@@ -449,6 +450,7 @@ public class SEG_ReclamacionesAutomaticas_B_V2_Test {
         
         update contratoList;
     
+        System.assertEquals(testUser.ProfileId,profile.Id, 'Se ha modificado el perfil del usuario que ejecuta el batch');
 
         Test.startTest();
         System.runAs (testUser) {            

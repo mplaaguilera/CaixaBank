@@ -1,0 +1,44 @@
+<template>
+
+    <!--Card-->
+    <article class="slds-card slds-var-m-top_large">
+        <!--Cabecera-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning-icon icon-name="standard:file" size="small"></lightning-icon>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 15px; font-weight: 600;">
+                        <span lwc:if={caso}>Documentos en FileNet con Snow Number {caso.fields.SNOW_Number__c.value}</span>
+                        <span lwc:else>Documentos en FileNet con este Snow Number</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <!--Cuerpo-->
+        <div class="slds-card__body slds-card__body_inner">
+            <div lwc:if={displayMessage} class="slds-var-m-horizontal_medium">
+                <p lwc:if={messageResponse}>{messageResponse}</p>
+                <p lwc:else>Tickets no obtenidos.</p>
+            </div>
+            <div lwc:else class="datatableContainer">
+                <!-- sldsValidatorIgnoreNextLine -->
+                <lightning-datatable
+                    key-field="Id_FileNet"
+                    data={documentos}
+                    data-id={id}
+                    columns={columns}
+                    sorted-by={sortedBy}
+                    sorted-direction={sortDirection}
+                    onsort={handleSortData}
+                    is-loading={isLoading}
+                    onrowaction={handleRowAction}
+                    hide-checkbox-column
+                    show-row-number-column>
+                </lightning-datatable>
+            </div>
+        </div>
+    </article>
+
+</template>

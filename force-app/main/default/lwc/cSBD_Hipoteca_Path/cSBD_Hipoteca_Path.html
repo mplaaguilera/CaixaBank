@@ -13,7 +13,7 @@
 				<lightning-progress-step class="etapaFinal" label="Perdida" value="Perdida" onclick={etapaOnclick} data-etapa-value="Perdida"></lightning-progress-step>
 			</lightning-progress-indicator>
 
-			<div class="slds-grid slds-grid_align-spread slds-gutters_direct-small slds-var-m-top_medium">
+			<div class="slds-grid slds-grid_align-spread slds-gutters_direct-small slds-var-m-top_x-small">
 				<div class="slds-col slds-grow-none">
 					<lightning-input
 						class="toggleInternacional slds-var-m-left_xx-small"
@@ -32,10 +32,12 @@
 								<template for:each={subetapas} for:item="subetapa">
 									<lightning-progress-step
 										key={subetapa.value}
+										class="step"
 										label={subetapa.label}
 										value={subetapa.value}
 										title={subetapa.title}
-										onclick={subetapaOnclick}>
+										onclick={subetapaOnclick}
+										data-value={subetapa.value}>
 									</lightning-progress-step>
 								</template>
 							</lightning-progress-indicator>

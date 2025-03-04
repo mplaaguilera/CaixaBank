@@ -6,8 +6,9 @@ public with sharing class SAC_Auditoria_AU_TRHan_Test {
         Test.startTest();
         UserRole uRole = [SELECT Id FROM UserRole WHERE DeveloperName = 'SAC_General'];
 
-        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];     
-        Database.insert(usuarioAdmin);
+        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);     
+        //Database.insert(usuarioAdmin);
 
         User usuario;
         System.runAs(usuarioAdmin) {
@@ -16,18 +17,21 @@ public with sharing class SAC_Auditoria_AU_TRHan_Test {
             usuario.Username = 'ustestesteo@test.com';   
             usuario.UserRoleId = uRole.Id;   
             usuario.SAC_PerteneceCOPSAJ__c = true;
-            Database.insert(usuario);
+            SAC_DatabaseDML.insertDML(usuario, false);
+            //Database.insert(usuario);
         }
         Test.stopTest();
 
         List<CC_Grupo_Colaborador__c> listGrupoColab = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor',1);
         listGrupoColab[0].Name = 'Grupo Proveedores Test1';
         listGrupoColab[0].OwnerId = usuario.Id;
-        Database.insert(listGrupoColab);
+        SAC_DatabaseDML.insertListDML(listGrupoColab, false);
+        //Database.insert(listGrupoColab);
 
         CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = SAC_TestDataFactory.crearColaboradorContact(usuario.Id,listGrupoColab[0].Id);
         grupoColaboradorContact.SAC_Auditor__c = true;
-        Database.insert(grupoColaboradorContact);
+        SAC_DatabaseDML.insertDML(grupoColaboradorContact, false);
+        //Database.insert(grupoColaboradorContact);
 
         Case casoReclamacion = SAC_TestDataFactory.crearReclamacion(1)[0];
         casoReclamacion.Subject = 'TestRec';
@@ -35,14 +39,16 @@ public with sharing class SAC_Auditoria_AU_TRHan_Test {
         casoReclamacion.SAC_StatusAuxiliar__c = casoReclamacion.Status;
         casoReclamacion.OwnerId = usuario.Id;
         casoReclamacion.SEG_Grupo__c = listGrupoColab[0].id;
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
 
         SEG_Auditoria__c auditoriaPadre = new SEG_Auditoria__c();
         auditoriaPadre.SAC_NombreAuditoria__c = 'Auditoria Test';
         auditoriaPadre.RecordTypeId = Schema.SObjectType.SEG_Auditoria__c.getRecordTypeInfosByDeveloperName().get('SAC_AuditoriaGeneral').getRecordTypeId();
         auditoriaPadre.OwnerId = usuario.Id;
         auditoriaPadre.SAC_Estado__c = 'SAC_Pendiente';
-        Database.insert(auditoriaPadre);
+        SAC_DatabaseDML.insertDML(auditoriaPadre, false);
+        //Database.insert(auditoriaPadre);
 
         SEG_Auditoria__c auditoriaHija = new SEG_Auditoria__c();
         auditoriaHija.SAC_NombreAuditoria__c = 'Auditoria Test Hija Clase Test';
@@ -52,7 +58,8 @@ public with sharing class SAC_Auditoria_AU_TRHan_Test {
         auditoriaHija.SAC_Tipo__c = 'SAC_Altas';
         auditoriaHija.SAC_AuditoriaGeneral__c = auditoriaPadre.Id;
         auditoriaHija.SAC_Reclamacion__c = casoReclamacion.Id;
-        Database.insert(auditoriaHija);
+        SAC_DatabaseDML.insertDML(auditoriaHija, false);
+        //Database.insert(auditoriaHija);
     }
 
     @isTest
@@ -72,12 +79,14 @@ public with sharing class SAC_Auditoria_AU_TRHan_Test {
         permiSetAssiGeneral1.AssigneeId = usuario.Id;
         permiSetAssiGeneral1.PermissionSetId = permiSets[1].Id;
         listaAsignaciones.add(permiSetAssiGeneral1);
-        Database.insert(listaAsignaciones);
+        SAC_DatabaseDML.insertListDML(listaAsignaciones, false);
+        //Database.insert(listaAsignaciones);
 
         Test.startTest();
         System.runAs(usuario) {
             auditoria.SAC_Estado__c = 'SAC_Completada';
-            Database.update(auditoria);
+            SAC_DatabaseDML.updateDML(auditoria, false);
+            //Database.update(auditoria);
         }
         Test.stopTest();
 

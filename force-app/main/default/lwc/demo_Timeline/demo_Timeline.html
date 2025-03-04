@@ -1,0 +1,191 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    <article class="slds-card">
+        <!--Cabecera card-->
+        <div class="slds-card__header slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-p-bottom_x-small slds-var-m-left_x-small slds-var-m-right_xx-small">
+            <div class="slds-col slds-grow-none slds-var-m-right_x-small slds-truncate">
+                <header class="slds-media slds-media_center">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="custom:custom112" size="small" class="iconoCard"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title slds-var-p-top_medium slds-var-p-bottom_medium">
+                            <span class="slds-truncate">Historial de comunicaciones</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-col slds-shrink-none">
+                <template lwc:if={opciones.agruparPorMeses}>
+                    <lightning-button-icon icon-name="utility:collapse_all" variant="bare" tooltip="Contraer todas las secciones" onclick={contraerSecciones}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:expand_all" variant="bare" tooltip="Expandir todas las secciones" onclick={expandirSecciones} class="slds-var-m-left_small"></lightning-button-icon>
+                </template>
+                <lightning-button-icon icon-name="utility:refresh" variant="bare" tooltip="Actualizar" onclick={getDatos} class="slds-var-m-left_x-large"></lightning-button-icon>
+                <lightning-button-icon icon-name="utility:settings" variant="bare" tooltip="Configuración" onclick={mostrarCerrarPopoverOpciones} class="slds-var-m-left_small slds-var-m-right_x-small">
+                </lightning-button-icon>
+                <section class="popoverOpciones slds-popover slds-popover--small slds-nubbin_top-right slds-is-absolute slds-hide" role="dialog" onclick={eventStopPropagation}>
+                    <div class="slds-popover__body slds-popover__body_small" style="max-height: initial;">
+                        <div class="slds-media">
+                            <div class="slds-media__body slds-var-p-top_x-small slds-var-p-bottom_medium">
+                                <div class="slds-var-m-left_x-small">
+                                    <div class="slds-var-m-top_xx-small">
+                                        <div class="slds-text-title_caps">Mostrar objetos</div>
+                                        <div class="slds-var-m-top_x-small">
+                                            <lightning-icon icon-name="standard:task" title="Tareas" size="small" class="opcionesBotonMostrarObjeto" onclick={botonMostrarObjetoOnclick} data-objeto="Tarea"></lightning-icon>
+                                            <lightning-icon icon-name="standard:event" title="Eventos" size="small" class="opcionesBotonMostrarObjeto slds-var-m-left_x-small" onclick={botonMostrarObjetoOnclick} data-objeto="Evento"></lightning-icon>
+                                            <lightning-icon icon-name="standard:log_a_call" title="Llamadas" size="small" class="opcionesBotonMostrarObjeto slds-var-m-left_x-small" onclick={botonMostrarObjetoOnclick} data-objeto="Llamada"></lightning-icon>
+                                            <lightning-icon icon-name="standard:email" title="Correos" size="small" class="opcionesBotonMostrarObjeto slds-var-m-left_x-small" onclick={botonMostrarObjetoOnclick} data-objeto="Correo"></lightning-icon>
+                                            <lightning-icon icon-name="standard:live_chat" title="Chats" size="small" class="opcionesBotonMostrarObjeto slds-var-m-left_x-small" onclick={botonMostrarObjetoOnclick} data-objeto="Chat"></lightning-icon>
+                                            <lightning-icon icon-name="standard:messaging_session" title="Messaging" size="small" class="opcionesBotonMostrarObjeto slds-var-m-left_x-small" onclick={botonMostrarObjetoOnclick} data-objeto="Whatsapp"></lightning-icon>
+                                            <lightning-icon icon-name="standard:story" title="Einstein" size="small" class="opcionesBotonMostrarObjeto slds-var-m-left_x-small" onclick={botonMostrarObjetoOnclick} data-objeto="Einstein"></lightning-icon>
+                                            <!-- <lightning-icon icon-name="standard:case" title="Interacciones" size="small" class="opcionesBotonMostrarObjeto" onclick={botonMostrarObjetoOnclick} data-objeto="Interaccion"></lightning-icon> -->
+                                        </div>
+                                    </div>
+                                    <div class="slds-var-p-top_x-large slds-var-p-bottom_small">
+                                        <span class="slds-text-title_caps">Ordenación</span>
+                                        <div class="slds-var-m-left_x-small slds-var-m-top_x-small">
+                                            <lightning-radio-group options={opcionesOrdenacion} variant="label-hidden" value="1" onchange={opcionOrdenOnchange}></lightning-radio-group>
+                                        </div>
+                                    </div>
+                                    <div class="slds-var-p-top_large">
+                                        <span class="slds-text-title_caps">Opciones</span>
+                                        <div class="slds-var-m-left_x-small slds-var-m-top_x-small">
+                                            <lightning-input type="checkbox" label="Agrupar por meses" checked onchange={opcionAgruparPorMesesOnchange}></lightning-input>
+                                            <lightning-input type="checkbox" label="Agrupar próximos" checked onchange={opcionAgruparProximosOnchange} class="slds-var-m-top_x-small"></lightning-input>
+                                            <!-- <lightning-input type="checkbox" label="Usar datos de prueba" onchange={opcionUsarDatosPruebaOnchange} class="slds-var-m-top_x-small" lwc:if={opciones.desarrollo}></lightning-input> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <!--Cuerpo card-->
+        <div class="slds-card__body slds-card__body_inner slds-is-relative" style="min-height: 30px;">
+            <template lwc:if={cargando}>
+                <lightning-spinner size="small" class="slds-var-m-top_small slds-var-m-bottom_xx-large"></lightning-spinner>
+            </template>
+
+            <div lwc:if={mensajeError} class="slds-text-color_error slds-var-m-left_x-small">
+                <div class="slds-text-color_error">Problema recuperando el listado de comunicaciones.</div>
+                <div class="slds-text-color_weak slds-text-body_small slds-var-m-top_small">{mensajeError}</div>
+            </div>
+
+            <template lwc:else>
+                <template if:false={cargando}>
+                    <div if:false={datos.length} class="slds-text-color_weak slds-var-m-left_x-small">
+                        Sin comunicaciones.
+                    </div>
+                </template>
+
+                <template lwc:if={datos.length}>
+                    <ul class="slds-timeline">
+                        <template for:each={datos} for:item="seccion">
+                            <div key={seccion.nombreSeccion} class="slds-section slds-is-open">
+                                <template lwc:if={opciones.agruparPorMeses}>
+                                    <h3 class="slds-section__title" onclick={tituloSeccionOnclick} data-nombre-seccion={seccion.nombreSeccion} style="margin-top: 4px; margin-bottom: 12px;">
+                                        <button aria-expanded="true" class={seccion.class}>
+                                            <div class="slds-grid" style="width: 100%;">
+                                                <div class="slds-col slds-grow-none">
+                                                    <lightning-icon icon-name="utility:switch" size="xx-small" class="iconoExpandirContraerSeccion slds-var-m-right_small">
+                                                    </lightning-icon>
+                                                </div>
+                                                <div class="slds-col slds-shrink-none" style="font-size: 0.8125rem; font-weight: 700; color: #404040;">
+                                                    <lightning-icon icon-name={seccion.iconName} size="x-small" class="iconoTituloSeccion slds-var-m-right_small"></lightning-icon>
+                                                    <span class="slds-truncate">{seccion.nombreSeccion}</span>
+                                                </div>
+                                                <div class="slds-col slds-grow-none slds-is-relative" style="top: -3px;">
+                                                    <lightning-button-icon icon-name="utility:collapse_all" variant="bare" tooltip="Contraer todos los registros de la sección" class="slds-var-m-right_small" onclick={botonContraerTodoOnclick} data-id={seccion.nombreSeccion}>
+                                                    </lightning-button-icon>
+                                                    <lightning-button-icon icon-name="utility:expand_all" variant="bare" tooltip="Expandir todos los registros de la sección" class="slds-var-m-right_xx-small" onclick={botonExpandirTodoOnclick} data-id={seccion.nombreSeccion}>
+                                                    </lightning-button-icon>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </h3>
+                                </template>
+                                <div aria-hidden="false" class="slds-section__content contenidoSeccion slds-var-p-left_small">
+                                    <template for:each={seccion.items} for:item="item">
+                                        <template lwc:if={item.visible}>
+                                            <li key={item.id}>
+                                                <div class={item.clases} data-nombre-seccion-padre={seccion.nombreSeccion} data-item-id={item.id}>
+                                                    <div class="slds-media">
+                                                        <div class="slds-media__figure">
+                                                            <span class="botonExpandirContraerItem">
+                                                                <lightning-button-icon icon-name="utility:switch" variant="bare" onclick={expandirContraerItem} data-id={item.id}>
+                                                                </lightning-button-icon>
+                                                            </span>
+                                                            <div class="slds-icon_container slds-timeline__icon">
+                                                                <lightning-icon icon-name={item.iconName} size="small" class="timelineIconBorderRadius slds-var-m-left_small"></lightning-icon>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-media__body slds-is-relative" style="top: 1px;">
+                                                            <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                                                                <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                                                    <h3 class="slds-truncate" title={item.titulo} onclick={tituloItemOnclick} data-id={item.id} data-nombre-seccion={seccion.nombreSeccion}>
+                                                                        <a href="#">
+                                                                            <strong>{item.titulo} </strong>
+                                                                        </a>
+                                                                    </h3>
+
+                                                                </div>
+
+                                                                <div lwc:if={item.fecha} class="slds-timeline__actions slds-timeline__actions_inline">
+                                                                    <p class="slds-timeline__date">{item.fecha}</p>
+                                                                    <!-- Menú de acciones del item
+                                                                    <lightning-button-icon icon-name="utility:down" size="x-small"></lightning-button-icon>
+                                                                    -->
+                                                                </div>
+                                                            </div>
+                                                                <p class="slds-text-body_small slds-var-m-horizontal_x-small">
+                                                                    <span>{item.subtitulo}</span>
+                                                                    <span lwc:if={item.mostrarIconoPadre} class="slds-var-m-left_xx-small slds-text-color_weak" onclick={spanInteraccionOnclick} data-id-interaccion={item.idPadre} title={item.padreTooltip} style="cursor: pointer;">
+                                                                        &nbsp;| <lightning-icon class="iconoDetalles slds-var-m-right_x-small" icon-name={item.padreIcono} size="xx-small"></lightning-icon>
+                                                                        <span class="slds-text-link_faux">{item.padreObjectRecordName}</span>
+                                                                    </span>
+                                                                </p>
+                                                            <article class="slds-box slds-timeline__item_details slds-theme_shade slds-var-m-top_x-small slds-var-m-horizontal_xx-small" aria-hidden="true">
+                                                                <ul class="slds-list_horizontal slds-wrap">
+                                                                    <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-var-p-bottom_small">
+                                                                        <span class="slds-text-title slds-var-p-bottom_xx-small">{item.campo1Label}</span>
+                                                                        <span class="slds-text-body_medium slds-truncate" title={item.campo1Valor}>
+                                                                            {item.campo1Valor}
+                                                                        </span>
+                                                                    </li>
+                                                                    <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-var-p-bottom_x-small">
+                                                                        <span class="slds-text-title slds-var-p-bottom_xx-small">{item.campo2Label}</span>
+                                                                        <span class="slds-text-body_medium slds-truncate" title={item.campo2Valor}>
+                                                                            {item.campo2Valor}
+                                                                        </span>
+                                                                    </li>
+                                                                </ul>
+                                                                <div>
+                                                                    <span class="slds-text-title">{item.campo3Label}</span>
+
+                                                                    <template lwc:if={item.campo3Html}>
+                                                                        <p class="slds-var-m-top_xx-small slds-var-p-around_medium formattedRichTextContainer">
+                                                                            <lightning-formatted-rich-text value={item.campo3Valor}></lightning-formatted-rich-text>
+                                                                        </p>
+                                                                    </template>
+                                                                    <template lwc:else>
+                                                                        <p class="slds-var-m-top_xx-small">{item.campo3Valor}</p>
+                                                                    </template>
+                                                                </div>
+                                                            </article>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </ul>
+                </template>
+            </template>
+        </div>
+    </article>
+</template>

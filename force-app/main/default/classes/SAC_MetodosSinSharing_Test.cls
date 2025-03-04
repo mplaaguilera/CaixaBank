@@ -15,7 +15,7 @@ public class SAC_MetodosSinSharing_Test {
     @TestSetup
     static void makeData(){
     	User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
         List<PermissionSet> permiSets = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSet permiSet = permiSets[0];
@@ -25,10 +25,10 @@ public class SAC_MetodosSinSharing_Test {
         
 
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];      
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
         system.runAs(usuarioAdmin){
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
             
         }
     }
@@ -37,10 +37,8 @@ public class SAC_MetodosSinSharing_Test {
 	@isTest
     static void testInsert(){
         String clientePArt = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
-        RestRequest request = new RestRequest();
-        RestResponse response = new RestResponse();
+
         //testeamos un confidencial
-        list<account> listacc = new list<account>();
         list<sobject> objRes = new list<sobject>();
         
         account acc1 = new account(
@@ -66,14 +64,13 @@ public class SAC_MetodosSinSharing_Test {
             test.stopTest();
         }
         //insert acc2; 
-        system.assertEquals(1, [SELECT ID FROM ACCOUNT].size());  
+        system.assertEquals(1, [SELECT Count() FROM ACCOUNT], 'Error al recuperar registros de account');  
     }
     
     @isTest
     static void testUpdate(){
         String clientePArt = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
-        RestRequest request = new RestRequest();
-        RestResponse response = new RestResponse();
+
         //testeamos un confidencial
         list<account> listacc = new list<account>();
         list<sobject> objRes = new list<sobject>();
@@ -106,7 +103,7 @@ public class SAC_MetodosSinSharing_Test {
         	SAC_MetodosSinSharing.modificarInsertarObjetos(objRes, 'update');
          }
         //insert acc2;
-        system.assertEquals(1, [SELECT ID FROM ACCOUNT where firstName = 'OK'].size());
+        system.assertEquals(1, [SELECT Count() FROM ACCOUNT where firstName = 'OK'], 'Error al recuperar registros de account');
     }
     
     @isTest
@@ -128,7 +125,7 @@ public class SAC_MetodosSinSharing_Test {
         	listAcc = SAC_MetodosSinSharing.listaDeClientesPorDoc(acc);
             test.stopTest();
         }
-        system.assertEquals(1, listAcc.size());
+        system.assertEquals(false, listAcc.isEmpty(), 'Error al recuperar registros de account');
         
     }
 
@@ -144,7 +141,7 @@ public class SAC_MetodosSinSharing_Test {
             lastName='Test',
             recordTypeId = clientePArt
         );
-        Database.insert(acc1);
+        SAC_DatabaseDML.insertDML(acc1, false);
         camposRecl.put('Subject', 'Subject de prueba');
         camposRecl.put('Description', 'Descripcion de prueba');
         //camposRecl.put('ownerId', colaIA.Id);
@@ -155,7 +152,7 @@ public class SAC_MetodosSinSharing_Test {
         camposRecl.put('SuppliedEmail', 'test07032024931@test1.com.invalid');
  
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false);
         
         system.runAs(sacUser){
             resultado = SAC_MetodosSinSharing.comprobarCaseReclamante(reclamacion.Id);

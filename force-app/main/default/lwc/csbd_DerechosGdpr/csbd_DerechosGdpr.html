@@ -1,0 +1,228 @@
+<template>
+
+	<section lwc:ref="modalDerechosGdpr" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_medium" onkeydown={modalTeclaPulsada}>
+		<div class="slds-modal__container">
+
+			<!-- sldsValidatorIgnoreNextLine -->
+			<button class="buttonIconCerrarModal slds-button slds-button_icon slds-modal__close" onclick={cerrarModal}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+			<div class="slds-modal__header">
+				<h1 class="slds-modal__title slds-hyphenate" tabindex="-1">Derechos GDPR</h1>
+				<p class="slds-var-m-top_x-small">Alta de un nuevo derecho GDPR y historial de derechos ya ejercidos previamente.</p>
+			</div>
+
+			<div class="slds-modal__content slds-is-relative slds-var-p-vertical_x-large slds-var-p-horizontal_xx-large">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+				</div>
+
+				<article class="slds-card">
+					<div class="slds-page-header">
+						<div class="slds-page-header__row">
+							<div class="slds-page-header__col-title">
+								<div class="slds-media">
+									<div class="slds-media__figure">
+										<lightning-icon icon-name="standard:opportunity" size="small"></lightning-icon>
+									</div>
+									<div class="slds-media__body">
+										<div class="slds-page-header__name">
+											<div class="slds-page-header__name-title">
+												<h1>
+													<span lwc:if={oportunidad} class="slds-media__body slds-card__header-title slds-truncate slds-is-relative slds-text-color_weak" style="top: 3px; font-size: 13.5px; font-weight: 400;">
+														<span class="slds-truncate">Derechos vinculados a la oportunidad</span>
+														<span class="slds-truncate" style="font-weight: 600;">&nbsp;{oportunidad._identificador}</span>
+													</span>
+												</h1>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-page-header__col-actions" style="padding-bottom: 0;">
+								<div class="slds-page-header__controls">
+									<div class="slds-page-header__control slds-is-relative" style="top: 3px; margin-right: 2px;">
+										<span class="slds-text-body_small">&nbsp;{datatableData.oportunidad.length} items</span>
+									</div>
+									<div class="slds-page-header__control slds-is-relative" style="top: 3px;">
+										<!-- sldsValidatorIgnoreNextLine -->
+										<button class="botonActualizar slds-button slds-button_icon slds-button_icon-bare" title="Actualizar" onclick={botonRefrescarOnclick}>
+											<lightning-icon icon-name="utility:refresh" size="xx-small"></lightning-icon>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="datatableContainer" style="height: 128px;">
+						<!-- sldsValidatorIgnoreNextLine -->
+						<lightning-datatable
+							columns={datatableColumns.oportunidad}
+							data={datatableData.oportunidad}
+							key-field="Id"
+							hide-checkbox-column
+							column-widths-mode="auto"
+							min-column-width=90
+							wrap-text-max-lines=3
+							sorted-by="CreatedDate"
+							sorted-direction="desc">
+						</lightning-datatable>
+					</div>
+				</article>
+
+				<article class="slds-card" style="margin-top: 28px;">
+					<div class="slds-page-header">
+						<div class="slds-page-header__row">
+							<div class="slds-page-header__col-title">
+								<div class="slds-media">
+									<div class="slds-media__figure">
+										<lightning-icon icon-name="standard:person_account" size="small"></lightning-icon>
+									</div>
+									<div class="slds-media__body">
+										<div class="slds-page-header__name">
+											<div class="slds-page-header__name-title">
+												<h1>
+													<span lwc:if={oportunidad} class="slds-media__body slds-card__header-title slds-truncate slds-is-relative slds-text-color_weak" style="top: 3px; font-size: 13.5px; font-weight: 400;">
+														<span class="slds-truncate">Otros derechos del cliente&nbsp;</span>
+														<span class="slds-truncate slds-text-link_faux" title={oportunidad._accountName} onclick={navegarDetalleCliente} style="font-weight: 600; text-transform: uppercase;">
+															{oportunidad._accountName}
+														</span>													</span>
+												</h1>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-page-header__col-actions" style="padding-bottom: 0;">
+								<div class="slds-page-header__controls">
+									<div class="slds-page-header__control slds-is-relative" style="top: 3px; margin-right: 2px;">
+										<span class="slds-text-body_small">&nbsp;{datatableData.cliente.length} items</span>
+									</div>
+									<div class="slds-page-header__control slds-is-relative" style="top: 3px;">
+										<!-- sldsValidatorIgnoreNextLine -->
+										<button class="botonActualizar slds-button slds-button_icon slds-button_icon-bare" title="Actualizar" onclick={botonRefrescarOnclick}>
+											<lightning-icon icon-name="utility:refresh" size="xx-small"></lightning-icon>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="datatableContainer">
+						<!-- sldsValidatorIgnoreNextLine -->
+						<lightning-datatable
+							columns={datatableColumns.cliente}
+							data={datatableData.cliente}
+							key-field="Id"
+							hide-checkbox-column
+							column-widths-mode="auto"
+							min-column-width=90
+							sorted-by="CreatedDate"
+							sorted-direction="desc">
+						</lightning-datatable>
+					</div>
+				</article>
+			</div>
+
+			<footer class="slds-modal__footer">
+				<lightning-button lwc:ref="botonNuevo" label="Nuevo derecho" icon-name="utility:locker_service_console" variant="brand" onclick={modalNuevoDerechoAbrir}></lightning-button>
+				<lightning-button lwc:ref="botonCancelar" label="Cancelar" onclick={cerrarModal} class="slds-var-m-left_small"></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<section lwc:ref="modalNuevoDerecho" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_small modalNuevoDerecho" onkeydown={modalNuevoDerechoOnkeydown}>
+		<div class="slds-modal__container">
+			<!-- sldsValidatorIgnoreNextLine -->
+			<button class="slds-button slds-button_icon slds-modal__close" onclick={modalNuevoDerechoCerrar}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+			<header class="slds-modal__header">
+				<h2 class="slds-text-heading_medium slds-hyphenate">Ejercer nuevo derecho</h2>
+			</header>
+
+			<div class="slds-modal__content slds-var-p-vertical_x-large slds-var-p-horizontal_xx-large">
+				<div class="slds-box" style="padding-bottom: 11px;">
+					<lightning-combobox lwc:ref="comboboxTiposDerecho" label="Tipo del nuevo derecho a ejercer" options={tiposDerecho} required></lightning-combobox>
+				</div>
+
+				<div lwc:if={oportunidad} class="slds-box slds-var-m-top_x-large" style="padding-bottom: 0; padding-left: 12px; padding-right: 12px;">
+					<div class="slds-section slds-is-open">
+						<h3 class="slds-section__title slds-theme_shade">
+							<span class="slds-truncate slds-var-p-horizontal_small">Cliente</span>
+						</h3>
+						<div class="slds-section__content">
+							<div class="slds-grid slds-wrap slds-gutters_x-small">
+								<div class="slds-col slds-size_1-of-4">
+									<lightning-input name="nif" disabled value={oportunidad._accountNumeroDocumento} label="Núm. documento" required></lightning-input>
+								</div>
+								<div class="slds-col slds-size_1-of-4">
+									<lightning-input name="nombre" disabled value={oportunidad._contactFirstName} label="Nombre"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_2-of-4">
+									<lightning-input name="apellido1" disabled value={oportunidad._contactLastName} label="Apellidos"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_1-of-4">
+									<lightning-input name="fechaNacimiento" disabled value={oportunidad._contactFechaNacimiento} label="Fecha nacimiento"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_1-of-4">
+									<lightning-input name="telefono" disabled value={oportunidad._accountPhone} label="Teléfono"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_2-of-4">
+									<lightning-input name="email" disabled value={oportunidad._accountEmail} label="Email"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_2-of-3">
+									<lightning-input name="direccion" disabled value={oportunidad._accountBillingStreet} label="Dirección"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_1-of-3">
+									<lightning-input name="cp" disabled value={oportunidad._accountBillingPostalCode} label="Código postal"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_1-of-3">
+									<lightning-input name="provincia" disabled value={oportunidad._accountBillingState} label="Provincia"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_2-of-3">
+									<lightning-input name="localidad" disabled value={oportunidad._accountBillingCity} label="Localidad"></lightning-input>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="slds-section slds-is-open slds-var-p-top_large">
+						<h3 class="slds-section__title slds-theme_shade">
+							<span class="slds-truncate slds-var-p-horizontal_small">Oficina gestora</span>
+						</h3>
+						<div class="slds-section__content">
+							<div class="slds-grid slds-wrap slds-gutters_x-small">
+								<div class="slds-col slds-size_1-of-2">
+									<lightning-input name="oficinaGestora_nombre" disabled value={oportunidad._accountOficinaGestoraName} label="Nombre"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_1-of-2">
+									<lightning-input name="oficinaGestora_direccion" disabled value={oportunidad._accountOficinaGestoraBillingStreet} label="Dirección"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_1-of-3">
+									<lightning-input name="oficinaGestora_codigoPostal" disabled value={oportunidad._accountOficinaGestoraBillingPostalCode} label="Código postal"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_1-of-3">
+									<lightning-input name="oficinaGestora_ciudad" disabled value={oportunidad._accountOficinaGestoraBillingCity} label="Ciudad"></lightning-input>
+								</div>
+								<div class="slds-col slds-size_1-of-3">
+									<lightning-input name="oficinaGestora_provincia" disabled value={oportunidad._accountOficinaGestoraBillingState} label="Provincia"></lightning-input>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<footer class="slds-modal__footer">
+				<lightning-button label="Ejercer nuevo derecho" icon-name="utility:locker_service_console" variant="brand" onclick={modalNuevoDerechoEjercer}></lightning-button>
+				<lightning-button lwc:ref="modalNuevoDerechoCancelar" label="Cancelar" onclick={modalNuevoDerechoCerrar} class="slds-var-m-left_small"></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<div lwc:ref="backdropModal" class="backdrop slds-backdrop" role="presentation"></div>
+
+</template>

@@ -43,12 +43,23 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
             System.runAs ( new User(Id = UserInfo.getUserId()) ) {
             	insert plantillasAInsertar;
         	}
+
+            Group grupoPublico = new Group();
+            grupoPublico.Name = 'Cola AC DxC';
+            grupoPublico.Type = 'Queue';
+            grupoPublico.DeveloperName = 'CC_Inbound_Email_AC';
+            insert grupoPublico;
         }
 
         //crear usuarios CC
         Id profileId = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
+        Id profileCCId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
         Id profile2Id = [SELECT Id FROM Profile WHERE Name = 'CC_Analísta y 2º nivel MVP2'].Id;
+        UserRole rolId = [SELECT Id, DeveloperName FROM UserRole WHERE DeveloperName = 'Contact_Center'];
+        Id roleDirectorioCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center_sin_acceso_a_Directorio'].Id;
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO'];
+        PermissionSet psOperadorCliente = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_Cliente'];
+        PermissionSet psClasses = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Classes'];
         List<User> userList = new List<User>();
         User usuario1 = new User();
         usuario1.ProfileId = profileId;
@@ -65,7 +76,6 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         usuario1.LocaleSidKey = 'es_ES';
         userList.add(usuario1);
         insert userList;
-        UserRole rolId = [SELECT Id, DeveloperName FROM UserRole WHERE DeveloperName = 'Contact_Center'];
         System.runAs(usuario1){
             List<User> userList2 = new List<User>();
             User usuario = new User();
@@ -83,52 +93,87 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
             usuario.LocaleSidKey = 'es_ES';
             usuario.UserRoleId = rolId.Id;
             userList2.add(usuario);
+
+            User operadorCliente = new User();
+            operadorCliente.profileId = profileCCId;
+            operadorCliente.UserRoleId = roleDirectorioCC;
+            operadorCliente.AV_ExternalID__c = 'U0124112';
+            operadorCliente.FirstName = 'Operador';
+            operadorCliente.LastName = 'Operador Cliente';
+            operadorCliente.Email = 'tuser001@amamama.com';
+            operadorCliente.Username = 'tuser001@amamama.com' + System.currentTimeMillis();
+            operadorCliente.CompanyName = 'MST';
+            operadorCliente.Title = 'title';
+            operadorCliente.Alias = 'alias';
+            operadorCliente.TimeZoneSidKey = 'Europe/Paris';
+            operadorCliente.EmailEncodingKey = 'UTF-8';
+            operadorCliente.LanguageLocaleKey = 'es';
+            operadorCliente.LocaleSidKey = 'es_ES';
+            userList2.add(operadorCliente);
             insert userList2;
-        }  
-        List<CC_Lista_Valores__c> horariosInsertar = new List<CC_Lista_Valores__c>();
-        
+            
+            List<PermissionSetAssignment> insertPSAssOperadores = new List<PermissionSetAssignment>();
+            PermissionSetAssignment psaOperadorCliente = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psOperadorCliente.Id);
+            insertPSAssOperadores.add(psaOperadorCliente);
+
+            PermissionSetAssignment psaOperadorClasses = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psClasses.Id);
+            insertPSAssOperadores.add(psaOperadorClasses);
+            insert insertPSAssOperadores;
+        }
+
+        List<CC_Lista_Valores__c> valoresInsertar = new List<CC_Lista_Valores__c>();
+        List<CC_Lista_Valores__c> listasInsertar = new List <CC_Lista_Valores__c>();
+        Id recordTypeLista = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+        Id rtValor = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
         CC_Lista_Valores__c horario = new CC_Lista_Valores__c();
-        horario.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+        horario.RecordTypeId = recordTypeLista;
         horario.Name = 'Calendario_servicios';
         horario.CC_Activa__c = true;
-        insert horario;
+        listasInsertar.add(horario);
+
+        CC_Lista_Valores__c listaDerivar = new CC_Lista_Valores__c();
+        listaDerivar.Name = 'Textos operativa Derivar';
+        listaDerivar.RecordTypeId = recordTypeLista;
+        listasInsertar.add(listaDerivar);
+
+        insert listasInsertar;
         
-                CC_Lista_Valores__c horarioAccionista = new CC_Lista_Valores__c();
+        CC_Lista_Valores__c horarioAccionista = new CC_Lista_Valores__c();
         horarioAccionista.Name = 'Atención al Cliente';
-        horarioAccionista.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        horarioAccionista.RecordTypeId = rtValor;
         horarioAccionista.CC_Valor__c = '9';
         horarioAccionista.CC_Valor2__c = '23';
         horarioAccionista.CC_Valor_SFDC__c = 'L-J';
         horarioAccionista.CC_Lista__c = horario.Id;
-        horariosInsertar.add(horarioAccionista);
+        valoresInsertar.add(horarioAccionista);
         
         CC_Lista_Valores__c horarioAccionista2 = new CC_Lista_Valores__c();
         horarioAccionista2.Name = 'Atención al Cliente';
-        horarioAccionista2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        horarioAccionista2.RecordTypeId = rtValor;
         horarioAccionista2.CC_Valor__c = '9:30';
         horarioAccionista2.CC_Valor2__c = '19';
         horarioAccionista2.CC_Valor_SFDC__c = 'V';
         horarioAccionista2.CC_Lista__c = horario.Id;
-        horariosInsertar.add(horarioAccionista2);
+        valoresInsertar.add(horarioAccionista2);
         
         CC_Lista_Valores__c horarioServiciosCentrales = new CC_Lista_Valores__c();
         horarioServiciosCentrales.Name = 'Servicios Centrales';
-        horarioServiciosCentrales.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        horarioServiciosCentrales.RecordTypeId = rtValor;
         horarioServiciosCentrales.CC_Valor__c = '9:30';
         horarioServiciosCentrales.CC_Valor2__c = '19';
         horarioServiciosCentrales.CC_Valor_SFDC__c = 'L-J';
         horarioServiciosCentrales.CC_Lista__c = horario.Id;
-        horariosInsertar.add(horarioServiciosCentrales);
+        valoresInsertar.add(horarioServiciosCentrales);
         
         CC_Lista_Valores__c horarioServiciosCentrales2 = new CC_Lista_Valores__c();
         horarioServiciosCentrales2.Name = 'Servicios Centrales';
-        horarioServiciosCentrales2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        horarioServiciosCentrales2.RecordTypeId = rtValor;
         horarioServiciosCentrales2.CC_Valor__c = '9:30';
         horarioServiciosCentrales2.CC_Valor2__c = '19';
         horarioServiciosCentrales2.CC_Valor_SFDC__c = 'V';
         horarioServiciosCentrales2.CC_Lista__c = horario.Id;
-        horariosInsertar.add(horarioServiciosCentrales2);
-        insert horariosInsertar;
+        valoresInsertar.add(horarioServiciosCentrales2);
+        insert valoresInsertar;
     }    
     
     @isTest
@@ -137,7 +182,8 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
        /*CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = '';
         insert grupoColab;*/
-        
+        Test.startTest();
+
         Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo Colaborador Temporal';
@@ -152,8 +198,6 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         caso.Subject = 'Caso temporal';
         caso.CC_Referencia_Correo_Saliente__c = '#@1234567890#';
         insert caso;
-
-        Test.startTest();
         
         Task actividadCorreo = new Task();
         actividadCorreo.Type = 'Traslado Colaborador';
@@ -220,6 +264,7 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         caso.CC_Canal_Resolucion__c = 'Servicios Centrales';
         caso.CC_En_Tercer_Nivel__c = true;
         caso.CC_Grupo_3N__c = '3N de CaixaBank Now';
+        caso.CC_Fecha_Traslado_Colaborador__c = Date.today().addDays(-7);
         insert caso;
         
         //Correo origen crear las dos task en una lista
@@ -269,9 +314,6 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         cuerpoOrigen.add('</html>');
         correoOrigen.HtmlBody = String.join(cuerpoOrigen, '<br/>');
         insert correoOrigen;
-        
-        caso.CC_Fecha_Traslado_Colaborador__c = Date.today().addDays(-7);
-        update caso;
 
         Test.startTest();
 
@@ -507,6 +549,8 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         Case caso = new Case();
         caso.RecordTypeId = recordTypeCaso;
         caso.Subject = 'Caso temporal';
+        caso.Status = 'Pendiente Colaborador';
+        caso.CC_Fecha_Traslado_Colaborador__c = System.now();
         insert caso;
         
         Task actividadCorreoOrigen = new Task();
@@ -904,7 +948,7 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         insert caso;
         
         caso.CC_Canal_Resolucion__c = 'Activo';
-        Database.update(caso);
+        update caso;
 
         Task actividadCorreoOrigen = new Task();
         actividadCorreoOrigen.Type = 'Responder a cliente';
@@ -989,7 +1033,7 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         insert caso;
         
         caso.CC_Canal_Resolucion__c = 'Activo';
-        Database.update(caso);
+        update caso;
 
         Task actividadCorreoOrigen = new Task();
         actividadCorreoOrigen.Type = 'Responder a cliente';
@@ -1552,5 +1596,100 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
        System.assertEquals(2, [SELECT Id FROM EmailMessage WHERE ParentId = :caso.Id].size());
 
     }
-     
+
+    @isTest
+    public static void filtrarEmailMessageNoCC() {
+        Test.startTest();
+        System.runAs(new User(Id = [SELECT Id FROM User Where FirstName = 'Usuario Admin Prueba' LIMIT 1].Id)) {
+            Case caso = new Case();
+            caso.Subject = 'Caso Email to Case';
+            caso.Status = 'Activo';
+            caso.Origin = 'Email';
+            caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'SAC_Pretension');
+            insert caso;
+
+            //Setup header for the email
+            List<EmailServicesAddress> emailServicesList= [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE FunctionId IN (SELECT Id FROM EmailServicesFunction WHERE FunctionName = 'CC_AC') LIMIT 1];
+            String headerValueStr;
+            EmailServicesAddress headerValue= new EmailServicesAddress();
+            if (!EmailServicesList.isEmpty()) {
+                headerValue=emailServicesList[0];
+                headerValueStr = headervalue.LocalPart + '@' + headervalue.EmailDomainName;       
+            } else {
+                headerValueStr = 'Prueba@IBM';    
+            }
+
+            EmailMessage correoOrigen = new EmailMessage();
+            correoOrigen.Subject = 'Prueba de envío de correo';     
+            correoOrigen.CC_Procedencia__c = 'Responder Cliente';
+            correoOrigen.FromAddress = 'prueba@ibm.com';
+            correoOrigen.ToAddress = defaultFromAddressAttCliente;
+            correoOrigen.Incoming = true;
+            correoOrigen.ParentId = caso.Id;
+            correoOrigen.RelatedToId = caso.Id;
+            correoOrigen.Headers = '[{"value": "' + headerValueStr + '","name": "X-SFDC-Original-RCPT"}]';
+            
+            List<String> cuerpoOrigen = new List<String>();
+            cuerpoOrigen.add('<html>');
+            cuerpoOrigen.add('Cuerpo del correo');
+            cuerpoOrigen.add('<font color="gray">TEST Case Email - Revisar</font>');
+            cuerpoOrigen.add('</html>');
+            correoOrigen.HtmlBody = String.join(cuerpoOrigen, '<br/>');
+            insert correoOrigen;
+            List<EmailMessage> correo = [SELECT Id, Status, RelatedToId, ParentId FROM EmailMessage WHERE RelatedToId = :caso.Id];
+            List<EmailMessage> correos = CC_EmailMessage_AI_TRHan.filtrarEmailMessageNoCC(correo);
+            System.assertEquals(correos.size(), 0, 'Ha habido un problema con el RT del caso');
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void comprobarDocumentacionDerivarMenor() {
+        Test.startTest();
+        System.runAs(new User(Id = [SELECT Id FROM User Where FirstName = 'Usuario Admin Prueba' LIMIT 1].Id)) {
+            CC_Lista_Valores__c valorFecha = new CC_Lista_Valores__c ();
+            Datetime today = Datetime.newInstance(System.today().addDays(-1), Time.newInstance(0, 0, 0, 0));
+            String todayFormated = today.format('yyyy-MM-dd');
+            valorFecha.Name = 'Fecha documentacion respuesta cliente';
+            valorFecha.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            valorFecha.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'Textos operativa Derivar' AND recordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores')].Id;
+            valorFecha.CC_Mensajes_Mostrar__c = todayFormated;
+            insert valorFecha;
+
+            Case caso = new Case();
+            caso.Subject = 'Caso Email to Case';
+            caso.Status = 'Activo';
+            caso.Origin = 'Email';
+            caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            insert caso;
+            CC_EmailMessage_AI_TRHan.comprobarDocumentacionDerivar(caso);
+            System.assertEquals(caso.OwnerId, [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName  = 'CC_Inbound_Email_AC' LIMIT 1].Id, 'No se ha creado ningun caso');
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void comprobarDocumentacionDerivarMayor() {
+        Test.startTest();
+        System.runAs(new User(Id = [SELECT Id FROM User Where FirstName = 'Usuario Admin Prueba' LIMIT 1].Id)) {
+            CC_Lista_Valores__c valorFecha = new CC_Lista_Valores__c ();
+            Datetime today = Datetime.newInstance(System.today().addDays(1), Time.newInstance(0, 0, 0, 0));
+            String todayFormated = today.format('yyyy-MM-dd');
+            valorFecha.Name = 'Fecha documentacion respuesta cliente';
+            valorFecha.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            valorFecha.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'Textos operativa Derivar' AND recordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores')].Id;
+            valorFecha.CC_Mensajes_Mostrar__c = todayFormated;
+            insert valorFecha;
+
+            Case caso = new Case();
+            caso.Subject = 'Caso Email to Case';
+            caso.Status = 'Activo';
+            caso.Origin = 'Email';
+            caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            insert caso;
+            CC_EmailMessage_AI_TRHan.comprobarDocumentacionDerivar(caso);
+            System.assertEquals([SELECT OwnerId FROM Case WHERE CC_CasoRelacionado__c = :caso.Id].OwnerId, [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName  = 'CC_Inbound_Email_AC' LIMIT 1].Id, 'No se ha creado ningun caso');
+        }
+        Test.stopTest();
+    }
 }

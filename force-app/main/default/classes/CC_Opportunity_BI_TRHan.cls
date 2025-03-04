@@ -10,7 +10,7 @@ public with sharing class CC_Opportunity_BI_TRHan extends CC_TriggerHandlerBase 
             inicializarOportunidad(listNewObj);
             descartarOportunidadesNoCsbd(listNewObj);
             horarioComercialSiNo(listNewObj);
-            CSBD_Hipoteca.informarCampoPrioridad(listNewObj, null);
+            informarCampoPrioridad(listNewObj);
             if(FeatureManagement.checkPermission('CSBD_UsuarioPromptsIA')){
                 CSBD_EinsteinUtils.marcarCheckPromptSiCumple(listNewObj);
             }
@@ -39,9 +39,13 @@ public with sharing class CC_Opportunity_BI_TRHan extends CC_TriggerHandlerBase 
 			oportunidad.AV_FechaModificacion__c = System.today().addDays(CSBD_Opportunity.diasFechaCierre(oportunidad.RecordTypeId));
 			oportunidad.AV_CentroOrigen__c = centroOrigen;
 			oportunidad.AV_Center__c = centroOrigen;
-            oportunidad.CSBD_Fecha_vencimiento_alta__c = (oportunidad.RecordTypeId == hipotecaRT && oportunidad.CSBD_Canal__c == chequearCanal) ?
+            oportunidad.CSBD_Fecha_vencimiento_alta__c = (oportunidad.RecordTypeId == hipotecaRT) ?
                 System.today().addMonths(3) : 
                 System.today().addMonths(1);
+
+            if (oportunidad.CSBD_Now_Origen__c == 'Call Me CSBD') {
+                oportunidad.CSBD_Fecha_vencimiento_alta__c = System.today().addMonths(1);
+            }
 			//Comprobar si se ha informado el campo CSBD_Producto al dar de alta la oportunidad manualmente
 			if (!String.isBlank(oportunidad.CSBD_Producto__c)) {
 				productosCSBD.add(oportunidad.CSBD_Producto__c);
@@ -127,4 +131,17 @@ public with sharing class CC_Opportunity_BI_TRHan extends CC_TriggerHandlerBase 
         }
     }
 
+    private void informarCampoPrioridad(List<Opportunity> oportunidades){
+        Id hipotecaRT = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_Hipoteca');
+        List<Opportunity> oportunidadesConPrioridad = new List<Opportunity>();
+        for(Opportunity oportunidad : oportunidades){
+            if(oportunidad.RecordTypeId == hipotecaRT){
+                oportunidadesConPrioridad.add(oportunidad);
+            }
+        }
+
+        if(!oportunidadesConPrioridad.isEmpty()){
+            CSBD_Hipoteca.informarCampoPrioridad(oportunidadesConPrioridad, null);
+        }
+    }
 }

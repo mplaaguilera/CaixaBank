@@ -194,7 +194,7 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	protected List<String> getAssociatedHandlers(String objectApiName, String triggerEvent) {
 		
 		List<String> handlerClassNames = new List<String>();
-		List<CBK_TriggerHandlerAssociation__mdt> triggerHandlerAssociations = [SELECT CBK_HandlerClassName__c, DeveloperName FROM CBK_TriggerHandlerAssociation__mdt WHERE CBK_ObjectApiName__c = :objectApiName AND CBK_TriggerEvent__c = :triggerEvent ORDER BY DeveloperName asc];
+		List<CBK_TriggerHandlerAssociation__mdt> triggerHandlerAssociations = [SELECT CBK_HandlerClassName__c, DeveloperName FROM CBK_TriggerHandlerAssociation__mdt WHERE CBK_ObjectApiName__c = :objectApiName AND CBK_TriggerEvent__c = :triggerEvent ORDER BY CBK_Order__c, DeveloperName asc];
 		for (CBK_TriggerHandlerAssociation__mdt triggerHandlerAssociation : triggerHandlerAssociations){
 			if (String.isNotBlank(triggerHandlerAssociation.CBK_HandlerClassName__c)){
 				Type handlerClassType = Type.forName(triggerHandlerAssociation.CBK_HandlerClassName__c);

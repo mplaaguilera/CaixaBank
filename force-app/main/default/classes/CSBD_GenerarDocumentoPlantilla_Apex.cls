@@ -4,11 +4,13 @@ public with sharing class CSBD_GenerarDocumentoPlantilla_Apex {
 	public static Map<String, Object> verCarpetaInicial(String carpetaDeveloperName) {
 		Id idCarpeta;
 
-		List<Folder> carpeta = [SELECT Id FROM Folder WHERE DeveloperName = :carpetaDeveloperName];
+		List<Folder> carpeta = [SELECT Id FROM Folder
+								WHERE DeveloperName = :carpetaDeveloperName];
 		if (!carpeta.isEmpty()) {
 			idCarpeta = carpeta[0].Id;
 		} else if (Test.isRunningTest()) {
-			idCarpeta = [SELECT Id FROM User WHERE Id = :UserInfo.getUserId()].Id;
+			User usuario = [SELECT Id FROM User WHERE Id = :UserInfo.getUserId()];
+			idCarpeta = usuario.Id;
 		}
 
 		if (idCarpeta == null) {
@@ -37,10 +39,12 @@ public with sharing class CSBD_GenerarDocumentoPlantilla_Apex {
 		} else {
 			retorno.put('carpeta', carpeta);
 
-			List<Folder> subcarpetas = [SELECT Name, ParentId FROM Folder WHERE ParentId = :idCarpeta ORDER BY Name ASC];
+			List<Folder> subcarpetas = [SELECT Name, ParentId FROM Folder
+										WHERE ParentId = :idCarpeta ORDER BY Name ASC];
 			retorno.put('subcarpetas', subcarpetas);
 
-			List<EmailTemplate> plantillas = [SELECT Name, FolderId FROM EmailTemplate WHERE FolderId = :idCarpeta ORDER BY Name ASC];
+			List<EmailTemplate> plantillas = [SELECT Name, FolderId FROM EmailTemplate
+												WHERE FolderId = :idCarpeta ORDER BY Name ASC];
 			retorno.put('plantillas', plantillas);
 
 			return retorno;

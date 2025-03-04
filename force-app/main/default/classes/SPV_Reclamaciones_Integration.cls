@@ -80,8 +80,8 @@ public with sharing class SPV_Reclamaciones_Integration{
     }
     
     /**
-* @description Método para obtener el detalle de la reclamación.
-*/
+	* @description Método para obtener el detalle de la reclamación
+	*/
     @AuraEnabled
     public static ReclamacionResponse getReclamaciones(){
         
@@ -105,12 +105,10 @@ public with sharing class SPV_Reclamaciones_Integration{
         //if(Test.isRunningTest()){
         	dataMockup = createMock();
         //}
-        System.debug('*dataMockup ' + dataMockup);
         HTTPResponse resp = String.isNotBlank(dataMockup) ? getDataMockup(dataMockup) : CBK_HttpServiceIntegration.multiCallHttpService(request,'', SPV_GET_RECLAMACIONES);
         String statusCode = String.valueOf(resp.getStatusCode());
         if(statusCode.equalsIgnoreCase('200')){
             String xmlResponse = resp.getBody();
-            System.debug('*XML ' + xmlResponse);
             // Parsear el XML
             Dom.Document doc = new Dom.Document();
             doc.load(xmlResponse);
@@ -162,6 +160,53 @@ public with sharing class SPV_Reclamaciones_Integration{
             response.data = listaResultadoList;
             response.statusCode = '200';
             
+            // Convertir JSON
+            String jsonResponse = JSON.serialize(response);
+        }else{
+            response.statusCode = statusCode;
+            response.errorCode = 'Error en el servicio.';
+            response.errorMessage = resp.getStatus(); 
+        } 
+        return response;    
+    }
+    
+    /**
+	* @description Método para enviar el detalle de la reclamación
+	*/
+    @AuraEnabled
+    public static ReclamacionResponse updateReclamaciones(List<Case> reclamaciones){
+        
+        ReclamacionResponse response = new ReclamacionResponse();
+        CC_InterfaceSettings__mdt confInterfaz   = SAC_Utils.getInterfazConfigBody(SPV_UPDATE_RECLAMACIONES);
+        Map<String, String> mapHeader = new Map<String, String>();
+        if(confInterfaz != null && confInterfaz.CC_ContentType__c != null){
+            mapHeader.put(HEADER_CONTENT_TYPE, confInterfaz.CC_ContentType__c);
+        }
+        
+        CBK_HttpServiceIntegration.RequestWapper reqWap = new CBK_HttpServiceIntegration.RequestWapper();
+        reqWap.body = reclamacionRequest(reclamaciones);
+        reqWap.intSetting = SPV_UPDATE_RECLAMACIONES;
+        if(confInterfaz != null && confInterfaz.CC_TipoPeticion__c != null){
+            reqWap.method = confInterfaz.CC_TipoPeticion__c;
+        }
+        reqWap.mHeaders = mapHeader;
+        
+        HttpRequest request = new HttpRequest();
+        if(!Test.isRunningTest()){
+            request = CBK_HttpServiceIntegration.getRequest(reqWap);
+            // Endpoint
+            //String endpoint = request.getEndpoint();
+            //request.setEndpoint(endpoint);
+        }
+        
+        String dataMockup = '';
+        //if(Test.isRunningTest()){
+        	dataMockup = createMock();
+        //}
+        HTTPResponse resp = String.isNotBlank(dataMockup) ? getDataMockup(dataMockup) : CBK_HttpServiceIntegration.multiCallHttpService(request,'', SPV_UPDATE_RECLAMACIONES);
+        String statusCode = String.valueOf(resp.getStatusCode());
+        if(statusCode.equalsIgnoreCase('200')){
+            response.statusCode = '200';
             // Convertir JSON
             String jsonResponse = JSON.serialize(response);
             System.debug('*JSON ' + jsonResponse);
@@ -173,99 +218,97 @@ public with sharing class SPV_Reclamaciones_Integration{
         return response;    
     }
     
-    @AuraEnabled
-    public static ReclamacionResponse updateReclamaciones(){
-        
-        ReclamacionResponse response = new ReclamacionResponse();
-        CC_InterfaceSettings__mdt confInterfaz   = SAC_Utils.getInterfazConfigBody(SPV_UPDATE_RECLAMACIONES);
-        Map<String, String> mapHeader = new Map<String, String>();
-        mapHeader.put(HEADER_CONTENT_TYPE, confInterfaz.CC_ContentType__c);
-        
-        CBK_HttpServiceIntegration.RequestWapper reqWap = new CBK_HttpServiceIntegration.RequestWapper();
-        reqWap.body = confInterfaz.CC_Body__c;
-        reqWap.intSetting = SPV_UPDATE_RECLAMACIONES;
-        reqWap.method = confInterfaz.CC_TipoPeticion__c;
-        reqWap.mHeaders = mapHeader;
-        
-        HttpRequest request = new HttpRequest();
-        if(!Test.isRunningTest()){
-            request = CBK_HttpServiceIntegration.getRequest(reqWap);
-            // Endpoint
-            String endpoint = request.getEndpoint();
-            request.setEndpoint(endpoint);
-        }
-        
-        String dataMockup = '';
-        //if(Test.isRunningTest()){
-        	dataMockup = createMock();
-        //}
-        System.debug('*dataMockup ' + dataMockup);
-        HTTPResponse resp = String.isNotBlank(dataMockup) ? getDataMockup(dataMockup) : CBK_HttpServiceIntegration.multiCallHttpService(request,'', SPV_UPDATE_RECLAMACIONES);
-        String statusCode = String.valueOf(resp.getStatusCode());
-        if(statusCode.equalsIgnoreCase('200')){
-            String xmlResponse = resp.getBody();
-            System.debug('*XML ' + xmlResponse);
-            // Parsear el XML
-            Dom.Document doc = new Dom.Document();
-            doc.load(xmlResponse);
-            // Extraer los valores del XML
-            Dom.XMLNode rootNode = doc.getRootElement();
-            Dom.XMLNode bodyNode = rootNode.getChildElement('Body', 'http://schemas.xmlsoap.org/soap/envelope/');
-            Dom.XMLNode returnNode = bodyNode.getChildElement('return', null);
-            Dom.XMLNode beanBodyNode = returnNode.getChildElement('BeanBodyBusquedaReclamOut', null);
-            
-            // Construir el objeto de respuesta
-            List<ListaResultado> listaResultadoList = new List<ListaResultado>();
-            // Loop en lista
-            for (Dom.XMLNode listaResultadoNode : beanBodyNode.getChildElements()) {
-                if (listaResultadoNode.getName() == 'listaResultado') {
-                    ListaResultado listaResultado = new ListaResultado();
-                    listaResultado.expedienteReclamacion = listaResultadoNode.getChildElement('expedienteReclamacion', null).getText();
-                    listaResultado.estado = listaResultadoNode.getChildElement('estado', null).getText();
-                    listaResultado.usuario = listaResultadoNode.getChildElement('usuario', null).getText();
-                    listaResultado.nombreUsuario = listaResultadoNode.getChildElement('nombreUsuario', null).getText();
-                    listaResultado.orgProcedencia = listaResultadoNode.getChildElement('orgProcedencia', null).getText();
-                    listaResultado.grupo = listaResultadoNode.getChildElement('grupo', null).getText();
-                    listaResultado.prodReclamN1 = listaResultadoNode.getChildElement('prodReclamN1', null).getText();
-                    listaResultado.motivoReclamN1 = listaResultadoNode.getChildElement('motivoReclamN1', null).getText();
-                    listaResultado.numDocReclamante = listaResultadoNode.getChildElement('numDocReclamante', null).getText();
-                    listaResultado.nomReclamante = listaResultadoNode.getChildElement('nomReclamante', null).getText();
-                    listaResultado.idReclamacion = listaResultadoNode.getChildElement('idReclamacion', null).getText();
-                    listaResultado.prodReclamaN2 = listaResultadoNode.getChildElement('prodReclamaN2', null).getText();
-                    listaResultado.prodReclamaN3 = listaResultadoNode.getChildElement('prodReclamaN3', null).getText();
-                    listaResultado.motivoReclamN2 = listaResultadoNode.getChildElement('motivoReclamN2', null).getText();
-                    listaResultado.tieneRectificacion = listaResultadoNode.getChildElement('tieneRectificacion', null).getText();
-                    listaResultado.empresaProcede = listaResultadoNode.getChildElement('empresaProcede', null).getText();
-                    listaResultado.migrada = listaResultadoNode.getChildElement('migrada', null).getText();
-                    listaResultado.activa = listaResultadoNode.getChildElement('activa', null).getText();
-                    listaResultado.fechaRecepcion = listaResultadoNode.getChildElement('fechaRecepcion', null).getText();
-                    listaResultado.fechaVencimiento = listaResultadoNode.getChildElement('fechaVencimiento', null).getText();
-                    listaResultado.descProdReclamN1 = listaResultadoNode.getChildElement('descProdReclamN1', null).getText();
-                    listaResultado.descProdReclamN2 = listaResultadoNode.getChildElement('descProdReclamN2', null).getText();
-                    listaResultado.descProdReclamN3 = listaResultadoNode.getChildElement('descProdReclamN3', null).getText();
-                    listaResultado.descMotivoReclamN1 = listaResultadoNode.getChildElement('descMotivoReclamN1', null).getText();
-                    listaResultado.descMotivoReclamN2 = listaResultadoNode.getChildElement('descMotivoReclamN2', null).getText();
-                    listaResultado.pdteResp = listaResultadoNode.getChildElement('pdteResp', null).getText();
-                    listaResultado.pdteRevisarResp = listaResultadoNode.getChildElement('pdteRevisarResp', null).getText();
-                    listaResultado.idTipo = listaResultadoNode.getChildElement('idTipo', null).getText();
-                    listaResultado.reclActiva = listaResultadoNode.getChildElement('reclActiva', null).getText();
-                    listaResultado.esProrroga = listaResultadoNode.getChildElement('esProrroga', null).getText();
-                    listaResultadoList.add(listaResultado);
-                }
+    /**
+	* @description Método para generar el body de la request del envío de la reclamación
+	*/
+    private static String reclamacionRequest(List<Case> reclamaciones){
+        String body = '';
+        body = body + '<?xml version="1.0"?>';
+        body = body + '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:atr="https://extcaastb1.lacaixa.es/AttReclamacionesBusquedaReclamac/v1/BusquedaReclamac142/busquedaReclam/">';
+        body = body + '<soapenv:Header/>';
+        body = body + '<soapenv:Body>';
+        body = body + '<return>';
+        body = body + '<BeanBodyBusquedaReclamOut>';
+        for(Case reclamacion: reclamaciones){
+            // Convetir valores
+            Datetime fechaRecepcion = reclamacion.SAC_FechaRecepcion__c;
+            String formattedFechaRecepcion = fechaRecepcion.format('yyyyMMdd');
+            Date fechaVencimiento = reclamacion.SEG_Vencimiento__c;
+            String formattedFechaVencimiento;
+            if(fechaVencimiento != null){
+                formattedFechaVencimiento = String.valueOf(fechaVencimiento.year()) + String.valueOf(fechaVencimiento.month()) + String.valueOf(fechaVencimiento.day());
             }
-            response.data = listaResultadoList;
-            response.statusCode = '200';
-            
-            // Convertir JSON
-            String jsonResponse = JSON.serialize(response);
-            System.debug('*JSON ' + jsonResponse);
-        }else{
-            response.statusCode = statusCode;
-            response.errorCode = 'Error en el servicio.';
-            response.errorMessage = resp.getStatus(); 
-        } 
-        return response;    
+            String naturaleza;
+            if(reclamacion.SAC_Naturaleza__c == 'SAC_001'){
+                naturaleza = '1';
+            }else if(reclamacion.SAC_Naturaleza__c == 'SAC_004'){
+                naturaleza = '2';
+            }
+            String organismo;
+            if(reclamacion.SPV_Organismo__c == 'SPV_BDE'){
+                organismo = '1';
+            }else if(reclamacion.SPV_Organismo__c == 'SPV_CNMV'){
+                organismo = '2';
+            }else if(reclamacion.SPV_Organismo__c == 'SPV_DGS'){
+                organismo = '3';
+            }else if(reclamacion.SPV_Organismo__c == 'SPV_Consumo'){
+                organismo = '4';
+            }
+            body = body + '<listaResultado>';
+            body = body + '<expedienteReclamacion>' + reclamacion.SPV_NumExpediente__c + '</expedienteReclamacion>';
+            body = body + '<estado>' + reclamacion.Status + '</estado>';
+            body = body + '<usuario>' + reclamacion.Owner.Id + '</usuario>';
+            body = body + '<nombreUsuario>' + reclamacion.Owner.Name + '</nombreUsuario>';
+            body = body + '<orgProcedencia>' + organismo + '</orgProcedencia>';
+            body = body + '<grupo>' + reclamacion.SEG_Grupo__r.Name + '</grupo>';
+            body = body + '<prodReclamN1>' + '</prodReclamN1>';
+            body = body + '<motivoReclamN1>' + '</motivoReclamN1>';
+            body = body + '<numDocReclamante>' + reclamacion.CC_Numero_Documento__c + '</numDocReclamante>';
+            body = body + '<nomReclamante>' + '</nomReclamante>';
+            body = body + '<idReclamacion>' + reclamacion.CC_RefExterna__c + '</idReclamacion>';
+            body = body + '<prodReclamaN2>' + '</prodReclamaN2>';
+            body = body + '<prodReclamaN3>' + '</prodReclamaN3>';
+            body = body + '<motivoReclamN2>' + '</motivoReclamN2>';
+            body = body + '<tieneRectificacion>' + '</tieneRectificacion>';
+            body = body + '<empresaProcede>' + reclamacion.SAC_Entidad_Afectada__c + '</empresaProcede>';
+            body = body + '<migrada>' + '</migrada>';
+            body = body + '<activa>' + 'S' + '</activa>';
+            body = body + '<fechaRecepcion>' + formattedFechaRecepcion + '</fechaRecepcion>';
+            body = body + '<fechaVencimiento>' + formattedFechaVencimiento + '</fechaVencimiento>';
+            body = body + '<descProdReclamN1>' + '</descProdReclamN1>';
+            body = body + '<descProdReclamN2>' + '</descProdReclamN2>';
+            body = body + '<descProdReclamN3>' + '</descProdReclamN3>';
+            body = body + '<descMotivoReclamN1>' + '</descMotivoReclamN1>';
+            body = body + '<descMotivoReclamN2>' + '</descMotivoReclamN2>';
+            body = body + '<pdteResp>' + '</pdteResp>';
+            body = body + '<pdteRevisarResp>' + '</pdteRevisarResp>';
+            body = body + '<idTipo>' + naturaleza + '</idTipo>';
+            body = body + '<reclActiva>' + 'S' + '</reclActiva>';
+            body = body + '<esProrroga>' + '</esProrroga>';
+            body = body + '</listaResultado>';  
+        }
+        body = body + '</BeanBodyBusquedaReclamOut>';
+        body = body + '</return>';
+        body = body + '</soapenv:Body>';
+        body = body + '</soapenv:Envelope>';
+        return body;
     }
+    
+   /*
+	* @description Método que genera la respuesta para el mockup
+	*/
+    private static HTTPResponse getDataMockup(String dataMockup){
+        
+        HTTPResponse res = new HTTPResponse();
+        res.setStatusCode(Integer.valueOf('200'));
+        res.setStatus('OK');
+        res.setBody(dataMockup);
+        return res;
+    }
+    
+    /**
+	* @description Método para generar el mockup
+	*/
     private static String createMock(){
         String dataMockup = '';
         dataMockup = dataMockup + '<?xml version="1.0"?>';
@@ -412,31 +455,4 @@ public with sharing class SPV_Reclamaciones_Integration{
         dataMockup = dataMockup + '</soapenv:Envelope>';
         return dataMockup;
     }
-    /**
-	* @description Generate the response for the mockup data
-	*/
-    private static HTTPResponse getDataMockup(String dataMockup){
-        
-        HTTPResponse res = new HTTPResponse();
-        res.setStatusCode(Integer.valueOf('200'));
-        res.setStatus('OK');
-        res.setBody(dataMockup);
-        return res;
-    }
-    
-   /**
-    * @description Convertir en objeto el json de la response
-    */
-    /*private static Object getBodyResponse(String response, String clazzName){
-    Object result = parseJsonToObject(response, clazzName);
-    return result;
-    }*/
-    
-    /**
-    * @description Convertir en objeto el json de la response
-    */
-    /*private static Object parseJsonToObject(String jsonData, String jsonType){
-    Type typeClass = Type.forName(jsonType);
-    return System.JSON.deserializeStrict(jsonData, typeClass);
-    }*/
 }

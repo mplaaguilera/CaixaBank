@@ -5,13 +5,15 @@ public with sharing class SAC_LCMP_AcompanyamientoLlamada_Test {
     static void makeData(){
         //Usuario SAC_General
         User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertDML(usuario, false);
+        //Database.insert(usuario);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuario){
             //Reclamacion
@@ -21,7 +23,8 @@ public with sharing class SAC_LCMP_AcompanyamientoLlamada_Test {
             camposRecl.put('SAC_StatusAuxiliar__c', 'SAC_001');
             
             Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);
+            //Database.insert(casoReclamacion);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -31,7 +34,8 @@ public with sharing class SAC_LCMP_AcompanyamientoLlamada_Test {
             camposPret.put('SAC_Reclamacion__c', casoReclamacion.id);
             
             Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(casoPretension);
+            SAC_DatabaseDML.insertDML(casoPretension, false);
+            //Database.insert(casoPretension);
         }
     }
 

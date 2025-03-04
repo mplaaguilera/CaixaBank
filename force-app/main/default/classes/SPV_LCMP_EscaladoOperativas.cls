@@ -170,6 +170,9 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
                 escalado.OwnerId = cola[0].id;
                 //Cambiar el estado a pendiente respuesta
                 escalado.SAC_Estado__c = 'SAC_PendienteRespuesta';
+
+                //Añadido: Rellenar la fecha de envío del escalado
+                escalado.SPV_FechaEscalado__c = System.now();
                 if(Schema.sObjectType.SAC_Interaccion__c.isUpdateable()){   
                     // Database.update(escalado);
                     SPV_DatabaseDML.updateDML(escalado, true);
@@ -344,6 +347,7 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
 
                 //Cambiar el estado a respondido
                 escalado.SAC_Estado__c = 'SAC_Resuelta';
+                escalado.SAC_FechaRespuesta__c = System.now();                          //Añadido
             }
             else if (tipoRespuesta == 'SPV_AceptadoConModificaciones') {
                 escalado.SPV_TipoRespuesta__c = tipoRespuesta;
@@ -361,6 +365,7 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
 
                 //Cambiar el estado a respondido
                 escalado.SAC_Estado__c = 'SAC_Resuelta';
+                escalado.SAC_FechaRespuesta__c = System.now();                          //Añadido
             }
             
             if(Schema.sObjectType.SAC_Interaccion__c.isUpdateable()){   

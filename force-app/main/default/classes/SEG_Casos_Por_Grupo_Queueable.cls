@@ -23,7 +23,9 @@ public class SEG_Casos_Por_Grupo_Queueable implements Queueable{
 				casos.add(caso);
 			}
 		}
-		update casos;
-	}
 
+		if(!casos.isEmpty()){
+			CBK_DMLUtility.updateRecords(casos, false);
+		}
+	}
 }

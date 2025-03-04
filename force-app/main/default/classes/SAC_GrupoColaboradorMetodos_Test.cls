@@ -17,18 +17,21 @@ public with sharing class SAC_GrupoColaboradorMetodos_Test {
 
         //USUARIO SAC_Administrador
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+        //Database.insert(usuarioAdmin);
 
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE PermissionSet.Label = 'SAC_Administrador'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioAdmin.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioAdmin.id);
+        SAC_DatabaseDML.insertDML(psa, false);       
+        //Database.insert(psa);
 
         System.runAs(usuarioAdmin){
             //grupo colaborador
             CC_Grupo_Colaborador__c grupo = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
             grupo.SAC_Email__c = 'testing@test.test';
             grupo.SAC_DeveloperName__c = 'GRUPO';
-            Database.insert(grupo);
+            SAC_DatabaseDML.insertDML(grupo, false);   
+            //Database.insert(grupo);
         }
     }
     @istest
@@ -43,7 +46,8 @@ public with sharing class SAC_GrupoColaboradorMetodos_Test {
             grupo.SAC_DeveloperName__c = 'GRUPO';
 
             try {
-                Database.insert(grupo);
+                SAC_DatabaseDML.insertDML(grupo, true);   
+                //Database.insert(grupo);
             } catch (Exception e) {
                 error = true;
             }
@@ -60,11 +64,13 @@ public with sharing class SAC_GrupoColaboradorMetodos_Test {
             CC_Grupo_Colaborador__c grupo = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
             grupo.SAC_Email__c = 'correo@correo.test';
             grupo.SAC_DeveloperName__c = 'NUEVIOGRUPO';
-            Database.insert(grupo);
+            SAC_DatabaseDML.insertDML(grupo, false);   
+            //Database.insert(grupo);
 
             try {
-                grupo.SAC_DeveloperName__c = 'GRUPO'; 
-                Database.update(grupo);
+                grupo.SAC_DeveloperName__c = 'GRUPO';
+                SAC_DatabaseDML.updateDML(grupo, true);   
+                //Database.update(grupo);
             } catch (Exception e) {
                 error = true;
             }

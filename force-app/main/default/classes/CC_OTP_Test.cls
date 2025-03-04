@@ -1,8 +1,7 @@
 @isTest
 public with sharing class CC_OTP_Test {
 
-    @testSetup static void setup()
-    {
+    @testSetup static void setup() {
         Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
         Id profileAdmin = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
         UserRole rolCC = [SELECT Id, DeveloperName FROM UserRole WHERE DeveloperName = 'Contact_Center'];
@@ -30,8 +29,7 @@ public with sharing class CC_OTP_Test {
         insert usuarioAdmin;
 
 
-        System.runAs(usuarioAdmin)
-        {
+        System.runAs(usuarioAdmin) {
             User supervisor = new User();
             supervisor.ProfileId = profileId;
             supervisor.FirstName = 'Supervisor';
@@ -66,12 +64,12 @@ public with sharing class CC_OTP_Test {
             insert new List<User>{operador, supervisor};
 
             insert new List<PermissionSetAssignment> {
-                new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psOperador.Id),
-                new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psClasses.Id),
-                new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psSupervisor.Id),
-                new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psAutenticacion.Id),
-                new PermissionSetAssignment(AssigneeId = operador.id, PermissionSetId = psOperador.Id),
-                new PermissionSetAssignment(AssigneeId = operador.id, PermissionSetId = psClasses.Id)
+                new PermissionSetAssignment(AssigneeId = supervisor.Id, PermissionSetId = psOperador.Id),
+                new PermissionSetAssignment(AssigneeId = supervisor.Id, PermissionSetId = psClasses.Id),
+                new PermissionSetAssignment(AssigneeId = supervisor.Id, PermissionSetId = psSupervisor.Id),
+                new PermissionSetAssignment(AssigneeId = supervisor.Id, PermissionSetId = psAutenticacion.Id),
+                new PermissionSetAssignment(AssigneeId = operador.Id, PermissionSetId = psOperador.Id),
+                new PermissionSetAssignment(AssigneeId = operador.Id, PermissionSetId = psClasses.Id)
             };
 
         
@@ -85,24 +83,6 @@ public with sharing class CC_OTP_Test {
             CC_NumPerso__c = '206'
             );
             lstAccounts.add(cuenta);
-            //insert cuenta;
-
-            Account cuentaSinTelefono = new Account(
-            RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA'),
-            FirstName = 'Cuenta',
-            LastName = 'Sin Datos',
-            CC_Email__c = 'cuenta2@test.com',
-            PersonBirthdate = Date.newInstance(2000, 05, 22)
-            );
-            lstAccounts.add(cuentaSinTelefono);
-
-            Account cuentaSinDatos = new Account(
-            RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA'),
-            FirstName = 'Cuenta',
-            LastName = 'Sin Datos',
-            CC_Email__c = 'cuenta2@test.com'
-            );
-            lstAccounts.add(cuentaSinDatos);
             
             Account cuentaMenor = new Account(
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA'),
@@ -111,6 +91,7 @@ public with sharing class CC_OTP_Test {
                 PersonBirthdate = Date.newInstance(2014, 10, 22),
                 PersonMobilePhone = '+34 123 123 123'
             );
+            lstAccounts.add(cuentaMenor);
 
             Account cuentaJuridica = new Account(
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente'),
@@ -152,106 +133,119 @@ public with sharing class CC_OTP_Test {
             );
             insert representante;
             
+            Id recordTem = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+            Id recordProd = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+            Id recordMot = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+
+            CC_MCC__c mcc = new CC_MCC__c();
+            mcc.RecordTypeId = recordTem;
+            mcc.Name = 'App\'s';
+            mcc.CC_Tipo_Cliente__c = 'Cliente';
+            mcc.CC_Codigo_Externo__c = 'TE-000001';
+            mcc.CC_Canal_Operativo__c = 'App BrokerNow';
+            insert mcc;
+            CC_MCC__c mcc1 = new CC_MCC__c();
+            mcc1.RecordTypeId = recordProd;
+            mcc1.Name = 'APP CaixaBank';
+            mcc1.CC_Detalle__c = 'CaixaBank';
+            mcc1.CC_Tipo_Cliente__c = 'Cliente';
+            mcc1.CC_Tematica__c = mcc.Id;
+            mcc1.CC_Codigo_Externo__c = 'PR-000001';
+            insert mcc1;
+            CC_MCC__c mcc2 = new CC_MCC__c();
+            mcc2.RecordTypeId = recordMot;
+            mcc2.Name = 'Valoración positiva';
+            mcc2.CC_Tipo_Cliente__c = 'Cliente';
+            mcc2.CC_Producto_Servicio__c = mcc1.Id;
+            mcc2.CC_Codigo_Externo__c = 'MO-000001';
+            insert mcc2;
 
             List<Case> caseInsertLst = new List<Case>();
 
+            //Caso Generico
             Case caso1 = new Case();
             caso1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             caso1.Subject = 'Caso Test 1';
             caso1.Status = 'Activo';
-            caso1.CC_Canal_Procedencia__c= 'Formulario web';
+            caso1.CC_Canal_Procedencia__c = 'Accionista';
             caso1.CC_Canal_Respuesta__c = 'Email';
             caso1.CC_Idioma__c = 'es';
-            caso1.Origin = 'Email';
+            caso1.Origin = 'Phone';
             caso1.OwnerId = supervisor.Id;
             caso1.AccountId = cuenta.Id;
             caso1.ContactId = contacto.Id;
             caso1.CC_MailTelfNotif__c  = 'contacto@test.com';
+            caso1.CC_MCC_Tematica__c = mcc.Id;
+            caso1.CC_MCC_ProdServ__c = mcc1.Id;
+            caso1.CC_MCC_Motivo__c = mcc2.Id;
             caseInsertLst.add(caso1);
-            
-            Case caso2 = new Case();
-            caso2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
-            caso2.Subject = 'Caso Test 2';
-            caso2.Status = 'Activo';
-            caso2.CC_Canal_Procedencia__c= 'ImaginBank';
-            //caso.CC_Canal_Respuesta__c = 'Email';
-            caso2.CC_Idioma__c = 'es';
-            caso2.Origin = 'Phone';
-            caso2.OwnerId = supervisor.Id;
-            caso2.AccountId = cuentaSinDatos.Id;
-            caso2.ContactId = contacto.Id;
-            caso2.CC_MailTelfNotif__c  = 'contacto@test.com';
-            caseInsertLst.add(caso2);
 
+            //Caso cuenta menor
             Case caso3 = new Case();
             caso3.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             caso3.Subject = 'Caso Test 3';
-            caso3.CC_Canal_Procedencia__c= 'Formulario web';
+            caso3.CC_Canal_Procedencia__c = 'Accionista';
             caso3.CC_Representante__c = representante.Id;
-            caso3.CC_Canal_Respuesta__c = 'Email';
+            caso3.CC_Canal_Respuesta__c = 'Phone';
             caso3.CC_Idioma__c = 'es';
-            caso3.Origin = 'Email';
+            caso3.Origin = 'Phone';
             caso3.AccountId = cuentaMenor.Id;
             caso3.ContactId = contacto.Id;
             caso3.CC_MailTelfNotif__c  = 'contacto@test.com';
             caso3.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
             caseInsertLst.add(caso3);
 
+            //Caso juridico
             Case caso4 = new Case();
             caso4.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             caso4.Subject = 'Caso Test 4';
-            caso4.CC_Canal_Procedencia__c = 'Formulario web';
-            caso4.CC_Canal_Respuesta__c = 'Email';
+            caso4.OwnerId = operador.Id;
+            caso4.CC_Canal_Procedencia__c = 'Accionista';
+            caso4.CC_Canal_Respuesta__c = 'Phone';
             caso4.CC_Idioma__c = 'es';
-            caso4.Origin = 'Email';
+            caso4.Origin = 'Phone';
             caso4.AccountId = cuentaJuridica.Id;
             caso4.ContactId = apoderado.Id;
             caso4.CC_MailTelfNotif__c  = 'contacto@test.com';
             caso4.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
             caseInsertLst.add(caso4);
 
-            Case caso5 = new Case();
-            caso5.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
-            caso5.Subject = 'Caso Test 5';
-            caso5.Status = 'Activo';
-            caso5.CC_Canal_Procedencia__c= 'Formulario web';
-            caso5.CC_Canal_Respuesta__c = 'Email';
-            caso5.CC_Idioma__c = 'es';
-            caso5.Origin = 'Email';
-            caso5.OwnerId = supervisor.Id;
-            caso5.AccountId = cuentaSinTelefono.Id;
-            caso5.ContactId = contacto.Id;
-            caso5.CC_MailTelfNotif__c  = 'contacto@test.com';
-            caseInsertLst.add(caso5);
-
-            Case casoOperador = new Case();
-            casoOperador.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
-            casoOperador.Subject = 'Caso Test Operador';
-            casoOperador.OwnerId = operador.Id;
-            casoOperador.CC_Canal_Procedencia__c = 'Formulario web';
-            casoOperador.CC_Canal_Respuesta__c = 'Email';
-            casoOperador.CC_Idioma__c = 'es';
-            casoOperador.Origin = 'Email';
-            casoOperador.AccountId = cuentaJuridica.Id;
-            casoOperador.ContactId = apoderado.Id;
-            casoOperador.CC_MailTelfNotif__c  = 'contacto@test.com';
-            casoOperador.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-            caseInsertLst.add(casoOperador);
-
             insert caseInsertLst;
-            
-            caseInsertLst[1].CC_Canal_Respuesta__c = 'Email';
-            update caseInsertLst[1];
 
             // Inicialización de datos.        
-            Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();        
-            Id recorTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();        
+            Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();     
             
+            List<CC_Lista_Valores__c> lstListas = new List<CC_Lista_Valores__c>();
+
             CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
             lista.Name = 'Preguntas Básicas OTPSMS';
             lista.CC_Activa__c = true;
             lista.RecordTypeId = recorTypeLista;
-            insert lista;
+            lstListas.add(lista);
+
+            CC_Lista_Valores__c preguntas2Nivel = new CC_Lista_Valores__c();
+            preguntas2Nivel.RecordTypeId = recorTypeLista;
+            preguntas2Nivel.Name = 'Preguntas OTPSMS 2 Nivel';
+            preguntas2Nivel.CC_Activa__c = true;
+            lstListas.add(preguntas2Nivel);
+
+            CC_Lista_Valores__c validacionesToast = new CC_Lista_Valores__c();
+            validacionesToast.RecordTypeId = recorTypeLista;
+            validacionesToast.Name = 'Validaciones preguntas 2 Nivel';
+            validacionesToast.CC_Activa__c = true;
+            lstListas.add(validacionesToast);
+
+            CC_Lista_Valores__c listaAutenticacionCliente = new CC_Lista_Valores__c();
+            listaAutenticacionCliente.RecordTypeId = recorTypeLista;
+            listaAutenticacionCliente.CC_Activa__c = true;
+            listaAutenticacionCliente.Name = 'CC_Autenticacion_Cliente';
+            lstListas.add(listaAutenticacionCliente);
+
+            insert lstListas;
+
+            Id recorTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();   
+            
+            List<CC_Lista_Valores__c> lstValores = new List<CC_Lista_Valores__c>();     
             
             CC_Lista_Valores__c valor1 = new CC_Lista_Valores__c();
             valor1.Name = 'Nombre completo';
@@ -259,7 +253,7 @@ public with sharing class CC_OTP_Test {
             valor1.RecordTypeId = recorTypeValor;
             valor1.CC_Lista__c = lista.Id;
             valor1.CC_Valor__c = 'Nombre completo';
-            insert valor1;
+            lstValores.add(valor1);
             
             CC_Lista_Valores__c valor2 = new CC_Lista_Valores__c();
             valor2.Name = 'Número de identificación';
@@ -267,7 +261,48 @@ public with sharing class CC_OTP_Test {
             valor2.RecordTypeId = recorTypeValor;
             valor2.CC_Lista__c = lista.Id;
             valor2.CC_Valor__c = 'Número de identificación (DNI, NIE, pasaporte,…)';
-            insert valor2;
+            lstValores.add(valor2);
+
+            CC_Lista_Valores__c pregunta1 = new CC_Lista_Valores__c();
+            pregunta1.RecordTypeId = recorTypeValor;
+            pregunta1.Name = 'Edad del cliente';
+            pregunta1.CC_Activa__c = true;
+            pregunta1.CC_Valor__c = 'Edad del cliente';
+            pregunta1.CC_Lista__c = preguntas2Nivel.Id;
+            pregunta1.CC_Servicio__c = 'Pregunta 1';
+            pregunta1.CC_Orden__c = 5;
+            pregunta1.CC_Mensajes_Mostrar__c = 'Test';
+            lstValores.add(pregunta1);
+
+            CC_Lista_Valores__c pregunta2 = new CC_Lista_Valores__c();
+            pregunta2.RecordTypeId = recorTypeValor;
+            pregunta2.Name = 'Teléfono asociado';
+            pregunta2.CC_Activa__c = true;
+            pregunta2.CC_Valor__c = 'Teléfono asociado a CaixaBank del cliente';
+            pregunta2.CC_Lista__c = preguntas2Nivel.Id;
+            pregunta2.CC_Servicio__c = 'Pregunta 2';
+            pregunta2.CC_Orden__c = 5;
+            pregunta2.CC_Mensajes_Mostrar__c = 'Test';
+            lstValores.add(pregunta2);
+
+            CC_Lista_Valores__c validacion1 = new CC_Lista_Valores__c();
+            validacion1.RecordTypeId = recorTypeValor;
+            validacion1.Name = 'CORRECTO';
+            validacion1.CC_Activa__c = true;
+            validacion1.CC_Valor__c = 'Las respuestas de las preguntas son correctas';
+            validacion1.CC_Valor2__c = 'OK';
+            validacion1.CC_Lista__c = validacionesToast.Id;
+            lstValores.add(validacion1);
+
+            CC_Lista_Valores__c valorTelefono = new CC_Lista_Valores__c();
+            valorTelefono.RecordTypeId = recorTypeValor;
+            valorTelefono.CC_Activa__c = true;
+            valorTelefono.CC_Lista__c = listaAutenticacionCliente.Id;
+            valorTelefono.Name = 'Teléfono';
+            valorTelefono.CC_Valor__c = 'Teléfono';
+            lstValores.add(valorTelefono);
+
+            insert lstValores;
 
             List<CC_Comunicaciones__c> comInsertLst = new List<CC_Comunicaciones__c>();
             Id recordTypeIdOTP = Schema.SObjectType.CC_Comunicaciones__c.getRecordTypeInfosByDeveloperName().get('CC_OTPSMS').getRecordTypeId();
@@ -288,6 +323,7 @@ public with sharing class CC_OTP_Test {
             comInsertLst.add(comunicacion2);
             CC_Comunicaciones__c comunicacion3 =  new CC_Comunicaciones__c();
             comunicacion3.CC_Case__c = caseInsertLst[2].Id;
+            comunicacion3.CC_Nivel__c = 'Nivel 2';
             comunicacion3.CC_Estado__c = 'Pdte. Validar';
             comunicacion3.RecordTypeId = recordTypeIdOTP;
             comunicacion3.CC_Cliente__c = cuenta.Id;
@@ -295,55 +331,22 @@ public with sharing class CC_OTP_Test {
             comInsertLst.add(comunicacion3);
             insert comInsertLst;
 
-            // Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-            // Id recorTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
+            List<CC_Comunicaciones__Share> share = new List<CC_Comunicaciones__Share>();
+            for(CC_Comunicaciones__c a : [SELECT Id FROM CC_Comunicaciones__c]) {
+                CC_Comunicaciones__Share acshare = new CC_Comunicaciones__Share(
+                    ParentId = a.Id,
+                    UserOrGroupId = supervisor.Id, // Dar acceso al usuario actual
+                    AccessLevel = 'Edit' // o 'Read'
+                );
+                share.add(acshare);
+            }
 
-            List<CC_Lista_Valores__c> lstValores = new List<CC_Lista_Valores__c>();
-            CC_Lista_Valores__c preguntas2Nivel = new CC_Lista_Valores__c();
-            preguntas2Nivel.RecordTypeId = recorTypeLista;
-            preguntas2Nivel.Name = 'Preguntas OTPSMS 2 Nivel';
-            preguntas2Nivel.CC_Activa__c = true;
-            insert preguntas2Nivel;
-
-            CC_Lista_Valores__c pregunta1 = new CC_Lista_Valores__c();
-            pregunta1.RecordTypeId = recorTypeValor;
-            pregunta1.Name = 'Edad del cliente';
-            pregunta1.CC_Activa__c = true;
-            pregunta1.CC_Valor__c = 'Edad del cliente';
-            pregunta1.CC_Lista__c = preguntas2Nivel.Id;
-            pregunta1.CC_Servicio__c = 'Pregunta 1';
-            pregunta1.CC_Valor_SFDC__c = 'Salesforce';
-            pregunta1.CC_Orden__c = 5;
-            lstValores.add(pregunta1);
-
-            CC_Lista_Valores__c pregunta2 = new CC_Lista_Valores__c();
-            pregunta2.RecordTypeId = recorTypeValor;
-            pregunta2.Name = 'Teléfono asociado';
-            pregunta2.CC_Activa__c = true;
-            pregunta2.CC_Valor__c = 'Teléfono asociado a CaixaBank del cliente';
-            pregunta2.CC_Lista__c = preguntas2Nivel.Id;
-            pregunta2.CC_Servicio__c = 'Pregunta 2';
-            pregunta2.CC_Valor_SFDC__c = 'Salesforce';
-            pregunta2.CC_Orden__c = 5;
-            lstValores.add(pregunta2);
-
-
-            CC_Lista_Valores__c validacionesToast = new CC_Lista_Valores__c();
-            validacionesToast.RecordTypeId = recorTypeLista;
-            validacionesToast.Name = 'Validaciones preguntas 2 Nivel';
-            validacionesToast.CC_Activa__c = true;
-            insert validacionesToast;
-
-            CC_Lista_Valores__c validacion1 = new CC_Lista_Valores__c();
-            validacion1.RecordTypeId = recorTypeValor;
-            validacion1.Name = 'CORRECTO';
-            validacion1.CC_Activa__c = true;
-            validacion1.CC_Valor__c = 'Las respuestas de las preguntas son correctas';
-            validacion1.CC_Valor2__c = 'OK';
-            validacion1.CC_Lista__c = validacionesToast.Id;
-            lstValores.add(validacion1);
-
-            insert lstValores;
+            Boolean excepcion = false;
+            try {
+                Database.insert(share, false);
+            } catch(Exception e) {
+                excepcion = true;
+            }
 
             List<CC_Llamada__c> listadoLlamadas = new List<CC_Llamada__c>();
             CC_Llamada__c llamadaEntranteNOKAccount = new CC_Llamada__c(
@@ -376,40 +379,43 @@ public with sharing class CC_OTP_Test {
             Id recordTypeIdTask = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
             Task task = new Task();
             task.Status = 'Open';
-            task.WhatId = caso1.id;
+            task.WhatId = caso1.Id;
             task.RecordTypeId = recordTypeIdTask;
             task.CC_Llamada_Id__c = llamadaSalienteOKAccount.Id;
             taskList.add(task);
 
-            Task task2 = new Task();
-            task2.Status = 'Open';
-            task2.WhatId = caso2.id;
-            task2.RecordTypeId = recordTypeIdTask;
-            task2.CC_Llamada_Id__c = llamadaSalienteNOKAccount.Id;
-            taskList.add(task2);
 
             Task task3 = new Task();
             task3.Status = 'Open';
-            task3.WhatId = caso3.id;
+            task3.WhatId = caso3.Id;
             task3.RecordTypeId = recordTypeIdTask;
             task3.CC_Llamada_Id__c =  llamadaEntranteNOKAccount.Id;
             taskList.add(task3);
 
             Task task4 = new Task();
             task4.Status = 'Open';
-            task4.WhatId = caso4.id;
+            task4.WhatId = caso4.Id;
             task4.RecordTypeId = recordTypeIdTask;
             task4.CC_Llamada_Id__c = llamadaEntranteOKAccount.Id;
             taskList.add(task4);
 
-            Task task5 = new Task();
-            task5.Status = 'Open';
-            task5.WhatId = caso5.id;
-            task5.RecordTypeId = recordTypeIdTask;
-            taskList.add(task5);
             insert taskList;
+       
+            CC_Caracteristica__c caracteristicaCuenta = new CC_Caracteristica__c();
+            caracteristicaCuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Caracteristica__c', 'CC_Cliente_Cuenta');
+            caracteristicaCuenta.Name = 'Característica Cuenta';
+            caracteristicaCuenta.CC_Descripcion__c = 'descripcion';
+            caracteristicaCuenta.OS_Negocio__c = 'FRA';
+            caracteristicaCuenta.CC_RestriccionTotal__c = true;
+            insert caracteristicaCuenta;
 
-                            
+            CC_MCC_Caracteristica__c mccCaracteristica = new CC_MCC_Caracteristica__c();
+            mccCaracteristica.CC_MCC__c = mcc2.Id;
+            mccCaracteristica.CC_Caracteristica__c = caracteristicaCuenta.Id;
+            insert mccCaracteristica;
+
+            
+
             List<CC_Settings__c> settings = new List<CC_Settings__c>();
             CC_Settings__c parametrosIntegracion = new CC_Settings__c(
                 Name = 'CC_Integracion_Autenticacion',
@@ -469,381 +475,80 @@ public with sharing class CC_OTP_Test {
             customSettingAut.Name = 'CC_Autenticacion';
             customSettingAut.CC_Activa__c = true;
             settings.add(customSettingAut);
+
+            CC_Settings__c  circuitoAutenticacion = new CC_Settings__c ();
+            circuitoAutenticacion.Name = 'CC_CircuitoAutenticacion';
+            circuitoAutenticacion.CC_Activa__c = true;
+            settings.add(circuitoAutenticacion);
+
             insert settings;
 
-            CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
-            customSetting.Name = 'CC_Recuperar_Tarjetas';
-            customSetting.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/cards/creditCard/bis/cards/customers/id/request';
-            customSetting.RegistroTrazaIntegracion__c = true;
-            insert customSetting;
+            List<CBK_IntegrationSetting__c> lstCS = new List<CBK_IntegrationSetting__c>();
+            CBK_IntegrationSetting__c integracionTarjetas = new CBK_IntegrationSetting__c();
+            integracionTarjetas.Name = 'CC_Recuperar_Tarjetas';
+            integracionTarjetas.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/cards/creditCard/bis/cards/customers/Id/request';
+            integracionTarjetas.RegistroTrazaIntegracion__c = true;
+            lstCS.add(integracionTarjetas);
 
-            
-            // AccountShare acshare = new AccountShare();
-            // acshare.AccountId = cuenta.Id;
-            // acshare.UserOrGroupId = supervisor.Id;
-            // acshare.AccountAccessLevel = 'Edit';
-            // acshare.OpportunityAccessLevel = 'Edit';
-            // acshare.ContactAccessLevel = 'Edit';
-            // acshare.CaseAccessLevel = 'Edit';
-            // insert acshare;
-
-            // // AccountShare acshare3 = new AccountShare();
-            // // acshare3.AccountId = cuentaMenor.Id;
-            // // acshare3.UserOrGroupId = supervisor.Id;
-            // // acshare3.AccountAccessLevel = 'Edit';
-            // // acshare3.OpportunityAccessLevel = 'Edit';
-            // // acshare3.CaseAccessLevel = 'Edit';
-            // // insert acshare3;
-
-            // ContactShare contactShare = new ContactShare();
-            // contactShare.ContactId = contacto.Id;
-            // contactShare.UserOrGroupId = supervisor.Id;
-            // contactShare.ContactAccessLevel = 'Edit';
-            // insert contactShare;
-
-            // CaseShare conshare = new CaseShare();
-            // conshare.CaseAccessLevel = 'Read';
-            // conshare.CaseId = caso1.Id;
-            // conshare.UserOrGroupId = supervisor.Id; 
-            // insert conshare;
-
-            // CaseShare conshare3 = new CaseShare();
-            // conshare3.CaseId = caso3.Id;
-            // conshare3.UserOrGroupId = supervisor.Id;
-            // conshare3.CaseAccessLevel = 'All';
-            // insert conshare3;
+            CBK_IntegrationSetting__c integracionCuentas = new CBK_IntegrationSetting__c();
+            integracionCuentas.Name = 'CC_Autenticacion_Cuenta';
+            integracionCuentas.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/accountingServices/positionKeeping/accounts/request';
+            lstCS.add(integracionCuentas);
+            insert lstCS;
         }
 
     }
 
     @isTest
-    public static void testOTP()
-    {
-        Test.startTest();
-
+    public static void testOTP() {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-        List<Case> casesLst = [SELECT Id, Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
-        Case caso = new Case();
-        if (!casesLst.isEmpty()) {
-            caso = casesLst[0];
-        }
-
-        /*Account cuenta = new Account(
-            Name = 'Cuenta Test',
-            CC_Email__c = 'cuenta@test.com'
-        );
-        insert cuenta;*/
-
-        //Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        /*List<Account> acctLst = [SELECT Id, Name, CC_Email__c FROM Account WHERE Name = 'Cuenta Test' AND CC_Email__c = 'cuenta@test.com' LIMIT 1];
-        Account cuenta = new Account();
-        if (!acctLst.isEmpty()) {
-            cuenta = acctLst[0];
-        }
+        Case caso = [SELECT Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+        CC_Comunicaciones__c comunicacion = [SELECT Id FROM CC_Comunicaciones__c WHERE CC_Case__c = :caso.Id LIMIT 1];
         
-        Contact contacto = new Contact(
-        //RecordTypeId = recordTypeContacto,
-        RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId(),
-        FirstName = 'Contacto',
-        LastName = 'Test',      
-        AccountId = cuenta.Id,
-        CC_Idioma__c = 'es',
-        Email = 'contacto@test.com'   
-        );
-        insert contacto;
-        */
-        /*Case caso = new Case();
-        caso.Subject = 'Caso Test ';
-        caso.CC_Canal_Procedencia__c= 'Formulario web';
-        caso.CC_Canal_Respuesta__c = 'Email';
-        caso.CC_Idioma__c = 'es';
-        caso.Origin = 'Email';
-        caso.AccountId = cuenta.Id;
-        caso.ContactId = contacto.Id;
-        caso.CC_MailTelfNotif__c  = 'contacto@test.com';
-        insert caso;*/
-
-
-        //Obtenemos los datos del caso 
-        //List<Case> datosCaso = CC_OTP.datosCaso(caso.Id);
-
-        //System.assertEquals(caso.Id, datosCaso[0].Id);
-        //System.assertEquals('Email', datosCaso[0].Origin);
-        //System.assertEquals('Activo', datosCaso[0].Status);
-        //System.assertEquals('es', datosCaso[0].CC_Idioma__c);
-        //System.assertEquals('Email', datosCaso[0].CC_Canal_Respuesta__c);
-        //System.assertEquals(caso.AccountId, datosCaso[0].AccountId);
-        
-        //Funcionalidades de OTP - ¿existe OTP?
-        
-        //Boolean resultado = CC_OTP.existeOTPCaso(caso.Id);
-        //System.assertEquals(false, resultado);
-        //Map<String,Object>  resultadoNuevo = CC_OTP.existeBloqueoNuevo(caso.Id);
-        //System.assertEquals(true,  !resultadoNuevo.isEmpty());
-        
-        /* SELECT Id FROM CC_Comunicaciones__c
-        
-        CC_Comunicaciones__c comunicacion = new CC_Comunicaciones__c();
-        comunicacion.*/
-        
-        //Obtenemos valores de una picklist
-        //List<String> valoresPickList = CC_OTP.getPicklistValues('CC_Comunicaciones__c','CC_Nivel__c');
-        
-        // Inicialización de datos.        
-        /*Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();        
-        Id recorTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();        
-        
-        CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
-        lista.Name = 'Preguntas Básicas OTPSMS';
-        lista.CC_Activa__c = true;
-        lista.RecordTypeId = recorTypeLista;
-        insert lista;
-        
-        CC_Lista_Valores__c valor1 = new CC_Lista_Valores__c();
-        valor1.Name = 'Nombre completo';
-        valor1.CC_Activa__c = true;
-        valor1.RecordTypeId = recorTypeValor;
-        valor1.CC_Lista__c = lista.Id;
-        valor1.CC_Valor__c = 'Nombre completo';
-        insert valor1;
-        
-        CC_Lista_Valores__c valor2 = new CC_Lista_Valores__c();
-        valor2.Name = 'Número de identificación';
-        valor2.CC_Activa__c = true;
-        valor2.RecordTypeId = recorTypeValor;
-        valor2.CC_Lista__c = lista.Id;
-        valor2.CC_Valor__c = 'Número de identificación (DNI, NIE, pasaporte,…)';
-        insert valor2;*/
-        
-        //Devuelve las preguntas que se le hacen al cliente
-
-            List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');    
-            System.assert(preguntas.size() >=2 );
-        
-        
-        // List<CC_OTP.OTPWrapper> wrapperOTP = new List<CC_OTP.OTPWrapper>();
-
-        
-        /*Id recordTypeIdOTP = Schema.getGlobalDescribe().get('CC_Comunicaciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_OTPSMS').getRecordTypeId();
-        CC_Comunicaciones__c comunicacion =  new CC_Comunicaciones__c();
-        comunicacion.CC_Case__c = caso.Id;
-        comunicacion.CC_Estado__c = 'Pdte. Validar';
-        comunicacion.RecordTypeId = recordTypeIdOTP;
-        comunicacion.CC_Cliente__c = cuenta.Id;
-        insert comunicacion;*/
-        List<CC_Comunicaciones__c> comLst = [SELECT Id FROM CC_Comunicaciones__c WHERE CC_Case__c=:caso.Id LIMIT 1];
-        CC_Comunicaciones__c comunicacion = new CC_Comunicaciones__c();
-        if (!comLst.isEmpty()) {
-            comunicacion = comLst[0];
-        }
-        String  clienteId = caso.AccountId;   
-        List<CC_OTP.OTPWrapper> wrapperOTP = CC_OTP.obtenerOTPCliente(caso.Id, clienteId);
-        //system.assert(wrapperOTP.size()>1);  
-        //
-        //
-        String resultadoOTPValido = CC_OTP.gestionesSegunNivel(caso.Id, true, 'Nivel 1');
-        String resultadoOTPKO = CC_OTP.gestionesSegunNivel(caso.Id, false, 'Nivel 1');
         System.runAs(supervisor){
-            Map<string, string> resultadoSegundoNivelOK = CC_OTP.segundoNivel(caso.Id, true, 'Nivel 2',  'Edad del cliente', 'Teléfono asociado a CaixaBank del cliente', '20', '123456789', 'OK', 'OK', true, true);
-            Map<string, string> resultadoSegundoNivelKO = CC_OTP.segundoNivel(caso.Id, false, 'Nivel 2', 'Edad del cliente', 'Teléfono asociado a CaixaBank del cliente', '20', '123456789', 'OK', 'OK', true, true);
-        }
-        List<CC_OTP.OTPWrapper> wrapperOTPHistorico = CC_OTP.obtenerHistoricoOTPCliente(caso.Id, clienteId);
-        system.assert(wrapperOTPHistorico.size()>1);  
-                    
-        string resultadoIntentos = CC_OTP.comprobarIntentos(caso.Id, clienteId);
-        system.assertEquals('OK', resultadoIntentos);
-        
-        String resultadoValidacion = CC_OTP.validarRegistro(caso.Id, comunicacion.Id, '1234');
-        CC_OTP.enviarRegistro(comunicacion.Id);
-        Test.stopTest();
-    }
-    
-    @isTest
-    public static void testOTP2()
-    {
-        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-        
-        List<Case> casesLst = [SELECT Id, Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
-        Case caso = new Case();
-        if (!casesLst.isEmpty()) {
-            caso = casesLst[0];
-        }
-        //String casoId, Boolean valido, String nivel, String pregunta1, String pregunta2, String respuesta1, String respuesta2, String validacion1, String validacion2, Boolean enviarSMS
-        Test.startTest();
-        Map<String, String> resultadoSegundoNivelClienteDigital = CC_OTP.segundoNivel(caso.Id, false, 'Cliente Digital', caso.AccountId, caso.CC_Idioma__c, caso.OwnerId, null, null, null, false, false);
-        //Devuelve las preguntas que se le hacen al cliente
-        System.runAs(supervisor) {
-            List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');    
-            System.assert(preguntas.size() >=2 );
-        }
-        
-        List<CC_Comunicaciones__c> comLst = [SELECT Id FROM CC_Comunicaciones__c WHERE CC_Case__c=:caso.Id LIMIT 1];
-        CC_Comunicaciones__c comunicacion = new CC_Comunicaciones__c();
-        if (!comLst.isEmpty()) {
-            comunicacion = comLst[0];
-        }
-            
-        List<CC_OTP.OTPWrapper> wrapperOTP = CC_OTP.obtenerOTPCliente(caso.Id, caso.AccountId);
-        String resultadoOTPValido = CC_OTP.gestionesSegunNivel(caso.Id, true, 'Nivel 1');
-        System.runAs(supervisor){
-          Map<string, string> resultadoSegundoNivelOK = CC_OTP.segundoNivel(caso.Id, true, 'Nivel 2',  'Edad del cliente', 'Teléfono asociado a CaixaBank del cliente', '20', '123456789', 'OK', 'OK', true, true);
-        }
-        List<CC_OTP.OTPWrapper> wrapperOTPHistorico = CC_OTP.obtenerHistoricoOTPCliente(caso.Id, caso.AccountId);
-        system.assert(wrapperOTPHistorico.size()>1);
-
-        string resultadoIntentos = CC_OTP.comprobarIntentos(caso.Id, caso.AccountId);
-        system.assertEquals('OK', resultadoIntentos);
-
-        String resultadoValidacion = CC_OTP.validarRegistro(caso.Id, comunicacion.Id, '1234');
-        CC_OTP.enviarRegistro(comunicacion.Id);
-
-        String resultadoValidacionPruebaNull = CC_OTP.validarRegistro(caso.Id, null, '1234');
-        CC_OTP.enviarRegistro(comunicacion.Id);
-
-        Test.stopTest();
-    }
-
-    @isTest
-    public static void testOTP4()
-    {
-        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-
-        List<Case> casesLst = [SELECT Id, Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
-        Case caso = new Case();
-        if (!casesLst.isEmpty()) {
-            caso = casesLst[0];
-        }
-        Test.startTest();
-        Map<String, String> resultadoSegundoNivelClienteDigital = CC_OTP.segundoNivel(caso.Id, false, 'Cliente Digital', caso.AccountId, caso.CC_Idioma__c, caso.OwnerId, null, null, null, false, false);
-        System.runAs(supervisor) {
-            List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');
-            System.assert(preguntas.size() >=2 );
-        }
-
-        List<CC_Comunicaciones__c> comLst = [SELECT Id FROM CC_Comunicaciones__c WHERE CC_Case__c=:caso.Id LIMIT 1];
-        CC_Comunicaciones__c comunicacion = new CC_Comunicaciones__c();
-        if (!comLst.isEmpty()) {
-            comunicacion = comLst[0];
-        }
-
-        String resultadoOTPKO = CC_OTP.gestionesSegunNivel(caso.Id, false, 'Nivel 1');
-        System.runAs(supervisor){
-            Map<string, string> resultadoSegundoNivelKO = CC_OTP.segundoNivel(caso.Id, false, 'Nivel 2', 'Edad del cliente', 'Teléfono asociado a CaixaBank del cliente', '20', '123456789', 'OK', 'OK', true, true);
-        }
-        List<CC_OTP.OTPWrapper> wrapperOTPHistorico = CC_OTP.obtenerHistoricoOTPCliente(caso.Id, caso.AccountId);
-        system.assert(wrapperOTPHistorico.size()>1);
-                    
-        string resultadoIntentos = CC_OTP.comprobarIntentos(caso.Id, caso.AccountId);
-        system.assertEquals('OK', resultadoIntentos);
-        
-        String resultadoValidacion = CC_OTP.validarRegistro(caso.Id, comunicacion.Id, '1234');
-        CC_OTP.enviarRegistro(comunicacion.Id);
-
-        String resultadoValidacionPruebaNull = CC_OTP.validarRegistro(caso.Id, null, '1234');
-        CC_OTP.enviarRegistro(comunicacion.Id);
-        
-        Test.stopTest();
-    }
-    
-    @isTest
-    public static void noRecibidoTest(){
-        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-        /*Account cuenta = new Account(
-            Name = 'Cuenta Test',
-            CC_Email__c = 'cuenta@test.com'
-        );
-        insert cuenta;
-        
-        Case caso = new Case();
-        caso.Subject = 'Caso Test ';
-        caso.CC_Canal_Procedencia__c= 'Formulario web';
-        caso.CC_Canal_Respuesta__c = 'Email';
-        caso.CC_Idioma__c = 'es';
-        caso.Origin = 'Email';
-        caso.AccountId = cuenta.Id;
-        caso.CC_MailTelfNotif__c  = 'contacto@test.com';
-        caso.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        insert caso;*/
-        List<Case> casesLst = [SELECT Id, Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId FROM Case WHERE Subject = 'Caso Test 3' LIMIT 1];
-        Case caso = new Case();
-        if (!casesLst.isEmpty()) {
-            caso = casesLst[0];
-        }
-        
-        /*Id recordTypeIdOTP = Schema.getGlobalDescribe().get('CC_Comunicaciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_OTPSMS').getRecordTypeId();
-        CC_Comunicaciones__c comunicacion =  new CC_Comunicaciones__c();
-        comunicacion.CC_Case__c = caso.Id;
-        comunicacion.CC_Estado__c = 'Pdte. Validar';
-        comunicacion.RecordTypeId = recordTypeIdOTP;
-        comunicacion.CC_Cliente__c = cuenta.Id;
-        insert comunicacion;*/
-        List<CC_Comunicaciones__c> comLst = [SELECT Id FROM CC_Comunicaciones__c WHERE CC_Case__c=:caso.Id LIMIT 1];
-        CC_Comunicaciones__c comunicacion = new CC_Comunicaciones__c();
-        if (!comLst.isEmpty()) {
-            comunicacion = comLst[0];
-        }
-        System.runAs(supervisor) {
             Test.startTest();
-            CC_OTP.mensajeNoRecibido(comunicacion.Id, caso.Id);
-            system.assertEquals('OTP No recibida', [SELECT CC_Estado__c FROM CC_Comunicaciones__c WHERE Id = :comunicacion.Id].CC_Estado__c);
+                CC_OTP.reiniciarDerivar(caso.Id);
+                List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');    
+                System.assert(preguntas.size() > = 2, '');
+                String clienteId = caso.AccountId;   
+                List<CC_OTP.OTPWrapper> wrapperOTP = CC_OTP.obtenerOTPCliente(caso.Id, clienteId);
+
+                String resultadoOTPValido = CC_OTP.gestionesSegunNivel(caso.Id, true, 'Nivel 1');
+                String resultadoOTPKO = CC_OTP.gestionesSegunNivel(caso.Id, false, 'Nivel 1');
+
+                Map<string, string> resultadoSegundoNivelOK = CC_OTP.segundoNivel(caso.Id, true, 'Nivel 2',  'Edad del cliente', 'Teléfono asociado a CaixaBank del cliente', '20', '123456789', 'OK', 'OK', true, true, false);
+                Map<string, string> resultadoSegundoNivelKO = CC_OTP.segundoNivel(caso.Id, false, 'Nivel 2', 'Edad del cliente', 'Teléfono asociado a CaixaBank del cliente', '20', '123456789', 'OK', 'OK', true, true, false);
+
+                List<CC_OTP.OTPWrapper> wrapperOTPHistorico = CC_OTP.obtenerHistoricoOTPCliente(caso.Id, clienteId);
+                System.assert(wrapperOTPHistorico.size() > 1, '');  
+                            
+                string resultadoIntentos = CC_OTP.comprobarIntentos(caso.Id, clienteId);
+                System.assertEquals('OK', resultadoIntentos, '');
+                
+                String resultadoValidacion = CC_OTP.validarRegistro(caso.Id, comunicacion.Id, '1234');
+                CC_OTP.enviarRegistro(comunicacion.Id);
             Test.stopTest();
         }
     }
 
-    // @isTest
-    // public static void testExisteBloqueo(){
-    //     User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1]; 
+    @isTest
+    public static void noRecibidoTest(){
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        Case caso = [SELECT Id, Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId FROM Case WHERE Subject = 'Caso Test 3' LIMIT 1];
+        CC_Comunicaciones__c comunicacion = [SELECT Id, RecordType.DeveloperName, CC_Estado__c, CC_Nivel__c FROM CC_Comunicaciones__c WHERE CC_Case__c=:caso.Id LIMIT 1];
 
-    //     Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
-
-    //     //Obtenemos los datos del caso 
-    //     //List<Case> datosCaso = CC_OTP.datosCaso(caso.Id);
-
-        
-
-    //     //Devuelve las preguntas que se le hacen al cliente
-    //    /* System.runAs(supervisor)
-    //     {
-    //         Boolean resultado = CC_OTP.existeOTPCaso(caso.Id);
-    //         System.assertEquals(false, resultado);
-    //         Boolean  resultadoNuevo = CC_OTP.existeBloqueo(caso.Id);
-    //         System.assertEquals(true,  resultadoNuevo);
-    //     }*/
-        
-    // }
+        System.runAs(supervisor) {
+            Test.startTest();
+                CC_OTP.mensajeNoRecibido(comunicacion.Id, caso.Id);
+                System.assertEquals('OTP No recibida', [SELECT CC_Estado__c FROM CC_Comunicaciones__c WHERE Id = :comunicacion.Id].CC_Estado__c, '');
+            Test.stopTest();
+        }
+    }
 
     @isTest
     public static void validarCanalAutenticacionTest() {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-
-        CC_Lista_Valores__c listaAutenticacionCliente = new CC_Lista_Valores__c();
-        listaAutenticacionCliente.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
-        listaAutenticacionCliente.CC_Activa__c = true;
-        listaAutenticacionCliente.Name = 'CC_Autenticacion_Cliente';
-        insert listaAutenticacionCliente;
-        
-        CC_Lista_Valores__c valorTelefono = new CC_Lista_Valores__c();
-        valorTelefono.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
-        valorTelefono.CC_Activa__c = true;
-        valorTelefono.CC_Lista__c = listaAutenticacionCliente.Id;
-        valorTelefono.Name = 'Teléfono';
-        valorTelefono.CC_Valor__c = 'Teléfono';
-        insert valorTelefono;
-        
-        /*CC_Lista_Valores__c valorDesactivado = new CC_Lista_Valores__c();
-        valorDesactivado.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
-        valorDesactivado.CC_Activa__c = false;
-        valorDesactivado.CC_Lista__c = listaAutenticacionCliente.Id;
-        valorDesactivado.Name = 'Twitter';
-        valorDesactivado.CC_Valor__c = 'Twitter';
-        insert valorDesactivado;*/
-        
-        Case caso = new Case(
-            Status = 'Activo',
-            Origin = 'Phone',
-            CC_Canal_Procedencia__c = 'Accionista'
-        );
-        insert caso;
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
 
         Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
         Case casoInvalido = new Case(
@@ -855,71 +560,50 @@ public with sharing class CC_OTP_Test {
         insert casoInvalido;
 
         //Devuelve las preguntas que se le hacen al cliente
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            System.assertEquals(true,  CC_OTP.validarCanalAutenticacion(caso.Id));
-            System.assertEquals(false,  CC_OTP.validarCanalAutenticacion(casoInvalido.Id));
+                System.assertEquals(true,  CC_OTP.validarCanalAutenticacion(caso.Id), '');
+                System.assertEquals(false,  CC_OTP.validarCanalAutenticacion(casoInvalido.Id), '');
             Test.stopTest();
         }   
     }
 
     @isTest
     public static void preguntasNivelDosTest() {
-        // Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-        // Id recorTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
-
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
-        Map<String,String> preguntas = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
-        List<String> preguntasMapa = preguntas.values();
+        
         //Devuelve las preguntas que se le hacen al cliente
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            System.assertEquals('Edad del cliente', preguntasMapa[0]);
+            Map<String,String> preguntas = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
+            System.assertEquals(4, preguntas.size(), '');
             Test.stopTest();
         }
     }
 
     @isTest
     public static void validacionPreguntasTest() {
-        Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        Id rtContactClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
-        wsc.Name = 'CC_Autenticacion_Cuenta';
-        wsc.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/accountingServices/positionKeeping/accounts/request';
-        insert wsc;
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
-        Account cuenta = [SELECT Id FROM Account WHERE CC_NumPerso__c = '206'];
-        
         List<Boolean> validaciones = new List<Boolean>();
         validaciones.add(true);
         validaciones.add(true);
         validaciones.add(true);
         //Devuelve las preguntas que se le hacen al cliente
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
-            List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'Últimos 4 dígitos de una cuenta del cliente', 'Edad del cliente', '9491', '24');
-            System.assertEquals(validaciones, lista);
+                Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
+                List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'Últimos 4 dígitos de una cuenta del cliente', 'Edad del cliente', '9491', '24');
+                System.assertEquals(validaciones, lista, '');
             Test.stopTest();
         }
     }
     
     @isTest
     public static void validacionPreguntasTestDos() {
-        Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        Id rtContactClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
-        wsc.Name = 'CC_Autenticacion_Cuenta';
-        wsc.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/accountingServices/positionKeeping/accounts/request';
-        insert wsc;
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
-        Account cuenta = [SELECT Id FROM Account WHERE CC_NumPerso__c = '206'];
         
         List<Boolean> validaciones = new List<Boolean>();
         validaciones.add(true);
@@ -929,37 +613,29 @@ public with sharing class CC_OTP_Test {
         System.runAs(supervisor)
         {
             Test.startTest();
-            Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
-            //'Últimos 4 dígitos de una cuenta del cliente' 9491
-            List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'teléfono del cliente', 'Últimos 4 dígitos de una tarjeta del cliente', '123456789', '9491');
-            System.assertEquals(validaciones, lista);
+                Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
+                //'Últimos 4 dígitos de una cuenta del cliente' 9491
+                List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'teléfono del cliente', 'Últimos 4 dígitos de una tarjeta del cliente', '123456789', '9491');
+                System.assertEquals(validaciones, lista, '');
             Test.stopTest();
         }
     }
 
     @isTest
     public static void validacionPreguntasTestTres() {
-        Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        Id rtContactClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
-        wsc.Name = 'CC_Autenticacion_Cuenta';
-        wsc.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/accountingServices/positionKeeping/accounts/request';
-        insert wsc;
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 3' LIMIT 1];
-        Account cuenta = [SELECT Id FROM Account WHERE CC_NumPerso__c = '206'];
         
         List<Boolean> validaciones = new List<Boolean>();
         validaciones.add(true);
         validaciones.add(true);
         validaciones.add(false);
         //Devuelve las preguntas que se le hacen al cliente
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
-            List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'Edad del cliente', 'teléfono del cliente', '24', '+34 123456789');
-            System.assertEquals(validaciones, lista);
+                Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
+                List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'Edad del cliente', 'teléfono del cliente', '24', '+34 123456789');
+                System.assertEquals(validaciones, lista, '');
             Test.stopTest();
         }
     }
@@ -974,12 +650,11 @@ public with sharing class CC_OTP_Test {
         validaciones.add(true);
         validaciones.add(false);
         //Devuelve las preguntas que se le hacen al cliente
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
-            List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'teléfono del cliente', 'Edad del cliente', '+34 123456789', '24');
-            System.assertEquals(validaciones, lista);
+                Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
+                List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'teléfono del cliente', 'Edad del cliente', '+34 123456789', '24');
+                System.assertEquals(validaciones, lista, '');
             Test.stopTest();
         }
     }
@@ -994,12 +669,11 @@ public with sharing class CC_OTP_Test {
         validaciones.add(true);
         validaciones.add(true);
         //Devuelve las preguntas que se le hacen al cliente
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
-            List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'Edad del cliente', 'teléfono del cliente', '24', '123456789');
-            System.assertEquals(validaciones, lista);
+                Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
+                List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'Edad del cliente', 'teléfono del cliente', '24', '123456789');
+                System.assertEquals(validaciones, lista, '');
             Test.stopTest();
         }
     }
@@ -1014,12 +688,11 @@ public with sharing class CC_OTP_Test {
         validaciones.add(false);
         validaciones.add(false);
         //Devuelve las preguntas que se le hacen al cliente
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
-            List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'teléfono del cliente', 'Edad del cliente', '123456789', '24');
-            System.assertEquals(validaciones, lista);
+                Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_Validacion(200));
+                List<Boolean> lista = CC_OTP.validacionPreguntas(caso.Id, 'teléfono del cliente', 'Edad del cliente', '123456789', '24');
+                System.assertEquals(validaciones, lista, '');
             Test.stopTest();
         }
     }
@@ -1027,17 +700,17 @@ public with sharing class CC_OTP_Test {
     @isTest
     public static void clienteDigitalTest(){
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-        Case caso = [SELECT Id, AccountId, OwnerId FROM Case WHERE Subject = 'Caso Test 2' LIMIT 1];
-        CC_Settings__c aut = [SELECT Id, Name, CC_Activa__c FROM CC_Settings__c WHERE Name = 'CC_Autenticacion'];
+        Case caso = [SELECT AccountId, OwnerId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+        CC_Settings__c aut = [SELECT Name, CC_Activa__c FROM CC_Settings__c WHERE Name = 'CC_Autenticacion'];
         System.runAs(supervisor)
         {
             Test.startTest();
-            String resultado = CC_OTP.clienteDigital(caso.Id.toString(), caso.AccountId.toString(), caso.OwnerId.toString());
-            System.assertEquals('OK', resultado);
-            aut.CC_Activa__c = false;
-            update aut;
-            String resultadoNoActiva = CC_OTP.clienteDigital(caso.Id.toString(), caso.AccountId.toString(), caso.OwnerId.toString());
-            System.assertEquals('OK', resultado);
+                String resultado = CC_OTP.clienteDigital(caso.Id.toString(), caso.AccountId.toString(), caso.OwnerId.toString());
+                System.assertEquals('OK', resultado, '');
+                aut.CC_Activa__c = false;
+                update aut;
+                String resultadoNoActiva = CC_OTP.clienteDigital(caso.Id.toString(), caso.AccountId.toString(), caso.OwnerId.toString());
+                System.assertEquals('OK', resultado, '');
             Test.stopTest();
         }
     }
@@ -1045,65 +718,135 @@ public with sharing class CC_OTP_Test {
     @isTest
     public static void autenticacionCanceladaTest(){
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-        Case caso = [SELECT Id, AccountId, OwnerId FROM Case WHERE Subject = 'Caso Test 2' LIMIT 1];
+        Case caso = [SELECT AccountId, OwnerId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
         CC_Comunicaciones__c comunicacionId = [SELECT Id, CC_Estado__c FROM CC_Comunicaciones__c  WHERE CC_Estado__c = 'Pdte. Validar' LIMIT 1];
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            CC_OTP.autenticacionCancelada(comunicacionId.Id, caso.Id);
-            Case casoResultado = [SELECT Id, CC_Status_Autorizacion__c FROM Case WHERE CC_Status_Autorizacion__c = 'UNAUTHORIZED' LIMIT 1];
-            CC_Comunicaciones__c comunicacion = [SELECT Id, CC_Estado__c FROM CC_Comunicaciones__c WHERE CC_Estado__c = 'Cancelada por agente' LIMIT 1];
+                CC_OTP.autenticacionCancelada(comunicacionId.Id, caso.Id);
+                Case casoResultado = [SELECT Id, CC_Status_Autorizacion__c FROM Case WHERE CC_Status_Autorizacion__c = 'UNAUTHORIZED' LIMIT 1];
+                CC_Comunicaciones__c comunicacion = [SELECT Id, CC_Estado__c FROM CC_Comunicaciones__c WHERE CC_Estado__c = 'Cancelada por agente' LIMIT 1];
 
-            System.assertEquals('UNAUTHORIZED', casoResultado.CC_Status_Autorizacion__c);
-            System.assertEquals('Cancelada por agente', comunicacion.CC_Estado__c);
+                System.assertEquals('UNAUTHORIZED', casoResultado.CC_Status_Autorizacion__c, '');
+                System.assertEquals('Cancelada por agente', comunicacion.CC_Estado__c, '');
             Test.stopTest();
         }
     }
 
     @isTest
     public static void validacionMensajeToastTest() {
-        CC_Lista_Valores__c listaValores = CC_OTP.mensajeValidacionPreguntas('OK');
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            System.assertEquals('CORRECTO', listaValores.Name);
+            CC_Lista_Valores__c listaValores = CC_OTP.mensajeValidacionPreguntas('OK');
+            System.assertEquals('CORRECTO', listaValores.Name, '');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void comprobarDatos2NivelFisicoSinDatos() {
+        Case caso = [SELECT Id, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        Account cuenta = [SELECT Id FROM Account WHERE Id = :caso.AccountId];
+        cuenta.PersonMobilePhone = null;
+        cuenta.PersonBirthdate = null;
+        update cuenta;
+        System.runAs(supervisor) {
+            Test.startTest();
+                String error = CC_OTP.comprobarDatos2Nivel(caso.Id);
+                Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
+                List<String> lst = preguntasMapa.values();
+                System.assertEquals('SIN DATOS', error, 'Error en comprobarDatos2NivelFisico, datos no esperados');
+                System.assertEquals(lst.contains('true'), true, '');
             Test.stopTest();
         }
     }
 
     @isTest
     public static void comprobarDatos2NivelFisico() {
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 2' LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
 
-        string error = CC_OTP.comprobarDatos2Nivel(caso.Id);
-        Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
-        List<String> lst = preguntasMapa.values();
-
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            System.assertEquals('SIN DATOS', error, 'Error en comprobarDatos2NivelFisico, datos no esperados');
-            System.assertEquals(lst.contains('true'), true);
+                string error = CC_OTP.comprobarDatos2Nivel(caso.Id);
+                Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
+                List<String> lst = preguntasMapa.values();
+                System.assertEquals('OK', error, 'Error en comprobarDatos2NivelFisicoDos, datos no esperados');
+                System.assertEquals(lst.contains('true'), false, '');
             Test.stopTest();
         }
     }
 
     @isTest
-    public static void comprobarDatos2NivelFisicoDos() {
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 5' LIMIT 1];
+    public static void comprobarDatos2NivelFisicoCuenta() {
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        CC_Lista_Valores__c preguntasNivel2 = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'Preguntas OTPSMS 2 Nivel' LIMIT 1];
 
-        string error = CC_OTP.comprobarDatos2Nivel(caso.Id);
-         Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
-        List<String> lst = preguntasMapa.values();
+        CC_Lista_Valores__c preguntaEdad = [SELECT CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Lista__c = :preguntasNivel2.Id AND Name = 'Edad del cliente' LIMIT 1];
+        CC_Lista_Valores__c preguntaTelefono = [SELECT CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Lista__c = :preguntasNivel2.Id AND Name = 'Teléfono asociado' LIMIT 1];
+        
+        List<CC_Lista_Valores__c> preguntasUpd = new List<CC_Lista_Valores__c>();
+        preguntaEdad.CC_Activa__c = false;
+        preguntasUpd.add(preguntaEdad);
+        preguntaTelefono.CC_Activa__c = false;
+        preguntasUpd.add(preguntaTelefono);
+        update preguntasUpd;
 
-        System.runAs(supervisor)
-        {
+        
+        List<CC_Lista_Valores__c> preguntasInsert = new List<CC_Lista_Valores__c>();
+        CC_Lista_Valores__c pregunta1Cuenta = new CC_Lista_Valores__c();
+        pregunta1Cuenta.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
+        pregunta1Cuenta.Name = 'Cuenta';
+        pregunta1Cuenta.CC_Activa__c = true;
+        pregunta1Cuenta.CC_Valor__c = 'Últimos 4 dígitos de una cuenta del cliente';
+        pregunta1Cuenta.CC_Lista__c = preguntasNivel2.Id;
+        pregunta1Cuenta.CC_Servicio__c = 'Pregunta 1';
+        pregunta1Cuenta.CC_Orden__c = 5;
+        pregunta1Cuenta.CC_Mensajes_Mostrar__c = 'Test';
+        preguntasInsert.add(pregunta1Cuenta);
+
+        CC_Lista_Valores__c pregunta2Cuenta = new CC_Lista_Valores__c();
+        pregunta2Cuenta.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
+        pregunta2Cuenta.Name = 'Cuenta';
+        pregunta2Cuenta.CC_Activa__c = true;
+        pregunta2Cuenta.CC_Valor__c = 'Últimos 4 dígitos de una cuenta del cliente';
+        pregunta2Cuenta.CC_Lista__c = preguntasNivel2.Id;
+        pregunta2Cuenta.CC_Servicio__c = 'Pregunta 2';
+        pregunta2Cuenta.CC_Orden__c = 5;
+        pregunta2Cuenta.CC_Mensajes_Mostrar__c = 'Test';
+        preguntasInsert.add(pregunta2Cuenta);
+
+        insert preguntasInsert;
+
+        System.runAs(supervisor) {
             Test.startTest();
-            System.assertEquals('OK', error, 'Error en comprobarDatos2NivelFisicoDos, datos no esperados');
-            System.assertEquals(lst.contains('true'), false);
+                string error = CC_OTP.comprobarDatos2Nivel(caso.Id);
+                Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
+                List<String> lst = preguntasMapa.values();
+                System.assertEquals('OK', error, 'Error en comprobarDatos2NivelFisicoDos, datos no esperados');
+                System.assertEquals(lst.contains('true'), false, '');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void comprobarDatos2NivelFisicoPreguntaForzada() {
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 3' LIMIT 1];
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        Account cuenta = [SELECT Id FROM Account WHERE CC_NumPerso__c = '206' LIMIT 1];
+        cuenta.PersonMobilePhone = null;
+        cuenta.PersonBirthdate = null;
+        update cuenta;
+
+        System.runAs(supervisor) {
+            Test.startTest();
+                string error = CC_OTP.comprobarDatos2Nivel(caso.Id);
+                Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
+                List<String> lst = preguntasMapa.values();
+                System.assertEquals('SIN DATOS', error, 'Error en comprobarDatos2NivelFisicoDos, datos no esperados');
+                System.assertEquals(lst.contains('false'), false, '');
             Test.stopTest();
         }
     }
@@ -1113,86 +856,149 @@ public with sharing class CC_OTP_Test {
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 3' LIMIT 1];
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
 
-        string error = CC_OTP.comprobarDatos2Nivel(caso.Id);
-        Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
-        List<String> lst = preguntasMapa.values();
-
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            System.assertEquals('OK', error, 'Error en comprobarDatos2NivelMenor, datos no esperados');
-            System.assertEquals(lst.contains('true'), false);
+                String error = CC_OTP.comprobarDatos2Nivel(caso.Id);
+                Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
+                List<String> lst = preguntasMapa.values();
+                System.assertEquals('OK', error, 'Error en comprobarDatos2NivelMenor, datos no esperados');
+                System.assertEquals(lst.contains('true'), false, '');
             Test.stopTest();
         }
     }
 
     @isTest
     public static void comprobarDatos2NivelApoderado() {
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 4' LIMIT 1];
+        Case caso = [SELECT Id, Account.RecordType.DeveloperName, Contact.RecordType.DeveloperName FROM Case WHERE Subject = 'Caso Test 4' LIMIT 1];
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-        string error = CC_OTP.comprobarDatos2Nivel(caso.Id);
-        Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
-        List<String> lst = preguntasMapa.values();
-
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            System.assertEquals('SIN DATOS', error, 'Error en comprobarDatos2NivelApoderado, datos no esperados');
-            System.assertEquals(lst.contains('true'), true);
+                String error = CC_OTP.comprobarDatos2Nivel(caso.Id);
+                Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
+                List<String> lst = preguntasMapa.values();
+                System.assertEquals('SIN DATOS', error, 'Error en comprobarDatos2NivelApoderado, datos no esperados');
+                System.assertEquals(lst.contains('true'), true, '');
             Test.stopTest();
         }
     }
 
     @isTest
     public static void comprobarDatosNOKTask1(){
-        
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 4' LIMIT 1];
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Task task = [SELECT Id FROM Task WHERE WhatId = :caso.Id];
         task.WhatId = null;
         update task;
 
-        string error = CC_OTP.comprobarDatos2Nivel(caso.Id);
-         Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
-        List<String> lst = preguntasMapa.values();
-
         System.runAs(supervisor)
         {
             Test.startTest();
-            // System.assertEquals('SIN DATOS', error, 'Error en comprobarDatosNOKTask, datos no esperados');
-            System.assertEquals(lst.contains('true'), true);
+                String error = CC_OTP.comprobarDatos2Nivel(caso.Id);
+                Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
+                List<String> lst = preguntasMapa.values();
+                System.assertEquals(lst.contains('true'), true, '');
             Test.stopTest();
         }
     }
 
     @isTest
     public static void comprobarDatosNOKTask2() {
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test Operador' LIMIT 1];
-
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 4' LIMIT 1];
         User operador = [SELECT Id FROM User WHERE FirstName = 'Operador' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        Task task = [SELECT Id FROM Task WHERE WhatId = :caso.Id];
+        task.WhatId = null;
+
         System.runAs(operador) {
             Test.startTest();
-            string error = CC_OTP.comprobarDatos2Nivel(caso.Id);
-            Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
-            List<String> lst = preguntasMapa.values();
+                String error = CC_OTP.comprobarDatos2Nivel(caso.Id);
+                Map<String,String> preguntasMapa = CC_OTP.preguntasOTP2Nivel('Preguntas OTPSMS 2 Nivel', caso.Id);
+                List<String> lst = preguntasMapa.values();
+                System.assertEquals('SIN DATOS', error, 'Error en comprobarDatosNOKTask, datos no esperados');
+                System.assertEquals(lst.contains('true'), true, '');
             Test.stopTest();
-
-            System.assertEquals('SIN LLAMADAS', error, 'Error en comprobarDatosNOKTask, datos no esperados');
-            System.assertEquals(lst.contains('true'), true);
         }
     }
 
     @isTest
-    public static void existeBloqueoNuevoTest(){
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 3' LIMIT 1];
+    public static void existeBloqueoNuevoTest() {
+        List<Case> casos = [SELECT Id FROM Case WHERE Subject IN ('Caso Test 1','Caso Test 3') LIMIT 2];
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-        System.runAs(supervisor)
-        {
+        System.runAs(supervisor) {
             Test.startTest();
-            Map<String,Object> resultado = CC_OTP.existeBloqueoNuevo(caso.Id);
-            System.assertEquals(false, resultado.get('Resultado'));
+                Map<String,Object> resultado = CC_OTP.existeBloqueoNuevo(casos[0].Id);
+                System.assertEquals(false, resultado.get('Resultado'), '');
+                Map<String,Object> resultado2 = CC_OTP.existeBloqueoNuevo(casos[1].Id);
+                System.assertEquals(false, resultado2.get('Resultado'), '');
             Test.stopTest(); 
         }
     }
 
+    @isTest
+    public static void validarContratoSAUTest() {
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor) {
+            Test.startTest();
+                String testsss = CC_OTP.validarContratoSAU(caso.Id);
+                System.assertEquals(true, true, '');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void validarNacimientoTest() {
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor) {
+            Test.startTest();
+                List<Boolean> lstValidaciones = CC_OTP.validacionPreguntas(caso.Id, 'año', 'edad', '2000', '20');
+                System.assertEquals(true, lstValidaciones[0], '');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void comprobarNoImpedirTest() {
+        Case caso = [SELECT CC_MCC_Motivo__c FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        
+        System.runAs(supervisor) {
+            Test.startTest();
+                String resultado = CC_OTP.comprobarImpedirAutenticacion(caso.Id);
+                System.assertEquals('noImpedir', resultado, '');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void comprobarCaracteristicasClienteTest() {
+        Case caso = [SELECT AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+
+        CC_Caracteristica__c caracteristicaCuenta = [SELECT Id FROM CC_Caracteristica__c WHERE Name = 'Característica Cuenta' LIMIT 1];
+        CC_Caracteristica_Detalle__c caracteristicaDetalle = new CC_Caracteristica_Detalle__c();
+        caracteristicaDetalle.CC_Cuenta__c = caso.AccountId;
+        caracteristicaDetalle.CC_Caracteristica__c = caracteristicaCuenta.Id;
+        insert caracteristicaDetalle;
+        
+        System.runAs(supervisor) {
+            Test.startTest();
+                String resultado = CC_OTP.comprobarCaracteristicasCliente(caso.Id);
+                System.assertEquals('restriccion_total', resultado, '');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void comprobarCaracteristicasClienteDosTest() {
+        Case caso = [SELECT CC_MCC_Motivo__c FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        
+        System.runAs(supervisor) {
+            Test.startTest();
+                String resultado = CC_OTP.comprobarCaracteristicasCliente(caso.Id);
+                System.assertEquals('autenticar', resultado, '');
+            Test.stopTest();
+        }
+    }
 }

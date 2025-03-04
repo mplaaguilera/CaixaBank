@@ -137,7 +137,8 @@ public without sharing class SAC_EnvioMailAnalisis implements Database.Batchable
             List<ContentVersion> listaCV = crearFicheroConPlantilla(listaAccionesSuccess, mapaCasoPlantilla);
             //Si hay adjuntos, insertarlos
             if (!listaCV.isEmpty()) {
-                Database.insert(listaCV);
+                SAC_DatabaseDML.insertListDML(listaCV, true);
+                //Database.insert(listaCV);
             }
         }
 

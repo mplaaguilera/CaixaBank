@@ -3,8 +3,9 @@ public with sharing class SAC_DatabaseDML_Test {
     @TestSetup
     static void makeData(){
         User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        usuario.Username = 'ustestesteo@test.com';      
-        Database.insert(usuario);
+        usuario.Username = 'ustestesteo@test.com'; 
+        SAC_DatabaseDML.insertDML(usuario, false);      
+        //Database.insert(usuario);
 
 
         //RECLAMACION 1
@@ -16,7 +17,8 @@ public with sharing class SAC_DatabaseDML_Test {
         camposRecl.put('OwnerId', usuario.Id);
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);  
+        //Database.insert(casoReclamacion);
     }
 
 

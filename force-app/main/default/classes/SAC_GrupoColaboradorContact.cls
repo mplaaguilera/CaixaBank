@@ -66,7 +66,8 @@ public without sharing class SAC_GrupoColaboradorContact {
 
         if (!mapaGruposActualizarFinal.isEmpty()) { 
             //update listaGruposActualizar;
-            Database.update(mapaGruposActualizarFinal.values(), false);
+            SAC_DatabaseDML.updateListDML(mapaGruposActualizarFinal.values(), false); 
+            //Database.update(mapaGruposActualizarFinal.values(), false);
         }
 
     }

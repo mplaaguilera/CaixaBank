@@ -2,7 +2,7 @@
  * Name: SAC_CargaMasiva
  * Copyright © 2021  CaixaBank
  * 
- * Proposito: Hacer copias masivas de una reclamación y sus pretensiones
+ * @description Proposito: Hacer copias masivas de una reclamación y sus pretensiones
  * Clase test que cubre el código: SAC_LCMP_CopiaMasivaCasos_Test
  * 
  * Historial
@@ -10,7 +10,7 @@
  * VERSION        USER_STORY       AUTHOR         DATE         Description
  * 1.0            US308696         Carlos Solis   14/03/2022   Creación
 *****************************************************************/
-public without sharing class SAC_CargaMasiva implements Queueable {
+public with sharing class SAC_CargaMasiva implements Queueable {
 
     private static Set<String> objetos = new Set<String>{'Case'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
@@ -106,7 +106,7 @@ public without sharing class SAC_CargaMasiva implements Queueable {
             }
 
             //Insert de la reclamacion para tener su id y poder insertar sus pretensiones hijas
-            Database.insert(listaReclamacionCopiar);
+            SAC_DatabaseDML.insertListDML(listaReclamacionCopiar, true);
 
             //Recorrer de nuevo la lista de originales para copiar las pretensiones apuntando a sus padres
             for (Case caso : listaCasosOriginales) {
@@ -165,7 +165,7 @@ public without sharing class SAC_CargaMasiva implements Queueable {
             }
 
             //Insert de las pretensiones hijas
-            Database.insert(listaPretensionesCopiar);
+            SAC_DatabaseDML.insertListDML(listaPretensionesCopiar, true);
 
             //Asignar adjuntos a las reclamaciones y las pretensiones, si es que existen adjuntos
             if (!mapaConDocLink.isEmpty()) {
@@ -203,7 +203,7 @@ public without sharing class SAC_CargaMasiva implements Queueable {
                 }
 
                 //Insertar archivos adjuntos
-                Database.insert(listaCDLCopiar);
+                SAC_DatabaseDML.insertListDML(listaCDLCopiar, true);
             }
 
             //Update reclamaciones con pretension principal y sus checks de adjuntos
@@ -229,21 +229,39 @@ public without sharing class SAC_CargaMasiva implements Queueable {
                 listaCasos.addAll(listaReclamacionCopiar);
                 listaCasos.addAll(listaPretensionesCopiar);
 
-                Database.update(listaCasos);
+                //SAC_DatabaseDML.insertListDML(listaCasos, true);
+                SAC_DatabaseDML.updateListDML(listaCasos, true);
             }
             
             
             //Encola el siguiente job si aún no ha acabado con todas las copias que debe hacer
             if (totalCopias > 0) {
-                ID jobID = System.enqueueJob(new SAC_CargaMasiva(listaCasosOriginales, cola, mapaConDocLink, copiasAHacer, totalCopias));
+                DateTime dt = DateTime.now();
+		        Long dateInMilliseconds = dt.getTime();
+                AsyncOptions options = new AsyncOptions();
+                options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds)).build();
+                try {
+                    System.enqueueJob(new SAC_CargaMasiva(listaCasosOriginales, cola, mapaConDocLink, copiasAHacer, totalCopias), options);    
+                } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
             } else if(!Test.isRunningTest()) {
                 //Si ha acabado de hacer todas las copias, llamo a que finalice el proceso y mande el email de éxito
-                ID jobID = System.enqueueJob(new SAC_FinalizarProcesoCopia(listaCasosOriginales, false));
+                DateTime dt = DateTime.now();
+		        Long dateInMilliseconds = dt.getTime();
+                AsyncOptions options = new AsyncOptions();
+                options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds)).build();
+                try {
+                    System.enqueueJob(new SAC_FinalizarProcesoCopia(listaCasosOriginales, false), options);    
+                } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 }    
             }
         } catch (Exception e) {
             //Si hay un error, se mandará el correo de error
-            ID jobID = System.enqueueJob(new SAC_FinalizarProcesoCopia(listaCasosOriginales, true));
-            CBK_Log.error(e);
+            DateTime dt = DateTime.now();
+		    Long dateInMilliseconds = dt.getTime();
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds)).build();
+            try {
+                System.enqueueJob(new SAC_FinalizarProcesoCopia(listaCasosOriginales, true), options);    
+            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 }      
         }
     
     }

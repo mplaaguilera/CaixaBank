@@ -28,11 +28,11 @@ public without sharing class SAC_EmailService_Test{
     static void makeData(){
         //usuario a usar
         List<User> usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertListDML(usuario, false);
 
         //Account
         List<Account> cuentaA = SAC_TestDataFactory.crearCuentasNoClientePA(1);
-        Database.insert(cuentaA);
+        SAC_DatabaseDML.insertListDML(cuentaA, false);
         
         //Casos
         List<Case> listaCasos = new List<Case>();
@@ -63,7 +63,7 @@ public without sharing class SAC_EmailService_Test{
         Case casoReclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
         listaCasos.add(casoReclamacion3);
 
-        Database.insert(listaCasos);
+        SAC_DatabaseDML.insertListDML(listaCasos, false);
 
         //Consultas Interaccion
         List<SAC_Interaccion__c> listaInteracciones = SAC_TestDataFactory.crearInteraccionn(1, casoReclamacion2.id, null);
@@ -72,22 +72,22 @@ public without sharing class SAC_EmailService_Test{
         listaInteracciones[0].SAC_FechaRespuesta__c = system.now();
         listaInteracciones[0].SAC_EmailRespuesta__c = 'emailentrante@entrante.com';
         listaInteracciones[0].SAC_Estado__c = 'SAC_Resuelta';  
-        Database.insert(listaInteracciones);
+        SAC_DatabaseDML.insertListDML(listaInteracciones, false);
 
         //Grupo
         List<CC_Grupo_Colaborador__c> listaGrupoTareas = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion', 1);
-        Database.insert(listaGrupoTareas);
+        SAC_DatabaseDML.insertListDML(listaGrupoTareas, false);
 
         //Maestro tareas
         List<SAC_MaestroAccionesReclamacion__c> listaMaestros = SAC_TestDataFactory.crearMaestroAcciones(1, listaGrupoTareas[0].Id);
         listaMaestros[0].SAC_DeveloperName__c = 'GENERAL PARA OFICINAS';
-        Database.insert(listaMaestros);
+        SAC_DatabaseDML.insertListDML(listaMaestros, false);
 
         //Tareas
         List<SAC_Accion__c> listaTareas = SAC_TestDataFactory.crearTareas(1, casoReclamacion2, true);
         listaTareas[0].SAC_MaestroAccionesReclamacion__c = listaMaestros[0].Id;
         listaTareas[0].SAC_IndexedThreadId__c = 'ref:_threadId2:ref';
-        Database.insert(listaTareas);
+        SAC_DatabaseDML.insertListDML(listaTareas, false);
 
         /*Contact cont = new Contact();
         cont.LastName = 'cARLOS';
@@ -99,7 +99,7 @@ public without sharing class SAC_EmailService_Test{
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario[0].Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
     }
 
@@ -151,7 +151,7 @@ public without sharing class SAC_EmailService_Test{
         }
         Test.stopTest();
 
-        System.assertNotEquals([SELECT ID FROM Case].size(), 0, 'No se ha insertado el mail');  
+        System.assertNotEquals([SELECT Count() FROM Case], 0, 'No se ha insertado el mail');  
 
     }
 
@@ -162,7 +162,7 @@ public without sharing class SAC_EmailService_Test{
         
         Case caso = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'TestRec' LIMIT 1];
         caso.Subject ='Modifico el Subject';
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
 
         Case casoModificado = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'Modifico el Subject' LIMIT 1];
 
@@ -202,9 +202,8 @@ public without sharing class SAC_EmailService_Test{
         
         List<case> listaCasos = [SELECT id, Subject, CC_SuppliedID__c, Status FROM Case WHERE Id = :casoModificado.Id];
 
-        List<EmailMessage> listaEmailMessages = [SELECT Id FROM EmailMessage WHERE ParentId =:listaCasos[0].id];
         
-        System.assertEquals(listaEmailMessages.size(), 0, 'No se está verificando bien');
+        System.assertEquals([SELECT Count() FROM EmailMessage WHERE ParentId =:listaCasos[0].id], 0, 'No se está verificando bien');
     }
 
     @isTest
@@ -246,7 +245,6 @@ public without sharing class SAC_EmailService_Test{
         env.fromAddress = 'emailentrante@entrante.com';
         env.toAddress = 'emailentrante@entrante.com';
 
-        Messaging.InboundEmailResult result = new Messaging.InboundEmailResult();
         Test.startTest();
         //llamar a la clase del email service
         try {
@@ -272,7 +270,7 @@ public without sharing class SAC_EmailService_Test{
         caso.Status = 'SAC_007';
         caso.SAC_StatusAuxiliar__c = 'SAC_007';
         caso.SAC_TipoConsumidor__c = 'Sí';
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
 
         Case casoModificado = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'Modifico el Subject' LIMIT 1];  
 
@@ -308,9 +306,6 @@ public without sharing class SAC_EmailService_Test{
             emailProcess.handleInboundEmail(email, env);
         }
   
-        List<case> listaCasos = [SELECT id, Subject, CC_SuppliedID__c, Status FROM Case WHERE Id = :casoModificado.Id];
-        List<EmailMessage> listaEmailMessages = [SELECT Id FROM EmailMessage WHERE ParentId =:listaCasos[0].id];
-
         System.assertEquals('SAC_007' , caso.Status, 'No se está verificando bien');
         Test.stopTest();
     }
@@ -325,9 +320,7 @@ public without sharing class SAC_EmailService_Test{
         caso.Status = 'SAC_006';
         caso.SAC_StatusAuxiliar__c = 'SAC_006';
         caso.SAC_TipoConsumidor__c = 'Sí';
-        Database.update(caso);
-
-        Case casoModificado = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'Modifico el Subject' LIMIT 1];  
+        SAC_DatabaseDML.updateDML(caso, false);
 
         Messaging.InboundEmail email = new Messaging.InboundEmail() ;
         email.subject = 'Email entrante';
@@ -359,8 +352,6 @@ public without sharing class SAC_EmailService_Test{
         System.runAs(usuario) {
             emailProcess.handleInboundEmail(email, env);  
         }  
-        List<case> listaCasos = [SELECT id, Subject, CC_SuppliedID__c, Status FROM Case WHERE Id = :casoModificado.Id];
-        List<EmailMessage> listaEmailMessages = [SELECT Id FROM EmailMessage WHERE ParentId =:listaCasos[0].id];
 
         System.assertEquals('SAC_006' , caso.Status, 'No se está verificando bien');
         Test.stopTest();
@@ -376,7 +367,7 @@ public without sharing class SAC_EmailService_Test{
         caso.Status = 'SAC_006';
         caso.SAC_StatusAuxiliar__c = 'SAC_006';
         caso.SAC_TipoConsumidor__c = 'Sí';
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
 
         Case casoModificado = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'Modifico el Subject' LIMIT 1];  
 
@@ -411,9 +402,6 @@ public without sharing class SAC_EmailService_Test{
             emailProcess.handleInboundEmail(email, env);  
         }
          
-        List<case> listaCasos = [SELECT id, Subject, CC_SuppliedID__c, Status FROM Case WHERE Id = :casoModificado.Id];
-        List<EmailMessage> listaEmailMessages = [SELECT Id FROM EmailMessage WHERE ParentId =:listaCasos[0].id];
-
         System.assertEquals('SAC_006' , caso.Status, 'No se está verificando bien');
         Test.stopTest();
     }
@@ -457,11 +445,10 @@ public without sharing class SAC_EmailService_Test{
         env.fromAddress = 'emailentrante@entrante.com';
         env.toAddress = 'emailentrante@entrante.com';
 
-        Messaging.InboundEmailResult result = new Messaging.InboundEmailResult();
         Test.startTest();
         //llamar a la clase del email service
         try {
-
+            
             System.runAs(usuario) {
                 SAC_EmailService emailProcess = new SAC_EmailService();
                 emailProcess.handleInboundEmail (email, env);

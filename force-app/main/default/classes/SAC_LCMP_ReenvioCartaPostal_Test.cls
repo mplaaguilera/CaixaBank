@@ -15,20 +15,23 @@ public without sharing class SAC_LCMP_ReenvioCartaPostal_Test {
     static void makeData(){
 
         //Usuario SAC General
-        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             //Cuenta
             Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
             cuenta.recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Generico').getRecordTypeId();
-            Database.insert(cuenta);
+            SAC_DatabaseDML.insertDML(cuenta, false);
+            //Database.insert(cuenta);
             
             //Reclamacion
             Map<String, Object> camposRecl = new Map<String, Object>();
@@ -40,16 +43,19 @@ public without sharing class SAC_LCMP_ReenvioCartaPostal_Test {
             //Reclamacion sin RT
             Case caso2 = New Case(Subject = 'Sin RT', AccountId = cuenta.id);
 
-            Database.insert(caso);
-            Database.insert(caso2);
+            SAC_DatabaseDML.insertDML(caso, false);
+            //Database.insert(caso);
+            SAC_DatabaseDML.insertDML(caso2, false);
+            //Database.insert(caso2);
             
             SAC_DocumentoEnvio__c documento = new SAC_DocumentoEnvio__c(SAC_Caso__c = caso.id, SAC_TipoDocumento__c = 'redacción');
-            Database.insert(documento);
+            SAC_DatabaseDML.insertDML(documento, false);
+            //Database.insert(documento);
         }
     }
     
     @istest
-    static void reenvioRedaccionCartaPostal_Test() {
+    static void reenvioRedaccionCartaPostalTest() {
         Case caso = [SELECT id FROM case WHERE Subject = 'Reclamacion'];
         User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
@@ -65,7 +71,7 @@ public without sharing class SAC_LCMP_ReenvioCartaPostal_Test {
     }
 
     @istest
-    static void reenvioRedaccionCartaPostalNegativo_Test() {
+    static void reenvioRedaccionCartaPostalNegativoTest() {
         Boolean hayError;
         Case caso = [SELECT id FROM case WHERE Subject = 'Sin RT'];
         User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];

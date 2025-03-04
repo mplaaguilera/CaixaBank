@@ -291,7 +291,8 @@ public without sharing class SAC_Alertas {
         }
         
         if (!listaAlertasInsertar.isEmpty()) {
-            Database.insert(listaAlertasInsertar);
+            SAC_DatabaseDML.insertListDML(listaAlertasInsertar, true);
+            //Database.insert(listaAlertasInsertar);
         }
 
         //Añadir la id de las alertas insertadas al wrapper de alertas
@@ -313,6 +314,7 @@ public without sharing class SAC_Alertas {
      * 1.1            US494885         Alex Perez     14/12/22     versión plantillas 
      * 1.2            US723742         Raúl Santos    05/03/24     Modificación: añadir lógica envio emails blackList
      * 1.3              ---            Raúl Santos    02/10/24     Modificación: añadir lógica para el envio de alertas SPV
+     * 1.4            US756377         Raúl Santos    11/11/24     Modificación: en las alertas de recordatorios de consultas se deben adjunten los documentos de la consulta (proyecto SAC)
     *****************************************************************/
     public static void alertaEnviarEmails(List<SAC_WrapperAlerta> listaParaEnviarEmail, Map<String, SAC_MaestroTipologiasAlertas__mdt> mapaTipoMaestro, Map<Id, Group> mapaColas) {
         //Recuperar los mails de los usuarios
@@ -321,6 +323,10 @@ public without sharing class SAC_Alertas {
         //mapa de contactos que tienen mail coincidente
         map<string, Id> contactMap = new map<string, Id>();
         list<string> todosLosMails = new list<string>();
+        Set<Id> idsConsulta = new Set<Id>();
+        List<ContentVersion> listAdjuntos = new List<ContentVersion>();
+        List<Id> lstIdCV = new List<Id>();
+        Map<Id,Id> mapCDLIdRegistro = new Map<Id,Id>();
         //map<Id, string> map
         //Recuperar orgWideAdress para el remitente del correo
         //OrgWideEmailAddress orgwideaddress = new OrgWideEmailAddress();
@@ -331,7 +337,29 @@ public without sharing class SAC_Alertas {
         }
         for(SAC_WrapperAlerta wrapAlerta : listaParaEnviarEmail) {
             todosLosMails.addAll(wrapAlerta.listaEmailsGrupo);
+
+            //Si el wrapper es de una alerta de consulta de pendiente de respuesta (proyecto SAC)
+            if(wrapAlerta.idInteraccion != null && wrapAlerta.tipoAlerta.contains('SAC_ConsultaPdteRespuesta') && wrapAlerta.proyecto != 'SPV'){
+                idsConsulta.add(wrapAlerta.idInteraccion);
         }
+        }
+
+        //Si se trata de un recordatorio de consulta pte respuesta, debemos recuperar los documentos asociados a la consulta
+        if(!idsConsulta.isEmpty()){
+            Map<Id, Boolean> contentOculto = new Map<Id, Boolean>();
+            List<Id> idsDocumentLink = new List<Id>();
+
+            List<ContentDocumentLink> cdL = [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.Title FROM ContentDocumentLink WHERE LinkedEntityId IN :idsConsulta AND ContentDocument.FileType != 'SNOTE'];  
+
+            for(ContentDocumentLink recordCdL : cdL){
+                idsDocumentLink.add(recordCdL.ContentDocumentId);
+                mapCDLIdRegistro.put(recordCdL.ContentDocumentId, recordCdL.LinkedEntityId);
+            }
+
+            listAdjuntos = [SELECT Id, ContentDocumentId FROM ContentVersion WHERE ContentDocumentId IN: idsDocumentLink AND SAC_BloqueoTotalVisibilidad__c = false ORDER BY CreatedDate ASC];
+        }
+
+
         for(Contact contacto : [SELECT Id, Email FROM Contact WHERE Email IN : todosLosMails]) {
             contactMap.put(contacto.Email, contacto.Id);
         }
@@ -348,6 +376,8 @@ public without sharing class SAC_Alertas {
         //US777526 Poner owa de m2p en caso de que la owa del metada sea caixabank sac y la reclamacion tenga el check m2p
         Map<Id, Case> mapaReclamaciones = recuperarCasosComprobarM2P(listaParaEnviarEmail);
         for (SAC_WrapperAlerta wrapAlerta : listaParaEnviarEmail) {
+            lstIdCV.clear();
+            
             //Si la lista de emails no está vacía, significa que hay que mandar los emails a las direcciones de esta lista
             string objetoId = obtenerElObjeto(wrapAlerta);
             //US777526 Recuperar la id de la reclamación que hay en la alerta para poder comprobar si es m2p
@@ -444,14 +474,27 @@ public without sharing class SAC_Alertas {
                 mail.setOrgWideEmailAddressId(maporgwideaddress.get('M2P Noreply'));
             }
 
+            //Si existen archivos adjuntos asociados a la consulta, les añadimos al mail a enviar
+            if(wrapAlerta.idInteraccion != null && wrapAlerta.idInteraccion != '' && !listAdjuntos.isEmpty()){
+                for(ContentVersion contentVersion : listAdjuntos){
+                    if(idsConsulta.contains(wrapAlerta.idInteraccion) && mapCDLIdRegistro.get(contentVersion.ContentDocumentId) == wrapAlerta.idInteraccion){
+                        lstIdCV.add(contentVersion.Id);
+                    }
+                }
+
+                if(!lstIdCV.isEmpty()){
+                    mail.setEntityAttachments(lstIdCV);
+                }
+            }
+
             //Añadir el Messaging.SingleEmailMessage a una lista para posteriormente enviarlo
             if (!destinatarioEsCola) {
                 if(wrapAlerta.proyecto == 'SPV'){
                     listaSEMSPV.add(mail);  
                 }else{
-                listaSEM.add(mail);   
+                    listaSEM.add(mail);   
+                }
             }
-        }
         }
 
         // Recorremos la lista de emails a enviar y pasamos los valores a una nueva lista filtrada en la que no se incluyen los emails con un targetObjectId que equivalga a alguna de las queues (groups) SAC_PteSupervisor, SAC_PendienteAsignar o SPV_PendienteAsignar
@@ -668,7 +711,8 @@ public without sharing class SAC_Alertas {
 
         //Actualizar los EmailMessages
         if (!listaEMActualizar.isEmpty()) {
-            Database.update(listaEMActualizar);
+            SAC_DatabaseDML.updateListDML(listaEMActualizar, true);
+            //Database.update(listaEMActualizar);
         }
     }
 

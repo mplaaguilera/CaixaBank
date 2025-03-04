@@ -29,9 +29,9 @@ public class CSBD_BatchAnonimarOportunidades_Test {
             campos.put('CSBD_Telefono_Solicitud__c', '603845672');
             campos.put('CSBD_Anonimizada__c', false);
             campos.put('CSBD_Estado__c', 'Rechazada');
-            Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
 
-            hipoteca.CSBD_Fecha_vencimiento_alta__c = System.now().addHours(-50);
+            Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
+            hipoteca.CSBD_Fecha_vencimiento_alta__c = System.now().addHours(-75);
             update hipoteca;
 
             Test.startTest();

@@ -108,4 +108,83 @@ public with sharing class SPV_MCCHelper {
             }
         }
     }
+    /**************************************************************************
+    * Proposito: Añadir identificador ATR a todos los MCCs. 
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR          DATE        Description
+    * 1.0             			      Iria ANPC      20/11/24       Creación
+    **************************************************************************/ 
+    /*public static void checkExistingMCC(List<CC_MCC__c> listNewObj) {
+        List<String> tematicaIds = new List<String>();
+        List<String> motivoIds = new List<String>();
+        Decimal highestValueProducto = 0;
+        Decimal highestValueMotivo = 0;
+        // Get MCC highest value
+        List<CC_MCC__c> highestValueMCCProducto = [SELECT Id, SPV_IdProductoATR__c FROM CC_MCC__c WHERE SPV_IdProductoATR__c != null AND Id NOT IN: listNewObj ORDER BY SPV_IdProductoATR__c DESC LIMIT 1];
+        if(!highestValueMCCProducto.isEmpty()){
+            if(highestValueMCCProducto[0].SPV_IdProductoATR__c != null){
+                highestValueProducto = highestValueMCCProducto[0].SPV_IdProductoATR__c;
+            }
+        }
+        List<CC_MCC__c> highestValueMCCMotivo = [SELECT Id, SPV_IdMotivoATR__c FROM CC_MCC__c WHERE SPV_IdMotivoATR__c != null AND Id NOT IN: listNewObj ORDER BY SPV_IdMotivoATR__c DESC LIMIT 1];
+        if(!highestValueMCCMotivo.isEmpty()){
+            if(highestValueMCCMotivo[0].SPV_IdMotivoATR__c != null){
+                highestValueMotivo = highestValueMCCMotivo[0].SPV_IdMotivoATR__c;
+            }
+        }
+        // Get parent MCCs
+        for(CC_MCC__c mcc : listNewObj){   
+            if(mcc.RecordTypeId == RECTYPEPRODUCTO && mcc.CC_Tematica__c != null){
+                tematicaIds.add(mcc.CC_Tematica__c);
+            }else if(mcc.RecordTypeId == RECTYPEDETALLE && mcc.CC_Motivo__c != null){
+                motivoIds.add(mcc.CC_Motivo__c);
+            }
+        }
+        // Get sibling MCC highest value
+        Map<Id, Decimal> mapMCCs = new Map<Id, Decimal>();
+        for(CC_MCC__c mcc: [SELECT Id, RecordTypeId, CC_Tematica__c, CC_Motivo__c, SPV_Nivel2ATR__c FROM CC_MCC__c WHERE CC_Tipo_Cliente__c = 'SAC' AND ((CC_Tematica__c IN: tematicaIds AND RecordTypeId =: RECTYPEPRODUCTO) OR (CC_Motivo__c IN: motivoIds AND RecordTypeId =: RECTYPEDETALLE)) ORDER BY SPV_Nivel2ATR__c DESC]){
+            if(mcc.RecordTypeId == RECTYPEPRODUCTO && !mapMCCs.containsKey(mcc.CC_Tematica__c)){
+                mapMCCs.put(mcc.CC_Tematica__c, mcc.SPV_Nivel2ATR__c);
+            }else if(mcc.RecordTypeId == RECTYPEDETALLE && !mapMCCs.containsKey(mcc.CC_Motivo__c)){
+                mapMCCs.put(mcc.CC_Motivo__c, mcc.SPV_Nivel2ATR__c);
+            }
+        }
+        // Update ID, Nivel 1 and Nivel 2
+        for(CC_MCC__c mcc : listNewObj){
+            // Temática
+            if(mcc.RecordTypeId == RECTYPETEMATICA){
+                highestValueProducto += 1;
+                mcc.SPV_IdProductoATR__c = highestValueProducto;
+                mcc.SPV_Nivel2ATR__c = 0;
+            }
+            // Producto/Servicio
+            else if(mcc.RecordTypeId == RECTYPEPRODUCTO){
+                highestValueProducto += 1;
+                mcc.SPV_IdProductoATR__c = highestValueProducto;
+                Decimal nivel2 = 1;
+                if(mapMCCs.containsKey(mcc.CC_Tematica__c)){
+                    nivel2 = mapMCCs.get(mcc.CC_Tematica__c) + 1;
+                }
+                mcc.SPV_Nivel2ATR__c = nivel2;
+            }
+            // Motivo
+            else if(mcc.RecordTypeId == RECTYPEMOTIVO){
+                highestValueMotivo += 1;
+                mcc.SPV_IdMotivoATR__c = highestValueMotivo;
+                mcc.SPV_Nivel2ATR__c = 0;
+            }
+            // Detalle
+            else if(mcc.RecordTypeId == RECTYPEDETALLE){
+                highestValueMotivo += 1;       
+                mcc.SPV_IdMotivoATR__c = highestValueMotivo;
+                Decimal nivel2 = 1;
+                if(mapMCCs.containsKey(mcc.CC_Motivo__c)){
+                    nivel2 = mapMCCs.get(mcc.CC_Motivo__c) + 1;
+                }
+                mcc.SPV_Nivel2ATR__c = nivel2;
+            }
+        }
+    } */
 }

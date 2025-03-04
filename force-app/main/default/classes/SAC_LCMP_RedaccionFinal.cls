@@ -3,7 +3,7 @@
  * Copyright © 2021  CaixaBank
  * 
  * Proposito: Redacción final de la reclamación
- * 
+ *  
  * Historial
  * -------
  * VERSION        USER_STORY       AUTHOR         DATE         Description
@@ -68,7 +68,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
     *****************************************************************/ 
     @AuraEnabled
     public static Case devolverCaso(String id){
-        return [SELECT Id, CC_Canal_Respuesta__c, OS_Fecha_Resolucion__c, SAC_SentidoResolucion__c, SAC_MotivoSentidoResolucion__c, OwnerId, Status, SAC_FechaRecepcion__c, SAC_Entidad_Afectada__c, SAC_EntidadProductora__c, CC_Oficina_Afectada_Lookup__c, CC_Oficina_Afectada_Lookup__r.CC_Email__c, SAC_Naturaleza__c, SAC_MotivoDemora__c, SAC_ComentarioDemora__c, SAC_MotivoInadmision__c, CC_Idioma__c FROM Case WHERE Id =: id LIMIT 1];
+        return [SELECT Id, CC_Canal_Respuesta__c, OS_Fecha_Resolucion__c, SAC_SentidoResolucion__c, SAC_MotivoSentidoResolucion__c, OwnerId, Status, SAC_FechaRecepcion__c, SAC_Entidad_Afectada__c, SAC_EntidadProductora__c, CC_Oficina_Afectada_Lookup__c, CC_Oficina_Afectada_Lookup__r.CC_Email__c, SAC_Naturaleza__c, SAC_MotivoDemora__c, SAC_ComentarioDemora__c, SAC_MotivoInadmision__c, CC_Idioma__c, RecordType.DeveloperName FROM Case WHERE Id =: id LIMIT 1];
     }
     
     /*****************************************************************
@@ -117,7 +117,8 @@ public without sharing class SAC_LCMP_RedaccionFinal {
                
         // }else{
         //     casoActual.SAC_MotivoSentidoResolucion__c = argumento + '\n\n' + casoActual.SAC_MotivoSentidoResolucion__c;   
-        // }       
+        // }    
+
         SAC_DatabaseDML.updateDML(casoActual, false);
     }
 
@@ -148,7 +149,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
     }
 
     @AuraEnabled
-    public static DateTime finalizarRedaccion(String id, Boolean envioMail){
+    public static DateTime finalizarRedaccion(String id, Boolean envioMail, Boolean sinEnvio){
     /*****************************************************************
     * Proposito: Finalizar redacción de la reclamación.
     *
@@ -160,7 +161,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
         if(!Schema.sObjectType.Case.isAccessible() || !Schema.sObjectType.SAC_Accion__c.isAccessible() || !Schema.sObjectType.SAC_Accion__c.isUpdateable() || !Schema.sObjectType.Case.isUpdateable()){
             throw new AuraHandledException('No tienes privilegios para manipular la redacción.');
         }
-        Case reclamacion = [SELECT Id, OS_Fecha_Resolucion__c, Status, SAC_Redaccion__c, OS_Email__c, CaseNumber, AccountId , CC_No_Identificado__c
+        Case reclamacion = [SELECT Id, OS_Fecha_Resolucion__c, Status, SAC_Redaccion__c, OS_Email__c, CaseNumber, AccountId , CC_No_Identificado__c, SAC_SinEnvioComunicacion__c
                             FROM Case WHERE RecordTypeId =: RECTYPERECLAMACION AND Id =: id];
                             
         if(reclamacion.AccountId != null || reclamacion.CC_No_Identificado__c == true){
@@ -185,9 +186,10 @@ public without sharing class SAC_LCMP_RedaccionFinal {
             if(errorValidar != '') {
                 throw new AuraHandledException(errorValidar);
             }
-            
+            if(sinEnvio){
+                reclamacion.SAC_SinEnvioComunicacion__c = true;
+            }
             if(envioMail){
-           
                 if(!tareas.isEmpty()){
                     reclamacion.Status = 'SAC_004';
                     reclamacion.SAC_StatusAuxiliar__c = 'SAC_004';
@@ -211,7 +213,6 @@ public without sharing class SAC_LCMP_RedaccionFinal {
             listaCasosUpdatear.addAll(pretensiones);
             listaCasosUpdatear.add(reclamacion);
             SAC_DatabaseDML.updateListDML(listaCasosUpdatear, true);
-
         }else{
             throw new AuraHandledException('Para resolver es necesario informar el cliente.');
         }
@@ -303,8 +304,13 @@ public without sharing class SAC_LCMP_RedaccionFinal {
         if(!listaTareasOficina.isEmpty()){
             mapTareas.put(true, listaTareasOficina);
         }
-
-        System.enqueueJob(new SAC_QueueableEnvioEmail(mapTareas, numCaso));
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds)).build();
+        try {
+            System.enqueueJob(new SAC_QueueableEnvioEmail(mapTareas, numCaso), options);    
+        } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 }    
 
         SAC_DatabaseDML.updateListDML(acciones, false);
         SAC_DatabaseDML.upsertListDML(tmesTareas, false);
@@ -314,6 +320,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
 
     @AuraEnabled
     public static ContentDocumentLink getDocument(String idCaso, List<string> idDoc){
+
         try {
 
          
@@ -349,7 +356,6 @@ public without sharing class SAC_LCMP_RedaccionFinal {
                 }
 
             }               
-           
             return cdl;
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
@@ -620,13 +626,12 @@ public without sharing class SAC_LCMP_RedaccionFinal {
                 idPlantilla = [SELECT id, SAC_PlantillaCastellanoId__c FROM SAC_PlantillaRedaccion__c WHERE  SAC_TipoPlantilla__c =:tipo LIMIT 1].SAC_PlantillaCastellanoId__c;
             }
         }
-
         return idPlantilla;
     }
     @AuraEnabled
     public static void finalizarRedaccionCartaPostal(String idCaso){
         try {
-            finalizarRedaccion(idCaso, true);
+            finalizarRedaccion(idCaso, true, false);
         }  catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
@@ -735,13 +740,13 @@ public without sharing class SAC_LCMP_RedaccionFinal {
     * 1.0            US392178      Sergio Martín    04/07/2023       Creación
     *****************************************************************/ 
     @AuraEnabled
-    public static void finalizarRedaccionNegociacion(String idCaso, Boolean envioMail, List<Case> pretensionesNegociacion){
+    public static void finalizarRedaccionNegociacion(String idCaso, Boolean envioMail, List<Case> pretensionesNegociacion, Boolean sinEnvio){
         if(!Schema.sObjectType.Case.isAccessible() || !Schema.sObjectType.SAC_Accion__c.isAccessible() || !Schema.sObjectType.SAC_Accion__c.isUpdateable() || !Schema.sObjectType.Case.isUpdateable()){
             throw new AuraHandledException('No tienes privilegios para manipular la redacción.');
         }
         Map<Id, Case> pretensionesNegociacionMap = new Map<Id, Case>(pretensionesNegociacion);
 
-        Case reclamacion = [SELECT Id, OS_Fecha_Resolucion__c, Status, SAC_Redaccion__c, OS_Email__c, CaseNumber, AccountId , CC_No_Identificado__c
+        Case reclamacion = [SELECT Id, OS_Fecha_Resolucion__c, Status, SAC_Redaccion__c, OS_Email__c, CaseNumber, AccountId , CC_No_Identificado__c, SAC_SinEnvioComunicacion__c
                             FROM Case WHERE RecordTypeId =: RECTYPERECLAMACION AND Id =: idCaso];
                             
         if(reclamacion.AccountId != null || reclamacion.CC_No_Identificado__c == true){
@@ -757,6 +762,10 @@ public without sharing class SAC_LCMP_RedaccionFinal {
                 }
             }
             List<Case> listaCasosUpdatear = new List<Case>();
+            if(sinEnvio){
+                reclamacion.SAC_SinEnvioComunicacion__c = true;
+                listaCasosUpdatear.add(reclamacion);
+            }
             listaCasosUpdatear.addAll(pretensiones);
             SAC_DatabaseDML.updateListDML(listaCasosUpdatear, false);
 
@@ -829,19 +838,24 @@ public without sharing class SAC_LCMP_RedaccionFinal {
     * Historial
     * -------
     * VERSION        USER_STORY       AUTHOR         DATE         Description
-    * 1.0             US662816      Raúl Santos    18/07/23        Creación              
+    * 1.0             US662816      Raúl Santos    18/07/23        Creación     
+    * 1.1             US1091686      Iria ANPC     23/12/24        Todas las pretensiones deben tener al menos un producto              
     *****************************************************************/ 
     @AuraEnabled
     public static Boolean getContratoPretension(String idCaso){  
-        
-        List<SAC_ProductCase__c> productos = [SELECT Id FROM SAC_ProductCase__c WHERE SAC_Pretension__r.SAC_Reclamacion__c = :idCaso];
-        Case caso = [SELECT Id, CC_No_Identificado__c, SAC_EsCliente__c FROM Case WHERE Id = :idCaso];
-        
-        if(!productos.isEmpty() || caso.CC_No_Identificado__c  == true || caso.SAC_EsCliente__c == false ){
-            return true; 
-        }else{
-            return false;
+        Boolean withoutProduct = false;
+        Map<Id, SAC_ProductCase__c> mapPretensionProduct = new Map<Id, SAC_ProductCase__c>();
+        List<Case> pretensiones = [SELECT Id FROM Case WHERE SAC_Reclamacion__c =: idCaso AND Status != 'SAC_009'];
+        List<SAC_ProductCase__c> productos = [SELECT Id, SAC_Pretension__c FROM SAC_ProductCase__c WHERE SAC_Pretension__r.SAC_Reclamacion__c = :idCaso];
+        for(SAC_ProductCase__c producto :productos){
+            mapPretensionProduct.put(producto.SAC_Pretension__c, producto);
         }
+        for(Case pretension :pretensiones){
+            if(!mapPretensionProduct.containsKey(pretension.Id)){
+                withoutProduct = true;
+            }
+        }
+        return withoutProduct;
     }
 
     /*****************************************************************
@@ -923,7 +937,6 @@ public without sharing class SAC_LCMP_RedaccionFinal {
                                                     WHERE SAC_Caso__c = :id
                                                     AND SAC_TipoDocumento__c = 'redaccion' ORDER by createdDate desc LIMIT 1];
 
-
         return !docGuardado.isEmpty() ? true : false;
     }
 
@@ -941,5 +954,40 @@ public without sharing class SAC_LCMP_RedaccionFinal {
         List <ContentVersion> listaFicheros = [SELECT Id, Title FROM ContentVersion WHERE SAC_ValidadoCV__c = true AND FirstPublishLocationId =: recordId ];
         return listaFicheros;
     }
+
+
+    /***********************************************************************************************************
+    * Proposito: Validar si se permite resolver una reclamación complementaria en función de su sentido de resolución y de 
+    *   si tiene una reclamación vinculada
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0             US1094159      Álex Polo     21/01/25        Creación
+    ***********************************************************************************************************/ 
+    @AuraEnabled
+    public static Boolean validarResolucionComplementaria(Id idCaso) {
+
+        Case reclamacion = new Case();
+        List<Case> listaCasos = [SELECT Id, SAC_Naturaleza__c, SAC_SentidoResolucion__c, CC_CasoRelacionado__c FROM Case WHERE Id = :idCaso];
+
+        if(!listaCasos.isEmpty()){
+            reclamacion = listaCasos[0];
+            if(reclamacion.SAC_Naturaleza__c == 'SAC_007' && reclamacion.SAC_SentidoResolucion__c != 'SAC_004' && reclamacion.CC_CasoRelacionado__c == null){
+                return false;   //Si es complementaria, y el sentido resolución no es inadmisión y no tiene una reclamación vinculada, no se puede resolver
+            }else{
+                return true;        
+            }
+
+        }else{
+            return false;
+        }
+
+
+
+    }
+
+
+
  
 }

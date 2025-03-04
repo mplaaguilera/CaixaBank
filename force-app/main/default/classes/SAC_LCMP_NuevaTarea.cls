@@ -189,7 +189,8 @@ public without sharing class SAC_LCMP_NuevaTarea {
             tarea.SAC_EquipoResponsable__c = equipoResponsableId;
             try {
                 if (!Schema.sObjectType.SAC_Accion__c.isCreateable()) { throw new AuraHandledException( 'No tienes permisos para realziar esta accion.' ); }  
-                Database.insert(tarea);
+                SAC_DatabaseDML.insertDML(tarea, false);
+                //Database.insert(tarea);
             } catch (Exception e) {
                 throw new AuraHandledException(e.getMessage());
             }
@@ -211,7 +212,8 @@ public without sharing class SAC_LCMP_NuevaTarea {
             tarea.SAC_MaestroAccionesReclamacion__c = equipoResponsableId;
             try {
                 if (!Schema.sObjectType.SAC_Accion__c.isCreateable()) { throw new AuraHandledException( 'No tienes permisos para realziar esta accion.' ); }
-                Database.insert(tarea);
+                SAC_DatabaseDML.insertDML(tarea, false);
+                //Database.insert(tarea);
             } catch (Exception e) {
                 throw new AuraHandledException(e.getMessage());
             }

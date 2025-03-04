@@ -60,7 +60,7 @@ public with sharing class SAC_AcuseRecibo_Email {
     * 1.2            US994116         Raúl Santos           12/09/24     Modificación: Añadir las plantillas de valenciano, euskera y gallego
     *****************************************************************/
 
-    public static List<templateWrapper> getPlantillaAcuseRecibo(List<Case> newCases, Map<Id, Case> mapaDatosCasosActualizar){
+    public static List<templateWrapper> getPlantillaAcuseRecibo(List<Case> newCases, Map<Id, Case> mapaDatosCasosActualizar, String viaEnvio){
 
         List<templateWrapper> templateList = new List<templateWrapper>();
         List<String> origins = new List<String>();
@@ -202,6 +202,16 @@ public with sharing class SAC_AcuseRecibo_Email {
                 }
             }
         }
+
+        Boolean envioEspecificoWeb = false;
+        Boolean envioEspcCorreoCaso = false;
+        if(viaEnvio != ''){
+            if(viaEnvio == 'webEmail'){
+                envioEspecificoWeb = true;
+            }else if(viaEnvio == 'correoCaso'){
+                envioEspcCorreoCaso = true;
+            }
+        }
         
         if(idPlantillaEmail != null){
             
@@ -212,7 +222,8 @@ public with sharing class SAC_AcuseRecibo_Email {
 
                 if(caso.Origin == 'Email'){
                     Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(idPlantillaEmail, whoId, caso.id); 
-                    if(String.isNotBlank(caso.SuppliedEmail)){
+
+                    if(envioEspecificoWeb || (String.isNotBlank(caso.SuppliedEmail) && !envioEspcCorreoCaso)){
                         TemplateWrapper tempWrapper = new TemplateWrapper(templateEmail.Id, templateEmail.Name, renderStored.getSubject(), renderStored.getHtmlBody(), caso.Id, caso.CaseNumber, caso.SuppliedEmail);
                         templateList.add(tempWrapper);
                     }
@@ -232,7 +243,7 @@ public with sharing class SAC_AcuseRecibo_Email {
 
                 if(caso.Origin == 'SAC_Formulario'){
                     Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(idPlantillaFormulario, whoId, caso.id);        
-                    if(String.isNotBlank(caso.SuppliedEmail)){
+                    if(envioEspecificoWeb || (String.isNotBlank(caso.SuppliedEmail) && !envioEspcCorreoCaso)){
                         TemplateWrapper tempWrapper = new TemplateWrapper(templateFormulario.Id, templateFormulario.Name, renderStored.getSubject(), renderStored.getHtmlBody(), caso.Id, caso.CaseNumber, caso.SuppliedEmail);
                         templateList.add(tempWrapper);
                     }
@@ -255,7 +266,7 @@ public with sharing class SAC_AcuseRecibo_Email {
 
                     Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(idPlantillaCartaPostal, whoId, caso.id);              
                     
-                    if(String.isNotBlank(caso.SuppliedEmail)){
+                    if(envioEspecificoWeb || (String.isNotBlank(caso.SuppliedEmail) && !envioEspcCorreoCaso)){
                         TemplateWrapper tempWrapper = new TemplateWrapper(templateCartaPostal.Id, templateCartaPostal.Name, renderStored.getSubject(), renderStored.getHtmlBody(), caso.Id, caso.CaseNumber, caso.SuppliedEmail);
                         templateList.add(tempWrapper);
                     }
@@ -278,7 +289,7 @@ public with sharing class SAC_AcuseRecibo_Email {
                     
                     Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(idPlantillaManual, whoId, caso.id);              
 
-                    if(String.isNotBlank(caso.SuppliedEmail)){
+                    if(envioEspecificoWeb || (String.isNotBlank(caso.SuppliedEmail) && !envioEspcCorreoCaso)){
                         TemplateWrapper tempWrapper = new TemplateWrapper(templateManual.Id, templateManual.Name, renderStored.getSubject(), renderStored.getHtmlBody(), caso.Id, caso.CaseNumber, caso.SuppliedEmail);
                         templateList.add(tempWrapper);
                     }
@@ -301,7 +312,7 @@ public with sharing class SAC_AcuseRecibo_Email {
 
                     Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(idPlantillaFormularioOficina, whoId, caso.id);            
 
-                    if(String.isNotBlank(caso.SuppliedEmail)){
+                    if(envioEspecificoWeb || (String.isNotBlank(caso.SuppliedEmail) && !envioEspcCorreoCaso)){
                         TemplateWrapper tempWrapper = new TemplateWrapper(templateFormularioOficina.Id, templateFormularioOficina.Name, renderStored.getSubject(), renderStored.getHtmlBody(), caso.Id, caso.CaseNumber, caso.SuppliedEmail);
                         templateList.add(tempWrapper);
                     }
@@ -341,7 +352,7 @@ public with sharing class SAC_AcuseRecibo_Email {
         }
 
         List<Messaging.SingleEmailMessage> messageList = new List<Messaging.SingleEmailMessage>();
-        List<TemplateWrapper> emailTemplates = getPlantillaAcuseRecibo(newCases, mapaDatosCasosActualizar); 
+        List<TemplateWrapper> emailTemplates = getPlantillaAcuseRecibo(newCases, mapaDatosCasosActualizar, ''); 
 
         List<String> buzonesSalidaValidos = new List<String>();
         
@@ -418,7 +429,7 @@ public with sharing class SAC_AcuseRecibo_Email {
     * 1.1             US723742       Raúl Santos    05/03/24      Modificación: añadir lógica envio emails blackList
     * 1.2             US777526          CS          24/05/24      Modificación: añadido no reply de M2P
     *****************************************************************/
-    public static void envioAcuseReciboManual(List<Case> newCases, Map<Id, Case> mapaDatosCasosActualizar){
+    public static void envioAcuseReciboManual(List<Case> newCases, Map<Id, Case> mapaDatosCasosActualizar, String viaEnvio){
         //Recuperar las owas no reply y almacenarlas en mapa
         Map<String, String> mapaOwas = new Map<String, String>();
         List<OrgWideEmailAddress> listaOwas = [SELECT Id,DisplayName FROM OrgWideEmailAddress WHERE DisplayName = 'SAC Noreply' OR DisplayName = 'M2P Noreply'];
@@ -433,7 +444,7 @@ public with sharing class SAC_AcuseRecibo_Email {
 
         List<Messaging.SingleEmailMessage> messageList = new List<Messaging.SingleEmailMessage>();
 
-        List<TemplateWrapper> emailTemplates = getPlantillaAcuseRecibo(newCases, mapaDatosCasosActualizar);
+        List<TemplateWrapper> emailTemplates = getPlantillaAcuseRecibo(newCases, mapaDatosCasosActualizar, viaEnvio);
 
         List<String> buzonesSalidaValidos = new List<String>();
 

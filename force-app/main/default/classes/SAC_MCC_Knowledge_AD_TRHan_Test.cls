@@ -8,24 +8,28 @@ public with sharing class SAC_MCC_Knowledge_AD_TRHan_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC Admin
             usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
-            usuarioAdmin.UserPermissionsKnowledgeUser = true;     
-            Database.insert(usuarioAdmin);
+            usuarioAdmin.UserPermissionsKnowledgeUser = true;
+            SAC_DatabaseDML.insertDML(usuarioAdmin, false);         
+            //Database.insert(usuarioAdmin);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioAdmin.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);    
+            //Database.insert(permiSetAssi);
         }
 
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
         //cuenta.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false); 
+        //Database.insert(cuenta);
         	
         Contact contacto = SAC_TestDataFactory.crearContacto(1, cuenta.Id)[0];
         contacto.Email = 'mp@test.com';
         //contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
-		Database.insert(contacto);
+        SAC_DatabaseDML.insertDML(contacto, false); 
+		//Database.insert(contacto);
         
         Datetime fecha = Datetime.now();
         Datetime fechaInicio = fecha.addHours(2);
@@ -38,7 +42,8 @@ public with sharing class SAC_MCC_Knowledge_AD_TRHan_Test {
         articulo.CC_Fecha_Caducidad__c = fechaCaducidad;
         //articulo.CC_Responsable_Externo__c = contacto.Id;
         articulo.ValidationStatus = 'Validado';
-        Database.insert(articulo); 
+        SAC_DatabaseDML.insertDML(articulo, false); 
+        //Database.insert(articulo); 
 
         CC_MCC__c mccDetalle = new CC_MCC__c();
         Id recordTypeIdDetalle = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
@@ -47,7 +52,8 @@ public with sharing class SAC_MCC_Knowledge_AD_TRHan_Test {
         //mccDetalle.CC_Tipo_Cliente__c = 'Cliente';
         mccDetalle.CC_Codigo_Externo__c = 'TE-000789';
         mccDetalle.CC_Fecha_Vigencia_Inicio__c = fecha;
-        Database.insert(mccDetalle);
+        SAC_DatabaseDML.insertDML(mccDetalle, false);
+        //Database.insert(mccDetalle);
 
     }
 
@@ -71,8 +77,10 @@ public with sharing class SAC_MCC_Knowledge_AD_TRHan_Test {
             relacionDetalle.CBK_MCC__c = mccDetalle.Id;
             relacionDetalle.CBK_Knowledge__c = articulo.Id;
             relacionDetalle.RecordTypeId = recTypeSACProtocolo;
-            Database.insert(relacionDetalle);
-            Database.delete(relacionDetalle);
+            SAC_DatabaseDML.insertDML(relacionDetalle, false);
+            //Database.insert(relacionDetalle);
+            SAC_DatabaseDML.deleteDML(relacionDetalle, false);
+            //Database.delete(relacionDetalle);
             Test.stopTest();
         }
 

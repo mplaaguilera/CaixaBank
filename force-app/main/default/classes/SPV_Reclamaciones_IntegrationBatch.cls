@@ -309,8 +309,8 @@ public with sharing class SPV_Reclamaciones_IntegrationBatch implements Database
         }
 
         if(!listaReclamacionesInsertar.isEmpty()){
-            Database.insert(listaReclamacionesInsertar);
-            //SPV_DatabaseDML.insertListDML(listaReclamacionesInsertar, true);
+            SPV_DatabaseDML.insertListDML(listaReclamacionesInsertar, false);
+            //Database.insert(listaReclamacionesInsertar);
         }
     }
 
@@ -321,10 +321,10 @@ public with sharing class SPV_Reclamaciones_IntegrationBatch implements Database
         for(Case rec : listaRecExpDuplicado){
 
             //Si el estado es "Pendiente respeusta organismo2, actualizamos la reclamación. En el resto de casos, se envía alerta de nueva documentación adjunta en la reclamación (alerta se envía en el SPV_ContentVersionHelper tras el insert de los adjuntos)
-            if(rec.Status == 'SPV_PendienteRespuestaOrganismos'){
+           // if(rec.Status == 'SPV_PendienteRespuestaOrganismos'){
 				//rec.Status = 'SAC_002';
 				//rec.SEG_Subestado__c = 'SPV_AnalisisComplementaria';
-            }
+           // }
 
             //Recupera y adjunta los documentos en la reclamación
             SPV_RecuperarDocumentosController.recuperarTicketERR(rec.Id);
@@ -357,10 +357,16 @@ public with sharing class SPV_Reclamaciones_IntegrationBatch implements Database
         Map<String, String> mapaPicklist = new Map<String, String>();
 
         //Obtener la info del campo a buscar lso valores de la pickList
-        Map<String, Schema.SObjectField> mapaCamposCase = Schema.getGlobalDescribe().get('Case').getDescribe().Fields.getMap(); //Obtengo mapa de los campos de Case
+      /*  Map<String, Schema.SObjectField> mapaCamposCase = Schema.getGlobalDescribe().get('Case').getDescribe().Fields.getMap(); //Obtengo mapa de los campos de Case
         Schema.DescribeFieldResult fieldResult = mapaCamposCase.get(nombreCampo).getDescribe();                                 //Obtengo el campo que busco
-        List<Schema.PicklistEntry> valores = fieldResult.getPickListValues();                                                   //Obtengo los valores de la picklist de ese campo
+        List<Schema.PicklistEntry> valores = fieldResult.getPickListValues();     */                                              //Obtengo los valores de la picklist de ese campo
        
+        Schema.DescribeSObjectResult casoDescribe = Case.SObjectType.getDescribe();
+        Map<String, Schema.SObjectField> mapaCamposCase = casoDescribe.fields.getMap(); //Obtengo mapa de los campos de Caso
+        Schema.DescribeFieldResult fieldResult = mapaCamposCase.get(nombreCampo).getDescribe();                                 //Obtengo el campo que busco
+        List<Schema.PicklistEntry> valores = fieldResult.getPickListValues();         
+
+
         //Crear un mapa labelValorPicklist - Api name
         for(Schema.PicklistEntry valor : valores){
             if(!mapaPicklist.containsKey(valor.getLabel().toUpperCase())){

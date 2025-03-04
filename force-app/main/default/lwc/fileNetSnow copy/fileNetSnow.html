@@ -1,0 +1,30 @@
+<template>
+    <lightning-card>
+
+        <div class="slds-grid slds-grid_align-spread">
+            <div slot="title" class="slds-col slds-size_11-of-12 slds-var-m-left_medium slds-var-m-bottom_medium">
+                <lightning-icon icon-name="standard:file" size="small"></lightning-icon>
+                <lightning-formatted-rich-text class="slds-var-m-left_small slds-text-heading_small"
+                    value="<strong>Documentos en FileNet con este Snow Number</strong>"></lightning-formatted-rich-text>
+            </div>
+        </div>
+
+        <div if:false={displayMessage} class="slds-border_top slds-scrollable_y" style="max-height: 320px;">
+            <lightning-datatable key-field="Id_FileNet" data={documentos} data-id={id} columns={columns} sorted-by={sortedBy}
+                sorted-direction={sortDirection} onsort={handleSortData} is-loading={isLoading}
+                onrowaction={handleRowAction} hide-checkbox-column show-row-number-column>
+            </lightning-datatable>
+        </div>
+        <div if:true={displayMessage} class="slds-var-m-horizontal_medium">
+            <div if:false={messageResponse} class="slds-var-m-horizontal_medium">
+                <p>Tickets no obtenidos.</p>
+            </div>
+            
+            <div if:true={messageResponse}>
+                <p>{messageResponse}</p>
+            </div>
+        </div>
+    </lightning-card>
+
+
+</template>

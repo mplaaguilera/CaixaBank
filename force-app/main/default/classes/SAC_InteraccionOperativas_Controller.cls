@@ -71,7 +71,8 @@ public without sharing class SAC_InteraccionOperativas_Controller {
                 if(!colabContact.isEmpty())
                 {
                     interaccion.OwnerId = ownerId;
-                    Database.update(interaccion);
+                    SAC_DatabaseDML.updateDML(interaccion, false);
+                    //Database.update(interaccion);
                 }               
             }
             
@@ -92,7 +93,8 @@ public without sharing class SAC_InteraccionOperativas_Controller {
         SAC_Interaccion__c interaccion = recuperarInteraccion(interaccionId);
         interaccion.ownerId = idUser;
 
-        Database.update(interaccion);
+        SAC_DatabaseDML.updateDML(interaccion, false);
+        //Database.update(interaccion);
     }
 
     /*****************************************************************
@@ -219,7 +221,8 @@ public without sharing class SAC_InteraccionOperativas_Controller {
             interaccion.OwnerId = cola[0].id;
         }
 		if(Schema.sObjectType.Case.isUpdateable()){   
-			Database.update(interaccion);
+            SAC_DatabaseDML.updateDML(interaccion, false);
+			//Database.update(interaccion);
 		}else{
 			throw new AuraHandledException('No tienes permisos');
 		}
@@ -246,7 +249,8 @@ public without sharing class SAC_InteraccionOperativas_Controller {
         newcont.VersionData = archivo[0].VersionData;
         newcont.FirstPublishLocationId = escalado.SAC_CasoEscalado__c;
 
-        Database.insert(newcont);
+        SAC_DatabaseDML.insertDML(newcont, false);
+        //Database.insert(newcont);
 
     }
     
@@ -277,7 +281,8 @@ public without sharing class SAC_InteraccionOperativas_Controller {
                 interaccion.OwnerId = cola[0].Id;
             }
 
-            Database.update(interaccion);
+            SAC_DatabaseDML.updateDML(interaccion, false);
+            //Database.update(interaccion);
         } catch (Exception e) {
             CBK_log.error(e);
             throw new AuraHandledException(e.getMessage());
@@ -315,7 +320,8 @@ public without sharing class SAC_InteraccionOperativas_Controller {
                 listaEscaladosUpdatear.add(escaladoNV3);
             }
             
-            Database.update(listaEscaladosUpdatear);
+            SAC_DatabaseDML.updateListDML(listaEscaladosUpdatear, true);
+            //Database.update(listaEscaladosUpdatear);
 
             //Mandar una notificación de campanita al letrado de la pretensión.
             List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PendienteAsignar' LIMIT 1];
@@ -352,7 +358,8 @@ public without sharing class SAC_InteraccionOperativas_Controller {
 
         if(interaccion.SAC_Estado__c == 'SAC_Resuelta') {
             interaccion.SAC_Estado__c = 'SAC_PendienteRespuestaDefinitiva';
-            Database.update(interaccion);
+            SAC_DatabaseDML.updateDML(interaccion, false);
+            //Database.update(interaccion);
         }
     }
 }

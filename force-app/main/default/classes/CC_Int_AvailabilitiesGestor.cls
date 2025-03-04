@@ -29,10 +29,12 @@ public with sharing class CC_Int_AvailabilitiesGestor {
     public static Map<String, Object> obtenerDisponibilidadesGestor(String recordId, String employeeId, String gestorElegidoId, String eventType) {
         Map<String, Object> respuestaDisponibilidades = new Map<String, Object>();
         Set<String> employeeIdGestorBackup = new Set<String>();
+        Map<String, Integer> daydiff = CC_Disponibilidad_Cita_Setting.getDaysDiff();
+        Integer daysToAdd = daydiff.containsKey('default') ? daydiff.get('default') : 0;
 
         Map<Date, Set<Time>> fechasHorasMap = new Map<Date, Set<Time>>();
-        Datetime fechaIni = Datetime.now();
-        Datetime fechaFin = Datetime.now().addDays(30);
+        Datetime fechaIni = Datetime.now().addDays(daysToAdd);
+        Datetime fechaFin = Datetime.now().addDays(daysToAdd + 30);
         String startDate = fechaIni.format('yyyy-MM-dd');
         String endDate = fechaFin.format('yyyy-MM-dd');
         String device = 'CC';
@@ -79,53 +81,58 @@ public with sharing class CC_Int_AvailabilitiesGestor {
                 
                 Map<String, Set<String>> fechasHorasStringMap = new Map<String, Set<String>>();
 
-                for(Availability disponibilidad: availabilitiesGestor.availabilities) {
-                    if(disponibilidad.employeeId == gestorElegidoId) {
-                        if(!fechasHorasStringMap.containsKey(disponibilidad.dateAvailable)) {
-                            fechasHorasStringMap.put(disponibilidad.dateAvailable, new Set<String>());
+                if(availabilitiesGestor.availabilities != null){ 
+                    for(Availability disponibilidad: availabilitiesGestor.availabilities) {
+                        if(disponibilidad.employeeId == gestorElegidoId) {
+                            if(!fechasHorasStringMap.containsKey(disponibilidad.dateAvailable)) {
+                                fechasHorasStringMap.put(disponibilidad.dateAvailable, new Set<String>());
+                            }
+                            String horaIniFin = disponibilidad.startTime + ':' + disponibilidad.endTime;
+                            Set<String> horasSet = fechasHorasStringMap.get(disponibilidad.dateAvailable);
+                            horasSet.add(horaIniFin);
                         }
-                        String horaIniFin = disponibilidad.startTime + ':' + disponibilidad.endTime;
-                        Set<String> horasSet = fechasHorasStringMap.get(disponibilidad.dateAvailable);
-                        horasSet.add(horaIniFin);
+                        if(disponibilidad.employeeId != employeeId) {
+                            employeeIdGestorBackup.add(disponibilidad.employeeId);
+                        }
                     }
-                    if(disponibilidad.employeeId != employeeId) {
-                        employeeIdGestorBackup.add(disponibilidad.employeeId);
-                    }
-                }
-                for(String fechaDispo: fechasHorasStringMap.keySet()) {
-                    Date fechaCita = Date.valueOf(fechaDispo);
+                    for(String fechaDispo: fechasHorasStringMap.keySet()) {
+                        Date fechaCita = Date.valueOf(fechaDispo);
 
-                    if(!fechasHorasMap.containsKey(fechaCita)) {
-                        fechasHorasMap.put(fechaCita, new Set<Time>());
-                    }
-                    Set<Time> horasTramoSet = fechasHorasMap.get(fechaCita);
-                    
-                    Set<String> horasString = fechasHorasStringMap.get(fechaDispo);
-                    for(String horaDispo: horasString) {
-                        String[] timeSplit = horaDispo.split(':');
-                        Time timeIni = Time.newInstance(Integer.valueOf(timeSplit[0]),
-                                                        Integer.valueOf(timeSplit[1]),
-                                                        0,                            
-                                                        0);    
-                        Time timeFin = Time.newInstance(Integer.valueOf(timeSplit[2]),
-                                                        Integer.valueOf(timeSplit[3]),
-                                                        0,                            
-                                                        0);  
-                        while(timeIni < timeFin){
-                            horasTramoSet.add(timeIni);
-                            timeIni = timeIni.addMinutes(duracionEventType);
+                        if(!fechasHorasMap.containsKey(fechaCita)) {
+                            fechasHorasMap.put(fechaCita, new Set<Time>());
+                        }
+                        Set<Time> horasTramoSet = fechasHorasMap.get(fechaCita);
+
+                        Set<String> horasString = fechasHorasStringMap.get(fechaDispo);
+                        for(String horaDispo: horasString) {
+                            String[] timeSplit = horaDispo.split(':');
+                            Time timeIni = Time.newInstance(Integer.valueOf(timeSplit[0]),
+                                                            Integer.valueOf(timeSplit[1]),
+                                                            0,                            
+                                                            0);    
+                            Time timeFin = Time.newInstance(Integer.valueOf(timeSplit[2]),
+                                                            Integer.valueOf(timeSplit[3]),
+                                                            0,                            
+                                                            0);  
+                            while(timeIni < timeFin){
+                                horasTramoSet.add(timeIni);
+                                timeIni = timeIni.addMinutes(duracionEventType);
+                            }
                         }
                     }
+                    finOk = true;
+                }else{
+                    //Nota: Si devuelve null significa que no hay disponibilidad
+                    error = 'El campo availabilitiesGestor.availabilities ha devuelto nulo.';
+                    finOk = false;
+                    throw new DefaultException('El gestor no tiene disponibilidad.');
                 }
-                finOk = true;
             }
             else{
                 error = 'El proceso de consulta de disponibilidades ha funcionado pero no se ha obtenido una respuesta válida.';
                 finOk = false;
                 throw new DefaultException('El proceso de consulta de disponibilidades ha funcionado pero no se ha obtenido una respuesta válida. Por favor, vuelva a intentarlo o póngase en contacto con su administrador. ');
             }
-            System.debug('CC_Int_AvailabilitiesGestor - Respuesta status code: '+respuesta.getStatusCode());
-            System.debug('CC_Int_AvailabilitiesGestor - Respuesta body: '+respuesta.getBody());
         }
         respuestaDisponibilidades.put('fechasHorasMap', fechasHorasMap);
         respuestaDisponibilidades.put('employeeIdGestorBackup', employeeIdGestorBackup);
@@ -134,8 +141,6 @@ public with sharing class CC_Int_AvailabilitiesGestor {
         if(traza != null){
             insert traza;
         }
-        system.debug('VMLS mapa respuestaDisponibilidades ' + respuestaDisponibilidades);
-        system.debug('VMLS mapa respuestaDisponibilidades ' + respuestaDisponibilidades.tostring());
         return respuestaDisponibilidades;
     }
     public static List<OT_Picklist.Item> obtenerGestoresBackup(String recordId, String employeeId, String gestorElegidoId, String eventType) {

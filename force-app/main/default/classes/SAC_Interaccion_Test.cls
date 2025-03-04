@@ -21,14 +21,14 @@ public with sharing class SAC_Interaccion_Test {
 
         Test.startTest();
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];     
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
         User usuario;
         System.runAs(usuarioAdmin) {
             //Usuario SAC General
             usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
             usuario.Username = 'ustestesteo@test.com';      
-            Database.insert(usuario);
+            SAC_DatabaseDML.insertDML(usuario, false);
 
             /*PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
@@ -58,7 +58,7 @@ public with sharing class SAC_Interaccion_Test {
         listaCuentas[1].billingStreet  = 'Calle Mayor 55';
         listaCuentas[1].BillingCountry = 'España';
         listaCuentas[1].CC_Numero_Documento__c = '46666666C';
-        Database.insert(listaCuentas);
+        SAC_DatabaseDML.insertListDML(listaCuentas, false);
 
         //grupo colaborador nivel 2
         List<CC_Grupo_Colaborador__c> listaGrupos = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',6);
@@ -100,7 +100,7 @@ public with sharing class SAC_Interaccion_Test {
         listaGrupos[5].SAC_PermiteConsultas__c = true;
         listaGrupos[5].SAC_TieneUsuariosActivos__c = true;
         listaGrupos[5].SAC_Externo__c = true;
-        Database.insert(listaGrupos);
+        SAC_DatabaseDML.insertListDML(listaGrupos, false);
 
 
         List<Case> listaReclamaciones = new List<Case>();
@@ -228,7 +228,7 @@ public with sharing class SAC_Interaccion_Test {
         Case casoReclamacion10 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl10);
         listaReclamaciones.add(casoReclamacion10);
 
-        Database.insert(listaReclamaciones);  
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
 
 
         //Interaccion escalado
@@ -334,7 +334,7 @@ public with sharing class SAC_Interaccion_Test {
         SAC_Interaccion__c consulta4 = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons4);
         listaInteracciones.add(consulta4);
 
-        Database.insert(listaInteracciones);
+        SAC_DatabaseDML.insertListDML(listaInteracciones, false);
 
         List<CC_MCC__c> listaMCCs = new List<CC_MCC__c>();
         //MCC
@@ -350,7 +350,7 @@ public with sharing class SAC_Interaccion_Test {
         mcc2.SAC_EscaladoObligatorio__c = true;
         listaMCCs.add(mcc2);
 
-        Database.insert(listaMCCs);
+        SAC_DatabaseDML.insertListDML(listaMCCs, false);
 
 
         List<Case> listaPretensiones = new List<Case>();
@@ -380,7 +380,7 @@ public with sharing class SAC_Interaccion_Test {
         Case casoPretension2 = SAC_TestDataFactory.crearCaso('Pretension',campsoPret2);
         listaPretensiones.add(casoPretension2);
 
-        Database.insert(listaPretensiones); 
+        SAC_DatabaseDML.insertListDML(listaPretensiones, false);
 
 
         //Parametrizaciones Escalados
@@ -481,7 +481,7 @@ public with sharing class SAC_Interaccion_Test {
         SAC_ParametrizacionEscalado__c parametrizacionEscalado6 = SAC_TestDataFactory.crearParamEsc(camposParam6);
         listaParametrizaciones.add(parametrizacionEscalado6);
        
-        Database.insert(listaParametrizaciones);
+        SAC_DatabaseDML.insertListDML(listaParametrizaciones, false);
 
         //CREACION EMAILTEMPLATE
         // User usuario2;
@@ -520,7 +520,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
 
         Test.startTest();
@@ -531,7 +531,7 @@ public with sharing class SAC_Interaccion_Test {
             interaccion.SAC_Propuesta__c = 'testConsulta';
             interaccion.SAC_Reclamacion__c = caso.Id;
             interaccion.recordTypeId = Schema.SObjectType.SAC_Interaccion__c.getRecordTypeInfosByDeveloperName().get('SAC_Consulta').getRecordTypeId();
-            Database.insert(interaccion);
+            SAC_DatabaseDML.insertDML(interaccion, false);
         }
         Test.stopTest();
 
@@ -548,7 +548,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -569,11 +569,11 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
-            Database.update(consulta);
+            SAC_DatabaseDML.updateDML(consulta, false);
         }
         Test.stopTest();
 
@@ -602,7 +602,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -632,7 +632,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -654,7 +654,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         SAC_Interaccion__c escalado = new SAC_Interaccion__c();
         escalado.SAC_Propuesta__c = 'propuesta test';
@@ -667,7 +667,7 @@ public with sharing class SAC_Interaccion_Test {
 
         Test.startTest();
         System.runAs(usuarioAdmin){
-            Database.insert(escalado);
+            SAC_DatabaseDML.insertDML(escalado, false);
         }
         //insert escalado;
         Test.stopTest();
@@ -680,18 +680,17 @@ public with sharing class SAC_Interaccion_Test {
     static void cerrarTMEEscaladoTest(){
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
         SAC_Interaccion__c escalado = [SELECT Id FROM SAC_Interaccion__c WHERE  SAC_Titulo__c = 'propuesta test' LIMIT 1];
-        CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'grupoTest' LIMIT 1];
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
             escalado.SAC_Estado__c = 'SAC_Atendida';
-            Database.update(escalado);
+            SAC_DatabaseDML.updateDML(escalado, false);
         }
         Test.stopTest();
 
@@ -708,14 +707,14 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
             consulta.SAC_Pregunta__c = 'pregunta';
-            Database.update(consulta);
+            SAC_DatabaseDML.updateDML(consulta, false);
             consulta.SAC_Estado__c = 'SAC_PendienteRespuestaDefinitiva';
-            Database.update(consulta);
+            SAC_DatabaseDML.updateDML(consulta, false);
         }
         Test.stopTest();
 
@@ -732,7 +731,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -775,7 +774,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -796,7 +795,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         SAC_Interaccion.ValidacionesEscalado respuesta;
@@ -817,7 +816,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         SAC_Interaccion.ValidacionesEscalado respuesta;
@@ -848,7 +847,7 @@ public with sharing class SAC_Interaccion_Test {
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         permisos.add(permiSetAssi2);
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
 
         Test.startTest();
         SAC_Interaccion.ValidacionesEscalado respuesta;
@@ -880,11 +879,12 @@ public with sharing class SAC_Interaccion_Test {
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         permisos.add(permiSetAssi2);
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
+
 
         Test.startTest();
         System.runAs(usuario) {
-            Database.update(consulta);
+            SAC_DatabaseDML.updateDML(consulta, false);
         }
         Test.stopTest();
 
@@ -903,11 +903,11 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
         }
         Test.stopTest();
 
@@ -921,10 +921,9 @@ public with sharing class SAC_Interaccion_Test {
         Case caso = [SELECT Id, Status, SAC_StatusAuxiliar__c  FROM Case WHERE Subject = 'TestRec' LIMIT 1];
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
         List<SAC_Interaccion__c> listaConsultasAFinalizar = [SELECT id FROM SAC_Interaccion__c  WHERE SAC_Reclamacion__c =: caso.id AND RecordType.DeveloperName = 'SAC_Consulta' AND SAC_Estado__c = 'SAC_PendienteRespuesta'];
-        List<String> consultasIds = new String [listaConsultasAFinalizar.size()];
-        Integer i = 0;
+        List<String> consultasIds = new List<String>();
         for (SAC_Interaccion__c consulta: listaConsultasAFinalizar) {
-            consultasIds[i++] = consulta.id;
+            consultasIds.add(consulta.id);
         }
         String motivoFinalizado = 'SAC_CanceladaAltaErronea';
 
@@ -932,7 +931,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -954,7 +953,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         List<SAC_Interaccion__c> consultasPendientes;
         Test.startTest();
@@ -972,13 +971,13 @@ public with sharing class SAC_Interaccion_Test {
         CC_Grupo_Colaborador__c grupo = [SELECT id FROM CC_Grupo_Colaborador__c WHERE name='grupoTest4'];
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
         usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'System Administrator' OR Name = 'Administrador del sistema'].Id;        
-        Database.update(usuario);
+        SAC_DatabaseDML.updateDML(usuario, false);
 
         Test.startTest();
         System.runAs(usuario) {
             SAC_Interaccion__c consulta = listaConsultas[0];
             consulta.SAC_GrupoColaborador__c = grupo.id;
-            Database.update(consulta);
+            SAC_DatabaseDML.updateDML(consulta, false);
         }
         Test.stopTest();
 
@@ -996,7 +995,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -1021,7 +1020,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -1041,7 +1040,7 @@ public with sharing class SAC_Interaccion_Test {
         List<SAC_Interaccion__c> listaConsultas = [SELECT Id, SAC_GrupoColaborador__c, SAC_Oficina__c, SAC_Oficina__r.CC_Email__c, SAC_Pregunta__c, SAC_Estado__c, SAC_EmailOficina__c, SAC_EmailCC__c, SAC_EmailCCO__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'consulta4'];
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
 
-        List<EmailMessage> listaEmailMsg = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY AND RelatedToId =: listaConsultas[0].Id];
+        Integer emailCnt = [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY AND RelatedToId =: listaConsultas[0].Id];
 
         List<PermissionSetAssignment> permisos = new List<PermissionSetAssignment>();
 
@@ -1057,7 +1056,7 @@ public with sharing class SAC_Interaccion_Test {
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         permisos.add(permiSetAssi2);
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
 
 
         Test.startTest();
@@ -1066,9 +1065,7 @@ public with sharing class SAC_Interaccion_Test {
         }
         Test.stopTest();
 
-        List<EmailMessage> listaEmailMsgFinal  = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY AND RelatedToId =: listaConsultas[0].Id];
-
-        Assert.areNotEqual(listaEmailMsg.size(), listaEmailMsgFinal.size(), 'No se ha enviado la consulta');
+        Assert.areNotEqual(emailCnt, [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY AND RelatedToId =: listaConsultas[0].Id], 'No se ha enviado la consulta');
     }
     @istest 
     static void informarCorreoOficinaTest() {
@@ -1089,7 +1086,7 @@ public with sharing class SAC_Interaccion_Test {
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         permisos.add(permiSetAssi2);
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
 
 
         Test.startTest();
@@ -1121,7 +1118,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -1150,7 +1147,7 @@ public with sharing class SAC_Interaccion_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         Test.startTest();
         System.runAs(usuario) {

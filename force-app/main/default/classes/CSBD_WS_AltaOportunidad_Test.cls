@@ -1118,4 +1118,48 @@ public class CSBD_WS_AltaOportunidad_Test  {
                                     AND CSBD_CasoOrigen__c = :casoCc.Id LIMIT 2], 'Debería haberse creado una oportunidad de tipo MAC');
         }
     }
+    
+    @isTest
+    public static void altaOportunidadTestMACCentralita() {
+        User usuarioAdministrador = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1];
+
+        RestRequest request = new RestRequest();
+        RestResponse response = new RestResponse();
+        // Set request properties
+        request.requestUri = '/services/apexrest/AltaOportunidad/altaOportunidad';
+        request.httpMethod = 'POST';
+        request.requestBody = Blob.valueOf([SELECT Body FROM StaticResource WHERE Name = 'CSBD_WS_Alta_Oportunidad_MACCentralita_JSON' LIMIT 1].Body.toString());
+        RestContext.request = request;
+        RestContext.response = response;
+
+        //Preparación de respuestas de prueba de los servicios web guardadas como static resources
+        MultiStaticResourceCalloutMock multiMock = new MultiStaticResourceCalloutMock();
+        String endpointSirCalcLimites = obtenerParametrosIntegracion('CSBD_SIR_CalcLimites')?.CC_EndPoint__c;
+        if (String.isNotBlank(endpointSirCalcLimites)) {
+            multiMock.setStaticResource(endpointSirCalcLimites, 'CSBD_SIR_Respuesta_sirCalcLimites');
+        }
+        String endpointSirConsultaScorings = obtenerParametrosIntegracion('CSBD_SIR_ConsultaScorings')?.CC_EndPoint__c;
+        if (String.isNotBlank(endpointSirConsultaScorings)) {
+            multiMock.setStaticResource(endpointSirConsultaScorings, 'CSBD_SIR_Respuesta_sirCalcLimites');
+        }
+        multiMock.setStatusCode(200);
+        multiMock.setHeader('Content-Type', 'text/xml');
+        Test.setMock(HttpCalloutMock.class, multiMock);
+
+        list<String> iDs = new list<String>();
+        System.runAs (usuarioAdministrador) {
+            Test.startTest();
+            CSBD_WS_AltaOportunidad_Output output = CSBD_WS_AltaOportunidad.altaOportunidad();
+            Test.stopTest();
+            for(CSBD_WS_AltaOportunidad_Output.Respuesta respuesta : output.respuestas) {
+                System.assertEquals('OK', respuesta.resultado, 'Ha habido algun error: ' + respuesta.detalleError);
+                System.assertNotEquals('', respuesta.opportunityId, 'No se ha creado la oportunidad.' + respuesta.detalleError);
+                iDs.add(respuesta.opportunityId);
+            }
+            list<Opportunity> oportunidades =  [SELECT id,CSBD_SistemaOrigen__c FROM Opportunity WHERE Id = :iDs];
+            for(Opportunity oportunidad : oportunidades){
+                System.assertEquals('WS',oportunidad.CSBD_SistemaOrigen__c);
+            }
+        }
+    }
 }

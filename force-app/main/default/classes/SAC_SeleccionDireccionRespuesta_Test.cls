@@ -20,7 +20,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
             isActive = true,
             userRole = uRole
         );
-        Database.insert(user);
+        SAC_DatabaseDML.insertDML(user, false); 
+        //Database.insert(user);
 
         List<Account> listaCuentas = new List<Account>();
         Account cuenta = new Account(Name = 'Cuenta', CC_Email__c = 'test@test.com', recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId(), OwnerId = user.Id);
@@ -29,7 +30,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
         Account cuenta2 = new Account(Name = 'Cuenta2', CC_Email__c = 'test@test.com', recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('SAC_NoCliente').getRecordTypeId(), OwnerId = user.Id);
         listaCuentas.add(cuenta2);
 
-        Database.insert(listaCuentas);
+        SAC_DatabaseDML.insertListDML(listaCuentas, false); 
+        //Database.insert(listaCuentas);
 
         List<Case> listaCasos = new List<Case>();
 
@@ -105,7 +107,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
         casoReclamacion7.OwnerId = user.Id;  
         listaCasos.add(casoReclamacion7);
 
-        Database.insert(listaCasos);
+        SAC_DatabaseDML.insertListDML(listaCasos, false); 
+        //Database.insert(listaCasos);
 
     }
     @istest
@@ -113,8 +116,9 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
         User usuarioGeneral = [SELECT id From User Where Username = 'admin123@testcaixa1.com' AND isActive = true Limit 1];
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);
+        SAC_DatabaseDML.insertDML(psa, false);     
+        //Database.insert(psa);
 
         Case caso = [SELECT id, OS_Email__c FROM Case WHERE Subject = 'TestRec'];
         caso.OS_Email__c = 'caso@caso.com';
@@ -123,7 +127,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
        
         System.runAs(usuarioGeneral) {
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);   
+            //Database.update(caso);
             caso2 = [SELECT id, OS_Email__c FROM Case WHERE Subject = 'TestRec'];
             Test.stopTest();
         }
@@ -136,14 +141,16 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);  
+        //Database.insert(psa);
 
         Case caso = [SELECT id, OS_Email__c FROM Case WHERE Subject = 'Caso2'];
         caso.SAC_DireccionPostal__c = 'direccion';
 
         System.runAs(usuarioGeneral) {
             Test.startTest();
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);  
+            //Database.update(caso);
             Test.stopTest();
         }     
 
@@ -156,7 +163,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);  
+        //Database.insert(psa);
 
         Account cuenta = [SELECT id, recordTypeId FROM Account WHERE Name = 'Cuenta2'];
         cuenta.CC_Email__c = 'email@test.com';
@@ -167,7 +175,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
 
         System.runAs(usuarioGeneral) {
             Test.startTest();
-            Database.update(cuenta);
+            SAC_DatabaseDML.updateDML(cuenta, false);  
+            //Database.update(cuenta);
             resultado = SAC_SeleccionDireccionRespuesta.setParaEmail(caso, cuenta.recordTypeId);
             Test.stopTest();
         }     
@@ -180,8 +189,9 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
         User usuarioGeneral = [SELECT id From User Where Username = 'admin123@testcaixa1.com' AND isActive = true Limit 1];
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);      
+        SAC_DatabaseDML.insertDML(psa, false);   
+        //Database.insert(psa);
         
         Account cuenta = [SELECT id, recordTypeId FROM Account WHERE Name = 'Cuenta2'];
         Case caso = [SELECT id, Origin, Account.CC_Email__c, OS_Email__c, SAC_DireccionPostalNotificacion__c FROM Case WHERE Subject = 'Caso4'];
@@ -190,7 +200,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
 
         System.runAs(usuarioGeneral) {
             Test.startTest();
-            Database.update(cuenta);
+            SAC_DatabaseDML.updateDML(cuenta, false);   
+            //Database.update(cuenta);
             resultado = SAC_SeleccionDireccionRespuesta.setParaEmail(caso, cuenta.recordTypeId);
             Test.stopTest();
         }     
@@ -203,8 +214,9 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
         User usuarioGeneral = [SELECT id From User Where Username = 'admin123@testcaixa1.com' AND isActive = true Limit 1];
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id); 
+        SAC_DatabaseDML.insertDML(psa, false);      
+        //Database.insert(psa);
 
         Account cuenta = [SELECT id, recordTypeId FROM Account WHERE Name = 'Cuenta2'];
         Case caso = [SELECT id, Origin, Account.CC_Email__c, OS_Email__c, SAC_DireccionPostalNotificacion__c,SuppliedEmail FROM Case WHERE Subject = 'Caso5'];
@@ -213,7 +225,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
 
         System.runAs(usuarioGeneral) {
             Test.startTest();
-            Database.update(cuenta);
+            SAC_DatabaseDML.updateDML(cuenta, false);  
+            //Database.update(cuenta);
             resultado = SAC_SeleccionDireccionRespuesta.setParaEmail(caso, cuenta.recordTypeId);
             Test.stopTest();
         }     
@@ -225,8 +238,9 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
         User usuarioGeneral = [SELECT id From User Where Username = 'admin123@testcaixa1.com' AND isActive = true Limit 1];
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);    
+        SAC_DatabaseDML.insertDML(psa, false);     
+        //Database.insert(psa);
 
         SAC_SeleccionDireccionRespuesta.objetoWrapper resultado;
 
@@ -234,12 +248,15 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
             Test.startTest();
             Account cuenta = [SELECT id, recordTypeId FROM Account WHERE Name = 'Cuenta'];
             cuenta.CC_Email__c = 't@t.t';
-            Database.update(cuenta);
+            SAC_DatabaseDML.updateDML(cuenta, false);  
+            //Database.update(cuenta);
             Case caso = [SELECT id, Origin, Account.CC_Email__c, OS_Email__c, SAC_DireccionPostalNotificacion__c,SuppliedEmail FROM Case WHERE Subject = 'Caso3'];
             caso.AccountId = cuenta.Id;
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);  
+            //Database.update(caso);
 
-            Database.update(cuenta);
+            SAC_DatabaseDML.updateDML(cuenta, false);  
+            //Database.update(cuenta);
             resultado = SAC_SeleccionDireccionRespuesta.setParaEmail(caso, cuenta.recordTypeId);
             Test.stopTest();
         }     
@@ -252,8 +269,9 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
         User usuarioGeneral = [SELECT id From User Where Username = 'admin123@testcaixa1.com' AND isActive = true Limit 1];
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);   
+        SAC_DatabaseDML.insertDML(psa, false);      
+        //Database.insert(psa);
 
         Account cuenta = [SELECT id, recordTypeId FROM Account WHERE Name = 'Cuenta'];
         Case caso = [SELECT id, Origin, Account.CC_Email__c, OS_Email__c, SAC_DireccionPostalNotificacion__c,SuppliedEmail FROM Case WHERE Subject = 'Caso7'];
@@ -262,7 +280,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
 
         System.runAs(usuarioGeneral) {
             Test.startTest();
-            Database.update(cuenta);
+            SAC_DatabaseDML.updateDML(cuenta, false);   
+            //Database.update(cuenta);
             resultado = SAC_SeleccionDireccionRespuesta.setParaEmail(caso, cuenta.recordTypeId);
             Test.stopTest();
         }     
@@ -276,7 +295,8 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);       
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);   
+        //Database.insert(psa);
 
         String resultado;
 
@@ -284,12 +304,15 @@ public with sharing class SAC_SeleccionDireccionRespuesta_Test {
             Test.startTest();
             Account cuenta = [SELECT id, recordTypeId FROM Account WHERE Name = 'Cuenta'];
             cuenta.CC_Email__c = 't@t.t';
-            Database.update(cuenta);
+            SAC_DatabaseDML.updateDML(cuenta, false);
+            //Database.update(cuenta);
             Case caso = [SELECT id, CC_Canal_Respuesta__c, OS_Email__c, SAC_DireccionPostalNotificacion__c, SuppliedEmail  FROM Case WHERE Subject = 'Caso6'];
             caso.AccountId = cuenta.Id;
-            Database.update(caso);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.update(caso);
 
-            Database.update(cuenta);
+            SAC_DatabaseDML.updateDML(cuenta, false);
+            //Database.update(cuenta);
             resultado = SAC_SeleccionDireccionRespuesta.getParaEmail(caso, cuenta.recordTypeId);
             Test.stopTest();
         }     

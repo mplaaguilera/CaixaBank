@@ -1,236 +1,235 @@
 @isTest
-public with sharing class CSBD_AutenticacionOtp_Apex_Test {
+public class CSBD_AutenticacionOtp_Apex_Test {
 
     @TestSetup
     private static void testSetup() {
-        //Usuarios
-        User usuarioGestor = CSBD_Usuarios.usuarioGestor();
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+            //Custom settings y custom metadata
+            CC_Settings__c csAutenticacionBloqueos = new CC_Settings__c();
+            csAutenticacionBloqueos.Name = 'CC_Autenticacion_Bloqueos';
+            csAutenticacionBloqueos.CC_Configuracion_1__c = '2';
+            csAutenticacionBloqueos.CC_Configuracion_2__c = '24';
+            csAutenticacionBloqueos.CC_Activa__c = true;
+            CC_Settings__c csPerfilesAutenticacion = new CC_Settings__c();
+            csPerfilesAutenticacion.Name = 'CC_PerfilesAutentication';
+            csPerfilesAutenticacion.CC_Configuracion_1__c = 'CC';
+            csPerfilesAutenticacion.CC_Configuracion_2__c = 'CSBD';
+            csPerfilesAutenticacion.CC_Configuracion_3__c = 'HDT';
+            csPerfilesAutenticacion.CC_Activa__c = true;
+            CC_Settings__c csIntClienteDigital = new CC_Settings__c();
+            csIntClienteDigital.Name = 'CC_Integracion_ClienteDigital';
+            csIntClienteDigital.CC_Configuracion_1__c = 'APPROVALSPLUGIN_PROCESSCOMMAND_SALESFORCE';
+            csIntClienteDigital.CC_Configuracion_2__c = 'APPROVALSPLUGIN_PROCESSCOMMAND_SALESFORCE2';
+            csIntClienteDigital.CC_Configuracion_3__c = 'AUT00001_P1_ET1_VALET1';
+            csIntClienteDigital.CC_Configuracion_4__c = 'AUT00002_P1_ET1_VALET1';
+            csIntClienteDigital.CC_Activa__c = true;
+            CBK_IntegrationSetting__c csIntAutRobusta = new CBK_IntegrationSetting__c();
+            csIntAutRobusta.Name = 'CC_Autenticacion_Robusta';
+            csIntAutRobusta.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthorization/v2/authorizations';
+            csIntAutRobusta.RegistroTrazaIntegracion__c = true;
+            CBK_IntegrationSetting__c csIntAutRobustaEstado = new CBK_IntegrationSetting__c();
+            csIntAutRobustaEstado.Name = 'CC_Autenticacion_Robusta_Estado';
+            csIntAutRobustaEstado.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthorization/v2/authorizations/{authorizationId}/approver/status';
+            csIntAutRobustaEstado.RegistroTrazaIntegracion__c = true;
+            insert new List<SObject>{csAutenticacionBloqueos, csPerfilesAutenticacion, csIntClienteDigital, csIntAutRobusta, csIntAutRobustaEstado};
 
-        //Custom settings
-        CC_Settings__c csAutenticacionBloqueos = new CC_Settings__c();
-        csAutenticacionBloqueos.Name = 'CC_Autenticacion_Bloqueos';
-        csAutenticacionBloqueos.CC_Configuracion_1__c = '2';
-        csAutenticacionBloqueos.CC_Configuracion_2__c = '24';
-        csAutenticacionBloqueos.CC_Activa__c = true;
-        CC_Settings__c csPerfilesAutenticacion = new CC_Settings__c();
-        csPerfilesAutenticacion.Name = 'CC_PerfilesAutentication';
-        csPerfilesAutenticacion.CC_Configuracion_1__c = 'CC';
-        csPerfilesAutenticacion.CC_Configuracion_2__c = 'CSBD';
-        csPerfilesAutenticacion.CC_Configuracion_3__c = 'HDT';
-        csPerfilesAutenticacion.CC_Activa__c = true;
-        CC_Settings__c csIntClienteDigital = new CC_Settings__c();
-        csIntClienteDigital.Name = 'CC_Integracion_ClienteDigital';
-        csIntClienteDigital.CC_Configuracion_1__c = 'APPROVALSPLUGIN_PROCESSCOMMAND_SALESFORCE';
-        csIntClienteDigital.CC_Configuracion_2__c = 'APPROVALSPLUGIN_PROCESSCOMMAND_SALESFORCE2';
-        csIntClienteDigital.CC_Configuracion_3__c = 'AUT00001_P1_ET1_VALET1';
-        csIntClienteDigital.CC_Configuracion_4__c = 'AUT00002_P1_ET1_VALET1';
-        csIntClienteDigital.CC_Activa__c = true;
-        insert new List<CC_Settings__c>{csAutenticacionBloqueos, csPerfilesAutenticacion, csIntClienteDigital};
-
-        CBK_IntegrationSetting__c csIntAutRobusta = new CBK_IntegrationSetting__c();
-        csIntAutRobusta.Name = 'CC_Autenticacion_Robusta';
-        csIntAutRobusta.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthorization/v2/authorizations';
-        csIntAutRobusta.RegistroTrazaIntegracion__c = true;
-        CBK_IntegrationSetting__c csIntAutRobustaEstado = new CBK_IntegrationSetting__c();
-        csIntAutRobustaEstado.Name = 'CC_Autenticacion_Robusta_Estado';
-        csIntAutRobustaEstado.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthorization/v2/authorizations/{authorizationId}/approver/status';
-        csIntAutRobustaEstado.RegistroTrazaIntegracion__c = true;
-        insert new List<CBK_IntegrationSetting__c>{csIntAutRobusta, csIntAutRobustaEstado};
-
-        //Cuenta y contacto
-		List<Map<String, Object>> camposCuentas = new List<Map<String, Object>>{
-			new Map<String, Object>{
-				'AV_NumPerso__c' => '12345678',
-				'CC_NumPerso__c' => '12345678'
-			},
-			new Map<String, Object>{
-				'AV_NumPerso__c' => '22345678',
-				'CC_NumPerso__c' => '22345678'
-			}
-		};
-		List<Account> cuentas = CSBD_TestDataFactory.crearCuenta(camposCuentas);
-		Account cuenta = cuentas[0];
-		Account cuentaApoderado = cuentas[1];
-
-		List<Map<String, Object>> camposContactos = new List<Map<String, Object>>{
-			new Map<String, Object>{
-				'AccountId' => cuenta.Id,
-				'Birthdate' => Date.today().addYears(-18),
-				'MobilePhone' => '612345678',
-				'Phone' => '612345678'
-			},
-			new Map<String, Object>{
-				'AccountId' => cuenta.Id,
-				'Birthdate' => Date.today().addYears(-18)
-			},
-			new Map<String, Object>{
-				'RecordTypeId' => Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CIBE_Apoderado').getRecordTypeId(),
-				'AccountId' => cuentaApoderado.Id,
-				'Birthdate' => Date.today().addYears(-18),
-				'MobilePhone' => '612345678',
-				'Phone' => '612345678'
-			}
-		};
-		List<Contact> contactos = CSBD_TestDataFactory.crearContacto(camposContactos);
-		Contact contacto = contactos[0];
-		Contact contactoSinTelefono = contactos[1];
-		Contact contactoApoderado = contactos[2];
-
-        // Contact contactoApoderado = CSBD_TestDataFactory.crearContacto(new Map<String, Object>{
-        //     'RecordTypeId' => Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CIBE_Apoderado').getRecordTypeId(),
-        //     'AccountId' => cuentaApoderado.Id,
-        //     'Birthdate' => Date.today().addYears(-18),
-        //     'MobilePhone' => '612345678',
-        //     'Phone' => '612345678'
-        // });
-
-        CC_Representante_Contrato__c representante = new CC_Representante_Contrato__c();
-        representante.RecordTypeId = Schema.SObjectType.CC_Representante_Contrato__c.getRecordTypeInfosByDeveloperName().get('CC_Representante').getRecordTypeId();
-        representante.CC_Representante__c = cuenta.Id;
-        insert representante;
-
-        //Casos origen
-        Case caso = new Case();
-        caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        caso.Subject = 'Caso origen Test';
-        caso.AccountId = cuenta.Id;
-        caso.ContactId = contacto.Id;
-        Case casoRepresentante = new Case();
-        casoRepresentante.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        casoRepresentante.Subject = 'Caso origen Test';
-        casoRepresentante.AccountId = cuenta.Id;
-        casoRepresentante.ContactId = contacto.Id;
-        casoRepresentante.CC_Representante__c = representante.Id;
-        Case casoApoderado = new Case();
-        casoApoderado.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        casoApoderado.Subject = 'Caso origen Test';
-        casoApoderado.AccountId = cuentaApoderado.Id;
-        casoApoderado.ContactId = contactoApoderado.Id;
-        Case casoImaginBank = new Case();
-        casoImaginBank.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        casoImaginBank.Subject = 'Caso origen ImaginBank Test';
-        casoImaginBank.AccountId = cuenta.Id;
-        casoImaginBank.ContactId = contacto.Id;
-        insert new List<Case>{caso, casoRepresentante, casoApoderado, casoImaginBank};
-
-        System.runAs(usuarioGestor) {
-            //Oportunidades
-            Map<String, Object> camposOpp = new Map<String, Object>{
-                'CSBD_Titulo__c' => 'Oportunidad Test',
-                'CSBD_CasoOrigen__c' => caso.Id,
-                'AccountId' => cuenta.Id,
-                'CSBD_Contact__c' => contacto.Id,
-                'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
+            //Cuenta y contacto
+            List<Map<String, Object>> camposCuentas = new List<Map<String, Object>>{
+                new Map<String, Object>{
+                    'AV_NumPerso__c' => '12345678',
+                    'CC_NumPerso__c' => '12345678'
+                },
+                new Map<String, Object>{
+                    'AV_NumPerso__c' => '22345678',
+                    'CC_NumPerso__c' => '22345678'
+                }
             };
-            Opportunity opp = CSBD_Opportunity.crearOportunidad('CSBD_MAC', camposOpp);
+            List<Account> cuentas = CSBD_TestDataFactory.crearCuenta(camposCuentas);
+            Account cuenta = cuentas[0];
+            Account cuentaApoderado = cuentas[1];
 
-            Map<String, Object> camposOppRepresentante = new Map<String, Object>{
-                'CSBD_Titulo__c' => 'Oportunidad Representante Test',
-                'CSBD_CasoOrigen__c' => casoRepresentante.Id,
-                'AccountId' => cuenta.Id,
-                'CSBD_Contact__c' => contacto.Id,
-                'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
+            List<Map<String, Object>> camposContactos = new List<Map<String, Object>>{
+                new Map<String, Object>{
+                    'AccountId' => cuenta.Id,
+                    'Birthdate' => Date.today().addYears(-18),
+                    'MobilePhone' => '612345678',
+                    'Phone' => '612345678'
+                },
+                new Map<String, Object>{
+                    'AccountId' => cuenta.Id,
+                    'Birthdate' => Date.today().addYears(-18)
+                },
+                new Map<String, Object>{
+                    'RecordTypeId' => Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CIBE_Apoderado').getRecordTypeId(),
+                    'AccountId' => cuentaApoderado.Id,
+                    'Birthdate' => Date.today().addYears(-18),
+                    'MobilePhone' => '612345678',
+                    'Phone' => '612345678'
+                }
             };
-            Opportunity oppRepresentante = CSBD_Opportunity.crearOportunidad('CSBD_MAC', camposOppRepresentante);
+            List<Contact> contactos = CSBD_TestDataFactory.crearContacto(camposContactos);
+            Contact contacto = contactos[0];
+            Contact contactoSinTelefono = contactos[1];
+            Contact contactoApoderado = contactos[2];
 
-            Map<String, Object> camposOppApoderado = new Map<String, Object>{
-                'CSBD_Titulo__c' => 'Oportunidad Apoderado Test',
-                'CSBD_CasoOrigen__c' => casoApoderado.Id,
-                'AccountId' => cuentaApoderado.Id,
-                'CSBD_Contact__c' => contactoApoderado.Id,
-                'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
-            };
-            Opportunity oppApoderado = CSBD_Opportunity.crearOportunidad('CSBD_MAC', camposOppApoderado);
+            // Contact contactoApoderado = CSBD_TestDataFactory.crearContacto(new Map<String, Object>{
+            //     'RecordTypeId' => Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CIBE_Apoderado').getRecordTypeId(),
+            //     'AccountId' => cuentaApoderado.Id,
+            //     'Birthdate' => Date.today().addYears(-18),
+            //     'MobilePhone' => '612345678',
+            //     'Phone' => '612345678'
+            // });
 
-            Map<String, Object> camposOppImaginBank = new Map<String, Object>{
-                'CSBD_Titulo__c' => 'Oportunidad ImaginBank Test',
-                'CSBD_CasoOrigen__c' => casoImaginBank.Id,
-                'AccountId' => cuenta.Id,
-                'CSBD_Contact__c' => contacto.Id
-                // 'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
-            };
-            Opportunity oppImaginBank = CSBD_Opportunity.crearOportunidad('CSBD_MAC', camposOppImaginBank);
+            CC_Representante_Contrato__c representante = new CC_Representante_Contrato__c();
+            representante.RecordTypeId = Schema.SObjectType.CC_Representante_Contrato__c.getRecordTypeInfosByDeveloperName().get('CC_Representante').getRecordTypeId();
+            representante.CC_Representante__c = cuenta.Id;
+            insert representante;
 
-            Map<String, Object> camposOppSinLlamada = new Map<String, Object>{
-                'CSBD_Titulo__c' => 'Oportunidad sin llamada en curso Test',
-                'CSBD_CasoOrigen__c' => casoImaginBank.Id,
-                'AccountId' => cuenta.Id,
-                'CSBD_Contact__c' => contacto.Id,
-                'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
-            };
-            Opportunity oppSinLlamada = CSBD_Opportunity.crearOportunidad('CSBD_MAC', camposOppSinLlamada);
+            //Casos origen
+            Id idRtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            Case caso = new Case();
+            caso.RecordTypeId = idRtCliente;
+            caso.CC_Admin__c = false;
+            caso.Subject = 'Caso origen Test';
+            caso.AccountId = cuenta.Id;
+            caso.ContactId = contacto.Id;
+            Case casoRepresentante = new Case();
+            casoRepresentante.RecordTypeId = idRtCliente;
+            casoRepresentante.CC_Admin__c = false;
+            casoRepresentante.Subject = 'Caso origen Test';
+            casoRepresentante.AccountId = cuenta.Id;
+            casoRepresentante.ContactId = contacto.Id;
+            casoRepresentante.CC_Representante__c = representante.Id;
+            Case casoApoderado = new Case();
+            casoApoderado.RecordTypeId = idRtCliente;
+            casoApoderado.CC_Admin__c = false;
+            casoApoderado.Subject = 'Caso origen Test';
+            casoApoderado.AccountId = cuentaApoderado.Id;
+            casoApoderado.ContactId = contactoApoderado.Id;
+            Case casoImaginBank = new Case();
+            casoImaginBank.RecordTypeId = idRtCliente;
+            casoImaginBank.CC_Admin__c = false;
+            casoImaginBank.Subject = 'Caso origen ImaginBank Test';
+            casoImaginBank.AccountId = cuenta.Id;
+            casoImaginBank.ContactId = contacto.Id;
+            insert new List<Case>{caso, casoRepresentante, casoApoderado, casoImaginBank};
 
-            Map<String, Object> camposOppSinMailPhone = new Map<String, Object>{
-                'CSBD_Titulo__c' => 'Oportunidad sin correo/teléfono',
-                'CSBD_CasoOrigen__c' => caso.Id,
-                'AccountId' => cuenta.Id,
-                'CSBD_Contact__c' => contactoSinTelefono.Id
-            };
-            Opportunity oppSinMailPhone = CSBD_Opportunity.crearOportunidad('CSBD_MAC', camposOppSinMailPhone);
+            Test.startTest(); //Evita que el testSetup falle por Apex CPU time limit
 
-            //Llamadas
-            CC_Llamada__c llamadaEntrante = new CC_Llamada__c();
-            llamadaEntrante.RecordTypeId = Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('CSBD_Cliente').getRecordTypeId();
-            llamadaEntrante.CC_Tipo__c = 'Saliente';
-            llamadaEntrante.CC_Fecha_Inicio__c = System.now();
-            CC_Llamada__c llamadaSaliente = new CC_Llamada__c();
-            llamadaSaliente.RecordTypeId = Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('CSBD_Cliente').getRecordTypeId();
-            llamadaSaliente.CC_Tipo__c = 'Saliente';
-            llamadaSaliente.CC_Fecha_Inicio__c = System.now();
-            insert new List<CC_Llamada__c>{llamadaEntrante, llamadaSaliente};
-            Task tareaLlamadaEntrante = new Task();
-            tareaLlamadaEntrante.RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CSBD_Task').getRecordTypeId();
-            tareaLlamadaEntrante.CC_Llamada_Id__c = llamadaEntrante.Id;
-            tareaLlamadaEntrante.WhatId = opp.Id;
-            Task tareaLlamadaSaliente = new Task();
-            tareaLlamadaSaliente.RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CSBD_Task').getRecordTypeId();
-            tareaLlamadaSaliente.CC_Llamada_Id__c = llamadaSaliente.Id;
-            tareaLlamadaSaliente.WhatId = oppImaginBank.Id;
-            insert new List<Task>{tareaLlamadaEntrante, tareaLlamadaSaliente};
+            User usuarioGestor = CSBD_TestDataFactory.usuarioGestor();
+            System.runAs(usuarioGestor) {
+                //Oportunidades
+                List<Map<String, Object>> listaCamposOportunidades = new List<Map<String, Object>>{
+                    new Map<String, Object>{
+                        'CSBD_Titulo__c' => 'Oportunidad Test', 'CSBD_CasoOrigen__c' => caso.Id,
+                        'AccountId' => cuenta.Id, 'CSBD_Contact__c' => contacto.Id,
+                        'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
+                    },
+                    new Map<String, Object>{
+                        'CSBD_Titulo__c' => 'Oportunidad Representante Test', 'CSBD_CasoOrigen__c' => casoRepresentante.Id,
+                        'AccountId' => cuenta.Id, 'CSBD_Contact__c' => contacto.Id,
+                        'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
+                    },
+                    new Map<String, Object>{
+                        'CSBD_Titulo__c' => 'Oportunidad Apoderado Test', 'CSBD_CasoOrigen__c' => casoApoderado.Id,
+                        'AccountId' => cuentaApoderado.Id, 'CSBD_Contact__c' => contactoApoderado.Id,
+                        'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
+                    },
+                    new Map<String, Object>{
+                        'CSBD_Titulo__c' => 'Oportunidad ImaginBank Test', 'CSBD_CasoOrigen__c' => casoImaginBank.Id,
+                        'AccountId' => cuenta.Id, 'CSBD_Contact__c' => contacto.Id,
+                        'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
+                    },
+                    new Map<String, Object>{
+                        'CSBD_Titulo__c' => 'Oportunidad sin llamada en curso Test', 'CSBD_CasoOrigen__c' => casoImaginBank.Id,
+                        'AccountId' => cuenta.Id, 'CSBD_Contact__c' => contacto.Id,
+                        'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
+                    },
+                    new Map<String, Object>{
+                        'CSBD_Titulo__c' => 'Oportunidad sin correo/teléfono', 'CSBD_CasoOrigen__c' => caso.Id,
+                        'AccountId' => cuenta.Id, 'CSBD_Contact__c' => contactoSinTelefono.Id,
+                        'CSBD_Email_Solicitud__c' => 'email_opp@test.com'
+                    }
+                };
 
-            //Autenticaciones
-            Id idRtAutenticacionCsbd = Schema.SObjectType.CC_Comunicaciones__c.getRecordTypeInfosByDeveloperName().get('CSBD_Autenticacion').getRecordTypeId();
-            CC_Comunicaciones__c aut1 = new CC_Comunicaciones__c();
-            aut1.RecordTypeId = idRtAutenticacionCsbd;
-            aut1.CSBD_Opportunity__c = opp.Id;
-            aut1.CC_Cliente__c = cuenta.Id;
-            aut1.CC_Nivel__c = 'Nivel 2';
-            aut1.CC_Estado__c = 'Cerrado';
-            CC_Comunicaciones__c aut2 = new CC_Comunicaciones__c();
-            aut2.RecordTypeId = idRtAutenticacionCsbd;
-            aut2.CSBD_Opportunity__c = null;
-            aut2.CC_Cliente__c = cuenta.Id;
-            aut2.CC_Nivel__c = 'Cliente Digital';
-            aut2.CC_Estado__c = 'Error';
-            CC_Comunicaciones__c aut3 = new CC_Comunicaciones__c();
-            aut3.RecordTypeId = idRtAutenticacionCsbd;
-            aut3.CSBD_Opportunity__c = opp.Id;
-            aut3.CC_Cliente__c = cuenta.Id;
-            aut3.CC_Nivel__c = 'Cliente Digital';
-            aut3.CC_Estado__c = 'Pdte. Envío';
-            aut3.CC_AuthorizationId__c = 'SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq';
-            CC_Comunicaciones__c aut4 = new CC_Comunicaciones__c();
-            aut4.RecordTypeId = idRtAutenticacionCsbd;
-            aut4.CSBD_Opportunity__c = oppImaginBank.Id;
-            aut4.CC_Cliente__c = cuenta.Id;
-            aut4.CC_Nivel__c = 'Cliente Digital';
-            aut4.CC_Estado__c = 'Pdte. Envío';
-            aut4.CC_AuthorizationId__c = 'SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq';
-            insert new List<CC_Comunicaciones__c>{aut1, aut2, aut3, aut4};
+                Map<String, Opportunity> oportunidades = new Map<String, Opportunity>();
+                for (Opportunity oportunidad : CSBD_Opportunity.crearOportunidad('CSBD_MAC', listaCamposOportunidades)) {
+                    oportunidades.put(oportunidad.CSBD_Titulo__c, oportunidad);
+                }
+                Opportunity opp = oportunidades.get('Oportunidad Test');
+                Opportunity oppRepresentante = oportunidades.get('Oportunidad Representante Test');
+                Opportunity oppApoderado = oportunidades.get('Oportunidad Apoderado Test');
+                Opportunity oppImaginBank = oportunidades.get('Oportunidad ImaginBank Test');
+                Opportunity oppSinLlamada = oportunidades.get('Oportunidad sin llamada en curso Test');
+                Opportunity oppSinMailPhone = oportunidades.get('Oportunidad sin correo/teléfono');
 
-            //EmailTemplates
-            EmailTemplate plantilla = new EmailTemplate();
-            plantilla.Name = 'Notificación OTP ES - OK';
-            plantilla.TemplateType = 'Text';
-            plantilla.FolderId = usuarioGestor.Id;
-            insert plantilla;
+                //Llamadas
+                Id idRtLlamadaCliente = Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('CSBD_Cliente').getRecordTypeId();
+                CC_Llamada__c llamadaEntrante = new CC_Llamada__c();
+                llamadaEntrante.RecordTypeId = idRtLlamadaCliente;
+                llamadaEntrante.CC_Tipo__c = 'Saliente';
+                llamadaEntrante.CC_Fecha_Inicio__c = System.now();
+                CC_Llamada__c llamadaSaliente = new CC_Llamada__c();
+                llamadaSaliente.RecordTypeId = idRtLlamadaCliente;
+                llamadaSaliente.CC_Tipo__c = 'Saliente';
+                llamadaSaliente.CC_Fecha_Inicio__c = System.now();
+                insert new List<CC_Llamada__c>{llamadaEntrante, llamadaSaliente};
+
+                //Tareas
+                Id idRtTask = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CSBD_Task').getRecordTypeId();
+                Task tareaLlamadaEntrante = new Task();
+                tareaLlamadaEntrante.RecordTypeId = idRtTask;
+                tareaLlamadaEntrante.CC_Llamada_Id__c = llamadaEntrante.Id;
+                tareaLlamadaEntrante.WhatId = opp.Id;
+                tareaLlamadaEntrante.Status = 'Open';
+                Task tareaLlamadaSaliente = new Task();
+                tareaLlamadaSaliente.RecordTypeId = idRtTask;
+                tareaLlamadaSaliente.CC_Llamada_Id__c = llamadaSaliente.Id;
+                tareaLlamadaSaliente.WhatId = oppImaginBank.Id;
+                tareaLlamadaSaliente.Status = 'Open';
+                //Autenticaciones
+                Id idRtAutenticacionCsbd = Schema.SObjectType.CC_Comunicaciones__c.getRecordTypeInfosByDeveloperName().get('CSBD_Autenticacion').getRecordTypeId();
+                CC_Comunicaciones__c aut1 = new CC_Comunicaciones__c();
+                aut1.RecordTypeId = idRtAutenticacionCsbd;
+                aut1.CSBD_Opportunity__c = opp.Id;
+                aut1.CC_Cliente__c = cuenta.Id;
+                aut1.CC_Nivel__c = 'Nivel 2';
+                aut1.CC_Estado__c = 'Cerrado';
+                CC_Comunicaciones__c aut2 = new CC_Comunicaciones__c();
+                aut2.RecordTypeId = idRtAutenticacionCsbd;
+                aut2.CSBD_Opportunity__c = null;
+                aut2.CC_Cliente__c = cuenta.Id;
+                aut2.CC_Nivel__c = 'Cliente Digital';
+                aut2.CC_Estado__c = 'Error';
+                CC_Comunicaciones__c aut3 = new CC_Comunicaciones__c();
+                aut3.RecordTypeId = idRtAutenticacionCsbd;
+                aut3.CSBD_Opportunity__c = opp.Id;
+                aut3.CC_Cliente__c = cuenta.Id;
+                aut3.CC_Nivel__c = 'Cliente Digital';
+                aut3.CC_Estado__c = 'Pdte. Envío';
+                aut3.CC_AuthorizationId__c = 'SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq';
+                CC_Comunicaciones__c aut4 = new CC_Comunicaciones__c();
+                aut4.RecordTypeId = idRtAutenticacionCsbd;
+                aut4.CSBD_Opportunity__c = oppImaginBank.Id;
+                aut4.CC_Cliente__c = cuenta.Id;
+                aut4.CC_Nivel__c = 'Cliente Digital';
+                aut4.CC_Estado__c = 'Pdte. Envío';
+                aut4.CC_AuthorizationId__c = 'SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq';
+                //EmailTemplates
+                EmailTemplate plantilla = new EmailTemplate();
+                plantilla.DeveloperName = 'Notificacion_OTP_ES_OK';
+                plantilla.Name = 'Notificación OTP ES - OK';
+                plantilla.TemplateType = 'Text';
+                plantilla.FolderId = usuarioGestor.Id;
+
+                insert new List<SObject>{tareaLlamadaEntrante, tareaLlamadaSaliente, aut1, aut2, aut3, aut4, plantilla};
+            }
         }
     }
 
     @isTest
-    private static void getDatos() {
-        User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
-        System.runAs(usuarioGestor) {
+    private static void getDatosTest() {
+        System.runAs((User)[SELECT Id FROM User WHERE Alias = 'Gestor']) {
             Opportunity oportunidad = [SELECT AccountId FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
             Test.startTest();
             Map<String, Boolean> datos = CSBD_AutenticacionOtp_Apex.getDatos(oportunidad.Id, oportunidad.AccountId);
@@ -243,7 +242,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void segundoNivel() {
+    private static void segundoNivelTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             Opportunity oportunidad = [SELECT Id FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
@@ -257,7 +256,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void validacionRespuestasNivel2() {
+    private static void validacionRespuestasNivel2Test() {
 		CC_Settings__c csIntAutenticacion = new CC_Settings__c();
         csIntAutenticacion.Name = 'CC_Integracion_Autenticacion';
         csIntAutenticacion.CC_Activa__c = true;
@@ -281,7 +280,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void getPreguntasNivel2() {
+    private static void getPreguntasNivel2Test() {
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
         lista.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         lista.Name = 'Preguntas OTPSMS 2 Nivel';
@@ -318,7 +317,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void getPreguntasNivel2Representante() {
+    private static void getPreguntasNivel2RepresentanteTest() {
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
         lista.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         lista.Name = 'Preguntas OTPSMS 2 Nivel';
@@ -355,7 +354,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void getPreguntasNivel2Apoderado() {
+    private static void getPreguntasNivel2ApoderadoTest() {
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
         lista.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         lista.Name = 'Preguntas OTPSMS 2 Nivel';
@@ -391,7 +390,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void getPreguntasEmergencia() {
+    private static void getPreguntasEmergenciaTest() {
         Id idRecordTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         CC_Lista_Valores__c lista1 = new CC_Lista_Valores__c();
         lista1.RecordTypeId = idRecordTypeLista;
@@ -453,7 +452,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void canalAutenticable() {
+    private static void canalAutenticableTest() {
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
         lista.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         lista.Name = 'CC_Autenticacion_Cliente';
@@ -474,7 +473,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void comprobarDatosNivel2() {
+    private static void comprobarDatosNivel2Test() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             Opportunity opp = [SELECT Id FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
@@ -488,7 +487,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void comprobarDatosNivel2Representante() {
+    private static void comprobarDatosNivel2RepresentanteTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             Opportunity oppRepresentante = [SELECT Id FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Representante Test'];
@@ -502,7 +501,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void comprobarDatosNivel2SinLlamada() {
+    private static void comprobarDatosNivel2SinLlamadaTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             Opportunity oppSinLlamada = [SELECT Id FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad sin llamada en curso Test'];
@@ -516,7 +515,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void enviarAutenticacionNivel2() {
+    private static void enviarAutenticacionNivel2Test() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             CC_Comunicaciones__c autenticacion = [SELECT Id FROM CC_Comunicaciones__c WHERE CC_Estado__c = 'Pdte. Envío' LIMIT 1];
@@ -530,7 +529,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void autenticacionNivel2Validar1() {
+    private static void autenticacionNivel2Validar1Test() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             CC_Comunicaciones__c autenticacion = [SELECT CSBD_Opportunity__c FROM CC_Comunicaciones__c WHERE CC_Estado__c = 'Pdte. Envío' LIMIT 1];
@@ -544,7 +543,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void codigoAutenticacionNoRecibido() {
+    private static void codigoAutenticacionNoRecibidoTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             CC_Comunicaciones__c autenticacion = [SELECT CSBD_Opportunity__c FROM CC_Comunicaciones__c WHERE CC_Estado__c = 'Pdte. Envío' LIMIT 1];
@@ -558,7 +557,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void autenticacionEmergencia1() {
+    private static void autenticacionEmergencia1Test() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             Opportunity opp = [SELECT AccountId FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
@@ -572,7 +571,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void autenticacionEmergencia2() {
+    private static void autenticacionEmergencia2Test() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             Opportunity oppImaginBank = [SELECT AccountId FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad ImaginBank Test'];
@@ -586,7 +585,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void autenticacionEmergencia3() {
+    private static void autenticacionEmergencia3Test() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             Opportunity oppSinMailPhone = [SELECT AccountId FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad sin correo/teléfono'];
@@ -600,7 +599,21 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void autenticacionEmergenciaImaginBank() {
+    private static void autenticacionEmergencia4Test() {
+        User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
+        System.runAs(usuarioGestor) {
+            Opportunity oppSinMailPhone = [SELECT AccountId FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
+
+            Test.startTest();
+            CSBD_AutenticacionOtp_Apex.autenticacionEmergencia(oppSinMailPhone.Id, 'Emergencia', false);
+            Test.stopTest();
+
+            System.assert(true, 'PENDIENTE');
+        }
+    }
+
+    @isTest
+    private static void autenticacionEmergenciaImaginBankTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             Opportunity oportunidad = [SELECT AccountId FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
@@ -614,7 +627,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void autenticacionClienteDigital() {
+    private static void autenticacionClienteDigitalTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             Opportunity opp = [SELECT AccountId, OwnerId FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
@@ -630,7 +643,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void autenticacionClienteDigitalEnviar() {
+    private static void autenticacionClienteDigitalEnviarTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             CC_Comunicaciones__c autenticacion = [SELECT CSBD_Opportunity__c FROM CC_Comunicaciones__c WHERE CC_Estado__c = 'Pdte. Envío' LIMIT 1];
@@ -644,7 +657,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void autenticacionClienteDigitalValidar() {
+    private static void autenticacionClienteDigitalValidarTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             CC_Comunicaciones__c autenticacion = [SELECT CSBD_Opportunity__c FROM CC_Comunicaciones__c WHERE CC_Estado__c = 'Pdte. Envío' LIMIT 1];
@@ -658,13 +671,26 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
     }
 
     @isTest
-    private static void cancelarAutenticacion() {
+    private static void cancelarAutenticacionTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
         System.runAs(usuarioGestor) {
             CC_Comunicaciones__c autenticacion = [SELECT CSBD_Opportunity__c FROM CC_Comunicaciones__c WHERE CC_Estado__c = 'Pdte. Envío' LIMIT 1];
 
             Test.startTest();
             CSBD_AutenticacionOtp_Apex.cancelarAutenticacion(autenticacion.CSBD_Opportunity__c, autenticacion.Id);
+            Test.stopTest();
+
+            System.assert(true, 'PENDIENTE');
+        }
+    }
+
+    @isTest
+    private static void eliminarAutenticacionesClienteTest() {
+        User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
+        System.runAs(usuarioGestor) {
+            Id idCuenta = [SELECT AccountId FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'].AccountId;
+            Test.startTest();
+            CSBD_AutenticacionOtp_Apex.eliminarAutenticacionesCliente(idCuenta);
             Test.stopTest();
 
             System.assert(true, 'PENDIENTE');

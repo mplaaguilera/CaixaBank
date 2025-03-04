@@ -207,7 +207,7 @@ public without sharing class SAC_SchedulableAlertas extends CBK_SCH_Queueable_Ab
             //Ya que hemos tenido que mandar alertas porque sigue pendiente de respuesta, volvemos a insertar los mismos pending process
             //para que vuelva a comprobar si tiene que volver a alertar al cabo de 24 horas más
             if (!nuevosPendingProcess.isEmpty()) {
-                Database.insert(nuevosPendingProcess);
+                SAC_DatabaseDML.insertListDML(nuevosPendingProcess, true);
             }
         }catch(Exception e) {
             CBK_Log.error(e);

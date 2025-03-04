@@ -878,24 +878,31 @@ public with sharing class CC_Case_BU_TRHan extends CC_TriggerHandlerBase {
         for(Case caso :listNewObj){
             if(/*mapInfoCasos.get(caso.Id) != null &&*/ caso.CC_Idioma__c != null && caso.CC_Matricula_Empleado__c != null &&
             caso.CC_MCC_Tematica__c != null && caso.CC_Tematica__c != null && !linkEncuestaEmpleado.isEmpty()){
+                String grupoTematica = (!String.isEmpty(caso.CC_Grupo_Colaborador__c) ? caso.CC_Grupo_Colaborador__c : caso.CC_Tematica__c);
                 if(caso.CC_En_Tercer_Nivel__c){
                     if(!mapInfoChat.isEmpty()){
-                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaTercerNivel+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
+                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaTercerNivel+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
+                        //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaTercerNivel+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
                     }else{
-                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaTercerNivel +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
+                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaTercerNivel +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
+                        //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaTercerNivel +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
                     }
                 }else {
                     if(caso.Origin == 'Phone'){
-                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaLlamada+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
+                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaLlamada+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
+                        //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaLlamada+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
                     }
                     else if(caso.Origin == 'Chat'){
                         if(!mapInfoChat.isEmpty()){
-                            caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaChat+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
+                            caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaChat+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
+                            //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaChat+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
                         }else{
-                            caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaChat +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
+                            caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaChat +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
+                            //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaChat +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
                         }
                     }else{
-                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaGenerico +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
+                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaGenerico +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
+                        //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaGenerico +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
                         
                     }
                 }

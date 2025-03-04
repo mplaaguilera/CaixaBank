@@ -128,7 +128,13 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
         Case caso = [SELECT id, Status, SEG_Subestado__c FROM Case WHERE subject = 'ReclamacionTest' limit 1];
 
         System.runAs(usuario) {
-            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_BDE', caso.Status, caso.SEG_Subestado__c);
+            List<ContentVersion> seleccionados = [SELECT id FROM ContentVersion];
+            System.debug('CGR seleccionados ' + seleccionados);
+            List<String> idSeleccionados = new List<String>();
+            for(ContentVersion cv: seleccionados){
+                idSeleccionados.add(cv.id);
+            }
+            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_BDE', caso.Status, caso.SEG_Subestado__c, idSeleccionados);
         }
         Case casoActualizado = [SELECT id, Status FROM Case WHERE subject = 'ReclamacionTest' limit 1];
         Test.stopTest();
@@ -144,10 +150,31 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
         Case caso = [SELECT id, Status, SEG_Subestado__c FROM Case WHERE subject = 'ReclamacionTest' limit 1];
 
         System.runAs(usuario) {
-            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_CNMV', caso.Status, caso.SEG_Subestado__c);
+
+            List<ContentVersion> seleccionados = [SELECT id FROM ContentVersion];
+        List<String> idSeleccionados = new List<String>();
+
+        for(ContentVersion cv: seleccionados){
+            idSeleccionados.add(cv.id);
+        }
+            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_CNMV', caso.Status, caso.SEG_Subestado__c, idSeleccionados);
         }
         Case casoActualizado = [SELECT id, Status FROM Case WHERE subject = 'ReclamacionTest' limit 1];
         Test.stopTest();
         system.assertEquals('SPV_PendienteRespuestaOrganismos', casoActualizado.Status, 'No se ha podido enviar la documentacion');
+    }
+
+    @isTest
+    static void getDocumentosValidadosTest() {
+
+        Test.startTest();
+        User usuario = [SELECT Id FROM User WHERE Username = 'userageneral@test.com.testdata' AND IsActive = true LIMIT 1];
+        Case caso = [SELECT id, Status, SEG_Subestado__c FROM Case WHERE subject = 'ReclamacionTest' limit 1];
+        List<ContentVersion> resultado = new List<ContentVersion> ();
+        System.runAs(usuario) {
+            resultado = SPV_LCMP_RedaccionEnvioOrganismos.getDocumentosValidados(caso.id);
+        }
+        Test.stopTest();
+        system.assertNotEquals(null , resultado, 'No se ha podido enviar la documentacion');
     }
 }

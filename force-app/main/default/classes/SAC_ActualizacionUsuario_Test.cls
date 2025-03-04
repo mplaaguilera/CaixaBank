@@ -41,7 +41,7 @@ public with sharing class SAC_ActualizacionUsuario_Test {
         usuarios[2].Username = 'usuarioAdminGrupocaixa@testcaixa.com';
         usuarios[2].LastName = 'usuarioAdminGrupo Test'; 
  
-        Database.insert(usuarios);
+        SAC_DatabaseDML.insertListDML(usuarios, false);
 
         List<PermissionSetAssignment> permisos = new List<PermissionSetAssignment>();
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_AdministradorGrupos'];
@@ -52,16 +52,15 @@ public with sharing class SAC_ActualizacionUsuario_Test {
         PermissionSetAssignment psa2 = new PermissionSetAssignment (PermissionSetId = ps2.id, AssigneeId = usuarios[2].id);       
         permisos.add(psa2);
 
-        Database.insert(permisos);
+        SAC_DatabaseDML.insertListDML(permisos, false);
 
         System.runAs(usuarios[0]){
-            Database.insert(gruposColaboradores);
+            SAC_DatabaseDML.insertListDML(gruposColaboradores, false);
 
-            CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = SAC_TestDataFactory.crearColaboradorContact(usuarios[1].id,gruposColaboradores[0].id);
             CC_Grupo_Colaborador_Contact__c grupoColaboradorContact2 = SAC_TestDataFactory.crearColaboradorContact(usuarios[0].id,gruposColaboradores[1].id);
             CC_Grupo_Colaborador_Contact__c grupoColaboradorContactSecundario = SAC_TestDataFactory.crearColaboradorContact(usuarios[1].id,gruposColaboradores[1].id);
-            Database.insert(grupoColaboradorContact2);
-            Database.insert(grupoColaboradorContactSecundario);
+            SAC_DatabaseDML.insertDML(grupoColaboradorContact2, false);
+            SAC_DatabaseDML.insertDML(grupoColaboradorContactSecundario, false);
         }
         
     }
@@ -75,12 +74,13 @@ public with sharing class SAC_ActualizacionUsuario_Test {
 
         PermissionSet ps2 = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa2 = new PermissionSetAssignment (PermissionSetId = ps2.id, AssigneeId = usuarioAdministrador.id);       
-        Database.insert(psa2);
+        SAC_DatabaseDML.insertDML(psa2, false);
+
 
         system.runAs(usuarioAdministrador){
             Test.startTest();
             CC_Grupo_Colaborador_Contact__c grupoColaboradorContact2 = SAC_TestDataFactory.crearColaboradorContact(usuarioAdministrador.id,grupo.id);
-            Database.insert(grupoColaboradorContact2);
+            SAC_DatabaseDML.insertDML(grupoColaboradorContact2, false);
 
             List<CC_Grupo_Colaborador_Contact__c> listaTest = [SELECT Id, CC_Grupo_Colaborador__r.RecordTypeId, CC_Usuario__c, CC_Grupo_Colaborador__c
                                                             FROM CC_Grupo_Colaborador_Contact__c ];
@@ -104,7 +104,7 @@ public with sharing class SAC_ActualizacionUsuario_Test {
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_Administrador'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioAdministrador.id);       
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
 
         grupoViejo = [SELECT SAC_GruposPerteneciente__c FROM User WHERE Username = 'admin123@testcaixa1.com'].SAC_GruposPerteneciente__c;
            
@@ -116,7 +116,8 @@ public with sharing class SAC_ActualizacionUsuario_Test {
         
         system.runAs(usuarioAdministrador){
             Test.startTest(); 
-            Database.update(listaTest); 
+            SAC_DatabaseDML.updateListDML(listaTest, false);
+
             Test.stopTest();
         }    
 
@@ -137,12 +138,12 @@ public with sharing class SAC_ActualizacionUsuario_Test {
             grupoC.Name = 'Grupo Proveedores Test 2';
             grupoC.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SAC_GrupoProveedores').getRecordTypeId();
             grupoC.SAC_MaximoCasosDiarios__c=10;
-            Database.insert(grupoC);
+            SAC_DatabaseDML.insertDML(grupoC, false);
        
             CC_Grupo_Colaborador_Contact__c grupoCC = new CC_Grupo_Colaborador_Contact__c();
             grupoCC.CC_Grupo_Colaborador__c = grupoC.id;
             grupoCC.CC_Usuario__c = usuarioQueSeActualiza.id;
-            Database.insert(grupoCC);
+            SAC_DatabaseDML.insertDML(grupoCC, false);
 
             List<CC_Grupo_Colaborador_Contact__c> listaTest = [SELECT Id, CC_Grupo_Colaborador__r.RecordTypeId, CC_Usuario__c, CC_Grupo_Colaborador__c
                                                             FROM CC_Grupo_Colaborador_Contact__c ];
@@ -160,7 +161,7 @@ public with sharing class SAC_ActualizacionUsuario_Test {
     static void borrarGrupoColaboradorContactTest() {
 
         User usuarioAdministrador = [SELECT id From User Where Username = 'admin123@testcaixa1.com' AND isActive = true Limit 1];
-        User usuarioQueSeActualiza = [SELECT id, SAC_GruposPerteneciente__c FROM User WHERE Username = 'usergeneralcaixa@testcaixa.com' AND isActive = true];
+
 
         List<CC_Grupo_Colaborador_Contact__c> listaTest = [SELECT Id, CC_Grupo_Colaborador__r.RecordTypeId, CC_Usuario__c, CC_Grupo_Colaborador__c
                                                         FROM CC_Grupo_Colaborador_Contact__c WHERE CC_Usuario__c = :usuarioAdministrador.Id LIMIT 1];
@@ -169,11 +170,11 @@ public with sharing class SAC_ActualizacionUsuario_Test {
 
         system.runAs(usuarioAdministrador){
             Test.startTest();
-            Database.delete(listaTest);
+            SAC_DatabaseDML.deleteListDML(listaTest, false);
             Test.stopTest();
         }
-        List<CC_Grupo_Colaborador_Contact__c> listaComprobacion = [SELECT ID FROM CC_Grupo_Colaborador_Contact__c WHERE Id = :idGrupoColaboradorContact];
-        system.assertEquals(listaComprobacion.size() , 0, 'No se ha borrado la lista.');
+
+        system.assertEquals([SELECT Count() FROM CC_Grupo_Colaborador_Contact__c WHERE Id = :idGrupoColaboradorContact] , 0, 'No se ha borrado la lista.');
     }
 
     @isTest
@@ -188,16 +189,16 @@ public with sharing class SAC_ActualizacionUsuario_Test {
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_AdministradorGrupos'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuarioAdministrador.id);       
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
 
         system.runAs(usuarioAdministrador){
             Test.startTest();
-            Database.delete(listaTest);
+            SAC_DatabaseDML.deleteListDML(listaTest, false);
             Test.stopTest();
         }
 
-        List<CC_Grupo_Colaborador__c> listaComprobacion = [SELECT ID FROM CC_Grupo_Colaborador__c WHERE Id = :idGrupoColaborador];
-        system.assertEquals(listaComprobacion.size() , 0, 'No se ha borrado la lista.');
+
+        system.assertEquals([SELECT Count() FROM CC_Grupo_Colaborador__c WHERE Id = :idGrupoColaborador] , 0, 'No se ha borrado la lista.');
     }
 
     @istest
@@ -216,29 +217,27 @@ public with sharing class SAC_ActualizacionUsuario_Test {
             grupoColaborador.SAC_PorcentajeAsignacion__c=0;
             grupoColaborador.SAC_MaximoCasosDiarios__c = 15;
 
-            Database.insert(grupoColaborador);
+            SAC_DatabaseDML.insertDML(grupoColaborador, false);
 
             CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = new CC_Grupo_Colaborador_Contact__c();
             grupoColaboradorContact.CC_Grupo_Colaborador__c = grupoColaborador.id;
             grupoColaboradorContact.CC_Usuario__c = usuarioQueSeActualiza.id;
             grupoColaboradorContact.SAC_Supervisor__c = true;
 
-            Database.insert(grupoColaboradorContact);
+            SAC_DatabaseDML.insertDML(grupoColaboradorContact, false);
 
             grupoColaboradorContact.SAC_Supervisor__c = false;
-            Database.update(grupoColaboradorContact);
+            SAC_DatabaseDML.updateDML(grupoColaboradorContact, false);
 
             grupoColaboradorContact.SAC_Supervisor__c = true;
-            Database.update(grupoColaboradorContact);
+            SAC_DatabaseDML.updateDML(grupoColaboradorContact, false);
 
-            Database.delete(grupoColaboradorContact);
+            SAC_DatabaseDML.deleteDML(grupoColaboradorContact, false);
             Test.stopTest();
         }
-        
-        List<CC_Grupo_Colaborador_Contact__c> listaComprobacion = [SELECT Id, CC_Usuario__c FROM CC_Grupo_Colaborador_Contact__c 
-                            WHERE CC_Usuario__c = :usuarioQueSeActualiza.Id AND CC_Grupo_Colaborador__c =: grupoColaborador.Id];
 
-        System.assertEquals(0, listaComprobacion.size(), 'NO se ha eliminado el grupo colaborador contact correctamente.');
+        System.assertEquals(0, [SELECT Count() FROM CC_Grupo_Colaborador_Contact__c 
+                            WHERE CC_Usuario__c = :usuarioQueSeActualiza.Id AND CC_Grupo_Colaborador__c =: grupoColaborador.Id], 'NO se ha eliminado el grupo colaborador contact correctamente.');
     }
 
     @istest
@@ -257,29 +256,27 @@ public with sharing class SAC_ActualizacionUsuario_Test {
             grupoColaborador.SAC_PorcentajeAsignacion__c=0;
             grupoColaborador.SAC_MaximoCasosDiarios__c = 15;
 
-            Database.insert(grupoColaborador);
+            SAC_DatabaseDML.insertDML(grupoColaborador, false);
 
             CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = new CC_Grupo_Colaborador_Contact__c();
             grupoColaboradorContact.CC_Grupo_Colaborador__c = grupoColaborador.id;
             grupoColaboradorContact.CC_Usuario__c = usuarioQueSeActualiza.id;
             grupoColaboradorContact.SAC_Administrador__c = true;
 
-            Database.insert(grupoColaboradorContact);
+            SAC_DatabaseDML.insertDML(grupoColaboradorContact, false);
 
             grupoColaboradorContact.SAC_Administrador__c = false;
-            Database.update(grupoColaboradorContact);
+            SAC_DatabaseDML.updateDML(grupoColaboradorContact, false);
 
             grupoColaboradorContact.SAC_Administrador__c = true;
-            Database.update(grupoColaboradorContact);
+            SAC_DatabaseDML.updateDML(grupoColaboradorContact, false);
 
-            Database.delete(grupoColaboradorContact);
+            SAC_DatabaseDML.deleteDML(grupoColaboradorContact, false);
             Test.stopTest();
         }
         
-        List<CC_Grupo_Colaborador_Contact__c> listaComprobacion = [SELECT Id, CC_Usuario__c FROM CC_Grupo_Colaborador_Contact__c 
-                            WHERE CC_Usuario__c = :usuarioQueSeActualiza.Id AND CC_Grupo_Colaborador__c =: grupoColaborador.Id];
-
-        System.assertEquals(0, listaComprobacion.size(), 'NO se ha eliminado el grupo colaborador contact correctamente.');
+        System.assertEquals(0, [SELECT Count() FROM CC_Grupo_Colaborador_Contact__c 
+                            WHERE CC_Usuario__c = :usuarioQueSeActualiza.Id AND CC_Grupo_Colaborador__c =: grupoColaborador.Id], 'NO se ha eliminado el grupo colaborador contact correctamente.');
     }
 
 
@@ -299,16 +296,16 @@ public with sharing class SAC_ActualizacionUsuario_Test {
             grupoColaborador.SAC_PorcentajeAsignacion__c=0;
             grupoColaborador.SAC_MaximoCasosDiarios__c = 15;
 
-            Database.insert(grupoColaborador);
+            SAC_DatabaseDML.insertDML(grupoColaborador, false);
 
             CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = new CC_Grupo_Colaborador_Contact__c();
             grupoColaboradorContact.CC_Grupo_Colaborador__c = grupoColaborador.id;
             grupoColaboradorContact.CC_Usuario__c = usuarioQueSeActualiza.id;
             grupoColaboradorContact.SAC_Administrador__c = true;
 
-            Database.insert(grupoColaboradorContact);
+            SAC_DatabaseDML.insertDML(grupoColaboradorContact, false);
 
-            Database.delete(grupoColaboradorContact);
+            SAC_DatabaseDML.deleteDML(grupoColaboradorContact, false);
             Test.stopTest();
         }
         

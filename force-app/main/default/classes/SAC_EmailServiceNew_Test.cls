@@ -121,7 +121,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         direcciones.add('consulta_cops@entrante.com');
         email.toAddresses = direcciones;
         email.ccAddresses = direcciones;
-        email.plainTextBody = 'threadId';
+        email.plainTextBody = 'eeso';
         email.htmlBody= 'eeso';
         email.binaryAttachments = new Messaging.inboundEmail.BinaryAttachment[] { binAttachment};
         email.textAttachments = new Messaging.inboundEmail.TextAttachment[] {txtAttachment};
@@ -182,7 +182,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         List<String> direcciones = new List<String>();
         direcciones.add('abcd');
         email.toAddresses = direcciones;
-        email.plainTextBody = 'threadId';
+        email.plainTextBody = 'eeso ';
         email.htmlBody= 'eeso ';
 
         EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'SAC_EmailService' LIMIT 1];
@@ -245,7 +245,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         List<String> direcciones = new List<String>();
         direcciones.add('emailentrante@entrante.com');
         email.toAddresses = direcciones;
-        email.plainTextBody = 'threadId';
+        email.plainTextBody = 'ref:_threadId:ref';
         email.htmlBody= 'ref:_threadId:ref';
         email.binaryAttachments = new Messaging.inboundEmail.BinaryAttachment[] {binAttachment};
         email.textAttachments = new Messaging.inboundEmail.TextAttachment[] {txtAttachment};
@@ -456,7 +456,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         List<String> direcciones = new List<String>();
         direcciones.add('emailentrante@entrante.com');
         email.toAddresses = direcciones;
-        email.plainTextBody = 'threadId2';
+        email.plainTextBody = 'ref:_threadId2:ref';
         email.htmlBody= 'ref:_threadId2:ref';
         email.binaryAttachments = new Messaging.inboundEmail.BinaryAttachment[] {binAttachment};
         email.textAttachments = new Messaging.inboundEmail.TextAttachment[] {txtAttachment};
@@ -520,7 +520,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         direcciones.add('consulta_cops@entrante.com');
         email.toAddresses = direcciones;
         email.ccAddresses = direcciones;
-        email.plainTextBody = 'threadId';
+        email.plainTextBody = 'eeso';
         email.htmlBody= 'eeso';
         email.binaryAttachments = new Messaging.inboundEmail.BinaryAttachment[] { binAttachment};
         email.textAttachments = new Messaging.inboundEmail.TextAttachment[] {txtAttachment};

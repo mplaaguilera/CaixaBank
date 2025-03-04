@@ -174,4 +174,37 @@ public with sharing class SAC_LCMP_GeneracionDocumento_Test {
 
         System.assertEquals(documentoEnvio2 != null, true);
     }
+    
+    @isTest
+    static void getHeaderAndFooterTest(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true LIMIT 1];
+
+        Id parametro = [SELECT Id FROM Folder WHERE DeveloperName = 'PlantillasSAC' LIMIT 1].Id;
+        Case reclamacion = [SELECT Id, RecordTypeId, SAC_Entidad_Afectada__c FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+        String idReclamacion = reclamacion.Id; 
+        SAC_LCMP_GeneracionDocumento.WrapperTemplate infoTemplate; 
+
+        EmailTemplate e = new EmailTemplate(
+            developerName = 'paraClasetest', 
+            FolderId = usuario.id, 
+            TemplateType= 'Text', 
+            Name = 'test',
+            HtmlValue = 'cuerpo prueba',
+            Subject = 'test'
+        ); 
+    
+        SAC_DatabaseDML.insertDML(e, false);
+
+        EnhancedLetterhead letterhead = new EnhancedLetterhead(Name = 'PlantillaSAC', LetterheadFooter = 'Test Footer', LetterheadHeader = 'Test Header');
+        SAC_DatabaseDML.insertDML(letterhead, false);
+
+        String idPlantilla = e.Id;
+
+        System.RunAs(usuario){   
+            Test.startTest();
+            infoTemplate = SAC_LCMP_GeneracionDocumento.getHeaderAndFooterMTP('es', reclamacion.RecordTypeId, reclamacion.SAC_Entidad_Afectada__c);
+            Assert.areNotEqual(null, infoTemplate, 'Ha fallado la obtención de datos de la plantilla');
+            Test.stopTest();
+        }
+    }
 }

@@ -11,6 +11,17 @@
  * 1.1            US507573         Jose Carlos Blanco   19/01/23     Modificación
 *****************************************************************/
 
+
+/*
+Cosas a añadir:
+    Maestro temas:
+        nombre: Resolución SAC
+        record type: SAC_TipoAdjuntos
+        SAC_DeveloperName__c: RESOLUCION
+    Oficinas
+    grupos de trabajo en cada mcc
+*/
+
 public with sharing class SAC_SetupSandbox {
     //Nombre de la Org
     public static String nombreOrg = UserInfo.getUserName().substringAfterLast('.');
@@ -39,6 +50,9 @@ public with sharing class SAC_SetupSandbox {
     public static Id recTypeHistoricas = Schema.SObjectType.SAC_Antecedentes__c.getRecordTypeInfosByDeveloperName().get('SAC_ReclamacionesHistoricas').getRecordTypeId();
     public static Id recTypeCPC = Schema.SObjectType.SAC_Antecedentes__c.getRecordTypeInfosByDeveloperName().get('SAC_ReclamacionesPrescriptoresCPC').getRecordTypeId();
     
+    //RecordTypes maestro acciones
+    public static Id recTypeMaestroAcciones = Schema.SObjectType.SAC_MaestroAccionesReclamacion__c.getRecordTypeInfosByDeveloperName().get('SAC_MaestroAcciones').getRecordTypeId();
+
     public static void crearUsuarios(){
 
         List<User> usuarios = new List<User>();
@@ -139,8 +153,8 @@ public with sharing class SAC_SetupSandbox {
         usuarios.add(user6);
 	
         if(usuarioComprueba.isEmpty()){
-            
-            Database.insert(usuarios);
+            SAC_DatabaseDML.insertListDML(usuarios, true); 
+            //Database.insert(usuarios);
         }
     }
 
@@ -284,7 +298,8 @@ public with sharing class SAC_SetupSandbox {
             SAC_PermiteEscalado__c = false);
         grupos.add(g11);
 
-        Database.insert(grupos);
+        SAC_DatabaseDML.insertListDML(grupos, true); 
+        //Database.insert(grupos);
 
 
         //Creación Acciones
@@ -292,6 +307,7 @@ public with sharing class SAC_SetupSandbox {
         SAC_MaestroAccionesReclamacion__c ac1 = new SAC_MaestroAccionesReclamacion__c(
             Name = 'Comisiones descubierto',
             SAC_Descripcion__c = 'Comisiones descubierto',
+            RecordTypeId = recTypeMaestroAcciones,
             SAC_PlazoMaximo__c = 2,
             SAC_Prorroga__c = 1,
             SAC_Activo__c = true,
@@ -302,6 +318,7 @@ public with sharing class SAC_SetupSandbox {
         SAC_MaestroAccionesReclamacion__c ac2 = new SAC_MaestroAccionesReclamacion__c(
             Name = 'Comisiones descubierto',
             SAC_Descripcion__c = 'Intereses, Reliquidación de intereses',
+            RecordTypeId = recTypeMaestroAcciones,
             SAC_PlazoMaximo__c = 3,
             SAC_Prorroga__c = 2,
             SAC_Activo__c = true,
@@ -311,6 +328,7 @@ public with sharing class SAC_SetupSandbox {
         SAC_MaestroAccionesReclamacion__c ac3 = new SAC_MaestroAccionesReclamacion__c(
             Name = 'Comisiones descubierto',
             SAC_Descripcion__c = 'Tarjetas, Operaciones TCO tarjetas de  fraude',
+            RecordTypeId = recTypeMaestroAcciones,
             SAC_PlazoMaximo__c = 2,
             SAC_Prorroga__c = 1,
             SAC_Activo__c = true,
@@ -320,6 +338,7 @@ public with sharing class SAC_SetupSandbox {
         SAC_MaestroAccionesReclamacion__c ac4 = new SAC_MaestroAccionesReclamacion__c(
             Name = 'Gastos de formalización, GGH',
             SAC_Descripcion__c = 'Gastos de formalización, GGH',
+            RecordTypeId = recTypeMaestroAcciones,
             SAC_PlazoMaximo__c = 3,
             SAC_Prorroga__c = 1,
             SAC_Activo__c = true,
@@ -329,13 +348,15 @@ public with sharing class SAC_SetupSandbox {
         SAC_MaestroAccionesReclamacion__c ac5 = new SAC_MaestroAccionesReclamacion__c(
             Name = 'Seguros, Devolución recibos',
             SAC_Descripcion__c = 'Seguros, Devolución recibos',
+            RecordTypeId = recTypeMaestroAcciones,
             SAC_PlazoMaximo__c = 3,
             SAC_Prorroga__c = 1,
             SAC_Activo__c = true,
             SAC_EquipoResponsable__c = g11.id);
         acciones.add(ac5);
 
-        Database.insert(acciones);
+        SAC_DatabaseDML.insertListDML(acciones, true); 
+        //Database.insert(acciones);
 
         //Creación MCCs 
 
@@ -448,7 +469,8 @@ public with sharing class SAC_SetupSandbox {
             CC_Motivo__c = mccMotivo3.id);
         mccs.add(mccDetalle3);
 
-        Database.insert(mccs);
+        SAC_DatabaseDML.insertListDML(mccs, true); 
+        //Database.insert(mccs);
 
         //Creación grupos colaboradores MCCs
 
@@ -470,7 +492,8 @@ public with sharing class SAC_SetupSandbox {
             CC_Grupo_Colaborador__c = g3.id);
             mccGrupos.add(mccGrupo3);
 
-            Database.insert(mccGrupos);
+            SAC_DatabaseDML.insertListDML(mccGrupos, true); 
+            //Database.insert(mccGrupos);
 
 
         //Creación de colaboradores
@@ -845,7 +868,8 @@ public with sharing class SAC_SetupSandbox {
         );
         colaboradores.add(gC47);
 
-        Database.insert(colaboradores);
+        SAC_DatabaseDML.insertListDML(colaboradores, true); 
+        //Database.insert(colaboradores);
     }
 
     public static List<Account> creacionPersonAccount(){
@@ -1175,7 +1199,8 @@ public with sharing class SAC_SetupSandbox {
         );
         clientesParticulares.add(pAntecedentes);
 
-        Database.insert(clientesParticulares);
+        SAC_DatabaseDML.insertListDML(clientesParticulares, true); 
+        //Database.insert(clientesParticulares);
         return clientesParticulares;
     }
 
@@ -1185,17 +1210,12 @@ public with sharing class SAC_SetupSandbox {
         SlaProcess slaProceso = [SELECT id FROM SlaProcess WHERE Name = 'SAC_Process' ORDER BY VersionNumber DESC LIMIT 1];
         
         Account pA23 = new Account(
-            FirstName = 'Oliver',
-            LastName = 'Suárez Gómez',
-            RecordTypeId = recTypeClienteParticular,
-            CC_Numero_Documento__c = '7845856Z',
-            CC_Email__c = 'obartoli@caixabank.com',
-            Phone = '935004644',
-            PersonMobilePhone = '658965885',
-            BillingStreet = 'Avd. Diagonal 48 8C',
-            CC_Sexo__pc = 'V'
+            FirstName = 'Cuenta',
+            LastName = 'Entitlement',
+            RecordTypeId = recTypeClienteParticular//tiene que ser el record type generico
         );
-        Database.insert(pA23);
+        SAC_DatabaseDML.insertDML(pA23, false); 
+        //Database.insert(pA23);
 
         Entitlement et = new Entitlement(
             Name = 'Entitlement SAC Reclamacion',
@@ -1204,7 +1224,8 @@ public with sharing class SAC_SetupSandbox {
             StartDate =  Date.newInstance(2021, 02, 15),
             EndDate = Date.newInstance(2050, 02, 15));
 
-        Database.insert(et);
+        SAC_DatabaseDML.insertDML(et, false); 
+        //Database.insert(et);
         return et;
     }
         
@@ -1223,7 +1244,8 @@ public with sharing class SAC_SetupSandbox {
             BillingStreet = 'Avd. Diagonal 48 8C',
             CC_Sexo__pc = 'V'
         );
-        Database.insert(pAntecedentes);
+        SAC_DatabaseDML.insertDML(pAntecedentes, false); 
+        //Database.insert(pAntecedentes);
 
         Case casoReclamacion1 = new Case(
         Subject = 'Reclamacion con antecedentes',
@@ -1232,7 +1254,8 @@ public with sharing class SAC_SetupSandbox {
         AccountId = pAntecedentes.Id,
         RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId());
 
-        Database.insert(casoReclamacion1);
+        SAC_DatabaseDML.insertDML(casoReclamacion1, false); 
+        //Database.insert(casoReclamacion1);
 
         SAC_Antecedentes__c antecedente1 = new SAC_Antecedentes__c(
             Name = 'Antecedente Contact Center',
@@ -1297,7 +1320,8 @@ public with sharing class SAC_SetupSandbox {
             AccountId = pAntecedentes.Id,
             RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId());
     
-        Database.insert(casoReclamacion2);
+        SAC_DatabaseDML.insertDML(casoReclamacion2, false); 
+        //Database.insert(casoReclamacion2);
 
         SAC_Antecedentes__c antecedente7 = new SAC_Antecedentes__c(
             Name = 'Antecedente Contact Center 2',
@@ -1353,7 +1377,8 @@ public with sharing class SAC_SetupSandbox {
         );
         antecedentes.add(antecedente12);
     
-        Database.insert(antecedentes);
+        SAC_DatabaseDML.insertListDML(antecedentes, true); 
+        //Database.insert(antecedentes);
         return antecedentes;
     }    
 }

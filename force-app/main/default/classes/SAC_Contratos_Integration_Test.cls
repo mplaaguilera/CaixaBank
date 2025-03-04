@@ -5,14 +5,16 @@ public with sharing class SAC_Contratos_Integration_Test {
         User usuarioGeneral;
         System.runAs(new User(Id = UserInfo.getUserId())) {
             //Usuario SAC General
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+            //Database.insert(permiSetAssi);
         }
     }
     @isTest
@@ -24,7 +26,8 @@ public with sharing class SAC_Contratos_Integration_Test {
         CBK_IntegrationSetting__c csCliente = new CBK_IntegrationSetting__c();
         csCliente.Name = 'SAC_Contratos_Cliente';
         csCliente.NamedCredential__c = 'callout:API_GWT_PRO/partyReference/customers/contracts';
-        Database.insert(csCliente);
+        SAC_DatabaseDML.insertDML(csCliente, false);  
+        //Database.insert(csCliente);
         
         SAC_Contratos_Integration.ProductResponse  response;
         // Simular la respuesta del servicio HTTP utilizando un mockup de datos
@@ -50,7 +53,8 @@ public with sharing class SAC_Contratos_Integration_Test {
         CBK_IntegrationSetting__c csProductDetail = new CBK_IntegrationSetting__c();
         csProductDetail.Name = 'SAC_Contratos_Detalle';
         csProductDetail.NamedCredential__c = 'callout:API_GWT_PRO/partyReference/customers/commercialProducts/{commercialProductId}?tenure=S';
-        Database.insert(csProductDetail);
+        SAC_DatabaseDML.insertDML(csProductDetail, false);  
+        //Database.insert(csProductDetail);
 
         
         SAC_Contratos_Integration.ProductDetailResponse  response;
@@ -76,7 +80,8 @@ public with sharing class SAC_Contratos_Integration_Test {
         CBK_IntegrationSetting__c csTicket = new CBK_IntegrationSetting__c();
         csTicket.Name = 'SAC_Contratos_Ticket';
         csTicket.NamedCredential__c = 'callout:API_GWT_PRO/customerPosition/customers/tickets';
-        Database.insert(csTicket);
+        SAC_DatabaseDML.insertDML(csTicket, false);  
+        //Database.insert(csTicket);
 
         
         SAC_Contratos_Integration.TicketResponse  response;
@@ -102,7 +107,8 @@ public with sharing class SAC_Contratos_Integration_Test {
         CBK_IntegrationSetting__c csTicket = new CBK_IntegrationSetting__c();
         csTicket.Name = 'SPV_Contratos_Ticket';
         csTicket.NamedCredential__c = 'callout:API_GWT_PRO/customerPosition/customers/tickets';
-        Database.insert(csTicket);
+        SAC_DatabaseDML.insertDML(csTicket, false);  
+        //Database.insert(csTicket);
 
         
         SAC_Contratos_Integration.TicketResponse  response;
@@ -128,7 +134,8 @@ public with sharing class SAC_Contratos_Integration_Test {
         CBK_IntegrationSetting__c csContract = new CBK_IntegrationSetting__c();
         csContract.Name = 'SAC_Contratos_Contrato';
         csContract.NamedCredential__c = 'https://api.private.cer.caixabank.com/customerPosition/customers/contracts?ticket={numTicket}&isCancelledContratcs=true';
-        Database.insert(csContract);
+        SAC_DatabaseDML.insertDML(csContract, false);
+        //Database.insert(csContract);
 
         
         SAC_Contratos_Integration.ContractResponse  response;
@@ -154,7 +161,8 @@ public with sharing class SAC_Contratos_Integration_Test {
         CBK_IntegrationSetting__c csContract = new CBK_IntegrationSetting__c();
         csContract.Name = 'SPV_Contratos_Contrato';
         csContract.NamedCredential__c = 'https://api.private.cer.caixabank.com/customerPosition/customers/contracts?ticket={numTicket}&isCancelledContratcs=true';
-        Database.insert(csContract);
+        SAC_DatabaseDML.insertDML(csContract, false);
+        //Database.insert(csContract);
 
         
         SAC_Contratos_Integration.ContractResponse  response;

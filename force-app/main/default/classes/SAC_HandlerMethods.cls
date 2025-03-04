@@ -12,6 +12,13 @@
  * 															   asociadas a un caso.
  *****************************************************************/
 public without sharing class SAC_HandlerMethods {
+	private static Set<String> objetos = new Set<String>{'CBK_Case_Extension__c', 'Case'};
+	private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
+
+	private static final Id RECTYPECASEEXTENSION = mapRTsObjects.get('CBK_Case_Extension__c').get('SAC_ReclamacionCaseExt').getRecordTypeId();
+	private static final Id RECORDTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
+
+	
 	/*****************************************************************
 	 * Proposito: Método que comprueba si un Caso ha cambiado de Account y Contact y crea
 	 * un registro en el objeto reclamante en caso de que así sea.
@@ -22,8 +29,6 @@ public without sharing class SAC_HandlerMethods {
 	 * 1.0            US213184       Nicolás García   9/05/21      Creación
 	 *****************************************************************/
 	public static void createReclamanteRecord(List<Case> listNewObj, Map<Id, Case> mapOldObj) {
-
-		
 		//RecordTypesIds
 		Id recTypeReclamacion = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
 		Id recTypePretension = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
@@ -199,4 +204,85 @@ public without sharing class SAC_HandlerMethods {
             SAC_DatabaseDML.updateListDML(listaReclamaciones, false);
 		}
 	}
+
+
+	/*******************************************************************************************************************
+     * Proposito: Método para crear un registro asociado del CBK_Case_Extension__c a la reclamacion
+     * 			Modificación 1.1: Se añade que las pretensiones que se crean en las reclamaciones cerradas se ponga a true el campo
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1114134     Sergio Martín   26/12/24     	Creación
+	 * 1.1            US1132463     Sergio Martín   21/01/25     	Modificación
+    **********************************************************************************************************************/
+    /**
+     * @description  Método para crear un registro asociado del CBK_Case_Extension__c a la reclamacion
+     * @param listCasosInsertar
+     */
+    public static void creacionCaseExtension(List<Case> listCasosInsertar) { 
+        List<CBK_Case_Extension__c> listaCaseExtension = new List<CBK_Case_Extension__c>();
+        List<Case> listaCase = new List<Case>();
+        Set<Id> idCasos = new Set<Id>();
+
+        for(Case caso : listCasosInsertar) {
+            CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+            caseExtension.recordTypeId = RECTYPECASEEXTENSION;
+            caseExtension.Case_Id__c = caso.id;
+			// Para la US1132463 se añade que las pretensiones que se crean en las reclamaciones cerradas se ponga a true el campo
+			if(caso.recordTypeId == RECORDTYPEPRETENSION && caso.Status == 'SAC_003') {
+				caseExtension.SAC_PretensionCreadaCerrada__c = true;
+			}
+            listaCaseExtension.add(caseExtension);
+            idCasos.add(caso.id);
+        }
+
+        if (Schema.sObjectType.CBK_Case_Extension__c.isCreateable()) {    
+            SAC_DatabaseDML.insertListDML(listaCaseExtension, false);
+            List<Case> listaCaseActualizar = [SELECT Id, RecordTypeId, Status FROM Case WHERE Id IN :idCasos];
+            if(!listaCaseActualizar.isEmpty()) {
+                for(Case caso : listaCaseActualizar) {
+                    for(CBK_Case_Extension__c extension : listaCaseExtension) {
+                        if(extension.Case_Id__c == caso.id) {
+                            caso.CBK_Case_Extension_Id__c = extension.id;
+                            listaCase.add(caso);
+                        }
+                    }
+                }
+
+                if (Schema.sObjectType.Case.isUpdateable()) {  
+                    SAC_DatabaseDML.updateListDML(listaCase, false);
+                }
+            }
+        }
+    }
+
+
+	/*******************************************************************************************************************
+     * Proposito: Método para insertar permisos al creador de las pretensiones que se crean cerradas directamente
+	 *
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1132463     Sergio Martín   22/01/25     	Creación
+    **********************************************************************************************************************/
+    /**
+     * @description  Método para crear un registro asociado del CBK_Case_Extension__c a la reclamacion
+     * @param listaPretensionesCreadasCerradas
+     */
+    public static void insertarCaseSharePretensionCerrada(List<Case> listaPretensionesCreadasCerradas) { 
+        List<CaseShare> listaCaseShare = new List<CaseShare>();
+        
+        if(!listaPretensionesCreadasCerradas.isEmpty()){
+            for(Case pretension : listaPretensionesCreadasCerradas){
+                CaseShare csNuevo = new CaseShare();
+                csNuevo.CaseId = pretension.Id;
+                csNuevo.UserOrGroupId = pretension.CreatedById;
+                csNuevo.CaseAccessLevel='Edit';
+                listaCaseShare.add(csNuevo);
+            }
+			if(!listaCaseShare.isEmpty()){
+            	SAC_DatabaseDML.insertListDML(listaCaseShare, false);
+			}
+        }
+    }
 }

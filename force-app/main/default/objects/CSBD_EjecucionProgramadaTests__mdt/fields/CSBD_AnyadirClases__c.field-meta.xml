@@ -3,7 +3,7 @@
     <fullName>CSBD_AnyadirClases__c</fullName>
     <defaultValue>false</defaultValue>
     <fieldManageability>DeveloperControlled</fieldManageability>
-    <inlineHelpText>Antes de ejecutar la test suite se le añadirá cualquier clase con el prefijo indicado que no incluya ya.</inlineHelpText>
+    <inlineHelpText>Antes de ejecutar la test suite se le añadirá cualquier clase con el prefijo indicado que no incluya ya y que no esté en la lista de clases excluidas</inlineHelpText>
     <label>Añadir clases automáticamente</label>
     <type>Checkbox</type>
 </CustomField>

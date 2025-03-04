@@ -12,7 +12,8 @@ public with sharing class SAC_SchedulableTaskMisClientes_Test {
         //Users
         List<User> listaUsers = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
         listaUsers[0].Username = 'sac5reclamacion@test.test';
-        Database.insert(listaUsers);
+        SAC_DatabaseDML.insertListDML(listaUsers, false);  
+        //Database.insert(listaUsers);
 
         //MCC
         List<CC_MCC__c> listamccsDetalle = new List<CC_MCC__c>();
@@ -22,7 +23,8 @@ public with sharing class SAC_SchedulableTaskMisClientes_Test {
         Name = 'Avales',
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-0101');
-        Database.insert(mccTematica1);
+        SAC_DatabaseDML.insertDML(mccTematica1, false);  
+        //Database.insert(mccTematica1);
 
         CC_MCC__c mccProdServ1 = new CC_MCC__c(
         RecordTypeId = recTypeProdServ,
@@ -30,7 +32,8 @@ public with sharing class SAC_SchedulableTaskMisClientes_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-010101',
         CC_Tematica__c = mccTematica1.id);
-        Database.insert(mccProdServ1);
+        SAC_DatabaseDML.insertDML(mccProdServ1, false);  
+        //Database.insert(mccProdServ1);
 
         CC_MCC__c mccMotivo1 = new CC_MCC__c(
         RecordTypeId = recTypeMotivo,
@@ -38,7 +41,8 @@ public with sharing class SAC_SchedulableTaskMisClientes_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Producto_Servicio__c = mccProdServ1.id,
         CC_Codigo_Externo__c = 'TEST-0102');
-        Database.insert(mccMotivo1);
+        SAC_DatabaseDML.insertDML(mccMotivo1, false);  
+        //Database.insert(mccMotivo1);
 
         CC_MCC__c mccDetalle2 = new CC_MCC__c(
         RecordTypeId = recTypeDetalle,
@@ -48,7 +52,8 @@ public with sharing class SAC_SchedulableTaskMisClientes_Test {
         CC_Motivo__c = mccMotivo1.id,
         SAC_GenerarTaskMisClientes__c = true);
         listamccsDetalle.add(mccDetalle2);
-        Database.insert(listamccsDetalle);
+        SAC_DatabaseDML.insertListDML(listamccsDetalle, false); 
+        //Database.insert(listamccsDetalle);
 
         //Reclamacion
         List<Case> reclamaciones = new List<Case>();
@@ -65,7 +70,8 @@ public with sharing class SAC_SchedulableTaskMisClientes_Test {
         mapaCamposCaso.put('OwnerId', listaUsers[0].id);
         Case casoReclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
         reclamaciones.add(casoReclamacion3);
-        Database.insert(reclamaciones);
+        SAC_DatabaseDML.insertListDML(reclamaciones, false); 
+        //Database.insert(reclamaciones);
 
         //Pretension
         List<Case> pretensiones = new List<Case>();

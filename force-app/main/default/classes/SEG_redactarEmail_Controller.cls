@@ -929,7 +929,7 @@ public with sharing class SEG_redactarEmail_Controller {
 		Set<String> emailsComSetCc = new Set<String>();
 		Set<String> emailsComSetCco = new Set<String>();
 		
-		Case caso = [SELECT id, AccountId, SEG_Email_Buzon_Entrada__c FROM Case WHERE id =: caseId];
+		Case caso = [SELECT id, AccountId, SEG_Buz_n_de_la_zona__c FROM Case WHERE id =: caseId];
 		
 		if (noContactos == false){
 			
@@ -937,7 +937,7 @@ public with sharing class SEG_redactarEmail_Controller {
 				emailsListado.addAll(emails.split(','));
 			}
 
-			emailsListado = SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(emailsListado, caso.SEG_Email_Buzon_Entrada__c);
+			emailsListado = SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(emailsListado, caso.SEG_Buz_n_de_la_zona__c);
 
 			for (String email : emailsListado) {
 				listadoCorrecto.add(email.replaceAll('\\s+',''));

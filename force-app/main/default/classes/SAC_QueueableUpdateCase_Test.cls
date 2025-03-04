@@ -3,13 +3,13 @@ public with sharing class SAC_QueueableUpdateCase_Test {
     @TestSetup
     static void makeData(){
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         System.runAs(usuarioGeneral){
             //Reclamacion 1
@@ -33,7 +33,7 @@ public with sharing class SAC_QueueableUpdateCase_Test {
             List<Case> listaReclamaciones = new List<Case>();
             listaReclamaciones.add(reclamacion1);
             listaReclamaciones.add(reclamacion2);
-            Database.insert(listaReclamaciones);
+            SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
         }
     }
 
@@ -50,8 +50,16 @@ public with sharing class SAC_QueueableUpdateCase_Test {
        
         System.runAs(usuario){
             Test.startTest();
-            
-            System.enqueueJob(new SAC_QueueableUpdateCase(lstReclamaciones));
+            DateTime dt = DateTime.now();
+            Long dateInMilliseconds = dt.getTime();
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+            .addId(lstReclamaciones.get(0).Id)
+            .addString(String.valueOf(dateInMilliseconds))
+            .build();
+            try {
+                System.enqueueJob(new SAC_QueueableUpdateCase(lstReclamaciones), options);    
+            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
             Test.stopTest();
 
             System.assertNotEquals(lstReclamaciones, null, 'Hay un error');

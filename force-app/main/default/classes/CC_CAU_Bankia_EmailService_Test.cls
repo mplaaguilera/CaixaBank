@@ -83,12 +83,12 @@ public class CC_CAU_Bankia_EmailService_Test {
         Test.stopTest();
 
         Case newCase = [SELECT Id, OwnerId, Subject, Origin, CC_Idioma__c, CC_Canal_Procedencia__c, CC_Tipo_Contacto__c, SuppliedName, 
-                                CC_SuppliedIdioma__c, CC_MailTelfNotif__c, CC_SuppliedUser__c, CC_Id_CAU_Bankia__c
+                                CC_SuppliedIdioma__c, CC_MailTelfNotif__c, CC_SuppliedUser__c
                         FROM Case WHERE Subject = 'RV: Nuevo Caso #12487398 # de PeopleSoft (INTEC ) [Puesto ]' LIMIT 1];
 
         System.assertEquals(colaEmail.Id, newCase.OwnerId, 'Caso asignado a la cola de correos entrantes para CSI Bankia');
         System.assertEquals('RV: Nuevo Caso #12487398 # de PeopleSoft (INTEC ) [Puesto ]', newCase.Subject);
-        System.assertEquals('12487398', newCase.CC_Id_CAU_Bankia__c);
+        //System.assertEquals('12487398', newCase.CC_Id_CAU_Bankia__c);
 
         //System.assertEquals('cau@email.com', newCase.CC_MailTelfNotif__c);
         System.assertEquals('Email', newCase.Origin);
@@ -169,12 +169,12 @@ public class CC_CAU_Bankia_EmailService_Test {
         Test.stopTest();
 
         Case newCase = [SELECT Id, OwnerId, Subject, Origin, CC_Idioma__c, CC_Canal_Procedencia__c, CC_Tipo_Contacto__c, SuppliedName, 
-                                CC_SuppliedIdioma__c, CC_MailTelfNotif__c, CC_SuppliedUser__c, CC_Id_CAU_Bankia__c, ContactId, AccountId
+                                CC_SuppliedIdioma__c, CC_MailTelfNotif__c, CC_SuppliedUser__c,  ContactId, AccountId
                         FROM Case WHERE Subject = 'RV: Nuevo Caso #12487398 # de PeopleSoft (INTEC ) [Puesto ]' LIMIT 1];
 
         System.assertEquals(colaEmail.Id, newCase.OwnerId, 'Caso asignado a la cola de correos entrantes para CSI Bankia');
         System.assertEquals('RV: Nuevo Caso #12487398 # de PeopleSoft (INTEC ) [Puesto ]', newCase.Subject);
-        System.assertEquals('12487398', newCase.CC_Id_CAU_Bankia__c);
+        //System.assertEquals('12487398', newCase.CC_Id_CAU_Bankia__c);
         System.assertEquals('cau@email.com', newCase.CC_MailTelfNotif__c);
         System.assertEquals('Email', newCase.Origin);
         System.assertEquals('es', newCase.CC_Idioma__c);
@@ -241,12 +241,11 @@ public class CC_CAU_Bankia_EmailService_Test {
         Test.stopTest();
 
         Case newCase = [SELECT Id, OwnerId, Subject, Origin, CC_Idioma__c, CC_Canal_Procedencia__c, CC_Tipo_Contacto__c, SuppliedName, 
-                                CC_SuppliedIdioma__c, CC_MailTelfNotif__c, CC_SuppliedUser__c, CC_Id_CAU_Bankia__c
+                                CC_SuppliedIdioma__c, CC_MailTelfNotif__c, CC_SuppliedUser__c
                         FROM Case WHERE Subject = 'RV: Nuevo Caso #12487398 # de PeopleSoft (INTEC ) [Puesto ]' LIMIT 1];
 
         System.assertEquals(colaEmail.Id, newCase.OwnerId, 'Caso asignado a la cola de respuestas para CSI Bankia');
         System.assertEquals('RV: Nuevo Caso #12487398 # de PeopleSoft (INTEC ) [Puesto ]', newCase.Subject);
-        System.assertEquals(null, newCase.CC_Id_CAU_Bankia__c);
         System.assertEquals('cau@email.com', newCase.CC_MailTelfNotif__c);
         System.assertEquals('Email', newCase.Origin);
         System.assertEquals('es', newCase.CC_Idioma__c);

@@ -30,7 +30,6 @@ public without sharing class SAC_TMOGlobal {
     *****************************************************************/
 
     public static void insertarTMOs(List<Case> listaRecPretCons) { 
-        
         List<SAC_TMECaso__c> listaTMOs = new List<SAC_TMECaso__c> ();
 
         for (Case caso : listaRecPretCons) {
@@ -144,7 +143,8 @@ public without sharing class SAC_TMOGlobal {
                     }
                 }                
 
-                Integer listaTPEsCasoSize = listaTPEsCaso.size();
+                List<SAC_TiempoEstados__c> cntListaTPEsCaso = listaTPEsCaso;
+                Integer listaTPEsCasoSize = cntListaTPEsCaso.size();
                 Integer contador = 0;
                 for (SAC_TiempoEstados__c tpe : listaTPEsCaso) {
                     contador++;

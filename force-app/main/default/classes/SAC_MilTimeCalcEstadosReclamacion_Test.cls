@@ -19,13 +19,13 @@ public with sharing class SAC_MilTimeCalcEstadosReclamacion_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         //Reclamación Alta
@@ -107,7 +107,7 @@ public with sharing class SAC_MilTimeCalcEstadosReclamacion_Test {
         listaCasos.add(casoReclamacionSubsanacion);
         listaCasos.add(casoReclamacionNegociacion);
 
-        Database.insert(listaCasos);
+        SAC_DatabaseDML.insertListDML(listaCasos, false);
     }
 
     @isTest
@@ -115,7 +115,7 @@ public with sharing class SAC_MilTimeCalcEstadosReclamacion_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
         MilestoneType[] mtLst = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(mtLst.size() == 0) { return; }
+        if(mtLst.isEmpty()) { return; }
         MilestoneType mt = mtLst[0];
         
         Case casoReclamacionAlta = [SELECT id, RecordTypeId from case where subject = 'TestRec'];
@@ -135,7 +135,7 @@ public with sharing class SAC_MilTimeCalcEstadosReclamacion_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
         MilestoneType[] mtLst = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(mtLst.size() == 0) { return; }
+        if(mtLst.isEmpty()) { return; }
         MilestoneType mt = mtLst[0];
         
         Case casoReclamacionAnalisis = [SELECT id, RecordTypeId from case where subject = 'TestRec2'];
@@ -155,7 +155,7 @@ public with sharing class SAC_MilTimeCalcEstadosReclamacion_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
         MilestoneType[] listMilestoneType = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(listMilestoneType.size() == 0) { return; }
+        if(listMilestoneType.isEmpty()) { return; }
         MilestoneType mt = listMilestoneType[0];
 
         Case casoPretension = [SELECT id, RecordTypeId from case where subject = 'TestPret'];
@@ -175,7 +175,7 @@ public with sharing class SAC_MilTimeCalcEstadosReclamacion_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
         MilestoneType[] mtLst = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(mtLst.size() == 0) { return; }
+        if(mtLst.isEmpty()) { return; }
         MilestoneType mt = mtLst[0];
         
         Case casoReclamacionRedaccion = [SELECT id, RecordTypeId from case where subject = 'TestRec3'];
@@ -196,7 +196,7 @@ public with sharing class SAC_MilTimeCalcEstadosReclamacion_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
         MilestoneType[] mtLst = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(mtLst.size() == 0) { return; }
+        if(mtLst.isEmpty()) { return; }
         MilestoneType mt = mtLst[0];
         
         Case casoReclamacionEjecucion = [SELECT id, RecordTypeId from case where subject = 'TestRec4'];
@@ -216,7 +216,7 @@ public with sharing class SAC_MilTimeCalcEstadosReclamacion_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
         MilestoneType[] mtLst = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(mtLst.size() == 0) { return; }
+        if(mtLst.isEmpty()) { return; }
         MilestoneType mt = mtLst[0];
         
         Case casoReclamacionSubsanacion = [SELECT id, RecordTypeId from case where subject = 'TestRec5'];
@@ -236,7 +236,7 @@ public with sharing class SAC_MilTimeCalcEstadosReclamacion_Test {
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
         MilestoneType[] mtLst = [SELECT Id, Name FROM MilestoneType LIMIT 1];      
-        if(mtLst.size() == 0) { return; }
+        if(mtLst.isEmpty()) { return; }
         MilestoneType mt = mtLst[0];
         
         Case casoReclamacionNegociacion = [SELECT id, RecordTypeId from case where subject = 'TestRec6'];

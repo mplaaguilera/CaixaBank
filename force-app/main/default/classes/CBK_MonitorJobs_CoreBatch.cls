@@ -36,7 +36,7 @@ global class CBK_MonitorJobs_CoreBatch implements Database.Batchable<String>, Da
         //System.schedule('Jobs Details' + sysTime,chron_exp,scheduler);
         //        CBK_MonitorJobs_Batch batch = new CBK_MonitorJobs_Batch();
 		//		  database.executeBatch(batch,1); 
-		CBK_BatchJob.schedulleBatch('CBK_MonitorJobs_Batch' + '_' + String.valueof(DateTime.now().getTime()), 'CBK_MonitorJobs_Batch',1,null,sysTime);
+		CBK_BatchJob.schedulleBatch('CBK_MonitorJobs_Batch' + '_' + CBK_BatchJob_Helper.timestamp(), 'CBK_MonitorJobs_Batch',1,null,sysTime);
 
     }
 /***************/    

@@ -4,29 +4,34 @@ public with sharing class SAC_AsignarTMEs_Test {
     static void actualizacionCaso() {
 
         //Usuario SAC General
-		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);       
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         //Usuario SAC Admin
 		User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';      
-        Database.insert(usuarioAdmin);
+        usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);     
+        //Database.insert(usuarioAdmin);
 
         PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
         PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
         permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
         permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-        Database.insert(permiSetAssiAdmin);
+        SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false);    
+        //Database.insert(permiSetAssiAdmin);
 
         System.runAs(usuarioAdmin){
             List<CC_MCC__c> mccs = SAC_TestDataFactory.crearMCCs();
-            Database.insert(mccs);
+            SAC_DatabaseDML.insertListDML(mccs, false); 
+            //Database.insert(mccs);
             List<SAC_ParametrizacionSLATME__c> listaParams = SAC_TestDataFactory.crearParamsSla('TME',3);
             listaParams[0].SAC_Duracion__c = 5; 
             listaParams[0].SAC_Estados__c='SAC_002';
@@ -43,7 +48,8 @@ public with sharing class SAC_AsignarTMEs_Test {
             camposRecl.put('Subject', 'TestRec');
 
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false); 
+            //Database.insert(reclamacion);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -51,7 +57,8 @@ public with sharing class SAC_AsignarTMEs_Test {
             camposPret.put('SAC_Reclamacion__c', reclamacion.Id);
 
             Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(casoPretension);
+            SAC_DatabaseDML.insertDML(casoPretension, false); 
+            //Database.insert(casoPretension);
         }
 
         Case caso = [SELECT Id FROM Case WHERE Subject = 'TestPret' LIMIT 1];
@@ -66,7 +73,8 @@ public with sharing class SAC_AsignarTMEs_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
 		System.runAs(usuario){
             Test.startTest();
-            Database.update(caso);        
+            SAC_DatabaseDML.updateDML(caso, false); 
+            //Database.update(caso);        
             
             Case casov2 = caso;
 
@@ -78,7 +86,8 @@ public with sharing class SAC_AsignarTMEs_Test {
             casov2.SAC_StatusAuxiliar__c = casov2.Status;
 
             SAC_Case_BU_TRHan.actualizarVariablesControl();
-            Database.update(casov2);
+            SAC_DatabaseDML.updateDML(casov2, false);
+            //Database.update(casov2);
 
             Case casov3 = casov2;
 
@@ -92,7 +101,8 @@ public with sharing class SAC_AsignarTMEs_Test {
             casov3.SAC_Importe_Resuelto__c = 100;
             casov3.SAC_ResultadoNegociacion__c = 'Con acuerdo';
             SAC_Case_BU_TRHan.actualizarVariablesControl();
-            Database.update(casov3);
+            SAC_DatabaseDML.updateDML(casov3, false);
+            //Database.update(casov3);
 
             system.assertNotEquals(tmeCreado, tmeCreadov2, 'No se han creado TMEs en la actualizacion');
             system.assertNotEquals(tmeCreadov2, tmeCreadov3, 'No se han creado TMEs en la actualizacion');

@@ -170,30 +170,107 @@ public with sharing class FRA_Caracteristicas_Controller {
     public static void asociarCaracteristicaCuenta(Id idCaso, Id idCaracteristica) {
         Case caso = [SELECT AccountId FROM Case WHERE Id = :idCaso LIMIT 1];
         Id accountId = caso.AccountId;
-
+    
         if (accountId != null && idCaracteristica != null) {
-            CC_Caracteristica_Detalle__c detalle = new CC_Caracteristica_Detalle__c();
-            
-            detalle.CC_Cuenta__c = accountId; 
-            detalle.CC_Caracteristica__c = idCaracteristica;  
-
-            insert detalle;
+            List<CC_Caracteristica_Detalle__c> existentes = [
+                SELECT Id 
+                FROM CC_Caracteristica_Detalle__c 
+                WHERE CC_Cuenta__c = :accountId AND CC_Caracteristica__c = :idCaracteristica
+                LIMIT 1
+            ];
+    
+            if (existentes.isEmpty()) {
+                CC_Caracteristica_Detalle__c detalle = new CC_Caracteristica_Detalle__c();
+                detalle.CC_Cuenta__c = accountId;
+                detalle.CC_Caracteristica__c = idCaracteristica;
+    
+                insert detalle;
+            }
         }
     }
+    
 
     @AuraEnabled
     public static void asociarCaracteristicaContacto(Id idCaso, Id idCaracteristica) {
-        Case caso = [SELECT contactId FROM Case WHERE Id = :idCaso LIMIT 1];
+        // Obtener el contacto asociado al caso
+        Case caso = [SELECT ContactId FROM Case WHERE Id = :idCaso LIMIT 1];
         Id contactId = caso.ContactId;
-
+    
         if (contactId != null && idCaracteristica != null) {
-            CC_Caracteristica_Detalle__c detalle = new CC_Caracteristica_Detalle__c();
-            
-            detalle.CC_Cliente__c = contactId; 
-            detalle.CC_Caracteristica__c = idCaracteristica;  
-
-            insert detalle;
+            // Verificar si ya existe una asociación
+            List<CC_Caracteristica_Detalle__c> existentes = [
+                SELECT Id 
+                FROM CC_Caracteristica_Detalle__c 
+                WHERE CC_Cliente__c = :contactId AND CC_Caracteristica__c = :idCaracteristica
+                LIMIT 1
+            ];
+    
+            // Si no existe, asociar la característica
+            if (existentes.isEmpty()) {
+                CC_Caracteristica_Detalle__c detalle = new CC_Caracteristica_Detalle__c();
+                detalle.CC_Cliente__c = contactId;
+                detalle.CC_Caracteristica__c = idCaracteristica;
+    
+                insert detalle;
+            }
         }
     }
-       
+     
+    @AuraEnabled(cacheable=true)
+    public static List<CC_Caracteristica_Detalle__c> conseguirCaracteristicaContactoLlamada(Id idLlamada) {
+        String recordTypeAccount;
+        Id idRegistro;
+        if (idLlamada != null) {
+            // Consulta optimizada
+            List<CC_Llamada__c> llamadas = [SELECT CC_Contacto__c, CC_Contacto__r.RecordType.DeveloperName
+                                             FROM CC_Llamada__c 
+                                             WHERE Id = :idLlamada 
+                                             LIMIT 1];
+    
+            if (!llamadas.isEmpty()) {
+                CC_Llamada__c millamada = llamadas[0];
+                idRegistro = millamada.CC_Contacto__c;
+            }
+        }
+    
+        if (idRegistro != null) {
+            return [SELECT CC_Caracteristica__r.CC_Avisar_agente__c, CC_Caracteristica__r.Name, CC_Caracteristica__r.CC_Descripcion__c
+                    FROM CC_Caracteristica_Detalle__c 
+                    WHERE CC_Cliente__c = :idRegistro 
+                      AND CC_Caracteristica__r.CC_Activo__c = true 
+                      AND CC_Caracteristica__r.OS_Negocio__c = 'FRA' 
+                    ORDER BY CC_Caracteristica__r.CC_Prioridad__c];
+        } else {
+            return new List<CC_Caracteristica_Detalle__c>();
+        }
     }
+    
+    @AuraEnabled(cacheable=true)
+    public static List<CC_Caracteristica_Detalle__c> conseguirCaracteristicaCuentaLlamada(Id idLlamada) {
+        String recordTypeAccount;
+        Id idRegistro;
+        if (idLlamada != null) {
+            // Consulta optimizada
+            List<CC_Llamada__c> llamadas = [SELECT CC_Contacto__c, CC_Contacto__r.AccountId, CC_Contacto__r.Account.RecordType.DeveloperName 
+                                             FROM CC_Llamada__c 
+                                             WHERE Id = :idLlamada 
+                                             LIMIT 1];
+    
+            if (!llamadas.isEmpty()) {
+                CC_Llamada__c millamada = llamadas[0];
+                idRegistro = millamada.CC_Contacto__r.AccountId;
+            }
+        }
+    
+        if (idRegistro != null) {
+            return [SELECT CC_Caracteristica__r.CC_Avisar_agente__c, CC_Caracteristica__r.Name, CC_Caracteristica__r.CC_Descripcion__c
+                    FROM CC_Caracteristica_Detalle__c 
+                    WHERE CC_Cuenta__c = :idRegistro 
+                      AND CC_Caracteristica__r.CC_Activo__c = true 
+                      AND CC_Caracteristica__r.OS_Negocio__c = 'FRA' 
+                    ORDER BY CC_Caracteristica__r.CC_Prioridad__c];
+        } else {
+            return new List<CC_Caracteristica_Detalle__c>();
+        }
+    }
+}

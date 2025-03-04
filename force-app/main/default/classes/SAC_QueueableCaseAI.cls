@@ -27,7 +27,8 @@ public without sharing class SAC_QueueableCaseAI implements Queueable {
         }
         //Updatear casos
         if (!mapCaseUpdate.isEmpty()) {
-            Database.update(mapCaseUpdate.values());
+            SAC_DatabaseDML.updateListDML(mapCaseUpdate.values(), true);
+            //Database.update(mapCaseUpdate.values());
         }
         //Enviar acuse recibo (debe estar despues del update, para que ya tengan un thread id añadido en el caso)
         // COMENTADO POR US995254

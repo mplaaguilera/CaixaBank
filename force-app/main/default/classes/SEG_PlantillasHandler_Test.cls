@@ -140,6 +140,7 @@ public class SEG_PlantillasHandler_Test {
 		empresaSEG.CC_Numero_Documento__c = '11111111H';
 		empresaSEG.ParentId = grupoEmpresa.Id;
 		empresaSEG.SEG_Oficina_Gestora_Segmentos__c = centro.Id;
+        empresaSEG.SEG_Prioridad_Carterizacion_Segmentos__c = true;
 		insert empresaSEG;
 
 

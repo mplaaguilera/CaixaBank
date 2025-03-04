@@ -255,6 +255,12 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 		} catch (Exception e) {
 			CBK_Log.error(e);
 		}
+		try{
+			//CSBD_InfobipController.sendInfobipMessage(JSON.serialize(new CSBD_WS_AltaOportunidad_NowInSales.InputLogicaAsincrona(oportunidadesCreadas)))
+			CSBD_InfobipController.sendInfobipMessage(inputJson);
+		}catch(Exception e){
+			CBK_Log.error('CSBD_Infobip_Call_Future', e);
+		}
 	}
 
 	public class InputLogicaAsincrona {
@@ -337,7 +343,7 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 	private static List<String> tiposSolicitudAdmitidos() {
 		return new List<String>{
 			'prestamo', 'hipoteca', 'hipotecaPlataforma', 'renting', 'tpv', 'compraEstrella', 'cmn',
-			'cmb', 'desistimiento', 'desistimiento PAI', 'proAutomatica', 'soporteDigital', 'mac'
+			'cmb', 'desistimiento', 'desistimiento PAI', 'proAutomatica', 'soporteDigital', 'mac', 'macCentralita'
 		};
 	}
 

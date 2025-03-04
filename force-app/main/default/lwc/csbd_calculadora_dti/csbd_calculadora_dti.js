@@ -22,6 +22,7 @@ import OPPTY_TIPO_CONSTRUCCION from '@salesforce/schema/Opportunity.CSBD_TipoCon
 import OPPTY_PRIORIDAD from '@salesforce/schema/Opportunity.CSBD_OC_Prioridad__c';
 import OPPTY_CANAL_ENTRADA from '@salesforce/schema/Opportunity.CSBD_OC_Canal_Entrada__c';
 import OPPTY_CIRBE_SOLICITADO from '@salesforce/schema/Opportunity.CSBD_OC_Cirbe_Solicitado__c';
+import OPPTY_IMPORTE_CIRBE from '@salesforce/schema/Opportunity.CSBD_ImporteCirbe__c';
 import OPPTY_COMUNIDAD_AUTONOMA from '@salesforce/schema/Opportunity.CSBD_Comunidad_Autonoma_2__c';
 import OPPTY_PROVINCIA from '@salesforce/schema/Opportunity.CSBD_Provincia_2__c';
 import OPPTY_CODIGO_POSTAL from '@salesforce/schema/Opportunity.CSBD_CodigoPostal__c';
@@ -55,7 +56,7 @@ import OPPTY_TITULAR2_NUM_HIJOS from '@salesforce/schema/Opportunity.CSBD_Contac
 
 const OPPTY_FIELDS = [
 	OPPTY_IDENTIFICADOR, OPPTY_OWNER_ID, OPPTY_OWNER_NAME, OPPTY_DATOS_CALCULO, OPPTY_TIPO_OPERACION, OPPTY_USO_VIVIENDA,
-	OPPTY_TIPO_CONSTRUCCION, OPPTY_PRIORIDAD, OPPTY_CANAL_ENTRADA, OPPTY_CIRBE_SOLICITADO, OPPTY_COMUNIDAD_AUTONOMA,
+	OPPTY_TIPO_CONSTRUCCION, OPPTY_PRIORIDAD, OPPTY_CANAL_ENTRADA, OPPTY_CIRBE_SOLICITADO, OPPTY_IMPORTE_CIRBE, OPPTY_COMUNIDAD_AUTONOMA,
 	OPPTY_PROVINCIA, OPPTY_CODIGO_POSTAL, OPPTY_MUNICIPIO, OPPTY_VIA_TIPO, OPPTY_VIA_NOMBRE, OPPTY_VIA_NUMERO, OPPTY_VIA_PISO,
 	OPPTY_VIA_PUERTA, OPPTY_PRECIO_INMUEBLE, OPPTY_AMOUNT, OPPTY_NOW_PLAZO, OPPTY_APORTACION_INICIAL, OPPTY_PORCENTAJE_BONIFICACION,
 	OPPTY_DONACION, OPPTY_TIN_INICIAL, OPPTY_CONTACT1_ID, OPPTY_TITULAR1_ID, OPPTY_TITULAR1_NAME, OPPTY_TITULAR1_ESCALA_MAESTRA,
@@ -200,6 +201,7 @@ export default class csbdCalculadoraDti extends NavigationMixin(LightningElement
 		//fieldName es el fieldName de la columna modificada
 		let [fieldName, nuevoValor] = Object.entries(draftValue).find(([key]) => key !== 'id');
 		nuevoValor = nuevoValor ? nuevoValor : 0;
+		typeof nuevoValor === 'string' && (nuevoValor = nuevoValor.trim());
 
 		//Validaciones
 		const camposPorcentajeEditables = ['interes', 'porcentajeGastosConstitucion', 'porcentajeBonificacion'];
@@ -376,6 +378,7 @@ export default class csbdCalculadoraDti extends NavigationMixin(LightningElement
 		fieldsOportunidad[OPPTY_PORCENTAJE_BONIFICACION.fieldApiName] = this.data.porcentajeBonificacion;
 		fieldsOportunidad[OPPTY_DONACION.fieldApiName] = getFieldValue(this.oportunidad, OPPTY_DONACION);
 		fieldsOportunidad[OPPTY_CIRBE_SOLICITADO.fieldApiName] = getFieldValue(this.oportunidad, OPPTY_CIRBE_SOLICITADO);
+		fieldsOportunidad[OPPTY_IMPORTE_CIRBE.fieldApiName] = getFieldValue(this.oportunidad, OPPTY_IMPORTE_CIRBE);
 		updateRecord({fields: fieldsOportunidad})
 			.then(() => {
 				this.cambiosSinGuardar = false;
@@ -400,7 +403,7 @@ export default class csbdCalculadoraDti extends NavigationMixin(LightningElement
 		if (value === 'borrarDatosGuardados') {
 			this.modalBorrarDatosGuardadosAbrir();
 		} else if (value === 'debugger') {
-			window.setTimeout(() => {debugger}, 1500);
+			//window.setTimeout(() => {debugger}, 1500);
 		} else if (value === 'log') {
 			//eslint-disable-next-line no-console
 			//console.log(this.data.deuda.cuota);

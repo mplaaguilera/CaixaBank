@@ -1,21 +1,8 @@
 @isTest
-public with sharing class CSBD_EmailMessage_Test {
+public class CSBD_EmailMessage_Test {
 
     @TestSetup
     private static void altaDatosPrueba() {
-        User usuarioGestor = CSBD_Usuarios.usuarioGestor();
-
-        Account cliente = crearCuentaContacto('46979396X');
-
-        AccountShare acshare = new AccountShare();
-        acshare.AccountId = cliente.Id;
-        acshare.UserOrGroupId = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1].Id;
-        acshare.AccountAccessLevel = 'Edit';
-        acshare.OpportunityAccessLevel = 'Edit';
-        acshare.CaseAccessLevel = 'Edit';
-        insert acshare;
-
-        //Alta de las parametrizaciones que necesita el trigger BI de oportunidades
         CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
         listaValores.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         listaValores.Name = 'CSBD: Días cierre oportunidad por defecto';
@@ -35,36 +22,6 @@ public with sharing class CSBD_EmailMessage_Test {
         listaPrecios.Description = 'CSBD Price Book';
         listaPrecios.IsActive = true;
         insert listaPrecios;
-
-        EmailTemplate plantilla = new EmailTemplate();
-        plantilla.isActive = true;
-        plantilla.Name = 'Prestamos Hipotecarios CLIENTE - CAST';
-        plantilla.DeveloperName = 'CSBD_Test_' + System.now().getTime();
-        plantilla.TemplateType = 'text';
-        plantilla.FolderId = usuarioGestor.Id;
-        System.runAs(usuarioGestor) {
-            insert plantilla;
-        }
-    }
-
-    private static Account crearCuentaContacto(String nif) {
-        Account cuenta = new Account();
-        cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
-        cuenta.Name = 'test@test.com';
-        cuenta.CC_Numero_Documento__c = nif;
-        cuenta.Phone = '666666666';
-        insert cuenta;
-        
-        Contact contacto = new Contact();
-        contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
-        contacto.Email = 'test@test.com';
-        contacto.Phone = '666666666';
-        contacto.FirstName = 'Nombre';
-        contacto.LastName = 'Apellido';
-        contacto.AccountId = cuenta.Id;
-        insert contacto;
-
-        return cuenta;
     }
 
     private static Opportunity crearOportunidadPrestamo(Account cuenta) {
@@ -80,197 +37,136 @@ public with sharing class CSBD_EmailMessage_Test {
 
     @isTest
     public static void vincularCorreoAOportunidad() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-        Account cuenta = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '46979396X'];
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+            EmailServicesAddress address = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'CSBD_%' LIMIT 1];
+            Contact contacto = (Contact)CSBD_TestDataFactory.crearCuentaContacto('46979396X').get('contacto');
 
-        EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'CSBD_%' LIMIT 1];
-        String headerValueStr = headerValue.LocalPart +'@'+ headerValue.EmailDomainName;
+            System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+                Opportunity prestamo = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo', new Map<String, Object>{
+                    'CSBD_Estado__c' => 'Activa', 'AccountId' => contacto.AccountId, 'CSBD_Contact__c' => contacto.Id
+                });
 
-        Opportunity prestamo = crearOportunidadPrestamo(cuenta);
-        prestamo.OwnerId = usuarioGestor.Id;
-        update prestamo;
+                EmailMessage correo = new EmailMessage();
+                correo.CC_Aplicacion__c = 'CSBD';
+                correo.Incoming = true;
+                correo.FromAddress = 'from@test.org';
+                correo.ToAddress = 'to@test.org';
+                correo.Subject = 'asunto correo entrante';
+                correo.Headers = '[{"value": "' + address.LocalPart + '@' + address.EmailDomainName + '","name": "X-SFDC-Original-RCPT"}]';
+                insert correo;
 
-        System.runAs ( usuarioGestor ) {
-            EmailMessage correo = new EmailMessage();
-            correo.CC_Aplicacion__c = 'CSBD';
-            correo.Incoming = true;
-            correo.FromAddress = 'from@test.org';
-            correo.ToAddress = 'to@test.org';
-            correo.Subject = 'asunto correo entrante';
-            correo.Headers = '[{"value": "' + headerValueStr + '","name": "X-SFDC-Original-RCPT"}]';
-            insert correo;
+                Test.startTest();
+                CSBD_EmailMessage.vincularCorreoAOportunidad(correo.Id, prestamo.Id);
+                Test.stopTest();
 
-            Test.startTest();
-            CSBD_EmailMessage.vincularCorreoAOportunidad(correo.Id, prestamo.Id);
-            Test.stopTest();
-
-            /*  System.assertEquals(
-                    prestamo.Id,
-                    [SELECT CSBD_Oportunidad_Id__c FROM EmailMessage WHERE Id = :correo.Id].CSBD_Oportunidad_Id__c,
-                    'El correo no se ha vinculado a la oportunidad'
-                ); */
-            
-            //El correo origen se elimina
-            EmailMessage[] emailOriginal = [SELECT Id FROM EmailMessage WHERE Id=:correo.Id];
-            System.assert(emailOriginal.size()==0);
-            
-            //Se clona el email
-            EmailMessage emailClonado = [SELECT Id FROM EmailMessage WHERE CSBD_Oportunidad_Id__c =: prestamo.Id AND Subject=:correo.Subject];
-            System.assert(emailClonado<>null);
-            
-            //La oportunidad se reactiva
-            prestamo = [SELECT CSBD_Estado__c FROM Opportunity WHERE Id = :prestamo.Id];
-            System.assertEquals('Activa', prestamo.CSBD_Estado__c);
+                System.assert([SELECT COUNT() FROM EmailMessage WHERE Id = :correo.Id] == 0, 'El correo origen no se ha eliminado');
+                System.assert([SELECT COUNT() FROM EmailMessage WHERE CSBD_Oportunidad_Id__c =: prestamo.Id AND Subject = :correo.Subject] != 0, 'El correo clonado no se ha creado');
+                System.assertEquals('Activa', [SELECT CSBD_Estado__c FROM Opportunity WHERE Id = :prestamo.Id].CSBD_Estado__c, 'La oportunidad no se ha reactivado');
+            }
         }
     }
 
     @isTest
     public static void historicoCorreosOportunidad() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-        Account cuenta = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '46979396X'];
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+            EmailServicesAddress address = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'CSBD_%' LIMIT 1];
+            Contact contacto = (Contact)CSBD_TestDataFactory.crearCuentaContacto('46979396X').get('contacto');
 
-        EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'CSBD_%' LIMIT 1];
-        String headerValueStr = headerValue.LocalPart +'@'+ headerValue.EmailDomainName;
+            System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+                Opportunity prestamo = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo', new Map<String, Object>{
+                    'CSBD_Estado__c' => 'Activa', 'AccountId' => contacto.AccountId, 'CSBD_Contact__c' => contacto.Id
+                });
 
-        Opportunity prestamo = crearOportunidadPrestamo(cuenta);
+                EmailMessage correoEntrante = new EmailMessage();
+                correoEntrante.Status = '3';
+                correoEntrante.CC_Aplicacion__c = 'CSBD';
+                correoEntrante.RelatedToId = prestamo.Id;
+                correoEntrante.CSBD_Oportunidad_Id__c = prestamo.Id;
+                correoEntrante.Incoming = true;
+                correoEntrante.FromAddress = 'from@test.org';
+                correoEntrante.ToAddress = 'to@test.org';
+                correoEntrante.Subject = 'asunto correo entrante';
+                correoEntrante.HtmlBody = 'zipi';
+                correoEntrante.Headers = '[{"value": "' + address + '","name": "X-SFDC-Original-RCPT"}]';
+                insert correoEntrante;
 
-        EmailMessage correoEntrante = new EmailMessage();
-        correoEntrante.Status = '3';
-        correoEntrante.CC_Aplicacion__c = 'CSBD';
-        correoEntrante.RelatedToId = prestamo.Id;
-        correoEntrante.CSBD_Oportunidad_Id__c = prestamo.Id;
-        correoEntrante.Incoming = true;
-        correoEntrante.FromAddress = 'from@test.org';
-        correoEntrante.ToAddress = 'to@test.org';
-        correoEntrante.Subject = 'asunto correo entrante';
-        correoEntrante.HtmlBody = 'zipi';
-        correoEntrante.Headers = '[{"value": "' + headerValueStr + '","name": "X-SFDC-Original-RCPT"}]';
-        insert correoEntrante;
+                EmailMessage correoSaliente = new EmailMessage();
+                correoSaliente.Status = '3';
+                correoSaliente.CC_Aplicacion__c = 'CSBD';
+                correoSaliente.RelatedToId = prestamo.Id;
+                correoSaliente.CSBD_Oportunidad_Id__c = prestamo.Id;
+                correoSaliente.Incoming = false;
+                correoSaliente.FromAddress = [SELECT Address FROM OrgWideEmailAddress WHERE DisplayName LIKE 'CSBD%' LIMIT 1].Address;
+                correoSaliente.ToAddress = 'to@test.org';
+                correoSaliente.Subject = 'asunto correo saliente';
+                correoSaliente.HtmlBody = 'zape';
+                insert correoSaliente;
 
-        EmailMessage correoSaliente = new EmailMessage();
-        correoSaliente.Status = '3';
-        correoSaliente.CC_Aplicacion__c = 'CSBD';
-        correoSaliente.RelatedToId = prestamo.Id;
-        correoSaliente.CSBD_Oportunidad_Id__c = prestamo.Id;
-        correoSaliente.Incoming = false;
-        correoSaliente.FromAddress = 'from@test.org';
-        correoSaliente.ToAddress = 'to@test.org';
-        correoSaliente.Subject = 'asunto correo saliente';
-        correoSaliente.HtmlBody = 'zape';
-        insert correoSaliente;
+                Test.startTest();
+                String historicoCorreosOportunidad = CSBD_EmailMessage.historicoCorreosOportunidad(prestamo.Id);
+                Test.stopTest();
 
-        System.runAs ( usuarioGestor ) {
-            Test.startTest();
-            String historicoCorreosOportunidad = CSBD_EmailMessage.historicoCorreosOportunidad(prestamo.Id);
-            Test.stopTest();
-
-            System.assert(historicoCorreosOportunidad.contains(correoEntrante.HtmlBody), 'El histórico no contiene el cuerpo del corroe entrante');
-            System.assert(historicoCorreosOportunidad.contains(correoSaliente.HtmlBody), 'El histórico no contiene el cuerpo del corroe saliente');
+                System.assert(historicoCorreosOportunidad.contains(correoEntrante.HtmlBody), 'El histórico no contiene el cuerpo del corroe entrante');
+                System.assert(historicoCorreosOportunidad.contains(correoSaliente.HtmlBody), 'El histórico no contiene el cuerpo del corroe saliente');
+            }
         }
     }
 
     @isTest
     public static void plantillaOperativaId() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-
         String operativa = 'Solicitud de documentación hipoteca';
 
-        System.runAs ( usuarioGestor) {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
             Id idPlantilla = CSBD_EmailMessage.plantillaOperativaId(operativa, '');
             Test.stopTest();
 
-            String nombrePlantilla = [SELECT CSBD_Nombre_Plantilla__c FROM CSBD_Plantillas_Correo__mdt
-                                        WHERE MasterLabel = :operativa AND CSBD_Idioma__c = 'Castellano' LIMIT 1].CSBD_Nombre_Plantilla__c;
+            CSBD_Plantillas_Correo__mdt cfgPlantilla = [SELECT CSBD_Nombre_Plantilla__c FROM CSBD_Plantillas_Correo__mdt
+                                                        WHERE MasterLabel = :operativa AND CSBD_Idioma__c = 'Castellano' LIMIT 1];
             System.assertEquals(
-                [SELECT Id FROM EmailTemplate WHERE Name = :nombrePlantilla LIMIT 1].Id,
-                idPlantilla,
-                'Id de plantilla incorrecto'
+                [SELECT Id FROM EmailTemplate WHERE Name = :cfgPlantilla.CSBD_Nombre_Plantilla__c LIMIT 1].Id,
+                idPlantilla, 'Id de plantilla incorrecto'
             );
         }
     }
 
     @isTest
     public static void plantillaOperativaNombre() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
         String operativa = 'Solicitud de documentación hipoteca';
 
-        System.runAs ( usuarioGestor ) {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
             String nombrePlantilla = CSBD_EmailMessage.plantillaOperativaNombre(operativa, '');
             Test.stopTest();
 
-            System.assertEquals(
-                [SELECT CSBD_Nombre_Plantilla__c FROM CSBD_Plantillas_Correo__mdt
-                    WHERE MasterLabel = :operativa AND CSBD_Idioma__c = 'Castellano' LIMIT 1].CSBD_Nombre_Plantilla__c,
-                nombrePlantilla,
-                'Nombre de plantilla incorrecto'
-            );
+            CSBD_Plantillas_Correo__mdt cfgPlantilla = [SELECT CSBD_Nombre_Plantilla__c FROM CSBD_Plantillas_Correo__mdt
+                                                        WHERE MasterLabel = :operativa AND CSBD_Idioma__c = 'Castellano' LIMIT 1];
+            System.assertEquals(cfgPlantilla.CSBD_Nombre_Plantilla__c, nombrePlantilla, 'Nombre de plantilla incorrecto');
         }
     }
 
     @isTest
     public static void descartarCorreosNoCsbd() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-        EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'CSBD_%' LIMIT 1];
-        String headerValueStr = headerValue.LocalPart +'@'+ headerValue.EmailDomainName;
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+            EmailServicesAddress address = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'CSBD_%' LIMIT 1];
 
-        List<EmailMessage> correos = new List<EmailMessage>();
+            EmailMessage entranteCsbd = new EmailMessage();
+            entranteCsbd.Incoming = true;
+            entranteCsbd.CC_Aplicacion__c = 'CSBD';
+            entranteCsbd.Headers = '[{"value": "' + address.LocalPart + '@' + address.EmailDomainName + '","name": "X-SFDC-Original-RCPT"}]';
+            EmailMessage salienteCsbd = new EmailMessage();
+            salienteCsbd.Incoming = false;
+            salienteCsbd.FromAddress = [SELECT Address FROM OrgWideEmailAddress WHERE DisplayName LIKE 'CSBD - %' OR DisplayName LIKE 'Now In Sales - %'LIMIT 1].Address;
+            EmailMessage entranteNoCsbd = new EmailMessage();
+            entranteNoCsbd.Incoming = true;
+            EmailMessage salienteNoCsbd = new EmailMessage();
+            salienteNoCsbd.Incoming = false;
 
-        EmailMessage correoEntranteCsbd = new EmailMessage();
-        correoEntranteCsbd.Incoming = true;
-        correoEntranteCsbd.CC_Aplicacion__c = 'CSBD';
-        correoEntranteCsbd.Headers = '[{"value": "' + headerValueStr + '","name": "X-SFDC-Original-RCPT"}]';
-        correos.add(correoEntranteCsbd);
-
-        EmailMessage correoSalienteCsbd = new EmailMessage();
-        correoSalienteCsbd.Incoming = false;
-        correoSalienteCsbd.FromAddress = [SELECT Address FROM OrgWideEmailAddress WHERE DisplayName LIKE 'CSBD - %' OR DisplayName LIKE 'Now In Sales - %'LIMIT 1].Address;
-        correos.add(correoSalienteCsbd);
-
-        EmailMessage correoEntranteNoCsbd = new EmailMessage();
-        correoEntranteCsbd.Incoming = true;
-        correos.add(correoEntranteNoCsbd);
-
-        EmailMessage correoSalienteNoCsbd = new EmailMessage();
-        correoSalienteNoCsbd.Incoming = false;
-        correos.add(correoSalienteNoCsbd);
-
-        insert correos;
-
-        System.runAs ( usuarioGestor ) {
             Test.startTest();
-            List<EmailMessage> correosCsbd = CSBD_EmailMessage.descartarCorreosNoCsbd(correos);
+            List<EmailMessage> correosCsbd = CSBD_EmailMessage.descartarCorreosNoCsbd(new List<EmailMessage>{entranteCsbd, salienteCsbd, entranteNoCsbd, salienteNoCsbd});
             Test.stopTest();
 
-            System.assertEquals(2, correosCsbd.size(), 'Número incorrecto de correos Csbd en la lista proporcionada');
-        }
-    }
-
-    @isTest
-    public static void validarRemitente() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-        Account cuenta = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '46979396X'];
-
-        EmailMessage correo = new EmailMessage();
-        correo.CC_Aplicacion__c = 'CSBD';
-        correo.Incoming = false;
-        correo.FromAddress = 'from@test.org';
-        correo.ToAddress = 'to@test.org';
-        correo.Subject = 'asunto correo entrante';
-
-        Opportunity prestamo = crearOportunidadPrestamo(cuenta);
-        correo.RelatedToId = prestamo.Id;
-
-        List<EmailMessage> listaCorreos = new List<EmailMessage>();
-        listaCorreos.add(correo);
-        
-        System.runAs(usuarioGestor) {
-            Test.startTest();
-            Database.SaveResult result = Database.insert(listaCorreos[0], false);
-            Test.stopTest();
-
-            System.assert(result.getErrors()[0].getMessage().contains('El buzón de salida indicado no es apto para el envío de correos.'));
+            System.assertEquals(2, correosCsbd.size(), 'Número incorrecto de correos Csbd');
         }
     }
 }

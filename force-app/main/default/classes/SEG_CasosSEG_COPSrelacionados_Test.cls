@@ -27,13 +27,23 @@ public with sharing class SEG_CasosSEG_COPSrelacionados_Test {
 
         Contact contacto = new Contact();
         contacto.FirstName = 'Contacto01';
-        contacto.LastName = 'Contacto01';
+        contacto.LastName = 'Contacto01'; 
         contacto.CC_NumPerso__c = '25345561';
         contacto.AccountId = cuenta.Id;
         contacto.CC_Idioma__c = 'Es';
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
         contacto.Email = 'correo@prueba.com';
         insert contacto;
+
+        Contact contacto2 = new Contact();
+        contacto2.FirstName = 'Contacto02';
+        contacto2.LastName = 'Contacto02';
+        contacto2.CC_NumPerso__c = '25345562';
+        contacto2.AccountId = cuenta.Id;
+        contacto2.CC_Idioma__c = 'Es';
+        contacto2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
+        contacto2.Email = 'correo2@prueba.com';
+        insert contacto2;
 
         CC_MCC__c tematica = new CC_MCC__c();
 		tematica.Name = 'tematica cops test';
@@ -320,6 +330,7 @@ public with sharing class SEG_CasosSEG_COPSrelacionados_Test {
 		System.debug('::: id mensaje  - '+correo.Id);
 
 		Contact contacto = [SELECT Id, AccountId FROM Contact WHERE Email = 'correo@prueba.com'];
+        Contact contacto2 = [SELECT Id, AccountId FROM Contact WHERE Email = 'correo2@prueba.com'];
 		CC_MCC__c mccs =[SELECT Id, CC_Producto_Servicio__c, CC_Tematica__c FROM CC_MCC__c  WHERE CC_Codigo_Externo__c = 'MOC-000001'];
         Id recordTypeSeg = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
 		Id recordTypeOs = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
@@ -352,8 +363,26 @@ public with sharing class SEG_CasosSEG_COPSrelacionados_Test {
                 SEG_Id_Related_Mail__c = correo.Id
 			);
         lstCase.add(caso2);
-		insert lstCase;
 
+        Case caso3 = new Case(
+		RecordTypeId = recordTypeOs,
+        Subject = 'Caso OS_EmailService_Test3',
+        Origin = 'Email',
+        Status = 'Activo',
+        AccountId = contacto2.AccountId,
+        ContactId = contacto2.Id,
+        CC_Idioma__c = 'es',
+        CC_Detalles_Consulta__c = 'Detalles consulta',
+        CC_Detalles_Solucion__c = 'Detalles solución',
+        CC_MCC_Tematica__c = mccs.CC_Tematica__c,
+        CC_MCC_ProdServ__c = mccs.CC_Producto_Servicio__c,
+        CC_MCC_Motivo__c = mccs.Id,
+        CC_Canal_Procedencia__c = 'Buzón CCI Holabank',
+        CC_Tipo_Contacto__c = 'Asesoramiento',
+		SEG_Id_Related_Mail__c = correo.Id
+			);
+        lstCase.add(caso3);
+		insert lstCase;
         
         SEG_CasosSEG_COPSrelacionados job = new SEG_CasosSEG_COPSrelacionados(correo.Id, correo.htmlBody, correo.subject);
         System.runAs (usuarioAdmin) {
@@ -380,7 +409,7 @@ public with sharing class SEG_CasosSEG_COPSrelacionados_Test {
 			Integer countCases = 
 			Database.countQuery(QueryString);	
 			
-            System.assertEquals( 2, countCases);
+            System.assertEquals( 3, countCases, 'Los casos actuales son 3');
         }   
     }
 }

@@ -8,6 +8,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
         Id roleCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center'].Id;
         Id roleDirectorioCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center_sin_acceso_a_Directorio'].Id;
         PermissionSet psOperadorCliente = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_Cliente'];
+        PermissionSet psOperadorEmpleado = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO'];
         PermissionSet psAVGestorOp = [SELECT Id FROM PermissionSet WHERE Name = 'AV_GestorOperativa'];
         PermissionSet psClasses = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Classes'];
         List<User> userList = new List<User>();
@@ -49,6 +50,9 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
         
         PermissionSetAssignment psaOperadorCliente = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psOperadorCliente.Id);
         insertPSAssOperadores.add(psaOperadorCliente);
+
+        PermissionSetAssignment psaOperadorEmpleado = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psOperadorEmpleado.Id);
+        insertPSAssOperadores.add(psaOperadorEmpleado);
 
         PermissionSetAssignment psaOperadorClasses = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psClasses.Id);
         insertPSAssOperadores.add(psaOperadorClasses);
@@ -111,6 +115,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             contactoEmple.AccountId = centro.Id;
             contactoEmple.RecordtypeId =  rtEmpleado;
             contactoEmple.CC_Num_Empleado_Generico__c = '12345';
+            contactoEmple.AV_Pool__c = true;
             insert contactoEmple;
 
             //Accounts
@@ -119,13 +124,24 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Account cuentaCliente = new Account();
             cuentaCliente.LastName = 'Cliente Senior';
             cuentaCliente.AV_EAPGestor__c = contactoEmple.Id;
-            cuentaCliente.CC_NumPerso__c = '0000012';
+            cuentaCliente.CC_NumPerso__c = '214622853';
+            cuentaCliente.AV_NumPerso__c = '214622853';
             cuentaCliente.AV_IndicadoresClientes__c = '28';
             cuentaCliente.AV_OficinaPrincipal__c = centro.Id;
             cuentaCliente.RecordtypeId =  rtClientePA;
             cuentaCliente.CC_Numero_Documento__c = '45729937A';
             cuentaCliente.AV_Cliente__c = true;
             accounts.add(cuentaCliente);
+
+            Account cuentaCaixa = new Account();
+            cuentaCaixa.LastName = 'Cliente Senior';
+            cuentaCaixa.AV_EAPGestor__c = contactoEmple.Id;
+            cuentaCaixa.CC_NumPerso__c = '0000015';
+            cuentaCaixa.AV_OficinaPrincipal__c = centro.Id;
+            cuentaCaixa.RecordtypeId =  rtClientePA;
+            cuentaCaixa.CC_Numero_Documento__c = '45729937B';
+            cuentaCaixa.AV_Cliente__c = true;
+            accounts.add(cuentaCaixa);
 
             Account clienteConfidencial = new Account();
             clienteConfidencial.LastName = 'Cliente Senior';
@@ -204,7 +220,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             accounts.add(cuentaNoImaginContact);
             insert accounts;
             
-            for(Account a : accounts) {
+            for(Account a : [SELECT Id FROM Account]) {
                 AccountShare acshare = new AccountShare();
                 acshare.AccountId = a.Id;
                 acshare.UserOrGroupId = operadorCliente.Id;
@@ -443,6 +459,28 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             valor27.CC_Lista__c = listaDerivar.Id;
             valor27.CC_Mensajes_Mostrar__c = '¿Has intentado transferir el caso en online?';
             valores.add(valor27);
+
+            CC_Lista_Valores__c valor28 = new CC_Lista_Valores__c();
+            valor28.Name = 'Toast CSBD No Contratar';
+            valor28.RecordTypeId = recordTypeValor;
+            valor28.CC_Lista__c = listaDerivar.Id;
+            valor28.CC_Mensajes_Mostrar__c = '¿Has intentado transferir el caso en online?';
+            valores.add(valor28);
+
+            
+            CC_Lista_Valores__c valor29 = new CC_Lista_Valores__c();
+            valor29.Name = 'Texto documentacion certificado';
+            valor29.RecordTypeId = recordTypeValor;
+            valor29.CC_Lista__c = listaDerivar.Id;
+            valor29.CC_Mensajes_Mostrar__c = 'textoDocumentacionCertificado';
+            valores.add(valor29);
+
+            CC_Lista_Valores__c valor30 = new CC_Lista_Valores__c();
+            valor30.Name = 'Documentacion certificado caixa';
+            valor30.RecordTypeId = recordTypeValor;
+            valor30.CC_Lista__c = listaDerivar.Id;
+            valor30.CC_Mensajes_Mostrar__c = 'Ventas';
+            valores.add(valor30);
             insert valores;
 
             List<CC_MCC__c> tematicas = new List<CC_MCC__c>();
@@ -646,6 +684,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Name = 'CSBD Contratar',
             RecordTypeId = motivoId,
             CC_Ambito_Tareas_Caixa__c = 'CSBD Contratar',
+            CC_Ambito_Tareas_Imagin__c = 'CSBD Contratar',
             CC_Producto_Servicio__c = producto.Id,
             CC_Tipo_Cliente__c = 'Cliente',
             CC_Codigo_Externo__c = 'MO-000014'
@@ -663,6 +702,42 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             );
             motivos.add(motivoCSBDNoContratar);
             mccCreado.add(motivoCSBDNoContratar);
+
+            CC_MCC__c motivoHubImagin = new CC_MCC__c(
+            Name = 'Hub Imagin',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Imagin__c = 'Hub Imagin',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000016'
+            );
+            motivos.add(motivoHubImagin);
+            mccCreado.add(motivoHubImagin);
+
+            CC_MCC__c motivoOficinaFisica = new CC_MCC__c(
+            Name = 'Oficina fisica',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Caixa__c = 'Oficina física',
+            CC_Ambito_Tareas_Imagin__c = 'Oficina física',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000017'
+            );
+            motivos.add(motivoOficinaFisica);
+            mccCreado.add(motivoOficinaFisica);
+
+            CC_MCC__c motivoDocumentacion = new CC_MCC__c(
+                Name = 'Documentación',
+                RecordTypeId = motivoId,
+                CC_Ambito_Tareas_Caixa__c = 'Documentación',
+                CC_Ambito_Tareas_Imagin__c = 'Documentación',
+                CC_Producto_Servicio__c = producto.Id,
+                CC_Tipo_Cliente__c = 'Cliente',
+                CC_Codigo_Externo__c = 'MO-000018'
+                );
+                motivos.add(motivoDocumentacion);
+                mccCreado.add(motivoDocumentacion);
+
             insert motivos;
             
             CC_MCC__c causaFraude = new CC_MCC__c(
@@ -716,7 +791,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             insert grupo;
 
             CC_MCC_Grupo_Colaborador__c grupoColaboradorMCC = new CC_MCC_Grupo_Colaborador__c();
-            grupoColaboradorMCC.CC_MCC__c = [SELECT Id FROM CC_MCC__c WHERE Name = 'Enrollment Sign'].Id;
+            grupoColaboradorMCC.CC_MCC__c = [SELECT Id FROM CC_MCC__c WHERE Name = 'CSBD 3N' AND RecordType.DeveloperName = 'CC_Motivo' LIMIT 1].Id;
             grupoColaboradorMCC.CC_Grupo_Colaborador__c = grupo.Id;
             grupoColaboradorMCC.Name = 'Grupo Colaborador MCC';
             insert grupoColaboradorMCC;
@@ -783,18 +858,20 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             casoContratarCSBD.CC_MCC_ProdServ__c = producto.Id;
             casoContratarCSBD.CC_MCC_Motivo__c = motivoCSBDContratar.Id;
             casoContratarCSBD.RecordTypeId = recordTypeCaso;
+            casoContratarCSBD.CC_OTP_Valido__c = true;
             insertCase.add(casoContratarCSBD);
 
             Case casoNoContratarCSBD = new Case();
             casoNoContratarCSBD.Subject = 'CSBD No Contratar';
             casoNoContratarCSBD.Origin = 'Email';
             casoNoContratarCSBD.Status = 'Activo';
-            casoNoContratarCSBD.accountId = cuentaCliente.Id;
+            casoNoContratarCSBD.accountId = cuentaCaixa.Id;
             casoNoContratarCSBD.CC_Idioma__c = 'es';
             casoNoContratarCSBD.CC_MCC_Tematica__c = tematica.Id; 
             casoNoContratarCSBD.CC_MCC_ProdServ__c = producto.Id;
             casoNoContratarCSBD.CC_MCC_Motivo__c = motivoCSBDNoContratar.Id;
             casoNoContratarCSBD.RecordTypeId = recordTypeCaso;
+            casoNoContratarCSBD.CC_OTP_Valido__c = true;
             insertCase.add(casoNoContratarCSBD);
             
             Case casoCajeros = new Case();
@@ -1101,6 +1178,85 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             );
     
             insertCase.add(casoDNITestamenteria);
+
+            Case casoHubImagin = new Case(
+                Description = 'casoHubImagin',
+                Subject = 'casoHubImagin',
+                Origin = 'Email',
+                Status = 'Activo',
+                accountId = cuentaImagin.Id,
+                CC_Idioma__c = 'es',
+                CC_MCC_Tematica__c = tematica.Id, 
+                CC_MCC_ProdServ__c = producto.Id,
+                CC_MCC_Motivo__c = motivoHubImagin.Id,
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                RecordTypeId = recordTypeCaso
+            );
+
+            insertCase.add(casoHubImagin);
+
+            Case casoOficinaFisicaImagin = new Case(
+                Description = 'casoOficinaFisicaImagin',
+                Subject = 'casoOficinaFisicaImagin',
+                Origin = 'Email',
+                Status = 'Activo',
+                accountId = cuentaImagin.Id,
+                CC_Idioma__c = 'es',
+                CC_MCC_Tematica__c = tematica.Id, 
+                CC_MCC_ProdServ__c = producto.Id,
+                CC_MCC_Motivo__c = motivoOficinaFisica.Id,
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                RecordTypeId = recordTypeCaso
+            );
+
+            insertCase.add(casoOficinaFisicaImagin);
+
+            Case casoOficinaFisicaNoImagin = new Case(
+                Description = 'casoOficinaFisicaNoImagin',
+                Subject = 'casoOficinaFisicaNoImagin',
+                Origin = 'Email',
+                Status = 'Activo',
+                accountId = cuentaCaixa.Id,
+                CC_Idioma__c = 'es',
+                CC_MCC_Tematica__c = tematica.Id, 
+                CC_MCC_ProdServ__c = producto.Id,
+                CC_MCC_Motivo__c = motivoOficinaFisica.Id,
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                RecordTypeId = recordTypeCaso
+            );
+    
+            insertCase.add(casoOficinaFisicaNoImagin);
+
+            Case casoDocumentacionNoImagin = new Case(
+                Description = 'casoDocumentacionNoImagin',
+                Subject = 'casoDocumentacionNoImagin',
+                Origin = 'Email',
+                Status = 'Activo',
+                accountId = cuentaCaixa.Id,
+                CC_Idioma__c = 'es',
+                CC_MCC_Tematica__c = tematica.Id, 
+                CC_MCC_ProdServ__c = producto.Id,
+                CC_MCC_Motivo__c = motivoDocumentacion.Id,
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                RecordTypeId = recordTypeCaso
+            );
+    
+            insertCase.add(casoDocumentacionNoImagin);
             insert insertCase;
             
             List<CC_Settings__c > listCustomSetting= new List<CC_Settings__c >();
@@ -1142,6 +1298,12 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             customSetting3.CC_Configuracion_14__c = 'test';
             listCustomSetting.add(customSetting3);            
             insert listCustomSetting;
+
+            CBK_IntegrationSetting__c customSettingClienteDigital = new CBK_IntegrationSetting__c();
+            customSettingClienteDigital.Name = 'CC_Autenticacion_SAU_No_Traza';
+            customSettingClienteDigital.NamedCredential__c = 'callout:API_GWT_TST_CCSF/eChannels/eBranchManagement/customers/id/contracts/validation';
+            customSettingClienteDigital.RegistroTrazaIntegracion__c = false;
+            insert customSettingClienteDigital;
             
             List<Group> grupos = new List<Group>();
 
@@ -1161,58 +1323,79 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             QueuesObject queueCSBD = new QueueSObject(QueueID = groupCSBD.id, SObjectType = 'Case');
             colas.add(queueCSBD);
             insert colas;
+
+            Opportunity oportunidad1 = CSBD_Opportunity.crearOportunidad('CSBD_MAC');
+            oportunidad1.CSBD_CasoOrigen__c = casoEnrollment.Id;
+            update oportunidad1;
         }
     } 
 
     
-    @isTest //Pass
+    @isTest
     public static void getDatosTest() {
         Test.startTest();
-        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' AND AV_ExternalID__c = 'U0124112' AND UserRole.DeveloperName = 'Contact_Center_sin_acceso_a_Directorio' LIMIT 1].Id)) {
             Case casoImagin = [SELECT Id from Case Where CC_Motivo__c LIKE 'Cambio de Oficina' AND Account.AV_IndicadoresClientes__c = '28'];
-            Map<String, Object> resultadoImagin = CC_Operativa_Oficina_Controller.getDatos(casoImagin.Id);
+            Map<String, Object> resultadoImagin = CC_Operativa_Oficina_Controller.getDatos(casoImagin.Id, null);
             System.assertEquals(resultadoImagin.get('mostrarModalCreacionTarea'), true, 'Error en caso Imagin');
             
             Case casoNoImaginOficina = [SELECT Id from Case Where CC_Motivo__c LIKE 'Cambio de Oficina' AND Account.AV_IndicadoresClientes__c != '28'];
-            Map<String, Object> resultadoNoImaginOficina = CC_Operativa_Oficina_Controller.getDatos(casoNoImaginOficina.Id);
+            Map<String, Object> resultadoNoImaginOficina = CC_Operativa_Oficina_Controller.getDatos(casoNoImaginOficina.Id, null);
             System.assertEquals(resultadoNoImaginOficina.get('cambioOficina'), true, 'Error en caso 2');
             
             Case casoNoImaginGestor = [SELECT Id from Case Where CC_Motivo__c = 'Cambio de Gestor'];
-            Map<String, Object> resultadoNoImaginGestor = CC_Operativa_Oficina_Controller.getDatos(casoNoImaginGestor.Id);
+            Map<String, Object> resultadoNoImaginGestor = CC_Operativa_Oficina_Controller.getDatos(casoNoImaginGestor.Id, null);
             System.assertEquals(resultadoNoImaginGestor.get('mostrarModalCreacionTarea'), true, 'Error en caso 3');
             System.assertEquals(resultadoNoImaginGestor.get('cambioGestor'), true, 'Error en caso 3');
             
             Case casoNoImaginPrueba = [SELECT Id from Case Where CC_Motivo__c = 'Cambio de Prueba'];
-            Map<String, Object> resultadoNoImaginPrueba = CC_Operativa_Oficina_Controller.getDatos(casoNoImaginPrueba.Id);
+            Map<String, Object> resultadoNoImaginPrueba = CC_Operativa_Oficina_Controller.getDatos(casoNoImaginPrueba.Id, null);
             //System.assertEquals(resultadoNoImaginPrueba.get('mostrarModalGestionGestorGenerico'), true, 'Error en caso 4');
                        
             Case casoNoImaginNoClientesPrueba = [SELECT Id from Case Where CC_Motivo__c = 'No clientes' AND  Account.AV_IndicadoresClientes__c != '28'];
-            Map<String, Object> resultadoNoImaginPruebaNoCliente = CC_Operativa_Oficina_Controller.getDatos(casoNoImaginNoClientesPrueba.Id);
+            Map<String, Object> resultadoNoImaginPruebaNoCliente = CC_Operativa_Oficina_Controller.getDatos(casoNoImaginNoClientesPrueba.Id, null);
             System.assertEquals(resultadoNoImaginPruebaNoCliente.get('cambioOficina'), true, 'Error en caso 5');
             
             Case cajeros = [SELECT Id from Case Where Subject = 'Cajeros'];
-            Map<String, Object> resultadoCajeros = CC_Operativa_Oficina_Controller.getDatos(cajeros.Id);
+            Map<String, Object> resultadoCajeros = CC_Operativa_Oficina_Controller.getDatos(cajeros.Id, null);
             System.assertNotEquals(resultadoCajeros.get('preguntaCajeros'), null, 'Error en caso cajeros');
             
             Case fraude = [SELECT Id from Case Where Subject = 'Fraude'];
-            Map<String, Object> resultadoFraude = CC_Operativa_Oficina_Controller.getDatos(fraude.Id);
+            Map<String, Object> resultadoFraude = CC_Operativa_Oficina_Controller.getDatos(fraude.Id, null);
             System.assertNotEquals(resultadoFraude.get('preguntaRealizarRemitido'), null, 'Error en caso fraude');
             
             Case testamentaria = [SELECT Id from Case Where Subject = 'casoImaginTestamentaria'];
-            Map<String, Object> resultadoTestamentaria = CC_Operativa_Oficina_Controller.getDatos(testamentaria.Id);
+            Map<String, Object> resultadoTestamentaria = CC_Operativa_Oficina_Controller.getDatos(testamentaria.Id, null);
             System.assertEquals(resultadoTestamentaria.get('mostrarModalDNITestamentaria'), true);
+
+            Case hubImagin = [SELECT Id from Case Where Subject = 'casoHubImagin'];
+            Map<String, Object> resultadoHubImagin = CC_Operativa_Oficina_Controller.getDatos(hubImagin.Id, null);
+            System.assertEquals(resultadoHubImagin.get('hubImagin'), true);
+
+            Case oficinaFisicaImagin = [SELECT Id from Case Where Subject = 'casoOficinaFisicaImagin'];
+            Map<String, Object> resultadoOficinaFisicaImagin = CC_Operativa_Oficina_Controller.getDatos(oficinaFisicaImagin.Id, null);
+            System.assertEquals(resultadoOficinaFisicaImagin.get('oficinaFisica'), true);
+
+            Case oficinaFisicaNoImagin = [SELECT Id from Case Where Subject = 'casoOficinaFisicaNoImagin'];
+            Map<String, Object> resultadoficinaFisicaNoImagin = CC_Operativa_Oficina_Controller.getDatos(oficinaFisicaNoImagin.Id, null);
+            //System.assertEquals(resultadoficinaFisicaNoImagin.get('hubImagin'), true);
 
             /*Case enrollment = [SELECT Id from Case Where Subject = 'casoEnrollmentPreguntaSi'];
             Map<String, Object> resultadoEnrollment = CC_Operativa_Oficina_Controller.getDatos(enrollment.Id);
             System.assertEquals(resultadoEnrollment.get('preguntaEnrollment'), '¿El cliente se encuentra en el extranjero?');*/
 
-            /*Case csbdContratar  = [SELECT Id from Case Where Subject = 'CSBD Contratar'];
-            Map<String, Object> resultadoCSBDContratar  = CC_Operativa_Oficina_Controller.getDatos(csbdContratar.Id);
+            Case csbdContratar  = [SELECT Id, CC_DevolucionCSBD__c from Case Where Subject = 'CSBD Contratar'];
+            Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_SAU(200));
+            Map<String, Object> resultadoCSBDContratar  = CC_Operativa_Oficina_Controller.getDatos(csbdContratar.Id, null);
             System.assertNotEquals(resultadoCSBDContratar.get('preguntaCSBDContratar'), null, 'Error en caso de CSBD Contratar');
 
-            Case csbdNoContratar = [SELECT Id from Case Where Subject = 'CSBD No Contratar'];
-            Map<String, Object> resultadoCSBDNoContratar = CC_Operativa_Oficina_Controller.getDatos(csbdNoContratar.Id);
-            System.assertNotEquals(resultadoCSBDNoContratar.get('toastCSBDNoContratar'), null, 'Error en caso de CSBD No Contratar');*/
+            Case casoDocumentacionNoImagin  = [SELECT Id, CC_DevolucionCSBD__c from Case Where Subject = 'casoDocumentacionNoImagin'];
+            Map<String, Object> casoDocumentacionNoImaginresult  = CC_Operativa_Oficina_Controller.getDatos(casoDocumentacionNoImagin.Id, null);
+            System.debug(JSON.serialize(casoDocumentacionNoImaginresult));
+            System.assertNotEquals(casoDocumentacionNoImaginresult.get('textoDocumentacionCertificado'), null, 'Error en caso de Documentación');
+
+            Case csbdNoContratar = [SELECT Id, AccountId, Account.AV_OficinaPrincipal__r.Parent.CC_Derivacion_CSBD__c, Account.AV_OficinaPrincipal__r.ParentId, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, CC_MCC_Motivo__r.CC_Alerta_Imagin__c from Case Where Subject = 'CSBD No Contratar'];
+            Map<String, Object> resultadoCSBDNoContratar = CC_Operativa_Oficina_Controller.getDatos(csbdNoContratar.Id, null);
         }
         Test.stopTest();
     }
@@ -1228,7 +1411,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
             //Caso ventas
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentas.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);            
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentas.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);            
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1246,7 +1429,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
             Case casoCCVentasImagin = [SELECT Id from Case where Subject = 'casoImaginVentas' LIMIT 1];
             //Caso ventas
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentasImagin.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentasImagin.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1267,7 +1450,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             cuenta.AV_EAPGestor__c = null;
             update cuenta;
             //Caso ventas
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentasImagin.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentasImagin.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1285,8 +1468,8 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
             Case casoCCVentasNoImagin = [SELECT Id from Case where Subject = 'casoNoImaginOficina' LIMIT 1];
             //Caso ventas no imagin
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentasNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true , contacto);            
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentasNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, false, true, null);
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentasNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true , contacto, null);            
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCVentasNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, false, true, null, false);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1305,11 +1488,11 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Case casoCCGestorNoImagin = [SELECT Id from Case where Subject = 'casoNoImaginGestor' LIMIT 1];
             Account cuentaImagin = [SELECT Id from Account where AV_IndicadoresClientes__c = '28' LIMIT 1];
             //Caso gestor no imagin
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCGestorNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCGestorNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             //Caso gestor imagin
             casoCCGestorNoImagin.accountId = cuentaImagin.Id;
             upsert casoCCGestorNoImagin;
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCGestorNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCGestorNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1327,7 +1510,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
             Case casoCCPruebaNoImagin = [SELECT Id from Case where Subject = 'casoNoImaginContact' LIMIT 1];
             //Caso gestor no imagin
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCPruebaNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCPruebaNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1344,7 +1527,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
             Case casoCCPruebaNoImagin = [SELECT Id from Case where Subject = 'casoImaginVentas' LIMIT 1];
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCPruebaNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCPruebaNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1380,7 +1563,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
             Case casoCCPruebaNoImagin = [SELECT Id from Case where Subject = 'casoNoImaginGestor' LIMIT 1];
             //Caso gestor no imagin
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCPruebaNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCPruebaNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1423,7 +1606,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             CC_MCC__c mcc = [SELECT Id from CC_MCC__c where Name = 'Oficina' LIMIT 1];
             caso.CC_MCC_Motivo__c = mcc.Id;
             update caso;
-            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1443,7 +1626,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             CC_MCC__c mcc = [SELECT Id from CC_MCC__c where Name = 'Vacio' LIMIT 1];
             caso.CC_MCC_Motivo__c = mcc.Id;
             update caso;
-            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null,centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null,centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1466,7 +1649,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             cuenta.AV_EAPGestor__c = null;
             update caso;
             update cuenta;
-            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1495,7 +1678,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             insert file;
             List <String> fileList = new List <String>();
             fileList.add(String.valueOf(file.Id)); 
-            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, fileList, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, fileList, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1517,8 +1700,8 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             caso.CC_MCC_Motivo__c = mcc.Id;
             caso.AccountId = cuenta.Id;
             update caso;
-            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
-            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, false, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
+            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, false, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1536,7 +1719,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
             Case casoCCPruebaNoImagin = [SELECT Id, Account.AV_EAPGestor__c from Case where Subject = 'casoNoImaginContact' LIMIT 1];
             //Caso gestor no imagin
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCPruebaNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoCCPruebaNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }
@@ -1555,12 +1738,12 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Case casoNoImaginNoClientes = [SELECT Id, Account.AV_IndicadoresClientes__c from Case where Subject = 'casoNoImaginNoClientes' LIMIT 1];
             
             //Caso gestor no imagin
-            CC_Operativa_Oficina_Controller.crearTarea(casoNoImaginNoClientes.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoNoImaginNoClientes.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
 
             Case casoNoImaginNoClientesPrueba = [SELECT Id, Account.AV_IndicadoresClientes__c from Case where Subject = 'casoImaginPruebaNoClientes' LIMIT 1];
-            CC_Operativa_Oficina_Controller.crearTarea(casoNoImaginNoClientesPrueba.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoNoImaginNoClientesPrueba.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tareaprueba = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tareaprueba.isEmpty(), true);
             }
@@ -1580,15 +1763,69 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             Case casoNoImaginTestamentaria = [SELECT Id, Account.AV_IndicadoresClientes__c from Case where Subject = 'casoNoImaginTestamentaria' LIMIT 1];
             
             //Caso gestor no imagin
-            CC_Operativa_Oficina_Controller.crearTarea(casoNoImaginTestamentaria.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoNoImaginTestamentaria.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
 
             Case casoImaginTestamentaria = [SELECT Id, Account.AV_IndicadoresClientes__c from Case where Subject = 'casoImaginTestamentaria' LIMIT 1];
 
-            CC_Operativa_Oficina_Controller.crearTarea(casoImaginTestamentaria.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto);
+            CC_Operativa_Oficina_Controller.crearTarea(casoImaginTestamentaria.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tareaprueba = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tareaprueba.isEmpty(), true);
+            }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void crearTareaTestHubImagin() {
+        Test.startTest();
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+            String asunto = 'Prueba';
+            String fechaActividad = date.today().toString();
+            String comentarios = 'Prueba';
+            Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
+            Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
+            Case casoHubImagin = [SELECT Id, Account.AV_EAPGestor__c from Case where Subject = 'casoHubImagin' LIMIT 1];
+            //Caso gestor no imagin
+            CC_Operativa_Oficina_Controller.crearTarea(casoHubImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
+            Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
+            System.assert(!tarea.isEmpty(), true);
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void crearTareaTestOficinaFisicaNoImagin() {
+        Test.startTest();
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+            String asunto = 'Prueba';
+            String fechaActividad = date.today().toString();
+            String comentarios = 'Prueba';
+            Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
+            Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
+            Case casoOficinaFisicaNoImagin = [SELECT Id, Account.AV_EAPGestor__c from Case where Subject = 'casoOficinaFisicaNoImagin' LIMIT 1];
+            //Caso gestor no imagin
+            CC_Operativa_Oficina_Controller.crearTarea(casoOficinaFisicaNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
+            Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
+            System.assert(!tarea.isEmpty(), true);
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void crearTareaTestOficinaFisicaImagin() {
+        Test.startTest();
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+            String asunto = 'Prueba';
+            String fechaActividad = date.today().toString();
+            String comentarios = 'Prueba';
+            Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
+            Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
+            Case casoOficinaFisicaImagin = [SELECT Id, Account.AV_EAPGestor__c from Case where Subject = 'casoOficinaFisicaImagin' LIMIT 1];
+            //Caso gestor no imagin
+            CC_Operativa_Oficina_Controller.crearTarea(casoOficinaFisicaImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
+            Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
+            System.assert(!tarea.isEmpty(), true);
             }
         Test.stopTest();
     }
@@ -1691,8 +1928,17 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
         Test.startTest();
         Map<String, Object> respuesta = new Map<String, Object>();
         respuesta.put('casoId', caso.Id);
+        Opportunity oportunidad = [
+            SELECT Id, CSBD_CasoOrigen__r.OwnerId 
+            FROM Opportunity 
+            //WHERE CSBD_CasoOrigen__r.OwnerId  = :caso.Id
+            LIMIT 1
+        ];
+        respuesta.put('oportunidadId', oportunidad.Id);
+
         Boolean excepcion = false;
         System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+
             try {
                 CC_Operativa_Oficina_Controller.devolverCasoCSBD(respuesta);
             } catch (Exception e) {
@@ -1703,6 +1949,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             System.assertEquals(casoCerrado.Status, 'Cerrado');*/
             try {
                 respuesta.put('casoId', '');
+                respuesta.put('oportunidadId', '');
                 CC_Operativa_Oficina_Controller.devolverCasoCSBD(respuesta);
             } catch (Exception e) {
                 excepcion = true;
@@ -1714,13 +1961,37 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
 
     @isTest
     public static void reabrirCasoCSBD() {
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoEnrollmentPreguntaSi' LIMIT 1];
-        List<String> casosId = new List<String>();
-        casosId.add(caso.Id);
+        Case caso = [SELECT Id, OwnerId, ContactId FROM Case WHERE Subject = 'casoEnrollmentPreguntaSi' LIMIT 1];
+        User operador = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1];
+        Map<String, String> casosId = new Map<String, String>();
+        casosId.put('casoId', caso.Id);
+
+        Opportunity oportunidadCaso = CSBD_Opportunity.crearOportunidad('CSBD_MAC', new Map<String, Object>{'CSBD_Resolucion__c' => 'Devolución a contact'});
+        casosId.put('oportunidadId', oportunidadCaso.Id);
+        
+        Task tareaOportunidad = new Task();
+        tareaOportunidad.Type = 'Oportunidad CSBD';
+        tareaOportunidad.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+        tareaOportunidad.Subject = 'Creación oportunidad';
+        tareaOportunidad.Status = 'Completed';
+        tareaOportunidad.Priority = 'Normal';
+        tareaOportunidad.Description = '';
+        tareaOportunidad.WhatId = caso.Id;
+        tareaOportunidad.AV_OrigenAct__c = 'Contact Center';
+        tareaOportunidad.OwnerId = caso.OwnerId;
+        tareaOportunidad.Type = 'Oportunidad CSBD';
+        tareaOportunidad.AV_Case__c = caso.Id;
+        tareaOportunidad.WhoId = caso.ContactId;
+        insert tareaOportunidad;
+
+        // Share opportunity with the user
+        OpportunityShare oppShare = new OpportunityShare();
+        oppShare.OpportunityId = oportunidadCaso.Id;
+        oppShare.UserOrGroupId = operador.Id;
+        oppShare.OpportunityAccessLevel = 'Read';
+        insert oppShare;
         Test.startTest();
-        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
-            caso.Status = 'Cerrado';
-            update caso;
+        System.runAs(operador) {
             CC_Operativa_Oficina_Controller.reabrirCasoCSBD(casosId);
             Case casoCerrado = [SELECT Status FROM Case WHERE Subject = 'casoEnrollmentPreguntaSi' LIMIT 1];
             System.assertEquals(casoCerrado.Status, 'Activo');
@@ -1746,6 +2017,26 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
             }
             Case casoCerrado = [SELECT Status FROM Case WHERE Subject = 'casoEnrollmentPreguntaSi' LIMIT 1];
             System.assertEquals(casoCerrado.Status, 'Activo');
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void comprobarOportunidadExistente(){
+        Test.startTest();
+        Boolean result = true;
+        Boolean excepcion = false;
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoEnrollmentPreguntaSi' LIMIT 1];
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+            try {
+                result = CC_Operativa_Oficina_Controller.comprobarOportunidadExistente(caso.Id);
+            } catch (Exception e) {
+                excepcion = true;
+            }
+            System.assertEquals(result, false, 'Fallo en la comprobacion');
+
+            result = CC_Operativa_Oficina_Controller.comprobarOportunidadExistente('');  
+            System.assertEquals(result, false);
         }
         Test.stopTest();
     }
@@ -1777,7 +2068,7 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
     }*/
 
     @isTest
-    public static void  recuperarDatosEntradaFlow() {
+    public static void recuperarDatosEntradaFlow() {
         Test.startTest();
         Boolean excepcion = false;
         Case caso = [SELECT Id, OwnerId FROM Case WHERE Subject = 'casoEnrollmentPreguntaSi' LIMIT 1];
@@ -1795,6 +2086,42 @@ public with sharing class CC_Operativa_Oficina_Controller_Test {
                 excepcion = true;
             }
             System.assertEquals(excepcion, true);
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void realizarTraslado3N() {
+        Test.startTest();
+        Boolean excepcion = false;
+        Case caso = [SELECT Id, OwnerId FROM Case WHERE Subject = '3N DE CSBD' LIMIT 1];
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+            try {
+                CC_Operativa_Oficina_Controller.realizarTraslado3N(caso.Id);
+                System.assertEquals(excepcion, false);
+            } catch (Exception e) {
+                excepcion = true;
+            }
+            try {
+                CC_Operativa_Oficina_Controller.realizarTraslado3N('');
+                System.assertEquals(excepcion, false);
+            } catch (Exception e) {
+                excepcion = true;
+            }
+            System.assertEquals(excepcion, true);
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void crearNuevoCasoDocumentacionTest() {
+        Test.startTest();
+        Boolean excepcion = false;
+        Case caso = [SELECT Id, OwnerId, Status FROM Case WHERE Subject = 'casoDocumentacionNoImagin' LIMIT 1];
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+            CC_Operativa_Oficina_Controller.crearNuevoCasoDocumentacion(caso.Id);
+            Integer casoCount = [SELECT COUNT() FROM Case WHERE CBK_Case_Extension_Id__r.CC_Documentacion__c = true];
+            System.assertNotEquals(casoCount, 0, 'No se ha creado la extensión');
         }
         Test.stopTest();
     }

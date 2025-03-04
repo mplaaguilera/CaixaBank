@@ -18,18 +18,18 @@ public with sharing class CSBD_FamiliaProductoPicklistController {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<CC_Lista_Valores__c> getProductos(String familia, String nombreRecordType) {
+    public static List<CC_Lista_Valores__c> getProductos(String familia) {
         return [SELECT Name FROM CC_Lista_Valores__c WHERE CC_Activa__c = TRUE
                 AND RecordType.DeveloperName = 'CC_Valor'
-                AND CC_Lista__r.Name != NULL AND CC_Lista__r.Name = :familia AND CC_Lista__r.CSBD_Tipo_de_oportunidad__c INCLUDES (:nombreRecordType)
+                AND CC_Lista__r.Name != NULL AND CC_Lista__r.Name = :familia
                 ORDER BY Name];
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<CC_Lista_Valores__c> getMotivosMac() {
-        return [SELECT Name FROM CC_Lista_Valores__c WHERE CC_Activa__c = TRUE
-                AND RecordType.DeveloperName = 'CC_Valor'
-                AND CC_Lista__r.Name = 'CSBD: Motivos MAC'
-                ORDER BY Name];
+    public static List<CC_Lista_Valores__c> getMotivosMac(String producto) {
+        return [SELECT CC_Lista__r.Name FROM CC_Lista_Valores__c WHERE CC_Activa__c = TRUE
+                AND CC_Lista__r.RecordType.DeveloperName = 'CSBD_Motivos_CSCC'
+                AND RecordType.DeveloperName = 'CC_Valor' AND Name = :producto
+                ORDER BY CC_Lista__r.Name];
     }
 }

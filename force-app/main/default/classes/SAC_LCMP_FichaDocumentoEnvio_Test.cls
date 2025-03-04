@@ -5,18 +5,21 @@ public with sharing class SAC_LCMP_FichaDocumentoEnvio_Test {
     static void makeData(){      
 
         //Usuario SAC General
-		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             Account acc = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
-            Database.insert(acc);
+            SAC_DatabaseDML.insertDML(acc, false); 
+            //Database.insert(acc);
             
 
             List<Case> reclamaciones = new List<Case>();
@@ -38,11 +41,13 @@ public with sharing class SAC_LCMP_FichaDocumentoEnvio_Test {
             Case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
             reclamaciones.add(reclamacion2);
 
-            Database.insert(reclamaciones);
+            SAC_DatabaseDML.insertListDML(reclamaciones, false);
+            //Database.insert(reclamaciones);
 
             //ContentVersion
             ContentVersion cv = SAC_TestDataFactory.crearContentVersion(reclamacion1);
-            Database.insert(cv);
+            SAC_DatabaseDML.insertDML(cv, false);
+            //Database.insert(cv);
 
 
             List<SAC_DocumentoEnvio__c> documentosEnvio = new List<SAC_DocumentoEnvio__c>();
@@ -59,7 +64,8 @@ public with sharing class SAC_LCMP_FichaDocumentoEnvio_Test {
             docEnv2.SAC_Direccion__c = 'direccionTest2';
             documentosEnvio.add(docEnv2);
             
-            Database.insert(documentosEnvio);
+            SAC_DatabaseDML.insertListDML(documentosEnvio, false);
+            //Database.insert(documentosEnvio);
         }
     }
 

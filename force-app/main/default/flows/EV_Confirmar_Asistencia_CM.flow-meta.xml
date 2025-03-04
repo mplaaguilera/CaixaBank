@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>57.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Asignacion_Asistio</name>
+        <label>Asignación Asistió</label>
+        <locationX>1056</locationX>
+        <locationY>241</locationY>
+        <assignmentItems>
+            <assignToReference>Get_Campaign_Member.EV_Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Asistió</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Actualizar_Estado</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Ya_Confirmada</name>
+        <label>Ya Confirmada</label>
+        <locationX>802</locationX>
+        <locationY>240</locationY>
+        <defaultConnector>
+            <targetReference>Asignacion_Asistio</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Si_Ya_Confirmada</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Campaign_Member.EV_Status__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Asistió</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Pantalla_Ya_Confirmada</targetReference>
+            </connector>
+            <label>Si Ya Confirmada</label>
+        </rules>
+    </decisions>
+    <description>Flow para confirmar la asistencia de un Miembro de Campaña (nuevo objeto EV_CampaignMemberC__c)</description>
+    <environments>Default</environments>
+    <interviewLabel>EV Confirmar Asistencia CM {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>EV Confirmar Asistencia CM</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <recordLookups>
+        <name>Get_Campaign_Member</name>
+        <label>Get Campaign Member</label>
+        <locationX>571</locationX>
+        <locationY>239</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Ya_Confirmada</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>EV_CampaignMemberC__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Actualizar_Estado</name>
+        <label>Actualizar Estado</label>
+        <locationX>1059</locationX>
+        <locationY>442</locationY>
+        <connector>
+            <targetReference>Actualizado</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Error</targetReference>
+        </faultConnector>
+        <inputReference>Get_Campaign_Member</inputReference>
+    </recordUpdates>
+    <screens>
+        <name>Actualizado</name>
+        <label>Actualizado</label>
+        <locationX>1281</locationX>
+        <locationY>441</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>AsistenciaConfirmada</name>
+            <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;Se ha registrado la asistencia correctamente&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <screens>
+        <name>Error</name>
+        <label>Error</label>
+        <locationX>874</locationX>
+        <locationY>486</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>ErrorUpdate</name>
+            <fieldText>&lt;p&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgb(68, 68, 68);&quot;&gt;Se ha producido un error durante la confirmacion de la asistencia. Por favor, contacte con el administrador.&lt;/span&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <screens>
+        <name>Pantalla_Ya_Confirmada</name>
+        <label>Pantalla Ya Confirmada</label>
+        <locationX>692</locationX>
+        <locationY>423</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>confirmada</name>
+            <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); font-size: 14.6667px; font-family: Calibri, sans-serif; color: rgb(68, 68, 68);&quot;&gt;Ya se había realizado el registro de asistencia&lt;/span&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <start>
+        <locationX>650</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>Get_Campaign_Member</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>recordId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+</Flow>

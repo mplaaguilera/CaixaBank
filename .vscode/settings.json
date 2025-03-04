@@ -14,7 +14,10 @@
     "activityBar.background": null
   },
   "eslint.useFlatConfig": false,
-  "salesforce.einsteinForDevelopers.enableAutocompletions": false,
+  "salesforce.einsteinForDevelopers.enableAutocompletions": true,
   "salesforce.einsteinForDevelopers.autocompletionLength": "Short",
-  "workbench.externalBrowser": "chrome"
+  "workbench.externalBrowser": "chrome",
+  "CodeGPT.apiKey": "CodeGPT Plus Beta",
+  "salesforcedx-vscode-slds.enhancements.autoSuggest": true,
+  "sarif-viewer.connectToGithubCodeScanning": "off"
 }

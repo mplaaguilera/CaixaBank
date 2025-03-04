@@ -48,7 +48,7 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal {
         List<Case> casos = new List<Case>();
         casos.add(caso);
         Map<Id, Case> mapa = new Map<Id, Case>();
-        List<SAC_AcuseRecibo_Email.TemplateWrapper> plantilla = SAC_AcuseRecibo_Email.getPlantillaAcuseRecibo(casos, mapa);
+        List<SAC_AcuseRecibo_Email.TemplateWrapper> plantilla = SAC_AcuseRecibo_Email.getPlantillaAcuseRecibo(casos, mapa, '');
         
         if(!plantilla.isEmpty()){
             cuerpo = plantilla[0].htmlValueTemplate;
@@ -93,7 +93,7 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal {
     }
     
     @AuraEnabled
-    public static void envioEmailManual(Case casoApex){
+    public static void envioEmailManual(Case casoApex, String viaEnvio){
 
         if(casoApex.CC_AcuseRecibo__c != '2'){
             casoApex.CC_AcuseRecibo__c = '2';
@@ -101,7 +101,7 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal {
         List<Case> casos = new List<Case>();
         casos.add(casoApex);
         Map<Id, Case> mapa = new Map<Id, Case>();
-        SAC_AcuseRecibo_Email.envioAcuseReciboManual(casos, mapa);
+        SAC_AcuseRecibo_Email.envioAcuseReciboManual(casos, mapa, viaEnvio);
 
         SAC_DatabaseDML.updateListDML(casos, true); 
     }

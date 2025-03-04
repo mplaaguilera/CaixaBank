@@ -77,8 +77,8 @@ public with sharing class CC_Busqueda_ALF_Controller {
 			return null;
 		}
 
-		List<Account> cuenta = [SELECT Recordtype.Developername, CC_Tipo_Persona__c, CC_Edad__pc FROM Account WHERE Id = :sCliente];
-		
+		List<Account> cuenta = [SELECT RecordType.DeveloperName, CC_Tipo_Persona__c, CC_Edad__pc FROM Account WHERE Id = :sCliente];
+
         String sTipoPersona = cuenta[0].CC_Tipo_Persona__c;
 		Decimal edad = cuenta[0].CC_Edad__pc ;
 
@@ -97,7 +97,7 @@ public with sharing class CC_Busqueda_ALF_Controller {
 				representanteWrapper.cargoRepresentante = representante.CC_CargoRepresentante__c;
 				oRepresentantesOrContactos.add(representanteWrapper);
 			}*/
-            
+
             for (Contact representante : [SELECT Account.Name, FirstName, LastName, CC_CargoRepresentante__c FROM Contact
 											WHERE AccountId = :sCliente AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CIBE_Apoderado')]) {
 				RepresentanteOrContactoWrapper representanteWrapper = new RepresentanteOrContactoWrapper();
@@ -109,9 +109,8 @@ public with sharing class CC_Busqueda_ALF_Controller {
 				representanteWrapper.idCuenta = representante.AccountId;
 				representanteWrapper.cargoRepresentante = 'Apoderado';
 				oRepresentantesOrContactos.add(representanteWrapper);
+			}
 
-                                            }
-            
 		} else if (sTipoPersona == 'F' && edad >=18) {
 			for (CC_Representante_Contrato__c representante : [SELECT CC_RepresentanteAsociado__r.CC_ClienteRepresentante__c, CC_RepresentanteAsociado__c, CC_RepresentanteAsociado__r.CC_Nombre__c, CC_RepresentanteAsociado__r.CC_Apellido1__c, CC_RepresentanteAsociado__r.CC_Apellido2__c, CC_RepresentanteAsociado__r.CC_TipoRepresentante__c, CC_ContratoAsociado__r.Name
 																FROM CC_Representante_Contrato__c WHERE CC_RepresentanteAsociado__r.CC_ClienteRepresentante__r.Id = :sCliente
@@ -172,7 +171,7 @@ public with sharing class CC_Busqueda_ALF_Controller {
 
 	@AuraEnabled
 	public static String setClienteCaso(String sID, String sTipo, String sCasoId) {
-      
+
 		Map<String, Object> oRes = new Map<String, Object>();
 
 		if (String.isBlank(sID) || String.isBlank(sTipo)) {
@@ -204,7 +203,7 @@ public with sharing class CC_Busqueda_ALF_Controller {
 				sCuentaId = oRepresentante.CC_RepresentanteAsociado__r.CC_ClienteRepresentante__c;
 			} else */
 			if(oRepresentante.RecordTypeId == sRepresentanteRecordTypeId && oRepresentante.CC_ClienteRepresentante__c != null) {
-				sRepresentanteId = sID;   
+				sRepresentanteId = sID;
 				sCuentaId = oRepresentante.CC_ClienteRepresentante__c;
 				if(oRepresentante.CC_Representante__c != null){
 					Contact oContacto = [SELECT Id FROM Contact WHERE AccountId = :oRepresentante.CC_Representante__c LIMIT 1];
@@ -313,20 +312,6 @@ public with sharing class CC_Busqueda_ALF_Controller {
 		}
 	}
 
-	@TestVisible
-	private static String getTipoRegistro(Id sID) {
-		//Devolvemos el tipo de registro para poder realizar las acciones necesarias en cada una de las diferentes entidades
-		String sTipoRegistro = '';
-		if ((sID).getSObjectType() == Schema.getGlobalDescribe().get('Case')) {
-			sTipoRegistro = 'Caso';
-		} else if ((sID).getSObjectType() == Schema.getGlobalDescribe().get('CC_Llamada__c')) {
-			sTipoRegistro = 'Llamada';
-		} else if ((sID).getSObjectType() == Schema.getGlobalDescribe().get('Opportunity')) {
-			sTipoRegistro = 'Opportunity';
-		}
-		return sTipoRegistro;
-	}
-
 	@AuraEnabled(cacheable=true)
 	public static String getContactoAsoc(String sCuenta) {
 		return [SELECT Id FROM Contact WHERE AccountId = :sCuenta].Id;
@@ -417,7 +402,7 @@ public with sharing class CC_Busqueda_ALF_Controller {
         if (sRepresentanteId != '') {
 			oLlamadaUpd.CC_Representante__c = sRepresentanteId;
 		}
-        
+
 		if (sContactId != '') {
 			oLlamadaUpd.CC_Contacto__c = sContactId;
 		} else {
@@ -494,16 +479,15 @@ public with sharing class CC_Busqueda_ALF_Controller {
 	@AuraEnabled
 	public static Boolean getEsPropietarioCaso(Id recordId) {
 		//Comparamos el usuario logado con el propietario del registro y devolvemos si coinciden o no
-		Id propietarioRegistro;
-		String tipoRegistro = getTipoRegistro(recordId);
-		if (tipoRegistro == 'Caso') {
-			propietarioRegistro = [SELECT OwnerId FROM Case WHERE Id = :recordId].OwnerId;
-		} else if (tipoRegistro == 'Llamada') {
-			propietarioRegistro = [SELECT OwnerId FROM CC_Llamada__c WHERE Id = :recordId].OwnerId;
-		} else if (tipoRegistro == 'Opportunity') {
-			propietarioRegistro = [SELECT OwnerId FROM Opportunity WHERE Id = :recordId].OwnerId;
+		String objectApiName = recordId.getSObjectType().getDescribe().getName();
+		if (objectApiName == 'Case') {
+			return [SELECT OwnerId FROM Case WHERE Id = :recordId].OwnerId == UserInfo.getUserId();
+		} else if (objectApiName == 'CC_Llamada__c') {
+			return [SELECT OwnerId FROM CC_Llamada__c WHERE Id = :recordId].OwnerId == UserInfo.getUserId();
+		} else if (objectApiName == 'Opportunity') {
+			return [SELECT OwnerId FROM Opportunity WHERE Id = :recordId].OwnerId == UserInfo.getUserId();
 		}
-		return (propietarioRegistro == UserInfo.getUserId());
+		return false;
 	}
 
 	@AuraEnabled
@@ -562,12 +546,13 @@ public with sharing class CC_Busqueda_ALF_Controller {
 
 	@AuraEnabled
 	public static SObject datosRegistro(Id recordId) {
-		if ((recordId).getSObjectType() == Schema.getGlobalDescribe().get('CC_Llamada__c')) {
+		String objectApiName = recordId.getSObjectType().getDescribe().getName();
+		if (objectApiName == 'CC_Llamada__c') {
 			return [SELECT CC_No_Identificado__c, CC_Fecha_Fin__c FROM CC_Llamada__c WHERE Id = :recordId];
-		} else if ((recordId).getSObjectType() == Schema.getGlobalDescribe().get('Opportunity')) {
+		} else if (objectApiName == 'Opportunity') {
 			return [SELECT AccountId, CSBD_Contact__c FROM Opportunity WHERE Id = :recordId];
-		} else {   
-			return [SELECT CC_No_Identificado__c, AccountId, ContactId, RecordType.DeveloperName, CC_Representante__c, Contact.RecordType.Developername FROM Case WHERE Id = :recordId];
+		} else {
+			return [SELECT CC_No_Identificado__c, AccountId, ContactId, RecordType.DeveloperName, CC_Representante__c, Contact.RecordType.DeveloperName FROM Case WHERE Id = :recordId];
 		}
 	}
 }

@@ -31,6 +31,7 @@ public class CC_Task_AI_TRHan extends CC_TriggerHandlerBase {
         {
             validarCreacionTarea(listNewTask);
             informarCampoLlamada(listNewTask);
+            //informarTipoTarea(listNewTask);
         }
         
         //Validamos si hay tareas OS_Task
@@ -172,5 +173,16 @@ public class CC_Task_AI_TRHan extends CC_TriggerHandlerBase {
             }
             
         }       
-    }               
+    }
+
+    /*private void informarTipoTarea(List<Task> listNewObj) {
+        List<Task> tareasUpdate = new List<Task>();
+        for(Task tarea : listNewObj) {
+            Task tareaUpdate = new Task();
+            tareaUpdate.Id = tarea.Id;
+            tareaUpdate.AV_Type__c = tarea.Type;
+            tareasUpdate.add(tareaUpdate);
+        }
+        update tareasUpdate;
+    }*/
 }

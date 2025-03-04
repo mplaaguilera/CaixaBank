@@ -55,34 +55,47 @@ public with sharing class SAC_GenialBalanceador implements Queueable {
     }
     public void execute(QueueableContext context) {
         try {
+            List<Case> reclamacionesNoEnviadas = new List<Case>();
             // Obtener la configuración del balanceador
             Map<String, Integer> balanceadorMap = obtenerConfiguracionBalanceador(canal);
             SAC_GenialSettingsCanal__c settings = SAC_GenialSettingsCanal__c.getInstance(canal);
-
+            
             if (balanceadorMap != null) {
-                // Verificar si alguno de los adjuntos supera el límite introducido en el setting
-                
-                Decimal sizeLimit = (Decimal)settings.SAC_Tamano_Maximo_Attach__c;
-                Boolean limiteAdjuntos = verificarSizeAdjuntos(reclamacionId, sizeLimit);
-                String bestIntegration = null;
-                if (limiteAdjuntos) {
-                    bestIntegration = String.isNotBlank(settings.SAC_Integracion_Adjuntos_Pesados__c) ? 
-                                      settings.SAC_Integracion_Adjuntos_Pesados__c : 'Azure';
-                } else {
-
-                    List<AggregateResult> casosAgrupadosPorTipo = ejecutarConsultaSOQL();
-
-                    Map<String, Integer> casosPorTipo = procesarResultadosConsulta(casosAgrupadosPorTipo);
-
-                    Map<String, Double> cargaActual = calcularCargaActual(casosPorTipo, balanceadorMap);
-
-                    bestIntegration = determinarMejorIntegracion(cargaActual, balanceadorMap, casosPorTipo);
-                }
-                // Ejecutamos programarEnviar con la integración mas óptima
-                if (!String.isBlank(bestIntegration)) {
-                    SAC_GenialUtils.programarEnviar(reclamacionId, canal, description, bestIntegration);
-                } else {
-                    CBK_Log.error('El sistema de integracion IA no es reconocido' + bestIntegration);
+                // Verificar si alguno de los adjuntos supera el límite de SF para queueables (6MB)
+                Boolean maxHeapSize = verificarMaxHeapSize(reclamacionId);
+                if(maxHeapSize) {
+                    List<Case> reclamaciones = [SELECT Id, SAC_GenialEstado__c FROM Case WHERE Id =: reclamacionId];
+                    for(Case reclamacion: reclamaciones){
+                        reclamacion.SAC_GenialEstado__c = 'SAC_007';
+                        reclamacionesNoEnviadas.add(reclamacion);
+                    }
+                    if(!reclamacionesNoEnviadas.isEmpty()) {
+                        update reclamacionesNoEnviadas;
+                    } 
+                }else{
+                    // Verificar si alguno de los adjuntos supera el límite introducido en el setting                
+                    Decimal sizeLimit = (Decimal)settings.SAC_Tamano_Maximo_Attach__c;
+                    Boolean limiteAdjuntos = verificarSizeAdjuntos(reclamacionId, sizeLimit);
+                    String bestIntegration = null;
+                    if (limiteAdjuntos) {
+                        bestIntegration = String.isNotBlank(settings.SAC_Integracion_Adjuntos_Pesados__c) ? 
+                            settings.SAC_Integracion_Adjuntos_Pesados__c : 'Azure';
+                    } else {
+                        
+                        List<AggregateResult> casosAgrupadosPorTipo = ejecutarConsultaSOQL();
+                        
+                        Map<String, Integer> casosPorTipo = procesarResultadosConsulta(casosAgrupadosPorTipo);
+                        
+                        Map<String, Double> cargaActual = calcularCargaActual(casosPorTipo, balanceadorMap);
+                        
+                        bestIntegration = determinarMejorIntegracion(cargaActual, balanceadorMap, casosPorTipo);
+                    }
+                    // Ejecutamos programarEnviar con la integración mas óptima
+                    if (!String.isBlank(bestIntegration)) {
+                        SAC_GenialUtils.programarEnviar(reclamacionId, canal, description, bestIntegration);
+                    } else {
+                        CBK_Log.error('El sistema de integracion IA no es reconocido' + bestIntegration);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -141,6 +154,37 @@ public with sharing class SAC_GenialBalanceador implements Queueable {
         }
         return false;
     }
+
+    /*Proposito: Control del tamaño de adjuntos en la fase previa a la integración, si supera límite de SF (6MB en queauables),
+    * no se enviará, y el estado de la reclamación será "No enviado".
+    * 
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR            DATE         Description
+    * 1.0              ------        Iria ANPC         15/01/25      Creación 
+    */
+    private static Boolean verificarMaxHeapSize(Id casoId) {
+        Decimal sizeMaximoAdjuntoMB = 6;
+        List<ContentDocumentLink> doculink = [SELECT Id, ContentDocumentId 
+                                              FROM ContentDocumentLink 
+                                              WHERE LinkedEntityId = :casoId];
+        List<String> idsAttachments = new List<String>();
+        for (ContentDocumentLink d : doculink) {
+            idsAttachments.add(d.ContentDocumentId);
+        }
+        List<ContentVersion> docuversions = [SELECT Id, ContentDocumentId, ContentSize, IsLatest 
+                                             FROM ContentVersion 
+                                             WHERE ContentDocumentId IN :idsAttachments AND IsLatest = true];
+        final Decimal bytesToMb = 1024 * 1024;
+        for (ContentVersion d : docuversions) {
+            Decimal sizeMB = d.ContentSize / bytesToMb; // Convertir bytes a MB
+            if (sizeMB > sizeMaximoAdjuntoMB) {                
+                return true;
+            }
+        }
+        return false;
+    }
+
     /*Proposito: Consulta SOQL para obtener volumetría de casos Gestionados por cada tipo de Sistema IA
     * 
     * Historial

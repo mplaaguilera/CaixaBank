@@ -1,18 +1,19 @@
-.slds-list_dotted, .slds-list--dotted {
+.slds-list_dotted,
+.slds-list--dotted {
     list-style: none;
 }
 
-.slds-m-right_x-small>button {
+.slds-m-right_x-small > button {
     border: none;
     background: transparent;
 }
 
-.slds-m-right_x-small>button:hover {
+.slds-m-right_x-small > button:hover {
     border: none;
     background: transparent;
 }
 
-.slds-m-right_x-small>button:active {
+.slds-m-right_x-small > button:active {
     background: transparent;
     outline: none;
 }
@@ -26,5 +27,17 @@
 }
 
 @keyframes blinker {
-    50% { opacity: 0; }
+    50% {
+        opacity: 0;
+    }
+}
+
+div.slds-page-header:has(+ div.slds-card__body) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: solid 1px var(--slds-s-container-color-border, rgb(201, 201, 201));
+}
+
+ul > li + li {
+    margin-top: 14px;
 }

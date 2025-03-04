@@ -12,24 +12,28 @@ public with sharing class SAC_LCMP_GetOwnerCases_Test {
             CC_Email__c = 'test@test.com',
             CC_Tipo_Centro__c = 'DT'
         );        
-        Database.insert(oficina);
+        SAC_DatabaseDML.insertDML(oficina, false);
+        //Database.insert(oficina);
         
         //Usuario SAC General
         User usuarioGeneral;
         System.runAs(new User(Id = UserInfo.getUserId())) {
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
         }
 
         //Cuenta a utilizar tipo test
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
 
         //RECLAMACION 1 - NECESITO SU ID PARA EJECUTAR EL METODO 1
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -166,10 +170,12 @@ public with sharing class SAC_LCMP_GetOwnerCases_Test {
         reclamacionesAInsertar.add(consulta);
         reclamacionesAInsertar.add(consulta2);
 		
-        Database.insert(reclamacionesAInsertar);
+        SAC_DatabaseDML.insertListDML(reclamacionesAInsertar, false); 
+        //Database.insert(reclamacionesAInsertar);
 		
         consulta2.CC_CasoRelacionado__c = casoReclamacion10.Id;
-        Database.update(consulta2);
+        SAC_DatabaseDML.updateDML(consulta2, false); 
+        //Database.update(consulta2);
         
         Test.startTest();
         //reclamantes
@@ -183,7 +189,8 @@ public with sharing class SAC_LCMP_GetOwnerCases_Test {
         reclamantes.add(reclamante);
         reclamantes.add(reclamante2);
         reclamantes.add(reclamante3);
-        Database.insert(reclamantes);
+        SAC_DatabaseDML.insertListDML(reclamantes, false); 
+        //Database.insert(reclamantes);
 
         //PRETENSION 1 - ESTA PRETENSION SE TIENE QUE MOSTRAR COMO PRETENSION ASOCIADA Y QUE SE PUEDA MANIPULAR EN EL METODO 1 bucle entra al else
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -210,7 +217,8 @@ public with sharing class SAC_LCMP_GetOwnerCases_Test {
         List<Case> pretensionesAInsertar = new List<Case>();
         pretensionesAInsertar.add(casoPretension);
         pretensionesAInsertar.add(casoPretension2);
-        Database.insert(pretensionesAInsertar);
+        SAC_DatabaseDML.insertListDML(pretensionesAInsertar, false);
+        //Database.insert(pretensionesAInsertar);
 
         Test.stopTest();  
     }
@@ -341,7 +349,8 @@ public with sharing class SAC_LCMP_GetOwnerCases_Test {
         reclamacion2.Status = 'Cerrado';
         reclamacion2.SAC_StatusAuxiliar__c = reclamacion2.Status;
         reclamacion2.CC_Oficina_Afectada_Lookup__c = oficina.Id;
-        Database.update(reclamacion2);
+        SAC_DatabaseDML.insertDML(reclamacion2, false);
+        //Database.update(reclamacion2);
 
         System.runAs(usuario){ 
             testResultado = SAC_LCMP_GetOwnerCases.modifySameOwnerCases(reclamacion.id, consulta.id);
@@ -354,6 +363,27 @@ public with sharing class SAC_LCMP_GetOwnerCases_Test {
         }
         System.assertNotEquals(null, testResultado, 'No se ha vinculado la consulta');
         System.assertNotEquals(null, testResultado2, 'No se ha vinculado la consulta con una reclamación cerrada');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void  methodModifySameOwnerCasesConsulta2(){
+        Test.startTest();
+		
+        Case consulta = [SELECT Id FROM Case WHERE subject = 'Consulta'];
+        Case reclamacion = [SELECT Id, Status, SAC_StatusAuxiliar__c  FROM Case WHERE subject = 'TestRec5'];
+        String testResultado;
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PendienteAsignar'];
+
+        System.runAs(usuario){ 
+            reclamacion.OwnerId = cola[0].Id;
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+        
+            testResultado = SAC_LCMP_GetOwnerCases.modifySameOwnerCases(reclamacion.id, consulta.id);
+        }
+
+        System.assertNotEquals(null, testResultado, 'No se ha vinculado la consulta');
         Test.stopTest();
     }
 }

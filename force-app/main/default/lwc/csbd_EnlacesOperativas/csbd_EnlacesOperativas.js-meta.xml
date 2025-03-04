@@ -4,5 +4,10 @@
     <isExposed>true</isExposed>
     <targets>
         <target>lightning__RecordPage</target>
-    </targets>
+    </targets>  
+    <targetConfigs>  
+        <targetConfig targets="lightning__RecordPage">
+            <property name="campoBusqueda" type="String" default="" label="Campo lookup búsqueda"/>
+        </targetConfig>
+    </targetConfigs>
 </LightningComponentBundle>

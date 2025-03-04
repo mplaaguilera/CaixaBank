@@ -38,30 +38,35 @@ public with sharing class SAC_GenialOpenServicesQueueable_Test {
         list<case> listreclama = new list<case>{reclamacion, reclamacion2};
 
         //usuario general de testing sac
-        user usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+        user usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);    
+        //Database.insert(usuarioGeneral);
 
         List<PermissionSet> permiSets = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSet permiSet = permiSets[0];
      
         //se necesita para evitar mixed operations al insertar los PS
-        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];      
-        Database.insert(usuarioAdmin);
+        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);         
+        //Database.insert(usuarioAdmin);
 
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
         system.runAs(usuarioAdmin) {
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);   
+            //Database.insert(permiSetAssi);
         }
         system.runAs(usuarioGeneral) {
-            Database.insert(listreclama);
+            SAC_DatabaseDML.insertListDML(listreclama, false);  
+            //Database.insert(listreclama);
             insert contentVersion;
             ContentDocumentLink doculink = new ContentDocumentLink(
                 ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :contentVersion.Id].ContentDocumentId,
                 LinkedEntityId = listreclama.get(0).Id
             );
-            Database.insert(doculink);
+            SAC_DatabaseDML.insertDML(doculink, false);  
+           //Database.insert(doculink);
         }
 
 
@@ -149,7 +154,8 @@ public with sharing class SAC_GenialOpenServicesQueueable_Test {
         openServicesConf.CBK_Method__c = 'POST';
         openServicesConf.CBK_TimeOut__c = 120000;
         openServicesConf.CBK_ContentType__c = 'application/json';
-        Database.insert(openServicesConf);
+        SAC_DatabaseDML.insertDML(openServicesConf, false);  
+        //Database.insert(openServicesConf);
         user sacUser = [SELECT ID FROM USER WHERE Username = 'usertest0@test.com.testSetup'];
 
         /*ContentDocumentLink doculink = new ContentDocumentLink(
@@ -222,7 +228,8 @@ public with sharing class SAC_GenialOpenServicesQueueable_Test {
         openServicesConf.CBK_Method__c = 'POST';
         openServicesConf.CBK_TimeOut__c = 120000;
         openServicesConf.CBK_ContentType__c = 'application/json';
-        Database.insert(openServicesConf);
+        SAC_DatabaseDML.insertDML(openServicesConf, false);  
+        //Database.insert(openServicesConf);
         user sacUser = [SELECT ID FROM USER WHERE Username = 'usertest0@test.com.testSetup'];
 
         /*ContentDocumentLink doculink = new ContentDocumentLink(
@@ -291,7 +298,8 @@ public with sharing class SAC_GenialOpenServicesQueueable_Test {
         openServicesConf.CBK_Method__c = 'POST';
         openServicesConf.CBK_TimeOut__c = 120000;
         openServicesConf.CBK_ContentType__c = 'application/json';
-        Database.insert(openServicesConf);
+        SAC_DatabaseDML.insertDML(openServicesConf, false); 
+        //Database.insert(openServicesConf);
         user sacUser = [SELECT ID FROM USER WHERE Username = 'usertest0@test.com.testSetup'];
 
         /*ContentDocumentLink doculink = new ContentDocumentLink(

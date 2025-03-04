@@ -268,27 +268,27 @@
 							<c-lwc-labs-loading-stencil type="table"></c-lwc-labs-loading-stencil>
 							<!-- sldsValidatorIgnoreNextLine -->
 							<lightning-datatable
-												 class="datatableGeneral1 sinNumerosFilas listaTablas transparente slds-hide"
-												 key-field="id"
-												 columns={datatableColumns.general1}
-												 data={datatableData.general1}
-												 hide-checkbox-column
-												 hide-table-header
-												 suppress-bottom-bar
-												 oncellchange={datatableOncellchange}
-												 data-datatable="general1">
+								class="datatableGeneral1 sinNumerosFilas listaTablas transparente slds-hide"
+								key-field="id"
+								columns={datatableColumns.general1}
+								data={datatableData.general1}
+								hide-checkbox-column
+								hide-table-header
+								suppress-bottom-bar
+								oncellchange={datatableOncellchange}
+								data-datatable="general1">
 							</lightning-datatable>
 							<!-- sldsValidatorIgnoreNextLine -->
 							<lightning-datatable
-												 class="datatableGeneral2 sinNumerosFilas listaTablas transparente slds-hide"
-												 key-field="id"
-												 columns={datatableColumns.general2}
-												 data={datatableData.general2}
-												 hide-checkbox-column
-												 hide-table-header
-												 suppress-bottom-bar
-												 oncellchange={datatableOncellchange}
-												 data-datatable="general2">
+								class="datatableGeneral2 sinNumerosFilas listaTablas transparente slds-hide"
+								key-field="id"
+								columns={datatableColumns.general2}
+								data={datatableData.general2}
+								hide-checkbox-column
+								hide-table-header
+								suppress-bottom-bar
+								oncellchange={datatableOncellchange}
+								data-datatable="general2">
 							</lightning-datatable>
 						</div>
 					</div>
@@ -392,6 +392,7 @@
 													{tipo.nombre}
 												</div>
 												<div class="datatableContainerTiposBonificados">
+													<!-- sldsValidatorIgnoreNextLine -->
 													<lightning-datatable
 														class="datatableTiposBonificados"
 														key-field="tipo"
@@ -457,6 +458,7 @@
 												<span class="pillClienteLabel">{oportunidad.fields.CSBD_ContactoTitular1__r.displayValue}</span>
 											</span>
 											<div class="pillClienteSpanBotonDetalles">
+												<!-- sldsValidatorIgnoreNextLine -->
 												<lightning-button-icon icon-name="utility:chevronright" size="small" variant="bare" title="Ver/ocultar detalles" class="slds-is-relative slds-var-m-left_x-small" style="top: -1px;" onclick={pillClienteBotonDetalles}></lightning-button-icon>
 											</div>
 										</span>
@@ -514,6 +516,7 @@
 												<span class="pillClienteLabel">{oportunidad.fields.CSBD_ContactoTitular2__r.displayValue}</span>
 											</span>
 											<div class="pillClienteSpanBotonDetalles">
+												<!-- sldsValidatorIgnoreNextLine -->
 												<lightning-button-icon icon-name="utility:chevronright" size="small" variant="bare" title="Ver/ocultar detalles" class="slds-is-relative slds-var-m-left_x-small" style="top: -1px;" onclick={pillClienteBotonDetalles}></lightning-button-icon>
 											</div>
 										</span>
@@ -600,6 +603,7 @@
 		<footer class="slds-card__footer slds-var-p-top_large slds-var-p-bottom_x-small">
 			<div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-center">
 				<div class="slds-col slds-shrink-none slds-grow-none">
+					<!-- sldsValidatorIgnoreNextLine -->
 					<lightning-button-icon icon-name="utility:arrow_top" onclick={scrollToTop} variant="bare" tooltip="Subir al inicio" class="slds-var-m-right_medium slds-is-relative" style="top: 1px;"></lightning-button-icon>
 
 					<lightning-button-menu class="botonesFooter" icon-name="utility:settings" variant="container" menu-alignment="bottom-left" tooltip="Opciones" onselect={menuSettingsOnselect}>
@@ -638,7 +642,7 @@
 
 	<section role="dialog" tabindex="-1" aria-modal="true" class="modalBorrarDatosGuardados slds-modal" onkeydown={modalOnkeydown}>
 		<div class="slds-modal__container">
-			<!-- <lightning-button-icon icon-name="utility:close" size="large" onclick={modalCerrar} variant="border-filled" class="slds-modal__close"></lightning-button-icon> -->
+			<!-- sldsValidatorIgnoreNextLine -->
 			<button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar}>
 				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
 			</button>

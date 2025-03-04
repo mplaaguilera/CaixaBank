@@ -17,16 +17,16 @@ public with sharing class SAC_Utils_Test {
         Test.startTest();
         //Usuario Admin
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, true);
         Test.stopTest();
                 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
         camposRecl.put('Subject', 'Test');
-        camposRecl.put('SAC_TiempoParadaSubsanacion__c', 1);
+        camposRecl.put('SAC_MinutosParadaSubsanacion__c', 1);
         
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, true);
 
         //Consulta
         Map<String, Object> camposCons = new Map<String, Object>();
@@ -37,7 +37,7 @@ public with sharing class SAC_Utils_Test {
         camposCons.put('SAC_Respuesta__c', 'test respuesta consulta');
         
         SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
-        Database.insert(consulta);
+        SAC_DatabaseDML.insertDML(consulta, true);
 
         //Accion
         List<SAC_Accion__c> tareas = new List<SAC_Accion__c>();
@@ -45,7 +45,7 @@ public with sharing class SAC_Utils_Test {
         listaDeTareasOtras[0].SAC_Observaciones__c = 'tareaTest'; 
         tareas.addAll(listaDeTareasOtras);
         
-        Database.insert(tareas);
+        SAC_DatabaseDML.insertListDML(tareas, true);
 
 
         //Clasificación rápida   
@@ -58,7 +58,7 @@ public with sharing class SAC_Utils_Test {
         camposClasR.put('SAC_MotivoDescarte__c', 'SAC_Otros');
         
         SEG_ClasificacionRapida__c clasR = SAC_TestDataFactory.crearClasificacionRapida(camposClasR);
-        Database.insert(clasR);
+        SAC_DatabaseDML.insertDML(clasR, true);
         
         //Reglas de clasificación
         Map<String, Object> camposReglas = new Map<String, Object>();
@@ -68,7 +68,7 @@ public with sharing class SAC_Utils_Test {
         camposReglas.put('OS_OrdenEjecucion__c', 1);
         
         SEG_Regladeclasificacion__c reglas = SAC_TestDataFactory.crearReglasClasificacion(clasR.Id, camposReglas);
-        Database.insert(reglas);
+        SAC_DatabaseDML.insertDML(reglas, true);
         
 
         List<SEG_Multivalor__c> multivLst = new List<SEG_Multivalor__c>();
@@ -97,7 +97,7 @@ public with sharing class SAC_Utils_Test {
         multivLst.addAll(multiV9);
         multivLst.addAll(multiV10);
 
-        Database.insert(multivLst);
+        SAC_DatabaseDML.insertListDML(multivLst, true);
 
         //Custom Setting
         SAC_EmailService__c csMailS = new SAC_EmailService__c();
@@ -106,19 +106,19 @@ public with sharing class SAC_Utils_Test {
         csMailS.Name = 'DXC_Zaragoza';
         csMailS.SAC_EmailEntrante__c = 'dx@zar.com';
         csMailS.SAC_Naturaleza__c = 'SAC_005';
-        Database.insert(csMailS);
+        SAC_DatabaseDML.insertDML(csMailS, true);
 
         //Grupo Colaborador
         List<CC_Grupo_Colaborador__c> listaGrupoTareas = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion', 1);
         listaGrupoTareas[0].Name = 'DXC Zaragoza';
-        Database.insert(listaGrupoTareas);
+        SAC_DatabaseDML.insertListDML(listaGrupoTareas, true);
 
         //Email Backlist
         SAC_MaestroTemas__c maestroTema = new SAC_MaestroTemas__c();
         maestroTema.Name ='emailtestinvalido@prueba.com';
         maestroTema.SAC_Activo__c = true;
         maestroTema.RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SAC_BlackListEmails').getRecordTypeId();
-        Database.insert(maestroTema);
+        SAC_DatabaseDML.insertDML(maestroTema, true);
 
         EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'SAC_EmailService' LIMIT 1];
         String headerValueSTR = headerValue.LocalPart + '@' + headerValue.EmailDomainName;
@@ -132,7 +132,7 @@ public with sharing class SAC_Utils_Test {
         // emailMsg.ParentId = testRecCC.Id;
         emailMsg.Headers = '[{"value": "' + headerValueSTR + '","name": "X-SDFC-Original-RCPT"}]';
 
-        Database.insert(emailMsg);
+        SAC_DatabaseDML.insertDML(emailMsg, true);
     }
 
     @isTest
@@ -213,6 +213,7 @@ public with sharing class SAC_Utils_Test {
         correo.fromName='nombre odin test';
         correo.fromAddress = 'testsac@testsac.testsac';
         correo.htmlBody = 'Valor';
+        correo.plainTextBody = 'Valor';
     	correo.headers = new List<Messaging.InboundEmail.Header>{header};
         
         Test.startTest();
@@ -242,6 +243,7 @@ public with sharing class SAC_Utils_Test {
         correo.fromName='nombre odin test';
         correo.fromAddress = 'remexclutest@testsac.testsac';
         correo.htmlBody = 'cuerpoexclu';
+        correo.plainTextBody = 'cuerpoexclu';
         List<String> listaDirecciones = new List<String>();
         List<String> listaDireccionesCC = new List<String>();
         listaDirecciones.add('destexclutest@testsac.testsac');
@@ -441,7 +443,7 @@ public with sharing class SAC_Utils_Test {
     static void calcularTiempoParadaSubsanacionTest() {
         
         User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        List<Case> caso = [SELECT Id, RecordTypeId, SAC_TiempoParadaSubsanacion__c FROM Case WHERE Subject = 'Test' LIMIT 1];
+        List<Case> caso = [SELECT Id, RecordTypeId, SAC_MinutosParadaSubsanacion__c FROM Case WHERE Subject = 'Test' LIMIT 1];
         Integer tiempoTotal;
 
         System.runAs(usuario) {
@@ -450,6 +452,96 @@ public with sharing class SAC_Utils_Test {
             Test.stopTest();
         }
         
-        Assert.areEqual(1450, tiempoTotal, 'Error al calcular el tiempo de la parada de subsanacion');
+        Assert.areEqual(11, tiempoTotal, 'Error al calcular el tiempo de la parada de subsanacion');
+    }
+
+    @isTest
+    static void gestionarImagenesInlineRedactarMailTest() {
+        
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+
+        System.runAs(usuario) {
+
+            ContentVersion docsV = new contentVersion();
+            docsV.title='/test.jpeg';
+            docsV.PathOnClient ='/test.jpeg';
+            docsV.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body');
+            SAC_DatabaseDML.insertDML(docsV, true);
+
+            ContentVersion docsV2 = new ContentVersion();
+            docsV2.title='/testDos.jpeg';
+            docsV2.PathOnClient ='/testDos.jpeg';
+            docsV2.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body Dos');
+            SAC_DatabaseDML.insertDML(docsV2, true);
+    
+            String randomUuid = UUID.randomUUID().toString().remove('-').left(18);
+            String developerNameFinal = 'SAC_' + docsV2.id + randomUuid;
+            
+            ContentAsset assetId = new ContentAsset();
+            assetId.DeveloperName = developerNameFinal;
+            assetId.IsVisibleByExternalUsers = true;
+            assetId.MasterLabel = developerNameFinal;
+            SAC_DatabaseDML.insertDML(assetId, true);
+
+            List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = : docsV2.Id];
+    
+            ContentDocument cntDocument2 = new ContentDocument();
+            cntDocument2.Id = documents[0].Id;
+            SAC_DatabaseDML.updateDML(cntDocument2, true);
+
+            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '"></p><p>';
+        
+            Test.startTest();
+                String htmlResult = SAC_Utils.gestionarImagenesInlineRedactarMail(emailBody);
+            Test.stopTest();
+
+            Assert.areNotEqual(emailBody, htmlResult, 'Error al parsear la imagen del email body');
+        }
+    }
+
+    @isTest
+    static void gestionarImagenesInlineRedactarMailTest2() {
+        
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+
+        System.runAs(usuario) {
+
+            ContentVersion docsV = new contentVersion();
+            docsV.title='/test.jpeg';
+            docsV.PathOnClient ='/test.jpeg';
+            docsV.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body');
+            SAC_DatabaseDML.insertDML(docsV, true);
+
+            ContentVersion docsV2 = new ContentVersion();
+            docsV2.title='/testDos.jpeg';
+            docsV2.PathOnClient ='/testDos.jpeg';
+            docsV2.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body Dos');
+            SAC_DatabaseDML.insertDML(docsV2, true);
+    
+            String randomUuid = UUID.randomUUID().toString().remove('-').left(18);
+            String developerNameFinal = 'SAC_' + docsV2.id + randomUuid;
+            
+            ContentAsset assetId = new ContentAsset();
+            assetId.DeveloperName = developerNameFinal;
+            assetId.IsVisibleByExternalUsers = true;
+            assetId.MasterLabel = developerNameFinal;
+            SAC_DatabaseDML.insertDML(assetId, true);
+
+            List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = : docsV2.Id];
+    
+            ContentDocument cntDocument2 = new ContentDocument();
+            cntDocument2.Id = documents[0].Id;
+            cntDocument2.ContentAssetId = assetId.Id;
+            SAC_DatabaseDML.updateDML(cntDocument2, true);
+
+            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '"></p><p>';
+        
+            Test.startTest();
+                String htmlResult = SAC_Utils.gestionarImagenesInlineRedactarMail(emailBody);
+            Test.stopTest();
+
+            Assert.areNotEqual(emailBody, htmlResult, 'Error al parsear la imagen del email body');
+            Assert.areEqual(true, htmlResult.contains(developerNameFinal), 'Errir al convertir la imagen del email body');
+        }
     }
 }

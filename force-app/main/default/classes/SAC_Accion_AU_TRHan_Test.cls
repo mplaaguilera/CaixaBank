@@ -17,13 +17,15 @@ public with sharing class SAC_Accion_AU_TRHan_Test {
 
         //Usuario SAC General
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);     
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             //Reclamacion
@@ -31,28 +33,33 @@ public with sharing class SAC_Accion_AU_TRHan_Test {
             camposRecl.put('Subject', 'TestRec');
         
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);  
+            //Database.insert(reclamacion);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
             camposPret.put('SAC_Reclamacion__c', reclamacion.Id);
             
             Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);
 
             //Tareas
             List<SAC_Accion__c> listaTareas = SAC_TestDataFactory.crearTareas(2,pretension,false);
-            Database.insert(listaTareas);
+            SAC_DatabaseDML.insertListDML(listaTareas, false);
+            //Database.insert(listaTareas);
 
             CC_Grupo_Colaborador__c grupoTareas = new CC_Grupo_Colaborador__c();
             grupoTareas = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
             grupoTareas.SAC_DeveloperName__c = 'COPS';
-            Database.insert(grupoTareas);
+            SAC_DatabaseDML.insertDML(grupoTareas, false);
+            //Database.insert(grupoTareas);
 
             CC_Grupo_Colaborador_Contact__c grupoTareas1 = new CC_Grupo_Colaborador_Contact__c();
             grupoTareas1 = SAC_TestDataFactory.crearColaboradorContact(usuarioGeneral.id, grupoTareas.id);
             grupoTareas1.SAC_Administrador__c = true;
-            Database.insert(grupoTareas1);
+            SAC_DatabaseDML.insertDML(grupoTareas1, false);
+            //Database.insert(grupoTareas1);
         } 
     }
     @istest
@@ -64,8 +71,9 @@ public with sharing class SAC_Accion_AU_TRHan_Test {
 		System.runAs(usuario){
             listaTareas[0].SAC_ImporteResuelto__c = 100.0;
             listaTareas[0].SAC_ImpResueltoInteresesLegales__c= 100.0;
-            listaTareas[0].SAC_ImporteAbonar__c = 100.0;     
-            Database.update(listaTareas[0]);
+            listaTareas[0].SAC_ImporteAbonar__c = 100.0;
+            SAC_DatabaseDML.updateDML(listaTareas[0], false);    
+            //Database.update(listaTareas[0]);
 
             //ver que el recalculo funciona
             for(SAC_Accion__c tarea : listaTareas) {
@@ -80,7 +88,8 @@ public with sharing class SAC_Accion_AU_TRHan_Test {
                 tarea.SAC_ImporteAbonar__c = importes2;
             }
             test.startTest();
-            Database.update(listaTareas);
+            SAC_DatabaseDML.updateListDML(listaTareas, false);
+            //Database.update(listaTareas);
             test.stopTest();
         }
 
@@ -90,7 +99,7 @@ public with sharing class SAC_Accion_AU_TRHan_Test {
     }
 
     @istest
-    static void TareaActivaDescar(){
+    static void tareaActivaDescar(){
         list<SAC_Accion__c> listaTareas = [SELECT Id, SAC_ImporteResuelto__c, SAC_ImpResueltoInteresesLegales__c, SAC_ImporteAbonar__c, SAC_Pretension__c
                                            FROM SAC_Accion__c LIMIT 1];
 
@@ -99,11 +108,13 @@ public with sharing class SAC_Accion_AU_TRHan_Test {
 		System.runAs(usuario){
             listaTareas[0].SAC_ImporteResuelto__c = 100.0;
             listaTareas[0].SAC_ImpResueltoInteresesLegales__c= 100.0;
-            listaTareas[0].SAC_ImporteAbonar__c = 100.0;     
-            Database.update(listaTareas);
+            listaTareas[0].SAC_ImporteAbonar__c = 100.0;
+            SAC_DatabaseDML.updateListDML(listaTareas, false);     
+            //Database.update(listaTareas);
             test.startTest();
             listaTareas[0].SAC_Estado__c = 'SAC_Descartada';
-            Database.update(listaTareas);
+            SAC_DatabaseDML.updateListDML(listaTareas, false);   
+            //Database.update(listaTareas);
             test.stopTest();
         }
 
@@ -112,7 +123,7 @@ public with sharing class SAC_Accion_AU_TRHan_Test {
     }
 
     @istest
-    static void TareaDescarActiva(){
+    static void tareaDescarActiva(){
         list<SAC_Accion__c> listaTareas = [SELECT Id, SAC_ImporteResuelto__c, SAC_ImpResueltoInteresesLegales__c, SAC_ImporteAbonar__c, SAC_Pretension__c
                                            FROM SAC_Accion__c LIMIT 1];
 
@@ -122,11 +133,13 @@ public with sharing class SAC_Accion_AU_TRHan_Test {
             listaTareas[0].SAC_ImporteResuelto__c = 100.0;
             listaTareas[0].SAC_ImpResueltoInteresesLegales__c= 100.0;
             listaTareas[0].SAC_ImporteAbonar__c = 100.0;
-            listaTareas[0].SAC_Estado__c = 'SAC_Descartada';     
-            Database.update(listaTareas);
+            listaTareas[0].SAC_Estado__c = 'SAC_Descartada';
+            SAC_DatabaseDML.updateListDML(listaTareas, false);      
+            //Database.update(listaTareas);
             test.startTest();
             listaTareas[0].SAC_Estado__c = 'SAC_PendienteEnviar';
-            Database.update(listaTareas);
+            SAC_DatabaseDML.updateListDML(listaTareas, false);
+            //Database.update(listaTareas);
             test.stopTest();
         }
 

@@ -31,125 +31,104 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
  * VERSION        USER_STORY       AUTHOR         DATE         Description
  * 1.0            US200298         Luis Mesa    16/04/21       Creación Método
 *****************************************************************/
-
         if(!Case.SObjectType.getDescribe().isAccessible()){
-            throw new AuraHandledException(MSG_ERROR_PERMISSIONS);        }
-
-        //Caso para poder obtener casos relacionados a este
-        Case casoAuxiliar = [Select Id, recordTypeId, CaseNumber, CC_CasoRelacionado__c, AccountId From Case Where Id =: idcasoDisparador];
-        List<Case> reclamaciones = new List<Case>();
-
-        if(casoAuxiliar.AccountId == null){
-            throw new AuraHandledException(MSG_ERROR_RECORDS);        }
-
-        if(casoAuxiliar.recordTypeId == RECORTYPECONSULTA || casoAuxiliar.recordTypeId == RECORTYPECONSULTASAC){
-            List<ReclamacionWrapper> resultado = infoConsulta(casoAuxiliar);
-            return resultado;
+            throw new AuraHandledException(MSG_ERROR_PERMISSIONS);        
         }
 
-        //Add - Lista de reclamantes
-        List<SAC_CaseReclamante__c> reclamantes = [SELECT Id, Name, SAC_ReclamantePrincipal__c, SAC_Case__c, SAC_Account__c, SAC_Account__r.Name
-                                                    FROM SAC_CaseReclamante__c
-                                                    WHERE SAC_Case__c =: casoAuxiliar.Id];
+        //Caso para poder obtener casos relacionados a este
+        Case casoAuxiliar = [SELECT Id, recordTypeId, CaseNumber, CC_CasoRelacionado__c, AccountId, SAC_Naturaleza__c FROM Case WHERE Id =: idcasoDisparador];
+        List<Case> listCasos = new List<Case>();
 
-        List<Id> reclamantesAccount = new List<Id>();
-        
+        if(casoAuxiliar.AccountId == null){
+            throw new AuraHandledException(MSG_ERROR_RECORDS);        
+        }
+
+        //Lista de reclamantes de la reclamación actual
+        List<SAC_CaseReclamante__c> reclamantes = [SELECT SAC_Account__c FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: casoAuxiliar.Id];
+
+        Set<Id> reclamantesAccount = new Set<Id>();
         for(SAC_CaseReclamante__c reclamante : reclamantes){
             reclamantesAccount.add(reclamante.SAC_Account__c);
         }
 
-        List<SAC_CaseReclamante__c> reclamantesV2 = [SELECT Id, Name, SAC_ReclamantePrincipal__c, SAC_Case__c, SAC_Account__c, SAC_Account__r.Name
-                FROM SAC_CaseReclamante__c
-                WHERE SAC_Account__c IN: reclamantesAccount];
+        //Lista de todos los case reclamantes equivalentes a los de la reclamación actual
+        List<SAC_CaseReclamante__c> reclamantesV2 = [SELECT Id, SAC_Case__c, SAC_ReclamantePrincipal__c, Name, SAC_Account__c, SAC_Account__r.Name FROM SAC_CaseReclamante__c WHERE SAC_Account__c IN: reclamantesAccount];
 
-        List<Id> idsCasos = new List<Id>();
+        Set<Id> idsCasos = new Set<Id>();
         for(SAC_CaseReclamante__c rec : reclamantesV2){
             idsCasos.add(rec.SAC_Case__c);
         }
                 
-        reclamaciones = [SELECT SAC_Reclamacion__c, Id, CaseNumber, AccountId, Description, ParentId, Subject, CreatedDate, toLabel(Status), Account.Name
+        //Recuperamos las reclamacones asociadas a estos reclamantes, así como las pretensiones asociadas a estas reclamaciones
+        //US1094159 -> Se añade SAC_Naturaleza__c != 'SAC_007', para no mostrar las reclamaciones con Naturaleza: Complementaria
+        //y en caso de que el caso actual sea una complementaria, solo mostrar reclamaciones que estén cerradas y sentido resolución favorable a cliente SAC_003
+        
+        listCasos = [SELECT SAC_Reclamacion__c, Id, CaseNumber, AccountId, Subject, CreatedDate, toLabel(Status), Account.Name, RecordTypeId, SEG_Grupo__r.Name, Owner.Name
                                 FROM Case 
-                                WHERE Id IN: idsCasos//AccountId IN: reclamantesAccount
-                                AND AccountId != null
-                                AND recordTypeId =: RECTYPERECLAMACION
-                                AND Id != :casoAuxiliar.Id];
+                                WHERE (Id IN: idsCasos AND AccountId != null AND recordTypeId =: RECTYPERECLAMACION AND Id != :casoAuxiliar.Id AND SAC_Naturaleza__c != 'SAC_007') OR 
+                                (recordTypeId =: RECTYPEPRETENSION AND SAC_Reclamacion__c IN :idsCasos AND SAC_Reclamacion__r.AccountId != null AND SAC_Reclamacion__C != :casoAuxiliar.Id)]; //AccountId IN: reclamantesAccount
 
-        //Lista reclamantes principales
-        List<SAC_CaseReclamante__c> reclamantesPrincipalesTotales = 
-            [SELECT Id, Name, SAC_ReclamantePrincipal__c, SAC_Case__c, SAC_Account__c, SAC_Account__r.Name
-                FROM SAC_CaseReclamante__c
-                WHERE SAC_Case__c IN: reclamaciones
-                    AND SAC_ReclamantePrincipal__c = true];
-  
+        Set<Id> idsReclamaciones = new Set<Id>();
+        for(Case rec : listCasos){
+            if(rec.recordTypeId == RECTYPERECLAMACION){
+                idsReclamaciones.add(rec.Id);
+            }
+        }
+
         Map<Id, List<SAC_CaseReclamante__c>> mapDeReclamantesPrincipales = new Map<Id, List<SAC_CaseReclamante__c>>();
-        for(SAC_CaseReclamante__c reclamante : reclamantesPrincipalesTotales){
-            List<SAC_CaseReclamante__c> nombreReclamantes = new List<SAC_CaseReclamante__c>();
-            if(mapDeReclamantesPrincipales.containsKey(reclamante.SAC_Case__c)){
-                nombreReclamantes = mapDeReclamantesPrincipales.get(reclamante.SAC_Case__c);
-                nombreReclamantes.add(reclamante);
-                mapDeReclamantesPrincipales.put(reclamante.SAC_Case__c, nombreReclamantes);
-            }
-            else{
-                nombreReclamantes.add(reclamante);
-                mapDeReclamantesPrincipales.put(reclamante.SAC_Case__c, nombreReclamantes);
-            }
-        }
-        //Lista reclamantes secundarios
-        List<SAC_CaseReclamante__c> reclamantesSecundariosTotales = 
-        [SELECT Id, Name, SAC_ReclamantePrincipal__c, SAC_Case__c, SAC_Account__c, SAC_Account__r.Name
-            FROM SAC_CaseReclamante__c
-            WHERE SAC_Case__c IN: reclamaciones
-                AND SAC_ReclamantePrincipal__c = false];
-                
         Map<Id, List<SAC_CaseReclamante__c>> mapDeReclamantesSecundarios = new Map<Id, List<SAC_CaseReclamante__c>>();
-        for(SAC_CaseReclamante__c reclamante : reclamantesSecundariosTotales){
-            List<SAC_CaseReclamante__c> nombreReclamantes = new List<SAC_CaseReclamante__c>();
-            if(mapDeReclamantesSecundarios.containsKey(reclamante.SAC_Case__c)){
-                nombreReclamantes = mapDeReclamantesSecundarios.get(reclamante.SAC_Case__c);
-                nombreReclamantes.add(reclamante);
-                mapDeReclamantesSecundarios.put(reclamante.SAC_Case__c, nombreReclamantes);
-            }
-            else{
-                nombreReclamantes.add(reclamante);
-                mapDeReclamantesSecundarios.put(reclamante.SAC_Case__c, nombreReclamantes);
+
+        for(SAC_CaseReclamante__c reclamante : reclamantesV2){
+            if(idsReclamaciones.contains(reclamante.SAC_Case__c)){
+                List<SAC_CaseReclamante__c> nombreReclamantes = new List<SAC_CaseReclamante__c>();
+
+                if(reclamante.SAC_ReclamantePrincipal__c){
+                    if(mapDeReclamantesPrincipales.containsKey(reclamante.SAC_Case__c)){
+                        nombreReclamantes = mapDeReclamantesPrincipales.get(reclamante.SAC_Case__c);
+                        nombreReclamantes.add(reclamante);
+                        mapDeReclamantesPrincipales.put(reclamante.SAC_Case__c, nombreReclamantes);
+                    }
+                    else{
+                        nombreReclamantes.add(reclamante);
+                        mapDeReclamantesPrincipales.put(reclamante.SAC_Case__c, nombreReclamantes);
+                    }
+                }else{
+                    if(mapDeReclamantesSecundarios.containsKey(reclamante.SAC_Case__c)){
+                        nombreReclamantes = mapDeReclamantesSecundarios.get(reclamante.SAC_Case__c);
+                        nombreReclamantes.add(reclamante);
+                        mapDeReclamantesSecundarios.put(reclamante.SAC_Case__c, nombreReclamantes);
+                    }
+                    else{
+                        nombreReclamantes.add(reclamante);
+                        mapDeReclamantesSecundarios.put(reclamante.SAC_Case__c, nombreReclamantes);
+                    }
+                }
             }
         }
 
-        //Map con Id - Reclamacion
+        //Mapeo reclamaciones y pretensiones
         Map<Id,Case> mapDeReclamaciones = new Map<Id, Case>();
-        for(Case reclamacionMap : reclamaciones){
-            mapDeReclamaciones.put(reclamacionMap.Id, reclamacionMap);
-        }
+        Map<Id,List<Case>> mapPretensiones = new Map<Id,List<Case>>();
 
-        //Lista pretensiones de las reclamaciones
-        List<Case> pretensiones = new List<Case>();
-        if(casoAuxiliar.recordTypeId == RECTYPERECLAMACION){
-            pretensiones = [ SELECT Id, SAC_Reclamacion__c, SAC_Reclamacion__r.Subject, CaseNumber,Subject, CreatedDate, toLabel(Status),
-                                    Owner.Name, SEG_Grupo__r.Name, SEG_Grupo__c
-                                    FROM Case
-                                    WHERE SAC_Reclamacion__c IN: reclamaciones AND recordTypeId =: RECTYPEPRETENSION];
+        for(Case caso : listCasos){
+            if(caso.recordTypeId == RECTYPERECLAMACION){
+                mapDeReclamaciones.put(caso.Id, caso);
+            }else if(casoAuxiliar.recordTypeId == RECTYPERECLAMACION || casoAuxiliar.recordTypeId == RECORTYPECONSULTA || casoAuxiliar.recordTypeId == RECORTYPECONSULTASAC){
+                List<Case> listadoAuxiliar = new List<Case>();  
+                if(mapPretensiones.containsKey(caso.SAC_Reclamacion__c)){
+                    listadoAuxiliar = mapPretensiones.get(caso.SAC_Reclamacion__c);
+                    listadoAuxiliar.add(caso);
+                    mapPretensiones.put(caso.SAC_Reclamacion__c, listadoAuxiliar);
+                }
+                else{
+                    listadoAuxiliar.add(caso);
+                    mapPretensiones.put(caso.SAC_Reclamacion__c, listadoAuxiliar);
+                }
+            }
         }
         
         //Objeto reclamaciones + pretensiones
-        List<ReclamacionWrapper> listadoFinal = new List<ReclamacionWrapper>();
-
-        //Map contiene reclamacion + pretensiones
-        Map<Id,List<Case>> mapPretensiones = new Map<Id,List<Case>>();
-
-        //MAPEO DEL LISTADO PRETENSIONES A SU CORRESPONDIENTE MAP DE RECLAMACIONES, LISTA PRETENSIONES
-        for(Case casoMap : pretensiones){
-            //Lista para iterar las pretensiones
-            List<Case> listadoAuxiliar = new List<Case>();  
-            if(mapPretensiones.containsKey(casoMap.SAC_Reclamacion__c)){
-                listadoAuxiliar = mapPretensiones.get(CasoMap.SAC_Reclamacion__c);
-                listadoAuxiliar.add(casoMap);
-                mapPretensiones.put(CasoMap.SAC_Reclamacion__c, listadoAuxiliar);
-            }
-            else{
-                listadoAuxiliar.add(casoMap);
-                mapPretensiones.put(casoMap.SAC_Reclamacion__c, listadoAuxiliar);
-            }
-        }
+        List<ReclamacionWrapper> listadoFinal = new List<ReclamacionWrapper>();        
         
         //Pasar el objeto MAP al objeto wrapper
         for(String reclamacionMap : mapDeReclamaciones.keySet()){
@@ -171,6 +150,7 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
         return listadoFinal;
     }
 
+
     /*****************************************************************
      * Proposito: Método para vincular reclamaciones en el apartado Antecedentes del objeto Case 
      *                                                                                        
@@ -182,6 +162,8 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
      * 1.3            US330921       Marcela Neira  12/11/21       Modificacion (En caso que la reclamación con la que se vincula la Consulta esté 
      *                                                             en estado Cerrada/Ejecución" Y el GESTOR sea diferente del que trata la consulta, 
      *                                                             se mande una notificación al gestor. )
+     * 1.4            US683740       Raúl Santos    31/10/24       Modificación:  Si desde una consulta SAC vinculamos una reclamación con grupo letrado informado, 
+     *                                                             la consulta SAC debe heredar ese grupo letrado
     *****************************************************************/
     
     @AuraEnabled
@@ -191,7 +173,7 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
         if(!Case.SObjectType.getDescribe().isAccessible()){
             throw new AuraHandledException(MSG_ERROR_PERMISSIONS);
         }
-        List<Case> casoAnteriorAVincular = [Select Id, CC_CasoRelacionado__c, Status, RecordTypeId, OwnerId, SEG_Grupo__c, CaseNumber, SAC_PretensionPrincipal__r.OwnerId From Case Where Id =: idCasoVinculado Limit 1];
+        List<Case> casoAnteriorAVincular = [Select Id, CC_CasoRelacionado__c, Status, RecordTypeId, OwnerId, SEG_Grupo__c, CaseNumber, SAC_PretensionPrincipal__r.OwnerId, SAC_GrupoLetrado__c From Case Where Id =: idCasoVinculado Limit 1];
         List<Case> casoActual = [Select Id, CC_CasoRelacionado__c, Status, RecordTypeId, RecordType.DeveloperName, CaseNumber, OwnerId, SEG_Grupo__c From Case Where Id =: idCasoActual Limit 1];
         //List<Case> pretensiones = [SELECT Id, SAC_Reclamacion__c, Status, SEG_Grupo__c  FROM Case WHERE SAC_Reclamacion__c =: idCasoActual AND Status != 'SAC_009'];
         String tipoCaso = casoActual[0].RecordType.DeveloperName + ';' + casoAnteriorAVincular[0].CaseNumber;
@@ -254,7 +236,17 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
                                 //Añadirla a la lista para posteriormente llamar al método
                                 listaWrapperAlerta.add(wrapAlerta);
                             }                           
-                        }                        
+                        } 
+
+                        //Si desde una consulta SAC vinculamos una reclamación con grupo letrado informado, la consulta SAC debe heredar ese grupo letrado
+                        if(casoActual[0].RecordTypeId == RECORTYPECONSULTASAC){
+                            if(casoAnteriorAVincular[0].SAC_GrupoLetrado__c != null){
+                                casoActual[0].SAC_GrupoLetrado__c = casoAnteriorAVincular[0].SAC_GrupoLetrado__c;
+                            }else{
+                                casoActual[0].SAC_GrupoLetrado__c = null;
+                            }   
+                            casoActual[0].SAC_Letrado__c = 'Pte. Asignar';         
+                        }                  
                 }
 
                 listaCasosUpdatear.add(casoActual[0]);
@@ -362,140 +354,33 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
        // else{
         //    throw new AuraHandledException('No se puede desvincular la reclamación.');
         //}
-    }    
-
-//--------------------------- Metodo para consultas -----------------------------    
-
+    }
+    
+    
+    /***********************************************************************************************************
+    * Proposito: Validar si se permite vincular/desvincular una reclamación. No se permite si es una complementaria y ya ha sido resuelta
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0             US1094159      Álex Polo     21/01/25        Creación
+    ***********************************************************************************************************/ 
     @AuraEnabled
-    public static List<ReclamacionWrapper> infoConsulta(Case consulta){
-        List<ReclamacionWrapper> resultado = new List<ReclamacionWrapper>();
+    public static Boolean validarVincularDesvincularComplementaria(Id idCaso) {
 
-        //Add - Lista de reclamantes
-        List<SAC_CaseReclamante__c> reclamantes = [SELECT Id, Name, SAC_ReclamantePrincipal__c, SAC_Case__c, SAC_Account__c, SAC_Account__r.Name
-                                                    FROM SAC_CaseReclamante__c
-                                                    WHERE SAC_Case__c =: consulta.Id];
+        Case reclamacion = new Case();
+        List<Case> listaCasos = [SELECT Id, SAC_Naturaleza__c, OS_Fecha_Resolucion__c FROM Case WHERE Id = :idCaso];
+        if(!listaCasos.isEmpty()){
+            reclamacion = listaCasos[0];
+            if(reclamacion.SAC_Naturaleza__c == 'SAC_007' && reclamacion.OS_Fecha_Resolucion__c != null){
+                return false;   //Si es complementaria y SÍ ha sido resuelta (tiene fecha resolución), no se puede desvincular ni vincular
+            }else{
+                return true;        //Si no es complementaria o si sí lo es pero no está resuelta (no tiene fecha de resolución), sí se puede desvincular y vincular
+            }
 
-        List<Id> reclamantesAccount = new List<Id>();
-        
-        for(SAC_CaseReclamante__c reclamante : reclamantes){
-            reclamantesAccount.add(reclamante.SAC_Account__c);
+        }else{
+            return false;
         }
-
-        List<SAC_CaseReclamante__c> reclamantesV2 = [SELECT Id, Name, SAC_ReclamantePrincipal__c, SAC_Case__c, SAC_Account__c, SAC_Account__r.Name
-                FROM SAC_CaseReclamante__c
-                WHERE SAC_Account__c IN: reclamantesAccount];
-
-        List<Id> idsCasos = new List<Id>();
-        for(SAC_CaseReclamante__c rec : reclamantesV2){
-            idsCasos.add(rec.SAC_Case__c);
-        }
-        
-        
-        List<Case> reclamaciones = [SELECT SAC_Reclamacion__c, Id, CaseNumber, AccountId, Description, ParentId, Subject, CreatedDate, toLabel(Status), Account.Name
-                                FROM Case 
-                                WHERE Id IN: idsCasos//AccountId IN: reclamantesAccount
-                                AND AccountId != null
-                                AND recordTypeId =: RECTYPERECLAMACION
-                                AND Id != :consulta.Id];
-        
-
-        //Lista reclamantes principales
-        List<SAC_CaseReclamante__c> reclamantesPrincipalesTotales = 
-            [SELECT Id, Name, SAC_ReclamantePrincipal__c, SAC_Case__c, SAC_Account__c, SAC_Account__r.Name
-                FROM SAC_CaseReclamante__c
-                WHERE SAC_Case__c IN: reclamaciones
-                    AND SAC_ReclamantePrincipal__c = true];
-  
-        Map<Id, List<SAC_CaseReclamante__c>> mapDeReclamantesPrincipales = new Map<Id, List<SAC_CaseReclamante__c>>();
-        for(SAC_CaseReclamante__c reclamante : reclamantesPrincipalesTotales){
-            List<SAC_CaseReclamante__c> nombreReclamantes = new List<SAC_CaseReclamante__c>();
-            if(mapDeReclamantesPrincipales.containsKey(reclamante.SAC_Case__c)){
-                nombreReclamantes = mapDeReclamantesPrincipales.get(reclamante.SAC_Case__c);
-                nombreReclamantes.add(reclamante);
-                mapDeReclamantesPrincipales.put(reclamante.SAC_Case__c, nombreReclamantes);
-            }
-            else{
-                nombreReclamantes.add(reclamante);
-                mapDeReclamantesPrincipales.put(reclamante.SAC_Case__c, nombreReclamantes);
-            }
-        }
-        //Lista reclamantes secundarios
-        List<SAC_CaseReclamante__c> reclamantesSecundariosTotales = 
-        [SELECT Id, Name, SAC_ReclamantePrincipal__c, SAC_Case__c, SAC_Account__c, SAC_Account__r.Name
-            FROM SAC_CaseReclamante__c
-            WHERE SAC_Case__c IN: reclamaciones
-                AND SAC_ReclamantePrincipal__c = false];
-                
-        Map<Id, List<SAC_CaseReclamante__c>> mapDeReclamantesSecundarios = new Map<Id, List<SAC_CaseReclamante__c>>();
-        for(SAC_CaseReclamante__c reclamante : reclamantesSecundariosTotales){
-            List<SAC_CaseReclamante__c> nombreReclamantes = new List<SAC_CaseReclamante__c>();
-            if(mapDeReclamantesSecundarios.containsKey(reclamante.SAC_Case__c)){
-                nombreReclamantes = mapDeReclamantesSecundarios.get(reclamante.SAC_Case__c);
-                nombreReclamantes.add(reclamante);
-                mapDeReclamantesSecundarios.put(reclamante.SAC_Case__c, nombreReclamantes);
-            }
-            else{
-                nombreReclamantes.add(reclamante);
-                mapDeReclamantesSecundarios.put(reclamante.SAC_Case__c, nombreReclamantes);
-            }
-        }
-
-        //Map con Id - Reclamacion
-        Map<Id,Case> mapDeReclamaciones = new Map<Id, Case>();
-        for(Case reclamacionMap : reclamaciones){   
-            mapDeReclamaciones.put(reclamacionMap.Id, reclamacionMap);
-        }
-        //Lista pretensiones de las reclamaciones
-        List<Case> pretensiones = new List<Case>();
-            pretensiones = [ SELECT Id, SAC_Reclamacion__c, SAC_Reclamacion__r.Subject, CaseNumber,Subject, CreatedDate, toLabel(Status),
-                                    Owner.Name, SEG_Grupo__r.Name, SEG_Grupo__c
-                                    FROM Case
-                                    WHERE SAC_Reclamacion__c IN: reclamaciones AND recordTypeId =: RECTYPEPRETENSION];
-        
-        //Objeto reclamaciones + pretensiones
-        List<ReclamacionWrapper> listadoFinal = new List<ReclamacionWrapper>();
-
-        //Map contiene reclamacion + pretensiones
-        Map<Id,List<Case>> mapPretensiones = new Map<Id,List<Case>>();
-
-        //MAPEO DEL LISTADO PRETENSIONES A SU CORRESPONDIENTE MAP DE RECLAMACIONES, LISTA PRETENSIONES
-        for(Case casoMap : pretensiones){
-            //Lista para iterar las pretensiones
-            List<Case> listadoAuxiliar = new List<Case>(); 
-            if(mapPretensiones.containsKey(casoMap.SAC_Reclamacion__c)){
-                listadoAuxiliar = mapPretensiones.get(CasoMap.SAC_Reclamacion__c);
-                listadoAuxiliar.add(casoMap);
-                mapPretensiones.put(CasoMap.SAC_Reclamacion__c, listadoAuxiliar);
-            }
-            else{
-                listadoAuxiliar.add(casoMap);
-                mapPretensiones.put(casoMap.SAC_Reclamacion__c, listadoAuxiliar);
-            }
-        }
-        
-        //Pasar el objeto MAP al objeto wrapper
-        for(Case reclamacion : reclamaciones){
-
-            Boolean desactivarBtn = false;
-
-            if(reclamacion.Id == consulta.CC_CasoRelacionado__c){
-                desactivarBtn=true;
-            }
-
-            //Lista para iterar las pretensiones
-            List<Case> pretensionesMapa = new List<Case>();
-            if(mapPretensiones.containsKey(reclamacion.Id)){
-                pretensionesMapa = mapPretensiones.get(reclamacion.Id);
-            }
-
-            ReclamacionWrapper reclamacionAuxiliar = new ReclamacionWrapper(mapDeReclamaciones.get(reclamacion.Id) , pretensionesMapa,
-                mapDeReclamantesPrincipales.get(reclamacion.Id), mapDeReclamantesSecundarios.get(reclamacion.Id), desactivarBtn, !desactivarBtn);
-
-            resultado.add(reclamacionAuxiliar);
-        }
-
-        return resultado;
-
     }
 
 }

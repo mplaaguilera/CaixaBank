@@ -17,7 +17,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
         usuario.Username = 'ustestesteo@test.com'; 
 
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertDML(usuario, false);
+        //Database.insert(usuario);
 
         Id recTypeTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         Id recTypeProdServ = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
@@ -31,7 +32,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-0101',
         OwnerId = usuario.id);
-        Database.insert(mccTematica1);
+        SAC_DatabaseDML.insertDML(mccTematica1, false);
+        //Database.insert(mccTematica1);
 
         CC_MCC__c mccProdServ1 = new CC_MCC__c(
         RecordTypeId = recTypeProdServ,
@@ -40,7 +42,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         CC_Codigo_Externo__c = 'TEST-010101',
         CC_Tematica__c = mccTematica1.id,
         OwnerId = usuario.id);
-        Database.insert(mccProdServ1);
+        SAC_DatabaseDML.insertDML(mccProdServ1, false);
+        //Database.insert(mccProdServ1);
 
         CC_MCC__c mccMotivo1 = new CC_MCC__c(
         RecordTypeId = recTypeMotivo,
@@ -49,7 +52,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         CC_Producto_Servicio__c = mccProdServ1.id,
         CC_Codigo_Externo__c = 'TEST-0102',
         OwnerId = usuario.id);
-        Database.insert(mccMotivo1);
+        SAC_DatabaseDML.insertDML(mccMotivo1, false);
+        //Database.insert(mccMotivo1);
 
         CC_MCC__c mccDetalle1 = new CC_MCC__c(
         RecordTypeId = recTypeDetalle,
@@ -58,7 +62,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         CC_Codigo_Externo__c = 'TEST-010101012',
         CC_Motivo__c = mccMotivo1.id,
         OwnerId = usuario.id);
-        Database.insert(mccDetalle1);
+        SAC_DatabaseDML.insertDML(mccDetalle1, false);
+        //Database.insert(mccDetalle1);
 
         CC_MCC__c mccDetalle2 = new CC_MCC__c(
         RecordTypeId = recTypeDetalle,
@@ -67,7 +72,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         CC_Codigo_Externo__c = 'TEST-010101013',
         CC_Motivo__c = mccMotivo1.id,
         OwnerId = usuario.id);
-        Database.insert(mccDetalle2);
+        SAC_DatabaseDML.insertDML(mccDetalle2, false);
+        //Database.insert(mccDetalle2);
 
         //GRUPOS
         List<CC_Grupo_Colaborador__c> listGrupos = new List<CC_Grupo_Colaborador__c>();
@@ -75,7 +81,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         grupoResp.OwnerId = usuario.id;
         grupoResp.SAC_DeveloperName__c = 'COPS';
         listGrupos.add(grupoResp);
-        Database.insert(listGrupos);
+        SAC_DatabaseDML.insertListDML(listGrupos, false);
+        //Database.insert(listGrupos);
 
         //GRUPO MCC
 		CC_MCC_Grupo_Colaborador__c relacionMCCGrupo = new CC_MCC_Grupo_Colaborador__c();
@@ -85,7 +92,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
 		relacionMCCGrupo.Name = 'Prueba';
 		relacionMCCGrupo.SAC_MaximoDeCasosDiarios__c = 1;
         relacionMCCGrupo.SPV_Tipo_Cliente__c = 'SAC';
-		Database.insert(relacionMCCGrupo);
+        SAC_DatabaseDML.insertDML(relacionMCCGrupo, false);
+		//Database.insert(relacionMCCGrupo);
 
         List<Case> lstRecl = new List<Case>();
         //RECLAMACION 1
@@ -102,7 +110,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
         lstRecl.add(casoReclamacion);
-        Database.insert(lstRecl);
+        SAC_DatabaseDML.insertListDML(lstRecl, false);
+        //Database.insert(lstRecl);
 
         //PRETENSION 1
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -117,7 +126,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         camposPret.put('SEG_Detalle__c', mccDetalle1.Id);
         
         Case casoPretension1 = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(casoPretension1);
+        SAC_DatabaseDML.insertDML(casoPretension1, false);
+        //Database.insert(casoPretension1);
     }
 
 
@@ -129,7 +139,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         CC_MCC__c mcct = [SELECT id FROM CC_MCC__c WHERE Name = 'Avales MCC Clase Test' LIMIT 1];
         CC_MCC__c mccp = [SELECT id FROM CC_MCC__c WHERE Name = 'Avales Fianzas y Otras Garantías MCC Clase Test' LIMIT 1];
         CC_MCC__c mccm = [SELECT id FROM CC_MCC__c WHERE Name = 'Discrepancia con importe deuda reclamada MCC Clase Test' LIMIT 1];
@@ -165,7 +176,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         CC_MCC__c mccd = [SELECT id FROM CC_MCC__c WHERE Name = 'Discrepancia con importe deuda MCC Clase Test' LIMIT 1];
 
         List<SObject> listaResultado1 = new List<sObject>();
@@ -187,7 +199,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         
         CC_MCC__c mccd = [SELECT id FROM CC_MCC__c WHERE Name = 'Discrepancia con importe deuda MCC Cambio MCC' LIMIT 1];
         Case pretension = [SELECT id, SEG_Detalle__c FROM Case WHERE SuppliedCompany = 'pruebaMCC' limit 1];
@@ -210,7 +223,8 @@ public with sharing class SAC_LCMP_BuscadorMCCController_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         
         CC_MCC__c mccId = [SELECT id FROM CC_MCC__c WHERE Name = 'Discrepancia con importe deuda MCC Clase Test' LIMIT 1];
         Case pretension = [SELECT id, SEG_Detalle__c FROM Case WHERE SuppliedCompany = 'pruebaMCC' limit 1];

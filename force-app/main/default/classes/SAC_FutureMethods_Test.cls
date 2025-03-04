@@ -9,25 +9,29 @@ public with sharing class SAC_FutureMethods_Test {
         Id recordTypeNoCliente = mapRTsObjects.get('Account').get('SAC_NoCliente').getRecordTypeId();
 
         Test.startTest();
-        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];  
-        Database.insert(usuarioAdmin);
+        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);  
+        //Database.insert(usuarioAdmin);
 
         User usuarioGeneral;
         System.runAs(usuarioAdmin) {
             //Usuario SAC General
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);       
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);    
+            //Database.insert(permiSetAssi);
 
             PermissionSetAssignment permiSetAssi2 = new PermissionSetAssignment();
             permiSetAssi2.AssigneeId = usuarioAdmin.Id;
             permiSetAssi2.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi2);
+            SAC_DatabaseDML.insertDML(permiSetAssi2, false); 
+            //Database.insert(permiSetAssi2);
         }
         Test.stopTest();
 
@@ -35,7 +39,8 @@ public with sharing class SAC_FutureMethods_Test {
         Account cuentaB = SAC_TestDataFactory.crearCuentas(1)[0];
         cuentaB.RecordTypeId = recordTypeNoCliente;
         cuentaB.OwnerId = usuarioGeneral.id;
-        Database.insert(cuentaB);
+        SAC_DatabaseDML.insertDML(cuentaB, false); 
+        //Database.insert(cuentaB);
 
         //MCC
         CC_MCC__c mcc = new CC_MCC__c(
@@ -55,7 +60,8 @@ public with sharing class SAC_FutureMethods_Test {
         List<CC_MCC__c> mccs = new List<CC_MCC__c>();
         mccs.add(mcc);
         mccs.add(mcc2);
-        Database.insert(mccs);
+        SAC_DatabaseDML.insertListDML(mccs, false); 
+        //Database.insert(mccs);
 
         //PARAMETRIZACIONES MCC
         SAC_ParametrizacionSLATME__c parametrizacion1  = SAC_TestDataFactory.crearParamsSla('Regulatorio',1)[0];
@@ -80,7 +86,8 @@ public with sharing class SAC_FutureMethods_Test {
         parametrizaciones.add(parametrizacion1);
         parametrizaciones.add(parametrizacion2);
         parametrizaciones.add(parametrizacion3);
-        Database.upsert(parametrizaciones);
+        SAC_DatabaseDML.insertListDML(parametrizaciones, false); 
+        //Database.upsert(parametrizaciones);
 
         //RECLAMACION 1
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -117,8 +124,9 @@ public with sharing class SAC_FutureMethods_Test {
         //INSERTAMOS RECLAMACIONES
         List<Case> reclamaciones = new List<Case>();
         reclamaciones.add(casoReclamacion);
-        reclamaciones.add(casoReclamacion2); 
-        Database.insert(reclamaciones);
+        reclamaciones.add(casoReclamacion2);
+        SAC_DatabaseDML.insertListDML(reclamaciones, false); 
+        //Database.insert(reclamaciones);
  
 
         //PRETENSION 1 
@@ -197,7 +205,22 @@ public with sharing class SAC_FutureMethods_Test {
         pretensiones.add(casoPretension3);
         pretensiones.add(casoPretension4);
         pretensiones.add(casoPretension5);
-        Database.insert(pretensiones);
+        SAC_DatabaseDML.insertListDML(pretensiones, false);
+        //Database.insert(pretensiones);
+
+        CC_Grupo_Colaborador__c grupoColaboradorLetrado = new CC_Grupo_Colaborador__c();
+        grupoColaboradorLetrado.name = 'grupoColaboradorTestLetrado';
+        grupoColaboradorLetrado.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SAC_Letrados').getRecordTypeId();
+        grupoColaboradorLetrado.SAC_PorcentajeAsignacion__c = 100;
+        grupoColaboradorLetrado.SAC_MaximoCasosDiarios__c = 30;
+        SAC_DatabaseDML.insertDML(grupoColaboradorLetrado, false);
+
+        List<SAC_DocumentoEnvio__c> listaDocs = new List<SAC_DocumentoEnvio__c>();
+        SAC_DocumentoEnvio__c documento = new SAC_DocumentoEnvio__c();
+        documento.SAC_Caso__c = casoReclamacion.Id;
+        documento.SAC_TipoDocumento__c = 'redaccionTest1001';
+        listaDocs.add(documento);
+        SAC_DatabaseDML.insertListDML(listaDocs, true);
     }
 
     @isTest
@@ -210,7 +233,8 @@ public with sharing class SAC_FutureMethods_Test {
         User usuarioAdmin = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Test.startTest();
         System.runAs(usuarioAdmin) {
-            Database.update(pretension1);
+            SAC_DatabaseDML.updateDML(pretension1, false);
+            //Database.update(pretension1);
             SAC_Case_BU_TRHan.actualizarVariablesControl();
         }
         Test.stopTest();
@@ -288,7 +312,8 @@ public with sharing class SAC_FutureMethods_Test {
 
         Test.startTest();
         System.runAs(usuario) {
-            Database.update(pretension1);
+            SAC_DatabaseDML.updateDML(pretension1, false);
+            //Database.update(pretension1);
         }
         Test.stopTest();
 
@@ -339,7 +364,8 @@ public with sharing class SAC_FutureMethods_Test {
         User usuarioAdmin = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Test.startTest();
         System.runAs(usuarioAdmin) {
-            Database.update(casos);
+            SAC_DatabaseDML.updateListDML(casos, false);
+            //Database.update(casos);
         }
         Test.stopTest();
 
@@ -367,14 +393,16 @@ public with sharing class SAC_FutureMethods_Test {
         System.runAs(usuarioAdmin) {
             //Usuario SAC General
             usuarioNuevo = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0]; 
-            usuarioNuevo.Username = 'usertest454758437@test.com.testSetup';    
-            Database.insert(usuarioNuevo);
+            usuarioNuevo.Username = 'usertest454758437@test.com.testSetup';
+            SAC_DatabaseDML.insertDML(usuarioNuevo, false);    
+            //Database.insert(usuarioNuevo);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioNuevo.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
         }
 
         User usuario = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' AND IsActive = true LIMIT 1];
@@ -384,7 +412,8 @@ public with sharing class SAC_FutureMethods_Test {
 
         Test.startTest();
         System.runAs(usuario) {
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
         }
         Test.stopTest();
 
@@ -414,7 +443,8 @@ public with sharing class SAC_FutureMethods_Test {
 
         Test.startTest();
         System.runAs(usuario) {
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
         }
         Test.stopTest();
 
@@ -480,5 +510,46 @@ public with sharing class SAC_FutureMethods_Test {
         // Verificar que los casos de pretensión tienen el nuevo OwnerId
         List<Case> updatedPretensiones = [SELECT Id, subject, OwnerId FROM Case WHERE SAC_Reclamacion__c = :reclamacion.Id AND Subject = 'Pretension Owner' LIMIT 1];
         System.assertEquals(reclamacion.OwnerId, updatedPretensiones[0].OwnerId, 'El OwnerId de la pretensión se actualizó correctamente');
+    }
+
+    @isTest
+    public static void eliminarPermisosOwnerLetradoTest() {
+        User usuario = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        CC_Grupo_Colaborador__c grupoLet = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'grupoColaboradorTestLetrado' LIMIT 1];
+
+        Map<String, Object> camposCons = new Map<String, Object>();
+        camposCons.put('Subject', 'ConsuultaSAC090125');
+        Case consulta = SAC_TestDataFactory.crearCaso('Consulta',camposCons);
+        consulta.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_ConsultaSAC').getRecordTypeId();  
+        consulta.SAC_Letrado__c = 'Test consulta SAC Letrado';
+        SAC_DatabaseDML.insertDML(consulta, true);
+
+        Test.startTest();
+        System.runAs(usuario) {
+            consulta.SAC_GrupoLetrado__c = grupoLet.Id;
+            SAC_DatabaseDML.updateDML(consulta, true); 
+        }
+        Test.stopTest();
+
+        // Verificar que los casos de pretensión tienen el nuevo OwnerId
+        List<Case> updateConsulta = [SELECT Id, SAC_Letrado__c FROM Case WHERE Id = :consulta.Id AND Subject = 'ConsuultaSAC090125' LIMIT 1];
+        Assert.areNotEqual('Test consulta SAC Letrado', updateConsulta[0].SAC_Letrado__c, 'El owner letrado de la consulta no se actualizó');
+    }
+
+    @isTest
+    public static void generarCartaPostalTest() {
+        User usuario = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        case reclamacion = [SELECT Id, OwnerId FROM Case WHERE subject = 'TestRec' LIMIT 1];
+        SAC_DocumentoEnvio__c carta = [SELECT Id FROM SAC_DocumentoEnvio__c WHERE SAC_TipoDocumento__c = 'redaccionTest1001' LIMIT 1];
+
+        Test.startTest();
+        System.runAs(usuario) {
+            SAC_FutureMethods.generarCartaPostal(carta.Id, reclamacion.id);
+        }
+        Test.stopTest();
+
+        // Verificar que los casos de pretensión tienen el nuevo OwnerId
+        List<Case> casoUpdate = [SELECT Id, CC_AcuseRecibo__c FROM Case WHERE Id = :reclamacion.Id AND Subject = 'TestRec' LIMIT 1];
+        Assert.areNotEqual('0', casoUpdate[0].CC_AcuseRecibo__c, 'No se ha generado la carta postal');
     }
 }

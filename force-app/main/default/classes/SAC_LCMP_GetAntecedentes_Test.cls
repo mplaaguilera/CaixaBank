@@ -7,14 +7,16 @@ public with sharing class SAC_LCMP_GetAntecedentes_Test {
         User usuarioGeneral;
         System.runAs(new User(Id = UserInfo.getUserId())) {
             //Usuario SAC General
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];    
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);    
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+            //Database.insert(permiSetAssi);
         }
 
         System.runAs(usuarioGeneral){
@@ -24,13 +26,15 @@ public with sharing class SAC_LCMP_GetAntecedentes_Test {
             cuenta.FirstName = 'test';
             cuenta.LastName = 'Test';
             cuenta.CC_Numero_Documento__c = '123456789';
-            Database.insert(cuenta);
+            SAC_DatabaseDML.insertDML(cuenta, false);
+            //Database.insert(cuenta);
 
             Account cuentaCC = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
             cuentaCC.CC_Numero_Documento__c = '123456780';
             cuentaCC.FirstName = 'test';
             cuentaCC.LastName = 'CC';
-            Database.insert(cuentaCC);
+            SAC_DatabaseDML.insertDML(cuentaCC, false);
+            //Database.insert(cuentaCC);
 
             //Reclamacion
             Map<String, Object> camposRecl = new Map<String, Object>();
@@ -39,7 +43,8 @@ public with sharing class SAC_LCMP_GetAntecedentes_Test {
             camposRecl.put('SAC_StatusAuxiliar__c', 'SAC_001');
 
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+            //Database.insert(reclamacion);
 
             //Reclamacion 2
             Map<String, Object> camposRecl2 = new Map<String, Object>();
@@ -48,7 +53,8 @@ public with sharing class SAC_LCMP_GetAntecedentes_Test {
             camposRecl2.put('SAC_StatusAuxiliar__c', 'SAC_001');
 
             Case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
-            Database.insert(reclamacion2);
+            SAC_DatabaseDML.insertDML(reclamacion2, false);
+            //Database.insert(reclamacion2);
 
             //Reclamacion 3
             Map<String, Object> camposRecl3 = new Map<String, Object>();
@@ -58,7 +64,8 @@ public with sharing class SAC_LCMP_GetAntecedentes_Test {
             camposRecl3.put('AccountId', cuentaCC.Id);
 
             Case reclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl3);
-            Database.insert(reclamacion3);
+            SAC_DatabaseDML.insertDML(reclamacion3, false);
+            //Database.insert(reclamacion3);
 
             //Reclamacion CC
             Map<String, Object> camposReclCC = new Map<String, Object>();
@@ -73,17 +80,21 @@ public with sharing class SAC_LCMP_GetAntecedentes_Test {
             camposReclCC.put('RecordTypeId', Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId());
 
             Case reclamacionCC = SAC_TestDataFactory.crearCaso('Reclamacion',camposReclCC);
-            Database.insert(reclamacionCC);
+            SAC_DatabaseDML.insertDML(reclamacionCC, false);
+            //Database.insert(reclamacionCC);
 
             //Reclamantes
             SAC_CaseReclamante__c reclamantePrin = SAC_TestDataFactory.crearReclamante(true,reclamacion,cuenta.Id);
-            Database.insert(reclamantePrin);
+            SAC_DatabaseDML.insertDML(reclamantePrin, false);
+            //Database.insert(reclamantePrin);
 
             SAC_CaseReclamante__c reclamanteCC = SAC_TestDataFactory.crearReclamante(true,reclamacionCC,cuentaCC.Id);
-            Database.insert(reclamanteCC);
+            SAC_DatabaseDML.insertDML(reclamanteCC, false);
+            //Database.insert(reclamanteCC);
 
             SAC_CaseReclamante__c reclamante2 = SAC_TestDataFactory.crearReclamante(true,reclamacion3,cuentaCC.Id);
-            Database.insert(reclamante2);
+            SAC_DatabaseDML.insertDML(reclamante2, false);
+            //Database.insert(reclamante2);
         }
         
         CBK_IntegrationSetting__c csAntecedentes = new CBK_IntegrationSetting__c();
@@ -107,7 +118,8 @@ public with sharing class SAC_LCMP_GetAntecedentes_Test {
         lstIntegration.add(csGescon);
         lstIntegration.add(csProes);
         lstIntegration.add(csPromo);
-        Database.insert(lstIntegration);
+        SAC_DatabaseDML.insertListDML(lstIntegration, false);
+        //Database.insert(lstIntegration);
     }
 
     @isTest

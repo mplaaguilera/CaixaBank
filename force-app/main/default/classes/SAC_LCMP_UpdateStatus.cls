@@ -23,6 +23,7 @@ public without sharing class SAC_LCMP_UpdateStatus {
     private static final String MSG_ERROR_PERMISSIONS = 'No tienes permisos para realizar la acción.';
     private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
     private static final Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
+    private static final Id RECTYPECONSULTASAC = mapRTsObjects.get('Case').get('SAC_ConsultaSAC').getRecordTypeId();
     private static final String RECTYPEMAESTROACCIONES = mapRTsObjects.get('SAC_MaestroAccionesReclamacion__c').get('SAC_MaestroAcciones').getRecordTypeId();
     private static final String RECTYPEMAESTROTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_MaestroDeTareas').getRecordTypeId();
     private static final String RECTYPEMAESTROTEMASFT = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_FastTrack').getRecordTypeId();
@@ -40,6 +41,69 @@ public without sharing class SAC_LCMP_UpdateStatus {
         public Boolean mandarEmail = false;
         public Boolean enviarAcuseRecibo = false;
     }
+
+
+    //Método en el que se verá si el campo consumidor de la reclamación está relleno en el momento en el que todas las pretensiones estén en resolución
+    //El id de pretensión actual es la que se ha pulsado para que pase al estado de Resolución
+    //Se devolverá false en caso de no estar informado
+    @AuraEnabled
+    public static Boolean comprobarConsumidorReclamacion(Id idReclamacionPadre, Id idPretensionActual){
+
+        //Obtengo tanto la reclamación principal como las pretensiones
+        List<Case> listaCasos = [SELECT Id, RecordTypeId, SAC_TipoConsumidor__c, Status FROM Case WHERE (Id = :idReclamacionPadre OR SAC_Reclamacion__c = :idReclamacionPadre)];
+
+        //Separar la reclamación de las pretensiones
+        Case reclamacion = new Case();
+        List<Case> listaPretensiones = new List<Case>();
+        Case pretensionActualizar = new Case();
+
+        for(Case caso : listaCasos){
+            if(caso.RecordTypeId == RECTYPERECLAMACION){
+                reclamacion = caso; 
+            }else if(caso.RecordTypeId == RECTYPEPRETENSION){
+                if(caso.Id == idPretensionActual){
+                    pretensionActualizar = caso;
+                }
+                listaPretensiones.add(caso);
+            }
+        }
+
+
+        //Comprobar primero si con esta actualización de estado de pretensión, todas las pretensiones estarán en resolución o en baja
+        Boolean todasPretResolucion = true;
+        //Boolean alMenosUnaResolucion = false;
+        for(Case pretension : listaPretensiones){
+            //La pretensionActual es la que está pasando a resolución (porque ha entrado a este método), asique solo habrá que comprobar que el resto esté en resolución o baja
+            if(pretension.Id != idPretensionActual && pretension.Status != 'SAC_003' && pretension.Status != 'SAC_009'){
+                todasPretResolucion = false;    //Se pone a false si hay alguna que no está en resolución o baja
+            }
+            /*else{
+                if((pretension.Id != idPretensionActual && pretension.Status == 'SAC_003') || (pretension.Id == idPretensionActual && nuevoEstado == 'SAC_003')){
+                    alMenosUnaResolucion = true;    //Controlar que no estén todas en BAJA
+                }
+            }*/
+        }
+
+        //Si todas las pretensiones van a estar en resolución, entonces se comprueba que el campo consumidor de la reclamación esté relleno
+        if(todasPretResolucion == true){
+
+            //Si la pertensión está en estado de alta y entra a este método es que va a darse de baja
+            //Solo se pueden poner TODAS en baja en estado de alta, después ya no, por eso no hace falta controlar que no estén todas en baja
+            if(pretensionActualizar.Status == 'SAC_001' /*&& listaPretensiones.size() == 1*/){
+                return true;    //Si la pretensión está en estado de alta, sí, se le permite  actualizarla a estado de Baja
+            }
+
+            if(reclamacion.SAC_TipoConsumidor__c == null || String.isBlank(reclamacion.SAC_TipoConsumidor__c)){
+                return false;       //Si el campo no está informado, se devuelve false
+            }else{
+                return true;        
+            }
+        }else{
+            //Si no todas las pretensiones están en resolución (o algunas en baja y otras en resolución), entonces se devuelve true, para permitir el update sin neceidad del campo consumidor relleno
+            return true;
+        }
+    }
+
 
     @AuraEnabled
     public static void updateRecordStatus(Id record, String newStatus){
@@ -110,7 +174,8 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     
                     listaCasosActualizar.add(casoPorActualizar);
                     if(!listaCasosActualizar.isEmpty()){
-                        Database.update(listaCasosActualizar);
+                        SAC_DatabaseDML.updateListDML(listaCasosActualizar, true); 
+                        //Database.update(listaCasosActualizar);
                     }
                     
                     if(enviarAcuse){
@@ -168,7 +233,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
     public static void subsanarCaso(Id record, String motivo, String newStatus, String para, String copia, String copiaOculta, String cuerpo, String asunto, String ficherosAdjuntos){
 
        // updateRecordStatus(record, newStatus);
-        Case casoPorActualizar = [SELECT Id, Status, SAC_MotivoInadmision__c, CC_AcuseRecibo__c, Origin, CC_Idioma__c, SuppliedEmail, CaseNumber, OS_Email__c, SAC_M2P__c, RecordTypeId
+        Case casoPorActualizar = [SELECT Id, Status, SAC_MotivoInadmision__c, CC_AcuseRecibo__c, Origin, CC_Idioma__c, SuppliedEmail, CaseNumber, OS_Email__c, SAC_M2P__c, RecordTypeId, CC_Canal_Respuesta__c
                                     FROM Case 
                                     WHERE RecordType.DeveloperName LIKE 'SAC_%' AND Id =: record];
 
@@ -187,7 +252,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         casoPorActualizar.SAC_StatusAuxiliar__c = newStatus;
         casoPorActualizar.SAC_TipoSubsanacion__c = motivo;
         
-        Database.update(casoPorActualizar);  
+        SAC_DatabaseDML.updateDML(casoPorActualizar, false); 
+        //Database.update(casoPorActualizar);  
+
+        // Si el correo electrónico web del caso no es nulo se tiene que enviar un email indicando que se ha enviado la subsanación del caso
+        if(String.isNotBlank(casoPorActualizar.SuppliedEmail)) {  
+            comunicarResolucion(casoPorActualizar);
+        }
         
         SAC_LCMP_GestionEmails.enviarEmail(record, para, copia, copiaOculta,cuerpo, asunto, ficherosAdjuntos, null);
 
@@ -200,15 +271,15 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
     }
 
     @AuraEnabled
-    public static void subsanarCasoCartaPostal(Id record, String motivo, String newStatus){
-
+    public static String subsanarCasoCartaPostal(Id record, String motivo, String newStatus){
+        string maestroTarea = '';
         List<Case> listaCasos = new List<Case>();
         List<SAC_DocumentoEnvio__c> listaDocumentoEnvio = new List<SAC_DocumentoEnvio__c>();
 
         Case casoPorActualizar = new Case();
        // updateRecordStatus(record, newStatus);
        listaCasos = [SELECT Id, Status, SAC_MotivoInadmision__c, CC_AcuseRecibo__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c, SAC_NombreContacto__c, CaseNumber, Origin, CC_Idioma__c, 
-                                        SuppliedEmail, OS_Email__c, CreatedDate, RecordTypeId
+                                        SuppliedEmail, OS_Email__c, CreatedDate, RecordTypeId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, CC_Canal_Respuesta__c
                                     FROM Case 
                                     WHERE Id =: record LIMIT 1];
 
@@ -246,7 +317,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         
                 SAC_GeneracionCartas.adjuntarPDFaCaso2(urlVF, record, 'subsanación');
         
-                Database.update(casoPorActualizar);  
+                SAC_DatabaseDML.updateDML(casoPorActualizar, false); 
+                //Database.update(casoPorActualizar);  
+
+                // Si el correo electrónico web del caso no es nulo se tiene que enviar un email indicando que se ha enviado la subsanación del caso
+                if(String.isNotBlank(casoPorActualizar.SuppliedEmail)) {  
+                    comunicarResolucion(casoPorActualizar);
+                }
         
                 if(enviarAcuse){
         
@@ -261,8 +338,43 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     }
         
                     SAC_LCMP_AcuseReciboCartaPostal.envioCartaPostal(casoPorActualizar, casoPorActualizar.SAC_DireccionContacto__c, casoPorActualizar.SAC_CodigoPostalContacto__c, casoPorActualizar.SAC_PoblacionContacto__c, casoPorActualizar.SAC_ProvinciaContacto__c, pais);
-                }   
-    
+                } 
+                
+                if(casoPorActualizar.SAC_CasoEspecial__c == 'SAC_Presidencia'){
+                    maestroTarea = 'SAC_ImprimirCartasAD';
+                }else if(casoPorActualizar.CC_Canal_Procedencia__c == 'Castilla la Mancha' || casoPorActualizar.CC_Canal_Procedencia__c == 'Junta Andalucia'){
+                    maestroTarea = 'SAC_ImprimirCartasJACM';
+                }else{
+                    maestroTarea = 'SAC_ImprimirCartasOrdinario';
+                }
+                //US1101520 crear tarea al subsanar por carta postal
+                SAC_MaestroAccionesReclamacion__c maestroTareaAutomatica = [SELECT Id, Name FROM SAC_MaestroAccionesReclamacion__c WHERE RecordTypeId = :RECTYPEMAESTROACCIONES AND SAC_Activo__c = true AND SAC_DeveloperName__c = :maestroTarea LIMIT 1];  
+
+                SAC_Accion__c tarea = new SAC_Accion__c();
+
+                tarea.SAC_MaestroAccionesReclamacion__c = maestroTareaAutomatica.Id;
+                tarea.RecordTypeId = RECTYPEMAESTROTAREAS;
+                tarea.SAC_Reclamacion__c = record;
+                
+                try {
+                    if (!Schema.sObjectType.SAC_Accion__c.isCreateable()) { throw new AuraHandledException( 'No tienes permisos para realizar esta accion.' ); }
+                    SAC_DatabaseDML.insertDML(tarea, true);
+                } catch (Exception e) {
+                    CBK_log.error(e);
+                }
+
+                // FALLA POR List has more than 1 row for assignment to SObject ya que recupera la carta del acuse de recibo y la del envio de subsanacion
+                ContentVersion cv = [SELECT Id, Title, ContentDocumentId FROM ContentVersion WHERE FirstPublishLocationId =: record order by CreatedDate DESC LIMIT 1];
+                ContentDocumentLink cdl = new ContentDocumentLink();
+
+                cdl.ContentDocumentId = cv.ContentDocumentId;
+                cdl.LinkedEntityId = tarea.Id;
+                cdl.ShareType = 'I';
+
+                SAC_DatabaseDML.insertDML(cdl, true);
+
+                return tarea.Id;
+
     
             }else{
                 throw new AuraHandledException( 'Es necesario asociar un cliente y generar la carta correspondiente a la hora de subsanar.' );
@@ -273,6 +385,73 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
 
        
 
+    }
+
+    /**
+    * Proposito: Envio Comunicación Resolución Mail
+    */
+    public static void comunicarResolucion(Case casoActual){
+        Boolean continuarProceso = true;
+
+        //Recuperar los dominios activos en el metadata SAC_BlacklistDominioEmail__mdt
+        List<SAC_BlacklistDominioEmail__mdt> listDominiosBloqueados = [SELECT SAC_DominioEmail__c FROM SAC_BlacklistDominioEmail__mdt WHERE SAC_DominioActivo__c = true];
+
+        if(!listDominiosBloqueados.isEmpty()){
+            Set<String> dominiosBloqueados = new Set<String>();
+
+            for(SAC_BlacklistDominioEmail__mdt dominio : listDominiosBloqueados) {
+                dominiosBloqueados.add(dominio.SAC_DominioEmail__c);
+            }
+
+            String webEmail = casoActual.SuppliedEmail;
+            String dominioWebEmail = '@' + webEmail.substringAfter('@');
+
+            //Si el dominio del web email, esta contenido en los dominios activos de la blacklist de dominios, no se envia la comunicación
+            if(dominiosBloqueados.contains(dominioWebEmail)){
+                continuarProceso = false;
+            }
+        }
+
+        if(continuarProceso){
+            //Recupero los emails no validos de envio (emails en la blackList)
+            List<SAC_MaestroTemas__c> listEmailsNoValidos = [SELECT Name FROM SAC_MaestroTemas__c WHERE RecordTypeId =: RECORDTYPEBLACKLIST AND SAC_Activo__c = true];
+
+            //Compruebo la dirección de envio con las de la blackList
+            List<String> listaDireccionesPara = new List<String>{ casoActual.SuppliedEmail };
+            List<String> emailsValidos = SAC_Utils.comprobarEmailsBlackListAuto(listEmailsNoValidos, listaDireccionesPara);
+
+            //Si la dirección de envio es válida (no está en la blackList), continuo el proceso
+            if(!emailsValidos.isEmpty()){
+                List<String> body = new List<String>();
+                Id idPlantillaAviso = null;
+                List<SAC_PlantillaRedaccion__c> lstPlantillas = [SELECT Id, SAC_PlantillaCatalanId__c, SAC_PlantillaCastellanoId__c, SAC_PlantillaInglesId__c, SAC_PlantillaEuskeraId__c, SAC_PlantillaGallegoId__c, SAC_PlantillaValencianoId__c FROM SAC_PlantillaRedaccion__c WHERE SAC_TipoPlantilla__c = 'SAC_AvisoResolucionSubsanacion'];
+
+                if(lstPlantillas != null && !lstPlantillas.isEmpty()){
+                    for(SAC_PlantillaRedaccion__c plantilla : lstPlantillas){
+                        if(casoActual.CC_Idioma__c == 'es'){ idPlantillaAviso = plantilla.SAC_PlantillaCastellanoId__c;
+                        } else if(casoActual.CC_Idioma__c == 'ca'){ idPlantillaAviso = plantilla.SAC_PlantillaCatalanId__c;
+                        } else if(casoActual.CC_Idioma__c == 'en'){ idPlantillaAviso = plantilla.SAC_PlantillaInglesId__c;
+                        } else if(casoActual.CC_Idioma__c == 'eu'){ idPlantillaAviso = plantilla.SAC_PlantillaEuskeraId__c;
+                        } else if(casoActual.CC_Idioma__c == 'va'){ idPlantillaAviso = plantilla.SAC_PlantillaValencianoId__c;
+                        } else if(casoActual.CC_Idioma__c == 'ga'){ idPlantillaAviso = plantilla.SAC_PlantillaGallegoId__c;
+                        }else { idPlantillaAviso = plantilla.SAC_PlantillaCastellanoId__c;
+                        }   
+                    }
+                }
+
+                if(idPlantillaAviso != null){
+                    EmailTemplate templateEmail = new EmailTemplate();
+                    templateEmail = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id =: idPlantillaAviso];
+
+                    body.add(templateEmail.HtmlValue);
+                    String whoId = UserInfo.getUserId();
+                    String whatId = casoActual.Id;
+                    Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(templateEmail.Id, whoId, whatId); 
+
+                    SAC_LCMP_GestionEmails.enviarEmail(casoActual.id, casoActual.SuppliedEmail, '', '', renderStored.getHtmlBody(), renderStored.getSubject(), '', 'primerenvioinformarredaccion');
+                }
+            }
+        }   
     }
 
     @AuraEnabled
@@ -291,7 +470,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         if(!Schema.sObjectType.Case.isAccessible() || 
             !Schema.sObjectType.CaseHistory.isAccessible()){ throw new AuraHandledException( 'Fallo al acutalizar.' ); }
 
-        Case casoPorActualizar = [SELECT Id, Status, SAC_Reclamacion__r.Status, recordTypeId, SAC_DetenidoDesde__c, SAC_TiempoParadaSubsanacion__c, SAC_DetenidoHasta__c, SAC_FechaUltimaSubsanacion__c
+        Case casoPorActualizar = [SELECT Id, Status, SAC_Reclamacion__r.Status, recordTypeId, SAC_DetenidoDesde__c, SAC_TiempoParadaSubsanacion__c, SAC_DetenidoHasta__c, SAC_FechaUltimaSubsanacion__c, SAC_FechaRecepcion__c, SAC_MinutosParadaSubsanacion__c
         FROM Case
         WHERE Id =: record];
 
@@ -306,7 +485,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         }
 
         List<Integer> pos = new List<Integer>();
-        if(ch.size() > 0 || Test.isRunningTest()){
+        if(!ch.isEmpty() || Test.isRunningTest()){
             for(CaseHistory ch2 : ch){ if(ch2.OldValue == 'Cerrado' || ch2.OldValue == 'SAC_006'){ Integer posicion = ch.indexOf(ch2); pos.add(posicion); } }
             for(Integer posicion : pos){ ch.remove(posicion - resta); resta = resta + 1; }
         }
@@ -352,14 +531,16 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         List<Case> listaPretensionesSubsanacion = new List<Case>();
         Case reclamacion = new Case();
         Integer dias;
+        Long milliseconds;
+        Long minutes;
 
         if(casoPorActualizar.RecordTypeId == RECTYPERECLAMACION){
-            listaFamiliaCasos = [SELECT id, recordTypeId, Status, SAC_Reclamacion__r.SAC_DetenidoHasta__c, SAC_DetenidoDesde__c, SAC_DetenidoHasta__c, SAC_TiempoParadaSubsanacion__c, SAC_FechaUltimaSubsanacion__c
+            listaFamiliaCasos = [SELECT id, recordTypeId, Status, SAC_Reclamacion__r.SAC_DetenidoHasta__c, SAC_DetenidoDesde__c, SAC_DetenidoHasta__c, SAC_TiempoParadaSubsanacion__c, SAC_FechaUltimaSubsanacion__c, SAC_MinutosParadaSubsanacion__c, SAC_FechaRecepcion__c
                 FROM Case
                 WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND (SAC_Reclamacion__c =: casoPorActualizar.Id OR id = :casoPorActualizar.Id)];
         }
         else if(casoPorActualizar.RecordTypeId == RECTYPEPRETENSION){
-            listaFamiliaCasos = [SELECT id, recordTypeId, Status, SAC_Reclamacion__r.SAC_DetenidoHasta__c, SAC_DetenidoDesde__c, SAC_DetenidoHasta__c, SAC_TiempoParadaSubsanacion__c, SAC_FechaUltimaSubsanacion__c
+            listaFamiliaCasos = [SELECT id, recordTypeId, Status, SAC_Reclamacion__r.SAC_DetenidoHasta__c, SAC_DetenidoDesde__c, SAC_DetenidoHasta__c, SAC_TiempoParadaSubsanacion__c, SAC_FechaUltimaSubsanacion__c, SAC_MinutosParadaSubsanacion__c, SAC_FechaRecepcion__c
                 FROM Case
                 WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND (SAC_Reclamacion__c =: casoPorActualizar.SAC_Reclamacion__c OR id = :casoPorActualizar.SAC_Reclamacion__c)];
         }
@@ -373,12 +554,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 }
             }
         }
-        
         if (casoPorActualizar.RecordTypeId == RECTYPEPRETENSION) {
             if(!listaPretensionesSubsanacion.isEmpty()) {
                 if(reclamacion.SAC_DetenidoHasta__c != null && reclamacion.SAC_DetenidoHasta__c > casoPorActualizar.SAC_DetenidoDesde__c && reclamacion.SAC_DetenidoHasta__c < System.now()) {
+                    milliseconds = System.now().getTime() - reclamacion.SAC_DetenidoHasta__c.getTime();
+                    minutes = milliseconds / (1000 * 60);
                     // Si la subsanación empezó en el mismo día que terminó la anterior no se debe sumar ese primer día
-                    if(casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaUltimaSubsanacion__c) {
+                    if(casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaUltimaSubsanacion__c || (casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaRecepcion__c.date() && reclamacion.SAC_DetenidoHasta__c.date() == reclamacion.SAC_FechaRecepcion__c.date())) {
                         dias = reclamacion.SAC_DetenidoHasta__c.date().daysBetween(Date.today());
                     } else {
                         dias = reclamacion.SAC_DetenidoHasta__c.date().daysBetween(Date.today()) + 1;
@@ -387,19 +569,24 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     if(dias == 1 && reclamacion.SAC_FechaUltimaSubsanacion__c == Date.today()) {dias = 0;}
     
                     if(casoPorActualizar.SAC_TiempoParadaSubsanacion__c != null) {
+                        casoPorActualizar.SAC_MinutosParadaSubsanacion__c = casoPorActualizar.SAC_MinutosParadaSubsanacion__c + minutes;
                         casoPorActualizar.SAC_TiempoParadaSubsanacion__c = casoPorActualizar.SAC_TiempoParadaSubsanacion__c + dias;
                         casoPorActualizar.SAC_FechaUltimaSubsanacion__c = Date.today();
                     } else {
+                        casoPorActualizar.SAC_MinutosParadaSubsanacion__c = minutes;
                         casoPorActualizar.SAC_TiempoParadaSubsanacion__c =  dias;
                         casoPorActualizar.SAC_FechaUltimaSubsanacion__c = Date.today();
                     }
                     listaCasosActualizar.add(casoPorActualizar);
                     // Hay más de una pretensión en subsanación por lo que la reclamación no debe salir de ese estado, por lo que solo se informa el campo en la pretensión que se actualiza
-                    if(listaPretensionesSubsanacion.size() == 1) {
+                    List<Case> listPretSubsanacion = listaPretensionesSubsanacion;
+                    if(listPretSubsanacion.size() == 1) {       
                         if(reclamacion.SAC_TiempoParadaSubsanacion__c != null) {
+                            reclamacion.SAC_MinutosParadaSubsanacion__c = reclamacion.SAC_MinutosParadaSubsanacion__c + minutes;
                             reclamacion.SAC_TiempoParadaSubsanacion__c = reclamacion.SAC_TiempoParadaSubsanacion__c + dias;
                             reclamacion.SAC_FechaUltimaSubsanacion__c = Date.today();
                         } else {
+                            reclamacion.SAC_MinutosParadaSubsanacion__c = minutes;
                             reclamacion.SAC_TiempoParadaSubsanacion__c =  dias;
                             reclamacion.SAC_FechaUltimaSubsanacion__c = Date.today();
                         }  
@@ -412,8 +599,10 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         } else if(casoPorActualizar.RecordTypeId == RECTYPERECLAMACION) {
             for(Case caso : listaPretensionesSubsanacion) {
                 if(reclamacion.SAC_DetenidoHasta__c != null && reclamacion.SAC_DetenidoHasta__c > caso.SAC_DetenidoDesde__c && reclamacion.SAC_DetenidoHasta__c < System.now()) {
+                    milliseconds = System.now().getTime() - reclamacion.SAC_DetenidoHasta__c.getTime();
+                    minutes = milliseconds / (1000 * 60);
                     // Si la subsanación empezó en el mismo día que terminó la anterior no se debe sumar ese primer día
-                    if(casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaUltimaSubsanacion__c) {
+                    if(casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaUltimaSubsanacion__c || (casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaRecepcion__c.date() && reclamacion.SAC_DetenidoHasta__c.date() == reclamacion.SAC_FechaRecepcion__c.date())) {
                         dias = reclamacion.SAC_DetenidoHasta__c.date().daysBetween(Date.today());
                     } else {
                         dias = reclamacion.SAC_DetenidoHasta__c.date().daysBetween(Date.today()) + 1;
@@ -422,9 +611,11 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     if(dias == 1 && reclamacion.SAC_FechaUltimaSubsanacion__c == Date.today()) {dias = 0;}
     
                     if(caso.SAC_TiempoParadaSubsanacion__c != null) {
+                        caso.SAC_MinutosParadaSubsanacion__c = caso.SAC_MinutosParadaSubsanacion__c + minutes;
                         caso.SAC_TiempoParadaSubsanacion__c = caso.SAC_TiempoParadaSubsanacion__c  + dias;
                         caso.SAC_FechaUltimaSubsanacion__c = Date.today();
                     } else {
+                        caso.SAC_MinutosParadaSubsanacion__c = minutes;
                         caso.SAC_TiempoParadaSubsanacion__c =  dias;
                         caso.SAC_FechaUltimaSubsanacion__c = Date.today();
                     }
@@ -434,8 +625,10 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 }
             }
             if(casoPorActualizar.SAC_DetenidoHasta__c != null && casoPorActualizar.SAC_DetenidoHasta__c > casoPorActualizar.SAC_DetenidoDesde__c && casoPorActualizar.SAC_DetenidoHasta__c < System.now()) {
+                milliseconds = System.now().getTime() - casoPorActualizar.SAC_DetenidoHasta__c.getTime();
+                minutes = milliseconds / (1000 * 60);
                 // Si la subsanación empezó en el mismo día que terminó la anterior no se debe sumar ese primer día
-                if(casoPorActualizar.SAC_DetenidoDesde__c.date() == casoPorActualizar.SAC_FechaUltimaSubsanacion__c) {
+                if(casoPorActualizar.SAC_DetenidoDesde__c.date() == casoPorActualizar.SAC_FechaUltimaSubsanacion__c || (casoPorActualizar.SAC_DetenidoDesde__c.date() == casoPorActualizar.SAC_FechaRecepcion__c.date() && casoPorActualizar.SAC_DetenidoHasta__c.date() == casoPorActualizar.SAC_FechaRecepcion__c.date())) {
                     dias = casoPorActualizar.SAC_DetenidoHasta__c.date().daysBetween(Date.today());
                 } else {
                     dias = casoPorActualizar.SAC_DetenidoHasta__c.date().daysBetween(Date.today()) + 1;
@@ -444,9 +637,11 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 if(dias == 1 && casoPorActualizar.SAC_FechaUltimaSubsanacion__c == Date.today()) {dias = 0;}
 
                 if(casoPorActualizar.SAC_TiempoParadaSubsanacion__c != null) {
+                    casoPorActualizar.SAC_MinutosParadaSubsanacion__c = casoPorActualizar.SAC_MinutosParadaSubsanacion__c + minutes;
                     casoPorActualizar.SAC_TiempoParadaSubsanacion__c = casoPorActualizar.SAC_TiempoParadaSubsanacion__c + dias;
                     casoPorActualizar.SAC_FechaUltimaSubsanacion__c = Date.today();
                 } else {
+                    casoPorActualizar.SAC_MinutosParadaSubsanacion__c = minutes;
                     casoPorActualizar.SAC_TiempoParadaSubsanacion__c = dias;
                     casoPorActualizar.SAC_FechaUltimaSubsanacion__c = Date.today();
                 }
@@ -516,12 +711,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
          * -------
          * VERSION        USER_STORY       AUTHOR         DATE         Description
          * 1.0            US219267         Luis Mesa    31/05/21       Creación Método
+         * 1.1            US683740         Raúl Santos  04/11/24       Modificación: en consultas SAC, también puede realizar la operativa el letrado
         *****************************************************************/
         if(!Case.SObjectType.getDescribe().isAccessible()){ throw new AuraHandledException( 'Fallo al acutalizar.' ); }
 
         Id usuarioActual = UserInfo.getUserId();
 
-        Case casoActual = [SELECT Id, Status, OwnerId, RecordTypeId, SAC_Reclamacion__r.OwnerId, SAC_PretensionPrincipal__c
+        Case casoActual = [SELECT Id, Status, OwnerId, RecordTypeId, SAC_Reclamacion__r.OwnerId, SAC_PretensionPrincipal__c, SAC_Letrado__c
                             FROM Case
                             WHERE RecordType.DeveloperName LIKE 'SAC_%' AND Id =: record
                             LIMIT 1];
@@ -531,9 +727,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         }
 
         else{
+            //Si es letrado de la consulta SAC, habilitar
+            if(casoActual.recordTypeId == RECTYPECONSULTASAC && casoActual.SAC_Letrado__c == UserInfo.getName()){
+                return true;
+            }
             //comprobar el recordType del registro actual para ver si el usuario actual es propietario de otro caso relacionado
             //si es Reclamacion comprobar que el usuario es el propietario de sus pretensiones -> return true;
-            if(casoActual.recordTypeId == RECTYPERECLAMACION){
+            else if(casoActual.recordTypeId == RECTYPERECLAMACION){
                 //es reclamación, hay que garantizar acceso a las pretensiones hijas también
                 //en teoria todas las pretensiones las trata el mismo letrado, por tanto con tener en cuenta cual es la pretension principal.ownerId basta
                 List<Case> pretension = [SELECT Id, OwnerId
@@ -595,7 +795,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         List<Case> pretension = [SELECT Id, SAC_Reclamacion__c, Status
                             FROM Case
                             WHERE SAC_Reclamacion__c =: casoActual.Id AND Status <> 'SAC_009'];
-        if(pretension.size() == 0){
+        if(pretension.isEmpty()){
             return false;
         }
         else{
@@ -661,23 +861,25 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
     /**********************************************************************************
      * Proposito: Método para recoger la información de las SLA's relacionadas 
      * con el caso y contabilizar el numero de prorrogas.
+     * Modificación 1.1: Añadido que en el caso de que tenga un envío pendiente de prórroga se desmarque el check una vez enviada
      * ***************************************************************
      * Historial
      * -------
-     * VERSION        USER_STORY        AUTHOR         DATE         Description
+     * VERSION        USER_STORY         AUTHOR           DATE         Description
      * 1.0            US254502          Esteve Llaó    21/07/2021   Creación Método
+     * 1.1            US1114134        Sergio Martín   31/12/2024   Modificación
     ***********************************************************************************/
 
     @AuraEnabled
     public static void prorroga(Id record){
-
+        List<CBK_Case_Extension__c> listaUpdateExtension = new List<CBK_Case_Extension__c>();
         // Id tipoRegistroRec = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
-        Case casoActual = [SELECT Id, SAC_Prorrogado__c, recordTypeId, CC_Canal_Procedencia__c
+        Case casoActual = [SELECT Id, SAC_Prorrogado__c, recordTypeId, CC_Canal_Procedencia__c, CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c
                             FROM Case
                             WHERE id =: record AND CC_Canal_Procedencia__c !=: 'Junta Andalucia'
                             LIMIT 1];
         
-        List<Case> listaPretensiones= [SELECT Id, SAC_Reclamacion__c,SAC_Prorrogado__c, recordTypeId
+        List<Case> listaPretensiones= [SELECT Id, SAC_Reclamacion__c,SAC_Prorrogado__c, recordTypeId, CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c
                                         FROM Case
                                         WHERE SAC_Reclamacion__C =:casoActual.id];
         
@@ -693,7 +895,14 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             // Datetime ahora= system.now();
             // Datetime objetivo = milestoneData.TargetDate;
             // Id ideBH = [SELECT Id, name FROM BusinessHours WHERE name ='SAC_Calendario'].id; 
-
+            if(casoActual.CBK_Case_Extension_Id__c != null) {
+                if(casoActual.CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c == true) {
+                    CBK_Case_Extension__c extension = new CBK_Case_Extension__c();
+                    extension.id = casoActual.CBK_Case_Extension_Id__c;
+                    extension.SAC_PendienteEnvioProrroga__c = false;
+                    listaUpdateExtension.add(extension); 
+                }
+            }
             casoActual.SAC_Prorrogado__c = true;
             casoActual.SAC_ProrrogaCounter__c = 1;
             casoActual.SAC_FechaProrroga__c = system.now();
@@ -702,6 +911,14 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             
             if (!listaPretensiones.isEmpty()) {
                 for (case pretensiones : listaPretensiones) {
+                    if(pretensiones.CBK_Case_Extension_Id__c != null) {
+                        if(pretensiones.CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c == true) {
+                            CBK_Case_Extension__c extension = new CBK_Case_Extension__c();
+                            extension.id = pretensiones.CBK_Case_Extension_Id__c;
+                            extension.SAC_PendienteEnvioProrroga__c = false;
+                            listaUpdateExtension.add(extension); 
+                        }
+                    }
                     pretensiones.SAC_Prorrogado__c = casoActual.SAC_Prorrogado__c ;
                     pretensiones.SAC_FechaProrroga__c = casoActual.SAC_FechaProrroga__c;
                     //pretensiones.SAC_FechaVencimientoSLA__c = casoActual.SAC_FechaVencimientoSLA__c;
@@ -713,7 +930,11 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             listaCasosInsertar.add(casoActual);
             listaCasosInsertar.addAll(listaPretensiones);
 
-            Database.update(listaCasosInsertar);
+            SAC_DatabaseDML.updateListDML(listaCasosInsertar, true); 
+            if(!listaUpdateExtension.isEmpty()) {
+                SAC_DatabaseDML.updateListDML(listaUpdateExtension, true);  
+            }
+            //Database.update(listaCasosInsertar);
 
         
     }
@@ -828,7 +1049,8 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         List<Case> pretensiones = [SELECT id FROM CASE WHERE SAC_Reclamacion__c =: reclamacion[0].id AND Status != 'SAC_009'];
         
         if(reclamacion[0].Status != STATUS_ALTA){
-            if(pretensiones.size() == 1){
+            List<Case> listPrets = pretensiones;
+            if(listPrets.size() == 1){
 
                 respuesta = 'una';
     
@@ -869,13 +1091,15 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         List<Case> reclamacionActual = [SELECT id, SAC_Reclamacion__c FROM Case WHERE id =: record];
         List<Case> pretensiones = [SELECT id, Status FROM Case WHERE recordTypeId =: RECTYPEPRETENSION AND SAC_Reclamacion__c =: reclamacionActual[0].SAC_Reclamacion__c ];
         List<Case> pretensionesBaja = [SELECT id FROM CASE WHERE recordTypeId =: RECTYPEPRETENSION  AND Status = 'SAC_009' AND SAC_Reclamacion__c =: reclamacionActual[0].SAC_Reclamacion__c];
+        
+        List<Case> listPrets = pretensiones;
+        List<Case> listPretsBaja = pretensionesBaja;
 
-
-        if(pretensiones.size() == 1 && pretensionesBaja.isEmpty()){
+        if(listPrets.size() == 1 && pretensionesBaja.isEmpty()){
                 return true;
         }else if(!pretensionesBaja.isEmpty()){
-            numPreten = pretensiones.size() - 1;
-            if(numPreten == pretensionesBaja.size()){
+            numPreten = listPrets.size() - 1;
+            if(numPreten == listPretsBaja.size()){
                 return true;
             }
         }
@@ -893,10 +1117,11 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
          * VERSION        USER_STORY       AUTHOR         DATE         Description
          * 1.0             US271700     Marcela Neira    29/10/21       Creación Método
          * 1.1             US994116      Raúl Santos     12/09/24       Modificación: Si la reclamación está en estado 'Alta' y no se ha enviado el acuse de recibo, se envia automáticamente al pasar a subsanación (tanto vía email como carta postal)
+         * 1.2             US1100463     Raúl Santos     03/01/25       Modificación: verificar que los campos de control de altas de la reclamación están todos marcados
         *****************************************************************/
         if(!Schema.sObjectType.Case.isAccessible()){ throw new AuraHandledException( 'Fallo al acutalizar.' ); }
         List<Case> listaCaso = [SELECT Id, recordTypeId, Status, SAC_MotivoInadmision__c, SAC_TipoConsumidor__c, SAC_Reclamacion__r.SAC_TipoConsumidor__c, CC_AcuseRecibo__c, Origin, CC_Idioma__c, SuppliedEmail, CaseNumber, OS_Email__c, SAC_M2P__c, CC_Canal_Respuesta__c,
-                                        SAC_PaisContacto__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_NombreContacto__c, CreatedDate
+                                        SAC_PaisContacto__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_NombreContacto__c, CreatedDate, SAC_Reclamacion__r.Status
                                     FROM Case 
                                     WHERE Id =: record];
 		
@@ -906,6 +1131,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
 		Case casoPorActualizar = listaCaso[0];
         if(casoPorActualizar.recordTypeId == RECTYPERECLAMACION){
             if (String.isBlank(casoPorActualizar.SAC_TipoConsumidor__c)) {throw new AuraHandledException('Debe seleccionar el tipo consumidor');}
+
+            if(casoPorActualizar.Status == 'SAC_001' || casoPorActualizar.Status == 'SAC_006'){
+                List<Case> listaValidarControlAlta = new List<Case>();
+                listaValidarControlAlta.add(casoPorActualizar);
+                SAC_Validaciones.validarControlAlta(listaValidarControlAlta, false);
+            }
+
             listaFamiliaCasos = [SELECT id, recordTypeId, Status, SAC_MotivoInadmision__c 
                                 FROM  Case 
                                 WHERE SAC_Reclamacion__c =: record AND (Status != 'SAC_009' AND Status != 'Cerrado')];
@@ -932,6 +1164,14 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
 
         } else {
             if (String.isBlank(casoPorActualizar.SAC_Reclamacion__r.SAC_TipoConsumidor__c)) {throw new AuraHandledException('Debe seleccionar el tipo consumidor en la reclamación');}
+
+            if(casoPorActualizar.SAC_Reclamacion__r.Status == 'SAC_001' || casoPorActualizar.SAC_Reclamacion__r.Status == 'SAC_006'){
+                List<Case> listaValidarControlAlta = new List<Case>();
+                Case recActual = new Case(Id = casoPorActualizar.SAC_Reclamacion__c);
+                listaValidarControlAlta.add(recActual);
+                SAC_Validaciones.validarControlAlta(listaValidarControlAlta, false);
+            }
+
             casoPorActualizar.Status = 'SAC_003';
             casoPorActualizar.SAC_StatusAuxiliar__c = 'SAC_003';
             casoPorActualizar.SAC_MotivoInadmision__c = motivo;
@@ -992,7 +1232,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
          * Historial
          * -------
          * VERSION        USER_STORY       AUTHOR         DATE         Description
-         * 1.0             US337252     Daniel Benito    28/02/22       Creación Método
+         * 1.0            US337252      Daniel Benito   28/02/22     Creación Método
         *****************************************************************/
         if(!Schema.sObjectType.Case.isAccessible()){ throw new AuraHandledException( 'Fallo al acutalizar.' ); }
         Case casoPorActualizar = [SELECT Id, recordTypeId, Status, SAC_MotivoInadmision__c, CC_Rechazar_Reabrir_Caso__c
@@ -1020,14 +1260,14 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         if(casoPorActualizar.CC_Rechazar_Reabrir_Caso__c){
 
             casoPorActualizar.CC_Rechazar_Reabrir_Caso__c = false;
-        }     
+        }
         
         
         listaFamiliaCasos.add(casoPorActualizar);
 
         if(Case.SObjectType.getDescribe().isUpdateable()){
             try {
-                SAC_DatabaseDML.updateListDML(listaFamiliaCasos, true);   
+                SAC_DatabaseDML.updateListDML(listaFamiliaCasos, true);
             } catch (Exception e) { 
                 String errorMsg = e.getMessage();
                 String pureErrorMsg = errorMsg.substringAfter('_EXCEPTION,');
@@ -1261,10 +1501,12 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
     public class NegociacionWrapper {
         @AuraEnabled public DateTime fechaNegociacion {get; set;}
         @AuraEnabled public Decimal slaNegocio {get; set;}
+        @AuraEnabled public DateTime fechaFinNegociacion {get; set;}
 
-        public NegociacionWrapper(DateTime fechaNegociacion, Decimal slaNegocio) {
+        public NegociacionWrapper(DateTime fechaNegociacion, Decimal slaNegocio, DateTime fechaFinNegociacion) {
             this.fechaNegociacion = fechaNegociacion;
             this.slaNegocio = slaNegocio;
+            this.fechaFinNegociacion = fechaFinNegociacion;
         }
     }
      /*****************************************************************
@@ -1283,6 +1525,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         List<Id> idPretensiones = new List<Id>();
         Map<Id, CaseHistory> mapaHistorialFecha = new Map<Id, CaseHistory>();
         DateTime negociacionMasAntigua;
+        DateTime fechaFinNegociacion;
         Decimal slaRecuperado;
 
 
@@ -1293,12 +1536,15 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         if(caso.RecordType.DeveloperName == 'SAC_Reclamacion'){
 
             pretensiones = [SELECT id, Status FROM CASE WHERE SAC_Reclamacion__c =: recordId AND Status = 'SAC_007'];
+            List<Case> listPrets = pretensiones;
 
-            if(pretensiones.size() == 1){
+            if(listPrets.size() == 1){
                 if(!Test.isRunningTest()){
                 	historial = [SELECT Id, CreatedDate FROM CaseHistory WHERE CaseId =: pretensiones[0].id AND Field = 'Status' ORDER BY CreatedDate desc];
                 }
-                NegociacionWrapper fecha = new NegociacionWrapper(historial[0].CreatedDate, slaRecuperado);
+                fechaFinNegociacion = calcularFechaFinNegociacion(historial[0].CreatedDate, Integer.valueOf(slaRecuperado));
+            
+                NegociacionWrapper fecha = new NegociacionWrapper(historial[0].CreatedDate, slaRecuperado, fechaFinNegociacion);
                 return fecha;
             }else{
                 for(Case p : pretensiones){
@@ -1351,7 +1597,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                         }   
                     }   
                 }
-                NegociacionWrapper fecha = new NegociacionWrapper(negociacionMasAntigua, slaRecuperado);
+
+                if(Test.isRunningTest()){
+                    negociacionMasAntigua = System.now();
+                }
+                fechaFinNegociacion = calcularFechaFinNegociacion(negociacionMasAntigua, Integer.valueOf(slaRecuperado));
+            
+                NegociacionWrapper fecha = new NegociacionWrapper(negociacionMasAntigua, slaRecuperado, fechaFinNegociacion);
                 return fecha;
             }
 
@@ -1375,7 +1627,9 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 }   
             }
 
-            NegociacionWrapper fecha = new NegociacionWrapper(negociacionMasAntigua, slaRecuperado);
+            fechaFinNegociacion = calcularFechaFinNegociacion(negociacionMasAntigua, Integer.valueOf(slaRecuperado));
+            
+            NegociacionWrapper fecha = new NegociacionWrapper(negociacionMasAntigua, slaRecuperado, fechaFinNegociacion);
             return fecha;
         }
 
@@ -1404,6 +1658,40 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
 
         return 10;
 
+    }
+
+
+    /*************************************************************************************
+     * Proposito: Método para Calcular la fecha de fin de negociación teniendo en cuenta 
+     *            que no puede finalizar en un día festivo o fin de semana
+     * 
+     * ***********************************************************************************
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1042703     Sergio Martín   07/11/24      Creación
+    ***************************************************************************************/
+    @AuraEnabled
+    public static DateTime calcularFechaFinNegociacion(DateTime fechaInicial, Integer duracion){
+        Id ideBH;
+        if (Cache.Org.contains('local.SAC.SACCalendario')) {
+            String calend = (String)Cache.Org.get('local.SAC.SACCalendario');
+            ideBH = Id.valueOf(calend);
+        }
+        else{
+            ideBH = [SELECT Id, name FROM BusinessHours where name ='SAC_Calendario'].id;
+            Cache.Org.put('local.SAC.SACCalendario', String.valueOf(ideBH),300);
+        }
+
+        Datetime fechaFin = fechaInicial.addDays(duracion);
+        Boolean esDiaHabil = BusinessHours.isWithin(ideBH, fechaFin);
+
+        if(!esDiaHabil){//Si no entra en horario de BH necesitamos calcular el siguiente día hábil
+            fechaFin = BusinessHours.nextStartDate(ideBH, fechaFin);
+            Integer horas = fechaInicial.hour() - fechaFin.hour();
+            fechaFin = fechaFin.addHours(horas);
+        }
+        return fechaFin;
     }
 
     @AuraEnabled
@@ -1478,25 +1766,29 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     }
                 }
             }
-            Database.insert(wrapFT.listaAcciones);
+            SAC_DatabaseDML.insertListDML(wrapFT.listaAcciones, true); 
+            //Database.insert(wrapFT.listaAcciones);
             //Enviar las tareas
             for (SAC_Accion__c tarea : wrapFT.listaAcciones) {
                 tarea.SAC_Estado__c = 'SAC_PendienteAsignar';
                 tarea.OwnerId = cola.Id;
             }
-            Database.update(wrapFT.listaAcciones);
+            SAC_DatabaseDML.updateListDML(wrapFT.listaAcciones, true); 
+            //Database.update(wrapFT.listaAcciones);
 
             //Preparar adjuntos
             List<ContentVersion> listaCV = crearFicheroConPlantilla(listaTemplates, reclamacion.Id, wrapFT.listaAcciones);
             //Si hay adjuntos, insertarlos
             if (!listaCV.isEmpty()) {
-                Database.insert(listaCV);
+                SAC_DatabaseDML.insertListDML(listaCV, true); 
+                //Database.insert(listaCV);
             }
         }
 
         //Updatear Casos
         if (!wrapFT.listaCasosActualizar.isEmpty()) {
-            Database.update(wrapFT.listaCasosActualizar);
+            SAC_DatabaseDML.updateListDML(wrapFT.listaCasosActualizar, true); 
+            //Database.update(wrapFT.listaCasosActualizar);
         }
 
         //Recuperar caseMilestone letrado y cerrarlo (No se cierra en el trigger ya que no existe al no haber pasado por análisis)
@@ -1505,7 +1797,8 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             cm.CompletionDate = system.now();
         }
         if (!listaCM.isEmpty()) {
-            Database.update(listaCM);
+            SAC_DatabaseDML.updateListDML(listaCM, true); 
+            //Database.update(listaCM);
         }
 
         //Mandar email si hay que mandarlo
@@ -1928,7 +2221,8 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             
             if(Case.SObjectType.getDescribe().isUpdateable()){
                 try {
-                    Database.update(listaFamiliaCasos);
+                    SAC_DatabaseDML.updateListDML(listaFamiliaCasos, true); 
+                    //Database.update(listaFamiliaCasos);
                 } catch (Exception e) { 
                     String errorMsg = e.getMessage();
                     String pureErrorMsg = errorMsg.substringAfter('_EXCEPTION,');
@@ -1982,7 +2276,8 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             
             if(Case.SObjectType.getDescribe().isUpdateable()){
                 try {
-                    Database.update(listaFamiliaCasos);
+                    SAC_DatabaseDML.updateListDML(listaFamiliaCasos, true); 
+                    //Database.update(listaFamiliaCasos);
                 } catch (Exception e) { 
                     String errorMsg = e.getMessage();
                     String pureErrorMsg = errorMsg.substringAfter('_EXCEPTION,');
@@ -2065,7 +2360,8 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             List<Case> listaCasosUpdatear = new List<Case>();
             listaCasosUpdatear.addAll(pretensiones);
             listaCasosUpdatear.add(reclamacion);
-            Database.update(listaCasosUpdatear);  
+            SAC_DatabaseDML.updateListDML(listaCasosUpdatear, true); 
+            //Database.update(listaCasosUpdatear);  
 
         } else{
             throw new AuraHandledException('Para resolver es necesario informar el cliente.');
@@ -2161,5 +2457,22 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             }
         }
         return mapaMilestone;
+    }
+
+    @AuraEnabled
+    public static void checkImportesGGHPretensiones(String record){
+        // Get Pretensiones
+        List<Case> pretensiones = [SELECT Id, SEG_Detalle__r.SAC_esGGH__c , SAC_ImpReclamadoGestoria__c, SAC_ImpReclamadoInteresesLegales__c, SAC_ImpReclamadoNotaria__c, SAC_ImpReclamadoRegistros__c, 
+                                    SAC_ImpReclamadoTasacion__c, SAC_TasacionReclamado__c, SAC_RegistrosReclamado__c, SAC_NotariaReclamado__c, SAC_GestoriaReclamado__c, CaseNumber
+                                    FROM Case
+                                    WHERE SEG_Detalle__r.SAC_esGGH__c = true
+                                    AND SAC_Reclamacion__c =: record];
+        for (Case pret : pretensiones) {
+            if ((pret.SAC_ImpReclamadoGestoria__c == null  && pret.SAC_ImpReclamadoInteresesLegales__c == null  
+            && pret.SAC_ImpReclamadoNotaria__c == null  && pret.SAC_ImpReclamadoRegistros__c == null  && pret.SAC_ImpReclamadoTasacion__c == null) || 
+            (pret.SAC_TasacionReclamado__c == null || pret.SAC_RegistrosReclamado__c == null || pret.SAC_NotariaReclamado__c == null || pret.SAC_GestoriaReclamado__c == null)){
+                throw new AuraHandledException('No se puede pasar a Inadmisión, las siguientes pretensiones ' + pret.CaseNumber +  ' no tienen los importes reclamados informados');
+            }
+        }
     }
 }

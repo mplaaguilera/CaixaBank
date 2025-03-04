@@ -542,7 +542,8 @@ public without sharing class SAC_Pretension {
                 permisos.add(csNuevo);
             }
     
-            Database.insert(permisos, false);
+            SAC_DatabaseDML.insertListDML(permisos, false);
+            //Database.insert(permisos, false);
         }
     }  
 
@@ -652,7 +653,51 @@ public without sharing class SAC_Pretension {
             }
         }
     }
+    /*****************************************************************
+     * Proposito: Actualizar el mail, telefono y direccion de contacto en las pretensiones de una reclamación
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            --            Carlos Gómez    12/12/24     Creación
+    *****************************************************************/
+    public static Map<Id,Case> actualizarDatosContacto(List<Case> listaCasosSelect, List<Case> listaReclaPadre, map<Id,Case> mapaDatosCasosActualizar) { 
 
+        Map<Id,List<Case>> mapaCasos = new Map<Id,List<Case>>();
+        Map<Id,Case> mapaCasoPadre = new Map<Id,Case>(listaReclaPadre);
+        List<Case> listaCasosUpdatear = new List<Case>();
+
+        for (Case caso : listaReclaPadre) {
+            List<case> listaAux = new List<case> ();
+            mapaCasos.put(caso.id, listaAux);
+        }
+        for (Case caso : listaCasosSelect) {
+            if(mapaCasos.containsKey(caso.SAC_Reclamacion__c)){ 
+                List<case> listaAux = mapaCasos.get(caso.SAC_Reclamacion__c);
+                Case casoAux = caso;
+                casoAux.OS_Email__c = mapaCasoPadre.get(caso.SAC_Reclamacion__c).OS_Email__c;
+                casoAux.CC_Telefono_Contacto__c = mapaCasoPadre.get(caso.SAC_Reclamacion__c).CC_Telefono_Contacto__c;
+                casoAux.SAC_DireccionPostalNotificacion__c = mapaCasoPadre.get(caso.SAC_Reclamacion__c).SAC_DireccionPostalNotificacion__c;
+                listaAux.add(casoAux);                
+                mapaCasos.put(caso.SAC_Reclamacion__c, listaAux);
+            }            
+        }
+
+        for(Id key : mapaCasos.keySet()){ 
+            listaCasosUpdatear.addAll(mapaCasos.get(key));            
+        }
+        
+        for (Case caso : listaCasosUpdatear) {
+            if(mapaDatosCasosActualizar.containsKey(caso.id)){
+                mapaDatosCasosActualizar.get(caso.id).OS_Email__c = caso.OS_Email__c;
+                mapaDatosCasosActualizar.get(caso.id).CC_Telefono_Contacto__c = caso.CC_Telefono_Contacto__c;
+                mapaDatosCasosActualizar.get(caso.id).SAC_DireccionPostalNotificacion__c = caso.SAC_DireccionPostalNotificacion__c;
+            }else{
+                mapaDatosCasosActualizar.put(caso.id, caso);
+            }
+        } 
+        return mapaDatosCasosActualizar;
+    }
     /*****************************************************************
      * Proposito: Cambiar el owner de las pretensiones hermanas cuando cambia el owner de una de ellas (pone el mismo owner en todas).
      * Cambia solamente si el cambio no se esta produciendo en todas las pretensiones. Si hay alguna pretension de la familia

@@ -16,28 +16,33 @@ public with sharing class SAC_ProrrogaAutomatica_Test {
    
     @TestSetup
     static void makeData() {
-        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+        User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];   
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);   
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
         cuenta.recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Generico').getRecordTypeId();
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false); 
+        //Database.insert(cuenta);
         
         Entitlement entitle = SAC_TestDataFactory.crearEntitlement(cuenta.id);
-        Database.insert(entitle);
+        SAC_DatabaseDML.insertDML(entitle, false); 
+        //Database.insert(entitle);
 
         CC_MCC__c mcc = new CC_MCC__c();
         mcc.Name = 'PSD2';
         mcc.SAC_EsPsd2__c = true;
         mcc.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
-        Database.insert(mcc);
+        SAC_DatabaseDML.insertDML(mcc, false); 
+        //Database.insert(mcc);
 
   
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -51,7 +56,8 @@ public with sharing class SAC_ProrrogaAutomatica_Test {
         camposRecl.put('SAC_Prorrogado__c', false);
         camposRecl.put('OS_Email__c', 'Test@test.com');
         Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-        Database.insert(casoReclamacion2);
+        SAC_DatabaseDML.insertDML(casoReclamacion2, false); 
+        //Database.insert(casoReclamacion2);
 
         Map<String, Object> camposPret = new Map<String, Object>();
         camposPret.put('SuppliedCompany', 'TestPret1');
@@ -63,7 +69,8 @@ public with sharing class SAC_ProrrogaAutomatica_Test {
         camposPret.put('SEG_Detalle__c', mcc.Id);
         camposPret.put('SAC_CASE_esPSD2__c', true);
         Case pretension1 = SAC_TestDataFactory.crearCaso('Pretension', camposPret);
-        Database.insert(pretension1);
+        SAC_DatabaseDML.insertDML(pretension1, false); 
+        //Database.insert(pretension1);
         }  
     }
 
@@ -76,13 +83,36 @@ public with sharing class SAC_ProrrogaAutomatica_Test {
         Case casoP = [SELECT Id, OS_Alerta_Descripcion__c,SAC_FechaRecepcion__c, OS_Email__c FROM case WHERE Subject = 'TestRec2' LIMIT 1];
         casoP.SAC_FechaRecepcion__c = system.now().addDays(-2);
         casoP.OS_Email__c = 'Test@test.com';
-        Database.update(casoP);
+        SAC_DatabaseDML.updateDML(casoP, false); 
+        //Database.update(casoP);
         
-        Id batchId = Database.executeBatch(new SAC_ProrrogaAutomatica(), 1);
+        SAC_ProrrogaAutomatica obj = new SAC_ProrrogaAutomatica();
+        DataBase.executeBatch(obj); 
         Test.stopTest();
         
         List<Case> casosProrrogados = [SELECT Id, OS_Alerta_Descripcion__c, SAC_Prorrogado__c FROM case WHERE Subject = 'TestRec2' LIMIT 1];
         system.assertEquals(true, casosProrrogados[0].SAC_Prorrogado__c, 'No se ha prorrogado correctamente');
+        }
+    }
+
+    @isTest
+    static void testProrroga2() {
+        User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
+       
+        System.runAs(usuarioGeneral){
+        Test.startTest();
+        Case casoP = [SELECT Id, OS_Alerta_Descripcion__c,SAC_FechaRecepcion__c, OS_Email__c FROM case WHERE Subject = 'TestRec2' LIMIT 1];
+        casoP.SAC_FechaRecepcion__c = system.now().addDays(-2);
+        casoP.OS_Email__c = '';
+        SAC_DatabaseDML.updateDML(casoP, false); 
+        //Database.update(casoP);
+        
+        SAC_ProrrogaAutomatica obj = new SAC_ProrrogaAutomatica();
+        DataBase.executeBatch(obj); 
+        Test.stopTest();
+        
+        List<Case> casosProrrogados = [SELECT Id, OS_Alerta_Descripcion__c, SAC_Prorrogado__c, CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c FROM case WHERE Subject = 'TestRec2' LIMIT 1];
+        system.assertEquals(true, casosProrrogados[0].CBK_Case_Extension_Id__r.SAC_PendienteEnvioProrroga__c, 'No se ha prorrogado correctamente');
         }
     }
 }

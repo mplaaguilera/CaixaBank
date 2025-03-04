@@ -91,8 +91,8 @@ public without sharing class SAC_LCMP_InsertarPretension {
     *****************************************************************/
     @AuraEnabled
     public static Boolean insertarPretensiones(String idCase, List<SObject> mccsPretension) {
-        
         List<Case> nuevasPretensiones = new List<Case>();
+        List<Case> nuevasPretensionesCreadasCerradas = new List<Case>();
         List<Id> idsDetalle = new List<Id>();
         List<Id> idsDetalleRepetidos = new List<Id>();
         Set<Id> setIdsDetalleAux = new  Set<Id>();
@@ -116,7 +116,7 @@ public without sharing class SAC_LCMP_InsertarPretension {
         
         Case reclamacionActual = [SELECT Id,CC_Canal_Procedencia__c, ContactId, AccountId, SAC_TiempoSLARegulatorio__c, SAC_TiempoSLALetradoAlta__c, Origin, Status,
                                   SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_PretensionPrincipal__r.OwnerId, OwnerId, SAC_CasoEspecial__c, CC_CasoRelacionado__c, CC_SuppliedNIF__c,
-                                  CC_CasoRelacionado__r.Status, CC_CasoRelacionado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c
+                                  CC_CasoRelacionado__r.Status, CC_CasoRelacionado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c, OS_Email__c, CC_Telefono_Contacto__c, SAC_DireccionPostalNotificacion__c, SuppliedEmail, SAC_CheckResumen__c
                                   FROM Case Where RecordType.DeveloperName LIKE 'SAC_%' AND Id =: idCase];
         
         for(SObject mcc : mccsPretension){
@@ -166,7 +166,6 @@ public without sharing class SAC_LCMP_InsertarPretension {
         if(!detalleMotivo.isEmpty()){
             Group cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PendienteAsignar' LIMIT 1];
             for(Id idDetalle : detalleMotivo.KeySet()){
-                
                 Id detalle = idDetalle;
                 Id motivo = detalleMotivo.get(idDetalle);
                 Id prodServ = motivoProdServ.get(motivo);
@@ -174,7 +173,7 @@ public without sharing class SAC_LCMP_InsertarPretension {
                 String asunto = prodServSubject.get(detalle) + ' - ' + detalleSubject.get(detalle);
                 
                 Case nuevaPretension = camposPretension(reclamacionActual, detalle, motivo, prodServ, tematica, RECORDTYPEPRETENSION, asunto, mapaMcc);
-                
+
                 if (reclamacionActual.Status == 'SAC_001') { //Si la reclamación padre está en Alta, se crea la pretensión                     
                     //MOD --> US426108 Mejora: Vinculación reclamaciones MNR 25/085/2022
                     //Si la reclamación a la que se vinculó esta cerrada hay que asignar el mismo grupo letrado de las pretensiones anteriores a la nueva que vamos a crear
@@ -188,6 +187,11 @@ public without sharing class SAC_LCMP_InsertarPretension {
                     nuevaPretension.SEG_Grupo__c = reclamacionActual.SAC_PretensionPrincipal__r.SEG_Grupo__c;      
                     nuevaPretension.OwnerId = reclamacionActual.SAC_PretensionPrincipal__r.OwnerId;
                     nuevasPretensiones.add(nuevaPretension);
+                } else if (reclamacionActual.Status == 'Cerrado') { //Si la reclamación padre está en Cerrado, se crea con el owner y el grupo de la pretensión principal
+                    nuevaPretension.SEG_Grupo__c = reclamacionActual.SAC_PretensionPrincipal__r.SEG_Grupo__c;      
+                    nuevaPretension.OwnerId = reclamacionActual.SAC_PretensionPrincipal__r.OwnerId;
+                    nuevasPretensiones.add(nuevaPretension);
+                    nuevasPretensionesCreadasCerradas.add(nuevaPretension);
                 } else {
                     throwAuraHandledException('La reclamación debe estar en alta o análisis para poder crear una o varias pretensiones');
                     return false;
@@ -214,6 +218,11 @@ public without sharing class SAC_LCMP_InsertarPretension {
                     nuevaPretension.SEG_Grupo__c = reclamacionActual.SAC_PretensionPrincipal__r.SEG_Grupo__c;      
                     nuevaPretension.OwnerId = reclamacionActual.SAC_PretensionPrincipal__r.OwnerId;
                     nuevasPretensiones.add(nuevaPretension);
+                } else if (reclamacionActual.Status == 'Cerrado') { //Si la reclamación padre está en Cerrado, se crea con el owner y el grupo de la pretensión principal
+                    nuevaPretension.SEG_Grupo__c = reclamacionActual.SAC_PretensionPrincipal__r.SEG_Grupo__c;      
+                    nuevaPretension.OwnerId = reclamacionActual.SAC_PretensionPrincipal__r.OwnerId;
+                    nuevasPretensiones.add(nuevaPretension);
+                    nuevasPretensionesCreadasCerradas.add(nuevaPretension);
                 } else {
                     throwAuraHandledException('La reclamación debe estar en alta o análisis para poder crear una o varias pretensiones');
                     return false;
@@ -222,11 +231,28 @@ public without sharing class SAC_LCMP_InsertarPretension {
         }
         
         if(!nuevasPretensiones.isEmpty()){
-            Database.insert(nuevasPretensiones);
+            SAC_DatabaseDML.insertListDML(nuevasPretensiones, false);
+            reclamacionActual.SAC_CheckResumen__c = false;
+            SAC_DatabaseDML.updateDML(reclamacionActual, false);
+
+
+        }
+
+        if(!nuevasPretensionesCreadasCerradas.isEmpty()){
+            List<Case> pretensionesCreadasCerradas = new List<Case>();
+            for (Case caso : nuevasPretensionesCreadasCerradas) {
+                caso.Status = 'Cerrado';
+                caso.SAC_StatusAuxiliar__c = 'Cerrado';
+                pretensionesCreadasCerradas.add(caso);
+            } 
+            if(!pretensionesCreadasCerradas.isEmpty()) {
+                SAC_DatabaseDML.updateListDML(pretensionesCreadasCerradas, false);
+            }
         }
         
         return true;
     }
+
     
     /*****************************************************************
     * Proposito: Método para controlar errores y lanzarlos por pantalla 
@@ -289,8 +315,13 @@ public without sharing class SAC_LCMP_InsertarPretension {
         nuevaPretension.CC_SuppliedNIF__c = reclamacionActual.CC_SuppliedNIF__c;
         nuevaPretension.Subject = asunto;
         nuevaPretension.recordTypeId = tipoRegistro;
-        nuevaPretension.status = reclamacionActual.Status;
-        nuevaPretension.SAC_StatusAuxiliar__c = reclamacionActual.Status;
+        if(reclamacionActual.Status == 'Cerrado') {
+            nuevaPretension.status = 'SAC_003';
+            nuevaPretension.SAC_StatusAuxiliar__c = 'SAC_003';
+        } else {
+            nuevaPretension.status = reclamacionActual.Status;
+            nuevaPretension.SAC_StatusAuxiliar__c = reclamacionActual.Status;
+        }
         nuevaPretension.Origin = reclamacionActual.Origin;
         nuevaPretension.SAC_TiempoSLARegulatorio__c = 30;
         nuevaPretension.SAC_TiempoSLALetradoAlta__c = 30;
@@ -315,6 +346,18 @@ public without sharing class SAC_LCMP_InsertarPretension {
         if(!String.isBlank(reclamacionActual.ContactId)){
             nuevaPretension.ContactId = reclamacionActual.ContactId;
         } 
+        if(!String.isBlank(reclamacionActual.OS_Email__c)){
+            nuevaPretension.OS_Email__c = reclamacionActual.OS_Email__c;
+        }
+        if(!String.isBlank(reclamacionActual.CC_Telefono_Contacto__c)){
+            nuevaPretension.CC_Telefono_Contacto__c = reclamacionActual.CC_Telefono_Contacto__c;
+        } 
+        if(!String.isBlank(reclamacionActual.SAC_DireccionPostalNotificacion__c)){
+            nuevaPretension.SAC_DireccionPostalNotificacion__c = reclamacionActual.SAC_DireccionPostalNotificacion__c;
+        } 
+        if(!String.isBlank(reclamacionActual.SuppliedEmail)){
+            nuevaPretension.SuppliedEmail = reclamacionActual.SuppliedEmail;
+        }
         return nuevaPretension;
         
     }
@@ -337,7 +380,7 @@ public without sharing class SAC_LCMP_InsertarPretension {
         
         Case reclamacionActual = [SELECT Id,CC_Canal_Procedencia__c, ContactId, AccountId, SAC_TiempoSLARegulatorio__c, SAC_TiempoSLALetradoAlta__c, Origin, Status,
                                   SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_PretensionPrincipal__r.OwnerId, OwnerId, SAC_CasoEspecial__c, CC_CasoRelacionado__c, CC_SuppliedNIF__c,
-                                  CC_CasoRelacionado__r.Status, CC_CasoRelacionado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_GrupoLetrado__c
+                                  CC_CasoRelacionado__r.Status, CC_CasoRelacionado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_GrupoLetrado__c, OS_Email__c, CC_Telefono_Contacto__c, SAC_DireccionPostalNotificacion__c, SuppliedEmail, SAC_CheckResumen__c
                                   FROM Case Where RecordType.DeveloperName LIKE 'SAC_%' AND Id =: idCase];  
         
         for(SObject mcc : mccsPretension){
@@ -399,19 +442,56 @@ public without sharing class SAC_LCMP_InsertarPretension {
                 nuevaPretension.SEG_Grupo__c = reclamacionActual.SAC_GrupoLetrado__c;
             }
             nuevaPretension.SAC_EsPrincipal__c = true;
-            Database.insert(nuevaPretension);
+            SAC_DatabaseDML.insertDML(nuevaPretension, false);  
 
                 if(reclamacionActual.SAC_PretensionPrincipal__c != null) {
                     pretensionPrincipal.SAC_EsPrincipal__c = false;
                     lstReclamacion.add(pretensionPrincipal);
                 }
-
+                reclamacionActual.SAC_CheckResumen__c = false;
                 reclamacionActual.SAC_PretensionPrincipal__c = nuevaPretension.id; 
                 reclamacionActual.SAC_Entidad_Afectada__c = nuevaPretension.SAC_Entidad_Afectada__c;
                 reclamacionActual.SAC_EntidadProductora__c = nuevaPretension.SAC_EntidadProductora__c;
     
             lstReclamacion.add(reclamacionActual); 
-            System.enqueueJob(new SAC_QueueableUpdateCase(lstReclamacion)); 
+            DateTime dt = DateTime.now();
+            Long dateInMilliseconds = dt.getTime();
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds)).build();
+            ID jobID;
+            try {
+                jobID = System.enqueueJob(new SAC_QueueableUpdateCase(lstReclamacion), options);    
+            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
         }
+    }
+
+
+    /***********************************************************************************************************
+    * Proposito: Comprobar si el usuario pertenece al public group SAC_GrupoCreacionPretensionCerrada para que
+                    pueda insertar pretensiones una vez cerrada la reclamacion.
+    * **********************************************************************************************************
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR          DATE         Description
+    * 1.0            US1132463      Sergio Martín   20/01/2024      Creación
+    *************************************************************************************************************/
+    @AuraEnabled
+    public static Boolean tienePermisosReclamacionCerrada(String idCaso){ 
+        Boolean tienePermiso= false;      
+        try {
+            List<GroupMember> listaMiembrosGrupo = [SELECT Id, UserOrGroupId FROM GroupMember WHERE Group.DeveloperName ='SAC_GrupoCreacionPretensionCerrada'];       
+
+            if(!listaMiembrosGrupo.isEmpty()) {
+                for (GroupMember ide : listaMiembrosGrupo) {
+                    if(ide.UserOrGroupId == UserInfo.getUserId()){
+                        tienePermiso=true;
+                        break;
+                    }                
+                }
+            }     
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+        return tienePermiso;
     }
 }

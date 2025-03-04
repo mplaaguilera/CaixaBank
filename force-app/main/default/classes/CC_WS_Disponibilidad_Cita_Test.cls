@@ -48,7 +48,8 @@ public with sharing class CC_WS_Disponibilidad_Cita_Test {
             Name = 'CC_Configuracion_Cita_Rapida',
             CC_Activa__c = true,
             CC_Configuracion_1__c = 'true',
-            CC_Configuracion_2__c = 'TELEMATIC'
+            CC_Configuracion_2__c = 'TELEMATIC',
+            CC_Configuracion_4__c = '4'
         );
         settingsList.add(reservationType);
 
@@ -69,7 +70,7 @@ public with sharing class CC_WS_Disponibilidad_Cita_Test {
         System.runAs(usuario) {
             Test.startTest();
             Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
-            List<String> resultado = CC_WS_Disponibilidad_Cita.obtenerFechasDisponiblidadGestorPool('1345', '2024-11-20');
+            List<String> resultado = CC_WS_Disponibilidad_Cita.obtenerFechasDisponiblidadGestorPool('1345', '2024-12-19');
             Test.stopTest();
             System.assertEquals(false, resultado.size() == 0);
         }
@@ -81,8 +82,8 @@ public with sharing class CC_WS_Disponibilidad_Cita_Test {
         System.runAs(usuario) {
             Test.startTest();
             Test.setMock(HttpCalloutMock.class, new MockHttpResponseError());
-            List<String> resultadoNumPerKO = CC_WS_Disponibilidad_Cita.obtenerFechasDisponiblidadGestorPool('', '2024-11-20');
-            List<String> resultadoCatch = CC_WS_Disponibilidad_Cita.obtenerFechasDisponiblidadGestorPool('1345', '2024-11-20');
+            List<String> resultadoNumPerKO = CC_WS_Disponibilidad_Cita.obtenerFechasDisponiblidadGestorPool('', '2024-12-19');
+            List<String> resultadoCatch = CC_WS_Disponibilidad_Cita.obtenerFechasDisponiblidadGestorPool('1345', '2024-12-19');
             Test.stopTest();
             System.assertEquals(true, resultadoNumPerKO.size() == 0);
             System.assertEquals(true, resultadoCatch.size() == 0);
@@ -91,11 +92,12 @@ public with sharing class CC_WS_Disponibilidad_Cita_Test {
 
     private class MockHttpResponseExito implements HttpCalloutMock {
         public HTTPResponse respond(HTTPRequest req) { 
-            String respuesta = '[{"Slots":[{"starTimeSlot":"09:00","endTimeSlot":"09:30","numberPlaces":2,"numberPlacesAvailable":2,"isAvailable":true}]}]';
+            String respuesta = '[{"Slots":[{"starTimeSlot":"09:00","endTimeSlot":"09:30","numberPlaces":2,"numberPlacesAvailable":2,"isAvailable":true}], "currentWaitTime": 0, "slotDate": "2024-12-19"}]';
             HttpResponse res = new HttpResponse();
             res.setHeader('Content-Type', 'application/json');
             res.setBody(respuesta);
             res.setStatusCode(200);
+            res.setStatus('OK');
             return res;
         }
     }
@@ -107,6 +109,7 @@ public with sharing class CC_WS_Disponibilidad_Cita_Test {
             res.setHeader('Content-Type', 'application/json');
             res.setBody(respuesta);
             res.setStatusCode(400);
+            res.setStatus('KO');
             return res;
         }
     }

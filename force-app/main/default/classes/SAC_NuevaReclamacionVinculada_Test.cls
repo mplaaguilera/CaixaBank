@@ -18,13 +18,13 @@ public with sharing class SAC_NuevaReclamacionVinculada_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         //Grupo Colaborador
@@ -32,7 +32,7 @@ public with sharing class SAC_NuevaReclamacionVinculada_Test {
 		grupoColaborador.SAC_PorcentajeAsignacion__c = 100;
 		grupoColaborador.SAC_MaximoCasosDiarios__c = 1;
 
-        Database.insert(grupoColaborador);
+        SAC_DatabaseDML.insertDML(grupoColaborador, false);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -41,7 +41,7 @@ public with sharing class SAC_NuevaReclamacionVinculada_Test {
         camposRecl.put('SEG_Grupo__c', grupoColaborador.Id);
         
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false);
 
         //Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -50,18 +50,18 @@ public with sharing class SAC_NuevaReclamacionVinculada_Test {
         camposPret.put('SAC_Reclamacion__c', reclamacion.Id);
         
         Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(pretension);
+        SAC_DatabaseDML.insertDML(pretension, false);
 
         
         reclamacion.SAC_PretensionPrincipal__c = pretension.Id;
-        Database.update(reclamacion);
+        SAC_DatabaseDML.updateDML(reclamacion, false);
 
         //Topic
         Topic  t = new Topic(Name = 'Topic');
-        Database.insert(t);
+        SAC_DatabaseDML.insertDML(t, false);
 
         TopicAssignment topicAssig = new TopicAssignment(TopicId=t.Id, EntityId=reclamacion.Id);
-        Database.insert(topicAssig);
+        SAC_DatabaseDML.insertDML(topicAssig, false);
 
         //Email
         EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'SAC_EmailService' LIMIT 1];
@@ -78,7 +78,7 @@ public with sharing class SAC_NuevaReclamacionVinculada_Test {
         emailMsg.ParentId = reclamacion.Id;
         emailMsg.Headers = '[{"value": "' + headerValueSTR + '","name": "X-SDFC-Original-RCPT"}]';
 
-        Database.insert(emailMsg);
+        SAC_DatabaseDML.insertDML(emailMsg, false);
 
         //Adjuntos
         Attachment attach = new Attachment();   	
@@ -87,7 +87,7 @@ public with sharing class SAC_NuevaReclamacionVinculada_Test {
     	attach.body = bodyBlob;
         attach.ParentId = emailMsg.id;       
 
-        Database.insert(attach);
+        SAC_DatabaseDML.insertDML(attach, false);
 
         ContentVersion content=new ContentVersion(); 
         content.Title='Header_Picture1'; 
@@ -95,7 +95,7 @@ public with sharing class SAC_NuevaReclamacionVinculada_Test {
         Blob bodyBlob2=Blob.valueOf('Unit Test ContentVersion Body'); 
         content.VersionData=bodyBlob2; 
         content.origin = 'H';
-        Database.insert(content);
+        SAC_DatabaseDML.insertDML(content, false);
 
         ContentDocumentLink contentlink=new ContentDocumentLink();
         contentlink.LinkedEntityId = reclamacion.id;
@@ -103,7 +103,7 @@ public with sharing class SAC_NuevaReclamacionVinculada_Test {
         contentlink.ShareType = 'I';
         contentlink.Visibility = 'AllUsers';        
         
-        Database.insert(contentlink);
+        SAC_DatabaseDML.insertDML(contentlink, false);
     }
 
     @istest
@@ -129,10 +129,18 @@ public with sharing class SAC_NuevaReclamacionVinculada_Test {
 
         Test.startTest();
         System.runAs(usuario) {
-            System.enqueueJob(new SAC_NuevaReclamacionVinculada(listaCasos, listaCasos[0]));
+            DateTime dt = DateTime.now();
+            Long dateInMilliseconds = dt.getTime();
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+            .addString(String.valueOf(dateInMilliseconds))
+            .build();
+            try {
+                System.enqueueJob(new SAC_NuevaReclamacionVinculada(listaCasos, listaCasos[0]), options);    
+            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
         }
 	    Test.stopTest();
 
-        System.assertNotEquals(null, listaCasos.size(), 'Lista casos correcta');
+        System.assertNotEquals(false, !listaCasos.isEmpty(), 'Lista casos correcta');
     }
 }

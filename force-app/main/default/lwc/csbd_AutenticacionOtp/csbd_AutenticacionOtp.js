@@ -2,7 +2,7 @@ import {LightningElement, api, wire, track} from 'lwc';
 import {getRecord, getFieldValue, getFieldDisplayValue} from 'lightning/uiRecordApi';
 import {NavigationMixin} from 'lightning/navigation';
 import LightningConfirm from 'lightning/confirm';
-import {errorApex} from 'c/csbd_lwcUtils';
+import {errorApex, publicarEvento} from 'c/csbd_lwcUtils';
 import {DATATABLE_COLUMNS, NAME_COLUMN, confirmarInicioAutenticacion, toast} from './utils.js';
 import {n2ValidarOtpMockOk, n2ValidarOtpMockKo} from './mocks.js';
 
@@ -119,7 +119,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 
 		this.nivel = nivel;
 		if (await confirmarInicioAutenticacion(nivel)) {
-			//this.cerrarModalNuevoIntento(); //PENDIENTE
+			//this.cerrarModalNuevoIntento(); //PENDIENTE!
 			this.componente.spinner = true;
 
 			if (nivel === 'Nivel 2') {
@@ -406,11 +406,14 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		}
 	}
 
-	async cerrarModal(ocultarBackdrop = true) {
+	cerrarModal(cierreComponente = true) {
 		if (!this.componente.spinner) {
 			this.componente.abierto = false;
 			this.refs.modalAutenticacionOtp.classList.remove('slds-fade-in-open');
-			ocultarBackdrop && this.refs.backdropModal.classList.remove('slds-backdrop_open');
+			if (cierreComponente) {
+				this.refs.backdropModal.classList.remove('slds-backdrop_open');
+				window.setTimeout(() => publicarEvento(this, 'modalcerrado', {nombreModal: 'modalAutenticacionOtp'}), 200);
+			}
 		}
 	}
 
@@ -509,7 +512,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 				{tipoPregunta: 'tarjeta', inputType: 'number', inputMin: 4, inputMax: 9999, inputMaxLength: 4, inputPlaceholder: '1234'},
 				{tipoPregunta: 'año', inputType: 'number', inputMin: 1900, inputMax: 2040, inputMaxLength: 4, inputPlaceholder: '2024'},
 				{tipoPregunta: 'edad', inputType: 'number', inputMin: 0, inputMax: 99, inputMaxLength: 2, inputPlaceholder: '18'}
-			].find(pi => label.toLowerCase().includes(pi.tipoPregunta))
+			].find(pi => label && label.toLowerCase().includes(pi.tipoPregunta))
 			|| {inputType: 'text', inputMin: 3, inputMax: null, inputMaxLength: 255, inputPlaceholder: '93000000'};
 
 			this.preguntasNivel2 = {
@@ -519,13 +522,14 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			this.componente.spinner = false;
 			this.cerrarModal(false);
 
-			if (this.componente.usuarioDesarrollador) {
-				this.refs.nivel2InputPregunta1.value = 650399855;
-				this.refs.nivel2InputPregunta2.value = 1984;
-			} else {
-				this.refs.nivel2InputPregunta1.value = null;
-				this.refs.nivel2InputPregunta2.value = null;
+			const desarrollador = this.componente.usuarioDesarrollador;
+			if (this.refs.nivel2InputPregunta1) {
+				this.refs.nivel2InputPregunta1.value = desarrollador ? '650399855' : null;
 			}
+			if (this.refs.nivel2InputPregunta2) {
+				this.refs.nivel2InputPregunta2.value = desarrollador ? 1984 : null;
+			}
+
 			this.refs.modalPreguntasNivel2.classList.add('slds-fade-in-open');
 			window.setTimeout(() => this.refs.nivel2InputPregunta1.focus(), 90);
 		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de preguntas de validación para nivel 2'))
@@ -913,13 +917,12 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 
 	navegarDetalleCliente() {
 		this[NavigationMixin.Navigate]({type: 'standard__recordPage', attributes: {
-			recordId: getFieldValue(this.oportunidad, OPP_ACCOUNT_ID),
-			actionName: 'view'
+			recordId: getFieldValue(this.oportunidad, OPP_ACCOUNT_ID), actionName: 'view'
 		}});
 	}
 
-	async menuDevOnselect({detail: {value: accion}}) {
-		//Menú de desarrollo
+	async menuDevOnselect({detail: {value: accion}}) { //Menú de desarrollo
+
 		if (accion.startsWith('simular.')) {
 			let [, tipo, valorNuevo] = accion.split('.');
 			valorNuevo = this.componente.simularRespuestas[tipo] === valorNuevo ? null : valorNuevo;
@@ -928,7 +931,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			this.refs[`simular.${tipo}.ko`].iconName = valorNuevo === 'ko' ? 'utility:check' : '';
 
 		} else if (accion === 'debugger') {
-			debugger;
+			//debugger;
 
 		} else if (accion === 'eliminarAutenticacionesCliente' && await LightningConfirm.open({
 			variant: 'header', theme: 'warning', label: 'Eliminar autenticaciones del cliente',

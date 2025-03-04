@@ -140,10 +140,19 @@ public with sharing class SPV_Documentos_Integration_EER{
         reqWap.method = 'POST';
         reqWap.mHeaders = mapHeader;
         
-        HttpRequest request = CBK_HttpServiceIntegration.getRequest(reqWap);
-        system.debug('Espe endpoint '+request);
-        String endpoint = request.getEndpoint().replace('{documentId}', idEER);
-        request.setEndpoint(endpoint);
+
+        HttpRequest request = new HttpRequest();
+        if(!Test.isRunningTest()){
+            request = CBK_HttpServiceIntegration.getRequest(reqWap);
+            system.debug('Espe endpoint '+request);
+            String endpoint = '';
+            if(request.getEndpoint().contains('{documentId}')){
+                endpoint = request.getEndpoint().replace('{documentId}', idEER);
+            }
+            request.setEndpoint(endpoint);
+        }
+
+
 
         String dataMockup = '{"file":"R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLCAgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=","metadata":{"documentId":166545614,"version":1,"format":"pdf","catalogueId":4195,"documentDescription":"Example document description","monthReference":"JANUARY_01","yearReference":"2023","originId":"OUTSOURCED_SERVICE_14","securityLevel":"PUBLIC_0","valijaSignal":"NOT_VALIJA_APPLICATION","ticketOCP":6287722695164947905},"relation":{"operation":9999700044332,"customerInternalId":214759120,"applicationXFile":"SRC","extReferenceXFile":"EXAMPLE_EXT_REF"},"structure":{"folder":{"order":1,"description":"Cliente","type":"PERSON"},"subFolder":{"order":2,"description":"Fincabilidad"}}}';
 

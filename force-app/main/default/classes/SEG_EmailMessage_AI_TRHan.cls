@@ -46,8 +46,6 @@ public class SEG_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
         if (!correosCc.isEmpty()) {
 
             setAcuseReciboEmail (correosCc);
-            //Se comprueba si el correo contiene algún fichero adjunto con un formato no permitido y, en tal caso, se impide su envío.
-            comprobarAnexosPermitidos(correosCc, mapaCorreos);
 
             //Se acumulan las inserciones/actualizaciones en las siguientes listas para ejecutarlas al final
             List<Case> casos = new List<Case>();
@@ -126,31 +124,6 @@ public class SEG_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
 		}
 		return newList;
 	}   
-
-    private static void comprobarAnexosPermitidos(List<EmailMessage> listNewObj, Map<Id, EmailMessage> mapNewObj) {
-        //Se obtienen las extensiones permitidas para un anexo
-        List<String> extensionesPermitidas = new List<String>();
-        for (CC_ConfiguracionAnexoPermitido__mdt extensionPermitida : [SELECT CC_Extension__c FROM CC_ConfiguracionAnexoPermitido__mdt]) {
-            extensionesPermitidas.add(extensionPermitida.CC_Extension__c);
-        }
-
-        // Se recopilan los correos salientes que contienen anexo
-        List<Id> correosSalientes = new List<Id>();
-        for (EmailMessage correo : listNewObj) {
-            if (!correo.Incoming) {
-                correosSalientes.add(correo.Id);
-            }
-        }
-
-        if (!correosSalientes.isEmpty()) {
-            // Se comprueban las extensiones de los anexos y se impide el envío del correo en caso de que contenga algún anexo con extensión no permitida.
-            for (ContentDocumentLink contentDocumentLink : [SELECT LinkedEntityId FROM ContentDocumentLink
-                                                            WHERE ContentDocument.FileExtension NOT IN :extensionesPermitidas AND LinkedEntityId IN :correosSalientes]) {
-                EmailMessage correoSalienteConAnexoProhibido = mapNewObj.get(contentDocumentLink.LinkedEntityId);
-                correoSalienteConAnexoProhibido.addError('El correo tiene un archivo adjunto con un formato no permitido. Por favor, adjunte otro tipo de fichero.');
-            }
-        }
-    }
 
     public static void setAcuseReciboEmail (List<EmailMessage> listNewObj){
         system.debug('Email message setacusereciboEmail: '+listNewObj);

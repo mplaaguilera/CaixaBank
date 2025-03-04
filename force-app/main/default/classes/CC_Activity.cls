@@ -29,7 +29,7 @@ public with sharing class CC_Activity {
 					tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'AM_Task');
 				} else if (tarea.RecordTypeId != CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'HDT_Task')) {
 					tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
-				} else {
+				}else {
 					tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
 				}
 				actividades.add(tarea);
@@ -178,4 +178,38 @@ public with sharing class CC_Activity {
 			actividad.CC_Fecha_Vencimiento__c = BusinessHours.add(idBusinessHours, System.now(), Integer.valueOf(horasSLA) * 3600 * 1000); //en milisegundos}
 		}
 	}
+
+
+	public static void createActivityTraslados(Id recordId, String comentario, String subject, String tipoTarea, String grupo3N, String grupoId, Id llamadaId, String estado) {
+        //Crear actividad
+        Task task = new Task();
+        task.WhatId = recordId;
+        task.Status = estado;
+        task.ActivityDate = System.today();
+        task.Subject = subject;
+        task.Type = tipoTarea;
+        task.CallObject = grupo3N;
+        task.Description = comentario;
+        task.CC_Fecha_Inicio__c = Datetime.valueOf(System.now());
+        task.CC_Llamada_Id__c = llamadaId;
+        task.CC_Grupo_Colaborador_Id__c = grupoId;
+        task.CC_validacion_tarea_manual__c = true;
+        task.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+        //Cálculo de la fecha límite
+        String horasSLA = CC_Listas_Valores.lookupValue('Configuración de SLA para 3N', grupo3N);
+        String nombreBusinessHours = CC_Listas_Valores.lookupValue('Configuración de horario de oficina para 3N', grupo3N);
+
+        if (horasSLA != null && nombreBusinessHours != null) {
+            String idBusinessHours = [SELECT Id FROM BusinessHours WHERE Name = :nombreBusinessHours LIMIT 1].Id;
+            task.CC_Tiempo_Resolucion__c = Integer.valueof(horasSLA);
+            Datetime fechaVencimiento = BusinessHours.add(idBusinessHours, System.now(), Integer.valueof(horasSLA) * 60 * 60 * 1000); //en milisegundos
+            if (fechaVencimiento != null) {
+                Task.CC_Fecha_Vencimiento__c = fechaVencimiento;
+            }
+        }
+        //insert task;
+        crearActividad(task);
+
+    }
+
 }

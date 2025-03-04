@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>51.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>actualizar el campo Estado al mismo valor que a la reclamación que pertenece</description>
+        <name>SAC_setRecordStatus</name>
+        <label>modificar el estado de la pretension</label>
+        <locationX>824</locationX>
+        <locationY>488</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Status</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>SAC_getReclamacion.Status</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <constants>
+        <description>record type para obtener el de Reclamacion del objeto Case</description>
+        <name>SAC_myRecordType</name>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>SAC_Pretension</stringValue>
+        </value>
+    </constants>
+    <decisions>
+        <description>Se crea pretensión desde una reclamación, en caso afirmativo continua el flujo</description>
+        <name>SAC_deReclamacion</name>
+        <label>Se crea pretensión desde una reclamación</label>
+        <locationX>614</locationX>
+        <locationY>640</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>SAC_siDeReclamacion</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>SAC_getReclamacion</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>SAC_setRecordStatus</targetReference>
+            </connector>
+            <label>Si</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>comprobar que tipo de caso se ha creado y continuar en caso de que sea recordType pretension</description>
+        <name>SAC_isPretension</name>
+        <label>comprobar que tipo de caso se ha creado</label>
+        <locationX>307</locationX>
+        <locationY>529</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>SAC_siPretension</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordType.Name</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>SAC_myRecordType</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>SAC_getReclamacion</targetReference>
+            </connector>
+            <label>Si</label>
+        </rules>
+    </decisions>
+    <description>Flow triggered para actualizar el estado de la pretensión al mismo valor que la reclamación que va a pertenecer justo antes de crearlo.</description>
+    <interviewLabel>SAC_updatePretensionStatus {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SAC_updatePretensionStatus</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>obtener reclamacion desde la que se dispara el flow y posteriormente asignarle a la pretension creada el mismo estado</description>
+        <name>SAC_getReclamacion</name>
+        <label>obtener reclamacion desde la que se dispara el flow</label>
+        <locationX>529</locationX>
+        <locationY>426</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>SAC_deReclamacion</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.SAC_Reclamacion__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.SAC_Reclamacion__r.RecordTypeId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Case</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>163</locationX>
+        <locationY>208</locationY>
+        <connector>
+            <targetReference>SAC_isPretension</targetReference>
+        </connector>
+        <object>Case</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

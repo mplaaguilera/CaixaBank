@@ -26,7 +26,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         usuarios[2].Username = 'ustestesteo3@test.com';
         usuarios[2].Alias = 'alias3';
         
-        Database.insert(usuarios);
+        SAC_DatabaseDML.insertListDML(usuarios, false);
+        //Database.insert(usuarios);
 
         //grupo colaborador
         CC_Grupo_Colaborador__c grupo = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
@@ -36,15 +37,18 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         grupo.SAC_Externo__c = false;
         grupo.SAC_DeveloperName__c = 'Test';
         grupo.SAC_TienePropietario__c = true;
-        Database.insert(grupo);
+        SAC_DatabaseDML.insertDML(grupo, false);
+        //Database.insert(grupo);
 
         //grupo colaborador contact
         CC_Grupo_Colaborador_Contact__c grupoColabContact = SAC_TestDataFactory.crearColaboradorContact(usuarios[0].id, grupo.id);
-        Database.insert(grupoColabContact);
+        SAC_DatabaseDML.insertDML(grupoColabContact, false);
+        //Database.insert(grupoColabContact);
 
         //grupo colaborador contact 2
         CC_Grupo_Colaborador_Contact__c grupoColabContact2 = SAC_TestDataFactory.crearColaboradorContact(usuarios[2].id, grupo.id);
-        Database.insert(grupoColabContact2);
+        SAC_DatabaseDML.insertDML(grupoColabContact2, false);
+        //Database.insert(grupoColabContact2);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -55,7 +59,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         camposRecl.put('OwnerId', usuarios[0].Id);
 
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(casoReclamacion);
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
+        //Database.insert(casoReclamacion);
 
         
         List<SAC_Interaccion__c> escalados = SAC_TestDataFactory.crearInteraccionEsc(2, casoReclamacion.Id, grupo.Id);
@@ -72,7 +77,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         escalados[1].OwnerId = usuarios[2].Id;
         escalados[1].SAC_ImporteAutorizado__c = 20;
 
-        Database.insert(escalados);
+        SAC_DatabaseDML.insertListDML(escalados, false);
+        //Database.insert(escalados);
         
         
         SAC_ParametrizacionEscalado__c parametrizacionEscalado = new SAC_ParametrizacionEscalado__c();
@@ -85,7 +91,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         parametrizacionEscalado.SAC_todosMCCs__c =true;
         parametrizacionEscalado.SAC_TodosDespachos__c = true;
         parametrizacionEscalado.SAC_validarImporte__c = false;
-        Database.insert(parametrizacionEscalado);
+        SAC_DatabaseDML.insertDML(parametrizacionEscalado, false);
+        //Database.insert(parametrizacionEscalado);
 
         //Interaccion Consulta
         Map<String, Object> camposCons = new Map<String, Object>();
@@ -96,7 +103,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         camposCons.put('SAC_GrupoColaborador__c', grupo.Id);
         
         SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
-        Database.insert(consulta);
+        SAC_DatabaseDML.insertDML(consulta, false);
+        //Database.insert(consulta);
     }
 
     @isTest
@@ -108,7 +116,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -130,7 +139,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -151,7 +161,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         SAC_InteraccionOperativas_Controller.wrapperInit wpInit = new SAC_InteraccionOperativas_Controller.wrapperInit();
 
@@ -172,7 +183,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Boolean mostrarBoton = false;
 
@@ -194,7 +206,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Boolean propietario = false;
         Test.startTest();
@@ -215,7 +228,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Boolean esConsulta = false;
         Test.startTest();
@@ -236,7 +250,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -259,7 +274,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -271,7 +287,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         Blob b=Blob.valueOf('This is version data');
         newcont.VersionData = EncodingUtil.base64Decode('Unit Test Attachment Body');
         newcont.FirstPublishLocationId  = escalado.id;
-        Database.insert(newcont);
+        SAC_DatabaseDML.insertDML(newcont, false);
+        //Database.insert(newcont);
             
         SAC_InteraccionOperativas_Controller.insertarAdjuntoCaso(escalado.Id);
         }
@@ -288,7 +305,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -308,7 +326,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -328,7 +347,8 @@ public with sharing class SAC_InteraccionOperativasControllerTest {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {

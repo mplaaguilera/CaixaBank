@@ -16,34 +16,34 @@
 		</div>
 		<div lwc:if={mostrarOportunidadesHijas} class="slds-grid slds-card__body slds-card__body_inner">
 			<div class="slds-col slds-size_1-of-3 slds-var-m-around_x-small">
-				<div class="slds-text-title_caps slds-var-m-bottom_large" style="font-weight: 500;">En curso</div>
+				<div class="slds-text-title_caps slds-var-m-bottom_large">En curso</div>
 				<ul lwc:if={oportunidadesHijas.enCurso.length}>
 					<template for:each={oportunidadesHijas.enCurso} for:item="oportunidadHija">
-						<li key={oportunidadHija.Id} class="slds-truncate slds-var-m-vertical_small" onclick={oportunidadOnclick} data-id={oportunidadHija.Id}>
+						<li key={oportunidadHija.Id} class="slds-truncate slds-var-m-vertical_small" onclick={oportunidadOnclick} data-id={oportunidadHija.Id} style="cursor: pointer;">
 							<lightning-icon icon-name="utility:more" size="x-small" class="iconVariantLight"></lightning-icon>
-							<span class="slds-text-link_faux slds-var-m-left_small slds-text-color_weak">{oportunidadHija.producto}</span>
+							<span class="slds-text-link_faux slds-var-m-left_small slds-text-color_weak" title={oportunidadHija.producto}>{oportunidadHija.producto}</span>
 						</li>
 					</template>
 				</ul>
 			</div>
 			<div class="slds-col slds-size_1-of-3 slds-var-m-around_x-small">
-				<div class="slds-text-title_caps slds-var-m-bottom_large" style="font-weight: 500;">Formalizadas</div>
+				<div class="slds-text-title_caps slds-var-m-bottom_large">Formalizadas</div>
 				<ul lwc:if={oportunidadesHijas.formalizadas.length}>
 					<template for:each={oportunidadesHijas.formalizadas} for:item="oportunidadHija">
-						<li key={oportunidadHija.Id} class="slds-truncate slds-var-m-vertical_small" onclick={oportunidadOnclick} data-id={oportunidadHija.Id}>
+						<li key={oportunidadHija.Id} class="slds-truncate slds-var-m-vertical_small" onclick={oportunidadOnclick} data-id={oportunidadHija.Id} style="cursor: pointer;">
 							<lightning-icon variant="success" icon-name="utility:success" size="x-small"></lightning-icon>
-							<span class="slds-text-link_faux slds-var-m-left_small slds-text-color_weak">{oportunidadHija.producto}</span>
+							<span class="slds-text-link_faux slds-var-m-left_small slds-text-color_weak" title={oportunidadHija.producto}>{oportunidadHija.producto}</span>
 						</li>
 					</template>
 				</ul>
 			</div>
 			<div class="slds-col slds-size_1-of-3 slds-var-m-around_x-small">
-				<div class="slds-text-title_caps slds-var-m-bottom_large" style="font-weight: 500;">Perdidas</div>
+				<div class="slds-text-title_caps slds-var-m-bottom_large">Perdidas</div>
 				<ul lwc:if={oportunidadesHijas.perdidas.length}>
 					<template for:each={oportunidadesHijas.perdidas} for:item="oportunidadHija">
-						<li key={oportunidadHija.Id} class="slds-truncate slds-var-m-vertical_small" onclick={oportunidadOnclick} data-id={oportunidadHija.Id}>
+						<li key={oportunidadHija.Id} class="slds-truncate slds-var-m-vertical_small" onclick={oportunidadOnclick} data-id={oportunidadHija.Id} style="cursor: pointer;">
 							<lightning-icon icon-name="utility:clear" size="x-small" variant="error"></lightning-icon>
-							<span class="slds-text-link_faux slds-var-m-left_small slds-text-color_weak">{oportunidadHija.producto}</span>
+							<span class="slds-text-link_faux slds-var-m-left_small slds-text-color_weak" title={oportunidadHija.producto}>{oportunidadHija.producto}</span>
 						</li>
 					</template>
 				</ul>

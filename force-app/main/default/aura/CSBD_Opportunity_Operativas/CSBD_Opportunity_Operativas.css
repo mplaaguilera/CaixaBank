@@ -2,7 +2,7 @@
     color: red;
 }
 
-.THIS .slds-modal__content {
+.THIS section.slds-modal:not(.modalProgramar) .slds-modal__content {
     overflow: initial;
 }
 
@@ -17,7 +17,8 @@
 }
 
 .THIS div.divBotones button {
-    /* transition: background-color 100ms linear; */
+    will-change: background-color;
+    transition: background-color 100ms ease;
 }
 
 .THIS div.divBotones button.botonOtrasOperativas:hover,
@@ -35,29 +36,24 @@
 }
 
 .THIS button.botonOtrasOperativas {
-    width: 50px;
+    width: 40px;
     color: var(--slds-c-button-text-color, var(--sds-c-button-text-color, var(--lwc-brandAccessible, rgb(1, 118, 211))));
 }
 
 .THIS div.divBotones div.popoverOtrasOperativas {
     position: absolute;
-    left: -91px;
-    top: 20px;
-    z-index: 100;
-    /* transform: translateY(-19px); */
-    /* will-change: visibility, opacity, transform; */
+    left: -89px;
+    top: 14px;
+    z-index: 92;
     will-change: visibility, opacity, top;
     visibility: hidden;
     opacity: 0;
-    /* transition: visibility 90ms linear, opacity 90ms ease-in, transform 90ms ease-in-out; */
-    transition: visibility 90ms linear, opacity 90ms ease-in, top 90ms ease-in-out;
-    /* -webkit-font-smoothing: antialiased; */
+    transition: visibility 100ms linear, opacity 100ms ease-out, top 120ms ease-out;
     pointer-events: none;
 }
 
 .THIS div.divBotones div.popoverOtrasOperativas.visible {
-    /* transform: translateY(0); */
-    top: 39px;
+    top: 36px;
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
@@ -65,10 +61,11 @@
 
 .THIS div.divBotones div.popoverOtrasOperativas > div.slds-popover {
     border-radius: 7px;
+    width: 226px;
 }
 
 .THIS div.divBotones div.popoverOtrasOperativas > div.slds-popover > div.slds-popover__body {
-    padding: 9px 10px 11px 11px;
+    padding: 3px 9px 3px 6px;
 }
 
 .THIS div.divBotones div.popoverOtrasOperativas > div.slds-popover > div.slds-popover__body > div.slds-grid.slds-grid.vertical {
@@ -82,11 +79,26 @@
 }
 
 .THIS div.divBotones div.popoverOtrasOperativas button {
-    margin-left: 0px;
+    margin: 3px 0 3px 1px;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 70ms linear;
 }
 
-.THIS div.divBotones div.popoverOtrasOperativas button:not(:last-child) {
-    margin-bottom: 5px;
+.THIS div.divBotones div.popoverOtrasOperativas button:hover:not(:disabled) {
+    background-color: #f4f4f4;
+}
+
+.THIS div.divBotones div.popoverOtrasOperativas button > lightning-primitive-icon {
+    top: -1px;
+    position: relative;
+}
+
+.THIS div.divBotones div.popoverOtrasOperativas hr {
+    border: none;
+    height: 1px;
+    background-color: #e8e8e8;
+    margin: 0 7px;
 }
 
 .THIS button.slds-button:not(.slds-button_icon-bare):not(.slds-button_icon-container):not(.slds-text-link),
@@ -101,45 +113,51 @@
 	border-color: rgb(201, 201, 201);
 }
 
-.THIS.modalInformeSia lightning-textarea > div > textarea.slds-textarea,
-.THIS.modalInformeSia2 lightning-textarea > div > textarea.slds-textarea {
-    height: 34px !important;
+.THIS div.slds-radio_button-group {
+    border-color: rgb(201, 201, 201);;
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}
+
+.THIS.modalTrasladoSia lightning-textarea > div > textarea.slds-textarea,
+.THIS.modalInformeSia lightning-textarea > div > textarea.slds-textarea {
+    height: 32px;
     background-color: #f7f7f7;
-    font-size: 11.9px;
+    font-size: 12px;
+    color: black;
+}
+
+.THIS.modalTrasladoSia lightning-textarea.multilinea > div > textarea.slds-textarea {
+    height: 260px;
 }
 
 .THIS.modalInformeSia lightning-textarea.multilinea > div > textarea.slds-textarea {
-    height: 260px !important;
+    height: 460px;
 }
 
-.THIS.modalInformeSia2 lightning-textarea.multilinea > div > textarea.slds-textarea {
-    height: 460px !important;
-}
-
+.THIS.modalTrasladoSia button.botonCopiar:focus,
+.THIS.modalTrasladoSia button.botonCopiar:active,
 .THIS.modalInformeSia button.botonCopiar:focus,
-.THIS.modalInformeSia button.botonCopiar:active,
-.THIS.modalInformeSia2 button.botonCopiar:focus,
-.THIS.modalInformeSia2 button.botonCopiar:active {
+.THIS.modalInformeSia button.botonCopiar:active {
     box-shadow: none;
     border: none;
 }
 
 .THIS.modalInformeSia button.botonCopiar svg,
-.THIS.modalInformeSia2 button.botonCopiar svg {
+.THIS.modalTrasladoSia button.botonCopiar svg {
     will-change: fill, transform;
     transform-origin: center;
     fill: #919191;
 }
 
 .THIS.modalInformeSia button.botonCopiar:hover svg,
-.THIS.modalInformeSia2 button.botonCopiar:hover svg {
+.THIS.modalTrasladoSia button.botonCopiar:hover svg {
     fill: rgb(83, 112, 147);
 }
 
 .THIS.modalInformeSia button.botonCopiar.copiarOk svg,
 .THIS.modalInformeSia button.botonCopiar.copiarOk:hover svg,
-.THIS.modalInformeSia2 button.botonCopiar.copiarOk svg,
-.THIS.modalInformeSia2 button.botonCopiar.copiarOk:hover svg {
+.THIS.modalTrasladoSia button.botonCopiar.copiarOk svg,
+.THIS.modalTrasladoSia button.botonCopiar.copiarOk:hover svg {
     animation: blinkOkKf 100ms ease 4 alternate;
 }
 
@@ -168,4 +186,105 @@
 
 .THIS lightning-icon.iconoConvertirOppActual {
     background-color: #dda290;
+}
+
+.THIS lightning-icon.iconoDisponibilidad svg {
+    fill: var(--lwc-brandTextLink, rgba(33, 97, 134, 1));
+}
+
+.THIS .csbd-var-p-bottom_xxx-large {
+    padding-bottom: 32px;
+}
+
+.THIS.modalProgramar > div.slds-modal__container {
+    max-width: min-content;
+    width: fit-content;
+    will-change: width;
+    transition: width 300ms ease-in-out;
+}
+
+.THIS.modalProgramar div.slds-modal__content {
+    min-width: 40rem;
+    width: fit-content;
+    min-height: 224px;
+    /* overflow: hidden; */
+    overflow-y: hidden;
+    will-change: max-height;
+    transition: width 300ms ease-in-out, max-height 300ms ease-in-out;
+}
+
+.THIS.modalProgramar lightning-input div.slds-form-element__help {
+    display: none;
+}
+
+.THIS.modalProgramar lightning-input lightning-datepicker {
+    border-radius: 4px;
+    will-change: box-shadow;
+}
+
+.THIS.modalProgramar lightning-input.csbd_flash_dia lightning-datepicker input.slds-input {
+    animation-name: flashKf;
+    animation-direction: alternate;
+    animation-iteration-count: 6;
+    animation-timing-function: ease;
+    animation-duration: 100ms;
+}
+
+.THIS.modalProgramar lightning-input.csbd_flash_hora lightning-timepicker input.slds-input {
+    animation-name: flashKf;
+    animation-direction: alternate;
+    animation-iteration-count: 6;
+    animation-timing-function: ease;
+    animation-duration: 100ms;
+}
+
+
+.THIS.modalProgramar .modalProgramarLookupGestor {
+    transition: opacity 300ms ease-in-out;
+}
+
+.THIS.modalProgramar div.modalProgramarCalendarioDisponibilidadContainer {
+    width: fit-content;
+    padding: 0 18px;
+    /* overflow-y: hidden; */
+    display: none;
+    opacity: 0;
+    max-height: 0;
+    transition: width 300ms ease-in-out, opacity 300ms ease-in-out, max-height 300ms ease-in-out;
+}
+
+.THIS.modalProgramar .modalProgramarCalendarioDisponibilidad {
+    /* display: none; */
+    /* width: 0; */
+    /* max-height: 0; */
+    /* opacity: 0; */
+    /* transition: width 320ms ease-in-out, max-height 320ms ease-in-out, opacity 320ms ease-out; */
+}
+
+.THIS.modalProgramar .modalProgramarInfoAsignacionAuto {
+    display: none;
+    opacity: 0;
+    transition: opacity 300ms ease-in-out;
+}
+
+@keyframes flashKf {
+    from {box-shadow: none}
+    to {box-shadow: 0 0 8px 1px rgb(112 157 216)}
+}
+
+.THIS button.pointerEventsNone {
+    pointer-events: none;
+}
+
+.THIS div.infoAsignacionAuto > div.slds-grid {
+    font-size: 12.6px;
+    line-height: 19px;
+    background-color: #f3f3f3;
+    padding: 7px;
+    border-radius: 6px;
+}
+
+.THIS.modalAsignarAuto footer div.slds-button_last > button {
+    background-color: rgb(33, 97, 134);
+    color: white;
 }

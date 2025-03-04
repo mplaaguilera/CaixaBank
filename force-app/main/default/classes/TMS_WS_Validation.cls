@@ -12,13 +12,12 @@ global with sharing class TMS_WS_Validation extends CBK_HttpServiceIntegration_A
 			requestTms = (TMS_WS_Validation_DTO.RequestDTO) JSON.deserialize(requestBody, TMS_WS_Validation_DTO.RequestDTO.class);
 
             String numPerSolicitanteFormat = TMS_MetodosUtiles.formatearNumperso(requestTms.numperSolicitanteCita);
-            
             List<Case> idCaso = [SELECT Id, CaseNumber, OwnerId FROM Case WHERE TMS_Numexp__c = :requestTms.numExp AND Contact.AV_NumPerso__c = :numPerSolicitanteFormat];
             
             if(!idCaso.isEmpty()){
                 responseTms = new TMS_WS_Validation_DTO.ResponseDTO();
                 responseTms.estado = 'OK';
-    
+
                 RestResponse res = RestContext.response;
                 res.statusCode = 200;
                 res.addHeader('Content-Type', 'application/json; charset=utf-8');

@@ -16,14 +16,16 @@ public with sharing class SAC_LCMP_Alertas_Test {
         User usuarioGeneral;
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
-            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);     
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);     
+            //Database.insert(permiSetAssi);
         }
 
         System.runAs(usuarioGeneral) {
@@ -32,11 +34,13 @@ public with sharing class SAC_LCMP_Alertas_Test {
             camposRecl.put('Subject', 'TestRecl');
             
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);  
+            //Database.insert(reclamacion);
 
             // Alerta
             List<SAC_Alerta__c> listaAlertas = SAC_TestDataFactory.crearAlerta(1, reclamacion.Id);
-            Database.insert(listaAlertas);
+            SAC_DatabaseDML.insertListDML(listaAlertas, false);  
+            //Database.insert(listaAlertas);
         }
     }
 

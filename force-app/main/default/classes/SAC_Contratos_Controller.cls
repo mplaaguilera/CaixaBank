@@ -98,7 +98,7 @@ public with sharing class SAC_Contratos_Controller {
         ResponseData response = new ResponseData();
         List<CustomerContrato> lstContratosMostrar = new List<CustomerContrato>();
         List<String> lstCodProductos = new List<String>();
-
+        
         Case reclamacion = [Select Account.CC_NumPerso__c from Case where id = :idRegistro limit 1];
 
         if(reclamacion != null && reclamacion.Account.CC_NumPerso__c != null){
@@ -284,13 +284,20 @@ public with sharing class SAC_Contratos_Controller {
     
 
     @AuraEnabled
-    public static void linkarContrato(String idRecord, String tipo, String numContrato, String descripcion) {
+    public static void linkarContrato(String idRecord, String tipo, String numContrato, String descripcion, String fechaApertura, String fechaCancelacion) {
         SAC_ProductCase__c producto = new SAC_ProductCase__c();
         producto.SAC_Pretension__c = idRecord;
         producto.SAC_Tipo__c = tipo;
         producto.N_Contrato__c = numContrato;
         producto.SAC_Descripcion__c = descripcion;
+        if(fechaApertura != null && fechaApertura != ''){
+            producto.SAC_FechaApertura__c = Date.valueOf(fechaApertura);
+        }
+        if(fechaCancelacion != null && fechaCancelacion != ''){
+            producto.SAC_FechaCancelacion__c = Date.valueOf(fechaCancelacion);
+        }
 
-        Database.insert(producto);
+        SAC_DatabaseDML.insertDML(producto, false);
+        //Database.insert(producto);
     }    
 }

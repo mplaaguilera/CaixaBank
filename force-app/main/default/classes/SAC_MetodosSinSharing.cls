@@ -20,7 +20,7 @@ public without sharing class SAC_MetodosSinSharing {
     public static list<account> listaDeClientesPorDoc(set<string> numDocumentos){
         list<account> listaAccount;
         if(Schema.SObjectType.Account.isAccessible()) {
-            listaAccount = [SELECT id, CC_Numero_Documento__c, recordTypeId, AV_Confidencial__c, AV_Numperso__c 
+            listaAccount = [SELECT id, CC_Numero_Documento__c, recordTypeId, AV_Confidencial__c, AV_Numperso__c, CC_Numperso__c 
                                             FROM Account WHERE CC_Numero_Documento__c != null AND CC_Numero_Documento__c IN : numDocumentos
                                             AND recordType.developerName IN ('CC_Cliente', 'CC_ClientePA', 'CC_Cliente', 'SAC_NoCliente_PA')];
         }

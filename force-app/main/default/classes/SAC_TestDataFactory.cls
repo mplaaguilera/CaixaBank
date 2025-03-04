@@ -604,6 +604,16 @@ public with sharing class SAC_TestDataFactory {
                 
                 listMaestroTemas.add(maestroTema);
             } 
+            else if(recordType == 'SAC_ControlAltas'){
+                SAC_MaestroTemas__c maestroTema = new SAC_MaestroTemas__c(
+                Name = 'maestroControlAlta' + i,
+                RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SAC_ControlAltas').getRecordTypeId(),
+                SAC_Seccion__c = 'Test control alta',
+                SAC_Descripcion__c = 'Test control alta'
+                );
+                
+                listMaestroTemas.add(maestroTema);
+            } 
         }
         return listMaestroTemas;
     }

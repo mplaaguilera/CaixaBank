@@ -18,19 +18,22 @@ public with sharing class SAC_GrupoColaboradorContact_BI_Test {
     static void makeData(){
        
         List<User> usuarios = SAC_TestDataFactory.crearUsuarioSACGeneral(2);
-        Database.insert(usuarios);
+        SAC_DatabaseDML.insertListDML(usuarios, false);
+        //Database.insert(usuarios);
 
         system.runAs(usuarios[0]){
             CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor',1)[0];
             grupoColaborador.SAC_PorcentajeAsignacion__c=100;
             grupoColaborador.SAC_MaximoCasosDiarios__c = 15;
-            Database.insert(grupoColaborador);
+            SAC_DatabaseDML.insertDML(grupoColaborador, false);
+            //Database.insert(grupoColaborador);
         }
         system.runAs(usuarios[1]){
             CC_Grupo_Colaborador__c grupoColaboradorNA = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor',1)[0];
             grupoColaboradorNA.SAC_PorcentajeAsignacion__c=100;
             grupoColaboradorNA.SAC_MaximoCasosDiarios__c = 15;
-            Database.insert(grupoColaboradorNA);
+            SAC_DatabaseDML.insertDML(grupoColaboradorNA, false);
+            //Database.insert(grupoColaboradorNA);
         }
     }
     
@@ -39,7 +42,8 @@ public with sharing class SAC_GrupoColaboradorContact_BI_Test {
         User usuarioGeneral = [SELECT id From User Where Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         PermissionSet ps = [select id from PermissionSet where PermissionSet.Label = 'SAC_Administrador'];
 		PermissionSetAssignment psa = new PermissionSetAssignment(PermissionSetId = ps.id, AssigneeId = usuarioGeneral.id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
             
         system.runAs(usuarioGeneral){
             
@@ -48,7 +52,8 @@ public with sharing class SAC_GrupoColaboradorContact_BI_Test {
             CC_Grupo_Colaborador_Contact__c contact = SAC_TestDataFactory.crearColaboradorContact(usuarioGeneral.id, gc.id);
         
             Test.startTest();
-            Database.insert(contact);
+            SAC_DatabaseDML.insertDML(contact, false);
+            //Database.insert(contact);
             Test.stopTest();
             
             List<CC_Grupo_Colaborador_Contact__c> contacts = [SELECT id FROM CC_Grupo_Colaborador_Contact__c WHERE CC_Grupo_Colaborador__c =: gc.id LIMIT 1];
@@ -61,7 +66,8 @@ public with sharing class SAC_GrupoColaboradorContact_BI_Test {
         User usuarioGeneralNA = [SELECT id From User Where Username = 'usertest1@test.com.testSetup' AND isActive = true Limit 1];
         PermissionSet ps = [select id from PermissionSet where PermissionSet.Label = 'SAC_General'];
 		PermissionSetAssignment psa = new PermissionSetAssignment(PermissionSetId = ps.id, AssigneeId = usuarioGeneralNA.id);
-		Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+		//Database.insert(psa);
             
         system.runAs(usuarioGeneralNA){
             
@@ -70,7 +76,8 @@ public with sharing class SAC_GrupoColaboradorContact_BI_Test {
             CC_Grupo_Colaborador_Contact__c contactNA = SAC_TestDataFactory.crearColaboradorContact(usuarioGeneralNA.id, gcNA.id);
         
             Test.startTest();
-            Database.insert(contactNA);
+            SAC_DatabaseDML.insertDML(contactNA, false);
+            //Database.insert(contactNA);
             Test.stopTest();
             
             List<CC_Grupo_Colaborador_Contact__c> contactsNA = [SELECT id FROM CC_Grupo_Colaborador_Contact__c WHERE CC_Grupo_Colaborador__c =: gcNA.id LIMIT 1];

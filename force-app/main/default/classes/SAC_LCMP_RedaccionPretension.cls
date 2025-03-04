@@ -312,18 +312,34 @@ public without sharing class SAC_LCMP_RedaccionPretension{
     public static Boolean compruebaPropietario(String id){
         /*****************************************************************
          * Proposito: Método para comprobar si el usuario actual es el propietario. La finalidad es que si es el propietario el lwc estará abierto y se podrá usar; si no
+         * Modificación 1.1: Se añade que las pretensiones que se crean en las reclamaciones cerradas se permita modificar.
          * ************************************************************
          * Historial
          * -------
          * VERSION        USER_STORY       AUTHOR         DATE         Description
          * 1.0            US248481         Luis Mesa     13/07/21      Creación Método
+         * 1.1            US1132463     Sergio Martín    22/01/25     	Modificación
          *****************************************************************/
         String user = UserInfo.getUserId();
-        Case record = [SELECT Id, OwnerId, SAC_Reclamacion__r.OwnerId
+        Boolean tienePermisoPretensionCerrada= false;      
+        Case record = [SELECT Id, OwnerId, SAC_Reclamacion__r.OwnerId, Status, CBK_Case_Extension_Id__r.SAC_PretensionCreadaCerrada__c
                        FROM Case
                        WHERE Id = :id
                        LIMIT 1];
-        return (record.OwnerId == user || record.SAC_Reclamacion__r.OwnerId == user) ? false : true;
+
+        if(record.Status == 'Cerrado' && record.CBK_Case_Extension_Id__r.SAC_PretensionCreadaCerrada__c) {
+            List<GroupMember> listaMiembrosGrupo = [SELECT Id, UserOrGroupId FROM GroupMember WHERE Group.DeveloperName ='SAC_GrupoCreacionPretensionCerrada'];       
+
+            if(!listaMiembrosGrupo.isEmpty()) {
+                for (GroupMember ide : listaMiembrosGrupo) {
+                    if(ide.UserOrGroupId == UserInfo.getUserId()){
+                        tienePermisoPretensionCerrada = true;
+                        break;
+                    }                
+                }
+            }    
+        }
+        return (record.OwnerId == user || record.SAC_Reclamacion__r.OwnerId == user || tienePermisoPretensionCerrada == true) ? false : true;
     }
 
     public class PlantillasWrapper{

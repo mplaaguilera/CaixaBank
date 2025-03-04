@@ -4,7 +4,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
         static void makeData(){    
             User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
             usuarioAdmin.Username = 'usergadmin3@test.com';
-            Database.insert(usuarioAdmin);
+            SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+            //Database.insert(usuarioAdmin);
 
             CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor',1)[0];
             grupoColaborador.Name = 'Grupo Proveedores Test';
@@ -12,7 +13,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
             grupoColaborador.SAC_MaximoCasosDiarios__c = 5;
 
             System.runAs(usuarioAdmin){
-                Database.insert(grupoColaborador);
+                SAC_DatabaseDML.insertDML(grupoColaborador, false);
+                //Database.insert(grupoColaborador);
             }
 
             List<CC_Grupo_Colaborador__c> listaGrupoColab = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor',3);
@@ -28,7 +30,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
             grupoColaboradorRespAccion.SAC_PorcentajeAsignacion__c=90;
             listaGrupoColab.add(grupoColaboradorRespAccion);
             
-            Database.insert(listaGrupoColab);
+            SAC_DatabaseDML.insertListDML(listaGrupoColab, false);
+            //Database.insert(listaGrupoColab);
 
             List<User> usuariosGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(7);
             usuariosGeneral[0].Username = 'usergeneral@test.com';
@@ -46,7 +49,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
             usuariosGeneral[6].Username = 'usergeneral7@test.com';
             usuariosGeneral[6].SAC_GruposPerteneciente__c = listaGrupoColab[1].id;
          
-            Database.insert(usuariosGeneral);
+            SAC_DatabaseDML.insertListDML(usuariosGeneral, false);
+            //Database.insert(usuariosGeneral);
 
             //GRUPO COLABORADOR CONTACT
             CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = SAC_TestDataFactory.crearColaboradorContact(usuariosGeneral[0].Id,grupoColaborador.Id);
@@ -78,7 +82,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
             listaColaboradores.add(grupoColaboradorContact5);
             listaColaboradores.add(grupoColaboradorContact6);
             listaColaboradores.add(grupoColaboradorContactAdmin);
-            Database.insert(listaColaboradores);
+            SAC_DatabaseDML.insertListDML(listaColaboradores, false);
+            //Database.insert(listaColaboradores);
 
             Case casoReclamacion = SAC_TestDataFactory.crearReclamacion(1)[0];
             casoReclamacion.Subject = 'TestRec';
@@ -86,7 +91,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
             casoReclamacion.SAC_StatusAuxiliar__c = casoReclamacion.Status;
             casoReclamacion.OwnerId = usuariosGeneral[2].Id;
             casoReclamacion.SEG_Grupo__c = listaGrupoColab[0].id;
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);
+            //Database.insert(casoReclamacion);
     }
 
     @IsTest
@@ -108,7 +114,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
         PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
         permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
         permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-        Database.insert(permiSetAssiAdmin);
+        SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false);
+        //Database.insert(permiSetAssiAdmin);
           
         Test.startTest();
 
@@ -118,7 +125,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
                 WHERE  PermissionSet.Label ='SAC_AdministradorGrupos'];
 
             List<PermissionSetAssignment> psa = [SELECT Id, AssigneeId, PermissionSet.Name FROM PermissionSetAssignment WHERE PermissionSetId =: ps.id AND AssigneeId =: colaboradorNuevo.CC_Usuario__c];   
-            Database.insert(colaboradorNuevo);
+            SAC_DatabaseDML.insertDML(colaboradorNuevo, false);
+            //Database.insert(colaboradorNuevo);
 
             Test.stopTest();
 
@@ -152,7 +160,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
         PermissionSetAssignment asignacionPermiso = new PermissionSetAssignment();
         asignacionPermiso.AssigneeId = admin.Id;
         asignacionPermiso.PermissionSetId = permiso.Id;
-        Database.insert(asignacionPermiso);
+        SAC_DatabaseDML.insertDML(asignacionPermiso, false);
+        //Database.insert(asignacionPermiso);
 
         Set<Id> ids = new Set<Id>();
         ids.add(colaboradorNuevo.Id);
@@ -173,7 +182,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
             WHERE  PermissionSet.Label ='SAC_AdministradorGrupos'];
         List<PermissionSetAssignment> psa = [SELECT Id, AssigneeId, PermissionSet.Name FROM PermissionSetAssignment WHERE PermissionSetId =: ps.id AND (AssigneeId =: colaboradorNuevo.CC_Usuario__c OR AssigneeId =: colaboradorNuevo2.CC_Usuario__c OR AssigneeId =: colaboradorNuevo3.CC_Usuario__c)];   
         System.runAs(admin){
-            Database.update(listadoUpdate);
+            SAC_DatabaseDML.updateListDML(listadoUpdate, false);
+            //Database.update(listadoUpdate);
         }
         Test.stopTest();
         List<PermissionSetAssignment> psaV2 = [SELECT Id, AssigneeId, PermissionSet.Name FROM PermissionSetAssignment WHERE PermissionSetId =: ps.id AND (AssigneeId =: colaboradorNuevo.CC_Usuario__c OR AssigneeId =: colaboradorNuevo2.CC_Usuario__c OR AssigneeId =: colaboradorNuevo3.CC_Usuario__c)];   
@@ -189,7 +199,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
 
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE PermissionSet.Label = 'SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment(PermissionSetId = ps.id, AssigneeId = usuarioGeneral.Id);
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
 
         Case caso = [SELECT OwnerId FROM Case WHERE Subject = 'TestRec'];
         
@@ -197,7 +208,8 @@ public with sharing class SAC_AdministrarUsuarios_Test {
         caso.OwnerId = usuarioGeneral2.Id;
         Test.startTest();
         system.runAs(usuarioGeneral){
-            Database.SaveResult resultado = Database.update(caso, false);
+            SAC_DatabaseDML.updateDML(caso, false);
+            //Database.SaveResult resultado = Database.update(caso, false);
         }
         Test.stopTest();
         

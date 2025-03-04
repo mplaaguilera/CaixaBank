@@ -1,286 +1,196 @@
 @isTest
 public with sharing class CSBD_ProductoOportunidadHija_Test {
+
     @TestSetup
-    static void data(){
-        User usuarioGestor = CSBD_Usuarios.usuarioGestor();
-        Account cuenta = crearCuentaContacto('12345678N');
-        User userPrueba = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1];
-        
-        AccountShare acshare = new AccountShare();
-        acshare.AccountId = cuenta.Id;
-        acshare.UserOrGroupId = userPrueba.Id;
-        acshare.AccountAccessLevel = 'Edit';
-        acshare.OpportunityAccessLevel = 'Edit';
-        acshare.CaseAccessLevel = 'Edit';
-        insert acshare;
-        
-        RecordType  listaValoresRT = [SELECT Id  FROM RecordType  WHERE DeveloperName   = 'CC_Lista_Valores'];
+    static void data() {
         CC_Lista_Valores__c listaValoresPrueba = new CC_Lista_Valores__c();
+        listaValoresPrueba.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         listaValoresPrueba.Name = 'CSBD: Acciones comerciales oportunidad';
         listaValoresPrueba.CC_Activa__c = true;
-        listaValoresPrueba.RecordTypeId = listaValoresRT.Id;
         insert listaValoresPrueba;
 
+		Id idRecordTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
         CC_Lista_Valores__c listaValoresPrueba1 = new CC_Lista_Valores__c();
+		listaValoresPrueba1.RecordTypeId = idRecordTypeValor;
         listaValoresPrueba1.Name = 'Valores test';
-        listaValoresPrueba1.CC_Valor2__c='Fondos';
-        listaValoresPrueba1.CC_Valor__c='Seguros';
+        listaValoresPrueba1.CC_Valor2__c = 'Fondos';
+        listaValoresPrueba1.CC_Valor__c = 'Seguros';
         listaValoresPrueba1.CC_Lista__c = listaValoresPrueba.Id;
         listaValoresPrueba1.CC_Valor_SFDC__c = 'Hipoteca';
         listaValoresPrueba1.CC_Activa__c = true;
-        insert listaValoresPrueba1;
-
         CC_Lista_Valores__c listaValoresPrueba2 = new CC_Lista_Valores__c();
+        listaValoresPrueba2.RecordTypeId = idRecordTypeValor;
         listaValoresPrueba2.Name = 'Valores test 2';
-        listaValoresPrueba2.CC_Valor2__c='MyBox Auto';
-        listaValoresPrueba2.CC_Valor__c='Hipotecas';
+        listaValoresPrueba2.CC_Valor2__c = 'MyBox Auto';
+        listaValoresPrueba2.CC_Valor__c = 'Hipotecas';
         listaValoresPrueba2.CC_Lista__c = listaValoresPrueba.Id;
         listaValoresPrueba2.CC_Valor_SFDC__c = 'Hipoteca';
         listaValoresPrueba2.CC_Activa__c = true;
-        insert listaValoresPrueba2;
+        insert new List<CC_Lista_Valores__c>{listaValoresPrueba1, listaValoresPrueba2};
     }
 
-    public static Account crearCuentaContacto(String nif) {
-        Account cuenta = new Account();
-        cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
-        cuenta.Name = 'test@test.com';
-        cuenta.CC_Numero_Documento__c = nif;
-        insert cuenta;
-        
-        Contact contacto = new Contact();
-        contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
-        contacto.Email = 'test@test.com';
-        contacto.FirstName = 'Nombre';
-        contacto.LastName = 'Apellido';
-        contacto.AccountId = cuenta.Id;
-        insert contacto;
-
-        return cuenta;
-    }
     @isTest
     private static void crearOportunidadesHijasTest() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1];
-        Account cuenta1 = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
-        
-        Opportunity oportunidadTest = new Opportunity();
-        oportunidadTest.Name='test';
-        oportunidadTest.stageName='Solicitud';
-        oportunidadTest.AccountId=cuenta1.Id;
-        oportunidadTest.OwnerId=usuarioGestor.Id;
-        insert oportunidadTest;
-        
-        Opportunity oportunidadTest1 = new Opportunity();
-        oportunidadTest1.Name='test';
-        oportunidadTest1.stageName='Rechazada';
-        oportunidadTest1.AccountId=cuenta1.Id;
-        oportunidadTest1.OwnerId=usuarioGestor.Id;
-        insert oportunidadTest1;
-        
-        Opportunity oportunidadTest2 = new Opportunity();
-        oportunidadTest2.Name='test';
-        oportunidadTest2.stageName='Formalizada';
-        oportunidadTest2.AccountId=cuenta1.Id;
-        oportunidadTest2.OwnerId=usuarioGestor.Id;
-        insert oportunidadTest2;
-        
-        List<String> productos = new List<String>{'MyBox Auto','Fondos'};
-        
-        System.runAs (usuarioGestor) {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+			Opportunity oportunidadTest = new Opportunity();
+			oportunidadTest.Name = 'test';
+			oportunidadTest.stageName = 'Solicitud';
+			Opportunity oportunidadTest1 = new Opportunity();
+			oportunidadTest1.Name = 'test';
+			oportunidadTest1.stageName = 'Rechazada';
+			Opportunity oportunidadTest2 = new Opportunity();
+			oportunidadTest2.Name = 'test';
+			oportunidadTest2.stageName = 'Formalizada';
+			insert new List<Opportunity>{oportunidadTest, oportunidadTest1, oportunidadTest2};
+
             Test.startTest();
+			List<String> productos = new List<String>{'MyBox Auto','Fondos'};
             CSBD_ProductoOportunidadHija.crearOportunidadesHijas(productos, oportunidadTest.StageName, oportunidadTest.Id,'Hipoteca', '');
             CSBD_ProductoOportunidadHija.crearOportunidadesHijas(productos, oportunidadTest1.StageName, oportunidadTest1.Id,'Hipoteca', 'Duplicada');
             CSBD_ProductoOportunidadHija.crearOportunidadesHijas(productos, oportunidadTest2.StageName, oportunidadTest2.Id,'Hipoteca', 'Duplicada');
-            List<Opportunity> oportunidadesHijas=[SELECT id,OwnerId,CSBD_Estado__c FROM Opportunity WHERE CSBD_Parent_Id__c = :oportunidadTest.Id];
-            Opportunity oportunidad1 = [SELECT Id, OwnerId, CSBD_Estado__c FROM Opportunity WHERE CSBD_Parent_Id__c = :oportunidadTest1.Id LIMIT 1];
-            List<Task> tareaCierre = [SELECT Id FROM Task WHERE WhatId = :oportunidad1.Id AND Subject = :oportunidad1.CSBD_Estado__c];  
-            system.assert(oportunidadesHijas.isEmpty()==false, 'No se han creado oportunidades hijas');
-            system.assert(tareaCierre.isEmpty()==false, 'No se ha creado tarea de cierre');
+            List<Opportunity> oportunidadesHijas = [SELECT OwnerId, CSBD_Estado__c FROM Opportunity WHERE CSBD_Parent_Id__c = :oportunidadTest.Id];
+            Opportunity oportunidad1 = [SELECT OwnerId, CSBD_Estado__c FROM Opportunity WHERE CSBD_Parent_Id__c = :oportunidadTest1.Id LIMIT 1];
+            List<Task> tareaCierre = [SELECT Id FROM Task WHERE WhatId = :oportunidad1.Id AND Subject = :oportunidad1.CSBD_Estado__c];
             Test.stopTest();
+
+            System.assert(!oportunidadesHijas.isEmpty(), 'No se han creado oportunidades hijas');
+            System.assert(!tareaCierre.isEmpty(), 'No se ha creado tarea de cierre');
         }
     }
 
     @isTest
     private static void cerrarOportunidadesHijasTest() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1];
-        Account cuenta1 = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
-        
-        Opportunity oportunidadTest = new Opportunity();
-        oportunidadTest.Name='test';
-        oportunidadTest.stageName='Solicitud';
-        oportunidadTest.AccountId=cuenta1.Id;
-        oportunidadTest.OwnerId=usuarioGestor.Id;
-        insert oportunidadTest;
-        
-        List<String> productos = new List<String>{'MyBox Auto','Fondos'};
-        CSBD_ProductoOportunidadHija.crearOportunidadesHijas(productos, oportunidadTest.StageName, oportunidadTest.Id,'Hipoteca', '');
-        
-        List<Opportunity> oportunidadPadre =[SELECT Id, OwnerId, CSBD_Estado__c, StageName, CSBD_Resolucion__c FROM Opportunity WHERE Id = :oportunidadTest.Id];
-        Map<Id, Opportunity> idOportunidad = new Map<Id, Opportunity>();
-        for(Opportunity oportunidad: oportunidadPadre) {
-            idOportunidad.put(oportunidad.Id, oportunidad);
-        }
-        CSBD_Opportunity.cerrarOportunidad(oportunidadTest.Id, 'Rechazada', 'No aplica');
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+			Opportunity padre = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial');
+			CSBD_ProductoOportunidadHija.crearOportunidadesHijas(new List<String>{'MyBox Auto', 'Fondos'}, padre.StageName, padre.Id, 'Hipoteca', '');
 
-        
-        System.runAs (usuarioGestor) {
-            Test.startTest();
-            CSBD_ProductoOportunidadHija.cerrarOportunidadesHijas(idOportunidad);
-            List<Opportunity> oportunidadesHijas=[SELECT Id FROM Opportunity WHERE CSBD_Parent_Id__c = :oportunidadTest.Id AND StageName = 'Rechazada' AND CSBD_Resolucion__c = 'No aplica' ];
-            System.assert(oportunidadesHijas.isEmpty()==false, 'No se han cerrado oportunidades hijas');
+			Test.startTest();
+			CSBD_Opportunity.cerrarOportunidad(padre.Id, 'Rechazada', 'No aplica');
+            CSBD_ProductoOportunidadHija.cerrarOportunidadesHijas(new Map<Id, Opportunity>{padre.Id => padre});
             Test.stopTest();
+
+            List<Opportunity> oportunidadesHijas = [SELECT Id FROM Opportunity WHERE CSBD_Parent_Id__c = :padre.Id AND StageName = 'Rechazada' AND CSBD_Resolucion__c = 'No aplica' ];
+            System.assert(!oportunidadesHijas.isEmpty(), 'No se han cerrado oportunidades hijas');
         }
     }
-    
+
     @isTest
     private static void obtenerProductosTest() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1];
-        
-        System.runAs (usuarioGestor) {
-            Test.startTest();
-            List<CC_Lista_Valores__c> listaValores= CSBD_ProductoOportunidadHija.obtenerProductos('Hipoteca');
-            system.assert(listaValores.isEmpty()==false, 'No hay productos disponibles');
-            Test.stopTest();
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+			Test.startTest();
+			List<CC_Lista_Valores__c> listaValores = CSBD_ProductoOportunidadHija.obtenerProductos('Hipoteca');
+			Test.stopTest();
+
+            System.assert(!listaValores.isEmpty(), 'No hay productos disponibles');
         }
     }
-    
+
     @isTest
     private static void obtenerOportunidadesHijasTest() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1];
-        Account cuenta1 = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N']; 
-        RecordType  accionComercialRT = [SELECT Id  FROM RecordType  WHERE DeveloperName   = 'CSBD_Accion_Comercial'];
-          
-        Opportunity oportunidadTest = new Opportunity();
-        oportunidadTest.Name='test';
-        oportunidadTest.stageName='Solicitud';
-        oportunidadTest.AccountId=cuenta1.Id;
-        oportunidadTest.OwnerId=usuarioGestor.Id;
-        insert oportunidadTest;
-        
-        Opportunity oportunidadTest1 = new Opportunity();
-        oportunidadTest1.Name='test';
-        oportunidadTest1.stageName='Solicitud';
-        oportunidadTest1.CSBD_Parent_Id__c=oportunidadTest.Id;
-        oportunidadTest1.AccountId=cuenta1.Id;
-        oportunidadTest1.RecordTypeId= accionComercialRT.Id;
-        oportunidadTest1.OwnerId=usuarioGestor.Id;
-        insert oportunidadTest1;
-        
-        System.runAs (usuarioGestor) {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+			Opportunity opp1 = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial');
+			Opportunity opp2 = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial', new Map<String, Object>{'CSBD_Parent_Id__c' => opp1.Id});
+
             Test.startTest();
-            List<Opportunity> oportunidadesHijas= CSBD_ProductoOportunidadHija.obtenerOportunidadesHijas(oportunidadTest.Id);
-            system.assert(oportunidadesHijas.isEmpty()==false, 'No hay oportunidades hijas');
+            System.assertEquals(1, CSBD_ProductoOportunidadHija.obtenerOportunidadesHijas(opp1.Id).size(), 'El número de oportunidades hijas debe ser 1');
             Test.stopTest();
         }
     }
-    
+
     @isTest
     private static void obtenerOportunidadesHijasAbiertasTest() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1];
-        RecordType  accionComercialRT = [SELECT Id  FROM RecordType  WHERE DeveloperName   = 'CSBD_Accion_Comercial'];
-        Account cuenta1 = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
-        
-        Opportunity oportunidadTest = new Opportunity();
-        oportunidadTest.Name='test';
-        oportunidadTest.stageName='Solicitud';
-        oportunidadTest.OwnerId = usuarioGestor.Id;
-        insert oportunidadTest;
-        
-        Opportunity oportunidadTest1 = new Opportunity();
-        oportunidadTest1.Name='test';
-        oportunidadTest1.stageName='Solicitud';
-        oportunidadTest1.CSBD_Parent_Id__c=oportunidadTest.Id;
-        oportunidadTest1.RecordtypeId = accionComercialRT.Id;
-        oportunidadTest1.AccountId=cuenta1.Id;
-        oportunidadTest1.OwnerId = usuarioGestor.Id;
-        insert oportunidadTest1;
-        
-        Opportunity oportunidadTest2 = new Opportunity();
-        oportunidadTest2.Name='test';
-        oportunidadTest2.stageName='Rechazada';
-        oportunidadTest2.CSBD_Parent_Id__c=oportunidadTest1.Id;
-        oportunidadTest2.RecordtypeId = accionComercialRT.Id;
-        oportunidadTest2.AccountId=cuenta1.Id;
-        oportunidadTest2.OwnerId = usuarioGestor.Id;
-        insert oportunidadTest2;
-        
-        System.runAs (usuarioGestor) {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+			Opportunity opp1 = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial');
+			Opportunity opp2 = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial', new Map<String, Object>{'CSBD_Parent_Id__c' => opp1.Id});
+			Opportunity opp3 = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial', new Map<String, Object>{'CSBD_Parent_Id__c' => opp2.Id});
+			CSBD_Opportunity.cerrarOportunidad(opp3.Id, 'Rechazada', 'resolución');
+
             Test.startTest();
-            Boolean oportunidadesHijasAbiertas= CSBD_ProductoOportunidadHija.obtenerOportunidadesHijasAbiertas(oportunidadTest.Id);
-            Boolean oportunidadesHijasAbiertas2= CSBD_ProductoOportunidadHija.obtenerOportunidadesHijasAbiertas(oportunidadTest1.Id);
-            system.assert(oportunidadesHijasAbiertas==true, 'No hay oportunidades hijas abiertas');
-            system.assert(oportunidadesHijasAbiertas2==false, 'Hay oportunidades hijas abiertas');
+            System.assert(CSBD_ProductoOportunidadHija.obtenerOportunidadesHijasAbiertas(opp1.Id), 'La oportunidad 1 sí tiene oportunidades hijas abiertas');
+            System.assert(!CSBD_ProductoOportunidadHija.obtenerOportunidadesHijasAbiertas(opp2.Id), 'La oportunidad 2 no tiene oportunidades hijas abiertas');
             Test.stopTest();
         }
     }
-   
+
     @isTest
     private static void crearTareaCambioEmpresaProveedoraTest() {
-        Account cuenta1 = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1];
+		System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+			Opportunity oportunidadTest = new Opportunity();
+			oportunidadTest.Name = 'test';
+			oportunidadTest.stageName = 'Solicitud';
+			oportunidadTest.CSBD_Empresa_Proveedora__c = 'CaixaBank';
+			insert oportunidadTest;
 
-        Opportunity oportunidadTest = new Opportunity();
-        oportunidadTest.Name='test';
-        oportunidadTest.stageName='Solicitud';
-        oportunidadTest.CSBD_Empresa_Proveedora__c='CaixaBank';
-        oportunidadTest.AccountId=cuenta1.Id;
-        oportunidadTest.OwnerId=usuarioGestor.Id;
-        insert oportunidadTest;
-        
-    	System.runAs (usuarioGestor) {
             Test.startTest();
-            oportunidadTest.CSBD_Empresa_Proveedora__c='imaginBank';
+            oportunidadTest.CSBD_Empresa_Proveedora__c = 'imaginBank';
             update oportunidadTest;
-            List<Task> tarea = [SELECT Subject,Description FROM Task  WHERE WhatId= : oportunidadTest.Id and Subject = 'Cambio empresa proveedora'];
-            System.assertEquals(tarea.isEmpty(),false, 'No se ha creado la tarea de Cambio empresa proveedora');
             Test.stopTest();
+
+            List<Task> tareas = [SELECT Id FROM Task WHERE WhatId = :oportunidadTest.Id AND Subject = 'Cambio empresa proveedora' LIMIT 1];
+            System.assert(!tareas.isEmpty(), 'No se ha creado la tarea de Cambio empresa proveedora');
         }
     }
-    
-    @isTest
-    private static void actualizarPropietarioOportunidadesHijasTest() {
-        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1];
-        Account cuenta1 = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
-        Contact contacto1 = [SELECT Id FROM Contact WHERE AccountId =: cuenta1.Id];
 
-        RecordType  accionComercialRT = [SELECT Id  FROM RecordType  WHERE DeveloperName   = 'CSBD_Accion_Comercial'];
-        Map<Id, Opportunity> mapaOportunidades= new Map<Id, Opportunity>();
-        Profile profileId = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        
-        User usuarioGestor2 = CSBD_Usuarios.usuarioGestor();
-        
-        AccountShare acshare = new AccountShare();
-        acshare.AccountId = cuenta1.Id;
-        acshare.UserOrGroupId = usuarioGestor2.Id;
-        acshare.AccountAccessLevel = 'Edit';
-        acshare.OpportunityAccessLevel = 'Edit';
-        acshare.CaseAccessLevel = 'Edit';
-        insert acshare;
-        
-        Opportunity oportunidadTest = new Opportunity();
-        oportunidadTest.Name='test';
-        oportunidadTest.stageName='Solicitud';
-        oportunidadTest.OwnerId = usuarioGestor.id;
-        oportunidadTest.AccountId=cuenta1.Id;
-        insert oportunidadTest;
-        mapaOportunidades.put(oportunidadTest.Id, oportunidadTest);
-        
-        Opportunity oportunidadTest1 = new Opportunity();
-        oportunidadTest1.Name='test';
-        oportunidadTest1.stageName='Solicitud';
-        oportunidadTest1.CSBD_Parent_Id__c=oportunidadTest.Id;
-        oportunidadTest1.RecordtypeId = accionComercialRT.Id;
-        oportunidadTest1.AccountId=cuenta1.Id;
-        insert oportunidadTest1;
-       
-        System.runAs (usuarioGestor2) {
+    @isTest
+    private static void actualizarPropietarioOportunidadesHijasFutureTest() {
+        User nuevoPropietario = CSBD_TestDataFactory.usuarioGestor();
+
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+			Opportunity padre = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca');
+			Opportunity hija = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial', new Map<String, Object>{'CSBD_Parent_Id__c' => padre.Id});
+
+            OpportunityShare oppSharePadre = new OpportunityShare();
+            oppSharePadre.UserOrGroupId = nuevoPropietario.Id;
+            oppSharePadre.OpportunityId = padre.Id;
+            oppSharePadre.OpportunityAccessLevel = 'Edit';
+            OpportunityShare oppShareHija = new OpportunityShare();
+            oppShareHija.UserOrGroupId = nuevoPropietario.Id;
+            oppShareHija.OpportunityId = hija.Id;
+            oppShareHija.OpportunityAccessLevel = 'Edit';
+            insert new List<OpportunityShare>{oppSharePadre, oppShareHija};
+
+			System.runAs(nuevoPropietario) {
+				Test.startTest();
+				padre.OwnerId = nuevoPropietario.Id;
+				update padre;
+				Test.stopTest();
+
+				Id hijaOwnerId = [SELECT OwnerId FROM Opportunity WHERE Id = :hija.Id].OwnerId;
+				System.assertEquals(nuevoPropietario.Id, hijaOwnerId, 'No se ha sincronizado el propietario de la oportunidad padre con el de las hijas');
+			}
+		}
+    }
+
+    @isTest
+    private static void searchAccounts() {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+            Account cuenta1 = new Account();
+            cuenta1.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            cuenta1.Name = 'JAIME MATEO';
+            Account cuenta2 = new Account();
+            cuenta2.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            cuenta2.Name = 'MATEO CARIDE';
+            insert new List<Account>{cuenta1, cuenta2};
+
             Test.startTest();
-            oportunidadTest.OwnerId= usuarioGestor2.Id;
-            update oportunidadTest;
-            Opportunity opp= [SELECT Id, OwnerId, CSBD_Parent_Id__c FROM Opportunity 
-                                                                WHERE CSBD_Parent_Id__c = :oportunidadTest.Id AND Recordtype.DeveloperName = 'CSBD_Accion_Comercial' AND IsClosed = false];
-            
-            System.assertEquals(oportunidadTest.OwnerId,opp.OwnerId, 'No se ha sincronizado el propietario de la oportunidad padre con el de las hijas');
+            Test.setFixedSearchResults(new List<Id>{cuenta1.Id, cuenta2.Id});
+            List<Account> cuentas = CSBD_ProductoOportunidadHija.searchAccounts('MATEO');
             Test.stopTest();
-       }
-    } 
+
+            System.assertEquals(2, cuentas.size(), 'Debería devolver 2 cuentas');
+        }
+    }
+
+    @isTest
+    private static void duplicarOpp() {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+            Opportunity opp1 = CSBD_Opportunity.crearOportunidad('CSBD_Accion_Comercial');
+
+            Test.startTest();
+            Opportunity opp2 = CSBD_ProductoOportunidadHija.duplicarOpp(opp1.Id, 'CSBD_Accion_Comercial', null);
+            Test.stopTest();
+
+            System.assert(opp2 != null, 'No se ha duplicado la oportunidad');
+        }
+    }
 }

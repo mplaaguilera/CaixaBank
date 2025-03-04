@@ -11,12 +11,9 @@ public with sharing class SPV_ContentVersionAITRHan extends CC_TriggerHandlerBas
         List<ContentVersion> listNewObjFiltrado = SPV_ContentVersionHelper.filtrarRTSPV(listNewObj, mapaDatosCasos);
 
         if(!listNewObjFiltrado.isEmpty()){
-            SPV_ContentVersionHelper.envioEER(listNewObjFiltrado);
-
             if(!mapaDatosCasos.isEmpty()){
                 SPV_ContentVersionHelper.alertaNuevaDocuReclamacion(listNewObjFiltrado, mapaDatosCasos);
             }
         }
-
     }
 }

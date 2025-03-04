@@ -17,24 +17,28 @@ public with sharing class SAC_LCMP_Derivar_Test {
 
         //Usuario SAC Admin
 		User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';      
-        Database.insert(usuarioAdmin);
+        usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);      
+        //Database.insert(usuarioAdmin);
 
         PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
         PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
         permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
         permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-        Database.insert(permiSetAssiAdmin);
+        SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false);
+        //Database.insert(permiSetAssiAdmin);
 
         //Usuario SAC General
-		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];   
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);   
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioAdmin){
             //EmailTemplate
@@ -45,7 +49,8 @@ public with sharing class SAC_LCMP_Derivar_Test {
             template.Name = 'test';
             template.Subject = 'testSubject';
             template.HtmlValue = 'test body';
-            Database.insert(template);
+            SAC_DatabaseDML.insertDML(template, false);
+            //Database.insert(template);
         }
         EmailTemplate template = [SELECT Id FROM EmailTemplate WHERE developerName = 'test'];
 
@@ -56,7 +61,8 @@ public with sharing class SAC_LCMP_Derivar_Test {
             plantillaRed.Name = 'testPlantillaRed';
             plantillaRed.SAC_TipoPlantilla__c = 'SAC_Derivacion';
             plantillaRed.SAC_PlantillaCastellanoId__c = template.Id;
-            Database.insert(plantillaRed);
+            SAC_DatabaseDML.insertDML(plantillaRed, false);
+            //Database.insert(plantillaRed);
 
             //Grupos
             List<CC_Grupo_Colaborador__c> listaGrupos = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor',2);
@@ -77,14 +83,16 @@ public with sharing class SAC_LCMP_Derivar_Test {
             listaGrupos[1].SAC_PlantillaReclamacionId__c = template.Id;
             listaGrupos[1].SAC_PlantillaReclamante__c = plantillaRed.Id;
 
-            Database.insert(listaGrupos);  
+            SAC_DatabaseDML.insertListDML(listaGrupos, false);
+            //Database.insert(listaGrupos);  
         }
 		
         System.runAs(usuarioGeneral){
-            Test.startTest();
             //Account
             Account cuenta = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
-            Database.insert(cuenta);
+            SAC_DatabaseDML.insertDML(cuenta, false);
+            //Database.insert(cuenta);
+            Test.startTest();
 
             //Reclamacion
             Map<String, Object> camposRecl = new Map<String, Object>();
@@ -93,14 +101,16 @@ public with sharing class SAC_LCMP_Derivar_Test {
             camposRecl.put('CC_Idioma__c', 'es');
 
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+            //Database.insert(reclamacion);
 
             //Consulta
             Map<String, Object> camposCons = new Map<String, Object>();
             camposCons.put('Subject', 'consulta');
 
             Case consulta = SAC_TestDataFactory.crearCaso('Consulta',camposCons);
-            Database.insert(consulta);
+            SAC_DatabaseDML.insertDML(consulta, false);
+            //Database.insert(consulta);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -108,28 +118,45 @@ public with sharing class SAC_LCMP_Derivar_Test {
             camposPret.put('SAC_Reclamacion__c', reclamacion.Id);
 
             Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-            Database.insert(pretension);  
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);  
 
             //Acciones (tareas)
             SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1,reclamacion,false)[0];
             tarea.SAC_Observaciones__c ='tareaTest'; 
             tarea.SAC_PlazoMaximo__c = 10; 
             tarea.SAC_Prorroga__c = 5;
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
 
             //Ficheritos (ContentVersion)
             ContentVersion cv = SAC_TestDataFactory.crearContentVersion(reclamacion);
-            Database.insert(cv);
+            SAC_DatabaseDML.insertDML(cv, false);
+            //Database.insert(cv);
 
+            List<CC_Grupo_Colaborador__c> listaGrupos1 = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1);
+            listaGrupos1[0].Name = 'grupo de tareas';
+            listaGrupos1[0].SAC_PermiteTareas__c = true;
+            SAC_DatabaseDML.insertListDML(listaGrupos1, true);
             
+            SAC_MaestroAccionesReclamacion__c maestroTareaAutomatica = SAC_TestDataFactory.crearMaestroAcciones(1,listaGrupos1[0].Id)[0];
+            maestroTareaAutomatica.SAC_DeveloperName__c ='SAC_ImprimirCartasOrdinario';
+            SAC_DatabaseDML.insertDML(maestroTareaAutomatica, true);
+
             //Email Backlist
             SAC_MaestroTemas__c maestroTema = new SAC_MaestroTemas__c();
             maestroTema.Name ='emailtest@prueba.com';
             maestroTema.SAC_Activo__c = true;
             maestroTema.RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SAC_BlackListEmails').getRecordTypeId();
-            Database.insert(maestroTema);
+            SAC_DatabaseDML.insertDML(maestroTema, false);
+            //Database.insert(maestroTema);
+
+            SAC_DocumentoEnvio__c carta = new SAC_DocumentoEnvio__c(SAC_TipoDocumento__c = 'derivación', SAC_Caso__c = reclamacion.Id, SAC_Documento__c = null);
+
+            SAC_DatabaseDML.insertDML(carta, false);
 
             Test.stopTest();
+
         }
     }
 
@@ -307,5 +334,21 @@ public with sharing class SAC_LCMP_Derivar_Test {
         }
         System.assertEquals('emailtest@prueba.com', result, 'No coincide');
         Test.stopTest();
+    }
+
+    
+    @isTest
+    static void crearCartaPostalCVTest() {
+        User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'testRec1'];
+        ContentVersion content;
+
+        System.runAs(usuarioGeneral){
+            Test.startTest();
+            SAC_LCMP_Derivar.crearCartaPostalCV(caso.Id);
+            content = [SELECT Id, PathOnClient FROM ContentVersion WHERE FirstPublishLocationId =: caso.id LIMIT 1];
+            Test.stopTest();
+        }
+        System.assertNotEquals('SampleTitle.pdf', content.PathOnClient, 'Fallo en la obtencion del path del cliente');
     }
 }

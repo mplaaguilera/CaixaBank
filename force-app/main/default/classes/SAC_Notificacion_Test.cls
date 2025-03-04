@@ -31,7 +31,8 @@ public with sharing class SAC_Notificacion_Test {
       
       listaGrupos.add(grupoColaborador);
       listaGrupos.add(grupoColaborador2);
-      Database.insert(listaGrupos);
+      SAC_DatabaseDML.insertListDML(listaGrupos, false);
+      //Database.insert(listaGrupos);
 
       //Usuarios
       List<User> listaUsers = new List<User>();
@@ -50,7 +51,8 @@ public with sharing class SAC_Notificacion_Test {
          usuarioGeneral2.Username = 'usergeneralSAC2@test.com';
          usuarioGeneral2.SAC_GruposPerteneciente__c = grupoColaborador.id;     
          listaUsers.add(usuarioGeneral2);
-         Database.insert(listaUsers);
+         SAC_DatabaseDML.insertListDML(listaUsers, false);
+         //Database.insert(listaUsers);
 
          //Permisos
          PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
@@ -64,7 +66,8 @@ public with sharing class SAC_Notificacion_Test {
          permiSetAssi2.AssigneeId = usuarioGeneral2.Id;
          permiSetAssi2.PermissionSetId = permiSet2.Id;
          permisos.add(permiSetAssi2);
-         Database.insert(permisos);
+         SAC_DatabaseDML.insertListDML(permisos, false);
+         //Database.insert(permisos);
 
          //Grupo colaborador contact
          List<CC_Grupo_Colaborador_Contact__c> listaColabContact = new List<CC_Grupo_Colaborador_Contact__c>();
@@ -76,18 +79,21 @@ public with sharing class SAC_Notificacion_Test {
          grupoColaboradorContact2.SAC_Administrador__c = true;
          listaColabContact.add(grupoColaboradorContact2);
 
-         Database.insert(listaColabContact);
+         SAC_DatabaseDML.insertListDML(listaColabContact, false);
+         //Database.insert(listaColabContact);
       }
            
       //MCCs
       CC_MCC__c mccDetalle = new CC_MCC__c(Name='Prueba', CC_Codigo_Externo__c='a', RecordTypeId=recordTypeIdMCCSAC, CC_Tipo_Cliente__c='SAC');
-      Database.upsert(mccDetalle);
+      SAC_DatabaseDML.upsertDML(mccDetalle, false);
+      //Database.upsert(mccDetalle);
 
       SAC_ParametrizacionSLATME__c parametrizacion1 = SAC_TestDataFactory.crearParamsSla('Regulatorio', 1)[0];
       parametrizacion1.SAC_Duracion__c = 3;
       parametrizacion1.SAC_MCC__c = mccDetalle.Id; 
       parametrizacion1.SAC_CanalProcedencia__c = ''; 
-      Database.upsert(parametrizacion1);
+      SAC_DatabaseDML.upsertDML(parametrizacion1, false);
+      //Database.upsert(parametrizacion1);
 
       //Cuentas
       Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
@@ -97,10 +103,12 @@ public with sharing class SAC_Notificacion_Test {
       cuenta.billingStreet  = 'Calle Mayor 55';
       cuenta.BillingCountry = 'España';
       cuenta.OwnerId = usuarioGeneral.id;
-      Database.insert(cuenta);
+      SAC_DatabaseDML.insertDML(cuenta, false);
+      //Database.insert(cuenta);
 
       Account cuentaOfi = SAC_TestDataFactory.crearCuentasOficina(1)[0];
-      Database.insert(cuentaOfi);
+      SAC_DatabaseDML.insertDML(cuentaOfi, false);
+      //Database.insert(cuentaOfi);
 
       Test.startTest();
 
@@ -165,7 +173,8 @@ public with sharing class SAC_Notificacion_Test {
       Case caso5 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl5);
       misCasos.add(caso5); 
 
-      Database.insert(misCasos);
+      SAC_DatabaseDML.insertListDML(misCasos, false);
+      //Database.insert(misCasos);
 
       
 
@@ -195,7 +204,8 @@ public with sharing class SAC_Notificacion_Test {
       Case casoPret2 = SAC_TestDataFactory.crearCaso('Pretension', camposPret2);
       listaPrets.add(casoPret2);
 
-      Database.insert(listaPrets);
+      SAC_DatabaseDML.insertListDML(listaPrets, false);
+      //Database.insert(listaPrets);
 
 
       //Test.startTest();
@@ -210,7 +220,8 @@ public with sharing class SAC_Notificacion_Test {
       camposEsc.put('SAC_Estado__c', 'SAC_PendienteRespuesta');
       
       SAC_Interaccion__c escalado = SAC_TestDataFactory.crearInteraccion('Escalado',camposEsc);
-      Database.insert(escalado);
+      SAC_DatabaseDML.insertDML(escalado, false);
+      //Database.insert(escalado);
 
       //Parametrización escalado
       Map<String, Object> camposParam = new Map<String, Object>();
@@ -225,13 +236,15 @@ public with sharing class SAC_Notificacion_Test {
       camposParam.put('SAC_validarImporte__c', false);
       
       SAC_ParametrizacionEscalado__c parametrizacionEscalado = SAC_TestDataFactory.crearParamEsc(camposParam);
-      Database.insert(parametrizacionEscalado);
+      SAC_DatabaseDML.insertDML(parametrizacionEscalado, false);
+      //Database.insert(parametrizacionEscalado);
 
       //Acciones
       SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas (1, caso, false)[0];
       tarea.SAC_Descripcion__c = 'tareaTest1';
       tarea.OwnerId = usuarioGeneral2.Id;
-      Database.insert(tarea);
+      SAC_DatabaseDML.insertDML(tarea, false);
+      //Database.insert(tarea);
       
       //Interaccion Consulta
       Map<String, Object> camposCons = new Map<String, Object>();
@@ -240,7 +253,8 @@ public with sharing class SAC_Notificacion_Test {
       camposCons.put('OwnerId', usuarioGeneral.id);
 
       SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
-      Database.insert(consulta);
+      SAC_DatabaseDML.insertDML(consulta, false);
+      //Database.insert(consulta);
 
       Test.stopTest();
    }
@@ -257,9 +271,12 @@ public with sharing class SAC_Notificacion_Test {
          caso.OS_SLA_Completado__c = '48RegulatorioEntitlement';
          caso2.OS_SLA_Completado__c = '24RegulatorioEntitlement';
          caso3.OS_SLA_Completado__c = '48LetradoEntitlement';
-         Database.update(caso);
-         Database.update(caso2);
-         Database.update(caso3);
+         SAC_DatabaseDML.updateDML(caso, false);
+         //Database.update(caso);
+         SAC_DatabaseDML.updateDML(caso2, false);
+         //Database.update(caso2);
+         SAC_DatabaseDML.updateDML(caso3, false);
+         //Database.update(caso3);
       }
 
       Case casoActualizado = [SELECT id, OS_SLA_Completado__c  FROM Case WHERE Subject = 'reclamacion1' LIMIT 1];
@@ -278,7 +295,8 @@ public with sharing class SAC_Notificacion_Test {
          caso.Status = 'SAC_008';
          caso.SAC_StatusAuxiliar__c = 'SAC_008';
 
-         Database.update(caso);
+         SAC_DatabaseDML.updateDML(caso, false);
+         //Database.update(caso);
       }
 
       Case casoFinal = [SELECT Id, Status FROM Case WHERE Subject = 'reclamacion1'];
@@ -346,7 +364,8 @@ public with sharing class SAC_Notificacion_Test {
       }
       reclamacion.CC_Oficina_Afectada_Lookup__c = cuentaOfi.id;
          
-      Database.update(reclamacion);
+      SAC_DatabaseDML.updateDML(reclamacion, false);
+      //Database.update(reclamacion);
 
       Case casoFinal = [SELECT Id, Status FROM Case WHERE Subject = 'recPrueba' LIMIT 1];
       System.assertEquals('SAC_004', casoFinal.Status, 'No se ha podido notificar el cambio de redacción a ejecución');
@@ -363,7 +382,8 @@ public with sharing class SAC_Notificacion_Test {
          caso.Status = 'SAC_001';
          caso.SAC_StatusAuxiliar__c = 'SAC_001';
 
-         Database.update(caso);
+         SAC_DatabaseDML.updateDML(caso, false);
+         //Database.update(caso);
       }
 
       Case casoFinal = [SELECT Id, Status FROM Case WHERE Subject = 'recPrueba2' LIMIT 1];
@@ -384,7 +404,8 @@ public with sharing class SAC_Notificacion_Test {
          consulta.recordTypeId = recTypeConsulta;
          consulta.SAC_Reclamacion__c = reclamacion.Id;
          
-         Database.insert(consulta);
+         SAC_DatabaseDML.insertDML(consulta, false);
+         //Database.insert(consulta);
 
          SAC_Interaccion__c consultaFinal = [SELECT Id FROM SAC_Interaccion__c WHERE SAC_Reclamacion__c = :reclamacion.Id LIMIT 1];
          System.assertEquals(consulta.Id, consultaFinal.Id, 'no se ha podido notificar la inserción de la consulta');
@@ -405,7 +426,8 @@ public with sharing class SAC_Notificacion_Test {
          casoNuevo.AccountId = caso.AccountId;
          casoNuevo.Subject = 'nueva Rec';
 
-         Database.insert(casoNuevo);
+         SAC_DatabaseDML.insertDML(casoNuevo, false);
+         //Database.insert(casoNuevo);
       }
 
       Case casoFinal = [SELECT Id, Subject FROM Case WHERE Subject = 'nueva Rec'];
@@ -423,7 +445,8 @@ public with sharing class SAC_Notificacion_Test {
          escalado.SAC_Estado__c = 'SAC_Atendida';
          escalado.SAC_ImporteAutorizado__c = 20;
 
-         Database.update(escalado);
+         SAC_DatabaseDML.updateDML(escalado, false);
+         //Database.update(escalado);
       }
 
       SAC_Interaccion__c escaladoFinal = [SELECT Id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'propuesta test'];
@@ -440,7 +463,8 @@ public with sharing class SAC_Notificacion_Test {
 
       system.runAs(usuario) {
          tarea.SAC_Estado__c = 'SAC_FinalizadaIncompleta';
-         Database.update(tarea);
+         SAC_DatabaseDML.updateDML(tarea, false);
+         //Database.update(tarea);
       }
 
       SAC_Accion__c tareaFinal = [SELECT Id, OwnerId, SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Descripcion__c = 'tareaTest1' LIMIT 1];
@@ -457,7 +481,8 @@ public with sharing class SAC_Notificacion_Test {
 
       System.runAs(usuario2){
          caso.OwnerId = usuario.Id;
-         Database.update(caso);
+         SAC_DatabaseDML.updateDML(caso, false);
+         //Database.update(caso);
 
       }
 
@@ -475,7 +500,8 @@ public with sharing class SAC_Notificacion_Test {
 
       System.runAs(usuario){
          caso.OwnerId = usuario2.Id;
-         Database.update(caso);
+         SAC_DatabaseDML.updateDML(caso, false);
+         //Database.update(caso);
 
       }
 
@@ -492,7 +518,8 @@ public with sharing class SAC_Notificacion_Test {
 
       System.runAs(usuario){
          consulta.SAC_Estado__c = 'SAC_Resuelta';
-         Database.update(consulta);
+         SAC_DatabaseDML.updateDML(consulta, false);
+         //Database.update(consulta);
       }
 
       SAC_Interaccion__c consultaResult = [SELECT Id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'titulo test'];

@@ -31,7 +31,7 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
 		if (!carpeta.isEmpty()) {
 			idCarpeta = carpeta[0].Id;
 		} else if (Test.isRunningTest()) {
-			idCarpeta = [SELECT Id FROM User WHERE Id = :UserInfo.getUserId()].Id;
+			idCarpeta = [SELECT Id FROM User WHERE Id = :UserInfo.getUserId()]?.Id;
 		}
 
 		if (idCarpeta == null) {
@@ -48,17 +48,17 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
 		retorno.put('subcarpetas', new List<Folder>());
 		retorno.put('plantillas', new List<EmailTemplate>());
 
-		SObject carpeta;
+		List<Object> carpeta;
 		if (Test.isRunningTest()) {
-			carpeta = [SELECT Name FROM User WHERE Id = :idCarpeta];
+			carpeta = [SELECT Name FROM User WHERE Id = :idCarpeta LIMIT 1];
 		} else {
-			carpeta = [SELECT Name FROM Folder WHERE Id = :idCarpeta];
+			carpeta = [SELECT Name FROM Folder WHERE Id = :idCarpeta LIMIT 1];
 		}
 
 		if (idCarpeta == null) {
 			return retorno;
 		} else {
-			retorno.put('carpeta', carpeta);
+			retorno.put('carpeta', !carpeta.isEmpty() ? carpeta[0] : '');
 
 			List<Folder> subcarpetas = [SELECT Name, ParentId FROM Folder WHERE ParentId = :idCarpeta ORDER BY Name ASC];
 			retorno.put('subcarpetas', subcarpetas);
@@ -73,61 +73,40 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
     
     @AuraEnabled
     public static WrapperTemplate obtenerDatosTemplate(String idPlantilla, String recordId) {
-        String idiomaCaso = [SELECT CC_Idioma__c FROM Case WHERE Id = :recordId].CC_Idioma__c;
+        String idiomaCaso = [SELECT CC_Idioma__c FROM Case WHERE Id = :recordId]?.CC_Idioma__c;
         EmailTemplate plantillaSeleccionada = new EmailTemplate();
         EmailTemplate plantillaHeader = new EmailTemplate();
         EmailTemplate plantillaFooter = new EmailTemplate();
-        EmailTemplate plantillaEncabezado = new EmailTemplate();
-        EmailTemplate plantillaPieFirma = new EmailTemplate();
-        EmailTemplate plantillaFirma = new EmailTemplate();
+        Id plantillaEncabezado;
+        Id plantillaPieFirma;
+        Id plantillaFirma;
         List<EmailTemplate> lstPlantillas = new List<EmailTemplate>();
-        String encabezado;
-        String pieFirma;
-        String firma;
-        if (idiomaCaso == 'es') { // Castellano
-            encabezado = 'CC_Encabezado_Correo_Postal_CAS';
-            pieFirma = 'CC_Pie_Firma_Correo_Postal_CAS';
-            firma = 'CC_Firma_Correo_Postal_CAS';
-        } else if (idiomaCaso == 'ca') { // Catalán
-            encabezado = 'CC_Encabezado_Correo_Postal_CAT';
-            pieFirma = 'CC_Pie_Firma_Correo_Postal_CAT';
-            firma = 'CC_Firma_Correo_Postal_CAT';
-        } else if (idiomaCaso == 'eu') { // Euskera
-            encabezado = 'CC_Encabezado_Correo_Postal_EU';
-            pieFirma = 'CC_Pie_Firma_Correo_Postal_EU';
-            firma = 'CC_Firma_Correo_Postal_EU';
-        } else if (idiomaCaso == 'va') { // Valenciano
-            encabezado = 'CC_Encabezado_Correo_Postal_VA';
-            pieFirma = 'CC_Pie_Firma_Correo_Postal_VA';
-            firma = 'CC_Firma_Correo_Postal_VA';
-        } else if (idiomaCaso == 'ga') { // Gallego
-            encabezado = 'CC_Encabezado_Correo_Postal_GA';
-            pieFirma = 'CC_Pie_Firma_Correo_Postal_GA';
-            firma = 'CC_Firma_Correo_Postal_GA';
-        } else { //Inglés y otros idiomas
-            encabezado = 'CC_Encabezado_Correo_Postal_EN';
-            pieFirma = 'CC_Pie_Firma_Correo_Postal_EN';
-            firma = 'CC_Firma_Correo_Postal_EN';
-        }
+
+        Map<String,String> deveoperNames = recuperarDeveloperNamePlantillas(!String.isEmpty(idiomaCaso) ? idiomaCaso : 'es');
+
+        String encabezado = deveoperNames.get('encabezado');
+        String pieFirma = deveoperNames.get('pieFirma');
+        String firma = deveoperNames.get('firma');
+        String footer = deveoperNames.get('footer');
 
         if (Schema.sObjectType.EmailTemplate.isAccessible()){
-            lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName, Folder.DeveloperName FROM EmailTemplate WHERE Id =: idPlantilla OR Developername IN ('CC_Header','CC_Footer',:encabezado,:pieFirma,:firma)];
+            lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName, Folder.DeveloperName FROM EmailTemplate WHERE Id =: idPlantilla OR Developername IN ('CC_Header',:footer,:encabezado,:pieFirma,:firma)];
         }
-        
+
         if(lstPlantillas != null && !lstPlantillas.isEmpty()) {
             for(EmailTemplate em : lstPlantillas) {
                 if(em.id == idPlantilla) {
                     plantillaSeleccionada = em;
                 } else if(em.DeveloperName == 'CC_Header') {
                     plantillaHeader = em;
-                } else if(em.DeveloperName == 'CC_Footer') {
+                } else if(em.DeveloperName == footer) {
                     plantillaFooter = em;
                 } else if (em.DeveloperName == encabezado) {
-                    plantillaEncabezado = em;
+                    plantillaEncabezado = em.Id;
                 } else if (em.DeveloperName == pieFirma) {
-                    plantillaPieFirma = em;
+                    plantillaPieFirma = em.Id;
                 } else if (em.DeveloperName == firma) {
-                    plantillaFirma = em;
+                    plantillaFirma = em.Id;
                 }
             }
         }
@@ -136,25 +115,47 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
         body.add(plantillaSeleccionada.HtmlValue);
         
         try{
-            Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(idPlantilla, UserInfo.getUserId(), recordId); 
-            String cuerpoEmail = renderStored.getHtmlBody();
+            //Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(idPlantilla, UserInfo.getUserId(), recordId);
+            String cuerpoEmail = cuerpoPlantilla(idPlantilla,recordId);
+            //Messaging.SingleEmailMessage renderStoredEncabezado = Messaging.renderStoredEmailTemplate(plantillaEncabezadoId, UserInfo.getUserId(), recordId);
+            String encabezadoEmail = plantillaEncabezado != null ? cuerpoPlantilla(plantillaEncabezado,recordId) : '';
+            String plantillaPieFirmaEmail = plantillaPieFirma != null ? cuerpoPlantilla(plantillaPieFirma,recordId) : '';
+            String plantillaFirmaEmail = plantillaFirma != null ? cuerpoPlantilla(plantillaFirma,recordId) : '';
+
             WrapperTemplate datosTemplate;
             if(!Test.isRunningTest()) {
                 datosTemplate = new WrapperTemplate(
                     cuerpoEmail,
                     plantillaHeader != null ? plantillaHeader.HtmlValue : null,
                     plantillaFooter != null ? plantillaFooter.HtmlValue : null,
-                    plantillaEncabezado != null ? plantillaEncabezado.HtmlValue : null,
-                    plantillaPieFirma != null ? plantillaPieFirma.HtmlValue : null,
-                    plantillaFirma != null ? plantillaFirma.HtmlValue : null
+                    plantillaEncabezado != null ? encabezadoEmail : null,
+                    plantillaPieFirma != null ? plantillaPieFirmaEmail : null,
+                    plantillaFirma != null ? plantillaFirmaEmail : null
                 );
             } else {
                 datosTemplate = new WrapperTemplate(cuerpoEmail, 'Header', 'Footer', '', '', '');
             }
             return datosTemplate;
         } catch (Exception e) {
-            throw new AuraHandledException('La plantilla seleccionada no puede aplicarse debido a que no tiene relación con el objeto actual.');
+            throw new AuraHandledException('La plantilla seleccionada no puede aplicarse debido a que no tiene relación con el objeto actual.' + e.getMessage());
         }
+    }
+    @AuraEnabled(cacheable=true)
+	public static Map<String,String> recuperarDeveloperNamePlantillas(String idioma) {
+        Map<String,String> developerNamePlantillas = new Map<String,String>();
+        
+        String subfijo = idioma == 'ca' ? 'CAT' :  idioma == 'eu' ? 'EU':  idioma == 'va' ? 'VA' :  idioma == 'ga' ? 'GA' :  idioma == 'en' ? 'EN' : 'CAS';
+        
+        developerNamePlantillas.put('encabezado','CC_Encabezado_Correo_Postal_'+subfijo);
+        developerNamePlantillas.put('pieFirma','CC_Pie_Firma_Correo_Postal_'+subfijo);
+        developerNamePlantillas.put('firma','CC_Firma_Correo_Postal_'+subfijo);
+        if(subfijo != 'CAS'){
+            developerNamePlantillas.put('footer','CC_Footer_'+subfijo);
+        }else{
+            developerNamePlantillas.put('footer','CC_Footer');
+        }
+
+        return developerNamePlantillas;
     }
     
     

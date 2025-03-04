@@ -18,14 +18,14 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
 
         //Usuario Admin
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
         User usuario = new User();
         System.RunAs(usuarioAdmin) {
             usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
             usuario.Username = 'ustestesteo@test.com'; 
             usuario.UserRoleId = uRole.id;      
-            Database.insert(usuario);
+            SAC_DatabaseDML.insertDML(usuario, false);
         }
         Test.stopTest();
 
@@ -40,7 +40,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         Name = 'Avales MCC Clase Test',
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-0101');
-        Database.insert(mccTematica1);
+        SAC_DatabaseDML.insertDML(mccTematica1, false);
 
         CC_MCC__c mccProdServ1 = new CC_MCC__c(
         RecordTypeId = recTypeProdServ,
@@ -48,7 +48,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-010101',
         CC_Tematica__c = mccTematica1.id);
-        Database.insert(mccProdServ1);
+        SAC_DatabaseDML.insertDML(mccProdServ1, false);
 
         CC_MCC__c mccMotivo1 = new CC_MCC__c(
         RecordTypeId = recTypeMotivo,
@@ -56,7 +56,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Producto_Servicio__c = mccProdServ1.id,
         CC_Codigo_Externo__c = 'TEST-0102');
-        Database.insert(mccMotivo1);
+        SAC_DatabaseDML.insertDML(mccMotivo1, false);
 
         CC_MCC__c mccDetalle2 = new CC_MCC__c(
         RecordTypeId = recTypeDetalle,
@@ -65,7 +65,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         CC_Codigo_Externo__c = 'TEST-010101012',
         CC_Motivo__c = mccMotivo1.id,
         SAC_GenerarTaskMisClientes__c = true);
-        Database.insert(mccDetalle2);
+        SAC_DatabaseDML.insertDML(mccDetalle2, false);
 
         //GRUPOS
         List<CC_Grupo_Colaborador__c> listGrupos = new List<CC_Grupo_Colaborador__c>();
@@ -81,11 +81,11 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         grupoResp.OwnerId = usuario.id;
         grupoResp.SAC_DeveloperName__c = 'COPS';
         listGrupos.add(grupoResp);
-        Database.insert(listGrupos);
+        SAC_DatabaseDML.insertListDML(listGrupos, false);
 
         CC_Grupo_Colaborador_Contact__c grupoColaboradorContact = SAC_TestDataFactory.crearColaboradorContact(usuario.Id,listGrupos[0].Id);
         grupoColaboradorContact.SAC_Auditor__c = true;
-        Database.insert(grupoColaboradorContact);
+        SAC_DatabaseDML.insertDML(grupoColaboradorContact, false);
 
         // CC_Grupo_Colaborador_Contact__c grupoColaboradorContact2 = SAC_TestDataFactory.crearColaboradorContact(usuario.Id,listGrupos[1].Id);
         // grupoColaboradorContact2.SAC_Auditor__c = true;
@@ -122,7 +122,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         
         Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
         lstRecl.add(casoReclamacion2);
-        Database.insert(lstRecl);
+        SAC_DatabaseDML.insertListDML(lstRecl, false);
 
 
         //PRETENSION 1
@@ -139,7 +139,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         camposPret.put('SEG_Detalle__c', mccDetalle2.Id);
         
         Case casoPretension1 = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(casoPretension1);
+        SAC_DatabaseDML.insertDML(casoPretension1, false);
 
 
         //AUDITORIA
@@ -149,7 +149,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         auditoriaPadre.SAC_DictamenManual__c = 'SAC_Pendiente';
         auditoriaPadre.RecordTypeId = Schema.SObjectType.SEG_Auditoria__c.getRecordTypeInfosByDeveloperName().get('SAC_AuditoriaGeneral').getRecordTypeId();
         auditoriaPadre.OwnerId = usuario.Id;
-        Database.insert(auditoriaPadre);
+        SAC_DatabaseDML.insertDML(auditoriaPadre, false);
 
         //AUDITORIA
         SEG_Auditoria__c auditoria = new SEG_Auditoria__c();
@@ -160,7 +160,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         auditoria.SAC_AuditoriaGeneral__c = auditoriaPadre.Id;
         auditoria.RecordTypeId = Schema.SObjectType.SEG_Auditoria__c.getRecordTypeInfosByDeveloperName().get('SAC_Auditoria').getRecordTypeId();
         auditoria.OwnerId = usuario.Id;
-        Database.insert(auditoria);
+        SAC_DatabaseDML.insertDML(auditoria, false);
 
         //AUDITORIA
         SEG_Auditoria__c auditoriaFin = new SEG_Auditoria__c();
@@ -172,7 +172,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         auditoriaFin.SAC_Observaciones__c = 'Obs prueba';
         auditoriaFin.SAC_Replica__c = 'Replica prueba';
         auditoriaFin.OwnerId = usuario.Id;
-        Database.insert(auditoriaFin);
+        SAC_DatabaseDML.insertDML(auditoriaFin, false);
 
         //AUDITORIA COMPLETADA
         SEG_Auditoria__c auditoriaCompletada = new SEG_Auditoria__c();
@@ -185,13 +185,13 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         auditoriaCompletada.RecordTypeId = Schema.SObjectType.SEG_Auditoria__c.getRecordTypeInfosByDeveloperName().get('SAC_Auditoria').getRecordTypeId();
         auditoriaCompletada.SAC_Observaciones__c = 'Obs prueba completada';
         auditoriaCompletada.OwnerId = usuario.Id;
-        Database.insert(auditoriaCompletada);
+        SAC_DatabaseDML.insertDML(auditoriaCompletada, false);
 
         System.runAs(usuario) {
             EmailMessage em  = new EmailMessage();
             em.relatedtoId = auditoriaPadre.Id;
             em.Subject = 'emTestAuditoria';
-            Database.insert(em);
+            SAC_DatabaseDML.insertDML(em, false);
         }
     }
 
@@ -342,7 +342,8 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
-        Database.insert(lstPsAssigment);
+        SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
+
         Case caso = [SELECT id, SEG_SRAuditoria__c  FROM Case WHERE Subject = 'TestRec' limit 1];
 
         System.RunAs(usuario){
@@ -367,7 +368,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
-        Database.insert(lstPsAssigment);
+        SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         System.RunAs(usuario){
             infoAuditoria = SAC_LCMP_AuditoriasController.getAuditoriaReclamacion(caso);
@@ -390,7 +391,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
-        Database.insert(lstPsAssigment);
+        SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         System.RunAs(usuario){
             SAC_LCMP_AuditoriasController.finalizarAuditoriaReclamacion(caso, audi.id);
@@ -430,7 +431,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
-        Database.insert(lstPsAssigment);
+        SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         System.RunAs(usuario){
             SAC_LCMP_AuditoriasController.replicarAuditoriaReclamacion(caso, audi.id);
@@ -451,7 +452,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
-        Database.insert(lstPsAssigment);
+        SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         SEG_Auditoria__c auditoriaPadre = [SELECT Id FROM SEG_Auditoria__c WHERE SAC_NombreAuditoria__c = 'AuditoriaPadreTest' LIMIT 1];
         List<EmailMessage> listaEM = new List<EmailMessage>();
@@ -475,7 +476,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
-        Database.insert(lstPsAssigment);
+        SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         SEG_Auditoria__c audi = [SELECT Id FROM SEG_Auditoria__c WHERE SAC_NombreAuditoria__c = 'AuditoriaTest' LIMIT 1];
         Boolean envioEmail;
@@ -499,7 +500,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
-        Database.insert(lstPsAssigment);
+        SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         SEG_Auditoria__c audi = [SELECT Id FROM SEG_Auditoria__c WHERE SAC_NombreAuditoria__c = 'AuditoriaTest' LIMIT 1];
 
@@ -507,8 +508,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
             SAC_LCMP_AuditoriasController.enviarEmailsAuditores(audi.Id);
         }
 
-        List<EmailMessage> listaEmailMsgFinal  = [SELECT Id FROM EmailMessage WHERE CreatedDate = TODAY];     
-        Assert.areNotEqual(0, listaEmailMsgFinal.size(), 'No se ha podido efectuar el envío de email');
+        Assert.areNotEqual(0, [SELECT Count() FROM EmailMessage WHERE CreatedDate = TODAY], 'No se ha podido efectuar el envío de email');
         Test.stopTest();
     }
 
@@ -523,7 +523,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
-        Database.insert(lstPsAssigment);
+        SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         System.runAs(usuario) {
             SAC_LCMP_AuditoriasController.crearProgramacionAuditoria('testAuditoriaAutomaticaTest', 'SAC_Altas', 'SAC_SLACalidadTrue', Date.today(), Date.today(), 'Hoy', null, null, 10, 11, null, null, null, null, null,  1, null, true, 'Diaria: Lunes');

@@ -42,7 +42,7 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
             Messaging.InboundEmailResult result = new Messaging.InboundEmailresult();
             result.success= false;
 
-            String texto = email.htmlBody;
+            String texto = ''; //email.htmlBody;
             if(String.isBlank(texto)){
                 texto = email.plainTextBody;
             }
@@ -50,7 +50,9 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
             String threadId = '';
             Boolean encontradoThread = false;
             Boolean encontradoInteraccionTarea = false;
-            Datetime now = system.now();
+
+            Datetime emailDate = SAC_Utils.recuperarFechaEmail(email);
+
             //Obtenemos el ThreadId del mensaje entrante en el formato correcto.
             if (String.isNotBlank(texto)){
                 threadId = texto.substringAfter('ref:_').substringBefore(':ref');
@@ -82,8 +84,7 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
 
                 if (!interacciones.isEmpty()) {
                     encontradoInteraccionTarea = true;
-                    Datetime fechaActual = Datetime.now();
-                    String fechaFormateada = fechaActual.format('dd') + '/' + fechaActual.format('MM') + '/' + fechaActual.format('yyyy') + ' ' + fechaActual.format('kk:mm');
+                    String fechaFormateada = emailDate.format('dd') + '/' + emailDate.format('MM') + '/' + emailDate.format('yyyy') + ', ' + emailDate.format('kk:mm');
                     for (SAC_Interaccion__c interaccion : interacciones) {
                         //US632598 - Concatenar respuesta si ya tenemos una respuesta existente (consultas oficina)
                         if(interaccion.SAC_GrupoColaborador__r.SAC_DeveloperName__c == 'OFICINA'){
@@ -96,7 +97,7 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
                             interaccion.SAC_Respuesta__c = texto.left(32200);
                         }
                         
-                        interaccion.SAC_FechaRespuesta__c = now;
+                        interaccion.SAC_FechaRespuesta__c = emailDate;
                         interaccion.SAC_EmailRespuesta__c = email.fromAddress;
                         interaccion.SAC_Estado__c = 'SAC_Resuelta';               
                     } 
@@ -234,9 +235,9 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
                             }                  
                             }                  
 
-                            if(email.htmlBody != null){ 
+                            /*if(email.htmlBody != null){ 
                                 caso.Description = email.htmlBody.left(32000).stripHtmlTags(); 
-                            }else if(email.plainTextBody != null){ 
+                            }else */if(email.plainTextBody != null){ 
                                 caso.Description = email.plainTextBody.left(32000);
                             }
                             
@@ -252,7 +253,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
                         }
 
                         //caso.CC_AcuseRecibo__c = '1'; esta linea se ha comentado para que no se quede el acuse de recibo en 1. Al no introducir un valor, manda el acuse de recibo y se updatea a 2 (dia 7/11/22)
-                        resultado = Database.insert(caso);
+                        SAC_DatabaseDML.insertDML(caso, false);
+                        //resultado = Database.insert(caso);
 
                         wrapEmRes = emailTask(caso.Id, email, RECORDTYPETAREA);
                         Map<String,Boolean> mapaResultadoEmailTask = wrapEmRes.mapaResultado;
@@ -260,8 +262,9 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
                         
                         result.success= mapaResultadoEmailTask.get('resultado');
                         caso.SourceId = [SELECT id FROM EmailMessage WHERE ParentId =: caso.id AND Incoming = true LIMIT 1].id;
-                        caso.SAC_UltimaModificacionFichero__c = (mapaResultadoEmailTask.get('tieneAttachments')) ? System.now() : null;
-                        resultado = Database.update(caso);     
+                        caso.SAC_UltimaModificacionFichero__c = (mapaResultadoEmailTask.get('tieneAttachments')) ? emailDate : null;
+                        SAC_DatabaseDML.updateDML(caso, false);
+                        //resultado = Database.update(caso);     
                             
                     }
                 }else{
@@ -344,7 +347,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
                     //Añadido para recortar la description del caso
                     //listaCaso[0].Description = listaCaso[0].Description.left(32000);
                     Database.SaveResult resultado = null;
-                    resultado = Database.update(listaCaso[0]);
+                    SAC_DatabaseDML.updateDML(listaCaso[0], false);
+                    //resultado = Database.update(listaCaso[0]);
 
                     wrapEmRes = emailTask(listaCaso[0].Id, email, RECORDTYPETAREA);
                     result.success = wrapEmRes.mapaResultado.get('resultado');
@@ -430,7 +434,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
             contentEmMes.CcAddress=String.join(email.ccAddresses,',');
         }
         
-        Database.insert(contentEmMes);
+        SAC_DatabaseDML.insertDML(contentEmMes, false);
+        //Database.insert(contentEmMes);
         resultado = true; 
         
         // Add Email Message Relation for id of the sender
@@ -439,7 +444,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
         emr.RelationAddress = email.FromAddress;
         emr.RelationType = 'FromAddress';
         if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
-            Database.insert(emr);
+            SAC_DatabaseDML.insertDML(emr, false);
+            //Database.insert(emr);
         }
         
         //Guardamos los attachments si hubiese alguno
@@ -449,7 +455,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
             if ( !attachmentsMap.isEmpty() ) {
                 try{
                     List<ContentVersion> listaContents = attachmentsMap.values();
-                    Database.insert(listaContents, false);
+                    SAC_DatabaseDML.insertListDML(listaContents, true);
+                    //Database.insert(listaContents, false);
     
                     List<ContentVersion> listaContentsInsertados = [SELECT Id, ContentDocumentId FROM ContentVersion WHERE ID IN: listaContents];
     
@@ -466,7 +473,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
     
                         contentLinks.add(cdlCaso);
                     }
-                    Database.insert(contentLinks);
+                    SAC_DatabaseDML.insertListDML(contentLinks, true);
+                    //Database.insert(contentLinks);
                 }catch(Exception e){
                     CBK_Log.error(e);
                 }
@@ -485,7 +493,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
                 contentEmMes.htmlBody = (String.isNotBlank(contentEmMes.htmlBody))?contentEmMes.htmlBody.replaceAll( 'cid:' + cid, url ):contentEmMes.htmlBody;
             }
             if(Schema.sObjectType.EmailMessage.isUpdateAble()){
-                Database.update(contentEmMes);
+                SAC_DatabaseDML.updateDML(contentEmMes, true);
+                //Database.update(contentEmMes);
                 resultado = true; 
             }
         }  
@@ -546,7 +555,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
         conEmailMessage.CBK_sfdcMessageId__c = email.messageId?.left(255);
         conEmailMessage.ThreadIdentifier = email.inReplyTo;
         
-        Database.insert(conEmailMessage);
+        SAC_DatabaseDML.insertDML(conEmailMessage, false);
+        //Database.insert(conEmailMessage);
         resultado = true; 
         
         // Add Email Message Relation for id of the sender
@@ -555,7 +565,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
         emr.RelationAddress = email.FromAddress;
         emr.RelationType = 'FromAddress';
         if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
-            Database.insert(emr);
+            SAC_DatabaseDML.insertDML(emr, false);
+            //Database.insert(emr);
         }
 
         if(resultado=true){
@@ -569,7 +580,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
                 try{
                     tieneAttachments = true;
                     List<ContentVersion> listaContents = attachmentsMap.values();
-                    Database.insert(listaContents, false);
+                    SAC_DatabaseDML.insertListDML(listaContents, true);
+                    //Database.insert(listaContents, false);
     
                     List<ContentVersion> listaContentsInsertados = [SELECT Id, ContentDocumentId FROM ContentVersion WHERE ID IN: listaContents];
     
@@ -586,7 +598,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
     
                         contentLinks.add(cdlCaso);
                     }
-                    Database.insert(contentLinks);
+                    SAC_DatabaseDML.insertListDML(contentLinks, true);
+                    //Database.insert(contentLinks);
                 }catch(Exception e){
                     CBK_Log.error(e);
                 }
@@ -609,7 +622,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
             }
             
             if(Schema.sObjectType.EmailMessage.isUpdateAble()){
-                Database.update(conEmailMessage);
+                SAC_DatabaseDML.updateDML(conEmailMessage, true);
+                //Database.update(conEmailMessage);
                 resultado = true; 
             }
         } 
@@ -741,7 +755,8 @@ public without sharing class SAC_EmailService implements Messaging.InboundEmailH
         tarea.ActivityDate= system.today();
         tarea.RecordTypeId = TaskTR;
         if(Schema.sObjectType.Task.isCreateable()){
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
         }
     }
 

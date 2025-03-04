@@ -1,0 +1,50 @@
+<aura:component implements="lightning:recordHomeTemplate">
+
+	<aura:attribute name="top" type="Aura.Component[]" />
+	<aura:attribute name="left" type="Aura.Component[]" />
+	<aura:attribute name="leftCol1" type="Aura.Component[]" />
+	<aura:attribute name="leftCol2" type="Aura.Component[]" />
+	<aura:attribute name="right" type="Aura.Component[]" />
+
+	<div>
+		<lightning:layout>
+			<!-- Sección superior -->
+			<lightning:layoutItem size="12">
+				{!v.top}
+			</lightning:layoutItem>
+		</lightning:layout>
+
+		<lightning:layout>
+			<!-- Sección izquierda -->
+			<lightning:layoutItem size="8">
+				<lightning:layout>
+					<lightning:layoutItem size="12" padding="around-small">
+						{!v.left}
+					</lightning:layoutItem>
+				</lightning:layout>
+
+				<lightning:layout>
+					<lightning:layout>
+						<!-- Sección izquierda columna 1 -->
+						<lightning:layoutItem flexibility="auto" padding="around-small">
+							{!v.leftCol1}
+						</lightning:layoutItem>
+
+						<!-- Sección izquierda columna 2 -->
+						<lightning:layoutItem flexibility="auto" padding="around-small">
+							{!v.leftCol2}
+						</lightning:layoutItem>
+					</lightning:layout>
+				</lightning:layout>
+
+			</lightning:layoutItem>
+
+			<!-- Sección derecha -->
+			<lightning:layoutItem size="4" padding="around-small">
+				{!v.right}
+			</lightning:layoutItem>
+
+		</lightning:layout>
+	</div>
+
+</aura:component>

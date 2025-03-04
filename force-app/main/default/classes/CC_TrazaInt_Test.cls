@@ -39,13 +39,12 @@ public with sharing class CC_TrazaInt_Test {
         System.assertEquals(false, traza2.CC_FinOK__c, 'traza2 debería tener fin KO');
         System.assert(traza3 != null, 'traza3 no debería ser null');
     }
-    
+
     @isTest
     public static void generarTrazaTest() {
-        User usuarioGestor = CSBD_Usuarios.usuarioGestor();
         CC_TrazaInt__c traza = new CC_TrazaInt__c();
-      
-        System.runAs (usuarioGestor) {
+
+        System.runAs (CSBD_TestDataFactory.usuarioGestor()) {
         Test.startTest();
         traza = CC_TrazaInt.generarTraza('nombreTrazaTest', 'identificadorTest', 'estadoTest', 'mensajeEntradaTest', 'detalleErrorTest', 'requestStringTest', true);
         Test.stopTest();
@@ -56,8 +55,8 @@ public with sharing class CC_TrazaInt_Test {
         System.assertEquals(true, traza.CC_MensajeEntrada__c == 'mensajeEntradaTest' , 'No se han introducido los datos en la traza correctamente');
         System.assertEquals(true, traza.CC_DetalleError__c == 'detalleErrorTest' , 'No se han introducido los datos en la traza correctamente');
         System.assertEquals(true, traza.CC_MensajeSalida__c == 'requestStringTest' , 'No se han introducido los datos en la traza correctamente');
-        
+
     }
-     
+
 
 }

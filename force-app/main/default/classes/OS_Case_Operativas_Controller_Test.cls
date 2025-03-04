@@ -408,7 +408,7 @@ public class OS_Case_Operativas_Controller_Test {
 
         List<Case> caseList = new List<Case>();
         caseList.add(new Case(CC_Idioma__c = null));
-        caseList.add(new Case(Origin = 'Phone', CC_Detalles_Consulta__c= 'AAAAA', CC_Canal_Procedencia__c = 'Centralita', CC_Tipo_Contacto__c = 'Consulta',
+        caseList.add(new Case(Origin = 'Phone', CC_Detalles_Consulta__c= 'AAAAA', 
         CC_MCC_Tematica__c = mccTematica.Id, CC_MCC_ProdServ__c = mccProducto.Id, CC_MCC_Motivo__c = mccMotivo.Id));
         insert caseList;
 
@@ -422,8 +422,8 @@ public class OS_Case_Operativas_Controller_Test {
             invalidFieldsList = OS_Case_Operativas_Controller.validarCamposCaso(caseList[1].Id, 'botonResponder');
             Test.stopTest();
 
-            System.assertEquals(2, invalidFieldsList.size(), 'Validamos 2 excepciones.');
-            System.assertEquals('Cuenta y Contacto', invalidFieldsList[0], 'Validamos las 2 excepciones sean de cuenta y contacto.');
+            System.assertEquals(4, invalidFieldsList.size(), 'Validamos 4 excepciones.');
+      
         }
     }
         

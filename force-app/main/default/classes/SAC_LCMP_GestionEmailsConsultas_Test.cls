@@ -6,14 +6,16 @@ public with sharing class SAC_LCMP_GestionEmailsConsultas_Test {
         
         //Usuario SAC General
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        usuarioGeneral.SAC_PerteneceCOPSAJ__c = true;      
-        Database.insert(usuarioGeneral);
+        usuarioGeneral.SAC_PerteneceCOPSAJ__c = true;
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);      
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);    
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             //Grupos
@@ -29,11 +31,13 @@ public with sharing class SAC_LCMP_GestionEmailsConsultas_Test {
             listaGrupos[1].name = 'grupoB';
             listaGrupos[1].SAC_PorcentajeAsignacion__c = 20;
             listaGrupos[1].SAC_MaximoCasosDiarios__c = 1;
-            Database.insert(listaGrupos);
+            SAC_DatabaseDML.insertListDML(listaGrupos, false);    
+            //Database.insert(listaGrupos);
 
             //Cuenta
             Account ac = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
-            Database.insert(ac);
+            SAC_DatabaseDML.insertDML(ac, false);    
+            //Database.insert(ac);
 
             //Reclamacion
             Map<String, Object> camposRecl = new Map<String, Object>();
@@ -42,7 +46,8 @@ public with sharing class SAC_LCMP_GestionEmailsConsultas_Test {
             camposRecl.put('AccountId', ac.Id);
 
             Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);  
+            //Database.insert(casoReclamacion);
 
             //Interaccion consulta
             Map<String, Object> camposInt = new Map<String, Object>();
@@ -52,7 +57,8 @@ public with sharing class SAC_LCMP_GestionEmailsConsultas_Test {
             camposInt.put('SAC_GrupoColaborador__c', listaGrupos[0].Id);
 
             SAC_Interaccion__c interaccion = SAC_TestDataFactory.crearInteraccion('Consulta',camposInt);
-            Database.insert(interaccion); 
+            SAC_DatabaseDML.insertDML(interaccion, false);
+            //Database.insert(interaccion); 
 
             //Template
             EmailTemplate validEmailTemplate = new EmailTemplate(
@@ -64,12 +70,13 @@ public with sharing class SAC_LCMP_GestionEmailsConsultas_Test {
                 Body = 'Texted', 
                 FolderId = UserInfo.getUserId()
             );
-            Database.insert(validEmailTemplate);
+            SAC_DatabaseDML.insertDML(validEmailTemplate, false);
+            //Database.insert(validEmailTemplate);
         }
     }
 
     @isTest
-    static void obtenerInformacion_Test(){
+    static void obtenerInformacionTest(){
         SAC_Interaccion__c interaccion = [SELECT Id FROM SAC_Interaccion__c WHERE SAC_Email1__c = 'testEmail@t.t' LIMIT 1];
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];  
 

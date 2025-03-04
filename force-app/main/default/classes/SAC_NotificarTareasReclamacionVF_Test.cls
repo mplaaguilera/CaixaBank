@@ -5,11 +5,13 @@ public with sharing class SAC_NotificarTareasReclamacionVF_Test {
 
         User userAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
         userAdmin.Username = 'useradminpruebaredfinal@test.com.testdata';
-        Database.insert(userAdmin);
+        SAC_DatabaseDML.insertDML(userAdmin, false);   
+        //Database.insert(userAdmin);
 
         User userAdmin2 = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
         userAdmin2.Username = 'useradminpruebaredfinal@test.com.testdata2';
-        Database.insert(userAdmin2);
+        SAC_DatabaseDML.insertDML(userAdmin2, false);   
+        //Database.insert(userAdmin2);
 
         List<CC_Grupo_Colaborador__c> gruposTareas = SPV_TestDataFactory.crearGrupoColaborador('GrupoDeTareas',1);
         gruposTareas[0].SAC_Email__c = 'testSPV@testemail.com.invalid';
@@ -17,29 +19,34 @@ public with sharing class SAC_NotificarTareasReclamacionVF_Test {
         gruposTareas[0].SAC_Email3__c = 'testSPV@testemail.com.invalid3';
         gruposTareas[0].SAC_DeveloperName__c = 'COPS';
         gruposTareas[0].SAC_PermiteTareas__c = true;
-        Database.insert(gruposTareas);
+        SAC_DatabaseDML.insertListDML(gruposTareas, false); 
+        //Database.insert(gruposTareas);
 
         CC_Grupo_Colaborador_Contact__c grupoTareas1 = new CC_Grupo_Colaborador_Contact__c();
         grupoTareas1 = SAC_TestDataFactory.crearColaboradorContact(userAdmin.id, gruposTareas[0].id);
         grupoTareas1.SAC_Administrador__c = true;
-        Database.insert(grupoTareas1);
+        SAC_DatabaseDML.insertDML(grupoTareas1, false); 
+        //Database.insert(grupoTareas1);
         
         Map<String, Object> camposRecl = new Map<String, Object>();
         camposRecl.put('Subject', 'TestRec');
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false); 
+        //Database.insert(reclamacion);
 
         Map<String, Object> camposRecSPV = new Map<String, Object>();
         camposRecSPV.put('Subject', 'TestRecSPV');        
         Case casoReclamacionSPV = SPV_TestDataFactory.crearCaso('Reclamacion',camposRecSPV);
-        Database.insert(casoReclamacionSPV);
+        SAC_DatabaseDML.insertDML(casoReclamacionSPV, false); 
+        //Database.insert(casoReclamacionSPV);
 
         List<SAC_Accion__c> tareas = SAC_TestDataFactory.crearTareas(2,reclamacion,false);
         tareas[0].SAC_Descripcion__c = 'TestTarea1';
         tareas[0].SAC_Estado__c = 'SAC_EnGestion';
         tareas[1].SAC_Descripcion__c = 'TestTarea2';
         tareas[1].SAC_Estado__c = 'SAC_EnGestion';
-        Database.insert(tareas);
+        SAC_DatabaseDML.insertListDML(tareas, false); 
+        //Database.insert(tareas);
 
         Group cola = [SELECT Id, DeveloperName, Name FROM Group WHERE Type = 'Queue' AND  DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
 
@@ -51,7 +58,8 @@ public with sharing class SAC_NotificarTareasReclamacionVF_Test {
         tareasSPV[1].SAC_Estado__c = 'SAC_EnGestion';
         tareasSPV[1].OwnerId = cola.Id;
         tareasSPV[1].SAC_EquipoResponsable__c = gruposTareas[0].Id;
-        Database.insert(tareasSPV);
+        SAC_DatabaseDML.insertListDML(tareasSPV, false); 
+        //Database.insert(tareasSPV);
     }
 
     @isTest
@@ -118,7 +126,8 @@ public with sharing class SAC_NotificarTareasReclamacionVF_Test {
         Test.startTest();
         System.runAs(usuario) {
             reclamacion.OwnerId = usuario.Id;
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false); 
+            //Database.update(reclamacion);
 
             PageReference pageRef = Page.SAC_NotificarTareasReclamacion;
             Test.setCurrentPage(pageRef);
@@ -148,7 +157,8 @@ public with sharing class SAC_NotificarTareasReclamacionVF_Test {
         Test.startTest();
         System.runAs(usuario) {
             reclamacion.OwnerId = usuario.Id;
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false); 
+            //Database.update(reclamacion);
 
             PageReference pageRef = Page.SAC_NotificarTareasReclamacion;
             Test.setCurrentPage(pageRef);

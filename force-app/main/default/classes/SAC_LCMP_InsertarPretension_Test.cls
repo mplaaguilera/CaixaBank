@@ -5,16 +5,26 @@ public with sharing class SAC_LCMP_InsertarPretension_Test {
     static void makeData() {
 
         User usuario;
-        System.runAs(new User(Id = Userinfo.getUserId())) {
+        //Usuario Admin
+        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+
+        System.runAs(usuarioAdmin) {
             //Usuario SAC General
-            usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuario);
+            usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];  
+            SAC_DatabaseDML.insertDML(usuario, false);   
+            //Database.insert(usuario);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);   
+            //Database.insert(permiSetAssi);
+
+            Group grupoPretensionesCerradas = [SELECT id FROM Group WHERE DeveloperName = 'SAC_GrupoCreacionPretensionCerrada'];
+            GroupMember groupMemberNew = new GroupMember(GroupId = grupoPretensionesCerradas.Id, UserOrGroupId = usuario.Id);
+            SAC_DatabaseDML.insertDML(groupMemberNew, false);   
         }
 
         List<Case> listaReclamaciones = new List<Case>(); 
@@ -39,7 +49,19 @@ public with sharing class SAC_LCMP_InsertarPretension_Test {
         Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
         listaReclamaciones.add(casoReclamacion2);
 
-        Database.insert(listaReclamaciones);
+        //RECLAMACION 3
+        Map<String, Object> camposRecl3 = new Map<String, Object>();
+        camposRecl3.put('Subject', 'TestRec3');
+        camposRecl3.put('Origin', 'Backoffice');
+        camposRecl3.put('Status', 'Cerrado');
+        camposRecl3.put('SAC_StatusAuxiliar__c', 'Cerrado');
+        camposRecl3.put('OwnerId', usuario.Id);
+
+        Case casoReclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl3);
+        listaReclamaciones.add(casoReclamacion3);
+
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false);   
+        //Database.insert(listaReclamaciones);
 
 
         List<Case> listaPretensiones = new List<Case>();
@@ -66,7 +88,8 @@ public with sharing class SAC_LCMP_InsertarPretension_Test {
         Case nuevaPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret2);
         listaPretensiones.add(nuevaPretension);
 
-        Database.insert(listaPretensiones); 
+        SAC_DatabaseDML.insertListDML(listaPretensiones, false);   
+        //Database.insert(listaPretensiones); 
         
         //MCCs
         String mccTematicaRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
@@ -75,16 +98,21 @@ public with sharing class SAC_LCMP_InsertarPretension_Test {
         String mccDetalleRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
         
         CC_MCC__c mccTematica = new CC_MCC__c(Name='Tematica', CC_Codigo_Externo__c='a', RecordTypeId=mccTematicaRecordTypeId, CC_Tipo_Cliente__c='SAC');
-        Database.insert(mccTematica);
+        SAC_DatabaseDML.insertDML(mccTematica, false);   
+        //Database.insert(mccTematica);
 
         CC_MCC__c mccProdServ = new CC_MCC__c(Name='ProdServ',CC_Tematica__c = mccTematica.id , CC_Codigo_Externo__c='b', RecordTypeId=mccProdServRecordTypeId, CC_Tipo_Cliente__c='SAC');
-        Database.insert(mccProdServ);
+        SAC_DatabaseDML.insertDML(mccProdServ, false);   
+        //Database.insert(mccProdServ);
 
         CC_MCC__c mccMotivo = new CC_MCC__c(Name='Motivo',CC_Producto_Servicio__c = mccProdServ.id, CC_Codigo_Externo__c='c', RecordTypeId=mccMotivoRecordTypeId, CC_Tipo_Cliente__c='SAC');
-        Database.insert(mccMotivo);
+        SAC_DatabaseDML.insertDML(mccMotivo, false);   
+        //Database.insert(mccMotivo);
 
         CC_MCC__c mccDetalle = new CC_MCC__c(Name='Detalle',CC_Motivo__c = mccMotivo.id, CC_Codigo_Externo__c='d', RecordTypeId=mccDetalleRecordTypeId, CC_Tipo_Cliente__c='SAC');
-        Database.insert(mccDetalle);
+        SAC_DatabaseDML.insertDML(mccDetalle, false);   
+        //Database.insert(mccDetalle);
+
     }
 
     @isTest 
@@ -92,7 +120,6 @@ public with sharing class SAC_LCMP_InsertarPretension_Test {
         Boolean respuesta=false;
         Case reclamacion = [SELECT id, OwnerId FROM Case WHERE Subject = 'TestRec' LIMIT 1];
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
-        System.debug('reclamacion---->' + reclamacion);
         System.runAs(usuario){
             Test.startTest();
             respuesta = SAC_LCMP_InsertarPretension.tienePermisos(reclamacion.id);
@@ -146,7 +173,8 @@ public with sharing class SAC_LCMP_InsertarPretension_Test {
         System.runAs(usuario){
             Test.startTest();
             reclamacion.SAC_PretensionPrincipal__c = pretension.Id;
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false); 
+            //Database.update(reclamacion);
             respuesta = SAC_LCMP_InsertarPretension.insertarPretensiones(reclamacion.id, mccs);
             Test.stopTest();
         }
@@ -200,5 +228,36 @@ public with sharing class SAC_LCMP_InsertarPretension_Test {
         Case pretension = [SELECT Id, SAC_Reclamacion__c FROM Case WHERE SAC_Reclamacion__c =:casoReclamacion.id];
         System.assertEquals(pretension.id, casoReclamacionAct.SAC_PretensionPrincipal__c, 'No se ha insertado la pretensión como principal.');
         System.assertEquals(pretension.SAC_Reclamacion__c, casoReclamacionAct.id, 'No se ha insertado la pretensión como principal.');
+    }
+
+    @isTest
+    static void tienePermisosReclamacionCerradaTest(){
+        Case casoReclamacion = [SELECT id, Status, Origin, SAC_PretensionPrincipal__c FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        Boolean tienePermisos = false;
+
+        System.runAs(usuario){
+            Test.startTest();
+            tienePermisos = SAC_LCMP_InsertarPretension.tienePermisosReclamacionCerrada(casoReclamacion.id);
+            Test.stopTest();
+        }
+        System.assertEquals(true, tienePermisos, 'No se insertado el usuario en el grupo permisos reclamaciones cerradas');
+    }
+
+    @isTest
+    static void insertarPretensionesCerradasTest(){
+        Case casoReclamacion = [SELECT id, Status, Origin FROM Case WHERE Subject = 'TestRec3' LIMIT 1];
+        List<CC_MCC__c> mccs = [SELECT id, Name FROM CC_MCC__c WHERE Name='Detalle'];
+        CC_MCC__c mccsRepetido = [SELECT id, Name FROM CC_MCC__c WHERE Name='Detalle' LIMIT 1];
+        mccs.add(mccsRepetido);
+        Boolean respuesta = false;
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+
+        System.runAs(usuario){
+            Test.startTest();
+            respuesta = SAC_LCMP_InsertarPretension.insertarPretensiones(casoReclamacion.id, mccs);
+            Test.stopTest();
+        }
+        System.assertEquals(true, respuesta, 'No se han insertado las pretensiones');
     }
 }

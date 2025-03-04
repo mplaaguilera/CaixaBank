@@ -3,6 +3,39 @@ public class HDT_CaseTriggerHelper_Test {
 
     @TestSetup
     static void makeData(){
+        CC_Lista_Valores__c lovAvisosSobreAgrupadores2 = new CC_Lista_Valores__c();
+        lovAvisosSobreAgrupadores2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+        lovAvisosSobreAgrupadores2.CC_Activa__c = true;
+        lovAvisosSobreAgrupadores2.Name = 'HDT - Aviso Comunicaciones Informativas';
+        insert lovAvisosSobreAgrupadores2;
+
+        CC_Lista_Valores__c valorUmbralSiguientesAvisosx = new CC_Lista_Valores__c();
+        valorUmbralSiguientesAvisosx.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralSiguientesAvisosx.CC_Activa__c = true;
+        valorUmbralSiguientesAvisosx.CC_Lista__c = lovAvisosSobreAgrupadores2.Id;
+        valorUmbralSiguientesAvisosx.Name = 'Comunicación Informativa de Caso - Umbral de tiempo';
+        valorUmbralSiguientesAvisosx.CC_Valor__c = '15';
+
+        CC_Lista_Valores__c valorUmbralSiguientesAvisosx1 = new CC_Lista_Valores__c();
+        valorUmbralSiguientesAvisosx1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralSiguientesAvisosx1.CC_Activa__c = true;
+        valorUmbralSiguientesAvisosx1.CC_Lista__c = lovAvisosSobreAgrupadores2.Id;
+        valorUmbralSiguientesAvisosx1.Name = 'Comunicación Informativa de Caso - Umbral Envio de Emails';
+        valorUmbralSiguientesAvisosx1.CC_Valor__c = '15';
+
+        CC_Lista_Valores__c valorUmbralSiguientesAvisosx2 = new CC_Lista_Valores__c();
+        valorUmbralSiguientesAvisosx2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralSiguientesAvisosx2.CC_Activa__c = true;
+        valorUmbralSiguientesAvisosx2.CC_Lista__c = lovAvisosSobreAgrupadores2.Id;
+        valorUmbralSiguientesAvisosx2.Name = 'Comunicación Informativa de Caso - Umbral primer aviso';
+        valorUmbralSiguientesAvisosx2.CC_Valor__c = '1';
+
+        List<CC_Lista_Valores__c> valorUmbralInsertx = new List<CC_Lista_Valores__c>();
+        valorUmbralInsertx.add(valorUmbralSiguientesAvisosx);
+        valorUmbralInsertx.add(valorUmbralSiguientesAvisosx1);
+        valorUmbralInsertx.add(valorUmbralSiguientesAvisosx2);
+        
+        insert valorUmbralInsertx;
 
         // Datos para telefono unico
         Id recordTypeOficina = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
@@ -1021,7 +1054,7 @@ public class HDT_CaseTriggerHelper_Test {
     }
 
     @isTest
-    private static void InsertDetallesConsultaTest(){
+    private static void insertDetallesConsultaTest(){
 
        System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
 
@@ -1234,6 +1267,8 @@ public class HDT_CaseTriggerHelper_Test {
     }
 
     @isTest static void testGenerarUrlEncuesta() {
+        System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
+
         // Datos de prueba
         String configuracion2 = 'https://example.com/';
         String configuracion1 = '12345';
@@ -1259,5 +1294,59 @@ public class HDT_CaseTriggerHelper_Test {
                              '&newtest=Y';
         
         System.assertEquals(urlEsperada, resultado, 'La URL generada no es la esperada');
+        }
+    }
+
+    @isTest
+    private static void asociarCasosCausaComunicacionInformativa(){
+
+       System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
+            
+            Account cliente = [SELECT id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
+            Contact contacto = [SELECT id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
+            CC_MCC__c tematica = [SELECT id FROM CC_MCC__c WHERE Name = 'App\'s' limit 1];
+            CC_MCC__c producto = [SELECT id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' limit 1];
+            CC_MCC__c motivo = [SELECT id FROM CC_MCC__c WHERE Name = 'Valoración positiva' limit 1];
+            CC_MCC__c causa = [SELECT id FROM CC_MCC__c WHERE Name = 'Valoración positiva causa' limit 1];
+
+            
+            //List<case> listaCasos = new List<Case>();
+            List<Id> idsCasosC = new List<Id>();
+
+            //Creación nuevo caso asociado a un usuario
+            Case caso2 = new Case(AccountId = cliente.Id,
+                                ContactId = contacto.Id,
+                                Status = 'Activo',
+                                CC_Idioma__c = 'ca',
+                                Subject = 'PruebaCierreHDT1n',
+                                Origin = 'Phone',
+                                CC_Tipo_Contacto__c = 'Consulta',
+                                CC_Canal_Procedencia__c = 'Servicios Centrales',
+                                CC_Canal_Resolucion__c = 'Incidencias Técnicas',
+                                CC_MCC_Tematica__c = tematica.Id,
+                                CC_MCC_ProdServ__c = producto.Id,
+                                CC_MCC_Motivo__c = motivo.Id,
+                                CC_MCC_Causa__c = causa.Id,
+                                CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
+                                CC_Detalles_Solucion__c = 'Detalles 1234-5678-9876-5432 Solución',
+                                RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId());
+            insert caso2;
+
+            idsCasosC.add(caso2.Id);
+            
+            Test.startTest();
+                HDT_CaseTriggerHelper.asociarCasosCausaAComunicacionInformativaNoFuture(idsCasosC);
+            Test.stopTest();
+
+            // Consulta los casos actualizados para verificar el cambio
+            List<Case> updatedCases = [SELECT Id, CC_Repetitivo__c FROM Case WHERE Id IN :idsCasosC];
+
+            // Verifica que todos los casos actualizados tengan el campo Repetitivo__c en true
+            for (Case c : updatedCases) {
+                System.assertEquals(true, c.CC_Repetitivo__c, 'El campo Repetitivo__c debería estar en true.');
+            }
+
+            //System.assertEquals(1, numEmails, 'Debería haber enviado un email');
+        }
     }
 }

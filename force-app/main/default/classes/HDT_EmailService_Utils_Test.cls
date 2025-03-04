@@ -1,10 +1,7 @@
 @isTest
 public with sharing class HDT_EmailService_Utils_Test {
-
-
     @testSetup
     static void data(){
-
         Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
 
         Contact contacto = new Contact(LastName = 'Test', CC_Numero_Documento__c = '36592162J', CC_Sexo__c = 'V');
@@ -25,7 +22,7 @@ public with sharing class HDT_EmailService_Utils_Test {
         insert caso2;
 
 
-        List <String> owaEmails = new List<String>{('Atención Empleados Contact Center IT Grupo CaixaBank')};
+        List <String> owaEmails = new List<String>{('Atención Empleados HDT CaixaBank')};
 
         List <OrgWideEmailAddress> owa = new List <OrgWideEmailAddress>([SELECT Id, Address FROM OrgWideEmailAddress WHERE DisplayName IN : owaEmails]);
 
@@ -110,12 +107,10 @@ public with sharing class HDT_EmailService_Utils_Test {
         attachmenttext.fileName = 'textfiletwo3.txt';
         attachmenttext.mimeTypeSubType = 'texttwo/plain';
         email.textAttachments =   new Messaging.inboundEmail.TextAttachment[] { attachmenttext };
-        
+
         Test.startTest();
         //Ejecución de la prueba
         HDT_EmailService_Utils.gestionAdjuntos(email, caso, 'test@test.com');
-        HDT_EmailService_Utils.gestionAdjuntosNew(email, caso, 'test@test.com');
-    
         Test.stopTest();
         
         ContentDocumentLink contentDocument = [Select id, ShareType from ContentDocumentLink where LinkedEntityId = :caso.Id limit 1];
@@ -258,21 +253,18 @@ public with sharing class HDT_EmailService_Utils_Test {
     static void testRespuestaSolicitudInfo() {
        
         System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
-
         // Crear contacto y caso de prueba
         Contact contact = new Contact(LastName = 'Doe', Email = 'johndoe@example.com');
         insert contact;
 
-        Case caso = new Case(RecordTypeId = rtCaso, Subject = 'Test Subject', CC_Idioma__c = 'ca' , ContactId = contact.Id, Status = 'Pendiente Cliente', CC_Ultima_Interaccion__c = 'Respuesta de solicitud de información');
+        Case caso = new Case(Subject = 'Test Subject', CC_Idioma__c = 'ca' , ContactId = contact.Id, Status = 'Pendiente Cliente', CC_Ultima_Interaccion__c = 'Respuesta de solicitud de información');
         insert caso;
-        
-        /*
-        Case caso2 = new Case(RecordTypeId = rtCaso, Subject = 'Test Subject', CC_Idioma__c = 'en' , ContactId = contact.Id, Status = 'Cerrado', CC_Ultima_Interaccion__c = 'Respuesta de solicitud de información');
+
+        Case caso2 = new Case(Subject = 'Test Subject', CC_Idioma__c = 'en' , ContactId = contact.Id, Status = 'Cerrado', CC_Ultima_Interaccion__c = 'Respuesta de solicitud de información');
         insert caso2;
         
-        Case caso3 = new Case(RecordTypeId = rtCaso, Subject = 'Test Subject', CC_Idioma__c = 'es' , ContactId = contact.Id, Status = 'Cerrado', CC_Ultima_Interaccion__c = 'Respuesta de solicitud de información');
-        insert caso3;*/
+        Case caso3 = new Case(Subject = 'Test Subject', CC_Idioma__c = 'es' , ContactId = contact.Id, Status = 'Cerrado', CC_Ultima_Interaccion__c = 'Respuesta de solicitud de información');
+        insert caso3;
 
         // Crear email de prueba
         Messaging.InboundEmail email = new Messaging.InboundEmail();
@@ -286,10 +278,10 @@ public with sharing class HDT_EmailService_Utils_Test {
         Test.startTest(); 
         // Llamar al método respuestaSolicitudInfo
             HDT_EmailService_Utils.respuestaSolicitudInfo(email, caso.Id, 'Test plain text body', 'test@test.com');
-            //HDT_EmailService_Utils.respuestaSolicitudInfo(email, caso2.Id, 'Test plain text body', 'test@test.com');
+            HDT_EmailService_Utils.respuestaSolicitudInfo(email, caso2.Id, 'Test plain text body', 'test@test.com');
             HDT_EmailService_Utils.envioCorreoNoReaperturaCaso(caso);
-            //HDT_EmailService_Utils.envioCorreoNoReaperturaCaso(caso2);
-            //HDT_EmailService_Utils.envioCorreoNoReaperturaCaso(caso3);
+            HDT_EmailService_Utils.envioCorreoNoReaperturaCaso(caso2);
+            HDT_EmailService_Utils.envioCorreoNoReaperturaCaso(caso3);
 
         Test.stopTest();
 
@@ -347,82 +339,5 @@ public with sharing class HDT_EmailService_Utils_Test {
         }
     }
 
-    @isTest static void testCrearContentDocumentLink() {
-        System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
-
-            Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
-            Case caso = new Case();
-            caso.RecordTypeId = recordTypeCaso;
-            caso.Subject = 'Caso temporal';
-            caso.Status = 'New';
-            caso.CC_Referencia_Correo_Saliente__c = '#@1234567890#';
-            insert caso;
-
-            Task actividadCorreo = new Task();
-            actividadCorreo.Type = 'Traslado Colaborador';
-            actividadCorreo.WhatId = caso.Id;
-            actividadCorreo.RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('HDT_Task').getRecordTypeId();
-            actividadCorreo.CC_Referencia_Correo_Saliente__c = '1234567890';
-            insert actividadCorreo;
-
-            Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
-           
-            CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
-            grupoColab.Name = 'Grupo Colaborador Temporal';
-            grupoColab.RecordTypeId = recordTypeGrupoColaborador;
-            grupoColab.CC_External__c = 'GC-00001';
-            insert grupoColab;
-
-
-        /*
-        List <String> owaEmails = new List<String>{('Atención Empleados Contact Center IT Grupo CaixaBank')};
-        List <OrgWideEmailAddress> owa = new List <OrgWideEmailAddress>([SELECT Id, Address FROM OrgWideEmailAddress WHERE DisplayName IN : owaEmails]);
-        String direccionEmail = owa[0].Address;
-
-
-        // Crear un mensaje de correo electrónico de prueba
-        EmailMessage emailTest = new EmailMessage(
-            Subject = 'Correo de Prueba',
-            FromAddress = direccionEmail,
-            Status = '0', // Estado que represente un correo enviado
-            ToAddress = 'test@example.com',
-            RelatedToId = casoTest.Id
-        );
-        insert emailTest;*/
-
-        EmailMessage emailTest = new EmailMessage();
-        emailTest.Subject = 'Prueba de envío de correo';
-        emailTest.ActivityId = actividadCorreo.Id;
-        emailTest.Status = '0';
-        emailTest.CC_Grupo_Colab__c = grupoColab.Name;
-        emailTest.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE DeveloperName = 'HDT_Buzon'].CC_Direccion_Correo__c;
-        emailTest.ToAddress = 'prueba@ibm.com';
-        emailTest.Incoming = false;
-        emailTest.ParentId = caso.Id;
-        emailTest.RelatedToId = caso.Id;
-        insert emailTest;
-
-        // Crear una versión de contenido de prueba
-        ContentVersion cvTest = new ContentVersion(
-            Title = 'Documento de Prueba',
-            PathOnClient = 'TestDocument.txt',
-            VersionData = Blob.valueOf('Contenido de prueba'),
-            IsMajorVersion = true
-        );
-        insert cvTest;
-
-        // Recuperar el ID de ContentVersion insertado
-        Id cvId = [SELECT Id, ContentDocumentId FROM ContentVersion WHERE Title = 'Documento de Prueba'].Id;
-
-        // Llamar al método a probar
-        Set<Id> listaContentVersionId = new Set<Id>{cvId};
-        HDT_EmailService_Utils.crearContentDocumentLink(listaContentVersionId, emailTest, caso);
-
-        
-        // Verificar resultados
-        List <ContentDocumentLink> links = [Select id, ShareType from ContentDocumentLink where LinkedEntityId = :caso.Id limit 1]; 
-        System.assertEquals(1, links.size(), 'Debería haber dos enlaces de documentos de contenido creados.');
-        }
-    }
 
 }

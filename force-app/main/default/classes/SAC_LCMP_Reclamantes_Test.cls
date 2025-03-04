@@ -27,23 +27,27 @@ public with sharing class SAC_LCMP_Reclamantes_Test {
         usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
         listaUsuarios.add(usuarioAdmin);    
 
-        Database.insert(listaUsuarios);
+        SAC_DatabaseDML.insertListDML(listaUsuarios, false);
+        //Database.insert(listaUsuarios);
 
         System.runAs(usuarioAdmin) {
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
         }
 
         //Account
         Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-        Database.insert(cuenta);
+        SAC_DatabaseDML.insertDML(cuenta, false);
+        //Database.insert(cuenta);
 
         //Contact
 		Contact contacto = SAC_TestDataFactory.crearContacto(1, cuenta.Id)[0];
-		Database.insert(contacto);
+        SAC_DatabaseDML.insertDML(contacto, false);
+		//Database.insert(contacto);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -53,7 +57,8 @@ public with sharing class SAC_LCMP_Reclamantes_Test {
         camposRecl.put('OwnerId', usuarioGeneral.id);
         
         Case reclamacion1 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-        Database.insert(reclamacion1);
+        SAC_DatabaseDML.insertDML(reclamacion1, false);
+        //Database.insert(reclamacion1);
 
         //Reclamantes
         SAC_CaseReclamante__c reclamantePrincipal = SAC_TestDataFactory.crearReclamante(true, reclamacion1, cuenta.Id);
@@ -69,7 +74,8 @@ public with sharing class SAC_LCMP_Reclamantes_Test {
         listaReclamantes.add(reclamantePrincipal);
         listaReclamantes.add(reclamanteSecundario1);
         listaReclamantes.add(reclamanteSecundario2);
-        Database.insert(listaReclamantes);
+        SAC_DatabaseDML.insertListDML(listaReclamantes, false);
+        //Database.insert(listaReclamantes);
     }
 
     @isTest
@@ -117,7 +123,7 @@ public with sharing class SAC_LCMP_Reclamantes_Test {
 
         System.runAs(usuarioGeneral) {
             Test.startTest();
-            clienteConMasCasos = SAC_LCMP_Reclamantes.comprobarMultiplesCasosCliente(reclamacion.OwnerId, null, caseRecl.Id);
+            clienteConMasCasos = SAC_LCMP_Reclamantes.comprobarMultiplesCasosCliente(reclamacion.Id, reclamacion.OwnerId, null, caseRecl.Id);
             Test.stopTest();
         }
 

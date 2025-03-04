@@ -17,14 +17,16 @@ public with sharing class SAC_Balanceo_Test {
 
         //Usuario SAC Admin
 		User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';      
-        Database.insert(usuarioAdmin);
+        usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);        
+        //Database.insert(usuarioAdmin);
 
         PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
         PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
         permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
         permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-        Database.insert(permiSetAssiAdmin);
+        SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false); 
+        //Database.insert(permiSetAssiAdmin);
 
         //Creamos grupos
         System.runAs(usuarioAdmin){
@@ -33,23 +35,26 @@ public with sharing class SAC_Balanceo_Test {
             grupos[0].SAC_MaximoCasosDiarios__c = 1;
             grupos[1].SAC_PorcentajeAsignacion__c = 20;
             grupos[1].SAC_MaximoCasosDiarios__c = 1;
-            Database.insert(grupos);
+            SAC_DatabaseDML.insertListDML(grupos, false); 
+            //Database.insert(grupos);
         }
 
         //Recuperamos grupos
         CC_Grupo_Colaborador__c grupo1 = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'Grupo Proveedor 0'];
-        CC_Grupo_Colaborador__c grupo2 = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'Grupo Proveedor 1'];
+        // CC_Grupo_Colaborador__c grupo2 = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'Grupo Proveedor 1'];
 
         //Usuario SAC General
 		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0]; 
-        usuarioGeneral.SAC_GruposPerteneciente__c = grupo1.id;    
-        Database.insert(usuarioGeneral);
+        usuarioGeneral.SAC_GruposPerteneciente__c = grupo1.id;
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);     
+        //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
             Test.startTest();
@@ -57,7 +62,8 @@ public with sharing class SAC_Balanceo_Test {
             List<Account> cuentas = SAC_TestDataFactory.crearCuentasNoClientePA(2);
             cuentas[0].OwnerId = usuarioGeneral.id;
             cuentas[1].OwnerId = usuarioGeneral.id;
-            Database.insert(cuentas);
+            SAC_DatabaseDML.insertListDML(cuentas, false); 
+            //Database.insert(cuentas);
 
             //Reclamacion 1
             Map<String, Object> camposRecl1 = new Map<String, Object>();
@@ -69,7 +75,8 @@ public with sharing class SAC_Balanceo_Test {
             camposRecl1.put('OwnerId', usuarioGeneral.id);
 
             Case reclamacion1 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl1);
-            Database.insert(reclamacion1);
+            SAC_DatabaseDML.insertDML(reclamacion1, false); 
+            //Database.insert(reclamacion1);
 
             //Reclamacion 2
             Map<String, Object> camposRecl2 = new Map<String, Object>();
@@ -77,7 +84,8 @@ public with sharing class SAC_Balanceo_Test {
             //camposRecl2.put('SEG_Grupo__c', grupo2.id);
 
             Case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
-            Database.insert(reclamacion2);
+            SAC_DatabaseDML.insertDML(reclamacion2, false); 
+            //Database.insert(reclamacion2);
 
             //Reclamacion 3
             Map<String, Object> camposRecl3 = new Map<String, Object>();
@@ -86,7 +94,8 @@ public with sharing class SAC_Balanceo_Test {
             camposRecl3.put('AccountId', cuentas[1].id);
 
             Case reclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl3);
-            Database.insert(reclamacion3);
+            SAC_DatabaseDML.insertDML(reclamacion3, false);
+            //Database.insert(reclamacion3);
 
             //Reclamacion 4
             Map<String, Object> camposRecl4 = new Map<String, Object>();
@@ -96,7 +105,8 @@ public with sharing class SAC_Balanceo_Test {
             camposRecl4.put('OwnerId', usuarioGeneral.id);
 
             Case reclamacion4 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl4);
-            Database.insert(reclamacion4);
+            SAC_DatabaseDML.insertDML(reclamacion4, false);
+            //Database.insert(reclamacion4);
     
             Test.stopTest();
         }
@@ -104,8 +114,8 @@ public with sharing class SAC_Balanceo_Test {
     }
     @isTest
     static void balanceoGruposTest () {
-        Account cuenta = [select id from account limit 1];
-        List<Case> listacasos = [select id, Subject, Origin, Status, SEG_Grupo__c, AccountId, OwnerId, RecordTypeId from case];
+        // Account cuenta = [select id from account limit 1];
+        // List<Case> listacasos = [select id, Subject, Origin, Status, SEG_Grupo__c, AccountId, OwnerId, RecordTypeId from case];
 
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
 		System.runAs(usuario){
@@ -117,7 +127,8 @@ public with sharing class SAC_Balanceo_Test {
             caso3.SAC_StatusAuxiliar__c = caso3.Status;
             //caso3.AccountId = cuenta.Id;
             caso3.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
-            Database.insert(caso3);
+            SAC_DatabaseDML.insertDML(caso3, false);
+            //Database.insert(caso3);
 
             Case caso4 = new Case();
             caso4.Subject = 'Tec';
@@ -126,7 +137,8 @@ public with sharing class SAC_Balanceo_Test {
             caso4.SAC_StatusAuxiliar__c = caso4.Status;
             //caso4.AccountId = cuenta.Id;
             caso4.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
-            Database.insert(caso4);
+            SAC_DatabaseDML.insertDML(caso4, false);
+            //Database.insert(caso4);
             Test.stopTest();
         }
         Case caso = [select id, Subject, SEG_Grupo__c from Case where subject = 'Tec' limit 1];
@@ -143,7 +155,8 @@ public with sharing class SAC_Balanceo_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
 		System.runAs(usuario){
             Test.startTest();
-            Database.update(listacasos);
+            SAC_DatabaseDML.updateListDML(listacasos, false);
+            //Database.update(listacasos);
             Test.stopTest();
         }
         system.assertEquals(listacasos.isEmpty(), false, 'No se ha podido efectuar el balanceo');

@@ -21,20 +21,23 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         usuarioSACAdmin.Username = 'usertestadmin@test.com.testSetup';      
         listaUsuarios.add(usuarioSACAdmin);
 
-        Database.insert(listaUsuarios);
+        SAC_DatabaseDML.insertListDML(listaUsuarios, false);
+        //Database.insert(listaUsuarios);
 
         System.runAs(usuarioAdmin) {
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            //Database.insert(permiSetAssi);
 
             PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
             PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
             permiSetAssiAdmin.AssigneeId = usuarioSACAdmin.Id;
             permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-            Database.insert(permiSetAssiAdmin);
+            SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false);
+            //Database.insert(permiSetAssiAdmin);
         }
 
         // Crear cuentas
@@ -54,8 +57,9 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         cuentas[3].name = 'Test05';
         cuentas[3].CC_Numero_Documento__c = '71234771E';
         cuentas[4].name = 'Test07';
-        cuentas[4].CC_Numero_Documento__c = '15197951B';                                   
-        Database.insert(cuentas);
+        cuentas[4].CC_Numero_Documento__c = '15197951B';    
+        SAC_DatabaseDML.insertListDML(cuentas, false);                               
+        //Database.insert(cuentas);
         
     
         // Crear contactos
@@ -76,8 +80,9 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         contactos.add(contacto2);
         contactos.add(contacto3);
         contactos.add(contacto4);
-        contactos.add(contacto5);                       
-        Database.insert(contactos);
+        contactos.add(contacto5);   
+        SAC_DatabaseDML.insertListDML(contactos, false);                      
+        //Database.insert(contactos);
     
         // Crear casos
         List<Case> reclamaciones = new List<Case>();
@@ -169,8 +174,9 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
 
         Case reclamacion7 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl7);
         reclamaciones.add(reclamacion7);
-         
-        Database.insert(reclamaciones);
+        
+        SAC_DatabaseDML.insertListDML(reclamaciones, false); 
+        //Database.insert(reclamaciones);
 
         
         // Crear canal comunicación.
@@ -181,7 +187,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         c1.CC_CuentaId__c = cuentas[0].Id;
         c1.CC_Telefono__c = '938500000';
         c1.RecordTypeId = sRecordType1;
-        Database.insert(c1);
+        SAC_DatabaseDML.insertDML(c1, false);
+        //Database.insert(c1);
 
         // Alta de datos para la prueba
         Id recordTypeIdContrato = Schema.SObjectType.CC_Representante_Contrato__c.getRecordTypeInfosByDeveloperName().get('CC_Contrato').getRecordTypeId();
@@ -190,12 +197,14 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         CC_Representante_Contrato__c representante = new CC_Representante_Contrato__c();
         representante.RecordTypeId = recordTypeIdRepresentante;
         representante.CC_ClienteRepresentante__c = cuentas[0].Id;
-        Database.insert(representante);
+        SAC_DatabaseDML.insertDML(representante, false);
+        //Database.insert(representante);
 
         CC_Representante_Contrato__c contrato = new CC_Representante_Contrato__c();
         contrato.RecordTypeId = recordTypeIdContrato;
         contrato.CC_ClienteContrato__c = cuentas[0].Id;
-        Database.insert(contrato);
+        SAC_DatabaseDML.insertDML(contrato, false);
+        //Database.insert(contrato);
     }
 
     @isTest
@@ -210,7 +219,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         oCont = [SELECT Id FROM Contact WHERE LastName = 'Test02'];
         oAcc = [SELECT Id FROM Account WHERE Name = 'Test01'];
         oCaso.OwnerId = usuario.id;
-        Database.update(oCaso);
+        SAC_DatabaseDML.updateDML(oCaso, false);
+        //Database.update(oCaso);
         
         System.runAs(usuario) {
             Test.startTest();
@@ -220,7 +230,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
             SAC_Reclamacion__c = oCaso.Id,
             AccountId = oAcc.id
             );
-            Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);
 
             SAC_LCMP_BusquedaCliente.setClienteCaso (oCont.Id, 'Contacto', oCaso.Id);
             Test.stopTest();
@@ -248,7 +259,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         oCaso = [SELECT Id FROM Case WHERE Subject = 'Test03'];
         oCont = [SELECT Id FROM Contact WHERE LastName = 'Test03'];
         oCaso.ContactId = oCont.Id;
-        Database.update(oCaso);
+        SAC_DatabaseDML.updateDML(oCaso, false);
+        //Database.update(oCaso);
         oCont = [SELECT Id FROM Contact WHERE LastName = 'Test02'];
         System.runAs(usuario) {
             SAC_LCMP_BusquedaCliente.setClienteCaso (oCont.Id, 'Contacto', oCaso.Id);
@@ -258,7 +270,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         oCaso = [SELECT Id FROM Case WHERE Subject = 'Test04'];
         oCont = [SELECT Id FROM Contact WHERE LastName = 'Test04'];
         oCaso.ContactId = oCont.Id;
-        Database.update(oCaso);
+        SAC_DatabaseDML.updateDML(oCaso, false);
+        //Database.update(oCaso);
         oCont = [SELECT Id FROM Contact WHERE LastName = 'Test02'];
         System.runAs(usuario) {
             SAC_LCMP_BusquedaCliente.setClienteCaso (oCont.Id, 'Contacto', oCaso.Id);
@@ -277,7 +290,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         oCaso = [SELECT Id FROM Case WHERE Subject = 'Test05'];
         oAcc = [SELECT Id FROM Account WHERE Name = 'Test05'];
         oCaso.AccountId = oAcc.Id;
-        Database.update(oCaso);
+        SAC_DatabaseDML.updateDML(oCaso, false);
+        //Database.update(oCaso);
         oCont = [SELECT Id FROM Contact WHERE LastName = 'Test02'];
         System.runAs(usuario){
             SAC_LCMP_BusquedaCliente.setClienteCaso (oCont.Id, 'Contacto', oCaso.Id);
@@ -288,7 +302,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         oCaso = [SELECT Id, AccountId FROM Case WHERE Subject = 'Test06'];
         oCont = [SELECT Id FROM Contact WHERE LastName = 'Test06'];
         oCaso.ContactId = oCont.Id;
-        Database.update(oCaso);
+        SAC_DatabaseDML.updateDML(oCaso, false);
+        //Database.update(oCaso);
         oAcc = [SELECT Id FROM Account WHERE Name = 'Test01'];
         System.runAs(usuario){
             SAC_LCMP_BusquedaCliente.setClienteCaso (oAcc.Id, 'Cuenta', oCaso.Id);
@@ -299,7 +314,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         oCaso = [SELECT Id FROM Case WHERE Subject = 'Test07'];
         oAcc = [SELECT Id FROM Account WHERE Name = 'Test07'];
         oCaso.AccountId = oAcc.Id;
-        Database.update(oCaso);
+        SAC_DatabaseDML.updateDML(oCaso, false);
+        //Database.update(oCaso);
         oAcc = [SELECT Id FROM Account WHERE Name = 'Test01'];
         System.runAs(usuario){
             SAC_LCMP_BusquedaCliente.setClienteCaso (oAcc.Id, 'Cuenta', oCaso.Id);
@@ -335,7 +351,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         Account oAcc = [SELECT Id FROM Account WHERE Name = 'Test01'];
         Contact oCon = [SELECT Id FROM Contact WHERE LastName = 'Test01'];
         oCon.Account = oAcc;
-        Database.update(oCon);
+        SAC_DatabaseDML.updateDML(oCon, false);
+        //Database.update(oCon);
         CC_Canal_Com__c canal = [SELECT Id, CC_ContactoId__c, CC_CuentaId__c, CC_Telefono__c FROM CC_Canal_Com__c WHERE CC_Telefono__c = '938500000' LIMIT 1];
 
         Test.startTest();
@@ -468,7 +485,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         caso = [SELECT Id, AccountId FROM Case WHERE Subject = 'Test01'];
         cont = [SELECT Id FROM Contact WHERE LastName = 'Test02'];
         caso.OwnerId = usuario.id;
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
+        //Database.update(caso);
         
         System.runAs(usuario) {
             Test.startTest();
@@ -487,7 +505,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
         caso = [SELECT Id, AccountId FROM Case WHERE Subject = 'Test01'];
         cont = [SELECT Id FROM Contact WHERE LastName = 'Test02'];
         caso.OwnerId = usuario.id;
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
+        //Database.update(caso);
         
         System.runAs(usuario) {
             Test.startTest();
@@ -504,7 +523,8 @@ public with sharing class SAC_LCMP_BusquedaCliente_Test {
 
         caso = [SELECT Id FROM Case WHERE Subject = 'Test01'];
         caso.OwnerId = usuario.id;
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
+        //Database.update(caso);
         Boolean test;
 
         System.runAs(usuario){

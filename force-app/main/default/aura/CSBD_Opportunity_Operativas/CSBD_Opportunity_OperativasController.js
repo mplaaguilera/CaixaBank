@@ -6,87 +6,49 @@
 				const retorno = response.getReturnValue();
 				component.set('v.esResponsable', retorno.esResponsable);
 				component.set('v.esAdministrador', retorno.esAdministrador);
+
+				const oportunidad = component.get('v.oportunidad');
+				const botonesActivos = component.get('v.botonesActivos');
+				botonesActivos.botonReactivarActivo = oportunidad.IsClosed && (retorno.esResponsable || ['Hipoteca', 'Acción comercial'].includes(oportunidad.RecordType.Name));
+				botonesActivos.botonAsignacionAutoActivo = retorno.esAdministrador && ['Nueva', 'Activa'].includes(oportunidad.CSBD_Estado__c);
+				component.set('v.botonesActivos', botonesActivos);
 			}
 		});
-		$A.enqueueAction(checkPSResponsable);
+		window.setTimeout($A.getCallback(() => $A.enqueueAction(checkPSResponsable)), 3000);
 	},
 
 	botonRefrescarBotoneraOnclick: function(component, event) {
 		component.find('opportunityData').reloadRecord(true);
 		const botonRefrescarBotonera = event.getSource();
 		$A.util.addClass(botonRefrescarBotonera, 'rotar');
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
 		window.setTimeout($A.getCallback(() => $A.util.removeClass(event.currentTarget, 'rotar')), 470);
 	},
 
-	oportunidadCargada: function(component, event, helper) {
+	recordUpdated: function(component, event, helper) {
 		if (event.getParams().changeType === 'CHANGED') {
-			component.find('opportunityData').reloadRecord();
+			//const camposRelevantes = [
+			//'OwnerId', 'IsClosed', 'CSBD_Estado__c', 'CSBD_Empresa_Proveedora__c', 'CSBD_Contact__c', 'AccountId',
+			//'CSBD_No_Identificado__c', 'CSBD_Fecha_Cita__c', 'CSBD_Fecha_Firma__c', 'CSBD_Familia_Producto__c'
+			//];
+			//if (Object.keys(event.getParams().changedFields).some(campo => camposRelevantes.includes(campo))) {
+			window.setTimeout($A.getCallback(() => component.find('opportunityData').reloadRecord(false)), 0);
+			//}
 
 		} else if (event.getParams().changeType === 'LOADED') {
-			const oportunidad = component.get('v.oportunidad');
-			const esPropietario = oportunidad.OwnerId === $A.get('$SObjectType.CurrentUser.Id');
-			if (!esPropietario) {
+			const ownerId = component.get('v.oportunidad').OwnerId;
+			if (ownerId !== $A.get('$SObjectType.CurrentUser.Id')) {
 				//actualizar owner oportunidad desde omnichannel
 				let actualizarOwnerOportunidadApex = component.get('c.actualizarOwnerOportunidad');
-				actualizarOwnerOportunidadApex.setParams({idOpportunity: component.get('v.recordId'), ownerId: component.get('v.oportunidad.OwnerId')});
+				actualizarOwnerOportunidadApex.setParams({idOpportunity: component.get('v.recordId'), ownerId});
 				actualizarOwnerOportunidadApex.setCallback(this, response => {
 					if (response.getState() === 'SUCCESS' && response.getReturnValue()) {
-						$A.get('e.force:refreshView').fire();
+						component.find('opportunityData').reloadRecord(true);
+						//$A.get('e.force:refreshView').fire();
 					}
 				});
 				$A.enqueueAction(actualizarOwnerOportunidadApex);
 			}
-
-			const isClosed = oportunidad.IsClosed;
-			const estado = oportunidad.CSBD_Estado__c;
-			const imaginBank = oportunidad.CSBD_Empresa_Proveedora__c === 'imaginBank';
-			const contactoInformado = Boolean(oportunidad.CSBD_Contact__c);
-			let botonesActivos = {};
-			component.set('v.esPropietario', esPropietario);
-			if (esPropietario) {
-				botonesActivos.botonTrasladoImagin = !isClosed && imaginBank && ['CMB', 'CMN'].includes(oportunidad.RecordType.Name);
-				botonesActivos.botonPendienteInternoActivo = ['Activa', 'Pendiente Interno'].includes(estado);
-				botonesActivos.botonCerrarActivo = estado === 'Activa';
-				botonesActivos.botonReactivarActivo = isClosed && ((component.get('v.esResponsable') && oportunidad.RecordType.Name !== 'Hipoteca') || oportunidad.RecordType.Name === 'Hipoteca' || oportunidad.RecordType.Name === 'Acción comercial');
-				botonesActivos.botonAutenticarActivo = !isClosed && oportunidad.AccountId && oportunidad.CSBD_Contact__c;
-				botonesActivos.botonAmpliarVencimiento = ['Activa', 'Pendiente Interno', 'Pendiente Cita', 'Pendiente Cliente'].includes(estado);
-				botonesActivos.botonInformeSiaActivo = !isClosed && estado !== 'Nueva';
-
-				if (contactoInformado || !contactoInformado && oportunidad.CSBD_No_Identificado__c) { //identificado
-					botonesActivos.botonEnviarCorreoActivo = !isClosed && estado !== 'Nueva';
-					botonesActivos.botonConvertirActivo = !isClosed;
-					botonesActivos.botonEnviarNotificacionActivo = botonesActivos.botonEnviarCorreoActivo;
-					botonesActivos.botonProgramarActivo = ['Activa', 'Pendiente Interno'].includes(estado);
-					botonesActivos.botonDesprogramarActivo = estado === 'Pendiente Cita';
-					botonesActivos.botonAgendarFirmaActivo = ['Activa', 'Pendiente Interno', 'Pendiente Cita', 'Pendiente Cliente'].includes(estado);
-					botonesActivos.botonCancelarFirmaActivo = botonesActivos.botonAgendarFirmaActivo;
-				}
-
-				botonesActivos.botonTareaGestorActivo = contactoInformado && !isClosed && estado !== 'Nueva' ;
-			}
-			botonesActivos.botonCopiarNIFActivo = contactoInformado;
-			botonesActivos.botonHistorialSolicitudesActivo = contactoInformado;
-			botonesActivos.botonActualizarDatosRiesgoContactoActivo = contactoInformado;
-			component.set('v.programarNuevoPropietarioSeleccionado', oportunidad.OwnerId);
-
-			if (estado === 'Pendiente Cita') {
-				component.set('v.fechaCitaFormateada', $A.localizationService.formatDateTime(oportunidad.CSBD_Fecha_Cita__c, 'd MMM HH:mm'));
-			} else if (['Nueva', 'Activa'].includes(estado)) {
-				botonesActivos.botonAsignacionAutoActivo = component.get('v.esAdministrador');
-			}
-			component.set('v.botonesActivos', botonesActivos);
-
-			if (oportunidad.CSBD_Fecha_Firma__c) {
-				component.set('v.fechaFirmaFormateada', $A.localizationService.formatDateTime(oportunidad.CSBD_Fecha_Firma__c, 'd MMM HH:mm'));
-			}
-
-			const familiaProducto = component.get('v.oportunidad.CSBD_Familia_Producto__c');
-			if (familiaProducto === 'Hipotecas') {
-				component.set('v.tipoOperativaConvertir', 'hipoteca');
-			} else if (familiaProducto === 'Préstamos') {
-				component.set('v.tipoOperativaConvertir', 'préstamo');
-			}
+			helper.refrescarBotones(component);
 
 		} else if (event.getParams().changeType === 'ERROR') {
 			console.error(component.get('v.errorLds'));
@@ -105,7 +67,8 @@
 		trasladoImaginBank.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				helper.mostrarToast('Oportunidad traspasada a Imagin', 'La oportunidad ' + component.get('v.oportunidad.CSBD_Identificador__c') + ' ha sido traspasada a Imagin mediante correo electrónico.', 'success');
-				$A.get('e.force:refreshView').fire();
+				component.find('opportunityData').reloadRecord(true);
+				//$A.get('e.force:refreshView').fire();
 			} else if (response.getState() === 'ERROR') {
 				helper.mostrarToast('Problema realizando el traspaso a Imagin', JSON.stringify(trasladoImaginBank.getError()[0].message), 'error');
 			}
@@ -133,11 +96,10 @@
 
 	botonAmpliarVencimiento: function(component, event, helper) {
 		component.set('v.cargarModales', true);
-		component.find('prorrogaFechaAltaVencimientoContinuar').set('v.disabled', false);
 		let fechaVencimiento = new Date(component.get('v.oportunidad.CSBD_Fecha_vencimiento_alta__c'));
 		fechaVencimiento.setMonth(fechaVencimiento.getMonth() + 1);
 		component.set('v.fechaAmpliarVencimiento', fechaVencimiento.toISOString());
-		$A.util.addClass(component.find('modalboxProrrogaFechaAltaVencimiento'), 'slds-fade-in-open');
+		$A.util.addClass(component.find('modalProrrogaFechaAltaVencimiento'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 		helper.seleccionarControl(component, 'prorrogaFechaAltaVencimiento', 50);
 	},
@@ -170,7 +132,7 @@
 			$A.enqueueAction(subdirectoriosOperativas);
 
 			component.set('v.cargarModales', true);
-			$A.util.addClass(component.find('modalboxEnviarCorreo'), 'slds-fade-in-open');
+			$A.util.addClass(component.find('modalEnviarCorreo'), 'slds-fade-in-open');
 			$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 		}
 	},
@@ -221,8 +183,9 @@
 	},
 
 	cerrarModalEnviarCorreo: function(component) {
-		$A.util.removeClass(component.find('modalboxEnviarCorreo'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalEnviarCorreo'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	togglePendienteClienteChange: function(component, event, helper) {
@@ -301,7 +264,7 @@
 
 			//Mostrar modal
 			component.set('v.enviarNotificacionEnvioDeshabilitado', false);
-			$A.util.addClass(component.find('modalboxEnviarNotificacion'), 'slds-fade-in-open');
+			$A.util.addClass(component.find('modalEnviarNotificacion'), 'slds-fade-in-open');
 			$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 		}
 	},
@@ -351,8 +314,9 @@
 	},
 
 	cerrarModalEnviarNotificacion: function(component) {
-		$A.util.removeClass(component.find('modalboxEnviarNotificacion'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalEnviarNotificacion'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	enviarNotificacion: function(component, event, helper) {
@@ -378,7 +342,8 @@
 					if (resultado === 'OK') {
 						helper.mostrarToast('Se envió SMS', 'Se envió correctamente el SMS al destinatario ' + destinatario, 'success');
 						$A.enqueueAction(component.get('c.cerrarModalEnviarNotificacion'));
-						$A.get('e.force:refreshView').fire();
+						component.find('opportunityData').reloadRecord(true);
+						//$A.get('e.force:refreshView').fire();
 					} else {
 						helper.mostrarToast('No se pudo enviar el SMS', resultado, 'error');
 					}
@@ -394,14 +359,15 @@
 
 	abrirModalAgendarFirma: function(component, event, helper) {
 		component.set('v.cargarModales', true);
-		$A.util.addClass(component.find('modalboxAgendarCita'), 'slds-fade-in-open');
+		$A.util.addClass(component.find('modalAgendarCita'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 		helper.seleccionarControl(component, 'cerrarModalAgendarFirma', 50);
 	},
 
 	cerrarModalAgendarFirma: function(component) {
-		$A.util.removeClass(component.find('modalboxAgendarCita'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalAgendarCita'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	agendarFirma: function(component, event, helper) {
@@ -417,34 +383,37 @@
 				tipoFirma: component.find('inputTipoFirma').get('v.checked'),
 				startDateTime: inputAgendarFirma.get('v.value')
 			}).then(() => {
+				component.find('opportunityData').reloadRecord(true);
+				//$A.get('e.force:refreshView').fire();
 				helper.mostrarToast('Se programó firma', 'Se programó una firma con el cliente para el ' + helper.formatearFecha(Date.parse(inputAgendarFirma.get('v.value'))), 'success');
 				$A.enqueueAction(component.get('c.cerrarModalAgendarFirma'));
-				$A.get('e.force:refreshView').fire();
 			}).catch(textoError => {
 				console.error(textoError);
 				helper.mostrarToast('error', textoError, 'error');
-			}).finally(() => botonAceptar.set('v.disabled', false));
+				botonAceptar.set('v.disabled', false);
+			});
 		}
 	},
 
 	abrirModalCancelarFirma: function(component, event, helper) {
 		component.set('v.cargarModales', true);
-		$A.util.addClass(component.find('modalboxCancelarFirma'), 'slds-fade-in-open');
+		$A.util.addClass(component.find('modalCancelarFirma'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
-		helper.seleccionarControl(component, 'modalboxCancelarFirmaCerrar', 50);
+		helper.seleccionarControl(component, 'modalCancelarFirmaCerrar', 50);
 	},
 
 	cerrarModalCancelarFirma: function(component) {
-		$A.util.removeClass(component.find('modalboxCancelarFirma'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalCancelarFirma'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	cancelarFirma: function(component, event, helper) {
 		helper.apex(component, 'cancelarFirmaApex', {recordId: component.get('v.recordId')})
 		.then(firmaCancelada => {
 			if (firmaCancelada) {
+				component.find('opportunityData').reloadRecord(true);
 				helper.mostrarToast('Se canceló firma', 'Se ha cancelado la firma para el ' + helper.formatearFecha(firmaCancelada.StartDateTime), 'info');
-				$A.get('e.force:refreshView').fire();
 			} else {
 				helper.mostrarToast('Sin firmas programadas', 'No existían firmas pendientes con el cliente que cancelar.', 'info');
 			}
@@ -454,27 +423,45 @@
 		$A.enqueueAction(component.get('c.cerrarModalCancelarFirma'));
 	},
 
-	abrirModalProgramar: function(component, event, helper) {
+	abrirModalProgramar: function(component) {
 		component.set('v.cargarModales', true);
-		if (!component.find('inputProgramarFecha').get('v.value')) {
-			component.find('inputProgramarFecha').set('v.value', new Date().toISOString());
+		component.set('v.modalProgramarCita', true);
+		window.setTimeout($A.getCallback(() => component.find('modalProgramarCita').abrirModal()), 50);
+		/*
+		component.set('v.cargarModales', true);
+		if (!component.find('modalProgramarInputFecha').get('v.value')) {
+			const ahora = new Date();
+			const ahoraIso = ahora.toISOString();
+			component.find('modalProgramarInputFecha').set('v.value', ahoraIso);
+			component.set('v.modalProgramarInputFechaValueAnterior', ahoraIso);
+			const modalProgramarCalendarioDisponibilidad = component.find('modalProgramarCalendarioDisponibilidad');
+			if (modalProgramarCalendarioDisponibilidad) {
+				modalProgramarCalendarioDisponibilidad.set('v.fecha', ahora);
+			}
 		}
-		$A.util.addClass(component.find('modalboxProgramar'), 'slds-fade-in-open');
-		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
-		helper.seleccionarControl(component, 'modalboxProgramarCancelar', 50);
+		window.setTimeout($A.getCallback(() => {
+			$A.util.addClass(component.find('modalProgramar'), 'slds-fade-in-open');
+			$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+			helper.seleccionarControl(component, 'modalProgramarInputFecha', 0);
+		}), 400);
+		*/
 	},
 
 	cerrarModalProgramar: function(component) {
-		$A.util.removeClass(component.find('modalboxProgramar'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalProgramar'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.programarCitaTipoAsignacion', 'A gestor específico');
+		component.set('v.cargarModales', false);
 	},
 
+	/*
 	programar: function(component, event, helper) {
-		let inputProgramarFecha = component.find('inputProgramarFecha');
+		const inputFecha = component.find('modalProgramarInputFecha');
 		let programarNuevoPropietarioSeleccionado = component.get('v.programarNuevoPropietarioSeleccionado');
 		//Si se mantiene el propietario de la oportunidad se recupera el usuario en concreto
 		let propietarioId = null;
-		if (!component.get('v.programarReasignacionAutomatica')) {
+		//if (!component.get('v.programarReasignacionAutomatica')) {
+		if (component.get('v.programarCitaTipoAsignacion') === 'A gestor específico') {
 			if (typeof programarNuevoPropietarioSeleccionado !== 'string') {
 				component.find('inputProgramarBuscarPropietario').reportValidity();
 			} else {
@@ -483,55 +470,60 @@
 		}
 		if (typeof programarNuevoPropietarioSeleccionado === 'string') {
 			//Se programa para una fecha y hora
-			inputProgramarFecha.showHelpMessageIfInvalid();
+			inputFecha.showHelpMessageIfInvalid();
 
-			if (inputProgramarFecha.get('v.validity').valid) {
+			if (inputFecha.get('v.validity').valid) {
+				component.find('modalProgramarAceptar').set('v.disabled', true);
 				let argsProgramarCita = {
 					recordId: component.get('v.recordId'),
-					asignacionAuto: component.find('inputProgramarAsignacionAuto').get('v.checked'),
+					asignacionAuto: component.get('v.programarCitaTipoAsignacion') === 'Automática',
 					comprobarContacto: component.find('inputComprobarContacto').get('v.checked'),
 					idPropietario: propietarioId,
-					startDateTime: inputProgramarFecha.get('v.value')
+					startDateTime: inputFecha.get('v.value')
 				};
 				helper.apex(component, 'programarCita', argsProgramarCita)
 				.then(() => {
-					helper.mostrarToast('Se programó cita', 'Se programó una cita con el cliente para el ' + helper.formatearFecha(Date.parse(inputProgramarFecha.get('v.value'))), 'success');
+					helper.mostrarToast('Se programó cita', 'Se programó una cita con el cliente para el ' + helper.formatearFecha(Date.parse(inputFecha.get('v.value'))), 'success');
 					$A.enqueueAction(component.get('c.cerrarModalProgramar'));
-					$A.get('e.force:refreshView').fire();
+					component.find('opportunityData').reloadRecord(true);
 				}).catch(textoError => {
 					console.error(textoError);
 					helper.mostrarToast('Problema programando la cita', textoError, 'error');
+					component.find('modalProgramarAceptar').set('v.disabled', false);
 				});
-
 			}
 		}
 	},
+	*/
 
 	abrirModalDesprogramar: function(component, event, helper) {
 		component.set('v.cargarModales', true);
-		$A.util.addClass(component.find('modalboxDesprogramar'), 'slds-fade-in-open');
+		$A.util.addClass(component.find('modalDesprogramarCita'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 		helper.seleccionarControl(component, 'cerrarModalDesprogramar', 50);
 	},
 
 	cerrarModalDesprogramar: function(component) {
-		$A.util.removeClass(component.find('modalboxDesprogramar'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalDesprogramarCita'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	desprogramar: function(component, event, helper) {
+		component.find('modalDesprogramarCitaAceptar').set('v.disabled', true);
 		helper.apex(component, 'desprogramarCita', {recordId: component.get('v.recordId')})
 		.then(eventoDesprogramado => {
 			if (eventoDesprogramado) {
 				helper.mostrarToast('Se desprogramó cita', 'Se ha cancelado la cita para el ' + helper.formatearFecha(eventoDesprogramado.StartDateTime), 'info');
-				$A.get('e.force:refreshView').fire();
 			} else {
 				helper.mostrarToast('Sin citas programadas', 'No existían citas pendientes con el cliente que cancelar.', 'info');
 			}
 			$A.enqueueAction(component.get('c.cerrarModalDesprogramar'));
+			component.find('opportunityData').reloadRecord(true);
 		}).catch(textoError => {
 			console.error(textoError);
 			helper.mostrarToast('Problema desprogramando la cita', textoError, 'error');
+			component.find('modalDesprogramarCitaAceptar').set('v.disabled', false);
 		});
 	},
 
@@ -559,7 +551,7 @@
 				$A.enqueueAction(component.get('c.seleccionarCerrarEtapa'));
 			}
 
-			$A.util.addClass(component.find('modalboxCerrar'), 'slds-fade-in-open');
+			$A.util.addClass(component.find('modalCerrar'), 'slds-fade-in-open');
 			$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 			//Foco en el desplegable de etapa final o de resolución
 			if (etapasFinales.length !== 1) {
@@ -569,8 +561,9 @@
 	},
 
 	cerrarModalCerrar: function(component) {
-		$A.util.removeClass(component.find('modalboxCerrar'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalCerrar'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	seleccionarCerrarEtapa: function(component, event, helper) {
@@ -590,13 +583,13 @@
 			$A.enqueueAction(oportunidadesHijasAbiertas);
 		}
 
-		let obtenerResoluciones = component.get('c.obtenerResoluciones');
-		obtenerResoluciones.setParams({
+		let obtenerResolucionesApex = component.get('c.obtenerResoluciones');
+		obtenerResolucionesApex.setParams({
 			producto: component.get('v.oportunidad.CSBD_Producto__c'),
 			nombreRecordType: component.get('v.oportunidad.RecordType.Name'),
 			etapa: resultado
 		});
-		obtenerResoluciones.setCallback(this, response => {
+		obtenerResolucionesApex.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				let inputCerrarResolucion = component.find('inputCerrarResolucion');
 				inputCerrarResolucion.set('v.value', null);
@@ -613,11 +606,13 @@
 				helper.seleccionarControl(component, 'inputCerrarResolucion', 40);
 			}
 		});
-		$A.enqueueAction(obtenerResoluciones);
+		$A.enqueueAction(obtenerResolucionesApex);
 	},
 
 	cerrar: function(component, event, helper) {
 		let campos = new Map();
+
+		let notasGestor;
 
 		let inputCerrarEtapa = component.find('inputCerrarEtapa');
 		inputCerrarEtapa.checkValidity();
@@ -626,6 +621,18 @@
 		let inputCerrarResolucion = component.find('inputCerrarResolucion');
 		inputCerrarResolucion.checkValidity();
 		inputCerrarResolucion.reportValidity();
+
+		let inputMotivoRechazo = component.find('inputMotivoRechazo');
+		if (inputMotivoRechazo) {
+			inputMotivoRechazo.checkValidity();
+			inputMotivoRechazo.reportValidity();
+			if (inputMotivoRechazo.get('v.validity').valid) {
+
+				notasGestor = component.get('v.oportunidad.CSBD_Notas_gestor__c') ? inputMotivoRechazo.get('v.value') + '\n' + component.get('v.oportunidad.CSBD_Notas_gestor__c') : inputMotivoRechazo.get('v.value');
+
+				campos.set('CSBD_Notas_gestor__c', notasGestor);
+			}
+		}
 
 		let inputTipoOfertado = component.find('inputTipoOfertado');
 		if (inputTipoOfertado) {
@@ -645,7 +652,11 @@
 			}
 		}
 
-		if (inputCerrarEtapa.get('v.validity').valid && inputCerrarResolucion.get('v.validity').valid) {
+		if (inputCerrarEtapa.get('v.validity').valid
+		&& inputCerrarResolucion.get('v.validity').valid
+		&& (!inputMotivoRechazo || inputMotivoRechazo.get('v.validity').valid)
+		&& (!inputTipoOfertado || inputTipoOfertado.get('v.validity').valid)
+		&& (!inputEntidadCompetencia || inputEntidadCompetencia.get('v.validity').valid)) {
 			component.find('botonCerrarCerrar').set('v.disabled', true);
 			let cerrarOportunidad = component.get('c.cerrarOportunidad');
 			cerrarOportunidad.setParams({
@@ -657,16 +668,17 @@
 			cerrarOportunidad.setCallback(this, response => {
 				if (response.getState() === 'SUCCESS') {
 					helper.mostrarToast('Se cerró oportunidad ' + response.getReturnValue().CSBD_Identificador__c, 'La oportunidad se cerró satisfactoriamente', 'success');
+					component.find('opportunityData').reloadRecord(true);
 					$A.enqueueAction(component.get('c.cerrarModalCerrar'));
-					$A.get('e.force:refreshView').fire();
 				} else {
 					console.error(cerrarOportunidad.getError());
 					helper.mostrarToast('Problema cerrando la oportunidad', cerrarOportunidad.getError()[0].message, 'error');
+					component.find('botonCerrarCerrar').set('v.disabled', false);
 				}
-				component.find('botonCerrarCerrar').set('v.disabled', false);
 			});
 			$A.enqueueAction(cerrarOportunidad);
 		}
+
 	},
 
 	seleccionarCerrarResolucion: function(component, event, helper) {
@@ -683,8 +695,14 @@
 				}
 			});
 			$A.enqueueAction(obtenerEntidad);
+
 			component.set('v.mostrarTipoBonificado', true);
+			component.set('v.mostrarMotivoRechazo', false);
+		} else if (resultado === 'Devolución a contact') {
+			component.set('v.mostrarMotivoRechazo', true);
+			component.set('v.mostrarTipoBonificado', false);
 		} else {
+			component.set('v.mostrarMotivoRechazo', false);
 			component.set('v.mostrarTipoBonificado', false);
 		}
 	},
@@ -694,14 +712,15 @@
 		//Por defecto se volverá a la penúltima etapa de ventas
 		component.find('inputReactivarEtapa').set('v.value', component.get('v.oportunidad.CSBD_Ultima_Etapa_Ventas__c'));
 
-		$A.util.addClass(component.find('modalboxReactivar'), 'slds-fade-in-open');
+		$A.util.addClass(component.find('modalReactivar'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 		helper.seleccionarControl(component, 'inputReactivarEtapa', 50);
 	},
 
 	cerrarModalReactivar: function(component) {
-		$A.util.removeClass(component.find('modalboxReactivar'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalReactivar'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	reactivar: function(component, event, helper) {
@@ -718,12 +737,14 @@
 			reactivarOportunidad.setCallback(this, response => {
 				if (response.getState() === 'SUCCESS') {
 					helper.mostrarToast('Se reactivó oportunidad ' + response.getReturnValue().CSBD_Identificador__c, 'La oportunidad se reactivó satisfactoriamente.', 'success');
+					component.find('opportunityData').reloadRecord(true);
+					//$A.get('e.force:refreshView').fire();
 					$A.enqueueAction(component.get('c.cerrarModalReactivar'));
-					$A.get('e.force:refreshView').fire();
 				} else {
+					console.error(reactivarOportunidad.getError());
 					helper.mostrarToast('No se ha podido reactivar la oportunidad', JSON.stringify(response.getError()), 'error');
+					component.find('botonReactivarReactivar').set('v.disabled', false);
 				}
-				component.find('botonReactivarReactivar').set('v.disabled', false);
 			});
 			$A.enqueueAction(reactivarOportunidad);
 		}
@@ -736,65 +757,64 @@
 
 	cerrarOtrasOperativas: function(component) {
 		const popover = component.find('popoverOtrasOperativas');
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
-		component.set('v.otrasOperativasTimeout', window.setTimeout($A.getCallback(() => $A.util.removeClass(popover, 'visible')), 220));
+		component.set('v.otrasOperativasTimeout', window.setTimeout($A.getCallback(() => $A.util.removeClass(popover, 'visible')), 260));
 	},
 
-	modalboxEnviarCorreoTeclaPulsada: function(component, event) {
+	modalEnviarCorreoTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalEnviarCorreo'));
 		}
 	},
 
-	modalboxEnviarNotificacionTeclaPulsada: function(component, event) {
+	modalEnviarNotificacionTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalEnviarNotificacion'));
 		}
 	},
 
-	modalboxAgendarCitaTeclaPulsada: function(component, event) {
+	modalAgendarCitaTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalAgendarFirma'));
 		}
 	},
 
-	modalboxProgramarTeclaPulsada: function(component, event) {
+	modalProgramarTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalProgramar'));
 		}
 	},
 
-	modalboxCerrarTeclaPulsada: function(component, event) {
+	modalCerrarTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalCerrar'));
 		}
 	},
 
-	modalboxReactivarTeclaPulsada: function(component, event) {
+	modalReactivarTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalReactivar'));
 		}
 	},
 
-	modalboxDesprogramarTeclaPulsada: function(component, event) {
+	modalDesprogramarCitaTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalDesprogramar'));
 		}
 	},
 
-	modalboxCancelarFirmaTeclaPulsada: function(component, event) {
+	modalCancelarFirmaTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalCancelarFirma'));
 		}
 	},
 
-	modalboxAsignarAutoTeclaPulsada: function(component, event) {
+	modalAsignarAutoTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalAsignarAuto'));
 		}
 	},
 
-	modalboxDuplicarTeclaPulsada: function(component, event) {
+	modalClonarTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalDuplicar'));
 		}
@@ -806,13 +826,13 @@
 		}
 	},
 
-	modalboxPendienteInternoTeclaPulsada: function(component, event) {
+	modalPendienteInternoTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalPendienteInterno'));
 		}
 	},
 
-	modalboxProrrogaFechaAltaVencimientoTeclaPulsada: function(component, event) {
+	modalProrrogaFechaAltaVencimientoTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalProrrogaFechaAltaVencimiento'));
 		}
@@ -820,9 +840,9 @@
 
 	abrirModalAsignarAuto: function(component, event, helper) {
 		component.set('v.cargarModales', true);
-		$A.util.addClass(component.find('modalboxAsignarAuto'), 'slds-fade-in-open');
+		$A.util.addClass(component.find('modalAsignarAuto'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
-		helper.seleccionarControl(component, 'modalboxAsignarAutoCancelar', 50);
+		helper.seleccionarControl(component, 'modalAsignarAutoCancelar', 50);
 	},
 
 	abrirModalPendienteInterno: function(component, event, helper) {
@@ -835,7 +855,7 @@
 
 		if (component.get('v.oportunidad.CSBD_Estado__c') === 'Pendiente Interno') {
 			component.set('v.modalPendienteInternoTexto', '¿Quieres reanudar la gestión de la oportunidad?');
-			component.find('pendienteInternoAceptar').set('v.label', 'Reactivar');
+			component.find('pendienteInternoAceptar').set('v.label', 'Reanudar');
 			component.find('pendienteInternoAceptar').set('v.iconName', 'utility:play');
 		} else {
 			component.set('v.modalPendienteInternoTexto', '¿Quieres cambiar el estado de la oportunidad a "Pendiente Interno"?');
@@ -878,33 +898,6 @@
 					motivos = [
 						{label: 'Interno', value: 'Interno'}
 					];
-				/*
-				} else if(recordTypeOpportunity === 'CSBD_Hipoteca'){
-					motivos = [
-						{label: 'Aprobada pte. Escritura', value: 'Aprobada pte. Escritura'},
-						{label: 'Aprobada pte. FEIN', value: 'Aprobada pte. FEIN'},
-						{label: 'Aprobada pte. Homologación', value: 'Aprobada pte. Homologación'},
-						{label: 'Aprobada pte. OK cliente', value: 'Aprobada pte. OK cliente'},
-						{label: 'Aprobada pte. Tasación', value: 'Aprobada pte. Tasación'},
-						{label: 'Cliente no localizado', value: 'Cliente no localizado'},
-						{label: 'Interno', value: 'Interno'},
-						{label: 'Pendiente Acta Notarial', value: 'Pendiente Acta Notarial'},
-						{label: 'Pendiente de documentación', value: 'Pendiente de documentación'},
-						{label: 'Pendiente de firma', value: 'Pendiente de firma'},
-						{label: 'Pendiente de tasación', value: 'Pendiente de tasación'},
-						{label: 'Pendiente escrituración', value: 'Pendiente escrituración'},
-						{label: 'Pendiente informe', value: 'Pendiente informe'},
-						{label: 'Pendiente iniciar SIA', value: 'Pendiente iniciar SIA'},
-						{label: 'Pendiente OK cliente', value: 'Pendiente OK cliente'},
-						{label: 'Propuesta viable enviada', value: 'Propuesta viable enviada'},
-						{label: 'SIA en trámite', value: 'SIA en trámite'},
-						{label: 'Solicitada Prov. de Fondos CV/Hip.', value: 'Solicitada Prov. de Fondos CV/Hip.'},
-						{label: 'Solicitar Emisión Cheques Bancarios', value: 'Solicitar Emisión Cheques Bancarios'},
-						{label: 'Solicitud CIRBE/Nota Simple', value: 'Solicitud CIRBE/Nota Simple'},
-						{label: 'Trasladada CARP', value: 'Trasladada CARP'},
-						{label: 'Trasladada DT Tarifa', value: 'Trasladada DT Tarifa'}
-					];
-				}*/
 				} else if (recordType === 'CSBD_Prestamo') {
 					motivos = [
 						{label: 'Cliente no localizado', value: 'Cliente no localizado'},
@@ -940,19 +933,21 @@
 			}
 		}
 
-		$A.util.addClass(component.find('modalboxPendienteInterno'), 'slds-fade-in-open');
+		$A.util.addClass(component.find('modalPendienteInterno'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 		helper.seleccionarControl(component, 'pendienteInternoCancelar', 50);
 	},
 
 	cerrarModalAsignarAuto: function(component) {
-		$A.util.removeClass(component.find('modalboxAsignarAuto'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalAsignarAuto'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	cerrarModalProrrogaFechaAltaVencimiento: function(component) {
-		$A.util.removeClass(component.find('modalboxProrrogaFechaAltaVencimiento'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalProrrogaFechaAltaVencimiento'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	pendienteInterno: function(component, event, helper) {
@@ -976,8 +971,8 @@
 				} else if (saveResult.state === 'ERROR') {
 					console.error(JSON.stringify(saveResult.error));
 					helper.mostrarToast('Problema cambiando estado a "Pendiente Interno"', JSON.stringify(saveResult.error), 'error');
+					component.find('pendienteInternoAceptar').set('v.disabled', false);
 				}
-				component.find('pendienteInternoAceptar').set('v.disabled', false);
 			}));
 
 		} else {
@@ -991,15 +986,16 @@
 				} else if (saveResult.state === 'ERROR') {
 					console.error(JSON.stringify(saveResult.error));
 					helper.mostrarToast('Problema reactivando la oportunidad', JSON.stringify(saveResult.error), 'error');
+					component.find('pendienteInternoAceptar').set('v.disabled', false);
 				}
-				component.find('pendienteInternoAceptar').set('v.disabled', false);
 			}));
 		}
 	},
 
 	cerrarModalPendienteInterno: function(component) {
-		$A.util.removeClass(component.find('modalboxPendienteInterno'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalPendienteInterno'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	abrirModalDuplicar: function(component, event, helper) {
@@ -1013,7 +1009,7 @@
 
 				//Abrir modal
 				component.set('v.cargarModales', true);
-				$A.util.addClass(component.find('modalboxDuplicar'), 'slds-fade-in-open');
+				$A.util.addClass(component.find('modalClonar'), 'slds-fade-in-open');
 				$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 
 				component.find('inputClonarOportunidadRecordTypes').set('v.value', component.get('v.oportunidad.RecordType.DeveloperName'));
@@ -1027,22 +1023,24 @@
 	},
 
 	cerrarModalDuplicar: function(component) {
-		$A.util.removeClass(component.find('modalboxDuplicar'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalClonar'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	cerrarModalConvertirAHipoteca: function(component) {
 		$A.util.removeClass(component.find('modalConvertirAHipoteca'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	asignarAuto: function(component, event, helper) {
 		helper.apex(component, 'solicitarAltaOmnichannel', {idOportunidad: component.get('v.recordId')})
 		.then(() => {
+			component.find('opportunityData').reloadRecord(true);
+			//window.setTimeout($A.getCallback(() => $A.get('e.force:refreshView').fire()), 1000);
 			helper.mostrarToast('Asignación automática solicitada', 'Asignación automática solicitada a Omnichannel para la oportunidad ' + component.get('v.oportunidad.CSBD_Identificador__c'), 'success');
 			$A.enqueueAction(component.get('c.cerrarModalAsignarAuto'));
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
-			window.setTimeout($A.getCallback(() => $A.get('e.force:refreshView').fire()), 1000);
 		}).catch(textoError => helper.mostrarToast('Problema solicitando asignación automática', textoError, 'error'));
 	},
 
@@ -1052,8 +1050,8 @@
 			.then(() => {
 				helper.mostrarToast('Fin de asignación automática solicitado', 'Fin de asignación automática solicitado a Omnichannel para la oportunidad ' + component.get('v.oportunidad.CSBD_Identificador__c'), 'info');
 				$A.enqueueAction(component.get('c.cerrarModalAsignarAuto'));
-				//eslint-disable-next-line @lwc/lwc/no-async-operation
-				window.setTimeout($A.getCallback(() => $A.get('e.force:refreshView').fire()), 1000);
+				component.find('opportunityData').reloadRecord(true);
+				//window.setTimeout($A.getCallback(() => $A.get('e.force:refreshView').fire()), 1000);
 			}).catch(textoError => helper.mostrarToast('Problema solicitando asignación automática', textoError, 'error'));
 		}
 	},
@@ -1062,8 +1060,8 @@
 		helper.apex(component, 'actualizarDatosRiesgoContacto', {idOportunidad: component.get('v.recordId')})
 		.then(() => {
 			helper.mostrarToast('Se actualizó la información financiera del contacto', 'Se actualizó la información financiera del contacto', 'success');
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
-			window.setTimeout($A.getCallback(() => $A.get('e.force:refreshView').fire()), 1000);
+			component.find('opportunityData').reloadRecord(true);
+			//window.setTimeout($A.getCallback(() => $A.get('e.force:refreshView').fire()), 1000);
 		}).catch(textoError => helper.mostrarToast('Problema actualizando la información financiera del contacto', textoError, 'error'));
 	},
 
@@ -1082,8 +1080,8 @@
 				$A.enqueueAction(component.get('c.cerrarModalDuplicar'));
 			} else if (response.getState() === 'ERROR') {
 				helper.mostrarToast('No se pudo clonar Oportunidad', duplicar.getError()[0].message, 'error');
+				component.find('botonDuplicarOportunidad').set('v.disabled', false);
 			}
-			component.find('botonDuplicarOportunidad').set('v.disabled', false);
 		});
 		$A.enqueueAction(duplicar);
 	},
@@ -1108,22 +1106,23 @@
 		});
 		ampliarVencimiento.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
+				component.find('opportunityData').reloadRecord(true);
+				//$A.get('e.force:refreshView').fire();
 				const fecha = new Date(response.getReturnValue());
 				let fechaString = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
 				fechaString += `, ${(fecha.getHours() < 10 ? '0' : '') + fecha.getHours()}:${(fecha.getMinutes() < 10 ? '0' : '') + fecha.getMinutes()}`;
-				helper.mostrarToast('Se amplió el plazo de vencimiento', 'La nueva fecha de vencimiento de alta es ' + fechaString, 'success');
 				$A.enqueueAction(component.get('c.cerrarModalProrrogaFechaAltaVencimiento'));
-				$A.get('e.force:refreshView').fire();
+				helper.mostrarToast('Se amplió el plazo de vencimiento', 'La nueva fecha de vencimiento de alta es ' + fechaString, 'success');
 			} else if (response.getState() === 'ERROR') {
 				console.error(ampliarVencimiento.getError());
 				helper.mostrarToast('Problema posponiendo la fecha de vencimiento', ampliarVencimiento.getError()[0].message, 'error');
+				component.find('prorrogaFechaAltaVencimientoContinuar').set('v.disabled', false);
 			}
-			component.find('prorrogaFechaAltaVencimientoContinuar').set('v.disabled', false);
 		});
 		$A.enqueueAction(ampliarVencimiento);
 	},
 
-	abrirModalInformeSia: function(component, event, helper) {
+	abrirModalTrasladoSia: function(component, event, helper) {
 		component.set('v.cargarModales', true);
 
 		//Traslados
@@ -1135,14 +1134,17 @@
 			const datosCalculoDti = JSON.parse(component.get('v.oportunidad.CSBD_Datos_Calculo_DTI__c'));
 			ingresosTitular1 = parseInt(datosCalculoDti.primerTitular.nominasNetas.ingresos, 10);
 			totalIngresosTitulares = ingresosTitular1;
-			if (datosCalculoDti.segundoTitular) {
+			if (datosCalculoDti.segundoTitular.nominasNetas) {
 				ingresosTitular2 = parseInt(datosCalculoDti.segundoTitular.nominasNetas.ingresos, 10);
 				totalIngresosTitulares += ingresosTitular2;
 			}
 		}
 
-		let valorTtraslados = component.get('v.oportunidad.Account.CC_Numero_Documento__c') + '\n';
-		valorTtraslados += '\nCanal: ' + component.get('v.oportunidad.RecordType.Name');
+		const numeroDocumento = component.get('v.oportunidad.Account.CC_Numero_Documento__c');
+
+		let valorTtraslados = '';
+		valorTtraslados += numeroDocumento ? numeroDocumento + '\n\n' : '';
+		valorTtraslados += 'Canal: ' + component.get('v.oportunidad.RecordType.Name');
 		valorTtraslados += '\nLínea: ' + component.get('v.oportunidad.CSBD_Producto__c');
 		valorTtraslados += '\nIngresos mes Tit. 1: ';
 		if (ingresosTitular1 !== null) {
@@ -1170,12 +1172,12 @@
 		valorTtraslados += '\n';
 		valorTtraslados += '\nVinculación asociada a la operación:\n';
 		valorTtraslados = valorTtraslados.replace(/null\n/g, '\n');
-		component.find('modalInformeSiaTextareaTraslados').set('v.value', valorTtraslados);
+		component.find('modalTrasladoSiaTextareaTraslados').set('v.value', valorTtraslados);
 
 		//Aprobada
 		let valorAprobada = 'Aprobada - ' + component.get('v.oportunidad.Account.CC_Numero_Documento__c');
 		valorAprobada = valorAprobada.replace(/null\n/g, '\n');
-		component.find('modalInformeSiaTextareaAprobada').set('v.value', valorAprobada);
+		component.find('modalTrasladoSiaTextareaAprobada').set('v.value', valorAprobada);
 
 		//Fecha firma
 		let valorFechaFirma = 'Fecha firma - ';
@@ -1195,7 +1197,7 @@
 		valorFechaFirma += ' - ';
 		valorFechaFirma += 'Modalidad: ' + component.get('v.oportunidad.CSBD_TipoInteres2__c');
 		valorFechaFirma = valorFechaFirma.replace(/ null/g, ' ');
-		component.find('modalInformeSiaTextareaFechaFirma').set('v.value', valorFechaFirma);
+		component.find('modalTrasladoSiaTextareaFechaFirma').set('v.value', valorFechaFirma);
 
 		//Firmada
 		let valorFirmada = 'Firmada - ';
@@ -1215,269 +1217,37 @@
 		valorFirmada += ' - ';
 		valorFirmada += 'Modalidad: ' + component.get('v.oportunidad.CSBD_TipoInteres2__c');
 		valorFirmada = valorFirmada.replace(/ null/g, ' ');
-		component.find('modalInformeSiaTextareaFirmada').set('v.value', valorFirmada);
+		component.find('modalTrasladoSiaTextareaFirmada').set('v.value', valorFirmada);
 
 		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		$A.util.addClass(component.find('modalTrasladoSia'), 'slds-fade-in-open');
+		window.setTimeout($A.getCallback(() => component.find('modalTrasladoSiaCancelar').focus()), 200);
+	},
+
+	cerrarModalTrasladoSia: function(component) {
+		$A.util.removeClass(component.find('modalTrasladoSia'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
+	},
+
+	abrirModalInformeSia: function(component, event, helper) {
+		component.set('v.cargarModales', true);
+		helper.informeSiaCuerpo(component);
+		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 		$A.util.addClass(component.find('modalInformeSia'), 'slds-fade-in-open');
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
 		window.setTimeout($A.getCallback(() => component.find('modalInformeSiaCancelar').focus()), 200);
 	},
 
 	cerrarModalInformeSia: function(component) {
 		$A.util.removeClass(component.find('modalInformeSia'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
-	abrirModalInformeSia2: function(component, event, helper) {
-		component.set('v.cargarModales', true);
-
-		const opp = component.get('v.oportunidad');
-
-		let ltv = null, dtiNomina = null, dtiNominaBonificado = null, dtiIrpf = null, dtiIrpfBonificado = null;
-		let totalNominas = null, totalIrpf = null;
-		let ingresosTotales, deudasTotales = null;
-		let totalIngresosNomina = 0, totalIngresosIrpf = 0; //Sin multiplicar por las mensualidades.
-
-		const importeCompraventa = opp.CSBD_PrecioInmueble__c ? parseFloat(opp.CSBD_PrecioInmueble__c) : null;
-		const importeHipoteca = opp.Amount ? parseFloat(opp.Amount) : 0;
-		const plazo = opp.CSBD_Now_Plazo__c ? opp.CSBD_Now_Plazo__c : 0;
-
-		let fondosPropios = importeCompraventa - importeHipoteca;
-		let totalFondosPropios = fondosPropios;
-		totalFondosPropios -= opp.CSBD_AportacionInicial__c ? parseFloat(opp.CSBD_AportacionInicial__c) : 0;
-		totalFondosPropios -= opp.CSBD_OC_Donacion__c ? parseFloat(opp.CSBD_OC_Donacion__c) : 0;
-
-		const tasa = 1 + opp.CSBD_TIN_Inicial__c / 100 / 12 - 1;
-		let tasaBonificada;
-		const interesBonificado = opp.CSBD_InteresBonificado__c >= 0 ? opp.CSBD_InteresBonificado__c : 0;
-		if (interesBonificado) {
-			//eslint-disable-next-line no-extra-parens
-			tasaBonificada = (1 + (interesBonificado / 100) / 12) - 1;
-		} else {
-			tasaBonificada = tasa;
+	modalTrasladoSiaTeclaPulsada: function(component, event) {
+		if (event.keyCode === 27) { //ESC
+			$A.enqueueAction(component.get('c.cerrarModalTrasladoSia'));
 		}
-
-		let cuotaBonificada = null, cuotaSinBonificar = null;
-		if (plazo) {
-			if (tasa === 0) {
-				cuotaSinBonificar = importeHipoteca / (plazo * 12) / 12;
-				cuotaBonificada = importeHipoteca / (plazo * 12) / 12;
-			} else {
-				const factorPresenteValorFuturo = Math.pow(1 + tasa, plazo);
-				const factorPresenteValorFuturoBonificado = Math.pow(1 + tasaBonificada, plazo);
-				cuotaSinBonificar = -tasa * (-importeHipoteca * factorPresenteValorFuturo) / (factorPresenteValorFuturo - 1);
-				cuotaBonificada = -tasaBonificada * (-importeHipoteca * factorPresenteValorFuturoBonificado) / (factorPresenteValorFuturoBonificado - 1);
-			}
-		}
-
-		let datosCalculo;
-		if (component.get('v.oportunidad.CSBD_Datos_Calculo_DTI__c')) {
-			try {
-				datosCalculo = JSON.parse(component.get('v.oportunidad.CSBD_Datos_Calculo_DTI__c'));
-				fondosPropios += importeCompraventa * datosCalculo.porcentajeGastosConstitucion;
-				totalFondosPropios = fondosPropios;
-				totalFondosPropios -= opp.CSBD_AportacionInicial__c ? parseFloat(opp.CSBD_AportacionInicial__c) : 0;
-				totalFondosPropios -= opp.CSBD_OC_Donacion__c ? parseFloat(opp.CSBD_OC_Donacion__c) : 0;
-				totalFondosPropios -= datosCalculo.ahorro ? parseFloat(datosCalculo.ahorro) : 0;
-
-				if (Object.keys(datosCalculo.primerTitular).length) {
-					const t1 = datosCalculo.primerTitular;
-					let ingresosTit1Nomina = parseFloat(t1.nominasNetas.ingresos) * parseFloat(t1.nominasNetas.numPagosImpuestos);
-					ingresosTit1Nomina += parseFloat(t1.otrosIngresos.ingresos) * parseFloat(t1.otrosIngresos.numPagosImpuestos);
-					ingresosTit1Nomina += parseFloat(t1.ingresosAlquiler.ingresos) * parseFloat(t1.ingresosAlquiler.numPagosImpuestos);
-
-					let ingresosTit1Irpf = parseFloat(t1.ingresosNetosIrpf.ingresos) - parseFloat(t1.ingresosNetosIrpf.numPagosImpuestos);
-					ingresosTit1Irpf += parseFloat(t1.otrosIngresos.ingresos) * parseFloat(t1.otrosIngresos.numPagosImpuestos);
-					ingresosTit1Irpf += parseFloat(t1.ingresosAlquiler.ingresos) * parseFloat(t1.ingresosAlquiler.numPagosImpuestos);
-
-					totalNominas = parseFloat(t1.nominasNetas.ingresos) * parseFloat(t1.nominasNetas.numPagosImpuestos);
-					totalIrpf = parseFloat(t1.ingresosNetosIrpf.ingresos) - parseFloat(t1.ingresosNetosIrpf.numPagosImpuestos);
-					ingresosTotales = ingresosTit1Nomina ? ingresosTit1Nomina : ingresosTit1Irpf;
-
-					totalIngresosNomina += parseFloat(t1.nominasNetas.ingresos) * parseFloat(t1.nominasNetas.numPagosImpuestos) / 12;
-					totalIngresosNomina += parseFloat(t1.otrosIngresos.ingresos) * parseFloat(t1.otrosIngresos.numPagosImpuestos) / 12;
-					totalIngresosNomina += parseFloat(t1.ingresosAlquiler.ingresos) * parseFloat(t1.ingresosAlquiler.numPagosImpuestos) / 12 / 2;
-
-					totalIngresosIrpf += (parseFloat(t1.ingresosNetosIrpf.ingresos) - parseFloat(t1.ingresosNetosIrpf.numPagosImpuestos)) / 12;
-					totalIngresosIrpf += parseFloat(t1.otrosIngresos.ingresos) * parseFloat(t1.otrosIngresos.numPagosImpuestos) / 12;
-					totalIngresosIrpf += parseFloat(t1.ingresosAlquiler.ingresos) * parseFloat(t1.ingresosAlquiler.numPagosImpuestos) / 12 / 2;
-				}
-
-				if (Object.keys(datosCalculo.segundoTitular).length) {
-					const t2 = datosCalculo.segundoTitular;
-					let ingresosTit2Nomina = parseFloat(t2.nominasNetas.ingresos) * parseFloat(t2.nominasNetas.numPagosImpuestos);
-					ingresosTit2Nomina += parseFloat(t2.otrosIngresos.ingresos) * parseFloat(t2.otrosIngresos.numPagosImpuestos);
-					ingresosTit2Nomina += parseFloat(t2.ingresosAlquiler.ingresos) * parseFloat(t2.ingresosAlquiler.numPagosImpuestos);
-
-					let ingresosTit2Irpf = parseFloat(t2.ingresosNetosIrpf.ingresos) - parseFloat(t2.ingresosNetosIrpf.numPagosImpuestos);
-					ingresosTit2Irpf += parseFloat(t2.otrosIngresos.ingresos) * parseFloat(t2.otrosIngresos.numPagosImpuestos);
-					ingresosTit2Irpf += parseFloat(t2.ingresosAlquiler.ingresos) * parseFloat(t2.ingresosAlquiler.numPagosImpuestos);
-
-					totalNominas += parseFloat(t2.nominasNetas.ingresos) * parseFloat(t2.nominasNetas.numPagosImpuestos);
-					totalIrpf += parseFloat(t2.ingresosNetosIrpf.ingresos) - parseFloat(t2.ingresosNetosIrpf.numPagosImpuestos);
-					ingresosTotales += ingresosTit2Nomina > 0 ? ingresosTit2Nomina : ingresosTit2Irpf;
-
-					totalIngresosNomina += parseFloat(t2.nominasNetas.ingresos) * parseFloat(t2.nominasNetas.numPagosImpuestos) / 12;
-					totalIngresosNomina += parseFloat(t2.otrosIngresos.ingresos) * parseFloat(t2.otrosIngresos.numPagosImpuestos) / 12;
-					totalIngresosNomina += parseFloat(t2.ingresosAlquiler.ingresos) * parseFloat(t2.ingresosAlquiler.numPagosImpuestos) / 12 / 2;
-
-					totalIngresosIrpf += (parseFloat(t2.ingresosNetosIrpf.ingresos) - parseFloat(t2.ingresosNetosIrpf.numPagosImpuestos)) / 12;
-					totalIngresosIrpf += parseFloat(t2.otrosIngresos.ingresos) * parseFloat(t2.otrosIngresos.numPagosImpuestos) / 12;
-					totalIngresosIrpf += parseFloat(t2.ingresosAlquiler.ingresos) * parseFloat(t2.ingresosAlquiler.numPagosImpuestos) / 12 / 2;
-				}
-
-				deudasTotales = parseFloat(datosCalculo.deuda.hipoteca.primerTitular);
-				deudasTotales += parseFloat(datosCalculo.deuda.prestamo.primerTitular);
-				deudasTotales += parseFloat(datosCalculo.deuda.tarjetas.primerTitular);
-				deudasTotales += parseFloat(datosCalculo.deuda.alquiler.primerTitular);
-				deudasTotales += parseFloat(datosCalculo.deuda.hipoteca.segundoTitular);
-				deudasTotales += parseFloat(datosCalculo.deuda.prestamo.segundoTitular);
-				deudasTotales += parseFloat(datosCalculo.deuda.tarjetas.segundoTitular);
-				deudasTotales += parseFloat(datosCalculo.deuda.alquiler.segundoTitular);
-				deudasTotales += parseFloat(cuotaSinBonificar);
-
-				let deudasTotalesBonificacion = parseFloat(datosCalculo.deuda.hipoteca.primerTitular);
-				deudasTotalesBonificacion += parseFloat(datosCalculo.deuda.prestamo.primerTitular);
-				deudasTotalesBonificacion += parseFloat(datosCalculo.deuda.tarjetas.primerTitular);
-				deudasTotalesBonificacion += parseFloat(datosCalculo.deuda.alquiler.primerTitular);
-				deudasTotalesBonificacion += parseFloat(datosCalculo.deuda.hipoteca.segundoTitular);
-				deudasTotalesBonificacion += parseFloat(datosCalculo.deuda.prestamo.segundoTitular);
-				deudasTotalesBonificacion += parseFloat(datosCalculo.deuda.tarjetas.segundoTitular);
-				deudasTotalesBonificacion += parseFloat(datosCalculo.deuda.alquiler.segundoTitular);
-				deudasTotalesBonificacion += parseFloat(cuotaBonificada);
-
-				if (deudasTotales && plazo) {
-					if (totalIngresosNomina) {
-						dtiNomina = deudasTotales / totalIngresosNomina;
-						dtiNominaBonificado = deudasTotalesBonificacion / totalIngresosNomina;
-					}
-
-					if (totalIngresosIrpf) {
-						dtiIrpf = deudasTotales / totalIngresosIrpf;
-						dtiIrpfBonificado = deudasTotalesBonificacion / totalIngresosIrpf;
-					}
-				}
-
-			} catch (error) {
-				console.error('Error parsing JSON (entrevista)', error);
-				return;
-			}
-		}
-
-		let datosFincas;
-		if (component.get('v.oportunidad.CSBD_FincasJson__c')) {
-			try {
-				datosFincas = JSON.parse(component.get('v.oportunidad.CSBD_FincasJson__c'));
-
-
-			} catch (error) {
-				console.error('Error parsing JSON (fincas)', error);
-				return;
-			}
-		}
-
-		if (opp.Amount && opp.CSBD_PrecioInmueble__c) {
-			ltv = opp.Amount / opp.CSBD_PrecioInmueble__c;
-		}
-
-		let texto = `OPERACIÓN SOLICITADA
-
-FINALIDAD. ARGUMENTADA Y ACREDITADA DOCUMENTALMENTE
-
-Operación de cliente/s procedente/s de un LEAD generado por el canal ${opp.CSBD_OC_Canal_Entrada__c ? `${opp.CSBD_OC_Canal_Entrada__c} + ${opp.CSBD_Now_Origen__c}` : opp.CSBD_Now_Origen__c}
-
-Finalidad: ${opp.CSBD_TipoOperacion2__c} ${opp.CSBD_UsoVivienda2__c} de ${opp.CSBD_TipoConstruccion2__c} en ${opp.CSBD_Comunidad_Autonoma_2__c}
-Se han entregado arras por importe de: ${helper.formatImporte(opp.CSBD_AportacionInicial__c)}
-
-% sobre compra: ${helper.formatPorcentaje(helper.formatCalculo(ltv, 2, true))}
-% sobre tasación: ${helper.formatPorcentaje(opp.CSBD_PorcentajeTasacion__c)}
-
-OPERACIÓN: RESUMEN Y COMENTARIOS SEGÚN TIPOLOGÍA
-
-Línea: ${opp.CSBD_Linea__c}
-Importe del préstamo: ${helper.formatImporte(opp.Amount)}
-Plazo: ${plazo}
-Modalidad de tipo de interés: ${opp.CSBD_TipoInteres2__c}
-Interés bonificado: ${helper.formatPorcentaje(interesBonificado)}
-Interés sin bonificar: ${helper.formatPorcentaje(opp.CSBD_TIN_Inicial__c)}
-
-Cuota: ${helper.formatImporte(cuotaBonificada)}
-Cuota sin bonificar: ${helper.formatImporte(cuotaSinBonificar)}
-
-GARANTÍAS
-
-Valor de inversión COMPRAVENTA: ${helper.formatImporte(opp.CSBD_PrecioInmueble__c)}
-% sobre inversión: ${helper.formatPorcentaje(helper.formatCalculo(ltv, 2, true))}
-Valor tasación ESTIMADA: ${helper.formatImporte(opp.CSBD_Tasacion__c)}
-% sobre tasación ESTIMADA: ${helper.formatPorcentaje(opp.CSBD_PorcentajeTasacion__c)}
-
-${helper.informeSiaBloqueFincas(datosFincas)}
-
-SOLICITANTES
-
-Solicitantes CLIENTES CAIXABANK
-
-${helper.informeSiaDescripcionTitulares(opp, datosCalculo)}
-
-Los ingresos anuales totales ascienden a ${helper.formatImporte(ingresosTotales)}
-Los compromisos de pago anuales totales ascienden a ${helper.formatImporte(deudasTotales * 12)}
-
-Origen de los fondos propios: ${helper.formatImporte(fondosPropios, 2, true)}
-
-El importe estimado que debe aportar el cliente es de ${helper.formatImporte(totalFondosPropios)}
-
-Régimen de residencia actual: ${opp.CSBD_Residencia_Actual__c}
-
-CAPACIDAD DE DEVOLUCIÓN
-
-Ingresos anuales netos según Nómina: ${helper.formatImporte(totalNominas)}
-Ingresos anuales netos según IRPF: ${helper.formatImporte(totalIrpf)}
-Compromisos anuales: ${helper.formatImporte(deudasTotales)}
-Cuota ptmo. anual: ${helper.formatImporte(cuotaBonificada)}
-
-DTI sin bonificar según nómina: ${helper.formatPorcentaje(helper.formatCalculo(dtiNomina, 2, true))}
-DTI bonificado según nómina: ${helper.formatPorcentaje(helper.formatCalculo(dtiNominaBonificado, 2, true))}
-
-DTI sin bonificar según IRPF: ${helper.formatPorcentaje(helper.formatCalculo(dtiIrpf, 2, true))}
-DTI bonificado según IRPF: ${helper.formatPorcentaje(helper.formatCalculo(dtiIrpfBonificado, 2, true))}
-
-DTI propuesta SIA: ...
-PD propuesta SIA: ...
-
-ANÁLISIS Y JUSTIFICACIÓN SCORING OPERACIÓN
-
-El scoring de la operación es. El scoring cliente es: ...
-
-Morosidad: ...
-
-CIRBE EXTERNA
-
-La CIRBE total asciende a. Origen: ...
-
-SOLVENCIA
-
-Patrimonio:...
-
-RENTABILIDAD ACTUAL
-
-La REN actual de: ...
-
-Vinculación asociada a la operación: ...
-
-CONCLUSIONES
-
-CONCLUSIONES Y FIRMA
-`;
-		component.find('modalInformeSiaTextareaInfoSia').set('v.value', texto.replace(/null(\n|\s)?/g, ''));
-
-		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
-		$A.util.addClass(component.find('modalInformeSia2'), 'slds-fade-in-open');
-		window.setTimeout($A.getCallback(() => component.find('modalInformeSiaCancelar2').focus()), 200);
-	},
-
-	cerrarModalInformeSia2: function(component) {
-		$A.util.removeClass(component.find('modalInformeSia2'), 'slds-fade-in-open');
-		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
 	},
 
 	modalInformeSiaTeclaPulsada: function(component, event) {
@@ -1486,22 +1256,16 @@ CONCLUSIONES Y FIRMA
 		}
 	},
 
-	modalInformeSiaTeclaPulsada2: function(component, event) {
-		if (event.keyCode === 27) { //ESC
-			$A.enqueueAction(component.get('c.cerrarModalInformeSia2'));
-		}
-	},
-
 	modalInformeSiaCopiarAlPortapapeles: function(component, event, helper) {
 		const idBoton = event.getSource().getLocalId();
-		if (idBoton === 'modalInformeSiaCopiarTraslados') {
-			helper.copiarTextoAlPortapapeles(component.find('modalInformeSiaTextareaTraslados').get('v.value'));
-		} else if (idBoton === 'modalInformeSiaCopiarAprobada') {
-			helper.copiarTextoAlPortapapeles(component.find('modalInformeSiaTextareaAprobada').get('v.value'));
-		} else if (idBoton === 'modalInformeSiaCopiarFechafirma') {
-			helper.copiarTextoAlPortapapeles(component.find('modalInformeSiaTextareaFechaFirma').get('v.value'));
-		} else if (idBoton === 'modalInformeSiaCopiarFirmada') {
-			helper.copiarTextoAlPortapapeles(component.find('modalInformeSiaTextareaFirmada').get('v.value'));
+		if (idBoton === 'modalTrasladoSiaCopiarTraslados') {
+			helper.copiarTextoAlPortapapeles(component.find('modalTrasladoSiaTextareaTraslados').get('v.value'));
+		} else if (idBoton === 'modalTrasladoSiaCopiarAprobada') {
+			helper.copiarTextoAlPortapapeles(component.find('modalTrasladoSiaTextareaAprobada').get('v.value'));
+		} else if (idBoton === 'modalTrasladoSiaCopiarFechafirma') {
+			helper.copiarTextoAlPortapapeles(component.find('modalTrasladoSiaTextareaFechaFirma').get('v.value'));
+		} else if (idBoton === 'modalTrasladoSiaCopiarFirmada') {
+			helper.copiarTextoAlPortapapeles(component.find('modalTrasladoSiaTextareaFirmada').get('v.value'));
 		} else if (idBoton === 'modalInformeSiaCopiarInfoSia') {
 			helper.copiarTextoAlPortapapeles(component.find('modalInformeSiaTextareaInfoSia').get('v.value'));
 		}
@@ -1515,7 +1279,6 @@ CONCLUSIONES Y FIRMA
 		if (component.get('v.oportunidad.AV_PF__c')) {
 			$A.util.addClass(component.find('modalTareaGestor'), 'slds-fade-in-open');
 			$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
 			window.setTimeout($A.getCallback(() => component.find('modalTareaGestorCancelar').focus()), 200);
 		} else {
 			helper.mostrarToast('Operativa no disponible', 'La oportunidad no se puede derivar a gestor porque no tiene producto PF', 'info');
@@ -1525,6 +1288,7 @@ CONCLUSIONES Y FIRMA
 	modalTareaGestorCerrar: function(component) {
 		$A.util.removeClass(component.find('modalTareaGestor'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+		component.set('v.cargarModales', false);
 	},
 
 	modalTareaGestorTeclaPulsada: function(component, event) {
@@ -1534,9 +1298,9 @@ CONCLUSIONES Y FIRMA
 	},
 
 	crearTarea: function(component, event, helper) {
-		//component.find('opportunityData').reloadRecord();
-		if (!component.find('comentariosTarea').get('v.value')) {
-			helper.mostrarToast('Campos vacíos', 'Por favor, informa todos los campos del formulario', 'info');
+		const modalInformeSiaTextareaInfoSia = component.find('comentariosTarea');
+		if (!modalInformeSiaTextareaInfoSia.get('v.value')) {
+			modalInformeSiaTextareaInfoSia.reportValidity();
 		} else {
 			component.set('v.cargandoGestor', true);
 			let crearTareaGestor = component.get('c.crearTareaGestor');
@@ -1548,8 +1312,7 @@ CONCLUSIONES Y FIRMA
 			});
 			crearTareaGestor.setCallback(this, response => {
 				if (response.getState() === 'SUCCESS') {
-					helper.mostrarToast('Oportunidad creada con éxito', 'Podrá localizar la oportunidad en la ficha del cliente', 'success');
-
+					helper.mostrarToast('Oportunidad para el gestor creada con éxito', 'Podrá localizar la oportunidad en la ficha del cliente', 'success');
 					let cerrarOportunidad = component.get('c.cerrarOportunidad');
 					cerrarOportunidad.setParams({
 						recordId: component.get('v.recordId'),
@@ -1558,9 +1321,9 @@ CONCLUSIONES Y FIRMA
 					});
 					cerrarOportunidad.setCallback(this, responseCerrarOportunidad => {
 						if (responseCerrarOportunidad.getState() === 'SUCCESS') {
-							helper.mostrarToast('Oportunidad cerrada con éxito', 'La oportunidad se ha cerrado como Perdida', 'success');
+							helper.mostrarToast('Oportunidad ' + component.get('v.oportunidad.CSBD_Identificador__c') + ' cerrada con éxito', 'La oportunidad se cerró como Perdida', 'info');
 							$A.enqueueAction(component.get('c.modalTareaGestorCerrar'));
-							$A.get('e.force:refreshView').fire();
+							component.find('opportunityData').reloadRecord(true);
 						} else {
 							helper.mostrarToast('Problema cerrando la oportunidad', JSON.stringify(responseCerrarOportunidad.getError()), 'error');
 						}
@@ -1570,7 +1333,7 @@ CONCLUSIONES Y FIRMA
 				} else {
 					console.error(response.getError());
 					component.set('v.cargandoGestor', false);
-					helper.mostrarToast('No es posible crear la oportunidad', 'El proceso de creación de la oportunidad ha fallado', 'error');
+					helper.mostrarToast('Problema creando la oportunidad para el gestor', 'El proceso de creación de la oportunidad ha fallado', 'error');
 
 				}
 			});
@@ -1580,7 +1343,7 @@ CONCLUSIONES Y FIRMA
 
 	buttonmenuSiaOnselect: function(component, event) {
 		if (event.getParam('value') === 'Informe SIA') {
-			$A.enqueueAction(component.get('c.abrirModalInformeSia2'));
+			$A.enqueueAction(component.get('c.abrirModalInformeSia'));
 		}
 	},
 
@@ -1620,7 +1383,6 @@ CONCLUSIONES Y FIRMA
 						console.error(responseCerrarOportunidad.getError());
 						helper.mostrarToast('Problema cerrando la oportunidad', JSON.stringify(responseCerrarOportunidad.getError()), 'error');
 					}
-					component.find('botonConvertirOportunidad').set('v.disabled', false);
 				});
 				$A.enqueueAction(cerrarOportunidadApex);
 			} else if (responseConvertirOportunidad.getState() === 'ERROR') {
@@ -1634,6 +1396,79 @@ CONCLUSIONES Y FIRMA
 
 	abrirModalAutenticacionOtp: function(component) {
 		component.set('v.cargarModales', true);
-		window.setTimeout($A.getCallback(() => component.find('modalAutenticacionOtp').abrirModal(true)), 0);
+		component.set('v.modalAutenticacionOtp', true);
+		window.setTimeout($A.getCallback(() => component.find('modalAutenticacionOtp').abrirModal(true)), 50);
+	},
+
+	abrirModalGdpr: function(component) {
+		component.set('v.cargarModales', true);
+		component.set('v.modalDerechosGdpr', true);
+		window.setTimeout($A.getCallback(() => component.find('modalDerechosGdpr').abrirModal()), 50);
+	},
+
+	cerrarModalHijo: function(component, event) {
+		component.set('v.' + event.getParam('nombreModal'), false);
+		component.set('v.cargarModales', false);
+	},
+
+	calendarioDisponibilidadOnupdatecalendarios: function() {
+		//const segunDisponibilidad = component.get('v.programarCitaTipoAsignacion') === 'Según disponibilidad';
+		//helper.cambiarContenido(component, segunDisponibilidad);
+	},
+
+	calendarioDisponibilidadOnupdatefecha: function(component, event) {
+		const inputFecha = component.find('modalProgramarInputFecha');
+		component.set('v.modalProgramarInputFechaValueAnterior', inputFecha.get('v.value'));
+		inputFecha.set('v.value', event.getParam('fecha').toISOString());
+
+		$A.util.addClass(inputFecha, 'csbd_flash_dia');
+		window.setTimeout($A.getCallback(() => $A.util.removeClass(inputFecha, 'csbd_flash_dia')), 600);
+
+		$A.util.addClass(inputFecha, 'csbd_flash_hora');
+		window.setTimeout($A.getCallback(() => $A.util.removeClass(inputFecha, 'csbd_flash_hora')), 600);
+	},
+
+	modalProgramarInputFechaOnchange: function(component, event) {
+		const fechaOld = new Date(component.get('v.modalProgramarInputFechaValueAnterior'));
+		const fechaNewIso = event.getParam('value');
+		const fechaNew = new Date(fechaNewIso);
+
+		const calendarioDisponibilidad = component.find('modalProgramarCalendarioDisponibilidad');
+		calendarioDisponibilidad.set('v.fecha', fechaNew);
+
+		const mismoDia = fechaOld.toDateString() === fechaNew.toDateString();
+		if (!mismoDia) {
+			calendarioDisponibilidad.scrollToHorarioLaboral();
+		}
+		component.set('v.modalProgramarInputFechaValueAnterior', fechaNewIso);
+	},
+
+	programarCitaTipoAsignacionOptionsOnchange: function(component, event, helper) {
+		try {
+			const tipoActual = component.get('v.programarCitaTipoAsignacion');
+			const tipoNew = event.getParam('value');
+			/*
+			const acciones = $A.getCallback(() => {
+			if (tipoNew === 'Según disponibilidad') {
+				const fecha = new Date(component.find('modalProgramarInputFecha').get('v.value'));
+				component.find('modalProgramarCalendarioDisponibilidad').set('v.fecha', fecha);
+			}
+			component.set('v.programarCitaTipoAsignacion', event.getParam('value'));
+		});
+		*/
+			component.set('v.programarCitaTipoAsignacion', tipoNew);
+			helper.cambiarSeccion(component, tipoActual, tipoNew);
+		} catch (error) {
+			console.error(error);
+			helper.mostrarToast('Problema cambiando la sección', 'El proceso de cambio de sección ha fallado', 'error');
+		}
+	},
+
+	buttonMenuProgramarOnselect: function(component, event) {
+		if (event.getParam('value') === 'programarCita') {
+			$A.enqueueAction(component.get('c.abrirModalProgramar'));
+		} else if (event.getParam('value') === 'programarFirma') {
+			$A.enqueueAction(component.get('c.abrirModalAgendarFirma'));
+		}
 	}
 });

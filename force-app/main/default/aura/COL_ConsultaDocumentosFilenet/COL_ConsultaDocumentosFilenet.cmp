@@ -1,0 +1,53 @@
+<aura:component controller="COL_ConsultaDocumentosFilenet_ctrl" implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader">
+
+	<aura:attribute name="recordId" type="String"/>
+	<aura:attribute name="columns" type="List" default="[]"/>
+    <aura:attribute name="data" type="List" default="[]"/>
+    <aura:attribute name="keyField" type="String" default="Id_FileNet"/>
+    <aura:attribute name="NIFManual" type="String" default=""/>
+
+    <!--Ticket-->
+    <aura:attribute name="sortDirection" type="String" default="asc" />
+    <aura:attribute name="defaultSortDirection" type="String" default="asc" />
+    <aura:attribute name="sortedBy" type="String" default="Nombre_Documento"/>
+    <!--Fin de ticket-->
+
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+
+    <article class="slds-card slds-card_boundary">
+        <div class="slds-card__body slds-card__body_inner slds-var-m-top_medium" style="position: relative;">
+            <div class="slds-grid slds-grid_vertical-align-start slds-grid_align-spread">
+                <div class="slds-col">
+                    <lightning:input aura:id="inputNif" type="search" placeholder="NIF a buscar" value="{!v.NIFManual}" variant="label-hidden" style="display: inline-block;"/>
+                    <lightning:button aura:id="botonBuscar" label="Buscar" variant="brand" onclick="{!c.busquedaManual}" class="slds-var-m-left_x-small"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:button label="Restaurar búsqueda inicial" variant="bare" onclick="{!c.busquedaInicial}"/>
+                </div>
+            </div>
+
+            <aura:if isTrue="{!!v.data.length}">
+                <h1 class="slds-var-m-vertical_x-small">No hay documentos vinculados al ticket o no se ha informado el NIF/CIF del ticket.</h1>
+
+                <aura:set attribute="else">
+                    <h1 class="slds-var-m-vertical_x-small" style="font-weight: bold;">{!v.data.length} documentos encontrados.</h1>
+                    <div class="datatableContainer">
+                        <lightning:datatable
+                            columns="{!v.columns}"
+                            data="{!v.data}"
+                            keyField="{! v.keyField}"
+                            hideCheckboxColumn="{!true}"
+                            resizeColumnDisabled="{!true}"
+                            onrowaction="{!c.consultarDocumento}"
+                            defaultSortDirection="{!v.defaultSortDirection}"
+                            sortedDirection="{!v.sortDirection}"
+                            sortedBy="{!v.sortedBy}"
+                            onsort="{!c.handleSort}">
+                        </lightning:datatable>
+                    </div>
+                </aura:set>
+            </aura:if>
+        </div>
+    </article>
+
+</aura:component>

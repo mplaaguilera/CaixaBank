@@ -20,13 +20,11 @@ public with sharing class SPV_LCMP_CamposNegociacion {
         List<Case> pretensionesMostrar = new List<Case>();
 
         try {
-            pretensionesCaso = [SELECT Id, Status, SAC_Reclamacion__r.SEG_Subestado__c, SAC_CasoNegociado__c, CC_MCC_Tematica__r.name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.name, SEG_Detalle__r.Name FROM Case 
-                                WHERE RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c =: casoId AND (Status = 'SAC_007' OR SAC_CasoNegociado__c = true)];
+            pretensionesCaso = [SELECT Id, Status, CaseNumber, SAC_Reclamacion__r.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c, CC_MCC_Tematica__r.name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.name, SEG_Detalle__r.Name, CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c, CBK_Case_Extension_Id__c FROM Case 
+                                WHERE RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c =: casoId];
 
             for(Case pretension : pretensionesCaso) {
-                if(pretension.SAC_Reclamacion__r.SEG_Subestado__c == 'Negociacion' && pretension.Status == 'SAC_007') {
-                    pretensionesMostrar.add(pretension);
-                } else if(pretension.SAC_Reclamacion__r.SEG_Subestado__c != 'Negociacion' && pretension.SAC_CasoNegociado__c == true) {
+                if(pretension.SAC_Reclamacion__r.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c == true && pretension.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c == true) {
                     pretensionesMostrar.add(pretension);
                 }
             }

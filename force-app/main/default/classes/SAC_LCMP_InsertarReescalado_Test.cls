@@ -22,7 +22,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         listaGrupos[0].SAC_Email2__c = 'correo2@test.com';
         listaGrupos[0].SAC_Email3__c = 'correo3@test.com';
         listaGrupos[0].SAC_DeveloperName__c   = 'AJ';
-        Database.insert(listaGrupos);
+        SAC_DatabaseDML.insertListDML(listaGrupos, false);
+        //Database.insert(listaGrupos);
 
         User usuario;
         usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
@@ -36,14 +37,16 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         usuario.EmailEncodingKey = 'ISO-8859-1';
         usuario.LanguageLocaleKey = 'en_US';
         usuario.isActive = true;
-        usuario.SAC_GruposPerteneciente__c = listaGrupos[0].Id;    
-        Database.insert(usuario);
+        usuario.SAC_GruposPerteneciente__c = listaGrupos[0].Id;  
+        SAC_DatabaseDML.insertDML(usuario, false);  
+        //Database.insert(usuario);
 
         
         //Cuentas
         List<Account> listaCuentas = SAC_TestDataFactory.crearCuentas(1);
         listaCuentas[0].Name = 'Cuenta Test';
-        Database.insert(listaCuentas);
+        SAC_DatabaseDML.insertListDML(listaCuentas, false);  
+        //Database.insert(listaCuentas);
 
         List<Case> listaReclamaciones = new List<Case>();
         //RECLAMACION 1
@@ -68,7 +71,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
         listaReclamaciones.add(casoReclamacion2);
 
-        Database.insert(listaReclamaciones);
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false);  
+        //Database.insert(listaReclamaciones);
 
         List<Case> listaPretensiones = new List<Case>();
         //Pretension 1
@@ -78,11 +82,13 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         camposPret.put('OwnerId', usuario.Id);
         Case casoPret1 = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
         listaPretensiones.add(casoPret1);
-        Database.insert(listaPretensiones);
+        SAC_DatabaseDML.insertListDML(listaPretensiones, false); 
+        //Database.insert(listaPretensiones);
 
         //Poner pretension principal
         casoReclamacion.SAC_PretensionPrincipal__c = casoPret1.Id;
-        Database.update(casoReclamacion);
+        SAC_DatabaseDML.updateDML(casoReclamacion, false); 
+        //Database.update(casoReclamacion);
 
         //Interaccion escalado
         List<SAC_Interaccion__c> listaInteracciones = new List<SAC_Interaccion__c>();
@@ -111,7 +117,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         
         SAC_Interaccion__c escalado2 = SAC_TestDataFactory.crearInteraccion('Escalado',camposEsc2);
         listaInteracciones.add(escalado2);
-        Database.insert(listaInteracciones);
+        SAC_DatabaseDML.insertListDML(listaInteracciones, false); 
+        //Database.insert(listaInteracciones);
 
         //Escalado NV3
         Map<String, Object> camposEscNV3 = new Map<String, Object>();
@@ -125,7 +132,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         camposEscNV3.put('SAC_EscaladoNV2__c', escalado2.Id);
         
         SAC_Interaccion__c escaladoNV3 = SAC_TestDataFactory.crearInteraccion('EscaladoNV3',camposEscNV3);
-        Database.insert(escaladoNV3);
+        SAC_DatabaseDML.insertDML(escaladoNV3, false); 
+        //Database.insert(escaladoNV3);
 
         //Parametrizaciones Escalado 1
         Map<String, Object> camposParam = new Map<String, Object>();
@@ -140,12 +148,14 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         camposParam.put('SAC_validarImporte__c', false);
         
         SAC_ParametrizacionEscalado__c parametrizacionEscalado = SAC_TestDataFactory.crearParamEsc(camposParam);
-        Database.insert(parametrizacionEscalado);
+        SAC_DatabaseDML.insertDML(parametrizacionEscalado, false); 
+        //Database.insert(parametrizacionEscalado);
 
 
         //ContentVersion
         ContentVersion cv = SAC_TestDataFactory.crearContentVersion(casoReclamacion2);
-        Database.insert(cv);
+        SAC_DatabaseDML.insertDML(cv, false); 
+        //Database.insert(cv);
     }
 
     @isTest
@@ -157,7 +167,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -178,7 +189,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+        //Database.insert(permiSetAssi);
         List<SAC_LCMP_InsertarReescalado.plantillasWrapper> resultado;
         Test.startTest();
         System.runAs(usuario) {
@@ -196,7 +208,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         List<SAC_LCMP_InsertarReescalado.plantillasWrapper> resultado;
 
         Test.startTest();
@@ -217,7 +230,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -229,7 +243,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         Blob b=Blob.valueOf('This is version data');
         newcont.VersionData = EncodingUtil.base64Decode('Unit Test Attachment Body');
         newcont.FirstPublishLocationId  = escalado.id;
-        Database.insert(newcont);
+        SAC_DatabaseDML.insertDML(newcont, false);
+        //Database.insert(newcont);
         List<String> listaCVIds = new List<String>();
         listaCVIds.add(newcont.Id);
             SAC_LCMP_InsertarReescalado.insertarAdjuntoCaso(escalado.Id, listaCVIds);
@@ -248,7 +263,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -277,7 +293,7 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
     }
 
     @isTest
-    static void GuardarEscaladoTest() {
+    static void guardarEscaladoTest() {
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
         SAC_Interaccion__c escalado = [SELECT id, SAC_Conclusion__c, SAC_ImporteAutorizado__c, SAC_Respuesta__c, SAC_Propuesta__c, SAC_GrupoColaborador__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'propuesta test3' LIMIT 1];
 
@@ -285,7 +301,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -305,7 +322,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {
@@ -325,7 +343,8 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
 
         Test.startTest();
         System.runAs(usuario) {

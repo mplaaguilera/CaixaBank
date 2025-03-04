@@ -12,10 +12,12 @@
 *****************************************************************/
 public without sharing class SAC_LCMP_Derivar {
 
-    private static Set<String> objetos = new Set<String>{'SAC_MaestroTemas__c'};
+    private static Set<String> objetos = new Set<String>{'SAC_MaestroTemas__c', 'SAC_MaestroAccionesReclamacion__c', 'SAC_Accion__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
 
     final static Id RECORDTYPEBLACKLIST = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_BlackListEmails').getRecordTypeId();
+    private static final Id RECTYPEMAESTROACCIONES = mapRTsObjects.get('SAC_MaestroAccionesReclamacion__c').get('SAC_MaestroAcciones').getRecordTypeId();
+    private static final Id RECTYPEMAESTROTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_MaestroDeTareas').getRecordTypeId();
 
 
     /*****************************************************************
@@ -390,6 +392,61 @@ public without sharing class SAC_LCMP_Derivar {
 
         //Devuelvo las direcciones de envio no válidas encontradas (están en la blackList) o si las direcciones son válidas devuelvo ''
         return emailsNoValidosEncontrados;
+    }
+
+    /*****************************************************************
+    * Proposito: Convierte en content version la carta para la comunicación con el cliente mediante carta Postal
+    * 
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0                             Carlos Gómez   15/01/2025       Creación
+    *****************************************************************/
+    @AuraEnabled
+    public static String crearCartaPostalCV(String caseId) {
+        Case caso = [SELECT Id, SAC_CasoEspecial__c, CC_Canal_Procedencia__c FROM Case WHERE Id =: caseId];
+        string maestroTarea = '';
+        SAC_DocumentoEnvio__c carta = [SELECT id FROM SAC_DocumentoEnvio__c WHERE  SAC_Caso__c =:caseId  AND SAC_Documento__c = null AND SAC_TipoDocumento__c = 'derivación' order by CreatedDate DESC  LIMIT 1]; 
+
+        String vfHostname = DomainCreator.getVisualforceHostname(null);
+        String urlVF = 'https://' + vfHostname + '/apex/SAC_CartaPDF?id=' + carta.Id;
+        SAC_GeneracionCartas.adjuntarPDFaCaso2(urlVF, caseId, 'derivación');
+
+        if(caso.SAC_CasoEspecial__c == 'SAC_Presidencia'){
+            maestroTarea = 'SAC_ImprimirCartasAD';
+        }else if(caso.CC_Canal_Procedencia__c == 'Castilla la Mancha' || caso.CC_Canal_Procedencia__c == 'Junta Andalucia'){
+            maestroTarea = 'SAC_ImprimirCartasJACM';
+        }else{
+            maestroTarea = 'SAC_ImprimirCartasOrdinario';
+        }
+        //US1101520 crear tarea al subsanar por carta postal
+        SAC_MaestroAccionesReclamacion__c maestroTareaAutomatica = [SELECT Id, Name FROM SAC_MaestroAccionesReclamacion__c WHERE RecordTypeId = :RECTYPEMAESTROACCIONES AND SAC_Activo__c = true AND SAC_DeveloperName__c = :maestroTarea LIMIT 1];  
+
+        SAC_Accion__c tarea = new SAC_Accion__c();
+
+        tarea.SAC_MaestroAccionesReclamacion__c = maestroTareaAutomatica.Id;
+        tarea.RecordTypeId = RECTYPEMAESTROTAREAS;
+        tarea.SAC_Reclamacion__c = caseId;
+        
+        try {
+            if (!Schema.sObjectType.SAC_Accion__c.isCreateable()) { throw new AuraHandledException( 'No tienes permisos para realizar esta accion.' ); }
+            SAC_DatabaseDML.insertDML(tarea, true);
+        } catch (Exception e) {
+            CBK_log.error(e);
+        }
+
+        // FALLA POR List has more than 1 row for assignment to SObject ya que recupera la carta del acuse de recibo y la del envio de subsanacion
+        ContentVersion cv = [SELECT Id, Title, ContentDocumentId FROM ContentVersion WHERE FirstPublishLocationId =: caseId order by CreatedDate DESC LIMIT 1];
+        ContentDocumentLink cdl = new ContentDocumentLink();
+
+        cdl.ContentDocumentId = cv.ContentDocumentId;
+        cdl.LinkedEntityId = tarea.Id;
+        cdl.ShareType = 'I';
+
+        SAC_DatabaseDML.insertDML(cdl, true);
+
+        return tarea.Id;
+
     }
 
     /*****************************************************************

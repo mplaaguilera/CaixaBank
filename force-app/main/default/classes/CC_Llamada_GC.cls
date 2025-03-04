@@ -17,12 +17,10 @@ public with sharing class CC_Llamada_GC {
 			CC_Agente__c = [SELECT EmployeeNumber FROM User WHERE Id = :UserInfo.getUserId()].EmployeeNumber,
 			CC_Extension__c = inputLlamada.extension,
 			CC_ConnId__c = inputLlamada.connId,
-			//CC_ConnId_Consulta__c = null,
 			CC_ANI__c = inputLlamada.ani,
 			CC_DNIS__c = inputLlamada.dnis,
 			CC_Servicio_Genesys__c = servicioGenesys.Id,
 			CC_Idioma__c = codigoIdioma(inputLlamada.idioma),
-			//CC_Asunto__c = inputLlamada.asunto.left(255),
             CC_Asunto__c = String.isNotEmpty(inputLlamada.userQuery) ? inputLlamada.userQuery.left(255) : inputLlamada.asunto.left(255),
 			CC_Datos_Genesys__c = inputLlamada.datos,
 			CC_ConnId_Cognitivo__c = inputLlamada.connIdCognitivo,
@@ -30,40 +28,19 @@ public with sharing class CC_Llamada_GC {
 			CC_Llamada_Padre__c = String.isEmpty(inputLlamada.salesforceParentId) ? null : inputLlamada.salesforceParentId,
 			CC_No_Identificado__c = false,
 			CC_Fecha_Inicio__c = System.now(),
-            //CC_Automatica__c = true,           
-			//CC_Canal_del_Empleado__c = inputLlamada.canalEmpleado,
 			CC_Id_Cognitivo__c = inputLlamada.cognitivoId,
 			CC_IdentCliente__c = '0',  //Sin datos ALF
-			//CC_Campana_Genesys__c = (inputLlamada.nombreCampana == null ? null: inputLlamada.nombreCampana)
 			CC_Campana_Genesys__c = inputLlamada.nombreCampana,
 			CC_Perfil__c = inputLlamada.perfil,
 			KIN_Genesys_Cloud_URL_Grabacion__c = inputLlamada.urlGrabacion,
-
-			//Nuevo proyecto GENiaL
-			//CC_Resumen_AI__c = inputLlamada.summary,
-            // CC_Resumen_AI__c = String.isEmpty(inputLlamada.summary) ? 'Sin Información' : inputLlamada.summary,
-
 			CC_Sentimiento__c = inputLlamada.sentiment,
 			CC_Respuesta_Asistente__c = inputLlamada.assistantResponse,
-			//CC_Asunto_IA__c = inputLlamada.userQuery
+
 
 			//Campo para US750318
 			CC_LlamadoOficina__c = String.isEmpty(inputLlamada.telefonoUnico) ? false : true
 		);
 
-		if (String.isNotBlank(inputLlamada.statusAuto)) {
-			//Validamos que el valor este dentro de la picklist CC_Status_Autorizacion__c
-			List<String> valoresPermitidos = new List<String>();
-			for (Schema.PicklistEntry picklistEntry : Schema.sObjectType.CC_Llamada__c.fields.CC_Status_Autorizacion__c.getPicklistValues()) {
-
-				valoresPermitidos.add(picklistEntry.getValue());
-			}
-			if (valoresPermitidos.contains(inputLlamada.statusAuto)) {
-				llamada.CC_Status_Autorizacion__c = inputLlamada.statusAuto;
-			} else {
-				llamada.CC_Status_Autorizacion__c = null;
-			}
-		}
 
 		if (servicioGenesys.CC_Codigo__c == 'INC_TEC_DESPLIEGUES') {
 			llamada.CC_Canal_del_Empleado__c = 'Despliegues';
@@ -75,22 +52,36 @@ public with sharing class CC_Llamada_GC {
 		}
 
         if (servicioGenesys.CC_Tipo_Cliente__c == 'Empleado' || servicioGenesys.CC_Tipo_Cliente__c == 'CSI Bankia') {
-            llamada.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'CC_Empleado');
+			llamada.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'CC_Empleado');
             identificarPorTelefono(llamada, inputLlamada.ani);
             if (String.isEmpty(inputLlamada.casoId) && !String.isEmpty(llamada.CC_Id_Cognitivo__c)) {
-                //Buscamos el caso correspondiente al Id de cognitivo. Si no lo encuentra, lo crea con la información de la llamada y el chat obtenido de cognitivo
+				//Buscamos el caso correspondiente al Id de cognitivo. Si no lo encuentra, lo crea con la información de la llamada y el chat obtenido de cognitivo
                 caso = CC_WS_Recupera_LogConversacion.CC_WS_Recupera_Conversacion(llamada);
             }
         } else {
-            llamada.RecordTypeId = Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+			llamada.RecordTypeId = Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
             Contact contactoAsociado = identificarPorNumPerso(llamada, inputLlamada.numPerso);
             if(!String.isEmpty(inputLlamada.summary)){
-                llamada.CC_Resumen_AI__c = inputLlamada.summary;
-            }else if(llamada.CC_Idioma__c == 'en' || contactoAsociado != null && (contactoAsociado.Account.CC_Empleado_Familiar__c || contactoAsociado.Account.CC_Marca_senior__c)){
-                llamada.CC_Resumen_AI__c = 'No hay conversación con el asistente';   
+				llamada.CC_Resumen_AI__c = inputLlamada.summary;
+            }else if(llamada.CC_Idioma__c == 'en' || contactoAsociado != null && (contactoAsociado.Account.CC_Empleado_Familiar__c || contactoAsociado.Account.CC_MarcaSenior__c)){
+				llamada.CC_Resumen_AI__c = 'No hay conversación con el asistente';
             }else{
-                llamada.CC_Resumen_AI__c = 'Sin Información';
+				llamada.CC_Resumen_AI__c = 'Sin Información';
             }
+			if (String.isNotBlank(inputLlamada.statusAuto)) {
+				//Validamos que el valor este dentro de la picklist CC_Status_Autorizacion__c
+				List<String> valoresPermitidos = new List<String>();
+				for (Schema.PicklistEntry picklistEntry : Schema.sObjectType.CC_Llamada__c.fields.CC_Status_Autorizacion__c.getPicklistValues()) {
+
+					valoresPermitidos.add(picklistEntry.getValue());
+				}
+				if (valoresPermitidos.contains(inputLlamada.statusAuto)) {
+					llamada.CC_Status_Autorizacion__c = inputLlamada.statusAuto;
+				} else {
+					llamada.CC_Status_Autorizacion__c = null;
+				}
+			}
+
         }
 		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 		insert llamada;
@@ -107,19 +98,22 @@ public with sharing class CC_Llamada_GC {
 			actualizarCaso(inputLlamada.casoId, UserInfo.getUserId(), servicioGenesys.CC_Canal_Procedencia__c);
 		}
 
-		Id casoIdCom = (casoVinculado != null && !String.isEmpty(String.valueOf(casoVinculado.Id))) ? casoVinculado.Id : inputLlamada.casoId;
 
-		if(llamada.CC_Status_Autorizacion__c == 'DENIED' && !String.isEmpty(String.valueOf(casoIdCom))){
-			CC_Comunicaciones__c comunicacion = crearComunicacion(llamada, casoIdCom, 'Denegado');
-		}else if(llamada.CC_Status_Autorizacion__c == 'APPROVED' && !String.isEmpty(String.valueOf(casoIdCom))){
-			CC_Comunicaciones__c comunicacion = crearComunicacion(llamada, casoIdCom, 'Aprobado');
+		if(servicioGenesys.CC_Tipo_Cliente__c == 'Cliente'){
+			Id casoIdCom = (casoVinculado != null && !String.isEmpty(String.valueOf(casoVinculado.Id))) ? casoVinculado.Id : inputLlamada.casoId;
+
+			if(llamada.CC_Status_Autorizacion__c == 'DENIED' && !String.isEmpty(String.valueOf(casoIdCom))){
+				CC_Comunicaciones__c comunicacion = crearComunicacion(llamada, casoIdCom, 'Denegado');
+			}else if(llamada.CC_Status_Autorizacion__c == 'APPROVED' && !String.isEmpty(String.valueOf(casoIdCom))){
+				CC_Comunicaciones__c comunicacion = crearComunicacion(llamada, casoIdCom, 'Aprobado');
+			}
 		}
 		return new Map<String, Object>{
 			'className' => CC_Llamada_GC.class.getName(),
 			'llamada' => llamada,
 			'caso' => casoVinculado,
 			'encuestaId' => servicioGenesys.CC_Encuesta__r.CC_Codigo__c,
-			'abrirTabId' => llamada.Id 
+			'abrirTabId' => llamada.Id
 		};
 	}
 
@@ -151,10 +145,8 @@ public with sharing class CC_Llamada_GC {
 				CC_Asunto__c = String.isNotBlank(inputLlamada.asunto) ? inputLlamada.asunto.left(255) : null,
 				CC_No_Identificado__c = false,
 				CC_Fecha_Inicio__c = System.now(),
-				// CC_Servicio_Llamada_Saliente__c  = caso.CC_Canal_Resolucion__c,
 				CC_IdentCliente__c = '0', // Sin datos ALF);
 				KIN_Genesys_Cloud_URL_Grabacion__c = inputLlamada.urlGrabacion
-				// CC_Campana_Genesys__c =  inputLlamada.nombreCampana
 			);
 			if (servicioGenesys.CC_Tipo_Cliente__c == 'Empleado' || servicioGenesys.CC_Tipo_Cliente__c == 'CSI Bankia') {
 				llamada.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'CC_Empleado');
@@ -191,7 +183,6 @@ public with sharing class CC_Llamada_GC {
 			RecordTypeId = llamada.RecordTypeId,
 			KIN_Genesys_Cloud__c = true,
 			KIN_Consulta__c = true,
-			//KIN_Numero_Consulta__c = Integer.valueOf([SELECT Count(Id) FROM CC_Llamada__c WHERE CC_Llamada_Padre__c = :llamada.Id AND KIN_Consulta__c = TRUE]) + 1,
 			CC_Tipo__c = 'Entrante',
 			CC_Agente__c = [SELECT EmployeeNumber FROM User WHERE Id = :UserInfo.getUserId()].EmployeeNumber,
 			CC_Extension__c = inputConsulta.extension,
@@ -218,38 +209,6 @@ public with sharing class CC_Llamada_GC {
 		return new Map<String, Object>{'className' => CC_Llamada_GC.class.getName(), 'llamada' => consulta, 'caso' => caso};
 	}
 
-	/*
-	public static Map<String, Object> registrarConsultaExterna(CC_Llamada_Input inputConsulta) {
-		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
-		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
-													FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :inputConsulta.servicio LIMIT 1];
-		CC_Llamada__c consulta = new CC_Llamada__c(
-			KIN_Genesys_Cloud__c = true,
-			KIN_Consulta__c = true,
-			CC_Tipo__c = 'Entrante',
-			CC_Agente__c = [SELECT EmployeeNumber FROM User WHERE Id = :UserInfo.getUserId()].EmployeeNumber,
-			CC_Extension__c = inputConsulta.extension,
-			CC_ConnId__c = null,
-			CC_ConnId_Consulta__c = inputConsulta.connId,
-			CC_ANI__c = inputConsulta.ani,
-			CC_DNIS__c = inputConsulta.dnis,
-			CC_Servicio_Genesys__c = servicioGenesys.Id,
-			CC_Idioma__c = codigoIdioma(inputConsulta.idioma),
-			CC_Fecha_Inicio__c = System.now(),
-			CC_IdentCliente__c = '0' // Sin datos ALF
-		);
-
-		if (servicioGenesys.CC_Tipo_Cliente__c == 'Empleado' || servicioGenesys.CC_Tipo_Cliente__c == 'CSI Bankia') {
-			consulta.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'CC_Empleado');
-		} else {
-			consulta.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'CC_Cliente');
-		}
-		insert consulta;
-		//return consulta;
-		return new Map<String, Object>{'className' => CC_Llamada_GC.class.getName(), 'llamada' => consulta};
-	}
-	*/
-
 	public static Id registrarConsultaNoAtendida(CC_Llamada_Input inputLlamada, CC_Llamada_Input inputConsulta) {
 		if (String.isNotBlank(inputConsulta.servicio)) {
 			CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
@@ -268,9 +227,7 @@ public with sharing class CC_Llamada_GC {
 	public static Map<String, Object> registrarEncuesta(CC_Llamada_Input inputLlamada) {
 		String nombreEncuesta;
 		if (String.isNotBlank(inputLlamada.llamadaId)) {
-			// Id idLlamada = Id.valueOf(inputLlamada.llamadaId);
 			String connId = String.valueOf(inputLlamada.connId);
-			// CC_Llamada__c llamada = [SELECT CC_Servicio_Genesys__r.CC_Encuesta__r.Name, CC_Tipo__c FROM CC_Llamada__c WHERE  Id = :idLlamada];
 			List<CC_Llamada__c> llamada = [SELECT Id, CC_Servicio_Genesys__r.CC_Encuesta__r.Name, CC_Tipo__c FROM CC_Llamada__c WHERE CC_ConnId__c = :connId ORDER BY CreatedDate DESC];
 			Id idLlamada = llamada[0].Id;
 
@@ -292,7 +249,7 @@ public with sharing class CC_Llamada_GC {
 			}
 			update llamada[0];
 
-			
+
 			try {
 
 				DateTime dt = DateTime.now();
@@ -382,24 +339,6 @@ public with sharing class CC_Llamada_GC {
 		}
 	}
 
-	/*
-	public static void finalizarConsultaExterna(CC_Llamada_Input inputConsulta, String tipoCierre) {
-		if (String.isNotBlank(inputConsulta.servicio)) {
-			CC_Servicio_Genesys__c servicioGenesys = [SELECT CC_Tipo__c, CC_Activo_Salesforce__c FROM CC_Servicio_Genesys__c
-														WHERE CC_Codigo__c = :inputConsulta.servicio LIMIT 1];
-			if (!servicioGenesys.CC_Activo_Salesforce__c) {
-				crearActividad(inputConsulta.salesforceParentId, inputConsulta.casoId, servicioGenesys.CC_Tipo__c.equals('Empleado') ? 'Consulta externa a empleado' : 'Consulta externa', inputConsulta.servicio, tipoCierre);
-			}
-		} else if (String.isNotBlank(inputConsulta.empleadoTelefono)) {
-			crearActividadEmpleado(inputConsulta.salesforceParentId, inputConsulta.casoId, inputConsulta.empleadoId, inputConsulta.empleadoTelefono, tipoCierre, 'Consulta externa a empleado');
-		} else {
-			IllegalArgumentException excepcion = new IllegalArgumentException();
-			excepcion.setMessage('No se puede finalizar una consulta externa sin servicio/empleado.');
-			throw excepcion;
-		}
-	}
-	*/
-
 	public static Boolean cancelarConsulta(CC_Llamada_Input inputConsulta) {
 		String consultaId = buscarLlamada(inputConsulta, true);
 		if (String.isNotBlank(consultaId)) {
@@ -412,7 +351,7 @@ public with sharing class CC_Llamada_GC {
 
 	public static void completarConsulta(String connIdConsulta, Id idNuevoOwner) {
 		CC_Llamada__c consulta = [SELECT CC_ConnId_Consulta__c, CC_Llamada_Padre__c, CC_Case_Consulta__c, OwnerId, CC_Servicio_Genesys__r.Name,
-									CC_Servicio_Genesys__r.CC_Tipo__c, CC_Servicio_Genesys__r.CC_Activo_Salesforce__c, CC_Servicio_Genesys__r.CC_Canal_Procedencia__c
+									CC_Servicio_Genesys__r.CC_Tipo__c, CC_Servicio_Genesys__r.CC_Activo_Salesforce__c, CC_Servicio_Genesys__r.CC_Canal_Procedencia__c,  CC_Servicio_Genesys__r.CC_Tipo_Cliente__c
 									FROM CC_Llamada__c WHERE RecordType.DeveloperName IN ('CC_Cliente', 'CC_Empleado')
 									AND CC_ConnId_Consulta__c = :connIdConsulta AND CC_Fecha_Fin__c = NULL AND OwnerId = :idNuevoOwner AND KIN_Consulta__c = TRUE];
 		consulta.CC_ConnId__c = consulta.CC_ConnId_Consulta__c;
@@ -420,9 +359,9 @@ public with sharing class CC_Llamada_GC {
 		finalizarActividadesLlamada(consulta, 'Consulta%', 'Consulta completada');
 
 		crearActividad(consulta.Id, consulta.CC_Case_Consulta__c, 'Llamada transferida',  consulta.CC_Servicio_Genesys__r.Name, 'Llamada transferida');
-		
+
 		if (consulta.CC_Servicio_Genesys__r.CC_Tipo__c.equals('Tercer nivel')) {
-			traspasarTercerNivel(consulta.CC_Case_Consulta__c, idNuevoOwner, consulta.CC_Servicio_Genesys__r.Name, consulta.Id);
+				traspasarTercerNivel(consulta.CC_Case_Consulta__c, idNuevoOwner, consulta.CC_Servicio_Genesys__r.Name, consulta.Id, consulta.CC_Servicio_Genesys__r.CC_Tipo_Cliente__c);
 		} else if (consulta.CC_Case_Consulta__c != null) {
 			if (consulta.CC_Servicio_Genesys__r.CC_Tipo__c.equals('Servicio')) {
 				//El canal de resolución sólo se actualiza para transferencias entre servicios normales
@@ -431,50 +370,11 @@ public with sharing class CC_Llamada_GC {
 				actualizarCaso(consulta.CC_Case_Consulta__c, idNuevoOwner);
 			}
 		}
-		
+
 		CC_Llamada__c llamadaCliente = [SELECT CC_Servicio_Genesys__r.Name FROM CC_Llamada__c WHERE Id = :consulta.CC_Llamada_Padre__c];
 		//Cierre de la llamada con el cliente
 		finalizarLlamadaActividades(llamadaCliente, 'Llamada%', 'Llamada finalizada');
 	}
-
-	/*
-	public static void completarConsulta_OLD(CC_Llamada_Input inputConsulta) {
-		String consultaId = buscarLlamada(inputConsulta, true);
-		if (String.isNotBlank(consultaId)) {
-			CC_Llamada__c consulta = [SELECT CC_Llamada_Padre__c, CC_Case_Consulta__c, OwnerId, CC_Servicio_Genesys__r.Name, CC_Servicio_Genesys__r.CC_Tipo__c, CC_Servicio_Genesys__r.CC_Activo_Salesforce__c, CC_Servicio_Genesys__r.CC_Canal_Procedencia__c
-										FROM CC_Llamada__c WHERE Id = :consultaId];
-			consulta.CC_ConnId__c = inputConsulta.transferConnId;
-			update consulta;
-
-			finalizarActividadesLlamada(consulta, 'Consulta%', 'Consulta completada');
-
-			CC_Llamada__c llamada = [SELECT CC_ANI__c, CC_Servicio_Genesys__r.Name FROM CC_Llamada__c WHERE Id = :consulta.CC_Llamada_Padre__c];
-			crearActividad(consulta.Id, consulta.CC_Case_Consulta__c, 'Llamada transferida', llamada != null ? llamada.CC_Servicio_Genesys__r.Name : 'externo');
-
-			if (consulta.CC_Servicio_Genesys__r.CC_Tipo__c.equals('Tercer nivel')) {
-				traspasarTercerNivel(consulta.CC_Case_Consulta__c, consulta.OwnerId, consulta.CC_Servicio_Genesys__r.Name, consulta.Id);
-			} else if (consulta.CC_Case_Consulta__c != null) {
-				if (consulta.CC_Servicio_Genesys__r.CC_Tipo__c.equals('Servicio')) {
-					//El canal de resolución sólo se actualiza para transferencias entre servicios normales
-					actualizarCaso(consulta.CC_Case_Consulta__c, consulta.OwnerId, consulta.CC_Servicio_Genesys__r.CC_Canal_Procedencia__c);
-				} else {
-					actualizarCaso(consulta.CC_Case_Consulta__c, consulta.OwnerId);
-				}
-			}
-		}
-	}
-	*/
-
-	/*public static Contact getEmpleadoGestor(Id llamadaId) {
-		List<CC_Llamada__c> llamadas = [SELECT CC_Cuenta__r.AV_EAPGestor__c FROM CC_Llamada__c WHERE Id = :llamadaId AND CC_Cuenta__r.AV_EAPGestor__c != NULL];
-		if (!llamadas.isEmpty()) {
-			List<Contact> contactos = [SELECT Name, (SELECT CC_Telefono__c FROM Canales_Comunicacion__r
-														WHERE RecordType.DeveloperName = 'CC_Telefono' ORDER BY CC_Clase_Com__c DESC)
-										FROM Contact WHERE Id = :llamadas[0].CC_Cuenta__r.AV_EAPGestor__c];
-			return contactos.isEmpty() ? null : contactos[0];
-		}
-		return null;
-	}*/
 
 	public static Case crearVincularCaso(CC_Llamada__c llamada) {
 		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Canal_Procedencia__c, CC_Canal_de_Entrada__c, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
@@ -489,7 +389,7 @@ public with sharing class CC_Llamada_GC {
 		String telefonoCaso;
 		List<Account> cuenta = new List<Account>();
 		if (llamada.CC_Cuenta__c != null) {
-			cuenta = [SELECT Phone, PersonMobilePhone, CC_Marca_senior__c, CC_Empleado_Familiar__c  FROM Account WHERE Id = :llamada.CC_Cuenta__c];
+			cuenta = [SELECT Phone, PersonMobilePhone, CC_MarcaSenior__c, CC_Empleado_Familiar__c  FROM Account WHERE Id = :llamada.CC_Cuenta__c];
 			if (cuenta[0].PersonMobilePhone != null) {
 				telefonoCaso = cuenta[0].PersonMobilePhone;
 			} else if (cuenta[0].Phone != null) {
@@ -512,32 +412,34 @@ public with sharing class CC_Llamada_GC {
 			Canal_del_Empleado__c = llamada.CC_Canal_del_Empleado__c,
 			CC_Id_Cognitivo__c = llamada.CC_Id_Cognitivo__c,
 			CC_Status_Autorizacion__c = llamada.CC_Status_Autorizacion__c,
-            //KIN_Genesys_Cloud_URL_Grabacion__c = llamada. KIN_Genesys_Cloud_URL_Grabacion__c,
-			//Nuevo proyecto GENiaL
-			//CC_Resumen_AI__c = llamada.CC_Resumen_AI__c,
 			CC_Sentimiento__c = llamada.CC_Sentimiento__c,
 			CC_Respuesta_Asistente__c = llamada.CC_Respuesta_Asistente__c
-			//CC_Asunto__c = llamada.CC_Asunto_IA__c
 			);
-			
-			if(!String.isEmpty(llamada.CC_Resumen_AI__c)){
-				caso.CC_Resumen_AI__c = llamada.CC_Resumen_AI__c;
-			}else if(!cuenta.isEmpty() || llamada.CC_Idioma__c == 'en' && (cuenta[0].CC_Empleado_Familiar__c || cuenta[0].CC_Marca_senior__c)){
-				caso.CC_Resumen_AI__c = 'No hay conversación con el asistente';
-			}else{
-				caso.CC_Resumen_AI__c = 'Sin Información';
-			}
-			
+
 			if (servicioGenesys.CC_Tipo_Cliente__c == 'Cliente') {
+
 				caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
 				caso.CC_Tipo_Cliente__c = 'Cliente';
 				caso.CC_OTP_Nivel__c = llamada.CC_Status_Autorizacion__c != null ? 'Cliente Digital' : '';
-			if (llamada.CC_Cuenta__c != null) {
-				caso.CC_Oficina_Afectada_Lookup__c = llamada.CC_Cuenta__r.AV_OficinaPrincipal__c;
-			}
+
+				if (llamada.CC_Cuenta__c != null) {
+					caso.CC_Oficina_Afectada_Lookup__c = llamada.CC_Cuenta__r.AV_OficinaPrincipal__c;
+				}
+
+				if(!String.isEmpty(llamada.CC_Resumen_AI__c)){
+					caso.CC_Resumen_AI__c = llamada.CC_Resumen_AI__c;
+				}else if(!cuenta.isEmpty() || llamada.CC_Idioma__c == 'en' && (cuenta[0].CC_Empleado_Familiar__c || cuenta[0].CC_MarcaSenior__c)){
+					caso.CC_Resumen_AI__c = 'No hay conversación con el asistente';
+				}else{
+					caso.CC_Resumen_AI__c = 'Sin Información';
+				}
+
+
+
 		} else if (servicioGenesys.CC_Tipo_Cliente__c == 'Empleado') {
 			caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
 			caso.CC_Tipo_Cliente__c = 'Empleado';
+			caso.CC_Fecha_Traslado_1N__c = DateTime.now();
 		} else if (servicioGenesys.CC_Tipo_Cliente__c == 'CSI Bankia') {
 			caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_CSI_Bankia');
 			caso.CC_Tipo_Cliente__c = 'Empleado';
@@ -644,8 +546,8 @@ public with sharing class CC_Llamada_GC {
 				}
 			} else {
 				//Identificación contra BD
-				List<Contact> contactos = [SELECT AccountId, Account.CC_Marca_senior__c, Account.CC_Empleado_Familiar__c FROM Contact WHERE CC_NumPerso__c = :numPerso
-											AND (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_ClientePA') LIMIT 2];
+				List<Contact> contactos = [SELECT AccountId, Account.CC_MarcaSenior__c, Account.CC_Empleado_Familiar__c FROM Contact WHERE CC_NumPerso__c = :numPerso
+											AND (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_ClientePA') AND Account.AV_Confidencial__c = false LIMIT 2];
 				if (contactos.size() == 1) {
 					llamada.CC_Cuenta__c = contactos[0].AccountId;
 					llamada.CC_Contacto__c = contactos[0].Id;
@@ -654,16 +556,16 @@ public with sharing class CC_Llamada_GC {
 				}
 			}
 		}
-		return retorno; 
+		return retorno;
 	}
 
 	@TestVisible
-	private static void identificarPorTelefono(CC_Llamada__c llamada, String telefono) {    
-        
+	private static void identificarPorTelefono(CC_Llamada__c llamada, String telefono) {
+
 		if (!String.isEmpty(telefono)) {
             telefono = telefono.replace('+3400', '');
             telefono = telefono.replace('+34', '');
-            
+
 			List<CC_Canal_Com__c> telefonos = [SELECT CC_ContactoId__c, CC_ContactoId__r.AccountId FROM CC_Canal_Com__c
 												WHERE CC_Telefono__c =:telefono AND RecordType.DeveloperName = 'CC_Telefono'
 												AND CC_ContactoId__r.RecordType.DeveloperName = 'CC_Empleado' LIMIT 2];
@@ -782,14 +684,6 @@ public with sharing class CC_Llamada_GC {
 		return crearActividad(llamadaId, casoId, tipoActividad, asunto, null);
 	}
 
-	/*
-	@future
-	private static void crearActividadFuture(Id llamadaId, Id casoId, String tipoActividad, String asunto) {
-		crearActividad(llamadaId, casoId, tipoActividad, asunto, null);
-	}
-	*/
-	// @future
-	//private static void crearActividadCasos(Id llamadaId, String tipoActividad, String detalle, String tipoCierre) {
 	private static void crearActividadCasosNoFuture(Id llamadaId, String tipoActividad, String detalle, String tipoCierre) {
 		List<Task> actividades = new List<Task>();
 		for (AggregateResult resultado : [SELECT WhatId FROM Task WHERE CC_Llamada_Id__c = :llamadaId GROUP BY WhatId]) {
@@ -864,16 +758,34 @@ public with sharing class CC_Llamada_GC {
 		return caso;
 	}
 
-	private static void traspasarTercerNivel(Id casoId, Id propietarioId, String grupo3n, Id llamadaId) {
+
+	private static void traspasarTercerNivel(Id casoId, Id propietarioId, String grupo3n, Id llamadaId, String tipoCliente) {
+		String grupoApiName = '3N de Carteras CAM'.equals(grupo3N) ? 'CC_3n_Carteras_CAM' : '3N de Valores CAM'.equals(grupo3N) ? 'CC_3n_Valores_CAM' :'3N de Fondos CAM'.equals(grupo3N) ? 'CC_3n_Fondos_CAM' : '';
+
 		Case caso = new Case(Id = casoId);
 		caso.Status = 'Activo';
 		caso.CC_En_Tercer_Nivel__c = true;
-        caso.CC_Fecha_Traslado_3N__c  = System.now();
+		caso.CC_Fecha_Traslado_3N__c  = System.now();
 		caso.CC_Grupo_3N__c = grupo3n;
 		caso.OwnerId = propietarioId;
+
+		if(tipoCliente == 'Empleado'){
+			List<Case> casoEmple = [SELECT CC_Tiempo_Nivel_1__c, CC_Fecha_Traslado_1N__c FROM Case WHERE Id = :casoId LIMIT 1];
+			Id idGrupo = [SELECT Id, Name, DeveloperName FROM Group WHERE Type = 'Queue' AND DeveloperName = :grupoApiName LIMIT 1]?.Id;
+			Datetime ahora = DateTime.now();
+			caso.CC_Tiempo_Nivel_1__c = (casoEmple[0].CC_Tiempo_Nivel_1__c ?? 0) + ((ahora.getTime() - casoEmple[0].CC_Fecha_Traslado_1N__c.getTime()) / 1000);
+
+			CC_Activity.createActivityTraslados(casoEmple[0].Id, null, 'Traslado a ' + grupo3n + ' de Tercer Nivel', 'Traslado Tercer Nivel', idGrupo, null, llamadaId, 'Completed');
+
+		}else{
+			CC_Activity.createActivityTraslados(caso.Id, null, 'Traslado a ' + grupo3n + ' de Tercer Nivel', 'Traslado Tercer Nivel', grupo3n, null, llamadaId, 'Open');
+
+		}
+
 		update caso;
-		CC_EmailSendController.createActivityTraslados(caso.Id, null, 'Traslado a ' + grupo3n + ' de Tercer Nivel', 'Traslado Tercer Nivel', grupo3n, null, llamadaId);
+
 	}
+
 
 	@TestVisible
 	private static boolean hayCasosAbiertosCuenta(Id cuentaId) {

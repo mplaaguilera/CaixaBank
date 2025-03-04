@@ -17,13 +17,15 @@ public with sharing class SAC_LCMP_AsuntosPendientes_Test {
 
         //Usuario SAC_General
         User usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertDML(usuario, false);
+        //Database.insert(usuario);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        //Database.insert(permiSetAssi);
         
 
         //grupo colaborador
@@ -37,7 +39,8 @@ public with sharing class SAC_LCMP_AsuntosPendientes_Test {
         List<SAC_Interaccion__c> listaInteracciones = new List<SAC_Interaccion__c>();
         
         System.runAs(usuario){
-            Database.insert(grupo);
+            SAC_DatabaseDML.insertDML(grupo, false);
+            //Database.insert(grupo);
 
             //Reclamacion
             Map<String, Object> camposRecl = new Map<String, Object>();
@@ -53,10 +56,12 @@ public with sharing class SAC_LCMP_AsuntosPendientes_Test {
             Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
             listacasos.add(casoReclamacion2);
 
-            Database.insert(listacasos);
+            SAC_DatabaseDML.insertListDML(listacasos, false);
+            //Database.insert(listacasos);
 
             SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1, casoReclamacion, false)[0];
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
 
 
             //Interaccion Escalado
@@ -81,7 +86,8 @@ public with sharing class SAC_LCMP_AsuntosPendientes_Test {
             SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
             listaInteracciones.add(consulta);
 
-            Database.insert(listaInteracciones);
+            SAC_DatabaseDML.insertListDML(listaInteracciones, false);
+            //Database.insert(listaInteracciones);
         }   
     }
 

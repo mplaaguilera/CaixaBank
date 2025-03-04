@@ -103,18 +103,21 @@ public without sharing class SAC_LCMP_BuscadorTopic {
                 List<Topic> topicBD = [SELECT id FROM Topic WHERE  name = :topic];
                 Topic t = new Topic();
                 if(!temaEnMaestro.isEmpty() && topicBD.isEmpty()){
-                    Topic tema = new Topic(Name = topic);        
-                    Database.SaveResult result = Database.insert(tema, false); 
+                    Topic tema = new Topic(Name = topic);
+                    SAC_DatabaseDML.insertDML(tema, false);     
+                    //Database.SaveResult result = Database.insert(tema, false); 
                 }
 
                 t = [SELECT id FROM Topic WHERE  name = :topic];
                 TopicAssignment topicAssig = new TopicAssignment(TopicId=t.Id, EntityId=caso.Id);
-                Database.insert(topicAssig);
+                SAC_DatabaseDML.insertDML(topicAssig, false);     
+                //Database.insert(topicAssig);
 
                 if(!temaEnMaestro.isEmpty()) {
                     // Creación del registro del objeto junction SAC_Marca_Case__c que relaciona la marca con el caso
                     SAC_Marca_Case__c marcaCaso = new SAC_Marca_Case__c(SAC_Case__c = caso.id, SAC_Marca__c = temaEnMaestro[0].id);
-                    Database.insert(marcaCaso);
+                    SAC_DatabaseDML.insertDML(marcaCaso, false);     
+                    //Database.insert(marcaCaso);
                 }
                 
             } else {
@@ -170,14 +173,16 @@ public without sharing class SAC_LCMP_BuscadorTopic {
         List<TopicAssignment> listaTopicsCaso = [SELECT id, TopicId 
                                                 FROM TopicAssignment
                                                 WHERE EntityId =: idCaso AND TopicId =: topic];
-        Database.delete(listaTopicsCaso);
+        SAC_DatabaseDML.deleteListDML(listaTopicsCaso, true);  
+        //Database.delete(listaTopicsCaso);
 
         Topic t = [SELECT name FROM Topic WHERE id = :topic];
         List<SAC_MaestroTemas__c> temaEnMaestro = [SELECT id, name FROM SAC_MaestroTemas__c WHERE Name =: t.name AND SAC_Activo__c = true];
         List<SAC_Marca_Case__c> listaMarcaCaso = [SELECT id 
                                                 FROM SAC_Marca_Case__c
                                                 WHERE SAC_Case__c =: idCaso AND SAC_Marca__c =: temaEnMaestro[0].id];
-        Database.delete(listaMarcaCaso);
+        SAC_DatabaseDML.deleteListDML(listaMarcaCaso, true);
+        //Database.delete(listaMarcaCaso);
     }
 
 

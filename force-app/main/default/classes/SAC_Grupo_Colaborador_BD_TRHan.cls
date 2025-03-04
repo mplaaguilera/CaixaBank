@@ -28,7 +28,7 @@ public with sharing class SAC_Grupo_Colaborador_BD_TRHan extends CC_TriggerHandl
                                             AND (CC_Grupo_Colaborador__r.RecordTypeId =:recTypeProveedores
                                                                                 OR CC_Grupo_Colaborador__r.RecordTypeId =:recTypeTareas)];
         }
-        if(grupoColaboradorContact.size()>0 ){
+        if(!grupoColaboradorContact.isEmpty()){
             if(Schema.sObjectType.CC_Grupo_Colaborador_Contact__c.isDeletable()){
                 delete grupoColaboradorContact ;
             }

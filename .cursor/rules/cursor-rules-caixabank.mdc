@@ -1,0 +1,6 @@
+---
+description: CaixaBank Marc
+globs: **/*.{css,html,js,apex,cls}
+alwaysApply: false
+---
+Reglas para Apex y Lightning Components del proyecto de Salesforce

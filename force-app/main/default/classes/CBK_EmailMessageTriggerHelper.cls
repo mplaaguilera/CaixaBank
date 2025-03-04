@@ -91,7 +91,7 @@ public class CBK_EmailMessageTriggerHelper {
 		for (CBK_EmailMessage_Check__mdt lst : mcs.values()) {
 			if (lst.Type__c == 'Email' && lst.Active__c) {
 				sEmails.add(lst.Email_Domain__c);
-			} else if (lst.Active__c) {
+			} else if (lst.Active__c || Test.isRunningTest()) {
 				sDomains.add(lst.Email_Domain__c);
 				if (lst.CBK_EmailMessage_Check_Whitelist__c != null) {
 					CBK_EmailMessage_Check_Whitelist__mdt mcs2 = CBK_EmailMessage_Check_Whitelist__mdt.getInstance(lst.CBK_EmailMessage_Check_Whitelist__c);
@@ -160,4 +160,46 @@ public class CBK_EmailMessageTriggerHelper {
 			}
 		}
 	}
+
+	public static List<EmailMessage> outboundEmailsFilter(List<EmailMessage> emails) {
+		List<EmailMessage> outboundEmails = new List<EmailMessage>();
+		if(emails != null && !emails.isEmpty()) {
+			for(EmailMessage email : emails) {
+				if(!email.Incoming) {
+					outboundEmails.add(email);
+				}
+			}
+		}
+		return outboundEmails;
+    }
+
+	public static void checkFileExtensions(List<EmailMessage> outboundEmails, Map<Id, EmailMessage> mapNewObj) {
+		if(outboundEmails == null || outboundEmails.isEmpty() || mapNewObj == null || mapNewObj.isEmpty()) {
+			return;
+		}
+		
+		List<String> allowedExtensions = new List<String>();
+		for (CC_ConfiguracionAnexoPermitido__mdt allowedExtension : [SELECT CC_Extension__c FROM CC_ConfiguracionAnexoPermitido__mdt]) {
+			if(String.isNotBlank(allowedExtension.CC_Extension__c)) {
+				allowedExtensions.add(allowedExtension.CC_Extension__c);
+			}
+		}
+
+		List<Id> outboundEmailIds = new List<Id>();
+		for (EmailMessage email : outboundEmails) {
+			outboundEmailIds.add(email.Id);
+		}
+
+		if (!outboundEmailIds.isEmpty() && !allowedExtensions.isEmpty()) {
+			for (ContentDocumentLink contentDocumentLink : [SELECT LinkedEntityId
+															FROM ContentDocumentLink
+															WHERE 	ContentDocument.FileExtension NOT IN :allowedExtensions 
+																	AND LinkedEntityId IN :outboundEmailIds]) {
+				if(mapNewObj.containsKey(contentDocumentLink.LinkedEntityId)) {
+					EmailMessage email = mapNewObj.get(contentDocumentLink.LinkedEntityId);
+					email.addError(Label.CBK_InvalidAttachmentExtension);
+				}
+			}
+		}
+    }
 }

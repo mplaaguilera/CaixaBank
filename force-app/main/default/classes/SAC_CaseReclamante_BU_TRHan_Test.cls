@@ -19,7 +19,8 @@ public with sharing class SAC_CaseReclamante_BU_TRHan_Test  {
     static void makeData() {
 		//Cuenta
 		Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-		Database.insert(cuenta);
+		SAC_DatabaseDML.insertDML(cuenta, false);
+		//Database.insert(cuenta);
 
 		//Reclamacion
 		Map<String, Object> camposRecl = new Map<String, Object>();
@@ -27,15 +28,18 @@ public with sharing class SAC_CaseReclamante_BU_TRHan_Test  {
         camposRecl.put('AccountId', cuenta.Id);
 
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+		SAC_DatabaseDML.insertDML(reclamacion, false);
+        //Database.insert(reclamacion);
 
 		//Reclamante
 		SAC_CaseReclamante__c re = SAC_TestDataFactory.crearReclamante(false,reclamacion,cuenta.id);
-		Database.insert(re);
+		SAC_DatabaseDML.insertDML(re, false);
+		//Database.insert(re);
 
 		//Usuario SAC General
-		List<User> usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1);      
-        Database.insert(usuarioGeneral);
+		List<User> usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1);  
+		SAC_DatabaseDML.insertListDML(usuarioGeneral, false);    
+        //Database.insert(usuarioGeneral);
 	}
 
 	@isTest
@@ -46,7 +50,8 @@ public with sharing class SAC_CaseReclamante_BU_TRHan_Test  {
 		User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true];
 		System.runAs(usuario){
 			Test.startTest();
-			Database.SaveResult dr = Database.update(caseRecl,false);
+			SAC_DatabaseDML.updateDML(caseRecl, false); 
+			//Database.SaveResult dr = Database.update(caseRecl,false);
 			Test.stopTest();
 		}
 		System.assertEquals(true, caseRecl.SAC_ReclamantePrincipal__c, 'No se ha actualizado el reclamante.');

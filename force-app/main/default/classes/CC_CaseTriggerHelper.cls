@@ -172,7 +172,7 @@ public with sharing class CC_CaseTriggerHelper {
                 Map<Id, CC_MCC__c> mapMCCs = new Map<Id, CC_MCC__c>([SELECT CC_Omitir_Facturacion_Imagin__c FROM CC_MCC__c WHERE Id IN :setTematica OR Id IN :setProducto]);
                 for(Case casoCerrado : lstCasosCerrados) {
                     casosExcepcionar = false;
-                    if (!lstCanalesOperativos.isEmpty() && casoCerrado.CC_MCC_Tematica__c != null && casoCerrado.CC_MCC_ProdServ__c != null) {
+                    if (!lstCanalesOperativos.isEmpty() && casoCerrado.CC_MCC_Tematica__c != null && casoCerrado.CC_MCC_ProdServ__c != null && String.valueOf(lstCanalesOperativos).contains(casoCerrado.CC_Canal_Operativo__c) != null) {
                         if (mapMCCs.get(casoCerrado.CC_MCC_Tematica__c).CC_Omitir_Facturacion_Imagin__c == true ||
                         mapMCCs.get(casoCerrado.CC_MCC_ProdServ__c).CC_Omitir_Facturacion_Imagin__c == true ||
                         String.valueOf(lstCanalesOperativos).contains(casoCerrado.CC_Canal_Operativo__c)) {
@@ -1013,7 +1013,7 @@ public with sharing class CC_CaseTriggerHelper {
             }
         }
     }
-    
+
     public static void informarOficinaAfectadaBU(List<Case> lstCasos, Map<Id, Case> mapOldObj, List<Id> idsCAM) {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         Id rtBankia = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_CSI_Bankia').getRecordTypeId();
@@ -1175,39 +1175,28 @@ public with sharing class CC_CaseTriggerHelper {
     }
 
     //Método creado a partir del traspaso de PB (cc_Gestion_Caso) a Trigger
-    public static void creacionCasoBI(List<Case> lstCasos) {
-        Schema.DescribeSObjectResult recordType = Case.SObjectType.getDescribe();
-        List<Schema.RecordTypeInfo> lstRT = recordType.getRecordTypeInfos();
-        Set<Id> setIdsRt = New Set<Id>();
-        List<Case> listaCasosUpdate = new List<Case>();
-        for (Schema.RecordTypeInfo rt: lstRT){
-            if ((rt.getDeveloperName().left(3)=='CC_')) {
-                setIdsRt.add(rt.getRecordTypeId());
+    public static void creacionCasoBI(List<Case> casos) {
+        Set<Id> idRecordTypesCc = new Set<Id>();
+        for (Schema.RecordTypeInfo recordTypeInfo : Case.SObjectType.getDescribe().getRecordTypeInfos()){
+            if (recordTypeInfo.getDeveloperName().left(3) == 'CC_') {
+                idRecordTypesCc.add(recordTypeInfo.getRecordTypeId());
             }
         }
 
-        Set<Id> setIdsGrupos = new Set<Id>();
-        Map<Id,Group> mapaGruposCasos = new Map<Id, Group>();
-        for (Case caso : lstCasos) {
-            if(setIdsRt.contains(caso.RecordtypeId)){
-                listaCasosUpdate.add(caso);
+        List<Case> casosCc = new List<Case>();
+        Set<Id> idGrupos = new Set<Id>();
+        for (Case caso : casos) {
+            if (idRecordTypesCc.contains(caso.RecordTypeId)) {
+                casosCc.add(caso);
                 if (caso.OwnerId != null && String.valueOf(caso.OwnerId).startsWith('00G')) {
-                    setIdsGrupos.add(caso.OwnerId);
-                }
-            }
-
-        }
-
-        if (!setIdsGrupos.isEmpty()) {
-            List<Group> lstGruposCasos = [SELECT Id, DeveloperName FROM Group WHERE Id IN :setIdsGrupos];
-            if(!lstGruposCasos.isEmpty()){
-                for (Group grupo : lstGruposCasos) {
-                    mapaGruposCasos.put(grupo.Id, grupo);
+                    idGrupos.add(caso.OwnerId);
                 }
             }
         }
 
-        for (Case caso : listaCasosUpdate) {
+        Map<Id, Group> mapaGruposCasos = new Map<Id, Group>([SELECT DeveloperName FROM Group WHERE Id IN :idGrupos]);
+
+        for (Case caso : casosCc) {
             caso.CC_Admin__c = true;
             caso.CC_Tramo_TRZ__c = 'Recibida - En evaluacion';
             caso.CC_CanalNotifCli__c = 'Email';
@@ -1228,6 +1217,7 @@ public with sharing class CC_CaseTriggerHelper {
             }
         }
     }
+
     public static void creacionCasoPropuestasBI(List<Case> lstCasos) {
         for (Case caso : lstCasos) {
             if (caso.Origin == 'Propuestas de mejora') {
@@ -1325,16 +1315,16 @@ public with sharing class CC_CaseTriggerHelper {
                     }
             }
         }
-        
+
         Map<String,Boolean> procesos = new Map<String, Boolean>();
-        List <CC_Settings__c> procesosComunicacionesInformativas = [SELECT Name, CC_Activa__c FROM CC_Settings__c 
+        List <CC_Settings__c> procesosComunicacionesInformativas = [SELECT Name, CC_Activa__c FROM CC_Settings__c
                                                  WHERE Name IN ('CC_Agrupador_CI_Asignacion_Casos',
                                                                 'CC_Agrupador_CIC_Asignacion_Casos',
                                                                 'CC_Agrupador_CIM_Asignacion_Casos')];
 
         for(CC_Settings__c setting : procesosComunicacionesInformativas){
             procesos.put(setting.Name, setting.CC_Activa__c);
-        
+
         }
 
         if (!idsCasos.isEmpty() && procesos.get('CC_Agrupador_CI_Asignacion_Casos')) {
@@ -2363,7 +2353,7 @@ public with sharing class CC_CaseTriggerHelper {
                 allmsg.add(email);
             }
         }
-        
+
         if (!allmsg.isEmpty()){
             //Enviamos todos los mensajes
             try{

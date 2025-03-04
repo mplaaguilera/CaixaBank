@@ -67,6 +67,7 @@
 					</div>
 
 					<div lwc:if={datatableData.datatableEnCurso.length} class="datatableContainer">
+						<!-- sldsValidatorIgnoreNextLine -->
 						<lightning-datatable
 							columns={datatableColumns.datatableEnCurso}
 							data={datatableData.datatableEnCurso}
@@ -91,7 +92,7 @@
 							<div class="slds-page-header__col-title">
 								<div class="slds-media">
 									<div class="slds-media__figure">
-										<lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+										<lightning-icon icon-name="standard:person_account" size="small"></lightning-icon>
 									</div>
 									<div class="slds-media__body">
 										<div class="slds-page-header__name">
@@ -136,6 +137,7 @@
 						</div>
 					</div>
 					<div lwc:if={datatableData.datatableHistorico.length} class="datatableContainer" style="height: 214px;">
+						<!-- sldsValidatorIgnoreNextLine -->
 						<lightning-datatable
 							columns={datatableColumns.datatableHistorico}
 							data={datatableData.datatableHistoricoFiltrada}
@@ -225,69 +227,72 @@
 					<div class="slds-grid slds-wrap" style="width: 87%;">
 
 						<!-- Pregunta 1 -->
-						<div class="slds-col slds-size_3-of-5 slds-is-relative slds-var-m-top_medium" style="top: 6px;">
-							<span class="numPregunta numPregunta1">1</span>
-							<label class="slds-form-element__label negrita" style="font-size: 13px;">
-								<abbr class="slds-required">*</abbr>{preguntasNivel2.pregunta1.inputLabel}
-							</label>
-						</div>
-						<div class="slds-col slds-size_2-of-5 slds-var-m-top_medium">
-							<lightning-input
-								lwc:ref="nivel2InputPregunta1"
-								type={preguntasNivel2.pregunta1.inputType}
-								min={preguntasNivel2.pregunta1.inputMin}
-								max={preguntasNivel2.pregunta1.inputMax}
-								max-length={preguntasNivel2.pregunta1.inputMaxLength}
-								placeholder={preguntasNivel2.pregunta1.inputPlaceholder}
-								variant="label-hidden"
-								required
-								class="inputPregunta negrita slds-var-m-right_small"
-								onkeypress={inputPreguntaOnkeypress}>
-							</lightning-input>
-						</div>
-						<div lwc:if={preguntasNivel2.pregunta1.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_x-small slds-var-m-bottom_medium slds-text-color_weak" style="padding-left: 31px;">
-							<div class="slds-grid slds-gutters_direct-xx-small">
-								<div class="slds-col" style="line-height: 18px; font-weight: 300;">
-									{preguntasNivel2.pregunta1.textoAyuda}
+						<template lwc:if={preguntasNivel2.pregunta1.inputLabel} >
+							<div class="slds-col slds-size_3-of-5 slds-is-relative slds-var-m-top_medium" style="top: 6px;">
+								<span class="numPregunta numPregunta1">1</span>
+								<label class="slds-form-element__label negrita" style="font-size: 13px;">
+									<abbr class="slds-required">*</abbr>{preguntasNivel2.pregunta1.inputLabel}
+								</label>
+							</div>
+							<div class="slds-col slds-size_2-of-5 slds-var-m-top_medium">
+								<lightning-input
+									lwc:ref="nivel2InputPregunta1"
+									type={preguntasNivel2.pregunta1.inputType}
+									min={preguntasNivel2.pregunta1.inputMin}
+									max={preguntasNivel2.pregunta1.inputMax}
+									max-length={preguntasNivel2.pregunta1.inputMaxLength}
+									placeholder={preguntasNivel2.pregunta1.inputPlaceholder}
+									variant="label-hidden"
+									required
+									class="inputPregunta negrita slds-var-m-right_small"
+									onkeypress={inputPreguntaOnkeypress}>
+								</lightning-input>
+							</div>
+							<div lwc:if={preguntasNivel2.pregunta1.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_x-small slds-var-m-bottom_medium slds-text-color_weak" style="padding-left: 31px;">
+								<div class="slds-grid slds-gutters_direct-xx-small">
+									<div class="slds-col" style="line-height: 18px; font-weight: 300;">
+										{preguntasNivel2.pregunta1.textoAyuda}
+									</div>
 								</div>
 							</div>
-						</div>
 
-						<div lwc:if={preguntasNivel2.pregunta1.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_large slds-var-m-bottom_x-small">
-							<hr/>
-						</div>
+							<div lwc:if={preguntasNivel2.pregunta1.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_large slds-var-m-bottom_x-small">
+								<hr/>
+							</div>
+						</template>
 
 						<!-- Pregunta 2 -->
-						<div class="slds-col slds-size_3-of-5 slds-is-relative slds-var-m-top_x-large" style="top: 6px;">
-							<span class="numPregunta numPregunta2">2</span>
-							<label class="slds-form-element__label negrita" style="font-size: 13px;">
-								<abbr class="slds-required">*</abbr>{preguntasNivel2.pregunta2.inputLabel}
-							</label>
-						</div>
-						<div class="slds-col slds-size_2-of-5 slds-var-m-top_x-large">
-							<lightning-input
-								lwc:ref="nivel2InputPregunta2"
-								type={preguntasNivel2.pregunta2.inputType}
-								min={preguntasNivel2.pregunta2.inputMin}
-								max={preguntasNivel2.pregunta2.inputMax}
-								max-length={preguntasNivel2.pregunta2.inputMaxLength}
-								placeholder={preguntasNivel2.pregunta2.inputPlaceholder}
-								variant="label-hidden"
-								required
-								class="inputPregunta negrita slds-var-m-right_small"
-								onkeypress={inputPreguntaOnkeypress}>
-							</lightning-input>
-						</div>
-						<div lwc:if={preguntasNivel2.pregunta2.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_x-small slds-var-m-bottom_medium slds-text-color_weak" style="padding-left: 31px;">
-							<div class="slds-grid slds-gutters_direct-xx-small">
-								<div class="slds-col" style="line-height: 18px; font-weight: 300;">
-									{preguntasNivel2.pregunta2.textoAyuda}
+						<template lwc:if={preguntasNivel2.pregunta2.inputLabel}>
+							<div lwc:if={preguntasNivel2.pregunta2.inputLabel} class="slds-col slds-size_3-of-5 slds-is-relative slds-var-m-top_x-large" style="top: 6px;">
+								<span class="numPregunta numPregunta2">2</span>
+								<label class="slds-form-element__label negrita" style="font-size: 13px;">
+									<abbr class="slds-required">*</abbr>{preguntasNivel2.pregunta2.inputLabel}
+								</label>
+							</div>
+							<div class="slds-col slds-size_2-of-5 slds-var-m-top_x-large">
+								<lightning-input
+									lwc:ref="nivel2InputPregunta2"
+									type={preguntasNivel2.pregunta2.inputType}
+									min={preguntasNivel2.pregunta2.inputMin}
+									max={preguntasNivel2.pregunta2.inputMax}
+									max-length={preguntasNivel2.pregunta2.inputMaxLength}
+									placeholder={preguntasNivel2.pregunta2.inputPlaceholder}
+									variant="label-hidden"
+									required
+									class="inputPregunta negrita slds-var-m-right_small"
+									onkeypress={inputPreguntaOnkeypress}>
+								</lightning-input>
+							</div>
+							<div lwc:if={preguntasNivel2.pregunta2.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_x-small slds-var-m-bottom_medium slds-text-color_weak" style="padding-left: 31px;">
+								<div class="slds-grid slds-gutters_direct-xx-small">
+									<div class="slds-col" style="line-height: 18px; font-weight: 300;">
+										{preguntasNivel2.pregunta2.textoAyuda}
+									</div>
 								</div>
 							</div>
-						</div>
-
+						</template>
 						<!-- Botón Validar -->
-						<div lwc:if={preguntasNivel2.pregunta1.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_medium slds-var-m-bottom_x-small">
+						<div lwc:if={preguntasNivel2.pregunta2.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_medium slds-var-m-bottom_x-small">
 							<hr/>
 						</div>
 

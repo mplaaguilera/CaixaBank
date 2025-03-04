@@ -257,10 +257,21 @@ public with sharing class CC_MCC_Buscador_Controller_Test {
         detalle.CC_Motivo__c = motivo.Id;
         detalle.CC_Codigo_Externo__c = 'DE-000001';
         insert detalle;
+        
+        SEG_ClasificacionRapida__c regla1 = new SEG_ClasificacionRapida__c();
+        regla1.Name = 'CR1';
+        regla1.SEG_Tematica__c = tematica.Id;
+        regla1.SEG_Producto__c = productoServicio.Id;
+        regla1.SEG_Motivo__c = motivo.Id;
+        regla1.CBK_Negocio__c = 'Segmentos';
+        regla1.SEG_Organizacion__c= 'Banca Corporativa';
+        insert regla1;
 
         Case caso = new Case();
         caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'SEG_Cliente');
         caso.Subject = 'Caso Test';
+        caso.SEG_Organizacion__c = 'Banca Corporativa';
+        caso.SEG_Zona__c = 'Corporativa';
         insert caso;
 
         Test.startTest();

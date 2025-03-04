@@ -24,7 +24,8 @@ public with sharing class SAC_TestDataFactory_Test {
             List<User> usuariosDos = SAC_TestDataFactory.crearUsuarioSACGeneral(2);
             List<User> usuariosTres = SAC_TestDataFactory.crearUsuarioSACGeneral(3);
             List<User> usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1);
-            Database.insert(usuariosDos);
+            SAC_DatabaseDML.insertListDML(usuariosDos, false);
+            //Database.insert(usuariosDos);
             System.assertEquals(2, usuariosDos.size(), 'No se han creado los dos usuarios.');
             System.assertEquals(3, usuariosTres.size(), 'No se han creado los tres usuarios.');
             System.assertEquals(1, usuarioAdmin.size(), 'No se han creado el usuario admin.');
@@ -32,9 +33,12 @@ public with sharing class SAC_TestDataFactory_Test {
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', camposCaso);
             Case pretension = SAC_TestDataFactory.crearCaso('Pretension', camposCaso);
             Case consulta = SAC_TestDataFactory.crearCaso('Consulta', camposCaso);
-            Database.insert(reclamacion);
-            Database.insert(pretension);
-            Database.insert(consulta);
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+            //Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(pretension, false);
+            //Database.insert(pretension);
+            SAC_DatabaseDML.insertDML(consulta, false);
+            //Database.insert(consulta);
             System.assertNotEquals(null, reclamacion.id, 'No se ha creado la reclamacion.');
             System.assertNotEquals(null, pretension.id, 'No se ha creado la pretension.');
             System.assertNotEquals(null, consulta.id, 'No se ha creado la consulta.');
@@ -48,7 +52,8 @@ public with sharing class SAC_TestDataFactory_Test {
             List<Account> cuentas = SAC_TestDataFactory.crearCuentas(2);
             List<Account> cuentasPA = SAC_TestDataFactory.crearCuentasNoClientePA(2);
             List<Account> cuentasOficina = SAC_TestDataFactory.crearCuentasOficina(2);
-            Database.insert(cuentas);
+            SAC_DatabaseDML.insertListDML(cuentas, false);
+            //Database.insert(cuentas);
             System.assertEquals(2, reclamacionesDos.size(), 'No se han creado las dos reclamaciones.');
             System.assertEquals(3, reclamacionesTres.size(), 'No se han creado las tres reclamaciones.');
             System.assertEquals(2, consultasDos.size(), 'No se han creado las dos consultas.');
@@ -64,10 +69,14 @@ public with sharing class SAC_TestDataFactory_Test {
             SAC_CaseReclamante__c reclamanteReclSec = SAC_TestDataFactory.crearReclamante(false, reclamacion, cuentas[0].id);
             SAC_CaseReclamante__c reclamantePretPrin = SAC_TestDataFactory.crearReclamante(true, pretension, cuentas[0].id);
             SAC_CaseReclamante__c reclamantePretSec = SAC_TestDataFactory.crearReclamante(false, pretension, cuentas[0].id);
-            Database.insert(reclamanteReclPrin);
-            Database.insert(reclamanteReclSec);
-            Database.insert(reclamantePretPrin);
-            Database.insert(reclamantePretSec);
+            SAC_DatabaseDML.insertDML(reclamanteReclPrin, false);
+            //Database.insert(reclamanteReclPrin);
+            SAC_DatabaseDML.insertDML(reclamanteReclSec, false);
+            //Database.insert(reclamanteReclSec);
+            SAC_DatabaseDML.insertDML(reclamantePretPrin, false);
+            //Database.insert(reclamantePretPrin);
+            SAC_DatabaseDML.insertDML(reclamantePretSec, false);
+            //Database.insert(reclamantePretSec);
             System.assertNotEquals(null, reclamanteReclPrin.id, 'No se ha creado el reclamante principal de la reclamación.');
             System.assertNotEquals(null, reclamanteReclSec.id, 'No se ha creado el reclamante secundario de la reclamación.');
             System.assertNotEquals(null, reclamantePretPrin.id, 'No se ha creado el reclamante principal de la pretension.');
@@ -99,7 +108,8 @@ public with sharing class SAC_TestDataFactory_Test {
             Test.startTest();
             List<User> usuariosDos = SAC_TestDataFactory.crearUsuarioSACGeneral(2);
             List<User> usuariosTres = SAC_TestDataFactory.crearUsuarioSACGeneral(3);
-            Database.insert(usuariosDos);
+            SAC_DatabaseDML.insertListDML(usuariosDos, false);
+            //Database.insert(usuariosDos);
             System.assertEquals(2, usuariosDos.size(), 'No se han creado los dos usuarios.');
             System.assertEquals(3, usuariosTres.size(), 'No se han creado los tres usuarios.');
             List<Group> gruposDos = SAC_TestDataFactory.crearGrupo(2);
@@ -110,9 +120,12 @@ public with sharing class SAC_TestDataFactory_Test {
             List<CC_Grupo_Colaborador__c> grupoRespAccion = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',2);
             List<CC_Grupo_Colaborador__c> grupoProv = SAC_TestDataFactory.crearGrupoColaborador('GrupoProveedor',3);
             List<CC_Grupo_Colaborador__c> grupoLet = SAC_TestDataFactory.crearGrupoColaborador('GrupoLetrados',5);
-            Database.insert(grupoRespAccion);
-            Database.insert(grupoProv);
-            Database.insert(grupoLet);
+            SAC_DatabaseDML.insertListDML(grupoRespAccion, false);
+            //Database.insert(grupoRespAccion);
+            SAC_DatabaseDML.insertListDML(grupoProv, false);
+            //Database.insert(grupoProv);
+            SAC_DatabaseDML.insertListDML(grupoLet, false);
+            //Database.insert(grupoLet);
             System.assertEquals(2, grupoRespAccion.size(), 'No se han creado los dos grupos.');
             System.assertEquals(3, grupoProv.size(), 'No se han creado los tres grupos.');
             System.assertEquals(5, grupoLet.size(), 'No se han creado los cinco grupos.');
@@ -120,9 +133,12 @@ public with sharing class SAC_TestDataFactory_Test {
             CC_Grupo_Colaborador_Contact__c contactRespAccion = SAC_TestDataFactory.crearColaboradorContact(usuariosDos[0].id, grupoRespAccion[0].id);
             CC_Grupo_Colaborador_Contact__c contactProv = SAC_TestDataFactory.crearColaboradorContact(usuariosDos[0].id, grupoProv[0].id);
             CC_Grupo_Colaborador_Contact__c contactLet = SAC_TestDataFactory.crearColaboradorContact(usuariosDos[0].id, grupoLet[0].id);
-            Database.insert(contactRespAccion);
-            Database.insert(contactProv);
-            Database.insert(contactLet);
+            SAC_DatabaseDML.insertDML(contactRespAccion, false);
+            //Database.insert(contactRespAccion);
+            SAC_DatabaseDML.insertDML(contactProv, false);
+            //Database.insert(contactProv);
+            SAC_DatabaseDML.insertDML(contactLet, false);
+            //Database.insert(contactLet);
             System.assertNotEquals(null, contactRespAccion.id, 'No se ha creado el contacto para el grupo Responsable Acción.');
             System.assertNotEquals(null, contactProv.id, 'No se ha creado el contacto para el grupo Proveedores.');
             System.assertNotEquals(null, contactLet.id, 'No se ha creado el contacto para el grupo Letrados.');
@@ -137,7 +153,8 @@ public with sharing class SAC_TestDataFactory_Test {
         System.runAs(usuario){
             Test.startTest();
             List<Account> cuentas = SAC_TestDataFactory.crearCuentas(2);
-            Database.insert(cuentas);
+            SAC_DatabaseDML.insertListDML(cuentas, false);
+            //Database.insert(cuentas);
             System.assertEquals(2, cuentas.size(), 'No se han creado las dos cuentas.');
             
             List<Contact> contacto = SAC_TestDataFactory.crearContacto(1, cuentas[0].id);
@@ -179,7 +196,8 @@ public with sharing class SAC_TestDataFactory_Test {
         System.runAs(usuario){
             Test.startTest();
             Account cuenta = SAC_TestDataFactory.crearCuentas(1)[0];
-            Database.insert(cuenta);
+            SAC_DatabaseDML.insertDML(cuenta, false);
+            //Database.insert(cuenta);
 
             Entitlement entitle = SAC_TestDataFactory.crearEntitlement(cuenta.id);
             System.assertEquals(cuenta.id, entitle.AccountId, 'No se ha creado correctamente el entitlement.');
@@ -196,7 +214,8 @@ public with sharing class SAC_TestDataFactory_Test {
             camposCaso.put('Status', 'SAC_001');
             camposCaso.put('Description', 'Test Description');
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposCaso);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+            //Database.insert(reclamacion);
 
 
             List<SAC_DocumentoEnvio__c> docs = SAC_TestDataFactory.crearDocumentoEnvio(2, reclamacion);
@@ -228,10 +247,12 @@ public with sharing class SAC_TestDataFactory_Test {
             camposReglas.put('OS_OrdenEjecucion__c', 1);
             
             SEG_ClasificacionRapida__c clasR = SAC_TestDataFactory.crearClasificacionRapida(camposClasR);
-            Database.insert(clasR);
+            SAC_DatabaseDML.insertDML(clasR, false);
+            //Database.insert(clasR);
             
             SEG_Regladeclasificacion__c reglas = SAC_TestDataFactory.crearReglasClasificacion(clasR.id, camposReglas);
-            Database.insert(reglas);
+            SAC_DatabaseDML.insertDML(reglas, false);
+            //Database.insert(reglas);
 
             List<SEG_Multivalor__c> multivalores = SAC_TestDataFactory.crearMultivalor(2, reglas.id, 'Remitente');
             List<SEG_Multivalor__c> multivalores2 = SAC_TestDataFactory.crearMultivalor(4, reglas.id, 'Destinatario a excluir');
@@ -295,7 +316,8 @@ public with sharing class SAC_TestDataFactory_Test {
             camposCaso.put('Status', 'SAC_001');
             camposCaso.put('Description', 'Test Description');
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposCaso);
-            Database.insert(reclamacion);
+            SAC_DatabaseDML.insertDML(reclamacion, false);
+            //Database.insert(reclamacion);
 
             ContentVersion cv = SAC_TestDataFactory.crearContentVersion(reclamacion);
             System.assertNotEquals(null, cv.Title, 'No se han creado correctamente el content version.');
@@ -310,7 +332,8 @@ public with sharing class SAC_TestDataFactory_Test {
         System.runAs(usuario){
             Test.startTest();
             List<CC_Grupo_Colaborador__c> grupoRespAccion = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1);
-            Database.insert(grupoRespAccion);
+            SAC_DatabaseDML.insertListDML(grupoRespAccion, false);
+            //Database.insert(grupoRespAccion);
 
             List<SAC_MaestroAccionesReclamacion__c> listMaestroAcciones = SAC_TestDataFactory.crearMaestroAcciones(1, grupoRespAccion[0].Id);
             System.assertNotEquals(0, listMaestroAcciones.size(), 'No se han creado correctamente el maestro.');
@@ -331,13 +354,16 @@ public with sharing class SAC_TestDataFactory_Test {
         System.runAs(usuario){
             Test.startTest();
             SAC_Interaccion__c consultaInteraccion = SAC_TestDataFactory.crearInteraccion('Consulta', camposInteraccion);
-            Database.insert(consultaInteraccion);
+            SAC_DatabaseDML.insertDML(consultaInteraccion, false);
+            //Database.insert(consultaInteraccion);
 
             SAC_Interaccion__c escaladoInteraccion = SAC_TestDataFactory.crearInteraccion('Escalado', camposEscalado);
-            Database.insert(escaladoInteraccion);
+            SAC_DatabaseDML.insertDML(escaladoInteraccion, false);
+            //Database.insert(escaladoInteraccion);
 
             SAC_Interaccion__c escaladonv3Interaccion = SAC_TestDataFactory.crearInteraccion('EscaladoNV3', camposEscalado);
-            Database.insert(escaladonv3Interaccion);
+            SAC_DatabaseDML.insertDML(escaladonv3Interaccion, false);
+            //Database.insert(escaladonv3Interaccion);
 
             System.assertNotEquals(null, consultaInteraccion.id, 'No se ha creado la consulta.');
             System.assertNotEquals(null, escaladoInteraccion.id, 'No se ha creado el escalado.');

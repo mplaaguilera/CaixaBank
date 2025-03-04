@@ -13,7 +13,7 @@ public with sharing class SAC_LCMP_CopiaMasivaCasos {
                                             SAC_EmailRepresentante__c, SAC_TelefonoRepresentante__c, SAC_DireccionPostal__c, Subject, SAC_Reclamacion__c, CC_CasoRelacionado__c, Origin, SAC_Quebranto__c,
                                             CC_Canal_Procedencia__c, CC_Canal_Respuesta__c, SuppliedEmail, SAC_Importe_Tipo__c, CC_Importe_Reclamado__c, SAC_Importe_Resuelto__c, CC_Importe_Abonado__c,
                                             SAC_Prorrogado__c, SAC_ProrrogaCounter__c, SAC_FechaProrroga__c, SAC_TipoSubsanacion__c, CC_SuppliedFiles__c, SAC_CasoEspecial__c, SAC_Naturaleza__c,
-                                            Status, SAC_StatusAuxiliar__c, CC_Idioma__c, Priority, SAC_Tipologiareparto__c, SEG_Grupo__c, OwnerId, SAC_Entidad_Afectada__c, CC_Oficina_Afectada_Lookup__c,
+                                            Status, SAC_StatusAuxiliar__c, CC_Idioma__c, Priority, SEG_Grupo__c, OwnerId, SAC_Entidad_Afectada__c, CC_Oficina_Afectada_Lookup__c,
                                             CC_Oficina__c, SAC_FechaRecepcion__c, SAC_FechaVencimientoSLA__c, OS_Fecha_Resolucion__c, IsStopped, SAC_CASE_esPSD2__c, SAC_EnvioParcial__c,
                                             SAC_RedaccionFinal__c, SAC_NoAplicaTareas__c, SAC_ReclamanteConformeNegociacion__c, SAC_ResultadoNegociacion__c, SAC_DetalleResultadoNegociacion__c,
                                             CC_SuppliedEntidad__c, CC_Numero_Contrato__c, CC_Observaciones__c, CC_SuppliedProductoDesc__c, SAC_Redaccion__c, Description, SourceId,
@@ -65,7 +65,14 @@ public with sharing class SAC_LCMP_CopiaMasivaCasos {
         }
         
         //Llamada a la clase para que encole un Job con los casos a copiar, la cola a la que pertenece, los documentos a copiar, las copias a hacer (6 o menos) y el numero de copias total que quedan
-        ID jobID = System.enqueueJob(new SAC_CargaMasiva(listaCasosOriginales, cola, mapaConDocLink, copiasAHacer, numeroCopias));
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(UserInfo.getUserId()).addString(String.valueOf(dateInMilliseconds)).build();
+        ID jobID;
+        try {
+            jobID = System.enqueueJob(new SAC_CargaMasiva(listaCasosOriginales, cola, mapaConDocLink, copiasAHacer, numeroCopias), options);    
+        } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
         //Almacenamiento de la Id del Job en el campo de la reclamación
         if (String.isNotBlank(reclamacion.CC_Detalles_Solucion__c)) {
             reclamacion.CC_Detalles_Solucion__c = reclamacion.CC_Detalles_Solucion__c + jobID + ';';

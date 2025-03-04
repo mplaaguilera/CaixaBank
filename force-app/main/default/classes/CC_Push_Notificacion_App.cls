@@ -1,5 +1,5 @@
 public with sharing class CC_Push_Notificacion_App {
-    
+    //callout:API_GWT_TST_CC/AlertasFinancEnvios/ServicioExternoEnviosWS/
     public class CC_Push_Notificacion_App_Mssg {
         public Id sObjectId {get;set;}
         public String app {get;set;}
@@ -76,7 +76,11 @@ public with sharing class CC_Push_Notificacion_App {
             // Los datos de la solicitud viajan en el tag <daveve> con el siguiente formato
             // Inicio tag <dadeve>  Destinatario        Cuerpo del mensaje             Id solicitante Identificador solicitud                                     Fin tag <dadeve>"
             //"CAN00001010X         TLF00001009638877746 TXT00001020PRUEBA DEL MARTES 20IDI00001003002 CLAU0O01 050 MCDW5150H8I20092011083347153649774313             99999999000"
-            String valorTagDadeve = '<![CDATA[CAN00001' + '010' + '  X       '; // La posición de la X indica que es una invocación para PUSH
+
+            // String valorTagDadeve = '<![CDATA[CAN00001' + '010' + '  X       '; // La posición de la X indica que es una invocación para PUSH
+
+            String valorTagDadeve = 'CAN00001' + '010' + '  X       '; // La posición de la X indica que es una invocación para PUSH
+
             // PER00002: Es obligatorio enviar el bloque del numper de la persona a la que queremos notificar el PUSH, en hexadecimal
             //Decimal dc = 15482499;
             String persMayusHex = '';
@@ -87,50 +91,41 @@ public with sharing class CC_Push_Notificacion_App {
             //persMayusHex = '0014A410';
             String ceroIzquierda = '0';
             Integer longitudNumPerso = persMayusHex.length();
-            system.debug('longitud numperso ' + longitudNumPerso);
             if(longitudNumPerso != 8){
                 Integer huecosPorRellenar = 8 - longitudNumPerso;
-                system.debug('huecosPorRellenar ' + huecosPorRellenar);
                 for(Integer i = 0; i < huecosPorRellenar; i++){
-                    system.debug('dentro for iteracion ' + i);
                     ceroIzquierda = '0';
                     ceroIzquierda += persMayusHex;
                     persMayusHex = ceroIzquierda;
-                    system.debug('dentro for ' + persMayusHex);
                 }
-                
-                system.debug('numperso final ' + persMayusHex);
+            
             }
-            system.debug('numPers to HEX ' + persMayusHex);
             valorTagDadeve += 'PER00002' + '008' + persMayusHex;
-            system.debug('dadeve numperso ' + valorTagDadeve);
+
             
              // Longitud 8
             //valorTagDadeve += 'TLF00001009' + mensaje.destinatario.right(9); > El teléfono se indicaría si se quisiera que se enviara la notificación por SMS si no se puede enviar la notificación PUSH a la app
             // Texto privado
-            system.debug('mensaje.textoPrivado: ' + mensaje.textoPrivado);
             if (!String.isBlank(mensaje.textoPrivado)) {
-                valorTagDadeve += 'TXT00005' + String.valueOf(mensaje.textoPrivado.length()).leftPad(3, '0') + mensaje.textoPrivado;
+                String txtPri = mensaje.textoPrivado.replace('"', '\\"');
+                valorTagDadeve += 'TXT00005' + String.valueOf(mensaje.textoPrivado.length()).leftPad(3, '0') + txtPri;
             }
-            system.debug('valorTagDadeve: ' + valorTagDadeve);
-            
-            // Texto privado avanzado ??
-        /*    if (!String.isBlank(mensaje.textoPrivadoAvanzado)) {
-                valorTagDadeve += 'TXT00005' + String.valueOf(mensaje.textoPrivadoAvanzado.length()).leftPad(3, '0') + mensaje.textoPrivadoAvanzado;
-            }
-        */    // Texto público
+           // Texto público
             if (!String.isBlank(mensaje.textoPublico)) {
-                valorTagDadeve += 'TEXPUB01' + String.valueOf(mensaje.textoPublico.length()).leftPad(3, '0') + mensaje.textoPublico;
+                String txtPubli = mensaje.textoPublico.replace('"', '\\"');
+                valorTagDadeve += 'TEXPUB01' + String.valueOf(mensaje.textoPublico.length()).leftPad(3, '0') + txtPubli;
             }
             if (!String.isBlank(mensaje.sobreTitulo) || !String.isBlank(mensaje.titulo) || !String.isBlank(mensaje.textoPrivado) || !String.isBlank(mensaje.textoBoton) || !String.isBlank(mensaje.deeplink)) {
             String txtaPrivAva = '{"v":"1.0","s":"AtencionCliente","mc":{"h":"'+ mensaje.sobreTitulo +'","t":"'+ mensaje.titulo +'","ds":"'+mensaje.textoPrivado+'","mac":{"l":"'+ mensaje.textoBoton +'","u":"'+ mensaje.deeplink +'"}}}';
-            valorTagDadeve += 'TXTAVA01'+String.valueOf(txtaPrivAva.length()).leftPad(3, '0')+ txtaPrivAva;
-            system.debug('txtaPrivAva: ' + txtaPrivAva);
-            system.debug('valorTagDadeve: ' + valorTagDadeve);
+
+            String textpriva = txtaPrivAva.replace('"', '\\"');
+
+            valorTagDadeve += 'TXTAVA01'+String.valueOf(txtaPrivAva.length()).leftPad(3, '0')+ textpriva;
             }
             // Asunto
             if (!String.isBlank(mensaje.asunto)) {
-                valorTagDadeve += 'ASUNTO01' + String.valueOf(mensaje.asunto.length()).leftPad(3, '0') + mensaje.asunto;
+                String txtAsunto = mensaje.asunto.replace('"', '\\"');
+                valorTagDadeve += 'ASUNTO01' + String.valueOf(mensaje.asunto.length()).leftPad(3, '0') + txtAsunto;
             }
             // Deeplink ???? PENDIENTE
             // ------------------------------------
@@ -159,39 +154,22 @@ public with sharing class CC_Push_Notificacion_App {
             valorTagDadeve += 'CODTIP01' + '008' + '00000001'; //a sustituir por el valor correcto de
             valorTagDadeve += '99999999000';
 
-            String cuerpo = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://servicioexternoenviosws.alertasfinancenvios.mca.si.absis.lacaixa.es/">';
-            cuerpo += '<soapenv:Header></soapenv:Header>';
-            cuerpo += '<soapenv:Body>';
-            cuerpo += '<ser:ProcesarEvento>';
-            cuerpo += '<externalInputTO>';
-            cuerpo += '<codeve>SLFC00000521000</codeve>'; // PENDIENTE: MODIFICAR CODEVE CON LA NUEVA ALERTA
-            cuerpo += '<dadeve>' + valorTagDadeve + ']]></dadeve>';
-            cuerpo += '</externalInputTO>';
-            cuerpo += '</ser:ProcesarEvento>';
-            cuerpo += '</soapenv:Body>';
-            cuerpo += '</soapenv:Envelope>';
-            //req.setBody(cuerpo);
-            system.debug('body ' + cuerpo);
             // Framework de integración CBK
             Map<String, String> mHeaders = new Map<String, String>();
-            mHeaders.put('Content-Type', 'text/xml');
+           mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
 
+           String body = '{"event":"00CCSP001                                                     SLFC00000521000..' + valorTagDadeve +  '"}';
             CBK_HttpServiceIntegration.RequestWapper integracion= new CBK_HttpServiceIntegration.RequestWapper();
-               integracion.body=cuerpo;
+               integracion.body=body;
                integracion.intSetting= 'CC_MCD_Envio_PUSH';
                integracion.method = 'POST';
                integracion.mHeaders = mHeaders;
                HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
-            // HttpRequest request = CBK_HttpServiceIntegration.getRequest(cuerpo, 'CC_MCD_Envio_PUSH', 'POST', mHeaders);
             // request.setHeader('HTTP-HEADER-ACTOR', 'CBCCSF'); //solo para tst
-            //request.setClientCertificateName('cc_camaleon');
-            system.debug(request.getBody());
-
+            //request.setClientCertificateName('cc_camaleon');//solo para tst
             Boolean errorHttpSend = false;
             try {
                 HttpResponse respuesta = CBK_HttpServiceIntegration.callHttpService(request, null, 'CC_MCD_Envio_PUSH');
-                system.debug(respuesta.getBody());
-                system.debug(respuesta.getStatusCode());
                 if(String.isNotBlank(respuesta.getBody()) && respuesta.getStatusCode() == 200){
                     resultados.add(respuesta.getBody());
 
@@ -199,10 +177,9 @@ public with sharing class CC_Push_Notificacion_App {
             if (mensaje.sObjectId != null) {
                 if (mensaje.sObjectId.getSobjectType() == Schema.Case.getSObjectType()) {
                     //Tareas de casos (CC o COPS): el RT de las tareas se deduce del RT del caso
-                    String prefijoRT = [SELECT RecordType.DeveloperName FROM Case
-                                    WHERE Id = :mensaje.sObjectId].RecordType.DeveloperName.substringBefore('_');
+                    // String prefijoRT = [SELECT RecordType.DeveloperName FROM Case WHERE Id = :mensaje.sObjectId].RecordType.DeveloperName.substringBefore('_');
                     Task tarea = new Task();
-                    tarea.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', prefijoRT + '_Task');
+                    tarea.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
                     tarea.WhatId = mensaje.sObjectId;
                     //tarea.Type = 'Notificación - Salida'; > Valor no activo
                     tarea.Type = 'Otros';
@@ -241,7 +218,6 @@ public with sharing class CC_Push_Notificacion_App {
     // Se valida el enrollment PUSH del cliente
     //public static List<String> validarEnrollmentPUSH(List<CC_Push_Notificacion_App.CC_Push_Notificacion_App_Mssg> mensajes) {
     public static Map<String, Boolean> validarEnrollmentPUSH(String numPer) {
-        system.debug('Luis dentro validar enrollment PUSH ' + numPer);
         Http http = new Http();
         Map<String, Boolean> resMap = new Map<String, Boolean>();
         List<String> res = new List<String>();
@@ -250,8 +226,6 @@ public with sharing class CC_Push_Notificacion_App {
             Decimal numPersDec = Decimal.valueOf(numPer);
             persMayusHex = CC_MetodosUtiles.decimalToHex(numPersDec).toUpperCase();
         }
-        system.debug('perso to HEX ' + persMayusHex);
-
         // Framework de integración CBK
         Map<String, String> mHeaders = new Map<String, String>();
         mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
@@ -264,8 +238,6 @@ public with sharing class CC_Push_Notificacion_App {
                integracion.method = 'GET';
                integracion.mHeaders = mHeaders;
         HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
-        //HttpRequest request = CBK_HttpServiceIntegration.getRequest(null, 'CC_MCD_Gestion_PUSH_uuIds', 'GET', mHeaders);
-        
 
         String httpRequestEndpoint = request.getEndpoint();
         httpRequestEndpoint += '?customerType=C&appId=';
@@ -278,9 +250,7 @@ public with sharing class CC_Push_Notificacion_App {
         String httpRequestEndpointlaCaixa = httpRequestEndpoint + appIdCaixa;
         String httpRequestEndpointImagin = httpRequestEndpoint + appIdImagin;
 
-        system.debug('test endpoint caixa' + httpRequestEndpointlaCaixa);
         request.setEndpoint(httpRequestEndpointlaCaixa);
-        system.debug('request caixa' + request);
         List<CC_TrazaInt__c> registroTrazas = new List<CC_TrazaInt__c>();
         Boolean errorHttpSend = false;
         try {
@@ -292,7 +262,7 @@ public with sharing class CC_Push_Notificacion_App {
             
             CC_TrazaInt__c registroIntegracion = new CC_TrazaInt__c ();
 			registroIntegracion.Name = 'CC_MCD_Gestion_PUSH_uuIds';
-			registroIntegracion.CC_Identificador__c = 'callout:API_GWT_PRO_CC/distribution/messagePush/applicationAlerts/uuids';
+			registroIntegracion.CC_Identificador__c = 'callout:API_GWT_TST_CC/distribution/messagePush/applicationAlerts/uuids';
 			registroIntegracion.CC_FechaInicio__c = dtStart;
 			registroIntegracion.CC_FechaFin__c = dtStop;
 			registroIntegracion.CC_MensajeEntrada__c = request.toString();
@@ -304,13 +274,6 @@ public with sharing class CC_Push_Notificacion_App {
 				registroIntegracion.CC_DetalleError__c = respuesta.getBody();
 			}
             registroTrazas.add(registroIntegracion);
-
-
-
-            system.debug('response body ' + respuesta.getBody());
-			system.debug('response ' + respuesta);
-			system.debug('response status ' + respuesta.getStatus());
-			system.debug('response status code ' + respuesta.getStatusCode());
             
             if(String.isNotBlank(respuesta.getBody()) && respuesta.getStatusCode() == 200){
                 res.add(respuesta.getBody());
@@ -319,28 +282,15 @@ public with sharing class CC_Push_Notificacion_App {
             else {
                 resMap.put('CaixaBank', false);
             }
-            system.debug('cantidad de elementos ' + res.size());
-            system.debug('lista ' + res);
-            system.debug('mapaRes ' + resMap);
-            /*List<String> errores = obtenerErrores(respuesta.getBody());
-            system.debug('errores ' + errores.size());
-            if (errores.isEmpty()) {
-                resultados.add('OK');
-            } else {
-                resultados.add('KO: ' + errores[0]);
-            }*/
             
         } catch (Exception e) {
             errorHttpSend = true;
-            system.debug('error catch ' + e.getMessage());
             CBK_Log.error(e);
             res.add('KO: ' + e.getMessage());
             resMap.put('CaixaBank', false);
-            system.debug('mapaRes ' + resMap);
         }
 
         request.setEndpoint(httpRequestEndpointImagin);
-        system.debug('request Imagin' + request);
 
         try {
             Datetime dtStart = Datetime.now();
@@ -350,7 +300,7 @@ public with sharing class CC_Push_Notificacion_App {
 
             CC_TrazaInt__c registroIntegracion = new CC_TrazaInt__c ();
 			registroIntegracion.Name = 'CC_MCD_Gestion_PUSH_uuIds';
-			registroIntegracion.CC_Identificador__c = 'callout:API_GWT_PRO_CC/distribution/messagePush/applicationAlerts/uuids';
+			registroIntegracion.CC_Identificador__c = 'callout:API_GWT_TST_CC/distribution/messagePush/applicationAlerts/uuids';
 			registroIntegracion.CC_FechaInicio__c = dtStart;
 			registroIntegracion.CC_FechaFin__c = dtStop;
 			registroIntegracion.CC_MensajeEntrada__c = request.toString();
@@ -362,11 +312,6 @@ public with sharing class CC_Push_Notificacion_App {
 				registroIntegracion.CC_DetalleError__c = respuesta2.getBody();
 			}
             registroTrazas.add(registroIntegracion);
-
-            system.debug('response body ' + respuesta2.getBody());
-			system.debug('response ' + respuesta2);
-			system.debug('response status ' + respuesta2.getStatus());
-			system.debug('response status code ' + respuesta2.getStatusCode());
             
             if(String.isNotBlank(respuesta2.getBody()) && respuesta2.getStatusCode() == 200){
                 res.add(respuesta2.getBody());
@@ -375,16 +320,12 @@ public with sharing class CC_Push_Notificacion_App {
             else {
                 resMap.put('IMAGIN', false);
             }
-            system.debug('cantidad de elementos ' + res.size());
-            system.debug('lista ' + res);
-            system.debug('mapaRes ' + resMap);
+
         } catch (Exception e) {
             errorHttpSend = true;
-            system.debug('error catch ' + e.getMessage());
             CBK_Log.error(e);
             res.add('KO: ' + e.getMessage());
             resMap.put('IMAGIN', false);
-            system.debug('mapaRes ' + resMap);
         }
 
         if(!registroTrazas.isEmpty()){

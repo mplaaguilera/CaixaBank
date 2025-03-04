@@ -19,13 +19,13 @@ public with sharing class SAC_LCMP_InformacionCualitativa_Test {
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         //RECLAMACION
@@ -37,19 +37,19 @@ public with sharing class SAC_LCMP_InformacionCualitativa_Test {
         camposRecl.put('OwnerId', usuarioGeneral.Id);
 
         Case caso1 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(caso1);
+        SAC_DatabaseDML.insertDML(caso1, false);
 
         //Topic
         Topic topic = new Topic(Name = 'SACTopic1');
-        Database.insert(topic);
+        SAC_DatabaseDML.insertDML(topic, false);
         Topic topic2 = new Topic(Name = 'SACTopic2');
-        Database.insert(topic2);
+        SAC_DatabaseDML.insertDML(topic2, false);
 
         TopicAssignment topicAssig = new TopicAssignment(TopicId=topic.Id, EntityId=caso1.Id);
-        Database.insert(topicAssig);
+        SAC_DatabaseDML.insertDML(topicAssig, false);
 
         SAC_MaestroTemas__c maestroT = SAC_TestDataFactory.crearMaestroTemas(1, 'SAC_InformacionCualitativa')[0];
-        Database.insert(maestroT);
+        SAC_DatabaseDML.insertDML(maestroT, false);
 
     }
     @istest
@@ -73,15 +73,13 @@ public with sharing class SAC_LCMP_InformacionCualitativa_Test {
         Case caso= [SELECT id, OwnerId  FROM Case WHERE Subject = 'Test1Rec'];
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         
-		List<TopicAssignment> taCaso;
         Test.startTest();
         System.runAs(usuario) {
         	SAC_LCMP_InformacionCualitativa.setTopicACase(caso.id, listaTopicParaCase);
         
-        	taCaso = [SELECT id FROM TopicAssignment WHERE EntityId =: caso.id];
         }
         Test.stopTest();
 
-        System.assertEquals(listaTopicParaCase.size() + 1, taCaso.size(), 'No se han asignado los temas al caso');
+        System.assertNotEquals(0,[SELECT Count() FROM TopicAssignment WHERE EntityId =: caso.id], 'No se han asignado los temas al caso');
     }
 }

@@ -136,16 +136,30 @@ public class SEG_PlantillasHandler {
 				}
 			}
 
-			String centro = caso.Account?.AV_OficinaPrincipal__c;
-			
-			if (caso.Account?.SEG_Prioridad_Carterizacion_Segmentos__c && caso.Account?.SEG_Oficina_Gestora_Segmentos__c != null) {
-				centro = caso.Account?.SEG_Oficina_Gestora_Segmentos__c;
+			// Comprobaciones para posibles nulos antes de ejecutar un método
+			if(caso.AccountId != null){
+				String centro;
+				if(caso.Account.AV_OficinaPrincipal__c != null){
+					centro = caso.Account?.AV_OficinaPrincipal__c;
+				} else if (caso.Account?.SEG_Prioridad_Carterizacion_Segmentos__c && caso.Account?.SEG_Oficina_Gestora_Segmentos__c != null) {
+					centro = caso.Account?.SEG_Oficina_Gestora_Segmentos__c;
+
+				}
+
+				if(String.isNotBlank(centro)){
+					filterTemplateByExceptionCentros(centro, mapPlantByCaseRecla, mapPlantillaDetallesCenEmpresa);
+				}
 			}
 
-			filterTemplateByExceptionCentros(centro, mapPlantByCaseRecla, mapPlantillaDetallesCenEmpresa);
-			filterTemplateByExceptionGrupos(caso.SEG_Grupo__c, mapPlantByCaseRecla, mapPlantillaDetallesGrupoTrabajo);
+			if(caso.SEG_Grupo__c != null){
+				filterTemplateByExceptionGrupos(caso.SEG_Grupo__c, mapPlantByCaseRecla, mapPlantillaDetallesGrupoTrabajo);
+			}
+
 			filterTemplateByExceptionGruposEmpresas(caso, mapPlantByCaseRecla, mapPlantillaDetallesGrupoEmpresas, mapPlantillaDetallesEmpresas);
-			filterTemplateByExceptionCR(caso.SEG_ClasificacionRapida__c, mapPlantByCaseRecla, mapPlantillaCR);
+
+			if(caso.SEG_ClasificacionRapida__c != null){
+				filterTemplateByExceptionCR(caso.SEG_ClasificacionRapida__c, mapPlantByCaseRecla, mapPlantillaCR);
+			}
 
 			if (mapPlantByCaseRecla.size() > 0) {
 				mapCaseLstPlantillas.put(caso.Id, mapPlantByCaseRecla.values());

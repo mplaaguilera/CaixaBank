@@ -5,14 +5,16 @@ public with sharing class SAC_Alertas_Test {
      
         System.runAs(new User(Id = Userinfo.getUserId())) {
             //Usuario SAC General
-            User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-            Database.insert(usuarioGeneral);
+            User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);       
+            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+            //Database.insert(permiSetAssi);
         }
 
         //Reclamaciones
@@ -20,7 +22,8 @@ public with sharing class SAC_Alertas_Test {
         camposRecl.put('Subject', 'TestRec');
         
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        Database.insert(reclamacion);
+        SAC_DatabaseDML.insertDML(reclamacion, false); 
+        //Database.insert(reclamacion);
 
         //Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
@@ -28,7 +31,8 @@ public with sharing class SAC_Alertas_Test {
         camposPret.put('SAC_Reclamacion__c', reclamacion.id);
         
         Case pretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret);
-        Database.insert(pretension);
+        SAC_DatabaseDML.insertDML(pretension, false); 
+        //Database.insert(pretension);
 
         //Contactos
         List<Contact> contactos = SAC_TestDataFactory.crearContacto(2,null);
@@ -41,7 +45,8 @@ public with sharing class SAC_Alertas_Test {
         contactos[1].FirstName = 'Rene';
         contactos[1].LastName = 'Descartes';
         contactos[1].Email = 'Descartes@existo.com';
-        Database.insert(contactos);
+        SAC_DatabaseDML.insertListDML(contactos, false); 
+        //Database.insert(contactos);
         
         //Grupos
         CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1)[0];
@@ -50,7 +55,8 @@ public with sharing class SAC_Alertas_Test {
         grupoColaborador.SAC_Email__c = 'test@email.com';
         grupoColaborador.SAC_Email2__c = 'test@email.com';
         grupoColaborador.SAC_Email3__c = 'test@email.com';
-        Database.insert(grupoColaborador);
+        SAC_DatabaseDML.insertDML(grupoColaborador, false); 
+        //Database.insert(grupoColaborador);
 
         //Interaccion Consulta
         Map<String, Object> camposCons = new Map<String, Object>();
@@ -59,7 +65,8 @@ public with sharing class SAC_Alertas_Test {
         camposCons.put('SAC_Estado__c', 'SAC_PendienteRespuesta');
         
         SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccion('Consulta',camposCons);
-        Database.insert(consulta);
+        SAC_DatabaseDML.insertDML(consulta, false); 
+        //Database.insert(consulta);
 
         /*SAC_Interaccion__c consulta = SAC_TestDataFactory.crearInteraccionn(1,reclamacion.id,grupoColaborador.id)[0];
         consulta.SAC_Estado__c = 'SAC_PendienteRespuesta';
@@ -68,7 +75,8 @@ public with sharing class SAC_Alertas_Test {
         //Tarea
         SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1,reclamacion,false)[0];
         //tarea.OwnerId = usuarioGeneral2.Id;
-        Database.insert(tarea);
+        SAC_DatabaseDML.insertDML(tarea, false); 
+        //Database.insert(tarea);
     }
 
     @isTest

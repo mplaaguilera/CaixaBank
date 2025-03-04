@@ -1,4 +1,5 @@
 public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.InboundEmailHandler{
+
     private static Set<String> objetos = new Set<String>{'Task','Case', 'CC_Grupo_Colaborador__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
     
@@ -19,13 +20,14 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
     * 1.0            US219261         Nicolás G.   15/06/21     Creación
     *****************************************************************/
     public Messaging.InboundEmailResult handleInboundEmail(Messaging.InboundEmail email, Messaging.InboundEnvelope envelope) {
-        
+       String methodname = 'handleInboundEmail';
+
         // Trazabilidad para registrar la entrada del correo.
         try{
             CBK_Log.auditemail(email,envelope);
         }catch (Exception e){
             // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-            CBK_Log.error(e,'Error registrando entrada correo',email);
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
         }
         
         
@@ -35,7 +37,6 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
         EmailMessage emailMess = new EmailMessage();
         
         try{
-            
             WrapperEmailResult wrapEmRes = new WrapperEmailResult();
                         
             String texto = email.htmlBody;
@@ -56,13 +57,13 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
                     encontradoThread = true;
                 }
                 threadId = ('ref:_' + threadId + ':ref');
-            }
-            
+            }            
             
             List<Case> listaCaso = [SELECT id, RecordTypeId, Status, CaseNumber, OwnerId, SAC_AlertasPtes__c, SAC_Reclamacion__c,
                                     SAC_PretensionPrincipal__r.OwnerId, SAC_Reclamacion__r.OwnerId, CC_SuppliedUser__c, Description, recordType.DeveloperName,
                                     CC_SuppliedID__c, SuppliedEmail, Subject
                                     FROM Case WHERE RecordTypeId = :RECORDTYPECONSULTA AND CC_SuppliedID__c =: threadId LIMIT 1];
+
             /*
             Comprobar que el body del mail recibido tenga threadId y buscar un caso que lo tenga
             Si hay un caso con ese threadId, se añade el mail al caso
@@ -90,17 +91,18 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
                 } else if (String.isNotBlank(casoConThreadId.Id)) { //De lo contrario, y si la lista no está vacía, significa que ha encontrado un thread id y debe linkarse el email al caso
                     linkarEmailACasoExistente = true;
                 }
-            
+
             if (abrirCasoNuevo) {
                 //Comprobar parametrizaciones de custom settings para saber que caracteristicas debe tener el caso que debemos crear
                 SAC_EmailService__c parametrizacion = SAC_Utils.comprobarCustomSettings(email, 'SAC_Consulta');
-                
+
                 //Guardar grupo de la parametrización
                 List<CC_Grupo_Colaborador__c> grupos = new List<CC_Grupo_Colaborador__c>();
                 Map<String, Id> mapaGruposIds = new Map<String, Id>();
                 if (parametrizacion != null && String.isNotBlank(parametrizacion.SAC_GroupName__c)) {
                     grupos = [SELECT Id, SAC_DeveloperName__c FROM CC_Grupo_Colaborador__c WHERE SAC_DeveloperName__c = :parametrizacion.SAC_GroupName__c];
                 }
+
                 if (!grupos.isEmpty()) {
                     for (CC_Grupo_Colaborador__c grupo : grupos) {
                         mapaGruposIds.put(grupo.SAC_DeveloperName__c, grupo.Id);
@@ -123,13 +125,14 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
                     //Hacer reglas de validacion antes del insert del caso
                     SAC_Utils.WrapperReglaClasificacion wrapRC = new SAC_Utils.WrapperReglaClasificacion();
                     wrapRC = SAC_Utils.determinarCR(email.fromAddress, email.toAddresses, email.ccAddresses, email.Subject, texto, consultaNueva.RecordTypeId);
+
                     if (String.isNotBlank(wrapRC.id)) {
                         consultaNueva.OS_ReglaUtilizada__c = wrapRC.id;
                     }
-                    
+
                     //caso.CC_AcuseRecibo__c = '1'; esta linea se ha comentado para que no se quede el acuse de recibo en 1. Al no introducir un valor, manda el acuse de recibo y se updatea a 2 (dia 7/11/22)
-                    resultado = Database.insert(consultaNueva);
-                    
+                    SAC_DatabaseDML.insertDML(consultaNueva, false);
+                    //resultado = Database.insert(consultaNueva);
                     wrapEmRes = emailTask(consultaNueva.Id, email, RECORDTYPETAREA);
                     Map<String,Boolean> mapaResultadoEmailTask = wrapEmRes.mapaResultado;
                     emailMess = wrapEmRes.eMessage;
@@ -137,7 +140,8 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
                     result.success= mapaResultadoEmailTask.get('resultado');
                     consultaNueva.SourceId = [SELECT id FROM EmailMessage WHERE ParentId =: consultaNueva.id AND Incoming = true LIMIT 1].id;
                     consultaNueva.SAC_UltimaModificacionFichero__c = (mapaResultadoEmailTask.get('tieneAttachments')) ? emailDate : null;
-                    resultado = Database.update(consultaNueva);    
+                    SAC_DatabaseDML.updateDML(consultaNueva, false);
+                    //resultado = Database.update(consultaNueva);    
                 }
             } else if(linkarEmailACasoExistente) {
                 if(casoConThreadId.RecordTypeId == RECORDTYPECONSULTA && (casoConThreadId.Status == 'SAC_008' || casoConThreadId.Status == 'SAC_012' || casoConThreadId.Status == 'SAC_013')){
@@ -146,48 +150,48 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
                 }
                 
                 Database.SaveResult resultado = null;
-                resultado = Database.update(casoConThreadId);
-                
+                SAC_DatabaseDML.updateDML(casoConThreadId, false);
+                //resultado = Database.update(casoConThreadId);
                 wrapEmRes = emailTask(casoConThreadId.Id, email, RECORDTYPETAREA);
                 result.success = wrapEmRes.mapaResultado.get('resultado');
                 emailMess = wrapEmRes.eMessage;
             }
-            
-        }catch(Exception e){
-            // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-            CBK_Log.error(e,'Error procesando el correo entrante',email);
-        }
-        
-        // Trazabilidad para registrar el procesamiento del correo.
-        //Añadido US527358
-        try{
+
+            //Trazabilidad para registrar el procesamiento del correo.
             CBK_Log.ResultWrapper resultado = new CBK_Log.ResultWrapper();
             resultado.Status = (result.success) ? 'OK' : 'KO';
             resultado.Detail = (result.success) ? 'Envio correcto' : 'Error procesando el correo';
             resultado.CaseId = emailMess.ParentId;
             resultado.EmailMessageId = emailMess.Id;
             CBK_Log.auditemailResult(resultado, email);
-        }catch (Exception e){
+            
+        }catch(Exception e){
             // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-            CBK_Log.error(e,'Error registrando procesamiento correo',email);
+            // Trazabilidad para registrar el procesamiento del correo.
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + METHODNAME + ' - MSG ERROR: ' + e.getMessage(), email);
+
+            CBK_Log.ResultWrapper resultado = new CBK_Log.ResultWrapper();
+            resultado.Status = 'KO';
+            resultado.Detail = 'Error procesando el correo: ' + e.getMessage()?.left(225);
+            resultado.CaseId = emailMess.ParentId;
+            resultado.EmailMessageId = emailMess.Id;
+            CBK_Log.auditemailResult(resultado, email);
         }
         
-        
-        return result;
-        
+        return result; 
     }
     
     /*****************************************************************
-* Proposito: Decide asociar el email al caso o crear un nuevo caso, asociando el email y el contacto o medio de contacto.
-* 
-* Historial
-* -------
-* VERSION        USER_STORY       AUTHOR         DATE         Description
-* 1.0            US219261         Nicolás G.   15/06/21     Creación
-*****************************************************************/
+    * Proposito: Decide asociar el email al caso o crear un nuevo caso, asociando el email y el contacto o medio de contacto.
+    * 
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0            US219261         Nicolás G.   15/06/21     Creación
+    *****************************************************************/
     
     public static WrapperEmailResult emailTask(ID casoid, Messaging.InboundEmail email, Id taskTR){
-        final String METHODNAME = 'emailTask';
+        String methodname = 'emailTask';
         Boolean resultado = false;
         Boolean tieneAttachments = false;
         Map<String,Boolean> mapaResultado = new Map<String,Boolean>();
@@ -225,24 +229,36 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
             conEmailMessage.CcAddress=String.join(email.ccAddresses,',');
         }
         //Añadido US527358
+
         conEmailMessage.MessageIdentifier = email.messageId;
         conEmailMessage.CBK_sfdcMessageId__c = email.messageId?.left(255);
         conEmailMessage.ThreadIdentifier = email.inReplyTo;
         
-        Database.insert(conEmailMessage);
-        resultado = true; 
-        
+        //Try
+        try{
+            SAC_DatabaseDML.insertDML(conEmailMessage, false);
+            //Database.insert(conEmailMessage);
+            resultado = true; 
+        }catch(Exception e){
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+        }
         // Add Email Message Relation for id of the sender
         EmailMessageRelation emr = new EmailMessageRelation();
         emr.EmailMessageId = conEmailMessage.id;
         emr.RelationAddress = email.FromAddress;
         emr.RelationType = 'FromAddress';
-        if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
-            Database.insert(emr);
-        }
-        
-        if(resultado=true){
-            createTask(casoid, email.Subject, TaskTR);
+
+        //Try
+        try{
+            if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
+                SAC_DatabaseDML.insertDML(emr, false);
+                //Database.insert(emr);
+            }
+            if(resultado=true){
+                createTask(casoid, email.Subject, TaskTR);
+            }
+        }catch(Exception e){
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
         }
         //Guardamos los attachments si hubiese alguno
         if(resultado=true){	
@@ -252,7 +268,8 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
                 try{
                     tieneAttachments = true;
                     List<ContentVersion> listaContents = attachmentsMap.values();
-                    Database.insert(listaContents, false);
+                    SAC_DatabaseDML.insertListDML(listaContents, true);
+                    //Database.insert(listaContents, false);
                     
                     List<ContentVersion> listaContentsInsertados = [SELECT Id, ContentDocumentId FROM ContentVersion WHERE ID IN: listaContents];
                     
@@ -269,10 +286,11 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
                         
                         contentLinks.add(cdlCaso);
                     }
-                    Database.insert(contentLinks);
+                    SAC_DatabaseDML.insertListDML(contentLinks, true);
+                    //Database.insert(contentLinks);
                 }catch(Exception e){
                     // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-                    CBK_Log.error(e,'Error procesando el correo entrante',email);
+                    CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
                 }
                 
             }
@@ -293,10 +311,15 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
                     conEmailMessage.htmlBody = (String.isNotBlank(conEmailMessage.htmlBody))?conEmailMessage.htmlBody.replaceAll( 'cid:' + cid, url ).left(130000):conEmailMessage.htmlBody;
                 }
             }
-            
-            if(Schema.sObjectType.EmailMessage.isUpdateAble()){
-                Database.update(conEmailMessage);
-                resultado = true; 
+            //Try
+            try{
+                if(Schema.sObjectType.EmailMessage.isUpdateAble()){
+                    SAC_DatabaseDML.updateDML(conEmailMessage, false);
+                    //Database.update(conEmailMessage);
+                    resultado = true; 
+                }
+            }catch(Exception e){
+                CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
             }
         } 
         
@@ -319,7 +342,7 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
 *****************************************************************/
     
     public static Map<String, ContentVersion> handleAttachments(Messaging.InboundEmail email){
-        final String METHODNAME = 'handleAttachments';
+        String methodname = 'handleAttachments';
         Integer contadorSinHeader = 0;
         Map<String, ContentVersion> attachments = new Map<String, ContentVersion>();
         if(email.textAttachments != null){
@@ -392,7 +415,7 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
 *****************************************************************/
     
     private static void createTask(String casoid, String subject, Id taskTR){
-        final String METHODNAME = 'createTask';
+        String methodname = 'createTask';
         Task tarea= new Task();
         tarea.Type = 'Email';
         tarea.WhatId = casoid;
@@ -401,7 +424,8 @@ public without sharing class SAC_EmailServiceConsultaCOPS implements Messaging.I
         tarea.ActivityDate= system.today();
         tarea.RecordTypeId = TaskTR;
         if(Schema.sObjectType.Task.isCreateable()){
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertDML(tarea, false);
+            //Database.insert(tarea);
         }
     }
     

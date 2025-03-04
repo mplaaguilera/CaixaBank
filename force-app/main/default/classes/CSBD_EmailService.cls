@@ -13,7 +13,7 @@ public with sharing class CSBD_EmailService implements Messaging.InboundEmailHan
 
             Task tareaReferencia = null;
             Opportunity oportunidadReferencia = null;
-            
+
             //Preparar versión en texto plano del cuerpo del correo
             String cuerpoTextoPlano = String.isNotBlank(email.plainTextBody) ? email.plainTextBody : email.htmlBody.stripHtmlTags();
             cuerpoTextoPlano = cuerpoTextoPlano.left(131052);
@@ -35,10 +35,10 @@ public with sharing class CSBD_EmailService implements Messaging.InboundEmailHan
                     }
                 }
             }
-            
+
             //Creación del EmailMessage
             String nuevoHtmlBody = guardarFiles(oportunidadReferencia, email);
-            
+
             EmailMessage correo = new EmailMessage();
             correo.Headers = JSON.serialize(email.headers);
             correo.Incoming = true;
@@ -59,7 +59,7 @@ public with sharing class CSBD_EmailService implements Messaging.InboundEmailHan
                 correo.CcAddress = String.join(email.ccAddresses, ', ');
             }
             insert correo;
-            
+
             //Inserción id de email message
             messageId = correo.Id;
             parentMessageId = correo.RelatedToId;
@@ -89,7 +89,7 @@ public with sharing class CSBD_EmailService implements Messaging.InboundEmailHan
             CBK_Log.auditemailResult(wResult, email);
 
             return resultado;
-        } 
+        }
         catch (Exception e){
 
             CBK_Log.error(e, 'Error en el envio de email', email);
@@ -101,7 +101,7 @@ public with sharing class CSBD_EmailService implements Messaging.InboundEmailHan
             wResult.CaseId = parentMessageId;
             wResult.EmailMessageId = messageId;
             CBK_Log.auditemailResult(wResult, email);
-            
+
             return null;
         }
     }
@@ -127,7 +127,7 @@ public with sharing class CSBD_EmailService implements Messaging.InboundEmailHan
             }
         }
         insert attachments;
-    } 
+    }
 
     private static String guardarFiles(Opportunity oportunidad, Messaging.InboundEmail email) {
         List<Id> listaContentVersionIdEmail = new List<Id>();
@@ -185,7 +185,7 @@ public with sharing class CSBD_EmailService implements Messaging.InboundEmailHan
                 cv.VersionData = binaryAttachment?.body;
 
                 //Se almacena el identificador de la imagen para poder realizar un reemplazo posterior
-                
+
                 if (binaryAttachment.headers != null && !binaryAttachment.headers.isEmpty()) {
                     for (Integer i = 0; i < binaryAttachment.headers.size(); i++) {
                         if (binaryAttachment.headers[i].name == 'Content-Id') {
@@ -210,7 +210,7 @@ public with sharing class CSBD_EmailService implements Messaging.InboundEmailHan
             listaContentVersion = [SELECT ContentDocumentId FROM ContentVersion WHERE Id IN :listaContentVersionId];
 
             //Insertar registros ContentDocumentLink
-            if (oportunidad != null) { 
+            if (oportunidad != null) {
                 List<ContentDocumentLink> listaContentDocumentLink = new List<ContentDocumentLink>();
                 for (ContentVersion cv : listaContentVersion) {
                     ContentDocumentLink cdLink = new ContentDocumentLink();

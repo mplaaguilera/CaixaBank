@@ -18,14 +18,16 @@ public with sharing class SAC_NotificacionesBatch_Test {
         User usuarioGeneral;
           System.runAs(new User(Id = Userinfo.getUserId())) {
                //Usuario SAC General
-               usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
-               Database.insert(usuarioGeneral);
+               usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];   
+               SAC_DatabaseDML.insertDML(usuarioGeneral, false);  
+               //Database.insert(usuarioGeneral);
 
                PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
                PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
                permiSetAssi.AssigneeId = usuarioGeneral.Id;
                permiSetAssi.PermissionSetId = permiSet.Id;
-               Database.insert(permiSetAssi);
+               SAC_DatabaseDML.insertDML(permiSetAssi, false); 
+               //Database.insert(permiSetAssi);
           }
 
         //Reclamaciones
@@ -47,7 +49,8 @@ public with sharing class SAC_NotificacionesBatch_Test {
         Case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl2);
         listaReclamaciones.add(reclamacion2);
 
-        Database.insert(listaReclamaciones);
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false); 
+        //Database.insert(listaReclamaciones);
 
         //Pretensiones
         List<Case> listaPretensiones = new List<Case>();
@@ -64,7 +67,8 @@ public with sharing class SAC_NotificacionesBatch_Test {
         Case pretension2 = SAC_TestDataFactory.crearCaso('Pretension', camposPret2);
         listaPretensiones.add(pretension2);
 
-        Database.insert(listaPretensiones);
+        SAC_DatabaseDML.insertListDML(listaPretensiones, false); 
+        //Database.insert(listaPretensiones);
 
         //TMEs
         List<SAC_TMECaso__c> listaTMEs = new List<SAC_TMECaso__c>();
@@ -86,7 +90,8 @@ public with sharing class SAC_NotificacionesBatch_Test {
         SAC_TMECaso__c tme2 = SAC_TestDataFactory.crearTMECaso(camposTME2);
         listaTMEs.add(tme2);
 
-        Database.insert(listaTMEs);
+        SAC_DatabaseDML.insertListDML(listaTMEs, false); 
+        //Database.insert(listaTMEs);
 
         //Tiempo por estados
         List<SAC_TiempoEstados__c> listaTiemposEstado = new List<SAC_TiempoEstados__c>();
@@ -104,7 +109,8 @@ public with sharing class SAC_NotificacionesBatch_Test {
         SAC_TiempoEstados__c tiempoPorEstado2 = SAC_TestDataFactory.crearTiempoEstados(tme2.Id, camposTiempo2);
         listaTiemposEstado.add(tiempoPorEstado2);
         
-        Database.insert(listaTiemposEstado);
+        SAC_DatabaseDML.insertListDML(listaTiemposEstado, false); 
+        //Database.insert(listaTiemposEstado);
     }
 
     @isTest

@@ -18,21 +18,25 @@ public class SAC_Reclamacion_Test {
         //Account
         List<Account> listaCuentas = SAC_TestDataFactory.crearCuentas(1);
         listaCuentas[0].name = 'cuentaTest';
-        Database.insert(listaCuentas);
+        SAC_DatabaseDML.insertListDML(listaCuentas, false);
+        //Database.insert(listaCuentas);
 
         Account cuentaOficina = SAC_TestDataFactory.crearCuentasOficina(1)[0];
         cuentaOficina.CC_Email__c = 'test@test.com'; 
-        Database.insert(cuentaOficina);
+        SAC_DatabaseDML.insertDML(cuentaOficina, false);
+        //Database.insert(cuentaOficina);
 
         //Users
         List<User> listaUsers = SAC_TestDataFactory.crearUsuarioSACGeneral(2);
         listaUsers[0].Username = 'sac5reclamacion@test.test';
         listaUsers[1].Username = 'Name123456@test.com';
-        Database.insert(listaUsers);
+        SAC_DatabaseDML.insertListDML(listaUsers, false);
+        //Database.insert(listaUsers);
 
         List<User> listaUsersAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1);
         listaUsersAdmin[0].Username = 'sacadmin1906@test.test';
-        Database.insert(listaUsersAdmin);
+        SAC_DatabaseDML.insertListDML(listaUsersAdmin, false);
+        //Database.insert(listaUsersAdmin);
         
         //MCC
         CC_MCC__c mccTematica1 = new CC_MCC__c(
@@ -40,7 +44,8 @@ public class SAC_Reclamacion_Test {
         Name = 'Avales',
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-0101');
-        Database.insert(mccTematica1);
+        SAC_DatabaseDML.insertDML(mccTematica1, false);
+        //Database.insert(mccTematica1);
 
         CC_MCC__c mccProdServ1 = new CC_MCC__c(
         RecordTypeId = recTypeProdServ,
@@ -48,7 +53,8 @@ public class SAC_Reclamacion_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Codigo_Externo__c = 'TEST-010101',
         CC_Tematica__c = mccTematica1.id);
-        Database.insert(mccProdServ1);
+        SAC_DatabaseDML.insertDML(mccProdServ1, false);
+        //Database.insert(mccProdServ1);
 
         CC_MCC__c mccMotivo1 = new CC_MCC__c(
         RecordTypeId = recTypeMotivo,
@@ -56,7 +62,8 @@ public class SAC_Reclamacion_Test {
         CC_Tipo_Cliente__c = 'SAC',
         CC_Producto_Servicio__c = mccProdServ1.id,
         CC_Codigo_Externo__c = 'TEST-0102');
-        Database.insert(mccMotivo1);
+        SAC_DatabaseDML.insertDML(mccMotivo1, false);
+        //Database.insert(mccMotivo1);
 
         List<CC_MCC__c> listamccsDetalle = new List<CC_MCC__c>();
         CC_MCC__c mccDetalle1 = new CC_MCC__c(
@@ -75,7 +82,8 @@ public class SAC_Reclamacion_Test {
         CC_Motivo__c = mccMotivo1.id,
         SAC_GenerarTaskMisClientes__c = true);
         listamccsDetalle.add(mccDetalle2);
-        Database.insert(listamccsDetalle);
+        SAC_DatabaseDML.insertListDML(listamccsDetalle, false);
+        //Database.insert(listamccsDetalle);
 
         
         Map<String, Object> mapaCamposCaso = new Map<String, Object>();
@@ -88,6 +96,7 @@ public class SAC_Reclamacion_Test {
         mapaCamposCaso.put('CC_MCC_ProdServ__c', mccProdServ1.id);
         mapaCamposCaso.put('OwnerId', listaUsers[0].id);
         mapaCamposCaso.put('CC_Oficina_Afectada_Lookup__c', cuentaOficina.id);
+        mapaCamposCaso.put('CC_Idioma__c', 'en');
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
         reclamaciones.add(casoReclamacion);
 
@@ -100,6 +109,8 @@ public class SAC_Reclamacion_Test {
         mapaCamposCaso.put('CC_MCC_Motivo__c', mccMotivo1.id);
         mapaCamposCaso.put('CC_MCC_ProdServ__c', mccProdServ1.id);
         mapaCamposCaso.put('SAC_TipoConsumidor__c', 'Si');
+        mapaCamposCaso.put('SAC_TipoDeRepresentante__c', 'SAC_Abogado');
+        mapaCamposCaso.put('CC_Importe_Abonado__c', 0.0);
         mapaCamposCaso.put('CC_Oficina_Afectada_Lookup__c', cuentaOficina.id);
         mapaCamposCaso.put('AccountId', listaCuentas[0].id);
         mapaCamposCaso.put('OwnerId', listaUsers[0].id);
@@ -151,10 +162,7 @@ public class SAC_Reclamacion_Test {
         mapaCamposCaso.put('OwnerId', listaUsers[0].id);
         Case casoReclamacion5 = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
         reclamaciones.add(casoReclamacion5);
-
-
-    
-
+        
         mapaCamposCaso.clear();
         mapaCamposCaso.put('Subject', 'TestRec6');
         mapaCamposCaso.put('Origin', 'Otros');
@@ -165,8 +173,59 @@ public class SAC_Reclamacion_Test {
         Case casoReclamacion6 = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
         reclamaciones.add(casoReclamacion6);
 
-        Database.insert(reclamaciones);
+        mapaCamposCaso.clear();
+        mapaCamposCaso.put('Subject', 'Complementaria');
+        mapaCamposCaso.put('Origin', 'Otros');
+        mapaCamposCaso.put('Status', 'SAC_001');
+        mapaCamposCaso.put('SAC_TipoConsumidor__c', 'No');
+        mapaCamposCaso.put('SAC_Naturaleza__c', 'SAC_007');
+        mapaCamposCaso.put('CC_Importe_Abonado__c', 5.0);
+        mapaCamposCaso.put('OwnerId', listaUsers[0].id);
+        Case casoReclamacion7 = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
+        reclamaciones.add(casoReclamacion7);
+
+
+        SAC_DatabaseDML.insertListDML(reclamaciones, false);
+
+
+        List<Case> listaComplementariasVinculadas = new List<Case>();
+        mapaCamposCaso.clear();
+        mapaCamposCaso.put('Subject', 'ComplementariaVinculada');
+        mapaCamposCaso.put('Origin', 'Otros');
+        mapaCamposCaso.put('Status', 'SAC_001');
+        mapaCamposCaso.put('SAC_TipoConsumidor__c', 'No');
+        mapaCamposCaso.put('SAC_Naturaleza__c', 'SAC_007');
+        mapaCamposCaso.put('CC_Importe_Abonado__c', 5.0);
+        mapaCamposCaso.put('CC_CasoRelacionado__c', casoReclamacion2.Id);
+        mapaCamposCaso.put('OwnerId', listaUsers[0].id);
+        Case casoReclamacion8 = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
+        listaComplementariasVinculadas.add(casoReclamacion8);
+
+        //Esta tiene naturaleza: reclamación, para en un método cambiarla ahí por Complementaria
+        mapaCamposCaso.clear();
+        mapaCamposCaso.put('Subject', 'ComplementariaVinculada2');
+        mapaCamposCaso.put('Origin', 'Otros');
+        mapaCamposCaso.put('Status', 'SAC_001');
+        mapaCamposCaso.put('SAC_TipoConsumidor__c', 'No');
+        mapaCamposCaso.put('SAC_Naturaleza__c', 'SAC_004');
+        mapaCamposCaso.put('CC_Importe_Abonado__c', 10.0);
+        mapaCamposCaso.put('CC_CasoRelacionado__c', casoReclamacion2.Id);
+        mapaCamposCaso.put('OwnerId', listaUsers[0].id);
+        Case casoReclamacion9 = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
+        listaComplementariasVinculadas.add(casoReclamacion9);
+
+        SAC_DatabaseDML.insertListDML(listaComplementariasVinculadas, false);
+        //Database.insert(reclamaciones);
         
+        //Documentos envío
+        List<SAC_DocumentoEnvio__c> listaDocs = new List<SAC_DocumentoEnvio__c>();
+        SAC_DocumentoEnvio__c documento = new SAC_DocumentoEnvio__c();
+        documento.SAC_Caso__c = casoReclamacion.Id;
+        documento.SAC_TipoDocumento__c = 'redaccion';
+
+        listaDocs.add(documento);
+        SAC_DatabaseDML.insertListDML(listaDocs, true);
+
         mapaCamposCaso.clear();
         mapaCamposCaso.put('SuppliedCompany', 'Pret1');
         mapaCamposCaso.put('Origin', 'Backoffice');
@@ -245,11 +304,12 @@ public class SAC_Reclamacion_Test {
         Case casoPretension6 = SAC_TestDataFactory.crearCaso('Pretension', mapaCamposCaso);
         pretensiones.add(casoPretension6);
 
-
-        Database.insert(pretensiones);
+        SAC_DatabaseDML.insertListDML(pretensiones, false);
+        //Database.insert(pretensiones);
 
         casoReclamacion2.SAC_PretensionPrincipal__c = casoPretension2.Id;
-        Database.update(casoReclamacion2);
+        SAC_DatabaseDML.updateDML(casoReclamacion2, false);
+        //Database.update(casoReclamacion2);
         
         // Test.startTest();
 
@@ -263,7 +323,8 @@ public class SAC_Reclamacion_Test {
         Case consulta = SAC_TestDataFactory.crearCaso('Consulta', mapaCamposCaso);
         
         casos.add(consulta);
-        Database.insert(casos);
+        SAC_DatabaseDML.insertListDML(casos, false);
+        //Database.insert(casos);
         Test.stopTest();
 
         List<CC_Grupo_Colaborador__c> listaGrupoTareas = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion', 2);
@@ -272,25 +333,187 @@ public class SAC_Reclamacion_Test {
         System.runAs(listaUsersAdmin[0]){
             PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_Administrador'];
             PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = listaUsers[0].id);
-            Database.insert(psa);
+            SAC_DatabaseDML.insertDML(psa, false);
+            //Database.insert(psa);
         }
 
         System.runAs(listaUsers[0]){
-            Database.insert(listaGrupoTareas);
+            SAC_DatabaseDML.insertListDML(listaGrupoTareas, false);
+            //Database.insert(listaGrupoTareas);
 
             CC_Grupo_Colaborador_Contact__c contact = SAC_TestDataFactory.crearColaboradorContact(listaUsers[0].id, listaGrupoTareas[1].id);
-            Database.insert(contact);
+            SAC_DatabaseDML.insertDML(contact, false);
+            //Database.insert(contact);
             
             List<SAC_Accion__c> listaTareas = SAC_TestDataFactory.crearTareas(2, casoReclamacion, false);
             listaTareas[0].SAC_Observaciones__c = 'TareaTest';
             listaTareas[1].SAC_Observaciones__c = 'TareaTest2';
             
-            Database.insert(listaTareas);
+            SAC_DatabaseDML.insertListDML(listaTareas, false);
+            //Database.insert(listaTareas);
         }
     }
 
     @isTest
-    public static void devolverConsultasCOPS_Test(){
+    public static void arrastrarImporteReclamacionVinculadaTest(){
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec2'];
+        Case complementaria = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'Complementaria'];
+        
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        CBK_Case_Extension__c casoExtension = new CBK_Case_Extension__c();
+
+        Test.startTest();
+        System.runAs(usuario){
+
+            complementaria.CC_CasoRelacionado__c = reclamacion.Id;
+            SAC_DatabaseDML.updateDML(complementaria, false);
+        }
+
+        Case reclamacionResult = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'TestRec2'];
+        Assert.areEqual(complementaria.CC_Importe_Abonado__c, reclamacionResult.CC_Importe_Abonado__c, 'No se ha arrastrado el imorte abonado a la reclamación.');
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void actualizarImporteCambioVinculacionTest(){
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec2'];
+        Case complementaria = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'ComplementariaVinculada'];
+        
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        CBK_Case_Extension__c casoExtension = new CBK_Case_Extension__c();
+
+        Test.startTest();
+        System.runAs(usuario){
+
+            //Se le quita el caso relacionado para que reste el importe abonado que le correspondía a la complementaria
+            complementaria.CC_CasoRelacionado__c = null;
+            SAC_DatabaseDML.updateDML(complementaria, false);
+
+        }
+
+        Case reclamacionResult = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'TestRec2'];
+        Assert.areEqual(0, reclamacionResult.CC_Importe_Abonado__c, 'No se ha arrastrado el imorte abonado a la reclamación.');
+        Test.stopTest();
+    }
+    
+
+    @isTest
+    public static void calcularNuevoImporteAbonadoTest(){
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec2'];
+        Case complementaria = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'ComplementariaVinculada'];
+        
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        CBK_Case_Extension__c casoExtension = new CBK_Case_Extension__c();
+
+        Test.startTest();
+        System.runAs(usuario){
+
+            //Aunque ponga 10, el inicial es 5 asique le sumará 5 a la reclamación vinculada. El resultado será 5 porque se ha puesto el test para que parta desde importe = 0 la reclamación vinculada
+            complementaria.CC_Importe_Abonado__c = 10;
+            SAC_DatabaseDML.updateDML(complementaria, false);
+
+        }
+
+        Case reclamacionResult = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'TestRec2'];
+        Assert.areEqual(5, reclamacionResult.CC_Importe_Abonado__c, 'No se ha arrastrado el imorte abonado a la reclamación.');
+        Test.stopTest();
+    }
+
+
+    @isTest
+    public static void calcularNuevoImporteAbonadoTest2(){
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec2'];
+        Case complementaria = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'ComplementariaVinculada'];
+        
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        CBK_Case_Extension__c casoExtension = new CBK_Case_Extension__c();
+
+        Test.startTest();
+        System.runAs(usuario){
+
+            complementaria.CC_Importe_Abonado__c = 0;
+            SAC_DatabaseDML.updateDML(complementaria, false);
+
+        }
+
+        Case reclamacionResult = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'TestRec2'];
+        Assert.areEqual(0, reclamacionResult.CC_Importe_Abonado__c, 'No se ha arrastrado el imorte abonado a la reclamación.');
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void calcularNuevoImporteCambioNaturalezaTest(){
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec2'];
+        Case complementaria = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'ComplementariaVinculada2'];
+        
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        CBK_Case_Extension__c casoExtension = new CBK_Case_Extension__c();
+
+        Test.startTest();
+        System.runAs(usuario){
+
+            complementaria.SAC_Naturaleza__c = 'SAC_007';
+            SAC_DatabaseDML.updateDML(complementaria, false);
+
+        }
+
+        Case reclamacionResult = [SELECT Id, Status, CC_Importe_Abonado__c FROM Case WHERE Subject = 'TestRec2'];
+        Assert.areEqual(10, reclamacionResult.CC_Importe_Abonado__c, 'No se ha arrastrado el imorte abonado a la reclamación.');
+        Test.stopTest();
+    }
+    
+     
+
+    @isTest
+    public static void comprobarDespachoRepresentanteTest(){
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec2'];
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        CBK_Case_Extension__c casoExtension = new CBK_Case_Extension__c();
+
+        Test.startTest();
+        System.runAs(usuario){
+            
+            casoExtension.SAC_DespachoRepresentante__c = 'Test';
+            SAC_DatabaseDML.insertDML(casoExtension, false);
+
+            reclamacion.CBK_Case_Extension_Id__c = casoExtension.Id;
+            reclamacion.SAC_TipoDeRepresentante__c = 'SAC_Autorizado';
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+
+            
+           // SAC_DatabaseDML.updateDML(reclamacion, false);
+
+        }
+
+        CBK_Case_Extension__c casoExtensionResult = [SELECT SAC_DespachoRepresentante__c FROM CBK_Case_Extension__c WHERE Id = :casoExtension.Id];
+        Assert.areEqual(null, casoExtensionResult.SAC_DespachoRepresentante__c, 'No se ha vaciado el despacho representante.');
+        Test.stopTest();
+
+
+    }
+
+    @isTest
+    public static void actualizarPlantillaLateralTest(){
+
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec'];
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+
+        Test.startTest();
+        System.runAs(usuario){
+            
+            reclamacion.CC_Idioma__c = 'es';
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
+        }
+
+        SAC_DocumentoEnvio__c resultado = [SELECT Id, SAC_NombrePlantillaLateral__c FROM SAC_DocumentoEnvio__c WHERE SAC_Caso__c = :reclamacion.Id];
+        Assert.areEqual(resultado.SAC_NombrePlantillaLateral__c, 'SAC_CartaPlantilla', 'No se ha actualizado la plantilla,');
+        Test.stopTest();
+    }
+
+
+    @isTest
+    public static void devolverConsultasCOPSTest(){
 
         Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec'];
         reclamacion.Status = 'Cerrado';
@@ -301,7 +524,8 @@ public class SAC_Reclamacion_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -343,7 +567,8 @@ public class SAC_Reclamacion_Test {
         System.runAs(usuario){
             Test.startTest();
             reclamacion.AccountId = cuenta.Id;
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -382,7 +607,8 @@ public class SAC_Reclamacion_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -397,14 +623,15 @@ public class SAC_Reclamacion_Test {
     }
 
     @isTest
-    static void ModificarPermisoLetradoTest() {
+    static void modificarPermisoLetradoTest() {
         Case casoPretension = [SELECT Id, Status, OwnerId, SAC_Reclamacion__c FROM Case WHERE SuppliedCompany = 'Pret1' LIMIT 1];
         User usuario = [SELECT Id, UserName FROM User WHERE UserName = 'sac5reclamacion@test.test' LIMIT 1];
 
         System.runAs(usuario){
             Test.startTest();
             casoPretension.OwnerId = usuario.Id;
-            Database.update(casoPretension);
+            SAC_DatabaseDML.updateDML(casoPretension, false);
+            //Database.update(casoPretension);
             Test.stopTest();
         }
 
@@ -436,7 +663,8 @@ public class SAC_Reclamacion_Test {
             List<Case> listaUpdate = new List<Case>();
             listaupdate.add(reclamacion);
             listaupdate.add(pretension);
-            Database.update(listaUpdate);
+            SAC_DatabaseDML.updateListDML(listaUpdate, false);
+            //Database.update(listaUpdate);
             Test.stopTest();
         }
 
@@ -448,14 +676,15 @@ public class SAC_Reclamacion_Test {
     }
     
      @isTest
-    static void cerrarTareas_Test() {
+    static void cerrarTareasTest() {
         Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec'];
-        SAC_Accion__c accion = [SELECT Id, SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c ='TareaTest' LIMIT 1];
+        //SAC_Accion__c accion = [SELECT Id, SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c ='TareaTest' LIMIT 1];
         User usuario = [SELECT Id, UserName FROM User WHERE UserName = 'sac5reclamacion@test.test' LIMIT 1];
         
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
-        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);       
-        Database.insert(psa);
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);      
+        SAC_DatabaseDML.insertDML(psa, false); 
+        //Database.insert(psa);
         
         reclamacion.Status = 'Rechazado';
        	reclamacion.SAC_StatusAuxiliar__c = reclamacion.Status;
@@ -463,7 +692,8 @@ public class SAC_Reclamacion_Test {
         
         System.runAs(usuario){
         	Test.startTest();
-        	Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+        	//Database.update(reclamacion);
         	Test.stopTest();
         }
         
@@ -492,7 +722,8 @@ public class SAC_Reclamacion_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -501,7 +732,7 @@ public class SAC_Reclamacion_Test {
     }
     
     @isTest
-    static void guardarComentariosRechazo_Test(){
+    static void guardarComentariosRechazoTest(){
         
         Case reclamacion = [SELECT Id, Status,SAC_StatusAuxiliar__c, SAC_MotivoRechazo__c, Comments FROM Case WHERE Subject = 'TestRec'];
         reclamacion.Status = 'Rechazado';
@@ -512,7 +743,8 @@ public class SAC_Reclamacion_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -521,10 +753,10 @@ public class SAC_Reclamacion_Test {
     }
     
     @isTest
-    static void bajaPretensionesRechazo_Test(){
+    static void bajaPretensionesRechazoTest(){
         
         Case reclamacion = [SELECT Id, Status,SAC_StatusAuxiliar__c, SAC_MotivoRechazo__c, Comments FROM Case WHERE Subject = 'TestRec'];
-        Case casoPretension = [SELECT Id, Status, OwnerId, SAC_Reclamacion__c FROM Case WHERE SuppliedCompany = 'Pret1' LIMIT 1];
+        //Case casoPretension = [SELECT Id, Status, OwnerId, SAC_Reclamacion__c FROM Case WHERE SuppliedCompany = 'Pret1' LIMIT 1];
         reclamacion.Status = 'Rechazado';
         reclamacion.SAC_StatusAuxiliar__c = 'Rechazado';
         reclamacion.SAC_MotivoRechazo__c = 'Otros';
@@ -534,7 +766,8 @@ public class SAC_Reclamacion_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
         System.runAs(usuario){
             Test.startTest();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
         
@@ -580,7 +813,8 @@ public class SAC_Reclamacion_Test {
             Test.startTest();
             reclamacion.Status = 'SAC_007';
             reclamacion.SAC_StatusAuxiliar__c = reclamacion.Status;
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -599,7 +833,8 @@ public class SAC_Reclamacion_Test {
             reclamacion.Status = 'SAC_006';
             reclamacion.SAC_StatusAuxiliar__c = reclamacion.Status;
             reclamacion.SAC_TipoConsumidor__c = 'Si';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -609,21 +844,24 @@ public class SAC_Reclamacion_Test {
     }
 
     @isTest
-    static void informarGrupoLetrado_Test() {
+    static void informarGrupoLetradoTest() {
         Case reclamacion = [SELECT Id, Status, SAC_GrupoLetrado__c, SAC_PretensionPrincipal__c FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
         Case pretension = [SELECT Id, SEG_Grupo__c, SAC_Reclamacion__c FROM Case WHERE SuppliedCompany = 'Pret2' LIMIT 1];
         CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'COPS' LIMIT 1];
+
 
         User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
         System.runAs(usuario){
             Test.startTest();
             pretension.SEG_Grupo__c = grupo.id;
-            Database.update(pretension);
+
+            SAC_DatabaseDML.updateDML(pretension, false);
+            //Database.update(pretension);
             Test.stopTest();
         }
-
+       
         Case reclamacionResult = [SELECT Id, Status, SAC_GrupoLetrado__c FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
-        
+
         Assert.areNotEqual(reclamacion.SAC_GrupoLetrado__c, reclamacionResult.SAC_GrupoLetrado__c, 'No se ha cambiado el grupo Letrado.');
     }		
     
@@ -637,7 +875,8 @@ public class SAC_Reclamacion_Test {
             Test.startTest();
             reclamacion.Status = 'SAC_002';
             reclamacion.SAC_StatusAuxiliar__c = 'SAC_002';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -655,7 +894,8 @@ public class SAC_Reclamacion_Test {
         System.runAs(usuario){
             Test.startTest();
             reclamacion.OS_Fecha_Resolucion__c = system.now();
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -677,7 +917,8 @@ public class SAC_Reclamacion_Test {
             pretensiones.add(pret1);
             pret2.SAC_ResultadoNegociacion__c = 'Sin acuerdo';
             pretensiones.add(pret2);
-            Database.update(pretensiones);
+            SAC_DatabaseDML.updateListDML(pretensiones, false);
+            //Database.update(pretensiones);
             Test.stopTest();
         }
 
@@ -693,16 +934,19 @@ public class SAC_Reclamacion_Test {
 
         PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
         PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);       
-        Database.insert(psa);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
 
         System.runAs(usuario){
             Test.startTest();
             List<Account> listaCuenta = SAC_TestDataFactory.crearCuentasNoClientePA(1);
             listaCuenta[0].AV_Empleado__c = true;
-            Database.insert(listaCuenta);
+            SAC_DatabaseDML.insertListDML(listaCuenta, false);
+            //Database.insert(listaCuenta);
 
             reclamacion.AccountId = listaCuenta[0].Id;
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -734,7 +978,8 @@ public class SAC_Reclamacion_Test {
             List<Case> listaUpdate = new List<Case>();
             listaupdate.add(pretension); 
             listaupdate.add(reclamacion); 
-            Database.update(listaUpdate);
+            SAC_DatabaseDML.updateListDML(listaUpdate, false);
+            //Database.update(listaUpdate);
             Test.stopTest();
         }
         Case preteResult = [SELECT Id, CaseNumber, SAC_MotivoSentidoResolucion__c FROM Case WHERE SuppliedCompany = 'Pret1' LIMIT 1];
@@ -752,7 +997,8 @@ public class SAC_Reclamacion_Test {
         System.runAs(usuario){
             Test.startTest();
             pret1.SAC_ValidacionMCC__c = true;
-            Database.update(pret1);
+            SAC_DatabaseDML.updateDML(pret1, false);
+            //Database.update(pret1);
             Test.stopTest();
         }
 
@@ -773,7 +1019,8 @@ public class SAC_Reclamacion_Test {
             //El estado de derivación es SAC_008
             reclamacion.Status = 'SAC_008';
             reclamacion.SAC_StatusAuxiliar__c = 'SAC_008';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -793,7 +1040,8 @@ public class SAC_Reclamacion_Test {
             //El estado de derivación es SAC_004
             reclamacion.Status = 'SAC_004';
             reclamacion.SAC_StatusAuxiliar__c = 'SAC_004';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+            //Database.update(reclamacion);
             Test.stopTest();
         }
 
@@ -812,11 +1060,87 @@ public class SAC_Reclamacion_Test {
             //El estado de subsanacion es SAC_006
             reclamacion.Status = 'SAC_006';
             reclamacion.SAC_StatusAuxiliar__c = 'SAC_006';
-            Database.update(reclamacion);
+            SAC_DatabaseDML.updateDML(reclamacion, true);
             Test.stopTest();
         }
 
         Case reclamacionEditada = [SELECT Id, Status, SAC_DetenidoDesde__c FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
         Assert.areNotEqual(reclamacion.SAC_DetenidoDesde__c, reclamacionEditada.SAC_DetenidoDesde__c, 'No se ha actualizado la fecha de detenido desde.');
     }	
+
+    @isTest
+    static void informarGrupoLetradoTest2() {
+        Case reclamacion = [SELECT Id, Status, SAC_GrupoLetrado__c, SAC_PretensionPrincipal__c FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
+        Case pretension = [SELECT Id, SEG_Grupo__c, SAC_Reclamacion__c FROM Case WHERE SuppliedCompany = 'Pret2' LIMIT 1];
+        CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'COPS' LIMIT 1];
+
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        System.runAs(usuario){
+            Test.startTest();
+            Map<String, Object> camposCons = new Map<String, Object>();
+            camposCons.put('Subject', 'Consulta2');
+            camposCons.put('OwnerId', usuario.id);
+
+            Case consulta = SAC_TestDataFactory.crearCaso('Consulta',camposCons);
+            consulta.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_ConsultaSAC').getRecordTypeId();   
+            consulta.CC_CasoRelacionado__c = reclamacion.Id;
+            SAC_DatabaseDML.insertDML(consulta, true);
+
+            pretension.SEG_Grupo__c = grupo.id;
+            SAC_DatabaseDML.updateDML(pretension, true);
+            Test.stopTest();
+        }
+
+        Case reclamacionResult = [SELECT Id, Status, SAC_GrupoLetrado__c FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
+        
+        Assert.areNotEqual(reclamacion.SAC_GrupoLetrado__c, reclamacionResult.SAC_GrupoLetrado__c, 'No se ha cambiado el grupo Letrado.');
+    }		
+
+    @isTest
+    static void actualizarResumenManualTest() {
+        List<Case> listaCasos = [SELECT Id, Status, OwnerId, SAC_Reclamacion__c, SAC_PretensionPrincipal__c, SAC_ResumenManual__c, RecordType.DeveloperName FROM Case WHERE SuppliedCompany = 'Pret1'  OR Subject = 'TestRec'];
+        Case pretension = new Case();
+        Case reclamacion = new Case();
+
+        for (Case caso : listaCasos) {
+            if (caso.RecordType.DeveloperName == 'SAC_Pretension') {
+                pretension.Id = caso.Id;
+                pretension.SAC_Reclamacion__c = caso.SAC_Reclamacion__c;
+            }
+            if (caso.RecordType.DeveloperName == 'SAC_Reclamacion') {
+                reclamacion.Id = caso.Id;
+            }
+        }
+
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        System.runAs(usuario){
+            Test.startTest();
+            pretension.SAC_ResumenManual__c = 'Prueba test resumen';
+            List<Case> listaUpdate = new List<Case>();
+            listaupdate.add(pretension); 
+            listaupdate.add(reclamacion); 
+            SAC_DatabaseDML.updateListDML(listaUpdate, true);
+            Test.stopTest();
+        }
+        Case reclamacionResult = [SELECT Id, CaseNumber, SAC_ResumenManual__c FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+
+        Assert.areNotEqual(reclamacionResult, null, 'No se ha actualizado el resumen correctamente');
+    }
+    
+    
+    @isTest
+    static void cambiarOwnerReclamaciones() {
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        List<Case> reclamaciones = [SELECT Id, Status, OwnerId, SAC_Reclamacion__c, SAC_PretensionPrincipal__c, SAC_ResumenManual__c, RecordType.DeveloperName FROM Case WHERE Subject = 'TestRec'];
+        List<Case> pretensiones = [SELECT Id, SAC_Reclamacion__c FROM Case WHERE SAC_Reclamacion__c IN: reclamaciones];
+        System.runAs(usuario){
+            Test.startTest();
+            SAC_Reclamacion.insertarCaseShareByReclamacion(reclamaciones);
+            Test.stopTest();
+        }
+        List<CaseShare> sharings = [SELECT Id, RowCause FROM CaseShare WHERE RowCause = 'Manual' AND CaseId IN: pretensiones LIMIT 1];
+
+        System.assertEquals(sharings.isEmpty(), false, 'Existen sharings en las pretensiones');
+    }
+
 }

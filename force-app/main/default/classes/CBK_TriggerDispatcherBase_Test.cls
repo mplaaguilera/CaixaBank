@@ -1,16 +1,17 @@
 @isTest
 public  class CBK_TriggerDispatcherBase_Test {
     @isTest static void testVirtualMethods() {
+        CC_TriggerParameters tp = new CC_TriggerParameters();
         CC_TriggerDispatcherBase base = new CC_TriggerDispatcherBase();
         base.bulkBefore();
         base.bulkAfter();
-        base.beforeInsert(null);
-        base.afterInsert(null);
-        base.beforeUpdate(null);
-        base.afterUpdate(null);
-        base.beforeDelete(null);
-        base.afterDelete(null);
-        base.afterUndelete(null);
+        base.beforeInsert(tp);
+        base.afterInsert(tp);
+        base.beforeUpdate(tp);
+        base.afterUpdate(tp);
+        base.beforeDelete(tp);
+        base.afterDelete(tp);
+        base.afterUndelete(tp);
         base.andFinally();
     }
     @isTest static void testExecuteMethod() {
@@ -57,7 +58,7 @@ public  class CBK_TriggerDispatcherBase_Test {
                 execute(null, null, triggerEvent);
             }
             List<String> lstHanlders = getAssociatedHandlers('EmailMessage', 'beforeInsert');
-            List<CBK_TriggerHandlerAssociation__mdt> lstconfigHandler = getAssociatedHandlersFilterCriteria('Account', 'beforeInsert');
+            	//List<CBK_TriggerHandlerAssociation__mdt> lstconfigHandler = getAssociatedHandlersFilterCriteria('Account', 'beforeInsert');
 
             List<Account> lstAcc = new List<Account>();
             Id rtAcc = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
@@ -126,13 +127,13 @@ public  class CBK_TriggerDispatcherBase_Test {
             Test.startTest();
             User usr = [SELECT id FROM User WHERE LastName = 'LastNameTest' LIMIT 1];
             System.runAs (usr) {
-                Map<String, List<SObject>> mapfiltered = segmentationHandlers(tp2, 'Account', 'beforeInsert', false);
+                //Map<String, List<SObject>> mapfiltered = segmentationHandlers(tp2, 'Account', 'beforeInsert', false);
             insert lstAcc;
             CC_TriggerParameters tp = new CC_TriggerParameters();
             tp.newList = lstAcc;
             Map<Id, SObject>mapNew = generateMap( tp.newList);
             List<SObject> lstnew =  generateOldList(tp.newList, tp.newList); 
-            Boolean check =  getProfilesIdByNames(new List<String>{'System Administrator'});
+            	//Boolean check =  getProfilesIdByNames(new List<String>{'System Administrator'});
             }
             Test.stopTest();
         }

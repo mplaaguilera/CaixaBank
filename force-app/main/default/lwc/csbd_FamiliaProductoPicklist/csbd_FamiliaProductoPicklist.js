@@ -1,8 +1,9 @@
 import {LightningElement, api, wire} from 'lwc';
 import currentUserId from '@salesforce/user/Id';
 import {getRecord, updateRecord, getFieldValue} from 'lightning/uiRecordApi';
+import LightningConfirm from 'lightning/confirm';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
-import {errorApex} from 'c/csbd_lwcUtils';
+import {errorApex, formatExcepcion} from 'c/csbd_lwcUtils';
 
 import getFamiliasApex from '@salesforce/apex/CSBD_FamiliaProductoPicklistController.getFamilias';
 import getProductosApex from '@salesforce/apex/CSBD_FamiliaProductoPicklistController.getProductos';
@@ -44,6 +45,8 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 	oportunidad;
 
 	editando = false;
+
+	mensajeError;
 
 	spinner = false;
 
@@ -89,15 +92,18 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 	mostrar = {motivoMac: false, finalidad: false, detalleProducto: false, vehiculo: false};
 
-	funcionEventListener;
+	funcionEventListener = this.windowOnclick.bind(this);
 
 	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS, timestamp: '$getRecordTimestamp'})
 	wiredRecord({error, data}) {
 		if (data) {
+			this.oportunidad = data;
+			if (this.editando) {
+				return;
+			}
+
 			const editados = this.template.querySelectorAll('div.slds-form-element.slds-is-edited');
 			editados.forEach(c => c.classList.remove('slds-is-edited'));
-
-			this.oportunidad = data;
 
 			const formatFieldValue = fieldValue => fieldValue ?? '--Ninguno--';
 
@@ -125,7 +131,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 				this.opcionesProducto = [this.producto];
 			}
 
-			this.mostrar.motivoMac = getFieldValue(data, OPP_RT_NAME) === 'AC';
+			this.mostrar.motivoMac = getFieldValue(data, OPP_RT_NAME) === 'CSCC';
 			if (this.mostrar.motivoMac) {
 				const motivoMac = formatFieldValue(getFieldValue(data, OPP_MOTIVO_MAC));
 				if (motivoMac !== this.motivoMac?.value) {
@@ -199,6 +205,9 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 		this.producto = this.valueToOpcion('--Ninguno--');
 		this.opcionesProducto = [this.producto];
 		this.opcionesCargadas.productos = false;
+		this.motivoMac = this.valueToOpcion('--Ninguno--');
+		this.opcionesMotivoMac = [this.motivoMac];
+		this.opcionesCargadas.motivosMac = false;
 		this.empresaProveedora = this.valueToOpcion(nuevaEmpresa);
 		if (nuevaEmpresa !== '--Ninguno--') {
 			this.template.querySelector('.comboboxFamilias').focus();
@@ -234,6 +243,9 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 		this.producto = this.valueToOpcion('--Ninguno--');
 		this.opcionesProducto = [this.producto];
 		this.opcionesCargadas.productos = false;
+		this.motivoMac = this.valueToOpcion('--Ninguno--');
+		this.opcionesMotivoMac = [this.motivoMac];
+		this.opcionesCargadas.motivosMac = false;
 		this.familiaProducto = this.valueToOpcion(nuevaFamiliaProducto);
 		if (nuevaFamiliaProducto !== '--Ninguno--') {
 			this.template.querySelector('.comboboxProductos').focus();
@@ -265,6 +277,9 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 	}
 
 	comboboxProductosOnchange({currentTarget: comboboxProductos, detail: {value: nuevoProducto}}) {
+		this.motivoMac = this.valueToOpcion('--Ninguno--');
+		this.opcionesMotivoMac = [this.motivoMac];
+		this.opcionesCargadas.motivosMac = false;
 		this.producto = this.valueToOpcion(nuevoProducto);
 		comboboxProductos.closest('div.slds-form-element').classList.add('slds-is-edited');
 	}
@@ -278,16 +293,16 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 	getMotivosMac() {
 		const comboboxMotivosMac = this.template.querySelector('.comboboxMotivosMac');
 		comboboxMotivosMac.spinnerActive = true;
-		getMotivosMacApex({})
+		getMotivosMacApex({producto: this.producto.value})
 		.then(motivosMac => {
-			let motivosMacAux = motivosMac.map(m => this.valueToOpcion(m.Name));
+			let motivosMacAux = motivosMac.map(m => this.valueToOpcion(m.CC_Lista__r.Name));
 			if (!motivosMacAux.some(m => m.value === this.motivoMac.value)) {
 				motivosMacAux.push(this.valueToOpcion(this.motivoMac.value));
 			}
 			motivosMacAux.sort((a, b) => a.label.localeCompare(b.label));
 			this.opcionesMotivoMac = motivosMacAux;
 			this.opcionesCargadas.motivosMac = true;
-		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de motivos AC seleccionables'))
+		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de Motivos CSCC seleccionables'))
 		.finally(() => comboboxMotivosMac.spinnerActive = false);
 	}
 
@@ -296,59 +311,104 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 		comboboxMotivosMac.closest('div.slds-form-element').classList.add('slds-is-edited');
 	}
 
-	actualizarOportunidad() {
-		this.spinner = true;
-		const formatOpcion = valor => valor === '--Ninguno--' ? null : valor;
-		const fields = {};
-		fields.Id = this.recordId;
-		fields[OPP_EMPRESA.fieldApiName] = formatOpcion(this.empresaProveedora?.value);
-		fields[OPP_FAMILIA_PROD.fieldApiName] = formatOpcion(this.familiaProducto?.value);
-		fields[OPP_PRODUCTO.fieldApiName] = formatOpcion(this.producto?.value);
-		fields[OPP_MOTIVO_MAC.fieldApiName] = formatOpcion(this.motivoMac?.value);
-		const recordInput = {fields};
-		updateRecord(recordInput)
-		.then(() => {
-			const editados = this.template.querySelectorAll('div.slds-form-element.slds-is-edited');
-			editados.forEach(c => c.classList.remove('slds-is-edited'));
-		}).catch(error => {
-			console.error(error);
-			if (error.body.output && error.body.output.errors && error.body.output.errors.length) {
-				this.toast('error', 'Problema actualizando la oportunidad', error.body.output.errors[0].message);
-			}
-		}).finally(() => this.spinner = false);
-	}
-
 	inicioEditando() {
 		this.editando = true;
-		this.funcionEventListener = this.windowOnclick.bind(this);
-		window.addEventListener('click', this.funcionEventListener);
+		//this.funcionEventListener = this.windowOnclick.bind(this);
+		window.addEventListener('click', this.funcionEventListener, {once: true});
+		this.refs.cardComponente.classList.add('editando');
 	}
 
-	finEditando(guardarCambios = true) {
-		if (guardarCambios) {
-			if (getFieldValue(this.oportunidad, OPP_OWNER_ID) !== currentUserId) {
-				this.toast('error', 'No eres el propietario de la oportunidad', 'Solo el propietario de la oportunidad puede modificarla');
+	async finEditando(guardarCambios = true) {
+		this.cerrarPopoverError();
+		if (this.hayCambiosSinGuardar()) {
+			if (guardarCambios) {
+				if (getFieldValue(this.oportunidad, OPP_OWNER_ID) !== currentUserId) {
+					this.abrirPopoverError('Solo el propietario de la oportunidad puede modificarla.');
+					return;
+				}
+				if (!await this.actualizarOportunidad()) { //Error actualizando la oportunidad
+					return;
+				}
 			} else {
-				guardarCambios && this.actualizarOportunidad();
-				this.editando = false;
-				window.removeEventListener('click', this.funcionEventListener);
+				this.empresaProveedora = this.valueToOpcion(getFieldValue(this.oportunidad, OPP_EMPRESA));
+				this.familiaProducto = this.valueToOpcion(getFieldValue(this.oportunidad, OPP_FAMILIA_PROD));
+				this.producto = this.valueToOpcion(getFieldValue(this.oportunidad, OPP_PRODUCTO));
+				this.motivoMac = this.valueToOpcion(getFieldValue(this.oportunidad, OPP_MOTIVO_MAC));
 			}
-		} else {
-			this.editando = false;
-			window.removeEventListener('click', this.funcionEventListener);
 		}
+
+		this.editando = false;
+		this.refs.cardComponente.classList.remove('editando', 'error');
+		window.removeEventListener('click', this.funcionEventListener);
+	}
+
+	hayCambiosSinGuardar() {
+		return [
+			[OPP_EMPRESA, this.empresaProveedora], [OPP_FAMILIA_PROD, this.familiaProducto],
+			[OPP_PRODUCTO, this.producto], [OPP_MOTIVO_MAC, this.motivoMac]
+		].some(([campo, opcion]) => this.opcionToValue(opcion) !== getFieldValue(this.oportunidad, campo));
+	}
+
+	async actualizarOportunidad() {
+		this.spinner = true;
+
+		const fields = {};
+		fields.Id = this.recordId;
+		fields[OPP_EMPRESA.fieldApiName] = this.opcionToValue(this.empresaProveedora);
+		fields[OPP_FAMILIA_PROD.fieldApiName] = this.opcionToValue(this.familiaProducto);
+		fields[OPP_PRODUCTO.fieldApiName] = this.opcionToValue(this.producto);
+		fields[OPP_MOTIVO_MAC.fieldApiName] = this.opcionToValue(this.motivoMac);
+		const recordInput = {fields};
+
+		let updateOk = true;
+		try {
+			await updateRecord(recordInput);
+		} catch (error) {
+			console.error(error);
+			this.abrirPopoverError(formatExcepcion(error));
+			updateOk = false;
+		} finally {
+			this.spinner = false;
+		}
+		return updateOk;
+	}
+
+	cancelar() {
+		this.finEditando(false);
+	}
+
+	guardar() {
+		this.finEditando();
 	}
 
 	tituloSeccionOnclick() {
-		this.template.querySelector('.seccion').classList.toggle('slds-is-open');
+		if (!this.editando) {
+			this.refs.seccion.classList.toggle('slds-is-open');
+		}
 	}
 
-	stopPropagation(event) {
+	cardComponenteOnclick(event) {
+		this.cerrarPopoverError();
 		event.stopPropagation();
 	}
 
-	windowOnclick() {
-		this.finEditando();
+	async windowOnclick() {
+		if (!this.hayCambiosSinGuardar()) {
+			this.finEditando(false);
+			return;
+		}
+
+		window.removeEventListener('click', this.funcionEventListener);
+		if (await LightningConfirm.open({
+			variant: 'header', theme: 'warning', label: 'Descartar cambios',
+			message: '¿Quieres descartar los cambios sin guardar?'
+		})) {
+			this.finEditando(false);
+		} else {
+			window.setTimeout(() => {
+				window.addEventListener('click', this.funcionEventListener, {once: true});
+			}, 0);
+		}
 	}
 
 	toast(variant, title, message) {
@@ -372,22 +432,35 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 		return {value, label: value, labelNoEdit: value === '--Ninguno--' ? null : value};
 	}
 
-	deshacer() {
-		const sinValor = this.valueToOpcion('--Ninguno--');
-		this.empresaProveedora = sinValor;
-		this.familiaProducto = sinValor;
-		this.producto = sinValor;
-
-		this.opcionesEmpresaProveedora = [];
-		this.opcionesFamiliaProducto = [];
-		this.opcionesProducto = [];
-
-		this.opcionesCargadas = {
-			empresas: false, familiasProducto: false, productos: false, motivosMac: false
-		};
-
-		this.getRecordTimestamp = new Date(); //Refresca el getRecord()
-		this.finEditando(false);
+	opcionToValue(opcion) {
+		return opcion.value === '--Ninguno--' ? null : opcion.value;
 	}
 
+	deshacer({target: {dataset: {campo}}}) {
+		const formatFieldValue = fieldValue => fieldValue ?? '--Ninguno--';
+		this[campo] = {
+			empresaProveedora: this.valueToOpcion(formatFieldValue(getFieldValue(this.oportunidad, OPP_EMPRESA))),
+			familiaProducto: this.valueToOpcion(formatFieldValue(getFieldValue(this.oportunidad, OPP_FAMILIA_PROD))),
+			producto: this.valueToOpcion(formatFieldValue(getFieldValue(this.oportunidad, OPP_PRODUCTO))),
+			motivoMac: this.valueToOpcion(formatFieldValue(getFieldValue(this.oportunidad, OPP_MOTIVO_MAC)))
+		}[campo];
+	}
+
+	botonErrorOnclick() {
+		this.abrirPopoverError();
+	}
+
+	abrirPopoverError(mensajeError) {
+		this.mensajeError = mensajeError || 'Problema actualizando la oportunidad.';
+		this.refs.cardComponente.classList.add('error');
+		this.refs.popoverError.classList.add('visible');
+	}
+
+	stopPropagation(event) {
+		event.stopPropagation();
+	}
+
+	cerrarPopoverError() {
+		this.refs.popoverError.classList.remove('visible');
+	}
 }

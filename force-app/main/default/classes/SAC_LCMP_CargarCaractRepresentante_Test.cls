@@ -3,6 +3,10 @@ public with sharing class SAC_LCMP_CargarCaractRepresentante_Test {
     @TestSetup
     static void makeData(){
 
+        Set<String> objetos = new Set<String>{'SAC_MaestroTemas__c'};
+        Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
+        Id recTypeDespachosMaestroTemas = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_DespachoRepresentante').getRecordTypeId();
+
         Test.startTest();
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];     
         SAC_DatabaseDML.insertDML(usuarioAdmin, true);
@@ -27,6 +31,15 @@ public with sharing class SAC_LCMP_CargarCaractRepresentante_Test {
         asignacion.CC_Caracteristica__c = caracteristica2.Id;
         asignacion.SAC_Identificador__c = 'TEST123456';
         SAC_DatabaseDML.insertDML(asignacion, true);
+
+        SAC_MaestroTemas__c maestroTemas1 = new SAC_MaestroTemas__c();
+        maestroTemas1.RecordTypeId = recTypeDespachosMaestroTemas;
+        maestroTemas1.Name = 'Ejemplo1';
+        maestroTemas1.SAC_Activo__c = true;
+        maestroTemas1.SAC_Descripcion__c = 'Ejemplo1';
+        SAC_DatabaseDML.insertDML(maestroTemas1, true);
+
+
     }
 
     @isTest
@@ -44,6 +57,20 @@ public with sharing class SAC_LCMP_CargarCaractRepresentante_Test {
 
         Assert.areNotEqual(null, listCaratetisticas[0].Id, 'No se ha podido recuperar las caracteristicas del representante');
     }
+
+    @isTest
+    static void obtenerValoresDespachoRepresentanteTest(){
+
+        List<String> listaResult = new List<String>();
+        Test.startTest();
+        User usuario = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' and IsActive = true limit 1];
+        System.runAs(usuario){
+            listaResult = SAC_LCMP_CargarCaractRepresentante.obtenerValoresDespachoRepresentante();
+        }
+        Assert.areNotEqual(listaResult.isEmpty(), true, 'No se han obtenido los despachos correctamente.');
+        Test.stopTest();
+    }
+
 
     @isTest
     static void crearAsignacionTest() {

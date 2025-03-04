@@ -60,7 +60,8 @@ export default class csbdMediosDePago extends LightningElement {
 	get aportarClienteTotalImporte() {
 		let aportarClienteTotalImporte = this.pagosTotal;
 		aportarClienteTotalImporte += this.aportarClienteIva ?? 0;
-		aportarClienteTotalImporte -= this.mediosPago.desembolsoPrestamoPrevision ?? 0;
+		//aportarClienteTotalImporte -= this.mediosPago.desembolsoPrestamoPrevision ?? 0;
+		aportarClienteTotalImporte -= this.desembolsoPrestamoTotal ?? 0;
 		return aportarClienteTotalImporte;
 	}
 

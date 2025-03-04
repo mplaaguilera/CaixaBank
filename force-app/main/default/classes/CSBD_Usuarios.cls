@@ -64,7 +64,7 @@ public class CSBD_Usuarios {
 
     public static User usuarioAdministrador(){
         User admin = new User();
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
             admin.FirstName = 'AdminCSBD';
             admin.LastName = '1';
             admin.IsActive = true;
@@ -149,9 +149,9 @@ public class CSBD_Usuarios {
         }
     }
 
-    public static User usuarioDerivarGestor(){
+    public static User usuarioDerivarGestor() {
         User gestor = new User();
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (new User(Id = UserInfo.getUserId())) {
             gestor.FirstName = 'GestorDerivar';
             gestor.LastName = '1';
             gestor.IsActive = true;
