@@ -7,7 +7,7 @@ public with sharing class SEG_Grupo_Colaborador_Contact_BI_TR_Test {
 		User supervisor = [SELECT Id FROM User WHERE Profile.Name = 'SEG_Usuario_CaixaBank' AND IsActive = true AND FirstName = 'IBM' AND LastName = 'Segmentos' LIMIT 1];
 
         //Grupos Colaboradores
-        Id grupoOpSegId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        Id grupoOpSegId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoCol1 = new CC_Grupo_Colaborador__c(Name = 'GrupoSegOp1', RecordTypeId = grupoOpSegId);
 		insert grupoCol1;
         

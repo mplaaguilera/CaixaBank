@@ -333,10 +333,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Chat NOA WhatsApp</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Clases Pasivas</fullName>
             <default>false</default>
         </values>
@@ -641,6 +637,22 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>CSBD_CMN_CMB_Hipotecas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD_CMN_CMB_Intouch</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD_CSCC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD_CSCC_Centralita</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>CSBD_Hipotecas</fullName>
             <default>false</default>
         </values>
@@ -745,6 +757,33 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>CSBD_TablaPrecios_Producto__c</picklist>
+        <values>
+            <fullName>Convenios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omni</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PHD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sostenibles</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>imaginBank</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>CSBD_Tipo_de_oportunidad__c</picklist>
         <values>
             <fullName>Acción comercial</fullName>
@@ -759,7 +798,15 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>CSCC</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Chat</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Consumo</fullName>
             <default>false</default>
         </values>
         <values>
@@ -772,10 +819,6 @@
         </values>
         <values>
             <fullName>Hipoteca</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>MAC</fullName>
             <default>false</default>
         </values>
         <values>

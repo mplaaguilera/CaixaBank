@@ -12,6 +12,14 @@
 *****************************************************************/
 @isTest
 public with sharing class SAC_LCMP_InformacionCualitativa_Test {
+
+    private static Set<String> objetos = new Set<String>{'SAC_MaestroTemas__c'};
+    private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
+
+    //Rt para el maestro de temas que es la información cualitativa en SPV
+    private static final Id RECTYPEINFOCUALITATIVA = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_InformacionCualitativa').getRecordTypeId();
+
+
     @TestSetup
     static void makeData(){
 
@@ -48,8 +56,15 @@ public with sharing class SAC_LCMP_InformacionCualitativa_Test {
         TopicAssignment topicAssig = new TopicAssignment(TopicId=topic.Id, EntityId=caso1.Id);
         SAC_DatabaseDML.insertDML(topicAssig, false);
 
-        SAC_MaestroTemas__c maestroT = SAC_TestDataFactory.crearMaestroTemas(1, 'SAC_InformacionCualitativa')[0];
+
+        SAC_MaestroTemas__c maestroT = new SAC_MaestroTemas__c();
+        maestroT.Name = 'SACTopic1';
+        maestroT.RecordTypeId = RECTYPEINFOCUALITATIVA;
+        maestroT.SAC_Seccion__c = 'Test maestro InforCual';
         SAC_DatabaseDML.insertDML(maestroT, false);
+
+        /*SAC_MaestroTemas__c maestroT = SAC_TestDataFactory.crearMaestroTemas(1, 'SAC_InformacionCualitativa')[0];
+        SAC_DatabaseDML.insertDML(maestroT, false);*/
 
     }
     @istest

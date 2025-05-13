@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Product__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que almacena el producto de la tarea oportunidad</description>
     <label>Producto</label>
     <referenceTo>Product2</referenceTo>
     <relationshipLabel>Tarea-Oportunidad</relationshipLabel>

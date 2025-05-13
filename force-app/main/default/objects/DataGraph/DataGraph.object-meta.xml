@@ -76,28 +76,36 @@
     <searchLayouts>
         <customTabListAdditionalFields>DataGraphApiName</customTabListAdditionalFields>
         <customTabListAdditionalFields>PrimaryDmo</customTabListAdditionalFields>
+        <customTabListAdditionalFields>DataSpace</customTabListAdditionalFields>
         <customTabListAdditionalFields>LastRunStatus</customTabListAdditionalFields>
+        <customTabListAdditionalFields>DataGraphType</customTabListAdditionalFields>
         <customTabListAdditionalFields>Schedule</customTabListAdditionalFields>
         <customTabListAdditionalFields>RecordCount</customTabListAdditionalFields>
         <customTabListAdditionalFields>LastRefreshDate</customTabListAdditionalFields>
         <customTabListAdditionalFields>CreatedDate</customTabListAdditionalFields>
         <lookupDialogsAdditionalFields>DataGraphApiName</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>PrimaryDmo</lookupDialogsAdditionalFields>
+        <lookupDialogsAdditionalFields>DataSpace</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>LastRunStatus</lookupDialogsAdditionalFields>
+        <lookupDialogsAdditionalFields>DataGraphType</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>Schedule</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>RecordCount</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>LastRefreshDate</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>CreatedDate</lookupDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>DataGraphApiName</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>PrimaryDmo</lookupPhoneDialogsAdditionalFields>
+        <lookupPhoneDialogsAdditionalFields>DataSpace</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>LastRunStatus</lookupPhoneDialogsAdditionalFields>
+        <lookupPhoneDialogsAdditionalFields>DataGraphType</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>Schedule</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>RecordCount</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>LastRefreshDate</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>CreatedDate</lookupPhoneDialogsAdditionalFields>
         <searchResultsAdditionalFields>DataGraphApiName</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>PrimaryDmo</searchResultsAdditionalFields>
+        <searchResultsAdditionalFields>DataSpace</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>LastRunStatus</searchResultsAdditionalFields>
+        <searchResultsAdditionalFields>DataGraphType</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>Schedule</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>RecordCount</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>LastRefreshDate</searchResultsAdditionalFields>

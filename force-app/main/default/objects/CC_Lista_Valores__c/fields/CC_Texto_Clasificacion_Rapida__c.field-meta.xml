@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CC_Texto_Clasificacion_Rapida__c</fullName>
     <encryptionScheme>None</encryptionScheme>
-    <label>Texto de la clasificación rápida</label>
+    <label>Texto clasificación rápida</label>
     <length>32768</length>
     <trackTrending>false</trackTrending>
     <type>LongTextArea</type>

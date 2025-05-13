@@ -4,6 +4,8 @@
     <active>true</active>
     <description>Se evita que los usuarios no Admin o con perfil integrador (API) creen formularios de refinanciación</description>
     <errorConditionFormula>AND(
+!$Permission.CBK_BypassValidationRules,
+!$Permission.SIR_ByPassValidationRules,
 $Profile.Name != &apos;System Administrator&apos;,
 NOT(CONTAINS($Profile.Name, &apos;API&apos;)),
 NOT( CONTAINS(Name, &apos;Check-List de Refinanciación&apos;))

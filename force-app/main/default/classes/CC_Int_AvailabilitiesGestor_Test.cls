@@ -2,30 +2,36 @@
 public with sharing class CC_Int_AvailabilitiesGestor_Test {
     @TestSetup
     static void testSetup() {
-        //Cuentas cliente
-        List<Account> accountsInsert = new List<Account>();
-        Account cuentaCliente = new Account();
-        cuentaCliente.LastName = 'Cliente Senior'; 
-        cuentaCliente.CC_NumPerso__c = '0000012';
-        cuentaCliente.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
-        accountsInsert.add(cuentaCliente);
-        insert accountsInsert;
+        User adminUser = CC_TestDataFactory.insertUserAdmin();
+        User usuarioOperador = CC_TestDataFactory.insertUserOperadorCliente('U0123456');
+        System.runAs(adminUser){
+            //Cuentas cliente
+            List<Account> accountsInsert = new List<Account>();
+            Account cuentaCliente = new Account();
+            cuentaCliente.LastName = 'Cliente Senior'; 
+            cuentaCliente.CC_NumPerso__c = '0000012';
+            cuentaCliente.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
+            accountsInsert.add(cuentaCliente);
+            insert accountsInsert;
 
-        //Casos
-        List<Case> casosInsert = new List<Case>();
-        Case casoCC = new Case();
-        casoCC.Subject = 'Caso de Contact Center';
-        casoCC.Description = 'Caso de Contact Center';
-        casoCC.CC_Idioma__c = 'es';
-        casoCC.Origin = 'Email';
-        casoCC.CC_Tipo_Contacto__c = 'Consulta';
-        casoCC.CC_Canal_Procedencia__c = 'Formulario web';
-        casoCC.CC_Detalles_Consulta__c = 'Caso de Contact Center';
-        casoCC.Status = 'Activo';
-        casoCC.AccountId = cuentaCliente.Id;
-        casoCC.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        casosInsert.add(casoCC);
-        insert casosInsert;
+            //Casos
+            List<Case> casosInsert = new List<Case>();
+            Case casoCC = new Case();
+            casoCC.Subject = 'Caso de Contact Center';
+            casoCC.Description = 'Caso de Contact Center';
+            casoCC.CC_Idioma__c = 'es';
+            casoCC.Origin = 'Email';
+            casoCC.CC_Tipo_Contacto__c = 'Consulta';
+            casoCC.CC_Canal_Procedencia__c = 'Formulario web';
+            casoCC.CC_Detalles_Consulta__c = 'Caso de Contact Center';
+            casoCC.Status = 'Activo';
+            casoCC.AccountId = cuentaCliente.Id;
+            casoCC.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            casosInsert.add(casoCC);
+            insert casosInsert;        
+
+            //TODO: hacer el share del account y el caso con el usuario operador para cambiar el runAs de los metodos
+        }
     }
     
     private class MockHttpResponseExito implements HttpCalloutMock {
@@ -62,47 +68,94 @@ public with sharing class CC_Int_AvailabilitiesGestor_Test {
     }
 
     @isTest
-    private static void getAvaibilitiesGestor(){
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
-        Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
-        Map<String, Object> maparespuesta = CC_Int_AvailabilitiesGestor.obtenerDisponibilidadesGestor(caso.Id, '23456', '23456','43');
-        Map<Date,Set<Time>> respuesta = (Map<Date,Set<Time>>)maparespuesta.get('fechasHorasMap');      
-        Test.stopTest();
-        String fechaRespuesta;
-        for(Date fecha: respuesta.keySet()) {
-            fechaRespuesta = String.valueOf(fecha);
+    private static void getAvaibilitiesGestor(){      
+        System.runAs(CC_TestDataFactory.getUserAdmin()){
+            Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
+            Test.startTest();
+                Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
+                Map<String, Object> maparespuesta = CC_Int_AvailabilitiesGestor.obtenerDisponibilidadesGestor(caso.Id, '23456', '23456','43');
+                Map<Date,Set<Time>> respuesta = (Map<Date,Set<Time>>)maparespuesta.get('fechasHorasMap');  
+                String fechaRespuesta;
+                for(Date fecha: respuesta.keySet()) {
+                    fechaRespuesta = String.valueOf(fecha);
+                }
+                System.assertEquals('2022-06-20', fechaRespuesta, 'Fecha incorrecta');    
+            Test.stopTest();           
         }
-        System.assertEquals('2022-06-20', fechaRespuesta);
     }
 
     @isTest
-    private static void getFechas() {
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
-        Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
-        List<OT_Picklist.Item> respuesta = CC_EmailSendController.obtenerFechasDisponiblidadGestor(caso.Id, '23456', '23456','43');      
-        Test.stopTest();
-        System.assertEquals('2022-06-20', respuesta[0].value);
+    private static void getFechas() {    
+        System.runAs(CC_TestDataFactory.getUserAdmin()){
+            Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
+            Test.startTest();
+                Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
+                List<OT_Picklist.Item> respuesta = CC_EmailSendController.obtenerFechasDisponiblidadGestor(caso.Id, '23456', '23456','43');   
+                System.assertEquals('2022-06-20', respuesta[0].value);   
+            Test.stopTest();
+        }
     }
 
     @isTest
     private static void getHoras() {
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
-        Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
-        List<OT_Picklist.Item> respuesta = CC_EmailSendController.obtenerHorasDisponiblidadGestor(caso.Id, '23456', '23456', '43', '2022-06-20');      
-        Test.stopTest();
-        System.assertEquals('15:30', respuesta[0].value);
+        System.runAs(CC_TestDataFactory.getUserAdmin()){
+            Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
+            Test.startTest();
+                Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
+                List<OT_Picklist.Item> respuesta = CC_EmailSendController.obtenerHorasDisponiblidadGestor(caso.Id, '23456', '23456', '43', '2022-06-20'); 
+                System.assertEquals('15:30', respuesta[0].value);     
+            Test.stopTest();
+        }
     }
 
     @isTest
     private static void obtenerGestoresBackup() {
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
-        Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
-        List<OT_Picklist.Item> respuesta = CC_EmailSendController.obtenerGestoresBackup(caso.Id, '23456', '23456', '43');      
-        Test.stopTest();
-        System.assert(respuesta.isEmpty());
+     
+        System.runAs(CC_TestDataFactory.getUserAdmin()){     
+            Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
+            Test.startTest();
+                Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
+                List<OT_Picklist.Item> respuesta = CC_EmailSendController.obtenerGestoresBackup(caso.Id, '23456', '23456', '43');   
+                System.assert(respuesta.isEmpty());   
+            Test.stopTest();            
+        }
     }
+
+
+    @isTest
+    private static void obtenerGestoresBackupDerivar() {
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
+        System.runAs(CC_TestDataFactory.getUserAdmin()){     
+            Test.startTest();
+                Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
+                List<OT_Picklist.Item> respuesta = CC_Operativa_Oficina_Controller.obtenerGestoresBackup(caso.Id, '23456', '23456', '43'); 
+                System.assert(respuesta.isEmpty());   
+            Test.stopTest();           
+        }       
+    }
+
+    @isTest
+    private static void obtenerHorasDisponiblidadGestorDerivar() {
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
+        System.runAs(CC_TestDataFactory.getUserAdmin()){
+            Test.startTest();
+                Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
+                List<OT_Picklist.Item> respuesta = CC_Operativa_Oficina_Controller.obtenerHorasDisponiblidadGestor(caso.Id, '23456', '23456', '43', '2022-06-20');
+                System.assertEquals('15:30', respuesta[0].value);   
+            Test.stopTest();        
+        }    
+    }
+
+    @isTest
+    private static void obtenerFechasDisponiblidadGestorDerivar() {
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center'];
+        System.runAs(CC_TestDataFactory.getUserAdmin()){
+            Test.startTest();
+                Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
+                List<OT_Picklist.Item> respuesta = CC_Operativa_Oficina_Controller.obtenerFechasDisponiblidadGestor(caso.Id, '23456', '23456','43');      
+                System.assertEquals('2022-06-20', respuesta[0].value);
+            Test.stopTest();           
+        }
+    }
+   
 }

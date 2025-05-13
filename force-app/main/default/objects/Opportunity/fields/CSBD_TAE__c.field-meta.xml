@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CSBD_TAE__c</fullName>
-    <label>TAE</label>
+    <label>TAE sin bonificar</label>
     <precision>12</precision>
     <required>false</required>
     <scale>3</scale>

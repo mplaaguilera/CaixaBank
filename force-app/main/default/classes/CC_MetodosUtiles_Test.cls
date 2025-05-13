@@ -3,130 +3,186 @@ public class CC_MetodosUtiles_Test {
     
     @testSetup static void InitDatos() {
         
-        // Inicialización de datos.
-        List<CC_Lista_Valores__c> oListVal = new List<CC_Lista_Valores__c>();
-        List<CC_Lista_Valores__c> oListVal2 = new List<CC_Lista_Valores__c>();
-        
-        ID sTipoRegL = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();        
-        ID sTipoRegV = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();        
-        
-        CC_Lista_Valores__c a1 = new CC_Lista_Valores__c();
-        a1.Name = 'CC_Idioma_ALF';
-        a1.CC_Activa__c = true;
-        a1.RecordTypeId = sTipoRegL;
-        oListVal.add(a1);
-        
-        CC_Lista_Valores__c a2 = new CC_Lista_Valores__c();
-        a2.Name = 'CC_TipoCom_ALF';
-        a2.CC_Activa__c = true;
-        a2.RecordTypeId = sTipoRegL;
-        oListVal.add(a2);
-        
-        CC_Lista_Valores__c a3 = new CC_Lista_Valores__c();
-        a3.Name = 'CC_ClaseCom_ALF';
-        a3.CC_Activa__c = true;
-        a3.RecordTypeId = sTipoRegL;
-        oListVal.add(a3);
-        
-        CC_Lista_Valores__c a4 = new CC_Lista_Valores__c();
-        a4.Name = 'CC_Sexo_ALF';
-        a4.CC_Activa__c = true;
-        a4.RecordTypeId = sTipoRegL;
-        oListVal.add(a4);
-        
-        insert oListVal;
-        
-        CC_Lista_Valores__c a5 = new CC_Lista_Valores__c();
-        a5.Name = '000';
-        a5.CC_Activa__c = true;
-        a5.RecordTypeId = sTipoRegV;
-        a5.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Idioma_ALF'].Id;
-        a5.CC_Valor__c = 'DESCONOCIDO';
-        a5.CC_Valor_SFDC__c = 'es';
-        oListVal2.add(a5);
-        
-        CC_Lista_Valores__c a6 = new CC_Lista_Valores__c();
-        a6.Name = '001';
-        a6.CC_Activa__c = true;
-        a6.RecordTypeId = sTipoRegV;
-        a6.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Idioma_ALF'].Id;
-        a6.CC_Valor__c = 'CATALÀ';
-        a6.CC_Valor_SFDC__c = 'ca';
-        oListVal2.add(a6);
-        
-        CC_Lista_Valores__c a7 = new CC_Lista_Valores__c();
-        a7.Name = '002';
-        a7.CC_Activa__c = true;
-        a7.RecordTypeId = sTipoRegV;
-        a7.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Idioma_ALF'].Id;
-        a7.CC_Valor__c = 'CASTELLANO';
-        a7.CC_Valor_SFDC__c = 'es';
-        oListVal2.add(a7);
-        
-        CC_Lista_Valores__c a8 = new CC_Lista_Valores__c();
-        a8.Name = '0';
-        a8.CC_Activa__c = true;
-        a8.RecordTypeId = sTipoRegV;
-        a8.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_ClaseCom_ALF'].Id;
-        a8.CC_Valor__c = 'Personal';
-        a8.CC_Valor_SFDC__c = '0';
-        oListVal2.add(a8);
-        
-        CC_Lista_Valores__c a9 = new CC_Lista_Valores__c();
-        a9.Name = '1';
-        a9.CC_Activa__c = true;
-        a9.RecordTypeId = sTipoRegV;
-        a9.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_ClaseCom_ALF'].Id;
-        a9.CC_Valor__c = 'Trabajo';
-        a9.CC_Valor_SFDC__c = '1';
-        oListVal2.add(a9);
-        
-        CC_Lista_Valores__c a10 = new CC_Lista_Valores__c();
-        a10.Name = 'V';
-        a10.CC_Activa__c = true;
-        a10.RecordTypeId = sTipoRegV;
-        a10.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Sexo_ALF'].Id;
-        a10.CC_Valor__c = 'Varón';
-        a10.CC_Valor_SFDC__c = 'V';
-        oListVal2.add(a10);
-        
-        CC_Lista_Valores__c a11 = new CC_Lista_Valores__c();
-        a11.Name = 'M';
-        a11.CC_Activa__c = true;
-        a11.RecordTypeId = sTipoRegV;
-        a11.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Sexo_ALF'].Id;
-        a11.CC_Valor__c = 'Mujer';
-        a11.CC_Valor_SFDC__c = 'M';
-        oListVal2.add(a11);
-        
-        CC_Lista_Valores__c a12 = new CC_Lista_Valores__c();
-        a12.Name = '006';
-        a12.CC_Activa__c = true;
-        a12.RecordTypeId = sTipoRegV;
-        a12.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_TipoCom_ALF'].Id;
-        a12.CC_Valor__c = 'Móvil-Principal';
-        a12.CC_Valor_SFDC__c = '006';
-        oListVal2.add(a12);
-        
-        CC_Lista_Valores__c a13 = new CC_Lista_Valores__c();
-        a13.Name = '001';
-        a13.CC_Activa__c = true;
-        a13.RecordTypeId = sTipoRegV;
-        a13.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_TipoCom_ALF'].Id;
-        a13.CC_Valor__c = 'Fijo';
-        a13.CC_Valor_SFDC__c = '001';
-        oListVal2.add(a13);
-        
-        CC_Lista_Valores__c a14 = new CC_Lista_Valores__c();
-        a14.Name = '002';
-        a14.CC_Activa__c = true;
-        a14.RecordTypeId = sTipoRegV;
-        a14.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_TipoCom_ALF'].Id;
-        a14.CC_Valor__c = 'Móvil';
-        a14.CC_Valor_SFDC__c = '002';
-        oListVal2.add(a14);
-        
-        insert oListVal2;
+        //crear usuarios para runAs
+        User usuarioAdmin = CC_TestDataFactory.insertUserAdmin();
+        System.runAs(usuarioAdmin){
+            CC_TestDataFactory.insertarLOVGestorDefault('XXXXXX', 'No asignado');
+
+            // Inicialización de datos.
+            List<CC_Lista_Valores__c> oListVal = new List<CC_Lista_Valores__c>();
+            List<CC_Lista_Valores__c> oListVal2 = new List<CC_Lista_Valores__c>();
+            
+            ID sTipoRegL = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();        
+            ID sTipoRegV = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();        
+            
+            CC_Lista_Valores__c a1 = new CC_Lista_Valores__c();
+            a1.Name = 'CC_Idioma_ALF';
+            a1.CC_Activa__c = true;
+            a1.RecordTypeId = sTipoRegL;
+            oListVal.add(a1);
+            
+            CC_Lista_Valores__c a2 = new CC_Lista_Valores__c();
+            a2.Name = 'CC_TipoCom_ALF';
+            a2.CC_Activa__c = true;
+            a2.RecordTypeId = sTipoRegL;
+            oListVal.add(a2);
+            
+            CC_Lista_Valores__c a3 = new CC_Lista_Valores__c();
+            a3.Name = 'CC_ClaseCom_ALF';
+            a3.CC_Activa__c = true;
+            a3.RecordTypeId = sTipoRegL;
+            oListVal.add(a3);
+            
+            CC_Lista_Valores__c a4 = new CC_Lista_Valores__c();
+            a4.Name = 'CC_Sexo_ALF';
+            a4.CC_Activa__c = true;
+            a4.RecordTypeId = sTipoRegL;
+            oListVal.add(a4);
+            
+            insert oListVal;
+            
+            CC_Lista_Valores__c a5 = new CC_Lista_Valores__c();
+            a5.Name = '000';
+            a5.CC_Activa__c = true;
+            a5.RecordTypeId = sTipoRegV;
+            a5.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Idioma_ALF'].Id;
+            a5.CC_Valor__c = 'DESCONOCIDO';
+            a5.CC_Valor_SFDC__c = 'es';
+            oListVal2.add(a5);
+            
+            CC_Lista_Valores__c a6 = new CC_Lista_Valores__c();
+            a6.Name = '001';
+            a6.CC_Activa__c = true;
+            a6.RecordTypeId = sTipoRegV;
+            a6.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Idioma_ALF'].Id;
+            a6.CC_Valor__c = 'CATALÀ';
+            a6.CC_Valor_SFDC__c = 'ca';
+            oListVal2.add(a6);
+            
+            CC_Lista_Valores__c a7 = new CC_Lista_Valores__c();
+            a7.Name = '002';
+            a7.CC_Activa__c = true;
+            a7.RecordTypeId = sTipoRegV;
+            a7.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Idioma_ALF'].Id;
+            a7.CC_Valor__c = 'CASTELLANO';
+            a7.CC_Valor_SFDC__c = 'es';
+            oListVal2.add(a7);
+            
+            CC_Lista_Valores__c a8 = new CC_Lista_Valores__c();
+            a8.Name = '0';
+            a8.CC_Activa__c = true;
+            a8.RecordTypeId = sTipoRegV;
+            a8.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_ClaseCom_ALF'].Id;
+            a8.CC_Valor__c = 'Personal';
+            a8.CC_Valor_SFDC__c = '0';
+            oListVal2.add(a8);
+            
+            CC_Lista_Valores__c a9 = new CC_Lista_Valores__c();
+            a9.Name = '1';
+            a9.CC_Activa__c = true;
+            a9.RecordTypeId = sTipoRegV;
+            a9.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_ClaseCom_ALF'].Id;
+            a9.CC_Valor__c = 'Trabajo';
+            a9.CC_Valor_SFDC__c = '1';
+            oListVal2.add(a9);
+            
+            CC_Lista_Valores__c a10 = new CC_Lista_Valores__c();
+            a10.Name = 'V';
+            a10.CC_Activa__c = true;
+            a10.RecordTypeId = sTipoRegV;
+            a10.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Sexo_ALF'].Id;
+            a10.CC_Valor__c = 'Varón';
+            a10.CC_Valor_SFDC__c = 'V';
+            oListVal2.add(a10);
+            
+            CC_Lista_Valores__c a11 = new CC_Lista_Valores__c();
+            a11.Name = 'M';
+            a11.CC_Activa__c = true;
+            a11.RecordTypeId = sTipoRegV;
+            a11.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_Sexo_ALF'].Id;
+            a11.CC_Valor__c = 'Mujer';
+            a11.CC_Valor_SFDC__c = 'M';
+            oListVal2.add(a11);
+            
+            CC_Lista_Valores__c a12 = new CC_Lista_Valores__c();
+            a12.Name = '006';
+            a12.CC_Activa__c = true;
+            a12.RecordTypeId = sTipoRegV;
+            a12.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_TipoCom_ALF'].Id;
+            a12.CC_Valor__c = 'Móvil-Principal';
+            a12.CC_Valor_SFDC__c = '006';
+            oListVal2.add(a12);
+            
+            CC_Lista_Valores__c a13 = new CC_Lista_Valores__c();
+            a13.Name = '001';
+            a13.CC_Activa__c = true;
+            a13.RecordTypeId = sTipoRegV;
+            a13.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_TipoCom_ALF'].Id;
+            a13.CC_Valor__c = 'Fijo';
+            a13.CC_Valor_SFDC__c = '001';
+            oListVal2.add(a13);
+            
+            CC_Lista_Valores__c a14 = new CC_Lista_Valores__c();
+            a14.Name = '002';
+            a14.CC_Activa__c = true;
+            a14.RecordTypeId = sTipoRegV;
+            a14.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'CC_TipoCom_ALF'].Id;
+            a14.CC_Valor__c = 'Móvil';
+            a14.CC_Valor_SFDC__c = '002';
+            oListVal2.add(a14);
+            
+            insert oListVal2;
+
+            Account testAccount1 = new Account(
+                Name = 'Test Account 1',
+                RecordTypeId = [SELECT Id FROM RecordType WHERE SObjectType = 'Account' AND DeveloperName = 'CC_Cliente' LIMIT 1].Id,
+                AV_NumPerso__c = '123456',
+                CC_NumPerso__c = '654321'
+            );
+            insert testAccount1;
+    
+            Account testAccount2 = new Account(
+                Name = 'Test Account 2',
+                RecordTypeId = [SELECT Id FROM RecordType WHERE SObjectType = 'Account' AND DeveloperName = 'CC_Cliente' LIMIT 1].Id,
+                AV_NumPerso__c = '789012',
+                CC_NumPerso__c = '210987'
+            );
+            insert testAccount2;
+    
+            // Crear datos de prueba para Contact
+            Contact testContact = new Contact(
+                LastName = 'Test Contact',
+                AccountId = testAccount1.Id,
+                RecordTypeId = [SELECT Id FROM RecordType WHERE SObjectType = 'Contact' AND DeveloperName = 'CIBE_Apoderado' LIMIT 1].Id,
+                CIBE_NumPerso__c = '111111',
+                AV_NumPerso__c = '222222',
+                CC_NumPerso__c = '333333'
+            );
+            insert testContact;
+    
+            // Crear datos de prueba para Case
+            Case testCase1 = new Case(
+                Subject = 'Test Case 1',
+                AccountId = testAccount1.Id,
+                ContactId = testContact.Id
+            );
+            insert testCase1;
+    
+            Case testCase2 = new Case(
+                Subject = 'Test Case 2',
+                AccountId = testAccount2.Id
+            );
+            insert testCase2;
+    
+            // Crear datos de prueba para CC_Comunicaciones__c
+            CC_Comunicaciones__c comunicacion1 = new CC_Comunicaciones__c(
+                CC_Case__c = testCase1.Id
+            );
+            CC_Comunicaciones__c comunicacion2 = new CC_Comunicaciones__c(
+                CC_Case__c = testCase2.Id
+            );
+            insert new List<CC_Comunicaciones__c>{comunicacion1, comunicacion2};
+        }    
     }
 
     @isTest
@@ -505,4 +561,136 @@ public class CC_MetodosUtiles_Test {
         CC_MetodosUtiles.getApplicationName();
         Test.stopTest();        
     }
+
+    @isTest 
+    static void getLOVNameValueTest() {
+    
+        Test.startTest();
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
+                Map<String, Object> values = CC_MetodosUtiles.getLOVNameValue(new List<String>{'CC_Idioma_ALF'}, 'CC_Valor__c' );
+                System.assert(!values.isEmpty(), 'No se ha devuelvo la lista de valores');
+                System.assert(((String)values.get('000')) == 'DESCONOCIDO', 'No se ha devuelvo el valor correcto');
+            }
+        Test.stopTest();        
+    }
+
+    @isTest 
+    static void encriptarSHATest() {
+    
+        Test.startTest();
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
+                String value = CC_MetodosUtiles.encriptarSHA('MD5', 'text');
+                System.assert(String.isNotBlank(value), 'No se ha encriptado el texto');
+
+                String valueEmpty = CC_MetodosUtiles.encriptarSHA('', '');
+                System.assert(String.isBlank(valueEmpty), 'No ha funcionado la validacion de encriptar');
+            }
+        Test.stopTest();        
+    }
+
+    @isTest
+    static void buscarGestorTest() {
+        List<String> matriculas = new List<String>{'U0124112', 'XXXXXX'};
+        Map<String,User> mapGestor = CC_TestDataFactory.insertUserOperadoresCliente(matriculas);
+
+        User usuarioGestor = mapGestor.get('U0124112');
+        User usuarioGenerico = mapGestor.get('XXXXXX');
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            // Test with a specific gestor number
+            String numeroGestor = 'U0124112';
+            User gestor = CC_MetodosUtiles.buscarGestor(numeroGestor);
+            System.assertNotEquals(gestor, null, 'Gestor should not be null for a valid gestor number');
+            System.assertEquals(gestor.Id, usuarioGestor.Id, 'Gestor devuelto no correponde con el esperado');
+
+            // Test with a gestor number without U01
+            numeroGestor = '24112';
+            User gestor2 = CC_MetodosUtiles.buscarGestor(numeroGestor);
+            System.assertNotEquals(gestor2, null, 'Gestor should not be null for a valid gestor number');
+            System.assertEquals(gestor2.Id, usuarioGestor.Id, 'Gestor devuelto no correponde con el esperado');
+            
+            // Test with a generic gestor
+            numeroGestor = 'generico';
+            User gestor3 = CC_MetodosUtiles.buscarGestor(numeroGestor);
+            //User recuperarGenerico = [SELECT Id FROM User WHERE AV_ExternalID__c = '000000' ORDER BY CreatedDate DESC LIMIT 1];
+            System.assertNotEquals(gestor3, null, 'Gestor should not be null for a generic gestor');  
+            System.assertEquals(gestor3.Id, usuarioGenerico.Id, 'Gestor devuelto no correponde con el esperado');              
+        }       
+        Test.stopTest();
+    }
+
+    @isTest
+    static void buscarGestoresTest() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+        // Create a test office account
+            Account testOffice = new Account(Name = 'Test Office');
+            insert testOffice;
+            
+            // Create test contacts (gestores)
+            Contact gestor1 = new Contact(LastName = 'Gestor 1', AccountId = testOffice.Id, CC_Inactivo__c = false, CC_Num_Empleado_Generico__c = '12345');
+            Contact gestor2 = new Contact(LastName = 'Gestor 2', AccountId = testOffice.Id, CC_Inactivo__c = false, CC_Num_Empleado_Generico__c = '67890');
+            insert new List<Contact>{gestor1, gestor2};
+            
+            // Test buscarGestores method
+            List<Contact> gestores = CC_MetodosUtiles.buscarGestores(testOffice.Id);
+            System.assertNotEquals(gestores, null, 'Gestores should not be null for a valid office');
+            System.assertEquals(gestores.size(), 2, 'There should be 2 gestores for the test office');
+        }
+        Test.stopTest();      
+    }
+    //buscarGestoresPorMatricula
+
+    @isTest
+    static void buscarGestoresPorMatriculaTest() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            // Create test users (gestores)
+            List<String> matriculas = new List<String>{'U0123456', 'U0167890', 'XXXXXX'};
+            Map<String,User> mapGestor = CC_TestDataFactory.insertUserOperadoresCliente(matriculas);
+           
+            User gestor1 = mapGestor.get('U0123456');
+            User gestor2 = mapGestor.get('U0167890');
+            User usuarioGenerico = mapGestor.get('XXXXXX');
+            
+            // Test buscarGestoresPorMatricula method
+            List<String> numeroGestores = new List<String>{'U0123456', 'U0167890'};
+            Map<String, User> gestores = CC_MetodosUtiles.buscarGestoresPorMatricula(numeroGestores);
+
+            //Probar el generico
+            List<String> numeroGestoresFake = new List<String>{'U01XXXXX', 'U01XXXX2'}; //not exist
+            Map<String, User> gestoresGenerico = CC_MetodosUtiles.buscarGestoresPorMatricula(numeroGestoresFake); //debe devolver el generico
+            
+            Test.stopTest();
+            
+            System.assertNotEquals(gestores, null, 'Gestores should not be null for valid gestor numbers');
+            System.assertEquals(gestores.size(), 2, 'There should be 2 gestores for the given numbers');
+            System.assertEquals(gestores.get('U0123456').Id, gestor1.Id, 'Gestor devuelto no correponde con el esperado');
+            System.assertEquals(gestores.get('U0167890').Id, gestor2.Id, 'Gestor devuelto no correponde con el esperado');
+            //Probar el generico
+            System.assertNotEquals(gestoresGenerico, null, 'Gestres debe devolver el generico');
+            System.assertEquals(gestoresGenerico.size(), 1, 'Gestores debe devolver un elemento');
+            System.assertEquals(gestoresGenerico.get('XXXXXX').Id, usuarioGenerico.Id, 'Gestor devuelto no correponde con el esperado (generico)'); 
+        }
+    }
+    @isTest
+    static void testRecuperarNumpersoPorComunicaciones() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+        // Recuperar las comunicaciones de prueba
+        List<CC_Comunicaciones__c> comunicaciones = [SELECT Id, CC_Case__r.Account.RecordType.DeveloperName, CC_Case__r.Account.AV_Segmento__c, CC_Case__r.Account.AV_NumPerso__c, CC_Case__r.Account.CC_NumPerso__c, CC_Case__r.Contact.RecordType.DeveloperName, CC_Case__r.Contact.CIBE_NumPerso__c, CC_Case__r.Contact.AV_NumPerso__c, CC_Case__r.Contact.CC_NumPerso__c, CC_Case__r.CC_Representante__c, CC_Case__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c, CC_Case__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c FROM CC_Comunicaciones__c];
+
+        // Llamar al método a probar
+        Map<Id, String> idToNumPersoMap = CC_MetodosUtiles.recuperarNumpersoPorComunicaciones(comunicaciones);
+
+        // Verificar los resultados
+        System.assertEquals(2, idToNumPersoMap.size(), 'El mapa debe contener 2 entradas');
+
+        for (CC_Comunicaciones__c comunicacion : comunicaciones) {
+            String numPerso = idToNumPersoMap.get(comunicacion.Id);
+            System.assertNotEquals(null, numPerso, 'El numPerso no debe ser nulo');
+            //System.debug('Comunicacion Id: ' + comunicacion.Id + ', NumPerso: ' + numPerso);
+        }
+    }
+}
 }

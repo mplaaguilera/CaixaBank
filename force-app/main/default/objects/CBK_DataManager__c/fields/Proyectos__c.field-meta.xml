@@ -66,19 +66,61 @@
                 <label>CIBE</label>
             </value>
             <value>
-                <fullName>Fraude</fullName>
-                <default>false</default>
-                <label>Fraude</label>
-            </value>
-            <value>
                 <fullName>HDT</fullName>
                 <default>false</default>
                 <label>HDT</label>
             </value>
             <value>
-                <fullName>Kinton</fullName>
+                <fullName>FRA</fullName>
+                <default>false</default>
+                <label>Fraude</label>
+            </value>
+            <value>
+                <fullName>GRR</fullName>
+                <default>false</default>
+                <label>GRR</label>
+            </value>
+            <value>
+                <fullName>KIN</fullName>
                 <default>false</default>
                 <label>Kinton</label>
+            </value>
+            <value>
+                <fullName>SIRE</fullName>
+                <default>false</default>
+                <label>Solutions Empresas</label>
+            </value>
+            <value>
+                <fullName>OB</fullName>
+                <default>false</default>
+                <label>Outbound</label>
+            </value>
+            <value>
+                <fullName>SACH</fullName>
+                <default>false</default>
+                <label>SACH</label>
+            </value>
+            <value>
+                <fullName>TSM</fullName>
+                <default>false</default>
+                <label>Testamentarías</label>
+            </value>
+            <value>
+                <fullName>SPV</fullName>
+                <default>false</default>
+                <label>Supervisores</label>
+            </value>
+            <value>
+                <fullName>Fraude</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>FraudeOLD</label>
+            </value>
+            <value>
+                <fullName>Kinton</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>KintonOLD</label>
             </value>
         </valueSetDefinition>
     </valueSet>

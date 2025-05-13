@@ -4,8 +4,9 @@
     <fields>Subject</fields>
     <fields>CC_Idioma__c</fields>
     <fields>Status</fields>
-    <fields>Origin</fields>
+    <fields>SEG_SROrigen__c</fields>
     <fields>CC_Canal_Procedencia__c</fields>
-    <fields>CC_Sentimiento_Formula__c</fields>
+    <fields>CC_Estado_Autenticacion__c</fields>
+    <fields>OS_Telefono__c</fields>
     <label>Case Compact Layout</label>
 </CompactLayout>

@@ -3,7 +3,8 @@
     <fullName>CSBD_RO_si_usuario_no_es_propietario</fullName>
     <active>true</active>
     <errorConditionFormula>AND(
-    NOT($Permission.CSBD_Administrador),
+    AND(NOT($Permission.CSBD_Administrador),
+								NOT($Permission.CSBD_ByPassVR)),
     AND($User.Id &lt;&gt; OwnerId,
    OR(
       BEGINS($Profile.Name, &apos;AM&apos;),

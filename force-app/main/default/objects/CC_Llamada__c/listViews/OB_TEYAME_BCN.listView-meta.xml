@@ -20,6 +20,11 @@
         <operation>contains</operation>
         <value>TEYAM</value>
     </filters>
+    <filters>
+        <field>OB_Estado__c</field>
+        <operation>equals</operation>
+        <value>OB_Pendiente_Validacion</value>
+    </filters>
     <label>Llamadas TEYAME BCN</label>
     <sharedTo>
         <group>OB_TEYAME_BCN</group>

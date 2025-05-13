@@ -10,7 +10,7 @@
         <operation>equals</operation>
         <value>CC_Caracteristica__c.SAC_CaracteristicaClienteCuenta</value>
     </filters>
-    <label>SAC - Características de un cliente</label>
+    <label>SAC - Características de clientes</label>
     <sharedTo>
         <role>SAC_General</role>
     </sharedTo>

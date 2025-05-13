@@ -44,10 +44,10 @@ public with sharing class SEG_ContactPendienteAsociar_P5_Batch implements Databa
         List<Case> casesToUpdate = new List<Case>();
 
         for (Case caso : lstcaso) {
-            if (caso.contactId != null && caso.Contact?.Account?.Name == 'CUENTA PENDIENTE ASOCIAR') {
+            if (caso.contactId != null && caso.Contact?.Account?.Name == 'CUENTA PENDIENTE ASOCIAR' && !contactsToDelete.contains(new Contact(Id=caso.ContactId))) {
                 contactsToDelete.add(new Contact(Id = caso.ContactId));
             }
-            if (caso.AccountId != null  && caso.Account.Name == 'CUENTA PENDIENTE ASOCIAR') {
+            if (caso.AccountId != null  && caso.Account.Name == 'CUENTA PENDIENTE ASOCIAR' && !accountsToDelete.contains(new Account(Id=caso.AccountId))) {
                 accountsToDelete.add(new Account(Id = caso.AccountId));
             }
             caso.AccountId = null;

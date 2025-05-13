@@ -16,11 +16,6 @@
                 <label>Potencial</label>
             </value>
             <value>
-                <fullName>En gestión/insistir</fullName>
-                <default>false</default>
-                <label>En gestión/insistir</label>
-            </value>
-            <value>
                 <fullName>Cerrado positivo</fullName>
                 <default>false</default>
                 <label>Cerrado positivo</label>
@@ -36,11 +31,6 @@
                 <label>No interesado</label>
             </value>
             <value>
-                <fullName>No apto</fullName>
-                <default>false</default>
-                <label>No apto</label>
-            </value>
-            <value>
                 <fullName>Con venta</fullName>
                 <default>false</default>
                 <label>Con venta</label>
@@ -49,6 +39,58 @@
                 <fullName>Vencido</fullName>
                 <default>false</default>
                 <label>Vencido</label>
+            </value>
+            <value>
+                <fullName>CIBE_Cerrado positivo</fullName>
+                <default>false</default>
+                <label>CIBE_Cerrado positivo</label>
+            </value>
+            <value>
+                <fullName>En curso</fullName>
+                <default>false</default>
+                <label>En curso</label>
+            </value>
+            <value>
+                <fullName>CIBE_Pendiente_Firma</fullName>
+                <default>false</default>
+                <label>CIBE_Pendiente_Firma</label>
+            </value>
+            <value>
+                <fullName>CIBE_Vencido</fullName>
+                <default>false</default>
+                <label>CIBE_Vencido</label>
+            </value>
+            <value>
+                <fullName>Producto rechazado</fullName>
+                <default>false</default>
+                <label>Producto rechazado</label>
+            </value>
+            <value>
+                <fullName>Producto contratado</fullName>
+                <default>false</default>
+                <label>Producto contratado</label>
+            </value>
+            <value>
+                <fullName>En gestión/insistir</fullName>
+                <default>false</default>
+                <label>En gestión/insistir</label>
+            </value>
+            <value>
+                <fullName>No Gestionada</fullName>
+                <default>false</default>
+                <label>No Gestionada</label>
+            </value>
+            <value>
+                <fullName>En Gestión</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>En Gestión</label>
+            </value>
+            <value>
+                <fullName>No apto</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>No apto</label>
             </value>
         </valueSetDefinition>
     </valueSet>

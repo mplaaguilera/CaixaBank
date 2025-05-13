@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_PDMin__c</fullName>
+    <description>Campo con los datos de conversión mínimos de Rating S&amp;P</description>
     <label>PD Min</label>
     <precision>18</precision>
     <required>false</required>

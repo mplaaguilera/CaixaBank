@@ -779,6 +779,68 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>CIBE_AbsoluteClientProfSeg__c</picklist>
+        <values>
+            <fullName>A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>M</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MB</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MOR</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CIBE_AbsoluteGroupProfSeg__c</picklist>
+        <values>
+            <fullName>A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>M</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MB</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MOR</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>CIBE_Cargo__pc</picklist>
         <values>
             <fullName>Administración</fullName>
@@ -3115,6 +3177,68 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>CIBE_RelativeClientProfSeg__c</picklist>
+        <values>
+            <fullName>A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>M</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MB</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MOR</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CIBE_RelativeGroupProfSeg__c</picklist>
+        <values>
+            <fullName>A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>M</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MB</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MOR</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>CIBE_Sector__pc</picklist>
         <values>
             <fullName>001</fullName>
@@ -3189,37 +3313,6 @@
     </picklistValues>
     <picklistValues>
         <picklist>CSBD_TipoContrato2__pc</picklist>
-        <values>
-            <fullName>Autónomo</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Autónomo %28en nómina%29</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Contrato fijo</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Contrato temporal</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Desempleado</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Empleado público</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Otro</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
-        <picklist>CSBD_TipoContrato__pc</picklist>
         <values>
             <fullName>Autónomo</fullName>
             <default>false</default>

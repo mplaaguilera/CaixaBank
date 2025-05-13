@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_LimitReassignment__c</fullName>
     <defaultValue>30000</defaultValue>
+    <description>establece límites en la reasignación de registros</description>
     <externalId>false</externalId>
     <label>AV_LimitReassignment</label>
     <precision>18</precision>

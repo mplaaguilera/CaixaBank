@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FechaRecepcionText__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF( ISPICKVAL(CC_Idioma__c, &quot;es&quot;), TEXT( DAY(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot; de &quot; &amp; CASE(MONTH(DATEVALUE(SAC_FechaRecepcion__c)), 1, &quot;enero&quot;, 2, &quot;febrero&quot;, 3, &quot;marzo&quot;, 4, &quot;abril&quot;, 5, &quot;mayo&quot;, 6, &quot;junio&quot;, 7, &quot;julio&quot;, 8, &quot;agosto&quot;, 9, &quot;septiembre&quot;, 10, &quot;octubre&quot;, 11, &quot;noviembre&quot;, &quot;diciembre&quot;) &amp; &quot; de &quot; &amp; TEXT( YEAR(DATEVALUE(SAC_FechaRecepcion__c)) ),
+IF( ISPICKVAL(CC_Idioma__c, &quot;en&quot;), CASE(MONTH(DATEVALUE(SAC_FechaRecepcion__c)), 1, &quot;January&quot;, 2, &quot;February&quot;, 3, &quot;March&quot;, 4, &quot;April&quot;, 5, &quot;May&quot;, 6, &quot;June&quot;, 7, &quot;July&quot;, 8, &quot;August&quot;, 9, &quot;September&quot;, 10, &quot;October&quot;, 11, &quot;November&quot;, &quot;December&quot;) &amp; &quot; &quot; &amp; TEXT( DAY(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot;, &quot; &amp; TEXT( YEAR(DATEVALUE(SAC_FechaRecepcion__c)) ),
+IF(ISPICKVAL(CC_Idioma__c, &quot;ca&quot;), TEXT( DAY(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot; de &quot; &amp; CASE(MONTH(DATEVALUE(SAC_FechaRecepcion__c)), 1, &quot;gener&quot;, 2, &quot;febrer&quot;, 3, &quot;març&quot;, 4, &quot;abril&quot;, 5, &quot;maig&quot;, 6, &quot;juny&quot;, 7, &quot;juliol&quot;, 8, &quot;agost&quot;, 9, &quot;setembre&quot;, 10, &quot;octubre&quot;, 11, &quot;novembre&quot;, &quot;desembre&quot;) &amp; &quot; de &quot; &amp; TEXT( YEAR(DATEVALUE(SAC_FechaRecepcion__c)) ),
+IF(ISPICKVAL(CC_Idioma__c, &quot;eu&quot;), IF(
+CONTAINS(&quot;02346789&quot;, RIGHT(TEXT( YEAR( TODAY())),1) ),
+TEXT( YEAR(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot;ko&quot; &amp; &quot; &quot; &amp; CASE(MONTH(DATEVALUE(SAC_FechaRecepcion__c)), 1, &quot;urtarril&quot;, 2, &quot;otsail&quot;, 3, &quot;martxo&quot;, 4, &quot;apiril&quot;, 5, &quot;maiatz&quot;, 6, &quot;ekain&quot;, 7, &quot;uztail&quot;, 8, &quot;abuztu&quot;, 9, &quot;irail&quot;, 10, &quot;urri&quot;, 11, &quot;azaro&quot;, &quot;abendu&quot;) &amp; &quot;aren&quot; &amp; &quot; &quot; &amp; TEXT( DAY(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot;a&quot;,
+TEXT( YEAR(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot;eko&quot; &amp; &quot; &quot; &amp; CASE(MONTH(DATEVALUE(SAC_FechaRecepcion__c)), 1, &quot;urtarril&quot;, 2, &quot;otsail&quot;, 3, &quot;martxo&quot;, 4, &quot;apiril&quot;, 5, &quot;maiatz&quot;, 6, &quot;ekain&quot;, 7, &quot;uztail&quot;, 8, &quot;abuztu&quot;, 9, &quot;irail&quot;, 10, &quot;urri&quot;, 11, &quot;azaro&quot;, &quot;abendu&quot;) &amp; &quot;aren&quot; &amp; &quot; &quot; &amp; TEXT( DAY(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot;a&quot;
+),
+IF(ISPICKVAL(CC_Idioma__c, &quot;ga&quot;), TEXT( DAY(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot; de &quot; &amp; CASE(MONTH(DATEVALUE(SAC_FechaRecepcion__c)), 1, &quot;xaneiro&quot;, 2, &quot;febreiro&quot;, 3, &quot;marzo&quot;, 4, &quot;abril&quot;, 5, &quot;maio&quot;, 6, &quot;xuño&quot;, 7, &quot;xullo&quot;, 8, &quot;agosto&quot;, 9, &quot;setembro&quot;, 10, &quot;outubro&quot;, 11, &quot;novembro&quot;, &quot;decembro&quot;) &amp; &quot; de &quot; &amp; TEXT( YEAR(DATEVALUE(SAC_FechaRecepcion__c)) ),
+IF(ISPICKVAL(CC_Idioma__c, &quot;va&quot;), TEXT( DAY(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot; de &quot; &amp; CASE(MONTH(DATEVALUE(SAC_FechaRecepcion__c)), 1, &quot;gener&quot;, 2, &quot;febrer&quot;, 3, &quot;març&quot;, 4, &quot;abril&quot;, 5, &quot;maig&quot;, 6, &quot;juny&quot;, 7, &quot;juliol&quot;, 8, &quot;agost&quot;, 9, &quot;setembre&quot;, 10, &quot;octubre&quot;, 11, &quot;novembre&quot;, &quot;desembre&quot;) &amp; &quot; de &quot; &amp; TEXT( YEAR(DATEVALUE(SAC_FechaRecepcion__c)) ),
+
+TEXT( DAY(DATEVALUE(SAC_FechaRecepcion__c)) ) &amp; &quot; de &quot; &amp; CASE(MONTH(DATEVALUE(SAC_FechaRecepcion__c)), 1, &quot;enero&quot;, 2, &quot;febrero&quot;, 3, &quot;marzo&quot;, 4, &quot;abril&quot;, 5, &quot;mayo&quot;, 6, &quot;junio&quot;, 7, &quot;julio&quot;, 8, &quot;agosto&quot;, 9, &quot;septiembre&quot;, 10, &quot;octubre&quot;, 11, &quot;noviembre&quot;, &quot;diciembre&quot;) &amp; &quot; de &quot; &amp; TEXT( YEAR(DATEVALUE(SAC_FechaRecepcion__c)) )))))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Fecha Recepcion Text</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

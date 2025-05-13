@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiEvaluationDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <name>ACA_Agent_Test1</name>
+    <subjectName>AgentforceCompetitionAgent</subjectName>
+    <subjectType>AGENT</subjectType>
+    <testCase>
+        <expectation>
+            <expectedValue>p_16jgK000000CvKL_Secure_Authentication_Process</expectedValue>
+            <name>topic_sequence_match</name>
+        </expectation>
+        <expectation>
+            <expectedValue>[&quot;SvcCopilotTmpl__SendEmailVerificationCode&quot;]</expectedValue>
+            <name>action_sequence_match</name>
+        </expectation>
+        <expectation>
+            <expectedValue>Agent requests customer email address</expectedValue>
+            <name>bot_response_rating</name>
+        </expectation>
+        <inputs>
+            <utterance>Quiero iniciar una autenticación segura</utterance>
+        </inputs>
+        <number>1</number>
+    </testCase>
+</AiEvaluationDefinition>

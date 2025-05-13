@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_AAPP__c</fullName>
+    <label>AAPP</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>-</fullName>
+                <default>false</default>
+                <label>-</label>
+            </value>
+            <value>
+                <fullName>Asuntos sociales</fullName>
+                <default>false</default>
+                <label>Asuntos sociales</label>
+            </value>
+            <value>
+                <fullName>Ayuntamiento</fullName>
+                <default>false</default>
+                <label>Ayuntamiento</label>
+            </value>
+            <value>
+                <fullName>Comunidad Autónoma</fullName>
+                <default>false</default>
+                <label>Comunidad Autónoma</label>
+            </value>
+            <value>
+                <fullName>Convenio</fullName>
+                <default>false</default>
+                <label>Convenio</label>
+            </value>
+            <value>
+                <fullName>Defensor Pueblo</fullName>
+                <default>false</default>
+                <label>Defensor Pueblo</label>
+            </value>
+            <value>
+                <fullName>Diputación</fullName>
+                <default>false</default>
+                <label>Diputación</label>
+            </value>
+            <value>
+                <fullName>Emp Vivienda</fullName>
+                <default>false</default>
+                <label>Emp Vivienda</label>
+            </value>
+            <value>
+                <fullName>ONG (Cáritas, ...)</fullName>
+                <default>false</default>
+                <label>ONG (Cáritas, ...)</label>
+            </value>
+            <value>
+                <fullName>Policía /GC</fullName>
+                <default>false</default>
+                <label>Policía /GC</label>
+            </value>
+            <value>
+                <fullName>Vivienda</fullName>
+                <default>false</default>
+                <label>Vivienda</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

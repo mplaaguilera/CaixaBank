@@ -13,16 +13,14 @@ public with sharing class SEG_feedbackCogFFEE implements Queueable, Database.All
 
         CC_TrazaInt__c oTraza = new CC_TrazaInt__c();   
         oTraza = new CC_TrazaInt__c();
-        oTraza.Name = 'Feedback_Cognitive_Segmentos';
+        oTraza.Name = 'Feedback_Cognitive_FFEE_Segmentos';
         oTraza.CC_FechaInicio__c = datetime.now();
         oTraza.CC_FinOK__c = false;
         
-        List<SEG_fbCognitiveFFEE> lstFeedbacks = new List<SEG_fbCognitiveFFEE>();
         SEG_fbCognitiveFFEE sendFeedback = new SEG_fbCognitiveFFEE();
         sendFeedback.pkCodSr = caseNumber;
-        sendFeedback.des_category_real  = crName; 
-        lstFeedbacks.add(sendFeedback);
-        String jsonToCognitive = JSON.serialize(lstFeedbacks);
+        sendFeedback.desCategoryReal  = crName; 
+        String jsonToCognitive = JSON.serialize(sendFeedback);
 
         // Custom Setting
         String intSetting = 'SEG_fbCognitive_FFEE';
@@ -67,6 +65,6 @@ public with sharing class SEG_feedbackCogFFEE implements Queueable, Database.All
     public class SEG_fbCognitiveFFEE 
     {
         public String pkCodSr; //2-912076545
-        public String des_category_real ; //Categoría real 1
+        public String desCategoryReal ; //Categoría real 1
     }
 }

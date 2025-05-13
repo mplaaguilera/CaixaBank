@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_AsistioEnDiferido</fullName>
+    <active>true</active>
+    <description>Si un registro esta en &quot;Asistió&quot; no puede pasar a &quot;Asistió en diferido&quot;</description>
+    <errorConditionFormula>AND(
+ISCHANGED(EV_Status__c),
+ISPICKVAL(EV_Status__c, &quot;Asistió en diferido&quot;),
+ISPICKVAL(PRIORVALUE(EV_Status__c), &quot;Asistió&quot;),
+AND(
+!$Permission.CBK_BypassValidationRules,
+!$Permission.EV_ByPassValidationRules
+)
+)</errorConditionFormula>
+    <errorMessage>El registro se encuentra marcado con confirmación de asistencia, no se puede cambiar a Asistió en diferido.</errorMessage>
+</ValidationRule>

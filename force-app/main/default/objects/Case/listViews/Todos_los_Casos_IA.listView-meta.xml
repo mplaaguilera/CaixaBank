@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Todos_los_Casos_IA</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CORE.USERS.ALIAS</columns>
+    <columns>CC_Idioma__c</columns>
+    <columns>SAC_GenialEstado__c</columns>
+    <columns>SAC_FechaRecepcion__c</columns>
+    <columns>CASES.ORIGIN</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>SAC_GenialEstado__c</field>
+        <operation>equals</operation>
+        <value>SAC_001,SAC_002,SAC_003,SAC_004,SAC_005</value>
+    </filters>
+    <filters>
+        <field>CASES.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Case.SAC_Reclamacion</value>
+    </filters>
+    <filters>
+        <field>CASES.CREATED_DATE_DATE_ONLY</field>
+        <operation>greaterOrEqual</operation>
+        <value>12/18/2023 12:00 AM</value>
+    </filters>
+    <filters>
+        <field>CASES.CREATED_DATE_DATE_ONLY</field>
+        <operation>equals</operation>
+        <value>TODAY</value>
+    </filters>
+    <label>Todos los Casos IA</label>
+    <sharedTo>
+        <group>SAC_GENIAL_TECH</group>
+    </sharedTo>
+</ListView>

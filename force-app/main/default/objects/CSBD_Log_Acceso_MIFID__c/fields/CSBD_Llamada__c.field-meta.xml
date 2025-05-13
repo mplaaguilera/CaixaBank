@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Llamada__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Llamada a la que se accedió</description>
+    <externalId>false</externalId>
+    <label>Llamada</label>
+    <referenceTo>CC_Llamada__c</referenceTo>
+    <relationshipLabel>Logs Acceso MIFID</relationshipLabel>
+    <relationshipName>Logs_Acceso_MIFID</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

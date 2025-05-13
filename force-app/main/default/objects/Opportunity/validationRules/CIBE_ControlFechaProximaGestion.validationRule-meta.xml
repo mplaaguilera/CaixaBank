@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_ControlFechaProximaGestion</fullName>
+    <active>true</active>
+    <description>La fecha de próxima gestión no puede ser mayor a la fecha de cierre</description>
+    <errorConditionFormula>AND(
+NOT(OR($Permission.CBK_BypassValidationRules,
+$Permission.AV_AvoidBulkApi,
+$Permission.CIBE_ByPassVR))
+,
+OR(
+ISCHANGED(AV_FechaProximoRecordatorio__c),
+ISNEW()
+),
+
+OR(
+RecordType.DeveloperName = &quot;CIBE_AccionComercialEMP&quot;,
+RecordType.DeveloperName = &quot;CIBE_AlertaComercialEMP&quot;,
+RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoEMP&quot;,
+RecordType.DeveloperName = &quot;CIBE_SugerenciaEMP&quot;
+),
+OR(
+AV_FechaProximoRecordatorio__c &gt;  CloseDate,
+AV_FechaProximoRecordatorio__c &lt; TODAY()
+)
+)</errorConditionFormula>
+    <errorMessage>La fecha de próxima gestión no puede ser superior a la fecha de cierre ni inferior a la fecha actual</errorMessage>
+</ValidationRule>

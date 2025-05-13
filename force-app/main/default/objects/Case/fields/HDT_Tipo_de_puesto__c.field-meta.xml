@@ -14,37 +14,66 @@
             <value>
                 <fullName>Atril Bienvenida</fullName>
                 <default>false</default>
-                <label>Atril Bienvenida</label>
+                <label>Oficina - Puesto MAC</label>
             </value>
             <value>
                 <fullName>Puesto de Caja</fullName>
                 <default>false</default>
-                <label>Puesto de Caja</label>
-            </value>
-            <value>
-                <fullName>Puesto Atención Personalizada</fullName>
-                <default>false</default>
-                <label>Puesto Atención Personalizada</label>
-            </value>
-            <value>
-                <fullName>Puesto Atención Especializada</fullName>
-                <default>false</default>
-                <label>Puesto Atención Especializada</label>
+                <label>Oficina - Puesto de Caja</label>
             </value>
             <value>
                 <fullName>Team Room</fullName>
                 <default>false</default>
-                <label>Team Room</label>
+                <label>Oficina - Teams Room</label>
+            </value>
+            <value>
+                <fullName>Oficina - Atención Personalizada, Especializada o Despacho de Dirección</fullName>
+                <default>false</default>
+                <label>Oficina - Atención Personalizada, Especializada o Despacho de Dirección</label>
+            </value>
+            <value>
+                <fullName>Oficina Internacional</fullName>
+                <default>false</default>
+                <label>Oficina Internacional</label>
+            </value>
+            <value>
+                <fullName>Oficina Móvil</fullName>
+                <default>false</default>
+                <label>Oficina Móvil</label>
+            </value>
+            <value>
+                <fullName>Servicios Centrales, DAN, DT o Empresas del Grupo</fullName>
+                <default>false</default>
+                <label>Servicios Centrales, DAN, DT o Empresas del Grupo</label>
+            </value>
+            <value>
+                <fullName>Teletrabajo</fullName>
+                <default>false</default>
+                <label>Teletrabajo</label>
             </value>
             <value>
                 <fullName>Despacho Dirección</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>Despacho Dirección</label>
             </value>
             <value>
                 <fullName>Mueble Accesorios</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>Mueble Accesorios</label>
+            </value>
+            <value>
+                <fullName>Puesto Atención Especializada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Puesto Atención Especializada</label>
+            </value>
+            <value>
+                <fullName>Puesto Atención Personalizada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Puesto Atención Personalizada</label>
             </value>
         </valueSetDefinition>
     </valueSet>

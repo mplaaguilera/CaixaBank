@@ -2,6 +2,8 @@
 <RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>EV_EventosTechSummit</fullName>
     <active>true</active>
+    <compactLayoutAssignment>EV_CompactTechSummit</compactLayoutAssignment>
+    <description>Registros de tipo TechSummit</description>
     <label>Eventos Tech Summit</label>
     <picklistValues>
         <picklist>EV_CanalOrigen__c</picklist>
@@ -50,6 +52,25 @@
         </values>
         <values>
             <fullName>Y</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>EV_CodCompany__c</picklist>
+        <values>
+            <fullName>ACC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CXB</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IMG</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VCX</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -103,7 +124,7 @@
         </values>
         <values>
             <fullName>Pendiente</fullName>
-            <default>false</default>
+            <default>true</default>
         </values>
         <values>
             <fullName>QR enviado</fullName>

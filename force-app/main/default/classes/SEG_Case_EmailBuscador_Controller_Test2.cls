@@ -7,7 +7,7 @@ public class SEG_Case_EmailBuscador_Controller_Test2 {
 
         Account centro1 = new Account();
         centro1.Name = 'centro1';
-        centro1.recordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        centro1.recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
 		insert centro1;
 
         Account cuenta = new account();
@@ -44,7 +44,7 @@ public class SEG_Case_EmailBuscador_Controller_Test2 {
 
         Account centro1 = new Account();
         centro1.Name = 'centro1';
-        centro1.recordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        centro1.recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
 		insert centro1;
 
         Account cuenta = new account();
@@ -82,7 +82,7 @@ public class SEG_Case_EmailBuscador_Controller_Test2 {
 
         Account centro1 = new Account();
         centro1.Name = 'centro1';
-        centro1.recordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        centro1.recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
 		insert centro1;
 
         Account cuenta = new account();
@@ -100,7 +100,7 @@ public class SEG_Case_EmailBuscador_Controller_Test2 {
         contacto.AccountId = cuenta.id; 
         contacto.FirstName = 'Primero'; 
         contacto.LastName = 'Contactos';
-        contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         insert contacto;  
 
         cuenta.SEG_GestorOperativaNacional__c= contacto.id;
@@ -121,7 +121,7 @@ public class SEG_Case_EmailBuscador_Controller_Test2 {
 
         Account centro1 = new Account();
         centro1.Name = 'centro1';
-        centro1.recordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        centro1.recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
 		insert centro1;
 
         Account cuenta = new account();
@@ -159,7 +159,7 @@ public class SEG_Case_EmailBuscador_Controller_Test2 {
 
         Account centro1 = new Account();
         centro1.Name = 'centro1';
-        centro1.recordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        centro1.recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
 		insert centro1;
 
         Account cuenta = new account();
@@ -196,7 +196,7 @@ public class SEG_Case_EmailBuscador_Controller_Test2 {
 
         Account centro1 = new Account();
         centro1.Name = 'centro1';
-        centro1.recordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        centro1.recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
 		insert centro1;
 
         Account cuenta = new account();
@@ -214,7 +214,7 @@ public class SEG_Case_EmailBuscador_Controller_Test2 {
         contacto.AccountId = cuenta.id; 
         contacto.FirstName = 'Primero'; 
         contacto.LastName = 'Contactos';
-        contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         insert contacto;  
 
         cuenta.SEG_GestorOperativaNacional__c= contacto.id;

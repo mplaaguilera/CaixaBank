@@ -52,7 +52,7 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
         }
 
         //Lista de todos los case reclamantes equivalentes a los de la reclamación actual
-        List<SAC_CaseReclamante__c> reclamantesV2 = [SELECT Id, SAC_Case__c, SAC_ReclamantePrincipal__c, Name, SAC_Account__c, SAC_Account__r.Name FROM SAC_CaseReclamante__c WHERE SAC_Account__c IN: reclamantesAccount];
+        List<SAC_CaseReclamante__c> reclamantesV2 = [SELECT Id, SAC_Case__c, SAC_ReclamantePrincipal__c, Name, SAC_Account__c, SAC_Account__r.Name FROM SAC_CaseReclamante__c WHERE SAC_Account__c IN: reclamantesAccount AND SAC_Case__c != null];
 
         Set<Id> idsCasos = new Set<Id>();
         for(SAC_CaseReclamante__c rec : reclamantesV2){
@@ -63,9 +63,9 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
         //US1094159 -> Se añade SAC_Naturaleza__c != 'SAC_007', para no mostrar las reclamaciones con Naturaleza: Complementaria
         //y en caso de que el caso actual sea una complementaria, solo mostrar reclamaciones que estén cerradas y sentido resolución favorable a cliente SAC_003
         
-        listCasos = [SELECT SAC_Reclamacion__c, Id, CaseNumber, AccountId, Subject, CreatedDate, toLabel(Status), Account.Name, RecordTypeId, SEG_Grupo__r.Name, Owner.Name
+        listCasos = [SELECT SAC_Reclamacion__c, Id, CaseNumber, AccountId, Subject, CreatedDate, toLabel(Status), Account.Name, RecordTypeId, SEG_Grupo__r.Name, Owner.Name, toLabel(SAC_Naturaleza__c)
                                 FROM Case 
-                                WHERE (Id IN: idsCasos AND AccountId != null AND recordTypeId =: RECTYPERECLAMACION AND Id != :casoAuxiliar.Id AND SAC_Naturaleza__c != 'SAC_007') OR 
+                                WHERE (Id IN: idsCasos AND AccountId != null AND recordTypeId =: RECTYPERECLAMACION AND Id != :casoAuxiliar.Id) OR 
                                 (recordTypeId =: RECTYPEPRETENSION AND SAC_Reclamacion__c IN :idsCasos AND SAC_Reclamacion__r.AccountId != null AND SAC_Reclamacion__C != :casoAuxiliar.Id)]; //AccountId IN: reclamantesAccount
 
         Set<Id> idsReclamaciones = new Set<Id>();
@@ -142,8 +142,17 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
             List<Case> pretensionesMapa = new List<Case>();
             pretensionesMapa = mapPretensiones.get(reclamacionMap);
 
-            ReclamacionWrapper reclamacionAuxiliar = new ReclamacionWrapper(mapDeReclamaciones.get(reclamacionMap) , pretensionesMapa,
+            ReclamacionWrapper reclamacionAuxiliar;
+            //Las complementarias se mostrarán siempre con los botones desactivados si se ve desde una complementaria (Primero pone 'Complementaria' porque hay un toLabel)
+            if(mapDeReclamaciones.get(reclamacionMap).SAC_Naturaleza__c == 'Complementaria' && casoAuxiliar.SAC_Naturaleza__c == 'SAC_007' ){
+                desactivarBtn=true;
+                reclamacionAuxiliar = new ReclamacionWrapper(mapDeReclamaciones.get(reclamacionMap) , pretensionesMapa,
+                mapDeReclamantesPrincipales.get(reclamacionMap), mapDeReclamantesSecundarios.get(reclamacionMap), desactivarBtn, desactivarBtn);
+            }else{
+                reclamacionAuxiliar = new ReclamacionWrapper(mapDeReclamaciones.get(reclamacionMap) , pretensionesMapa,
                 mapDeReclamantesPrincipales.get(reclamacionMap), mapDeReclamantesSecundarios.get(reclamacionMap), desactivarBtn, !desactivarBtn);
+            }
+
             listadoFinal.add(reclamacionAuxiliar);
         }
 

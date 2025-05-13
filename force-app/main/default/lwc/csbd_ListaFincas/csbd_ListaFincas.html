@@ -2,10 +2,10 @@
 
 	<article class="contenedor slds-card slds-var-m-top_large">
 
-		<div class="slds-card__header slds-grid slds-var-m-bottom_small">
+		<div lwc:if={fincas.length} class="slds-card__header slds-grid slds-var-m-bottom_small">
 			<header class="slds-media slds-media_center slds-has-flexi-truncate">
 				<div class="slds-media__body">
-					<h2 class="slds-card__header-title" style="font-size: 16px;">
+					<h2 class="slds-card__header-title slds-var-m-left_x-small" style="font-size: 16px;">
 						Fincas afectadas
 						<span lwc:if={fincas.length} style="font-weight: 600;">&nbsp;({fincas.length})</span>
 					</h2>
@@ -16,8 +16,8 @@
 			</header>
 		</div>
 
-		<div class="slds-card__body slds-card__body_inner">
-			<!--Lista-->
+		<!--Lista de fincas-->
+		<div lwc:if={fincas.length} class="slds-card__body slds-card__body_inner">
 			<div style="position: relative; display: flex;">
 				<div class="datatableFincasContainer">
 					<div style="height: 100%;">
@@ -35,9 +35,15 @@
 				</div>
 			</div>
 		</div>
+		<!--Ilustración si no hay fincas-->
+		<template lwc:else>
+			<c-seg_-Illustration tipo="Research" size="small" mensaje="No hay fincas dadas de alta."></c-seg_-Illustration>
+			<div class="slds-align_absolute-center">
+				<lightning-button label="Nueva finca" onclick={nuevaFinca} class="slds-var-m-top_medium slds-var-m-bottom_large"></lightning-button>
+			</div>
+		</template>
 
 		<!--Formulario-->
-
 		<article lwc:if={fincaSeleccionada} class="slds-card slds-card_boundary slds-var-m-top_xx-large slds-var-p-top_small">
 			<div class="slds-card__header slds-grid slds-var-m-bottom_x-large">
 				<header class="slds-media slds-media_center slds-has-flexi-truncate">
@@ -82,7 +88,7 @@
 			</div>
 		</article>
 
-		<footer class="slds-var-m-top_x-large slds-var-m-bottom_small">
+		<footer lwc:if={fincas.length} class="slds-var-m-top_x-large slds-var-m-bottom_small">
 			<div class="slds-grid slds-grid_align-spread slds-gutters_direct-x-small">
 				<div class="slds-col">
 					<lightning-button label="Eliminar" variant="destructive-text" disabled={botonEliminarDisabled} onclick={eliminarFincaSeleccionada}></lightning-button>

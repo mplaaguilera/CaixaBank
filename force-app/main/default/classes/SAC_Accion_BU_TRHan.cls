@@ -37,10 +37,13 @@ public without sharing class SAC_Accion_BU_TRHan extends CC_TriggerHandlerBase {
         List<SAC_Accion__c> listaTareasEnviadas = new List<SAC_Accion__c>();
         List<SAC_Accion__c> listaTareasDevueltas = new List<SAC_Accion__c>();
         List<SAC_Accion__c> listaValidarImpAbonado = new List<SAC_Accion__c>();
+        List<SAC_Accion__c> listaValidarImpAbonadoPrete = new List<SAC_Accion__c>();
+
         List<Task> listaTasks = new List<Task>();
         List<Id> reclamacionesParaCerrar = new List<Id>();
         Set<Id> listaIdsCasosGlobal = new Set<Id>();
         Set<Id> idsRecTarea = new Set<Id>();
+        Set<Id> idsPreteTarea = new Set<Id>();
         Map<Id, Case> mapCasosSelect = new Map<Id, Case>();
         List<Case> listaCasosSelect = new List<Case>();
         Set<Id> listIdCasosRelated = new Set<Id>();
@@ -118,6 +121,12 @@ public without sharing class SAC_Accion_BU_TRHan extends CC_TriggerHandlerBase {
                         idsRecTarea.add(accion.SAC_Reclamacion__c);
                     }
                 }
+                //Si cambia el importe a abonar y no es null o 0, se añade a la lista para validar el sentido de resolución de la pretension
+                if((mapOldObj.get(accion.Id).SAC_ImporteAbonar__c != accion.SAC_ImporteAbonar__c) && accion.SAC_ImporteAbonar__c != null && accion.SAC_ImporteAbonar__c != 0){
+                    listaValidarImpAbonadoPrete.add(accion);
+                    idsPreteTarea.add(accion.SAC_Pretension__c);
+                }
+
                 //US458927 eliminar notificaciones de tarea finalizada completa y añadir el envío del email al grupo de el caso si este está en pendiente de asignar
                 if(/*accion.SAC_Estado__c == 'SAC_Finalizada' || */(mapOldObj.get(accion.Id).SAC_Estado__c != accion.SAC_Estado__c) && (accion.SAC_Estado__c == 'SAC_FinalizadaIncompleta'
                 || accion.SAC_Estado__c == 'SAC_Devuelta' || accion.SAC_Estado__c == 'SAC_Descartada')){
@@ -153,6 +162,12 @@ public without sharing class SAC_Accion_BU_TRHan extends CC_TriggerHandlerBase {
         //Si la tarea pasa a estado finalizada o finalizada incompleta y tiene informado el campo SAC_ImporteAbonar__c, tenemos que validar el sentido de resolución de la reclamación
         if(!listaValidarImpAbonado.isEmpty()){
             SAC_AccionMetodos.validarSentidoResReclamacion(listaValidarImpAbonado, idsRecTarea);
+        }
+
+        
+        //Si la tarea pasa a estado finalizada o finalizada incompleta y tiene informado el campo SAC_ImporteAbonar__c, tenemos que validar el sentido de resolución de la reclamación
+        if(!listaValidarImpAbonadoPrete.isEmpty()){
+            SAC_AccionMetodos.validarSentidoResPretension(listaValidarImpAbonadoPrete, idsPreteTarea);
         }
 
         if(!tareasFinalizadas.isEmpty()){

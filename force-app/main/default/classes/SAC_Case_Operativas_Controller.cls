@@ -13,7 +13,7 @@ public without sharing class SAC_Case_Operativas_Controller {
 
     public class MyException extends Exception{}
 
-    private static Set<String> objetos = new Set<String>{'Case','CC_Grupo_Colaborador__c'};
+    private static Set<String> objetos = new Set<String>{'Case','CC_Grupo_Colaborador__c', 'CBK_Case_Extension__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
     
     final static Id RECORDTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
@@ -22,6 +22,7 @@ public without sharing class SAC_Case_Operativas_Controller {
     final static Id RECORDTYPECONSULTASAC = mapRTsObjects.get('Case').get('SAC_ConsultaSAC').getRecordTypeId();
     final static Id RECORDTYPECASECLIENTE = mapRTsObjects.get('Case').get('CC_Cliente').getRecordTypeId();
     final static Id RECORDTYPEGRUPOPLET = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SAC_Letrados').getRecordTypeId();
+    final static Id RECTYPECASEEXTENSION = mapRTsObjects.get('CBK_Case_Extension__c').get('SAC_ReclamacionCaseExt').getRecordTypeId();
     
 
     public class WrapperCC {
@@ -46,7 +47,7 @@ public without sharing class SAC_Case_Operativas_Controller {
             SAC_EmailRepresentante__c, SAC_TelefonoRepresentante__c, SAC_Naturaleza__c, SAC_CasoEspecial__c, SAC_CASE_esPSD2__c,SAC_DerivadoA__c, SAC_CasoRelacionado__c,
             CC_Detalles_Solucion__c, SAC_UserElevoASupervisor__c, SAC_FechaRecepcion__c, SAC_ObservacionesSupervisor__c, SAC_Prorrogado__c, SAC_Entidad_Afectada__c, SAC_EntidadProductora__c, Description, SAC_EsPrincipal__c, CC_SuppliedFiles__c,
 
-            SAC_Reclamacion__c , SAC_Reclamacion__r.Status, CC_AcuseRecibo__c, CBK_Case_Extension_Id__r.SAC_DespachoRepresentante__c,
+            SAC_Reclamacion__c , SAC_Reclamacion__r.Status, CC_AcuseRecibo__c, CBK_Case_Extension_Id__r.SAC_DespachoRepresentante__c,CBK_Case_Extension_Id__c,
 
             SAC_PretensionPrincipal__r.Status, SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_PretensionPrincipal__r.SEG_Grupo__r.Name, SAC_PretensionPrincipal__r.OwnerId, 
             SAC_PretensionPrincipal__r.AccountId, SAC_PretensionPrincipal__r.CaseNumber, SAC_PretensionPrincipal__r.Origin, SAC_PretensionPrincipal__r.RecordTypeId, 
@@ -97,8 +98,8 @@ public without sharing class SAC_Case_Operativas_Controller {
                 List<CaseHistory> ch = [SELECT id,OldValue, NewValue, Field, CreatedDate  
                                         FROM CaseHistory 
                                         WHERE Case.RecordType.DeveloperName LIKE 'SAC_%' AND CaseId =:casoActual.Id AND Field = 'Owner' AND DataType = 'EntityId' ORDER BY CreatedDate desc]; 
-           
-                if(Test.isRunningTest() || ch[0].OldValue == colaSupervisores.Id ){
+
+                if(Test.isRunningTest() || (!ch.isEmpty() && ch[0].OldValue == colaSupervisores.Id)){
                     mapKeyValue.put('mostrarSupervisor', 'si');  
                 }                
             }            
@@ -743,6 +744,27 @@ public without sharing class SAC_Case_Operativas_Controller {
         if(caso.recordTypeId == RECORDTYPERECLAMACION && naturaleza == 'Consulta') {
             caso.SAC_Naturaleza__c = 'SAC_005';
             caso.SAC_Letrado__c = 'Pte. Asignar';
+
+            if(caso.recordTypeId == RECORDTYPERECLAMACION && caso.SAC_NPretensionesActivas__c != 0) {
+                List<Case> listaPretCasos = [SELECT id, recordTypeId, Status 
+                                    FROM  Case 
+                                    WHERE RecordType.DeveloperName = 'SAC_Pretension' AND SAC_Reclamacion__c =: caso.id];
+                if(!listaPretCasos.isEmpty()){
+                    for (Case pretension : listaPretCasos) {
+                        pretension.Status = 'SAC_009';
+                        pretension.SAC_StatusAuxiliar__c = 'SAC_009';
+                    }
+                }
+
+                AsyncOptions options = new AsyncOptions();
+                options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+                .addId(UserInfo.getUserId())
+                .addString('listaPretCasos')
+                .build();
+                try {
+                    System.enqueueJob(new SAC_QueueableCerrarMilestoneLetrado(listaPretCasos), options);    
+                } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 }     
+            }
         }
         else if (caso.recordTypeId == RECORDTYPECONSULTASAC && naturaleza == 'Reclamacion') {
             caso.SAC_Naturaleza__c = 'SAC_004';
@@ -773,6 +795,14 @@ public without sharing class SAC_Case_Operativas_Controller {
                 /*if(Case.SObjectType.getDescribe().isUpdateable()){
                     SAC_DatabaseDML.updateListDML(listaPretCasos, true);
                 }*/
+                AsyncOptions options = new AsyncOptions();
+                options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+                .addId(UserInfo.getUserId())
+                .addString('listaPretCasos')
+                .build();
+                try {
+                    System.enqueueJob(new SAC_QueueableCerrarMilestoneLetrado(listaPretCasos), options);    
+                } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 } 
             }
 
             if(naturaleza == 'Reclamacion' || naturaleza == 'Consulta') {
@@ -1257,9 +1287,21 @@ public without sharing class SAC_Case_Operativas_Controller {
             }
         }
 
+        // Si la reclamación no tiene un registro del CBK_Case_Extension__c asociado se crea uno al reabrir
+        if(casoEntrada.CBK_Case_Extension_Id__c == null) {
+            CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+            caseExtension.recordTypeId = RECTYPECASEEXTENSION;
+            caseExtension.Case_Id__c = casoReabrir.id;
+
+            if (Schema.sObjectType.CBK_Case_Extension__c.isCreateable()) {    
+                SAC_DatabaseDML.insertDML(caseExtension, false);
+                casoReabrir.CBK_Case_Extension_Id__c = caseExtension.id;
+            }
+        }
         //Se updatea todo lo que hemos ido añadiendo a la lista
-        SAC_DatabaseDML.updateListDML(listaActualizar, true);
+        SAC_DatabaseDML.updateListDML(listaActualizar, true);   
     }
+
 
     /*****************************************************************
      * Proposito: Desde la Reclamación en estado cerrrada o ejecución, se debe poder crear una nueva reclamación

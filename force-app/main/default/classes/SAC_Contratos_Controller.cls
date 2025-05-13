@@ -290,10 +290,10 @@ public with sharing class SAC_Contratos_Controller {
         producto.SAC_Tipo__c = tipo;
         producto.N_Contrato__c = numContrato;
         producto.SAC_Descripcion__c = descripcion;
-        if(fechaApertura != null && fechaApertura != ''){
+        if(fechaApertura != null && fechaApertura != '' && fechaApertura != '0'){
             producto.SAC_FechaApertura__c = Date.valueOf(fechaApertura);
         }
-        if(fechaCancelacion != null && fechaCancelacion != ''){
+        if(fechaCancelacion != null && fechaCancelacion != '' && fechaCancelacion != '0'){
             producto.SAC_FechaCancelacion__c = Date.valueOf(fechaCancelacion);
         }
 

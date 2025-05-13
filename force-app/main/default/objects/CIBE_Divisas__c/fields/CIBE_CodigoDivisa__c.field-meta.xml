@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_CodigoDivisa__c</fullName>
+    <description>Información del código de divisa del TC</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Código Divisa</label>

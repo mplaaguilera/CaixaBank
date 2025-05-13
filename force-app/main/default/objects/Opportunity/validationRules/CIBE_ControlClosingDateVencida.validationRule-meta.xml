@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_ControlClosingDateVencida</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+	!$Permission.CIBE_BypassValidationRules,
+	!$Permission.AV_AvoidBulkApi,
+	!$Permission.CBK_BypassValidationRules,
+OR(
+RecordType.DeveloperName = &quot;CIBE_AlertaComercialEMP&quot;,
+RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoEMP&quot;,
+RecordType.DeveloperName = &quot;CIBE_AccionComercialEMP&quot;
+),
+	OR(
+		CloseDate &lt; TODAY(),
+		CloseDate - TODAY() &gt; 547
+	),
+	AND(
+		ISPICKVAL(PRIORVALUE(StageName), &apos;CIBE_Vencido&apos;),
+	OR(
+		ISPICKVAL(StageName, &quot;CIBE_Cerrado positivo&quot;),
+		ISPICKVAL(StageName, &quot;Cerrado Negativo&quot;),
+		ISPICKVAL(StageName, &quot;CIBE_Vencido&quot;)
+		)
+	)
+)</errorConditionFormula>
+    <errorMessage>Introduzca una fecha de cierre no inferior desde la fecha actual o superior a 18 meses.</errorMessage>
+</ValidationRule>

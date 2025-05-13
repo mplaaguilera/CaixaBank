@@ -1,6 +1,6 @@
 import {LightningElement, api, wire} from 'lwc';
 import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
-import {errorApex, toast} from 'c/csbd_lwcUtils';
+import {errorApex, esperar, publicarEvento} from 'c/csbd_lwcUtils';
 
 import getEmpresasProveedorasApex from '@salesforce/apex/CSBD_BuscadorProducto_Apex.getEmpresasProveedoras';
 import getProductosApex from '@salesforce/apex/CSBD_BuscadorProducto_Apex.getProductos';
@@ -42,7 +42,6 @@ export default class csbdBuscadorProducto extends LightningElement {
 	}
 
 	inputOnfocus() {
-		//this.refs.buscador.classList.toggle('slds-is-open', this.busqueda);
 		if (this.busqueda) {
 			this.abrirDropdown();
 		} else {
@@ -50,12 +49,8 @@ export default class csbdBuscadorProducto extends LightningElement {
 		}
 	}
 
-	inputOnblur() {
-		//this.refs.buscador.classList.remove('slds-is-open');
-		this.cerrarDropdown();
-	}
-
 	inputOnchange({currentTarget: input, detail: {value: busqueda}}) {
+
 		this.busqueda = busqueda;
 		window.clearTimeout(this.componente.inputOnchangeTimeout);
 		if (!busqueda) {
@@ -63,26 +58,33 @@ export default class csbdBuscadorProducto extends LightningElement {
 		} else {
 			this.abrirDropdown();
 			this.componente.inputOnchangeTimeout = window.setTimeout(async () => {
-				this.resultados = [];
+				await this.getEmpresasProveedoras();
 
 				if (busqueda.length === 1) {
 					this.refs.buscador.classList.remove('sinResultados');
 					this.refs.buscador.classList.add('sinBusqueda');
+					this.abrirDropdown();
 				} else {
+					input.isLoading = true;
 					this.refs.buscador.classList.remove('sinBusqueda');
 					//this.refs.buscador.classList.add('sinResultados');
 
-					/*
-					input.isLoading = true;
-					if (busqueda) {
-						this.abrirDropdown();
-					} else {
-						this.cerrarDropdown();
-					}
-					*/
-					await this.getEmpresasProveedoras();
 					this.componente.renderResultados = true;
 					this.resultados = await this.buscarProductos(busqueda);
+					if (this.resultados.length) {
+						await esperar(0).then(() => {
+							const dropdown = this.refs.dropdown;
+							dropdown.offsetHeight;
+							const newHeight = Math.min(dropdown.scrollHeight + 2, 400);
+							dropdown.style.maxHeight = newHeight + 'px';
+
+							this.refs.buscador.classList.remove('sinResultados');
+							input.isLoading = false;
+						});
+					} else {
+						this.refs.buscador.classList.add('sinResultados');
+						input.isLoading = false;
+					}
 				}
 			}, 500);
 		}
@@ -106,8 +108,14 @@ export default class csbdBuscadorProducto extends LightningElement {
 				resultados.push({
 					idResultado: `${empresa}.${producto.CC_Lista__c}.${producto.Name}`,
 					empresa,
+					empresaLabel: empresa.replace(new RegExp(busqueda, 'gi'), match => `<strong>${match}</strong>`),
+					resaltarEmpresa: empresa.includes(busqueda),
 					familia: producto.CC_Lista__r.Name,
+					familiaLabel: producto.CC_Lista__r.Name.replace(new RegExp(busqueda, 'gi'), match => `<strong>${match}</strong>`),
+					resaltarFamilia: producto.CC_Lista__r.Name.includes(busqueda),
 					producto: producto.Name,
+					productoLabel: producto.Name.replace(new RegExp(busqueda, 'gi'), match => `<strong>${match}</strong>`),
+					resaltarProducto: producto.Name.includes(busqueda),
 					title: `${empresa} → ${producto.CC_Lista__r.Name} → ${producto.Name}`
 				});
 			});
@@ -122,21 +130,47 @@ export default class csbdBuscadorProducto extends LightningElement {
 	}
 
 	abrirDropdown() {
-		this.refs.backdrop.classList.add('slds-backdrop_open');
-		this.refs.buscador.classList.toggle('slds-is-open', this.busqueda);
+		esperar(0).then(() => {
+			if (!this.refs.input.value) {
+				return;
+			}
+			if (!this.refs.buscador.classList.contains('slds-is-open')) {
+				const backdrop = this.refs.backdrop;
+				backdrop.addEventListener('click', event => {
+					event.stopPropagation();
+					this.cerrarDropdown();
+				}, {once: true});
+				backdrop.classList.add('slds-backdrop_open');
+
+				/*const dropdown = this.refs.dropdown;
+				dropdown.addEventListener('transitionend', () => {
+					dropdown.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
+				}, {once: true}); */
+				this.refs.buscador.classList.add('slds-is-open');
+			}
+
+			this.refs.dropdown.style.maxHeight = Math.min(this.refs.dropdown.scrollHeight + 2, 400) + 'px';
+		});
 	}
 
 	cerrarDropdown() {
-		this.refs.buscador.classList.remove('slds-is-open');
-		this.refs.backdrop.classList.remove('slds-backdrop_open');
+		this.refs.dropdown.style.maxHeight = '0px';
+		esperar(150).then(() => {
+			this.refs.buscador.classList.remove('slds-is-open');
+			this.refs.backdrop.classList.remove('slds-backdrop_open');
+		});
 	}
 
 	resultadoSeleccionar({currentTarget: {dataset: {idResultado}}}) {
-		this.cerrarDropdown();
-		window.setTimeout(() => {
-			this.resultadoSeleccionado = this.resultados.find(r => r.idResultado === idResultado);
-			this.template.querySelector('div.slds-combobox_container').classList.add('slds-has-selection');
-		}, 160);
+		esperar(50).then(() => {
+			this.cerrarDropdown();
+			esperar(150).then(() => {
+				//this.resultadoSeleccionado = this.resultados.find(r => r.idResultado === idResultado);
+				//publicarEvento(this, 'resultadoseleccionado', {resultado: this.resultadoSeleccionado});
+				//this.template.querySelector('div.slds-combobox_container').classList.add('slds-has-selection');
+				publicarEvento(this, 'resultadoseleccionado', {resultado: this.resultados.find(r => r.idResultado === idResultado)});
+			});
+		});
 	}
 
 	resultadoDeseleccionar() {

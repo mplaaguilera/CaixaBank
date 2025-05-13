@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_CreatedDate__c</fullName>
+    <description>Campo Inicio para sincronizar entidades (CBK_Log, CBK_LogEvent)</description>
+    <isFilteringDisabled>false</isFilteringDisabled>
+    <isNameField>false</isNameField>
+    <isSortingDisabled>false</isSortingDisabled>
+    <label>Inicio</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

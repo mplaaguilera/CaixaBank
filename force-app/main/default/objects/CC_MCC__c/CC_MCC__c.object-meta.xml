@@ -169,7 +169,6 @@
         <fields>NAME</fields>
         <fields>CC_Tematica__c</fields>
         <fields>CC_Producto_Servicio__c</fields>
-        <fields>CC_Activo__c</fields>
         <fields>CC_Tipo_Cliente__c</fields>
         <profileName>CC_Usuario_CaixaBank</profileName>
     </profileSearchLayouts>
@@ -180,6 +179,13 @@
         <fields>CC_Activo__c</fields>
         <fields>CC_Tipo_Cliente__c</fields>
         <profileName>System Administrator</profileName>
+    </profileSearchLayouts>
+    <profileSearchLayouts>
+        <fields>NAME</fields>
+        <fields>CC_Tematica_Formula__c</fields>
+        <fields>CC_Producto_Servicio__c</fields>
+        <fields>CC_Tipo_Cliente__c</fields>
+        <profileName>FRA_Usuario_Caixabank</profileName>
     </profileSearchLayouts>
     <recordTypeTrackHistory>false</recordTypeTrackHistory>
     <searchLayouts>

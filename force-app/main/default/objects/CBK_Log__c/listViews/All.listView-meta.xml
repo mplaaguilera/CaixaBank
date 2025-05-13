@@ -3,15 +3,15 @@
     <fullName>All</fullName>
     <columns>NAME</columns>
     <columns>RECORDTYPE</columns>
+    <columns>createdBy__c</columns>
     <columns>CREATED_DATE</columns>
-    <columns>OBJECT_ID</columns>
-    <columns>OWNER.ALIAS</columns>
-    <columns>Subject__c</columns>
+    <columns>Project__c</columns>
+    <columns>Error_Code__c</columns>
+    <columns>Error_Type__c</columns>
+    <columns>Log_Level__c</columns>
+    <columns>Log_Message__c</columns>
+    <columns>Apex_Class__c</columns>
+    <columns>Apex_Method__c</columns>
     <filterScope>Everything</filterScope>
-    <filters>
-        <field>CREATED_DATE</field>
-        <operation>equals</operation>
-        <value>TODAY</value>
-    </filters>
     <label>All</label>
 </ListView>

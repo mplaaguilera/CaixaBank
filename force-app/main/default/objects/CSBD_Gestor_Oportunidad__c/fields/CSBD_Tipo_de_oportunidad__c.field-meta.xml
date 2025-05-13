@@ -46,11 +46,6 @@
                 <label>Hipoteca</label>
             </value>
             <value>
-                <fullName>Préstamo</fullName>
-                <default>false</default>
-                <label>Préstamo</label>
-            </value>
-            <value>
                 <fullName>Renting</fullName>
                 <default>false</default>
                 <label>Renting</label>
@@ -71,9 +66,25 @@
                 <label>Soporte digital</label>
             </value>
             <value>
-                <fullName>MAC</fullName>
+                <fullName>CSCC</fullName>
                 <default>false</default>
-                <label>MAC</label>
+                <label>CSCC</label>
+            </value>
+            <value>
+                <fullName>Consumo</fullName>
+                <default>false</default>
+                <label>Consumo</label>
+            </value>
+            <value>
+                <fullName>Préstamo</fullName>
+                <default>false</default>
+                <label>Préstamo</label>
+            </value>
+            <value>
+                <fullName>AC</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>AC</label>
             </value>
         </valueSetDefinition>
     </valueSet>

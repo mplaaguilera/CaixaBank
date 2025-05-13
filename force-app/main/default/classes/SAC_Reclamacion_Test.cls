@@ -1127,7 +1127,6 @@ public class SAC_Reclamacion_Test {
         Assert.areNotEqual(reclamacionResult, null, 'No se ha actualizado el resumen correctamente');
     }
     
-    
     @isTest
     static void cambiarOwnerReclamaciones() {
         User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
@@ -1135,7 +1134,22 @@ public class SAC_Reclamacion_Test {
         List<Case> pretensiones = [SELECT Id, SAC_Reclamacion__c FROM Case WHERE SAC_Reclamacion__c IN: reclamaciones];
         System.runAs(usuario){
             Test.startTest();
-            SAC_Reclamacion.insertarCaseShareByReclamacion(reclamaciones);
+            SAC_Reclamacion.insertarCaseSharePorReclamacionOPretension(pretensiones);
+            Test.stopTest();
+        }
+        List<CaseShare> sharings = [SELECT Id, RowCause FROM CaseShare WHERE RowCause = 'Manual' AND CaseId IN: pretensiones LIMIT 1];
+
+        System.assertEquals(sharings.isEmpty(), false, 'Existen sharings en las pretensiones');
+    }
+    
+    @isTest
+    static void cambiarOwnerPretensiones() {
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        List<Case> reclamaciones = [SELECT Id, Status, OwnerId, SAC_Reclamacion__c, SAC_PretensionPrincipal__c, SAC_ResumenManual__c, RecordType.DeveloperName FROM Case WHERE Subject = 'TestRec'];
+        List<Case> pretensiones = [SELECT Id, SAC_Reclamacion__c FROM Case WHERE SAC_Reclamacion__c IN: reclamaciones];
+        System.runAs(usuario){
+            Test.startTest();
+            SAC_Reclamacion.insertarCaseSharePorReclamacionOPretension(reclamaciones);
             Test.stopTest();
         }
         List<CaseShare> sharings = [SELECT Id, RowCause FROM CaseShare WHERE RowCause = 'Manual' AND CaseId IN: pretensiones LIMIT 1];

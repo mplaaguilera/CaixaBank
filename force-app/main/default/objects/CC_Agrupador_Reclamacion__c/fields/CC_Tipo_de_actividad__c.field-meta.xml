@@ -14,6 +14,71 @@
                 <default>false</default>
                 <label>Reclamación</label>
             </value>
+            <value>
+                <fullName>WORK</fullName>
+                <default>false</default>
+                <label>WORK</label>
+            </value>
+            <value>
+                <fullName>SEGEVENTO</fullName>
+                <default>false</default>
+                <label>SEGEVENTO</label>
+            </value>
+            <value>
+                <fullName>RECLAMACION</fullName>
+                <default>false</default>
+                <label>RECLAMACION</label>
+            </value>
+            <value>
+                <fullName>REASON REPLAN</fullName>
+                <default>false</default>
+                <label>REASON REPLAN</label>
+            </value>
+            <value>
+                <fullName>REASON RESTART</fullName>
+                <default>false</default>
+                <label>REASON RESTART</label>
+            </value>
+            <value>
+                <fullName>REASON REJECTED</fullName>
+                <default>false</default>
+                <label>REASON REJECTED</label>
+            </value>
+            <value>
+                <fullName>REASON REJECTING</fullName>
+                <default>false</default>
+                <label>REASON REJECTING</label>
+            </value>
+            <value>
+                <fullName>REASON REASSIGN</fullName>
+                <default>false</default>
+                <label>REASON REASSIGN</label>
+            </value>
+            <value>
+                <fullName>REASON PENDING</fullName>
+                <default>false</default>
+                <label>REASON PENDING</label>
+            </value>
+            <value>
+                <fullName>NOTAGEO</fullName>
+                <default>false</default>
+                <label>NOTAGEO</label>
+            </value>
+            <value>
+                <fullName>MENSAJEVRU</fullName>
+                <default>false</default>
+                <label>MENSAJEVRU</label>
+            </value>
+            <value>
+                <fullName>CLIENTNOTE</fullName>
+                <default>false</default>
+                <label>CLIENTNOTE</label>
+            </value>
+            <value>
+                <fullName>ACTEVENTO</fullName>
+                <default>false</default>
+                <label>ACTEVENTO</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

@@ -13,7 +13,7 @@ public with sharing class OS_Detector_Idioma
         List<CC_TrazaInt__c> oListTrazas = new List<CC_TrazaInt__c>();
         //recuperamos la info del caso
         List<Case> listCase = new List<Case>();
-        listCase = [select id, Description,ContactId,Contact.CC_Idioma__c,Contact.Account.AV_Idioma__c, CC_Canal_Procedencia__c from Case where id in:casoId];
+        listCase = [select id, Casenumber, Description,ContactId,Contact.CC_Idioma__c,Contact.Account.AV_Idioma__c, CC_Canal_Procedencia__c from Case where id in:casoId];
         for(Case caso:listCase)
         {
             string cuerpoAnalisis;
@@ -33,7 +33,6 @@ public with sharing class OS_Detector_Idioma
             
             
             cuerpoAnalisis=cuerpoAnalisis.replaceAll('\r\n|\n|\r',' ');
-            CC_InterfaceSettings__mdt oConfig = getConfigDETIDI ('OS_DETIDI');
             OS_DETIDI__mdt paramDETIDI = getParamtersDETIDI();
 
             CC_TrazaInt__c oTraza;
@@ -44,83 +43,85 @@ public with sharing class OS_Detector_Idioma
             String txtconfianza;
             Decimal confianza;
 
-            try{
-                if (oConfig != null){    
-                    // Incorporar los datos preconfigurados.
-                    if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
-                        oTraza = new CC_TrazaInt__c();
-                        oTraza.Name = 'DETIDI_Cops';
-                        oTraza.CC_FechaInicio__c = datetime.now();
-                    }
-                    Http http = new Http();
-                    HttpRequest request = new HttpRequest();
-                    request.setEndpoint(oConfig.CC_EndPoint__c );
-                    request.setMethod('POST');
-                    request.setHeader('Content-Type', 'application/json;charset=UTF-8');
-                    request.setClientCertificateName(oConfig.CC_Certificado__c);
-                    request.setBody('{"text":"' + cuerpoAnalisis + '"}');
-                    HttpResponse response = http.send(request);
-                    if (oConfig != null){
-                        if (oConfig.CC_TrazaEntrada__c){
-                            oTraza.CC_MensajeEntrada__c = String.valueOf(request);
-                        }
-                    }
+            String intSetting = 'OS_DETIDI';
 
-                    if (response.getStatusCode() == 200) {
-                        Object results = (Object) JSON.deserializeUntyped(response.getBody());
-                        Map<String, Object> agencymap = (Map<String, Object>)results;
-                        txtconfianza=(String)agencymap.get((String)agencymap.get('language'));
-                        confianza=Decimal.valueOf(txtconfianza.replaceAll('[^.\\d]',''));
-                        
-                        if (confianza>paramDETIDI.OS_Sensibilidad__c) {
-                            idioma=(String)agencymap.get('language');
-                            if(idioma=='cat')
-                            {
-                                idioma='ca';
-                            }
-                            if(idioma=='esp')
-                            {
-                                idioma='es';
-                            }
-                            if(idioma=='eng')
-                            {
-                                idioma='en';
-                            }
-                        }                        
-                        
-                    }else {
-                        sDescError = 'Error comunicaciones.';
-                        sDetalleError = response.getStatusCode() + ':' + response.getBody();
-                    }
-            }
+            try{
+
+                oTraza = new CC_TrazaInt__c();
+                oTraza.Name = 'DETIDI_Cops';
+                oTraza.CC_FechaInicio__c = datetime.now();
+                oTraza.CC_Identificador__c = caso.Casenumber;
+
+                // Crear HEADER 
+                Map<String,string> mHeaders =  new  Map<String,string>();  
+                mHeaders.put('Content-Type', 'application/json;charset=UTF-8'); 
+
+                CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
+                requestWrp.body = '{"text":"' + cuerpoAnalisis + '"}';
+                requestWrp.intSetting = intSetting;
+                requestWrp.method = 'POST';
+                requestWrp.mHeaders = mHeaders;
+                requestWrp.mUriParams = null;
+                requestWrp.mQueryParams = null;
+
+                HttpRequest request = CBK_HttpServiceIntegration.getRequest(requestWrp);
+
+                HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, intSetting, intSetting);
+
+                oTraza = new CC_TrazaInt__c();
+                oTraza.Name = 'DETIDI_Cops';
+                oTraza.CC_FechaInicio__c = datetime.now();
+                oTraza.CC_MensajeEntrada__c = String.valueOf(request);
+                oTraza.CBK_Body__c = requestWrp.body;
+
+
+                if (response.getStatusCode() == 200) {
+                    oTraza.CC_MensajeSalida__c = response.getBody();
+                    Object results = (Object) JSON.deserializeUntyped(response.getBody());
+                    Map<String, Object> agencymap = (Map<String, Object>)results;
+                    txtconfianza=(String)agencymap.get((String)agencymap.get('language'));
+                    confianza=Decimal.valueOf(txtconfianza.replaceAll('[^.\\d]',''));
+                    
+                    if (confianza>paramDETIDI.OS_Sensibilidad__c) {
+                        idioma=(String)agencymap.get('language');
+                        if(idioma=='cat')
+                        {
+                            idioma='ca';
+                        }
+                        if(idioma=='esp')
+                        {
+                            idioma='es';
+                        }
+                        if(idioma=='eng')
+                        {
+                            idioma='en';
+                        }
+                    }                        
+                    
+                }else {
+                    sDescError = 'Error comunicaciones.';
+                    sDetalleError = response.getStatusCode() + ':' + response.getBody();
+                }
             }catch(Exception e) {
                 // Error comunicaciones.
                 sDescError = 'Error comunicaciones.';
                 sDetalleError = e.getMessage();
             }
             
-            // Finalizar traza.
-                if (oConfig != null){
-                    if ((oConfig.CC_TrazaActiva__c || Test.isRunningTest()) && oTraza != null){
-                        oTraza.CC_FechaFin__c = datetime.now();
-                        // No hay mensaje de salida. Solo devuelve 200 - OK.
+            oTraza.CC_FechaFin__c = datetime.now();
+            // No hay mensaje de salida. Solo devuelve 200 - OK.
+            if (sDescError != ''){
+                oTraza.CC_FinOK__c = false;
+                oTraza.CC_TipoError__c = sDescError;
+                oTraza.CC_DetalleError__c = sDetalleError;
+            }else{
+                oTraza.CC_FinOK__c = true;
+            }
 
-                        if (sDescError != ''){
-                            oTraza.CC_FinOK__c = false;
-                            oTraza.CC_TipoError__c = sDescError;
-                            oTraza.CC_DetalleError__c = sDetalleError;
-                        }else{
-                            oTraza.CC_FinOK__c = true;
-                        }
-                    }
-                }
-                
-                if (oTraza != null){
-                    oListTrazas.add(oTraza);
-                }
-               
-                //return idioma;      
-            //string idioma = getIdiomaCuerpo(listCase[0].Description.substring(0, 15));
+            if (oTraza != null){
+                oListTrazas.add(oTraza);
+            } 
+
             if(idioma!='no confiable')
             {
                 caso.CC_Idioma__c=idioma;
@@ -138,7 +139,6 @@ public with sharing class OS_Detector_Idioma
         if(!listCase.isEmpty())
         {
             update listCase;
-
         }
         
         if(isAcuse)
@@ -146,7 +146,6 @@ public with sharing class OS_Detector_Idioma
            
             OS_Acuse_Recibo.enviarAcuse(listCase[0], fromAddress, buzon, nombreBuzon, eBody);   
         } 
-    
     }
     
     static private OS_DETIDI__mdt getParamtersDETIDI()
@@ -158,27 +157,4 @@ public with sharing class OS_Detector_Idioma
         }
         return parameter;
     }
-    static private CC_InterfaceSettings__mdt getConfigDETIDI (String sInterfaz){
-        if (sInterfaz == null){
-            return null;
-        }
-
-        if (sInterfaz == ''){
-            return null;
-        }
-
-        CC_InterfaceSettings__mdt oInterfaz;
-
-        List<CC_InterfaceSettings__mdt> oConfig = [SELECT Id, CC_EndPoint__c, CC_Certificado__c, CC_TrazaActiva__c, 
-                                                   CC_TrazaEntrada__c, CC_Activa__c
-                                                   FROM CC_InterfaceSettings__mdt 
-                                                   WHERE DeveloperName =: sInterfaz];
-        if (oConfig.size()==1){
-            if (oConfig[0] != null)
-                oInterfaz = oConfig[0];
-        }
-
-        return oInterfaz;
-    }
-   
 }

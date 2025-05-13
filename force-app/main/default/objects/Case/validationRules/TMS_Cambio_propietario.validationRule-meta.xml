@@ -12,6 +12,6 @@
 				NOT($Permission.TMS_CP_Admin) , 
 				ISCHANGED(OwnerId)
 			)
-				)</errorConditionFormula>
+			)</errorConditionFormula>
     <errorMessage>No es posible cambiar el propietario de un expediente.</errorMessage>
 </ValidationRule>

@@ -17,14 +17,16 @@ public with sharing class SPV_MilestoneComplementarias_Test {
        Test.startTest();
         User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
         usuarioAdmin.Username = 'useraadmin@test.com.testdata';
-        Database.insert(usuarioAdmin);
+        //Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
         User usuarioGeneral;
         System.runAs(usuarioAdmin){
             //Usuario SPV General
             usuarioGeneral = SPV_TestDataFactory.crearUsuarioSPVGeneral(1)[0];
             usuarioGeneral.Username = 'userageneral@test.com.testdata';
-            Database.insert(usuarioGeneral);
+            //Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
         }
 
 
@@ -34,19 +36,21 @@ public with sharing class SPV_MilestoneComplementarias_Test {
         camposPret.put('Origin', 'Backoffice');
     
         Case casoPretension = SPV_TestDataFactory.crearCaso('Pretension', camposPret);
-        Database.insert(casoPretension);
+        //Database.insert(casoPretension);
+        SAC_DatabaseDML.insertDML(casoPretension, false);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
         camposRecl.put('Subject', 'TestRec');
         camposRecl.put('Origin', 'Backoffice');
-        camposRecl.put('Status', 'SAC_002');
-        camposRecl.put('SEG_Subestado__c', 'Analisis');
+        camposRecl.put('Status', 'SPV_AnalisisDecision');
+        //camposRecl.put('SEG_Subestado__c', 'Analisis');
         camposRecl.put('SPV_EscaladoAJ__c', true);
         camposRecl.put('SAC_PretensionPrincipal__c', casoPretension.id);
     
         Case casoReclamacion = SPV_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-        Database.insert(casoReclamacion);  
+        //Database.insert(casoReclamacion);  
+        SAC_DatabaseDML.insertDML(casoReclamacion, false);
     }
 
     @istest

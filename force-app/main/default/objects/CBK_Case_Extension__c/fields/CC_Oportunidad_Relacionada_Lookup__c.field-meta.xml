@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Oportunidad_Relacionada_Lookup__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Oportunidad creada a partir de operativa derivar desde un caso</description>
+    <label>Oportunidad relacionada</label>
+    <referenceTo>Opportunity</referenceTo>
+    <relationshipLabel>Cases Extension</relationshipLabel>
+    <relationshipName>Opportunity_Lookup</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

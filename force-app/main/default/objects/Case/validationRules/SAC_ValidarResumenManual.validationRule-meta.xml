@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ValidarResumenManual</fullName>
+    <active>true</active>
+    <description>Validará que el campo Resumen de la reclamación esté completo cuando se produzca el cambio de estado de Alta a Análisis</description>
+    <errorConditionFormula>AND(
+AND(
+!$Permission.CBK_BypassValidationRules,
+!$Permission.SAC_BypassValidationRules
+),
+$UserRole.DeveloperName = &apos;SAC_General&apos;,
+RecordType.DeveloperName = &apos;SAC_Reclamacion&apos;,
+ISPICKVAL(Status, &apos;SAC_002&apos;),
+SAC_CheckResumen__c == false,
+ISPICKVAL(PRIORVALUE(Status), &apos;SAC_001&apos;)
+)</errorConditionFormula>
+    <errorMessage>El campo Resumen debe estar completo para pasar a Análisis. Recuerde completarlo en todas las pretensiones.</errorMessage>
+</ValidationRule>

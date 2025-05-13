@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SIREC__SIREC_fld_tipoContrato__c</fullName>
     <deprecated>false</deprecated>
+    <description>Producto que aparece en las listas de Contrato ( PRS,CCR,…)</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Tipo de producto</label>

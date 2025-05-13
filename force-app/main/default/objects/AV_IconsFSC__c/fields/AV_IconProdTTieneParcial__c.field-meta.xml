@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_IconProdTTieneParcial__c</fullName>
+    <description>icono prod tiene parcial</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>IconProdTTieneParcial</label>

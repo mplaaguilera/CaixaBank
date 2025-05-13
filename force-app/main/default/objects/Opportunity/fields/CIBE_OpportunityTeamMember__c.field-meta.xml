@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_OpportunityTeamMember__c</fullName>
-    <formula>IF(CONTAINS( CIBE_OpportunityTeam__c  , $User.Id ), true, false)</formula>
+    <formula>IF(
+	CONTAINS( 
+		CIBE_OpportunityTeam__c  , $User.Id )  ||   OwnerId = $User.Id,
+		true, false
+	)</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Is a member of the opportunity team</label>
     <trackHistory>false</trackHistory>

@@ -10,8 +10,8 @@
 												),
 				AND(
 								$UserRole.Name = &apos;Testamentarías&apos;,
-								NOT($Permission.TMS_CP_Admin) ,
-								ISCHANGED(Status)
+NOT($Permission.TMS_CP_Admin) ,
+ISCHANGED(Status)  
 				)
 )</errorConditionFormula>
     <errorMessage>No es posible cambiar el estado de un expediente.</errorMessage>

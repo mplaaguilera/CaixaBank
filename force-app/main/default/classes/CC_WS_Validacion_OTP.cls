@@ -7,7 +7,16 @@ public with sharing class CC_WS_Validacion_OTP {
 		List<CC_Comunicaciones__c> autenticaciones = [SELECT CC_Case__c, CC_Case__r.Account.CC_NumPerso__c, //Name, CC_Case__r.CC_NumPerso__c
 														CSBD_Opportunity__c, CSBD_Opportunity__r.Account.CC_NumPerso__c,
 														CC_Ticket__c, CC_Codigo_OTPSMS__c, CC_Intentos_Validacion_OTP__c,
-														CC_Resultado_Validacion__c, CC_Fecha_Validacion__c, CC_Codigo_Error__c
+														CC_Resultado_Validacion__c, CC_Fecha_Validacion__c, CC_Codigo_Error__c, CC_Case__r.Account.RecordType.DeveloperName,
+														CC_Case__r.Account.AV_Segmento__c,
+														CC_Case__r.Account.AV_NumPerso__c,
+														CC_Case__r.Contact.RecordType.DeveloperName,
+														CC_Case__r.Contact.CIBE_NumPerso__c,
+														CC_Case__r.Contact.AV_NumPerso__c,
+														CC_Case__r.Contact.CC_NumPerso__c,
+														CC_Case__r.CC_Representante__c,
+														CC_Case__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c,
+														CC_Case__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c
 														FROM CC_Comunicaciones__c WHERE Id IN :idAutenticaciones];
 
 		CC_InterfaceSettings__mdt cfgIntegracion = CC_MetodosUtiles.getInterfazConfigBody('CC_Validacion_OTP');
@@ -21,15 +30,26 @@ public with sharing class CC_WS_Validacion_OTP {
 
 				Id recordId = autenticacion.CC_Case__c ?? autenticacion.CSBD_Opportunity__c;
 				String tipoObjeto = recordId.getSObjectType().getDescribe().getName();
-				String numperso = autenticacion.CC_Case__r.Account.CC_NumPerso__c ?? autenticacion.CSBD_Opportunity__r.Account.CC_NumPerso__c;
+				String numper;
 
-				if (String.isBlank(numperso)) { //Sin NUMPERSO informado
+				if (tipoObjeto == 'Case' && autenticacion.CC_Case__c != null) {
+					Map<Id, String> idToNumPersoMap = CC_MetodosUtiles.recuperarNumpersoPorComunicaciones(autenticaciones);
+					numper = idToNumPersoMap.get(autenticacion.Id);
+						
+				} else {
+						// Si no es un caso, usar el numper directamente de la autenticación
+						numper = autenticacion.CC_Case__r.Account.CC_NumPerso__c ?? autenticacion.CSBD_Opportunity__r.Account.CC_NumPerso__c;
+				}
+
+				// if (String.isBlank(numperso)) { //Sin NUMPERSO informado
+				if (String.isBlank(numper)) { //Sin NUMPERSO informado
 					traza.CC_FinOK__c = false;
 					traza.CC_TipoError__c = 'Datos entrada no informados.';
 					traza.CC_DetalleError__c = 'NUMPERSO no informado. Comunicación: ' + autenticacion.Id;
 				} else {
 					try {
-						String requestBody = getRequestBody(cfgIntegracion, autenticacion, numperso, codigoOtp);
+						// String requestBody = getRequestBody(cfgIntegracion, autenticacion, numperso, codigoOtp);
+						String requestBody = getRequestBody(cfgIntegracion, autenticacion, numper, codigoOtp);
 						if (cfgIntegracion.CC_TrazaEntrada__c || Test.isRunningTest()) {
 							traza.CC_MensajeEntrada__c = requestBody;
 						}
@@ -38,7 +58,7 @@ public with sharing class CC_WS_Validacion_OTP {
 						HttpResponse httpResponse = new Http().send(getRequest(cfgIntegracion, requestBody));
 						traza.CC_FechaFin__c = Datetime.now();
 
-						httpResponse.setStatusCode(500); //Comentar ////////////////////////////////////////////////////////
+						// httpResponse.setStatusCode(200); //Comentar ////////////////////////////////////////////////////////
 
 						Boolean responseOk = httpResponse.getStatusCode() == 200;
 						traza.CC_FinOK__c = responseOk;
@@ -94,13 +114,15 @@ public with sharing class CC_WS_Validacion_OTP {
 		return autenticaciones;
 	}
 
-	private static String getRequestBody(CC_InterfaceSettings__mdt cfgIntegracion, CC_Comunicaciones__c autenticacion, String numperso, String codigoOtp) {
+	// private static String getRequestBody(CC_InterfaceSettings__mdt cfgIntegracion, CC_Comunicaciones__c autenticacion, String numperso, String codigoOtp) {
+	private static String getRequestBody(CC_InterfaceSettings__mdt cfgIntegracion, CC_Comunicaciones__c autenticacion, String numper, String codigoOtp) {
 		String requestBody = cfgIntegracion.CC_Body__c;
 		requestBody = requestBody.replace('##dateTime##', getTimestamp());
 		requestBody = requestBody.replace('##ticket##', autenticacion.CC_Ticket__c);
-		// requestBody = requestBody.replace('##ticket##', '0BCC00000353000'); //Comentar ////////////////////////////////////////////////////////
+		//requestBody = requestBody.replace('##ticket##', '0BCC00000353000'); //Comentar ////////////////////////////////////////////////////////
 		requestBody = requestBody.replace('##otpEncrypt##', codigoOtp); //autenticacion.CC_Codigo_OTPSMS__c);
-		requestBody = requestBody.replace('##personId##', numperso);
+		// requestBody = requestBody.replace('##personId##', numperso);
+		requestBody = requestBody.replace('##personId##', numper);
 		return requestBody;
 	}
 

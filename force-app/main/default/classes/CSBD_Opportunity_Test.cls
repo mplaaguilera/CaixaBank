@@ -527,13 +527,13 @@ public class CSBD_Opportunity_Test {
         System.runAs (usuarioGestor) {
             //Alta de las parametrizaciones que necesita el trigger BI de oportunidades
             CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
-            listaValores.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+            listaValores.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
             listaValores.Name = 'CSBD: Días cierre oportunidad por defecto';
             listaValores.CC_Activa__c = true;
             insert listaValores;
 
             CC_Lista_Valores__c valor = new CC_Lista_Valores__c();
-            valor.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            valor.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
             valor.CC_Lista__c = listaValores.Id;
             valor.Name = 'TPV';
             valor.CC_Valor__c = '5';
@@ -663,11 +663,11 @@ public class CSBD_Opportunity_Test {
                 Subject = 'Finalizar cita Oliver',
                 OwnerId = usuarioGestor.Id,
                 AV_ExternalID__c = String.valueof((Math.random() * 10000000)),
-                RecordTypeId = Schema.getGlobalDescribe().get('Event').getDescribe().getRecordTypeInfosByDeveloperName().get('CSBD_Cita_Cliente').getRecordTypeId(),
+                RecordTypeId = Schema.SObjectType.Event.getRecordTypeInfosByDeveloperName().get('CSBD_Cita_Cliente').getRecordTypeId(),
                 EndDateTime = System.now().addMinutes(60),
-                DurationInMinutes= null,
-                ActivityDateTime = System.today(),
-                StartDateTime = System.today(),
+                // DurationInMinutes= null,
+                ActivityDateTime = System.now(),
+                StartDateTime = System.now(),
                 WhatId = oportunidad.id,
                 CSBD_Evento_Estado__c = 'Pendiente'
             );
@@ -697,11 +697,10 @@ public class CSBD_Opportunity_Test {
                 Subject = 'Finalizar cita Oliver2',
                 OwnerId = usuarioGestor.Id,
                 AV_ExternalID__c = String.valueof((Math.random() * 10000000)),
-                RecordTypeId = Schema.getGlobalDescribe().get('Event').getDescribe().getRecordTypeInfosByDeveloperName().get('CSBD_Cita_Cliente').getRecordTypeId(),
+                RecordTypeId = Schema.SObjectType.Event.getRecordTypeInfosByDeveloperName().get('CSBD_Cita_Cliente').getRecordTypeId(),
                 EndDateTime = System.now().addMinutes(60),
-                DurationInMinutes= null,
-                ActivityDateTime = System.today(),
-                StartDateTime = System.today(),
+                // DurationInMinutes= null,
+                StartDateTime = System.now(),
                 WhatId = oportunidad2.id,
                 CSBD_Evento_Estado__c = 'Pendiente'
             );
@@ -746,11 +745,10 @@ public class CSBD_Opportunity_Test {
                 Subject = 'Finalizar cita Oliver2',
                 OwnerId = usuarioGestor.Id,
                 AV_ExternalID__c = String.valueof((Math.random() * 10000000)),
-                RecordTypeId = Schema.getGlobalDescribe().get('Event').getDescribe().getRecordTypeInfosByDeveloperName().get('CSBD_Cita_Cliente').getRecordTypeId(),
+                RecordTypeId = Schema.SObjectType.Event.getRecordTypeInfosByDeveloperName().get('CSBD_Cita_Cliente').getRecordTypeId(),
                 EndDateTime = System.now().addMinutes(60),
-                DurationInMinutes= null,
-                ActivityDateTime = System.today(),
-                StartDateTime = System.today(),
+                // DurationInMinutes= null,
+                StartDateTime = System.now(),
                 WhatId = oportunidad.id,
                 CSBD_Evento_Estado__c = 'Pendiente'
             );

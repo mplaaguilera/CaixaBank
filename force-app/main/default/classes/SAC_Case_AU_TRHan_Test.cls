@@ -27,7 +27,7 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         User usuarioGeneral;
         User usuarioGeneral2;
         User usuarioAdmin;
-
+        
         System.runAs(new User(Id = Userinfo.getUserId())) {
 
             //Usuario SAC General
@@ -45,13 +45,13 @@ public with sharing class SAC_Case_AU_TRHan_Test {
             SAC_DatabaseDML.insertDML(usuarioAdmin, false);
             //Database.insert(usuarioAdmin);
 
+            List<PermissionSetAssignment> psa = new List<PermissionSetAssignment>();
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            SAC_DatabaseDML.insertDML(permiSetAssi, false);
+            psa.add(permiSetAssi);
             //Database.insert(permiSetAssi);
-
             SetupEntityAccess sea = new SetupEntityAccess();
             sea.ParentId = permiSet.Id;
             sea.SetupEntityId = [SELECT Id FROM CustomPermission WHERE DeveloperName = 'SAC_ByPass'].Id;
@@ -62,17 +62,18 @@ public with sharing class SAC_Case_AU_TRHan_Test {
             PermissionSetAssignment permiSetAssi2 = new PermissionSetAssignment();
             permiSetAssi2.AssigneeId = usuarioAdmin.Id;
             permiSetAssi2.PermissionSetId = permiSet2.Id;
-            SAC_DatabaseDML.insertDML(permiSetAssi2, false);
+            psa.add(permiSetAssi2);
             //Database.insert(permiSetAssi2);
 
             PermissionSet permiSet3 = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi3 = new PermissionSetAssignment();
             permiSetAssi3.AssigneeId = usuarioGeneral2.Id;
             permiSetAssi3.PermissionSetId = permiSet3.Id;
-            SAC_DatabaseDML.insertDML(permiSetAssi3, false);
+            psa.add(permiSetAssi3);
+            SAC_DatabaseDML.insertListDML(psa, false);
             //Database.insert(permiSetAssi3);
         }
-
+        Test.startTest();
         //Cuentas
         List<Account> cuentas = SAC_TestDataFactory.crearCuentas(2);
         cuentas[0].name = 'cuentaTest';
@@ -103,8 +104,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         SAC_DatabaseDML.insertDML(mccDetalle, false);
         //Database.insert(mccDetalle);
 		
-
-        Test.startTest();
+        
+       
         List<Case> listaReclamaciones = new List<Case>();
 
         //Reclamacion
@@ -182,7 +183,6 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
         //Database.insert(listaReclamaciones);
 
-
         List<Case> listaPretensiones = new List<Case>();
 
         //Pretension
@@ -216,7 +216,7 @@ public with sharing class SAC_Case_AU_TRHan_Test {
 
         SAC_DatabaseDML.insertListDML(listaPretensiones, false);
         //Database.insert(listaPretensiones);  
-		Test.stopTest();
+		
 
         SAC_CaseReclamante__c reclamantePrin = SAC_TestDataFactory.crearReclamante(true, casoReclamacion, cuentas[0].id);
         SAC_DatabaseDML.insertDML(reclamantePrin, false);
@@ -227,6 +227,8 @@ public with sharing class SAC_Case_AU_TRHan_Test {
         SAC_DatabaseDML.updateDML(casoReclamacion, false);
         //Database.update(casoReclamacion);
         }
+
+        Test.stopTest();
     }
 
     @isTest

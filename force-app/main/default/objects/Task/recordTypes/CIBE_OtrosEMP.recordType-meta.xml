@@ -20,6 +20,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>AV_ContactGenerateAppointment__c</picklist>
+        <values>
+            <fullName>Cita generada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin cita</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>AV_InOutbound__c</picklist>
         <values>
             <fullName>Entrada</fullName>
@@ -86,6 +97,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>COTF</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>EC</fullName>
             <default>false</default>
         </values>
@@ -94,7 +109,7 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>LT</fullName>
+            <fullName>LMD</fullName>
             <default>false</default>
         </values>
         <values>
@@ -110,25 +125,6 @@
         <picklist>CSBD_Evento_Estado__c</picklist>
         <values>
             <fullName>Pendiente</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
-        <picklist>FinServ__Regarding__c</picklist>
-        <values>
-            <fullName>Client Retention</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Onboarding</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Prospecting</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Service</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -265,23 +261,11 @@
     <picklistValues>
         <picklist>Status</picklist>
         <values>
-            <fullName>Completed</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Desactivada</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Gestionada negativa</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Gestionada positiva</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Gestionado no localizado</fullName>
             <default>false</default>
         </values>
         <values>
@@ -291,14 +275,6 @@
         <values>
             <fullName>Open</fullName>
             <default>true</default>
-        </values>
-        <values>
-            <fullName>Pendiente no localizado</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Rechazada</fullName>
-            <default>false</default>
         </values>
     </picklistValues>
     <picklistValues>

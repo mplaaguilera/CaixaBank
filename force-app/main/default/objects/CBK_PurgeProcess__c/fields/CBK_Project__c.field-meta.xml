@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Project__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <description>Proyecto al que pertenece el borrado creado</description>
+    <label>Project</label>
+    <referenceTo>copado__Project__c</referenceTo>
+    <relationshipLabel>Purge Processes</relationshipLabel>
+    <relationshipName>Purge_Processes</relationshipName>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

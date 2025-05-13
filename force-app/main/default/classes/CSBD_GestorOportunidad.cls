@@ -6,7 +6,7 @@ public inherited sharing class CSBD_GestorOportunidad {
         List<Opportunity> oportunidades = [SELECT Name, CSBD_Empresa_Proveedora__c, CSBD_Idioma_Solicitud__c,
                                             RecordTypeId, CSBD_Turno_Contacto__c, CSBD_Familia_Producto__c,
                                             CSBD_Skill__c, CSBD_Horario_Contacto__c, CSBD_Alta_omnichannel__c,
-                                            CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c, RecordType.Name
+                                            CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c, RecordType.Name, CSBD_Producto__c
                                             FROM Opportunity WHERE Id = :oportunidadId];
         activarGestorOportunidad(oportunidades, new Set<Id>{oportunidadId}, '');
     }
@@ -147,7 +147,10 @@ public inherited sharing class CSBD_GestorOportunidad {
             '8' => '3', '9' => '3', '10' => '3', '11' => '3', '12' => '3', '13' => '3'
         };
 
-        gestorOportunidad.Name = oportunidad.Name;
+        gestorOportunidad.Name = oportunidad.Name + ' ' + (oportunidad.CSBD_Producto__c ?? '');
+        // if (oportunidad.CSBD_Producto__c != null) {
+        //     gestorOportunidad.Name += ' - ' + oportunidad.CSBD_Producto__c;
+        // }
         gestorOportunidad.CSBD_Oportunidad__c = oportunidad.Id;
         gestorOportunidad.CSBD_Empresa_proveedora__c = oportunidad.CSBD_Empresa_Proveedora__c;
         gestorOportunidad.CSBD_Idioma__c = oportunidad.CSBD_Idioma_Solicitud__c;

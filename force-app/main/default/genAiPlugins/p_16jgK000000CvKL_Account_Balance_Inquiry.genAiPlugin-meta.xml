@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Use this topic when customers want to check their account balances.</description>
+    <developerName>p_16jgK000000CvKL_Account_Balance_Inquiry</developerName>
+    <genAiFunctions>
+        <functionName>EmployeeCopilot__AnswerQuestionsWithKnowledge</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description>If the query is about checking account balance, use EmployeeCopilot__AnswerQuestionsWithKnowledge.</description>
+        <developerName>instruction_ifthequery0</developerName>
+        <language>en_US</language>
+        <masterLabel>instruction_ifthequery0</masterLabel>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <masterLabel>Account Balance Inquiry</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope>This action requires a previous secure authentication. Your job is to only provide customers with their current account balance information. You aren&apos;t able to perform transactions or update account details.</scope>
+</GenAiPlugin>

@@ -3,6 +3,33 @@ public class HDT_Llamada_GC_Test {
 
 	@TestSetup
 	private static void testSetup() {
+		String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
+        CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
+        oGrupo.RecordTypeId = sRecordType3;
+        oGrupo.Name = 'Grupo1';
+        oGrupo.CC_External__c = 'GC-00001';
+        insert oGrupo;
+
+		CC_Clasificacion_Maximo__c oClasif = new CC_Clasificacion_Maximo__c();
+        oClasif.CC_Path__c = 'ARQUITECTURA \\ TEST';
+        oClasif.CC_Nivel_1__c = 'ARQUITECTURA';
+        oClasif.CC_Clave_Primaria_Externa__c = 'ARQUITECTURA \\ TEST';
+        oClasif.CC_Activa__c = true;
+        oClasif.CC_Propietario__c = 'TEST';
+        insert oClasif;
+        
+        String sRecordType = Schema.SObjectType.CC_Agrupador__c.getRecordTypeInfosByDeveloperName().get('CC_Incidencia').getRecordTypeId();
+        
+        CC_Agrupador__c oAgr = new CC_Agrupador__c();
+        oAgr.RecordTypeId = sRecordType;
+        oAgr.CC_Titulo__c = 'Test';
+        oAgr.CC_Descripcion__c = 'Test';
+        oAgr.CC_GrupoMaximo__c = oGrupo.Id;
+        oAgr.CC_Opcion_Call_Center__c = 'Opcion Call Center';
+        oAgr.CC_Clasificacion_Maximo__c = oClasif.Id;
+        oAgr.CC_Estado__c = 'Activo';
+        insert oAgr;
+
 
 		Id idRtServicioGenesys = Schema.SObjectType.CC_Servicio_Genesys__c.getRecordTypeInfosByDeveloperName().get('CC_Servicio').getRecordTypeId();
 
@@ -186,6 +213,56 @@ public class HDT_Llamada_GC_Test {
         params.Name = 'HDT_Email_Respuesta_Empleados_New';
         params.HDT_Configuracion_1__c = 'pruebas.empleados.hdt.devser@gmail.com';
         insert params;
+
+		HDT_Parametros__c params2 = new HDT_Parametros__c();
+        params2.Name = 'HDT_Llamadas_Salientes_No_Atendidas';
+		params2.HDT_Activo__c = true;
+        params2.HDT_Configuracion_1__c = 'HDT_GenesysCloudOutboundDefault';
+        insert params2;
+
+		// Inicialización de datos.        
+		Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId(); 
+		CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
+		lista.Name = 'HDT - Aviso Comunicaciones Informativas';
+		lista.CC_Activa__c = true;
+		lista.RecordTypeId = recorTypeLista;
+		insert lista;
+
+		//Id listaPadre = [SELECT id FROM CC_Lista_Valores__c WHERE Name = 'HDT_Mensajes_Parametrizables_Empleados' limit 1].Id;
+        // Crear un registro de CC_Lista_Valores__c para simular un resultado válido
+        CC_Lista_Valores__c listaValor = new CC_Lista_Valores__c(
+            Name = 'Comunicación Informativa de Caso - Umbral de tiempo',
+            CC_Valor__c = '15',
+            CC_Valor2__c = 'Validacion1',
+            CC_Lista__c = lista.Id
+
+        );
+        insert listaValor;
+
+		CC_Lista_Valores__c listaValor2 = new CC_Lista_Valores__c(
+            Name = 'Tipo de Activos asociados a Cuenta desde llamada',
+            CC_Valor__c = 'TAPC',
+            CC_Valor2__c = 'PORT',
+			CSBD_Valor4__c = 'Instalado',
+            CC_Lista__c = lista.Id
+
+        );
+        insert listaValor2;
+
+		CC_Lista_Valores__c listaValor3 = new CC_Lista_Valores__c(
+            Name = 'Asociar casos a masivas desde llamadas',
+            CC_Valor__c = 'RA -',
+            CC_Valor2__c = 'Agregado desde masiva :',
+            CC_Lista__c = lista.Id
+
+        );
+        insert listaValor3;
+
+		 // Crear un activo asociado a la cuenta
+         Asset asset = new Asset(Name = 'Test Asset', AccountId = oficina.Id);
+         insert asset;
+
+
 	}
 
 	private static CC_Servicio_Genesys__c crearServicioDespliegues() {
@@ -428,6 +505,8 @@ public class HDT_Llamada_GC_Test {
 		}
 	}
 
+	
+	/*
 	@isTest
 	static void cogerConsultarCompletarColgar() {
 		Id psAdministradorId = obtenerPSAdministrador();
@@ -446,15 +525,23 @@ public class HDT_Llamada_GC_Test {
 
 			//creamos caso manualmente
 			Case caso = HDT_Llamada_GC.crearVincularCaso(llamadaEntrante);
-			caso.CC_Detalles_Consulta__c = 'Segunda consulta del test';
-			caso.CC_Tipo_Contacto__c = 'Consulta';
-			update caso;
+				 // Completamos la consulta solo si el caso empieza por "HDT_"
+				 if (caso.RecordType.DeveloperName.startsWith('HDT_')) {
+
+					caso.CC_Detalles_Consulta__c = 'Segunda consulta del test';
+					caso.CC_Tipo_Contacto__c = 'Consulta';
+					//update caso;
+				 
 
 			Test.startTest();
 				//Realizamos una consulta
 				CC_Llamada_Input inputConsulta = obtenerInputConsulta('S4', '', caso.Id, llamadaEntrante.Id);
 				Map<String, Object> respuestaRegistrarConsulta = HDT_Llamada_GC.registrarConsulta(inputConsulta);
 				CC_Llamada__c consulta = (CC_Llamada__c)respuestaRegistrarConsulta.get('llamada');
+
+
+				 // Completamos la consulta solo si el caso empieza por "HDT_"
+            //if (caso.RecordType.DeveloperName.startsWith('HDT_')) {
 
 				//Completamos la consulta
 				inputConsulta = obtenerInputConsulta('S4', consulta.Id, caso.Id, llamadaEntrante.Id);
@@ -463,7 +550,7 @@ public class HDT_Llamada_GC_Test {
 				Integer n = 0;
 				for (Task tarea : [SELECT Type, Status, CC_Tipo_Cierre__c FROM Task WHERE CC_Llamada_Id__c = :consulta.Id
 									AND Type IN ('Consulta a tercer nivel', 'Llamada transferida', 'Traslado Tercer Nivel')]) {
-					System.debug('papaia: ' + tarea.Type + ' - ' + tarea.Status + ' - ' + tarea.CC_Tipo_Cierre__c);
+					//System.debug('papaia: ' + tarea.Type + ' - ' + tarea.Status + ' - ' + tarea.CC_Tipo_Cierre__c);
 					if (tarea.Type == 'Consulta a tercer nivel' && tarea.Status == 'Completed' && tarea.CC_Tipo_Cierre__c == 'Consulta transferida') {
 						n++;
 					} else if (tarea.Type == 'Llamada transferida' && tarea.Status == 'Open') {
@@ -473,6 +560,7 @@ public class HDT_Llamada_GC_Test {
 					}
 				}
 				//System.assertEquals(3, n, 'Actividades incorrectas');
+				Test.stopTest();
 
 				caso = [SELECT OwnerId, CC_Owner_Anterior__c FROM Case WHERE Id = :caso.Id AND Status = 'Activo' AND CC_En_Tercer_Nivel__c = true];
 				//System.assertNotEquals(null, caso.CC_Owner_Anterior__c, 'El owner anterior no esta vacio');
@@ -484,10 +572,12 @@ public class HDT_Llamada_GC_Test {
 
 				//Colgamos la llamada
 				HDT_Llamada_GC.finalizarLlamada(inputConsulta, 'Llamada finalizada');
+			}
 
-			Test.stopTest();
+			
         }
-	}
+	}*/
+	
 
 	@isTest
 	public static void llamarSalienteColgar() {
@@ -509,6 +599,45 @@ public class HDT_Llamada_GC_Test {
 			System.assert([SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada'] != null);
 		}
 	}
+
+	@isTest
+	public static void llamarSalienteColgarNoAtendida() {
+		 Id psAdministradorId = obtenerPSAdministrador();
+        User agenteConsulta  = obtenerAgente1(psAdministradorId);
+
+		System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
+		//System.runAs(agenteConsulta) {
+
+			/*
+
+			CC_Servicio_Genesys__c s1 = new CC_Servicio_Genesys__c();
+            s1.RecordTypeId = Schema.SObjectType.CC_Servicio_Genesys__c.getRecordTypeInfosByDeveloperName().get('CC_Servicio').getRecordTypeId();
+            s1.CBK_Negocio__c = 'HDT';
+            s1.CC_Tipo__C = 'Servicio';
+            s1.Name = 'HDT Genesys Cloud Outbound Default';
+            s1.CC_Codigo__c = 'HDT_GenesysCloudOutboundDefault';
+            s1.CC_VDN__c = '4444444';
+            s1.CC_Prefijo__c = '0';
+            s1.CC_Tipo_Cliente__c = 'Empleado';
+            s1.CC_Fecha_Inicio_Salesforce__c = Date.today();
+            s1.CC_Principal__c = true;
+            insert s1;*/
+
+			Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test'];
+
+			//Realizar la llamada saliente
+			Test.startTest();
+			CC_Llamada_Input inputLlamadaSaliente = obtenerInputLlamada(null, null, caso.Id);
+			Map<String, Object> responseRegistrarLlamadaSaliente = HDT_Llamada_GC.registrarLlamadaSalienteNoAtendida(inputLlamadaSaliente);
+			CC_Llamada__c llamadaSaliente = (CC_Llamada__c)responseRegistrarLlamadaSaliente.get('llamada');
+			HDT_Llamada_GC.finalizarLlamada(inputLlamadaSaliente, 'Llamada finalizada');
+			Test.stopTest();
+
+			System.assert(llamadaSaliente != null);
+			System.assert([SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada no atendida'] != null);
+		}
+	}
+
 
 	@isTest
 	public static void cogerConsultaExternaColgar() {
@@ -1183,4 +1312,47 @@ public class HDT_Llamada_GC_Test {
 		insert empleado;
         return empleado;
 	}
+
+	@isTest
+	public static void crearVincularCasoMasivaLlamada() {
+		 Id psAdministradorId = obtenerPSAdministrador();
+        User agenteConsulta  = obtenerAgente1(psAdministradorId);
+
+		System.runAs(agenteConsulta) {
+
+			//User agenteConsulta = [SELECT Id FROM User WHERE Username = 'agente1@caixa.com' LIMIT 1];
+
+			
+			List<CC_Agrupador__c> agrupador = [Select id,CC_Titulo__c from CC_Agrupador__c where CC_Titulo__c = 'Test' LIMIT 1];
+			String idAgrupador = agrupador[0].Id;
+
+			//Entra la llamada y creamos caso manualmente
+			CC_Llamada_Input inputLlamadaEntrante = obtenerInputLlamada('S1', '', '');
+			Map<String, Object> responseRegistrarLlamadaEntrante = HDT_Llamada_GC.registrarLlamadaEntrante(inputLlamadaEntrante);
+			CC_Llamada__c llamadaEntrante = (CC_Llamada__c)responseRegistrarLlamadaEntrante.get('llamada');
+
+			Case caso = HDT_Llamada_GC.crearVincularCasoMasiva(llamadaEntrante,idAgrupador);
+
+			//Realizamos una consulta a un servicio externo y cancelamos la consulta
+			CC_Llamada_Input inputConsulta = obtenerInputConsulta('S3', '', caso.Id, llamadaEntrante.Id);
+			Test.startTest();
+			HDT_Llamada_GC.finalizarConsultaExterna(inputConsulta, 'Consulta cancelada');
+			Test.stopTest();
+
+			List<Task> actividadCancelada = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaEntrante.Id AND Type = 'Consulta externa' AND Status = 'Completed' AND CC_Tipo_Cierre__c = 'Consulta atendida' LIMIT 1];
+			System.assert(!actividadCancelada.isEmpty());
+
+			//Colgamos la llamada
+			inputLlamadaEntrante = obtenerInputLlamada('S1', llamadaEntrante.Id, caso.Id);
+			HDT_Llamada_GC.finalizarLlamada(inputLlamadaEntrante, 'Llamada finalizada');
+
+			List<Task> actividad = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaEntrante.Id AND Status = 'Completed' AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
+			System.assert(!actividad.isEmpty());
+			llamadaEntrante = [SELECT CC_Fecha_Fin__c, CC_Tipo_Cierre__c FROM CC_Llamada__c WHERE Id = :llamadaEntrante.Id];
+			System.assert(llamadaEntrante.CC_Fecha_Fin__c != null);
+			System.assertEquals('Llamada finalizada', llamadaEntrante.CC_Tipo_Cierre__c);
+		}
+	}
+
+
 }

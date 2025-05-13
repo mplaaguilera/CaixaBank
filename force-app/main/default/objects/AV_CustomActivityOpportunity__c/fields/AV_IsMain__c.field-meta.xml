@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_IsMain__c</fullName>
     <defaultValue>false</defaultValue>
+    <description>Campo para saber si la oportunidad es principal</description>
     <label>Principal</label>
     <trackTrending>false</trackTrending>
     <type>Checkbox</type>

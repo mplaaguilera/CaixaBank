@@ -3,7 +3,7 @@ public with sharing class SEG_Contact_BI_TRHan extends CC_TriggerHandlerBase {
         if((FeatureManagement.checkPermission('SEG_Operativo'))){
 
         List<Contact> newListSegmentos = new List<Contact>();
-        Id recordTypeContact = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        Id recordTypeContact = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         
         for (Contact contacto : (List<Contact>)tp.newList) {
 			if(contacto.RecordTypeId == recordTypeContact){

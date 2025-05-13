@@ -30,6 +30,7 @@
                     No eres miembro del equipo de 3N de CSBD.
                 </div>
             </aura:set>
+
         </aura:if>
     </div>
 

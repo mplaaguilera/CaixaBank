@@ -11,7 +11,7 @@ public class CC_Clasificacion_Casos_Controller_Test {
         Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
         Id roleCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center'].Id;
         Id profileAdmin = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
-
+        List<User> listaUsuarios = new List<User>();
         User usuarioAdmin = new User();
         usuarioAdmin.profileId = profileAdmin;
         usuarioAdmin.UserRoleId = roleCC;
@@ -26,31 +26,34 @@ public class CC_Clasificacion_Casos_Controller_Test {
         usuarioAdmin.EmailEncodingKey = 'UTF-8';
         usuarioAdmin.LanguageLocaleKey = 'es';
         usuarioAdmin.LocaleSidKey = 'es_ES';
-        insert usuarioAdmin;
+        listaUsuarios.add(usuarioAdmin);
+        User supervisor = new User();
+        supervisor.ProfileId = profileId;
+        supervisor.FirstName = 'Supervisor';
+        supervisor.LastName = 'last11';
+        supervisor.Email = 'tuser000@amamama.com';
+        supervisor.Phone = '+34 123456789';
+        supervisor.Username = 'tuser000@supervisor.com' + System.currentTimeMillis();
+        supervisor.CompanyName = 'MST';
+        supervisor.Title = 'title';
+        supervisor.Alias = 'alias';
+        supervisor.TimeZoneSidKey = 'Europe/Paris';
+        supervisor.EmailEncodingKey = 'UTF-8';
+        supervisor.LanguageLocaleKey = 'es';
+        supervisor.LocaleSidKey = 'es_ES';
+        supervisor.UserRoleId = roleCC;
+        listaUsuarios.add(supervisor);
+        insert listaUsuarios;
+        insert new List<PermissionSetAssignment> {
+             new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psOperador.Id),
+             new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psClasses.Id),
+             new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psSupervisor.Id),
+             new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psAutenticacion.Id)
+        };
+        
         
         System.runAs(usuarioAdmin) {
 
-            User supervisor = new User();
-            supervisor.ProfileId = profileId;
-            supervisor.FirstName = 'Supervisor';
-            supervisor.LastName = 'last11';
-            supervisor.Email = 'tuser000@amamama.com';
-            supervisor.Phone = '+34 123456789';
-            supervisor.Username = 'tuser000@supervisor.com' + System.currentTimeMillis();
-            supervisor.CompanyName = 'MST';
-            supervisor.Title = 'title';
-            supervisor.Alias = 'alias';
-            supervisor.TimeZoneSidKey = 'Europe/Paris';
-            supervisor.EmailEncodingKey = 'UTF-8';
-            supervisor.LanguageLocaleKey = 'es';
-            supervisor.LocaleSidKey = 'es_ES';
-            supervisor.UserRoleId = roleCC;
-            insert supervisor;
-            
-            insert new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psOperador.Id);
-            insert new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psClasses.Id);
-            insert new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psSupervisor.Id);
-            insert new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psAutenticacion.Id);
             //LISTA DE VALORES
             List<CC_Lista_Valores__c> lista = new List <CC_Lista_Valores__c>();
             List<CC_Lista_Valores__c> val = new List <CC_Lista_Valores__c>();
@@ -60,6 +63,13 @@ public class CC_Clasificacion_Casos_Controller_Test {
             a1.CC_Activa__c = true;
             a1.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
             lista.add(a1);
+
+            CC_Lista_Valores__c listaMensajes = new CC_Lista_Valores__c();
+            listaMensajes.Name = 'CC_Mensajes_Parametrizables_Clientes';
+            listaMensajes.CC_Activa__c = true;
+            listaMensajes.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
+            lista.add(listaMensajes);
+
             insert lista;
             
             
@@ -84,28 +94,40 @@ public class CC_Clasificacion_Casos_Controller_Test {
             a3.CC_Motivo_Relacionado__c = 'Bloquear producto / servicio';
             a3.CC_Solucion_Relacionada__c = 'Derivar a Asistencia tarjetas';
             val.add(a3);
-            insert val;
-            
+
             String recordTypeDeveloperName = 'CC_Comunicacion_Informativa';
             CC_Lista_Valores__c lovAvisosSobreAgrupadores = new CC_Lista_Valores__c();
             lovAvisosSobreAgrupadores.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
             lovAvisosSobreAgrupadores.CC_Activa__c = true;
             lovAvisosSobreAgrupadores.Name = 'Avisos sobre agrupadores';
-            insert lovAvisosSobreAgrupadores;
+            val.add(lovAvisosSobreAgrupadores);
+
             CC_Lista_Valores__c valorUmbralPrimerAviso = new CC_Lista_Valores__c();
             valorUmbralPrimerAviso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
             valorUmbralPrimerAviso.CC_Activa__c = true;
             valorUmbralPrimerAviso.CC_Lista__c = lovAvisosSobreAgrupadores.Id;
             valorUmbralPrimerAviso.Name = CC_MetodosUtiles.getRecordTypeNameFromDeveloperName('CC_Agrupador__c', recordTypeDeveloperName) + ' - Umbral primer aviso';
             valorUmbralPrimerAviso.CC_Valor__c = '2';
-            insert valorUmbralPrimerAviso;
+            val.add(valorUmbralPrimerAviso);
+
             CC_Lista_Valores__c valorUmbralSiguientesAvisos = new CC_Lista_Valores__c();
             valorUmbralSiguientesAvisos.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
             valorUmbralSiguientesAvisos.CC_Activa__c = true;
             valorUmbralSiguientesAvisos.CC_Lista__c = lovAvisosSobreAgrupadores.Id;
             valorUmbralSiguientesAvisos.Name = CC_MetodosUtiles.getRecordTypeNameFromDeveloperName('CC_Agrupador__c', recordTypeDeveloperName) + ' - Umbral siguientes avisos';
             valorUmbralSiguientesAvisos.CC_Valor__c = '50';
-            insert valorUmbralSiguientesAvisos;
+            val.add(valorUmbralSiguientesAvisos);
+
+            CC_Lista_Valores__c mensaje1 = new CC_Lista_Valores__c();
+            mensaje1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            mensaje1.CC_Activa__c = true;
+            mensaje1.CC_Lista__c = listaMensajes.Id;
+            mensaje1.Name = 'Mensaje';
+            mensaje1.CC_Valor__c = 'Prueba';
+            mensaje1.CC_Valor2__c = 'mensajePrueba';
+            val.add(mensaje1);
+
+            insert val;
             
             //LISTA DE CARACTERISTICAS
             List<CC_Caracteristica__c> listaCaracteristicas = new List<CC_Caracteristica__c>();
@@ -209,6 +231,8 @@ public class CC_Clasificacion_Casos_Controller_Test {
             mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
             mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
             mccMotivo.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente desiste';
+            mccMotivo.CC_Ambito_Tareas_Caixa__c = 'Oficina';
+            mccMotivo.CC_Ambito_Tareas_Imagin__c = 'Ventas';
             listaMotivos.add(mccMotivo);
             
             CC_MCC__c mccMotivo2 = new CC_MCC__c();
@@ -323,6 +347,16 @@ public class CC_Clasificacion_Casos_Controller_Test {
             mccSolucion4.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente no localizado por FEDEX;Error KYC;Recibe por error la tarjeta de otro cliente';
             listaSoluciones.add(mccSolucion4);
             insert listaSoluciones;
+
+            List<CC_MCC__Share> totalPermisosMCC = new List<CC_MCC__Share>();
+            for(CC_MCC__c record : [SELECT Id FROM CC_MCC__c]) {
+                CC_MCC__Share mccShare = new CC_MCC__Share();
+                mccShare.ParentId = record.Id;
+                mccShare.UserOrGroupId = supervisor.Id;
+                mccShare.AccessLevel = 'Edit';
+                totalPermisosMCC.add(mccShare);
+            }
+            insert totalPermisosMCC;
             
             Account cuenta = new Account(); 
             cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
@@ -398,19 +432,26 @@ public class CC_Clasificacion_Casos_Controller_Test {
 
             CC_Settings__c  customSetting6 = new CC_Settings__c ();
             customSetting6.Name = 'CC_Agrupador_CIC_Asignacion_Casos';
-            customSetting6.CC_Activa__c = true;
+            customSetting6.CC_Activa__c = false;
             listCustomSetting.add(customSetting6);
 
             CC_Settings__c  customSetting7 = new CC_Settings__c ();
             customSetting7.Name = 'CC_Agrupador_CI_Asignacion_Casos';
-            customSetting7.CC_Activa__c = true;
+            customSetting7.CC_Activa__c = false;
             listCustomSetting.add(customSetting7);
 
             CC_Settings__c  customSetting8 = new CC_Settings__c ();
             customSetting8.Name = 'CC_Agrupador_CIM_Asignacion_Casos';
-            customSetting8.CC_Activa__c = true;
+            customSetting8.CC_Activa__c = false;
             listCustomSetting.add(customSetting8);
             insert listCustomSetting;
+
+            CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
+            customSetting.Name = 'CC_Onboarding';
+            customSetting.NamedCredential__c = 'callout:API_GWT_TST/assetProductsBackofficeOperations/cbpo02/v1/teamworks/webservices/GDS707A/ConsultaEstadoSolicitud.tws';
+            customSetting.RegistroTrazaIntegracion__c = true;
+            insert customSetting;
+
         }
     }    
     
@@ -1396,5 +1437,57 @@ public class CC_Clasificacion_Casos_Controller_Test {
         }
     }
 
+    @isTest
+    public static void testRecuperarAmbitoMotivo() {
 
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor){
+        Id motivo = [Select Id FROM CC_MCC__c WHERE Name = 'Apertura sin autorización' LIMIT 1]?.Id;
+
+            // Call the method
+            Test.startTest();
+            Map<String, String> result = CC_Clasificacion_Casos_Controller.recuperarAmbitoMotivo(motivo);
+            Test.stopTest();
+
+            // Verify the results
+            System.assertEquals('Oficina', result.get('Caixa'), 'el ambito Oficina no es correcto');
+            System.assertEquals('Ventas', result.get('Imagin'), 'el ambito Ventas no es correcto');
+        }
+    }
+
+    @isTest
+    public static void testLlamadaWSOnboardingApex() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor){
+
+        Case testCase = new Case(
+            RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId(),
+            Subject = 'Test Case'
+        );
+        insert testCase;
+
+        // Mock the response from CC_WS_Onboarding
+        Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Onboarding(200));
+
+        // Call the method with NIF
+        Test.startTest();
+        String resultWithNif = CC_Clasificacion_Casos_Controller.llamadaWSOnboardingApex(testCase.Id, '');
+        Test.stopTest();
+
+        // Verify the results
+        System.assertEquals('El cliente esta en proceso de Onboarding', resultWithNif);
+        }
+    }
+
+    @isTest
+    public static void testMensajeValidacionPreguntas() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor){
+            Test.startTest();
+                CC_Lista_Valores__c listaValores = CC_Clasificacion_Casos_Controller.mensajeValidacionPreguntas('mensajePrueba');
+            Test.stopTest();
+            System.assertEquals(listaValores.Name, 'Mensaje');
+            System.assertEquals(listaValores.CC_Valor__c, 'Prueba');
+        }
+    }
 }

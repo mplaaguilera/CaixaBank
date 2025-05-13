@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>ActiveUsers</fullName>
-    <columns>CORE.USERS.SAML_SUBJECT</columns>
     <columns>FULL_NAME</columns>
     <columns>CORE.USERS.ALIAS</columns>
     <columns>CORE.USERS.USERNAME</columns>
@@ -13,10 +12,9 @@
     <columns>CORE.USERS.EMAIL</columns>
     <filterScope>Everything</filterScope>
     <filters>
-        <field>CORE.USERS.ACTIVE</field>
-        <operation>equals</operation>
-        <value>1</value>
+        <field>CORE.PROFILE.NAME</field>
+        <operation>contains</operation>
+        <value>FRA_</value>
     </filters>
     <label>Active Users</label>
-    <language>en_US</language>
 </ListView>

@@ -11,11 +11,6 @@
             <operation>equals</operation>
             <value>CC_Campana</value>
         </filterItems>
-        <filterItems>
-            <field>CC_Caracteristica__c.CC_Activo__c</field>
-            <operation>equals</operation>
-            <value>True</value>
-        </filterItems>
         <isOptional>true</isOptional>
     </lookupFilter>
     <referenceTo>CC_Caracteristica__c</referenceTo>

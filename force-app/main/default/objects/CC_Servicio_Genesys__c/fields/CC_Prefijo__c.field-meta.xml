@@ -3,7 +3,6 @@
     <fullName>CC_Prefijo__c</fullName>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
-    <inlineHelpText>Solo aplica para el widget SISGEN</inlineHelpText>
     <label>Prefijo</label>
     <length>10</length>
     <required>false</required>

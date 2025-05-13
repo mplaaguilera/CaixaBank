@@ -145,11 +145,10 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         camposRecl8.put('Subject', 'TestRec8');
         camposRecl8.put('Origin', 'Otros');
         camposRecl8.put('Status', 'SAC_001');
-        // camposRecl8.put('OwnerId', usuario.Id);
+        camposRecl8.put('OwnerId', usuario.Id);
         camposRecl8.put('SAC_StatusAuxiliar__c', 'SAC_001');
-        camposRecl8.put('SAC_DetenidoDesde__c', System.now());
         camposRecl8.put('AccountId', cuenta.Id);
-        camposRecl8.put('SAC_ProrrogaCounter__c', 1);
+        camposRecl8.put('SAC_ProrrogaCounter__c', 0);
         camposRecl8.put('SuppliedEmail', 't.t@t.t');
         camposRecl8.put('SAC_TipoConsumidor__c', 'Si');
         Case casoReclamacion8 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl8);
@@ -233,7 +232,7 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         Map<String, Object> camposPret7 = new Map<String, Object>();
         camposPret7.put('Subject', 'TestPret8');
         camposPret7.put('SuppliedCompany', 'TestPret8');
-        camposPret7.put('Status', 'SAC_003');
+        camposPret7.put('Status', 'SAC_007');
         camposPret7.put('SAC_StatusAuxiliar__c', 'SAC_007');
         camposPret7.put('SAC_RedaccionFinal__c', true);
         camposPret7.put('SAC_NegociacionFinalizada__c', true);
@@ -249,10 +248,9 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         Map<String, Object> camposPret8 = new Map<String, Object>();
         camposPret8.put('Subject', 'TestPret88');
         camposPret8.put('SuppliedCompany', 'TestPret88');
-        camposPret8.put('Status', 'SAC_003');
-        camposPret8.put('SAC_StatusAuxiliar__c', 'SAC_007');
+        camposPret8.put('Status', 'SAC_001');
+        camposPret8.put('SAC_StatusAuxiliar__c', 'SAC_001');
         camposPret8.put('SAC_RedaccionFinal__c', true);
-        camposPret8.put('SAC_NegociacionFinalizada__c', true);
         camposPret8.put('CC_Importe_Reclamado__c', 50);
         camposPret8.put('OwnerId', usuario.Id);
         camposPret8.put('SAC_Reclamacion__c', casoReclamacion8.Id);
@@ -273,7 +271,7 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         casosPretension.add(pretension7);
         casosPretension.add(pretension8);
         
-        SAC_DatabaseDML.insertListDML(casosPretension, true); 
+        SAC_DatabaseDML.insertListDML(casosPretension, false); 
         //Database.insert(casosPretension);
         
         
@@ -781,6 +779,24 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         System.assertNotEquals(listaCasosActualizar.isEmpty(), true,'No se ha informado el tiempo de parada'); 
     }
     
+
+    @isTest
+    static void checkImportesGGHPretensionesTest(){
+        Test.startTest();
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec7'];
+        
+        System.runAs(usuario){
+            try {
+                SAC_LCMP_UpdateStatus.checkImportesGGHPretensiones(reclamacion.Id);
+                System.assertEquals(false, false, 'Se esperaba una AuraHandledException');
+            } catch (AuraHandledException e) {
+                System.assertEquals(e.getMessage(), 'Script-thrown exception', 'No se ha mostrado el mensaje de error');
+            }
+        }
+        Test.stopTest();
+    }
+
     @isTest
     static void informarTiempoParadaSubsanacionTest2(){
         Test.startTest();
@@ -796,22 +812,5 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         Test.stopTest();   
         
         System.assertNotEquals(listaCasosActualizar.isEmpty(), true,'No se ha informado el tiempo de parada'); 
-    }
-    
-    @isTest
-    static void testPretensionGGH(){
-        Test.startTest();
-        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec8'];
-        User usuario = [SELECT id FROM User WHERE Username = 'Name12345@test.com' AND isActive = true LIMIT 1];
-        
-        System.runAs(usuario){
-            try {
-                SAC_LCMP_UpdateStatus.checkImportesGGHPretensiones(reclamacion.Id);
-                System.assert(false, 'Se esperaba una AuraHandledException');
-            } catch (AuraHandledException e) {
-                System.assertEquals('Script-thrown exception', e.getMessage());
-            }
-        }
-        Test.stopTest();
     }
 }

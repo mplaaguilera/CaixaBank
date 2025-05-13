@@ -22,6 +22,7 @@ public with sharing class SAC_QueueableCerrarMilestoneLetrado implements Queueab
     }
 
     public void execute(QueueableContext context) {
+        System.debug('Entra en execute');
         List<Id> listaIdsCase = new List<Id>();
         for (Case caso : listaReclamaciones) {
             listaIdsCase.add(caso.Id);

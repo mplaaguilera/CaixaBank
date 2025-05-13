@@ -1527,6 +1527,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>AV_Subestado__c</picklist>
+        <values>
+            <fullName>No localizada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>AV_Tenencia__c</picklist>
         <values>
             <fullName>N</fullName>
@@ -1558,6 +1569,17 @@
         <values>
             <fullName>Pendiente aprobación</fullName>
             <default>true</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CIBE_ApprovalType__c</picklist>
+        <values>
+            <fullName>Price comittee</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sign approval</fullName>
+            <default>false</default>
         </values>
     </picklistValues>
     <picklistValues>
@@ -1663,6 +1685,28 @@
         </values>
         <values>
             <fullName>Riesgos</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CIBE_CreditPortAnalystReview__c</picklist>
+        <values>
+            <fullName>NO</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>SI</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CIBE_DicALM__c</picklist>
+        <values>
+            <fullName>NO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SI</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -2157,13 +2201,21 @@
         </values>
     </picklistValues>
     <picklistValues>
-        <picklist>CIBE_Pais__c</picklist>
+        <picklist>CIBE_PaisMulti__c</picklist>
+        <values>
+            <fullName>Afganistán</fullName>
+            <default>false</default>
+        </values>
         <values>
             <fullName>Alemania</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Andorra</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Angola</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2203,6 +2255,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Benín</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Bermudas</fullName>
             <default>false</default>
         </values>
@@ -2211,7 +2267,19 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Bolivia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Botswana</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Brasil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brunéi</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2219,7 +2287,15 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Burundi</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Bélgica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Camerún</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2243,11 +2319,27 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Costa Rica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Costa de marfil</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Croacia</fullName>
             <default>false</default>
         </values>
         <values>
+            <fullName>Cuba</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Dinamarca</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Djibuti</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2260,6 +2352,10 @@
         </values>
         <values>
             <fullName>Egipto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>El Salvador</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2280,7 +2376,7 @@
         </values>
         <values>
             <fullName>España</fullName>
-            <default>false</default>
+            <default>true</default>
         </values>
         <values>
             <fullName>Estados Unidos</fullName>
@@ -2288,6 +2384,10 @@
         </values>
         <values>
             <fullName>Estonia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Eswatini</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2315,11 +2415,15 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Guatemala</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Guinea Ecuatorial</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Holanda</fullName>
+            <fullName>Honduras</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2359,11 +2463,23 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Jamaica</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Japón</fullName>
             <default>false</default>
         </values>
         <values>
+            <fullName>Jordania</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Kazakistan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kenia</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2375,7 +2491,19 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Laos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lesoto</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Letonia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Libia</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2391,11 +2519,31 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Madagascar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Malawi</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Malaysia</fullName>
             <default>false</default>
         </values>
         <values>
+            <fullName>Maldivas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mali</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Marruecos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mauricio</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2407,6 +2555,14 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Mozambique</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Myanmar</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>México</fullName>
             <default>false</default>
         </values>
@@ -2415,11 +2571,27 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Namibia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nepal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nicaragua</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Nigeria</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Noruega</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nueva Zelanda</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2432,6 +2604,18 @@
         </values>
         <values>
             <fullName>Pakistan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Panamá</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Paraguay</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Países Bajos</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2467,6 +2651,14 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>República Dominicana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ruanda</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Rumania</fullName>
             <default>false</default>
         </values>
@@ -2487,6 +2679,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Sri Lanka</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Suecia</fullName>
             <default>false</default>
         </values>
@@ -2499,6 +2695,14 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Tailandia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tanzania</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Turquía</fullName>
             <default>false</default>
         </values>
@@ -2507,7 +2711,15 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Uganda</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Uruguay</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Uzbekistán</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2520,6 +2732,561 @@
         </values>
         <values>
             <fullName>Yemen</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Zambia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Zimbabue</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CIBE_Pais__c</picklist>
+        <values>
+            <fullName>Afganistán</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alemania</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Andorra</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Angola</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Arabia Saudí</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Argelia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Argentina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Armenia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Australia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Austria</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Azerbaiyan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bahamas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Baréin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Benín</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bermudas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bielorusia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bolivia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Botswana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brasil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brunéi</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bulgaria</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Burundi</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bélgica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Camerún</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Canadá</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Chile</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Chipre</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Colombia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Corea Del Sur</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Costa Rica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Costa de marfil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Croacia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuba</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dinamarca</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Djibuti</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dubai</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ecuador</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Egipto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>El Salvador</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Emiratos Árabes Unidos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Escocia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Eslovaquia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Eslovenia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>España</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Estados Unidos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Estonia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Eswatini</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Filipinas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Finlandia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Francia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ghana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gibraltar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Grecia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Guatemala</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Guinea Ecuatorial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Honduras</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hong Kong</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hungría</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>India</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Indonesia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Irak</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Irlanda</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Islandia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Israel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Italia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Jamaica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Japón</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Jordania</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kazakistan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kenia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kirguistan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kuwait</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Laos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lesoto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Letonia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Libia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Liechtenstein</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lituania</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Luxemburgo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Madagascar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Malawi</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Malaysia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Maldivas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mali</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marruecos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mauricio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mauritania</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Moldavia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mozambique</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Myanmar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>México</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mónaco</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Namibia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nepal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nicaragua</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nigeria</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Noruega</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nueva Zelanda</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omán</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pakistan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Panamá</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Paraguay</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Países Bajos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Perú</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Polonia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Portugal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Puerto Rico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Qatar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reino Unido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rep%2E Checa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rep%2E Popular China</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>República Dominicana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ruanda</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rumania</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rusia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Senegal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Serbia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Singapur</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sri Lanka</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suecia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suiza</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suráfrica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tailandia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tanzania</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Turquía</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Túnez</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ucrania</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Uganda</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Uruguay</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Uzbekistán</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Venezuela</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vietnam</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yemen</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Zambia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Zimbabue</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -2616,6 +3383,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>CIBE_SyndicationTeamOpinion__c</picklist>
+        <values>
+            <fullName>NO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SI</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>CIBE_TipoOperacion__c</picklist>
         <values>
             <fullName>Ampliación importe</fullName>
@@ -2663,11 +3441,11 @@
     <picklistValues>
         <picklist>CIBE_Visto__c</picklist>
         <values>
-            <fullName>EG</fullName>
+            <fullName>NO</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>IG</fullName>
+            <fullName>SI</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -2733,6 +3511,14 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Comunidad Valenciana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ES-CT</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Extremadura</fullName>
             <default>false</default>
         </values>
@@ -2753,10 +3539,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Murcia</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Navarra</fullName>
             <default>false</default>
         </values>
@@ -2765,7 +3547,7 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Valencia</fullName>
+            <fullName>Región de Murcia</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -2781,6 +3563,73 @@
         </values>
         <values>
             <fullName>inTouch</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CSBD_EstadoAutenticacion__c</picklist>
+        <values>
+            <fullName>ABORTED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>APPROVED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DENIED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ERROR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EXPIRED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>INPROGRESS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IS_A_COMPANY</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IS_MINOR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>NOTIFICATIONS_OFF</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>NOT_DIGITAL_OR_BLOCKED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>NOT_IDENTIFIED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PENDING</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>REJECTED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SIN ESTADO</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>TIMEOUT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>UNAUTHORIZED</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -2818,7 +3667,43 @@
     <picklistValues>
         <picklist>CSBD_Familia_Producto__c</picklist>
         <values>
+            <fullName>Ahorro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta Cliente Digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta digital de menores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Altas Digitales</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Back Office</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank Now</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Colectivo ONCE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Colectivo TELEFONICA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2826,7 +3711,23 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Decesos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Depósito</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Depósitos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Depósitos_</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Descubierto</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2834,7 +3735,47 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Domiciliación Recibos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dummy menores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dummy menores familia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Escoger Familia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Facilitea</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Feedback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fes-te Client</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Fondos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hazte Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hazte Cliente Residentes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca PHD</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2842,7 +3783,67 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Hipotecas_</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HolaBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ImaginBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inmuebles</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inversión y ahorro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>KYC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LO Shop</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Now In Empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otra</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros seguros</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Planes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Planes de pensiones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos Empresas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos Particulares</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2850,7 +3851,23 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Préstamos Particulares</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recuperación deudas</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Renting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Retención Planes de Pensiones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro de Auto</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2858,7 +3875,55 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Seguros de Auto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros de Decesos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros de Hogar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros de Mascotas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros de Salud</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros de Vida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros de Vida Negocios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros de Vida Particulares</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Seguros de ahorro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros_</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicuentas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Shop</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta débito</fullName>
             <default>false</default>
         </values>
         <values>
@@ -2866,7 +3931,19 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Tarjetas_</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Valores</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Wivai</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>fondos de inversión</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -3091,11 +4168,63 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Acción PREMIER</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Activa Tarjeta de prepago%2F regalo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Activación tarjetas errores</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Adeslas pymes</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Alarma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta Cliente Digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta Cliente Holabank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta Cliente Residentes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta Cuenta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta Cuenta Multititulares</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta clientes Kids%26Teens</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta digital de menores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta nuevo cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Altas Digitales</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3107,7 +4236,27 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Auto %26 Moto</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Autónomos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bajas Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Baterias solares</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bienvenida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Building Center</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3115,7 +4264,191 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>C%26G</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>C%26G LEADS PORTAL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>C%26G LONO PORTAL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caixa Futuro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank Now</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>CaixaWallet</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Carné Joven</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Casa Fácil Fijo Empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cita Previa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cita Previa Hipoteca</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cita Previa Nómina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cita Previa Préstamo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cita Previa Seguros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cita Previa Wivai</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Click%26Go</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Colectivo ONCE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Colectivo TELEFONICA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones de Cancelación o Amortización</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones de Correspondencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones de TPVs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones de Transferencias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones de descubierto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones de ingresos de cheques</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones de mantenimiento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones de reclamación impagados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones de transferencias urgentes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones día a día</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones operaciones Fondos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones operaciones Valores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones operaciones de Divisas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones por Emision de Recibos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones por Emisión de Recibos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones por disposición cajero ajeno</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones por edición de extractos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones por emisión de certificados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones por emisión de cheques</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones por operaciones ventanilla</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisiones servicio descubierto flexible</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisión servicio cancelación Notarial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Compra inmuebles</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Convenio CA Andalucía</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Convenio CA Extremadura</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Convenio CA Madrid</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Convenio CA Valencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Convenio Castilla y Leon</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Convenio Ibavi</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3131,6 +4464,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Crédito Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Cuenta Caixafuturo - PIAS</fullName>
             <default>false</default>
         </values>
@@ -3139,11 +4476,55 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Cuenta Online</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuenta corriente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuenta menor</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Cuenta negocio</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Cuentas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuentas Multi Titular</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuentas multitular promo imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuota anual Via T</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuotas Tarjetas de Debito%2FPrepago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuotas de Resto de Tarjetas de Credito</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuotas de Resto de Tarjetas de Crédito</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuotas de Tarjetas Prepago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuotas de tarjeta MyCard</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3159,7 +4540,35 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Deposito Bonificado Empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Deposito bonificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Depositos bonificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Depósito</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Depósito Directivos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Depósito a plazo</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Depósitos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Depósitos Combinados</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3167,7 +4576,67 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Depósitos_</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Descubierto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Deuda préstamo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Deuda tarjeta</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Domiciliaciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dummy menores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dummy menores familia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dummy menores producto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Elegir producto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Error</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Escoger Familia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Escoger Producto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Facilitea</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Facilitea Coches</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Feedback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fes-te Client</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3179,7 +4648,35 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Hazte Cliente Residentes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Hipoteca 01</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Arras</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca CaixaBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Casa Facil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Casa Fàcil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Casa Fácil</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3187,7 +4684,55 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Hipoteca Click My Home NO TOP</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Click My Home TOP</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Directivos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Eficiente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Empleado Vivienda A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Empleado Vivienda B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca HolaBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Internacional</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca PHD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipoteca Subrogación</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Hipotecas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hipotecas_</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3195,7 +4740,51 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>HolaBank Onboarding</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ICO Familias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ICO Jovenes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Imagin%26Go</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ImaginBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inmuebles</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inversión y ahorro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>KYC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kit digital autonomos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Limite Tranferencias</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Mascotas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mejora vivienda</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3203,7 +4792,15 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Mobiliario</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Moto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>My Card Oro Empleado</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3211,7 +4808,27 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>MyBox Auto</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>MyBox Auto TR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Decesos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Generico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Genéric</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Genérico</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3219,7 +4836,19 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>MyBox Hogar KEOPS</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>MyBox Home</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Jubilación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Mascotas</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3235,7 +4864,27 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>MyBox Vida Negocios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Vida Negocios y Empresas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyCard</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyCard Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Nomina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Novación %2F Reconversión</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3243,11 +4892,59 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Nómina Directivos</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>One Clic Auto</fullName>
             <default>false</default>
         </values>
         <values>
+            <fullName>Otra</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>PAI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pack Digital Agrobank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pack Digital Agrobank%2C Pack Digital Retail %2B TPV Tablet</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pack Digital E-Commerce</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pack Digital E-Commerce %2B TPV Tablet</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pack Digital Food%26Drink %2B TPV Tablet</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pack Digital Redes Sociales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pack Digital Web</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pack Digital Web %2B TPV Tablet</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pago plazos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Paneles Solares</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3263,6 +4960,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Planes de Pensiones</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Plena</fullName>
             <default>false</default>
         </values>
@@ -3271,7 +4972,123 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Portatiles Samsung</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Prepagament</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Anticipo Nomina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Auto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Auto Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Click%26Go</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Consumo Bonificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Estrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Express</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Exprés Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Family</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Generico Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo ICO Empresas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo ICO Particulares</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo ImaginGo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Microbank Empresas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Microbank Particulares</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Online Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Personas Juridicas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Skill%26Education</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Vehiculo Ocasion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo Vida Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamo personal desde imaginBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos Amazon Electrónica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos Amortización Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos Electrónica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos LEADS PORTAL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prestamos LONO PORTAL</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3283,11 +5100,43 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Protección %26 Decesos</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Protección%C2%A0Jurídica</fullName>
             <default>false</default>
         </values>
         <values>
+            <fullName>Prueba filtrado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Amazon Estudios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Amazon Hogar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Amazon Viajes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Anticipo Nómina</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Préstamo Auto Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Bonificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo C%26G</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3323,6 +5172,18 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Préstamo Generico Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Hipotecario</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo ImaginGo</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Préstamo LCI</fullName>
             <default>false</default>
         </values>
@@ -3331,7 +5192,39 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Préstamo Persona Jurídica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Personal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Vehículo Ocasión</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Viajes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo Vida Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Préstamo a particulares a interés fijo y garantía personal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo a tipo fijo ECO Empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo atenciones diversas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamo personal a tipo fijo Empleados</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3343,7 +5236,23 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Préstamos Amortización Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamos Emprendedores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamos Hipotecarios</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Préstamos LONO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstamos Personales</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3359,7 +5268,15 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Préstec Estrella Exprés%C2%A0</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Préstec Estrella Jove</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstec Estrella Jove%C2%A0</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3367,7 +5284,15 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Préstec Estrella Nòmina%C2%A0</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Préstec Estrella Quota Mínima</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Préstec Estrella Quota Mínima%C2%A0</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3375,7 +5300,51 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Préstec Estudia Grau%2FMàster%C2%A0</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recibos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Renting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Renting Auto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Renting Bienes</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Renting_CaixaBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Retención Planes de Pensiones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Salud</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Salud Básico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Salud Go</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Salud Plena</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Salud Plena Plus</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3387,11 +5356,83 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Seguro Accidentes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro Asistencia en Viaje</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro Auto 1 año</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro Auto Negocio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro Auto Negocios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro Decesos 1 año</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro Hogar 1 año</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro Mascotas 1 año</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro Moto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro Tarjetas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro de ahorro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguro producto de Facilitea</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros Distribuidora</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros de ahorro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros_</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seleccionar producto</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Seleccionar tipus targeta</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Servicash</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicuenta Negocio</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3403,7 +5444,91 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Seviam Empresas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seviam Negocios y Empresas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Shop</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Skills%26Education</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Skills%26Education%C2%A0</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Smart Money</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Subrogación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Subrogación Hipoteca</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TPV Tablet</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta de crédito</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta de débito</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta de prepago%2F regalo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta de prepago%2Fregalo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta debito devolución</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta debito imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas_</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Telefon Samsung S22</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Telefon Samsung S23</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Televisores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Teléfono Samsung S22</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VCX Negocios</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3411,7 +5536,39 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Valor Futuro 10</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Valora CaixaBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Valores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Via T</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Viajes</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Vida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vida Familiar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vida Negocios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VisaGo</fullName>
             <default>false</default>
         </values>
         <values>
@@ -3419,7 +5576,23 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Wivai Contratación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>colectivo SIBUYA</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>ecoPréstamos Estrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>liniaoberta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>prestamos_personalización_imagin</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -3680,6 +5853,21 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>CSBD_SituacionVivienda__c</picklist>
+        <values>
+            <fullName>No%2C aún estoy buscando</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sí%2C he pagado las arras</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sí%2C ya tengo vivienda</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>CSBD_StageName_QuickAction_Cerrar__c</picklist>
         <values>
             <fullName>Rechazada</fullName>
@@ -3688,17 +5876,6 @@
     </picklistValues>
     <picklistValues>
         <picklist>CSBD_TipoConstruccion2__c</picklist>
-        <values>
-            <fullName>Nueva construcción</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Segunda mano</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
-        <picklist>CSBD_TipoConstruccion__c</picklist>
         <values>
             <fullName>Nueva construcción</fullName>
             <default>false</default>
@@ -3724,45 +5901,7 @@
         </values>
     </picklistValues>
     <picklistValues>
-        <picklist>CSBD_TipoInteres__c</picklist>
-        <values>
-            <fullName>Fijo</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Mixto</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Variable</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
         <picklist>CSBD_TipoOperacion2__c</picklist>
-        <values>
-            <fullName>Auto-promotor</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Compra de vivienda</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Mejora</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Otros</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Subrogación</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
-        <picklist>CSBD_TipoOperacion__c</picklist>
         <values>
             <fullName>Auto-promotor</fullName>
             <default>false</default>
@@ -3811,6 +5950,21 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>CSBD_UltimaAutenticacionNivel__c</picklist>
+        <values>
+            <fullName>Cliente digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Emergencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nivel 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>CSBD_Urgencia__c</picklist>
         <values>
             <fullName>No</fullName>
@@ -3841,21 +5995,21 @@
         </values>
     </picklistValues>
     <picklistValues>
-        <picklist>CSBD_UsoVivienda__c</picklist>
+        <picklist>EV_CodCompany__c</picklist>
         <values>
-            <fullName>Inversión</fullName>
+            <fullName>ACC</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Otros</fullName>
+            <fullName>CXB</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Primera residencia</fullName>
+            <fullName>IMG</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Segunda residencia</fullName>
+            <fullName>VCX</fullName>
             <default>false</default>
         </values>
     </picklistValues>

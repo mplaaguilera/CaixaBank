@@ -35,12 +35,18 @@ public with sharing class CC_WS_Autenticacion_SAU_Test {
                 AV_NumPerso__c = '1352710'
             );
             insert cuenta2;
-
+			List<CBK_IntegrationSetting__c> listaInt = new List<CBK_IntegrationSetting__c>();
             CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
             customSetting.Name = 'CC_Autenticacion_SAU';
             customSetting.NamedCredential__c = 'callout:API_GWT_TST_CCSF/eChannels/eBranchManagement/customers/id/contracts/validation';
             customSetting.RegistroTrazaIntegracion__c = true;
-            insert customSetting;
+            listaInt.add(customSetting);
+            CBK_IntegrationSetting__c customSettingSinTraza = new CBK_IntegrationSetting__c();
+            customSettingSinTraza.Name = 'CC_Autenticacion_SAU_No_Traza';
+            customSettingSinTraza.NamedCredential__c = 'callout:API_GWT_TST_CCSF/eChannels/eBranchManagement/customers/id/contracts/validation';
+            customSettingSinTraza.RegistroTrazaIntegracion__c = true;
+            listaInt.add(customSettingSinTraza);
+            insert listaInt;
         }
     }
 
@@ -57,4 +63,71 @@ public with sharing class CC_WS_Autenticacion_SAU_Test {
         }
         System.assertEquals('exist_contract', mensajeIntegracion);
     }
+     @isTest
+    static void testOKSinTraza() {
+        User usuario = [SELECT Id FROM User WHERE FirstName = 'Usuario Supervisor Prueba'];
+        Account cuenta = [SELECT AV_NumPerso__c FROM Account WHERE AV_NumPerso__c = '51304694'];
+        Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_SAU(200));
+        String mensajeIntegracion;
+        System.runAs(usuario) {
+            Test.startTest();
+            mensajeIntegracion = CC_WS_Autenticacion_SAU.ccWsEnvioAutenticacion(false, cuenta.AV_NumPerso__c, false);
+            Test.stopTest();
+        }
+        System.assertEquals('exist_contract', mensajeIntegracion);
+    }
+    
+        @isTest
+    static void testOKMulticall() {
+        User usuario = [SELECT Id FROM User WHERE FirstName = 'Usuario Supervisor Prueba'];
+        Account cuenta = [SELECT AV_NumPerso__c FROM Account WHERE AV_NumPerso__c = '51304694'];
+        Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_SAU(202));
+        String mensajeIntegracion;
+        System.runAs(usuario) {
+            Test.startTest();
+            mensajeIntegracion = CC_WS_Autenticacion_SAU.ccWsEnvioAutenticacion(false, cuenta.AV_NumPerso__c, true);
+            Test.stopTest();
+        }
+        System.assertEquals('no_contract', mensajeIntegracion);
+    }
+    
+         @isTest
+        static void testKO() {
+            User usuario = [SELECT Id FROM User WHERE FirstName = 'Usuario Supervisor Prueba'];
+            Account cuenta = [SELECT AV_NumPerso__c FROM Account WHERE AV_NumPerso__c = '51304694'];
+            Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_SAU(404));
+            String mensajeIntegracion;
+            System.runAs(usuario) {
+                Test.startTest();
+                mensajeIntegracion = CC_WS_Autenticacion_SAU.ccWsEnvioAutenticacion(false, cuenta.AV_NumPerso__c, true);
+                Test.stopTest();
+            }
+            System.assertEquals('Ha habido un problema con la integración', mensajeIntegracion);
+        }
+    
+          @isTest
+        static void TestProblemaDatos() {
+            User usuario = [SELECT Id FROM User WHERE FirstName = 'Usuario Supervisor Prueba'];
+            Account cuenta = [SELECT AV_NumPerso__c FROM Account WHERE AV_NumPerso__c = '51304694'];
+            Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_SAU(203));
+            String mensajeIntegracion;
+            System.runAs(usuario) {
+                Test.startTest();
+                mensajeIntegracion = CC_WS_Autenticacion_SAU.ccWsEnvioAutenticacion(false, cuenta.AV_NumPerso__c, true);
+                Test.stopTest();
+            }
+            System.assertEquals('Ha habido un problema con los datos', mensajeIntegracion);
+        }
+    
+             @isTest
+        static void testNumprVacio() {
+            User usuario = [SELECT Id FROM User WHERE FirstName = 'Usuario Supervisor Prueba'];
+            String mensajeIntegracion;
+            System.runAs(usuario) {
+                Test.startTest();
+                mensajeIntegracion = CC_WS_Autenticacion_SAU.ccWsEnvioAutenticacion(false, '', true);
+                Test.stopTest();
+            }
+            System.assertEquals('El numperso está vacío', mensajeIntegracion);
+        }
 }

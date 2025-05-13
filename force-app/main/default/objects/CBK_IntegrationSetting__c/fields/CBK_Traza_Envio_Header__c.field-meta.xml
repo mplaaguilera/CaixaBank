@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CBK_Traza_Envio_Header__c</fullName>
     <defaultValue>false</defaultValue>
-    <description>Por si queremos la traza de envio</description>
+    <description>Campo que se usa para guardar el envio en el CBK_Log del envio de datos.</description>
     <label>Traza Envio Header</label>
     <trackTrending>false</trackTrending>
     <type>Checkbox</type>

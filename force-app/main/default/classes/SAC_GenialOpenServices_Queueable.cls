@@ -78,13 +78,10 @@ public with sharing class SAC_GenialOpenServices_Queueable implements Queueable,
     public void execute(QueueableContext context) {
         //id generado por docIA proporcionado por Open Services
         SAC_GenialOpenServicesIntegracion.DocumentsInfo externoDocId;
-        system.debug('***externoDocId '+externoDocId);
         try{
             if(!this.bodyEnviado){
-                system.debug('***bodyEnviado ');
                 //enviar el body en formato txt como primer documento
                 externoDocId = SAC_GenialOpenServicesIntegracion.envioBody(this.reclamaId);
-                system.debug('***externoDocId '+externoDocId);
                 if(externoDocId != null) {
                     this.attachedDocuments.add(externoDocId);
                     this.bodyEnviado = true;
@@ -110,6 +107,7 @@ public with sharing class SAC_GenialOpenServices_Queueable implements Queueable,
             } else {
                 externoDocId = SAC_GenialOpenServicesIntegracion.envioDocumento(this.doculink.get(0));      
                 if(externoDocId != null) {
+                    actualizarDocumento(externoDocId);
                     this.doculink.remove(0);
                     this.attachedDocuments.add(externoDocId);
                     queueableRecursivo(context.getJobId(), null);
@@ -198,6 +196,41 @@ public with sharing class SAC_GenialOpenServices_Queueable implements Queueable,
         update reclamacion;
 
     }
-
+	
+        /*
+     * @description método que guarda en cada content version el id generado por la IA
+     * @param document datos que contienen el id generado por la IA que hay que guardar
+     */
+    public void actualizarDocumento (SAC_GenialOpenServicesIntegracion.DocumentsInfo document){
+        List<User> sacIntegracion = [SELECT Id FROM User WHERE Username like '%sacintegracion%' LIMIT 1];
+        List<ContentDocumentLink> cdlToInsert = new List<ContentDocumentLink>();
+        List<ContentVersion> contentVersionsToUpdate = new List<ContentVersion>();
+        Map<Id, String> mapDocumentId = new Map<Id, String>();
+        List<ContentDocumentLink> cdlList = [SELECT Id, ContentDocumentId, ContentDocument.Title, Visibility FROM ContentDocumentLink WHERE LinkedEntityId =: this.reclamaId];
+        for(ContentDocumentLink cdl: cdlList){
+            String title = SAC_GenialOpenServicesIntegracion.limpiarCaracteresEspeciales(cdl.ContentDocument.Title);
+            if(title == document.name){
+                mapDocumentId.put(cdl.ContentDocumentId, document.documentId);
+                ContentDocumentLink newCdl = new ContentDocumentLink();
+                newCdl.ContentDocumentId = cdl.ContentDocumentId;
+                newCdl.LinkedEntityId = sacIntegracion[0].Id;
+                newCdl.ShareType = 'V';
+                newCdl.Visibility = 'AllUsers';
+                cdlToInsert.add(newCdl);
+            }
+        }
+        for(ContentVersion cv: [SELECT Id, ContentDocumentId, SAC_StringRedaccion_fileupload__c FROM ContentVersion WHERE ContentDocumentId IN: mapDocumentId.keySet()]){
+            if(mapDocumentId.containsKey(cv.ContentDocumentId)){
+                cv.SAC_StringRedaccion_fileupload__c = mapDocumentId.get(cv.ContentDocumentId);
+                contentVersionsToUpdate.add(cv);
+            }
+        }
+        if(!contentVersionsToUpdate.isEmpty()){
+            update contentVersionsToUpdate;
+        }
+        if(!cdlToInsert.isEmpty()){
+            insert cdlToInsert;
+        }
+    }
     
 }

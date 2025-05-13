@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Parametrización de control de trigger de la aplicación Mis Clientes Soluciones</description>
     <label>SIR_mdt_TriggerControl</label>
     <pluralLabel>SIR_mdt_TriggersControls</pluralLabel>
     <visibility>Public</visibility>

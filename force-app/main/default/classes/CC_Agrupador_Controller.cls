@@ -143,7 +143,7 @@ public class CC_Agrupador_Controller {
             Case oCaso = new Case();
             oCaso.Id = sCasoId;
             
-            if(sAgrupadorId != '') {
+            if(!String.isBlank(sAgrupadorId)) {
                 oCaso.Status = 'Pendiente Incidencia';
                 oCaso.CC_Agrupador_Id__c = sAgrupadorId;
             }

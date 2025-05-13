@@ -2,52 +2,29 @@
 
     <article class="slds-card cardDisponibilidadGestores">
         <div class="slds-card__body slds-card__body_inner" style="margin: 0; padding: 0;">
-            <!--Fin sección de fecha mostrada y lookup de gestor seleccionado-->
+
+            <!--Sección de fecha mostrada y lookup de gestor seleccionado-->
             <div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small" style="margin-bottom: 5px;">
                 <div lwc:if={calendarViews} class="divSeleccionFecha slds-col slds-grow-none slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-gutters_xx-small slds-truncate">
 
                     <!--Botón de día anterior-->
                     <div class="slds-col slds-grow-none">
-                        <lightning-button-icon
-                            icon-name="utility:left"
-                            variant="bare"
-                            tooltip="Día anterior"
-                            onclick={diaAnteriorSiguienteOnclick}
-                            data-offset="-1">
-                        </lightning-button-icon>
+                        <lightning-button-icon icon-name="utility:left" variant="bare" tooltip="Día anterior" onclick={diaAnteriorSiguienteOnclick} data-offset="-1"></lightning-button-icon>
                     </div>
 
                     <!--Fecha del día que se está mostrando actualmente-->
                     <div class="slds-col slds-grow-none slds-is-relative slds-truncate" style="top: 3px;">
-                        <span title="Ver calendario" style="cursor: pointer;" onclick={verCalendario}>
-                            <lightning-icon
-                                icon-name="utility:date_input"
-                                size="x-small"
-                                class="slds-var-m-right_small slds-is-relative"
-                                style="top: -2px;">
-                            </lightning-icon>
-
+                        <span title="Abrir calendario" style="cursor: pointer;" onclick={verCalendario}>
+                            <lightning-icon icon-name="utility:date_input" size="x-small" class="slds-var-m-right_small slds-is-relative" style="top: -2px;"></lightning-icon>
                             <span class="slds-text-link slds-is-relative" style="top: -1px;">
-                                <lightning-formatted-date-time
-                                    value={fecha}
-                                    year="numeric"
-                                    month="long"
-                                    day="numeric"
-                                    weekday="long">
-                                </lightning-formatted-date-time>
+                                <lightning-formatted-date-time value={fecha} year="numeric" month="long" day="numeric" weekday="long"></lightning-formatted-date-time>
                             </span>
                         </span>
                     </div>
 
                     <!--Botón de día siguiente-->
                     <div class="slds-col slds-grow-none">
-                        <lightning-button-icon
-                            class="diaSiguiente"
-                            icon-name="utility:right"
-                            variant="bare"
-                            tooltip="Día siguiente"
-                            onclick={diaAnteriorSiguienteOnclick} data-offset="1">
-                        </lightning-button-icon>
+                        <lightning-button-icon class="diaSiguiente" icon-name="utility:right" variant="bare" tooltip="Día siguiente" onclick={diaAnteriorSiguienteOnclick} data-offset="1"></lightning-button-icon>
                     </div>
                 </div>
 
@@ -63,24 +40,9 @@
                     <label class="slds-form-element__label slds-is-relative" style="padding-right: 6px; top: 1px;">
                         <abbr class="slds-required">*</abbr>Gestor
                     </label>
-
-                    <lightning-helptext
-                        content="Para modificar el gestor seleccionado, programa la cita en una franja horaria de su calendario."
-                        class="slds-var-m-right_medium slds-is-relative"
-                        style="top: 5px;">
-                    </lightning-helptext>
-
-                    <lightning-record-picker
-                        label="Gestor"
-                        object-api-name="User"
-                        value={idGestor}
-                        variant="label-hidden"
-                        required
-                        style="display: inline-block; width: 230px; pointer-events: none;"
-                        disabled>
-                    </lightning-record-picker>
+                    <lightning-helptext content="Para modificar el gestor seleccionado, programa la cita en una franja horaria de su calendario." class="slds-var-m-right_medium slds-is-relative" style="top: 5px;"></lightning-helptext>
+                    <lightning-record-picker label="Gestor" object-api-name="User" value={idGestor} variant="label-hidden" required style="display: inline-block; width: 230px; pointer-events: none;" disabled></lightning-record-picker>
                 </div>
-
             </div>
             <!--Fin sección de fecha mostrada y lookup de gestor seleccionado-->
 
@@ -92,10 +54,7 @@
                     <div class="slds-col gridCalendariosColumnaHoras"></div>
 
                     <template for:each={calendarViews} for:item="calendarView">
-                        <div key={calendarView.id}
-                            class="slds-col cabeceraColumnaCalendario slds-truncate"
-                            data-publisher-id={calendarView.publisherId}>
-
+                        <div key={calendarView.id} class="slds-col cabeceraColumnaCalendario slds-truncate" data-publisher-id={calendarView.publisherId}>
                             <span title={calendarView.publisherName}>{calendarView.publisherName}</span>
                         </div>
                     </template>
@@ -177,7 +136,7 @@
                                             </template>
                                         </div>
 
-                                        <!--Tooltip de crear nuevo evento (en caso de no existir ningún evento en el tramo)-->
+                                        <!--Tooltip con la hora inicial del tramo al hacer hover en una celda sin eventos-->
                                         <div lwc:else class="calendarViewTramoAñadir slds-align_absolute-center">
                                             <lightning-icon icon-name="standard:event" size="xx-small" class="slds-var-m-right_x-small" style="opacity: 0.8;"></lightning-icon>
                                             <span class="slds-is-relative">{calendarViewTramo.label}</span>

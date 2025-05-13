@@ -29,7 +29,10 @@ public class CSBD_MetodosComunes_Test {
             CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
             listaValores.RecordTypeId = idRecordTypeListaValores;
             listaValores.Name = 'CSBD: Días cierre oportunidad por defecto';
-            insert new List<CC_Lista_Valores__c>{cmnWS, cmnMail, vidaCaixa, imagin, cmnDestMail, desisMail, lovPlantillasDesistimientos, listaValores};
+            CC_Lista_Valores__c matriculasPool = new CC_Lista_Valores__c();
+            matriculasPool.RecordTypeId = idRecordTypeListaValores;
+            matriculasPool.Name = 'Gestion Oficinas del Pool';
+            insert new List<CC_Lista_Valores__c>{cmnWS, cmnMail, vidaCaixa, imagin, cmnDestMail, desisMail, lovPlantillasDesistimientos, listaValores, matriculasPool};
 
             Id idRecordTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
             CC_Lista_Valores__c valor1MailDesis = new CC_Lista_Valores__c();
@@ -119,10 +122,16 @@ public class CSBD_MetodosComunes_Test {
             valorDESPAI.Name = 'Desistimiento PAI';
             valorDESPAI.RecordTypeId = idRecordTypeValor;
             valorDESPAI.CC_Lista__c = listaValores.Id;
-            valorDESPAI.CC_Valor__c = '1';
+            valorDESPAI.CC_Valor__c = '1';          
+            CC_Lista_Valores__c matriculaGenerica = new CC_Lista_Valores__c();
+            matriculaGenerica.RecordTypeId = idRecordTypeValor;
+            matriculaGenerica.CC_Lista__c = matriculasPool.Id;
+            matriculaGenerica.Name = 'Centro Genérico';
+            matriculaGenerica.CC_Valor__c = '012345';
+       
             insert new List<CC_Lista_Valores__c>{
                 valor1MailDesis, valor1Mail, valor2Mail, valor1CmnWS, valor2CmnMail, valor3VidaCaixa, valorImagin, valorHipoteca,
-                valorPrestamo, valorRenting, valorCompraEstrella, valorCMN, valorCMB, valorTPV, valorDES, valorDESPAI
+                valorPrestamo, valorRenting, valorCompraEstrella, valorCMN, valorCMB, valorTPV, valorDES, valorDESPAI, matriculaGenerica
             };
 
             CSBD_TestDataFactory.crearEmpleadoOficina('09999');
@@ -316,4 +325,124 @@ public class CSBD_MetodosComunes_Test {
             }
         }
     }
+
+    @isTest
+    public static void buscarCentroPool() {
+      
+        User usuarioAdmin = CSBD_TestDataFactory.usuarioAdministrador();
+        System.runAs(usuarioAdmin) {       
+            Account oficina = [SELECT Id FROM Account WHERE CC_Numero_Oficina__c = '09999'];
+            Account cuenta = [SELECT Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '84465909L'];
+            cuenta.AV_OfficeManager__c = oficina.Id;
+            update cuenta;
+
+            Contact contacto = [SELECT Id FROM Contact WHERE AccountId = :cuenta.Id LIMIT 1];
+            User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD'];
+
+            Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_CMN', new Map<String, Object>{
+                'Name' => 'Opportunity Test 3',
+                'StageName' => 'Solicitud',
+                'CSBD_Now_NIF__c' => cuenta.CC_Numero_Documento__c,
+                'AccountId' => cuenta.Id,
+                'CSBD_Contact__c' => contacto.Id
+            });
+          
+            System.runAs(usuarioGestor) {
+                String centroPool = '';
+                Test.startTest();
+                    List<Opportunity> oportunidadGet = [
+                        SELECT ContactId, AccountId, AV_PF__c, 
+                            Account.AV_EAPGestor__r.Account.CC_Numero_Oficina__c, AV_Comentarios__c, 
+                            Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c, 
+                            Account.AV_OfficeManager__r.CC_Numero_Oficina__c
+                        FROM Opportunity 
+                        WHERE Id = :oportunidad.Id
+                    ];
+                    centroPool = CSBD_MetodosComunes.buscarCentro(oportunidadGet[0], 'U01BPA01');
+                Test.stopTest();
+
+                System.assertEquals(centroPool, '09999',  'Error en el centro del gestor Pool');
+            }
+        }
+    }
+
+    @isTest
+    public static void buscarCentroPoolDefault() {
+      
+        User usuarioAdmin = CSBD_TestDataFactory.usuarioAdministrador();
+        System.runAs(usuarioAdmin) {     
+
+            Account cuenta = [SELECT Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '84465909L'];
+            Contact contacto = [SELECT Id FROM Contact WHERE AccountId = :cuenta.Id LIMIT 1];
+            User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD'];
+
+            Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_CMN', new Map<String, Object>{
+                'Name' => 'Opportunity Test 3',
+                'StageName' => 'Solicitud',
+                'CSBD_Now_NIF__c' => cuenta.CC_Numero_Documento__c,
+                'AccountId' => cuenta.Id,
+                'CSBD_Contact__c' => contacto.Id
+            });
+          
+            System.runAs(usuarioGestor) {
+                String centroPool = '';
+                Test.startTest();
+                    List<Opportunity> oportunidadGet = [
+                        SELECT ContactId, AccountId, AV_PF__c, 
+                            Account.AV_EAPGestor__r.Account.CC_Numero_Oficina__c, AV_Comentarios__c, 
+                            Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c, 
+                            Account.AV_OfficeManager__r.CC_Numero_Oficina__c
+                        FROM Opportunity 
+                        WHERE Id = :oportunidad.Id
+                    ];
+                    centroPool = CSBD_MetodosComunes.buscarCentro(oportunidadGet[0], 'U01BPA01');
+                Test.stopTest();
+
+                System.assertEquals(centroPool, '012345',  'Error en el centro del gestor por defecto');
+            }
+        }
+    }
+
+
+    @isTest
+    public static void buscarCentroNoPool() {
+      
+        User usuarioAdmin = CSBD_TestDataFactory.usuarioAdministrador();
+        System.runAs(usuarioAdmin) {       
+            //Contact empleado = [SELECT Id FROM Contact WHERE Account.CC_Numero_Oficina__c = '08888' ORDER BY CreatedDate DESC LIMIT 1];
+            Account oficina = [SELECT Id FROM Account WHERE CC_Numero_Oficina__c = '08888'];
+            Account cuenta = [SELECT Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '84465909L'];
+            cuenta.AV_OficinaPrincipal__c = oficina.Id;
+            update cuenta;
+
+            Contact contacto = [SELECT Id FROM Contact WHERE AccountId = :cuenta.Id LIMIT 1];
+            User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD'];
+
+            Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_CMN', new Map<String, Object>{
+                'Name' => 'Opportunity Test 3',
+                'StageName' => 'Solicitud',
+                'CSBD_Now_NIF__c' => cuenta.CC_Numero_Documento__c,
+                'AccountId' => cuenta.Id,
+                'CSBD_Contact__c' => contacto.Id
+            });
+          
+            System.runAs(usuarioGestor) {
+                String centroNoPool = '';
+                Test.startTest();
+                    List<Opportunity> oportunidadGet = [
+                        SELECT ContactId, AccountId, AV_PF__c, 
+                            Account.AV_EAPGestor__r.Account.CC_Numero_Oficina__c, AV_Comentarios__c, 
+                            Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c, 
+                            Account.AV_OfficeManager__r.CC_Numero_Oficina__c
+                        FROM Opportunity 
+                        WHERE Id = :oportunidad.Id
+                    ];
+                    centroNoPool = CSBD_MetodosComunes.buscarCentro(oportunidadGet[0], 'U01010101'); 
+                Test.stopTest();
+
+                System.assertEquals(centroNoPool, '08888',  'Error en el centro del gestor No Pool');
+            }
+        }
+    }
+
 }

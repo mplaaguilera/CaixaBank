@@ -8,7 +8,7 @@
     <columns>CASES.PRIORITY</columns>
     <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
     <columns>CORE.USERS.ALIAS</columns>
-    <filterScope>Queue</filterScope>
+    <filterScope>Everything</filterScope>
     <filters>
         <field>CC_Canal_Procedencia__c</field>
         <operation>equals</operation>
@@ -20,7 +20,6 @@
         <value>Cerrado,Rechazado</value>
     </filters>
     <label>Buenas prácticas</label>
-    <queue>CC_Inbound_Email_AC</queue>
     <sharedTo>
         <role>Contact_Center</role>
         <role>Contact_Center_sin_acceso_a_Directorio</role>

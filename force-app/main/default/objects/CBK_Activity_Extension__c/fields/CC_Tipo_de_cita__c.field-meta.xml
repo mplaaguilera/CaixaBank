@@ -11,14 +11,14 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Llamada telefónica</fullName>
+                <fullName>Cita telefónica</fullName>
                 <default>false</default>
-                <label>Llamada telefónica</label>
+                <label>Cita telefónica</label>
             </value>
             <value>
-                <fullName>Entrevista</fullName>
+                <fullName>Cita presencial</fullName>
                 <default>false</default>
-                <label>Entrevista</label>
+                <label>Cita presencial</label>
             </value>
         </valueSetDefinition>
     </valueSet>

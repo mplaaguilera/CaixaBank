@@ -25,7 +25,10 @@ public with sharing class CC_Opportunity_BU_TRHan extends CC_TriggerHandlerBase 
             crearTitularHipotecas(listNewObj, mapOldObj);
             calcularTMO(listNewObj, mapOldObj);
             informarCampoPrioridad(listNewObj, mapOldObj);
-            crearAccountTitular2(listNewObj, mapOldObj);
+            crearAccountTitularHipoteca(listNewObj, mapOldObj);
+            if(FeatureManagement.checkPermission('CSBD_UsuarioPromptsIA')){
+                comprobarCumpleCondicionesIAEinstein(listNewObj, mapOldObj);
+            }
         }
     }
 
@@ -378,51 +381,10 @@ public with sharing class CC_Opportunity_BU_TRHan extends CC_TriggerHandlerBase 
             }
         }
 
-        Map <Id, Account> idClienteMap = new Map<Id, Account>();
-        for(Account cliente: [SELECT Id, FirstName, LastName, CC_Numero_Documento__c, Name, RecordTypeId  FROM Account WHERE Id =: idsCliente]) {
-            idClienteMap.put(cliente.Id, cliente);
-        }
-
-        List<Account> cuentasTitularInsert = new List<Account>();
-        List<Contact> contactosTitularInsert = new List<Contact>();
-        Id recordTypeIdAccount = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
-        Id recordTypeIdAccountClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
-        Id recordTypeIdContact = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
-        Map<Id, Account> idTitularMap = new Map<Id, Account>();
-        for(Opportunity oportunidad: oportunidadesCrearTitular) {
-            Account cuentaTitulares = new Account();
-            cuentaTitulares.RecordTypeId = recordTypeIdAccount;
-            cuentaTitulares.Name = 'Cuenta titulares petición '+ oportunidad.CSBD_Identificador__c;
-            cuentasTitularInsert.add(cuentaTitulares);
-            idTitularMap.put(oportunidad.Id, cuentaTitulares);
-        }
-        insert cuentasTitularInsert;
-
-        Map<Id, Contact> idContactoTitularMap = new Map<Id, Contact>();
-        for(Opportunity oportunidad2: oportunidadesCrearTitular) {
-            Account cliente = idClienteMap.get(oportunidad2.AccountId);
-            Contact titular1 = new Contact();
-            titular1.AccountId = idTitularMap.get(oportunidad2.Id).Id;
-            titular1.RecordTypeId = recordTypeIdContact;
-            titular1.CC_Numero_Documento__c = cliente.CC_Numero_Documento__c;
-            // Si la cuenta es CC_ClientePA introduzco el FirstName y el LastName, si es otro RT introduzco el Name
-            if(cliente.RecordTypeId == recordTypeIdAccountClientePA){
-                titular1.FirstName = cliente.FirstName;
-                titular1.LastName = cliente.LastName;
-            }else{
-                titular1.LastName = cliente.Name;
-            }
-            contactosTitularInsert.add(titular1);
-            idContactoTitularMap.put(oportunidad2.Id, titular1);
-        }
-        insert contactosTitularInsert;
-
-        for(Opportunity oportunidad3: oportunidadesCrearTitular) {
-            oportunidad3.CSBD_ContactoTitular1__c = idContactoTitularMap.get(oportunidad3.Id).Id;
-        }
+        CSBD_Opportunity.crearTitularHipotecas(oportunidadesCrearTitular, idsCliente);
     }
 
-    private static void crearAccountTitular2(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
+    private static void crearAccountTitularHipoteca(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
         List<Opportunity> oportunidadesCrearAccount = new List<Opportunity>();
         List<Contact> contactosAActualizar = new List<Contact>();
         List<Account> cuentasTitularInsert = new List<Account>();
@@ -523,6 +485,20 @@ public with sharing class CC_Opportunity_BU_TRHan extends CC_TriggerHandlerBase 
 
         if(!oportunidades.isEmpty()){
             CSBD_Hipoteca.informarCampoPrioridad(oportunidades, null);
+        }
+    }
+
+    public static void comprobarCumpleCondicionesIAEinstein(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
+        List<Opportunity> oportunidades = new List<Opportunity>();
+        for (Opportunity newOportunidad : listNewObj) {
+            Opportunity oldOportunidad = mapOldObj.get(newOportunidad.Id);
+            if (newOportunidad.CSBD_Producto__c != oldOportunidad.CSBD_Producto__c) {
+                oportunidades.add(newOportunidad);
+            }
+        }
+
+        if(!oportunidades.isEmpty()){
+            CSBD_EinsteinUtils.marcarCheckPromptSiCumple(oportunidades);
         }
     }
 }

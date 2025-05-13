@@ -5,6 +5,7 @@
     <columns>CC_Detalle__c</columns>
     <columns>CC_Causa__c</columns>
     <columns>CC_Activo__c</columns>
+    <columns>CREATED_DATE</columns>
     <filterScope>Everything</filterScope>
     <filters>
         <field>RECORDTYPE</field>

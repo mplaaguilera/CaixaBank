@@ -19,9 +19,9 @@
     <filters>
         <field>OS_Propietario__c</field>
         <operation>equals</operation>
-        <value>Toni Garcia de la Cruz</value>
+        <value>Andres Mohamed Alfonso</value>
     </filters>
-    <label>Roberto de la Cruz Valverde</label>
+    <label>Casos Andres</label>
     <sharedTo>
         <group>PublicGroup_2N_Segundo_nivel_HDT</group>
     </sharedTo>

@@ -162,7 +162,7 @@ public with sharing class SAC_CaseReclamanteHandler {
             setIdsAccounts.add(reclamante.SAC_Account__c);
         }
 
-        Map<Id, Account> mapaAccounts = new Map<Id, Account>([SELECT Id, Phone, CC_Email__c, PersonEmail, ShippingPostalCode, CC_Segmento__c, CC_SubSegmento__c, BillingPostalCode, BillingStreet, BillingCity, BillingState, CC_Edad__pc,CC_Gestor_InTouch__c, CC_FechaNac__pc, AV_EAPGestor__c, AV_EAPGestor__r.AccountId FROM Account WHERE Id IN :setIdsAccounts]);
+        Map<Id, Account> mapaAccounts = new Map<Id, Account>([SELECT Id, Phone, CC_Email__c, PersonEmail, ShippingPostalCode, CC_Segmento__c, CC_SubSegmento__c, BillingPostalCode, BillingStreet, BillingCity, BillingState, CC_Edad__pc,CC_Gestor_InTouch__c, CC_FechaNac__pc, AV_OfficeManager__c FROM Account WHERE Id IN :setIdsAccounts]);
         for (SAC_CaseReclamante__c reclamante : listNewCaseReclamante) {
             if (mapaAccounts.containsKey(reclamante.SAC_Account__c)) {
                 reclamante.SAC_Telefono__c = mapaAccounts.get(reclamante.SAC_Account__c).Phone;
@@ -182,7 +182,7 @@ public with sharing class SAC_CaseReclamanteHandler {
 				reclamante.SAC_CodigoPostalContacto__c = mapaAccounts.get(reclamante.SAC_Account__c).BillingPostalCode;
 				reclamante.SAC_CodigoPostalContacto__c = mapaAccounts.get(reclamante.SAC_Account__c).BillingPostalCode;
 
-				String sOficina = mapaAccounts.get(reclamante.SAC_Account__c).AV_EAPGestor__r.AccountId;
+				String sOficina = mapaAccounts.get(reclamante.SAC_Account__c).AV_OfficeManager__c;
 				if(!String.isBlank(sOficina)) {
 					Case oCaseUpd = new Case();
 					oCaseUpd.id = reclamante.SAC_Case__c;

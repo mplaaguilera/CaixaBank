@@ -6,12 +6,16 @@
     <columns>OPPORTUNITY.STAGE_NAME</columns>
     <columns>ACCOUNT.NAME</columns>
     <columns>CORE.USERS.FULL_NAME</columns>
-    <columns>Case__c</columns>
+    <columns>CSBD_CasoOrigen__c</columns>
     <filterScope>Everything</filterScope>
     <filters>
         <field>OPPORTUNITY.RECORDTYPE</field>
         <operation>equals</operation>
         <value>Opportunity.CSBD_MAC</value>
     </filters>
-    <label>CSBD: Mac</label>
+    <label>CSBD: CSCC</label>
+    <sharedTo>
+        <group>CBK_Desarrollo_CSBD</group>
+        <role>CSBD_Generico</role>
+    </sharedTo>
 </ListView>

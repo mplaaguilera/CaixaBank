@@ -22,9 +22,10 @@ public class CSBD_DisponibilidadGestores_Apex_Test {
             CSBD_Opportunity.programarCita(cmn.Id, false, gestor.Id, System.now());
 
             Test.startTest();
-            Map<Id, List<Event>> eventosGestores = CSBD_DisponibilidadGestores_Apex.getEventosGestores(System.today(), new List<Id>{UserInfo.getUserId()});
+            Map<Id, List<Event>> eventosGestores = CSBD_DisponibilidadGestores_Apex.getEventosGestores(System.today(), new List<Id>{gestor.Id});
             Test.stopTest();
 
+            System.debug('eventosGestores: ' + eventosGestores);
             System.assert(eventosGestores.containsKey(gestor.Id));
         }
     }

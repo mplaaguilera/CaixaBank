@@ -5,7 +5,7 @@
     <label>Lista</label>
     <lookupFilter>
         <active>true</active>
-        <booleanFilter>1 OR 2 OR 3</booleanFilter>
+        <booleanFilter>1 OR 2 OR 3 OR 4</booleanFilter>
         <filterItems>
             <field>CC_Lista_Valores__c.RecordTypeId</field>
             <operation>equals</operation>
@@ -20,6 +20,11 @@
             <field>CC_Lista_Valores__c.RecordTypeId</field>
             <operation>equals</operation>
             <value>Familias</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_Lista_Valores__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Motivos CSCC</value>
         </filterItems>
         <isOptional>false</isOptional>
     </lookupFilter>

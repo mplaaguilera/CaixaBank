@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_BuyingPriceAmount__c</fullName>
+    <description>Campo en el que muestra el precio de compra del inmueble</description>
     <label>Precio compra del inmueble</label>
     <precision>18</precision>
     <required>false</required>

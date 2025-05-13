@@ -56,6 +56,25 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>EV_CodCompany__c</picklist>
+        <values>
+            <fullName>ACC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CXB</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IMG</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VCX</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>EV_FormatoDeAsistencias__c</picklist>
         <values>
             <fullName>001</fullName>
@@ -85,6 +104,10 @@
         <picklist>EV_Status__c</picklist>
         <values>
             <fullName>Asistió</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Asistió en diferido</fullName>
             <default>false</default>
         </values>
         <values>

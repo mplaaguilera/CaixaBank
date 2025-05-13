@@ -19,11 +19,11 @@ public with sharing class CC_Marcar_Casos_KPI_Batch implements Database.Batchabl
 
         List<Case> casosUpdate = new List<Case>();
 
-        List<Case> derivacionOficina = CC_Marcar_Casos_KPI.calcularDerivacionOficina(scope);
+        //List<Case> derivacionOficina = CC_Marcar_Casos_KPI.calcularDerivacionOficina(scope);
         List<Case> repetitividad = CC_Marcar_Casos_KPI.calcularRepetitividad(scope);
 
         casosUpdate.addAll(repetitividad);
-        casosUpdate.addAll(derivacionOficina);
+        //casosUpdate.addAll(derivacionOficina);
 
         casosUpdate = new List<Case>(new Set<Case>(casosUpdate));
 

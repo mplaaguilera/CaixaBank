@@ -100,11 +100,6 @@
                 <label>Contact Center</label>
             </value>
             <value>
-                <fullName>Now in Sales</fullName>
-                <default>false</default>
-                <label>Now in Sales</label>
-            </value>
-            <value>
                 <fullName>AV_AlertasComerciales</fullName>
                 <default>false</default>
                 <isActive>false</isActive>

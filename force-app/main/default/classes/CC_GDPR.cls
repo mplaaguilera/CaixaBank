@@ -1,13 +1,13 @@
 public with sharing class CC_GDPR {
 
 	public class DerechoWrapper {
-		@AuraEnabled public String idUrl{get;set;}
-		@AuraEnabled public String tipo{get;set;}
-		@AuraEnabled public String estado{get;set;}
-		@AuraEnabled public String fechaEnvio{get;set;}
-		@AuraEnabled public String idCasoUrl{get;set;}
-		@AuraEnabled public String numeroCaso{get;set;}
-		@AuraEnabled public String documentoCliente{get;set;}
+		@AuraEnabled public String idUrl {get;set;}
+		@AuraEnabled public String tipo {get;set;}
+		@AuraEnabled public String estado {get;set;}
+		@AuraEnabled public String fechaEnvio {get;set;}
+		@AuraEnabled public String idCasoUrl {get;set;}
+		@AuraEnabled public String numeroCaso {get;set;}
+		@AuraEnabled public String documentoCliente {get;set;}
 	}
 
 	@AuraEnabled
@@ -16,8 +16,9 @@ public with sharing class CC_GDPR {
 		Id idCliente = [SELECT AccountId FROM Case WHERE Id = :idCaso].AccountId;
 		if (idCliente != null) {
 			String numeroDocumentoCliente = [SELECT CC_Numero_Documento__c FROM Account WHERE Id = :idCliente].CC_Numero_Documento__c;
-			for (CC_Derecho__c derechoAux : [SELECT RecordType.Name, CC_Estado__c, CC_FechaEnvioCierre__c, CC_Caso__c, CC_Caso__r.CaseNumber, CC_DocumentoCliente__c
-												FROM CC_Derecho__c WHERE CC_DocumentoCliente__c = :numeroDocumentoCliente  ORDER BY CreatedDate DESC]) {
+			for (CC_Derecho__c derechoAux : [SELECT RecordType.Name, CC_Estado__c, CC_FechaEnvioCierre__c, CC_Caso__c,
+												CC_Caso__r.CaseNumber, CC_DocumentoCliente__c FROM CC_Derecho__c
+												WHERE CC_DocumentoCliente__c = :numeroDocumentoCliente ORDER BY CreatedDate DESC]) {
 				DerechoWrapper derecho = new DerechoWrapper();
 				derecho.idUrl = '/lightning/r/Case/' + derechoAux.Id + '/view';
 				derecho.tipo = derechoAux.RecordType.Name;
@@ -100,25 +101,19 @@ public with sharing class CC_GDPR {
 		}
 
 		if (String.isEmpty(camposPeticion.get('numperso'))) {
-			// Si no se ha informado NumPerso, debe enviarse el valor '0'
-			String numperso = '0';
-			camposPeticion.put('numperso', numperso);
+			camposPeticion.put('numperso', '0');
 		}
 		if (String.isNotEmpty(camposPeticion.get('paisExpedicion'))) {
-			String paisExpedicion = CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_Pais', camposPeticion.get('paisExpedicion'));
-			camposPeticion.put('paisExpedicion', paisExpedicion);
+			camposPeticion.put('paisExpedicion', CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_Pais', camposPeticion.get('paisExpedicion')));
 		}
 		if (String.isNotEmpty(camposPeticion.get('pais'))) {
-			String pais = CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_Pais', camposPeticion.get('pais'));
-			camposPeticion.put('pais', pais);
+			camposPeticion.put('pais', CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_Pais', camposPeticion.get('pais')));
 		}
 		if (String.isNotEmpty(camposPeticion.get('provincia'))) {
-			String provincia = CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_Provincia', camposPeticion.get('provincia'));
-			camposPeticion.put('provincia', provincia);
+			camposPeticion.put('provincia', CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_Provincia', camposPeticion.get('provincia')));
 		}
 		if (String.isNotEmpty(camposPeticion.get('derecho'))) {
-			String derecho = CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_Derecho', camposPeticion.get('derecho'));
-			camposPeticion.put('derecho', derecho);
+			camposPeticion.put('derecho', CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_Derecho', camposPeticion.get('derecho')));
 		}
 		if (String.isNotEmpty(camposPeticion.get('mineriaDatos')) &&
 			String.isNotEmpty(camposPeticion.get('telemarketing')) &&
@@ -136,18 +131,15 @@ public with sharing class CC_GDPR {
 			camposPeticion.put('textoRevocacion', textoRevocacion);
 		}
 		if (String.isNotEmpty(camposPeticion.get('tipoPortabilidad'))) {
-			String tipoPortabilidad = CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_TipoPortabilidad', camposPeticion.get('tipoPortabilidad'));
-			camposPeticion.put('tipoPortabilidad', tipoPortabilidad);
+			camposPeticion.put('tipoPortabilidad', CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_TipoPortabilidad', camposPeticion.get('tipoPortabilidad')));
 		}
 		if (String.isNotEmpty(camposPeticion.get('tipoLimitacion'))) {
-			String tipoLimitacion = CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_TipoLimitacion', camposPeticion.get('tipoLimitacion'));
-			camposPeticion.put('tipoLimitacion', tipoLimitacion);
+			camposPeticion.put('tipoLimitacion', CC_MetodosUtiles.getDestValueLOVMeta('CC_GDPR_TipoLimitacion', camposPeticion.get('tipoLimitacion')));
 		}
-
 		return camposPeticion;
 	}
 
-	public static String construirCuerpoPeticion(Map<String,String> camposPeticion, String cuerpoPeticion) {
+	public static String construirCuerpoPeticion(Map<String, String> camposPeticion, String cuerpoPeticion) {
 		camposPeticion = formatearCamposPeticion(camposPeticion);
 		cuerpoPeticion = cuerpoPeticion.replace('##canal##', camposPeticion.get('canal'));
 		cuerpoPeticion = cuerpoPeticion.replace('##canalComunicacion##', camposPeticion.get('canalComunicacion'));
@@ -178,69 +170,67 @@ public with sharing class CC_GDPR {
 		cuerpoPeticion = cuerpoPeticion.replace('##paisExpedicion##', camposPeticion.get('paisExpedicion'));
 		cuerpoPeticion = cuerpoPeticion.replace('##tipoDocumento##', camposPeticion.get('tipoDocumento'));
 
-		if(camposPeticion.get('tratamiento1') != null){
+		if (camposPeticion.get('tratamiento1') != null) {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento1##', camposPeticion.get('tratamiento1'));
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion1##', 'true');
-		}else{
+		} else {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento1##','01');
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion1##', 'false');
 		}
-		if(camposPeticion.get('tratamiento2') != null){
+		if (camposPeticion.get('tratamiento2') != null) {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento2##', camposPeticion.get('tratamiento2'));
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion2##', 'true');
-		}else{
+		} else {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento2##', '02');
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion2##', 'false');
 		}
-		if(camposPeticion.get('tratamiento3') != null){
+		if (camposPeticion.get('tratamiento3') != null) {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento3##', camposPeticion.get('tratamiento3'));
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion3##', 'true');
-		}else{
+		} else {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento3##', '03');
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion3##', 'false');
 		}
-		if(camposPeticion.get('tratamiento4') != null){
+		if (camposPeticion.get('tratamiento4') != null) {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento4##', camposPeticion.get('tratamiento4'));
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion4##', 'true');
-		}else{
+		} else {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento4##', '04');
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion4##', 'false');
 		}
-		if(camposPeticion.get('tratamiento5') != null){
+		if (camposPeticion.get('tratamiento5') != null) {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento5##', camposPeticion.get('tratamiento5'));
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion5##', 'true');
-		}else{
+		} else {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento5##', '05');
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion5##', 'false');
 		}
-		if(camposPeticion.get('tratamiento6') != null){
+		if (camposPeticion.get('tratamiento6') != null) {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento6##', camposPeticion.get('tratamiento6'));
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion6##', 'true');
-		}else{
+		} else {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento6##', '06');
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion6##', 'false');
 		}
-		if(camposPeticion.get('tratamiento7') != null){
+		if (camposPeticion.get('tratamiento7') != null) {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento7##', camposPeticion.get('tratamiento7'));
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion7##', 'true');
-		}else{
+		} else {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento7##', '07');
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion7##', 'false');
 		}
 		if(camposPeticion.get('tratamiento8') != null){
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento8##', camposPeticion.get('tratamiento8'));
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion8##', 'true');
-		}else{
+		} else {
 			cuerpoPeticion = cuerpoPeticion.replace('##idTratamiento8##', '08');
 			cuerpoPeticion = cuerpoPeticion.replace('##oposicion8##', 'false');
 		}
-
 		return cuerpoPeticion;
 	}
 
 	public static Map<String,String> parsearCamposRespuesta(String cuerpoRespuesta) {
-
-		Map<String,String> camposRespuesta = new Map<String,String>();
+		Map<String, String> camposRespuesta = new Map<String, String>();
 
 		// Cargar el XML de respuesta
 		DOM.Document documentoXML = new DOM.Document();
@@ -291,19 +281,16 @@ public with sharing class CC_GDPR {
 	}
 
 	@future(callout=true)
-	public static void altaSolicitudFuture(List<ID> derechosId) {
-		CC_InterfaceSettings__mdt cfgInterfazGdpr = CC_MetodosUtiles.getInterfazConfigBody('CC_Int_GDPR');
-		CC_InterfaceSettings__mdt cfgInterfazGdprOposicion = CC_MetodosUtiles.getInterfazConfigBody('CC_Int_GDPR_Oposicion');
-		CC_InterfaceSettings__mdt cfgInterfazGdprDerechoOposicion = CC_MetodosUtiles.getInterfazConfigBody('CC_Int_GDPR_Derecho_Oposicion');
-
+	public static void altaSolicitudFuture(List<Id> derechosId) {
 		List<CC_Derecho__c> derechos = new List<CC_Derecho__c>();
 
-		for (CC_Derecho__c derecho : [SELECT CC_Tratamiento__c, CC_CodigoPostal__c, CC_Localidad__c, CC_Nombre__c, CC_NombreVia__c, CC_Pais__c,
-										CC_Apellido1__c, CC_Provincia__c, CC_Resto__c, CC_Apellido2__c,RecordType.DeveloperName, RecordType.Name,
-										CC_Empresa__c, CC_Oficina__c, CC_DocumentoCliente__c, CC_NumPerso__c, CC_IdentificadorPortabilidad__c,
-										CC_TextoOposicion__c, CC_TextoRectificacion__c, CC_TipoPortabilidad__c, CC_TipoLimitacion__c,
-										CC_UtilizarDatosMineria__c, CC_Telemarketing__c, CC_MediosElectronicos__c, CC_PublicidadPostal__c,
-										CC_ContactosGestores__c, CC_CesionTerceros__c FROM CC_Derecho__c WHERE Id IN :derechosId]) {
+		for (CC_Derecho__c derecho : [SELECT CSBD_Opportunity__c,CC_Tratamiento__c, CC_CodigoPostal__c, CC_Localidad__c, CC_Nombre__c,
+										CC_NombreVia__c, CC_Pais__c, CC_Apellido1__c, CC_Provincia__c, CC_Resto__c, CC_Apellido2__c,
+										RecordType.DeveloperName, RecordType.Name, CC_Empresa__c, CC_Oficina__c, CC_DocumentoCliente__c,
+										CC_NumPerso__c, CC_IdentificadorPortabilidad__c, CC_TextoOposicion__c, CC_TextoRectificacion__c,
+										CC_TipoPortabilidad__c, CC_TipoLimitacion__c, CC_UtilizarDatosMineria__c, CC_Telemarketing__c,
+										CC_MediosElectronicos__c, CC_PublicidadPostal__c, CC_ContactosGestores__c, CC_CesionTerceros__c
+										FROM CC_Derecho__c WHERE Id IN :derechosId]) {
 
 			Map<String, String> camposPeticion = new Map<String, String>{
 				'canal' => '6', //Call Center
@@ -349,15 +336,23 @@ public with sharing class CC_GDPR {
 			String descripcionError = '';
 			String detalleError = '';
 
-			CC_InterfaceSettings__mdt cfgInterfaz;
-			if (derecho.RecordType.DeveloperName == 'CC_Oposicion') {
-				cfgInterfaz = cfgInterfazGdprOposicion;
-			} else if (derecho.RecordType.DeveloperName == 'CC_Oposicion_comunicaciones_interes_legitimo') {
-				cfgInterfaz = cfgInterfazGdprDerechoOposicion;
-			} else {
-				cfgInterfaz = cfgInterfazGdpr;
+			CC_InterfaceSettings__mdt cfgIntegracionGdpr;
+			if (derecho.CSBD_Opportunity__c != null) {
+				cfgIntegracionGdpr = CC_MetodosUtiles.getInterfazConfigBody('CSBD_Int_GDPR');
 			}
-			String cuerpoPeticion = construirCuerpoPeticion(camposPeticion, cfgInterfaz.CC_Body__c);
+			if (cfgIntegracionGdpr == null) {
+				cfgIntegracionGdpr = CC_MetodosUtiles.getInterfazConfigBody('CC_Int_GDPR');
+			}
+
+			CC_InterfaceSettings__mdt cfgIntegracionGdprBody;
+			if (derecho.RecordType.DeveloperName == 'CC_Oposicion') {
+				cfgIntegracionGdprBody = CC_MetodosUtiles.getInterfazConfigBody('CC_Int_GDPR_Oposicion');
+			} else if (derecho.RecordType.DeveloperName == 'CC_Oposicion_comunicaciones_interes_legitimo') {
+				cfgIntegracionGdprBody = CC_MetodosUtiles.getInterfazConfigBody('CC_Int_GDPR_Derecho_Oposicion');
+			} else {
+				cfgIntegracionGdprBody = cfgIntegracionGdpr;
+			}
+			String cuerpoPeticion = construirCuerpoPeticion(camposPeticion, cfgIntegracionGdprBody.CC_Body__c);
 
 			HttpRequest peticion = new HttpRequest();
 			HTTPResponse respuesta;
@@ -365,15 +360,15 @@ public with sharing class CC_GDPR {
 			Datetime fechaEnvio;
 
 			try {
-				peticion.setTimeOut(Integer.valueOf(cfgInterfazGdpr.CC_TimeOut__c));
-				peticion.setMethod(cfgInterfazGdpr.CC_TipoPeticion__c);
-				peticion.setHeader('Content-Type', cfgInterfazGdpr.CC_ContentType__c);
+				peticion.setTimeOut(Integer.valueOf(cfgIntegracionGdpr.CC_TimeOut__c));
+				peticion.setMethod(cfgIntegracionGdpr.CC_TipoPeticion__c);
+				peticion.setHeader('Content-Type', cfgIntegracionGdpr.CC_ContentType__c);
 				peticion.setHeader('Content-Length', '' + cuerpoPeticion.length());
 				if (!Test.isRunningTest()) {
-					peticion.setClientCertificateName(cfgInterfazGdpr.CC_Certificado__c);
+					peticion.setClientCertificateName(cfgIntegracionGdpr.CC_Certificado__c);
 				}
 
-				peticion.setEndpoint(cfgInterfazGdpr.CC_EndPoint__c);
+				peticion.setEndpoint(cfgIntegracionGdpr.CC_EndPoint__c);
 				peticion.setbody(cuerpoPeticion);
 				fechaEnvio = Datetime.now();
 				respuesta = new Http().send(peticion);
@@ -385,7 +380,7 @@ public with sharing class CC_GDPR {
 					throw errorRespuesta;
 				}
 			} catch (Exception e) {
-				// Error de comunicaciones
+				// Error de comunicaciones...
 				CBK_Log.error(e, 'CC_GDPR - altaSolicitudFuture - Error de comunicaciones');
 				descripcionError = 'Error de comunicaciones';
 				detalleError = e.getMessage();
@@ -420,7 +415,7 @@ public with sharing class CC_GDPR {
 	}
 
 	@InvocableMethod(label='Enviar solicitud de derecho a GDPR' description='Enviar solicitud de derecho a GDPR')
-	public static void altaSolicitud (List<ID> derechosId) {
+	public static void altaSolicitud(List<Id> derechosId) {
 		altaSolicitudFuture(derechosId);
 	}
 }

@@ -3,7 +3,7 @@
     <fullName>AV_AssignedManagerSales__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Gestor asignado a la venta</description>
-    <label>Empleado de la venta</label>
+    <label>Empleado</label>
     <referenceTo>Contact</referenceTo>
     <relationshipLabel>Opportunities (Empleado de la venta)</relationshipLabel>
     <relationshipName>Opportunities4</relationshipName>

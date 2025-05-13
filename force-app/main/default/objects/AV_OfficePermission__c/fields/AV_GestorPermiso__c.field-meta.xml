@@ -2,8 +2,10 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_GestorPermiso__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>indica el  permiso del gestor</description>
     <label>Gestor permiso</label>
     <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Permisos Oficinas (Gestor permiso)</relationshipLabel>
     <relationshipName>Permisos_Oficinas</relationshipName>
     <required>false</required>
     <trackTrending>false</trackTrending>

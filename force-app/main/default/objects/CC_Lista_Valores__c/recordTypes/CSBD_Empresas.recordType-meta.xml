@@ -358,10 +358,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Chat NOA WhatsApp</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Clases Pasivas</fullName>
             <default>false</default>
         </values>
@@ -379,6 +375,94 @@
         </values>
         <values>
             <fullName>Domiciliaciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-BUILDING CENTER</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-CAIXABANK PAYMENTS %26 CONSUMER</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-CAIXARENTING %2F CAIXABANK EQUIPMENT FINANCE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-CAM %2F CAIXABANK ASSET MANAGEMENT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-CAM LUXEMBURGO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-CAM PORTUGAL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-CBI %2F CAIXA BUSINESS INTELLIGENCE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-COMERCIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-CREDIFIMO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-GDS %2F CAIXABANK OPERATIONAL SERVICES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-GESTICAIXA %2F CAIXABANK TITULACION</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-HABITATGE ASSEQUIBLE %2F INMOCAIXA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-IMAGIN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-MICROBANK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-MONEY TO PAY</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-OpenWealth</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-PROMOCAIXA %2F WIVAI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-PTR %2F PUERTO TRIANA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-SUMASA %2F CAIXABANK FACILITIES MANAGEMENT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-TCF %2F TELEFONICA CONSUMER FINANCE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-VDC %2F VIDACAIXA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-VIDACAIXA MEDIACIÓN</fullName>
             <default>false</default>
         </values>
         <values>
@@ -638,6 +722,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Testamentarias</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Valija digital</fullName>
             <default>false</default>
         </values>
@@ -814,6 +902,33 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>CSBD_TablaPrecios_Producto__c</picklist>
+        <values>
+            <fullName>Convenios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omni</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PHD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sostenibles</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>imaginBank</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>CSBD_Tipo_de_oportunidad__c</picklist>
         <values>
             <fullName>Acción comercial</fullName>
@@ -828,7 +943,15 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>CSCC</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Chat</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Consumo</fullName>
             <default>false</default>
         </values>
         <values>
@@ -849,10 +972,6 @@
         </values>
         <values>
             <fullName>Llamada Servicio</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>MAC</fullName>
             <default>false</default>
         </values>
         <values>

@@ -71,6 +71,11 @@
                 <default>false</default>
                 <label>Firma hipoteca</label>
             </value>
+            <value>
+                <fullName>OFT</fullName>
+                <default>false</default>
+                <label>Tarea Oficina</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

@@ -420,8 +420,8 @@ SEG_ExcepcionesEmpresa__c - plantillas
             List<Case> nuevaAccountCase = new List<Case>();
             List<FeedItem> nuevaRelacionFeed = new List<FeedItem>();
             List<FeedItem> borrarRelacionFeed = new List<FeedItem>();
-            List<Account> actualizarCuentaALF = new List<Account>();
-            List<Account> borrarCuentaSEG = new List<Account>();
+            Map<Id,Account> actualizarCuentaALF = new Map<Id,Account>();
+            Map<Id,Account> borrarCuentaSEG = new Map<Id,Account>();
             Map<ID,ContentNote> notasPorCliente = new Map<ID,ContentNote>();
             List<SEG_Contratos__c> nuevaAccountContrato = new List<SEG_Contratos__c>();
             List<SEG_Excepciones_Empresa__c> nuevaAccountExcepcion = new List<SEG_Excepciones_Empresa__c>();
@@ -665,8 +665,14 @@ SEG_ExcepcionesEmpresa__c - plantillas
                     cuentaALF.SEG_DominioMail__c = dominioMail;
 
 
-                    actualizarCuentaALF.add(cuentaALF);
-                    borrarCuentaSEG.add(cuentaSEG);
+                    if (!actualizarCuentaALF.containsKey(cuentaALF.Id)) {
+                        actualizarCuentaALF.put(cuentaALF.Id, cuentaALF);
+                    }
+
+
+                    if (!borrarCuentaSEG.containsKey(cuentaSEG.Id)) {
+                        borrarCuentaSEG.put(cuentaSEG.Id, cuentaSEG);
+                    }
 
                     // ********************************************************
                     // Crear una nota para la cuenta de ALF, indicando la fusión.
@@ -970,36 +976,54 @@ SEG_ExcepcionesEmpresa__c - plantillas
             // Sincronizar la ficha del cliente.
             // ********************************************************
             //update actualizarCuentaALF;
-            Database.SaveResult[] resultadoUpdate3 = Database.update(actualizarCuentaALF, false);
-            for (Integer i = 0; i < resultadoUpdate3.size(); i++)
-            {
-                if (!resultadoUpdate3[i].isSuccess())
-                {
-                    bError = true;
-                    SEG_MetodosComunes.registrarErrorDML (resultadoUpdate3[i].getErrors(), actualizarCuentaALF[i]);
-                }
+            List<Account> lstCuentasALFUpdate = new List<Account>();
+
+            if (actualizarCuentaALF != null && !actualizarCuentaALF.isEmpty()) {
+                lstCuentasALFUpdate.addAll(actualizarCuentaALF.values());
             }
-            if (bError)
-            {
-                throw new DMLException('SEG_ConciliacionAccount_Batch : Error al actualizar registros en Account');
+
+            if (!lstCuentasALFUpdate.isEmpty()) {
+                Database.SaveResult[] resultadoUpdate3 = Database.update(lstCuentasALFUpdate, false);
+                for (Integer i = 0; i < resultadoUpdate3.size(); i++)
+                {
+                    if (!resultadoUpdate3[i].isSuccess())
+                    {
+                        bError = true;
+                        SEG_MetodosComunes.registrarErrorDML (resultadoUpdate3[i].getErrors(), lstCuentasALFUpdate[i]);
+                    }
+                }
+                if (bError)
+                {
+                    throw new DMLException('SEG_ConciliacionAccount_Batch : Error al actualizar registros en Account');
+                }
             }
 
             // ********************************************************
             // Borrar la cuenta de Segmentos.
             // ********************************************************
             //delete borrarCuentaSEG;
-            Database.DeleteResult[] resultadoDelete5 = Database.delete(borrarCuentaSEG, false);
-            for (Integer i = 0; i < resultadoDelete5.size(); i++)
-            {
-                if (!resultadoDelete5[i].isSuccess())
-                {
-                    bError = true;
-                    SEG_MetodosComunes.registrarErrorDML (resultadoDelete5[i].getErrors(), borrarCuentaSEG[i]);
-                }
+
+            List<Account> lstCuentasBorrarSEG = new List<Account>();
+
+            if (borrarCuentaSEG != null && !borrarCuentaSEG.isEmpty()) {
+                lstCuentasBorrarSEG.addAll(borrarCuentaSEG.values());
             }
-            if (bError)
-            {
-                throw new DMLException('SEG_ConciliacionAccount_Batch : Error al borrar registros en Account');
+
+            if (!lstCuentasBorrarSEG.isEmpty()) {
+
+                Database.DeleteResult[] resultadoDelete5 = Database.delete(lstCuentasBorrarSEG, false);
+                for (Integer i = 0; i < resultadoDelete5.size(); i++)
+                {
+                    if (!resultadoDelete5[i].isSuccess())
+                    {
+                        bError = true;
+                        SEG_MetodosComunes.registrarErrorDML (resultadoDelete5[i].getErrors(), lstCuentasBorrarSEG[i]);
+                    }
+                }
+                if (bError)
+                {
+                    throw new DMLException('SEG_ConciliacionAccount_Batch : Error al borrar registros en Account');
+                }
             }
 
             // ********************************************************

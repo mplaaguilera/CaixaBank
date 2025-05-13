@@ -7,7 +7,8 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
     final static Id RECTYPERECLAMACIONSPV =  mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
     final static Id RECTYPECONSULTA =  mapRTsObjects.get('Case').get('SAC_Consulta').getRecordTypeId();
     final static Id RECTYPEADJUNTOS = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_TipoAdjuntos').getRecordTypeId();
-
+    final static Id RECTYPEADJUNTOSSPV = mapRTsObjects.get('SAC_MaestroTemas__c').get('SPV_TipoAdjuntos').getRecordTypeId();
+    
     @AuraEnabled
     public static oficinaWrapper recuperarDatos(String idRegistro, String fieldApiName, String objectApiName){
 
@@ -46,19 +47,25 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                 }
             }
         }
+
+        List<SObject> globalObjectResults = Database.query(globalObject);
+
+        if(!globalObjectResults.isEmpty()) {
+            oficinaWrapper wpp = new oficinaWrapper(Database.query(globalObject)[0], esGeneral, '');
     
-        oficinaWrapper wpp = new oficinaWrapper(Database.query(globalObject)[0], esGeneral, '');
-    
-        if (objectApiName == 'Case') {
-            wpp.sacBloquePicklistValues = getPicklistValues('ContentVersion', 'SAC_Bloque__c');
-            List<Case> recla = [SELECT Id, CC_CasoRelacionado__c FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION OR RecordTypeId = :RECTYPERECLAMACIONSPV) AND Id = :idRegistro LIMIT 1];
-            if (!recla.isEmpty()) {
-                wpp.mostrarBloques = true;
-                wpp.idCasoRelacionado = recla[0].CC_CasoRelacionado__c;
+            if (objectApiName == 'Case') {
+                wpp.sacBloquePicklistValues = getPicklistValues('ContentVersion', 'SAC_Bloque__c');
+                List<Case> recla = [SELECT Id, CC_CasoRelacionado__c FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION OR RecordTypeId = :RECTYPERECLAMACIONSPV) AND Id = :idRegistro LIMIT 1];
+                if (!recla.isEmpty()) {
+                    wpp.mostrarBloques = true;
+                    wpp.idCasoRelacionado = recla[0].CC_CasoRelacionado__c;
+                }
             }
+        
+            return wpp;
+        }else{
+            return null;
         }
-    
-        return wpp;
     }
     
     public static Map<String, String> getPicklistValues(String objectName, String fieldName) {
@@ -278,11 +285,16 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
         }
 
         @AuraEnabled
-        public static List<SAC_MaestroTemas__c> recuperaTipoAdjuntos(String id){
+        public static List<SAC_MaestroTemas__c> recuperaTipoAdjuntos(String id, String rtCaso){
 
             try {
                 List<SAC_MaestroTemas__c> maestroAdjuntos = new List<SAC_MaestroTemas__c>();
-                maestroAdjuntos = [SELECT Id, Name, SAC_DocumentoVisible__c FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPEADJUNTOS AND SAC_Activo__c = true];
+                if(rtCaso == 'SPV_Reclamacion'){
+                    maestroAdjuntos = [SELECT Id, Name, SAC_DocumentoVisible__c FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPEADJUNTOSSPV AND SAC_Activo__c = true];
+                }else{
+                    maestroAdjuntos = [SELECT Id, Name, SAC_DocumentoVisible__c FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPEADJUNTOS AND SAC_Activo__c = true];
+                }
+
                 
                 if(!maestroAdjuntos.isEmpty()){
                     return maestroAdjuntos;

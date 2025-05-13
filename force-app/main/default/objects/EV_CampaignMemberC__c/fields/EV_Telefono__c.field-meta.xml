@@ -4,8 +4,8 @@
     <description>Teléfono</description>
     <externalId>false</externalId>
     <formula>IF(NOT(ISBLANK(EV_ContactId__c)),
-EV_ContactId__r.MobilePhone,
- EV_LeadId__r.MobilePhone)</formula>
+EV_ContactId__r.Phone,
+ EV_LeadId__r.Phone)</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Teléfono</label>
     <required>false</required>

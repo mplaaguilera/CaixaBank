@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CC_3N_SACH_Case</fullName>
+    <columns>CC_Nivel_Flag__c</columns>
     <columns>Flag__c</columns>
     <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
     <columns>CC_Fecha_Limite_Resolucion__c</columns>

@@ -9,7 +9,7 @@
     <valueSet>
         <restricted>true</restricted>
         <valueSetDefinition>
-            <sorted>true</sorted>
+            <sorted>false</sorted>
             <value>
                 <fullName>App BrokerNow</fullName>
                 <default>false</default>
@@ -46,14 +46,14 @@
                 <label>App imaginTeens</label>
             </value>
             <value>
-                <fullName>Cajero</fullName>
-                <default>false</default>
-                <label>Cajero</label>
-            </value>
-            <value>
                 <fullName>Cajero ATM NOW</fullName>
                 <default>false</default>
                 <label>Cajero ATM NOW</label>
+            </value>
+            <value>
+                <fullName>Cajero</fullName>
+                <default>false</default>
+                <label>Cajero</label>
             </value>
             <value>
                 <fullName>Oficina</fullName>
@@ -74,11 +74,6 @@
                 <fullName>Portal CBK</fullName>
                 <default>false</default>
                 <label>Portal CBK</label>
-            </value>
-            <value>
-                <fullName>Portal Wivai</fullName>
-                <default>false</default>
-                <label>Portal Facilitea</label>
             </value>
             <value>
                 <fullName>RRSS</fullName>
@@ -104,6 +99,11 @@
                 <fullName>Web CBKNow</fullName>
                 <default>false</default>
                 <label>Web CBKNow</label>
+            </value>
+            <value>
+                <fullName>Portal Wivai</fullName>
+                <default>false</default>
+                <label>Portal Facilitea</label>
             </value>
         </valueSetDefinition>
     </valueSet>

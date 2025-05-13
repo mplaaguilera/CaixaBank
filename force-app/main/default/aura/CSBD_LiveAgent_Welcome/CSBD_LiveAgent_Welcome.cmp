@@ -23,7 +23,8 @@
 		recordUpdated="{!c.chatDataUpdated}" />
 
 	<force:recordData aura:id="opportunityData" recordId="{!v.chat.CSBD_Oportunidad_Id__c}" mode="EDIT"
-		fields="CSBD_Identificador__c, CSBD_PrimerContactoSLA__c, CSBD_SLA_Primera_Respuesta__c, CSBD_SLA_TGT__c, CreatedDate" targetFields="{!v.oportunidad}" targetError="{!v.errorLds}"
+		fields="CSBD_Identificador__c, CSBD_PrimerContactoSLA__c, CSBD_Primera_Respuesta_Agente_SLA__c, CreatedDate"
+		targetFields="{!v.oportunidad}" targetError="{!v.errorLds}"
 		recordUpdated="{!c.opportunityDataUpdated}" />
 
 	<!-- <c:CSBD_LiveAgent_TimeOut aura:id="compTimeOut" timeout="{!v.timeout}"/> -->
@@ -40,7 +41,10 @@
 			<div class="slds-grid slds-grid_vertical-align-center">
 				<div class="slds-col">
 					<lightning:recordViewForm recordId="{!v.recordId}" objectApiName="LiveChatTranscript">
-						<lightning:outputField fieldName="CC_Idioma__c" style="margin-bottom: 0px;"/>
+						<label class="slds-form-element__label slds-var-m-left_x-small slds-var-m-right_small">Idioma</label>
+						<div style="display: inline-block;">
+							<lightning:outputField fieldName="CC_Idioma__c" style="margin-bottom: 0px;" variant="label-hidden"/>
+						</div>
 					</lightning:recordViewForm>
 				</div>
 				<div class="slds-col slds-grow-none">
@@ -49,5 +53,7 @@
 			</div>
 		</div>
 	</article>
+
+	<!-- <div class="lineaSeparacion"></div> -->
 
 </aura:component>

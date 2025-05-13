@@ -41,6 +41,7 @@ public with sharing class HDT_EmailMessage_AI_TRHan extends CC_TriggerHandlerBas
     }
 
     private static void process(List<EmailMessage> correos, Map<Id, EmailMessage> mapaCorreos) {
+        processEmailMessageUpdate(correos);
         List<EmailMessage> correosCc = filtrarCorreosNoCc(correos);
         validarBuzonSalida(correosCc);
         //Se comprueba si el correo contiene algún fichero adjunto con un formato no permitido y, en tal caso, se impide su envío.
@@ -813,4 +814,10 @@ public with sharing class HDT_EmailMessage_AI_TRHan extends CC_TriggerHandlerBas
             }
         }
     }
+
+    public static void processEmailMessageUpdate(List<EmailMessage> newEmails) {
+        system.debug('Entrando al metodo nuevo del email');
+    }
+
+
 }

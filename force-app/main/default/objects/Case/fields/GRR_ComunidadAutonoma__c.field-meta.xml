@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_ComunidadAutonoma__c</fullName>
+    <label>Comunidad autónoma</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>GRR_Provincia__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetName>GRR_ComunidadesAutonomas</valueSetName>
+        <valueSettings>
+            <controllingFieldValue>SORIA</controllingFieldValue>
+            <controllingFieldValue>VALLADOLID</controllingFieldValue>
+            <controllingFieldValue>ZAMORA</controllingFieldValue>
+            <controllingFieldValue>BURGOS</controllingFieldValue>
+            <controllingFieldValue>ÁVILA</controllingFieldValue>
+            <controllingFieldValue>LEÓN</controllingFieldValue>
+            <controllingFieldValue>PALENCIA</controllingFieldValue>
+            <controllingFieldValue>SALAMANCA</controllingFieldValue>
+            <controllingFieldValue>SEGOVIA</controllingFieldValue>
+            <valueName>Castilla y León</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>TARRAGONA</controllingFieldValue>
+            <controllingFieldValue>GERONA</controllingFieldValue>
+            <controllingFieldValue>BARCELONA</controllingFieldValue>
+            <controllingFieldValue>LÉRIDA</controllingFieldValue>
+            <valueName>Cataluña</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>TERUEL</controllingFieldValue>
+            <controllingFieldValue>ZARAGOZA</controllingFieldValue>
+            <controllingFieldValue>HUESCA</controllingFieldValue>
+            <valueName>Aragón</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>TOLEDO</controllingFieldValue>
+            <controllingFieldValue>CIUDAD REAL</controllingFieldValue>
+            <controllingFieldValue>CUENCA</controllingFieldValue>
+            <controllingFieldValue>ALBACETE</controllingFieldValue>
+            <controllingFieldValue>GUADALAJARA</controllingFieldValue>
+            <valueName>Castilla-La Mancha</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>VALENCIA</controllingFieldValue>
+            <controllingFieldValue>CASTELLÓN</controllingFieldValue>
+            <controllingFieldValue>ALICANTE</controllingFieldValue>
+            <valueName>Comunitat Valenciana</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>VIZCAYA</controllingFieldValue>
+            <controllingFieldValue>ÁLAVA</controllingFieldValue>
+            <controllingFieldValue>GUIPÚZCOA</controllingFieldValue>
+            <valueName>País Vasco</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CÁCERES</controllingFieldValue>
+            <controllingFieldValue>BADAJOZ</controllingFieldValue>
+            <valueName>Extremadura</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CÁDIZ</controllingFieldValue>
+            <controllingFieldValue>CÓRDOBA</controllingFieldValue>
+            <controllingFieldValue>ALMERÍA</controllingFieldValue>
+            <controllingFieldValue>GRANADA</controllingFieldValue>
+            <controllingFieldValue>HUELVA</controllingFieldValue>
+            <controllingFieldValue>JAÉN</controllingFieldValue>
+            <controllingFieldValue>MÁLAGA</controllingFieldValue>
+            <controllingFieldValue>SEVILLA</controllingFieldValue>
+            <valueName>Andalucía</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CANTABRIA</controllingFieldValue>
+            <valueName>Cantabria</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CEUTA</controllingFieldValue>
+            <valueName>Ceuta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>ASTURIAS</controllingFieldValue>
+            <valueName>Principado de Asturias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>BALEARES</controllingFieldValue>
+            <valueName>Illes Balears</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LA CORUÑA</controllingFieldValue>
+            <controllingFieldValue>LUGO</controllingFieldValue>
+            <controllingFieldValue>ORENSE</controllingFieldValue>
+            <controllingFieldValue>PONTEVEDRA</controllingFieldValue>
+            <valueName>Galicia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LA RIOJA</controllingFieldValue>
+            <valueName>La Rioja</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LAS PALMAS</controllingFieldValue>
+            <controllingFieldValue>SANTA CRUZ DE TENERIFE</controllingFieldValue>
+            <valueName>Canarias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>MADRID</controllingFieldValue>
+            <valueName>Comunidad de Madrid</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>MELILLA</controllingFieldValue>
+            <valueName>Melilla</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>MURCIA</controllingFieldValue>
+            <valueName>Región de Murcia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>NAVARRA</controllingFieldValue>
+            <valueName>Comunidad Foral de Navarra</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

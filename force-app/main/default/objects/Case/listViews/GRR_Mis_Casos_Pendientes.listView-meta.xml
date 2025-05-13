@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Mis_Casos_Pendientes</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>GRR_Codigo_UR__c</columns>
+    <columns>NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>CORE.USERS.ALIAS</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>equals</operation>
+        <value>Pendiente Colaborador,Pendiente Cliente</value>
+    </filters>
+    <filters>
+        <field>CASES.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Case.GRR_Cliente</value>
+    </filters>
+    <label>Mis Casos Pendientes GRR</label>
+    <sharedTo>
+        <role>GRR</role>
+        <role>GRR_Agente</role>
+    </sharedTo>
+</ListView>

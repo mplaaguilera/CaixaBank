@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_AccountId__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>Recoge el id del account</description>
     <label>Cliente</label>
     <referenceTo>Account</referenceTo>
     <relationshipLabel>Notificaciones</relationshipLabel>

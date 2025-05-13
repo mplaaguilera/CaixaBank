@@ -17,14 +17,12 @@ public with sharing class SEG_ClasRapida_BU_TRHan extends CC_TriggerHandlerBase 
         }
 	}   
     
-
+    //Se concatenan los Ids de los niveles de MCC para definir un identificador único a la clasificación rápida
     public static void concatenaCR(Map<Id, SEG_ClasificacionRapida__c> mapNewObj, Map<Id, SEG_ClasificacionRapida__c> mapOldObj) {
         for (Id recordId : mapNewObj.keySet()) {
-            
-
+            //Si se modifica alguno de los campos que forman el identificador de la CR, se recalcula el identificador.
             if(mapNewObj.get(recordId).SEG_Tematica__c != mapOldObj.get(recordId).SEG_Tematica__c || mapNewObj.get(recordId).SEG_Producto__c != mapOldObj.get(recordId).SEG_Producto__c || mapNewObj.get(recordId).SEG_Motivo__c  != mapOldObj.get(recordId).SEG_Motivo__c  ||mapNewObj.get(recordId).SEG_Detalle__c  != mapOldObj.get(recordId).SEG_Detalle__c  ||mapNewObj.get(recordId).OS_Causa__c  != mapOldObj.get(recordId).OS_Causa__c  ||mapNewObj.get(recordId).OS_Solucion__c  != mapOldObj.get(recordId).OS_Solucion__c  || mapNewObj.get(recordId).OS_GrupoTrabajo__c  != mapOldObj.get(recordId).OS_GrupoTrabajo__c){
                 String tpmv = '';
-                
                 if(mapNewObj.get(recordId).SEG_Tematica__c != null ){
                     tpmv = tpmv + String.valueOf(mapNewObj.get(recordId).SEG_Tematica__c);
                 }

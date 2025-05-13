@@ -1,3 +1,13 @@
-:host {
-    --slds-g-color-border-base-4: rgb(201, 201, 201);
+@import 'c/csbd_lwcStyle';
+
+div.divBotones {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+lightning-button-icon.botonOtrasOperativas {
+    pointer-events: none;
+    --slds-c-button-spacing-inlinestart: 1.2rem;
+    --slds-c-button-spacing-inlineend: 1.2rem;
 }

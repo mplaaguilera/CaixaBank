@@ -3,8 +3,7 @@
     <fullName>CSBD_Todas_Las_Listas</fullName>
     <columns>NAME</columns>
     <columns>CC_Activa__c</columns>
-    <columns>LAST_UPDATE</columns>
-    <columns>UPDATEDBY_USER</columns>
+    <columns>OBJECT_ID</columns>
     <filterScope>Everything</filterScope>
     <filters>
         <field>RECORDTYPE</field>

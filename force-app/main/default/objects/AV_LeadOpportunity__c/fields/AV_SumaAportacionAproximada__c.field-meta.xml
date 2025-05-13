@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_SumaAportacionAproximada__c</fullName>
+    <description>Campo que contiene la cantidad de aportacion total aproximada</description>
     <formula>AV_InitialExpensesAmount__c  +  AV_INITIALCONTRIBUTIONAMOUNT__c</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Aportación total aprox.</label>

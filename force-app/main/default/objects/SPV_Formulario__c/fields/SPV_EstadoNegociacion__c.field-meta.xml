@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_EstadoNegociacion__c</fullName>
+    <description>Campo que almacena el estado en el que se realizó la negociación de la reclamación</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Estado negociación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>TextArea</type>
+</CustomField>

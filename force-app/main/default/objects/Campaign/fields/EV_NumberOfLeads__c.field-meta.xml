@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_NumberOfLeads__c</fullName>
+    <defaultValue>0</defaultValue>
+    <description>Campo que contabiliza los Leads de un evento.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Del total de inscritos, personas que no se han inscrito a través de invitación centralizada.</inlineHelpText>
+    <label>No clientes en campaña</label>
+    <precision>9</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

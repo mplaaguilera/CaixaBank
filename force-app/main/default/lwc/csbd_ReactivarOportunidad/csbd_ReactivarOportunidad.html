@@ -1,0 +1,44 @@
+<template>
+	<section role="dialog" tabindex="-1" lwc:ref="modalReactivarOportunidad" class="slds-modal" aria-modal="true" onkeydown={modalTeclaPulsada}>
+		<div class="slds-modal__container">
+
+			<header class="slds-modal__header">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={spinner}>
+					<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+				</button>
+				<h2 class="slds-text-heading_medium slds-hyphenate">Reactivar la oportunidad</h2>
+				<p class="slds-var-m-top_x-small">Retomar la gestión de una oportunidad previamente cerrada o rechazada.</p>
+			</header>
+
+			<div class="slds-modal__content slds-var-p-top_xx-large csbd-var-p-bottom_xxx-large csbd-var-p-horizontal_xxxx-large">
+				<c-csbd_-spinner-kx lwc:if={spinner} variant="brand"></c-csbd_-spinner-kx>
+
+				<div class="slds-grid slds-grid_vertical-align-end slds-gutters_direct-xx-small slds-var-m-left_x-small slds-var-m-right_small">
+					<div class="slds-col slds-grow-none">
+						<lightning-icon icon-name="utility:breadcrumbs" size="small" class="iconoEtapas slds-is-relative" style="top: -6px;"></lightning-icon>
+					</div>
+					<div class="slds-col">
+						<lightning-combobox
+							lwc:ref="inputReactivarEtapa"
+							label="¿En qué etapa de ventas quieres reactivar la oportunidad?"
+							required
+							message-when-value-missing="Indica una etapa."
+							options={reactivarEtapas}
+						></lightning-combobox>
+					</div>
+				</div>
+				<div class="slds-var-m-top_x-large slds-var-m-horizontal_small" style="text-align: right; color: darkslategray;">
+					La oportunidad estaba en la etapa <i>{oportunidad._ultimaEtapaVentas}</i> antes de cerrarse.
+				</div>
+			</div>
+
+			<footer class="slds-modal__footer">
+				<lightning-button lwc:ref="botonAceptar" label="Reactivar" variant="brand" icon-name="utility:undo" onclick={reactivarOportunidad} disabled={spinner}></lightning-button>
+				<lightning-button lwc:ref="botonCancelar" label="Cancelar" onclick={modalCerrar} class="slds-var-m-left_small" disabled={spinner}></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<div lwc:ref="backdropModal" class="backdrop slds-backdrop" role="presentation"></div>
+</template>

@@ -4,6 +4,7 @@
     <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
     <columns>CASES.CASE_NUMBER</columns>
     <columns>Flag__c</columns>
+    <columns>CC_Idioma__c</columns>
     <columns>CC_Aqumetrix__c</columns>
     <columns>CC_CuentaRRSS_CLI__c</columns>
     <columns>CC_Social_Persona__c</columns>
@@ -11,7 +12,6 @@
     <columns>CASES.STATUS</columns>
     <columns>CC_Canal_Procedencia__c</columns>
     <columns>CC_Canal_Operativo__c</columns>
-    <columns>CC_Idioma__c</columns>
     <columns>CC_Ultima_Interaccion__c</columns>
     <filterScope>Queue</filterScope>
     <filters>

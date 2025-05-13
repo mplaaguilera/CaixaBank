@@ -143,6 +143,7 @@
     <allowInChatterGroups>false</allowInChatterGroups>
     <compactLayoutAssignment>AV_PlataformasHipotecarias</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
+    <description>Objeto que se utiliza para las oportunidades de clientes potenciales</description>
     <enableActivities>true</enableActivities>
     <enableBulkApi>true</enableBulkApi>
     <enableFeeds>false</enableFeeds>

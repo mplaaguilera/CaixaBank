@@ -7,6 +7,8 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 		List<Opportunity> oportunidadesCreadas = new List<Opportunity>();
 
 		Boolean rechazadoBlacklist = false;
+		Boolean rechazadoLeadExiste = false;
+		String  leadExistenteOpp = '';
 		//Valores por defecto de la respuesta para la solicitud actual
 		respuesta.referencia_usuario = solicitud.referencia_usuario;
 		respuesta.resultado = 'OK';
@@ -86,8 +88,38 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 			Boolean cmnDerivacionPorCorreo = false;
 			Boolean cmnDerivacionComdataPorWS = false;
 
+			//US Facilitea: Verificar para hipotecas, cmn y cmb, sólo si el origen es faciliteacasa			
+			List<String> tiposSolicitudChequear = CSBD_IdentificarOppsPHDSettingManager.getInstance().getSolicitudWSAltaOppList();
+			List<String> origenesChequear = CSBD_IdentificarOppsPHDSettingManager.getInstance().getOrigenList();
+			Boolean origenChequear = String.isNotBlank((String)campos.get('CSBD_Now_Origen__c')) && origenesChequear.contains((String)campos.get('CSBD_Now_Origen__c'));
+			if(tiposSolicitudChequear.contains(solicitud.tipoSolicitud) && origenChequear){
+				List<String> numDocumentos = new List<String>();	
+				if(String.isNotBlank(solicitud.nif)){
+					numDocumentos.add(solicitud.nif);
+				}
+				if(String.isNotBlank(solicitud.nif1Tit)){
+					numDocumentos.add(solicitud.nif1Tit);
+				}
+				if(String.isNotBlank(solicitud.nif2Tit)){
+					numDocumentos.add(solicitud.nif2Tit);
+				}
+				if(!numDocumentos.isEmpty()){
+					Map<String, Object> resultadoChequeo = CSBD_DetectarOportunidadesSimilares.getInstance(numDocumentos, '', (String)campos.get('CSBD_Now_Origen__c')).buscarOportunidadSimilares();
+					//el numDocumente en algunos casos pueden ser dos? titular 1 y titular 2
+					if(resultadoChequeo.containsKey('existLead') && (Boolean)resultadoChequeo.get('existLead') == true){
+						estadoInicial = 'Rechazada';
+						etapaVentasInicial = 'Rechazada';
+						resolucionInicial = 'Lead existente con origen: ' + (resultadoChequeo.get('origenLead') != null ? resultadoChequeo.get('origenLead') : 'N/I'); 
+						rechazadoLeadExiste = true;
+						leadExistenteOpp = (String)resultadoChequeo.get('opportunityName');
+					}			
+				}			
+			}
+			//END US Facilitea
+		
+
 			//Solo se ejecuta si no se ha rechazado en la blacklist
-			if (!rechazadoBlacklist) {
+			if (!rechazadoBlacklist && !rechazadoLeadExiste) {
 				//Calcular si aplica lógica específica según tipo de solicitud
 				if (solicitud.tipoSolicitud == 'cmn') {
 					if (solicitud?.buzonCajeros == true) {
@@ -137,12 +169,16 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 			//Creación de la tarea de tipo "Solicitud recibida"
 			String cuerpoTarea = JSON.serializePretty(inputSolicitudOriginal, true);
 			CSBD_Activity.crearActividad(oportunidad.Id, 'Solicitud recibida', 'Completed', 'Solicitud recibida', cuerpoTarea.left(30000));
+			
+			if(rechazadoLeadExiste){
+				CSBD_Activity.crearActividad(oportunidad.Id, 'Rechazada Lead existente', 'Completed', 'Rechazada Lead existente', resolucionInicial + '\n\nOportunidad encontrada: ' + leadExistenteOpp);
+			}
 
 			//Respuesta del servicio
 			respuesta.opportunityId = oportunidad.Id;
 
 			//Solo se ejecuta si no se ha rechazado en la blacklist
-			if (!rechazadoBlacklist) {
+			if (!rechazadoBlacklist && !rechazadoLeadExiste) {
 				//Añadimos a lista para ejecutar lógica asíncrona
 				oportunidadesCreadas.add(oportunidad);
 
@@ -278,7 +314,8 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 				AND CC_Activa__c = true], 'Name'
 		);
 
-		List<Opportunity> oportunidades = [SELECT Name, CSBD_Empresa_Proveedora__c, CSBD_Idioma_Solicitud__c, RecordtypeId, CSBD_Turno_Contacto__c, CSBD_Familia_Producto__c, CSBD_Skill__c, CSBD_Horario_Contacto__c, CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c, RecordType.Name
+		List<Opportunity> oportunidades = [SELECT Name, CSBD_Empresa_Proveedora__c, CSBD_Idioma_Solicitud__c, RecordtypeId, CSBD_Turno_Contacto__c, CSBD_Familia_Producto__c, CSBD_Skill__c, 
+											CSBD_Horario_Contacto__c, CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c, RecordType.Name, CSBD_Producto__c
 											FROM Opportunity WHERE Id = :idOportunidades AND RecordType.Name = :nombreRecordTypesOmnichannel AND IsClosed = FALSE];
 		if (!oportunidades.isEmpty()) {
 			//Registro del objeto CSBD_Gestor_Oportunidad__c que enrutará la oportunidad via omnichannel - en principio solo habrá una, ya que no llega más de una solicitud simultáneamente
@@ -343,7 +380,7 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 	private static List<String> tiposSolicitudAdmitidos() {
 		return new List<String>{
 			'prestamo', 'hipoteca', 'hipotecaPlataforma', 'renting', 'tpv', 'compraEstrella', 'cmn',
-			'cmb', 'desistimiento', 'desistimiento PAI', 'proAutomatica', 'soporteDigital', 'mac', 'macCentralita'
+			'cmb', 'desistimiento', 'desistimiento PAI', 'proAutomatica', 'soporteDigital', 'mac', 'macCentralita', 'cmbHipotecas'
 		};
 	}
 

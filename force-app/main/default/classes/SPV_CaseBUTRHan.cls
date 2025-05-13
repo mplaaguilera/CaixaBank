@@ -25,10 +25,6 @@ public with sharing class SPV_CaseBUTRHan extends CC_TriggerHandlerBase {
 
             SPV_CaseHelper.asignarEmpresaReclamacion(listCasosSPV, mapOldObj);   //Si la lista de reclamaciones con grupo cambiado no está vacía, se le asignará la empresa del grupo
             
-            SPV_CaseHelper.cambiarFechaAlegacionAllanamiento(listCasosSPV, mapOldObj);  //Si la reclamación cambia al estado de alegación o allanamiento, se actualiza su fecha correspondiente
-
-            // SPV_CaseHelper.cambiarFechaAlegacionAllanamiento(listCasosSPV, mapOldObj);  //Si la reclamación cambia al estado de alegación o allanamiento, se actualiza su fecha correspondiente
-            
             SPV_CaseHelper.camposRepresentanteValido(listCasosSPV, mapOldObj);    //Si se actualiza campo de representante, y se marca que se usarán sus datos, se actualizan los campos de la reclamación correspondientes
 
             SPV_CaseHelper.usarDatosDeAlf(listCasosSPV, mapOldObj);   //Si se actualiza el cliente de la reclamación, y se maraca que se usarán sus datos, se actualziam los campos necesarios
@@ -44,6 +40,8 @@ public with sharing class SPV_CaseBUTRHan extends CC_TriggerHandlerBase {
            SPV_CaseHelper.arrastrarReclamantePretension(listCasosSPV, mapOldObj, new Map<Id, Case>()); //Al actualizar el AccountId una pretensión, se rellenan sus campso de reclamante con los de la reclamación
         
            SPV_CaseHelper.rellenarFechaRecepcionResolucion(listCasosSPV, mapOldObj);
+
+           SPV_CaseHelper.validarTipoImporte(listCasosSPV, mapOldObj);          //Comprobar que el valor de tipo importe es correcto en función del importe reclamado
         }
 
         //Recuperar las colas del cache
@@ -74,7 +72,7 @@ public with sharing class SPV_CaseBUTRHan extends CC_TriggerHandlerBase {
                 if (caso.RecordTypeId == RECTYPERECLAMACION) {
                     listaReclamaciones.add(caso);
 
-                    if(mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'SAC_002') {
+                    if(mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'SPV_AnalisisDecision') {
                         listaIdsRec.add(caso.Id);
                     }
                 }

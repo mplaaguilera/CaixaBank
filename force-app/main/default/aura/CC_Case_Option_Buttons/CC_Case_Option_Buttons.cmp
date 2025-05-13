@@ -36,7 +36,7 @@
     <aura:attribute name="SearchKeyWordSegundaOfi" type="string" default="" />
     <aura:attribute name="Message" type="String" default="buscar..." />
     <aura:attribute name="myMap" type="Map" />
-    <aura:attribute name="remitir" type="boolean" />
+    <aura:attribute name="remitir" type="boolean" default="false"/>
     <aura:attribute name="tipoOperativa" type="String" />
     <aura:attribute name="noIdentificado" type="boolean" />
     <aura:attribute name="ultimoGrupo2N" type="String" />
@@ -59,6 +59,9 @@
     <aura:attribute name="ampliarInformacionDevolucion1N" type="boolean" default="false" />
     <aura:attribute name="tipoRegistro" type="String" />
     <aura:attribute name="modalAutenticacionVisible" type="Boolean" default="false" />
+    <!--GLM-->
+    <aura:attribute name="modalIdencencia" type="Boolean" default="false" />
+    <aura:attribute name="modalStores" type="Boolean" default="false" />
     <aura:attribute name="modalDevolverSACVisible" type="Boolean" default="false" />
     <aura:attribute name="picklistFirstOptionsPlantilla" type="Object[]" />
     <aura:attribute name="picklistFirstOptionsGrupo" type="Object[]" />
@@ -181,6 +184,7 @@
     <aura:attribute name="tipoGestion2N" type="String" />
     <aura:attribute name="tipoGestion3N" type="String" />
     <aura:attribute name="deshabilitarEscalar" type="Boolean" default="false" />
+    <aura:attribute name="mccVacio" type="Boolean" default="true" />
     <aura:attribute name="deshabilitarTransfer" type="Boolean" default="false" />
     <aura:attribute name="deshabilitarQAPropuestasMejora" type="Boolean" default="false" />
     <aura:attribute name="deshabilitarDerivarAlSac" type="Boolean" default="false" />
@@ -229,11 +233,22 @@
     <aura:attribute name="mostrarBotonOficinaEmpleadoCaixaBank" type="Boolean" default="true" description="True enseña los botones de Oficina CaixaBank y Empleado CaixaBank"/>
 	<aura:attribute name="mostrarModalGenerarDocumento" type="Boolean" default="false" description="True enseña el lwc de Generar Documento"/>
 	<aura:attribute name="psSdocs" type="Boolean" default="false" description="True si el agente tiene el PS asignado"/>
-    <aura:attribute name="mostrarOnboarding" type="Boolean" default="false" description="Cierto si se muestra boton Onboarding"/>
-    <aura:attribute name="botonValidarOnboarding" type="Boolean" default="true"/>
-    <aura:attribute name="valueInputDNI" type="String" default="" />
+    <!-- <aura:attribute name="mostrarOnboarding" type="Boolean" default="false" description="Cierto si se muestra boton Onboarding"/> -->
+    <!-- <aura:attribute name="botonValidarOnboarding" type="Boolean" default="true"/>
+    <aura:attribute name="botonOnboardingDisabled" type="Boolean" default="false"/> -->
+    <!-- <aura:attribute name="valueInputDNI" type="String" default="" /> -->
     <aura:attribute name="bloqueadoBotonDerivar" type="Boolean" default="false" />
-    <aura:attribute name="derivadaCSBD" type="Boolean" default="false" />
+    <aura:attribute name="derivadaCSBD" type="Boolean" default="false"/>
+    <aura:attribute name="grupoColaboradorFraude" type="String" default=""/>
+    <aura:attribute name="ocultarBotonesOTP" type="Boolean" default="false"/>
+    <!-- Atributos para el cmp de envio de correo quick action -->
+    <aura:attribute name="listPara" type="List" default="[]" />
+    <aura:attribute name="listCC" type="List" default="[]" />
+    <aura:attribute name="listBcc" type="List" default="[]" />
+    <aura:attribute name="plantillaName" type="String" default="" />
+    <aura:attribute name="segundaOficinaName" type="String" default="" />
+    <aura:attribute name="grupoColaborador" type="String" default="" />
+    <aura:attribute name="procedencia" type="String" default="" />
 
 
     <!--Handlers-->
@@ -253,6 +268,12 @@
     <lightning:quickActionAPI aura:id="quickActionAPI" />
     <lightning:workspaceAPI aura:id="workspace"/>
 
+    <aura:method name="trasladarPublico" action="{!c.abrirModalTrasladarColaboradorPublico}"/>
+    <aura:method name="remitirPublico" action="{!c.abrirModalRemitirColaboradorPublico}"/>
+    <aura:method name="metodoCerrarTest" action="{!c.cerrarModalPreguntasNivel2}"/>
+
+    <!-- <aura:handler event="c:cc_DerivarEvent" action="{!c.realizarTrasladoDesdeDerivar}" /> -->
+    <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.onDerivarInteraccionChannel}" scope="APPLICATION" aura:id="derivarInteraccionChannel"/>
     <!--Lightning Data Service-->
     <force:recordData aura:id="recordDataCase" recordId="{!v.recordId}" layoutType="COMPACT" targetFields="{!v.caso}"
         fields="OwnerId, CC_MCC_Motivo__c,CaseNumber, CC_MCC_Plantilla__c, CC_Derivar__c,
@@ -266,11 +287,15 @@
         <div><lightning:spinner size="medium" /></div>
     </aura:if>
 
+    <c:cc_EmailColaboradorAction recordId="{!v.recordId}" aura:id="emailColaboradorAction" listPara="{!v.listPara}" listCC="{!v.listCC}" listBcc="{!v.listBcc}" plantillaName="{!v.plantillaName}" segundaOficinaName="{!v.segundaOficinaName}" grupoColaborador="{!v.grupoColaborador}" procedencia="{!v.procedencia}"/>
+
     <!--Botonera-->
-    <aura:if isTrue="{!!v.cargando}">
+    <aura:if isTrue="{!and(!v.cargando, !v.ocultarBotonesOTP)}">
+    <!-- <aura:if isTrue="{!!v.cargando}"> -->
         <div class="slds-var-m-vertical_x-small">
             <div class="filaBotones">
-                <aura:if isTrue="{!v.permisos.CC_Trasladar_Colaborador}">
+                
+                <aura:if isTrue="{!and(v.permisos.CC_Trasladar_Colaborador, NOT(v.tipoRegistro == 'CC_Cliente'))}">
                     <lightning:button aura:id="Trasladar Colaborador" label="Trasladar a colaborador" iconName="action:email" onclick="{!c.validacionesOperativa}" />
                 </aura:if>
 
@@ -390,16 +415,11 @@
 
                 <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
                     <lightning:button aura:id="operativaOficina" label="Derivar" iconName="utility:company" onclick="{!c.validacionesOperativa}" disabled="{!v.bloqueadoBotonDerivar}"/>
-                    <aura:if isTrue="{!v.mostrarModalOficina}">
-                        <!--101-->
-                        <c:cc_Operativa_Oficina aura:id="lwcOperativa" recordId="{!v.recordId}" oportunidadCreadaAPI="{!v.derivadaCSBD}" onmodalcerrado="{!c.handleModalOficinaCerrado}" onrealizartrasladocolaborador="{!c.realizarTrasladoDesdeDerivar}" onrealizarremitido="{!c.abrirModalTrasladarColaborador}" onrefrescartab="{!c.refreshTab}" ondesactivarspinner="{!c.desactivarSpinnerDerivar}"/>
+                    <aura:if isTrue="{!v.mostrarModalOficina}">                    
+                           <c:cc_Operativa_Oficina_Popup aura:id="lwcOperativa" recordId="{!v.recordId}" oportunidadCreadaAPI="{!v.derivadaCSBD}" onmodalcerrado="{!c.handleModalOficinaCerrado}" onrealizartrasladocolaborador="{!c.realizarTrasladoDesdeDerivar}" onrealizarremitido="{!c.abrirModalTrasladarColaborador}" onsolicitarinfo="{!c.abrirModalSolicitarInfo}" onrefrescartab="{!c.refreshTab}" ondesactivarspinner="{!c.desactivarSpinnerDerivar}"/>                      
                     </aura:if>
-                </aura:if>
-
-                <!-- <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora &amp;&amp; v.mostrarOnboarding}">
-                    <lightning:button aura:id="operativaOnboarding" label="Onboarding" iconName="utility:company" onclick="{!c.validacionesOperativa}"/>
-                </aura:if> -->
-
+                </aura:if> 
+                 
                 <!-- <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
                     <lightning:button aura:id="cancelarCita" label="Cancelar cita" iconName="utility:company" onclick="{!c.validacionesOperativa}"/>
                     <aura:if isTrue="{!v.mostrarModalCancelarCita}">
@@ -448,7 +468,7 @@
                         </div>
 
                         <aura:if isTrue="{!v.verGrupos}">
-                            <lightning:buttonGroup class="slds-var-m-top_x-large slds-var-m-left_xx-large">
+                            <lightning:buttonGroup class="slds-var-m-top_x-large">  <!-- slds-var-m-left_xx-large -->
                                 <lightning:input aura:id="checkbox" name="checkbox" type="toggle" label="Mostrar todos los grupos" checked="{!v.verTodosLosGrupos}" onchange="{!c.allGrupos}" messageToggleActive="" messageToggleInactive="" />
                             </lightning:buttonGroup>
                             <div style="height: 1rem;" /> <!--Separador-->
@@ -499,8 +519,10 @@
                                 <lightning:combobox aura:id="plantillaSeleccionada" name="general" label="Plantilla" placeholder="Seleccione un valor" options="{!v.optionsPlantilla}" onchange="{!c.seleccionarPlantilla}" required="true" />
                             </aura:if>
                             <aura:if isTrue="{!v.grupoSeleccionado}">
+                                <div style="height:1rem;" />
                                 <div aura:id="searchResPlantilla" class="slds-form-element slds-lookup" data-select="single">
                                     <aura:if isTrue="{!v.uncheckedPlantilla}">
+                                          <!--  <div style="height:1rem;" />  --><!--Separador-->
                                         <label class="slds-form-element__label" for="lookup-348">Plantilla</label>
                                         <div class="slds-form-element__control">
                                             <div class="slds-input-has-icon slds-input-has-icon_right">
@@ -529,7 +551,7 @@
                                 </div>
                             </aura:if>
                             <aura:if isTrue="{!v.grupoSeleccionado}">
-                                <lightning:input aura:id="checkboxPlantilla" name="checkbox" type="toggle" label="Ver todas las plantillas" checked="{!v.uncheckedPlantilla}" messageToggleActive="" messageToggleInactive="" />
+                                <lightning:input class="slds-p-top_small" aura:id="checkboxPlantilla" name="checkbox" type="toggle" label="Ver todas las plantillas" checked="{!v.uncheckedPlantilla}" messageToggleActive="" messageToggleInactive="" />
                             </aura:if>
                         </aura:if>
                         <aura:if isTrue="{!v.verOficinas}">
@@ -1272,7 +1294,7 @@
                         </p>
                     </header>
                     <!--Contenido del modal-->
-                    <div class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-modal__content slds-var-p-around_medium">              
                         <c:CC_OTP />
                     </div>
 
@@ -1282,6 +1304,22 @@
                     </footer>
                 </div>
             </section>
+        </aura:if>
+
+        <!--GLM Modal para Autenticación-->
+        <aura:if isTrue="{!v.modalIdencencia}">
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium">              
+                <c:CC_CrearAgrupador />
+            </div>
+        </aura:if>
+
+        <!--GLM Modal para Autenticación-->
+        <aura:if isTrue="{!v.modalStores}">
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium">              
+                <c:CC_ST_Respuesta />
+            </div>
         </aura:if>
 
         <!--Modal cita gestor-->
@@ -1570,7 +1608,7 @@
                                             </span>
                                         </div>
                                         <div aura:id="lookupFieldQueue" class="slds-show">
-                                            <lightning:input type="search" aura:id="inputTextQueue" value="{!v.SearchKeyWordQueue}" onchange="{!c.inputTextQueueOnchange}" placeholder="Buscar cola por nombre" variant="label-hidden" required="true"/>
+                                            <lightning:input type="search" aura:id="inputTextQueue" value="{!v.SearchKeyWordQueue}" onchange="{!c.inputTextQueueOnchange}" placeholder="Buscar cola por nombre" variant="label-hidden" required="true" style="display: block;"/>
                                             <!--This part is for Display typehead lookup result List-->
                                             <div class="slds-lookup__menu slds">
                                                 <div class="slds-lookup__item_label slds-text-body_small">{!v.Message}</div>
@@ -1610,11 +1648,11 @@
                 <!--Contenido del modal-->
                 <div class="slds-modal__content slds-var-p-around_xx-large">
                     <!--Lookup de colas-->
-                    <div aura:id="searchResQueue" class="slds-form-element slds-lookup" data-select="single">
+                    <div class="slds-form-element slds-lookup" data-select="single">
                         <div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-center">
                             <div class="slds-col slds-grow-none">
                                 <!-- <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>DNI</label> -->
-                                <lightning:input aura:id="inputDNIOnboarding" label="Numero de documento" placeholder="DNI/NIE/Pasaporte..." onchange="{!c.validarDNIOnboarding}" />
+                                <lightning:input aura:id="inputDNIOnboarding" label="Numero de documento" onchange="{!c.validarDNIOnboarding}" />
                             </div>
                         </div>
 
@@ -1623,7 +1661,7 @@
                 </div>
                 <!--Pie-->
                 <footer class="slds-modal__footer">
-                    <lightning:button variant="brand" label="Validar DNI" disabled="{!v.botonValidarOnboarding}" onclick="{!c.validarDNIOnboarding}"/>
+                    <!-- <lightning:button variant="brand" label="Validar DNI" disabled="{!v.botonValidarOnboarding}" onclick="{!c.llamadaWSOnboarding}"/> -->
                     <lightning:button aura:id="modalOnboardingCancelar" class="slds-float_right" label="Cancelar" onclick="{!c.modalOnboardingCerrar}" />
                 </footer>
             </div>

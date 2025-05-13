@@ -81,6 +81,7 @@ public class CC_Agrupador_Controller_Test {
         mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
         mccTematica.RecordTypeId = recordTypeIdTematica;
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
+        mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
         insert mccTematica;
         
         Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
@@ -211,6 +212,7 @@ public class CC_Agrupador_Controller_Test {
         mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
         mccTematica.RecordTypeId = recordTypeIdTematica;
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
+        mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
         insert mccTematica;
         
         Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();

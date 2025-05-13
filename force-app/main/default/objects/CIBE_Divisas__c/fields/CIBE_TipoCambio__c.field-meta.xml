@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_TipoCambio__c</fullName>
+    <description>Información del valor del tipo de cambio la divisa en TC</description>
     <externalId>false</externalId>
     <label>Tipo de Cambio</label>
     <precision>18</precision>

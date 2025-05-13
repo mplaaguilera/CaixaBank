@@ -17,10 +17,12 @@ public with sharing class SAC_LCMP_ReenvioRedaccionEmail {
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECORDTYPEBLACKLIST = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_BlackListEmails').getRecordTypeId();
+    private static final Id RECORDTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
+
 
 
     @AuraEnabled
-    public static String reenviarRedaccionEmail(String idCaso) {
+    public static String reenviarRedaccionEmail(String idCaso, String newPara, String newCopia, String newCopiaOculta, String newAsunto, String idsAdjuntos, String newCuerpo) {
         String mensaje;
         List<String> listaDireccionesCopia = new List<String>();
         List<String> listaDireccionesCopiaOculta = new List<String>();
@@ -30,60 +32,13 @@ public with sharing class SAC_LCMP_ReenvioRedaccionEmail {
                                     SAC_IDAdjuntos__c, CcAddress, BccAddress
                                     FROM EmailMessage
                                     WHERE ParentId = :idCaso AND SAC_EnvioRedaccion__c = 'primerenvioredaccion' ORDER BY CreatedDate DESC LIMIT 1];
-            System.debug('CGR email ' + emAReenviar.ToAddress);
-            //Hago una selección de los adjuntos que quiero enviar
-            List<ContentVersion> lstCV = [SELECT id, ContentDocumentId, SAC_StringRedaccion_fileupload__c FROM ContentVersion WHERE FirstPublishLocationId =:idCaso  AND SAC_StringRedaccion_fileupload__c IN ('ReenvioNuevoRedaccion', 'ReenvioAntiguoRedaccion')];
-            // Convertir SAC_IDAdjuntos__c en una lista de IDs
-            // Set<String> adjuntosSet = new Set<String>();
-            // if (emAReenviar.SAC_IDAdjuntos__c != null) {
-            //     adjuntosSet.addAll(emAReenviar.SAC_IDAdjuntos__c.split(','));
-            // }
-            Set<Id> idsAdjuntosFinal = new Set<Id>();
-            if(String.isNotBlank(emAReenviar.SAC_IDAdjuntos__c) && emAReenviar.SAC_IDAdjuntos__c != '[]'){
-                Set<Id> idsAdjuntos = (Set<Id>)JSON.deserialize(emAReenviar.SAC_IDAdjuntos__c, Set<Id>.class);
-                for (Id adj : idsAdjuntos) {
-                    if (adj != null) {
-                        idsAdjuntosFinal.add(adj);
-                    }
-                }
-            }
-
-            // Identificar qué IDs agregar y cuáles eliminar
-            Id nuevoAdjunto = null;
-            Set<Id> idsAntiguos = new Set<Id>();
-
-            for (ContentVersion cv : lstCV) {
-                if (cv.SAC_StringRedaccion_fileupload__c == 'ReenvioNuevoRedaccion') {
-                    nuevoAdjunto = cv.ContentDocumentId;
-                } else if (cv.SAC_StringRedaccion_fileupload__c == 'ReenvioAntiguoRedaccion') {
-                    idsAntiguos.add(cv.ContentDocumentId);
-                }
-            }
-
-
-            // Eliminar los adjuntos antiguos
-            idsAdjuntosFinal.removeAll(idsAntiguos);
-
-
-
-            // Agregar el nuevo adjunto si existe
-            if (nuevoAdjunto != null) {
-                idsAdjuntosFinal.add(nuevoAdjunto);
-            }
-            List<String> listaIds = new List<String>();
-
-            for (Id idAdjunto : idsAdjuntosFinal) {
-                listaIds.add(String.valueOf(idAdjunto)); // Convertimos cada Id a String
-            }
-            
-            String idAdjuntosJson = '["' + String.join(listaIds, '","') + '"]';            // Convertir la lista de vuelta a String separado por comas
-
 
             //Recupero los emails no validos de envio (emails en la blackList)
             List<SAC_MaestroTemas__c> listEmailsNoValidos = [SELECT Name FROM SAC_MaestroTemas__c WHERE RecordTypeId =: RECORDTYPEBLACKLIST AND SAC_Activo__c = true];
 
             //Compruebo las direcciones de envio con las de la blackList
-            List<String> listaDireccionesPara = emAReenviar.ToAddress.split(';');
+            // List<String> listaDireccionesPara = emAReenviar.ToAddress.split(';');
+            List<String> listaDireccionesPara = newPara.split(';');
             List<String> emailsValidosPara = SAC_Utils.comprobarEmailsBlackListAuto(listEmailsNoValidos, listaDireccionesPara);
 
             //Si el para tiene direcciones validas para el envio, comprobamos si hay cc y cco, y si hay las direcciones de estos
@@ -95,8 +50,8 @@ public with sharing class SAC_LCMP_ReenvioRedaccionEmail {
                 String copiaOculta = '';
 
                 //Si hay CC, comprobamos si las direcciones son validas.Si hay direcciones validas las guardamos para pasarselas al metodo enviarEmail
-                if(emAReenviar.CcAddress != null){
-                    listaDireccionesCopia = emAReenviar.CcAddress.split(';');
+                if(newCopia != null){
+                    listaDireccionesCopia = newCopia.split(';');
                     emailsValidosCC = SAC_Utils.comprobarEmailsBlackListAuto(listEmailsNoValidos, listaDireccionesCopia);
                     if(!emailsValidosCC.isEmpty()){
                         copia = String.join(emailsValidosCC, ';');
@@ -104,19 +59,21 @@ public with sharing class SAC_LCMP_ReenvioRedaccionEmail {
                 }
 
                 //Si hay CCO, comprobamos si las direcciones son validas. Si hay direcciones validas las guardamos para pasarselas al metodo enviarEmail
-                if(emAReenviar.BccAddress != null){
-                    listaDireccionesCopiaOculta = emAReenviar.BccAddress.split(';');
+                if(newCopiaOculta != null){
+                    listaDireccionesCopiaOculta = newCopiaOculta.split(';');
                     emailsValidosCCO = SAC_Utils.comprobarEmailsBlackListAuto(listEmailsNoValidos, listaDireccionesCopiaOculta);
                     if(!emailsValidosCCO.isEmpty()){
                         copiaOculta = String.join(emailsValidosCCO, ';');
                     }
                 }
 
-                SAC_LCMP_GestionEmails.enviarEmail(idCaso, para, copia, copiaOculta, emAReenviar.HtmlBody, emAReenviar.Subject, idAdjuntosJson, 'segundoenvioredaccion');
+                SAC_LCMP_GestionEmails.enviarEmail(idCaso, para, copia, copiaOculta, newCuerpo, newAsunto, idsAdjuntos, 'segundoenvioredaccion'); //emAReenviar.Subject
                 mensaje = 'OK';
             }else{
                 //Ninguna de las direcciones del para son validas, luego notificamos al usuario de que no se enviará email
-                mensaje = emAReenviar.ToAddress;
+                // mensaje = emAReenviar.ToAddress;
+                mensaje = newPara;
+
             }
         } catch (Exception e) {
             CBK_Log.error(e);
@@ -127,15 +84,18 @@ public with sharing class SAC_LCMP_ReenvioRedaccionEmail {
 
     @AuraEnabled
     public static DatosEmailWrapper obtenerDatosEmail(String idCaso){
-        EmailMessage  datosEmailEnviado = [SELECT id, ToAddress, Subject, ParentId,
+        List<EmailMessage>  datosEmailEnviado = [SELECT id, ToAddress, Subject, ParentId, HtmlBody,
         CcAddress, BccAddress
         FROM EmailMessage
         WHERE ParentId = :idCaso AND SAC_EnvioRedaccion__c = 'primerenvioredaccion' ORDER BY CreatedDate DESC LIMIT 1];
 
-        System.debug('CGR datosEmailEnviado' + datosEmailEnviado);
+        List<Case> caso = [SELECT Id FROM Case WHERE RecordTypeId = :RECORDTYPERECLAMACION AND id = :idCaso LIMIT 1];
 
-        return new DatosEmailWrapper(datosEmailEnviado.ToAddress, datosEmailEnviado.CcAddress, datosEmailEnviado.BccAddress, datosEmailEnviado.Subject);
-
+        if(!datosEmailEnviado.isEmpty() && !caso.isEmpty()){
+            return new DatosEmailWrapper(datosEmailEnviado[0].ToAddress, datosEmailEnviado[0].CcAddress, datosEmailEnviado[0].BccAddress, datosEmailEnviado[0].Subject, datosEmailEnviado[0].HtmlBody, caso[0]);
+        }else{
+            return new DatosEmailWrapper('', '', '', '', '', caso[0]);
+        }
     }
 
     public class DatosEmailWrapper{
@@ -144,15 +104,18 @@ public with sharing class SAC_LCMP_ReenvioRedaccionEmail {
         @AuraEnabled public String copia {get; set;}
         @AuraEnabled public String copiaOculta {get; set;}
         @AuraEnabled public String asunto {get; set;}
+        @AuraEnabled public String cuerpo {get; set;}
+        @AuraEnabled public Case caso {get; set;}
 
         
-        public DatosEmailWrapper(String paraM, String copiaM, String copiaOcultaM, String asuntoM )
+        public DatosEmailWrapper(String paraM, String copiaM, String copiaOcultaM, String asuntoM, String cuerpoM, Case casoM)
         {
             para = paraM;
             copia = copiaM;   
             copiaOculta = copiaOcultaM;
             asunto = asuntoM;
-
+            cuerpo = cuerpoM;
+            caso = casoM;
         }
         
     }

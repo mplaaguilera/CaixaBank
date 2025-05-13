@@ -1,0 +1,34 @@
+<template>
+    <lightning-card title="Inteligencia artificial" icon-name="utility:einstein">
+        <!-- sldsValidatorIgnoreNextLine -->
+        <lightning-button-icon slot="actions" icon-name="utility:expand" variant="bare" tooltip="Vista completa" onclick={navigateToParentComponent}></lightning-button-icon>
+        <div class="slds-var-p-horizontal_medium">
+            <div class="slds-notify slds-notify_alert slds-alert_warning slds-var-p-horizontal_x-large slds-var-m-bottom_x-large" role="alert">
+                <span class="slds-icon_container slds-var-m-right_x-large">
+                    <lightning-icon icon-name="utility:warning" size="x-small"></lightning-icon>
+                </span>
+                <span class="slds-text-color_weak">{label.mensajeIAResponsable}</span>
+            </div>
+
+            <lightning-tabset variant="scoped" class="slds-var-m-top_x-large">
+                <lightning-tab label="Oportunidad" value="oportunidad" onactive={handleTabClick}>
+                    <c-csbd_test_ropp record-id={idOportunidad} plan-opo={planOpo} plan-ampli={planAmpli}></c-csbd_test_ropp>
+                </lightning-tab>
+
+                <lightning-tab label="Producto" value="producto" onactive={handleTabClick}>
+                    <c-csbd-_resumen-producto record-id={idOportunidad} plan-prod={planProd}></c-csbd-_resumen-producto>
+                </lightning-tab>
+
+                <lightning-tab label="Argumentario" value="argumentario" onactive={handleTabClick}>
+                    <c-csbd-_resumen-argumentario record-id={idOportunidad} plan-arg={planArg}></c-csbd-_resumen-argumentario>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+
+    <div style="height: 16px;"></div>
+
+    <c-csbd_test_cgpt record-id={idOportunidad}></c-csbd_test_cgpt>
+    <!-- <c-csbd_chatgpt record-id={idOportunidad}></c-csbd_chatgpt> -->
+
+</template>

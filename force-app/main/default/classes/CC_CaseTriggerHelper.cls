@@ -416,18 +416,30 @@ public with sharing class CC_CaseTriggerHelper {
                 setIdCasos.add(caso.Id);
             }
         }
-
+        
         if(!casosTraspasados.isEmpty()){
             Map<ID, Case> mapCasos = new Map<ID, Case>([SELECT Id, Owner.Name FROM Case WHERE Id IN :setIdCasos ORDER BY Owner.Name]);
+            Id rtEmpleados = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             for (Case casoTrasladado : casosTraspasados) {
                 String titulo = 'Reasignación del caso';
+                String tipo = 'Reasignación';
                 if((String.valueOf(casoTrasladado.OwnerId).startsWith('005') || String.valueOf(casoTrasladado.OwnerId).startsWith('00G')) && mapCasos.containsKey(casoTrasladado.Id)){
                     titulo = 'Reasignación del caso a ' + mapCasos.get(casoTrasladado.Id).Owner.Name;
+                    // DPK - US1035054 - Modificar Actividad de Reasignación para CCO
+                    if(casoTrasladado.RecordTypeId == rtEmpleados){
+                        if(!String.valueOf(casoTrasladado.OwnerId).startsWith('005') && String.valueOf(mapOldObj.get(casoTrasladado.Id).OwnerId).startsWith('005')){
+                            String nivel = casoTrasladado.CC_En_Segundo_Nivel__c == true ? 'Nivel 2' : casoTrasladado.CC_En_Tercer_Nivel__c == true ? 'Nivel 3' : 'Nivel 1';
+                            tipo = tipo + ' ' + nivel;
+                        }else if((!casoTrasladado.CC_En_Segundo_Nivel__c && !casoTrasladado.CC_En_Tercer_Nivel__c) && (!String.isEmpty(mapOldObj.get(casoTrasladado.Id).CC_Grupo_Transfer__c) && String.isEmpty(casoTrasladado.CC_Grupo_Transfer__c))){
+                            tipo = tipo + ' Nivel 1';
+                        }
+                        
                 }
-                Task createTask = new Task(Type = 'Reasignación ' , Subject = titulo, ActivityDate = System.today(), Status = 'Completed', WhatId = casoTrasladado.Id ,Priority = 'Normal');
+                Task createTask = new Task(Type = tipo , Subject = titulo, ActivityDate = System.today(), Status = 'Completed', WhatId = casoTrasladado.Id ,Priority = 'Normal');
                 lstTareas.add(createTask);
             }
         }
+    }
 
         if(!lstTareas.isEmpty()){
             CC_Activity.crearActividades(lstTareas);
@@ -1013,7 +1025,7 @@ public with sharing class CC_CaseTriggerHelper {
             }
         }
     }
-
+    
     public static void informarOficinaAfectadaBU(List<Case> lstCasos, Map<Id, Case> mapOldObj, List<Id> idsCAM) {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         Id rtBankia = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_CSI_Bankia').getRecordTypeId();
@@ -1175,28 +1187,39 @@ public with sharing class CC_CaseTriggerHelper {
     }
 
     //Método creado a partir del traspaso de PB (cc_Gestion_Caso) a Trigger
-    public static void creacionCasoBI(List<Case> casos) {
-        Set<Id> idRecordTypesCc = new Set<Id>();
-        for (Schema.RecordTypeInfo recordTypeInfo : Case.SObjectType.getDescribe().getRecordTypeInfos()){
-            if (recordTypeInfo.getDeveloperName().left(3) == 'CC_') {
-                idRecordTypesCc.add(recordTypeInfo.getRecordTypeId());
+    public static void creacionCasoBI(List<Case> lstCasos) {
+        Schema.DescribeSObjectResult recordType = Case.SObjectType.getDescribe();
+        List<Schema.RecordTypeInfo> lstRT = recordType.getRecordTypeInfos();
+        Set<Id> setIdsRt = New Set<Id>();
+        List<Case> listaCasosUpdate = new List<Case>();
+        for (Schema.RecordTypeInfo rt: lstRT){
+            if ((rt.getDeveloperName().left(3)=='CC_')) {
+                setIdsRt.add(rt.getRecordTypeId());
             }
         }
 
-        List<Case> casosCc = new List<Case>();
-        Set<Id> idGrupos = new Set<Id>();
-        for (Case caso : casos) {
-            if (idRecordTypesCc.contains(caso.RecordTypeId)) {
-                casosCc.add(caso);
+        Set<Id> setIdsGrupos = new Set<Id>();
+        Map<Id,Group> mapaGruposCasos = new Map<Id, Group>();
+        for (Case caso : lstCasos) {
+            if(setIdsRt.contains(caso.RecordtypeId)){
+                listaCasosUpdate.add(caso);
                 if (caso.OwnerId != null && String.valueOf(caso.OwnerId).startsWith('00G')) {
-                    idGrupos.add(caso.OwnerId);
+                    setIdsGrupos.add(caso.OwnerId);
+                }
+            }
+
+        }
+
+        if (!setIdsGrupos.isEmpty()) {
+            List<Group> lstGruposCasos = [SELECT Id, DeveloperName FROM Group WHERE Id IN :setIdsGrupos];
+            if(!lstGruposCasos.isEmpty()){
+                for (Group grupo : lstGruposCasos) {
+                    mapaGruposCasos.put(grupo.Id, grupo);
                 }
             }
         }
 
-        Map<Id, Group> mapaGruposCasos = new Map<Id, Group>([SELECT DeveloperName FROM Group WHERE Id IN :idGrupos]);
-
-        for (Case caso : casosCc) {
+        for (Case caso : listaCasosUpdate) {
             caso.CC_Admin__c = true;
             caso.CC_Tramo_TRZ__c = 'Recibida - En evaluacion';
             caso.CC_CanalNotifCli__c = 'Email';
@@ -1217,7 +1240,6 @@ public with sharing class CC_CaseTriggerHelper {
             }
         }
     }
-
     public static void creacionCasoPropuestasBI(List<Case> lstCasos) {
         for (Case caso : lstCasos) {
             if (caso.Origin == 'Propuestas de mejora') {
@@ -1315,16 +1337,16 @@ public with sharing class CC_CaseTriggerHelper {
                     }
             }
         }
-
+        
         Map<String,Boolean> procesos = new Map<String, Boolean>();
-        List <CC_Settings__c> procesosComunicacionesInformativas = [SELECT Name, CC_Activa__c FROM CC_Settings__c
+        List <CC_Settings__c> procesosComunicacionesInformativas = [SELECT Name, CC_Activa__c FROM CC_Settings__c 
                                                  WHERE Name IN ('CC_Agrupador_CI_Asignacion_Casos',
                                                                 'CC_Agrupador_CIC_Asignacion_Casos',
                                                                 'CC_Agrupador_CIM_Asignacion_Casos')];
 
         for(CC_Settings__c setting : procesosComunicacionesInformativas){
             procesos.put(setting.Name, setting.CC_Activa__c);
-
+        
         }
 
         if (!idsCasos.isEmpty() && procesos.get('CC_Agrupador_CI_Asignacion_Casos')) {
@@ -1530,7 +1552,7 @@ public with sharing class CC_CaseTriggerHelper {
             Map<Id,CC_Agrupador__c> mapAgrupador = new Map<Id,CC_Agrupador__c>([SELECT Id FROM CC_Agrupador__c WHERE Id IN :setIdContacto AND CC_Record_Type_Name__c != 'Incidencia']);
 
             for (Case caso : casosEncuesta) {
-                if (mapAgrupador.containsKey(caso.CC_Agrupador_Id__c) || caso.CC_Agrupador_Id__c == null || (caso.Origin == 'Phone' /*&& caso.Account.CC_Tipo_Centro__c == 'OF' && caso.Account.CC_SubTipo_Centro__c == 'BP'*/ && caso.RecordTypeId == rtEmpleado)) {
+                if (mapAgrupador.containsKey(caso.CC_Agrupador_Id__c) || caso.CC_Agrupador_Id__c == null) {
                     idsCasos.add(caso.Id);
                 }
             }
@@ -2177,123 +2199,7 @@ public with sharing class CC_CaseTriggerHelper {
                 return campoCaso;
             }
 	}
-    /*
-    public static void generarEncuestaHDT1N(List<Case> lstCasos, Map<Id, Case> oldMap){
-        List<Case> lstCasosHDT = new List<Case>();
-        for (Case caso : lstCasos) {
-            if(oldMap.containsKey(caso.Id)){
-                if (caso.CC_Resuelto_Primer_Contacto__c && caso.Origin == 'Phone' && caso.Status =='Cerrado' && oldMap.get(caso.Id).Status != 'Cerrado' && (caso.CC_Canal_Resolucion__c == 'Incidencias Técnicas' || caso.CC_Canal_Resolucion__c == 'Servicios Centrales' || caso.CC_Canal_Resolucion__c == 'SmartPhones')) {
-                    lstCasosHDT.add(caso);
-                }
-            }
-        }
-        if(!lstCasosHDT.isEmpty()){
-            List<CC_Envio_Encuesta__c> linkEncuestaEmpleado =[SELECT  CC_Id_Encuesta__c, CC_Link_LimeSurvey__c, CC_Tipo_Encuesta__c FROM CC_Envio_Encuesta__c WHERE CC_Id_Encuesta__c = '261467' LIMIT 1];
-            if(!linkEncuestaEmpleado.isEmpty()){
-                Map<Id, Case> mapInfoCasos = new Map<Id, Case>([SELECT Origin, CaseNumber, Contact.Email, CC_Idioma__c, CC_URL_Encuesta_3N__c,CC_Matricula_Empleado__c, CC_MCC_Tematica__r.name, CC_MCC_Tematica__r.CC_idCognitivo__c, CC_MCC_Tematica__c FROM Case WHERE Id IN :lstCasosHDT]);
-                for(Case casoFiltrado : lstCasosHDT){
-                        //Case casoCopia= new Case(Id = casoFiltrado.Id);
-                        casoFiltrado.CC_URL_Encuesta_3N__c = linkEncuestaEmpleado[0].CC_Link_LimeSurvey__c+'sid='+linkEncuestaEmpleado[0].CC_Id_Encuesta__c+'&lang='+
-                        mapInfoCasos.get(casoFiltrado.Id).CC_Idioma__c+'&userid='+mapInfoCasos.get(casoFiltrado.Id).CC_Matricula_Empleado__c+'&ticketid='+mapInfoCasos.get(casoFiltrado.Id).CaseNumber+'&idet='+mapInfoCasos.get(casoFiltrado.Id).CC_MCC_Tematica__c+'&et='+ mapInfoCasos.get(casoFiltrado.Id).CC_MCC_Tematica__r.name.replace(' ', '_')+ '&newtest=Y';
-                }
-            }
-        }
 
-    }
-*/
-/*
-    public static void cierreCasoHDT1N(List<Case> lstCasos, Map<Id, Case> oldMap) {
-        List<Case> lstCasosHDT = new List<Case>();
-        for (Case caso : lstCasos) {
-            if(oldMap.containsKey(caso.Id)){
-                if (caso.CC_Resuelto_Primer_Contacto__c && caso.Origin == 'Phone' && caso.Status =='Cerrado' && oldMap.get(caso.Id).Status != 'Cerrado' && (caso.CC_Canal_Resolucion__c == 'Incidencias Técnicas' || caso.CC_Canal_Resolucion__c == 'Servicios Centrales' || caso.CC_Canal_Resolucion__c == 'SmartPhones')) {
-                    lstCasosHDT.add(caso);
-                }
-            }
-        }
-
-        if(!lstCasosHDT.isEmpty()){
-            List<CC_Envio_Encuesta__c> linkEncuestaEmpleado =[SELECT  CC_Id_Encuesta__c, CC_Link_LimeSurvey__c, CC_Tipo_Encuesta__c FROM CC_Envio_Encuesta__c WHERE CC_Id_Encuesta__c = '261467' LIMIT 1];
-            if(!linkEncuestaEmpleado.isEmpty()){
-                Map<Id, Case> mapInfoCasos = new Map<Id, Case>([SELECT Origin, CaseNumber, Contact.Email, CC_Idioma__c, CC_URL_Encuesta_3N__c,CC_Matricula_Empleado__c, CC_MCC_Tematica__r.name, CC_MCC_Tematica__r.CC_idCognitivo__c, CC_MCC_Tematica__c FROM Case WHERE Id IN :lstCasosHDT]);
-                List<Messaging.SingleEmailMessage> allmsg = new List<Messaging.SingleEmailMessage>();
-
-                EmailTemplate plantillaCas = [SELECT Id,HtmlValue, Subject FROM EmailTemplate WHERE DeveloperName = 'Encuesta_1N_HDT_1664260886802' LIMIT 1];
-                EmailTemplate plantillaCat = [SELECT Id,HtmlValue, Subject FROM EmailTemplate WHERE DeveloperName = 'Enquesta_1N_HDT_1664261031880' LIMIT 1];
-
-                List<CC_Buzones_Por_Defecto__mdt> buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
-                                                        WHERE CC_Canal_Procedencia__c = :lstCasosHDT[0].CC_Canal_Procedencia__c
-                                                        AND CC_Idioma__c =: lstCasosHDT[0].CC_Idioma__c];
-
-
-                if (buzones.isEmpty()) {
-                    buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
-                        WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c =: lstCasosHDT[0].CC_Idioma__c
-                        AND CC_Activo__c = true];
-                }
-
-                if (buzones.isEmpty()) {
-                    buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
-                            WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano'
-                            AND CC_Activo__c = true];
-                }
-                String remitente;
-                Id remitenteId;
-                if (!buzones.isEmpty()) {
-                    remitente = buzones[0].CC_Direccion_Correo__c;
-                }
-                if(remitente != null){
-                    remitenteId = [SELECT Id FROM OrgWideEmailAddress WHERE Address = :remitente LIMIT 1].Id;
-                }
-                List<Case> lstCasosCopia = new List<Case>();
-                for(Case casoFiltrado : lstCasosHDT){
-
-                    List<String> body= new List<String>();
-                    String subject;
-                    //lstCasosCopia.add(casoCopia);
-                    if(casoFiltrado.CC_Idioma__c == 'ca'){
-                        body.add(plantillaCat.HtmlValue);
-                        subject = plantillaCat.Subject;
-                    }
-                    else{
-                        body.add(plantillaCas.HtmlValue);
-                        subject = plantillaCas.Subject;
-                    }
-                    String stringFinal;
-
-                    List<Messaging.RenderEmailTemplateBodyResult> resList = Messaging.renderEmailTemplate(UserInfo.getUserId(), casoFiltrado.Id, body);
-                    if(!resList.isEmpty()){
-                        stringFinal = resList[0].getMergedBody();
-                    }
-
-
-                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                    // mail.setTemplateId(plantilla.Id);
-                    //System.debug('testing body ' + stringFinal);
-                     mail.htmlBody = stringFinal;
-                     mail.setSubject(subject + ' - ' + casoFiltrado.CaseNumber);
-                     mail.setSaveAsActivity(true);
-                     mail.setWhatId(casoFiltrado.Id);
-                     mail.setTargetObjectId(casoFiltrado.ContactId);
-                     mail.setTreatTargetObjectAsRecipient(false);
-                     String[] toAddresses = new String[] {mapInfoCasos.get(casoFiltrado.Id).Contact.Email};
-                         mail.setToAddresses(toAddresses);
-                     mail.setOrgWideEmailAddressId(remitenteId);
-                     allmsg.add(mail);
-
-                }
-
-               // if(!lstCasosCopia.isEmpty()){
-                 //   update lstCasosCopia;
-                //}
-
-                if (!allmsg.isEmpty()){
-                    Messaging.SendEmailResult [] result = Messaging.sendEmail(allmsg, false);
-                }
-            }
-        }
-    }
-*/
     public static void comprobacionTransferBU(List<Case> lstCasos, Map<Id, Case> mapOldObj, List<Id> idsCAM) {
         for (Case caso : lstCasos) {
             if (caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas' && mapOldObj.get(caso.Id).OwnerId != caso.OwnerId) {
@@ -2306,64 +2212,73 @@ public with sharing class CC_CaseTriggerHelper {
     }
 
     public static void reaperturaNoValida(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
-        //Conseguir los emails
+        if (lstCasos.isEmpty()) return;
         Set<Id> setIdContacto = new Set<Id>();
         List<Case> casosReapertura = new List<Case>();
+    
         for (Case caso : lstCasos) {
-            if (caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'Cerrado' && caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas' && caso.CC_Reapertura_Valida__c == 'No') {
-                if (!setIdContacto.contains(caso.ContactId)) {
-                    setIdContacto.add(caso.ContactId);
-                }
+            if (caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'Cerrado' && caso.CC_Reapertura_Valida__c == 'No' && caso.ContactId != null) {
+                setIdContacto.add(caso.ContactId);
                 casosReapertura.add(caso);
             }
         }
-
-        List<Messaging.SingleEmailMessage> allmsg = new List<Messaging.SingleEmailMessage>();
-        Map <String,OrgWideEmailAddress> owasMap = new Map<String,OrgWideEmailAddress>();
+    
+        if (setIdContacto.isEmpty() || casosReapertura.isEmpty()) return;
+    
+        Map<Id, Contact> mapContacts = new Map<Id, Contact>(
+            [SELECT Email FROM Contact WHERE Id IN :setIdContacto]
+        );
+    
+        Map<String, OrgWideEmailAddress> owasMap = new Map<String, OrgWideEmailAddress>();
         for (OrgWideEmailAddress owa : [SELECT Id, Address FROM OrgWideEmailAddress]) {
-            owasMap.put(String.valueOf(owa.Address), owa);
+            owasMap.put(owa.Address, owa);
         }
+    
         List<CC_Buzones_Por_Defecto__mdt> owaPorDefecto = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano' AND CC_Activo__c = true LIMIT 1];
-        List<EmailTemplate> htmlBodyCas = [SELECT Subject, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_ReaperturaNoValida_FCO_cas' LIMIT 1];
-        List<EmailTemplate> htmlBodyCat = [SELECT Subject, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_ReaperturaNoValida_FCO_cat' LIMIT 1];
-        List<OrgWideEmailAddress> owa = new List<OrgWideEmailAddress>();
-        owa.add(owasMap.get(owaPorDefecto[0].CC_Direccion_Correo__c));
-        if (!setIdContacto.isEmpty()) {
-            Map<Id, Contact> mapContacts = new Map<Id, Contact>([SELECT Email FROM Contact WHERE Id IN :setIdContacto]);
-            for (Case caso : casosReapertura) {
-                Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-                if (caso.CC_Idioma__c == 'ca') {
-                    email.setHtmlBody(htmlBodyCat[0].HtmlValue);
-                    email.subject = htmlBodyCat[0].Subject;
-                } else {
-                    email.setHtmlBody(htmlBodyCas[0].HtmlValue);
-                    email.subject = htmlBodyCas[0].Subject;
-                }
-                email.setSaveAsActivity(true);
-                email.setTreatBodiesAsTemplate(true);
-                email.setWhatId(caso.Id);
-                email.setTargetObjectId(caso.ContactId);
-                email.setTreatTargetObjectAsRecipient(false);
-                email.setOrgWideEmailAddressId(owa[0].Id);
-                List<String> toAddress = new List<String>();
-                if (mapContacts.containsKey(caso.ContactId) && mapContacts.get(caso.ContactId).Email != null) {
-                    toAddress.add(mapContacts.get(caso.ContactId).Email);
-                }
-                email.setToAddresses(toAddress);
-                allmsg.add(email);
-            }
+    
+        if (owaPorDefecto.isEmpty() || !owasMap.containsKey(owaPorDefecto[0].CC_Direccion_Correo__c)) return;
+        OrgWideEmailAddress owaDefault = owasMap.get(owaPorDefecto[0].CC_Direccion_Correo__c);
+    
+        Map<String, EmailTemplate> templates = new Map<String, EmailTemplate>();
+        for (EmailTemplate template : [SELECT Subject, HtmlValue, DeveloperName FROM EmailTemplate WHERE DeveloperName IN ('CC_ReaperturaNoValida_FCO_cas', 'CC_ReaperturaNoValida_FCO_cat', 'CC_ReaperturaNoValida_CCO_cas', 'CC_ReaperturaNoValida_CCO_cat')]) {
+            templates.put(template.DeveloperName, template);
         }
+    
+        if (templates.isEmpty()) return;
+    
+    
+        List<Messaging.SingleEmailMessage> allmsg = new List<Messaging.SingleEmailMessage>();
+    
+        for (Case caso : casosReapertura) {
+            if (!mapContacts.containsKey(caso.ContactId) || String.isEmpty(mapContacts.get(caso.ContactId).Email)) continue;
+    
+            Boolean isFCO = caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas';
+            String templateKey = 'CC_ReaperturaNoValida_' + (isFCO ? 'FCO' : 'CCO') + '_' + (caso.CC_Idioma__c == 'ca' ? 'cat' : 'cas');
+            EmailTemplate template = templates.get(templateKey);
+            
 
-        if (!allmsg.isEmpty()){
-            //Enviamos todos los mensajes
-            try{
-                Messaging.SendEmailResult [] result = Messaging.sendEmail(allmsg, false);
-            }catch(exception e){
-                String exc = e.getMessage();
-                CBK_Log.error(e + '-' + exc);
-                CBK_Log.error('Resultado error: ' + e);
+            if (template == null) continue;
+    
+            Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+            email.setHtmlBody(template.HtmlValue);
+            email.setSubject(template.Subject);
+            email.setSaveAsActivity(true);
+            email.setTreatBodiesAsTemplate(true);
+            email.setWhatId(caso.Id);
+            email.setTargetObjectId(caso.ContactId);
+            email.setTreatTargetObjectAsRecipient(false);
+            email.setOrgWideEmailAddressId(owaDefault.Id);
+            email.setToAddresses(new List<String>{ mapContacts.get(caso.ContactId).Email });
+    
+            allmsg.add(email);
+        }
+    
+        if (!allmsg.isEmpty()) {
+            try {
+                Messaging.sendEmail(allmsg, false);
+            } catch (Exception e) {
+                CBK_Log.error('Error al enviar emails reaperturaNoValida: ' + e.getMessage());
             }
         }
     }
-
 }

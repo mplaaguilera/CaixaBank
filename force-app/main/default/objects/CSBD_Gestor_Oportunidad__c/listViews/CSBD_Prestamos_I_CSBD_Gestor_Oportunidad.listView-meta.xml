@@ -2,7 +2,7 @@
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CSBD_Prestamos_I_CSBD_Gestor_Oportunidad</fullName>
     <filterScope>Queue</filterScope>
-    <label>CSBD - Préstamos I</label>
+    <label>CSBD - Consumo I</label>
     <queue>CSBD_Prestamos_I</queue>
     <sharedTo>
         <allInternalUsers></allInternalUsers>

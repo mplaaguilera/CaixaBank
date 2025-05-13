@@ -261,10 +261,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Chat NOA WhatsApp</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Clases Pasivas</fullName>
             <default>false</default>
         </values>
@@ -535,8 +531,19 @@
             <fullName>OESIA</fullName>
             <default>false</default>
         </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Tipo__c</picklist>
         <values>
-            <fullName>SIN PROVEEDOR</fullName>
+            <fullName>Remitidos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslados y Remitidos</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -887,10 +894,6 @@
         </values>
         <values>
             <fullName>Empresas Valencia</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Export Finance</fullName>
             <default>false</default>
         </values>
         <values>

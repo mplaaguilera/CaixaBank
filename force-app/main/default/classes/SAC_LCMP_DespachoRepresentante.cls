@@ -13,13 +13,15 @@
 
 public with sharing class SAC_LCMP_DespachoRepresentante {
 
-    private static Set<String> objetos = new Set<String>{'SAC_MaestroTemas__c', 'CC_Caracteristica__c'};
+    private static Set<String> objetos = new Set<String>{'SAC_MaestroTemas__c', 'CC_Caracteristica__c', 'CC_Grupo_Colaborador__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
 
     //Los maestros de temas con este Record Type van a indicar qué valores de despachos representantes se pueden escoger
     private final static Id RECTYPEDESPACHOS_MAESTROTEMAS = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_DespachoRepresentante').getRecordTypeId();
     private final static Id RTREPRESENTANTECARACTERISTICA = mapRTsObjects.get('CC_Caracteristica__c').get('SAC_CaracteristicaRepresentante').getRecordTypeId();
 
+    //Rec Type de Tareas
+    private static final Id RECTYGRUPOTAREAS = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SAC_GrupoResponsableAccion').getRecordTypeId();
 
 
     //Los valores que se van a mostrar a modo de picklist serán aquellos nombres de maestro de temas con el RT correspondiente
@@ -68,14 +70,29 @@ public with sharing class SAC_LCMP_DespachoRepresentante {
 
     }
 
+    public class GestorLetradoWrapper{
+
+        @AuraEnabled public Boolean esUsuarioLetrado {get; set;}
+        @AuraEnabled public Boolean esUsuarioGestor {get; set;}
+        @AuraEnabled public Boolean esUsuarioCOPSAJ {get; set;}
+
+        public GestorLetradoWrapper(Boolean varEsUsuarioLetrado, Boolean varEsUsuarioGestor, Boolean varEsUsuarioCOPSAJ)
+        {
+            esUsuarioLetrado = varEsUsuarioLetrado;
+            esUsuarioGestor = varEsUsuarioGestor;
+            esUsuarioCOPSAJ = varEsUsuarioCOPSAJ;
+        }
+    }
+
     
     //Comprobar si el usuario es owner de la reclamación o de alguna de sus pretensiones
     @AuraEnabled
-    public static Boolean verSiGestorLetrado(id idCaso, id ownerCaso){
+    public static GestorLetradoWrapper verSiGestorLetrado(id idCaso, id ownerCaso){
         String idUser = UserInfo.getUserId();
         List<Case> listaPretensiones = new List<Case>();
         Boolean esGestor = false;
         Boolean esLetrado = false;
+        Boolean esCOPSAJ = false;
 
         //Se obtienen las pretnsiones de la reclamación
         listaPretensiones = listaPretensiones = [SELECT Id, SAC_Reclamacion__c, OwnerId FROM Case WHERE SAC_Reclamacion__c = :idCaso];
@@ -94,12 +111,17 @@ public with sharing class SAC_LCMP_DespachoRepresentante {
             esGestor = true;
         }
 
-        //Si es gestor o letrado, se devuelve true para la variable esGestorLetrado del js
-        if(esGestor == true || esLetrado == true){
-            return true;
-        }else{
-            return false;
-        }  
+        //Buscar si el usuario pertence a COPS o AJ
+        List<CC_Grupo_Colaborador_Contact__c> colabContact= new List<CC_Grupo_Colaborador_Contact__c>();
+        colabContact = [SELECT id FROM CC_Grupo_Colaborador_Contact__c 
+                        WHERE CC_Usuario__c=:idUser AND CC_Grupo_Colaborador__r.RecordTypeId = :RECTYGRUPOTAREAS
+                        AND (CC_Grupo_Colaborador__r.SAC_DeveloperName__c = 'COPS' OR CC_Grupo_Colaborador__r.SAC_DeveloperName__c = 'AJ')];
+
+        if(!colabContact.isEmpty()){esCOPSAJ = true;}       
+
+        //Se construye el wrapper que se va a devolver, con todos los escalados necesarios para el componente
+        GestorLetradoWrapper wrapperGestorLetrado = new GestorLetradoWrapper(esLetrado, esGestor, esCOPSAJ);
+        return wrapperGestorLetrado;
     }
 
 

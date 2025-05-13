@@ -1,6 +1,18 @@
 @isTest
-public with sharing class OS_Detector_Idioma_Test implements HttpCalloutMock{
+Global class  OS_Detector_Idioma_Test implements HttpCalloutMock{
     
+     global HTTPResponse respond(HTTPRequest req) 
+    {   
+        String sFakeRespuesta = '';
+
+        sFakeRespuesta = '{cat=0.777, eng=0.591, esp=1.000, language=esp}';
+        HttpResponse res = new HttpResponse();
+        res.setHeader('Content-Type', 'application/json');
+        res.setBody(sFakeRespuesta);
+        res.setStatusCode(200);
+        return res;
+    }
+
     @TestSetup
     static void makeData(){
         User usuarioOperador = OS_Usuarios.usuarioOperador();
@@ -66,24 +78,14 @@ public with sharing class OS_Detector_Idioma_Test implements HttpCalloutMock{
         caso.CC_Canal_Procedencia__c = 'Buzón CCI Holabank';
         caso.CC_Tipo_Contacto__c = 'Asesoramiento';
         insert caso;
+
+        CBK_IntegrationSetting__c csCognitive = new CBK_IntegrationSetting__c();
+        csCognitive.Name = 'OS_DETIDI';
+        csCognitive.NamedCredential__c = 'callout:API_OS_PRE/detidi/predictscores';
+        insert csCognitive;
     }
     
-    public HTTPResponse respond(HTTPRequest req) 
-    {   
-                String sFakeRespuesta = '';
-        sFakeRespuesta = sFakeRespuesta + '{';
-        sFakeRespuesta = sFakeRespuesta + '"cat":0.000,';
-        sFakeRespuesta = sFakeRespuesta + '"eng":"1.000",';
-        sFakeRespuesta = sFakeRespuesta + '"esp":"0.000",';
-        sFakeRespuesta = sFakeRespuesta + '"language":"eng"';
-        sFakeRespuesta = sFakeRespuesta + '}';
-         
-        HttpResponse res = new HttpResponse();
-        res.setHeader('Content-Type', 'application/json');
-        res.setBody(sFakeRespuesta); 
-        res.setStatusCode(200);
-        return res;
-    }
+    
         
     @istest
     public static void getIdioma() 
@@ -111,11 +113,19 @@ public with sharing class OS_Detector_Idioma_Test implements HttpCalloutMock{
             Test.stopTest();
         
             Case resultCaso = [SELECT CC_Idioma__c FROM Case WHERE id = :caso.Id];
-            System.assertEquals(resultCaso.CC_Idioma__c, 'en','Comprobamos el idioma.');
+            System.assertEquals(resultCaso.CC_Idioma__c, 'es','Comprobamos el idioma.');
         }
     }
     
-    
+    private class HttpCalloutMockImpl implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            HttpResponse response = new HttpResponse();
+            response.setStatusCode(200);
+            response.setBody('{"idiomaDetectado": "es"}');
+            return response;
+        }
+    }
+
     @istest
     public static void getError() 
     {             
@@ -125,6 +135,8 @@ public with sharing class OS_Detector_Idioma_Test implements HttpCalloutMock{
 
         String buzon =[SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE CC_Canal_Procedencia__c =:caso.CC_Canal_Procedencia__c LIMIT 1][0].CC_Direccion_Correo__c;
         
+        Test.setMock(HttpCalloutMock.class, new OS_Detector_Idioma_Test()); 
+
         CaseShare csNuevo = new CaseShare();
         csNuevo.CaseId = caso.Id;
         csNuevo.UserOrGroupId = usuarioOperador.Id;

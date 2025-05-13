@@ -18,6 +18,7 @@ public with sharing class OS_Case_TRHan_Test {
     @isTest
     public static void actualizarTelefonoEmailCasos() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
+        User usuarioAdmin = [SELECT Id FROM User WHERE FirstName = 'AdministradorOS' AND Profile.Name = 'System Administrator' LIMIT 1];
 
         Id recordTypeCuenta = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         Account cuenta = new Account();
@@ -47,7 +48,7 @@ public with sharing class OS_Case_TRHan_Test {
         Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
 
         // Ejecución de la prueba
-        System.runAs (usuarioOperador) {
+        System.runAs (usuarioAdmin) {
             Test.startTest();
             Case caso = new Case();
             caso.RecordTypeId = recordTypeCaso;
@@ -709,6 +710,7 @@ public with sharing class OS_Case_TRHan_Test {
     @isTest
     public static void crearActividadCierreAfterUpdate() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
+        User usuarioAdmin = [SELECT Id FROM User WHERE FirstName = 'AdministradorOS' AND Profile.Name = 'System Administrator' LIMIT 1];
 
         Id stdBHId;
         BusinessHours[] stdBH = [SELECT Id, Name FROM BusinessHours WHERE Name = 'cops' AND isActive = true];
@@ -885,7 +887,7 @@ public with sharing class OS_Case_TRHan_Test {
         caso2.OwnerId = usuarioOperador.Id;
         insert caso2;
 
-        System.runAs (usuarioOperador) {
+        System.runAs (usuarioAdmin) {
             Test.startTest();
             caso.Status = 'Cerrado';
             caso.AccountId = cuenta.Id;
@@ -923,7 +925,7 @@ public with sharing class OS_Case_TRHan_Test {
         
         Contact contacto = new Contact();
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
-        contacto.Email = 'test@test.com';
+        contacto.Email = 'testCopsBI@test.com';
         contacto.FirstName = 'Nombre';
         contacto.LastName = 'Apellido';
 

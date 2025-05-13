@@ -1,5 +1,5 @@
 import {LightningElement, api, wire} from 'lwc';
-import {getRecord, getFieldValue, updateRecord} from 'lightning/uiRecordApi';
+import {getRecord, getFieldValue, updateRecord, notifyRecordUpdateAvailable} from 'lightning/uiRecordApi';
 import LightningConfirm from 'lightning/confirm';
 import {NavigationMixin} from 'lightning/navigation';
 import {toast, errorApex} from 'c/csbd_lwcUtils';
@@ -28,8 +28,6 @@ export default class csbdMacRelatedList extends NavigationMixin(LightningElement
 			typeAttributes: {title: 'Vincular', iconName: 'utility:link', variant: {fieldName: '_variant'}, disabled: {fieldName: '_vinculada'}}}
 	];
 
-	wireTimestamp = null;
-
 	datatableData = [];
 
 	telefono;
@@ -46,7 +44,7 @@ export default class csbdMacRelatedList extends NavigationMixin(LightningElement
 		}
 	}
 
-	@wire(getOtrasLlamadasApex, {recordId: '$recordId', telefono: '$telefono', wireTimestamp: '$wireTimestamp'})
+	@wire(getOtrasLlamadasApex, {recordId: '$recordId', telefono: '$telefono'})
 	async wiredOtrasLlamadas({error, data}) {
 		if (data) {
 			this.datatableData = data.map(oportunidad => ({
@@ -80,7 +78,7 @@ export default class csbdMacRelatedList extends NavigationMixin(LightningElement
 						type: 'standard__recordPage',
 						attributes: {recordId: seleccionada.Id, actionName: 'view'}
 					});
-					this.wireTimestamp = new Date();
+					notifyRecordUpdateAvailable([{recordId: this.recordId}]);
 				}).catch(error => errorApex(this, error, 'Problema vinculando las oportunidades'))
 				.finally(() => this.spinner = false);
 		}

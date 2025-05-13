@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_EnvioCorreo__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Utilizado para enviar correo al owner, manager y director de la oportunidad identificada.</description>
+    <inlineHelpText>Utilizado para enviar correo al owner, manager y director de la oportunidad identificada.</inlineHelpText>
+    <label>Enviar correo automático</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

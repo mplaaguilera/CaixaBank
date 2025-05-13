@@ -12,36 +12,6 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>SAC_14</fullName>
-                <default>false</default>
-                <label>14%</label>
-            </value>
-            <value>
-                <fullName>SAC_14_145</fullName>
-                <default>false</default>
-                <label>14%-14,5%</label>
-            </value>
-            <value>
-                <fullName>SAC_145_15</fullName>
-                <default>false</default>
-                <label>14,5%-15%</label>
-            </value>
-            <value>
-                <fullName>SAC_15_16</fullName>
-                <default>false</default>
-                <label>15%-16%</label>
-            </value>
-            <value>
-                <fullName>SAC_16_17</fullName>
-                <default>false</default>
-                <label>16%-17%</label>
-            </value>
-            <value>
-                <fullName>SAC_17</fullName>
-                <default>false</default>
-                <label>&gt;17%</label>
-            </value>
-            <value>
                 <fullName>SAC_21</fullName>
                 <default>false</default>
                 <label>&lt;21%</label>
@@ -75,6 +45,36 @@
                 <fullName>SAC_24</fullName>
                 <default>false</default>
                 <label>&gt;24%</label>
+            </value>
+            <value>
+                <fullName>SAC_14</fullName>
+                <default>false</default>
+                <label>14%</label>
+            </value>
+            <value>
+                <fullName>SAC_14_145</fullName>
+                <default>false</default>
+                <label>14%-14,5%</label>
+            </value>
+            <value>
+                <fullName>SAC_145_15</fullName>
+                <default>false</default>
+                <label>14,5%-15%</label>
+            </value>
+            <value>
+                <fullName>SAC_15_16</fullName>
+                <default>false</default>
+                <label>15%-16%</label>
+            </value>
+            <value>
+                <fullName>SAC_16_17</fullName>
+                <default>false</default>
+                <label>16%-17%</label>
+            </value>
+            <value>
+                <fullName>SAC_17</fullName>
+                <default>false</default>
+                <label>&gt;17%</label>
             </value>
         </valueSetDefinition>
     </valueSet>

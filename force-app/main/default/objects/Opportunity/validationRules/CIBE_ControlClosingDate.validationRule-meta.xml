@@ -4,20 +4,17 @@
     <active>true</active>
     <description>La fecha de cierre no puede ser una fecha pasada ni una fecha superior a 18 meses</description>
     <errorConditionFormula>AND(
-NOT($Permission.CIBE_ByPassVR),
+NOT($Permission.CIBE_BypassValidationRules),
 !$Permission.CBK_BypassValidationRules,
 NOT($Permission.AV_AvoidBulkApi),
-OR(
-RecordType.DeveloperName = &quot;CIBE_AccionComercialCIB&quot;,
-RecordType.DeveloperName = &quot;CIBE_AlertaComercialCIB&quot;,
-RecordType.DeveloperName = &quot;CIBE_AlertaComercialEMP&quot;,
-RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoEMP&quot;,
-RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoCIB&quot;,
-RecordType.DeveloperName = &quot;CIBE_AccionComercialEMP&quot;
+				OR( RecordType.DeveloperName = &quot;CIBE_AccionComercialCIB&quot;, 
+							RecordType.DeveloperName = &quot;CIBE_AlertaComercialCIB&quot;, 
+RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoCIB&quot; ),
+OR(CloseDate &lt; TODAY(),
+CloseDate - TODAY() &gt; 547
 ),
-
-OR(CloseDate &lt;  TODAY(), 
-CloseDate - TODAY() &gt; 547)
-)</errorConditionFormula>
+NOT(ISPICKVAL(PRIORVALUE(StageName), &apos;CIBE_Vencido&apos;)),
+NOT(ISPICKVAL(StageName, &quot;CIBE_Vencido&quot;)),
+NOT(ISCHANGED(CIBE_ComiteDirector__c)))</errorConditionFormula>
     <errorMessage>Introduzca una fecha de cierre no inferior desde la fecha actual o superior a 18 meses.</errorMessage>
 </ValidationRule>

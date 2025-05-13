@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_PDRating__c</fullName>
     <caseSensitive>false</caseSensitive>
+    <description>Campo con los datos de conversión de Rating S&amp;P</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Rating</label>

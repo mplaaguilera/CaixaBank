@@ -187,6 +187,116 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>CC_Ambito_Tareas_Caixa__c</picklist>
+        <values>
+            <fullName>CSBD 3N</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD Contratar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD No Contratar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank Talks</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros Incidencias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No clientes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Testamentaría</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ventas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vidacaixa</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Ambito_Tareas_Imagin__c</picklist>
+        <values>
+            <fullName>CSBD 3N</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD Contratar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD No Contratar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank Talks</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros Incidencias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No clientes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Testamentaría</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ventas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vidacaixa</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>CC_Area_Responsable__c</picklist>
         <values>
             <fullName>1500 - CONTACT CENTER CLIENTS</fullName>
@@ -1131,11 +1241,7 @@
     <picklistValues>
         <picklist>SEG_Links_Relacionados__c</picklist>
         <values>
-            <fullName>Alta Formulario Pasarelas</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Consulta Formulario Pasarelas</fullName>
+            <fullName>Nueva alta pasarela</fullName>
             <default>false</default>
         </values>
     </picklistValues>

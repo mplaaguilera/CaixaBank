@@ -393,6 +393,11 @@
                 <label>Análisis</label>
             </value>
             <value>
+                <fullName>SPV_AnalisisComplementaria</fullName>
+                <default>false</default>
+                <label>Análisis complementaria</label>
+            </value>
+            <value>
                 <fullName>Allanamiento</fullName>
                 <default>false</default>
                 <label>Allanamiento</label>
@@ -416,6 +421,16 @@
                 <fullName>Pendiente respuesta Organismos</fullName>
                 <default>false</default>
                 <label>Pendiente respuesta Organismos</label>
+            </value>
+            <value>
+                <fullName>SPV_SubComplementaria</fullName>
+                <default>false</default>
+                <label>Complementaria</label>
+            </value>
+            <value>
+                <fullName>SPV_SubRectificacion</fullName>
+                <default>false</default>
+                <label>Rectificación</label>
             </value>
             <value>
                 <fullName>Revision</fullName>
@@ -463,6 +478,11 @@
                 <label>Cerrada descarte</label>
             </value>
             <value>
+                <fullName>SPV_AnalisisRectificacion</fullName>
+                <default>false</default>
+                <label>Análisis rectificación</label>
+            </value>
+            <value>
                 <fullName>SPV_Rectificar</fullName>
                 <default>false</default>
                 <label>Rectificar</label>
@@ -471,6 +491,16 @@
                 <fullName>SPV_No_rectificar</fullName>
                 <default>false</default>
                 <label>No rectificar</label>
+            </value>
+            <value>
+                <fullName>En gestión UAFE</fullName>
+                <default>false</default>
+                <label>En gestión UAFE</label>
+            </value>
+            <value>
+                <fullName>Gestionado por UAFE</fullName>
+                <default>false</default>
+                <label>Gestionado por UAFE</label>
             </value>
             <value>
                 <fullName>Con propietario anterior en la cola del caso</fullName>
@@ -551,6 +581,10 @@
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>SAC_002</controllingFieldValue>
+            <valueName>SPV_AnalisisComplementaria</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_002</controllingFieldValue>
             <valueName>Allanamiento</valueName>
         </valueSettings>
         <valueSettings>
@@ -564,8 +598,23 @@
         <valueSettings>
             <controllingFieldValue>SAC_002</controllingFieldValue>
             <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
-            <controllingFieldValue>SPV_PendienteRespuestaOrganismos</controllingFieldValue>
             <valueName>Negociacion</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
+            <valueName>Envio Organismos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
+            <valueName>SPV_SubComplementaria</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
+            <valueName>SPV_SubRectificacion</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
+            <valueName>Revision</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Planificado</controllingFieldValue>
@@ -885,20 +934,20 @@
             <valueName>Recibida respuesta jurídica</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
-            <valueName>Envio Organismos</valueName>
+            <controllingFieldValue>SPV_Rectificacion</controllingFieldValue>
+            <valueName>SPV_AnalisisRectificacion</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
-            <valueName>Revision</valueName>
+            <controllingFieldValue>SPV_Rectificacion</controllingFieldValue>
+            <valueName>SPV_Rectificar</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>SPV_PendienteRespuestaOrganismos</controllingFieldValue>
-            <valueName>Pendiente respuesta Organismos</valueName>
+            <controllingFieldValue>SPV_Rectificacion</controllingFieldValue>
+            <valueName>SPV_No_rectificar</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>SPV_PendienteRespuestaOrganismos</controllingFieldValue>
-            <valueName>Ejecucion y Pendiente Respuesta Organismo</valueName>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>En gestión UAFE</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Cerrado</controllingFieldValue>
@@ -977,12 +1026,9 @@
             <valueName>Cerrada descarte</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>SPV_Rectificacion</controllingFieldValue>
-            <valueName>SPV_Rectificar</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>SPV_Rectificacion</controllingFieldValue>
-            <valueName>SPV_No_rectificar</valueName>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <controllingFieldValue>Rechazado</controllingFieldValue>
+            <valueName>Gestionado por UAFE</valueName>
         </valueSettings>
     </valueSet>
 </CustomField>

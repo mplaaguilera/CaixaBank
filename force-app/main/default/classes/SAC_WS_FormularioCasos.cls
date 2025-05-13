@@ -239,6 +239,7 @@ global with sharing class SAC_WS_FormularioCasos extends CBK_HttpServiceIntegrat
         }
         for(SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input oDatos: oDatosList){
             if(oDatos.aplicacion == 'FORMGGH'){
+                system.debug('***');
                 SPV_Formulario__c fGGH = new SPV_Formulario__c();
                 fGGH.RecordTypeId = RECTYPEFORMGGH;
                 fGGH.SPV_Caso__c = caseId;
@@ -302,9 +303,11 @@ global with sharing class SAC_WS_FormularioCasos extends CBK_HttpServiceIntegrat
                             prod.N_Contrato__c = gasto.numPrestamo;
                             prod.SAC_Pretension__c = pretension.Id;
                             mapNumPersoProducto.put(gasto.numPrestamo, prod);
+                            system.debug('***');
                         }
                     }
                 }
+                system.debug('***');
                 formularios.add(fGGH);
             }
         }

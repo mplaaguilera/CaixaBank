@@ -9,6 +9,7 @@
     <columns>LANGUAGE</columns>
     <columns>LAST_PUBLISHED_DATE</columns>
     <columns>CC_Canal_Resolucion__c</columns>
+    <columns>VERSION_NUMBER</columns>
     <filterScope>Everything</filterScope>
     <label>All Articles</label>
 </ListView>

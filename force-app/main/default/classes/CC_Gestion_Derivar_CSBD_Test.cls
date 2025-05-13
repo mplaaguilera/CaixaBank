@@ -3,8 +3,10 @@ private class CC_Gestion_Derivar_CSBD_Test {
     @TestSetup
     static void makeData() {
 
-        User usuarioAdmin = CC_TestDataFactory.insertUserAdmin();
-        User operadorCliente = CC_TestDataFactory.insertUserOperadorCliente('U0123456');
+        Map<String, User> usuarios = CC_TestDataFactory.insertUserAdminOperador('U0123456');
+        User usuarioAdmin = usuarios.get('admin');
+        User operadorCliente = usuarios.get('operador');
+        
         System.runAs(usuarioAdmin) {
 
         //Listas de valores
@@ -348,17 +350,26 @@ private class CC_Gestion_Derivar_CSBD_Test {
     }
 
     @isTest
-    static void testCrearOportunidadExitoso() {
+    static void testCrearOportunidadValidacionOk() {
         Test.startTest();
         Case caso = [SELECT Id FROM Case WHERE Subject = 'casoEnrollmentPreguntaSi' LIMIT 1];
         System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
             Map<String, Object> resultado = CC_Gestion_Derivar_CSBD.crearOportunidad(caso.Id);
-            System.assertEquals((Boolean) resultado.get('oppCreada'), true);
+            System.assertEquals((Boolean) resultado.get('validacionCrearOportunidad'), true);
         }
         Test.stopTest();
     }
 
-    // MGT
+    @isTest
+    static void testCrearOportunidadExitoso() {
+        Test.startTest();
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoEnrollmentPreguntaSi' LIMIT 1];
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+            Map<String, Object> resultado = CC_Gestion_Derivar_CSBD.crearOportunidadCSBD(caso.Id);
+            System.assertEquals((Boolean) resultado.get('oppCreada'), true);
+        }
+        Test.stopTest();
+    }
 
     @isTest
     static void testCrearTareasRellamada() {

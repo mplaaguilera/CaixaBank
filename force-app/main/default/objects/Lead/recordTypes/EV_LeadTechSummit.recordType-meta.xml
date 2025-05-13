@@ -3,6 +3,7 @@
     <fullName>EV_LeadTechSummit</fullName>
     <active>true</active>
     <businessProcess>Lead Tech Summit</businessProcess>
+    <description>Registros de tipo TechSummit.</description>
     <label>Lead Tech Summit</label>
     <picklistValues>
         <picklist>AV_CustomerType__c</picklist>

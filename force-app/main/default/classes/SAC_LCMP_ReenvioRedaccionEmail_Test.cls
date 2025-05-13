@@ -38,6 +38,17 @@ public with sharing class SAC_LCMP_ReenvioRedaccionEmail_Test {
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', camporecl);
             SAC_DatabaseDML.insertDML(reclamacion, false); 
             //Database.insert(reclamacion);
+
+            EmailMessage em = new EmailMessage(ParentId = reclamacion.id, 
+            SAC_EnvioRedaccion__c = 'primerenvioredaccion',
+            FromAddress = 'email@email.com',
+            ToAddress = 'test06-03-2024-10-24@test1.com.invalid', 
+            CcAddress = 'test06-03-2024-10-24@test2.com.invalid', 
+            BccAddress = 'test06-03-2024-10-24@test3.com.invalid', 
+            Subject = 'Asunto',
+            Incoming = true,
+            Headers = '[{"value": ,"name": "X-SFDC-Original-RCPT"}]');
+            SAC_DatabaseDML.insertDML(em, false);   
         }
     }
 
@@ -65,10 +76,39 @@ public with sharing class SAC_LCMP_ReenvioRedaccionEmail_Test {
 
         Test.startTest();
         System.runAs(usuario) {
-            mensaje = SAC_LCMP_ReenvioRedaccionEmail.reenviarRedaccionEmail(reclamacion.Id);
+            mensaje = SAC_LCMP_ReenvioRedaccionEmail.reenviarRedaccionEmail(reclamacion.Id, 'test06-03-2024-10-24@test1.com.invalid', 'test06-03-2024-10-24@test2.com.invalid','test06-03-2024-10-24@test3.com.invalid','Asunto', '[]', 'Cuerpo');
         }
         Test.stopTest();
         
         System.assertNotEquals(null, mensaje, 'No se ha ejecutado el método');
+    }
+
+    @isTest
+    static void obtenerDatosEmailTest(){
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'Reclamacion' LIMIT 1];
+        User usuarioGeneral = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        SAC_LCMP_ReenvioRedaccionEmail.DatosEmailWrapper informacion;
+
+         //Email
+         EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'SAC_EmailService' LIMIT 1];
+         String headerValueSTR = headerValue.LocalPart + '@' + headerValue.EmailDomainName;
+     
+         EmailMessage em = new EmailMessage(ParentId = reclamacion.id, 
+                             SAC_EnvioRedaccion__c = 'primerenvioredaccion',
+                             FromAddress = 'email@email.com',
+                             ToAddress = 'test06-03-2024-10-24@test1.com.invalid', 
+                             CcAddress = 'test06-03-2024-10-24@test2.com.invalid', 
+                             BccAddress = 'test06-03-2024-10-24@test3.com.invalid', 
+                             Subject = 'Asunto',
+                             Incoming = true,
+                             Headers = '[{"value": "' + headerValueSTR + '","name": "X-SFDC-Original-RCPT"}]');
+         SAC_DatabaseDML.insertDML(em, false);  
+
+        System.runAs(usuarioGeneral){
+            Test.startTest();
+            informacion = SAC_LCMP_ReenvioRedaccionEmail.obtenerDatosEmail(reclamacion.Id);
+            Test.stopTest();
+        }
+        System.assertNotEquals(informacion, null, 'El objeto wrapper con datos del email no se ha instanciado correctamente.');
     }
 }

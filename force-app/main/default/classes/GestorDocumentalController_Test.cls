@@ -81,37 +81,6 @@ public class GestorDocumentalController_Test {
         detalleinformacionenviar, camposBoleanos, camposTexto);       
     }
     
-    @isTest static void obtenerPlantillas() {     	       
-       	SDOC__SDTemplate__c docSDOCs = generarPlantilla('Plantilla', 'Castellano', 'PDF');
-       	GestorDocumentalController.obtenerPlantillas(docSDOCs.Id);        
-    }
-    
-    @isTest static void obtenerCamposPlantillas() {
-        SDOC__SDTemplate__c docSDOCsAtencionDeficiente = generarPlantilla('Atención Deficiente en Oficina ES', 'Castellano', 'PDF');
-
-        //Lista de valores 
-        CC_Lista_Valores__c lovSDOC = new CC_Lista_Valores__c();
-        lovSDOC.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
-        lovSDOC.CC_Activa__c = true;
-        lovSDOC.Name = 'Plantillas SDocs';
-        insert lovSDOC;
-        
-        CC_Lista_Valores__c valorAtencionDeficiente = new CC_Lista_Valores__c();
-        valorAtencionDeficiente.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
-        valorAtencionDeficiente.CC_Activa__c = true;
-        valorAtencionDeficiente.CC_Lista__c = lovSDOC.Id;
-        valorAtencionDeficiente.Name = 'Atención Deficiente en Oficina';
-        valorAtencionDeficiente.CC_Valor__c = 'Atención Deficiente en Oficina';
-        //valorAtencionDeficiente.CC_Campos_SDocs__c = 'CC_All_In_One__c;CC_Contacto_Cliente__c';
-        insert valorAtencionDeficiente;
-        
-       
-        
-        List<String> listaPlantillas = new List<String>();
-        listaPlantillas.add(docSDOCsAtencionDeficiente.Id);
-
-        GestorDocumentalController.obtenerCamposPlantilla(listaPlantillas);          
-    }
     
     private static Case generarCaso(){
         Case caso = new Case();
@@ -119,16 +88,6 @@ public class GestorDocumentalController_Test {
         insert caso;        
         return caso;
     } 
-    
-     private static SDOC__SDTemplate__c generarPlantilla(String nombre, String idioma, String formato){
-        SDOC__SDTemplate__c documento = new SDOC__SDTemplate__c();
-        documento.Name = nombre;	
-        documento.SDOC__Language__c = idioma;
-        documento.SDOC__Template_Format__c = formato;
-        documento.SDOC__Active__c = true;
-        insert documento;
-        return documento;
-    } 
-   
+
       
 }

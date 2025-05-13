@@ -16,6 +16,39 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SPV_CalidadRespuesta__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Si</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SPV_ColaboracionBDE__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Si</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SPV_CongruenciaSAC__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Si</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SPV_ConllevaRiesgoReputacional__c</picklist>
         <values>
             <fullName>No</fullName>
@@ -38,6 +71,28 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SPV_EmisionPlazo__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Si</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SPV_EmisionSAC__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Si</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SPV_ExisteCriterioRespectoTipologia__c</picklist>
         <values>
             <fullName>No</fullName>
@@ -56,6 +111,21 @@
         </values>
         <values>
             <fullName>Si</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SPV_MotivoRechazoNegociacion__c</picklist>
+        <values>
+            <fullName>SPV_NoDeseaNegociar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SPV_SolicitaVerificarPrimero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SPV_TAEInsuficiente</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -104,6 +174,25 @@
         </values>
         <values>
             <fullName>Sí</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SPV_ResultadoNegociacion__c</picklist>
+        <values>
+            <fullName>Acuerdo aceptado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Acuerdo rechazado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Acuerdo revocado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente no localizado</fullName>
             <default>false</default>
         </values>
     </picklistValues>

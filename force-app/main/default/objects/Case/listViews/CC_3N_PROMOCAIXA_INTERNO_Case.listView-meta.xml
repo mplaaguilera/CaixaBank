@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CC_3N_PROMOCAIXA_INTERNO_Case</fullName>
+    <columns>CC_Nivel_Flag__c</columns>
     <columns>CC_Numero_Reclamaciones_Cliente__c</columns>
     <columns>CASES.CASE_NUMBER</columns>
     <columns>CC_Canal_Procedencia__c</columns>
@@ -16,7 +17,7 @@
         <operation>notEqual</operation>
         <value>Cerrado,Rechazado</value>
     </filters>
-    <label>Cola 3N Facilitea Interno</label>
+    <label>Cola 3N PromoCaixa Interno</label>
     <queue>CC_3N_PROMOCAIXA_INTERNO</queue>
     <sharedTo>
         <group>PublicGroup_3N_PromoCaixa_Interno</group>

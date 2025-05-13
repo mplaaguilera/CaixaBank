@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CSBD_TablaPrecios_Producto__c</fullName>
-    <encryptionScheme>None</encryptionScheme>
-    <externalId>false</externalId>
     <label>Producto</label>
-    <length>255</length>
     <required>false</required>
     <trackTrending>false</trackTrending>
-    <type>Text</type>
-    <unique>false</unique>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Convenios</fullName>
+                <default>false</default>
+                <label>Convenios</label>
+            </value>
+            <value>
+                <fullName>imaginBank</fullName>
+                <default>false</default>
+                <label>imaginBank</label>
+            </value>
+            <value>
+                <fullName>Omni</fullName>
+                <default>false</default>
+                <label>Omni</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>PHD</fullName>
+                <default>false</default>
+                <label>PHD</label>
+            </value>
+            <value>
+                <fullName>Sostenibles</fullName>
+                <default>false</default>
+                <label>Sostenibles</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
 </CustomField>

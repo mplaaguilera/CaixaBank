@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Priority__c</fullName>
+    <description>Recoger la prioridad para saber si es alta o muy alta</description>
     <label>Prioridad</label>
     <required>false</required>
     <trackTrending>false</trackTrending>

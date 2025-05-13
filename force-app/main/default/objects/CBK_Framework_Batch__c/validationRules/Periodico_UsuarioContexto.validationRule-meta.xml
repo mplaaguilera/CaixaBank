@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Periodico_UsuarioContexto</fullName>
+    <active>true</active>
+    <description>Validación que impide la creación del registro de tipo Periódico sin Usuario de Contexto</description>
+    <errorConditionFormula>AND(!$Permission.CBK_BypassValidationRules, ISNEW(), ISPICKVAL(Tipo__c, &quot;Periodico&quot;) , ISPICKVAL(UsuarioContexto__c, &quot;&quot;))</errorConditionFormula>
+    <errorDisplayField>UsuarioContexto__c</errorDisplayField>
+    <errorMessage>Debe informar el campo Usuario de contexto para batches de tipo Periódico</errorMessage>
+</ValidationRule>

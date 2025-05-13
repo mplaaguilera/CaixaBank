@@ -35,6 +35,11 @@
                 <label>CSI_Bankia</label>
             </value>
             <value>
+                <fullName>FRA</fullName>
+                <default>false</default>
+                <label>FRA</label>
+            </value>
+            <value>
                 <fullName>HDT</fullName>
                 <default>false</default>
                 <label>HDT</label>

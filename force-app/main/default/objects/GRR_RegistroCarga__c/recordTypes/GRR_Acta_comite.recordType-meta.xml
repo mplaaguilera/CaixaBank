@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Acta_comite</fullName>
+    <active>true</active>
+    <compactLayoutAssignment>GRR_Registro_carga_Compact_Layout</compactLayoutAssignment>
+    <label>Acta de comité</label>
+    <picklistValues>
+        <picklist>GRR_AAPP__c</picklist>
+        <values>
+            <fullName>-</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Asuntos sociales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ayuntamiento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunidad Autónoma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Convenio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Defensor Pueblo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Diputación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Emp Vivienda</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ONG %28Cáritas%2C %2E%2E%2E%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Policía %2FGC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vivienda</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Area__c</picklist>
+        <values>
+            <fullName>Bankia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buildingcenter</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CAC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Centro Empresas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Coral Homes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GRR Bcn</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestor Soluciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestor Stock</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>InTouch</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instituciones DT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mediadoras</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Red Comercial</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_GRR__c</picklist>
+        <values>
+            <fullName>15 días</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sí</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Incid__c</picklist>
+        <values>
+            <fullName>Mas de 2 días</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nok</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reportado Nok</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Resp errónea</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Varias incid</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Motivos__c</picklist>
+        <values>
+            <fullName>Caso PAH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contrato NO resuelto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contrato resuelto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Control del caso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Defunción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Deudor persona jurídica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No aporta documentación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No colabora</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No cumple criterios vulnerabilidad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No localizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No puede asumir condiciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No rescinden contrato</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suministros no regularizados</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_NoCumplimientoCriteriosVulnerabilida__c</picklist>
+        <values>
+            <fullName>Económico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ninguno</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sociofamiliar</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Origen__c</picklist>
+        <values>
+            <fullName>AAPP</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comité</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ILOC%2FNO DOC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ISOC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PAH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Propiedad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recobro Externo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Red</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SACH</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_PAH__c</picklist>
+        <values>
+            <fullName>-</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>NO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SI</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Problema__c</picklist>
+        <values>
+            <fullName>Alquiler</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amenazas oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COVID 19</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lanzamiento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ocupación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Okupación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prescripción deuda</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Procedimiento PJU</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Queja %2F Reclamación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reconsideracion DP</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Refinanciación</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Solucion__c</picklist>
+        <values>
+            <fullName>200 casos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Acuerdo de pago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caso no cerrado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Exclusión NO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Exclusión OK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recobrado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recuperada posesión</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Renovado alquiler</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solucionado RR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suspendido Lanz RDL</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Vulnerabilidad__c</picklist>
+        <values>
+            <fullName>Antiguo deudor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COVID</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Edad avanzada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Enfermedad%2Fdiscapacidad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Exclusión social</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Familia monoparental</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Menores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Programa centralizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Riesgo Reputacional</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte PAH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violencia de género</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

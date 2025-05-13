@@ -3,8 +3,8 @@
     <fullName>EV_CodigoQR__c</fullName>
     <description>Código QR del miembro de campaña</description>
     <externalId>false</externalId>
-    <formula>IMAGE(&apos;https://chart.googleapis.com/chart?chs=200x200&amp;cht=qr&amp;chl=&apos;&amp; IF(ISPICKVAL(EV_FormatoDeAsistencias__c, &apos;002&apos;), SUBSTITUTE(EV_URLStreamingEvento__c, &apos;&amp;&apos;, &apos;%26&apos;), 
-																																																																						SUBSTITUTE(EV_URLStreamingEvento__c&amp;&apos;&amp;asistencia=fisica&apos;, &apos;&amp;&apos;, &apos;%26&apos;)),&apos;&apos;)</formula>
+    <formula>IMAGE(&apos;https://quickchart.io/qr?size=200&amp;text=&apos;&amp; IF(ISPICKVAL(EV_FormatoDeAsistencias__c, &apos;002&apos;), SUBSTITUTE(EV_URLStreamingEvento__c, &apos;&amp;&apos;, &apos;%26&apos;), 
+SUBSTITUTE(EV_URLStreamingEvento__c&amp;&apos;&amp;asistencia=fisica&apos;, &apos;&amp;&apos;, &apos;%26&apos;)),&apos;&apos;)</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Código QR</label>
     <required>false</required>

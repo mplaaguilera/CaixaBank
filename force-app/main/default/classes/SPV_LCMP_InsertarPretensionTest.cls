@@ -7,18 +7,21 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         Test.startTest();
     User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
     usuarioAdmin.Username = 'useraadmin@test.com.testdata';
-    Database.insert(usuarioAdmin);
+    //Database.insert(usuarioAdmin);
+    SPV_DatabaseDML.insertDML(usuarioAdmin, false);
 
     User usuario;
     System.runAs(usuarioAdmin){
         usuario = SPV_TestDataFactory.crearUsuarioSPVGeneral(1)[0];
-        Database.insert(usuario);
+        //Database.insert(usuario);
+        SPV_DatabaseDML.insertDML(usuario, false);
 
         PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SPV_Administrador'];
         PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
         permiSetAssiAdmin.AssigneeId = usuario.Id;
         permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-        Database.insert(permiSetAssiAdmin);
+        //Database.insert(permiSetAssiAdmin);
+        SPV_DatabaseDML.insertDML(permiSetAssiAdmin, false);
     }
     Test.stopTest();    
 
@@ -29,7 +32,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         grupo.SAC_DeveloperName__c = 'SPV_FYRLEGALLETRADO';
    
         listGrupos.add(grupo);
-        Database.insert(listGrupos);
+        //Database.insert(listGrupos);
+        SPV_DatabaseDML.insertListDML(listGrupos, false);
 
         //Añadir las reclamaciones
         List<Case> listaReclamaciones = new List<Case>();
@@ -47,8 +51,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         Map<String, Object> camposReclamacion2 = new Map<String, Object>();  //Siendo Object tipo genérico
         camposReclamacion2.put('Subject', 'TestRec2');
         camposReclamacion2.put('Origin', 'Backoffice');
-        camposReclamacion2.put('Status', 'SAC_002');
-        camposReclamacion2.put('SAC_StatusAuxiliar__c', 'SAC_002');
+        camposReclamacion2.put('Status', 'SPV_AnalisisDecision');
+        camposReclamacion2.put('SAC_StatusAuxiliar__c', 'SPV_AnalisisDecision');
         camposReclamacion2.put('OwnerId', usuario.Id);
         camposReclamacion2.put('SAC_GrupoLetrado__c', listGrupos[0].Id);
 
@@ -56,7 +60,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         listaReclamaciones.add(casoReclamacion2);
 
         //Y, una vez obtenidos los casos en una lista, se insertan
-        Database.insert(listaReclamaciones);
+        //Database.insert(listaReclamaciones);
+        SPV_DatabaseDML.insertListDML(listaReclamaciones, false);
 
         
 
@@ -88,8 +93,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         Case pretension2 = SPV_TestDataFactory.crearCaso('Pretension', camposPretension2);
         listaPretensiones.add(pretension2);
 
-        Database.insert(listaPretensiones);
-
+        //Database.insert(listaPretensiones);
+        SPV_DatabaseDML.insertListDML(listaPretensiones, false);
 
            //MCCs
            String mccTematicaRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
@@ -98,16 +103,20 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
            String mccDetalleRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
            
            CC_MCC__c mccTematica = new CC_MCC__c(Name='Tematica', CC_Codigo_Externo__c='a', RecordTypeId=mccTematicaRecordTypeId, CC_Tipo_Cliente__c='SAC');
-           Database.insert(mccTematica);
+           //Database.insert(mccTematica);
+           SPV_DatabaseDML.insertDML(mccTematica, false);
    
            CC_MCC__c mccProdServ = new CC_MCC__c(Name='ProdServ',CC_Tematica__c = mccTematica.id , CC_Codigo_Externo__c='b', RecordTypeId=mccProdServRecordTypeId, CC_Tipo_Cliente__c='SAC');
-           Database.insert(mccProdServ);
+           //Database.insert(mccProdServ);
+           SPV_DatabaseDML.insertDML(mccProdServ, false);
    
            CC_MCC__c mccMotivo = new CC_MCC__c(Name='Motivo',CC_Producto_Servicio__c = mccProdServ.id, CC_Codigo_Externo__c='c', RecordTypeId=mccMotivoRecordTypeId, CC_Tipo_Cliente__c='SAC');
-           Database.insert(mccMotivo);
+           //Database.insert(mccMotivo);
+           SPV_DatabaseDML.insertDML(mccMotivo, false);
    
            CC_MCC__c mccDetalle = new CC_MCC__c(Name='Detalle',CC_Motivo__c = mccMotivo.id, CC_Codigo_Externo__c='d', RecordTypeId=mccDetalleRecordTypeId, CC_Tipo_Cliente__c='SAC');
-           Database.insert(mccDetalle);
+           //Database.insert(mccDetalle);
+           SPV_DatabaseDML.insertDML(mccDetalle, false);
     }//Fin de makeData
 
 
@@ -168,7 +177,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         campospret.put('OwnerId', usuario.Id);
 
         pretension = SPV_TestDataFactory.crearCaso('Pretension', campospret);
-        Database.insert(pretension);
+        //Database.insert(pretension);
+        SPV_DatabaseDML.insertDML(pretension, false);
 
 
         Case casoReclamacion = new Case();
@@ -178,7 +188,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         camposReclamacion.put('SAC_PretensionPrincipal__c', pretension.Id);
         //Se llama al método que devolverá el caso creado con los campos pasados
         casoReclamacion = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion);
-        Database.insert(casoReclamacion);
+        //Database.insert(casoReclamacion);
+        SPV_DatabaseDML.insertDML(casoReclamacion, false);
 
         System.runAs(usuario){
             Test.startTest();
@@ -209,7 +220,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
 
         //Se llama al método que devolverá el caso creado con los campos pasados
         casoRelacionado = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion);
-        Database.insert(casoRelacionado);
+        //Database.insert(casoRelacionado);
+        SPV_DatabaseDML.insertDML(casoRelacionado, false);
 
         Case pretension = new Case();
         Map<String, Object> campospret = new Map<String, Object>();
@@ -218,10 +230,12 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         campospret.put('OwnerId', usuario.Id);
 
         pretension = SPV_TestDataFactory.crearCaso('Pretension', campospret);
-        Database.insert(pretension);
+        //Database.insert(pretension);
+        SPV_DatabaseDML.insertDML(pretension, false);
 
         casoRelacionado.SAC_PretensionPrincipal__c = pretension.Id;
-        Database.update(casoRelacionado);
+        //Database.update(casoRelacionado);
+        SPV_DatabaseDML.updateDML(casoRelacionado, false);
 
         Case casoPrincipal = new Case();
         Map<String, Object> camposReclamacion2 = new Map<String, Object>(); 
@@ -231,7 +245,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         casoPrincipal.SAC_CasoRelacionado__c = casoRelacionado.Id;
         
         casoPrincipal = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion2);
-        Database.insert(casoPrincipal);
+        //Database.insert(casoPrincipal);
+        SPV_DatabaseDML.insertDML(casoPrincipal, false);
 
         System.runAs(usuario){
             respuesta = SPV_LCMP_InsertarPretension.insertarPretensiones(casoPrincipal.id, mccs);
@@ -260,7 +275,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
             Test.startTest();
             casoReclamacion.SPV_VueltaAlta__c = true;
             casoReclamacion.SAC_PretensionPrincipal__c = pretension.Id;
-            Database.update(casoReclamacion);
+            //Database.update(casoReclamacion);
+            SPV_DatabaseDML.updateDML(casoReclamacion, false);
 
             respuesta = SPV_LCMP_InsertarPretension.insertarPretensiones(casoReclamacion.id, mccs);
             Test.stopTest();
@@ -300,7 +316,8 @@ public with sharing class SPV_LCMP_InsertarPretensionTest {
         System.runAs(usuario){
             Test.startTest();
             reclamacion.SAC_PretensionPrincipal__c = pretension.Id;
-            Database.update(reclamacion);
+            //Database.update(reclamacion);
+            SPV_DatabaseDML.updateDML(reclamacion, false);
             respuesta = SPV_LCMP_InsertarPretension.insertarPretensiones(reclamacion.id, mccs);
             Test.stopTest();
         }

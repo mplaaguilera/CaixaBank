@@ -74,11 +74,13 @@
     <enableFeeds>false</enableFeeds>
     <externalSharingModel>ReadWrite</externalSharingModel>
     <searchLayouts>
+        <customTabListAdditionalFields>DataSpace</customTabListAdditionalFields>
         <customTabListAdditionalFields>ActionStatus</customTabListAdditionalFields>
         <customTabListAdditionalFields>CreatedBy</customTabListAdditionalFields>
         <customTabListAdditionalFields>ManagedBy</customTabListAdditionalFields>
         <customTabListAdditionalFields>CreatedDate</customTabListAdditionalFields>
         <customTabListAdditionalFields>LastModifiedDate</customTabListAdditionalFields>
+        <searchResultsAdditionalFields>DataSpace</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>ActionStatus</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>CreatedBy</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>ManagedBy</searchResultsAdditionalFields>

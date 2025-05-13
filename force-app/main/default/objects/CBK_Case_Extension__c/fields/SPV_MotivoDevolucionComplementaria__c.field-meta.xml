@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_MotivoDevolucionComplementaria__c</fullName>
+    <label>Motivo Devolución Envío Complementaria</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SPV_001</fullName>
+                <default>false</default>
+                <label>Documentación anexada de otro expediente</label>
+            </value>
+            <value>
+                <fullName>SPV_002</fullName>
+                <default>false</default>
+                <label>Empresa/logo del escrito erróneo</label>
+            </value>
+            <value>
+                <fullName>SPV_003</fullName>
+                <default>false</default>
+                <label>Escrito incompleto o incorrecto</label>
+            </value>
+            <value>
+                <fullName>SPV_004</fullName>
+                <default>false</default>
+                <label>Falta tarea ejecución</label>
+            </value>
+            <value>
+                <fullName>SPV_005</fullName>
+                <default>false</default>
+                <label>Falta/Error Nombre reclamante</label>
+            </value>
+            <value>
+                <fullName>SPV_006</fullName>
+                <default>false</default>
+                <label>Faltan documentos a anexar</label>
+            </value>
+            <value>
+                <fullName>SPV_007</fullName>
+                <default>false</default>
+                <label>Formato documento para enviar erróneo</label>
+            </value>
+            <value>
+                <fullName>SPV_008</fullName>
+                <default>false</default>
+                <label>Numeración documentos adjuntos errónea</label>
+            </value>
+            <value>
+                <fullName>SPV_009</fullName>
+                <default>false</default>
+                <label>Número expediente erróneo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

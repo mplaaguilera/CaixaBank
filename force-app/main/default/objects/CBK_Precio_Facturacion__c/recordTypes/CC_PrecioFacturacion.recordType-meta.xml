@@ -131,9 +131,5 @@
             <fullName>OESIA</fullName>
             <default>false</default>
         </values>
-        <values>
-            <fullName>SIN PROVEEDOR</fullName>
-            <default>false</default>
-        </values>
     </picklistValues>
 </RecordType>

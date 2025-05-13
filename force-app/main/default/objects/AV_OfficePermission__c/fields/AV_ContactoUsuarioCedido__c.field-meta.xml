@@ -2,8 +2,10 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_ContactoUsuarioCedido__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>permite identificar el usuario al que se ha cedido</description>
     <label>Contacto usuario cedido</label>
     <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Permisos Oficinas (Contacto usuario cedido)</relationshipLabel>
     <relationshipName>Permisos_Oficinas1</relationshipName>
     <required>false</required>
     <trackTrending>false</trackTrending>

@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_EmpleModif__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que contiene el empleado de modificación</description>
     <label>Empleado de modificación</label>
     <referenceTo>Contact</referenceTo>
     <relationshipLabel>Grupo Interlocución (Empleado de Modificación)</relationshipLabel>

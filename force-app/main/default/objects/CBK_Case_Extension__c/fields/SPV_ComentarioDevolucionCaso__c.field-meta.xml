@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_ComentarioDevolucionCaso__c</fullName>
+    <description>Campo en el que se indicarán los comentarios cada vez que se devuelva el caso.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Comentario de devolución del caso</label>
+    <length>20000</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>10</visibleLines>
+</CustomField>

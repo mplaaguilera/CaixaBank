@@ -100,11 +100,13 @@
     </actionOverrides>
     <actionOverrides>
         <actionName>NewEvent</actionName>
-        <type>Default</type>
+        <content>CIBE_OverrideNewEventButton</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>LightningComponent</type>
     </actionOverrides>
     <actionOverrides>
         <actionName>NewEvent</actionName>
-        <formFactor>Large</formFactor>
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>

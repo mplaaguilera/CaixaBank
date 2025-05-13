@@ -191,7 +191,11 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Fraude</fullName>
+            <fullName>FRA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GRR</fullName>
             <default>false</default>
         </values>
         <values>
@@ -199,7 +203,11 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Kinton</fullName>
+            <fullName>KIN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OB</fullName>
             <default>false</default>
         </values>
         <values>
@@ -215,11 +223,27 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>SACH</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>SEG</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>SIR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SIRE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SPV</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TSM</fullName>
             <default>false</default>
         </values>
     </picklistValues>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_VisibleByLoggedUser__c</fullName>
+    <description>visible para el usuario logeado</description>
     <formula>IF(  AV_EmpleadoAlta__r.AV_UsuarioAsociado__c = $User.Id , true , false)</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Visible By Logged User</label>

@@ -31,6 +31,5 @@ NOT(ISPICKVAL(CC_Canal_Procedencia__c,&quot;Caixabank Talks&quot;)),
 $Profile.Name &lt;&gt; &apos;System Administrator&apos;,
 $Profile.Name &lt;&gt; &apos;Administrador del sistema&apos;
 )</errorConditionFormula>
-    <errorDisplayField>AccountId</errorDisplayField>
     <errorMessage>No se puede rechazar un caso que no esté clasificado.</errorMessage>
 </ValidationRule>

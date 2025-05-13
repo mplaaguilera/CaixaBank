@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_BuildingNumber__c</fullName>
+    <description>Campo en el que se almacena el numero del edificio del cliente</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Número</label>

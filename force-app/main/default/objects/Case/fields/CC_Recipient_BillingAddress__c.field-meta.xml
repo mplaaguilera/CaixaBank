@@ -2,11 +2,11 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CC_Recipient_BillingAddress__c</fullName>
     <externalId>false</externalId>
-    <formula>IF(NOT(ISBLANK(Account.BillingStreet)),      Account.BillingStreet            + BR(), NULL) +
-IF(NOT(ISBLANK(Account.BillingCity)),        Account.BillingCity              + BR(), NULL) +
-IF(NOT(ISBLANK(Account.BillingState)),       Account.BillingState,                    NULL) +
-IF(NOT(ISBLANK(Account.BillingPostalCode)),  &quot;, &quot; + Account.BillingPostalCode + BR(), NULL) +
-IF(NOT(ISBLANK(Account.BillingCountry)),     Account.BillingCountry,                  NULL)</formula>
+    <formula>UPPER(
+    IF(NOT(ISBLANK(Account.BillingStreet)), Account.BillingStreet + BR() + BR(), NULL) +
+    IF(NOT(ISBLANK(Account.BillingPostalCode)), Account.BillingPostalCode, NULL) +
+    IF(NOT(ISBLANK(Account.BillingCity)), &quot; &quot; + Account.BillingCity, NULL)
+)</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Recipient BillingAddress</label>
     <required>false</required>

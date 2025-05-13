@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_FechaPteRespuestaOrganismo__c</fullName>
+    <description>Fecha en la que se pasa al estado &quot;Pendiente Respuesta Organismos&quot;</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha envío a organismo</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

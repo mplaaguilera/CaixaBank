@@ -6,7 +6,7 @@
     <externalId>false</externalId>
     <inlineHelpText>Producto formulario web.</inlineHelpText>
     <label>Producto formulario</label>
-    <length>3</length>
+    <length>100</length>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>

@@ -1,15 +1,38 @@
 <template>
 
 	<article class="slds-card" style="box-shadow: none;">
-		<div class="slds-card__body" align="center" style="min-height: 34px;">
+		<div class="slds-card__body" align="center" style="min-height: 32px;">
+
 			<div class="divBotones">
-				<lightning-button label="Copiar NIF" icon-name="utility:identity" onclick={copiarNifAlPortapapeles} disabled={botonesDisabled.copiarNifAlPortapapeles}></lightning-button>
-				<lightning-button label="Derivar a gestor" icon-name="utility:workforce_engagement" onclick={abrirModal} data-modal="modalDerivarGestor" disabled={botonesDisabled.derivarGestor} class="slds-var-m-left_small"></lightning-button>
-				<lightning-button label="Cerrar" icon-name="action:close" onclick={abrirModal} data-modal="modalCerrarOportunidad" disabled={botonesDisabled.cerrarOportunidad} class="slds-var-m-left_small"></lightning-button>
+
+				<!--Copiar NIF-->
+				<lightning-button label="NIF" icon-name="utility:identity" onclick={copiarNifAlPortapapeles} disabled={botonesDisabled.copiarNifAlPortapapeles} title="Copiar NIF al portapapeles"></lightning-button>
+
+				<!--Programar cita-->
+				<lightning-button lwc:if={oportunidad._pendienteCita} label={oportunidad._fechaCita} icon-name="utility:event" variant="destructive-text" onclick={abrirModal} data-modal="modalDesprogramarCita" disabled={botonesDisabled.desprogramarCita} title="Desprogramar cita" data-variant="destructive-text"></lightning-button>
+				<lightning-button lwc:else label="Programar cita" icon-name="utility:date_input" onclick={abrirModal} data-modal="modalProgramarCita" disabled={botonesDisabled.programarCita}></lightning-button>
+
+				<!--Derivar a gestor-->
+				<lightning-button label="Derivar" icon-name="utility:workforce_engagement" onclick={abrirModal} data-modal="modalDerivarGestor" disabled={botonesDisabled.derivarGestor} title="Derivar a gestor"></lightning-button>
+
+				<!--Cerrar oportunidad-->
+				<template lwc:if={usuarioDesarrollador}>
+					<lightning-button lwc:if={oportunidad._cerrada} label="Reactivar" icon-name="utility:undo" onclick={abrirModal} data-modal="modalReactivarOportunidad" disabled={botonesDisabled.reactivarOportunidad}></lightning-button>
+					<lightning-button lwc:else label="Cerrar" icon-name="utility:close" onclick={abrirModal} data-modal="modalCerrarOportunidad" disabled={botonesDisabled.cerrarOportunidad}></lightning-button>
+				</template>
+				<lightning-button lwc:else label="Cerrar" icon-name="utility:close" onclick={abrirModal} data-modal="modalCerrarOportunidad" disabled={botonesDisabled.cerrarOportunidad}></lightning-button>
+
+				<!--Otras operativas, sldsValidatorIgnoreNextLine-->
+				<lightning-button-icon lwc:if={usuarioDesarrollador} icon-name="utility:threedots" class="botonOtrasOperativas" disabled></lightning-button-icon>
+
 			</div>
 		</div>
 	</article>
 
-	<c-csbd_-derivar-gestor lwc:if={modalesVisibles.modalDerivarGestor} lwc:ref="modalDerivarGestor" record-id={idOportunidad} onmodalcerrado={cerrarModal}></c-csbd_-derivar-gestor>
-	<c-csbd_-cerrar-oportunidad lwc:elseif={modalesVisibles.modalCerrarOportunidad} lwc:ref="modalCerrarOportunidad" record-id={idOportunidad} onmodalcerrado={cerrarModal}></c-csbd_-cerrar-oportunidad>
+	<!--Modales-->
+	<c-csbd_-programar-cita lwc:if={modalesVisibles.modalProgramarCita} lwc:ref="modalProgramarCita" record-id={idOportunidad} onmodalabierto={modalAbierto} onmodalcerrado={modalCerrado}></c-csbd_-programar-cita>
+	<c-csbd_-desprogramar-cita lwc:elseif={modalesVisibles.modalDesprogramarCita} lwc:ref="modalDesprogramarCita" record-id={idOportunidad} onmodalabierto={modalAbierto} onmodalcerrado={modalCerrado}></c-csbd_-desprogramar-cita>
+	<c-csbd_-derivar-gestor lwc:elseif={modalesVisibles.modalDerivarGestor} lwc:ref="modalDerivarGestor" record-id={idOportunidad} onmodalabierto={modalAbierto} onmodalcerrado={modalCerrado}></c-csbd_-derivar-gestor>
+	<c-csbd_-cerrar-oportunidad lwc:elseif={modalesVisibles.modalCerrarOportunidad} lwc:ref="modalCerrarOportunidad" record-id={idOportunidad} onmodalabierto={modalAbierto} onmodalcerrado={modalCerrado}></c-csbd_-cerrar-oportunidad>
+	<c-csbd_-reactivar-oportunidad lwc:elseif={modalesVisibles.modalReactivarOportunidad} lwc:ref="modalReactivarOportunidad" record-id={idOportunidad} onmodalabierto={modalAbierto} onmodalcerrado={modalCerrado}></c-csbd_-reactivar-oportunidad>
 </template>

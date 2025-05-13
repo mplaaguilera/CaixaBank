@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_PretensionCreadaCerrada__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo checkbox que marca si la pretensión se ha creado en una reclamación cerrada</description>
+    <label>Pretensión creada cerrada</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

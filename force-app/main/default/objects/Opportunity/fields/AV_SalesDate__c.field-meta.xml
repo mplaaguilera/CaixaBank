@@ -3,7 +3,7 @@
     <fullName>AV_SalesDate__c</fullName>
     <description>Fecha de la venta</description>
     <encryptionScheme>None</encryptionScheme>
-    <label>Fecha de la venta</label>
+    <label>Fecha</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>

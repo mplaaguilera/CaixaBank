@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TrasladoAuto3n__c</fullName>
+    <inlineHelpText>Trasladar automáticamente a 3N el caso creado al recibir una llamadas entrante.</inlineHelpText>
+    <label>Traslado a 3N</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>3N de Carteras CAM</fullName>
+                <default>false</default>
+                <label>3N de Carteras CAM</label>
+            </value>
+            <value>
+                <fullName>3N de Fondos CAM</fullName>
+                <default>false</default>
+                <label>3N de Fondos CAM</label>
+            </value>
+            <value>
+                <fullName>3N de Valores CAM</fullName>
+                <default>false</default>
+                <label>3N de Valores CAM</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

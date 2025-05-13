@@ -1,13 +1,10 @@
 public with sharing class CSBD_EnlacesOperativasController {
+
     @AuraEnabled
-    public static Account obtenerDatosCuenta (String accountId){
-        Account acc= [SELECT AV_NumPerso__c,CC_Numero_Documento__c,FirstName,LastName  FROM Account WHERE id= :accountId limit 1];
-        return acc;
+    public static SObject getRegistroRelacionado(Id recordId, String campoLookup, String nombreObjeto) {
+        String query = 'SELECT Id, ' + String.escapeSingleQuotes(campoLookup) + ' FROM ' + String.escapeSingleQuotes(nombreObjeto) + ' WHERE Id = \'' + String.escapeSingleQuotes(recordId) + '\' LIMIT 1';
+        SObject result = Database.query(query);
+        return result;
     }
 
-   @AuraEnabled
-    public static User obtenerDatosUser (String userId){
-        User user= [SELECT EmployeeNumber, AV_ExternalID__c FROM User WHERE id= :userId limit 1];
-        return user;
-    }
 }

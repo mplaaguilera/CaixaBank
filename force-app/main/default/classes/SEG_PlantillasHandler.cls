@@ -137,31 +137,21 @@ public class SEG_PlantillasHandler {
 			}
 
 			// Comprobaciones para posibles nulos antes de ejecutar un método
+			String centro;
 			if(caso.AccountId != null){
-				String centro;
 				if(caso.Account.AV_OficinaPrincipal__c != null){
 					centro = caso.Account?.AV_OficinaPrincipal__c;
 				} else if (caso.Account?.SEG_Prioridad_Carterizacion_Segmentos__c && caso.Account?.SEG_Oficina_Gestora_Segmentos__c != null) {
 					centro = caso.Account?.SEG_Oficina_Gestora_Segmentos__c;
-
-				}
-
-				if(String.isNotBlank(centro)){
-					filterTemplateByExceptionCentros(centro, mapPlantByCaseRecla, mapPlantillaDetallesCenEmpresa);
 				}
 			}
+			
+			filterTemplateByExceptionCentros(centro, mapPlantByCaseRecla, mapPlantillaDetallesCenEmpresa);
+			filterTemplateByExceptionGrupos(caso.SEG_Grupo__c, mapPlantByCaseRecla, mapPlantillaDetallesGrupoTrabajo);
+ 			filterTemplateByExceptionGruposEmpresas(caso, mapPlantByCaseRecla, mapPlantillaDetallesGrupoEmpresas, mapPlantillaDetallesEmpresas);
+			filterTemplateByExceptionCR(caso.SEG_ClasificacionRapida__c, mapPlantByCaseRecla, mapPlantillaCR);
 
-			if(caso.SEG_Grupo__c != null){
-				filterTemplateByExceptionGrupos(caso.SEG_Grupo__c, mapPlantByCaseRecla, mapPlantillaDetallesGrupoTrabajo);
-			}
-
-			filterTemplateByExceptionGruposEmpresas(caso, mapPlantByCaseRecla, mapPlantillaDetallesGrupoEmpresas, mapPlantillaDetallesEmpresas);
-
-			if(caso.SEG_ClasificacionRapida__c != null){
-				filterTemplateByExceptionCR(caso.SEG_ClasificacionRapida__c, mapPlantByCaseRecla, mapPlantillaCR);
-			}
-
-			if (mapPlantByCaseRecla.size() > 0) {
+			if (!mapPlantByCaseRecla.isEmpty()) {
 				mapCaseLstPlantillas.put(caso.Id, mapPlantByCaseRecla.values());
 			}
 		}
@@ -268,25 +258,28 @@ public class SEG_PlantillasHandler {
 	}
 	
 	private static void filterTemplateByExceptionCentros(String numCentroCase, Map<Id, SEG_Plantilla__c> mapPlantByCaseRecla, Map<Id, Map<String, List<SEG_ExcepcionesCentro__c>>> mapPlantillaDetallesCenEmpresa) {
-		Set<Id> setPlantillasIdByExCentrosNumeroCentro = new Set<Id>();
-		Set<Id> setPlantillasIdByExCentros = new Set<Id>();
 		//Filtrar plantillas (caso y tipo reclamacion) por excepciones
-		for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values()) 
-		{
-			if (mapPlantillaDetallesCenEmpresa?.get(plantilla.Id)?.get(numCentroCase) != null) {setPlantillasIdByExCentrosNumeroCentro.add(plantilla.Id);
+		if (numCentroCase != null) {
+			Boolean plantillaEncontrada = false; //Indicamos que aún no se ha encontrado un plantilla con el filtro.
+			for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values())  {
+				if (mapPlantillaDetallesCenEmpresa.containsKey(plantilla.Id)){
+					if (!mapPlantillaDetallesCenEmpresa?.get(plantilla.Id)?.containsKey(numCentroCase)) {
+						mapPlantByCaseRecla.remove(plantilla.Id);
+					} else {
+						plantillaEncontrada = true;
+					}
+				}
 			}
-			if (mapPlantillaDetallesCenEmpresa?.get(plantilla.Id) != null) {setPlantillasIdByExCentros.add(plantilla.Id);
-			}
-		}
-		if (setPlantillasIdByExCentrosNumeroCentro.size() > 0) {
-			for (Id plantillaId : mapPlantByCaseRecla.keySet()) {
-				if (!setPlantillasIdByExCentrosNumeroCentro.contains(plantillaId)) {mapPlantByCaseRecla.remove(plantillaId);
+			if (plantillaEncontrada) { //Si se ha encontrado una o más plantillas con el filtro, se quitan todas las que no tengan filtro para priorizar las plantillas más exáctas.
+				for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values())  {
+					if (!mapPlantillaDetallesCenEmpresa.containsKey(plantilla.Id)){
+						mapPlantByCaseRecla.remove(plantilla.Id);
+					}
 				}
 			}
 		} else {
-			for (Id plantillaId : mapPlantByCaseRecla.keySet()) 
-			{
-				if (setPlantillasIdByExCentros.contains(plantillaId)) {
+			for (Id plantillaId : mapPlantillaDetallesCenEmpresa.keySet()) {
+				if (mapPlantByCaseRecla.containsKey(plantillaId)) {
 					mapPlantByCaseRecla.remove(plantillaId);
 				}
 			}
@@ -294,27 +287,28 @@ public class SEG_PlantillasHandler {
 	}
 	
 	private static void filterTemplateByExceptionGrupos(String numGrupoCase, Map<Id, SEG_Plantilla__c> mapPlantByCaseRecla, Map<Id, Map<String, List<SEG_ExcepcionesGrupo__c>>> mapPlantillaDetallesGrupoTrabajo) {
-		Set<Id> setPlantillasIdByExGrupoGrTrabajo = new Set<Id>();
-		Set<Id> setPlantillasIdByExGrupo = new Set<Id>();
-		//Filtrar plantillas (caso y tipo reclamacion) por excepciones
-		for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values()) 
-		{
-			if (mapPlantillaDetallesGrupoTrabajo?.get(plantilla.Id)?.get(numGrupoCase) != null) {
-				setPlantillasIdByExGrupoGrTrabajo.add(plantilla.Id);
+		if (numGrupoCase != null) {
+			Boolean plantillaEncontrada = false; //Indicamos que aún no se ha encontrado un plantilla con el filtro.
+			for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values())  {
+				if (mapPlantillaDetallesGrupoTrabajo.containsKey(plantilla.Id)){
+					if (!mapPlantillaDetallesGrupoTrabajo?.get(plantilla.Id)?.containsKey(numGrupoCase)) {
+						mapPlantByCaseRecla.remove(plantilla.Id);
+					} else {
+						plantillaEncontrada = true;
+					}
+				}
 			}
-			if (mapPlantillaDetallesGrupoTrabajo?.get(plantilla.Id) != null) {
-				setPlantillasIdByExGrupo.add(plantilla.Id);
-			}
-		}
-		if (setPlantillasIdByExGrupoGrTrabajo.size() > 0) {
-			for (Id plantillaId : mapPlantByCaseRecla.keySet()) 
-			{
-				if (!setPlantillasIdByExGrupoGrTrabajo.contains(plantillaId)) {mapPlantByCaseRecla.remove(plantillaId);
+			if (plantillaEncontrada) { //Si se ha encontrado una o más plantillas con el filtro, se quitan todas las que no tengan filtro para priorizar las plantillas más exáctas.
+				for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values())  {
+					if (!mapPlantillaDetallesGrupoTrabajo.containsKey(plantilla.Id)){
+						mapPlantByCaseRecla.remove(plantilla.Id);
+					}
 				}
 			}
 		} else {
-			for (Id plantillaId : mapPlantByCaseRecla.keySet()) {
-				if (setPlantillasIdByExGrupo.contains(plantillaId)) {mapPlantByCaseRecla.remove(plantillaId);
+			for (Id plantillaId : mapPlantillaDetallesGrupoTrabajo.keySet()) {
+				if (mapPlantByCaseRecla.containsKey(plantillaId)) {
+					mapPlantByCaseRecla.remove(plantillaId);
 				}
 			}
 		}
@@ -324,18 +318,20 @@ public class SEG_PlantillasHandler {
 		Set<Id> setPlantillasIdByExGrupoEmpresaByGrupo = new Set<Id>();
 		Set<Id> setPlantillasIdByExGrupoEmpresa = new Set<Id>();
 		//Filtrar plantillas (caso y tipo reclamacion) por excepciones
-		for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.Values()) 
-		{
-			if (mapPlantillaDetallesGrupoEmpresas?.get(plantilla.Id)?.get(cs.SEG_Grupo_Empresa__c) != null) {
-				setPlantillasIdByExGrupoEmpresaByGrupo.add(plantilla.Id);
-			}
-			if (mapPlantillaDetallesGrupoEmpresas?.get(plantilla.Id) != null) {
-				setPlantillasIdByExGrupoEmpresa.add(plantilla.Id);
+
+		if (cs.SEG_Grupo_Empresa__c != null) {
+			for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.Values())  {
+				if (mapPlantillaDetallesGrupoEmpresas?.get(plantilla.Id)?.get(cs.SEG_Grupo_Empresa__c) != null) {
+					setPlantillasIdByExGrupoEmpresaByGrupo.add(plantilla.Id);
+				}
+				if (mapPlantillaDetallesGrupoEmpresas?.get(plantilla.Id) != null) {
+					setPlantillasIdByExGrupoEmpresa.add(plantilla.Id);
+				}
 			}
 		}
-		if (setPlantillasIdByExGrupoEmpresaByGrupo.size() > 0) {
-			for (Id plantillaId : mapPlantByCaseRecla.keySet()) 
-			{
+
+		if (!setPlantillasIdByExGrupoEmpresaByGrupo.isEmpty()) {
+			for (Id plantillaId : mapPlantByCaseRecla.keySet())  {
 				if (setPlantillasIdByExGrupoEmpresaByGrupo.contains(plantillaId)) {
 					mapPlantByCaseRecla.remove(plantillaId);
 				}
@@ -346,48 +342,56 @@ public class SEG_PlantillasHandler {
 	}
 	
 	private static void filterTemplateByExceptionEmpresas(String accountId, Map<Id, SEG_Plantilla__c> mapPlantByCaseRecla, Map<Id, Map<String, List<SEG_ExcepcionesEmpresa__c>>> mapPlantillaDetallesEmpresa) {
-		Set<Id> setPlantillasIdByExEmpresaAccountId = new Set<Id>();
-		Set<Id> setPlantillasIdByExEmpresa = new Set<Id>();
-		//Filtrar plantillas (caso y tipo reclamacion) por excepciones
-		for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values()) {
-			if (mapPlantillaDetallesEmpresa?.get(plantilla.Id)?.get(accountId) != null) {setPlantillasIdByExEmpresaAccountId.add(plantilla.Id);
+		if (accountId != null) {
+			Boolean plantillaEncontrada = false; //Indicamos que aún no se ha encontrado un plantilla con el filtro.
+			for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values())  {
+				if (mapPlantillaDetallesEmpresa.containsKey(plantilla.Id) ) {
+					if (!mapPlantillaDetallesEmpresa?.get(plantilla.Id)?.containsKey(accountId)) {
+						mapPlantByCaseRecla.remove(plantilla.Id);
+					} else {
+						plantillaEncontrada = true;
+					}
+				}
 			}
-			if (mapPlantillaDetallesEmpresa?.get(plantilla.Id) != null) {setPlantillasIdByExEmpresa.add(plantilla.Id);
-			}
-		}
-		if (setPlantillasIdByExEmpresaAccountId.size() > 0) {
-			for (Id plantillaId : mapPlantByCaseRecla.keySet()) {
-				if (!setPlantillasIdByExEmpresaAccountId.contains(plantillaId)) {mapPlantByCaseRecla.remove(plantillaId);
+			if (plantillaEncontrada) { //Si se ha encontrado una o más plantillas con el filtro, se quitan todas las que no tengan filtro para priorizar las plantillas más exáctas.
+				for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values())  {
+					if (!mapPlantillaDetallesEmpresa.containsKey(plantilla.Id)){
+						mapPlantByCaseRecla.remove(plantilla.Id);
+					}
 				}
 			}
 		} else {
-			for (Id plantillaId : mapPlantByCaseRecla.keySet()) {
-				if (setPlantillasIdByExEmpresa.contains(plantillaId)) {mapPlantByCaseRecla.remove(plantillaId);
+			for (Id plantillaId : mapPlantillaDetallesEmpresa.keySet()) {
+				if (mapPlantByCaseRecla.containsKey(plantillaId)) {
+					mapPlantByCaseRecla.remove(plantillaId);
 				}
 			}
 		}
 	}
 
 	private static void filterTemplateByExceptionCR(String cR, Map<Id, SEG_Plantilla__c> mapPlantByCaseRecla, Map<Id, Map<String, List<SEG_ExcepcionesCR__c>>> mapPlantillaDetallesCR) {
-		Set<Id> setPlantillasIdByExCRbyCaseCR = new Set<Id>();
-		Set<Id> setPlantillasIdByExCR = new Set<Id>();
-		//Filtrar plantillas (caso y tipo reclamacion) por excepciones
-		for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values()) 
-		{
-			if (mapPlantillaDetallesCR?.get(plantilla.Id)?.get(cR) != null) {setPlantillasIdByExCRbyCaseCR.add(plantilla.Id);
+		if (cR != null) {
+			Boolean plantillaEncontrada = false; //Indicamos que aún no se ha encontrado un plantilla con el filtro.
+			for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values())  {
+				if (mapPlantillaDetallesCR.containsKey(plantilla.Id)) {
+					if (!mapPlantillaDetallesCR?.get(plantilla.Id)?.containsKey(cR)) {
+						mapPlantByCaseRecla.remove(plantilla.Id);
+					} else {
+						plantillaEncontrada = true;
+					}
+				}
 			}
-			if (mapPlantillaDetallesCR?.get(plantilla.Id) != null) {setPlantillasIdByExCR.add(plantilla.Id);
-			}
-		}
-		if (setPlantillasIdByExCRbyCaseCR.size() > 0) {
-			for (Id plantillaId : mapPlantByCaseRecla.keySet()) {
-				if (!setPlantillasIdByExCRbyCaseCR.contains(plantillaId)) {mapPlantByCaseRecla.remove(plantillaId);
+			if (plantillaEncontrada) { //Si se ha encontrado una o más plantillas con el filtro, se quitan todas las que no tengan filtro para priorizar las plantillas más exáctas.
+				for (SEG_Plantilla__c plantilla : mapPlantByCaseRecla.values())  {
+					if (!mapPlantillaDetallesCR.containsKey(plantilla.Id)){
+						mapPlantByCaseRecla.remove(plantilla.Id);
+					}
 				}
 			}
 		} else {
-			for (Id plantillaId : mapPlantByCaseRecla.keySet()) 
-			{
-				if (setPlantillasIdByExCR.contains(plantillaId)) {mapPlantByCaseRecla.remove(plantillaId);
+			for (Id plantillaId : mapPlantillaDetallesCR.keySet()) {
+				if (mapPlantByCaseRecla.containsKey(plantillaId)) {
+					mapPlantByCaseRecla.remove(plantillaId);
 				}
 			}
 		}

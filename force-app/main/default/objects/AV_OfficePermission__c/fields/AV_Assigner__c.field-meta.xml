@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Assigner__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>asignar o vincular el permiso de oficina</description>
     <label>Cedente</label>
     <lookupFilter>
         <active>false</active>

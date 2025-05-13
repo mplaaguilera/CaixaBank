@@ -786,8 +786,10 @@ public without sharing class SAC_Validaciones {
         Map<Id, Case> mapCasos = new Map<Id,Case>(listCasos);
 
         for(Case caso : listaValidarImpAbonado){
-           
+            System.debug('caso.CC_Importe_Abonado__c: ' + caso.CC_Importe_Abonado__c);
             if(caso.RecordTypeId == RECTYPERECLAMACION){
+                System.debug(' REC caso.CC_Importe_Abonado__c: ' + caso.CC_Importe_Abonado__c);
+
                 //Si cambia el sentido de resolución como "Favorable a la entidad" "Inadmisión" o "Desistimiento" y el campo "Importe abonado" de la reclamación sea distinto de cero
                 if(mapOldCase.containsKey(caso.Id) && caso.SAC_SentidoResolucion__c != mapOldCase.get(caso.Id).SAC_SentidoResolucion__c && caso.CC_Importe_Abonado__c != null && caso.CC_Importe_Abonado__c != 0 && (
                         caso.SAC_SentidoResolucion__c == 'SAC_001' || caso.SAC_SentidoResolucion__c == 'SAC_004' || caso.SAC_SentidoResolucion__c == 'SAC_005')){
@@ -801,16 +803,20 @@ public without sharing class SAC_Validaciones {
             }
 
             if(caso.RecordTypeId == RECTYPEPRETENSION){
+                System.debug(' PRETEN caso.CC_Importe_Abonado__c: ' + caso.CC_Importe_Abonado__c);
 
                 //Si el sentido de la resolución ya esta informado en la pretensión y/o reclamación como  "Favorable a la entidad" "Inadmisión" o "Desistimiento"
                 if(mapOldCase.containsKey(caso.Id) && caso.CC_Importe_Abonado__c != mapOldCase.get(caso.Id).CC_Importe_Abonado__c && 
                    ((caso.SAC_SentidoResolucion__c == 'SAC_001' || caso.SAC_SentidoResolucion__c == 'SAC_004' || caso.SAC_SentidoResolucion__c == 'SAC_005') || (mapCasos.containsKey(caso.SAC_Reclamacion__c) && (mapCasos.get(caso.SAC_Reclamacion__c).SAC_SentidoResolucion__c == 'SAC_001' || 
                     mapCasos.get(caso.SAC_Reclamacion__c).SAC_SentidoResolucion__c == 'SAC_004' || mapCasos.get(caso.SAC_Reclamacion__c).SAC_SentidoResolucion__c == 'SAC_005')))){ 
+                        System.debug('entra if  caso.CC_Importe_Abonado__c: ' + caso.CC_Importe_Abonado__c);
+
                     caso.addError('Revise el sentido de la resolución de la pretensión y/o reclamación. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" e informar un importe abonado.');
                 }
 
                 //Si el sentido resolución se informa como "Favorable a la entidad" "Inadmisión" o "Desistimiento" y el campo "Importe abonado" de la pretensión es distinto de cero
                 if(mapOldCase.containsKey(caso.Id) && caso.SAC_SentidoResolucion__c != mapOldCase.get(caso.Id).SAC_SentidoResolucion__c && caso.CC_Importe_Abonado__c != null && caso.CC_Importe_Abonado__c != 0 && (caso.SAC_SentidoResolucion__c == 'SAC_001' || caso.SAC_SentidoResolucion__c == 'SAC_004' || caso.SAC_SentidoResolucion__c == 'SAC_005')){
+                    System.debug('entra if 1 caso.CC_Importe_Abonado__c: ' + caso.CC_Importe_Abonado__c);
                     caso.addError('Revise el campo Importe abonado. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" con importe abonado informado.');
                 } 
 
@@ -987,12 +993,33 @@ public without sharing class SAC_Validaciones {
     * 1.0             US1094159      Álex Polo     22/01/25         Creación
     ***********************************************************************************************************/
     public static void validarCambioNaturalezaComplementariaResuelta(List<Case> listaCambioNaturalezaComplementarias, Map<Id, Case> mapOldObj) {
+        List<FeedItem> listFeed = new List<FeedItem>();
+        Map<String, String> mapaValores = new Map<String, String>{
+            'SAC_001' => 'Queja',
+            'SAC_004' => 'Reclamación',
+            'SAC_005' => 'Consulta',
+            'SAC_006' => 'Incidencia',
+            'SAC_007' => 'Complementaria'
+        };
 
         for(Case complementaria : listaCambioNaturalezaComplementarias){
             if(mapOldObj.containsKey(complementaria.Id) && complementaria.OS_Fecha_Resolucion__c != null){
                 complementaria.addError('No es posible modificar la naturaleza: Complementaria tras haber resuelto.');
+            }else{
+                String nueva = mapaValores.get(complementaria.SAC_Naturaleza__c) == null ? ' ' : mapaValores.get(complementaria.SAC_Naturaleza__c);
+                String old = mapaValores.get(mapOldObj.get(complementaria.Id).SAC_Naturaleza__c) == null ? ' ' : mapaValores.get(mapOldObj.get(complementaria.Id).SAC_Naturaleza__c);
+                FeedItem feed = new FeedItem();
+                feed.ParentId = complementaria.Id;
+                feed.Body = 'La naturaleza ha cambiado.\nAnterior: ' + old + '\nActual: ' + nueva;
+                listFeed.add(feed);
             }
         }
+
+        //Se añade un mensaje en comunicaciones indicando el cambio
+        if(!listFeed.isEmpty()){
+            SAC_DatabaseDML.insertListDML(listFeed, true);
+        }
+
     }
 
 

@@ -4,9 +4,9 @@
     <columns>OPPORTUNITY.NAME</columns>
     <columns>OPPORTUNITY.CREATED_DATE</columns>
     <columns>OPPORTUNITY.STAGE_NAME</columns>
-    <columns>CSBD_Contact_Escala_Maestra__c</columns>
     <columns>CSBD_Now_Importe__c</columns>
-    <columns>CSBD_Horario_Contacto__c</columns>
+    <columns>CSBD_PrecioInmueble__c</columns>
+    <columns>CSBD_ContactoTitular2__c</columns>
     <filterScope>Everything</filterScope>
     <filters>
         <field>OPPORTUNITY.RECORDTYPE</field>

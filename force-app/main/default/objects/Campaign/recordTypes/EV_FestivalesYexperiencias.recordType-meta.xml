@@ -2,6 +2,7 @@
 <RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>EV_FestivalesYexperiencias</fullName>
     <active>true</active>
+    <compactLayoutAssignment>EV_CompactLayoutEventos</compactLayoutAssignment>
     <description>Recordtype utilizado para eventos tipo Festivales y otras experiencias</description>
     <label>Festivales y otras experiencias</label>
     <picklistValues>

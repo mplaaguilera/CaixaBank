@@ -12,16 +12,36 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Alta Formulario Pasarelas</fullName>
+                <fullName>Nueva alta pasarela</fullName>
                 <default>false</default>
-                <label>Alta Formulario Pasarelas</label>
+                <label>Nueva alta pasarela</label>
             </value>
             <value>
-                <fullName>Consulta Formulario Pasarelas</fullName>
+                <fullName>Histórico solicitudes alta pasarela</fullName>
                 <default>false</default>
-                <label>Consulta Formulario Pasarelas</label>
+                <label>Histórico solicitudes alta pasarela</label>
+            </value>
+            <value>
+                <fullName>Nueva consulta/petición/Incidencia pasarela</fullName>
+                <default>false</default>
+                <label>Nueva consulta/petición/Incidencia pasarela</label>
+            </value>
+            <value>
+                <fullName>Histórico solicitudes consultas/peticiones/incidencias</fullName>
+                <default>false</default>
+                <label>Histórico solicitudes consultas/peticiones/incidencias</label>
+            </value>
+            <value>
+                <fullName>Informe BAI - Alta Pasarelas</fullName>
+                <default>false</default>
+                <label>Informe BAI - Alta Pasarelas</label>
+            </value>
+            <value>
+                <fullName>Informe BAI - Consulta Pasarelas</fullName>
+                <default>false</default>
+                <label>Informe BAI - Consulta Pasarelas</label>
             </value>
         </valueSetDefinition>
     </valueSet>
-    <visibleLines>4</visibleLines>
+    <visibleLines>6</visibleLines>
 </CustomField>

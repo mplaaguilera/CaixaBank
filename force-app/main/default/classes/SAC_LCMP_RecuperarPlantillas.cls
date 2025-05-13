@@ -5,7 +5,6 @@ public with sharing class SAC_LCMP_RecuperarPlantillas {
 
     private static final Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
     private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
-    private static final Id RECTYPERECLAMACIONSPV = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
 
 
     /**
@@ -117,45 +116,26 @@ public with sharing class SAC_LCMP_RecuperarPlantillas {
         EmailTemplate plantillaHeader = new EmailTemplate();
         EmailTemplate plantillaFooter = new EmailTemplate();
         List<EmailTemplate> lstPlantillas = new List<EmailTemplate>();
-        Boolean esReclamacionSPV = false;
-        String headerSPV;
-        String footerSPV;
-
-        if(RECTYPERECLAMACIONSPV == recordType) {
-            esReclamacionSPV = true;
-            // Añadir logica si el header debe ser diferente según campo
-            headerSPV = 'SPV_Header';
-            footerSPV = 'SPV_Footer_' + idioma;
-        }
 
         if (Schema.sObjectType.EmailTemplate.isAccessible()){
             lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName, Folder.DeveloperName FROM EmailTemplate 
             WHERE Id =: idTemplate 
-            OR Developername IN ('SAC_Header','SAC_Footer', 'SAC_Footer_ENG', 'SAC_FOOTER_CAT', 'SAC_FOOTER_Valenciano', 'SAC_FOOTER_Gallego', 'SAC_FOOTER_Euskera', 'SAC_FOOTER_ES_MTP', 'SAC_FOOTER_ENG_MTP', 'SAC_FOOTER_CAT_MTP', 'SAC_FOOTER_VAL_MTP', 'SAC_FOOTER_GAL_MTP', 'SAC_FOOTER_EUSK_MTP', 'SAC_HEADER_MTP', :footerSPV, :headerSPV)];
+            OR Developername IN ('SAC_Header','SAC_Footer', 'SAC_Footer_ENG', 'SAC_FOOTER_CAT', 'SAC_FOOTER_Valenciano', 'SAC_FOOTER_Gallego', 'SAC_FOOTER_Euskera', 'SAC_FOOTER_ES_MTP', 'SAC_FOOTER_ENG_MTP', 'SAC_FOOTER_CAT_MTP', 'SAC_FOOTER_VAL_MTP', 'SAC_FOOTER_GAL_MTP', 'SAC_FOOTER_EUSK_MTP', 'SAC_HEADER_MTP')];
         }   
 
         if(lstPlantillas != null && !lstPlantillas.isEmpty()) {
             for(EmailTemplate em : lstPlantillas) {
-                if(esReclamacionSPV) {
-                    if(em.id == idTemplate) {
-                        plantillaSeleccionada = em;
-                    } else if(em.DeveloperName.contains('SPV_Header')) {
-                        plantillaHeader = em;
-                    } else if(em.DeveloperName.contains('SPV_Footer')) {
-                        plantillaFooter = em;
-                    }
-                } else {
-                    if(em.id == idTemplate) {
-                        plantillaSeleccionada = em;
-                    } else if((em.DeveloperName == 'SAC_HEADER_MTP' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_Header' && entidadAfectada != 'SAC_010')) {
-                        plantillaHeader = em;
-                    }else if((em.DeveloperName == 'SAC_FOOTER_ES_MTP' && idioma == 'es' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_ENG_MTP' && idioma == 'en' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_CAT_MTP' && idioma == 'ca' && entidadAfectada == 'SAC_010') || 
-                    (em.DeveloperName == 'SAC_FOOTER_VAL_MTP' && idioma == 'va' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_GAL_MTP' && idioma == 'ga' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_EUSK_MTP' && idioma == 'eu' && entidadAfectada == 'SAC_010') ||
-                    (em.DeveloperName == 'SAC_Footer' && idioma == 'es' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_Footer_ENG' && idioma == 'en' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_Footer_CAT' && idioma == 'ca' && entidadAfectada != 'SAC_010') || 
-                    (em.DeveloperName == 'SAC_FOOTER_Valenciano' && idioma == 'va' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_Gallego' && idioma == 'ga' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_Euskera' && idioma == 'eu' && entidadAfectada != 'SAC_010')) {
-                        plantillaFooter = em;
-                    }
+                if(em.id == idTemplate) {
+                    plantillaSeleccionada = em;
+                } else if((em.DeveloperName == 'SAC_HEADER_MTP' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_Header' && entidadAfectada != 'SAC_010')) {
+                    plantillaHeader = em;
+                }else if((em.DeveloperName == 'SAC_FOOTER_ES_MTP' && idioma == 'es' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_ENG_MTP' && idioma == 'en' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_CAT_MTP' && idioma == 'ca' && entidadAfectada == 'SAC_010') || 
+                (em.DeveloperName == 'SAC_FOOTER_VAL_MTP' && idioma == 'va' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_GAL_MTP' && idioma == 'ga' && entidadAfectada == 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_EUSK_MTP' && idioma == 'eu' && entidadAfectada == 'SAC_010') ||
+                (em.DeveloperName == 'SAC_Footer' && idioma == 'es' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_Footer_ENG' && idioma == 'en' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_Footer_CAT' && idioma == 'ca' && entidadAfectada != 'SAC_010') || 
+                (em.DeveloperName == 'SAC_FOOTER_Valenciano' && idioma == 'va' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_Gallego' && idioma == 'ga' && entidadAfectada != 'SAC_010') || (em.DeveloperName == 'SAC_FOOTER_Euskera' && idioma == 'eu' && entidadAfectada != 'SAC_010')) {
+                    plantillaFooter = em;
                 }
+
             }
         }
 

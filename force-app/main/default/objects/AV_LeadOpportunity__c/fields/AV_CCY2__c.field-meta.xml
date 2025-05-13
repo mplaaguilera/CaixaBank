@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_CCY2__c</fullName>
+    <description>Campo que almacena la moneda de ingresos del titular 2</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Moneda ingresos titular 2</label>

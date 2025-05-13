@@ -3,8 +3,8 @@
     <fullName>CIBE_EventoCliente</fullName>
     <active>true</active>
     <compactLayoutAssignment>CIBE_CabeceraEventos</compactLayoutAssignment>
-    <description>Eventos para CIB&amp;EMP asociados a un cliente</description>
-    <label>Evento Cliente</label>
+    <description>Función no habilitada</description>
+    <label>Cita Cliente</label>
     <picklistValues>
         <picklist>AV_Chanel__c</picklist>
         <values>
@@ -41,6 +41,17 @@
         </values>
         <values>
             <fullName>Now</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>AV_ContactGenerateAppointment__c</picklist>
+        <values>
+            <fullName>Cita generada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin cita</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -195,7 +206,7 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>LT</fullName>
+            <fullName>LMD</fullName>
             <default>false</default>
         </values>
         <values>
@@ -223,25 +234,6 @@
         </values>
         <values>
             <fullName>Pendiente</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
-        <picklist>FinServ__Regarding__c</picklist>
-        <values>
-            <fullName>Client Retention</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Onboarding</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Prospecting</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Service</fullName>
             <default>false</default>
         </values>
     </picklistValues>

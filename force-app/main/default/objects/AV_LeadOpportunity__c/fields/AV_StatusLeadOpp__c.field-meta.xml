@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_StatusLeadOpp__c</fullName>
+    <description>Campo que contiene la etapa</description>
     <label>Etapa</label>
     <required>false</required>
     <trackHistory>true</trackHistory>

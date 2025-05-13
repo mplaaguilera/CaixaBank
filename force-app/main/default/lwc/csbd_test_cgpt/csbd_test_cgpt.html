@@ -1,0 +1,69 @@
+<template>
+    <lightning-card title="Custom ChatGPT" icon-name="utility:edit_gpt">
+        <lightning-button-icon slot="actions" icon-name="utility:add" variant="bare" tooltip="Limpiar" onclick={bloquearTexto}></lightning-button-icon>
+
+        <!-- para que se haga el renderedCallback cuando se modifique el valor del campo -->
+        <template if:true={primerRender}>
+            <p>{historicoChat}</p>
+        </template>
+        <div hidden>
+            <p>{historicoChat}</p>
+        </div>
+        <section role="log" class="slds-chat">
+            <div class="chat-body-container" data-id="chat-container">
+                <ul class="slds-chat-list">
+                    <li class="slds-chat-listitem slds-chat-listitem_bookend">
+                        <div class="slds-chat-bookend">
+                        <span class="slds-icon_container slds-icon-utility-chat slds-chat-icon">
+                            <svg class="slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#chat"></use>
+                            </svg>
+                        </span>
+                        <p>Iniciado el chat del producto con IA</p>
+                        </div>
+                    </li>
+
+                    <template for:each={messages} for:item="message">
+                        <li key={message.id} class={message.class2}>
+                            <div class="slds-chat-message">
+                                <div class="slds-chat-message__body">
+                                    <template lwc:if={message.escribiendo}>
+                                        <span class="slds-icon-typing slds-is-animated" title="Escribiendo...">
+                                            <span class="slds-icon-typing__dot"></span>
+                                            <span class="slds-icon-typing__dot"></span>
+                                            <span class="slds-icon-typing__dot"></span>
+                                        </span>
+                                    </template>
+                                    <template lwc:else>
+                                        <div class={message.class} role={message.alert}>
+                                            <lightning-formatted-rich-text value={message.text}></lightning-formatted-rich-text>
+                                        </div>
+                                    </template>
+                                    <div class="slds-chat-message__meta">{message.user}</div>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </section>
+
+        <div slot="footer">
+            <div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-xx-small slds-var-p-vertical_medium">
+                <div class="slds-col">
+                    <lightning-input
+                        value={userInput}
+                        onkeydown={handleEnter}
+                        onchange={handleInputChange}
+                        placeholder="Escribe tu pregunta..."
+                        disabled={bloquearTexto}
+                        variant="label-hidden">
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-grow-none">
+                    <lightning-button-icon icon-name="utility:send" variant="brand" disabled={bloquearTexto} onclick={handleSend} class="slds-is-relative" style="top: -1px;"></lightning-button-icon>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+</template>

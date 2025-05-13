@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_MargenCliente__c</fullName>
+    <description>Margen</description>
     <externalId>false</externalId>
     <formula>IF(ISPICKVAL( AV_ClaseVenta__c,&apos;C&apos;), -AV_Margen1__c,AV_Margen1__c )</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>

@@ -2,11 +2,9 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CC_AuthorizationId__c</fullName>
     <encryptionScheme>None</encryptionScheme>
-    <externalId>false</externalId>
     <label>AuthorizationId</label>
-    <length>255</length>
-    <required>false</required>
+    <length>500</length>
     <trackTrending>false</trackTrending>
-    <type>Text</type>
-    <unique>false</unique>
+    <type>LongTextArea</type>
+    <visibleLines>2</visibleLines>
 </CustomField>

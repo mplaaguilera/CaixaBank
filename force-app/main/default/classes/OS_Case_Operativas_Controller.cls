@@ -848,7 +848,7 @@ public without sharing class OS_Case_Operativas_Controller {
                 correo.de = eMessage.FromAddress;
                 correo.para = eMessage.ToAddress;
                 correo.cc = eMessage.CcAddress;
-                correo.fecha = eMessage.MessageDate.format('dd/MM/YYYY HH:mm'); //ARREGLADO LA FECHA
+                correo.fecha = eMessage.MessageDate.format('dd/MM/yyyy HH:mm'); //ARREGLADO LA FECHA
                 correo.nameUrl = '/'+eMessage.Id;
                 correo.estado = eMessage.Status;
                 

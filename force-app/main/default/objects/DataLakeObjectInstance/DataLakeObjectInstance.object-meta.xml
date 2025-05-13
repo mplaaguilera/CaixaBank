@@ -80,24 +80,28 @@
         <customTabListAdditionalFields>DataLakeObjectStatus</customTabListAdditionalFields>
         <customTabListAdditionalFields>LastRefreshDate</customTabListAdditionalFields>
         <customTabListAdditionalFields>TotalRecords</customTabListAdditionalFields>
+        <customTabListAdditionalFields>TotalNumberOfFields</customTabListAdditionalFields>
         <lookupDialogsAdditionalFields>ObjectCategory</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>Billable</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>Storage</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>DataLakeObjectStatus</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>LastRefreshDate</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>TotalRecords</lookupDialogsAdditionalFields>
+        <lookupDialogsAdditionalFields>TotalNumberOfFields</lookupDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>ObjectCategory</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>Billable</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>Storage</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>DataLakeObjectStatus</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>LastRefreshDate</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>TotalRecords</lookupPhoneDialogsAdditionalFields>
+        <lookupPhoneDialogsAdditionalFields>TotalNumberOfFields</lookupPhoneDialogsAdditionalFields>
         <searchResultsAdditionalFields>ObjectCategory</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>Billable</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>Storage</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>DataLakeObjectStatus</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>LastRefreshDate</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>TotalRecords</searchResultsAdditionalFields>
+        <searchResultsAdditionalFields>TotalNumberOfFields</searchResultsAdditionalFields>
     </searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
 </CustomObject>

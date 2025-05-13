@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Envio_Automatico_Activo__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Determina si se va a enviar un RCS message automaticamente cuando se crea una oportunidad de Préstamo.</description>
+    <inlineHelpText>Determina si se va a enviar un RCS message automaticamente cuando se crea una oportunidad de Préstamo.</inlineHelpText>
+    <label>Envio Automatico Activo</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

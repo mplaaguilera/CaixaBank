@@ -117,4 +117,111 @@ public with sharing class SPV_Utils_Test {
         
         Assert.areNotEqual(0, emailsValidos.size(), 'Error al comprobar los emails de la blackList en envios automáticos');
     }
+
+    @isTest
+    static void obtenerRecordTypesTest(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        
+        Test.startTest();
+
+        List<RecordType> listaResult = new List<RecordType>();
+        System.runAs(usuario){
+            
+            listaResult = SPV_Utils.obtenerRecordTypes();
+            
+        }
+
+        Assert.areNotEqual(true, listaResult.isEmpty(), 'No se han recuperado los record types.');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void gestionarImagenesInlineRedactarMailTest() {
+        
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+
+        System.runAs(usuario) {
+
+            ContentVersion docsV = new contentVersion();
+            docsV.title='/test.jpeg';
+            docsV.PathOnClient ='/test.jpeg';
+            docsV.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body');
+            SPV_DatabaseDML.insertDML(docsV, true);
+
+            ContentVersion docsV2 = new ContentVersion();
+            docsV2.title='/testDos.jpeg';
+            docsV2.PathOnClient ='/testDos.jpeg';
+            docsV2.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body Dos');
+            SPV_DatabaseDML.insertDML(docsV2, true);
+    
+            String randomUuid = UUID.randomUUID().toString().remove('-').left(18);
+            String developerNameFinal = 'SPV_' + docsV2.id + randomUuid;
+            
+            ContentAsset assetId = new ContentAsset();
+            assetId.DeveloperName = developerNameFinal;
+            assetId.IsVisibleByExternalUsers = true;
+            assetId.MasterLabel = developerNameFinal;
+            SPV_DatabaseDML.insertDML(assetId, true);
+
+            List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = : docsV2.Id];
+    
+            ContentDocument cntDocument2 = new ContentDocument();
+            cntDocument2.Id = documents[0].Id;
+            SPV_DatabaseDML.updateDML(cntDocument2, true);
+
+            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '" alt="test1"></p><p>';
+        
+            Test.startTest();
+                String htmlResult = SPV_Utils.gestionarImagenesInlineRedactarMail(emailBody);
+            Test.stopTest();
+
+            Assert.areNotEqual(emailBody, htmlResult, 'Error al parsear la imagen del email body');
+        }
+    }
+
+    @isTest
+    static void gestionarImagenesInlineRedactarMailTest2() {
+        
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+
+        System.runAs(usuario) {
+
+            ContentVersion docsV = new contentVersion();
+            docsV.title='/test.jpeg';
+            docsV.PathOnClient ='/test.jpeg';
+            docsV.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body');
+            SPV_DatabaseDML.insertDML(docsV, true);
+
+            ContentVersion docsV2 = new ContentVersion();
+            docsV2.title='/testDos.jpeg';
+            docsV2.PathOnClient ='/testDos.jpeg';
+            docsV2.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body Dos');
+            SPV_DatabaseDML.insertDML(docsV2, true);
+    
+            String randomUuid = UUID.randomUUID().toString().remove('-').left(18);
+            String developerNameFinal = 'SPV_' + docsV2.id + randomUuid;
+            
+            ContentAsset assetId = new ContentAsset();
+            assetId.DeveloperName = developerNameFinal;
+            assetId.IsVisibleByExternalUsers = true;
+            assetId.MasterLabel = developerNameFinal;
+            SPV_DatabaseDML.insertDML(assetId, true);
+
+            List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = : docsV2.Id];
+    
+            ContentDocument cntDocument2 = new ContentDocument();
+            cntDocument2.Id = documents[0].Id;
+            cntDocument2.ContentAssetId = assetId.Id;
+            SPV_DatabaseDML.updateDML(cntDocument2, true);
+
+            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '" alt="test2"></p><p>';
+        
+            Test.startTest();
+                String htmlResult = SPV_Utils.gestionarImagenesInlineRedactarMail(emailBody);
+            Test.stopTest();
+
+            Assert.areNotEqual(emailBody, htmlResult, 'Error al parsear la imagen del email body');
+            Assert.areEqual(true, htmlResult.contains(developerNameFinal), 'Error al convertir la imagen del email body');
+        }
+    }
 }

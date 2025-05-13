@@ -77,7 +77,6 @@ public with sharing class SPV_LCMP_CamposNegociacion_Test {
 
     @isTest
     static void getPretensionesTest(){
-
         User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
         Case reclamacion = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec' LIMIT 1];
         List<Case> listResultado = new List<Case>();
@@ -89,5 +88,59 @@ public with sharing class SPV_LCMP_CamposNegociacion_Test {
         }
 
         Assert.areNotEqual(null, listResultado, 'No se han recuperado las pretensiones de la reclamacion');
+    }
+
+    @isTest
+    static void addPretensionesNegociacionReclamacionTest(){
+        User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+        List<Case> listResultado = new List<Case>();
+
+        System.runAs(usuario1){
+            Test.startTest();
+            listResultado = SPV_LCMP_CamposNegociacion.addPretensionesNegociacionReclamacion(reclamacion.Id);
+            Test.stopTest();
+        }
+
+        Assert.areNotEqual(null, listResultado, 'No se han recuperado las pretensiones de la reclamacion que no se encuentran en negociación');
+    }
+
+
+    @isTest
+    static void activarNegociacionPretensionTest(){
+        User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+        Case pretensionNegociada;
+        List<Case> listResultado = new List<Case>();
+
+        System.runAs(usuario1){
+            Test.startTest();
+            List<Case> pretensionesCaso = SPV_LCMP_CamposNegociacion.addPretensionesNegociacionReclamacion(reclamacion.Id);
+            SPV_LCMP_CamposNegociacion.activarNegociacionPretension(reclamacion.Id, pretensionesCaso);
+            pretensionNegociada = [SELECT id, CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c FROM Case WHERE Id =: pretensionesCaso[0].Id LIMIT 1];
+            Test.stopTest();
+        }
+
+        Assert.areEqual(true, pretensionNegociada.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c, 'No se iniciado la negociación en la pretensión');
+    }
+
+
+    @isTest
+    static void eliminarPretensionNegociacionTest(){
+        User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+        Case pretensionEliminada;
+        List<Case> listResultado = new List<Case>();
+
+        System.runAs(usuario1){
+            Test.startTest();
+            List<Case> pretensionesCaso = SPV_LCMP_CamposNegociacion.addPretensionesNegociacionReclamacion(reclamacion.Id);
+            System.debug('pretensionesCaso ' +pretensionesCaso);
+            SPV_LCMP_CamposNegociacion.eliminarPretensionNegociacion(pretensionesCaso[0].Id);
+            pretensionEliminada = [SELECT id, CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c FROM Case WHERE Id =: pretensionesCaso[0].Id LIMIT 1];
+            Test.stopTest();
+        }
+
+        Assert.areEqual(false, pretensionEliminada.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c, 'No se eliminado la pretensión de la negociación');
     }
 }

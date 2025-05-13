@@ -45,11 +45,6 @@
                 <label>Visita del gestor</label>
             </value>
             <value>
-                <fullName>LT</fullName>
-                <default>false</default>
-                <label>Llamada telefónica</label>
-            </value>
-            <value>
                 <fullName>LMD</fullName>
                 <default>false</default>
                 <label>Llamada</label>
@@ -78,6 +73,26 @@
                 <fullName>COTF</fullName>
                 <default>false</default>
                 <label>Comentario TF</label>
+            </value>
+            <value>
+                <fullName>OCX</fullName>
+                <default>false</default>
+                <label>Oficinas CaixaBank</label>
+            </value>
+            <value>
+                <fullName>OCL</fullName>
+                <default>false</default>
+                <label>Oficinas Cliente</label>
+            </value>
+            <value>
+                <fullName>LT</fullName>
+                <default>false</default>
+                <label>Llamada telefónica</label>
+            </value>
+            <value>
+                <fullName>GSCC</fullName>
+                <default>false</default>
+                <label>Gestión sin contacto comercial</label>
             </value>
             <value>
                 <fullName>022</fullName>

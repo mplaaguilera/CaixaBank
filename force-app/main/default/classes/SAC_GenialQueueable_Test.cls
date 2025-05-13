@@ -10,6 +10,7 @@
  * 1.0            US749927         Alexandre Pérez   26/11/23     Creación
  * 1.1            US866221         David Ramos       03/04/24     Cambiar SAC_GenialSettings__c por el nuevo custom 
  *                                                                setting que separa configuraciones por canal 
+ * 1.2            US-0009818       Iria AN-PC        20/02/25     Adaptar clase test a pretensionWrapper
 *****************************************************************/
 @isTest
 public with sharing class SAC_GenialQueueable_Test {
@@ -43,6 +44,10 @@ public with sharing class SAC_GenialQueueable_Test {
         settings.SAC_IAactiva__c = true;
         settings.SAC_Shadow__c = true;
         settings.SAC_Porcentaje__c = 100;
+        settings.SAC_UmbralTematica__c = 0;
+        settings.SAC_UmbralProductoServicio__c = 0;
+        settings.SAC_UmbralMotivo__c = 0;
+        settings.SAC_UmbralDetalle__c = 0;
 
         Database.insert(settings);
         Group grupoIntegracion = [SELECT Id FROM group WHERE developerName = 'SAC_Integration'];
@@ -247,11 +252,11 @@ public with sharing class SAC_GenialQueueable_Test {
         
         case reclamacion = [SELECT ID, ownerId FROM CASE LIMIT 1];
         
-        string textoRequest = '{"reclamacion":{"Id":"'+reclamacion.id+'","ownerId":"'+reclamacion.ownerId+'"},"pretensiones":[{"CC_MCC_Tematica__c":"'+listaMCCs[0].Id+'",'+
+        string textoRequest = '{"reclamacion":{"Id":"'+reclamacion.id+'","ownerId":"'+reclamacion.ownerId+'"},"pretensiones":[{"pretension":{"CC_MCC_Tematica__c":"'+listaMCCs[0].Id+'",'+
         '"CC_MCC_ProdServ__c":"'+listaMCCs[1].Id+'","CC_MCC_Motivo__c":"'+listaMCCs[2].Id+'","SEG_Detalle__c":"'+listaMCCs[3].Id+'","SAC_EsPrincipal__c":true,'+
-            '"SAC_Reclamacion__c":"'+reclamacion.id+'","SAC_Resumen__c":"pretension de prueba genial"}],"pdteIA":true, "datosRecPrincipal":{"firstName":null, "lastName":null, "numPerso":null}}';
+            '"SAC_Reclamacion__c":"'+reclamacion.id+'","SAC_Resumen__c":"pretension de prueba genial"}, "umbrales": [{"nivel":"Tematica", "valor":1}, {"nivel":"ProductoServicio", "valor":1}, {"nivel":"Motivo", "valor":1}, {"nivel":"Detalle", "valor":1}]}],"pdteIA":true, "datosRecPrincipal":{"firstName":null, "lastName":null, "numPerso":null}},' +
+            '"jsonRequest":"{\"pretensiones\":[{\"pretension\":{\"CC_MCC_Tematica__c\":\"a0VKN000000Lx6b2AC\",\"CC_MCC_ProdServ__c\":\"a0VKN000000Lx6c2AC\",\"CC_MCC_Motivo__c\":\"a0VKN000000Lx6d2AC\",\"SEG_Detalle__c\":\"a0VKN000000Lx6q2AC\",\"SAC_EsPrincipal__c\":false,\"SAC_Reclamacion__c\":\"500KN000001uvUeYAI\",\"SAC_Resumen__c\":\"pretension de prueba genial secundaria 1\"},\"umbrales\":[{\"nivel\":\"Tematica\",\"valor\":0},{\"nivel\":\"ProductoServicio\",\"valor\":0},{\"nivel\":\"Motivo\",\"valor\":0},{\"nivel\":\"Detalle\",\"valor\":0}]},{\"pretension\":{\"CC_MCC_Tematica__c\":\"a0VKN000000Lx6T2AS\",\"CC_MCC_ProdServ__c\":\"a0VKN000000Lx6U2AS\",\"CC_MCC_Motivo__c\":\"a0VKN000000Lx6Z2AS\",\"SEG_Detalle__c\":\"a0VKN000000Lx6a2AC\",\"SAC_EsPrincipal__c\":true,\"SAC_Reclamacion__c\":\"500KN000001uvUeYAI\",\"SAC_Resumen__c\":\"pretension de prueba genial principal\"},\"umbrales\":[{\"nivel\":\"Tematica\",\"valor\":0.1},{\"nivel\":\"ProductoServicio\",\"valor\":0.3},{\"nivel\":\"Motivo\",\"valor\":0.5},{\"nivel\":\"Detalle\",\"valor\":0.7}]}]}"';
         genialRequest = (SAC_Genial_WS.genialRequest)JSON.deserialize(textoRequest, SAC_Genial_WS.genialRequest.class);
-
         //es necesario saber el canal para acceder a SAC_GenialSettingsCanal__c
         case reclamaOriginal = new case();
         reclamaOriginal.Origin = 'Email';
@@ -421,7 +426,7 @@ public with sharing class SAC_GenialQueueable_Test {
 
         SAC_Genial_WS.genialRequest genialRequest = new SAC_Genial_WS.genialRequest();
 
-        string textoRequest = '{"reclamacion":{"Id":"'+reclamacion.id+'", "SAC_Importe_Tipo__c":"fallo"}, "pdteIA":true}';
+        string textoRequest = '{"reclamacion":{"Id":"'+reclamacion.id+'", "SAC_Tipo_integracion_IA__c":"fallo"}, "pdteIA":true}';
 
         genialRequest = (SAC_Genial_WS.genialRequest)JSON.deserialize(textoRequest, SAC_Genial_WS.genialRequest.class);
 
@@ -502,9 +507,4 @@ public with sharing class SAC_GenialQueueable_Test {
 
         system.assertEquals(casoPretension.id, [SELECT SAC_PretensionPrincipal__c FROM Case WHERE Id = : reclamacion.id].SAC_PretensionPrincipal__c, 'la pretensión no se ha asociado a la reclamación como principal');
     }
-
-
-
-    
-
 }

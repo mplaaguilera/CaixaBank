@@ -135,6 +135,18 @@ public with sharing class SAC_LCMP_GetOwnerCases_Test {
 
         Case casoReclamacion10 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl10);
 
+        Map<String, Object> camposReclVinc = new Map<String, Object>();
+        camposReclVinc.clear();
+        camposReclVinc.put('Subject', 'ComplementariaVinculada');
+        camposReclVinc.put('Origin', 'Otros');
+        camposReclVinc.put('Status', 'SAC_003');
+        camposReclVinc.put('SAC_TipoConsumidor__c', 'No');
+        camposReclVinc.put('SAC_Naturaleza__c', 'SAC_007');
+        camposReclVinc.put('CC_Importe_Abonado__c', 5.0);
+        camposReclVinc.put('OwnerId', usuarioGeneral.id);
+        Case casoReclamacion11 = SAC_TestDataFactory.crearCaso('Reclamacion', camposReclVinc);
+    
+        
         //CONSULTA
         Map<String, Object> camposCons = new Map<String, Object>();
         camposCons.put('Subject', 'Consulta');
@@ -167,6 +179,7 @@ public with sharing class SAC_LCMP_GetOwnerCases_Test {
         reclamacionesAInsertar.add(casoReclamacion8);
         reclamacionesAInsertar.add(casoReclamacion9);
         reclamacionesAInsertar.add(casoReclamacion10);
+        reclamacionesAInsertar.add(casoReclamacion11);
         reclamacionesAInsertar.add(consulta);
         reclamacionesAInsertar.add(consulta2);
 		
@@ -214,15 +227,47 @@ public with sharing class SAC_LCMP_GetOwnerCases_Test {
 
         Case casoPretension2 = SAC_TestDataFactory.crearCaso('Pretension',camposPret2);
 
+
+        camposPret2.clear();
+        camposPret2.put('SuppliedCompany', 'prueba3');
+        camposPret2.put('Origin', 'Backoffice');
+        camposPret2.put('Status', 'Alta');
+        camposPret2.put('SAC_StatusAuxiliar__c', 'Alta');
+        camposPret2.put('AccountId', cuenta.Id);
+        camposPret2.put('SAC_Reclamacion__c', casoReclamacion9.Id);
+        camposPret2.put('OwnerId', usuarioGeneral.Id);
+        
+        Case casoPretension3 = SAC_TestDataFactory.crearCaso('Pretension',camposPret2);
+
+
         List<Case> pretensionesAInsertar = new List<Case>();
         pretensionesAInsertar.add(casoPretension);
         pretensionesAInsertar.add(casoPretension2);
+        pretensionesAInsertar.add(casoPretension3);
         SAC_DatabaseDML.insertListDML(pretensionesAInsertar, false);
         //Database.insert(pretensionesAInsertar);
+
+        casoReclamacion9.SAC_PretensionPrincipal__c = casoPretension3.Id;
+        SAC_DatabaseDML.updateDML(casoReclamacion9, true);
+
 
         Test.stopTest();  
     }
 
+    
+    @isTest
+    static void validarVincularDesvincularComplementariaTest(){
+        Test.startTest(); 
+        Case complementaria = [SELECT Id FROM Case WHERE subject = 'ComplementariaVinculada'];
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        
+        System.runAs(usuario){        
+            Boolean testResultado = SAC_LCMP_GetOwnerCases.validarVincularDesvincularComplementaria(complementaria.Id);  
+            Assert.areEqual(true, testResultado, 'No se ha realizado la comprobación correctamente.');
+        }
+        Test.stopTest();
+    }
+    
     @isTest
     static void methodGetSameOwnerCasesTest(){
         Test.startTest(); 

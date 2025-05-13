@@ -1,9 +1,14 @@
 public with sharing class CC_WS_Alta_Citas {
     public static Map<String, Object> altaCita(String numOficina, String numPer, String fechaSeleccionada, String franjaSeleccionada, String asunto, String recordId, String tipoCita) {
         Map<String, Object> resultado = new Map<String, Object>();
+
+        Case casoAltaCita = [SELECT Id, CC_Idioma__c, ContactId, Contact.Email, OwnerId, Account.Name, CaseNumber FROM Case WHERE Id = :recordId LIMIT 1];
+        CC_Lista_Valores__c listaValorTareaCita = [SELECT Id, CC_Activa__c, CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE Name = 'Texto cita o tarea existe' LIMIT 1];
+        Boolean existenTareasCitas = CC_Activity.identificarTareasCitasExistentes( casoAltaCita, listaValorTareaCita);
+
         if (String.isBlank(numPer)) {
             CBK_Log.error('Numperso no informado');
-        } else {
+        }else if(!existenTareasCitas){
             try {
                 CC_Settings__c configuracion = CC_Settings__c.getValues('CC_Configuracion_Cita_Rapida');
                 Blob digest = Crypto.generateDigest('SHA-256', Blob.valueOf(numPer + 'asesorVentas1'));
@@ -59,7 +64,7 @@ public with sharing class CC_WS_Alta_Citas {
                         mensaje = mensaje.replace('XX', fechaConvertida);
                     }
                     resultado.put('mensaje', mensaje);
-                    Case casoAltaCita = [SELECT Id, CC_Idioma__c, ContactId, Contact.Email, OwnerId, Account.Name, CaseNumber FROM Case WHERE Id = :recordId LIMIT 1];
+                    //Case casoAltaCita = [SELECT Id, CC_Idioma__c, ContactId, Contact.Email, OwnerId, Account.Name, CaseNumber FROM Case WHERE Id = :recordId LIMIT 1];
                     CC_Settings__c envioCorreoActivo = CC_Settings__c.getValues('CC_Configuracion_Cita_Rapida');
 
                     try {
@@ -90,6 +95,9 @@ public with sharing class CC_WS_Alta_Citas {
                 CBK_Log.error(e);
                 throw new AuraException(e.getMessage());
             }
+        }else{
+            resultado.put('textoTareaCitaCreada', listaValorTareaCita.CC_Mensajes_Mostrar__c);
+            resultado.put('existeTareaCitaCreada', true);
         }
         return resultado;
     }

@@ -33,9 +33,9 @@ public without sharing class SAC_LCMP_ForzarResolucion {
         String whoId = UserInfo.getUserId();
 
         if(!Schema.sObjectType.Case.isAccessible()){ throw new AuraHandledException( 'No tiene permisos para realizar la acción.' ); }
-        Case caso = [SELECT Id, Status, RecordType.DeveloperName FROM Case WHERE Id =: idCaso AND RecordTypeId =: RECTYPERECLAMACION];
+        List<Case> listCaso = [SELECT Id, Status, RecordType.DeveloperName FROM Case WHERE Id =: idCaso AND RecordTypeId =: RECTYPERECLAMACION LIMIT 1];
 
-        if(!caso.Status.equals('SAC_014')  && !caso.Status.equals('Cerrado') && !caso.Status.equals('Rechazado') && !caso.Status.equals('SAC_008') && !caso.Status.equals('SAC_013') && !caso.Status.equals('SAC_012') && !caso.Status.equals('SAC_009')){
+        if(!listCaso.isEmpty() && !listCaso[0].Status.equals('SAC_014')  && !listCaso[0].Status.equals('Cerrado') && !listCaso[0].Status.equals('Rechazado') && !listCaso[0].Status.equals('SAC_008') && !listCaso[0].Status.equals('SAC_013') && !listCaso[0].Status.equals('SAC_012') && !listCaso[0].Status.equals('SAC_009')){
 
             if(!Schema.sObjectType.User.isAccessible()){ throw new AuraHandledException( 'No tiene permisos para realizar la acción.' ); }
             User usuarioActual = [SELECT Id, SAC_PerteneceCOPSAJ__c  FROM User WHERE Id =: whoId];

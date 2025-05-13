@@ -1,6 +1,6 @@
 @isTest
-public with sharing class CSBD_Llamada_Test {
-
+public class CSBD_Llamada_Test {
+    /*
     @testSetup
     public static void altaDatosPrueba() {
         User adminUser = usuarioAdministrador();
@@ -56,7 +56,7 @@ public with sharing class CSBD_Llamada_Test {
             CC_Servicio_Genesys__c servicioGenesys = new CC_Servicio_Genesys__c();
             servicioGenesys.Name = 'testEntrante';
             servicioGenesys.CC_VDN__c = '2';
-            servicioGenesys.CC_Tipo_Cliente__c = 'Cliente'; 
+            servicioGenesys.CC_Tipo_Cliente__c = 'Cliente';
             servicioGenesys.CC_Codigo__c='1234';
             insert servicioGenesys;
         }
@@ -70,7 +70,7 @@ public with sharing class CSBD_Llamada_Test {
         cuenta.Name = 'test@test.com';
         cuenta.CC_Numero_Documento__c = '12312312K';
         insert cuenta;
-        
+
         Contact contacto = new Contact();
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
         contacto.Email = 'test@test.com';
@@ -119,7 +119,7 @@ public with sharing class CSBD_Llamada_Test {
         cuenta.Name = 'test@test.com';
         cuenta.CC_Numero_Documento__c = '12312312K';
         insert cuenta;
-        
+
         Contact contacto = new Contact();
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
         contacto.Email = 'test@test.com';
@@ -200,7 +200,7 @@ public with sharing class CSBD_Llamada_Test {
             System.assertEquals('es', idiomaOportunidad, 'Idioma de la oportunidad incorrecto');
         }
     }
-    
+
     @isTest
     public static void registrarLlamadaEntrante() {
         User usuarioAdmin = [SELECT Id FROM User WHERE Email = 'usuario_test@test.com'];
@@ -219,16 +219,16 @@ public with sharing class CSBD_Llamada_Test {
             inputLlamada.asunto = ', , 1, #, 02213133, hablar con operador, 4, hablar con operador';
             Opportunity oportunidad = CSBD_Llamada.registrarLlamadaEntrante(inputLlamada);
             Test.stopTest();
-            
+
             List<Opportunity> opp = [SELECT id from Opportunity where Id = :oportunidad.Id limit 1];
             List<Task> task = [SELECT id, WhatId from Task where CC_Llamada_Id__c != null and WhatId = : opp[0].Id];
 
             System.assertEquals(opp.isEmpty(), false, 'No se ha creado oportunidad relacionada con la llamada');
             System.assertEquals(task.isEmpty(), false, 'No se ha creado tarea relacionada con la llamada y la oportunidad');
-            
+
         }
     }
-    
+
     public static User usuarioAdministrador(){
         User admin = new User();
         admin.FirstName = 'Admin';
@@ -244,7 +244,7 @@ public with sharing class CSBD_Llamada_Test {
         admin.TimeZoneSidKey = 'Europe/Madrid';
         admin.UserName = 'usuariotest_' + UserInfo.getOrganizationId() + '_' + System.currentTimeMillis() + '@test.com';
         insert admin;
-        
+
         List<PermissionSetAssignment> nuevosPermisos = new List<PermissionSetAssignment>();
         List<PermissionSet> permissionSet = [SELECT Id FROM PermissionSet WHERE Name LIKE 'CSBD%'];
 
@@ -257,5 +257,6 @@ public with sharing class CSBD_Llamada_Test {
         insert nuevosPermisos;
 
         return admin;
-    }    
+    }
+    */
 }

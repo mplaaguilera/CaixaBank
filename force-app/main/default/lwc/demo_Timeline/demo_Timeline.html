@@ -4,9 +4,9 @@
         <!--Cabecera card-->
         <div class="slds-card__header slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-p-bottom_x-small slds-var-m-left_x-small slds-var-m-right_xx-small">
             <div class="slds-col slds-grow-none slds-var-m-right_x-small slds-truncate">
-                <header class="slds-media slds-media_center">
+                <header class="slds-media slds-media_center slds-var-m-left_x-small">
                     <div class="slds-media__figure">
-                        <lightning-icon icon-name="custom:custom112" size="small" class="iconoCard"></lightning-icon>
+                        <lightning-icon icon-name="standard:calculated_insights" size="small" class="iconoCard"></lightning-icon>
                     </div>
                     <div class="slds-media__body">
                         <h2 class="slds-card__header-title slds-var-p-top_medium slds-var-p-bottom_medium">
@@ -16,7 +16,7 @@
                 </header>
             </div>
             <div class="slds-col slds-shrink-none">
-                <template lwc:if={opciones.agruparPorMeses}>
+                <template lwc:if={oopciones.agruparPorMeses}>
                     <lightning-button-icon icon-name="utility:collapse_all" variant="bare" tooltip="Contraer todas las secciones" onclick={contraerSecciones}></lightning-button-icon>
                     <lightning-button-icon icon-name="utility:expand_all" variant="bare" tooltip="Expandir todas las secciones" onclick={expandirSecciones} class="slds-var-m-left_small"></lightning-button-icon>
                 </template>

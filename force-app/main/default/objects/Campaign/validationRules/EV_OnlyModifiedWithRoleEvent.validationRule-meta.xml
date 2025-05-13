@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>EV_OnlyModifiedWithRoleEvent</fullName>
-    <active>true</active>
+    <active>false</active>
     <errorConditionFormula>AND(
 NOT(ISPICKVAL( PRIORVALUE(Status) , &quot;009&quot;)),ISPICKVAL(Status, &quot;009&quot;),
 NOT( OR($UserRole.DeveloperName=&apos;EV_Eventos&apos;,$UserRole.DeveloperName=&apos;Eventos_Accionista&apos;,  $Profile.Name = &apos;System Administrator&apos;))

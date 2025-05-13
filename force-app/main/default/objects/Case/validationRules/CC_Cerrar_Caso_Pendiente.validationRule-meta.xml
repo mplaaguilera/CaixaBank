@@ -4,23 +4,36 @@
     <active>true</active>
     <description>Un caso pendiente no puede ser cerrado directamente. Si el caso se encuentra en pendiente, este solo puede cambiar a activo o rechazado.</description>
     <errorConditionFormula>IF(CC_Admin__c != TRUE,
-	OR( 
-	AND( 
-	ISCHANGED(Status), 
-	ISPICKVAL(Status,&quot;Cerrado&quot;), 
-	ISPICKVAL(PRIORVALUE(Status), &apos;Pendiente Colaborador&apos;), 
-	CC_Admin__c = FALSE), 
-	AND( 
-	ISCHANGED(Status), 
-	ISPICKVAL(Status,&quot;Cerrado&quot;), 
-	ISPICKVAL(PRIORVALUE(Status), &apos;Pendiente Cliente&apos;), 
-	CC_Admin__c = FALSE), 
-	AND( 
-	ISCHANGED(Status), 
-	ISPICKVAL(Status,&quot;Cerrado&quot;), 
-	ISPICKVAL(PRIORVALUE(Status), &apos;Pendiente Interno&apos;), 
-	CC_Admin__c = FALSE)),
-	CC_Admin__c = FALSE
+    OR( 
+        AND( 
+            ISCHANGED(Status), 
+            ISPICKVAL(Status, &quot;Cerrado&quot;), 
+            ISPICKVAL(PRIORVALUE(Status), &quot;Pendiente Colaborador&quot;), 
+            CC_Admin__c = FALSE
+        ), 
+        AND( 
+            ISCHANGED(Status), 
+            ISPICKVAL(Status, &quot;Cerrado&quot;), 
+            ISPICKVAL(PRIORVALUE(Status), &quot;Pendiente Cliente&quot;), 
+            CC_Admin__c = FALSE,
+            NOT(
+                AND(
+                    OR(
+                        ISPICKVAL(CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, &quot;Documentación&quot;),
+                        ISPICKVAL(CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c, &quot;Documentación&quot;)
+                    ),
+                    NOT(ISBLANK(CC_CasoRelacionado__c))
+                )
+            )
+        ), 
+        AND( 
+            ISCHANGED(Status), 
+            ISPICKVAL(Status, &quot;Cerrado&quot;), 
+            ISPICKVAL(PRIORVALUE(Status), &quot;Pendiente Interno&quot;), 
+            CC_Admin__c = FALSE
+        ) 
+    ),
+    CC_Admin__c = FALSE
 )</errorConditionFormula>
     <errorMessage>Un caso pendiente no puede ser cerrado directamente.</errorMessage>
 </ValidationRule>

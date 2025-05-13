@@ -14,12 +14,12 @@
     <filters>
         <field>NAME</field>
         <operation>equals</operation>
-        <value>CSBD_WS_AltaOportunidad</value>
+        <value>CSBD_WS_Adobe</value>
     </filters>
     <filters>
         <field>CREATED_DATE</field>
-        <operation>greaterOrEqual</operation>
-        <value>YESTERDAY</value>
+        <operation>equals</operation>
+        <value>TODAY</value>
     </filters>
     <label>CSBD - CSBD_WS_AltaOportunidad</label>
     <sharedTo>

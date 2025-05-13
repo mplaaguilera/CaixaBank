@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Fecha_Alta_Stock__c</fullName>
+    <description>Informa la fecha en la que se realiza el alta en stock</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Alta Stock</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_MARINTOUCH__c</fullName>
     <defaultValue>false</defaultValue>
+    <description>Campo que contiene si es cliente intouch</description>
     <label>Es Cliente Intouch</label>
     <trackTrending>false</trackTrending>
     <type>Checkbox</type>

@@ -377,8 +377,8 @@ public with sharing class FRA_Llamada_GC_Test {
             llamada2.CC_Cuenta__c = contacto.AccountId;
             Test.startTest();
     
-            Case caso1 = FRA_Llamada_GC.crearCaso(llamada1, servicio, true);
-            Case caso2 = FRA_Llamada_GC.crearCaso(llamada2, servicio, false);
+            Case caso1 = FRA_Llamada_GC.crearCaso(llamada1, servicio, true, false);
+            Case caso2 = FRA_Llamada_GC.crearCaso(llamada2, servicio, false, false);
                 System.assertEquals(caso1.CC_ContactoRelacionado__c, llamada1.CC_Contacto__c);
                 System.assertEquals(caso1.CC_Oficina__c, llamada1.CC_Cuenta__c);   
                 System.assertEquals(caso2.ContactId, llamada2.CC_Contacto__c);

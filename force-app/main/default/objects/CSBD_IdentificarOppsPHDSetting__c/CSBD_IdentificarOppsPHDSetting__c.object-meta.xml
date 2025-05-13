@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <description>Utilizado para el WS consumido desde puntos de servicio y/o plataformas hipotecarias para identificar si existen Leads (Oportunidades)</description>
+    <enableFeeds>false</enableFeeds>
+    <label>CSBD Identificar Opp desde PHD</label>
+    <visibility>Public</visibility>
+</CustomObject>

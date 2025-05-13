@@ -65,7 +65,7 @@ public class SEG_PlantillasHandler_Test {
 		plantilla1.SEG_PlantillaCastellanoID__c = emailEs.Id;
 		insert plantilla1;
 
-		Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+		Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
 		CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Tematica1';
 		mccTematica.CC_Tipo_Cliente__c = 'Segmentos';
@@ -74,7 +74,7 @@ public class SEG_PlantillasHandler_Test {
 		mccTematica.CC_Codigo_Externo__c = 'TE-000001';
 		insert mccTematica;
 
-		Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+		Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
 		CC_MCC__c mccProducto = new CC_MCC__c();
 		mccProducto.Name = 'Producto1';
 		mccProducto.CC_Tipo_Cliente__c = 'Segmentos';
@@ -84,7 +84,7 @@ public class SEG_PlantillasHandler_Test {
 		mccProducto.CC_Codigo_Externo__c = 'PR-000001';
 		insert mccProducto;
 
-		Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+		Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
 		CC_MCC__c mccMotivo = new CC_MCC__c();
 		mccMotivo.Name = 'Motivo1';
 		mccMotivo.CC_Tipo_Cliente__c = 'Segmentos';
@@ -95,7 +95,7 @@ public class SEG_PlantillasHandler_Test {
 		mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
 		insert mccMotivo;
 
-		Id recordTypeIdDetalle = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
+		Id recordTypeIdDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
 		CC_MCC__c mccDetalle = new CC_MCC__c();
 		mccDetalle.Name = 'Detalle1';
 		mccDetalle.CC_Tipo_Cliente__c = 'Segmentos';
@@ -145,12 +145,17 @@ public class SEG_PlantillasHandler_Test {
 
 
 		//Excepciones       
-		/*List<SEG_ExcepcionesCentro__c> lstExCentro = new List<SEG_ExcepcionesCentro__c>();
+		List<SEG_ExcepcionesCentro__c> lstExCentro = new List<SEG_ExcepcionesCentro__c>();
 		SEG_ExcepcionesCentro__c exCentro = new SEG_ExcepcionesCentro__c();
 		exCentro.SEG_Plantilla__c = plantilla.id;
 		exCentro.SEG_CentroEmpresa__c = centro.id;
-		lstExCentro.add(exCentro);*/
+		lstExCentro.add(exCentro);
 
+		SEG_ExcepcionesCentro__c exCentro2 = new SEG_ExcepcionesCentro__c();
+		exCentro2.SEG_Plantilla__c = plantilla1.id;
+		exCentro2.SEG_CentroEmpresa__c = centro.id;
+		lstExCentro.add(exCentro2);
+		insert lstExCentro;
 
 		List<SEG_ExcepcionesGrupo__c> lstExGrupo = new List<SEG_ExcepcionesGrupo__c>();
 		SEG_ExcepcionesGrupo__c exGrupo = new SEG_ExcepcionesGrupo__c();

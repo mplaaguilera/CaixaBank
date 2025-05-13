@@ -6,13 +6,13 @@ public class CSBD_BuscadorProducto_Apex_Test {
         CC_Lista_Valores__c empresa = new CC_Lista_Valores__c();
         empresa.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Empresas').getRecordTypeId();
         empresa.Name = 'CaixaBank';
-        empresa.CSBD_Tipo_de_oportunidad__c = 'Préstamo';
+        empresa.CSBD_Tipo_de_oportunidad__c = 'Consumo';
         empresa.CC_Activa__c = true;
         CC_Lista_Valores__c familia = new CC_Lista_Valores__c();
         familia.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Familias').getRecordTypeId();
         familia.Name = 'Família 1';
         familia.CSBD_Empresa_Proveedora_Multi__c = 'CaixaBank';
-        familia.CSBD_Tipo_de_oportunidad__c = 'Préstamo';
+        familia.CSBD_Tipo_de_oportunidad__c = 'Consumo';
         familia.CC_Activa__c = true;
         insert new List<CC_Lista_Valores__c>{empresa, familia};
 
@@ -33,7 +33,7 @@ public class CSBD_BuscadorProducto_Apex_Test {
     private static void getEmpresasProveedorasTest() {
         System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
-            List<CC_Lista_Valores__c> empresasPrestamo = CSBD_BuscadorProducto_Apex.getEmpresasProveedoras('Préstamo');
+            List<CC_Lista_Valores__c> empresasPrestamo = CSBD_BuscadorProducto_Apex.getEmpresasProveedoras('Consumo');
             List<CC_Lista_Valores__c> empresasHipoteca = CSBD_BuscadorProducto_Apex.getEmpresasProveedoras('Hipoteca');
             Test.stopTest();
 
@@ -46,9 +46,9 @@ public class CSBD_BuscadorProducto_Apex_Test {
     private static void getProductosTest() {
         System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
-            List<CC_Lista_Valores__c> resultados1 = CSBD_BuscadorProducto_Apex.getProductos('Préstamo', 'Producto 1');
-            List<CC_Lista_Valores__c> resultados2 = CSBD_BuscadorProducto_Apex.getProductos('Préstamo', 'Família');
-            List<CC_Lista_Valores__c> resultados3 = CSBD_BuscadorProducto_Apex.getProductos('Préstamo', 'Prod');
+            List<CC_Lista_Valores__c> resultados1 = CSBD_BuscadorProducto_Apex.getProductos('Consumo', 'Producto 1');
+            List<CC_Lista_Valores__c> resultados2 = CSBD_BuscadorProducto_Apex.getProductos('Consumo', 'Família');
+            List<CC_Lista_Valores__c> resultados3 = CSBD_BuscadorProducto_Apex.getProductos('Consumo', 'Prod');
             Test.stopTest();
 
             System.assertEquals(1, resultados1.size(), 'Hay 1 producto');

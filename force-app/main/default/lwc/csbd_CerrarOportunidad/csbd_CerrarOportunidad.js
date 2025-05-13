@@ -1,21 +1,25 @@
 import {LightningElement, api, wire} from 'lwc';
-import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
-import {errorApex, publicarEvento, toast} from 'c/csbd_lwcUtils';
+import {getRecord, getFieldValue, notifyRecordUpdateAvailable} from 'lightning/uiRecordApi';
+import {errorApex, publicarEvento, toast, transitionThenCallback} from 'c/csbd_lwcUtils';
 
-import OPP_PRODUCTO from '@salesforce/schema/Opportunity.CSBD_Producto__c';
+import OPP_RT_DEVNAME from '@salesforce/schema/Opportunity.RecordType.DeveloperName';
+import OPP_RT_NAME from '@salesforce/schema/Opportunity.RecordType.Name';
+import OPP_CREATED_DATE from '@salesforce/schema/Opportunity.CreatedDate';
 import OPP_CONTACT from '@salesforce/schema/Opportunity.CSBD_Contact__c';
 import OPP_NO_IDENTIFICADO from '@salesforce/schema/Opportunity.CSBD_No_Identificado__c';
-import OPP_RT_NAME from '@salesforce/schema/Opportunity.RecordType.Name';
-import OPP_RT_DEVNAME from '@salesforce/schema/Opportunity.RecordType.DeveloperName';
-import OPP_NOTAS_GESTOR from '@salesforce/schema/Opportunity.CSBD_Notas_gestor__c';
+import OPP_PRODUCTO from '@salesforce/schema/Opportunity.CSBD_Producto__c';
 import OPP_AMOUNT from '@salesforce/schema/Opportunity.Amount';
+import OPP_MOTIVO_DEVOLUCION from '@salesforce/schema/Opportunity.CSBD_Motivo_Devolucion__c';
 
 import cerrarOportunidadApex from '@salesforce/apex/CSBD_Opportunity_Operativas_Controller.cerrarOportunidad';
 import obtenerOportunidadesHijasApex from '@salesforce/apex/CSBD_Opportunity_Operativas_Controller.obtenerOportunidadesHijas';
-import obtenerResolucionesApex from '@salesforce/apex/CSBD_Opportunity_Operativas_Controller.obtenerResoluciones';
+import obtenerResolucionesApex from '@salesforce/apex/CSBD_CerrarOportunidad_Apex.obtenerResoluciones';
 import obtenerEntidadesCompetenciaApex from '@salesforce/apex/CSBD_Opportunity_Operativas_Controller.obtenerEntidades';
 
-const OPP_FIELDS = [OPP_PRODUCTO, OPP_CONTACT, OPP_NO_IDENTIFICADO, OPP_RT_NAME, OPP_RT_DEVNAME, OPP_CONTACT, OPP_AMOUNT];
+const OPP_FIELDS = [
+	OPP_PRODUCTO, OPP_CONTACT, OPP_NO_IDENTIFICADO, OPP_RT_NAME,
+	OPP_RT_DEVNAME, OPP_AMOUNT, OPP_MOTIVO_DEVOLUCION, OPP_CREATED_DATE
+];
 
 export default class csbdCerrarOportunidad extends LightningElement {
 
@@ -23,27 +27,41 @@ export default class csbdCerrarOportunidad extends LightningElement {
 
 	@api recordId;
 
+	spinner = false;
+
 	oportunidad;
 
-	cerrarEtapas = [];
+	botonesEtapaMensajeError;
 
-	cerrarResoluciones = [];
+	resoluciones;
+
+	inputResolucionOptions = [];
 
 	entidadesCompetencia = [];
 
-	mostrarNotificacion = false;
+	etapaFinal = 'Formalizada';
 
-	mostrarMotivoRechazo = false;
+	mensajeSinResoluciones = {texto: '', recordTypeName: '', etapaName: ''};
 
-	mostrarTipoBonificado = false;
+	/*get diasAbierta() {
+		if (!this.oportunidad) {
+			return 0;
+		}
+		const fechaCreacion = new Date(getFieldValue(this.oportunidad, OPP_CREATED_DATE));
+		const fechaActual = new Date();
+		const diferencia = fechaActual - fechaCreacion;
+		return Math.floor(diferencia / (1000 * 60 * 60 * 24)) + 1;
+	} */
 
-	wireGetRecordTimestamp = null;
-
-	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS, wireTimestamp: '$wireGetRecordTimestamp'})
+	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS})
 	wiredRecord({error, data: oportunidad}) {
 		if (oportunidad) {
-			this.oportunidad = oportunidad;
-			this.mostrarNotificacion = !getFieldValue(oportunidad, OPP_CONTACT) && !getFieldValue(oportunidad, OPP_NO_IDENTIFICADO);
+			const clienteIdentificado = Boolean(getFieldValue(oportunidad, OPP_CONTACT) || getFieldValue(oportunidad, OPP_NO_IDENTIFICADO));
+			this.oportunidad = {...oportunidad, _clienteIdentificado: clienteIdentificado};
+			this.refs.modalCerrarOportunidad.classList.toggle('clienteNoIdentificado', !clienteIdentificado);
+			this.refs.botonFormalizada.disabled = !clienteIdentificado;
+			this.refs.botonPerdida.disabled = !clienteIdentificado;
+			!clienteIdentificado && this.cambiarEtapa('Rechazada');
 
 			if (this.modalAbierto) {
 				this.abrirModal();
@@ -53,237 +71,296 @@ export default class csbdCerrarOportunidad extends LightningElement {
 		}
 	}
 
-	modalCerrar() {
-		this.modalAbierto = false;
-		this.refs.modalCerrarOportunidad.addEventListener('transitionend', () => {
-			publicarEvento(this, 'modalcerrado', {nombreModal: 'modalCerrarOportunidad'});
-		}, {once: true});
-		this.refs.modalCerrarOportunidad.classList.remove('slds-fade-in-open');
-		this.refs.backdropModal.classList.remove('slds-backdrop_open');
-	}
-
-	modalTeclaPulsada({keyCode}) {
-		keyCode === 27 && this.modalCerrar();
-	}
-
 	@api abrirModal() {
-		const modalCerrarOportunidad = this.refs.modalCerrarOportunidad;
-		if (modalCerrarOportunidad.classList.contains('slds-fade-in-open')) {
-			return;
-		}
-		this.modalAbierto = true;
-		if (!this.oportunidad) {
-			return; //Si el getRecord no ha acabado, el modal se abrirá cuando acabe
-		} else if (!getFieldValue(this.oportunidad, OPP_PRODUCTO)) {
-			this.modalAbierto = false;
-			toast('info', 'Oportunidad sin producto', 'Es necesario que la oportunidad tenga un producto para poder cerrarla');
-			return;
-		}
+		try {
+			const modalCerrarOportunidad = this.refs.modalCerrarOportunidad;
+			if (modalCerrarOportunidad.classList.contains('slds-fade-in-open')) {
+				return;
+			}
 
-		//Preparar opciones del desplegable de etapas finales
-		const etapasFinales = [{label: 'Rechazada', value: 'Rechazada'}];
-		if (getFieldValue(this.oportunidad, 'Opportunity.CSBD_Contact__c') || getFieldValue(this.oportunidad, 'Opportunity.CSBD_No_Identificado__c')) {
-			etapasFinales.push({label: 'Formalizada', value: 'Formalizada'}, {label: 'Perdida', value: 'Perdida'});
-		}
-		this.cerrarEtapas = etapasFinales;
+			this.modalAbierto = true;
+			if (!this.oportunidad) {
+				return; //Si el getRecord no ha acabado, el modal se abrirá cuando acabe
+			} else if (!getFieldValue(this.oportunidad, OPP_PRODUCTO)) {
+				this.modalAbierto = false;
+				toast('info', 'Oportunidad sin producto', 'Es necesario indicar el producto de la oportunidad para poder cerrarla');
+				return;
+			}
 
-		const inputEtapa = this.refs.inputEtapa;
-		if (etapasFinales.length === 1) {
-			inputEtapa.value = etapasFinales[0].value;
-			this.inputEtapaOnchange();
-		}
+			//Abrir modal
+			this.obtenerResoluciones();
 
-		this.refs.backdropModal.classList.add('slds-backdrop_open');
-		modalCerrarOportunidad.classList.add('slds-fade-in-open');
-		this.seleccionarControl(inputEtapa.value ? 'inputResolucion' : 'inputEtapa', 50);
-	}
+			let botonActivo, elementoFocus;
+			if (this.oportunidad._clienteIdentificado) {
+				this.refs.botonPerdida.disabled = false;
+				this.refs.botonRechazada.disabled = false;
 
-	inputEtapaOnchange() {
-		const inputEtapa = this.template.querySelector('.inputEtapa');
-		inputEtapa.setCustomValidity('');
-		const etapa = inputEtapa.value;
-		if (etapa === 'Formalizada') {
-			if (!getFieldValue(this.oportunidad, OPP_AMOUNT)) {
-				inputEtapa.setCustomValidity('No se puede formalizar una oportunidad con importe 0€.');
+				this.etapaFinal = 'Formalizada';
+				botonActivo = this.refs.botonFormalizada;
+				elementoFocus = botonActivo;
 			} else {
-				obtenerOportunidadesHijasApex({idOportunidad: this.recordId})
-				.then(abiertas => abiertas && inputEtapa.setCustomValidity('La oportunidad tiene acciones comerciales abiertas.'))
-				.catch(error => errorApex(this, error, 'Error consultando acciones comerciales'));
+				this.etapaFinal = 'Rechazada';
+				botonActivo = this.refs.botonRechazada;
+				elementoFocus = this.refs.inputResolucion;
 			}
+			botonActivo.disabled = false;
+			botonActivo.classList.add('selected');
+
+			this.etapaFinalValida();
+
+			this.refs.backdropModal.classList.add('slds-backdrop_open');
+			modalCerrarOportunidad.classList.remove('camposCompetencia', 'rechazadaDevolucionContact');
+			modalCerrarOportunidad.addEventListener('transitionend', () => {
+				modalCerrarOportunidad.classList.add('slds-fade-in-open');
+				elementoFocus.focus();
+			}, {once: true});
+			publicarEvento(this, 'modalabierto', {nombreModal: 'modalCerrarOportunidad'});
+
+		} catch (error) {
+			errorApex(this, error, 'Problema al iniciar la operariva');
+			this.modalCerrar();
 		}
-
-		obtenerResolucionesApex({
-			producto: getFieldValue(this.oportunidad, OPP_PRODUCTO),
-			nombreRecordType: getFieldValue(this.oportunidad, OPP_RT_NAME),
-			etapa
-		}).then(resoluciones => {
-			let inputResolucion =  this.template.querySelector('.inputResolucion');
-			inputResolucion.value = null;
-			this.cerrarResoluciones = resoluciones.map(resolucion => ({label: resolucion, value: resolucion}));
-
-			const esDesistimiento = getFieldValue(this.oportunidad, OPP_RT_DEVNAME) === 'CSBD_Desistimiento';
-			if (esDesistimiento && etapa === 'Formalizada') {
-				inputResolucion.value = 'Desistimiento realizado';
-			} else if (esDesistimiento && etapa === 'Rechazada') {
-				inputResolucion.value = 'Duplicada';
-			} else if (resoluciones.length === 1) {
-				inputResolucion.value = resoluciones[0];
-			}
-			this.seleccionarControl('inputResolucion', 20);
-		}).catch(error => errorApex(this, error, 'Error obteniendo la lista deresoluciones'));
 	}
 
-	inputResolucionOnchange() {
-		this.mostrarMotivoRechazo = false;
-		this.mostrarTipoBonificado = false;
-
-		let resolucion = this.template.querySelector('.inputResolucion').value;
-		if (resolucion === 'Competencia' && getFieldValue(this.oportunidad, OPP_RT_DEVNAME) === 'CSBD_Hipoteca') {
-			obtenerEntidadesCompetenciaApex()
-			.then(entidadesCompetencia => {
-				this.template.querySelector('.inputEntidadCompetencia').value = null;
-				this.entidadesCompetencia = entidadesCompetencia.map(entidad => ({label: entidad, value: entidad}));
-			}).catch(error => errorApex(this, error, 'Error obteniendo entidades'));
-			this.mostrarTipoBonificado = true;
-
-		} else if (resolucion === 'Devolución a contact' && getFieldValue(this.oportunidad, OPP_RT_DEVNAME) === 'CSBD_MAC') {
-			this.mostrarMotivoRechazo = true;
-		}
-
-		if (this.mostrarMotivoRechazo) {
-			this.seleccionarControl('inputMotivoRechazo', 40);
-		} else if (this.mostrarTipoBonificado) {
-			this.seleccionarControl('inputTipoOfertado', 40);
+	inputResolucionValido(resolucionNew) {
+		const inputResolucion = this.refs.inputResolucion;
+		if (!resolucionNew) {
+			inputResolucion.setCustomValidity('Éste campo es requerido.');
+			inputResolucion.reportValidity();
+			return false;
 		} else {
-			this.seleccionarControl('botonAceptar', 40);
+			inputResolucion.setCustomValidity('');
+			inputResolucion.reportValidity();
+			return true;
+		}
+	}
+
+	inputResolucionOnchange(event) {
+		const resolucionNew = event.currentTarget.value;
+		if (!this.inputResolucionValido(resolucionNew)) {
+			return;
 		}
 
-		//if (resultado === 'Competencia') {
-		//let obtenerEntidad = component.get('c.obtenerEntidades');
-		//obtenerEntidad.setCallback(this, response => {
-		//if (response.getState() === 'SUCCESS') {
-		//let inputEntidadCompetencia = component.find('inputEntidadCompetencia');
-		//inputEntidadCompetencia.set('v.value', null);
-		//const entidades = response.getReturnValue();
-		//component.set('v.entidadesCompetencia', entidades.map(entidad => ({label: entidad, value: entidad})));
-		//helper.seleccionarControl(component, 'inputEntidadCompetencia', 40);
-		//}
-		//});
-		//$A.enqueueAction(obtenerEntidad);
+		const perdidaCompetencia = resolucionNew === 'Competencia' && getFieldValue(this.oportunidad, OPP_RT_DEVNAME) === 'CSBD_Hipoteca';
+		if (perdidaCompetencia) {
+			if (!this.entidadesCompetencia.length) {
+				obtenerEntidadesCompetenciaApex()
+				.then(entidadesCompetencia => {
+					this.template.querySelector('.inputEntidadCompetencia').value = null;
+					this.entidadesCompetencia = entidadesCompetencia.map(entidad => ({label: entidad, value: entidad}));
+				}).catch(error => errorApex(this, error, 'Error obteniendo entidades'));
+			}
+		}
+
+		this.mostrarOcultarCamposAdicionales();
+	}
+
+	inputMotivoRechazoOnchange() {
+		this.refs.botonAceptar.disabled = false;
 	}
 
 	cerrarOportunidad() {
 		//Validaciones
-		const controles = ['.inputEtapa', '.inputResolucion', '.inputMotivoRechazo', '.inputTipoOfertado', '.inputEntidadCompetencia'];
-		const ok = controles.reduce((validity, control) => {
-			const input = this.template.querySelector(control);
-			input && input.reportValidity();
-			return validity && input?.validity.valid;
-		}, true);
+		const inputsList = ['.inputMotivoRechazo', '.inputTipoOfertado', '.inputEntidadCompetencia'];
+		const ok = inputsList.reduce((validity, input) => {
+			//Para cada input
+			const inputElement = this.template.querySelector(input);
+			if (inputElement) { //Muestra el mensaje de error si aplica y se actualiza el resultado acumulado
+				inputElement.reportValidity();
+				return validity && inputElement.validity.valid;
+			}
+			return validity; //Si el input no se muestra no afecta al resultado
+		}, true) && this.inputResolucionValido(this.refs.inputResolucion.value) && !this.botonesEtapaMensajeError;
 
 		if (ok) {
 			//Actualizar oportunidad
-			const inputTipoOfertado = this.refs.inputTipoOfertado;
-			const inputEntidadCompetencia = this.refs.inputEntidadCompetencia;
+			this.spinner = true;
+			const resolucion = this.refs.inputResolucion.value;
+			const perdidaCompetencia = resolucion === 'Competencia' && getFieldValue(this.oportunidad, OPP_RT_DEVNAME) === 'CSBD_Hipoteca';
 			const campos = {
-				'CSBD_TipoOfertado__c': inputTipoOfertado ? parseFloat(inputTipoOfertado.value) : null,
-				'CSBD_EntidadCompetencia__c': inputEntidadCompetencia ? inputEntidadCompetencia.value : null
+				'CSBD_TipoOfertado__c': perdidaCompetencia ? parseFloat(this.refs.inputTipoOfertado.value) : null,
+				'CSBD_EntidadCompetencia__c': perdidaCompetencia ? this.refs.inputEntidadCompetencia.value : null,
+				'CSBD_Motivo_Devolucion__c': this.refs.inputMotivoRechazo.value
 			};
-			const inputMotivoRechazo = this.refs.inputMotivoRechazo;
-			if (inputMotivoRechazo) {
-				let notasGestorNew = inputMotivoRechazo.value;
-				const notasGestorOld = getFieldValue(this.oportunidad, OPP_NOTAS_GESTOR);
-				notasGestorOld && (notasGestorNew += '\n' + notasGestorOld);
-				campos['CSBD_Notas_gestor__c'] = notasGestorNew;
-			}
 
-			this.refs.botonAceptar.disabled = true;
 			cerrarOportunidadApex({
 				recordId: this.recordId,
-				nombreEtapaVentas: this.refs.inputEtapa.value,
-				resolucion: this.refs.inputResolucion.value,
+				nombreEtapaVentas: this.etapaFinal,
+				resolucion,
 				campos
 			}).then(oportunidad => {
+				notifyRecordUpdateAvailable([{recordId: this.recordId}]);
 				toast('success', 'Se cerró oportunidad ' + oportunidad.CSBD_Identificador__c, 'La oportunidad se cerró correctamente');
-				this.wireGetRecordTimestamp = new Date();
 				this.modalCerrar();
-			}).catch(error => errorApex(this, error, 'Problema cerrando la oportunidad'))
-			.finally(() => this.refs.botonAceptar.disabled = false);
+			}).catch(error => {
+				errorApex(this, error, 'Problema cerrando la oportunidad');
+				this.spinner = false;
+			});
 		}
 	}
 
-	seleccionarControl(nombreControl, delay) {
-		window.setTimeout(() => this.template.querySelector('.' + nombreControl).focus(), delay);
+	etapaFinalValida() {
+		this.botonesEtapaMensajeError = null;
+		if (this.etapaFinal === 'Formalizada') {
+			if (!getFieldValue(this.oportunidad, OPP_AMOUNT)) {
+				this.botonesEtapaMensajeError = 'No se puede formalizar una oportunidad con importe 0€.';
+			} else {
+				obtenerOportunidadesHijasApex({idOportunidad: this.recordId})
+				.then(abiertas => {
+					if (abiertas) {
+						this.botonesEtapaMensajeError = 'La oportunidad tiene acciones comerciales abiertas.';
+					}
+					this.refs.buttonGroupEtapas.classList.toggle('slds-has-error', this.botonesEtapaMensajeError);
+				}).catch(error => errorApex(this, error, 'Error consultando acciones comerciales'));
+			}
+		}
+		this.refs.buttonGroupEtapas.classList.toggle('slds-has-error', this.botonesEtapaMensajeError);
+		return !this.botonesEtapaMensajeError;
 	}
 
+	botonEtapaOnclick({currentTarget}) {
+		const etapaNew = currentTarget.dataset.etapa;
+		if (etapaNew !== this.etapaFinal) {
+			this.cambiarEtapa(etapaNew);
+			currentTarget.classList.add('selected');
+		}
+	}
 
-	//cerrarOportunidad() {
-	//let campos = new Map();
+	cambiarEtapa(etapaNew) {
+		const modalCerrarOportunidad = this.refs.modalCerrarOportunidad;
+		modalCerrarOportunidad.classList.remove('perdidaCompetencia', 'rechazadaDevolucionContact');
+		this.template.querySelectorAll('lightning-button-group lightning-button').forEach(b => b.classList.remove('selected'));
 
-	//let notasGestor;
+		const inputResolucion = this.refs.inputResolucion;
+		inputResolucion.value = null;
+		inputResolucion.setCustomValidity('');
+		inputResolucion.reportValidity();
+		this.etapaFinal = etapaNew;
+		this.actualizarResoluciones(etapaNew);
 
-	//let inputEtapa = component.find('inputEtapa');
-	//inputEtapa.checkValidity();
-	//inputEtapa.reportValidity();
+		const esDesistimiento = getFieldValue(this.oportunidad, OPP_RT_DEVNAME) === 'CSBD_Desistimiento';
+		if (esDesistimiento && etapaNew === 'Formalizada') {
+			inputResolucion.value = 'Desistimiento realizado';
+		} else if (esDesistimiento && etapaNew === 'Rechazada') {
+			inputResolucion.value = 'Duplicada';
+		} else if (this.inputResolucionOptions.length === 1) {
+			inputResolucion.value = this.inputResolucionOptions[0].value;
+		}
+		this.etapaFinalValida() && this.mostrarOcultarCamposAdicionales();
+	}
 
-	//let inputResolucion = component.find('inputResolucion');
-	//inputResolucion.checkValidity();
-	//inputResolucion.reportValidity();
+	actualizarResoluciones(etapaFinal) {
+		const inputResolucion = this.refs.inputResolucion;
+		inputResolucion.value = null;
+		inputResolucion.setCustomValidity('');
+		inputResolucion.reportValidity();
+		const resoluciones = this.resoluciones ?? {};
+		const inputResolucionOptions = resoluciones[etapaFinal]?.map(r => ({label: r, value: r})) || [];
+		this.inputResolucionOptions = inputResolucionOptions;
 
-	//let inputMotivoRechazo = component.find('inputMotivoRechazo');
-	//if (inputMotivoRechazo) {
-	//inputMotivoRechazo.checkValidity();
-	//inputMotivoRechazo.reportValidity();
-	//if (inputMotivoRechazo.get('v.validity').valid) {
+		const sinResoluciones = !inputResolucionOptions.length;
+		if (sinResoluciones) {
+			this.mensajeSinResoluciones = {
+				recordTypeName: getFieldValue(this.oportunidad, OPP_RT_NAME),
+				producto: getFieldValue(this.oportunidad, OPP_PRODUCTO),
+				etapaName: (etapaFinal + 's').toLowerCase()
+			};
+			const modalCerrarOportunidad = this.refs.modalCerrarOportunidad;
+			if (!modalCerrarOportunidad.classList.contains('sinResoluciones')) {
+				modalCerrarOportunidad.classList.remove('sinResoluciones');
+				setTimeout(() => modalCerrarOportunidad.classList.add('sinResoluciones'), 0);
+			}
+		} else {
+			this.refs.modalCerrarOportunidad.classList.remove('sinResoluciones');
+			this.mensajeSinResoluciones = {texto: '', recordTypeName: '', etapaName: ''};
+		}
+	}
 
-	//notasGestor = component.get('v.oportunidad.CSBD_Notas_gestor__c') ? inputMotivoRechazo.get('v.value') + '\n' + component.get('v.oportunidad.CSBD_Notas_gestor__c') : inputMotivoRechazo.get('v.value');
+	mostrarOcultarCamposAdicionales() {
+		const modalCerrarOportunidad = this.refs.modalCerrarOportunidad;
+		const resolucion = this.refs.inputResolucion.value;
 
-	//campos.set('CSBD_Notas_gestor__c', notasGestor);
-	//}
-	//}
+		const rechazadaDevolucionContact = resolucion === 'Devolución a contact' && getFieldValue(this.oportunidad, OPP_RT_DEVNAME) === 'CSBD_MAC';
+		const perdidaCompetencia = resolucion === 'Competencia' && getFieldValue(this.oportunidad, OPP_RT_DEVNAME) === 'CSBD_Hipoteca';
 
-	//let inputTipoOfertado = component.find('inputTipoOfertado');
-	//if (inputTipoOfertado) {
-	//inputTipoOfertado.checkValidity();
-	//inputTipoOfertado.reportValidity();
-	//if (inputTipoOfertado.get('v.validity').valid) {
-	//campos.set('CSBD_TipoOfertado__c', parseFloat(inputTipoOfertado.get('v.value')));
-	//}
-	//}
+		if (rechazadaDevolucionContact) {
+			this.refs.camposDevolucionContact.classList.remove('slds-hide');
+			modalCerrarOportunidad.classList.add('rechazadaDevolucionContact');
+			setTimeout(() => this.refs.inputMotivoRechazo.focus(), 100);
 
-	//let inputEntidadCompetencia = component.find('inputEntidadCompetencia');
-	//if (inputEntidadCompetencia) {
-	//inputTipoOfertado.checkValidity();
-	//inputTipoOfertado.reportValidity();
-	//if (inputEntidadCompetencia.get('v.validity').valid) {
-	//campos.set('CSBD_EntidadCompetencia__c', inputEntidadCompetencia.get('v.value'));
-	//}
-	//}
+		} else if (perdidaCompetencia) {
+			this.refs.camposCompetencia.classList.remove('slds-hide');
+			modalCerrarOportunidad.classList.add('perdidaCompetencia');
+			this.refs.inputTipoOfertado.focus();
 
-	//if (inputEtapa.get('v.validity').valid
-	//&& inputResolucion.get('v.validity').valid
-	//&& !inputMotivoRechazo || inputEtapa.get('v.validity').valid && inputResolucion.get('v.validity').valid && inputMotivoRechazo && inputMotivoRechazo.get('v.validity').valid) {
-	//component.find('botonAceptar').set('v.disabled', true);
-	//let cerrarOportunidad = component.get('c.cerrarOportunidad');
-	//cerrarOportunidad.setParams({
-	//recordId: component.get('v.recordId'),
-	//nombreEtapaVentas: inputEtapa.get('v.value'),
-	//resolucion: inputResolucion.get('v.value'),
-	//campos: Object.fromEntries(campos)
-	//});
-	//cerrarOportunidad.setCallback(this, response => {
-	//if (response.getState() === 'SUCCESS') {
-	//helper.mostrarToast('Se cerró oportunidad ' + response.getReturnValue().CSBD_Identificador__c, 'La oportunidad se cerró satisfactoriamente', 'success');
-	//component.find('opportunityData').reloadRecord(true);
-	//$A.enqueueAction(component.get('c.cerrarModalCerrar'));
-	//} else {
-	//console.error(cerrarOportunidad.getError());
-	//helper.mostrarToast('Problema cerrando la oportunidad', cerrarOportunidad.getError()[0].message, 'error');
-	//component.find('botonAceptar').set('v.disabled', false);
-	//}
-	//});
-	//$A.enqueueAction(cerrarOportunidad);
-	//}
+		} else {
+			const modalCerrarOportunidadClases = modalCerrarOportunidad.classList;
+			if (modalCerrarOportunidadClases.contains('perdidaCompetencia')
+			|| modalCerrarOportunidadClases.contains('rechazadaDevolucionContact')) {
+				modalCerrarOportunidad.addEventListener('transitionend', () => {
+					this.refs.camposCompetencia.classList.add('slds-hide');
+					this.refs.camposDevolucionContact.classList.add('slds-hide');
+					setTimeout(() => this.refs.botonAceptar.focus(), 40);
+				}, {once: true});
+				modalCerrarOportunidad.classList.remove('perdidaCompetencia', 'rechazadaDevolucionContact');
+			}
+		}
+	}
 
-	//}
+	async obtenerResoluciones() {
+		if (this.resoluciones) {
+			return;
+		}
+
+		obtenerResolucionesApex({
+			producto: getFieldValue(this.oportunidad, OPP_PRODUCTO),
+			nombreRecordType: getFieldValue(this.oportunidad, OPP_RT_NAME)
+		}).then(resoluciones => {
+			this.resoluciones = resoluciones;
+			this.actualizarResoluciones(this.etapaFinal);
+			const esDesistimiento = getFieldValue(this.oportunidad, OPP_RT_DEVNAME) === 'CSBD_Desistimiento';
+			const inputResolucion = this.refs.inputResolucion;
+			if (esDesistimiento && this.etapaFinal === 'Formalizada') {
+				inputResolucion.value = 'Desistimiento realizado';
+			} else if (esDesistimiento && this.etapaFinal === 'Rechazada') {
+				inputResolucion.value = 'Duplicada';
+			} else if (this.inputResolucionOptions.length === 1) {
+				inputResolucion.value = this.inputResolucionOptions[0].value;
+			}
+			this.refs.modalCerrarOportunidad.classList.remove('cargando');
+		}).catch(error => errorApex(this, error, 'Error obteniendo la lista deresoluciones'));
+	}
+
+	modalCerrar() {
+		this.modalAbierto = false;
+		transitionThenCallback(
+			this.refs.modalCerrarOportunidad, 'slds-fade-in-open',
+			() => publicarEvento(this, 'modalcerrado', {nombreModal: 'modalCerrarOportunidad'}),
+			'opacity'
+		);
+		this.refs.backdropModal.classList.remove('slds-backdrop_open');
+	}
+
+	resetModal() {
+		this.refs.modalCerrarOportunidad.classList.remove('camposCompetencia', 'rechazadaDevolucionContact');
+
+		this.refs.inputResolucion.value = null;
+		this.inputResolucionOptions = [];
+		this.resoluciones = null;
+
+		this.etapaFinal = 'Formalizada';
+
+		const botonesEtapa = [this.refs.botonFormalizada, this.refs.botonPerdida, this.refs.botonRechazada];
+		botonesEtapa.forEach(b => b.classList.remove('selected'));
+
+		this.refs.botonFormalizada.diabled = true;
+		this.refs.botonPerdida.disabled = true;
+	}
+
+	modalTeclaPulsada({keyCode}) {
+		if (keyCode === 27 && !this.spinner
+		&& this.refs.modalCerrarOportunidad.classList.contains('slds-fade-in-open')) {
+			this.modalCerrar();
+		}
+	}
 }

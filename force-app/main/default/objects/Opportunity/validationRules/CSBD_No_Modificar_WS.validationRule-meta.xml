@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CSBD_No_Modificar_WS</fullName>
-    <active>true</active>
-    <description>Controla que no se puedan modificar los campos Empresa proveedora, Familia de producto, Producto y Nombre  en una oportunidad que ha llegado por WS</description>
+    <active>false</active>
+    <description>Controla que no se puedan modificar los campos empresa proveedora, Familia de producto, producto y nombre de la oportunidad que ha llegado por WS</description>
     <errorConditionFormula>AND(
 AND(
 NOT($Permission.CSBD_ByPassVR),
@@ -36,5 +36,5 @@ NOT(ISPICKVAL(PRIORVALUE(CSBD_Producto__c), &apos;&apos;))
 ISPICKVAL(CSBD_SistemaOrigen__c, &apos;WS&apos;)
 )
 ) &amp;&amp; NOT(ISNEW())</errorConditionFormula>
-    <errorMessage>Los campos Empresa proveedora, Familia de producto, Producto no se pueden modificar en una oportunidad con origen Now. Por favor, clona la oportunidad.</errorMessage>
+    <errorMessage>Los campos Empresa Proveedora, Familia de Producto, Producto no se pueden modificar en una oportunidad de origen Now. Por, favor, clona la oportunidad.</errorMessage>
 </ValidationRule>

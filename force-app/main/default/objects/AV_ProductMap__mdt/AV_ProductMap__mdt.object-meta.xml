@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Mapa con los diferentes valores de potencialidad como key, y la  tenencia como value.</description>
     <label>Mapa Producto</label>
     <pluralLabel>Mapa Productos</pluralLabel>
     <visibility>Public</visibility>

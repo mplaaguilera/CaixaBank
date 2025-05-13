@@ -10,8 +10,16 @@
 	border-color: rgb(201, 201, 201);
 }
 
-.THIS div.slds-combobox.slds-is-open > div.slds-dropdown {
-	max-height: 506px;
+.THIS div.divCampos div.slds-dropdown {
+	max-height: 310px;
+}
+
+.THIS div.divCampos.dropdownAlto div.slds-dropdown {
+	max-height: 400px;
+}
+
+.THIS div.divCampos.dropdownMuyAlto div.slds-dropdown {
+	max-height: 500px;
 }
 
 .THIS lightning-input-field.slds-form-element_stacked {

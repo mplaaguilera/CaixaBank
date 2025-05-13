@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_TablaEquivalencias_CC_Fraude</fullName>
+    <columns>NAME</columns>
+    <columns>FRA_Clasificacion_MCC_Origen__c</columns>
+    <columns>FRA_MotivoOrigen__c</columns>
+    <columns>FRA_Clasificacion_MCC_Destino__c</columns>
+    <columns>FRA_MotivoDestino__c</columns>
+    <columns>CC_Activa__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Lista_Valores__c.FRA_TablaEquivalenciasDerivacion_CC_FRAUDE</value>
+    </filters>
+    <label>Tabla equivalencias MCC CC - MCC Fraude</label>
+    <sharedTo>
+        <role>FRA</role>
+    </sharedTo>
+</ListView>

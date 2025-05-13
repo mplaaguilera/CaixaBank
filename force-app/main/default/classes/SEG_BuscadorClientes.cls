@@ -88,29 +88,30 @@ public with sharing class SEG_BuscadorClientes {
     */
     @AuraEnabled
     public static infoCasoPermissionSets datosRegistro(Id recordId) {
-        sObject retorno;
+        List<Case> retorno = new List<Case>(); 
         Boolean noEsSupervisor = true;
-        if ((recordId).getSObjectType() == Schema.getGlobalDescribe().get('Case')){
-            retorno = [SELECT CC_No_Identificado__c, Account.Name, AccountId, ContactId, RecordType.DeveloperName, Status FROM Case WHERE Id = :recordId];
+        
+       if (recordId != null && String.valueOf(recordId.getSObjectType()).equalsIgnoreCase('Case')) {
+            retorno = [SELECT CC_No_Identificado__c, Account.Name, AccountId, ContactId, RecordType.DeveloperName, Status 
+                    FROM Case 
+                    WHERE Id = :recordId];
         }
         
         List<String> psApiNames = new List<String> ();
         psApiNames.add('SEG_Supervisor');
         psApiNames.add('SEG_Supervisor2');
-        List<PermissionSetAssignment> permisset = [SELECT Id FROM PermissionSetAssignment WHERE AssigneeId =:Userinfo.getUserId() 
-                                                    AND PermissionSet.Name IN: psApiNames];
         
+        List<PermissionSetAssignment> permisset = [SELECT Id FROM PermissionSetAssignment  WHERE AssigneeId = :Userinfo.getUserId() AND PermissionSet.Name IN :psApiNames];
 
-        if(permisset.isEmpty()){
-            noEsSupervisor = true;
-        }
-        else{
+        if (!permisset.isEmpty()) {
             noEsSupervisor = false;
         }
-
-        infoCasoPermissionSets infoCasoYps = new infoCasoPermissionSets(retorno, noEsSupervisor);
         
-        return infoCasoYps;
+        if (!retorno.isEmpty()) {
+            return new infoCasoPermissionSets(retorno[0], noEsSupervisor);
+        }
+        
+        return null; // Retorno adecuado si no se encuentra el caso
     }
 
 
@@ -137,7 +138,7 @@ public with sharing class SEG_BuscadorClientes {
         Id propietarioRegistro;
 
         //Comparamos el usuario logado con el propietario del registro y devolvemos si coinciden o no
-        if ((recordId).getSObjectType() == Schema.getGlobalDescribe().get('Case'))
+        if ((recordId).getSObjectType() == Schema.SObjectType.Case.getSObjectType())
         {
             propietarioRegistro = [SELECT OwnerId FROM Case WHERE Id = :recordId].OwnerId;
         }
@@ -839,8 +840,8 @@ public with sharing class SEG_BuscadorClientes {
     {
         Map<String, Object> oRes = new Map<String, Object>();
         
-        // Si no hay datos, salir.
-        if (String.isBlank(clienteId)) {
+            // Si no hay datos, salir.
+        if (String.isBlank(clienteId) || clienteId.length() > 18) { 
             return 'No se ha seleccionado un registro válido';
         }
         
@@ -857,6 +858,7 @@ public with sharing class SEG_BuscadorClientes {
             oCaseUpd.ContactId = null;
         }
         
+        //Añadimos la comprobación para que el id del cliente no sea invalido
         if (String.isNotBlank(clienteId)) {
             oCaseUpd.AccountId = clienteId;
         }

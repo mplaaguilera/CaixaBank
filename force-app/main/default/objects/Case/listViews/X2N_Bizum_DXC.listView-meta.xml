@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>X2N_Bizum_DXC</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CASES.PRIORITY</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CORE.USERS.ALIAS</columns>
+    <filterScope>Queue</filterScope>
+    <filters>
+        <field>CC_MCC_ProdServ__c</field>
+        <operation>equals</operation>
+        <value>Bizum</value>
+    </filters>
+    <label>2N Bizum DXC</label>
+    <queue>CC_2N_CBNOW_DXC</queue>
+    <sharedTo>
+        <group>CC_2N_CBNOW_DXC</group>
+    </sharedTo>
+</ListView>

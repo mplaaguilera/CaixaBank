@@ -63,7 +63,7 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 			}
 			// Procesar los registros.
 			Map<String, List<CC_Agrupador__c>> mapAgrupadores = new Map<String, List<CC_Agrupador__c>>();
-			for (CC_Agrupador__c agrupador : [SELECT CC_Estado_Maximo__c, CC_Fecha_Resolucion__c, CC_Detalle_Solucion__c, CC_Estado__c, CC_Id_Maximo__c
+			for (CC_Agrupador__c agrupador : [SELECT CC_Estado_Maximo__c, CC_Fecha_Resolucion__c, CC_Detalle_Solucion__c, CC_Estado__c, CC_Id_Maximo__c, CC_Motivo__r.CC_Tipo_Cliente__c
 												FROM CC_Agrupador__c WHERE CC_Id_Maximo__c IN :oMapMaximo.keySet()]) {
 				if (mapAgrupadores.containsKey(agrupador.CC_Id_Maximo__c)) {
 					List<CC_Agrupador__c> agrupadorList = mapAgrupadores.get(agrupador.Id);
@@ -112,6 +112,15 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 						CC_WS_Maximo_Ret.CC_WS_Maximo_Input inputMaximo = oMapMaximo.get(codMaximo);
 						//Se realizan las actualizaciones del agrupador
 						for (CC_Agrupador__c agrupador : mapAgrupadores.get(codMaximo)) {
+
+							//MGT US1164720: Actualización del estado de los agrupadores de incidencias
+							// Verificar si el agrupador es de HDT y si ya está cerrado o rechazado
+							if (agrupador.CC_Motivo__r.CC_Tipo_Cliente__c == 'HDT Empleado' 
+							&& (agrupador.CC_Estado__c == 'Cerrado' || agrupador.CC_Estado__c == 'Rechazado')) {
+								// No actualizar el estado del agrupador si ya está cerrado o rechazado y es de HDT
+								continue;
+							}
+							//MGT US1164720: Actualización del estado de los agrupadores de incidencias
 
 							if (inputMaximo.ESTADO == 'RESOLV_REV_SOL') {
 								agrupador.CC_Estado__c = 'Pendiente Revision';

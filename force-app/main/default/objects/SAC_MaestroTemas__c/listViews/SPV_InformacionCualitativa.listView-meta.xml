@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_InformacionCualitativa</fullName>
+    <columns>NAME</columns>
+    <columns>SAC_Seccion__c</columns>
+    <columns>SAC_Descripcion__c</columns>
+    <columns>SAC_Activo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>SAC_MaestroTemas__c.SPV_InformacionCualitativa</value>
+    </filters>
+    <label>SPV - Información cualitativa</label>
+</ListView>

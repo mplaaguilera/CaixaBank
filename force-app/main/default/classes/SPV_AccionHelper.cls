@@ -362,9 +362,9 @@ public with sharing class SPV_AccionHelper {
     *****************************************************************/
     public static void cambioDeEstadosAU(List<SAC_Accion__c> listaNewAcciones, Map<Id, SAC_Accion__c> mapOldObj) {
         List<SAC_Accion__c> tareasFinalizarTMEs = new list<SAC_Accion__c>();
-        Map<Id, List<SAC_Accion__c>> reclamacionTareasMap = new Map<Id, List<SAC_Accion__c>>();
         List<SAC_Accion__c> listaRecalculoImportes = new List<SAC_Accion__c>();
         List<SAC_Accion__c> listaEnvioGGH = new List<SAC_Accion__c>();
+        Set<Id> idsTareaFinalizada = new Set<Id>();
         Set<String> listaEnvioGGHIds = new Set<String>();
 
         for (SAC_Accion__c accion : listaNewAcciones) {
@@ -373,9 +373,9 @@ public with sharing class SPV_AccionHelper {
                 //Si ha cambiado a finalizada, finalizada incompleta o descartada
                 if (accion.SAC_Estado__c == 'SAC_Finalizada' || accion.SAC_Estado__c == 'SAC_FinalizadaIncompleta' || accion.SAC_Estado__c == 'SAC_Descartada') {
                     tareasFinalizarTMEs.add(accion);
-                    //Rellenamos el mapa con el id de la reclamación y sus tareas que han pasado a finalizadas, para posteriormente comprobar si es la ultima de las tareas en finalizar para poder cerrar la reclamación.
-                    if (!reclamacionTareasMap.containsKey(accion.SAC_Reclamacion__c)) {
-                        reclamacionTareasMap.put(accion.SAC_Reclamacion__c, new List<SAC_Accion__c>());
+
+                    if(accion.SAC_Estado__c == 'SAC_Finalizada' || accion.SAC_Estado__c == 'SAC_FinalizadaIncompleta'){
+                        idsTareaFinalizada.add(accion.Id);
                     }
                 }
                 //Si pasa a estar descartada, o sale de descartada
@@ -393,8 +393,8 @@ public with sharing class SPV_AccionHelper {
         if (!tareasFinalizarTMEs.isEmpty()) {
             finalizarTMEs(tareasFinalizarTMEs);
         }
-        if (!reclamacionTareasMap.isEmpty()) {
-            comprobarTareasFinalizadas(reclamacionTareasMap);
+        if (!idsTareaFinalizada.isEmpty()) {
+            comprobarTareaFinalizada(idsTareaFinalizada);
         }
         if (!listaRecalculoImportes.isEmpty()) {
             recalculoImportes(listaRecalculoImportes, mapOldObj);
@@ -448,66 +448,6 @@ public with sharing class SPV_AccionHelper {
             }
             
             Database.update(tmesTarea);
-        }
-    }
-
-    /**************************************************************************
-     * Proposito: Comprobar si todas las tareas de la reclamación estan finalizadas
-     * De ser asi, cierra las reclamaciones
-     *
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR         DATE         Description
-     * 1.0            --               CS             18/07/24     Creación
-    *****************************************************************************/
-    public static void comprobarTareasFinalizadas(Map<Id, List<SAC_Accion__c>> reclamacionTareasMap){
-        Set<Id> reclamacionIds = new Set<Id>(reclamacionTareasMap.keySet());
-
-        Set<Id> tareasEnMapaIds = new Set<Id>();
-        for (List<SAC_Accion__c> tareasEnMapa : reclamacionTareasMap.values()) {
-            for (SAC_Accion__c tareaEnMapa : tareasEnMapa) {
-                tareasEnMapaIds.add(tareaEnMapa.Id);
-            }
-        }
-
-        //Recupero todas las tareas de la reclamación, SIN las tareas que han sido finalizadas
-        List<SAC_Accion__c> tareas = [SELECT Id, SAC_Reclamacion__c, SAC_Estado__c FROM SAC_Accion__c WHERE (RecordTypeId = :RECTYPEMAESTROTAREAS OR RecordTypeId = :RECTYPEACCION) AND SAC_Reclamacion__c IN :reclamacionIds AND Id NOT IN :tareasEnMapaIds];
-
-        //Crear una lista para almacenar todas las tareas combinadas
-        List<SAC_Accion__c> todasLasTareas = new List<SAC_Accion__c>();
-
-        // Añadir las tareas del mapa a la lista
-        for (List<SAC_Accion__c> tareasEnMapa : reclamacionTareasMap.values()) {
-            todasLasTareas.addAll(tareasEnMapa);
-        }
-
-        //Añadir las tareas de la consulta a la lista
-        todasLasTareas.addAll(tareas);
-        
-        List<Id> recParaCerrar = new List<Id>();
-
-        //Recorreos las reclamaciones, y dentro de estas recorremos las tareas, si la tarea es de la reclamación actual comprueba si no está finalizada.
-        //Si todas las tareas de una reclamación están finalizadas, llamamos al método que cierra las reclamaciones
-        for (Id reclamacionId : reclamacionTareasMap.keySet()) {
-
-            Boolean todasFinalizadas = true;
-            
-            for (SAC_Accion__c tarea : todasLasTareas) {
-                if(tarea.SAC_Reclamacion__c == reclamacionId){
-                    if (tarea.SAC_Estado__c != 'SAC_Finalizada' && tarea.SAC_Estado__c != 'SAC_FinalizadaIncompleta' && tarea.SAC_Estado__c != 'SAC_Descartada') {
-                        todasFinalizadas = false;
-                        break;
-                    }
-                }
-            }
-        
-            if (todasFinalizadas) {
-                recParaCerrar.add(reclamacionId);
-            }
-        }
-
-        if(!recParaCerrar.isEmpty()){
-            cerrarReclamaciones(recParaCerrar);
         }
     }
 
@@ -1259,13 +1199,9 @@ public with sharing class SPV_AccionHelper {
                 }else if (mapaCasos.containsKey(accion.SAC_Reclamacion__c) && String.isBlank(accion.SAC_Pretension__c) && (mapaCasos.get(accion.SAC_Reclamacion__c).OwnerId != UserInfo.getUserId() && mapaCasos.get(accion.SAC_Reclamacion__c).SAC_PretensionPrincipal__r.OwnerId != UserInfo.getUserId() && (mapaPerteneceGrupo.isEmpty() && mapaPerteneceGrupo.get(accion.SAC_Reclamacion__c) == false))) {
                     accion.addError('No puedes crear una tarea si no eres el dueño de la reclamación o de la pretensión');
                 }
-                if (mapaCasos.containsKey(accion.SAC_Pretension__c) && ((mapaCasos.get(accion.SAC_Pretension__c).Status == 'Cerrado' || mapaCasos.get(accion.SAC_Pretension__c).Status == 'SAC_009') && mapaCasos.get(accion.SAC_Pretension__c).SAC_Reclamacion__r.Status == 'Cerrado')) {
-                    accion.addError('No puedes crear una tarea si la reclamación ya está cerrada');
-                } /*else if (mapaCasos.containsKey(accion.SAC_Reclamacion__c) && String.isBlank(accion.SAC_Pretension__c) && 
-                          (mapaCasos.get(accion.SAC_Reclamacion__c).Status == 'Cerrado' || mapaCasos.get(accion.SAC_Reclamacion__c).Status == 'SAC_009' || mapaCasos.get(accion.SAC_Reclamacion__c).Status == 'SAC_004')) {
-                    accion.addError('No puedes crear una tarea si la reclamación ya está cerrada');
-                }
-                */
+                // if (mapaCasos.containsKey(accion.SAC_Pretension__c) && ((mapaCasos.get(accion.SAC_Pretension__c).Status == 'Cerrado' || mapaCasos.get(accion.SAC_Pretension__c).Status == 'SAC_009') && mapaCasos.get(accion.SAC_Pretension__c).SAC_Reclamacion__r.Status == 'Cerrado')) {
+                //     accion.addError('No puedes crear una tarea si la reclamación ya está cerrada');
+                // }
             }
         }
 
@@ -1294,50 +1230,6 @@ public with sharing class SPV_AccionHelper {
         }
                 
         return mapaTienePermisos;
-    }
-
-    /**************************************************************************
-     * Proposito: Crear una tarea con la reclamación cerrada, reabre esta a estado de ejecución
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR         DATE         Description
-     * 1.0            --               CS             22/07/24     Creación
-    *****************************************************************************/
-    public static void tareaReclamacionCerrada(List<SAC_Accion__c> listNewAccion){
-
-        List<Id> listaIdsReclamaciones = new List<Id>();
-        List<Id> listaIdsActualizar = new List<Id>();
-        List<Case> listaReclamacionesUpdate = new List<Case>();
-
-        for (SAC_Accion__c accion : listNewAccion) {
-            if (String.isNotBlank(accion.SAC_Reclamacion__c)) {
-                listaIdsReclamaciones.add(accion.SAC_Reclamacion__c);
-            }
-        }
-
-        if(!listaIdsReclamaciones.isEmpty()){
-            Map<Id, Case> mapaCasos = new Map<Id, Case>([SELECT Id, RecordTypeId, OwnerId, Status FROM Case WHERE Id IN :listaIdsReclamaciones]);
-            for (SAC_Accion__c accion : listNewAccion) {
-
-                if (mapaCasos.containsKey(accion.SAC_Reclamacion__c) && (mapaCasos.get(accion.SAC_Reclamacion__c).Status == 'Cerrado')) {
-                   
-                    listaIdsActualizar.add(accion.SAC_Reclamacion__c);
-                }
-            }
-
-            listaReclamacionesUpdate = [SELECT id,Status FROM CASE WHERE id IN: listaIdsActualizar AND RecordTypeId = :RECTYPERECLAMACION];
-
-            if(!listaReclamacionesUpdate.isEmpty()){
-
-                for(Case caso : listaReclamacionesUpdate){
-
-                    caso.Status = 'SAC_004';
-                }
-
-                Database.update(listaReclamacionesUpdate);
-            }
-        }
     }
 
     /**************************************************************************
@@ -1748,5 +1640,46 @@ public with sharing class SPV_AccionHelper {
         }
 
         return listaWrapperAlerta;
+    }
+
+    /**************************************************************************
+     * Proposito: Al finalizar una tarea, comprueba si su maestro es de tipo cambio de estado, en caso afirmativo, la reclamcion cambia de estado al indicado por el maestro
+     ***************************************************************************
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            --             Raúl Santos     11/04/25       Creación
+    *****************************************************************************/
+    public static void comprobarTareaFinalizada(Set<Id> idsTareasFinalizadas){
+
+        List<SAC_Accion__c> listTareas = [SELECT Id, SAC_MaestroAccionesReclamacion__r.SAC_tipo_formulario__c, SAC_Reclamacion__c, SAC_MaestroAccionesReclamacion__r.SPV_EstadoAlFinalizar__c FROM SAC_Accion__c WHERE (RecordTypeId = :RECTYPEMAESTROTAREAS OR RecordTypeId = :RECTYPEACCION) AND Id IN : idsTareasFinalizadas];
+
+        if(!listTareas.isEmpty()){
+            Map<Id, String> mapRecEstado = new Map<Id, String>();
+
+            //Recorro las tareas finalizadas, si es una tarea cuyp maestro es de cambio de estado, la añado al mapa para posteriormente actualizar la reclamación
+            for(SAC_Accion__c tarea : listTareas){
+                if(tarea.SAC_MaestroAccionesReclamacion__r.SAC_tipo_formulario__c == 'Cambio de estado'){
+                    if(!mapRecEstado.containsKey(tarea.SAC_Reclamacion__c)){
+                        mapRecEstado.put(tarea.SAC_Reclamacion__c, tarea.SAC_MaestroAccionesReclamacion__r.SPV_EstadoAlFinalizar__c);
+                    }
+                }
+            }
+
+            if(!mapRecEstado.isEmpty()){
+
+                List<Case> listRecs = [SELECT Id, Status FROM Case WHERE RecordTypeId = :RECTYPERECLAMACION AND Id IN :mapRecEstado.keySet()];
+
+                if(!listRecs.isEmpty()){
+                    for(Case caso : listRecs){
+                        if(mapRecEstado.containsKey(caso.Id)){
+                            caso.Status = mapRecEstado.get(caso.Id);
+                        }
+                    }
+
+                    SAC_DatabaseDML.updateListDML(listRecs, true);
+                }
+            }
+        }
     }
 }

@@ -24,5 +24,10 @@
         <operation>equals</operation>
         <value>Cliente</value>
     </filters>
+    <filters>
+        <field>CBK_Negocio__c</field>
+        <operation>equals</operation>
+        <value>,CC</value>
+    </filters>
     <label>Servicios CC de clientes</label>
 </ListView>

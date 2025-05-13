@@ -18,20 +18,35 @@ public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.Eve
      * @description Método de evaluación que solamente procesará las entradas de LoginEvent
      */
     public Boolean evaluate(SObject oEvent){
-        switch on oEvent{
-            when LoginEvent oLoginEvent{
-                if(!hasBypassIPRangeCustomPermission(oLoginEvent.UserId)){
-                    return evaluateLoginEvent(oLoginEvent);
+        try {
+            switch on oEvent{
+                when LoginEvent oLoginEvent{
+                    if(!hasBypassIPRangeCustomPermission(oLoginEvent.UserId)){
+                        return evaluateLoginEvent(oLoginEvent);
+                    }
+                    return false;
                 }
-                return false;
+                when null{
+                    return false;
+                }
+                when else{
+                    return false;
+                }
             }
-            when null{
-                return false;
-            }
-            when else{
-                return false;
-            }
-        } 
+        } catch(Exception e) {
+            CBK_Log.DebugProcessConfigBuilder oBuilder = new CBK_Log.DebugProcessConfigBuilder()
+                .setMessage('IPRangeError - Error al comprobar rango de IPs Cyber - ' + e.getMessage())
+                .setValues(new List<Object>{ JSON.serialize(oEvent) })
+                .setLevel(LoggingLevel.ERROR)
+                .setForce(true)
+                .setErr(e)
+                .setCategory('Login IP Out Of Range');
+
+            //Se inserta el Builder como CBK_Log
+            oBuilder.addLog();
+            CBK_Log.insertPlatformEvent();
+            return false;
+        }
     }
 
     /**
@@ -69,14 +84,14 @@ public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.Eve
 
                     //Se genera el Builder
                     CBK_Log.DebugProcessConfigBuilder oBuilder = new CBK_Log.DebugProcessConfigBuilder()
-                    .setContextId(oLoginEvent.Id)
-                    .setMessage('IPRangeError - Acceso fuera del rango de IPs de Cyber')
-                    .setValues(listValues)
-                    .setLevel(LoggingLevel.INFO)
-                    .setforce(true)
-                    .seterr(new DmlException('IP Range Exception'))
-                    .setemail(new Messaging.InboundEmail())
-                    .setCategory('Login IP Out Of Range');
+                        .setContextId(oLoginEvent.Id)
+                        .setMessage('IPRangeError - Acceso fuera del rango de IPs de Cyber')
+                        .setValues(listValues)
+                        .setLevel(LoggingLevel.INFO)
+                        .setforce(true)
+                        .seterr(new DmlException('IP Range Exception'))
+                        .setemail(new Messaging.InboundEmail())
+                        .setCategory('Login IP Out Of Range');
 
                     //Se inserta el Builder como CBK_Log
                     oBuilder.addLog();
@@ -115,6 +130,10 @@ public with sharing class CBK_CyberIPRangesValidation implements TxnSecurity.Eve
     private Boolean isIPInRangeList(String sSourceIP, List<CBK_CyberIPRange__mdt> listIPRanges){
         //Se utilizará este RegEx para comprobar que las IPs a comprobar tienen el formato correcto
         String sIPRegex = '^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$';
+
+        if(String.isBlank(sSourceIP) || !Pattern.matches(sIPRegex, sSourceIP)) {
+            return false;
+        }
 
         //Se recorren todos los rangos de IP para guardarlos en una forma procesable
         for(CBK_CyberIPRange__mdt oIPRange : listIPRanges){

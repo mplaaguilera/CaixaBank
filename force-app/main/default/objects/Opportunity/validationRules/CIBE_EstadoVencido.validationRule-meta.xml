@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_EstadoVencido</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+	NOT(OR($Permission.CBK_BypassValidationRules,
+		$Permission.AV_AvoidBulkApi,
+		$Permission.CIBE_ByPassVR))
+	,
+	ISCHANGED(StageName),
+    OR(
+        RecordType.DeveloperName = &quot;CIBE_AccionComercialCIB&quot;,
+        RecordType.DeveloperName = &quot;CIBE_AccionComercialEMP&quot;,
+        RecordType.DeveloperName = &quot;CIBE_AlertaComercialCIB&quot;,
+        RecordType.DeveloperName = &quot;CIBE_AlertaComercialEMP&quot;,
+        RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleado&quot;,
+        RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoCIB&quot;,
+        RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoEMP&quot;,
+        RecordType.DeveloperName = &quot;CIBE_OportunidadCentralizada&quot;,
+        RecordType.DeveloperName = &quot;CIBE_SugerenciaCIB&quot;,
+        RecordType.DeveloperName = &quot;CIBE_SugerenciaEMP&quot;
+    ),
+ISPICKVAL(StageName, &apos;CIBE_Vencido&apos;)
+
+)</errorConditionFormula>
+    <errorMessage>No es posible realizar el cambio de etapa. La etapa Vencida es una etapa automática.</errorMessage>
+</ValidationRule>

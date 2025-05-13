@@ -9,6 +9,7 @@ public class CC_Case_BU_TRHan_Test {
         Id profile3NId = [SELECT Id FROM Profile WHERE Name = 'CC_Tercer_Nivel_CBKNow_MVP2'].Id;
         Id profileIdAdmin = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO'];
+        PermissionSet psIA = [SELECT Id FROM PermissionSet WHERE Name = 'CC_IA_Prompt_User'];
 
         List<User> userList = new List<User>();
         User usuario1 = new User();
@@ -145,6 +146,7 @@ public class CC_Case_BU_TRHan_Test {
         insert new PermissionSetAssignment(AssigneeId = usuario2.Id, PermissionSetId = ps.Id);
         insert new PermissionSetAssignment(AssigneeId = usuario3.Id, PermissionSetId = ps.Id); 
         insert new PermissionSetAssignment(AssigneeId = usuario4.Id, PermissionSetId = ps.Id);
+        insert new PermissionSetAssignment(AssigneeId = usuario2.Id, PermissionSetId = psIA.Id);
         
     }
     
@@ -2072,5 +2074,44 @@ public class CC_Case_BU_TRHan_Test {
             
             System.assertEquals( 'Rechazado' , casoRobot.Status);
         }
+        @isTest
+    public static void casoGestionIA() {
+
+        User usuarioGestor = [SELECT Id FROM User WHERE IsActive = true AND Email = 'tuser000@amamama.com' AND firstname = 'first2'];
+
+        System.runAs(usuarioGestor) {
+            Account cuenta = new Account();
+            cuenta.Name = 'PRUEBA TEST';
+            cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+            insert(cuenta);
+    
+            Contact contacto = new Contact();
+            contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+            contacto.FirstName = 'Test';
+            contacto.LastName = 'Prueba';
+            contacto.Email = 'mp@test.com';
+            contacto.AccountId = cuenta.Id;
+            insert(contacto);
+    
+            Id casoClienteRt = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            Case casoCliente = new Case();
+            casoCliente.RecordTypeId = casoClienteRt;
+            casoCliente.Subject = 'Caso cliente IA';
+            casoCliente.Origin = 'Phone';
+            casoCliente.CC_Canal_Respuesta__c = 'Phone';
+            casoCliente.CC_Tipo_Cliente__c = 'Cliente';
+            casoCliente.CC_No_Identificado__c = true;
+            casoCliente.CC_Canal_Procedencia__c = 'CaixaBankNow';
+            casoCliente.AccountId = cuenta.id;
+            
+        Test.startTest();
+        insert casoCliente;
+        Test.stopTest();
+
+        // Verificar que el caso tiene el ID de la extensión asignado
+        Case casoInsertado = [SELECT Id, CBK_Case_Extension_Id__c FROM Case WHERE Id = :casoCliente.Id];
+        System.assertNotEquals(null, casoInsertado.CBK_Case_Extension_Id__c, 'El caso no tiene el ID de la extensión asignado.');
+        }
+    }
     
     }

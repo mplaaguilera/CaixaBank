@@ -67,58 +67,6 @@ public with sharing class CC_MCC_Plantilla_Asignar_Test {
     }
     
     @isTest
-    public static void guardarMCCPlantillaSDOC() {
-        
-       //Crear plantilla S-Docs
-        SDOC__SDTemplate__c docSDOCsES = generarPlantilla('Plantilla', 'Castellano', 'PDF');
-        SDOC__SDTemplate__c docSDOCsCA = generarPlantilla('Plantilla', 'Catalan', 'PDF');
-
-        // MCC y MCC Plantilla
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
-        CC_MCC__c mccTematica = new CC_MCC__c();
-        mccTematica.Name = 'Ahorro a la vista';
-        mccTematica.CC_Tipo_Cliente__c = 'Cliente';
-        mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccTematica.RecordTypeId = recordTypeIdTematica;
-        mccTematica.CC_Codigo_Externo__c = 'TE-00000651';
-        mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
-        insert mccTematica;
-
-        CC_MCC_Plantilla__c plantillaES = new CC_MCC_Plantilla__c(
-            CC_MCC__c = mccTematica.Id,
-            CC_MCC_Plantilla_Name__c = 'Plantilla Test Name ES',
-            CC_MCC_Plantilla_DeveloperName__c = 'Plantilla Test DeveloperName',
-            CC_Id_SDOC_Plantilla__c = docSDOCsES.Id
-        );
-        insert plantillaES;
-
-        CC_MCC_Plantilla__c plantillaCA = new CC_MCC_Plantilla__c(
-            CC_MCC__c = mccTematica.Id,
-            CC_MCC_Plantilla_Name__c = 'Plantilla Test Name CA',
-            CC_MCC_Plantilla_DeveloperName__c = 'Plantilla Test DeveloperName',
-            CC_Id_SDOC_Plantilla__c = docSDOCsCA.Id
-        );       
-
-        CC_MCC_Plantilla_Asignar.guardar(plantillaCA);
-        
-        System.assert(mccTematica.Id != null, 'Error al insertar el objeto CC_MCC__c');
-        System.assert(plantillaES.Id != null, 'Error al insertar la plantilla ES');
-        System.assert(plantillaCA.Id != null, 'Error al insertar la plantilla CA');
-
-    }
-    
-    //Método para crear plantillas
-    private static SDOC__SDTemplate__c generarPlantilla(String nombre, String idioma, String formato){
-        SDOC__SDTemplate__c documento = new SDOC__SDTemplate__c();
-        documento.Name = nombre;	
-        documento.SDOC__Language__c = idioma;
-        documento.SDOC__Template_Format__c = formato;
-        documento.SDOC__Active__c = true;
-        insert documento;
-        return documento;
-    } 
-    
-    @isTest
     public static void getNegocioTest(){
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'MCC Tematica';
@@ -137,13 +85,6 @@ public with sharing class CC_MCC_Plantilla_Asignar_Test {
         
         System.assertEquals('', CC_MCC_Plantilla_Asignar.getNegocio(mccTematica.Id));
         System.assertEquals('OS', CC_MCC_Plantilla_Asignar.getNegocio(mccTematica2.Id));
-
-    }
-    
-    @isTest
-    public static void buscarPlantillasSDOCTest(){
-        List<SDOC__SDTemplate__c> listaSdocs = CC_MCC_Plantilla_Asignar.buscarPlantillasSDOC('HTML', 'ES');
-        System.assertEquals(0, listaSdocs.size(), 'Se esperaba encontrar una única plantilla SDOCS');
 
     }
 }

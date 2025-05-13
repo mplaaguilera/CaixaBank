@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_TotalRegistrosConfirmadosC__c</fullName>
+    <defaultValue>0</defaultValue>
+    <description>Campo que contabiliza el total de registros confirmados en un evento.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Miembros que tienen alguna incidencia tras inscripción. Revisar registros.</inlineHelpText>
+    <label>Total registros confirmados</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,11 +1,5 @@
 public with sharing class CC_MCC_Plantilla_Asignar {
     @AuraEnabled
-    public static List<SDOC__SDTemplate__c> buscarPlantillasSDOC(String formato, String idioma) {
-        List<SDOC__SDTemplate__c> plantillas = new List<SDOC__SDTemplate__c>();
-        plantillas = [SELECT Id, Name FROM SDOC__SDTemplate__c WHERE SDOC__Template_Format__c =:formato AND SDOC__Language__c =: idioma AND SDOC__Active__c = TRUE ORDER BY Name];
-        return plantillas;
-    }
-    @AuraEnabled
     public static List<Folder> getCarpetas(String carpetaDeveloperName) {
         List<Folder> carpetas = new List<Folder>();
 

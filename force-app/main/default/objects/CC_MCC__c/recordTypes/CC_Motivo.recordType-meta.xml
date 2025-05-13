@@ -213,7 +213,86 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Enrollment Sign</fullName>
+            <fullName>No clientes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Testamentaria</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ventas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vidacaixa</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Ambito_Tareas_Caixa__c</picklist>
+        <values>
+            <fullName>Amenazas empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amenazas suicidios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Argos General</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Argos Xpays</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bizum Fraude</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD 3N</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD Contratar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD No Contratar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank Talks</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros Incidencias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caso a Fraude</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Documentación</fullName>
             <default>false</default>
         </values>
         <values>
@@ -225,7 +304,118 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Testamentaria</fullName>
+            <fullName>Oficina física</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Onboarding</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Phising%2FSmishing%2FMalware</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Testamentaría</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ventas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vidacaixa</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Ambito_Tareas_Imagin__c</picklist>
+        <values>
+            <fullName>Amenazas empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amenazas suicidios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Argos General</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Argos Xpays</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bizum Fraude</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD 3N</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD Contratar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD No Contratar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank Talks</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros Incidencias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caso a Fraude</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Documentación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hub Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No clientes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina física</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Onboarding</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Phising%2FSmishing%2FMalware</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Testamentaría</fullName>
             <default>false</default>
         </values>
         <values>
@@ -910,6 +1100,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Cliente %28GRR%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Cliente %28SACH%29</fullName>
             <default>false</default>
         </values>
@@ -1234,11 +1428,27 @@
     <picklistValues>
         <picklist>SEG_Links_Relacionados__c</picklist>
         <values>
-            <fullName>Alta Formulario Pasarelas</fullName>
+            <fullName>Histórico solicitudes alta pasarela</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Consulta Formulario Pasarelas</fullName>
+            <fullName>Histórico solicitudes consultas%2Fpeticiones%2Fincidencias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Informe BAI - Alta Pasarelas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Informe BAI - Consulta Pasarelas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nueva alta pasarela</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nueva consulta%2Fpetición%2FIncidencia pasarela</fullName>
             <default>false</default>
         </values>
     </picklistValues>

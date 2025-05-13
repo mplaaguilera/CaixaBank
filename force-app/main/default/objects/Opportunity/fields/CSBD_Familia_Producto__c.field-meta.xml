@@ -8,9 +8,13 @@
     <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>
-        <controllingField>CSBD_Empresa_Proveedora__c</controllingField>
         <valueSetDefinition>
             <sorted>true</sorted>
+            <value>
+                <fullName>Ahorro</fullName>
+                <default>false</default>
+                <label>Ahorro</label>
+            </value>
             <value>
                 <fullName>Alta Cliente</fullName>
                 <default>false</default>
@@ -22,9 +26,24 @@
                 <label>Alta Cliente Digital</label>
             </value>
             <value>
+                <fullName>Alta digital de menores</fullName>
+                <default>false</default>
+                <label>Alta digital de menores</label>
+            </value>
+            <value>
+                <fullName>Altas Digitales</fullName>
+                <default>false</default>
+                <label>Altas Digitales</label>
+            </value>
+            <value>
                 <fullName>Back Office</fullName>
                 <default>false</default>
                 <label>Back Office</label>
+            </value>
+            <value>
+                <fullName>CaixaBank Now</fullName>
+                <default>false</default>
+                <label>CaixaBank Now</label>
             </value>
             <value>
                 <fullName>Colectivo ONCE</fullName>
@@ -37,9 +56,24 @@
                 <label>Colectivo TELEFONICA</label>
             </value>
             <value>
+                <fullName>Comisiones</fullName>
+                <default>false</default>
+                <label>Comisiones</label>
+            </value>
+            <value>
                 <fullName>Cuentas</fullName>
                 <default>false</default>
                 <label>Cuentas</label>
+            </value>
+            <value>
+                <fullName>Decesos</fullName>
+                <default>false</default>
+                <label>Decesos</label>
+            </value>
+            <value>
+                <fullName>Depósito</fullName>
+                <default>false</default>
+                <label>Depósito</label>
             </value>
             <value>
                 <fullName>Depósitos</fullName>
@@ -47,9 +81,49 @@
                 <label>Depósitos</label>
             </value>
             <value>
+                <fullName>Depósitos_</fullName>
+                <default>false</default>
+                <label>Depósitos_</label>
+            </value>
+            <value>
+                <fullName>Descubierto</fullName>
+                <default>false</default>
+                <label>Descubierto</label>
+            </value>
+            <value>
                 <fullName>Domiciliaciones</fullName>
                 <default>false</default>
                 <label>Domiciliaciones</label>
+            </value>
+            <value>
+                <fullName>Domiciliación Recibos</fullName>
+                <default>false</default>
+                <label>Domiciliación Recibos</label>
+            </value>
+            <value>
+                <fullName>Dummy menores</fullName>
+                <default>false</default>
+                <label>Dummy menores</label>
+            </value>
+            <value>
+                <fullName>Dummy menores familia</fullName>
+                <default>false</default>
+                <label>Dummy menores familia</label>
+            </value>
+            <value>
+                <fullName>Escoger Familia</fullName>
+                <default>false</default>
+                <label>Escoger Familia</label>
+            </value>
+            <value>
+                <fullName>Facilitea</fullName>
+                <default>false</default>
+                <label>Facilitea</label>
+            </value>
+            <value>
+                <fullName>Feedback</fullName>
+                <default>false</default>
+                <label>Feedback</label>
             </value>
             <value>
                 <fullName>Fes-te Client</fullName>
@@ -62,9 +136,24 @@
                 <label>Fondos</label>
             </value>
             <value>
+                <fullName>fondos de inversión</fullName>
+                <default>false</default>
+                <label>fondos de inversión</label>
+            </value>
+            <value>
                 <fullName>Hazte Cliente</fullName>
                 <default>false</default>
                 <label>Hazte Cliente</label>
+            </value>
+            <value>
+                <fullName>Hazte Cliente Residentes</fullName>
+                <default>false</default>
+                <label>Hazte Cliente Residentes</label>
+            </value>
+            <value>
+                <fullName>Hipoteca PHD</fullName>
+                <default>false</default>
+                <label>Hipoteca PHD</label>
             </value>
             <value>
                 <fullName>Hipotecas</fullName>
@@ -72,9 +161,34 @@
                 <label>Hipotecas</label>
             </value>
             <value>
+                <fullName>Hipotecas_</fullName>
+                <default>false</default>
+                <label>Hipotecas_</label>
+            </value>
+            <value>
                 <fullName>HolaBank</fullName>
                 <default>false</default>
                 <label>HolaBank</label>
+            </value>
+            <value>
+                <fullName>ImaginBank</fullName>
+                <default>false</default>
+                <label>ImaginBank</label>
+            </value>
+            <value>
+                <fullName>Inmuebles</fullName>
+                <default>false</default>
+                <label>Inmuebles</label>
+            </value>
+            <value>
+                <fullName>Inversión y ahorro</fullName>
+                <default>false</default>
+                <label>Inversión y ahorro</label>
+            </value>
+            <value>
+                <fullName>KYC</fullName>
+                <default>false</default>
+                <label>KYC</label>
             </value>
             <value>
                 <fullName>LO Shop</fullName>
@@ -92,9 +206,29 @@
                 <label>MyBox Now In Empleados</label>
             </value>
             <value>
+                <fullName>Otra</fullName>
+                <default>false</default>
+                <label>Otra</label>
+            </value>
+            <value>
+                <fullName>Otros seguros</fullName>
+                <default>false</default>
+                <label>Otros seguros</label>
+            </value>
+            <value>
                 <fullName>Planes</fullName>
                 <default>false</default>
                 <label>Planes</label>
+            </value>
+            <value>
+                <fullName>Planes de pensiones</fullName>
+                <default>false</default>
+                <label>Planes de pensiones</label>
+            </value>
+            <value>
+                <fullName>Prestamos</fullName>
+                <default>false</default>
+                <label>Prestamos</label>
             </value>
             <value>
                 <fullName>Préstamos</fullName>
@@ -102,9 +236,39 @@
                 <label>Préstamos</label>
             </value>
             <value>
+                <fullName>Prestamos Empresas</fullName>
+                <default>false</default>
+                <label>Prestamos Empresas</label>
+            </value>
+            <value>
+                <fullName>Prestamos Particulares</fullName>
+                <default>false</default>
+                <label>Prestamos Particulares</label>
+            </value>
+            <value>
+                <fullName>Préstamos Particulares</fullName>
+                <default>false</default>
+                <label>Préstamos Particulares</label>
+            </value>
+            <value>
+                <fullName>Recuperación deudas</fullName>
+                <default>false</default>
+                <label>Recuperación deudas</label>
+            </value>
+            <value>
                 <fullName>Renting</fullName>
                 <default>false</default>
                 <label>Renting</label>
+            </value>
+            <value>
+                <fullName>Retención Planes de Pensiones</fullName>
+                <default>false</default>
+                <label>Retención Planes de Pensiones</label>
+            </value>
+            <value>
+                <fullName>Seguro de Auto</fullName>
+                <default>false</default>
+                <label>Seguro de Auto</label>
             </value>
             <value>
                 <fullName>Seguros</fullName>
@@ -112,9 +276,59 @@
                 <label>Seguros</label>
             </value>
             <value>
+                <fullName>Seguros_</fullName>
+                <default>false</default>
+                <label>Seguros_</label>
+            </value>
+            <value>
                 <fullName>Seguros de ahorro</fullName>
                 <default>false</default>
                 <label>Seguros de ahorro</label>
+            </value>
+            <value>
+                <fullName>Seguros de Auto</fullName>
+                <default>false</default>
+                <label>Seguros de Auto</label>
+            </value>
+            <value>
+                <fullName>Seguros de Decesos</fullName>
+                <default>false</default>
+                <label>Seguros de Decesos</label>
+            </value>
+            <value>
+                <fullName>Seguros de Hogar</fullName>
+                <default>false</default>
+                <label>Seguros de Hogar</label>
+            </value>
+            <value>
+                <fullName>Seguros de Mascotas</fullName>
+                <default>false</default>
+                <label>Seguros de Mascotas</label>
+            </value>
+            <value>
+                <fullName>Seguros de Salud</fullName>
+                <default>false</default>
+                <label>Seguros de Salud</label>
+            </value>
+            <value>
+                <fullName>Seguros de Vida</fullName>
+                <default>false</default>
+                <label>Seguros de Vida</label>
+            </value>
+            <value>
+                <fullName>Seguros de Vida Negocios</fullName>
+                <default>false</default>
+                <label>Seguros de Vida Negocios</label>
+            </value>
+            <value>
+                <fullName>Seguros de Vida Particulares</fullName>
+                <default>false</default>
+                <label>Seguros de Vida Particulares</label>
+            </value>
+            <value>
+                <fullName>Servicuentas</fullName>
+                <default>false</default>
+                <label>Servicuentas</label>
             </value>
             <value>
                 <fullName>Shop</fullName>
@@ -122,9 +336,24 @@
                 <label>Shop</label>
             </value>
             <value>
+                <fullName>Tarjeta débito</fullName>
+                <default>false</default>
+                <label>Tarjeta débito</label>
+            </value>
+            <value>
                 <fullName>Tarjetas</fullName>
                 <default>false</default>
                 <label>Tarjetas</label>
+            </value>
+            <value>
+                <fullName>Tarjetas_</fullName>
+                <default>false</default>
+                <label>Tarjetas_</label>
+            </value>
+            <value>
+                <fullName>Valores</fullName>
+                <default>false</default>
+                <label>Valores</label>
             </value>
             <value>
                 <fullName>Wivai</fullName>
@@ -132,155 +361,5 @@
                 <label>Wivai</label>
             </value>
         </valueSetDefinition>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Alta Cliente</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Alta Cliente Digital</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Back Office</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Colectivo ONCE</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Colectivo TELEFONICA</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Cuentas</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Depósitos</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Domiciliaciones</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Fes-te Client</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Fondos</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Hazte Cliente</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <controllingFieldValue>Now In Empleado</controllingFieldValue>
-            <controllingFieldValue>Now In Soporte</controllingFieldValue>
-            <valueName>Hipotecas</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>HolaBank</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>LO Shop</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Microbank</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>MyBox Now In Empleados</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Planes</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <controllingFieldValue>Now In Empleado</controllingFieldValue>
-            <controllingFieldValue>Now In Soporte</controllingFieldValue>
-            <valueName>Préstamos</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Renting</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Seguros</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Seguros de ahorro</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Shop</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <controllingFieldValue>Now In Empleado</controllingFieldValue>
-            <controllingFieldValue>Now In Soporte</controllingFieldValue>
-            <valueName>Tarjetas</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>CaixaBank</controllingFieldValue>
-            <controllingFieldValue>imaginBank</controllingFieldValue>
-            <controllingFieldValue>inTouch</controllingFieldValue>
-            <valueName>Wivai</valueName>
-        </valueSettings>
     </valueSet>
 </CustomField>

@@ -17,6 +17,11 @@
                 <label>Asistió</label>
             </value>
             <value>
+                <fullName>Asistió en diferido</fullName>
+                <default>false</default>
+                <label>Asistió en diferido</label>
+            </value>
+            <value>
                 <fullName>Baja del evento</fullName>
                 <default>false</default>
                 <label>Baja del evento</label>

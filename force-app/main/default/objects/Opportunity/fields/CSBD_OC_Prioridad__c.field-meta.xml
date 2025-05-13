@@ -11,7 +11,7 @@
     <valueSet>
         <restricted>true</restricted>
         <valueSetDefinition>
-            <sorted>true</sorted>
+            <sorted>false</sorted>
             <value>
                 <fullName>0</fullName>
                 <default>false</default>
@@ -21,26 +21,6 @@
                 <fullName>1</fullName>
                 <default>false</default>
                 <label>1</label>
-            </value>
-            <value>
-                <fullName>10</fullName>
-                <default>false</default>
-                <label>10</label>
-            </value>
-            <value>
-                <fullName>11</fullName>
-                <default>false</default>
-                <label>11</label>
-            </value>
-            <value>
-                <fullName>12</fullName>
-                <default>false</default>
-                <label>12</label>
-            </value>
-            <value>
-                <fullName>13</fullName>
-                <default>false</default>
-                <label>13</label>
             </value>
             <value>
                 <fullName>2</fullName>
@@ -81,6 +61,26 @@
                 <fullName>9</fullName>
                 <default>false</default>
                 <label>9</label>
+            </value>
+            <value>
+                <fullName>10</fullName>
+                <default>false</default>
+                <label>10</label>
+            </value>
+            <value>
+                <fullName>11</fullName>
+                <default>false</default>
+                <label>11</label>
+            </value>
+            <value>
+                <fullName>12</fullName>
+                <default>false</default>
+                <label>12</label>
+            </value>
+            <value>
+                <fullName>13</fullName>
+                <default>false</default>
+                <label>13</label>
             </value>
         </valueSetDefinition>
     </valueSet>

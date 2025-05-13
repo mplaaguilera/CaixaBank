@@ -41,6 +41,27 @@ public with sharing class CC_Clasificacion_Casos_Controller {
     public static List<OT_Picklist.Item> getCanalesOperativos() {
         return OT_Picklist.picklistCampo('Case', 'CC_Canal_Operativo__c');
     }
+
+    @AuraEnabled
+    public static Boolean validarActividadesFraude(Id recordId) {
+        List<String> tiposCita = new List<String>{'Fraude', 'Cita gestor', 'Cita rápida gestor', 'Tarea Oficina', 'Tarea gestor'};
+        List<Task> actividades = [SELECT Id FROM Task WHERE WhatId = :recordId AND Type IN :tiposCita];
+        return actividades.isEmpty();
+    }
+
+    @AuraEnabled
+    public static void crearCasoFraude(Id recordId) {
+        CC_Operativa_Oficina_Controller.crearNuevoCasoFraude(recordId);
+    }
+    
+    // @AuraEnabled
+    // public static Map<String, Object> getObjetosRelacionados(Id recordId) {
+    //     Map<String, Object> mapRelacionados = new Map<String, Id>();
+    //     List<Case> caso = [SELECT Id FROM Case WHERE CC_CasoRelacionado__c = :recordId ORDER BY CreatedDate DESC LIMIT 1 ];
+    //     mapRelacionados.put('caso', caso[0]);
+    //     //mapRelacionados.put('oportunidad', [SELECT Id FROM Opportunity WHERE CSBD_CasoOrigen__c = :recordId ORDER BY CreatedDate DESC LIMIT 1 ]);
+    //     return mapRelacionados;
+    // }
     
     @AuraEnabled(cacheable=true)
     public static List<OT_Picklist.Item> getTematicas(String tipoCliente, String canalProcedencia, String canalOperativo) {
@@ -180,7 +201,13 @@ public with sharing class CC_Clasificacion_Casos_Controller {
     @AuraEnabled
     public static Map<String, Object> validarGuardar(Id recordId, String nuevoCanalRespuesta, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, Boolean tieneActividad) {
         Case caso = [SELECT OwnerId, Origin, CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c,
-        CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name FROM Case WHERE Id = :recordId];
+        CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name, Account.AV_IndicadoresClientes__c, 
+        CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c FROM Case WHERE Id = :recordId];      
+        return validarGuardar(caso, nuevoCanalRespuesta, nuevaTematica, nuevoProducto, nuevoMotivo, tieneActividad);
+    }
+
+    
+    public static Map<String, Object> validarGuardar(Case caso, String nuevoCanalRespuesta, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, Boolean tieneActividad) {
         
         Id profileId = UserInfo.getProfileId();
         String profileName;
@@ -209,13 +236,36 @@ public with sharing class CC_Clasificacion_Casos_Controller {
             resultado.put('productoAnteriorName', caso.CC_MCC_ProdServ__r.Name);
             resultado.put('motivoAnteriorName', caso.CC_MCC_Motivo__r.Name);
         }
+        //verificar si es ambito CSBD
+        String ambitoMotivo = '';
+        if(caso?.Account?.AV_IndicadoresClientes__c != null && caso?.Account?.AV_IndicadoresClientes__c?.contains('28')) {
+            ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c;        
+        } else {
+            ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;        
+        }
+        List<String> motivosCSBD = new List<String>{'CSBD 3N', 'CSBD Contratar', 'CSBD No Contratar'}; 
+        //para identificar si el ambito es CSBD y no hacer la pregunta de derivarción. 
+        if(motivosCSBD.contains(ambitoMotivo)) {
+            resultado.put('ambitoCSBD', true);
+        } else {
+            resultado.put('ambitoCSBD', false);
+        }
+
         resultado.put('tieneActividad',tieneActividad);
         return resultado;
     }
     
     @AuraEnabled
     public static Map<String, Object> validarGuardarCerrar(Id recordId,boolean cerrar, String nuevoCanalRespuesta, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, String agrupacionComprobacion) {
-        Case caso = [SELECT RecordType.DeveloperName,CC_MCC_Causa__c,CC_MCC_Solucion__c, AccountId, ContactId, CC_Oportunidad_Creada__c FROM Case WHERE Id = :recordId];
+       
+        Case caso = [SELECT OwnerId, Origin, CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c, 
+                    CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name, 
+                    CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, 
+                    Account.AV_IndicadoresClientes__c, RecordType.DeveloperName, CC_MCC_Causa__c, 
+                    CC_MCC_Solucion__c, AccountId, ContactId, CC_Oportunidad_creada__c 
+                    FROM Case WHERE Id = :recordId];
+   
+        
         CC_Settings__c configuracionFuncionalidad = CC_Settings__c.getValues('CC_OperativaOficinaGuardar');
         Boolean tieneActividad = false;
         if(cerrar) {
@@ -249,13 +299,14 @@ public with sharing class CC_Clasificacion_Casos_Controller {
 
         if (configuracionFuncionalidad.CC_Configuracion_1__c == 'true' && caso.AccountId != null && caso.ContactId != null && caso.RecordType.DeveloperName == 'CC_Cliente' && (agrupacionComprobacion == 'Derivar a oficina' || agrupacionComprobacion == 'Derivar a oficina: Limitación protocolo')) {
             List<Task> tareas = [SELECT Id FROM Task WHERE AV_Case__c = :recordId AND Type IN ('Tarea gestor', 'Oportunidad CSBD')];
-            if(!tareas.isEmpty() || caso.CC_Oportunidad_Creada__c) {
+            if(!tareas.isEmpty() || caso.CC_Oportunidad_creada__c) {
                 tieneActividad = true;
             }                    
         } else {
             tieneActividad = true;
         }
-        return validarGuardar(recordId, nuevoCanalRespuesta, nuevaTematica, nuevoProducto, nuevoMotivo, tieneActividad);
+      
+        return validarGuardar(caso, nuevoCanalRespuesta, nuevaTematica, nuevoProducto, nuevoMotivo, tieneActividad);
     }
     
     @AuraEnabled(cacheable=true)
@@ -450,10 +501,34 @@ public with sharing class CC_Clasificacion_Casos_Controller {
 
     @AuraEnabled
     public static CC_Lista_Valores__c mensajeValidacionPreguntas(String validacion) {
-        CC_Lista_Valores__c valorValidacion = null;
+        CC_Lista_Valores__c valorValidacion = new CC_Lista_Valores__c();
+        valorValidacion.CC_Valor__c = '';
         if(!String.isEmpty(validacion)){
-            valorValidacion = [SELECT Name, CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'CC_Mensajes_Parametrizables_Clientes' AND CC_Valor2__c = :validacion LIMIT 1];
+            List<CC_Lista_Valores__c> valorValidaciones = [SELECT Name, CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'CC_Mensajes_Parametrizables_Clientes' AND CC_Valor2__c = :validacion LIMIT 1];
+            if(!valorValidaciones.isEmpty()){
+                valorValidacion = valorValidaciones[0];
+            }
         }
 		return valorValidacion;
+    }
+
+    @AuraEnabled
+    public static String llamadaWSOnboardingApex(String recordId, String nif) {
+        if (nif == null || nif == '') {
+            nif = [SELECT Account.CC_Numero_Documento__c FROM Case WHERE Id = :recordId LIMIT 1].Account.CC_Numero_Documento__c;
+        }
+        return CC_WS_Onboarding.recuperarClienteOnboarding(recordId, nif);
+    }
+
+    @AuraEnabled
+    public static Map<String, String> recuperarAmbitoMotivo(String recordId) {
+        Map<String, String> mapaAmbitos = new Map<String, String>();
+        List<CC_MCC__c> motivos = [SELECT CC_Ambito_Tareas_Caixa__c, CC_Ambito_Tareas_Imagin__c FROM CC_MCC__c WHERE Id = :recordId LIMIT 1];
+        if(!motivos.isEmpty()){
+            mapaAmbitos.put('Caixa', motivos[0].CC_Ambito_Tareas_Caixa__c);
+            mapaAmbitos.put('Imagin', motivos[0].CC_Ambito_Tareas_Imagin__c);
+        }
+         
+        return mapaAmbitos;
     }
 }

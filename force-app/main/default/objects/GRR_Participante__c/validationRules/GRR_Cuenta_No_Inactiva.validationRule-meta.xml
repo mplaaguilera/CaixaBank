@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Cuenta_No_Inactiva</fullName>
+    <active>true</active>
+    <errorConditionFormula>PRIORVALUE( GRR_Cliente_Participante__c ) != GRR_Cliente_Participante__c &amp;&amp;
+GRR_Cliente_Participante__r.CC_Inactivo__c = TRUE</errorConditionFormula>
+    <errorDisplayField>GRR_Cliente_Participante__c</errorDisplayField>
+    <errorMessage>La cuenta seleccionada no debe estar marcada como inactiva.</errorMessage>
+</ValidationRule>

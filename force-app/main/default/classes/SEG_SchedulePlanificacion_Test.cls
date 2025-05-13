@@ -4,7 +4,7 @@ public class SEG_SchedulePlanificacion_Test {
     @TestSetup
     public static void datosAltaTest(){
 
-        Id recordTypeCasoCliente = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
+        Id recordTypeCasoCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
 		List<Case> listCase = new List<Case>();
         Case caso = new Case();
         caso.Subject = 'Caso de prueba mcc 1';

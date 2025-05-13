@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_NoEditNewArchitecture</fullName>
+    <active>true</active>
+    <description>Regla creada para que el campo de Nueva arquitectura sólo se pueda editar cuando el evento esté en estado En Estudio o Confirmado, pero no posteriormente.</description>
+    <errorConditionFormula>AND(ISCHANGED(EV_NewArchitecture__c), 
+				NOT(OR(ISPICKVAL(Status, &apos;002&apos;),ISPICKVAL(Status, &apos;009&apos;))),
+			 !$Permission.CBK_BypassValidationRules,
+    !$Permission.EV_ByPassValidationRules)</errorConditionFormula>
+    <errorMessage>No puede modificar el campo Nueva Arquitectura si el evento ya no se encuentra &apos;En estudio&apos; o &apos;Confirmado&apos;.</errorMessage>
+</ValidationRule>

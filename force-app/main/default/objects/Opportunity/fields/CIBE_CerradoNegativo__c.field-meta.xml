@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_CerradoNegativo__c</fullName>
-    <label>Estado</label>
+    <label>Motivo</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
@@ -49,12 +49,22 @@
             <value>
                 <fullName>Denegada por Política ESG</fullName>
                 <default>false</default>
-                <label>Denegada por Política ESG</label>
+                <label>Denegada por Políticas de Financiación Sostenible</label>
             </value>
             <value>
                 <fullName>Otros</fullName>
                 <default>false</default>
                 <label>Otros</label>
+            </value>
+            <value>
+                <fullName>No volver a ofrecer  el producto</fullName>
+                <default>false</default>
+                <label>No volver a ofrecer  el producto</label>
+            </value>
+            <value>
+                <fullName>No gestionada</fullName>
+                <default>false</default>
+                <label>No gestionada</label>
             </value>
             <value>
                 <fullName>Riesgo / CPC</fullName>

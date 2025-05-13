@@ -3,6 +3,18 @@
     <fullName>EV_LimiteRegistros</fullName>
     <active>true</active>
     <description>Limita el numero de registros</description>
-    <errorConditionFormula>AND(EV_ContadorCheckInVirtual__c &gt; EV_CampaignId__r.EV_LimiteRegistrosVirtuales__c,OR(   EV_CampaignId__r.RecordType.DeveloperName =  $Label.EV_EventoVirtual, AND(EV_CampaignId__r.RecordType.DeveloperName = $Label.EV_EventoHibrido,  TEXT(EV_FormatoDeAsistencias__c) = &apos;002&apos; )), !$Permission.EV_ByPassVR)</errorConditionFormula>
+    <errorConditionFormula>AND(
+EV_ContadorCheckInVirtual__c &gt; EV_CampaignId__r.EV_LimiteRegistrosVirtuales__c,
+OR(   
+EV_CampaignId__r.RecordType.DeveloperName =  $Label.EV_EventoVirtual,
+EV_CampaignId__r.RecordType.DeveloperName =  $Label.EV_CampTechSummitVirtual,
+AND(
+ OR(
+	EV_CampaignId__r.RecordType.DeveloperName = $Label.EV_EventoHibrido,
+	EV_CampaignId__r.RecordType.DeveloperName = $Label.EV_CampTechSummitHibrido
+	),
+  TEXT(EV_FormatoDeAsistencias__c) = &apos;002&apos; 
+)
+), !$Permission.EV_ByPassVR)</errorConditionFormula>
     <errorMessage>Límite de registros alcanzado</errorMessage>
 </ValidationRule>

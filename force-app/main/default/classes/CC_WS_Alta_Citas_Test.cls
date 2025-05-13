@@ -85,6 +85,7 @@ public with sharing class CC_WS_Alta_Citas_Test {
             insert customSetting;
             insert settingsList;
 
+            //Lista de valores
             CC_Lista_Valores__c listaDerivar = new CC_Lista_Valores__c();
             listaDerivar.Name = 'Textos operativa Derivar';
             listaDerivar.RecordTypeId = recordTypeLista;
@@ -104,6 +105,14 @@ public with sharing class CC_WS_Alta_Citas_Test {
             valor2.CC_Lista__c = listaDerivar.Id;
             valor2.CC_Mensajes_Mostrar__c = 'Informar al cliente que su gestor se pondrá en contacto con él el día XX a las XX:XX horas';
             valores.add(valor2);
+
+            CC_Lista_Valores__c valor3 = new CC_Lista_Valores__c();
+            valor3.Name = 'Texto cita o tarea existe';
+            valor3.RecordTypeId = recordTypeValor;
+            valor3.CC_Lista__c = listaDerivar.Id;
+            valor3.CC_Mensajes_Mostrar__c = 'No es posible crear una nueva cita o tarea porque ya existe una cita o tarea creada';
+            valores.add(valor3);
+
             insert valores;
         }
     }

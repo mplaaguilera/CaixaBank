@@ -1,3 +1,4 @@
+//CC_TriggerDispatcherBase STINT
 public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 
 	/*
@@ -17,13 +18,13 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	private static CC_ITriggerHandler afterDeleteHandler;
 	private static CC_ITriggerHandler afterUndeleteHandler;
 
-	private static Boolean isBeforeInsertProcessing = false;
-	private static Boolean isBeforeUpdateProcessing = false;
-	private static Boolean isBeforeDeleteProcessing = false;
-	private static Boolean isAfterInsertProcessing = false;
-	private static Boolean isAfterUpdateProcessing = false;
-	private static Boolean isAfterDeleteProcessing = false;
-	private static Boolean isAfterUndeleteProcessing = false;
+	private static Map<String, Boolean> isBeforeInsertProcessing = new Map<String, Boolean>();
+	private static Map<String, Boolean> isBeforeUpdateProcessing = new Map<String, Boolean>();
+	private static Map<String, Boolean> isBeforeDeleteProcessing = new Map<String, Boolean>();
+	private static Map<String, Boolean> isAfterInsertProcessing = new Map<String, Boolean>();
+	private static Map<String, Boolean> isAfterUpdateProcessing = new Map<String, Boolean>();
+	private static Map<String, Boolean> isAfterDeleteProcessing = new Map<String, Boolean>();
+	private static Map<String, Boolean> isAfterUndeleteProcessing = new Map<String, Boolean>();
 
 	/*
 	* Este método se llama previo a la ejecución del evento before de un trigger.
@@ -40,13 +41,13 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	* Este método se llama para los registros que se van a insertar durante el BEFORE Trigger.
 	*/
 	public virtual void beforeInsert(CC_TriggerParameters tp) {
-		if (!isBeforeInsertProcessing) {
-			isBeforeInsertProcessing = true;
+		if(!isBeforeInsertProcessing.containsKey(tp.triggerObject) || !isBeforeInsertProcessing.get(tp.triggerObject)) {
+			isBeforeInsertProcessing.put(tp.triggerObject, true);
 			for (String handlerClassName : getAssociatedHandlers(tp.triggerObject, 'beforeInsert')) {
 				Type handlerClassType = Type.forName(handlerClassName);
 				execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
 			}
-			isBeforeInsertProcessing = false;
+			isBeforeInsertProcessing.put(tp.triggerObject, false);
 		}
 		else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
 	}
@@ -55,13 +56,13 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	* Este método se llama para los registros que se van a actualizar durante el BEFORE Trigger.
 	*/
 	public virtual void beforeUpdate(CC_TriggerParameters tp) {
-		if (!isBeforeUpdateProcessing) {
-			isBeforeUpdateProcessing = true;
+		if(!isBeforeUpdateProcessing.containsKey(tp.triggerObject) || !isBeforeUpdateProcessing.get(tp.triggerObject)) {
+			isBeforeUpdateProcessing.put(tp.triggerObject, true);
 			for (String handlerClassName : getAssociatedHandlers(tp.triggerObject, 'beforeUpdate')) {
 				Type handlerClassType = Type.forName(handlerClassName);
 				execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
 			}
-			isBeforeUpdateProcessing = false;
+			isBeforeUpdateProcessing.put(tp.triggerObject, false);
 		}
 		else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
 	}
@@ -70,13 +71,13 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	* Este método se llama para los registros que se van a eliminar durante el BEFORE Trigger.
 	*/
 	public virtual void beforeDelete(CC_TriggerParameters tp) {
-		if(!isBeforeDeleteProcessing) {
-			isBeforeDeleteProcessing = true;
+		if(!isBeforeDeleteProcessing.containsKey(tp.triggerObject) || !isBeforeDeleteProcessing.get(tp.triggerObject)) {
+			isBeforeDeleteProcessing.put(tp.triggerObject, true);
 			for (String handlerClassName : getAssociatedHandlers(tp.triggerObject, 'beforeDelete')) {
 				Type handlerClassType = Type.forName(handlerClassName);
 				execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterInsert);
 			}
-			isBeforeDeleteProcessing = false;
+			isBeforeDeleteProcessing.put(tp.triggerObject, false);
 		}
 		else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeDelete);
 	}
@@ -86,13 +87,13 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	* El registro es 'read-only' en este punto.
 	*/
 	public virtual void afterInsert(CC_TriggerParameters tp) {
-		if (!isAfterInsertProcessing) {
-			isAfterInsertProcessing = true;
+		if(!isAfterInsertProcessing.containsKey(tp.triggerObject) || !isAfterInsertProcessing.get(tp.triggerObject)) {
+			isAfterInsertProcessing.put(tp.triggerObject, true);
 			for (String handlerClassName : getAssociatedHandlers(tp.triggerObject, 'afterInsert')) {
 				Type handlerClassType = Type.forName(handlerClassName);
 				execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterInsert);
 			}
-			isAfterInsertProcessing = false;
+			isAfterInsertProcessing.put(tp.triggerObject, false);
 		}
 		else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterInsert);
 	}
@@ -101,13 +102,13 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	* Este método se llama de forma iterativa por cada registro actualizado durante el AFTER Trigger.
 	*/
 	public virtual void afterUpdate(CC_TriggerParameters tp) {
-		if (!isAfterUpdateProcessing) {
-			isAfterUpdateProcessing = true;
+		if(!isAfterUpdateProcessing.containsKey(tp.triggerObject) || !isAfterUpdateProcessing.get(tp.triggerObject)) {
+			isAfterUpdateProcessing.put(tp.triggerObject, true);
 			for (String handlerClassName : getAssociatedHandlers(tp.triggerObject, 'afterUpdate')) {
 				Type handlerClassType = Type.forName(handlerClassName);
 				execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterUpdate);
 			}
-			isAfterUpdateProcessing = false;
+			isAfterUpdateProcessing.put(tp.triggerObject, false);
 		}
 		else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterUpdate);
 	}
@@ -116,13 +117,13 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	* Este método se llama de forma iterativa por cada registro borrado durante el AFTER Trigger.
 	*/
 	public virtual void afterDelete(CC_TriggerParameters tp) {
-		if (!isAfterDeleteProcessing) {
-			isAfterDeleteProcessing = true;
+		if(!isAfterDeleteProcessing.containsKey(tp.triggerObject) || !isAfterDeleteProcessing.get(tp.triggerObject)) {
+			isAfterDeleteProcessing.put(tp.triggerObject, true);
 			for (String handlerClassName : getAssociatedHandlers(tp.triggerObject, 'afterDelete')) {
 				Type handlerClassType = Type.forName(handlerClassName);
 				execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterDelete);
 			}
-			isAfterDeleteProcessing = false;
+			isAfterDeleteProcessing.put(tp.triggerObject, false);
 		}
 		else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterDelete);
 	}
@@ -131,13 +132,13 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	* Este método se llama previo a la ejecución del AFTER UNDELETE Trigger.
 	*/
 	public virtual void afterUnDelete(CC_TriggerParameters tp) {
-		if (!isAfterUndeleteProcessing) {           
-            isAfterUndeleteProcessing = true;
-            for (String handlerClassName : getAssociatedHandlers(tp.triggerObject, 'afterUndelete')) {
+		if(!isAfterUndeleteProcessing.containsKey(tp.triggerObject) || !isAfterUndeleteProcessing.get(tp.triggerObject)) {
+			isAfterUndeleteProcessing.put(tp.triggerObject, true);
+		    for (String handlerClassName : getAssociatedHandlers(tp.triggerObject, 'afterUndelete')) {
                 Type handlerClassType = Type.forName(handlerClassName);
                 execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterUndelete);
             }
-            isAfterUndeleteProcessing = false;
+			isAfterUndeleteProcessing.put(tp.triggerObject, false);
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterUndelete);
 	}
@@ -192,10 +193,10 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 	}
 
 	protected List<String> getAssociatedHandlers(String objectApiName, String triggerEvent) {
-		
+
 		List<String> handlerClassNames = new List<String>();
 		List<CBK_TriggerHandlerAssociation__mdt> triggerHandlerAssociations = [SELECT CBK_HandlerClassName__c, DeveloperName FROM CBK_TriggerHandlerAssociation__mdt WHERE CBK_ObjectApiName__c = :objectApiName AND CBK_TriggerEvent__c = :triggerEvent ORDER BY CBK_Order__c, DeveloperName asc];
-		for (CBK_TriggerHandlerAssociation__mdt triggerHandlerAssociation : triggerHandlerAssociations){
+        for (CBK_TriggerHandlerAssociation__mdt triggerHandlerAssociation : triggerHandlerAssociations){
 			if (String.isNotBlank(triggerHandlerAssociation.CBK_HandlerClassName__c)){
 				Type handlerClassType = Type.forName(triggerHandlerAssociation.CBK_HandlerClassName__c);
 				if(handlerClassType != null){
@@ -213,7 +214,7 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 		for(SObject ob : newList){
 			Id mId = string.valueOf(ob.get('Id'));
 			mObj.put(mId, ob);
-		}	
+		}
 		return mObj;
 	}
 

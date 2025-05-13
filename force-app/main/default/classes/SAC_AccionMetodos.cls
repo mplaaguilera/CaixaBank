@@ -1415,4 +1415,27 @@ public without sharing class SAC_AccionMetodos {
             }
         }
     }
+
+        /**************************************************************************
+     * Proposito: Cuando una tarea tiene informado el campo SAC_ImporteAbonar__c, debemos validar que la reclamacion no tiene sentido de resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento"
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.1                           Carlos Gomez   04/04/2025       Creación
+    *****************************************************************************/
+    public static void validarSentidoResPretension(List<SAC_Accion__c> listaValidarImpAbonado, Set<Id> setIdsRec) {
+
+        List<Case> listaPretensiones = [SELECT Id, SAC_SentidoResolucion__c FROM Case WHERE RecordTypeId = :RECTYPEPRETENSION AND Id IN :setIdsRec];
+
+        if(!listaPretensiones.isEmpty()){
+            Map<Id, Case> mapPrete = new Map<Id,Case>(listaPretensiones);
+
+            for(SAC_Accion__c tarea : listaValidarImpAbonado){
+                if(mapPrete.containsKey(tarea.SAC_Pretension__c) && (mapPrete.get(tarea.SAC_Pretension__c).SAC_SentidoResolucion__c == 'SAC_001' || mapPrete.get(tarea.SAC_Pretension__c).SAC_SentidoResolucion__c == 'SAC_004' || mapPrete.get(tarea.SAC_Pretension__c).SAC_SentidoResolucion__c == 'SAC_005')){
+                    tarea.addError('Revise el sentido de la resolución de la reclamación. No es posible indicar sentido de la resolución "Favorable a la entidad" "Inadmisión" o "Desistimiento" e informar un importe abonado.');
+                }
+            }
+        }
+    }
+
 }

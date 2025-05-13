@@ -12,12 +12,480 @@
         <restricted>true</restricted>
         <valueSetName>CC_Canal_Procedencia</valueSetName>
         <valueSettings>
-            <controllingFieldValue>Teléfono UAFE Especialistas</controllingFieldValue>
-            <valueName>Teléfono UAFE Especialistas</valueName>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Activo</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>Chat NOA WhatsApp</controllingFieldValue>
-            <valueName>Chat NOA WhatsApp</valueName>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Banca Digital CNow</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Huawei App Store</controllingFieldValue>
+            <controllingFieldValue>Bloqueos</controllingFieldValue>
+            <controllingFieldValue>Now In Teléfono Único</controllingFieldValue>
+            <controllingFieldValue>ImaginBank</controllingFieldValue>
+            <controllingFieldValue>Accionista</controllingFieldValue>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <controllingFieldValue>Atención al Cliente</controllingFieldValue>
+            <controllingFieldValue>CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Cajeros</controllingFieldValue>
+            <controllingFieldValue>M2P Asistencia</controllingFieldValue>
+            <controllingFieldValue>Pago Móvil</controllingFieldValue>
+            <controllingFieldValue>Soporte PSU</controllingFieldValue>
+            <controllingFieldValue>Atención Cliente Sénior</controllingFieldValue>
+            <valueName>Cajeros</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Carteras</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Teléfono CC Confirming</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <valueName>Comercios</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Domiciliaciones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Extranjero</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Fondos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Incidencias Técnicas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Marketing</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Pasivo y Valores</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <controllingFieldValue>Buzón Carteras</controllingFieldValue>
+            <controllingFieldValue>Buzón Fondos</controllingFieldValue>
+            <valueName>Servicios Centrales</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Servicios Generales</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Huawei App Store</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Teléfono CC Confirming</controllingFieldValue>
+            <controllingFieldValue>Bloqueos</controllingFieldValue>
+            <controllingFieldValue>ImaginBank</controllingFieldValue>
+            <controllingFieldValue>Accionista</controllingFieldValue>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <controllingFieldValue>Atención al Cliente</controllingFieldValue>
+            <controllingFieldValue>CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Cajeros</controllingFieldValue>
+            <controllingFieldValue>M2P Asistencia</controllingFieldValue>
+            <controllingFieldValue>Pago Móvil</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Soporte PSU</controllingFieldValue>
+            <controllingFieldValue>Atención Cliente Sénior</controllingFieldValue>
+            <valueName>Tarjetas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Tarjetas y Comercios</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Comercios</controllingFieldValue>
+            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
+            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Extranjero</controllingFieldValue>
+            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
+            <controllingFieldValue>Marketing</controllingFieldValue>
+            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
+            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
+            <controllingFieldValue>Recaudación</controllingFieldValue>
+            <controllingFieldValue>RRHH</controllingFieldValue>
+            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
+            <controllingFieldValue>Servicios Generales</controllingFieldValue>
+            <controllingFieldValue>SmartPhones</controllingFieldValue>
+            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
+            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
+            <valueName>Valores</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Atención Preferente</controllingFieldValue>
+            <valueName>Atención Preferente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Banca Internacional</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE CaixaBankNow</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Canal Oficina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Ficheros</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Perfilado Clientes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Reclamaciones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Recuperaciones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Seguridad Operativa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Swift</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Tarjetas Consumer</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Recuperaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Reclamaciones</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Tarjetas Payments</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono UAFE Especialistas</controllingFieldValue>
+            <valueName>Teléfono UAFE Especialistas</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Caixabank Talks</controllingFieldValue>
@@ -45,22 +513,6 @@
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Huawei App Store</controllingFieldValue>
-            <controllingFieldValue>Bloqueos</controllingFieldValue>
-            <controllingFieldValue>Now In Teléfono Único</controllingFieldValue>
-            <controllingFieldValue>ImaginBank</controllingFieldValue>
-            <controllingFieldValue>Accionista</controllingFieldValue>
-            <controllingFieldValue>Tarjetas</controllingFieldValue>
-            <controllingFieldValue>Atención al Cliente</controllingFieldValue>
-            <controllingFieldValue>CaixaBankNow</controllingFieldValue>
-            <controllingFieldValue>Cajeros</controllingFieldValue>
-            <controllingFieldValue>M2P Asistencia</controllingFieldValue>
-            <controllingFieldValue>Pago Móvil</controllingFieldValue>
-            <controllingFieldValue>Soporte PSU</controllingFieldValue>
-            <controllingFieldValue>Atención Cliente Sénior</controllingFieldValue>
-            <valueName>Cajeros</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Huawei App Store</controllingFieldValue>
             <controllingFieldValue>Google Play Store</controllingFieldValue>
             <controllingFieldValue>Apple App Store</controllingFieldValue>
             <valueName>Google Play Store</valueName>
@@ -80,141 +532,6 @@
             <controllingFieldValue>Pago Móvil</controllingFieldValue>
             <controllingFieldValue>Atención Cliente Sénior</controllingFieldValue>
             <valueName>M2P Asistencia</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Huawei App Store</controllingFieldValue>
-            <controllingFieldValue>Bloqueos</controllingFieldValue>
-            <controllingFieldValue>ImaginBank</controllingFieldValue>
-            <controllingFieldValue>Accionista</controllingFieldValue>
-            <controllingFieldValue>Tarjetas</controllingFieldValue>
-            <controllingFieldValue>Atención al Cliente</controllingFieldValue>
-            <controllingFieldValue>CaixaBankNow</controllingFieldValue>
-            <controllingFieldValue>Cajeros</controllingFieldValue>
-            <controllingFieldValue>M2P Asistencia</controllingFieldValue>
-            <controllingFieldValue>Pago Móvil</controllingFieldValue>
-            <controllingFieldValue>Soporte PSU</controllingFieldValue>
-            <controllingFieldValue>Atención Cliente Sénior</controllingFieldValue>
-            <valueName>Tarjetas</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <valueName>Activo</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <valueName>Banca Digital CNow</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <valueName>Domiciliaciones</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <valueName>Extranjero</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <valueName>Marketing</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <valueName>Pasivo y Valores</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
@@ -258,46 +575,6 @@
             <valueName>RRHH</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <valueName>Servicios Generales</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Formulario Consultas Operativas</controllingFieldValue>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Oficina Feedback</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <valueName>Tarjetas y Comercios</valueName>
-        </valueSettings>
-        <valueSettings>
             <controllingFieldValue>Gestión FAQs</controllingFieldValue>
             <controllingFieldValue>Activo</controllingFieldValue>
             <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
@@ -308,44 +585,6 @@
         <valueSettings>
             <controllingFieldValue>Gestión FAQs</controllingFieldValue>
             <valueName>Gestión FAQs</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <valueName>Incidencias Técnicas</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Gestión FAQs</controllingFieldValue>
-            <controllingFieldValue>Activo</controllingFieldValue>
-            <controllingFieldValue>Banca Digital CNow</controllingFieldValue>
-            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
-            <controllingFieldValue>Extranjero</controllingFieldValue>
-            <controllingFieldValue>Incidencias Técnicas</controllingFieldValue>
-            <controllingFieldValue>Marketing</controllingFieldValue>
-            <controllingFieldValue>Pasivo y Valores</controllingFieldValue>
-            <controllingFieldValue>Recaudación</controllingFieldValue>
-            <controllingFieldValue>RRHH</controllingFieldValue>
-            <controllingFieldValue>Servicios Centrales</controllingFieldValue>
-            <controllingFieldValue>Servicios Generales</controllingFieldValue>
-            <controllingFieldValue>SmartPhones</controllingFieldValue>
-            <controllingFieldValue>Tarjetas y Comercios</controllingFieldValue>
-            <controllingFieldValue>Virtualización de Proveedores</controllingFieldValue>
-            <controllingFieldValue>Buzón Carteras</controllingFieldValue>
-            <controllingFieldValue>Buzón Fondos</controllingFieldValue>
-            <valueName>Servicios Centrales</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Gestión FAQs</controllingFieldValue>
@@ -631,74 +870,12 @@
             <valueName>Now in Sales-MAC</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
             <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
-            <valueName>Teléfono FRAUDE Banca Internacional</valueName>
+            <valueName>Buzón FRAUDE Now</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
             <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
-            <valueName>Teléfono FRAUDE CaixaBankNow</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
-            <valueName>Teléfono FRAUDE Canal Oficina</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
-            <valueName>Teléfono FRAUDE Perfilado Clientes</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
-            <valueName>Teléfono FRAUDE Seguridad Operativa</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
-            <valueName>Teléfono FRAUDE Tarjetas Consumer</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
-            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
-            <valueName>Teléfono FRAUDE Tarjetas Payments</valueName>
+            <valueName>Buzón FRAUDE Tarjetas</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
@@ -718,115 +895,7 @@
             <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
             <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
             <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-COMERCIA</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-CREDIFIMO</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-IMAGIN</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
             <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
             <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
             <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
@@ -853,7 +922,7 @@
             <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
             <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
             <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
             <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
             <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
             <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
@@ -880,14 +949,14 @@
             <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
             <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
             <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
             <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
             <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
             <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
             <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
             <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
             <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</valueName>
+            <valueName>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
@@ -907,331 +976,7 @@
             <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
             <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
             <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-GESTICAIXA / CAIXABANK TITULACION</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-MICROBANK</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-MONEY TO PAY</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-PROMOCAIXA / WIVAI</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-PTR / PUERTO TRIANA</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-TCF / TELEFONICA CONSUMER FINANCE</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-VDC / VIDACAIXA</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-BANKIA MEDIACIÓN</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-OpenWealth</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
             <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
             <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
             <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
@@ -1258,34 +1003,7 @@
             <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
             <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
             <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
-            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
-            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
-            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
-            <controllingFieldValue>EDG - Externos</controllingFieldValue>
-            <valueName>EDG-CAM PORTUGAL</valueName>
-        </valueSettings>
-        <valueSettings>
-            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
-            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
-            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
-            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
-            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
-            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
-            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
-            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
-            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
-            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
-            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
-            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
-            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
-            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
-            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
             <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
             <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
             <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
@@ -1312,7 +1030,115 @@
             <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
             <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
             <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-CAM PORTUGAL</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-COMERCIA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-CREDIFIMO</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
             <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
             <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
             <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
@@ -1339,7 +1165,7 @@
             <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
             <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
             <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
-            <controllingFieldValue>EDG-BANKIA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
             <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
             <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
             <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
@@ -1347,6 +1173,357 @@
             <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
             <controllingFieldValue>EDG - Externos</controllingFieldValue>
             <valueName>EDG - Externos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-GESTICAIXA / CAIXABANK TITULACION</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-IMAGIN</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-MICROBANK</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-MONEY TO PAY</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-OpenWealth</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-PROMOCAIXA / WIVAI</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-PTR / PUERTO TRIANA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-TCF / TELEFONICA CONSUMER FINANCE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-VDC / VIDACAIXA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-COMERCIA</controllingFieldValue>
+            <controllingFieldValue>EDG-CREDIFIMO</controllingFieldValue>
+            <controllingFieldValue>EDG-IMAGIN</controllingFieldValue>
+            <controllingFieldValue>EDG-BUILDING CENTER</controllingFieldValue>
+            <controllingFieldValue>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</controllingFieldValue>
+            <controllingFieldValue>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</controllingFieldValue>
+            <controllingFieldValue>EDG-GESTICAIXA / CAIXABANK TITULACION</controllingFieldValue>
+            <controllingFieldValue>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-MICROBANK</controllingFieldValue>
+            <controllingFieldValue>EDG-MONEY TO PAY</controllingFieldValue>
+            <controllingFieldValue>EDG-PROMOCAIXA / WIVAI</controllingFieldValue>
+            <controllingFieldValue>EDG-PTR / PUERTO TRIANA</controllingFieldValue>
+            <controllingFieldValue>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-TCF / TELEFONICA CONSUMER FINANCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VDC / VIDACAIXA</controllingFieldValue>
+            <controllingFieldValue>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</controllingFieldValue>
+            <controllingFieldValue>EDG-VIDACAIXA MEDIACIÓN</controllingFieldValue>
+            <controllingFieldValue>EDG-OpenWealth</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM / CAIXABANK ASSET MANAGEMENT</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM PORTUGAL</controllingFieldValue>
+            <controllingFieldValue>EDG-CAM LUXEMBURGO</controllingFieldValue>
+            <controllingFieldValue>EDG - Dualiza</controllingFieldValue>
+            <controllingFieldValue>EDG - Externos</controllingFieldValue>
+            <valueName>EDG-VIDACAIXA MEDIACIÓN</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Oficina Feedback</controllingFieldValue>
@@ -1471,6 +1648,10 @@
         <valueSettings>
             <controllingFieldValue>Buzón Crédito Stock</controllingFieldValue>
             <valueName>Buzón Crédito Stock</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ayuda Temporal</controllingFieldValue>
+            <valueName>Ayuda Temporal</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>Teléfono COPS Bancos</controllingFieldValue>

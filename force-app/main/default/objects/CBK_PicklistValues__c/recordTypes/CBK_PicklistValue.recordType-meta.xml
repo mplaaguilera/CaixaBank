@@ -18,6 +18,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>FRA</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>MCs</fullName>
             <default>false</default>
         </values>

@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SIREC__SIREC_fld_fechaBaja__c</fullName>
     <deprecated>false</deprecated>
+    <description>Fecha de baja</description>
     <encryptionScheme>None</encryptionScheme>
     <label>Fecha de Baja</label>
     <required>false</required>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Reminder__c</fullName>
+    <description>Campo para el recordatorio del historico de gestión</description>
     <encryptionScheme>None</encryptionScheme>
     <label>Recordatorio</label>
     <required>false</required>

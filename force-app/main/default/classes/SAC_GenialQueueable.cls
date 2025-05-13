@@ -19,6 +19,10 @@
  * 2.2            US911873         David Ramos       07/05/24     Alinear la creación de pretensiones de la fase 1 con 
  *                                                                SAC_LCMP_InsertarPretension
  * 2.3            US978023         Alexandre Pérez   29/08/24     Eliminar la creación de accounts y dejar sólo la creación de registros de resultado
+ * 
+ * 2.4            US-0009818       Iria AN-PC        13/02/25     Añadir Campos Documento + Página a nivel de reclamante (solo SAC_Genial_Resultado__c)
+ * 2.5            US-0009818       Iria AN-PC        17/02/25     Añadir Umbrales MCCs
+
 *****************************************************************/
 /**
 * @description : Queueable para crear/modificar secuencialmente los datos
@@ -82,7 +86,6 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                     //creación de pretensiones y registros shadow de reclamación y pretensión
                     cbk_log.debug('logica pretensiones');
                     try{
-                        
                         if((settings.SAC_IAactiva__c && genialRequest.pdteIA)){
                             genialRequest.reclamacion.SAC_NPretensionesActivas__c = crearDatosPretensiones(genialRequest);
                         }
@@ -344,28 +347,30 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                         //US9788023
                         datosRecPrincipal.numPerso = confidenciales.get(datosReclamante.reclamante.CC_Numero_Documento__c).AV_NumPerso__c;                 
                     } else {
-                        genialRequest.reclamacion.OS_Email__c = datosReclamante.reclamante.PersonEmail;
-                        genialRequest.reclamacion.CC_Telefono_Contacto__c = datosReclamante.reclamante.PersonMobilePhone;
-                        genialRequest.reclamacion.SAC_DireccionContacto__c = datosReclamante.reclamante.BillingStreet;
-                        genialRequest.reclamacion.SAC_CodigoPostalContacto__c = datosReclamante.reclamante.BillingPostalCode;
-                        genialRequest.reclamacion.SAC_PoblacionContacto__c = datosReclamante.reclamante.BillingCity;
-                        genialRequest.reclamacion.SAC_ProvinciaContacto__c = datosReclamante.reclamante.BillingState;
-                        genialRequest.reclamacion.SAC_PaisContacto__c = datosReclamante.reclamante.BillingCountry;
-                        genialRequest.reclamacion.CC_SuppliedNIF__c = datosReclamante.reclamante.CC_Numero_Documento__c;
-                        if (datosReclamante.reclamante.firstName != null){
-                            genialRequest.reclamacion.SAC_NombreContacto__c = datosReclamante.reclamante.firstName + ' ';
-                            //US9788023
-                            datosRecPrincipal.firstName = datosReclamante.reclamante.firstName;
+                        if(datosReclamante.tipo == 'SAC_001'){
+                            genialRequest.reclamacion.OS_Email__c = datosReclamante.reclamante.PersonEmail;
+                            genialRequest.reclamacion.CC_Telefono_Contacto__c = datosReclamante.reclamante.PersonMobilePhone;
+                            genialRequest.reclamacion.SAC_DireccionContacto__c = datosReclamante.reclamante.BillingStreet;
+                            genialRequest.reclamacion.SAC_CodigoPostalContacto__c = datosReclamante.reclamante.BillingPostalCode;
+                            genialRequest.reclamacion.SAC_PoblacionContacto__c = datosReclamante.reclamante.BillingCity;
+                            genialRequest.reclamacion.SAC_ProvinciaContacto__c = datosReclamante.reclamante.BillingState;
+                            genialRequest.reclamacion.SAC_PaisContacto__c = datosReclamante.reclamante.BillingCountry;
+                            genialRequest.reclamacion.CC_SuppliedNIF__c = datosReclamante.reclamante.CC_Numero_Documento__c;
+                            if (datosReclamante.reclamante.firstName != null){
+                                genialRequest.reclamacion.SAC_NombreContacto__c = datosReclamante.reclamante.firstName + ' ';
+                                //US9788023
+                                datosRecPrincipal.firstName = datosReclamante.reclamante.firstName;
+                            }
+                            if (datosReclamante.reclamante.lastName != null){
+                                genialRequest.reclamacion.SAC_NombreContacto__c += datosReclamante.reclamante.lastName;
+                                //US9788023
+                                datosRecPrincipal.lastName = datosReclamante.reclamante.lastName;
+                            }
+                            
+                            
                         }
-                        if (datosReclamante.reclamante.lastName != null){
-                            genialRequest.reclamacion.SAC_NombreContacto__c += datosReclamante.reclamante.lastName;
-                            //US9788023
-                            datosRecPrincipal.lastName = datosReclamante.reclamante.lastName;
-                        }
-                        
-                        
+                        genialRequest.datosRecPrincipal = datosRecPrincipal;
                     }
-                    genialRequest.datosRecPrincipal = datosRecPrincipal;
                 }
                 if(string.isNotBlank(datosReclamante.reclamante.CC_Numero_Documento__c)){
                     if(datosReclamante.reclamantePrincipal){
@@ -406,7 +411,7 @@ public with sharing class SAC_GenialQueueable implements Queueable {
      *                          CAMBIAR POR LLAMADA CONJUNTA EN EL CORE DE SAC
      * @param genialRequest     datos recibidos de SAC_Genial_WS.
      */
-    private static integer crearDatosPretensiones(SAC_Genial_WS.genialRequest genialRequest) {
+    private integer crearDatosPretensiones(SAC_Genial_WS.genialRequest genialRequest) {
 
         String rECORDTYPEPRETENSION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
 
@@ -414,7 +419,8 @@ public with sharing class SAC_GenialQueueable implements Queueable {
 
         list<id> setIdsDetalleAux = new list<id>();
         //sacamos una lista de detalles proporcionados por la IA
-        for(case pretension : genialRequest.pretensiones) {
+        for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
+			case pretension = pretensionW.pretension;
             //agregamos a la lista ids de detalle para buscarlos luego y acabar de completar los datos a rellenar de la pretensión
             setIdsDetalleAux.add(pretension.SEG_Detalle__c);
 
@@ -430,25 +436,42 @@ public with sharing class SAC_GenialQueueable implements Queueable {
         case reclamacionActual = [SELECT Id, Origin, Status, AccountId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, ContactId, CC_SuppliedNIF__c, OS_Email__c, CC_Telefono_Contacto__c, SAC_DireccionPostalNotificacion__c, SuppliedEmail FROM Case WHERE Id = : genialRequest.reclamacion.Id];
         
         //version 2 con el generador de SAC_LCMP_InsertarPretension
-        for(case pretension : genialRequest.pretensiones) {
+        for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
+            // obtener umbrales por cada nivel de MCC
+            Decimal umbralTematica;
+            Decimal umbralProductoServicio;
+            Decimal umbralMotivo;
+            Decimal umbralDetalle;
+            for(SAC_Genial_WS.Umbral umbral: pretensionW.umbrales){
+                if(umbral.nivel == 'Tematica'){
+                    umbralTematica = umbral.valor;
+                }else if(umbral.nivel == 'ProductoServicio'){
+                    umbralProductoServicio = umbral.valor;
+                }else if(umbral.nivel == 'Motivo'){
+                    umbralMotivo = umbral.valor;
+                }else if(umbral.nivel == 'Detalle'){
+                    umbralDetalle = umbral.valor;
+                }
+            }
+			case pretension = pretensionW.pretension;
             if(string.isNotBlank(pretension.SEG_Detalle__c) && string.isNotBlank(pretension.CC_MCC_Motivo__c) 
             && string.isNotBlank(pretension.CC_MCC_ProdServ__c) && string.isNotBlank(pretension.CC_MCC_Tematica__c)){
-                /*if(cs.SAC_Umbral_Tematica__c <= pretension.SAC_Umbral_Tematica__c && cs.SAC_Umbral_Producto__c <= pretension.SAC_Umbral_Producto__c 
-                 * && cs.SAC_Umbral_Motivo__c <= pretension.SAC_Umbral_Motivo__c && cs.SAC_Umbral_Detalle__c <= pretension.SAC_Umbral_Detalle__c){
-                    
-                }*/
                 String asunto = mapaMcc.get(pretension.SEG_Detalle__c).CC_Motivo__r.CC_Producto_Servicio__r.Name + ' - ' + mapaMcc.get(pretension.SEG_Detalle__c).Name;
-                Case pretensionGenerada = SAC_LCMP_InsertarPretension.camposPretension(reclamacionActual, pretension.SEG_Detalle__c, pretension.CC_MCC_Motivo__c, pretension.CC_MCC_ProdServ__c, pretension.CC_MCC_Tematica__c, RECORDTYPEPRETENSION, asunto, mapaMcc);
-                Map<String, Object> camposPretGenerada = pretensionGenerada.getPopulatedFieldsAsMap();
-                for (String nombreCampo : camposPretGenerada.keySet()) {
-                    pretension.put(nombreCampo, pretensionGenerada.get(nombreCampo));
+                
+                Case pretensionGenerada = null;
+                // comprobar umbrales de MCCs y no informarlos en la pretensión si no se cumplen
+                if(umbralTematica >= this.settings.SAC_UmbralTematica__c && umbralProductoServicio >= this.settings.SAC_UmbralProductoServicio__c && umbralMotivo >= this.settings.SAC_UmbralMotivo__c && umbralDetalle >= this.settings.SAC_UmbralDetalle__c){
+                    pretensionGenerada = SAC_LCMP_InsertarPretension.camposPretension(reclamacionActual, pretension.SEG_Detalle__c, pretension.CC_MCC_Motivo__c, pretension.CC_MCC_ProdServ__c, pretension.CC_MCC_Tematica__c, RECORDTYPEPRETENSION, asunto, mapaMcc);
+                    Map<String, Object> camposPretGenerada = pretensionGenerada.getPopulatedFieldsAsMap();
+                    for (String nombreCampo : camposPretGenerada.keySet()) {
+                        pretension.put(nombreCampo, pretensionGenerada.get(nombreCampo)); 
+                    }
+                    //pretension.AccountId = genialRequest.reclamacion.AccountId; 
+                    pretension.SAC_GenialEstado__c = 'SAC_003';
+                    pretensiones.add((sObject)pretension);
                 }
-                //pretension.AccountId = genialRequest.reclamacion.AccountId; 
-                pretension.SAC_GenialEstado__c = 'SAC_003';
-                pretensiones.add((sObject)pretension);
             }
         }
-
         /*
         for(case pretension : genialRequest.pretensiones) {
             pretension.recordTypeId = RECORDTYPEPRETENSION;
@@ -488,60 +511,105 @@ public with sharing class SAC_GenialQueueable implements Queueable {
      * @param genialRequest    datos recibidos de SAC_Genial_WS.
      */
     private static void crearRegistrosShadow(SAC_Genial_WS.genialRequest genialRequest){
-
         String recResRT = Schema.SObjectType.SAC_Genial_Resultado__c.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion_IA').getRecordTypeId();
         //rt de la pretensión en el objeto de resultado
         String pretResRT = Schema.SObjectType.SAC_Genial_Resultado__c.getRecordTypeInfosByDeveloperName().get('SAC_Pretension_IA').getRecordTypeId();
         SAC_Genial_Resultado__c genRes = new SAC_Genial_Resultado__c();
         list<sobject> objRes = new list<sobject>();
         //SAC_Genial_WS.DatosRecPrincipal datosRecPrincipal = new SAC_Genial_WS.DatosRecPrincipal();
-
-        genRes = SAC_GenialUtils.casteoCaseAgenialResultado(genialRequest.reclamacion);        
+        genRes = SAC_GenialUtils.casteoCaseAgenialResultado(genialRequest.reclamacion); 
         genRes.SAC_Reclamacion__c = genialRequest.reclamacion.id;
         genRes.SAC_Json__c = genialRequest.jsonRequest;
         genRes.recordTypeId = recResRT;
-        //añadimos los campos necesarios para la creación posterior del reclamante por botón     
-        genRes.SAC_FirstName__c = genialRequest.datosRecPrincipal.firstName;
-        genRes.SAC_LastName__c = genialRequest.datosRecPrincipal.lastName;
-        genRes.SAC_NumPerso__c = genialRequest.datosRecPrincipal.numPerso;
-
-        genialRequest.reclamacion.SAC_Resumen__c = '';
-
-        for(case pretension : genialRequest.pretensiones) {
-
-            genialRequest.reclamacion.SAC_Resumen__c += pretension.SAC_Resumen__c + ' ';
-            if(pretension.SAC_EsPrincipal__c){
-                genialRequest.reclamacion.SAC_PretensionPrincipal__c = pretension.id;
-                genRes.SAC_MCC_Tematica__c = pretension.CC_MCC_Tematica__c;
-                genRes.SAC_MCC_ProdServ__c = pretension.CC_MCC_ProdServ__c;
-                genRes.SAC_MCC_Motivo__c = pretension.CC_MCC_Motivo__c;
-                genRes.SAC_Detalle__c = pretension.SEG_Detalle__c;
-                
+        // comprobar importe - tipo
+        if(genRes.SAC_Importe_Reclamado__c != null  && genRes.SAC_Importe_Reclamado__c > 0){
+            genRes.SAC_Importe_Tipo__c = 'Importe Reclamado';
+        }else{
+            if(genRes.SAC_Importe_Tipo__c == 'Importe Reclamado' || (genRes.SAC_Importe_Tipo__c != 'Importe Reclamado' && genRes.SAC_Importe_Tipo__c != 'Sin Importe')){
+                genRes.SAC_Importe_Tipo__c = 'Sin cuantificar';
             }
         }
-        
-        objRes.add((sobject)genRes);
+        //añadimos los campos necesarios para la creación posterior del reclamante por botón  
+        if(genialRequest.datosRecPrincipal != null){
+            genRes.SAC_FirstName__c = genialRequest.datosRecPrincipal.firstName;
+            genRes.SAC_LastName__c = genialRequest.datosRecPrincipal.lastName;
+            genRes.SAC_NumPerso__c = genialRequest.datosRecPrincipal.numPerso;
+        }
+        // añadimos documento y página del reclamante principal
+        if(genialRequest.reclamantes != null && !genialRequest.reclamantes.isEmpty()){
+            for(SAC_Genial_WS.DatosReclamante dtRec: genialRequest.reclamantes){
+                genRes.SAC_TipoReclamante__c = dtRec.tipo;
+                if(dtRec.reclamantePrincipal && dtRec.document != null){
+                    Id contentDocumentId = getContentDocumentId(dtRec.document);
+                    genRes.SAC_DocumentoURL__c = contentDocumentId;
+                    genRes.SAC_PaginaDocumento__c = dtRec.page;
+                    break;
+                }
+            }
+        }
+        genialRequest.reclamacion.SAC_Resumen__c = '';
+       
+        // Pretensión Principal
+        for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
+            if(pretensionW.pretension != null){
+                case pretension = pretensionW.pretension;
+                genialRequest.reclamacion.SAC_Resumen__c += pretension.SAC_Resumen__c + ' ';
+                if(pretension.SAC_EsPrincipal__c){
+                    genialRequest.reclamacion.SAC_PretensionPrincipal__c = pretension.id;
+                    genRes.SAC_MCC_Tematica__c = pretensionW.pretension.CC_MCC_Tematica__c;
+                    genRes.SAC_MCC_ProdServ__c = pretensionW.pretension.CC_MCC_ProdServ__c;
+                    genRes.SAC_MCC_Motivo__c = pretensionW.pretension.CC_MCC_Motivo__c;
+                    genRes.SAC_Detalle__c = pretensionW.pretension.SEG_Detalle__c;
+                    for(SAC_Genial_WS.PretensionWrapper pw : genialRequest.pretensiones) {
+                        if(pw.pretension.SAC_EsPrincipal__c){
+                            for(SAC_Genial_WS.Umbral umbral: pw.umbrales){
+                                if(umbral.nivel == 'Tematica'){
+                                    genRes.SAC_UmbralTematica__c = umbral.valor;
+                                }else if(umbral.nivel == 'ProductoServicio'){
+                                    genRes.SAC_UmbralProdServ__c = umbral.valor;
+                                }else if(umbral.nivel == 'Motivo'){
+                                    genRes.SAC_UmbralMotivo__c = umbral.valor;
+                                }else if(umbral.nivel == 'Detalle'){
+                                    genRes.SAC_UmbralDetalle__c = umbral.valor;
+                                }
+                            }
+                        }
+                    }
+                    objRes.add((sobject)genRes);
+                }
+            }
+        }
         SAC_MetodosSinSharing.modificarInsertarObjetos(objRes, 'insert');
         objRes.clear();
         genialRequest.idShadow = genRes.id;
-                      
-        for(case pretension : genialRequest.pretensiones) {
-
-            genRes = new SAC_Genial_Resultado__c();
-            genRes = SAC_GenialUtils.casteoCaseAgenialResultado(pretension);
-            genRes.SAC_Reclamacion__c = genialRequest.reclamacion.id;
-            if(pretension.id != null) {
-                genRes.SAC_Pretension__c = pretension.id;
+        // Todas las pretensiones
+        for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
+            if(pretensionW.pretension != null){
+                case pretension = pretensionW.pretension;
+                genRes = new SAC_Genial_Resultado__c();
+                genRes = SAC_GenialUtils.casteoCaseAgenialResultado(pretension);
+                genRes.SAC_Reclamacion__c = genialRequest.reclamacion.id;
+                if(pretension.id != null) {
+                    genRes.SAC_Pretension__c = pretension.id;
+                }
+                genRes.SAC_Json__c = JSON.serialize(pretension);
+                genRes.recordTypeId = pretResRT;
+                genRes.SAC_ParentId__c = genialRequest.idShadow;
+                for(SAC_Genial_WS.Umbral umbral: pretensionW.umbrales){
+                    if(umbral.nivel == 'Tematica'){
+                        genRes.SAC_UmbralTematica__c = umbral.valor;
+                    }else if(umbral.nivel == 'ProductoServicio'){
+                        genRes.SAC_UmbralProdServ__c = umbral.valor;
+                    }else if(umbral.nivel == 'Motivo'){
+                        genRes.SAC_UmbralMotivo__c = umbral.valor;
+                    }else if(umbral.nivel == 'Detalle'){
+                        genRes.SAC_UmbralDetalle__c = umbral.valor;
+                    }
+                }
+                objRes.add((sObject)genRes);
             }
-            genRes.SAC_Json__c = JSON.serialize(pretension);
-            genRes.recordTypeId = pretResRT;
-            genRes.SAC_ParentId__c = genialRequest.idShadow;
-            objRes.add((sObject)genRes);
-
         }
-    //insert listGenRes;
-    SAC_MetodosSinSharing.modificarInsertarObjetos(objRes, 'insert');
-
+        SAC_MetodosSinSharing.modificarInsertarObjetos(objRes, 'insert');
     }
 
     /**
@@ -590,6 +658,7 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                 //siguiendo los mismos criterios que en los reclamantes
                 if (!settings.SAC_BotonReclamante__c){
                     genialRequest.reclamacion.SAC_NumeroDelDocumento__c = null;
+                    genialRequest.reclamacion.SAC_NombreRepresentante__c = null;
                 }
 
                 reclamacion = genialRequest.reclamacion;
@@ -597,7 +666,14 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                 pretPrincipalId = reclamacion.SAC_PretensionPrincipal__c;
                 //blanqueamos para que el trigger no coincida con la logica de cambio de owner
                 reclamacion.SAC_PretensionPrincipal__c = null;              
-               
+                // comprobar importe - tipo
+                if(reclamacion.CC_Importe_Reclamado__c != null && reclamacion.CC_Importe_Reclamado__c > 0){
+                    reclamacion.SAC_Importe_Tipo__c = 'Importe Reclamado';
+                }else{
+                    if(reclamacion.SAC_Importe_Tipo__c == 'Importe Reclamado' || (reclamacion.SAC_Importe_Tipo__c != 'Importe Reclamado' && reclamacion.SAC_Importe_Tipo__c != 'Sin Importe')){
+                        reclamacion.SAC_Importe_Tipo__c = 'Sin cuantificar';
+                    }
+                }
                 reclamacion.SAC_GenialEstado__c = 'SAC_003';
 
                 SAC_MetodosSinSharing.modificarInsertarObjetos((sobject)reclamacion, 'update');
@@ -655,7 +731,13 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                 reclaShadow.SAC_Reclamacion__c = genialRequest.reclamacion.Id;
                 reclaShadow.recordTypeId = reclaShadowRT;
                 reclaShadow.SAC_ParentId__c = genialRequest.idShadow;
-
+                // añadimos documento y página del reclamante
+                if(reclamante.reclamantePrincipal && reclamante.document != null){
+                    Id contentDocumentId = getContentDocumentId(reclamante.document);
+                    reclaShadow.SAC_DocumentoURL__c = contentDocumentId;
+                    reclaShadow.SAC_PaginaDocumento__c = reclamante.page;
+                    break;
+                }
                 // Verificamos si el account es confidencial o el dummy confidencial
                 if (reclamante.reclamante.CC_Confidencial__c || reclamante.reclamante.AV_Confidencial__c) {
                     reclaShadow.SAC_NombreContacto__c = 'CONFIDENCIAL';
@@ -725,5 +807,18 @@ public with sharing class SAC_GenialQueueable implements Queueable {
             CBK_Log.error(e, detalle);
         }
        // }
+    }
+    
+    /**
+     * @description            método para recuperar el contentDocumentId a partir del id generado por la IA
+     * @param document    	   datos recibidos de SAC_Genial_WS.
+     */
+    private static Id getContentDocumentId(String document){
+        Id contentDocumentId;
+        List<ContentVersion> cvList = [SELECT Id, ContentDocumentId, SAC_StringRedaccion_fileupload__c FROM ContentVersion WHERE SAC_StringRedaccion_fileupload__c =: document LIMIT 1];
+        if(!cvList.isEmpty()){
+            contentDocumentId = cvList[0].ContentDocumentId;
+        }
+        return contentDocumentId;
     }
 }

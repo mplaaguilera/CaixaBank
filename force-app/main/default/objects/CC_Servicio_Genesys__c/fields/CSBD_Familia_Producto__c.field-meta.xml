@@ -4,7 +4,7 @@
     <description>Campo utilizado para mapear con la oportunidad.</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
-    <label>Familia de producto</label>
+    <label>Familia Producto</label>
     <length>255</length>
     <required>false</required>
     <trackHistory>false</trackHistory>

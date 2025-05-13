@@ -19,7 +19,7 @@ public with sharing class SPV_MilestoneGeneral implements Support.MilestoneTrigg
             caso = [SELECT Id, Status, SAC_ProrrogaCounter__c, SPV_DiasProrroga__c, SAC_FechaRecepcion__c, RecordTypeId, SAC_FechaVencimientoSLA__c, SPV_MotivoComplementariaOrganismo__c, SPV_ComplementariaOrganismo__c FROM Case WHERE Id = :caseId];
             
             // Suma el tiempo de prorroga en la reclamación solo en el registro del SLA general en el que se ha prorrogado
-            if (caso.SPV_DiasProrroga__c != 0 && ((caso.Status == 'SAC_002' && caso.SAC_ProrrogaCounter__c == 1) || (caso.SPV_ComplementariaOrganismo__c && caso.SAC_ProrrogaCounter__c == 2 && caso.Status == 'SPV_Rectificacion'))) {
+            if (caso.SPV_DiasProrroga__c != 0 && ((caso.Status == 'SPV_AnalisisDecision' && caso.SAC_ProrrogaCounter__c == 1) || (caso.SPV_ComplementariaOrganismo__c && caso.SAC_ProrrogaCounter__c == 2 && caso.Status == 'SPV_Rectificacion'))) {
                 tiempoProrroga = calcularMinutos(Integer.valueOf(caso.SPV_DiasProrroga__c));
             }
 

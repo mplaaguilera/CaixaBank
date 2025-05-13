@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_IA_HaUsadoIA__c</fullName>
+    <description>Este campo comprueba si se ha usado la IA por parte del Agente del Contact Center.</description>
+    <formula>AND(
+    CC_IA_Interacciones_Asistente_IA__c &lt;&gt; 0
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Ha usado IA</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

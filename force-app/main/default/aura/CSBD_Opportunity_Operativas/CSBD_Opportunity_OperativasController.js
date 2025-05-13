@@ -17,6 +17,27 @@
 		window.setTimeout($A.getCallback(() => $A.enqueueAction(checkPSResponsable)), 3000);
 	},
 
+	messageChannelOnmessage: function(component, event) {
+		if (event && event.getParam('recordId') === component.get('v.recordId') && !component.get('v.cargarModales')) {
+			const type = event.getParam('type');
+			if (type === 'abrirModalAsignacionAutomatica') {
+				$A.enqueueAction(component.get('c.abrirModalAsignarAuto'));
+			} else if (type === 'cerrarOportunidad') {
+				$A.enqueueAction(component.get('c.abrirModalCerrar'));
+			} else if (type === 'programarCita') {
+				$A.enqueueAction(component.get('c.abrirModalProgramar'));
+			} else if (type === 'desprogramarCita') {
+				$A.enqueueAction(component.get('c.abrirModalDesprogramar'));
+			}
+		}
+
+		//Forzar render para evitar bug de Aura
+		setTimeout($A.getCallback(() => {
+			const divBotones = component.find('divBotones');
+			divBotones && divBotones.getElement().offsetTop;
+		}), 0);
+	},
+
 	botonRefrescarBotoneraOnclick: function(component, event) {
 		component.find('opportunityData').reloadRecord(true);
 		const botonRefrescarBotonera = event.getSource();
@@ -31,8 +52,9 @@
 			//'CSBD_No_Identificado__c', 'CSBD_Fecha_Cita__c', 'CSBD_Fecha_Firma__c', 'CSBD_Familia_Producto__c'
 			//];
 			//if (Object.keys(event.getParams().changedFields).some(campo => camposRelevantes.includes(campo))) {
-			window.setTimeout($A.getCallback(() => component.find('opportunityData').reloadRecord(false)), 0);
-			//}
+			setTimeout($A.getCallback(() => {
+				component.find('opportunityData').reloadRecord(false);
+			}), 200);			//}
 
 		} else if (event.getParams().changeType === 'LOADED') {
 			const ownerId = component.get('v.oportunidad').OwnerId;
@@ -223,8 +245,8 @@
 				.then(() => actionAPI.setActionFieldValues(argsAction))
 				.catch(e => {
 					if (e.errors) {
-						helper.mostrarToast('Seleccione la pestaña "Actividades/Correos"', 'El editor de correos debe estar visible para poder generar el borrador.	', 'info');
 						console.error('Error preparando el borrador del correo saliente.\n' + e.errors);
+						helper.mostrarToast('Seleccione la pestaña "Actividades/Correos"', 'El editor de correos debe estar visible para poder generar el borrador.	', 'info');
 					}
 				});
 			}
@@ -528,9 +550,18 @@
 	},
 
 	abrirModalCerrar: function(component, event, helper) {
-		if (!component.get('v.oportunidad.CSBD_Producto__c')) {
+		if (component.get('v.oportunidad.IsClosed')) {
+			// eslint-disable-next-line no-useless-return
+			return;
+		} else if (!component.get('v.oportunidad.CSBD_Producto__c')) {
 			helper.mostrarToast('Oportunidad sin producto', 'Es necesario que la oportunidad tenga un producto para poder cerrarla', 'info');
 		} else {
+
+			component.set('v.cargarModales', true);
+			component.set('v.modalCerrarOportunidad', true);
+			window.setTimeout($A.getCallback(() => component.find('modalCerrarOportunidad').abrirModal(true)), 50);
+
+			/*
 			component.set('v.cargarModales', true);
 
 			//Preparar opciones del desplegable de etapas finales
@@ -557,6 +588,7 @@
 			if (etapasFinales.length !== 1) {
 				helper.seleccionarControl(component, 'inputCerrarEtapa', 50);
 			}
+			*/
 		}
 	},
 
@@ -612,8 +644,6 @@
 	cerrar: function(component, event, helper) {
 		let campos = new Map();
 
-		let notasGestor;
-
 		let inputCerrarEtapa = component.find('inputCerrarEtapa');
 		inputCerrarEtapa.checkValidity();
 		inputCerrarEtapa.reportValidity();
@@ -627,10 +657,7 @@
 			inputMotivoRechazo.checkValidity();
 			inputMotivoRechazo.reportValidity();
 			if (inputMotivoRechazo.get('v.validity').valid) {
-
-				notasGestor = component.get('v.oportunidad.CSBD_Notas_gestor__c') ? inputMotivoRechazo.get('v.value') + '\n' + component.get('v.oportunidad.CSBD_Notas_gestor__c') : inputMotivoRechazo.get('v.value');
-
-				campos.set('CSBD_Notas_gestor__c', notasGestor);
+				campos.set('CSBD_Motivo_Devolucion__c', inputMotivoRechazo.get('v.value'));
 			}
 		}
 
@@ -840,9 +867,11 @@
 
 	abrirModalAsignarAuto: function(component, event, helper) {
 		component.set('v.cargarModales', true);
-		$A.util.addClass(component.find('modalAsignarAuto'), 'slds-fade-in-open');
-		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
-		helper.seleccionarControl(component, 'modalAsignarAutoCancelar', 50);
+		setTimeout($A.getCallback(() => {
+			$A.util.addClass(component.find('modalAsignarAuto'), 'slds-fade-in-open');
+			$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+			helper.seleccionarControl(component, 'modalAsignarAutoCancelar', 150);
+		}), 150);
 	},
 
 	abrirModalPendienteInterno: function(component, event, helper) {
@@ -1037,8 +1066,8 @@
 	asignarAuto: function(component, event, helper) {
 		helper.apex(component, 'solicitarAltaOmnichannel', {idOportunidad: component.get('v.recordId')})
 		.then(() => {
-			component.find('opportunityData').reloadRecord(true);
-			//window.setTimeout($A.getCallback(() => $A.get('e.force:refreshView').fire()), 1000);
+			//omponent.find('opportunityData').reloadRecord(true);
+			window.setTimeout($A.getCallback(() => $A.get('e.force:refreshView').fire()), 200);
 			helper.mostrarToast('Asignación automática solicitada', 'Asignación automática solicitada a Omnichannel para la oportunidad ' + component.get('v.oportunidad.CSBD_Identificador__c'), 'success');
 			$A.enqueueAction(component.get('c.cerrarModalAsignarAuto'));
 		}).catch(textoError => helper.mostrarToast('Problema solicitando asignación automática', textoError, 'error'));
@@ -1272,7 +1301,13 @@
 		helper.modalSiaAnimarBotonCopiar(component, idBoton);
 	},
 
-	modalTareaGestorAbrir: function(component, event, helper) {
+	// modalTareaGestorAbrir: function(component) {
+	abrirModalDerivarGestor: function(component) {
+		component.set('v.cargarModales', true);
+		component.set('v.modalDerivarGestor', true);
+		window.setTimeout($A.getCallback(() => component.find('modalDerivarGestor').abrirModal(true)), 50);
+
+		/*
 		component.set('v.cargarModales', true);
 		component.set('v.comentariosTarea', component.get('v.oportunidad.Description'));
 
@@ -1283,6 +1318,7 @@
 		} else {
 			helper.mostrarToast('Operativa no disponible', 'La oportunidad no se puede derivar a gestor porque no tiene producto PF', 'info');
 		}
+		*/
 	},
 
 	modalTareaGestorCerrar: function(component) {
@@ -1344,6 +1380,8 @@
 	buttonmenuSiaOnselect: function(component, event) {
 		if (event.getParam('value') === 'Informe SIA') {
 			$A.enqueueAction(component.get('c.abrirModalInformeSia'));
+		} else if (event.getParam('value') === 'Traslado SIA') {
+			$A.enqueueAction(component.get('c.abrirModalTrasladoSia'));
 		}
 	},
 
@@ -1365,7 +1403,7 @@
 		});
 		convertirOportunidadApex.setCallback(this, responseConvertirOportunidad => {
 			if (responseConvertirOportunidad.getState() === 'SUCCESS') {
-				helper.mostrarToast('Se creó la oportunidad', 'La oportunidad de tipo ' + component.get('v.tipoOperativaConvertir') + 'se creó correctamente.', 'success');
+				helper.mostrarToast('Se creó la oportunidad', 'La oportunidad de tipo ' + component.get('v.tipoOperativaConvertir') + ' se creó correctamente.', 'success');
 
 				let cerrarOportunidadApex = component.get('c.cerrarOportunidad');
 				cerrarOportunidadApex.setParams({
@@ -1470,5 +1508,13 @@
 		} else if (event.getParam('value') === 'programarFirma') {
 			$A.enqueueAction(component.get('c.abrirModalAgendarFirma'));
 		}
+	},
+
+	botonProgramarOnclick: function(component) {
+		component.find('menuProgramar').focus();
+	},
+
+	botonSiaOnclick: function(component) {
+		component.find('menuSia').focus();
 	}
 });

@@ -820,7 +820,8 @@ public with sharing class CBK_Log {
                 .setContextId((string)THIS_CONTEXT)
                 .setTxtStacktrace(stacktrace)
                 .setTxtFromAddress(email?.fromAddress)
-                .setTxtToAddress(txtToAddress);
+                .setTxtToAddress(txtToAddress)
+                .setForce(true);
             myBuilder.addLog();
 
             CBK_Log.insertPlatformEvent();
@@ -863,8 +864,8 @@ public with sharing class CBK_Log {
                 .setSfdcReplyTo(email?.inReplyTo)
                 .setSfdcToAddress(envelope.toAddress)
                 .setSfdcFromAddress(envelope.fromAddress)
-                .setSfdcType('Entrada');
-
+                .setSfdcType('Entrada')
+                .setForce(true);
             if  (email?.headers != null){
                 for (Messaging.InboundEmail.Header header : email.headers) {
                     mapHeaders.put(header.name, header.value?.left(255));
@@ -930,8 +931,8 @@ public with sharing class CBK_Log {
                 .setSfdcEmailMessageId(String.isNotBlank(inputResult.EmailMessageId) ? inputResult.EmailMessageId : '')
                 .setSfdcCaseId(String.isNotBlank(inputResult.CaseId) ? inputResult.CaseId : '')
                 .setSfdcResultStatus(String.isNotBlank(inputResult.Status) ? inputResult.Status : '')
-                .setSfdcResultDetail(String.isNotBlank(inputResult.Detail) ? inputResult.Detail : '');
-
+                .setSfdcResultDetail(String.isNotBlank(inputResult.Detail) ? inputResult.Detail : '')
+                .setForce(true);
             if  (email?.headers != null){
                 for (Messaging.InboundEmail.Header header : email.headers) {
                     mapHeaders.put(header.name, header.value?.left(255));
@@ -1870,6 +1871,7 @@ public with sharing class CBK_Log {
                 e.CBK_hdDeliveredTo__c = this.hdDeliveredTo?.left(255);
                 e.CBK_hdReference__c = this.hdReference?.left(255);
                 e.CBK_hdInReplyTo__c = this.hdInReplyTo?.left(255);
+                e.CBK_sfdcToAddress__c = this.sfdcToAddress?.left(255);
 
                 e.CBK_Error_Code__c = this.errorCode;
                 e.CBK_MessageException__c = this.messageException?.left(32500);

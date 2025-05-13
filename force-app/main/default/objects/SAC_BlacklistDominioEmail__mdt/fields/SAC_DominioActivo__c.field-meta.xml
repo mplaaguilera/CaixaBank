@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_DominioActivo__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Campo para activar o desactivar un dominio de la blacklist</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Actvo</label>
+    <type>Checkbox</type>
+</CustomField>

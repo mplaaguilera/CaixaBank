@@ -116,8 +116,11 @@ public with sharing class SPV_LCMP_GestionEmails {
 
         message.optOutPolicy = 'FILTER';
         message.Subject = asunto;
+
+        String cuerpoConcatenado = '';
+
         if(tipoObjeto == expectedCase){
-            message.HtmlBody = '<div style="display:none;">' + caso.CC_SuppliedID__c + ' </div>' + cuerpo;
+            cuerpoConcatenado = '<div style="display:none;">' + caso.CC_SuppliedID__c + ' </div>' + cuerpo;
         }
         else if(tipoObjeto == expectedInteraccion){
             if(interaccion.RecordTypeId == RECORDTYPECONSULTA && interaccion.SAC_GrupoColaborador__r.SAC_Externo__c == true){
@@ -129,14 +132,19 @@ public with sharing class SPV_LCMP_GestionEmails {
                     htmlArrastrarEmails = arrastrarEmailsFormato(listEmailMessages[0]);
                 }
 
-                message.HtmlBody = cuerpo + htmlArrastrarEmails;
+                cuerpoConcatenado = cuerpo + htmlArrastrarEmails;
             }else{
-                message.HtmlBody = cuerpo;
+                cuerpoConcatenado = cuerpo;
             }
         }
         else if(tipoObjeto == expectedAccion){
-            message.HtmlBody = cuerpo;
+            cuerpoConcatenado = cuerpo;
         }
+
+        //Raúl Santos - 08/04/2025 - Gestionar las imágenes que vienen inline.
+		String cuerpoFinal = SPV_Utils.gestionarImagenesInlineRedactarMail(cuerpoConcatenado);
+
+        message.setHtmlBody(cuerpoFinal);
 
         if(!lstIdCV.isEmpty()){
             message.setEntityAttachments(lstIdCV);

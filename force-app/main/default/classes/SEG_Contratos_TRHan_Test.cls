@@ -6,6 +6,51 @@ public class SEG_Contratos_TRHan_Test {
     @testSetup
     public static void testSetup() 
     {
+        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+            Profile perfil = [SELECT Id FROM Profile WHERE Name='System Administrator'];
+            UserRole rol = [SELECT Id FROM UserRole WHERE Name='Sistemática Comercial'];
+            String orgId = UserInfo.getOrganizationId();
+            String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
+            Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
+            String uniqueName = orgId + dateString + randomInt;
+            User thisUser = new User(alias = 'user2', email='testSEGBI2@acme.com',
+                emailencodingkey='UTF-8', lastname='Smith',
+                languagelocalekey='en_US',
+                localesidkey='en_US', profileid = perfil.Id, userroleid = rol.Id,
+                timezonesidkey='America/Los_Angeles',
+                Username = uniqueName + '@test' + orgId + '.org');
+            insert thisUser;
+            List<PermissionSetAssignment> listPermissionSetAssignment = new List<PermissionSetAssignment>();
+            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('CBK_Framework_Login','CBK_Framework_Admin')]){
+                PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
+                nuevoPermiso.PermissionSetId = permisoUnitario.PermissionSetId;
+                nuevoPermiso.AssigneeId = thisUser.id;
+                listPermissionSetAssignment.add(nuevoPermiso);
+            }
+            if (listPermissionSetAssignment.isEmpty()){
+                insert listPermissionSetAssignment;
+            }
+            Profile perfil2 = [SELECT Id FROM Profile WHERE Name='SEG_Usuario_CaixaBank'];
+            UserRole rol2 = [SELECT Id FROM UserRole WHERE Name='Segmentos + FFEE'];
+            User thisUser2 = new User(alias = 'tsegmen', email='testSEGBI@acme.com',
+                emailencodingkey='UTF-8', lastname='Smith',
+                languagelocalekey='en_US',
+                localesidkey='en_US', profileid = perfil2.Id, userroleid = rol2.Id,
+                timezonesidkey='America/Los_Angeles',
+                username='testSEGBI@acme.com');
+            insert thisUser2;
+            List<PermissionSetAssignment> listPermissionSetAssignment2 = new List<PermissionSetAssignment>();
+            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('SEG_Operativo','SEG_Supervisor')]){
+                PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
+                nuevoPermiso.PermissionSetId = permisoUnitario.PermissionSetId;
+                nuevoPermiso.AssigneeId = thisUser.id;
+                listPermissionSetAssignment2.add(nuevoPermiso);
+            }
+            if (listPermissionSetAssignment2.isEmpty()){
+                insert listPermissionSetAssignment2;
+            }
+        }
+
         Id recordDet = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
         // Creación cuentas a tratar.
         Account cuentaSEG1 = new Account();
@@ -41,11 +86,11 @@ public class SEG_Contratos_TRHan_Test {
 
 
 
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();        
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
-        Id recordTypeIdDetalle = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
-
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
+        
         //Crear reclamaciones
         SEG_Reclamaciones__c recl = new SEG_Reclamaciones__c();
         recl.Name = 'Testreclamaciones';
@@ -122,8 +167,8 @@ public class SEG_Contratos_TRHan_Test {
         caso3.Status = 'Activo';
         caso3.Subject = 'test Seguimiento';
         caso3.SEG_ClasificacionRapida__c = regla3.Id;
-        caso3.SEG_Organizacion__c = 'Instituciones';
-		caso3.SEG_Zona__c = 'Instituciones Catalunya';
+        caso3.SEG_Zona__c = 'Corporativa';
+        caso3.SEG_Organizacion__C = 'Banca Corporativa';
 
         insert caso3;
         
@@ -141,8 +186,8 @@ public class SEG_Contratos_TRHan_Test {
         caso4.Status = 'Activo';
         caso4.Subject = 'test Seguimiento';
         caso4.SEG_ClasificacionRapida__c = regla3.Id;
-        caso4.SEG_Organizacion__c = 'Instituciones';
-		caso4.SEG_Zona__c = 'Instituciones Catalunya';
+        caso4.SEG_Zona__c = 'Corporativa';
+        caso4.SEG_Organizacion__C = 'Banca Corporativa';
 
         insert caso4;
         
@@ -150,12 +195,14 @@ public class SEG_Contratos_TRHan_Test {
         caracteristica.RecordTypeId = Schema.SObjectType.CC_Caracteristica__c.getRecordTypeInfosByDeveloperName().get('Marca').getRecordTypeId();
         caracteristica.Name = 'Reclamaciones Agotadas';
         caracteristica.CC_Descripcion__c = 'descripción';
+        caracteristica.OS_Negocio__c = 'SEGMENTOS';
         insert caracteristica;
         
         CC_Caracteristica__c caracteristica2 = new CC_Caracteristica__c();
         caracteristica2.RecordTypeId = Schema.SObjectType.CC_Caracteristica__c.getRecordTypeInfosByDeveloperName().get('Marca').getRecordTypeId();
         caracteristica2.Name = 'Errores22';
         caracteristica2.CC_Descripcion__c = 'test';
+        caracteristica2.OS_Negocio__c = 'SEGMENTOS';
         insert caracteristica2;
         
         SEG_Marca_de_un_cliente__c marca1 = new SEG_Marca_de_un_cliente__c();
@@ -244,5 +291,84 @@ public class SEG_Contratos_TRHan_Test {
         
     }
 
+
+    //Metodo Test para probar el rellenado automático de los datos de reclamación (SEG_1a_Reclamacion_ejecutada_manualmente__c, SEG_2a_Reclamacion_ejecutada_manualmente__c y SEG_3a_Reclamacion_ejecutada_manualmente__c) en la inserción.
+    @isTest
+    public static void reclamacionesBITest(){
+ 
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
+        Account cuenta = [SELECT Id FROM Account LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact LIMIT 1];
+        Case caso = new Case();
+        caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Seguimiento').getRecordTypeId();
+        caso.Subject = 'Prueba primer caso';
+        caso.Status = 'Pendiente';
+        caso.SEG_Organizacion__c = 'Banca Corporativa';
+        caso.SEG_Zona__c = 'Corporativa';
+        caso.OwnerId = usuarioTest.Id;
+
+        Test.startTest();
+        System.runAs(usuarioTest) { 
+            insert caso;
+            SEG_Contratos__c contrato = new SEG_Contratos__c();
+            contrato.Name = 'Contrato 3 Fechas';
+            contrato.SEG_NombreCliente__c = contacto.Id;
+            contrato.SEG_NombreCuenta__c = cuenta.Id;
+            contrato.SEG_SR_Seguimiento__c = caso.Id;
+            contrato.SEG_1a_Reclamacion_ejecutada_manualmente__c = true;
+            contrato.SEG_2a_Reclamacion_ejecutada_manualmente__c = true;
+            contrato.SEG_3a_Reclamacion_ejecutada_manualmente__c = true;
+            contrato.SEG_Fecha_Envio_Gestor_Proceso__c = Date.today();
+            insert contrato;
+        }
+        Test.stopTest();
+        SEG_Contratos__c carTrasInsert = [SELECT Id, SEG_Estado__c, SEG_Fecha_1a_Reclamacion_Proceso__c, SEG_Fecha_2a_Reclamacion_Proceso__c, SEG_Fecha_3a_Reclamacion_Proceso__c FROM SEG_Contratos__c WHERE Name = 'Contrato 3 Fechas' LIMIT 1];
+        System.assertNotEquals(null , carTrasInsert.SEG_Fecha_1a_Reclamacion_Proceso__c,'No se ha rellenado la SEG_Fecha_1a_Reclamacion_Proceso__c');
+        System.assertNotEquals(null , carTrasInsert.SEG_Fecha_2a_Reclamacion_Proceso__c,'No se ha rellenado la SEG_Fecha_2a_Reclamacion_Proceso__c');
+        System.assertNotEquals(null , carTrasInsert.SEG_Fecha_3a_Reclamacion_Proceso__c,'No se ha rellenado la SEG_Fecha_3a_Reclamacion_Proceso__c');
+        System.assertEquals('Reclamaciones agotadas' , carTrasInsert.SEG_Estado__c,'No se ha modificado el estado del contrato');
+    }
+
+    //Metodo Test para probar el rellenado automático de los datos de reclamación (SEG_1a_Reclamacion_ejecutada_manualmente__c, SEG_2a_Reclamacion_ejecutada_manualmente__c y SEG_3a_Reclamacion_ejecutada_manualmente__c) en la actualización.
+    @isTest
+    public static void reclamacionesBUTest(){
     
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
+        Account cuenta = [SELECT Id FROM Account LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact LIMIT 1];
+        Case caso = new Case();
+        caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Seguimiento').getRecordTypeId();
+        caso.Subject = 'Prueba primer caso';
+        caso.Status = 'Pendiente';
+        caso.SEG_Organizacion__c = 'Banca Corporativa';
+        caso.SEG_Zona__c = 'Corporativa';
+        caso.OwnerId = usuarioTest.Id;
+
+        Test.startTest();
+        System.runAs(usuarioTest) { 
+            insert caso;
+            SEG_Contratos__c contrato = new SEG_Contratos__c();
+            contrato.Name = 'Contrato 3 Fechas';
+            contrato.SEG_NombreCliente__c = contacto.Id;
+            contrato.SEG_NombreCuenta__c = cuenta.Id;
+            contrato.SEG_SR_Seguimiento__c = caso.Id;
+            contrato.SEG_1a_Reclamacion_ejecutada_manualmente__c = false;
+            contrato.SEG_2a_Reclamacion_ejecutada_manualmente__c = false;
+            contrato.SEG_3a_Reclamacion_ejecutada_manualmente__c = false;
+            insert contrato;
+        
+            contrato.SEG_1a_Reclamacion_ejecutada_manualmente__c = true;
+            contrato.SEG_2a_Reclamacion_ejecutada_manualmente__c = true;
+            contrato.SEG_3a_Reclamacion_ejecutada_manualmente__c = true;
+            contrato.SEG_Fecha_Envio_Gestor_Proceso__c = Date.today();
+            update contrato;
+        }
+        Test.stopTest();
+
+        SEG_Contratos__c carTrasInsert = [SELECT Id, SEG_Estado__c, SEG_Fecha_1a_Reclamacion_Proceso__c, SEG_Fecha_2a_Reclamacion_Proceso__c, SEG_Fecha_3a_Reclamacion_Proceso__c FROM SEG_Contratos__c WHERE Name = 'Contrato 3 Fechas'  LIMIT 1];
+        System.assertNotEquals(null , carTrasInsert.SEG_Fecha_1a_Reclamacion_Proceso__c,'No se ha rellenado la SEG_Fecha_1a_Reclamacion_Proceso__c');
+        System.assertNotEquals(null , carTrasInsert.SEG_Fecha_2a_Reclamacion_Proceso__c,'No se ha rellenado la SEG_Fecha_2a_Reclamacion_Proceso__c');
+        System.assertNotEquals(null , carTrasInsert.SEG_Fecha_3a_Reclamacion_Proceso__c,'No se ha rellenado la SEG_Fecha_3a_Reclamacion_Proceso__c');
+        System.assertEquals('Reclamaciones agotadas' , carTrasInsert.SEG_Estado__c,'No se ha modificado el estado del contrato');
+    }
 }

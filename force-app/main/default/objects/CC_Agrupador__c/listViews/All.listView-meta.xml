@@ -9,6 +9,17 @@
     <columns>CC_Estado__c</columns>
     <columns>CC_Fecha_Deteccion__c</columns>
     <columns>CC_Id_Maximo__c</columns>
+    <columns>CC_Titulo__c</columns>
     <filterScope>Everything</filterScope>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>equals</operation>
+        <value>9/10/2024 12:00 AM</value>
+    </filters>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Agrupador__c.CC_Masiva_Control</value>
+    </filters>
     <label>All</label>
 </ListView>

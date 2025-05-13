@@ -9,9 +9,7 @@ public with sharing class CC_Opportunity_AI_TRHan extends CC_TriggerHandlerBase 
         if (!listNewObjCsbd.isEmpty()) {
             actualizarNombreOportunidad(listNewObjCsbd);
             envioAdobeCampaign(listNewObjCsbd);
-            if (!Test.isRunningTest()) {
-                CC_Opportunity_AI_HandlerHelper.actualizarIdOportunidadEnCase(JSON.serialize(listNewObjCsbd));
-            }
+            CC_Opportunity_AI_HandlerHelper.actualizarIdOportunidadEnCase(JSON.serialize(listNewObjCsbd));
         }
     }
 

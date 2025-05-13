@@ -77,7 +77,7 @@ export default class csbd_DisponibilidadGestores extends NavigationMixin(Lightni
 				if (tramoVisible) {
 					this.seleccionar(divTramo, false);
 				} else {
-					divTramo.scrollIntoView({behavior: 'smooth', block: 'center'});
+					window.scrollIntoView({behavior: 'smooth', block: 'center'});
 					window.setTimeout(() => this.seleccionar(divTramo, false), 210);
 				}
 			}

@@ -125,15 +125,6 @@ public with sharing class GestorDocumentalController {
         }
     }
 
-    @AuraEnabled
-    public static List<SDOC__SDTemplate__c> obtenerPlantillas(String ids){
-		List<String> res = ids.split(',');
-
-        List<SDOC__SDTemplate__c> plantillaSDOC = [SELECT Id, Name, SDOC__Language__c FROM SDOC__SDTemplate__c WHERE Id IN :res];
-        
-        return plantillaSDOC;
-    }
-
     /*
      *Método para recuperar valores configurados en LOV.
      */

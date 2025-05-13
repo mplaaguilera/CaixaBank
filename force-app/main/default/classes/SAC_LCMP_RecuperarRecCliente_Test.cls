@@ -3,7 +3,7 @@ public with sharing class SAC_LCMP_RecuperarRecCliente_Test {
     @TestSetup
     static void makeData(){
         
-        Test.startTest();
+        
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];     
         SAC_DatabaseDML.insertDML(usuarioAdmin, false);
         //Database.insert(usuarioAdmin);
@@ -16,13 +16,13 @@ public with sharing class SAC_LCMP_RecuperarRecCliente_Test {
             SAC_DatabaseDML.insertDML(usuario, false);    
             //Database.insert(usuario);
         }
-        Test.stopTest();
+        
 
         //Cuentas
         Account cuentaA = SAC_TestDataFactory.crearCuentasNoClientePA(1)[0];
         SAC_DatabaseDML.insertDML(cuentaA, false);  
         //Database.insert(cuentaA);
-        
+        Test.startTest();
         List<Case> listaReclamaciones = new List<Case>();
         //RECLAMACION 1
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -123,20 +123,23 @@ public with sharing class SAC_LCMP_RecuperarRecCliente_Test {
         accion1.SAC_Reclamacion__C = casoReclamacion.Id;
         SAC_DatabaseDML.insertDML(accion1, false); 
         //Database.insert(accion1);
+        Test.stopTest();
     }
 
     @isTest
     static void getReclamacionesClienteTest() {
+        Test.startTest();
         Account cuenta = [SELECT id FROM Account WHERE PersonEmail = 'acuserecibo0@acuse.com.test' LIMIT 1];
 		User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true LIMIT 1];
         List<SAC_LCMP_RecuperarReclamacionesCliente.InfoReclamacionWrapper> wrapperReclamaciones;
 
         System.runAs(usuario) {
-            Test.startTest();
+            
         	wrapperReclamaciones = SAC_LCMP_RecuperarReclamacionesCliente.getReclamacionesCliente(cuenta.Id);
-            Test.stopTest();
+          
         }
         
         Assert.areNotEqual(null, wrapperReclamaciones, 'No se ha recuperado reclamaciones asociadas al reclamante.');
+        Test.stopTest();
     }
 }

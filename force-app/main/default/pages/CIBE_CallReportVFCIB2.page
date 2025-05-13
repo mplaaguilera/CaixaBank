@@ -1,0 +1,666 @@
+<apex:page renderAs="PDF" showHeader="false" sidebar="false" standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" controller="CIBE_CallReportVFControllerCIB2">
+
+    <html>
+        <head>
+            <style type="text/css">
+                @page {
+                    margin-top:     170px;
+                    margin-left:    60px;
+                    @top-center {
+                        width: 100%;
+                        content: element(header);
+                    }
+                    @bottom-center {
+                        width: 100%;
+                        content: element(footer);
+                    }
+                }
+                div.header {
+                    padding-top: 70px;
+                    padding-left: 8px;
+                    display: block;
+                    position: running(header);
+                }
+                div.footer {
+                    display: block;
+                    position: running(footer);
+                }
+
+                #tabla{
+                    border: 1px solid white;
+                    border-collapse: collapse; 
+                    margin-top: 30px; 
+                    width: auto;
+                }
+                #tabla2{
+                    border: 1px solid white;
+                    border-collapse: collapse; 
+                    width: auto;
+                    margin-top: 10px; 
+
+                }
+                #tabla3{
+                    border: 1px solid white;
+                    border-collapse: collapse; 
+                    margin-top: 30px; 
+                    width: 50%;
+                }
+                th, td {
+                    background-color: white;
+                    text-align: left;
+                     font-family: Arial, Helvetica, sans-serif;
+                    
+                }
+
+                #tablaProductos{
+                    border: 1px solid white;
+                    border-collapse: collapse; 
+                    width: auto;
+                    margin-top: 10px;
+                }
+
+                #tablaProductos td{
+                    background-color: white;
+                    border-bottom: 10pt solid white;
+                }
+                #tablaProductos th{
+                    background-color: white;
+                    border-top: 10pt solid white;
+                }
+
+                #tabla3 td{
+                    background-color: white;
+                    border-bottom: 10pt solid white;
+                }
+
+                #tabla4{
+                    border: 1px solid white;
+                    border-collapse: collapse; 
+                    width: auto;
+                    margin-top: 30px; 
+
+                }
+                #tabla4 td{
+                    background-color: white;
+                    border-bottom: 10pt solid white;
+                }
+
+                <!--Todos los estilos Segmento-->
+                .table-container {
+                    display: table;
+                    width: 100%;
+                    table-layout: fixed; 
+                    margin: 12px 0;
+                    border-spacing: 12px; 
+                }
+
+                .table-cell {
+                    display: table-cell;
+                    vertical-align: top;
+                    border: 1px solid #c9c9c9;
+                    border-radius: 60px;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                th, td {
+                    padding: 0.5rem;
+                    vertical-align: top;
+                    border: none;
+                    font-family: Arial, Helvetica, sans-serif;
+                }
+
+                h3 {
+                    margin: 10;
+                    font-size: 14px; 
+                    font-family: Arial, Helvetica, sans-serif;
+                }
+
+                h2 {
+                    margin: 10;
+                    margin-left: 10px;
+                    font-size: 16px; 
+                    font-family: Arial, Helvetica, sans-serif;
+                }
+
+                .inline-icon-text {
+                    display: flex;
+                    align-items: center; 
+                    margin: 10px;
+                    font-size: 14px;
+                }
+
+                .help-icon {
+                    display: flex;
+                    align-items: center; 
+                    margin-left: 8px; 
+                }
+
+                .help-icon img {
+                    width: 16px; 
+                    height: auto;
+                }
+
+                .icon-rounded {
+                    width: 13px;
+                    height: 13px;
+                    display: inline-block;
+                    margin-right: 8px;
+                    border-radius: 50%;
+                }
+
+                .icon-rounded img {
+                    width: 100%;
+                    height: auto;
+                    display: block;
+                }
+
+                .alta-icon, .mediaAlta-icon, .media-icon, .mediaBaja-icon, .baja-icon, .morosos-icon, .inactivos-icon, .financiacionProyecto-icon {
+                    width: 16px;
+                    height: 16px;
+                    display: inline-block;
+                    border-radius: 100%;
+                }
+
+                .alta-icon {
+                    background-color: #04B94C;
+                }
+
+                .mediaAlta-icon {
+                    background-color: #56876D;
+                }
+
+                .media-icon {
+                    background-color: #F9F50C;
+                }
+
+                .mediaBaja-icon {
+                    background-color: #850000;
+                }
+
+                .baja-icon {
+                    background-color: #F0011D;
+                }
+
+                .morosos-icon {
+                    background-color: black;
+                }
+
+                .inactivos-icon {
+                    background-color: white;
+                    
+                }
+                .financiacionProyecto-icon{
+                    background-color: #999999;
+                }
+            </style>
+        </head>
+        <body>
+            
+                <div class="header">
+                    <div style="float: right; ">
+                        <apex:image url="{!$Resource.CIBE_LogoCallReportCIB}" width="170" height="70" />
+                    </div>
+                </div>
+
+                <div class="content" style="margin-top: 20px;  margin-left: 50px;">
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="padding-left: 10px; ">{!$Label.CIBE_CallReportV2}</th>
+                            <td style="padding-left: 430px; font-size: 14px;">{!$Label.CIBE_CXBCIB}</td>
+                        </tr>
+                    </table>
+                    <hr style=" margin-left: 10px; margin-right: 10px;"></hr>
+                </div>
+
+                <div class="content" style="margin-top: 40px;">
+                       
+                         <table id="tabla">
+                            <apex:repeat value="{!accounts}" var="account">
+                                <tr>
+                                    <th>
+                                        <apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/company_120.png')}"  width="25px" height="25px"/>
+                                    </th>
+                                    <th style=" text-align: left; padding: 0 30px 0;">{!$Label.CIBE_Company}</th>
+
+                                </tr>
+
+                                <tr>
+                                    <td style=" text-align: left; background-color: white;"></td>
+                                    <td style=" padding: 0 30px 0; text-align: left; background-color: white;">{!account.Name}</td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+
+                <!--Inicio Sección Segmento-->
+              <div style="margin-left: 50px; margin-top: 30px;">
+                    <h2>{!$Label.CIBE_SegmentoRentabilidad}</h2>
+                    <div class="table-container">
+                        <!-- Tabla Absoluta -->
+                        <div class="table-cell">
+                            <table>
+                                <!-- Fila combinada para Empresa y Grupo -->
+                                <tr>
+                                    <td style="margin-left: 15px;">
+                                        <label style="font-size: 15px; margin-left: 15px;">{!$Label.CIBE_EmpresaABS}</label>
+                                        <div class="inline-icon-text">
+                                            <apex:outputPanel rendered="{!empresaAbsoluta}">
+                                                <div class="icon-rounded" style="margin-left: 6px;">
+                                                    <apex:image url="{!URLFOR($Resource.CIBE_IconsCallReport)}" width="16px" height="16px" styleClass="{!empresaAbsolutaClass}" />
+                                                </div>
+                                            </apex:outputPanel>
+                                            <span style="font-size: 13px; margin-bottom: 1em;">{!absolutaEmpresa}</span>
+                                            
+                                        </div>
+                                    </td>
+                                    <td style="margin-left: 15px;">
+                                        <label style="font-size: 15px; margin-left: 15px;">{!$Label.CIBE_GrupoABS}</label>
+                                        <div class="inline-icon-text">
+                                            <apex:outputPanel rendered="{!grupoAbsoluta}">
+                                                <div class="icon-rounded" style="margin-left: 6px;">
+                                                    <apex:image url="{!URLFOR($Resource.CIBE_IconsCallReport)}" width="16px" height="16px" styleClass="{!grupoAbsolutaClass}" />
+                                                </div>
+                                            </apex:outputPanel> 
+                                            <span style="font-size: 13px;">{!absolutaGrupo}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Tabla Relativa -->
+                        <div class="table-cell">
+                            <table>
+                                <!-- Fila combinada para Empresa y Grupo -->
+                                <tr>
+                                    <td style="margin-left: 15px;">
+                                        <label style="font-size: 15px; margin-left: 15px;">{!$Label.CIBE_EmpresaREL}</label>
+                                        <div class="inline-icon-text">
+                                            <apex:outputPanel rendered="{!empresaRelativa}">
+                                                <div class="icon-rounded" style="margin-left: 6px;">
+                                                    <apex:image url="{!URLFOR($Resource.CIBE_IconsCallReport)}" width="16px" height="16px" styleClass="{!empresaRelativaClass}" />
+                                                </div>
+                                            </apex:outputPanel>
+                                            <span style="font-size: 13px;">{!relativaEmpresa}</span>
+                                        </div>
+                                    </td>
+                                    <td style="margin-left: 15px;">
+                                        <label style="font-size: 15px; margin-left: 15px;">{!$Label.CIBE_GrupoREL}</label>
+                                        <div class="inline-icon-text">
+                                            <apex:outputPanel rendered="{!grupoRelativa}">
+                                                <div class="icon-rounded" style="margin-left: 6px;">
+                                                    <apex:image url="{!URLFOR($Resource.CIBE_IconsCallReport)}" width="16px" height="16px" styleClass="{!grupoRelativaClass}" />
+                                                </div>
+                                            </apex:outputPanel>
+                                            <span style="font-size: 13px;">{!relativaGrupo}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!--Fin Sección Segmento-->
+
+                        <table style="border: 1px solid white;border-collapse: collapse; margin-top: 15px; width: auto;">
+                            <apex:repeat value="{!eventWrapper}" var="event">
+                                <!--Sector-->
+                                 <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style=" text-align: left; padding: 0 30px 0;">Sector</th>
+                                </tr>
+
+                                <tr>
+                                    <td  style= "width:25px; height: 25px"></td>
+                                    <td style=" padding: 0 30px 0; text-align: left;  background-color: white;">{!event.sector}</td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="2" style="height: 20px;"></td>
+                                </tr>
+
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/answer_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style=" text-align: left; padding: 0 30px 0; ">{!$Label.CIBE_Asunto}</th>
+                                </tr>
+
+                                <tr>
+                                    <td style= "width:25px; height: 25px"></td>
+                                    <td style=" text-align: left; padding: 0 30px 0;">{!event.Subject}</td>
+                                </tr>
+
+
+                            </apex:repeat>
+                        </table>
+
+                        <table id="tabla">
+                           
+                            <apex:repeat value="{!eventWrapper}" var="event">
+
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/event_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style=" text-align: left; padding: 0 30px 0;">{!$Label.CIBE_Fecha}</th>
+                                </tr>
+
+                                <tr>
+                                    <td  style= "width:25px; height: 25px"></td>
+                                    <td style=" padding: 0 30px 0; text-align: left;  background-color: white;">{!event.activityDate}</td>
+                                </tr>
+
+                                <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style=" text-align: left; padding: 0 30px 0;">{!$Label.CIBE_TipoCita}</th>
+                                </tr>
+
+                                <tr>
+                                    <td  style= "width:25px; height: 25px"></td>
+                                    <td style=" padding: 0 30px 0; text-align: left;  background-color: white;">{!event.type}</td>
+                                </tr>
+
+                                <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style=" text-align: left; padding: 0 30px 0;">{!$Label.CIBE_Ubicacion}</th>
+                                </tr>
+
+                                <tr>
+                                    <td  style= "width:25px; height: 25px"></td>
+                                    <td style=" padding: 0 30px 0; text-align: left;  background-color: white;">{!event.location}</td>
+                                </tr>
+
+                                <!--País-->
+                                <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style=" text-align: left; padding: 0 30px 0;">{!$Label.CIBE_Pais}</th>
+                                </tr>
+
+                                <tr>
+                                    <td  style= "width:25px; height: 25px"></td>
+                                    <td style=" padding: 0 30px 0; text-align: left;  background-color: white;">{!event.pais}</td>
+                                </tr>
+                                
+                            </apex:repeat>
+                        </table>
+
+                        <!-- todos rellenos -->
+                        <apex:pageBlock rendered="{!AND(eventWrapper.clientAttendees.size != 0, eventWrapper.caixabankAttendees.size != 0, eventWrapper.notRegisteredAttendees.size != 0)}">
+                            <table id="tabla2">
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/people_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesClientes}</th>
+                                </tr>
+                                <tr>
+                                    <td style= "width:25px; height: 25px"></td>
+                                    <td style="padding: 0 30px 0;  white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.clientAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name}<br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+
+                            <table id="tabla2">
+                                <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesCaixabank}</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.caixabankAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name} <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+
+                            <table id="tabla2">
+                                <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesNoRegistrados}</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.notRegisteredAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name} <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+                        </apex:pageBlock>
+
+
+                        <!-- solo cxbAttende relleno -->
+                        <apex:pageBlock rendered="{!AND(eventWrapper.clientAttendees.size == 0, eventWrapper.caixabankAttendees.size != 0, eventWrapper.notRegisteredAttendees.size == 0)}">
+                            <table id="tabla2">
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/people_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesCaixabank}</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.caixabankAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name}  <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+                        </apex:pageBlock>
+
+                        <!-- solo attCliente relleno -->
+                        <apex:pageBlock rendered="{!AND(eventWrapper.clientAttendees.size != 0, eventWrapper.caixabankAttendees.size == 0, eventWrapper.notRegisteredAttendees.size == 0)}">
+                            <table id="tabla2">
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/people_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesClientes}</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.clientAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name} <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+                        </apex:pageBlock>
+
+                        <!-- solo noRegistradoAtt relleno -->
+                        <apex:pageBlock rendered="{!AND(eventWrapper.clientAttendees.size == 0, eventWrapper.caixabankAttendees.size == 0, eventWrapper.notRegisteredAttendees.size != 0)}">
+                            <table id="tabla2">
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/people_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesNoRegistrados}</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.notRegisteredAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name} <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+                        </apex:pageBlock>
+
+                        <!-- rellenos cxb y clientes -->
+                        <apex:pageBlock rendered="{!AND(eventWrapper.clientAttendees.size != 0, eventWrapper.caixabankAttendees.size != 0, eventWrapper.notRegisteredAttendees.size == 0)}">
+                            <table id="tabla2">
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/people_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesClientes}</th>
+                                </tr>
+                                <tr>
+                                    <td style= "width:25px; height: 25px"></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.clientAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name} <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+
+                            <table id="tabla2">
+                                <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesCaixabank}</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.caixabankAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name} <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+                        </apex:pageBlock>
+
+
+                        <!--  rellenos cxb y no registrados -->
+                        <apex:pageBlock rendered="{!AND(eventWrapper.clientAttendees.size == 0, eventWrapper.caixabankAttendees.size != 0, eventWrapper.notRegisteredAttendees.size != 0)}">
+                            <table id="tabla2">
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/people_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesCaixabank}</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.caixabankAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name} <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+
+                            <table id="tabla2">
+                                <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesNoRegistrados}</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.notRegisteredAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name}  <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+                        </apex:pageBlock>
+
+                        <!-- rellenos cliente y no registrados -->
+                        <apex:pageBlock rendered="{!AND(eventWrapper.clientAttendees.size != 0, eventWrapper.caixabankAttendees.size == 0, eventWrapper.notRegisteredAttendees.size != 0)}">
+                            <table id="tabla2">
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/people_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesClientes}</th>
+                                </tr>
+                                <tr>
+                                    <td style= "width:25px; height: 25px"></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.clientAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name}  <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+
+                            <table id="tabla2">
+                                <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_AsistentesNoRegistrados}</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="padding: 0 30px 0; white-space: nowrap;">
+                                        <apex:repeat value="{!eventWrapper.notRegisteredAttendees}" var="attendee">
+                                            {!attendee.CIBE_Contacto__r.Name} <br/>
+                                        </apex:repeat>
+                                    </td>   
+                                </tr>
+
+                            </table>
+                        </apex:pageBlock>
+
+
+                        <apex:pageBlock rendered="{!AND(eventWrapper.relatedProducts.size != 0)}">
+
+                            <table id="tablaProductos">
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/archive_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style="padding: 0 30px 0;">{!$Label.CIBE_Productos}</th>
+                                </tr>
+
+                                <apex:repeat value="{!eventWrapper.relatedProducts}" var="product">
+                                    <tr>
+                                        <td style= "width:25px; height: 25px"></td>
+                                        <th style="padding: 0 30px 0;">
+                                            {!product.CIBE_Producto__r.Name}
+                                            
+                                        </th>   
+                                    </tr>
+                                    <tr>
+                                        <td style= "width:25px; height: 25px"></td>
+                                        <td style="padding: 0 30px 0;">
+                                                {!product.CIBE_Comentario__c}
+                                        </td>   
+                                    </tr>
+                                </apex:repeat>    
+
+                            </table>
+
+                        </apex:pageBlock>
+
+                        <table id="tabla4">
+                            <apex:repeat value="{!eventWrapper}" var="event">
+                                <tr>
+                                    <th><apex:image url="{!URLFOR($Resource.CIBE_IconsCallReportCIB, 'iconsCallReport/comments_120.png')}"  width="25px" height="25px"/></th>
+                                    <th style=" padding: 0 30px 0; text-align: left; ">{!$Label.CIBE_ComentariosCita}</th>
+                                </tr>
+
+                                <tr>
+                                    <td  style= "width:25px; height: 25px"></td>
+                                    <td style="padding: 0 30px 0;">
+                                        <apex:repeat value="{!event.comments}" var="comen">
+                                            {!comen} <br/>
+                                        </apex:repeat>
+                                    </td>  
+                                </tr>
+
+                                <tr>
+                                    <th  style= "width:25px; height: 25px"></th>
+                                    <th style=" padding: 0 30px 0; text-align: left; ">{!$Label.CIBE_ConclusionesCita}</th>
+                                </tr>
+
+                                <tr>
+                                    <td style= "width:25px; height: 25px"></td>
+                                    <td style="padding: 0 30px 0;">
+                                        <apex:repeat value="{!event.conclusions}" var="conclu"> 
+                                            {!conclu} <br/>
+                                        </apex:repeat>
+                                    </td> 
+                                </tr>
+                            </apex:repeat>
+
+                        </table>
+                </div>
+            </body>
+    </html>
+</apex:page>

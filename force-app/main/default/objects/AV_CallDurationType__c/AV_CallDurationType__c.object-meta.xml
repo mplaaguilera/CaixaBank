@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>List</customSettingsType>
+    <description>Parametrice el campo AV_Duration__c dependiendo de los segundo que tenga la llamada.</description>
+    <enableFeeds>false</enableFeeds>
+    <label>AV_CallDurationType</label>
+    <visibility>Public</visibility>
+</CustomObject>

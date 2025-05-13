@@ -26,10 +26,9 @@ public without sharing class CC_Envio_Encuestas_3N {
     public static void enviarEncuestaFuture(List<Case> casos, Boolean casoTelefonia) {
         Set<Id> idsCasosSet = new Set<Id>();
         Set<Id> idsCasosEnvioEncuesta = new Set<Id>();
-        
         //Solucion IN Too many Email Invocations: 11
         List<Messaging.SingleEmailmessage> oListMail = new List<Messaging.SingleEmailmessage>();
-             
+        
         if(casoTelefonia) {
             for (Case caso : casos) {
                 idsCasosEnvioEncuesta.add(caso.Id);
@@ -58,7 +57,7 @@ public without sharing class CC_Envio_Encuestas_3N {
         
         //Comprobar que hay un caso para enviar la encuesta
         if (idsCasosEnvioEncuesta.size() > 0) {
-         
+            
             List<Case> listCasos = new List<Case>();
             for (Case caso : casos) {
                 if(idsCasosEnvioEncuesta.contains(caso?.Id)) {
@@ -75,81 +74,18 @@ public without sharing class CC_Envio_Encuestas_3N {
                     mapIdIdiomaPlantilla.put('es', emailp.Id);
                 }
             }
-            
-            //Traigo la base del link LimeSurvey para usar con Empleado
-            List<CC_Envio_Encuesta__c> linkEncuestaEmpleado = [SELECT CC_Link_LimeSurvey__c, CC_Id_Encuesta__c, CC_Tipo_Encuesta__c FROM CC_Envio_Encuesta__c WHERE Name IN ( 'CC_URL_Encuesta', 'CC_TipoLlamada', 'TipoChat', 'CC_TercerNivel')];
-            String idEncuestaLlamada, idEncuestaChat, idEncuestaTercerNivel, linkBase, idEncuestaGenerico;
-            Map<Id, String> mapInfoChat = new  Map<Id,String>();
-            List<LiveChatTranscript> listaChats = new List<LiveChatTranscript>([SELECT CC_Espacio__c, CaseId FROM LiveChatTranscript WHERE CaseId IN :listCasos AND CC_Tipo__c = 'Agente'AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('LiveChatTranscript', 'CC_Empleados') ORDER BY CreatedDate DESC]);
-             //Map<Id, LiveChatTranscript> mapInfoChat = new Map<Id, LiveChatTranscript>([SELECT CC_Espacio__c FROM Case WHERE CaseId IN :setIdsCasos]);
-    
-            //Divido asigno los ids correspondientes a cada string
-            for(CC_Envio_Encuesta__c e : linkEncuestaEmpleado){
-                if(e.CC_Tipo_Encuesta__c == 'URL base'){
-                    linkBase = e.CC_Link_LimeSurvey__c;
-                    idEncuestaGenerico = e.CC_Id_Encuesta__c;
-                }else if (e.CC_Tipo_Encuesta__c == 'Phone'){
-                    idEncuestaLlamada = e.CC_Id_Encuesta__c;
-                }else if(e.CC_Tipo_Encuesta__c == 'Chat'){
-                    idEncuestaChat = e.CC_Id_Encuesta__c;
-                }else if(e.CC_Tipo_Encuesta__c == 'Caso Tercer Nivel'){
-                    idEncuestaTercerNivel = e.CC_Id_Encuesta__c;
-                }
-            }
-    
-            if(!listCasos.isEmpty()){
-                if(!listaChats.isEmpty()){
-                    for (LiveChatTranscript chat :listaChats) {
-                       Id key = chat.CaseId; 
-                            if (!mapInfoChat.containsKey(key)) {
-                                mapInfoChat.put(key, chat.CC_Espacio__c);
-                            }
-                    }
-                }
-           }
+
            String referencia;
            Map<Id, Case> mapReferenciaCasos = new Map<Id, Case>();
-            if(!linkEncuestaEmpleado.isEmpty()){
-                //Actualizar URL de la encuesta en el caso
-
-                for(Case caso : listCasos){
-                    referencia = CC_EmailMessage.generarReferenciaCorreoSaliente(caso.Id);
-                    if(caso.CC_Idioma__c != null && caso.CC_Matricula_Empleado__c != null && caso.CC_MCC_Tematica__c != null && caso.CC_Tematica__c != null && !linkEncuestaEmpleado.isEmpty()){
-                        caso.CC_Admin__c = true;
-                        String grupoTematica = (!String.isEmpty(caso.CC_Grupo_Colaborador__c) ? caso.CC_Grupo_Colaborador__c : caso.CC_Tematica__c);
-                        if(caso.CC_En_Tercer_Nivel__c){
-                            if(!mapInfoChat.isEmpty()){
-                                caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaTercerNivel+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                                //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaTercerNivel+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                            }else{
-                                caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaTercerNivel +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                                //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaTercerNivel +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                            }
-                        }else {
-                            if(caso.Origin == 'Phone'){
-                                caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaLlamada+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                                //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaLlamada+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                            }
-                            else if(caso.Origin == 'Chat'){
-                                if(!mapInfoChat.isEmpty()){
-                                    caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaChat+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                                    //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaChat+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                                }else{
-                                    caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaChat +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                                    //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaChat +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                                }
-                            } else{
-                                caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaGenerico +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                                //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaGenerico +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                                
-                            }
-                        }
-                    }
+           Map<Id, String> encuesta = CC_MetodosUtiles.generarURLsLimeSurvey(listCasos);
+               for(Case caso : listCasos){
+                   referencia = CC_EmailMessage.generarReferenciaCorreoSaliente(caso.Id);
+                    caso.CC_URL_Encuesta_3N__c = !encuesta.isEmpty() ? encuesta.get(caso.Id) : null;
                     caso.CC_Referencia_Correo_Saliente__c = referencia;
                     mapReferenciaCasos.put(caso.Id, caso);
                 }
                 update listCasos;
-            }
+            
             
             List<Task> tasks = new List<Task>();          
             List<CC_Buzones_Por_Defecto__mdt> buzones = [SELECT CC_Direccion_Correo__c, CC_Canal_Procedencia__c FROM CC_Buzones_Por_Defecto__mdt
@@ -164,6 +100,9 @@ public without sharing class CC_Envio_Encuestas_3N {
             for(OrgWideEmailAddress idOrgWide : remitentesEmails){
                 mapIdOrgWide.put(idOrgWide.Address, idOrgWide.Id);
             }
+
+            // Map<Id, Boolean> mapaResultados = new Map<Id, Boolean>();
+            Map<Id, Boolean> mapaResultados = comprobarEncuesta(casos);
             
             for(Integer i = 0; i< listCasos.size(); i++){
                 
@@ -171,9 +110,9 @@ public without sharing class CC_Envio_Encuestas_3N {
                 
                 Id remitenteId;
                 remitenteId = mapIdOrgWide.get(remitente);             
-                
+
                 //Si el caso es de FCO no se debe enviar la encuesta (US859756)
-                if (listCasos[i].CC_Canal_Procedencia__c != 'Formulario Consultas Operativas') {
+                if ((listCasos[i].CC_En_Tercer_Nivel__c && listCasos[i].CC_Canal_Procedencia__c != 'Formulario Consultas Operativas') || (!listCasos[i].CC_En_Tercer_Nivel__c && mapaResultados.get(listCasos[i].Id) == false || mapaResultados.isEmpty())) {
                     Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                     mail.setSaveAsActivity(true);
                     mail.setWhatId(listCasos[i].Id);
@@ -230,5 +169,21 @@ public without sharing class CC_Envio_Encuestas_3N {
                 CC_Activity.crearActividades(tasks);
             }
         }
+    }
+
+    private static Map<Id, Boolean> comprobarEncuesta(List<Case> casos) {
+        Map<Id, Boolean> mapResultado = new Map<Id, Boolean>();
+        if (!casos.isEmpty()) {
+            String plantillaCAS = CC_Settings__c.getValues('CC_Encuesta_CCO')?.CC_Configuracion_10__c;
+            String plantillaCAT = CC_Settings__c.getValues('CC_Encuesta_CCO')?.CC_Configuracion_11__c;
+            for (Case caso : casos) {
+                mapResultado.put(caso.Id, false);
+            }
+            
+            for (EmailMessage mail : [SELECT ParentId FROM EmailMessage WHERE ParentId IN :mapResultado.keySet() AND CC_Plantilla__c IN (:plantillaCAS,:plantillaCAT)]) {
+                mapResultado.put(mail.parentId, true);
+            }
+        }
+    return mapResultado;
     }
 }

@@ -1,52 +1,172 @@
 @isTest
 public with sharing class CC_Activity_Test {
+    private static Id taskRecordTypeId;
 
+    static {
+        taskRecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+    }
+    
     @TestSetup
     static void makeData(){
-        
-        
-        
-        Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
-        Id profile3NId = [SELECT Id FROM Profile WHERE Name = 'CC_Tercer_Nivel_CBKNow_MVP2'].Id;
-        Id profileIdAdmin = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
-        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO'];
 
-        List<User> userList = new List<User>();
-        User usuario1 = new User();
-        usuario1.ProfileId = profileIdAdmin;
-        usuario1.FirstName = 'Usuario Admin Prueba';
-        usuario1.LastName = 'last211053';
-        usuario1.Email = 'aalsdna@kfsb.com';
-        usuario1.Username = 'tuser0001@amamama.com' + System.currentTimeMillis();
-        usuario1.CompanyName = 'MST';
-        usuario1.Title = 'title';
-        usuario1.Alias = 'alias';
-        usuario1.TimeZoneSidKey = 'Europe/Paris';
-        usuario1.EmailEncodingKey = 'UTF-8';
-        usuario1.LanguageLocaleKey = 'es';
-        usuario1.LocaleSidKey = 'es_ES';
+        Map<String, Id> profilesCC = CC_TestDataFactory.getProfiles();
+        Map<String, Id> rolesCC = CC_TestDataFactory.getRoles();
+        Map<String, Id> psCC = CC_TestDataFactory.getPermissionSet();
 
-        userList.add(usuario1);
-       
-        UserRole rolId = [SELECT Id, DeveloperName FROM UserRole WHERE DeveloperName = 'Contact_Center'];
-        //crear usuarios CC
+        User usuario1 = CC_TestDataFactory.createUserAdmin(profilesCC.get('System Administrator'), rolesCC.get('Contact_Center'));
+        User usuario2 = CC_TestDataFactory.createtUserOperador(profilesCC.get('CC_Usuario_CaixaBank'), rolesCC.get('Contact_Center_sin_acceso_a_Directorio'), 'U0112345');
+        List<User> usuarios = new List<User>{usuario1, usuario2};
+        insert usuarios;
 
-        User usuario2 = new User();
-        usuario2.ProfileId = profileId;
-        usuario2.FirstName = 'first2';
-        usuario2.LastName = 'last2';
-        usuario2.Email = 'tuser000@amamama.com';
-        usuario2.Username = 'tuser002@amamama.com' + System.currentTimeMillis();
-        usuario2.CompanyName = 'DXC';
-        usuario2.Title = 'title';
-        usuario2.Alias = 'alias';
-        usuario2.TimeZoneSidKey = 'Europe/Paris';
-        usuario2.EmailEncodingKey = 'UTF-8';
-        usuario2.LanguageLocaleKey = 'es';
-        usuario2.LocaleSidKey = 'es_ES';
-        userList.add(usuario2);
-        insert userList;
+        PermissionSetAssignment psaAdminAV = new PermissionSetAssignment(AssigneeId = usuario1.Id, PermissionSetId = psCC.get('AV_GestorOperativa'));
+        PermissionSetAssignment psaOperadorCliente = new PermissionSetAssignment(AssigneeId = usuario2.Id, PermissionSetId =  psCC.get('CC_Operador_Cliente'));
+        PermissionSetAssignment psaOperadorEmpleado = new PermissionSetAssignment(AssigneeId = usuario2.Id, PermissionSetId =  psCC.get('CC_Operador_CCO'));
+        PermissionSetAssignment psaOperadorClasses = new PermissionSetAssignment(AssigneeId = usuario2.Id, PermissionSetId = psCC.get('CC_Classes'));
+        PermissionSetAssignment psaOperadorAV = new PermissionSetAssignment(AssigneeId = usuario2.Id, PermissionSetId = psCC.get('AV_GestorOperativa'));
+        PermissionSetAssignment psaOperadorCSBD = new PermissionSetAssignment(AssigneeId = usuario2.Id, PermissionSetId = psCC.get('CSBD_PS_Gestor'));
+        
+        List<PermissionSetAssignment> insertPSAssOperadores = new List<PermissionSetAssignment>{
+            psaOperadorCliente, 
+            psaOperadorEmpleado,
+            psaOperadorClasses,
+            psaOperadorAV,
+            psaOperadorCSBD,
+            psaAdminAV
+        };    
+
+        insert insertPSAssOperadores;
+
+ 
+        // User usuario1 = CC_TestDataFactory.insertUserAdmin();
+        // User usuario2 = CC_TestDataFactory.insertUserOperadorCliente('U0112345');
+
+        System.runAs(usuario1) {
+            Id rtEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
+            Id rtCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
+            Id rtCentroId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
+            Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            Id rtClientePA = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
+            Id rtOportunidad = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_MAC');
+            List<ContactShare> totalPermisosContact = new List<ContactShare>();
+            List<AccountShare> totalPermisosAccount = new List<AccountShare>();
+     
+            //Cuenta
+            List <Account> insertAccount = new List <Account>();
+
+            Account cuenta = new Account();
+            cuenta.Name = 'Cuenta01';
+            insertAccount.add(cuenta);
+
+            Account cuenta2 = new Account();
+            cuenta2.Name = 'Cuenta02';
+            insert cuenta2;  
+
+            Account oficina1 = new Account(
+            Name = 'Oficina 1',
+            CC_Email__c = 'cuenta@test.com',
+            CC_Numero_Empresa__c = '123',
+            CC_Numero_Oficina_Empresa__c = '000-12345',
+            CC_Numero_Oficina__c = '123',
+            CC_Numero_Documento__c = '45729937A',
+            RecordtypeId =  rtCentroId
+            );
+            insertAccount.add(oficina1);
+
+            insert insertAccount;
+
+            //Contacto
+            List <Contact> insertContact = new List <Contact>();
+
+            Contact contacto = new Contact();
+            contacto.FirstName = 'Contacto';
+            contacto.LastName = '01';
+            contacto.CC_NumPerso__c = '12345569';
+            contacto.AccountId = cuenta.Id;
+            contacto.CC_Idioma__c = 'Es';
+            contacto.RecordTypeId = rtEmpleado;
+
+            insertContact.add(contacto);
+
+            
+            Contact contacto2 = new Contact();
+            contacto2.FirstName = 'Contacto';
+            contacto2.LastName = '02';
+            contacto2.CC_NumPerso__c = '12345568';
+            contacto2.AccountId = cuenta2.Id;
+            contacto2.CC_Idioma__c = 'Es';
+            contacto2.RecordTypeId = rtCliente;
+            insert contacto2; 
+
+            insert insertContact; 
+
+
+            List<Account> accounts = [SELECT Id FROM Account];
+
+            for (Account a : accounts) {
+                AccountShare acshare = new AccountShare();
+                acshare.AccountId = a.Id;
+                acshare.UserOrGroupId = usuario2.Id;
+                acshare.AccountAccessLevel = 'Edit';
+                acshare.OpportunityAccessLevel = 'Edit';
+                acshare.CaseAccessLevel = 'Edit';
+                totalPermisosAccount.add(acshare);
+            }
+            insert totalPermisosAccount;
+            
+            ContactShare contactShare = new ContactShare();
+            contactShare.ContactId = contacto2.Id;
+            contactShare.UserOrGroupId = usuario2.Id;
+            contactShare.ContactAccessLevel = 'Edit';
+            totalPermisosContact.add(contactShare);
+
+            ContactShare contactShare2 = new ContactShare();
+            contactShare2.ContactId = contacto.Id;
+            contactShare2.UserOrGroupId = usuario2.Id;
+            contactShare2.ContactAccessLevel = 'Edit';
+            totalPermisosContact.add(contactShare2);
+
+            Boolean excepcion = false;
+            
+            try {
+                //Database.insert(totalPermisosAccount, true);
+                insert totalPermisosAccount;
+            } catch(Exception e) {
+                excepcion = true;
+            }
+
+            try {
+                //Database.insert(totalPermisosContact, true);
+                insert totalPermisosContact;
+            } catch(Exception e) {
+                excepcion = true;
+            }
+            
+            //Casos
+            List <Case> insertCase = new List <Case>();
+
+            Case casoConOportunidad = new Case(
+                Description = 'casoConOportunidad',
+                Subject = 'casoConOportunidad',
+                Origin = 'Email',
+                Status = 'Activo',
+                accountId = cuenta.Id,
+                CC_Idioma__c = 'es',
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                OwnerId = usuario2.Id,
+                ContactId = contacto2.Id,
+                RecordTypeId = recordTypeCaso
+            );
+
+            insertCase.add(casoConOportunidad);
+
+            insert insertCase;
+        }
     }
+
     @isTest
     public static void finalizarActividad() {
         Case caso = new Case();
@@ -59,7 +179,7 @@ public with sharing class CC_Activity_Test {
         caso.CC_Canal_Procedencia__c = 'Google Play Store';
         insert caso;
         
-        Id taskRecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+        Id taskRecordTypeId = taskRecordTypeId;
         Task actividad = new Task();
         actividad.Status = 'Open';
         actividad.WhatId= caso.Id;
@@ -77,6 +197,8 @@ public with sharing class CC_Activity_Test {
 
     @isTest
     public static void finalizarActividadCaso() {
+        List<Task> insertTareas = new List<Task>();
+
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Prueba';
@@ -87,21 +209,23 @@ public with sharing class CC_Activity_Test {
         caso.CC_Canal_Procedencia__c = 'Google Play Store';
         insert caso;
 
-        Id taskRecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+        Id taskRecordTypeId = taskRecordTypeId;
         
         Task actividad1 = new Task();
         actividad1.WhatId = caso.Id;
         actividad1.Type = 'Rechazar Primer Nivel';
         actividad1.Status = 'Open';
         actividad1.RecordTypeId = taskRecordTypeId;
-        insert actividad1;
+        insertTareas.add(actividad1);
 
         Task actividad2 = new Task();
         actividad2.WhatId = caso.Id;
         actividad2.Status = 'Open';
         actividad2.Type = 'Traslado Tercer Nivel';
         actividad2.RecordTypeId = taskRecordTypeId;
-        insert actividad2;
+        insertTareas.add(actividad2);
+
+        insert insertTareas;
 
         Test.startTest();
         CC_Activity.finalizarActividadCaso(caso.Id, 'Rechazar Primer Nivel', 'Devuelta 3N', 'descripción');
@@ -130,7 +254,7 @@ public with sharing class CC_Activity_Test {
         caso.CC_Canal_Procedencia__c = 'Google Play Store';
         insert caso;
 		
-        Id taskRecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+        Id taskRecordTypeId = taskRecordTypeId;
   		Task actividad1 = new Task();
         actividad1.WhatId = caso.Id;
         actividad1.Type = 'Rechazar Primer Nivel';
@@ -172,7 +296,7 @@ public with sharing class CC_Activity_Test {
         caso.CC_Canal_Procedencia__c = 'Google Play Store';
         insert caso;
 		
-        Id taskRecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+        Id taskRecordTypeId = taskRecordTypeId;
   		Task actividad1 = new Task();
         actividad1.WhatId = caso.Id;
         actividad1.Type = 'Traslado Colaborador';
@@ -201,7 +325,7 @@ public with sharing class CC_Activity_Test {
         caso.CC_Canal_Procedencia__c = 'Google Play Store';
         insert caso;
         
-        Id taskRecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+        Id taskRecordTypeId = taskRecordTypeId;
   		Task actividad2 = new Task();
         actividad2.WhatId = caso.Id;
         actividad2.Status = 'Open';
@@ -228,7 +352,7 @@ public with sharing class CC_Activity_Test {
         caso.CC_Canal_Procedencia__c = 'Google Play Store';
         insert caso;
         
-        Id taskRecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+        Id taskRecordTypeId = taskRecordTypeId;
   		Task actividad2 = new Task();
         actividad2.WhatId = caso.Id;
         actividad2.Status = 'Open';
@@ -490,4 +614,354 @@ public with sharing class CC_Activity_Test {
         }
     }
     
+    @isTest
+    public static void createActivityTrasladosTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE Profile.name LIKE 'CC_Usuario_CaixaBank' AND IsActive=true];
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Case caso = new Case();
+                caso.CC_Idioma__c = 'es';
+                caso.Subject = 'Prueba';
+                caso.CC_Tipo_Cliente__c = 'Cliente';
+                caso.Status = 'Activo';
+                caso.Origin = 'Comentarios Stores';
+                caso.CC_Tipo_Contacto__c = 'Consulta';
+                caso.CC_Canal_Procedencia__c = 'Google Play Store';
+                insert caso;
+
+               // Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+                Id recordTypeGrupoColaborador =  Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+                //Id recordTypeGrupoColaborador = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador','CC_Grupo_Colaborador');
+                CC_Grupo_Colaborador__c grupoColaborador  = new CC_Grupo_Colaborador__c();
+                grupoColaborador.RecordTypeId = recordTypeGrupoColaborador;
+                grupoColaborador.Name = 'Servicio bastanteo';
+                grupoColaborador.OS_Negocio__c = 'CC';
+                insert grupoColaborador;
+
+                String comentario = 'Comentario de prueba';
+                String subject = 'Asunto de la tarea';
+                String tipoTarea = 'Traslado Tercer Nivel';
+                String grupo3N = 'Grupo 3N';
+                String grupoId = grupoColaborador.Id; 
+                Id llamadaId = null;
+                String estado = 'Open';
+
+                Test.startTest();
+                CC_Activity.createActivityTraslados(caso.Id, comentario, subject, tipoTarea, grupo3N, grupoId, llamadaId, estado);
+                Test.stopTest();
+
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+    }
+
+    @isTest
+    public static void crearActividadOportunidadTest() {
+     
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName ='01'];
+        User operadorCliente = CC_TestDataFactory.getUserAdmin();
+        System.runAs(operadorCliente) {
+            Case caso = new Case();
+            caso.CC_Idioma__c = 'es';
+            caso.Subject = 'Prueba';
+            caso.CC_Tipo_Cliente__c = 'Cliente';
+            caso.Status = 'Activo';
+            caso.Origin = 'Comentarios Stores';
+            caso.CC_Tipo_Contacto__c = 'Consulta';
+            caso.CC_Canal_Procedencia__c = 'Google Play Store';
+            caso.OwnerId = operadorCliente.Id;
+            insert caso;               
+
+            Test.startTest();
+                CC_Activity.crearActividadOportunidad(caso.Id, operadorCliente.Id, contacto.Id);
+            Test.stopTest();
+
+            System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+        }      
+    }
+
+    @isTest
+    public static void crearActividadBaseDerivarTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE Profile.Name LIKE 'CC_Usuario_CaixaBank' AND IsActive=true LIMIT 1];
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Id taskRecordTypeId = taskRecordTypeId;
+
+                String asunto = 'Derivación de Caso';
+                String comentarios = 'Comentarios de prueba';
+                Date fechaActividad = Date.today().addDays(7);
+
+                Test.startTest();
+                Task tarea = CC_Activity.crearActividadBaseDerivar(taskRecordTypeId, asunto, comentarios, fechaActividad);
+                insert tarea;
+                Test.stopTest();
+
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE RecordTypeId = :taskRecordTypeId]);
+            }
+        }
+    }
+
+    @isTest
+    public static void crearTareaDirectorTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Account oficina1 = [SELECT Id, CC_Numero_Oficina__c FROM Account WHERE Name = 'Oficina 1' LIMIT 1];
+        Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Case caso = new Case();
+                caso.RecordTypeId = recordTypeCaso;
+                caso.CC_Idioma__c = 'es';
+                caso.Subject = 'Caso Director';
+                caso.CC_Tipo_Cliente__c = 'Cliente';
+                caso.Status = 'Activo';
+                caso.Origin = 'Chat';
+                caso.CC_Tipo_Contacto__c = 'Consulta';
+                caso.CC_Canal_Procedencia__c = 'Web';
+                caso.OwnerId = usuario[0].Id;
+                caso.AccountId = oficina1.Id;
+
+                insert caso;
+    
+                Id gestorClienteId = caso.OwnerId;
+                Id taskRecordTypeId = taskRecordTypeId;
+    
+                Map<String, Object> respuesta = new Map<String, Object>{
+                    'recordTypeTarea' => taskRecordTypeId,
+                    'asunto' => 'Tarea para Director',
+                    'comentarios' => 'Se requiere revisión del caso',
+                    'recordId' => caso.Id,
+                    'accountId' =>  caso.AccountId,
+                    'numeroOficina' => oficina1.CC_Numero_Oficina__c,
+                    'gestorClienteId' => gestorClienteId
+                };
+    
+                Test.startTest();
+                Task tarea = CC_Activity.crearTareaDirector(respuesta);
+                insert tarea;
+                Test.stopTest();
+
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :oficina1.Id]);
+            }
+        }
+    }
+ 
+    
+    @isTest
+    public static void crearTareaGestorTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE Profile.Name LIKE 'CC_Usuario_CaixaBank' AND IsActive=true LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = '01' LIMIT 1];
+    
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Case caso = new Case();
+                caso.CC_Idioma__c = 'es';
+                caso.Subject = 'Caso Gestor';
+                caso.CC_Tipo_Cliente__c = 'Cliente';
+                caso.Status = 'Activo';
+                caso.Origin = 'Comentarios Stores';
+                caso.CC_Tipo_Contacto__c = 'Consulta';
+                caso.CC_Canal_Procedencia__c = 'Google Play Store';
+                caso.OwnerId = usuario[0].Id;
+                insert caso;
+    
+                Id gestorClienteId = caso.OwnerId;
+                Id taskRecordTypeId = taskRecordTypeId;
+    
+                Map<String, Object> respuesta = new Map<String, Object>{
+                    'recordTypeTarea' => taskRecordTypeId,
+                    'asunto' => 'Tarea para Gestor',
+                    'comentarios' => 'Se requiere seguimiento del caso',
+                    'fechaActividad' => Date.today().addDays(5),
+                    'whatId' => caso.Id,
+                    'ownerId' => gestorClienteId
+                };
+    
+                Test.startTest();
+                Task tarea = CC_Activity.crearTareaGestor(respuesta);
+                insert tarea;
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }  
+    }
+    
+    
+    @isTest
+    public static void crearActividadFraudeTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = '02' LIMIT 1];
+        
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Case caso = new Case();
+                caso.CC_Idioma__c = 'es';
+                caso.Subject = 'Caso de Fraude';
+                caso.CC_Tipo_Cliente__c = 'Cliente';
+                caso.Status = 'Activo';
+                caso.Origin = 'Comentarios Stores';
+                caso.CC_Tipo_Contacto__c = 'Consulta';
+                caso.CC_Canal_Procedencia__c = 'Google Play Store';
+                caso.OwnerId = usuario[0].Id;
+                insert caso;
+    
+                Id ownerId = caso.OwnerId;
+    
+                Test.startTest();
+                CC_Activity.crearActividadFraude(caso.Id, ownerId, contacto.Id);
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+    }
+
+    @isTest
+    public static void crearTareaRellamadaCSBD() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoConOportunidad' LIMIT 1];
+        String descripcion = 'descripcion';
+        String type = 'Cita gestor';
+
+        Id rtOportunidad = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_MAC');
+
+        Opportunity oportunidad = new Opportunity(
+            RecordTypeId = rtOportunidad,
+            Name = 'Oportunidad Test',
+            StageName = 'Solicitud',
+            CSBD_Estado__c = 'Activa',
+            CSBD_CasoOrigen__c = caso.Id,
+            OwnerId = usuario[0].Id
+        );
+    
+        insert oportunidad;
+
+
+                Test.startTest();
+                Task tarea = CC_Activity.crearTareaRellamadaCSBD(oportunidad, caso, descripcion);
+                Test.stopTest();
+
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :oportunidad.Id]);
+
+            }
+        }
+    }
+    
+    @isTest
+    public static void crearTareaRellamadaCC() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Account cuenta = [SELECT Id FROM Account WHERE Name = 'Cuenta02' LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = '02' LIMIT 1];
+        
+        Case caso = new Case(
+            Description = 'casoConOportunidad',
+            Subject = 'casoConOportunidad',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuenta.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            OwnerId = usuario[0].Id,
+            ContactId = contacto.Id
+        );
+        insert caso;
+
+        String descripcion = 'Descripcion';
+        String type = 'Consulta oportunidad formalizada';
+
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+
+                Test.startTest();
+                Task tarea = CC_Activity.crearTareaRellamadaCC(caso, descripcion, type);
+                Test.stopTest();
+
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+
+            }
+        }
+    }
+
+    @isTest
+    public static void permisosNuevaTareaTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Account cuenta = [SELECT Id FROM Account WHERE Name = 'Cuenta02' LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = '02' LIMIT 1];
+        
+        Case caso = new Case(
+            Description = 'casoConOportunidad',
+            Subject = 'casoConOportunidad',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuenta.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            OwnerId = usuario[0].Id,
+            ContactId = contacto.Id
+        );
+        insert caso;
+
+        String descripcion = 'Descripcion';
+        String type = 'Consulta oportunidad formalizada';
+
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+
+                Test.startTest();
+                   Boolean valor = CC_Task.permisosNuevaTarea(caso.Id);
+                Test.stopTest();
+
+                System.assertEquals(true, valor, 'Error al recuperar el permisosNuevaTarea');
+            }
+        }
+    }
+
+        
+    @isTest
+    public static void crearActividadCSBDTelefonoNoCoincidenteTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Account cuenta = [SELECT Id FROM Account WHERE Name = 'Cuenta02' LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = '02' LIMIT 1];
+        
+        Case caso = new Case(
+            Description = 'caso',
+            Subject = 'caso',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuenta.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            OwnerId = usuario[0].Id,
+            ContactId = contacto.Id
+        );
+        insert caso;
+
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+
+                Test.startTest();
+                CC_Activity.crearActividadCSBDTelefonoNoCoincidente(caso.Id);
+                Test.stopTest();
+
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+
+            }
+        }
+    }
+
 }

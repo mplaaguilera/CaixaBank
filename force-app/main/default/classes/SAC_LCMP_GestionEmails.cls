@@ -1,6 +1,6 @@
 public without sharing class SAC_LCMP_GestionEmails {
 
-    private static Set<String> objetos = new Set<String>{'Case','SAC_MaestroTemas__c', 'SAC_Interaccion__c'};
+    private static Set<String> objetos = new Set<String>{'Case','SAC_MaestroTemas__c', 'SAC_Interaccion__c','SAC_Accion__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
 
     final static Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
@@ -9,6 +9,10 @@ public without sharing class SAC_LCMP_GestionEmails {
     final static Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
     final static Id RECORDTYPEBLACKLIST = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_BlackListEmails').getRecordTypeId();
     final static Id RECORDTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SAC_Consulta').getRecordTypeId();
+    final static Id RECORDTYPEESCALADON2 = mapRTsObjects.get('SAC_Interaccion__c').get('SAC_Escalado').getRecordTypeId();
+    final static Id RECORDTYPEESCALADON3 = mapRTsObjects.get('SAC_Interaccion__c').get('SAC_EscaladoNV3').getRecordTypeId();
+    final static Id RECORDTYPEMAESTROTAREA = mapRTsObjects.get('SAC_Accion__c').get('SAC_MaestroDeTareas').getRecordTypeId();
+    final static Id RECORDTYPEOTRASTAEAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_OtrasTareas').getRecordTypeId();
 
 
     /**
@@ -132,11 +136,11 @@ public without sharing class SAC_LCMP_GestionEmails {
             caso = [SELECT Id, CaseNumber, CC_SuppliedID__c, RecordTypeId, Status, SAC_M2P__c, SAC_Reclamacion__r.SAC_M2P__c FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPECONSULTA, :RECTYPECONSULTASAC, :RECTYPEPRETENSION) AND Id =: id  LIMIT 1];
         }else if(tipoObjeto == expectedInteraccion){
             interaccion = [SELECT Id, SAC_IndexedThreadId__c, SAC_Oficina__c, SAC_Reclamacion__c, SAC_GrupoColaborador__c, SAC_DNI__c, SAC_Reclamante__c, SAC_Respuesta__c, RecordTypeId, SAC_GrupoColaborador__r.SAC_Externo__c, SAC_Reclamacion__r.SAC_M2P__c
-                                FROM SAC_Interaccion__c WHERE RecordType.DeveloperName LIKE 'SAC_%' AND Id =: id LIMIT 1];
+                                FROM SAC_Interaccion__c WHERE RecordTypeId IN (:RECORDTYPECONSULTA, :RECORDTYPEESCALADON2, :RECORDTYPEESCALADON3) AND Id =: id LIMIT 1];
                                  
         }else if(tipoObjeto == expectedAccion){
             accion = [SELECT Id, SAC_IndexedThreadId__c, SAC_Oficina__c, SAC_Reclamacion__c, SAC_EquipoResponsable__c, SAC_Reclamacion__r.SAC_M2P__c
-                                FROM SAC_Accion__c WHERE RecordType.DeveloperName LIKE 'SAC_%' AND Id =: id LIMIT 1];
+                                FROM SAC_Accion__c WHERE RecordTypeId IN (:RECORDTYPEMAESTROTAREA, :RECORDTYPEOTRASTAEAS) AND Id =: id LIMIT 1];
         }
         
         if(String.isNotBlank(idAdjuntos) && idAdjuntos != '[]'){
@@ -164,7 +168,6 @@ public without sharing class SAC_LCMP_GestionEmails {
                     lstIdCV.add(contentVersion.Id);
                     Blob versionDataBlob = contentVersion.VersionData;
                     String versionData = EncodingUtil.base64Encode(versionDataBlob);
-                    system.debug('***versionData ' + versionData);
                 }
             }
         }
@@ -210,6 +213,7 @@ public without sharing class SAC_LCMP_GestionEmails {
 
         //DE106853 - Raúl Santos - 20/11/2024 - Gestionar las imágenes que vienen inline.
 		String cuerpoFinal = SAC_Utils.gestionarImagenesInlineRedactarMail(cuerpoConcatenado);
+
         message.setHtmlBody(cuerpoFinal);
 
         if(!lstIdCV.isEmpty()){
@@ -238,19 +242,18 @@ public without sharing class SAC_LCMP_GestionEmails {
         Messaging.SingleEmailMessage[] messages =   new List<Messaging.SingleEmailMessage> {message};
 
         try{
-            system.debug('***cuerpoFinal ' + cuerpoFinal);
             Messaging.SendEmailResult[] results = Messaging.sendEmail(messages);
             List<ContentDocumentLink> lstContentDocument = new List<ContentDocumentLink>();
             Date fechaActual = Date.today();
-            List<EmailMessage> lstEmailMessage = [Select id from EmailMessage where parentId = :caso.Id and Subject = :asunto and Incoming = false order by createdDate desc];
+            List<EmailMessage> lstEmailMessage = [SELECT id FROM EmailMessage WHERE parentId = :caso.Id AND Subject = :asunto AND Incoming = false ORDER BY createdDate DESC LIMIT 1];
             if(!lstEmailMessage.isEmpty()){
-                EmailMessage emailRecuperado = lstEmailMessage.get(0);
+                EmailMessage emailRecuperado = lstEmailMessage[0];
                 List<ContentDocumentLink> lstContentDocumentlink = [SELECT Id FROM ContentDocumentLink WHERE LINKEDENTITYID =: emailRecuperado.id];
                 if(lstContentDocumentlink.isEmpty()) {
                     if(!lstCV.isEmpty()){
                         for(ContentVersion contentVersion : lstCV){
                             ContentDocumentLink contentLink = new ContentDocumentLink();
-                            contentLink.LinkedEntityId = lstEmailMessage.get(0).Id;
+                            contentLink.LinkedEntityId = lstEmailMessage[0].Id;
                             contentLink.ContentDocumentId = contentVersion.ContentDocumentId;
                             lstContentDocument.add(contentLink);
                             
@@ -273,7 +276,24 @@ public without sharing class SAC_LCMP_GestionEmails {
         }catch (Exception e){
             CBK_Log.error(e);
             String emailDestinoInvalido = completaEmailNoValido(para, copia, copiaOculta);
-            throw new AuraHandledException('La dirección/es de destino ' + '"' + emailDestinoInvalido.trim() + '"' + ' no es válida/s.');
+
+            if(emailDestinoInvalido != '' && emailDestinoInvalido != null){
+                throw new AuraHandledException('La dirección/es de destino ' + '"' + emailDestinoInvalido.trim() + '"' + ' no es válida/s.');
+            }else{
+                String messageError = e.getMessage();
+
+                if(messageError.contains('FIELD_CUSTOM_VALIDATION_EXCEPTION')) {
+                    Pattern regex = Pattern.compile('FIELD_CUSTOM_VALIDATION_EXCEPTION,(.*)');
+
+                    Matcher matcher = regex.matcher(messageError);
+
+                    if (matcher.find()) {
+                        messageError = matcher.group(1);
+                    }
+                }
+
+                throw new AuraHandledException('Error en el envío: ' + messageError);
+            }
         }
     }
 

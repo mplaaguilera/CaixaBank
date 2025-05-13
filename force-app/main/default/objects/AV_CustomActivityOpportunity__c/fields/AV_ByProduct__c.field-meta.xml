@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_ByProduct__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>Almacena el subproducto que tiene la tarea oportunidad</description>
     <label>Subproducto</label>
     <referenceTo>Product2</referenceTo>
     <relationshipLabel>Tarea-Oportunidad (Subproducto)</relationshipLabel>

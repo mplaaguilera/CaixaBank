@@ -1329,6 +1329,523 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>FRA_Origen_Creacion__c</picklist>
+        <values>
+            <fullName>CGF</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Llamada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manual</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_ComunidadAutonoma__c</picklist>
+        <values>
+            <fullName>Andalucía</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aragón</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Canarias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cantabria</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Castilla y León</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Castilla-La Mancha</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cataluña</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ceuta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunidad Foral de Navarra</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunidad de Madrid</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunitat Valenciana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Extremadura</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Galicia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Illes Balears</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>La Rioja</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Melilla</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>País Vasco</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Principado de Asturias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Región de Murcia</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_GRR__c</picklist>
+        <values>
+            <fullName>15 días</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sí</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_MediacionPAH__c</picklist>
+        <values>
+            <fullName>Mediación PAH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Sí</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Motivos__c</picklist>
+        <values>
+            <fullName>Caso PAH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contrato NO resuelto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contrato resuelto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Control del caso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Defunción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Deudor persona jurídica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No aporta documentación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No colabora</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No cumple criterios vulnerabilidad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No localizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No puede asumir condiciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No rescinden contrato</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suministros no regularizados</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Otros__c</picklist>
+        <values>
+            <fullName>Excluir 18 meses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Excluir 3 meses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Excluir 6 meses</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Provincia__c</picklist>
+        <values>
+            <fullName>ALBACETE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ALICANTE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ALMERÍA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ASTURIAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>BADAJOZ</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>BALEARES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>BARCELONA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>BURGOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CANTABRIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CASTELLÓN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CEUTA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CIUDAD REAL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CUENCA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CÁCERES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CÁDIZ</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CÓRDOBA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GERONA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GRANADA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GUADALAJARA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GUIPÚZCOA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HUELVA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HUESCA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>JAÉN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LA CORUÑA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LA RIOJA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LAS PALMAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LEÓN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LUGO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LÉRIDA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MADRID</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MELILLA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MURCIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MÁLAGA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>NAVARRA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ORENSE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PALENCIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PONTEVEDRA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SALAMANCA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SANTA CRUZ DE TENERIFE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEGOVIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEVILLA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SORIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TARRAGONA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TERUEL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TOLEDO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VALENCIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VALLADOLID</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VIZCAYA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ZAMORA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ZARAGOZA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ÁLAVA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ÁVILA</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_RespuestaGRR__c</picklist>
+        <values>
+            <fullName>No se aprecia RR%2C pero excluir por otros motivos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No se aprecia RR%2E Continuar circuito externo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Se aprecia RR%2E Excluir 18 meses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Se aprecia RR%2E Excluir 3 meses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Se aprecia RR%2E Excluir 6 meses</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Result__c</picklist>
+        <values>
+            <fullName>Fail</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pending</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Success</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_SolucionCupo__c</picklist>
+        <values>
+            <fullName>Alquiler %2B condonación%E2%80%8B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alquiler %2B reubicación %2B condonación%E2%80%8B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alquiler %2B reubicación%E2%80%8B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alquiler%E2%80%8B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Condonación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros%E2%80%8B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reubicación</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GRR_Vulnerabilidad__c</picklist>
+        <values>
+            <fullName>Antiguo deudor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COVID</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Edad avanzada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Enfermedad%2Fdiscapacidad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Exclusión social</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Familia monoparental</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Menores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Programa centralizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Riesgo Reputacional</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte PAH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violencia de género</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>HDT_Tipo_de_Cierre__c</picklist>
         <values>
             <fullName>Administrativo</fullName>
@@ -1351,22 +1868,6 @@
         <picklist>HDT_Tipo_de_puesto__c</picklist>
         <values>
             <fullName>Atril Bienvenida</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Despacho Dirección</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Mueble Accesorios</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Puesto Atención Especializada</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Puesto Atención Personalizada</fullName>
             <default>false</default>
         </values>
         <values>
@@ -1477,10 +1978,6 @@
         </values>
         <values>
             <fullName>2N UAFE FAG ACCENTURE</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>2N UAFE FAG INDRA ZONA 1</fullName>
             <default>false</default>
         </values>
         <values>
@@ -1982,10 +2479,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Holanda</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Hong Kong</fullName>
             <default>false</default>
         </values>
@@ -2302,7 +2795,19 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>226</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>299</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>301</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>327</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -2582,18 +3087,14 @@
         </values>
     </picklistValues>
     <picklistValues>
-        <picklist>SAC_Genial_Valoracion_Resumen__c</picklist>
+        <picklist>SAC_GestoriaReclamado__c</picklist>
         <values>
-            <fullName>Acuerdo</fullName>
+            <fullName>SAC_No</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Desacuerdo</fullName>
+            <fullName>SAC_Yes</fullName>
             <default>false</default>
-        </values>
-        <values>
-            <fullName>Neutral</fullName>
-            <default>true</default>
         </values>
     </picklistValues>
     <picklistValues>
@@ -2912,6 +3413,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SAC_NotariaReclamado__c</picklist>
+        <values>
+            <fullName>SAC_No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SAC_OrigenConsulta__c</picklist>
         <values>
             <fullName>SAC_OrigenCOPS</fullName>
@@ -2931,6 +3443,17 @@
         </values>
         <values>
             <fullName>SAC_OrigenProveedores</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_RegistrosReclamado__c</picklist>
+        <values>
+            <fullName>SAC_No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Yes</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -2971,7 +3494,66 @@
     <picklistValues>
         <picklist>SAC_TAE__c</picklist>
         <values>
+            <fullName>SAC_14</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_145_15</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_14_145</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_15_16</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_16_17</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>SAC_17</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_21</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_21_22</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_225_23</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_22_225</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_235_24</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_23_235</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_24</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_TasacionReclamado__c</picklist>
+        <values>
+            <fullName>SAC_No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Yes</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -3054,17 +3636,6 @@
         </values>
         <values>
             <fullName>OpenServices</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
-        <picklist>SAC_Tipologiareparto__c</picklist>
-        <values>
-            <fullName>Comisiones</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>GGH</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -3786,10 +4357,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Export Finance</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Instituciones Canarias</fullName>
             <default>false</default>
         </values>
@@ -3807,6 +4374,17 @@
         </values>
         <values>
             <fullName>Instituciones Sur</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SPV_ClasificacionConclusionesSupervisor__c</picklist>
+        <values>
+            <fullName>SPV_001</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SPV_002</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -3942,6 +4520,13 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SPV_MotivoComplementariaOrganismo__c</picklist>
+        <values>
+            <fullName>SPV_Otros</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SPV_Organismo__c</picklist>
         <values>
             <fullName>SPV_BDE</fullName>
@@ -3962,6 +4547,18 @@
     </picklistValues>
     <picklistValues>
         <picklist>SPV_TipoDesfavorable__c</picklist>
+        <values>
+            <fullName>SPV_TipoDesf_02</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SPV_TipoDesf_03</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SPV_TipoDesf_04</fullName>
+            <default>false</default>
+        </values>
         <values>
             <fullName>SPV_Tipo_Desf_1</fullName>
             <default>false</default>

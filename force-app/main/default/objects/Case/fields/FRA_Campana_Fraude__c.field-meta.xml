@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>FRA_Campana_Fraude__c</fullName>
-    <label>Campaña Fraude</label>
+    <label>Campaña Fraude (OLD)</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
@@ -180,6 +180,30 @@
                 <fullName>No aplica</fullName>
                 <default>false</default>
                 <label>No aplica</label>
+            </value>
+            <value>
+                <fullName>Estafa: FRAUDE 1</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Estafa: FRAUDE 1</label>
+            </value>
+            <value>
+                <fullName>Estafa: FRAUDE 2</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Estafa: FRAUDE 2</label>
+            </value>
+            <value>
+                <fullName>Opción 1 CIV</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Opción 1 CIV</label>
+            </value>
+            <value>
+                <fullName>Opción 2 CIV</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Opción 2 CIV</label>
             </value>
         </valueSetDefinition>
     </valueSet>

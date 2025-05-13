@@ -6,15 +6,29 @@ public with sharing class CC_Metodos_EmailServices {
             referencia = correo.plainTextBody.substringBetween('#@', '#');
         }
         //En ocasiones el campo TextBody (sin formato) viene vacío, se busca en el campo HtmlBody
-        if (referencia == null && correo.HtmlBody != null) {            referencia = correo.HtmlBody.substringBetween('#@', '#');
+        if (referencia == null && correo.HtmlBody != null) {
+            referencia = correo.HtmlBody.substringBetween('#@', '#');
+        }
+        return referencia;
+    }
+
+    public static String referenciaCorreo(EmailMessage correo) {
+        //La referencia se envía entre estos los literales '#@' y '#' en los correos salientes.ApexPages
+        String referencia = null;
+        if (correo.TextBody != null) {
+            referencia = correo.TextBody.substringBetween('#@', '#');
+        }
+        //En ocasiones el campo TextBody (sin formato) viene vacío, se busca en el campo HtmlBody
+        if (referencia == null && correo.HtmlBody != null) {
+            referencia = correo.HtmlBody.substringBetween('#@', '#');
         }
         return referencia;
     }
     
-    public static void respuestaTrasladoColaborador(Messaging.inboundEmail email, Id WhatIdTarea, String myPlainText, String emailDestino) {
+    public static void respuestaTrasladoColaborador(Messaging.inboundEmail email, Id whatIdTarea, String myPlainText, String emailDestino) {
         //Cambio de estado del caso
         Case caso = [SELECT Id, Status, Subject, CC_Canal_Procedencia__c, Origin, CC_Autoasignado_Coordinador__c, CC_Cola_Procedencia__c, CC_En_Tercer_Nivel__c, Canal_del_Empleado__c,
-                    CC_Grupo_3N__c, ContactId  FROM Case WHERE Id = :WhatIdTarea LIMIT 1];
+                    CC_Grupo_3N__c, ContactId  FROM Case WHERE Id = :whatIdTarea LIMIT 1];
       
         if (caso.Status == 'Pendiente Colaborador') {
             caso.CC_Ultima_Interaccion__c = 'Respuesta de colaborador';
@@ -79,14 +93,14 @@ public with sharing class CC_Metodos_EmailServices {
                 EmailMessage crearEmailMessage = CC_ES_BuenasPracticas.crearEmailMessage(email,emailDestino,caso.Id,caso.ContactId,myPlainText);
             }
             //Cierre de la actividad de envío del traslado a grupo colaborador
-            CC_Activity.finalizarActividadCaso(WhatIdTarea, 'Traslado Colaborador', null, null);
+            CC_Activity.finalizarActividadCaso(whatIdTarea, 'Traslado Colaborador', null, null);
         }
     }
     
-    public static void respuestaRemitirColaborador(Messaging.inboundEmail correo, Id WhatIdTarea, String myPlainText, String emailDestino) {
+    public static void respuestaRemitirColaborador(Messaging.inboundEmail correo, Id whatIdTarea, String myPlainText, String emailDestino) {
 
         //Cambio de estado del caso
-        Case caso = [SELECT Id, ContactId, Status, CC_Canal_Procedencia__c, Canal_del_Empleado__c FROM Case WHERE Id = :WhatIdTarea LIMIT 1];
+        Case caso = [SELECT Id, ContactId, Status, CC_Canal_Procedencia__c, Canal_del_Empleado__c FROM Case WHERE Id = :whatIdTarea LIMIT 1];
         if (caso.Status == 'Pendiente Colaborador') {
             caso.Status = 'Activo';
             update caso;
@@ -104,13 +118,13 @@ public with sharing class CC_Metodos_EmailServices {
         } else if(caso.CC_Canal_Procedencia__c == 'Código de Buenas Prácticas'){            EmailMessage crearEmailMessage = CC_ES_BuenasPracticas.crearEmailMessage(correo,emailDestino,caso.Id,caso.ContactId,myPlainText);
         }
         //Cierre de la actividad de envío del traslado a grupo colaborador
-        CC_Activity.finalizarActividadCaso(WhatIdTarea, 'Remitir Colaborador', null, null);
+        CC_Activity.finalizarActividadCaso(whatIdTarea, 'Remitir Colaborador', null, null);
     }
     
-    public static void respuestaSolicitudInfo(Messaging.inboundEmail correo, Id WhatIdTarea, String myPlainText, String emailDestino) {
+    public static void respuestaSolicitudInfo(Messaging.inboundEmail correo, Id whatIdTarea, String myPlainText, String emailDestino) {
 
         Case caso = [SELECT Id, Status, CC_Canal_Procedencia__c, CC_Autoasignado_Coordinador__c, CC_Cola_Procedencia__c, ContactId, Canal_del_Empleado__c
-                        FROM Case WHERE Id = :WhatIdTarea LIMIT 1];
+                        FROM Case WHERE Id = :whatIdTarea LIMIT 1];
         if (caso.Status == 'Pendiente Cliente') { 
             caso.Status = 'Activo';
             caso.CC_Ultima_Interaccion__c = 'Respuesta de solicitud de información';
@@ -180,7 +194,7 @@ public with sharing class CC_Metodos_EmailServices {
                 EmailMessage crearEmailMessage = CC_ES_BuenasPracticas.crearEmailMessage(correo,emailDestino,caso.Id,caso.ContactId,myPlainText);
             }
             //Cierre de la actividad de envío del traslado a grupo colaborador
-            CC_Activity.finalizarActividadCaso(WhatIdTarea, 'Solicitud Información', null, null);
+            CC_Activity.finalizarActividadCaso(whatIdTarea, 'Solicitud Información', null, null);
         
         } else if (caso.Status == 'Cerrado') {
             //Para solicitudes info se reabre el caso aunque se hubiera cerrado
@@ -235,11 +249,11 @@ public with sharing class CC_Metodos_EmailServices {
         }
     }
     
-    public static void respuestaCliente(Messaging.inboundEmail correo, Id WhatIdTarea, String myPlainText, String emailDestino) {        
+    public static void respuestaCliente(Messaging.inboundEmail correo, Id whatIdTarea, String myPlainText, String emailDestino) {
         //Cuando un cliente responde a un email enviado desde la operativa reponder a cliente se envía un email automático
               
         Case caso = [SELECT Id, RecordTypeId, Status, CC_Numero_Documento__c, CC_Idioma__c, AccountId, ContactId, Contact.Email, CC_Canal_Procedencia__c, CC_Autoasignado_Coordinador__c, Canal_del_Empleado__c,
-                     CC_Cola_Procedencia__c, ClosedDate, CC_En_Tercer_Nivel__c, CC_En_Segundo_Nivel__c, CC_Reapertura_Valida__c, CC_Fecha_Reapertura__c, CC_Referencia_Correo_Saliente__c FROM Case WHERE Id = :WhatIdTarea LIMIT 1];
+                     CC_Cola_Procedencia__c, ClosedDate, CC_En_Tercer_Nivel__c, CC_En_Segundo_Nivel__c, CC_Reapertura_Valida__c, CC_Fecha_Reapertura__c, CC_Referencia_Correo_Saliente__c, Origin FROM Case WHERE Id = :whatIdTarea LIMIT 1];
         Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
         Id recordTypeCasoEmpl = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
         Id recordTypeCasoCSIBankia = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_CSI_Bankia');
@@ -378,108 +392,9 @@ public with sharing class CC_Metodos_EmailServices {
                 }                    
             }*/
         } else if(caso.RecordTypeId == recordTypeCasoEmpl) {
-            if (caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas') {
-                List<Messaging.SingleEmailMessage> allmsg = new List<Messaging.SingleEmailMessage>();
+            if (caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas' || caso.Origin == 'Phone' || caso.Origin == 'Chat') {
                 if (caso.Status == 'Cerrado') {
-                    List<CC_Buzones_Por_Defecto__mdt> owaPorDefecto = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano' AND CC_Activo__c = true LIMIT 1];
-                    Map <String,OrgWideEmailAddress> owasMap = new Map<String,OrgWideEmailAddress>();
-                    for (OrgWideEmailAddress owa : [SELECT Id, Address FROM OrgWideEmailAddress]) {
-                        owasMap.put(String.valueOf(owa.Address), owa);
-                    }
-                    List<OrgWideEmailAddress> owa = new List<OrgWideEmailAddress>();
-                    String emailCorreoEntrante = owaPorDefecto[0].CC_Direccion_Correo__c;
-                    
-                    owa.add(owasMap.get(emailCorreoEntrante));
-                    List<CBK_Resultado_Encuesta__c> resultadoEncuestas = [SELECT Id FROM CBK_Resultado_Encuesta__c WHERE CBK_Case__c = :caso.Id];
-                    Integer tiempoLimiteReapertura = Integer.valueOf([SELECT CC_Configuracion_2__c FROM CC_Settings__c WHERE Name = 'CC_FormularioConsultasOperativas' LIMIT 1].CC_Configuracion_2__c);
-                    Long hoy = System.now().getTime();
-                    Long cierreCaso = caso.ClosedDate.getTime();
-                    Long milliseconds = hoy - cierreCaso;
-                    Long seconds = milliseconds / 1000;
-                    Long minutes = seconds / 60;
-                    Long hours = minutes / 60;
-                    if (hours < tiempoLimiteReapertura) {
-                        if (!caso.CC_En_Tercer_Nivel__c && !caso.CC_En_Segundo_Nivel__c && resultadoEncuestas.isEmpty()) {
-                            List<Group> colaFCO = [SELECT Id FROM Group WHERE Type = 'queue' AND DeveloperName = 'CC_Reaperturas_FCO' LIMIT 1];
-                            if(!colaFCO.isEmpty()){
-                                caso.Status = 'Activo';
-                                caso.OwnerId = colaFCO[0].Id;
-                                caso.CC_Reapertura_Valida__c = null;
-                                caso.CC_Fecha_Reapertura__c = System.now();
-                                update caso;
-                
-                                CC_Formulario_Consultas_Operativas.crearEmailMessage(correo, emailDestino, caso.Id, null, myPlainText, null);
-                
-                                Task actividadReapertura = new Task();
-                                actividadReapertura.Type = 'Reapertura automatica';
-                                actividadReapertura.Subject = 'Reapertura automatica';
-                                actividadReapertura.WhatId = WhatIdTarea;
-                                actividadReapertura.Status = 'Completed';
-                                actividadReapertura.Description = myPlainText;
-                                actividadReapertura.CC_Referencia_Correo_Saliente__c = caso.CC_Referencia_Correo_Saliente__c;
-                                actividadReapertura.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
-                                insert actividadReapertura;
-                
-                                CBK_Activity_Extension__c tareaExtension = new CBK_Activity_Extension__c();
-                                tareaExtension.AV_ActivityId__c = actividadReapertura.Id;
-                                tareaExtension.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CBK_Activity_Extension__c', 'CC_Task');
-                                insert tareaExtension;
-                            }
-                        } else {
-                            if (!resultadoEncuestas.isEmpty() || Test.isRunningTest()) {
-                                String htmlBody;
-                                if (caso.CC_Idioma__c == 'es') {
-                                    htmlBody = [SELECT HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_Consulta_finalizada_FCO_cas' LIMIT 1].HtmlValue;
-                                } else {
-                                    htmlBody = [SELECT HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_Consulta_finalizada_FCO_cat' LIMIT 1].HtmlValue;
-                                }
-                                Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-                                email.setHtmlBody(htmlBody);
-                                email.setSaveAsActivity(true);
-                                email.setTreatBodiesAsTemplate(true);
-                                email.setWhatId(caso.Id);
-                                email.setTargetObjectId(caso.ContactId);
-                                email.setTreatTargetObjectAsRecipient(false);
-                                email.setOrgWideEmailAddressId(owa[0].Id);
-                                email.subject = email.Subject;
-                                List<String> toAddress = new List<String>();
-                                toAddress.add(caso.Contact.Email);
-                                email.setToAddresses(toAddress);
-                                allmsg.add(email);
-                                
-                            }
-                        }
-                    } else {
-                        String htmlBody;
-                        if (caso.CC_Idioma__c == 'es') {
-                            htmlBody = [SELECT HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_Fuera_Plazo_FCO_cas' LIMIT 1].HtmlValue;
-                        } else {
-                            htmlBody = [SELECT HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_Fuera_Plazo_FCO_cat' LIMIT 1].HtmlValue;
-                        }
-                        Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-                        email.setHtmlBody(htmlBody);
-                        email.setSaveAsActivity(true);
-                        email.setTreatBodiesAsTemplate(true);
-                        email.setWhatId(caso.Id);
-                        email.setTargetObjectId(caso.ContactId);
-                        email.setTreatTargetObjectAsRecipient(false);
-                        email.setOrgWideEmailAddressId(owa[0].Id);
-                        email.subject = email.Subject;
-                        List<String> toAddress = new List<String>();
-                        toAddress.add(caso.Contact.Email);
-                        email.setToAddresses(toAddress);
-                        allmsg.add(email);
-                    }
-                }
-                if (!allmsg.isEmpty()){
-                    //Enviamos todos los mensajes
-                    try{
-                        Messaging.SendEmailResult [] result = Messaging.sendEmail(allmsg, false);
-                    }catch(exception e){
-                        String exc = e.getMessage();
-                        CBK_Log.error(e + '-' + exc);
-                        CBK_Log.error('Resultado error: ' + e);
-                    }
+                    CC_Encuesta_CCO.respuestaCorreo(correo, whatIdTarea, myPlainText, emailDestino);
                 }
             } else {
                 List<CC_Queue_Procedencia__mdt> queues = [SELECT CC_Queue__c, CC_Canal_Procedencia__c FROM CC_Queue_Procedencia__mdt
@@ -488,10 +403,7 @@ public with sharing class CC_Metodos_EmailServices {
                 if(!queues.isEmpty()){
                     Group cola = [SELECT Id FROM Group WHERE TYPE = 'Queue' AND DEVELOPERNAME = :queues[0].CC_Queue__c LIMIT 1];
                     caso.OwnerId = cola.Id;          
-                }/*else{
-                    Group cola = [SELECT Id FROM Group WHERE TYPE = 'Queue' AND DEVELOPERNAME = 'CC_Inbound_Email_AC' LIMIT 1];
-                    caso.OwnerId = cola.Id;
-                }*/
+                }
                 update caso;
                 
                 CC_Metodos_EmailServices.crearAttachment(caso.Id,  correo.textAttachments, correo.binaryAttachments);
@@ -500,63 +412,8 @@ public with sharing class CC_Metodos_EmailServices {
                 if (caso.CC_Canal_Procedencia__c == 'Soporte Empleados CompraEstrella'){
                     EmailMessage crearEmailMessage = CC_PromoCaixa_Empleados_EmailService.crearEmailMessage(correo,emailDestino,caso.Id,caso.ContactId,myPlainText);
                 }
-                /*String htmlBody;
-                if(caso.CC_Idioma__c == 'ca'){
-                    htmlBody = [SELECT Id, DeveloperName, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_Respuesta_Automatica_Cliente_en' LIMIT 1].HtmlValue;
-                }else if(caso.CC_Idioma__c == 'en'){
-                    htmlBody = [SELECT Id, DeveloperName, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_Respuesta_Automatica_Cliente_ca' LIMIT 1].HtmlValue;
-                }else{
-                    htmlBody = [SELECT Id, DeveloperName, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'CC_Respuesta_Automatica_Cliente_es' LIMIT 1].HtmlValue;
-                }
-                
-                List<Messaging.SingleEmailMessage> allmsg = new List<Messaging.SingleEmailMessage>();  
-                List<OrgWideEmailAddress> owa = [select id, DisplayName, Address from OrgWideEmailAddress WHERE Address = :emailDestino LIMIT 1];  
-                
-                if (owa.isEmpty() && caso.CC_Canal_Procedencia__c == 'Soporte Empleados CompraEstrella'){
-                    List<CC_Valores__mdt> listaValoresCorreos = [SELECT CC_Valor_SFDC__c, CC_Valor__c, CC_Lista__c  FROM CC_Valores__mdt
-                                                                WHERE CC_Lista__c = 'promocaixaEmpleados'];
-                    
-                    for (CC_Valores__mdt listaCorreo : listaValoresCorreos) {
-                        if (listaCorreo.CC_Valor_SFDC__c == emailDestino || listaCorreo.CC_Valor__c == emailDestino) {
-                            owa = [select id, DisplayName, Address from OrgWideEmailAddress WHERE DisplayName = 'Atención Oficinas PromoCaixa' LIMIT 1];
-                        }
-                    }
-                }
-
-                //Generamos el email a enviar. Debe mantener el cuerpo del email anterior y agregar el cuerpo de la plantilla recuperada
-                Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-                //Falta que nos pasen la plantilla
-                //email.setHtmlBody(htmlBody);
-                email.setHtmlBody(htmlBody + '<br/>__________<br/><br/>' + correo.HtmlBody);
-                //email.setReplyTo(correo.Id);
-                email.setSaveAsActivity(true);
-                email.setTreatBodiesAsTemplate(true);
-                email.setWhatId(caso.Id);
-                email.setTargetObjectId(caso.ContactId);
-                email.setTreatTargetObjectAsRecipient(false);
-                email.setOrgWideEmailAddressId(owa[0].Id);
-                email.subject = correo.Subject;
-                String[] toAddress = new String[]{};
-                    toAddress.add(correo.FromAddress);
-                email.setToAddresses(toAddress);
-                allmsg.add(email);
-                
-                //Enviamos todos los mensajes
-                if (!allmsg.isEmpty()){
-                    Messaging.SendEmailResult [] r = Messaging.sendEmail(allmsg, false); 
-                    for (Messaging.SendEmailResult sr : r) {
-                        if (!sr.isSuccess()) {
-                            for(Database.Error err : sr.getErrors()) {
-                                System.debug('The following error has occurred.');                   
-                                System.debug(err.getStatusCode() + ': ' + err.getMessage());
-                                System.debug('Fields that affected this error: ' + err.getFields());
-                            }
-                        }
-                    }                    
-                }*/
             }
-        }
-        else if(caso.RecordTypeId == recordTypeCasoCSIBankia){
+        } else if(caso.RecordTypeId == recordTypeCasoCSIBankia){
             List<CC_Queue_Procedencia__mdt> queues = [SELECT CC_Queue__c, CC_Canal_Procedencia__c FROM CC_Queue_Procedencia__mdt
                                                       WHERE CC_Canal_Procedencia__c = :caso.Canal_del_Empleado__c];        
             

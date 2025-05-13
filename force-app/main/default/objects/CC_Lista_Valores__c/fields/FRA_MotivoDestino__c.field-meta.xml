@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_MotivoDestino__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que informa el MCC destino para la tabla de equivalencias</description>
+    <label>Motivo destino</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>El MCC seleccionado debe tener Record Type &apos;C - Motivo&apos; y tipo cliente &apos;Cliente (FRA)&apos;</errorMessage>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>C - Motivo</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.CC_Tipo_Cliente__c</field>
+            <operation>equals</operation>
+            <value>Cliente (FRA)</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Listas de valores (Motivo destino)</relationshipLabel>
+    <relationshipName>Listas_de_valores1</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

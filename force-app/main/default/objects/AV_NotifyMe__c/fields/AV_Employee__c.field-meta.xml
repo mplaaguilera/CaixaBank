@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Employee__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>Empleado</description>
     <label>Empleado</label>
     <referenceTo>Contact</referenceTo>
     <relationshipLabel>Notificaciones</relationshipLabel>

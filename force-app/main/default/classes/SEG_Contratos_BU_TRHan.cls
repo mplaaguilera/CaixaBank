@@ -29,15 +29,10 @@ public with sharing class SEG_Contratos_BU_TRHan extends CC_TriggerHandlerBase {
 	 *  @param mapNewObj
 	 *  @param mapOldObj
      */ 
-    public static void fechaFirma(List<Id> contratosSEG, Map<Id, SEG_Contratos__c> mapNewObj, Map<Id, SEG_Contratos__c> mapOldObj)
-    {
-        for (Id  contratoId : contratosSEG)
-        {
-            if(mapOldObj.get(contratoId).SEG_Estado__c!=mapNewObj.get(contratoId).SEG_Estado__c){
-                if (mapNewObj.get(contratoId).SEG_Estado__c == 'Firmado')
-                {
-                    mapNewObj.get(contratoId).SEG_Fecha_Firma__c= date.Today();                
-                }
+    public static void fechaFirma(List<Id> contratosSEG, Map<Id, SEG_Contratos__c> mapNewObj, Map<Id, SEG_Contratos__c> mapOldObj) {
+        for (Id  contratoId : contratosSEG) {
+            if(mapOldObj.get(contratoId).SEG_Estado__c != mapNewObj.get(contratoId).SEG_Estado__c && mapNewObj.get(contratoId).SEG_Estado__c == 'Firmado'){
+                mapNewObj.get(contratoId).SEG_Fecha_Firma__c = date.Today();                
             }
         }      
     }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_Origen_Creacion__c</fullName>
+    <description>Campo picklist que permite informar dónde se ha creado el caso para el aplicativo Hub Fraude</description>
+    <label>Origen creación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Manual</fullName>
+                <default>false</default>
+                <label>Manual</label>
+            </value>
+            <value>
+                <fullName>CGF</fullName>
+                <default>false</default>
+                <label>CGF</label>
+            </value>
+            <value>
+                <fullName>Llamada</fullName>
+                <default>false</default>
+                <label>Llamada</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

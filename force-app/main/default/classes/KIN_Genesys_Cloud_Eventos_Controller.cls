@@ -12,8 +12,6 @@ public with sharing class KIN_Genesys_Cloud_Eventos_Controller {
 			return SACH_Llamada_GC.registrarLlamadaEntrante(input);
 		} else if (negocioServicioGenesys == 'CC') {
 			return CC_Llamada_GC.registrarLlamadaEntrante(input);
-		} else if (negocioServicioGenesys == 'CAM') {
-			return AM_Llamada_GC.registrarLlamadaEntrante(input);
 		} else {
 			throw new AuraHandledException('No es posible determinar la aplicación Salesforce correspondiente al servicio Genesys con código "' + input.servicio + '"');
 		}
@@ -29,8 +27,6 @@ public with sharing class KIN_Genesys_Cloud_Eventos_Controller {
 			return CSBD_Llamada_GC.registrarLlamadaSaliente(input);
 		} else if (prefijoRecordType == 'SACH') {
 			return SACH_Llamada_GC.registrarLlamadaSaliente(input);
-		} else if (prefijoRecordType == 'CAM') {
-			return AM_Llamada_GC.registrarLlamadaSaliente(input);
 		} else {
 			return CC_Llamada_GC.registrarLlamadaSaliente(input);
 		}
@@ -38,11 +34,14 @@ public with sharing class KIN_Genesys_Cloud_Eventos_Controller {
 
 	@AuraEnabled
 	public static Map<String, Object> iniciarLlamadaSalienteClickToDial(String llamadaJson) {
+	
 		CC_Llamada_Input input = parseJson(llamadaJson);
 		String prefijoRecordType = prefijoRecordType(input.casoId);
 		if (prefijoRecordType == 'CSBD') {
 			return CSBD_Llamada_GC.iniciarLlamadaSalienteClickToDial(input);
-		} else {
+		}else if (prefijoRecordType == 'HDT') { 
+			return HDT_Llamada_GC.iniciarLlamadaSalienteClickToDial(input);
+		}else {
 			return null;
 		}
 	}
@@ -98,6 +97,7 @@ public with sharing class KIN_Genesys_Cloud_Eventos_Controller {
 
 	@AuraEnabled
 	public static Map<String, Object> finalizarLlamada(String llamadaJson, String tipoCierre) {
+		system.debug('Las llamadas tienen : ' + llamadaJson + 'tipo de cierre : ' + tipoCierre);
 		CC_Llamada_Input input = parseJson(llamadaJson);
 		if (String.isBlank(input.llamadaId)) {
 			throw new AuraHandledException('No se ha podido recuperar el id del registro de llamada por lo que no es posible finalizarla');
@@ -109,8 +109,6 @@ public with sharing class KIN_Genesys_Cloud_Eventos_Controller {
 				return CSBD_Llamada_GC.finalizarLlamada(input, tipoCierre);
 			} else if (prefijoRecordType == 'SACH') {
 				return SACH_Llamada_GC.finalizarLlamada(input, tipoCierre);
-			} else if (prefijoRecordType == 'CAM') {
-				return AM_Llamada_GC.finalizarLlamada(input, tipoCierre);
 			} else {
 				return CC_Llamada_GC.finalizarLlamada(input, tipoCierre);
 			}
@@ -218,7 +216,7 @@ public with sharing class KIN_Genesys_Cloud_Eventos_Controller {
 
 				Id idCaso;
 				List<Task> tareasLlamada = [SELECT WhatId FROM Task WHERE CC_Llamada_Id__c = :llamadaInicial.Id AND WhatId != NULL
-											AND RecordType.DeveloperName IN ('CC_Task', 'OS_Task', 'SACH_Task', 'HDT_Task', 'CSBD_Task', 'AM_Task') LIMIT 1];
+											AND RecordType.DeveloperName IN ('CC_Task', 'OS_Task', 'SACH_Task', 'HDT_Task', 'CSBD_Task') LIMIT 1];
 				if (!tareasLlamada.isEmpty()) {
 					idCaso = tareasLlamada[0].WhatId;
 				}

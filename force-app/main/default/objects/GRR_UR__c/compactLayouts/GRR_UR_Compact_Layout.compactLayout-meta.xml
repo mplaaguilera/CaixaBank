@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_UR_Compact_Layout</fullName>
+    <fields>GRR_Id_UR__c</fields>
+    <fields>GRR_Fecha_Proximo_Lanzamiento__c</fields>
+    <fields>GRR_Fecha_Ultimo_Lanzamiento__c</fields>
+    <fields>GRR_Sociedad__c</fields>
+    <fields>OwnerId</fields>
+    <fields>GRR_Region__c</fields>
+    <label>GRR UR Compact Layout</label>
+</CompactLayout>

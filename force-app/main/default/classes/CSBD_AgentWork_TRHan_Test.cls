@@ -12,7 +12,7 @@ public class CSBD_AgentWork_TRHan_Test {
             CC_Lista_Valores__c valor = new CC_Lista_Valores__c();
             valor.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
             valor.CC_Lista__c = listaValores.Id;
-            valor.Name = 'Préstamo';
+            valor.Name = 'Consumo';
             valor.CC_Valor__c = '1';
             insert valor;
 
@@ -24,9 +24,9 @@ public class CSBD_AgentWork_TRHan_Test {
 
             CC_Lista_Valores__c reglaAsignacion = new CC_Lista_Valores__c();
             reglaAsignacion.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Regla_asignacion_oportunidad').getRecordTypeId();
-            reglaAsignacion.Name = 'Oportunidades - Préstamos I';
+            reglaAsignacion.Name = 'Oportunidades - Consumos I';
             reglaAsignacion.CSBD_Cola_Oportunidad__c = 'CSBD_Prestamos_I';
-            reglaAsignacion.CSBD_Tipo_de_oportunidad__c = 'Préstamo';
+            reglaAsignacion.CSBD_Tipo_de_oportunidad__c = 'Consumo';
             reglaAsignacion.CC_Orden__c = 1;
             insert reglaAsignacion;
         }
@@ -34,7 +34,8 @@ public class CSBD_AgentWork_TRHan_Test {
 
     @isTest
     public static void biTestKo() {
-        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+        User admin = CSBD_TestDataFactory.usuarioAdministrador();
+        System.runAs(admin) {
             Contact contacto = (Contact)CSBD_TestDataFactory.crearCuentaContacto('53456777P').get('contacto');
 
             System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
@@ -53,7 +54,7 @@ public class CSBD_AgentWork_TRHan_Test {
                     AgentWork agentWork = new AgentWork();
                     agentWork.ServiceChannelId = [SELECT Id FROM ServiceChannel WHERE DeveloperName = 'CSBD_Gestor_Oportunidad_Service_Channel'].Id;
                     agentWork.WorkItemId = [SELECT Id FROM CSBD_Gestor_Oportunidad__c WHERE CSBD_Oportunidad__c = :prestamo.Id ORDER BY CreatedDate DESC LIMIT 1].Id;
-                    agentWork.UserId = UserInfo.getUserId();
+                    agentWork.UserId = admin.Id;
                     insert agentWork;
                 } catch (Exception e) {
                     errorInsert = e.getMessage();

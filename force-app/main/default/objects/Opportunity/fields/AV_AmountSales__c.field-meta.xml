@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_AmountSales__c</fullName>
     <description>Importe de la venta</description>
-    <label>Importe de la venta</label>
+    <label>Importe</label>
     <precision>18</precision>
     <required>false</required>
     <scale>2</scale>

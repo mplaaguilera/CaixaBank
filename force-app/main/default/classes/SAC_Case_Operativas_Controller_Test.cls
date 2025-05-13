@@ -1212,6 +1212,33 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         Test.stopTest();
     }
 
+    @isTest
+    static void reabrirReclamacionSinCaseExtensionTest() {
+        Test.startTest();
+        User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
+        
+        PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
+        SAC_DatabaseDML.insertDML(psa, false);
+        //Database.insert(psa);
+        
+        Case reclamacion = [SELECT Id, Status, CBK_Case_Extension_Id__c FROM Case WHERE Subject = 'TestRec5'];
+        Id caseExtensionAntiguo = reclamacion.CBK_Case_Extension_Id__c;
+
+        system.runAs(usuario) {
+            reclamacion.CBK_Case_Extension_Id__c = null;
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+
+            String motivo = 'test';
+            
+            SAC_Case_Operativas_Controller.reabrirReclamacion(reclamacion.Id, motivo);
+            Case reclamacionReabierta = [SELECT Id, Status, CBK_Case_Extension_Id__c FROM Case WHERE Subject = 'TestRec5'];
+            
+            System.assertNotEquals(caseExtensionAntiguo, reclamacionReabierta.CBK_Case_Extension_Id__c, 'No se ha insertado el registro del case extension.');
+        }
+        Test.stopTest();
+    }
+
     @istest
     static void nuevaReclamacionVinculadaTest(){
         User usuario = [SELECT id FROM User WHERE Username = 'Name124@test.com' AND isActive = true Limit 1];

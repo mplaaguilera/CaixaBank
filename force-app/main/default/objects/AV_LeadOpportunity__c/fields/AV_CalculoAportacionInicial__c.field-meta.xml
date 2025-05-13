@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_CalculoAportacionInicial__c</fullName>
+    <description>Campo que muestra el porcentaje de aportación inicial</description>
     <formula>1  -  AV_MAXMORTGAGEGRANTED__c</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Porcentaje aport. Inicial</label>

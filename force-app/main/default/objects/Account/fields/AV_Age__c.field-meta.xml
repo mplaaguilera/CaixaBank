@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Age__c</fullName>
+    <description>Campo edad</description>
     <externalId>false</externalId>
     <formula>IF( NOT( ISBLANK( PersonBirthdate ) ) ,  
     IF( DATE(2000, MONTH( PersonBirthdate ) , DAY( PersonBirthdate ) ) &lt;=  DATE(2000, MONTH(  TODAY() ) , DAY(  TODAY() ) ) , 

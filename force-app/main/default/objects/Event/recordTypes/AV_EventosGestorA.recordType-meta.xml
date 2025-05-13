@@ -44,6 +44,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>AV_ContactGenerateAppointment__c</picklist>
+        <values>
+            <fullName>Cita generada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin cita</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>AV_InOutbound__c</picklist>
         <values>
             <fullName>001</fullName>
@@ -211,25 +222,6 @@
         <values>
             <fullName>Pendiente</fullName>
             <default>true</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
-        <picklist>FinServ__Regarding__c</picklist>
-        <values>
-            <fullName>Client Retention</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Onboarding</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Prospecting</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Service</fullName>
-            <default>false</default>
         </values>
     </picklistValues>
     <picklistValues>

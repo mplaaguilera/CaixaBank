@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_CodCompany__c</fullName>
+    <description>To be used multichannel.</description>
+    <label>CodCompany</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CXB</fullName>
+                <default>false</default>
+                <label>CaixaBank</label>
+            </value>
+            <value>
+                <fullName>ACC</fullName>
+                <default>false</default>
+                <label>Accionistas</label>
+            </value>
+            <value>
+                <fullName>VCX</fullName>
+                <default>false</default>
+                <label>VidaCaixa</label>
+            </value>
+            <value>
+                <fullName>IMG</fullName>
+                <default>false</default>
+                <label>Imagin</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

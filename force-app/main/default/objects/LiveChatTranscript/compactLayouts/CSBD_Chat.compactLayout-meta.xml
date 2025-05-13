@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CSBD_Chat</fullName>
-    <fields>CC_Subject__c</fields>
-    <fields>CC_Idioma__c</fields>
+    <fields>CSBD_Nombre_Producto__c</fields>
     <label>CSBD_Chat</label>
 </CompactLayout>

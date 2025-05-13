@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_OrigenAct__c</fullName>
+    <description>Origen de la actividad</description>
     <label>Origen</label>
     <required>false</required>
     <trackTrending>false</trackTrending>
@@ -8,7 +9,7 @@
     <valueSet>
         <restricted>true</restricted>
         <valueSetDefinition>
-            <sorted>true</sorted>
+            <sorted>false</sorted>
             <value>
                 <fullName>AV_AccionComercial</fullName>
                 <default>false</default>
@@ -18,12 +19,6 @@
                 <fullName>AV_AlertaComercial</fullName>
                 <default>false</default>
                 <label>Alerta Comercial</label>
-            </value>
-            <value>
-                <fullName>AV_AlertasComerciales</fullName>
-                <default>false</default>
-                <isActive>false</isActive>
-                <label>Alertas comerciales</label>
             </value>
             <value>
                 <fullName>AV_CitasNoCerradas</fullName>
@@ -51,12 +46,6 @@
                 <label>Iniciativa Gestor/a</label>
             </value>
             <value>
-                <fullName>AV_IniciativaGestor</fullName>
-                <default>false</default>
-                <isActive>false</isActive>
-                <label>Iniciativa Gestor (Oportunidades Gestor)</label>
-            </value>
-            <value>
                 <fullName>AV_Llamadas</fullName>
                 <default>false</default>
                 <label>Llamadas</label>
@@ -82,12 +71,6 @@
                 <label>OnBoarding</label>
             </value>
             <value>
-                <fullName>AV_OnboardingIntouch</fullName>
-                <default>false</default>
-                <isActive>false</isActive>
-                <label>Onboarding Intouch</label>
-            </value>
-            <value>
                 <fullName>CIBE_OperacionesPendientesFirma</fullName>
                 <default>false</default>
                 <label>Operaciones pendientes de firma</label>
@@ -106,6 +89,24 @@
                 <fullName>AV_R2B</fullName>
                 <default>false</default>
                 <label>Stop&amp;GO</label>
+            </value>
+            <value>
+                <fullName>AV_AlertasComerciales</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Alertas comerciales</label>
+            </value>
+            <value>
+                <fullName>AV_IniciativaGestor</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Iniciativa Gestor (Oportunidades Gestor)</label>
+            </value>
+            <value>
+                <fullName>AV_OnboardingIntouch</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Onboarding Intouch</label>
             </value>
         </valueSetDefinition>
     </valueSet>

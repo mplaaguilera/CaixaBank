@@ -1,46 +1,94 @@
 <apex:page renderAs="pdf" applyBodyTag="false" showHeader="false" sidebar="false" standardStylesheets="false" applyHtmlTag="false" standardController="Case">
 
 	<head>
-		<style type="text/css" media="print">
-			@page {
-				margin-top: 3cm;
-				margin-bottom: 5cm;
-				margin-left: 3cm;
-				margin-right: 2.5cm;
-				line-height: normal;
+        
+        <style type="text/css" media="print">
+                  @page {
+                        margin-top:     5.5cm;
+                        margin-bottom:    3cm;
+                        margin-left:    3.5cm;
+                        margin-right:    2.5cm;
+                        line-height: normal;
 
-				@top-center {
-					width: 100%;
-					content: element(header);
-				}
+                        @top-center {
+                              width: 100%;
+                              content: element(header);
+                        }
+                        @bottom-left {
+                              width: 100%;
+                              content: element(footer);
+                        }
 
-				@bottom-left {
-					width: 100%;
-					content: element(footer);
-				}
-			}
+                        background-image: url(/resource/SAC_CartaPlantilla);
+                        background-repeat: no-repeat;
 
-			.pagenumber:before {
-				content: counter(page);
-			}
-
-			.pagecount:before {
-				content: counter(pages);
-			}
-
-			p {
-				margin-bottom: 0;
-				margin-top: 0;
-			}
-		</style>
-	</head>
-
+                  }
+                  div.header {
+                        /* display: block; */
+                        margin-top:     2cm;
+                        margin-left:    -1cm;
+                        line-height: 0;
+                        position: running(header);
+                  }
+                  div.footer {
+                        /* display: block; */
+                        line-height: 0.7;
+                        margin-bottom:    1cm;
+                        text-align: justify;
+                        font-family: Arial !important; 
+                        position: running(footer);
+                  }
+                  div.encabezado {
+                        line-height: 0.7;
+                        margin-top: 6cm;
+                     /*   text-align: justify;*/
+                        font-family: Arial !important; 
+                  }
+                  div.pieFirma {
+                        line-height: 1;
+                        /* text-align: justify; */
+                        font-family: Arial !important; 
+                  }
+                  div.firma {
+                        line-height: 1;
+                        /* text-align: justify; */
+                        font-family: Arial !important; 
+                  }
+                  .pagenumber:before {
+                        content: counter(page);
+                  }
+                  /* div.body{ 
+                        font-family: 'Arial Unicode MS'; } */
+                  .pagecount:before {
+                        content: counter(pages);
+                  }      
+            </style>
+      </head>
+      
 	<div class="content">
-		<div>
-			<apex:image url="{!$Resource.Logo_Caixa_Mail_ES}"/>
-		</div>
+            <!--<div>
+                  <apex:image url="{!$Resource.Logo_Caixa_Mail_ES}"/>
+            </div>-->
+        
+            <div id="div-0" class="header">
+                  <apex:outputText value="{!Case.CC_Header__c}" escape="false" ></apex:outputText>
+            </div>
+            <div class="footer">
+                  <apex:outputText value="{!Case.CC_Footer__c}" escape="false" ></apex:outputText>
+            </div>
+            <div class="encabezado">
+                  <apex:outputText value="{!Case.CC_Encabezado__c}" escape="false" ></apex:outputText>
+            </div>
+
 		<div>
 			<apex:outputText value="{!Case.CC_GenerarDocumentoHtml__c}" escape="false"></apex:outputText>
 		</div>
+
+            <div class="pieFirma">
+                  <apex:outputText value="{!Case.CC_PieFirma__c}" escape="false" ></apex:outputText>
+            </div>
+            <div class="firma">
+                  <apex:outputText value="{!Case.CC_Firma__c}" escape="false" ></apex:outputText>
+            </div>
 	</div>
 </apex:page>

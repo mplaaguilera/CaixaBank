@@ -19,6 +19,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>AV_ContactGenerateAppointment__c</picklist>
+        <values>
+            <fullName>Cita generada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin cita</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>AV_InOutbound__c</picklist>
         <values>
             <fullName>Entrada</fullName>
@@ -179,23 +190,24 @@
             <fullName>Pendiente</fullName>
             <default>false</default>
         </values>
-    </picklistValues>
-    <picklistValues>
-        <picklist>FinServ__Regarding__c</picklist>
         <values>
-            <fullName>Client Retention</fullName>
+            <fullName>RCS Entregado</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Onboarding</fullName>
+            <fullName>RCS Entregado %28SMS Alternativo%29</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Prospecting</fullName>
+            <fullName>RCS Enviado</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Service</fullName>
+            <fullName>RCS Envío Fallido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RCS Visto</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -475,6 +487,10 @@
         </values>
         <values>
             <fullName>Fusionado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Identificación del cliente</fullName>
             <default>false</default>
         </values>
         <values>

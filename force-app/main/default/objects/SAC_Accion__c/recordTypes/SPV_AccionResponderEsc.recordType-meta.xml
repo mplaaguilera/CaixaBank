@@ -262,6 +262,46 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Pendiente SCX-Ejec%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente SCX-SAC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente VCX-DG</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente VCX-GCI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente VCX-Gest%2E Colect%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente VCX-PPI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente VCX-PPO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente VCX-Prest%2E Colect%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente VCX-Prest%2E Ind%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente VCX-TradeMk</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Sistemas</fullName>
             <default>false</default>
         </values>

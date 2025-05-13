@@ -68,9 +68,16 @@ public with sharing class CC_WS_Recuperar_Tarjetas_Test {
         );
         settingsList.add(recuperarTarjetasFiltro);
 
+        CC_Settings__c isBizum = new CC_Settings__c(
+            Name = 'CC_Recuperar_Tarjetas_Bizum',
+            CC_Activa__c = true,
+            CC_Configuracion_1__c = 'true'
+        );
+        settingsList.add(isBizum);
+
         CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
         customSetting.Name = 'CC_Recuperar_Tarjetas';
-        customSetting.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/cards/creditCard/bis/cards/customers/id/request';
+        customSetting.NamedCredential__c = 'callout:API_GWT_TST_CCSF/cards/creditCard/bis/cards/customers/id/request';
         customSetting.RegistroTrazaIntegracion__c = true;
        
         System.runAs (usuario1) {

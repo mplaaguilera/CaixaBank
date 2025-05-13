@@ -95,6 +95,11 @@
                 <default>false</default>
                 <label>Empleado (HDT)</label>
             </value>
+            <value>
+                <fullName>Cliente (GRR)</fullName>
+                <default>false</default>
+                <label>Cliente (GRR)</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

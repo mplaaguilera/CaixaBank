@@ -3,7 +3,7 @@
     <fullName>AV_SalesCenter__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Centro de la venta</description>
-    <label>Oficina de la venta</label>
+    <label>Oficina</label>
     <referenceTo>Account</referenceTo>
     <relationshipLabel>Opportunities (Oficina de la venta)</relationshipLabel>
     <relationshipName>Opportunities2</relationshipName>

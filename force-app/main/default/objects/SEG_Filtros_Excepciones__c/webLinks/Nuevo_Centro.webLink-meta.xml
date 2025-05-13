@@ -11,5 +11,5 @@
     <openType>sidebar</openType>
     <protected>false</protected>
     <requireRowSelection>true</requireRowSelection>
-    <url>{!URLFOR(&apos;/lightning/o/SEG_Filtros_Excepciones__c/new?count=1&amp;nooverride=1&amp;useRecordTypeCheck=1&amp;navigationLocation=RELATED_LIST&amp;uid=172301265125570382&amp;ws=%2Flightning%2Fr%2FSEG_Excepciones__c%2Fa4GKN0000000ODl2AM%2Fview&amp;recordTypeId=0125r000001TMmTAAW&apos;, null)}</url>
+    <url>{!URLFOR(&apos;/lightning/o/SEG_Filtros_Excepciones__c/new?count=1&amp;nooverride=1&amp;useRecordTypeCheck=1&amp;navigationLocation=RELATED_LIST&amp;uid=172301265125570382&amp;ws=%2Flightning%2Fr%2FSEG_Excepciones__c%2Fa4GKN0000000ODl2AM%2Fview&amp;recordTypeId=0126M0000003Jg4QAE&apos;, null)}</url>
 </WebLink>

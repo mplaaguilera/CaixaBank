@@ -59,7 +59,7 @@
    )
 )</expression>
     </formulas>
-    <interviewLabel>AM_Task-2_InterviewLabel</interviewLabel>
+    <interviewLabel>AM_Task-3_InterviewLabel</interviewLabel>
     <label>AM_Task</label>
     <processMetadataValues>
         <name>ObjectType</name>
@@ -217,7 +217,7 @@
         <object>Case</object>
     </recordUpdates>
     <startElementReference>myDecision</startElementReference>
-    <status>Active</status>
+    <status>Draft</status>
     <variables>
         <name>myVariable_current</name>
         <dataType>SObject</dataType>

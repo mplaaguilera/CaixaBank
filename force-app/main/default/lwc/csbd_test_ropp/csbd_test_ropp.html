@@ -1,0 +1,25 @@
+<template>
+    <div class="slds-var-m-horizontal_x-small">
+        <template if:true={isLoadingOpp}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <template lwc:if={muestraCopiaOpp}>
+            <lightning-formatted-rich-text value={copiaResOpp}></lightning-formatted-rich-text>
+        </template>
+        <template lwc:else>
+            <lightning-formatted-rich-text value={resumenOportunidad}></lightning-formatted-rich-text>
+        </template>
+    </div>
+
+    <footer class="slds-card__footer slds-var-m-top_large" style="text-align: left; padding-top: 12px; padding-bottom: 0; margin: 8px 0 0 0;">
+        <lightning-record-edit-form object-api-name="Opportunity" record-id={recordId} onsubmit={handleSubmitOpp}>
+            <lightning-messages></lightning-messages>
+            <lightning-input-field field-name="CSBD_InstruccionesGPT__c" style="padding: 0;"></lightning-input-field>
+
+            <div class="slds-var-m-top_medium" style="text-align: right;">
+                <lightning-button type="submit" label="Guardar" variant="brand"></lightning-button>
+            </div>
+        </lightning-record-edit-form>
+    </footer>
+</template>

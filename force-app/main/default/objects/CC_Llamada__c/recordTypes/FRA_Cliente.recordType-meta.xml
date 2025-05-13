@@ -4,6 +4,56 @@
     <active>true</active>
     <label>Cliente (FRA)</label>
     <picklistValues>
+        <picklist>AV_DurationType__c</picklist>
+        <values>
+            <fullName>Corta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Larga</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Media</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>AV_State__c</picklist>
+        <values>
+            <fullName>Descartada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestionada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No Gestionada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No localizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Perdida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reportada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Respondida</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>CC_Canal_del_Empleado__c</picklist>
         <values>
             <fullName>900</fullName>

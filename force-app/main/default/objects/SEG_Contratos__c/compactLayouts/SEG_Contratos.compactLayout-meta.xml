@@ -8,7 +8,6 @@
     <fields>SEG_Fecha_1_Reclamacion__c</fields>
     <fields>SEG_Fecha_2_Reclamacion__c</fields>
     <fields>SEG_Fecha_3_Reclamacion__c</fields>
-    <fields>SEG_Fecha_Llamada__c</fields>
     <fields>SEG_Gestor_comercial__c</fields>
     <label>Contratos</label>
 </CompactLayout>

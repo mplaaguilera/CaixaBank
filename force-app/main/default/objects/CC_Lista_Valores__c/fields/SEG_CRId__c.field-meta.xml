@@ -4,7 +4,7 @@
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Clasificación rápida asociada a la lista de valores</description>
     <inlineHelpText>Clasificación rápida asociada a la lista de valores</inlineHelpText>
-    <label>Clasificación rápida</label>
+    <label>Clasificación Rápida</label>
     <lookupFilter>
         <active>true</active>
         <errorMessage>Value does not exist or does not match filter criteria.</errorMessage>

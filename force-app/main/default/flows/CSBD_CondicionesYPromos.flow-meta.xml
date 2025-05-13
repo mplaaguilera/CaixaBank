@@ -5,7 +5,7 @@
         <label>Condiciones y Promos Promt</label>
         <locationX>182</locationX>
         <locationY>350</locationY>
-        <actionName>0hfKA000000000DNotFound</actionName>
+        <actionName>CSBD_CondicionesYPromos</actionName>
         <actionType>generatePromptResponse</actionType>
         <connector>
             <targetReference>Asignaci_n_4</targetReference>
@@ -17,6 +17,7 @@
                 <elementReference>CSBD_RegistroOportunidad</elementReference>
             </value>
         </inputParameters>
+        <nameSegment>CSBD_CondicionesYPromos</nameSegment>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <actionCalls>
@@ -24,7 +25,7 @@
         <label>Copia 1 de Condiciones y Promos Promt</label>
         <locationX>578</locationX>
         <locationY>1190</locationY>
-        <actionName>0hfKA000000000DNotFound</actionName>
+        <actionName>CSBD_CondicionesYPromos</actionName>
         <actionType>generatePromptResponse</actionType>
         <connector>
             <targetReference>Guardar_resumen</targetReference>
@@ -36,6 +37,7 @@
                 <elementReference>CSBD_RegistroOportunidad</elementReference>
             </value>
         </inputParameters>
+        <nameSegment>CSBD_CondicionesYPromos</nameSegment>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <apiVersion>61.0</apiVersion>

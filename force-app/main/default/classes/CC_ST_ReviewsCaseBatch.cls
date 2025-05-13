@@ -185,17 +185,17 @@ global class CC_ST_ReviewsCaseBatch implements Database.Batchable<sObject>, Data
         }
         
         //Actualizar el caso informando cual es su Social Persona
-        List<Case> oListCaseUpd = new List<Case>();
+        Map<Id, Case> oListCaseUpd = new Map<Id, Case>();
         for(CC_ST_AppReviews__c Review : scope){
         	SocialPersona sp = spCaseMap.get(Review.Case__c);
             Case c = new Case();
             c.Id = Id.valueOf(Review.Case__c);
             c.CC_Social_Persona__c = sp.Id;
-            oListCaseUpd.add(c);
+            oListCaseUpd.put(c.Id, c);
         }
         
         if (!oListCaseUpd.isEmpty()){
-            Database.SaveResult[] oResultUpdateCase = Database.update(oListCaseUpd, false);
+            Database.SaveResult[] oResultUpdateCase = Database.update(oListCaseUpd.values(), false);
         }
         
         //Actualizar Social Post

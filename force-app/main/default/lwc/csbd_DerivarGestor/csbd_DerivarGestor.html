@@ -1,5 +1,5 @@
 <template>
-    <section role="dialog" lwc:ref="modalDerivarGestor"  class="slds-modal" tabindex="-1" aria-modal="true" onkeydown={modalTeclaPulsada}>
+    <section role="dialog" lwc:ref="modalDerivarGestor" class="slds-modal" tabindex="-1" aria-modal="true" onkeydown={modalTeclaPulsada}>
         <div class="slds-modal__container">
             <header class="slds-modal__header">
                 <!-- sldsValidatorIgnoreNextLine -->
@@ -7,45 +7,52 @@
                     <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
                 </button>
                 <h2 class="slds-text-heading_medium slds-hyphenate">Derivar a gestor</h2>
-                <p class="slds-var-m-top_x-small">Crear una oportunidad para el gestor.</p>
+                <p class="slds-var-m-top_x-small">Crear una oportunidad asignada al gestor del cliente para su gestión.</p>
             </header>
-            <div class="slds-modal__content slds-var-p-top_small slds-var-p-horizontal_xx-large slds-var-p-bottom_x-large slds-is-relative">
-                <template if:true={cargandoGestor}>
-                    <div align="center">
-                        <lightning-spinner size="medium" style="position: absolute;"></lightning-spinner>
-                    </div>
-                </template>
-                <div class="slds-grid slds-gutters_direct-small slds-wrap">
-                    <div lwc:if={nombreGestor} class="slds-col slds-size_1-of-1">
-                        <div class="slds-form-element slds-var-m-bottom_medium">
-                            <div class="slds-form-element__label"><abbr class="slds-required">*</abbr>Gestor</div>
-                            <div class="slds-form-element__control">
-                                <div class="slds-combobox_container slds-has-selection">
-                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
-                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
-                                            <span class="slds-icon_container slds-combobox__input-entity-icon slds-var-m-left_xx-small">
-                                                <lightning-icon icon-name="standard:user" size="x-small"></lightning-icon>
-                                            </span>
-                                            <div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
-                                                <span class="slds-truncate">{nombreGestor}</span>
-                                            </div>
+            <div class="slds-modal__content slds-var-p-top_large csbd-var-p-horizontal_xxx-large slds-var-p-bottom_xx-large">
+                <c-csbd_-spinner-kx lwc:if={cargandoGestor} size="large" variant="brand"></c-csbd_-spinner-kx>
+
+                <template lwc:if={oportunidad}>
+                    <div lwc:if={oportunidad._nombreGestor} class="slds-form-element slds-var-m-bottom_medium">
+                        <div class="slds-form-element__label"><abbr class="slds-required">*</abbr>Gestor</div>
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox_container slds-has-selection">
+                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                        <span class="slds-icon_container slds-combobox__input-entity-icon slds-var-m-left_xx-small">
+                                            <lightning-icon icon-name="standard:workforce_engagement" size="x-small" class="iconoGestor"></lightning-icon>
+                                        </span>
+                                        <div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                            <span class="slds-truncate">{oportunidad._nombreGestor}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div lwc:else class="slds-align_absolute-center slds-var-m-top_large slds-var-m-bottom_x-large">
-                        <div class="slds-align_absolute-center slds-var-m-top_large slds-var-m-bottom_x-large">
-                            <lightning-icon icon-name="utility:info_alt" size="x-small" class="slds-var-m-right_small"></lightning-icon>
-                            <span style="font-weight: 500;">La oportunidad se asignará a un gestor genérico.</span>
-                        </div>
+                    <div lwc:else class="contenedorBannerGestorGenerico slds-align_absolute-center slds-var-m-top_medium slds-var-m-bottom_x-large">
+                        <article class="slds-card slds-scoped-notification_light">
+                            <div class="slds-card__body" style="margin: unset;">
+                                <div class="slds-scoped-notification slds-media slds-media_center" role="status">
+                                    <div class="slds-media__figure">
+                                        <div class="slds-icon_container slds-var-m-right_x-small">
+                                            <lightning-icon icon-name="utility:info_alt" size="x-small" class="iconoInfo"></lightning-icon>
+                                        </div>
+                                    </div>
+                                    <div class="slds-media__body" style="line-height: 20px; font-weight: 300;">
+                                        <p><span style="font-weight: 500">No consta ningún gestor</span> asignado a este cliente.</p>
+                                        <p>La nueva oportunidad se asignará a un <span style="font-weight: 500">gestor genérico</span>.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
                     </div>
+                </template>
 
-                    <div class="slds-col slds-size_1-of-1 slds-var-m-top_medium slds-var-m-bottom_large">
-                        <lightning-textarea class="comentariosTarea" label="Comentarios para el gestor" value={comentariosTarea} required></lightning-textarea>
-                    </div>
+                <div class="contenedorInputComentarios slds-align_absolute-center slds-var-m-top_large">
+                    <lightning-textarea lwc:ref="inputComentarios" class="comentariosTarea" label="Comentarios para el gestor" value={comentariosTarea} required></lightning-textarea>
                 </div>
+
             </div>
             <div class="slds-modal__footer">
                 <lightning-button label="Derivar a gestor" variant="brand" icon-name="utility:workforce_engagement" onclick={crearOportunidadGestor} disabled={cargandoGestor}></lightning-button>

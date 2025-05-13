@@ -3,7 +3,7 @@
     <fullName>SAC_ValidarTelefonoContacto</fullName>
     <active>true</active>
     <description>Validar que el campo CC_Telefono_Contacto__c de la reclamación solo permitan introducir valores numéricos y con un máximo de 20 caracteres.</description>
-    <errorConditionFormula>IF (
+    <errorConditionFormula>IF ( 
     AND(
         RecordType.DeveloperName = &apos;SAC_Reclamacion&apos;,
         AND(
@@ -15,10 +15,10 @@
         LEN(SUBSTITUTE(CC_Telefono_Contacto__c, &apos; &apos;, &apos;&apos;)) &gt; 20,
         AND(
             NOT(ISNUMBER(SUBSTITUTE(CC_Telefono_Contacto__c, &apos; &apos;, &apos;&apos;))),
-            LEFT(CC_Telefono_Contacto__c, 1) &lt;&gt; &quot;+&quot;
-        )
-    ),
-    false
+									 LEFT(CC_Telefono_Contacto__c, 1) &lt;&gt; &quot;+&quot;
+					  )
+					),
+				 false   
 )</errorConditionFormula>
     <errorDisplayField>CC_Telefono_Contacto__c</errorDisplayField>
     <errorMessage>El campo teléfono de contacto debe ser numérico y tener menos de 20 caracteres.</errorMessage>

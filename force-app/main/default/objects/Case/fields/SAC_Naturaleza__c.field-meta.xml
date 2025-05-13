@@ -31,6 +31,11 @@
                 <default>false</default>
                 <label>Incidencia</label>
             </value>
+            <value>
+                <fullName>SAC_007</fullName>
+                <default>false</default>
+                <label>Complementaria</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

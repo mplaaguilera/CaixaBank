@@ -8,6 +8,7 @@
 	<aura:attribute name="esResponsable" type="Boolean" default="false" />
 	<aura:attribute name="esAdministrador" type="Boolean" default="false" />
 	<aura:attribute name="esPropietario" type="Boolean" default="false" />
+	<aura:attribute name="esHipoteca" type="Boolean" default="false" />
 
 	<aura:attribute name="mostrarBotones" type="Boolean" default="false" />
 	<aura:attribute name="botonesActivos" type="Map" />
@@ -56,9 +57,11 @@
 	<aura:attribute name="programarCitaTipoAsignacion" type="String" default="A gestor específico"/>
 	<aura:attribute name="modalProgramarCitaContainerStyle" type="String" />
 	<aura:attribute name="modalProgramarCita" type="Boolean" default="false" />
+	<aura:attribute name="modalDerivarGestor" type="Boolean" default="false" />
 	<aura:attribute name="modalProgramarInputFechaValueAnterior" type="String" />
 	<aura:attribute name="modalAutenticacionOtp" type="Boolean" default="false" />
 	<aura:attribute name="modalDerechosGdpr" type="Boolean" default="false" />
+	<aura:attribute name="modalCerrarOportunidad" type="Boolean" default="false" />
 
 	<!--Handlers-->
 	<aura:handler name="init" value="{!this}" action="{!c.init}" />
@@ -83,7 +86,9 @@
 		CSBD_AportacionInicial__c, CSBD_Notas_gestor__c"
 		targetFields="{!v.oportunidad}" targetError="{!v.errorLds}" recordUpdated="{!c.recordUpdated}" mode="EDIT" />
 
+
 	<!--Acceso a APIs-->
+	<lightning:messageChannel type="CSBD_Opportunity_MessageChannel__c" onMessage="{!c.messageChannelOnmessage}" scope="APPLICATION"/>
 	<lightning:workspaceAPI aura:id="workspace" />
 	<lightning:quickActionAPI aura:id="quickActionAPI" />
 	<lightning:navigation aura:id="navService"/>
@@ -96,7 +101,7 @@
 
 	<!--Botonera-->
 	<article class="slds-card" style="box-shadow: none;">
-		<div class="slds-card__body" align="center" style="min-height: 34px; padding-right: 6px;">
+		<div class="slds-card__body" align="center" style="min-height: 34px; margin-top: 10px; margin-bottom: 10px; padding-left: 3px; padding-right: 3px;">
 
 			<div class="divBotones">
 				<aura:if isTrue="{!v.mostrarBotones}">
@@ -105,15 +110,14 @@
 
 					<lightning:button aura:id="botonPendienteInterno" label="{!v.oportunidad.CSBD_Estado__c == 'Pendiente Interno' ? 'Reanudar' : 'Pendiente'}" iconName="{!v.oportunidad.CSBD_Estado__c == 'Pendiente Interno' ? 'utility:play' : 'utility:stop'}" onclick="{!c.abrirModalPendienteInterno}" disabled="{!!v.botonesActivos.botonPendienteInternoActivo}" variant="{!v.oportunidad.CSBD_Estado__c == 'Pendiente Interno' ? 'destructive-text' : 'neutral'}" />
 
-					<aura:if isTrue="{!v.oportunidad.RecordType.DeveloperName != 'CSBD_Hipoteca'}">
+					<aura:if isTrue="{!v.esHipoteca}">
 						<lightning:button aura:id="botonEnviarCorreo" label="Enviar correo" iconName="action:email" onclick="{!c.abrirModalEnviarCorreo}" disabled="{!!v.botonesActivos.botonEnviarCorreoActivo}" />
 					</aura:if>
 
-					<lightning:button aura:id="botonEnviarNotificacion" label="SMS" iconName="utility:share_post" onclick="{!c.abrirModalEnviarNotificacion}" disabled="{!!v.botonesActivos.botonEnviarNotificacionActivo}" />
+					<lightning:button aura:id="botonEnviarNotificacion" label="SMS" iconName="utility:sms" onclick="{!c.abrirModalEnviarNotificacion}" disabled="{!!v.botonesActivos.botonEnviarNotificacionActivo}" />
 
-					<aura:if isTrue="{!v.oportunidad.RecordType.DeveloperName == 'CSBD_Hipoteca'}">
-						<!--Si es hipoteca se muestra el botón "Desprogramar cita" o "Desprogramar firma" o el desplegable con "Programar cita" y "Programar firma"-->
-						<!--
+					<aura:if isTrue="{!v.esHipoteca}">
+						<!--Si es hipoteca se muestra el botón "Desprogramar cita" o "Desprogramar firma" o el desplegable con "Programar cita" y "Programar firma"
 						<aura:if isTrue="{!v.oportunidad.CSBD_Estado__c == 'Pendiente Cita'}">
 							<lightning:button aura:id="botonDesprogramar" label="{!v.fechaCitaFormateada}" title="Desprogramar cita" iconName="utility:event" onclick="{!c.abrirModalDesprogramar}" disabled="{!!v.botonesActivos.botonDesprogramarActivo}" variant="destructive-text" />
 							<aura:set attribute="else">
@@ -121,8 +125,8 @@
 									<lightning:button aura:id="botonCancelarFirma" label="{!v.fechaFirmaFormateada}" title="Cancelar firma" iconName="utility:signature" onclick="{!c.abrirModalCancelarFirma}" variant="destructive-text" disabled="{!!v.botonesActivos.botonCancelarFirmaActivo}" />
 									<aura:set attribute="else">
 										<lightning:buttonGroup>
-											<lightning:button label="Programar" iconName="utility:date_input" class="pointerEventsNone" disabled="{!and(!v.botonesActivos.botonProgramarActivo, !v.botonesActivos.botonAgendarFirmaActivo)}"/>
-											<lightning:buttonMenu class="slds-button_last" menuAlignment="right" onselect="{!c.buttonMenuProgramarOnselect}">
+											<lightning:button label="Programar" iconName="utility:date_input" onclick="{!c.botonProgramarOnclick}" disabled="{!and(!v.botonesActivos.botonProgramarActivo, !v.botonesActivos.botonAgendarFirmaActivo)}"/>
+											<lightning:buttonMenu aura:id="menuProgramar" class="slds-button_last" menuAlignment="right" onselect="{!c.buttonMenuProgramarOnselect}">
 												<lightning:menuItem label="Cita" value="programarCita" prefixIconName="utility:event" disabled="{!!v.botonesActivos.botonProgramarActivo}" />
 												<lightning:menuItem label="Firma" value="programarFirma" prefixIconName="utility:signature" disabled="{!!v.botonesActivos.botonAgendarFirmaActivo}" />
 											</lightning:buttonMenu>
@@ -132,11 +136,10 @@
 							</aura:set>
 						</aura:if>
 						-->
-
 						<aura:if isTrue="{!v.oportunidad.CSBD_Estado__c == 'Pendiente Cita'}">
 							<lightning:button aura:id="botonDesprogramar" label="{!v.fechaCitaFormateada}" title="Desprogramar cita" iconName="utility:event" onclick="{!c.abrirModalDesprogramar}" disabled="{!!v.botonesActivos.botonDesprogramarActivo}" variant="destructive-text" />
 							<aura:set attribute="else">
-								<lightning:button label="Programar cita" iconName="utility:date_input" onclick="{!c.abrirModalProgramar}" disabled="{!and(!v.botonesActivos.botonProgramarActivo, !v.botonesActivos.botonProgramarActivo)}"/> <!--class="pointerEventsNone" -->
+								<lightning:button label="Programar cita" iconName="utility:date_input" onclick="{!c.abrirModalProgramar}" disabled="{!and(!v.botonesActivos.botonProgramarActivo, !v.botonesActivos.botonProgramarActivo)}"/>
 							</aura:set>
 						</aura:if>
 
@@ -155,16 +158,16 @@
 									<lightning:button aura:id="botonDesprogramar" label="{!v.fechaCitaFormateada}" title="Desprogramar cita" iconName="utility:event" onclick="{!c.abrirModalDesprogramar}" disabled="{!!v.botonesActivos.botonDesprogramarActivo}" variant="destructive-text" />
 								</aura:set>
 							</aura:if>
-
 						</aura:set>
 					</aura:if>
 
-					<lightning:button aura:id="botonTareaGestor" label="Derivar a gestor" iconName="utility:workforce_engagement" onclick="{!c.modalTareaGestorAbrir}" disabled="{!!v.botonesActivos.botonTareaGestorActivo}" />
+					<lightning:button aura:id="botonTareaGestor" label="Derivar a gestor" iconName="utility:workforce_engagement" onclick="{!c.abrirModalDerivarGestor}" disabled="{!!v.botonesActivos.botonTareaGestorActivo}" />
 
-					<aura:if isTrue="{!v.oportunidad.RecordType.DeveloperName == 'CSBD_Hipoteca'}">
+					<aura:if isTrue="{!v.esHipoteca}">
 						<lightning:buttonGroup>
-							<lightning:button aura:id="botonInformeSia" label="Traslado SIA" iconName="utility:copy_to_clipboard" onclick="{!c.abrirModalTrasladoSia}" disabled="{!!v.botonesActivos.botonInformeSiaActivo}" />
-							<lightning:buttonMenu class="slds-button_last" menuAlignment="right" onselect="{!c.buttonmenuSiaOnselect}">
+							<lightning:button label="SIA" iconName="utility:copy_to_clipboard" onclick="{!c.botonSiaOnclick}" disabled="{!!v.botonesActivos.botonInformeSiaActivo}" />
+							<lightning:buttonMenu aura:id="menuSia" class="slds-button_last" menuAlignment="right" onselect="{!c.buttonmenuSiaOnselect}">
+								<lightning:menuItem label="Traslado SIA" value="Traslado SIA" prefixIconName="utility:copy_to_clipboard" disabled="{!!v.botonesActivos.botonInformeSiaActivo}" />
 								<lightning:menuItem label="Informe SIA" value="Informe SIA" prefixIconName="utility:copy_to_clipboard" disabled="{!!v.botonesActivos.botonInformeSiaActivo}" />
 							</lightning:buttonMenu>
 						</lightning:buttonGroup>
@@ -216,7 +219,7 @@
 											<lightning:button aura:id="botonDuplicar" label="Clonar oportunidad" iconName="utility:relate" onclick="{!c.abrirModalDuplicar}" disabled="{!v.botonesActivos.botonDuplicarActivo}" variant="base" stretch="true" />
 											<hr/>
 
-											<aura:if isTrue="{!v.oportunidad.RecordType.DeveloperName == 'CSBD_Hipoteca'}">
+											<aura:if isTrue="{!v.esHipoteca}">
 												<lightning:button aura:id="botonEnviarCorreo" label="Enviar correo" iconName="action:email" onclick="{!c.abrirModalEnviarCorreo}" disabled="{!!v.botonesActivos.botonEnviarCorreoActivo}" variant="base" stretch="true" />
 												<hr/>
 											</aura:if>
@@ -231,8 +234,8 @@
 												<hr/>
 											</aura:if>
 
-											<!-- <lightning:button aura:id="gdpr" label="Derechos GDPR" iconName="utility:locker_service_console" onclick="{!c.abrirModalGdpr}" variant="base" stretch="true"/> -->
-											<!-- <hr/> -->
+											<lightning:button aura:id="gdpr" label="Derechos GDPR" iconName="utility:locker_service_console" onclick="{!c.abrirModalGdpr}" disabled="{!!v.botonesActivos.botonDerechosGdpr}" variant="base" stretch="true"/>
+											<hr/>
 
 											<lightning:button aura:id="botonRefrescarBotonera" label="Refrescar operativas" iconName="utility:refresh" onclick="{!c.botonRefrescarBotoneraOnclick}" variant="base" stretch="true" class="botonRefrescarBotonera" />
 										</div>
@@ -511,7 +514,7 @@
 			</div>
 		</section>
 
-		<!--Modal para cerrar oportunidad-->
+		<!--Modal para cerrar oportunidad
 		<section role="dialog" tabindex="-1" aura:id="modalCerrar" aria-modal="true" class="slds-modal" onkeydown="{!c.modalCerrarTeclaPulsada}">
 			<div class="slds-modal__container">
 				<header class="slds-modal__header">
@@ -525,7 +528,7 @@
 				<div class="slds-modal__content slds-var-p-around_medium" style="padding-left: 0.5rem; padding-right: 0.5rem;">
 					<lightning:layoutItem size="12" padding="around-small">
 						<aura:if isTrue="{!and(empty(v.oportunidad.CSBD_Contact__c), !v.oportunidad.CSBD_No_Identificado__c)}">
-							<div style="padding-bottom: 16px; padding-left: 5px; padding-right: 5px; font-weight: 200;">
+							<div style="padding-bottom: 16px; padding-left: 5px; padding-right: 5px; font-weight: 300;">
 								<c:ccScopedNotification tema="Claro" icono="info" mensaje="La oportunidad no tiene contacto informado. Solo es posible rechazarla." />
 							</div>
 						</aura:if>
@@ -538,7 +541,7 @@
 							<lightning:textarea label="Motivo de rechazo" required="true" aura:id="inputMotivoRechazo" />
 							<br />
 						</aura:if>
-						<aura:if isTrue="{!and(v.mostrarTipoBonificado, v.oportunidad.RecordType.DeveloperName == 'CSBD_Hipoteca')}">
+						<aura:if isTrue="{!and(v.mostrarTipoBonificado, v.esHipoteca)}">
 						<lightning:input type="number" formatter="percent-fixed" min="0" max="100" step="0.01" aura:id="inputTipoOfertado" label="Tipo ofertado" />
 						<br />
 						<lightning:combobox aura:id="inputEntidadCompetencia" label="Entidad de competencia" options="{!v.entidadesCompetencia}" />
@@ -552,6 +555,8 @@
 				</footer>
 			</div>
 		</section>
+		-->
+
 
 		<!--Modal para reactivar oportunidad-->
 		<section role="dialog" tabindex="-1" aura:id="modalReactivar" aria-modal="true" class="slds-modal" onkeydown="{!c.modalReactivarTeclaPulsada}">
@@ -827,7 +832,7 @@
 			</div>
 		</section>
 
-		<!--Modal tarea gestor-->
+		<!--Modal tarea gestor
 		<section role="dialog" aura:id="modalTareaGestor" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTareaGestorTeclaPulsada}">
 			<div class="slds-modal__container">
 				<header class="slds-modal__header">
@@ -882,6 +887,7 @@
 				</div>
 			</div>
 		</section>
+		-->
 
 		<!--Modal para convertir oportunidad a préstamo/hipoteca-->
 		<section role="dialog" tabindex="-1" aura:id="modalConvertirAHipoteca" aria-modal="true" class="slds-modal" onkeydown="{!c.modalConvertirAHipotecaTeclaPulsada}">
@@ -921,6 +927,16 @@
 				</footer>
 			</div>
 		</section>
+
+		<!--Modal para derivar a gestor-->
+		<aura:if isTrue="{!v.modalDerivarGestor}">
+			<c:csbd_DerivarGestor aura:id="modalDerivarGestor" recordId="{!v.recordId}" onmodalcerrado="{!c.cerrarModalHijo}" />
+		</aura:if>
+
+		<!--Modal para cerrar-->
+		<aura:if isTrue="{!v.modalCerrarOportunidad}">
+			<c:csbd_CerrarOportunidad aura:id="modalCerrarOportunidad" recordId="{!v.recordId}" onmodalcerrado="{!c.cerrarModalHijo}" />
+		</aura:if>
 
 		<!--Modal para autenticación OTP-->
 		<aura:if isTrue="{!v.modalAutenticacionOtp}">

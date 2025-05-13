@@ -103,7 +103,7 @@ public with sharing class FRA_IntegrationCGF_Test {
         return mccMotivo;    
     }
 
-    @isTest
+    @isTest(SeeAllData=true)
     public static void testTraspasoInfoSFC1() {
         
         

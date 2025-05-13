@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_MotivoComplementariaOrganismo__c</fullName>
+    <description>Muestra los valores por los que se puede solicitar una complementaria organismo</description>
+    <label>Motivo complementaria organismo</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>SPV_Aclaraciones</fullName>
+                <default>false</default>
+                <label>Aclaraciones</label>
+            </value>
+            <value>
+                <fullName>SPV_Documentacion</fullName>
+                <default>false</default>
+                <label>Documentación</label>
+            </value>
+            <value>
+                <fullName>SPV_JustificarAllanamiento</fullName>
+                <default>false</default>
+                <label>Justificar Allanamiento</label>
+            </value>
+            <value>
+                <fullName>SPV_JustificarDesistimiento</fullName>
+                <default>false</default>
+                <label>Justificar Desistimiento</label>
+            </value>
+            <value>
+                <fullName>SPV_Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>SPV_Replica</fullName>
+                <default>false</default>
+                <label>Réplica</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Area__c</fullName>
+    <label>Área</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Bankia</fullName>
+                <default>false</default>
+                <label>Bankia</label>
+            </value>
+            <value>
+                <fullName>Buildingcenter</fullName>
+                <default>false</default>
+                <label>Buildingcenter</label>
+            </value>
+            <value>
+                <fullName>CAC</fullName>
+                <default>false</default>
+                <label>CAC</label>
+            </value>
+            <value>
+                <fullName>Centro Empresas</fullName>
+                <default>false</default>
+                <label>Centro Empresas</label>
+            </value>
+            <value>
+                <fullName>Coral Homes</fullName>
+                <default>false</default>
+                <label>Coral Homes</label>
+            </value>
+            <value>
+                <fullName>Gestor Soluciones</fullName>
+                <default>false</default>
+                <label>Gestor Soluciones</label>
+            </value>
+            <value>
+                <fullName>Gestor Stock</fullName>
+                <default>false</default>
+                <label>Gestor Stock</label>
+            </value>
+            <value>
+                <fullName>GRR Bcn</fullName>
+                <default>false</default>
+                <label>GRR Bcn</label>
+            </value>
+            <value>
+                <fullName>Instituciones DT</fullName>
+                <default>false</default>
+                <label>Instituciones DT</label>
+            </value>
+            <value>
+                <fullName>InTouch</fullName>
+                <default>false</default>
+                <label>InTouch</label>
+            </value>
+            <value>
+                <fullName>Mediadoras</fullName>
+                <default>false</default>
+                <label>Mediadoras</label>
+            </value>
+            <value>
+                <fullName>Red Comercial</fullName>
+                <default>false</default>
+                <label>Red Comercial</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

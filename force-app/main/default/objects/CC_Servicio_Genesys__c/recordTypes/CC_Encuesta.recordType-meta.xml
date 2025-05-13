@@ -6,6 +6,10 @@
     <picklistValues>
         <picklist>CBK_Negocio__c</picklist>
         <values>
+            <fullName>CAM</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>CC</fullName>
             <default>false</default>
         </values>
@@ -239,6 +243,21 @@
         </values>
         <values>
             <fullName>Tercer nivel</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_TrasladoAuto3n__c</picklist>
+        <values>
+            <fullName>3N de Carteras CAM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3N de Fondos CAM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3N de Valores CAM</fullName>
             <default>false</default>
         </values>
     </picklistValues>

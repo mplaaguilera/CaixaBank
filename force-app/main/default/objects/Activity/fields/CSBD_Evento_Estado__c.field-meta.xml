@@ -30,15 +30,49 @@
                 <label>Cerrado</label>
             </value>
             <value>
-                <fullName>Pendiente revisar</fullName>
+                <fullName>Cancelada</fullName>
                 <default>false</default>
-                <label>Pendiente revisar</label>
+                <label>Cancelada</label>
             </value>
             <value>
-                <fullName>Cerrado</fullName>
+                <fullName>Planificada</fullName>
                 <default>false</default>
-                <isActive>false</isActive>
-                <label>Cerrado</label>
+                <label>Planificada</label>
+            </value>
+            <value>
+                <fullName>Realizada</fullName>
+                <default>false</default>
+                <label>Realizada</label>
+            </value>
+            <value>
+                <fullName>Vencida</fullName>
+                <default>false</default>
+                <label>Vencida</label>
+            </value>
+            <value>
+                <fullName>RCS Enviado</fullName>
+                <default>false</default>
+                <label>RCS Enviado</label>
+            </value>
+            <value>
+                <fullName>RCS Entregado</fullName>
+                <default>false</default>
+                <label>RCS Entregado</label>
+            </value>
+            <value>
+                <fullName>RCS Entregado (SMS Alternativo)</fullName>
+                <default>false</default>
+                <label>RCS Entregado (SMS Alternativo)</label>
+            </value>
+            <value>
+                <fullName>RCS Visto</fullName>
+                <default>false</default>
+                <label>RCS Visto</label>
+            </value>
+            <value>
+                <fullName>RCS Envío Fallido</fullName>
+                <default>false</default>
+                <label>RCS Envío Fallido</label>
             </value>
             <value>
                 <fullName>Cierre Caducada</fullName>
@@ -87,6 +121,12 @@
                 <default>false</default>
                 <isActive>false</isActive>
                 <label>Pendiente no localizado</label>
+            </value>
+            <value>
+                <fullName>Pendiente revisar</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente revisar</label>
             </value>
         </valueSetDefinition>
     </valueSet>

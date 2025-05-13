@@ -383,7 +383,50 @@ public with sharing class SEG_redactarEmail_Controller {
 			}
 		}
 
-		Messaging.SendEmailResult resultadoEnvio = Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{correo})[0];
+		Messaging.SendEmailResult resultadoEnvio;
+
+		try {
+			resultadoEnvio = Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{correo})[0];
+		} catch (Exception e) {
+			String mensajeError = e.getMessage();
+			System.debug(mensajeError);
+			if(!String.isEmpty(mensajeError)){
+				if (mensajeError.contains('FIELD_CUSTOM_VALIDATION_EXCEPTION')) {
+						mensajeError = mensajeError.remove('SendEmail failed. First exception on row 0; first error: FIELD_CUSTOM_VALIDATION_EXCEPTION, ').trim();
+						mensajeError = mensajeError.removeEnd(': []');
+
+						throw new AuraHandledException(mensajeError);
+
+				}else if (mensajeError.contains('INVALID_EMAIL_ADDRESS')) {
+					System.debug(mensajeError);
+					if (mensajeError.contains('toAddresses')) {
+						// Expresión regular para detectar un correo electrónico en el mensaje de error
+						Pattern emailPattern = Pattern.compile('[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}');
+						Matcher matcher = emailPattern.matcher(mensajeError);
+
+						// Si encontramos un email en el mensaje de error, lo incluimos en la excepción
+						if (matcher.find()) {
+							String emailInvalido = matcher.group(0);
+							throw new AuraHandledException('Dirección de correo errónea: ' + emailInvalido);
+						} else {
+							throw new AuraHandledException('Dirección de correo errónea.');
+						}
+					} else {
+						throw new AuraHandledException('Error detectado: ' + mensajeError);
+					}
+
+				}else if(mensajeError.contains('REQUIRED_FIELD_MISSING')) {
+					throw new AuraHandledException('Es obligatorio poner un Para en la dirección de envío de email');
+				}
+				
+				if (!Test.isRunningTest()) {
+					throw new AuraHandledException('Error detectado: ' + mensajeError);
+				}
+			}else {
+				throw new AuraHandledException('Error detectado: ' + mensajeError);
+			}
+		}
+
 		if (resultadoEnvio.isSuccess()) {
 			EmailMessage emailEnviado = [SELECT Subject, FromAddress, FromName, ToAddress, CcAddress, HtmlBody, MessageDate, CreatedDate
 										FROM EmailMessage WHERE ParentId = :caseId AND Incoming = FALSE
@@ -544,20 +587,20 @@ public with sharing class SEG_redactarEmail_Controller {
 			if (String.isNotBlank(caseId) && String.isNotBlank(emailBody)) {
                 //System.debug('EmialBody',emailBody);
 
-				Pattern patronURLs = Pattern.compile('<img src=\\"https:\\/\\/caixabankcc([a-zA-Z0-9-=?&;%]|\\.|\\\\|:|\\/)+\\">');		
+				Pattern patronURLs = Pattern.compile('src=\\"https:\\/\\/caixabankcc([a-zA-Z0-9-=?&;%]|\\.|\\\\|:|\\/)+\\"');		
 				// AQA - 21/06 - Se añade un segundo patrón tras el cambio de nombre de dominios de SF - http:///sfc/servlet.shepherd/version/download/0685r0000020TItAAM
 				//Pattern patronURLsDominio = Pattern.compile('<img src="\\/sfc\\/servlet.shepherd\\/version\\/download\\/068[a-zA-Z0-9]+?">');	
 				//Prueba otro pattern - '<img src="\\/sfc\\/servlet.shepherd\\/version\\/download\\/068[A-Za-z0-9]{12,15}">' 
 				
-				Pattern patronURLconDominio = Pattern.compile('<img src="(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/download\\/068[A-Za-z0-9]{12,15}">');
-				Pattern patronURLchatter = Pattern.compile('<img src="https:\\/\\/(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/renditionDownload.{0,200}">');
+				Pattern patronURLconDominio = Pattern.compile('src="(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/download\\/068[A-Za-z0-9]{12,15}"');
+				Pattern patronURLchatter = Pattern.compile('src="https:\\/\\/(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/renditionDownload.{0,200}"');
 
 				// Expresión regular para buscar el ID del ContentVersion de la URL.
 				Pattern patronCV = Pattern.compile('\\/068[a-zA-Z0-9]+\\?');
 				// // AQA - 21/06 - Se añade un segundo patrón de Ids tras el cambio de nombre de dominios de SF
 				Pattern patronCVDominio = Pattern.compile('\\/068[a-zA-Z0-9]+');
 				Pattern patronChatter = Pattern.compile('068[a-zA-Z0-9]{12}');
-				
+                
 				// Preparar mapa de URLs de reemplazo.
 				Map<String,String> mapaReemplazoUrls = new Map<String,String>();
 				Set<String> setContentVersions = new Set<String>();
@@ -571,18 +614,8 @@ public with sharing class SEG_redactarEmail_Controller {
 					String urlImagen = matcherCorreo.group();
 
 					// Comprobar que no sea una URL pública.
-					// No ha de contener los valores que se generan como URL de descarga: /sfc/dist/version/download, oid=, ids=, &d=
-					Boolean urlPublica = false;
-					if (urlImagen.contains('/sfc/dist/version/download') && urlImagen.contains('oid=') && urlImagen.contains('ids=') && urlImagen.contains('&d='))
-					{
-						urlPublica = true;
-					}
-
-					// Assets públicos.
-					if (urlImagen.contains('/file-asset-public') && urlImagen.contains('oid='))
-					{
-						urlPublica = true;
-					}
+					boolean urlPublica = esUrlPublica(urlImagen);
+                    
 					if (!urlPublica)
 					{
 						// Parsear la url privada para encontrar el Identificador del fichero.
@@ -601,17 +634,10 @@ public with sharing class SEG_redactarEmail_Controller {
                 Matcher matcherCorreoconDominio = patronURLconDominio.matcher(emailBody);
 				while (matcherCorreoconDominio.find()) {
 					String urlImagen = matcherCorreoconDominio.group();
-					// Comprobar que no sea una URL pública.
-					// No ha de contener los valores que se generan como URL de descarga: /sfc/dist/version/download, oid=, ids=, &d=
-					Boolean urlPublica = false;
-					if (urlImagen.contains('/sfc/dist/version/download') && urlImagen.contains('oid=') && urlImagen.contains('ids=') && urlImagen.contains('&d=')){
-						urlPublica = true;
-					}
-
-					// Assets públicos.
-					if (urlImagen.contains('/file-asset-public') && urlImagen.contains('oid=')) {
-						urlPublica = true;
-					}
+                    
+					// Comprobar si la URL es pública
+					boolean urlPublica = esUrlPublica(urlImagen);
+                    
 					if (!urlPublica) {
 						// Parsear la url privada para encontrar el Identificador del fichero.
 						Matcher matcherCV = patronCVDominio.matcher(urlImagen);
@@ -626,20 +652,16 @@ public with sharing class SEG_redactarEmail_Controller {
 						}
 					}
 				}
-
+                
 				// Nuevo Matcher
 				Matcher matcherCorreoChatter = patronURLchatter.matcher(emailBody);
 
 				while (matcherCorreoChatter.find()) {
 					String urlImagen = matcherCorreoChatter.group();
-					// Comprobar que no sea una URL pública.
-					// No ha de contener los valores que se generan como URL de descarga: /sfc/dist/version/download, oid=, ids=, &d=
-					Boolean urlPublica = false;
-
-					// Assets públicos.
-					if (urlImagen.contains('/file-asset-public') && urlImagen.contains('oid=')) {
-						urlPublica = true;
-					}
+                    
+					// Comprobar si la URL es pública
+					boolean urlPublica = esUrlPublica(urlImagen);
+                    
 					if (!urlPublica) {
 						// Parsear la url privada para encontrar el Identificador del fichero.
 						//Matcher matcherCV = patronCVDominio.matcher(urlImagen);
@@ -744,7 +766,7 @@ public with sharing class SEG_redactarEmail_Controller {
 						nuevaURL = mapaFilePublicURL.get(ficheroURL);
 					}
 					if (!String.isBlank(nuevaURL) && String.isNotBlank(nuevaURL)) {
-						emailBody = emailBody.replace(urlPrivadaCorreo, '<img src="' + nuevaURL + '">');
+						emailBody = emailBody.replace(urlPrivadaCorreo, 'src="' + nuevaURL + '"');
 					}
 				}
 
@@ -777,7 +799,22 @@ public with sharing class SEG_redactarEmail_Controller {
 		return mapContentRepetidos;
 	}
 
-
+	public static boolean esUrlPublica(String urlImagen) {
+		// Comprobar si la URL es pública
+		if (urlImagen.contains('/sfc/dist/version/download') && 
+			urlImagen.contains('oid=') && 
+			urlImagen.contains('ids=') && 
+			urlImagen.contains('&d=')) {
+			return true;
+		}
+	
+		// Comprobar si la URL corresponde a un asset público
+		if (urlImagen.contains('/file-asset-public') && urlImagen.contains('oid=')) {
+			return true;
+		}
+	
+		return false; // La URL no es pública
+	}
 
 	
 	public static List<String> getAttachments(List<String> contentDocumentIds) {

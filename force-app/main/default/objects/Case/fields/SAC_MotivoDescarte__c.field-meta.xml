@@ -32,6 +32,16 @@
                 <default>false</default>
                 <label>Otros</label>
             </value>
+            <value>
+                <fullName>SPV_AltaErronea</fullName>
+                <default>false</default>
+                <label>Alta errónea</label>
+            </value>
+            <value>
+                <fullName>SPV_ErrorSupervisor</fullName>
+                <default>false</default>
+                <label>Error del Supervisor</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

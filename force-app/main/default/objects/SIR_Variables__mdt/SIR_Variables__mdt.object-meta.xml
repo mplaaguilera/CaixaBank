@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Parametrización que contiene variables utilizadas en la aplicación Mis Clientes Soluciones</description>
     <label>SIR Variables</label>
     <pluralLabel>SIR Variables</pluralLabel>
     <visibility>Public</visibility>

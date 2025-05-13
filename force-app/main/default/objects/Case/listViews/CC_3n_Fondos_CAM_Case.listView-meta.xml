@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_3n_Fondos_CAM_Case</fullName>
+    <filterScope>Queue</filterScope>
+    <label>3N de Fondos CAM</label>
+    <queue>CC_3n_Fondos_CAM</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

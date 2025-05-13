@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Origen__c</fullName>
+    <label>Origen</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>GRR_TipoDeFichero__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Emais</fullName>
+                <default>false</default>
+                <label>Emais</label>
+            </value>
+            <value>
+                <fullName>Azzam</fullName>
+                <default>false</default>
+                <label>Azzam</label>
+            </value>
+            <value>
+                <fullName>Coral</fullName>
+                <default>false</default>
+                <label>Coral</label>
+            </value>
+            <value>
+                <fullName>Semanal</fullName>
+                <default>false</default>
+                <label>Semanal</label>
+            </value>
+            <value>
+                <fullName>Urgente</fullName>
+                <default>false</default>
+                <label>Urgente</label>
+            </value>
+            <value>
+                <fullName>Titulizadas</fullName>
+                <default>false</default>
+                <label>Titulizadas</label>
+            </value>
+            <value>
+                <fullName>Building Center</fullName>
+                <default>false</default>
+                <label>Building Center</label>
+            </value>
+            <value>
+                <fullName>Living Center</fullName>
+                <default>false</default>
+                <label>Living Center</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Acta de comité</controllingFieldValue>
+            <valueName>Emais</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Acta de comité</controllingFieldValue>
+            <valueName>Azzam</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Acta de comité</controllingFieldValue>
+            <valueName>Coral</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Acta de comité</controllingFieldValue>
+            <valueName>Titulizadas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Acta de comité</controllingFieldValue>
+            <valueName>Building Center</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Acta de comité</controllingFieldValue>
+            <valueName>Living Center</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Recobro</controllingFieldValue>
+            <valueName>Semanal</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Recobro</controllingFieldValue>
+            <valueName>Urgente</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

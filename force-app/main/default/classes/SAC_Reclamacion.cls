@@ -733,7 +733,7 @@ public without sharing class SAC_Reclamacion {
     **************************************************************************/
   
     public static void calcularNuevoImporteAbonado(List<Case> listaCasosSelect, Map<Id, Case> mapOldObj, List<Case> listaReclaCambiaVinculacion, Map<Id, Case> mapaDatosCasosActualizar){
-
+        
         Map<Id, Case> mapaReclamacionesVinculadas = new Map<Id, Case>();    
         Map<Id, Double> mapaComplementariaImporteAbonado = new Map<Id, Double>();     //Mapa donde se relaciona cada caso con su diferencia del cambio de valor en el importe abonado 
         Set<Id> idsReclamacionesVinculadas = new Set<Id>();         //Ids de las reclamaciones a las que se han vinculado las complementarias
@@ -1648,43 +1648,104 @@ public without sharing class SAC_Reclamacion {
      * 1.0            --              Iria ANPC    07/01/2025       Creación
     **************************************************************************/
     /**
-	 * @description    Inserta permisos para que el gestor de la reclamación pueda tener permisos sobre las pretensiones hijas.
-     * @param listaSelect
+	 * @description    Inserta permisos para que el gestor de la reclamación pueda tener permisos sobre las pretensiones hijas, 
+	 * 				   y para que pueda tener permisos sobre la reclamación el gestor de la pretensión.
+     * @param casos
 	 */  
 
-    public static void insertarCaseShareByReclamacion(List<Case> reclamaciones){
-        List<Case> pretensiones = [SELECT Id, OwnerId, SAC_Reclamacion__c FROM Case WHERE SAC_Reclamacion__c IN: reclamaciones];
-        Map<Id, Case> mapaSelect = new Map<Id, Case>(reclamaciones);
-        Map<Id, List<Case>> mapaRecPrets = new Map<Id, List<Case>>();
-        Map<String, String> mapaReclamaciones = new Map<String, String>();
-        for (Case caso : pretensiones) {
-            if (mapaSelect.containsKey(caso.SAC_Reclamacion__c)) {
-                if (mapaRecPrets.containsKey(caso.SAC_Reclamacion__c)) {
-                    mapaRecPrets.get(caso.SAC_Reclamacion__c).add(caso);
-                } else {
-                    List<Case> listaPrets = new List<Case>();
-                    listaPrets.add(caso);
-                    mapaRecPrets.put(caso.SAC_Reclamacion__c, listaPrets);
-                    mapaReclamaciones.put(caso.SAC_Reclamacion__c, mapaSelect.get(caso.SAC_Reclamacion__c).OwnerId);
+    public static void insertarCaseSharePorReclamacionOPretension(List<Case> casos) {
+        if (casos.isEmpty()) {
+            return;
+        }
+        
+        // Identificar IDs de reclamaciones y pretensiones
+        Set<Id> idsReclamaciones = new Set<Id>();
+        Set<Id> idsPretensiones = new Set<Id>();
+        
+        for (Case caso : casos) {
+            if (caso.SAC_Reclamacion__c == null) {
+                idsReclamaciones.add(caso.Id); // Es una reclamación
+            } else {
+                idsPretensiones.add(caso.Id);  // Es una pretensión
+            }
+        }
+        
+        // Mapas para almacenar relaciones
+        Map<Id, List<Case>> mapaReclamacionAPretensiones = new Map<Id, List<Case>>();
+        Map<Id, Case> mapaPretensionAReclamacion = new Map<Id, Case>();
+        
+        // Obtener pretensiones relacionadas a las reclamaciones
+        if (!idsReclamaciones.isEmpty()) {
+            List<Case> pretensiones = [SELECT Id, OwnerId, SAC_Reclamacion__c FROM Case WHERE SAC_Reclamacion__c IN :idsReclamaciones];
+            for (Case pret : pretensiones) {
+                if (!mapaReclamacionAPretensiones.containsKey(pret.SAC_Reclamacion__c)) {
+                    mapaReclamacionAPretensiones.put(pret.SAC_Reclamacion__c, new List<Case>());
+                }
+                mapaReclamacionAPretensiones.get(pret.SAC_Reclamacion__c).add(pret);
+            }
+        }
+        
+        // Obtener pretensiones y sus reclamaciones padres
+        Map<Id, Case> mapaReclamaciones = new Map<Id, Case>();
+        if (!idsPretensiones.isEmpty()) {
+            List<Case> pretensiones = [SELECT Id, OwnerId, SAC_Reclamacion__c FROM Case WHERE Id IN :idsPretensiones];
+            Set<Id> idsReclamacionesDesdePretensiones = new Set<Id>();
+            
+            for (Case pret : pretensiones) {
+                if (pret.SAC_Reclamacion__c != null) {
+                    idsReclamacionesDesdePretensiones.add(pret.SAC_Reclamacion__c);
+                    mapaPretensionAReclamacion.put(pret.Id, pret);
+                }
+            }
+            
+            // Obtener las reclamaciones padres
+            if (!idsReclamacionesDesdePretensiones.isEmpty()) {
+                List<Case> reclamaciones = [SELECT Id, OwnerId FROM Case WHERE Id IN :idsReclamacionesDesdePretensiones];
+                for (Case rec : reclamaciones) {
+                    mapaReclamaciones.put(rec.Id, rec);
                 }
             }
         }
-        List<CaseShare> listaCSNuevos = new List<CaseShare>();
-        for (Id idReclamacion : mapaRecPrets.keySet()) {
-            for (Case pretension : mapaRecPrets.get(idReclamacion)) {
-                if (mapaReclamaciones.containsKey(idReclamacion)) {
-                    CaseShare csNuevo = new CaseShare();
-                    csNuevo.CaseId = pretension.Id;
-                    csNuevo.UserOrGroupId = mapaReclamaciones.get(idReclamacion);
-                    csNuevo.CaseAccessLevel='Edit';
-                    listaCSNuevos.add(csNuevo);
+        
+        // Lista de CaseShare a insertar
+        List<CaseShare> listaCaseShares = new List<CaseShare>();
+        
+        // Crear manual shares para pretensiones desde reclamaciones
+        for (Id idReclamacion : mapaReclamacionAPretensiones.keySet()) {
+            Case reclamacion = mapaReclamaciones.get(idReclamacion);
+            if (reclamacion != null) {
+                for (Case pretension : mapaReclamacionAPretensiones.get(idReclamacion)) {
+                    CaseShare cs = new CaseShare();
+                    cs.CaseId = pretension.Id;
+                    cs.UserOrGroupId = reclamacion.OwnerId;
+                    cs.CaseAccessLevel = 'Edit';
+                    cs.RowCause = 'Manual';
+                    listaCaseShares.add(cs);
                 }
             }
         }
-        if (!listaCSNuevos.isEmpty()) {
-            SAC_DatabaseDML.insertListDML(listaCSNuevos, false);
+        
+        // Crear manual shares para reclamaciones desde pretensiones
+        for (Id idPretension : mapaPretensionAReclamacion.keySet()) {
+            Case pretension = mapaPretensionAReclamacion.get(idPretension);
+            Case reclamacion = mapaReclamaciones.get(pretension.SAC_Reclamacion__c);
+            if (reclamacion != null) {
+                CaseShare cs = new CaseShare();
+                cs.CaseId = reclamacion.Id;
+                cs.UserOrGroupId = pretension.OwnerId;
+                cs.CaseAccessLevel = 'Edit';
+                cs.RowCause = 'Manual';
+                listaCaseShares.add(cs);
+            }
+        }
+        
+        // Insertar los manual shares si hay registros
+        if (!listaCaseShares.isEmpty()) {
+            SAC_DatabaseDML.insertListDML(listaCaseShares, false);
         }
     }
+
+
 
     /**************************************************************************
      * Proposito: Al cambiar el grupo letrado de la consulta SAC, el owner letrado pasará a ser 'Pte. Asignar'

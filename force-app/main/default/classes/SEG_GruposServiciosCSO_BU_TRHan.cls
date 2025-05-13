@@ -5,6 +5,7 @@ public with sharing class SEG_GruposServiciosCSO_BU_TRHan extends CC_TriggerHand
 
     private void process(List<SEG_GruposServiciosCSO__c> listNewObj, Map<Id, SEG_GruposServiciosCSO__c> mapNewObj, Map<Id, SEG_GruposServiciosCSO__c> mapOldObj) {
         activacionGrupo(listNewObj, mapNewObj, mapOldObj);
+        grupoServicioCSO(listNewObj, mapNewObj, mapOldObj);
     }
 
     public static void activacionGrupo(List<SEG_GruposServiciosCSO__c> listNewObj, Map<Id, SEG_GruposServiciosCSO__c> mapNewObj, Map<Id, SEG_GruposServiciosCSO__c> mapOldObj){
@@ -23,5 +24,22 @@ public with sharing class SEG_GruposServiciosCSO_BU_TRHan extends CC_TriggerHand
                 }           
             }
         }
+    }
+
+    //Se concatenan los campos de SEG_GrupoCSO__c y SEG_ServiciosCSO__c siempre que se detecte un cambio en los mismos
+    public static void grupoServicioCSO(List<SEG_GruposServiciosCSO__c> listNewObj, Map<Id, SEG_GruposServiciosCSO__c> mapNewObj, Map<Id, SEG_GruposServiciosCSO__c> mapOldObj){
+
+        for (SEG_GruposServiciosCSO__c grupoServicio : listNewObj) {
+            if(mapNewObj.get(grupoServicio.Id).SEG_GrupoCSO__c != mapOldObj.get(grupoServicio.Id).SEG_GrupoCSO__c ||  mapNewObj.get(grupoServicio.Id).SEG_ServiciosCSO__c != mapOldObj.get(grupoServicio.Id).SEG_ServiciosCSO__c){
+                String valorFinal = '';
+                if(grupoServicio.SEG_GrupoCSO__c != null){
+                    valorFinal = String.valueOf(grupoServicio.SEG_GrupoCSO__c);
+                }
+                if(grupoServicio.SEG_ServiciosCSO__c != null){
+                    valorFinal = valorFinal + String.valueOf(grupoServicio.SEG_ServiciosCSO__c);
+                }
+                grupoServicio.SEG_GruposServiciosCSO__c = valorFinal;
+            }                      
+        } 
     }
 }

@@ -11,52 +11,76 @@ public with sharing class OS_cognitiveCR {
         String sDescError = '';
         String sDetalleError = '';
         CC_TrazaInt__c oTraza;
-        if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
+        //if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
             List<CC_TrazaInt__c> oListTrazas = new List<CC_TrazaInt__c>();
             
             oTraza = new CC_TrazaInt__c();
                             oTraza.Name = 'Cognitive_COPS';
                             oTraza.CC_FechaInicio__c = datetime.now();
+        //}
+
+        Case casoCops = new Case();
+        OS_sendToCognitive sendCase = new OS_sendToCognitive();
+
+        if(casoid != null){
+            List<Case> casos = new List<Case>();
+            casos = [SELECT id, Subject, Description, CaseNumber FROM Case WHERE id = :casoid];
+            if(!casos.isEmpty()){
+                casoCops = casos[0];
+
+                sendCase.subject = casoCops.Subject;
+                sendCase.body = casoCops.Description.replaceAll('\r\n|\n|\r',' ');  
+                sendCase.date_time = Datetime.now().format('yyyy-MM-dd HH:mm:ss', 'Europe/Madrid'); //"2017-12-23 16:30:21" yyyy-MM-dd 
+                sendCase.sr=casoCops.CaseNumber;
+                System.debug(sendCase);
+            }
         }
         
-        Case casoCops = new Case();
-        casoCops = [SELECT id, Subject, Description, CaseNumber FROM Case WHERE id = :casoid];
-        OS_sendToCognitive sendCase = new OS_sendToCognitive();
-        sendCase.subject = casoCops.Subject;
-        sendCase.body = casoCops.Description.replaceAll('\r\n|\n|\r',' ');  
-        sendCase.date_time = Datetime.now().format('yyyy-MM-dd HH:mm:ss', 'Europe/Madrid'); //"2017-12-23 16:30:21" yyyy-MM-dd 
-        sendCase.sr=casoCops.CaseNumber;
-        System.debug(sendCase);
-
         String jsonToCognitive = JSON.serialize(sendCase);
         jsonToCognitive=jsonToCognitive.replace('date_time', 'date-time');
-        //TODO: reemplazar las variables afectadas por "-"
-        //espacio para lanzar llamada HHTP
+
+         String intSetting = 'OS_COGNITIVE';
         
         try {
-            Http http = new Http();
+            /*Http http = new Http();
             HttpRequest request = new HttpRequest();
             request.setEndpoint(oConfig.CC_EndPoint__c );
             request.setMethod('POST');
             request.setHeader('Content-Type', 'application/json;charset=UTF-8');
             request.setClientCertificateName(oConfig.CC_Certificado__c);
-            request.setBody(jsonToCognitive);
+            request.setBody(jsonToCognitive); */
+
+            // Crear HEADER 
+                Map<String,string> mHeaders =  new  Map<String,string>();  
+                mHeaders.put('Content-Type', 'application/json;charset=UTF-8'); 
+
+                CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
+                requestWrp.body = jsonToCognitive;
+                requestWrp.intSetting = intSetting;
+                requestWrp.method = 'POST';
+                requestWrp.mHeaders = mHeaders;
+                requestWrp.mUriParams = null;
+                requestWrp.mQueryParams = null;
+
+                HttpRequest request = CBK_HttpServiceIntegration.getRequest(requestWrp);
+
+                HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, intSetting, intSetting);
             
-            if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
+           // if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
                 string TextoEntrada = String.valueOf(jsonToCognitive);
                 if(TextoEntrada.length() > 131072 ){
                     TextoEntrada = TextoEntrada.substring(0, 131072);
                 }
 
                 oTraza.CC_MensajeEntrada__c = TextoEntrada;
-            }
+           // }
             
-            HttpResponse response = http.send(request);
+            //HttpResponse response = http.send(request);
             
             if (response.getStatusCode() == 200) {
                 OS_receiveFromCognitive results = new OS_receiveFromCognitive();
                 
-                if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
+                //if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
 
                     string TextoSalida = response.getBody();
                     if(TextoSalida.length() > 131072 ){
@@ -68,7 +92,7 @@ public with sharing class OS_cognitiveCR {
                     oTraza.CC_FechaFin__c = datetime.now();
                     oTraza.CC_FinOK__c = true;
                     insert(oTraza);
-                }
+               // }
                 
                 results = OS_receiveFromCognitive.parse(response.getBody());
 
@@ -120,7 +144,7 @@ public with sharing class OS_cognitiveCR {
                 
             }
             else {
-                if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
+                //if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
                     sDescError = 'Error comunicaciones.';
                     sDetalleError = response.getStatusCode() + ':' + response.getBody();
                     oTraza.CC_FechaFin__c = datetime.now();
@@ -128,11 +152,11 @@ public with sharing class OS_cognitiveCR {
                     oTraza.CC_TipoError__c = sDescError;
                     oTraza.CC_DetalleError__c = sDetalleError;
                     insert(oTraza);
-                }
+                //}
             }
         } catch (Exception e) {
             
-            if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
+            //if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
                 sDescError = 'Exception: Error comunicaciones.';
                 sDetalleError = e.getMessage();
                 oTraza.CC_FechaFin__c = datetime.now();
@@ -140,7 +164,7 @@ public with sharing class OS_cognitiveCR {
                 oTraza.CC_TipoError__c = sDescError;
                 oTraza.CC_DetalleError__c = sDetalleError;
                 insert(oTraza);
-            }
+           // }
 			
         }
         

@@ -162,10 +162,7 @@ public with sharing class SEG_FileController {
     public static void uploadFileModify(Id versionArchivo, String titulo, String descripcion, Boolean firma, String gdd){
         List<ContentDocumentLink> cdLink = new List<ContentDocumentLink>();
 
-        ContentVersion file = [SELECT Checksum,ContentDocumentId,ContentLocation,
-        ContentSize,ContentUrl,Description,FileExtension,FileType,FirstPublishLocationId,Id,
-        IsAssetEnabled,IsDeleted,Origin,OwnerId,PathOnClient,PublishStatus,RatingCount,ReasonForChange, 
-        SharingOption,Title,VersionData,VersionNumber FROM ContentVersion WHERE ContentDocumentId =: versionArchivo LIMIT 1];
+        ContentVersion file = [SELECT ContentDocumentId, PathOnClient, VersionData, FirstPublishLocationId FROM ContentVersion WHERE ContentDocumentId =: versionArchivo LIMIT 1];
         List<ContentDocumentLink> contenDocLink1 = [SELECT Id, ContentDocument.LatestPublishedVersion.IsLatest,ContentDocument.LatestPublishedVersionId , ContentDocument.LatestPublishedVersion.CreatedDate, LinkedEntityId FROM ContentDocumentLink WHERE ContentDocumentId =: file.ContentDocumentId];
         //delete contenDocLink1;
         for( ContentDocumentLink doc : contenDocLink1){
@@ -186,24 +183,13 @@ public with sharing class SEG_FileController {
 
         delete cdLink;
 
-        List<ContentVersion> file2 = [SELECT Checksum,ContentDocumentId,ContentLocation, 
-        ContentSize,ContentUrl,Description,FileExtension,FileType,FirstPublishLocationId,Id,
-        IsAssetEnabled,IsDeleted,Origin,OwnerId,PathOnClient,PublishStatus,RatingCount,ReasonForChange, 
-        SharingOption,Title,VersionData,VersionNumber FROM ContentVersion WHERE ID =: documentoNuevo.id];
-        List<ContentDocumentLink> contenDocLink = [SELECT Id, ContentDocument.LatestPublishedVersion.CreatedDate, LinkedEntityId,
-        ContentDocument.LatestPublishedVersion.VersionNumber, ContentDocument.LatestPublishedVersionId, ContentDocument.LatestPublishedVersion.IsLatest 
-                FROM ContentDocumentLink WHERE ContentDocumentId =: file2[0].ContentDocumentId
-                                                    ORDER BY ContentDocument.LatestPublishedVersion.CreatedDate DESC ];
     }
 
 
     @AuraEnabled
     public static void deleteUploadedFile(Id versionArchivo){
         List<ContentDocumentLink> cdLink = new List<ContentDocumentLink>();
-        ContentVersion file = [SELECT Checksum,ContentDocumentId,ContentLocation,
-        ContentSize,ContentUrl,Description,FileExtension,FileType,FirstPublishLocationId,Id,
-        IsAssetEnabled,IsDeleted,Origin,OwnerId,PathOnClient,PublishStatus,RatingCount,ReasonForChange, 
-        SharingOption,Title,VersionData,VersionNumber FROM ContentVersion WHERE ContentDocumentId =: versionArchivo LIMIT 1];
+        ContentVersion file = [SELECT ContentDocumentId FROM ContentVersion WHERE ContentDocumentId =: versionArchivo LIMIT 1];
         List<ContentDocumentLink> contenDocLink1 = [SELECT Id, ContentDocument.LatestPublishedVersion.IsLatest,ContentDocument.LatestPublishedVersionId , ContentDocument.LatestPublishedVersion.CreatedDate, LinkedEntityId FROM ContentDocumentLink WHERE ContentDocumentId =: file.ContentDocumentId];
         for( ContentDocumentLink doc : contenDocLink1){
             if (String.valueOf(doc.LinkedEntityId.getSObjectType()) != 'User'){
@@ -216,10 +202,7 @@ public with sharing class SEG_FileController {
     @AuraEnabled
     public static void deleteFiles(List<Id> versionArchivo){
         List<ContentDocumentLink> cdLink = new List<ContentDocumentLink>();
-        List<ContentVersion> file = [SELECT Checksum,ContentDocumentId,ContentLocation,
-        ContentSize,ContentUrl,Description,FileExtension,FileType,FirstPublishLocationId,Id,
-        IsAssetEnabled,IsDeleted,Origin,OwnerId,PathOnClient,PublishStatus,RatingCount,ReasonForChange, 
-        SharingOption,Title,VersionData,VersionNumber FROM ContentVersion WHERE ContentDocumentId IN: versionArchivo];
+        List<ContentVersion> file = [SELECT ContentDocumentId FROM ContentVersion WHERE ContentDocumentId IN: versionArchivo];
         List<Id> contentDocuments = new List<Id>();
         for (ContentVersion archivo : file) {
             contentDocuments.add(archivo.ContentDocumentId);

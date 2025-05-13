@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CC_Solucion_Relacionada__c</fullName>
     <description>Campo descriptivo con la solución del MCC la cual se relaciona con el Motivo NOK de la operativa de tarjetas.</description>
-    <label>Solución relacionada</label>
+    <label>Solución Relacionada</label>
     <required>false</required>
     <trackTrending>false</trackTrending>
     <type>Picklist</type>

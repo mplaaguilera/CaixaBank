@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_NegociacionFinalizadaRectificacion__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Se indica si las negociaciones que se han llevado a cabo en la rectificación están finalizadas o no</description>
+    <label>Negociación en rectificación finalizada</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

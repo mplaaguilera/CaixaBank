@@ -239,6 +239,21 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SAC_TipoReclamante__c</picklist>
+        <values>
+            <fullName>SAC_001</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_002</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_003</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SAC_ValoracionResumen__c</picklist>
         <values>
             <fullName>Negativo</fullName>

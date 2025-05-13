@@ -16,6 +16,7 @@
         <connector>
             <targetReference>myWaitEvent_myWait_myRule_1_event_0_postWaitExecutionAssignment</targetReference>
         </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <processMetadataValues>
                 <name>dataType</name>
@@ -60,7 +61,7 @@
         </inputParameters>
         <nameSegment>CC_Cierre_Automatico_Methods</nameSegment>
     </actionCalls>
-    <apiVersion>49.0</apiVersion>
+    <apiVersion>63.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>myWaitAssignment_myWait_myRule_1</name>
@@ -579,7 +580,7 @@
         </rules>
     </decisions>
     <description>Cierre Automático al cumplir el plazo de Solicitud Información</description>
-    <interviewLabel>CC_Cierre_Aut_Sol_Inf-4_InterviewLabel</interviewLabel>
+    <interviewLabel>CC_Cierre_Aut_Sol_Inf-3_InterviewLabel</interviewLabel>
     <label>Cierre Automático Solicitud Información</label>
     <processMetadataValues>
         <name>ObjectType</name>

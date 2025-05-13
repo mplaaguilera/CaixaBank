@@ -4,7 +4,7 @@
     <description>Email del reclamante principal proporcionado por la IA</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
-    <label>Email reclamante</label>
+    <label>Email Reclamante</label>
     <required>false</required>
     <trackTrending>false</trackTrending>
     <type>Email</type>

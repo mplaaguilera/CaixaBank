@@ -1,10 +1,13 @@
 public with sharing class SPV_LCMP_CamposDesplegables {
 
-    private static Set<String> objetos = new Set<String>{'SAC_Interaccion__c'};
+    private static Set<String> objetos = new Set<String>{'SAC_Interaccion__c', 'SPV_Formulario__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
-        //RT de escalado SPV
-        private static final Id RECTYPEESCALADO = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Escalado').getRecordTypeId();
+    //RT de escalado SPV
+    private static final Id RECTYPEESCALADO = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Escalado').getRecordTypeId();
+    
+    //Rec Type de Formulario
+    private static final Id RECTYPEFORMNEGOCIACION = mapRTsObjects.get('SPV_Formulario__c').get('SPV_FormularioNegociacion').getRecordTypeId();
 
 
 
@@ -78,19 +81,6 @@ public with sharing class SPV_LCMP_CamposDesplegables {
 
     }    
 
-    @AuraEnabled(cacheable=true)  
-    public static List<RecordType> obtenerRecordTypes(){
-        
-        List<String> nombresObjetos = new List<String>{'Case', 'SAC_Interaccion__c', 'CBK_Case_Extension__c'};
-        List<String> nombresRT = new List<String>{'SPV_Reclamacion', 'SPV_Escalado', 'SPV_ReclamacionCaseExt'};
-        List<RecordType> listaRecordTypes = new List<RecordType>();
-
-        
-    listaRecordTypes = [SELECT Id, DeveloperName FROM RecordType WHERE sObjectType IN :nombresObjetos AND DeveloperName IN :nombresRT];
-        
-        return listaRecordTypes;
-    }
-
 
     /*****************************************************************
      * Proposito: Wrapper en el que se devolveráán los escalados que se deben tener en cuenta de 
@@ -118,5 +108,80 @@ public with sharing class SPV_LCMP_CamposDesplegables {
 
 
 
+     /*****************************************************************
+     * Proposito: Recuperar las negociaciones de una reclamación
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1126342     Sergio Martín     07/02/25        Creación
+     *****************************************************************/
+    /**
+	 * @description    Recuperar las negociaciones de una reclamación
+	 * @param casoId
+	 */
+    @AuraEnabled
+    public static NegociacionesReclamacionWrapper getNegociacionesReclamacion(String casoId) {
+        List <SPV_Formulario__c> listaNegociacionPreviaInforme = new List<SPV_Formulario__c>();            //Almacenar las negociaciones previas al informe supervisor
+        List <SPV_Formulario__c> listaNegociacionPosteriorInforme = new List<SPV_Formulario__c>();         //Almacenar las negociaciones posteriores al informe supervisor
+        Boolean existeNegociacionPreviaInforme = false;
+        Boolean existeNegociacionPosteriorInforme = false;  
+
+        try{
+            List<SPV_Formulario__c> listaFormulariosNegociacion = [SELECT id, SPV_EstadoNegociacion__c, SPV_NegociacionEnCurso__c, SPV_ResultadoNegociacion__c, SPV_MotivoRechazoNegociacion__c, SPV_FechaInicioNegociacion__c, SPV_FechaFinNegociacion__c 
+                            FROM SPV_Formulario__c WHERE RecordTypeId =: RECTYPEFORMNEGOCIACION AND SPV_Caso__c =: casoId ORDER BY CreatedDate ASC];
+
+            //Clasificar las negociaciones en función del tipo que sean
+            if(!listaFormulariosNegociacion.isEmpty()){
+                for(SPV_Formulario__c negociacion : listaFormulariosNegociacion){
+                    if(negociacion.SPV_EstadoNegociacion__c == 'SPV_Rectificacion') { // Si la negociación se produce en estado de Rectificación es posterior al informe supervisor
+                        listaNegociacionPosteriorInforme.add(negociacion);
+                        existeNegociacionPosteriorInforme = true;
+                    }else { // Si la negociación se produce en cualquier otro estado es previa al informe supervisor
+                        listaNegociacionPreviaInforme.add(negociacion);
+                        existeNegociacionPreviaInforme = true;
+                    }
+                }
+                
+                //Se construye el wrapper que se va a devolver, con todos los escalados necesarios para el componente
+                NegociacionesReclamacionWrapper wrapperNegociaciones = new NegociacionesReclamacionWrapper(listaNegociacionPreviaInforme, existeNegociacionPreviaInforme, listaNegociacionPosteriorInforme, existeNegociacionPosteriorInforme);
+                return wrapperNegociaciones;
+            }else{
+                //Devolver nada
+                return null;
+            }
+        }catch(Exception e){
+            throw new AuraHandledException(e.getMessage());
+        }
+    }    
+
+
+    /*****************************************************************************************************
+     * Proposito: Wrapper en el que se devolverán las negociaciones que se deben tener en cuenta de 
+     * la reclamación
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1126342     Sergio Martín     07/02/25        Creación
+     *****************************************************************************************************/
+    /**
+	 * @description     Wrapper en el que se devolverán las negociaciones de la reclamación
+	 */
+    public class NegociacionesReclamacionWrapper{
+
+        @AuraEnabled public List<SPV_Formulario__c> listNegociacionPreviaInforme {get; set;}
+        @AuraEnabled public Boolean existeNegociacionPreviaInforme {get; set;}
+        @AuraEnabled public List<SPV_Formulario__c> listNegociacionPosteriorInforme {get; set;}
+        @AuraEnabled public Boolean existeNegociacionPosteriorInforme {get; set;}
+
+        public NegociacionesReclamacionWrapper(List<SPV_Formulario__c> formNegociacionPreviaInforme, Boolean varExisteNegociacionPreviaInforme, List<SPV_Formulario__c> formNegociacionPosteriorInforme, Boolean varExisteNegociacionPosteriorInforme)
+        {
+            listNegociacionPreviaInforme = formNegociacionPreviaInforme;
+            existeNegociacionPreviaInforme = varExisteNegociacionPreviaInforme;
+            listNegociacionPosteriorInforme = formNegociacionPosteriorInforme;
+            existeNegociacionPosteriorInforme = varExisteNegociacionPosteriorInforme;
+        }
+    }
     
 }

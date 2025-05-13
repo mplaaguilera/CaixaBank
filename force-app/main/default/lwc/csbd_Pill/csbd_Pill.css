@@ -1,0 +1,21 @@
+.slds-pill {
+    opacity: 0.9;
+}
+
+.slds-pill:hover {
+	background-color: unset;
+}
+
+.pillIconClass {
+	--slds-c-icon-color-background: transparent;
+	--slds-c-icon-color-foreground: rgb(117, 117, 117);
+	--slds-c-icon-color-foreground-default: rgb(117, 117, 117);
+    border-radius: 6px;
+    margin-left: 1px;
+}
+
+.slds-pill__action {
+    padding-left: 25px;
+	padding-right: 6px;
+    border-radius: 8px;
+}

@@ -10,11 +10,11 @@ public with sharing class SPV_AccionAITRHan extends CC_TriggerHandlerBase {
         List<SAC_Accion__C> listAccionesSPV = SPV_AccionHelper.filtrarAccionesSPV(listNewObj);
 
         if(!listAccionesSPV.isEmpty()){
-           SPV_AccionHelper.insertarPermisosAccion(listAccionesSPV);
-           SPV_AccionHelper.tareaReclamacionCerrada(listAccionesSPV);
-           SPV_AccionHelper.automatizarCasoAplicaTarea(listAccionesSPV);
-           SPV_AccionHelper.crearThreadId(listAccionesSPV);
-           SPV_AccionHelper.insertarTMEs(listAccionesSPV);
+            SPV_AccionHelper.insertarPermisosAccion(listAccionesSPV);
+            //    SPV_AccionHelper.tareaReclamacionCerrada(listAccionesSPV);
+            SPV_AccionHelper.automatizarCasoAplicaTarea(listAccionesSPV);
+            SPV_AccionHelper.crearThreadId(listAccionesSPV);
+            SPV_AccionHelper.insertarTMEs(listAccionesSPV);
         }
 
     }

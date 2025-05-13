@@ -1,3 +1,5 @@
+@import 'c/csbd_lwcStyle';
+
 div.datatableContainer > c-lwc-labs-loading-stencil {
     display: block;
     opacity: 0.58;
@@ -581,7 +583,7 @@ div.divSumaIngresosTitulares {
     text-align: center;
     border: 1px solid rgb(224, 224, 224);
     border-radius: 4px;
-    background-color: var(--lwc-paletteCloudBlue95, #ecf7ff);
+    background-color: #ecf7ff;
     font-weight: 200;
     padding: 6px 0 6px 0;
 }
@@ -631,10 +633,6 @@ div.tooltipCalculos ul {
 
 div.tooltipCalculos ul > li {
     display: list-item;
-}
-
-.csbd-var-m-top_xxx-large {
-    margin-top: 30px;
 }
 
 div.datosTitular lightning-badge + lightning-badge {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Tiempo_Espera__c</fullName>
+    <description>Tiempo en MINUTOS que se esperará antes de enviar el mensaje de SMS Failover. Después de este tiempo, si el RCS no ha sido enviado por algún motivo, se considera ¨Expired¨. Valor máximo 48h</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Tiempo en MINUTOS que se esperará antes de enviar el mensaje de SMS Failover. Después de este tiempo, si el RCS no ha sido enviado por algún motivo, se considera ¨Expired¨. Valor máximo 48h</inlineHelpText>
+    <label>Tiempo de Espera</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

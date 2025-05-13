@@ -6,6 +6,10 @@
     <picklistValues>
         <picklist>CBK_Negocio__c</picklist>
         <values>
+            <fullName>CAM</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>CC</fullName>
             <default>false</default>
         </values>
@@ -49,7 +53,15 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Atención Preferente</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Atención al Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ayuda Temporal</fullName>
             <default>false</default>
         </values>
         <values>
@@ -85,6 +97,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Comercios</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Dirección</fullName>
             <default>false</default>
         </values>
@@ -98,10 +114,6 @@
         </values>
         <values>
             <fullName>EDG - Externos</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>EDG-BANKIA MEDIACIÓN</fullName>
             <default>false</default>
         </values>
         <values>
@@ -186,6 +198,10 @@
         </values>
         <values>
             <fullName>EDG-VDC %2F VIDACAIXA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-VIDACAIXA MEDIACIÓN</fullName>
             <default>false</default>
         </values>
         <values>
@@ -325,11 +341,27 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Teléfono FRAUDE Ficheros</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Teléfono FRAUDE Perfilado Clientes</fullName>
             <default>false</default>
         </values>
         <values>
+            <fullName>Teléfono FRAUDE Reclamaciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Teléfono FRAUDE Recuperaciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Teléfono FRAUDE Seguridad Operativa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Teléfono FRAUDE Swift</fullName>
             <default>false</default>
         </values>
         <values>
@@ -395,6 +427,21 @@
         </values>
         <values>
             <fullName>Tercer nivel</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_TrasladoAuto3n__c</picklist>
+        <values>
+            <fullName>3N de Carteras CAM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3N de Fondos CAM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3N de Valores CAM</fullName>
             <default>false</default>
         </values>
     </picklistValues>

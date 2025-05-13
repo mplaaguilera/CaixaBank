@@ -1,6 +1,7 @@
 public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDispatcherBase {
 	private static String objectApiName = 'EmailMessage';
 	private final static String HEADER_PARAMS = 'X-SFDC-Original-RCPT';
+	private final static Set<String> INBOUND_QUIDDITY = new Set<String>{'INBOUND_EMAIL_SERVICE', 'SYNCHRONOUS'};
 	private static Map<Id, String> mapRTInfo = new Map <Id, String>();
 	private static Set<String> checkRTExistsSet = new Set<String>();
 	public void executeParent(CC_TriggerParameters tp, CC_TriggerParameters.TriggerEvent eventype) {
@@ -33,7 +34,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 		
 		for (EmailMessage correo : correos) {
 			if (correo.Incoming) {
-				if(result == 'INBOUND_EMAIL_SERVICE' || Test.isRunningTest()){
+				if(INBOUND_QUIDDITY.contains(result) || Test.isRunningTest()){
 					lstEntr.add(correo);
 				}
 			} else {

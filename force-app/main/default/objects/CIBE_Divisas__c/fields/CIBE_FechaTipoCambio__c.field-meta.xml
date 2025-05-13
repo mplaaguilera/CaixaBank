@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_FechaTipoCambio__c</fullName>
+    <description>Información de la fecha de cambio de valor la divisa</description>
     <encryptionScheme>None</encryptionScheme>
     <label>Fecha Tipo de Cambio</label>
     <required>false</required>

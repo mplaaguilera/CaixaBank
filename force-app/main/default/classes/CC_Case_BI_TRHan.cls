@@ -1,27 +1,27 @@
 public with sharing class CC_Case_BI_TRHan extends CC_TriggerHandlerBase {
 
-
 	public override void mainEntry(CC_TriggerParameters tp) {
-		process((List<Case>)tp.newList, (Map<Id, Case>)tp.newMap);
+		  process((List<Case>)tp.newList, (Map<Id, Case>)tp.newMap);
 	}
 
 	private void process(List<Case> listNewObj, Map<Id, Case> mapNewObj) {
 		//Obtención de RT CC_
-		Set<Id> setIdsRt = new Set<Id>();
+		Schema.DescribeSObjectResult recordType = Case.SObjectType.getDescribe();
+		List<Schema.RecordTypeInfo> lstRT = recordType.getRecordTypeInfos();
+		Set<Id> setIdsRt = New Set<Id>();
 
-		for (Schema.RecordTypeInfo rt : Case.SObjectType.getDescribe().getRecordTypeInfos()) {
-			String prefijo = rt.getDeveloperName().left(3);
-			if (prefijo == 'CC_' || prefijo == 'AM_') {
+		for (Schema.RecordTypeInfo rt: lstRT){
+			if ((rt.getDeveloperName().left(3)=='CC_')||(rt.getDeveloperName().left(3)=='AM_')) {
 				setIdsRt.add(rt.getRecordTypeId());
 			}
 		}
 
-		List<Case> listNewObjCC = new List<Case>();
-		Map<Id, Case> mapNewObjCC = new Map<Id, Case>();
-		for (Case tk : listNewObj) {
-			if (tk.RecordTypeId == null || setIdsRt.contains(tk.RecordTypeId)) {
+		List<Case> listNewObjCC= New List<Case>();
+		Map<Id, Case> mapNewObjCC = New Map<Id, Case>();
+		for (Case tk: listNewObj){
+			if(((setIdsRt).contains(tk.RecordTypeId))||(tk.RecordTypeId == null)){
 				listNewObjCC.add(tk);
-				mapNewObjCC.put(tk.Id, tk);
+				mapNewObjCC.put(tk.Id,tk);
 			}
 		}
 
@@ -53,6 +53,17 @@ public with sharing class CC_Case_BI_TRHan extends CC_TriggerHandlerBase {
 			CC_CaseTriggerHelper.motivoInformadoBI(listNewObjCC);
 			CC_CaseTriggerHelper.informarOficinaAfectadaBI(listNewObjCC);
 			CC_CaseTriggerHelper.cambioContactoEmpleadoBI(listNewObjCC, idsCAM);
+			if(FeatureManagement.checkPermission('CC_IA_UsuarioPromptsIA')){
+                for (Case caso : listNewObj) {
+					Id caseExtensionId = CC_IA_EinsteinUtils.createCaseExtensionRecord();
+					if (caseExtensionId != null) {
+						// Asignar el ID de la extensión al caso
+						caso.CBK_Case_Extension_Id__c = caseExtensionId;
+						// Marcar check prompt si cumple con las condiciones
+						CC_IA_EinsteinUtils.marcarCheckPromptSiCumple(caseExtensionId, caso.CC_Canal_Procedencia__c, caso.recordTypeId);
+					}
+				}
+            }
 		}
 	}
 

@@ -749,9 +749,12 @@ public with sharing class CC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                 update cerrarTareas;
             }
             
-            for (Task actividad : actividades) {
-                if(actividad.Status == 'Open'){
-                    casoIdCaso.get(actividad.WhatId).addError('Existen actividades pendientes que deben completarse antes de cerrar el caso.');
+            // DPK - US1183569 - EMPLEADOS CCO: Caso con actividad de documentación no recibida y no cerrado automáticamente (IN1261860)
+            Id rtEmpleados = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+
+            for (Task actividad : actividades) { 
+                 if(!(casoIdCaso.get(actividad.whatId).RecordTypeId == rtEmpleados && mapOldObj.get(actividad.whatId).Status == 'Pendiente cliente' && casoIdCaso.get(actividad.whatId).CC_Admin__c) && actividad.Status == 'Open'){               
+                        casoIdCaso.get(actividad.WhatId).addError('Existen actividades pendientes que deben completarse antes de cerrar el caso.');
                 }
             }
         }
@@ -843,73 +846,10 @@ public with sharing class CC_Case_BU_TRHan extends CC_TriggerHandlerBase {
     }
     
     private static void generarURLLimeSurvey(List<Case> listNewObj, Set<Id> setIdsCasos){
-        //Traigo la base del link LimeSurvey para usar con Empleado
-        List<CC_Envio_Encuesta__c> linkEncuestaEmpleado = [SELECT CC_Link_LimeSurvey__c, CC_Id_Encuesta__c, CC_Tipo_Encuesta__c FROM CC_Envio_Encuesta__c WHERE Name IN ( 'CC_URL_Encuesta', 'CC_TipoLlamada', 'TipoChat', 'CC_TercerNivel')];
-        String idEncuestaLlamada, idEncuestaChat, idEncuestaTercerNivel, linkBase, idEncuestaGenerico;
-        Map<Id, String> mapInfoChat = new  Map<Id,String>();
-        List<LiveChatTranscript> listaChats = new List<LiveChatTranscript>([SELECT CC_Espacio__c, CaseId FROM LiveChatTranscript WHERE CaseId IN :setIdsCasos AND CC_Tipo__c = 'Agente'AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('LiveChatTranscript', 'CC_Empleados') ORDER BY CreatedDate DESC]);
-         //Map<Id, LiveChatTranscript> mapInfoChat = new Map<Id, LiveChatTranscript>([SELECT CC_Espacio__c FROM Case WHERE CaseId IN :setIdsCasos]);
-
-        //Divido asigno los ids correspondientes a cada string
-        for(CC_Envio_Encuesta__c e : linkEncuestaEmpleado){
-            if(e.CC_Tipo_Encuesta__c == 'URL base'){
-                linkBase = e.CC_Link_LimeSurvey__c;
-                idEncuestaGenerico = e.CC_Id_Encuesta__c;
-            }else if (e.CC_Tipo_Encuesta__c == 'Phone'){
-                idEncuestaLlamada = e.CC_Id_Encuesta__c;
-            }else if(e.CC_Tipo_Encuesta__c == 'Chat'){
-                idEncuestaChat = e.CC_Id_Encuesta__c;
-            }else if(e.CC_Tipo_Encuesta__c == 'Caso Tercer Nivel'){
-                idEncuestaTercerNivel = e.CC_Id_Encuesta__c;
-            }
-        }
-
-        if(!setIdsCasos.isEmpty()){
-            if(!listaChats.isEmpty()){
-                for (LiveChatTranscript chat :listaChats) {
-                   Id key = chat.CaseId; 
-                        if (!mapInfoChat.containsKey(key)) {
-                            mapInfoChat.put(key, chat.CC_Espacio__c);
-                        }
-                }
-            }
-       }
-        
-        for(Case caso :listNewObj){
-            if(/*mapInfoCasos.get(caso.Id) != null &&*/ caso.CC_Idioma__c != null && caso.CC_Matricula_Empleado__c != null &&
-            caso.CC_MCC_Tematica__c != null && caso.CC_Tematica__c != null && !linkEncuestaEmpleado.isEmpty()){
-                String grupoTematica = (!String.isEmpty(caso.CC_Grupo_Colaborador__c) ? caso.CC_Grupo_Colaborador__c : caso.CC_Tematica__c);
-                if(caso.CC_En_Tercer_Nivel__c){
-                    if(!mapInfoChat.isEmpty()){
-                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaTercerNivel+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                        //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaTercerNivel+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                    }else{
-                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaTercerNivel +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                        //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaTercerNivel +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                    }
-                }else {
-                    if(caso.Origin == 'Phone'){
-                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaLlamada+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                        //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaLlamada+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                    }
-                    else if(caso.Origin == 'Chat'){
-                        if(!mapInfoChat.isEmpty()){
-                            caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaChat+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                            //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+idEncuestaChat+'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+mapInfoChat.get(caso.Id).replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                        }else{
-                            caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaChat +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                            //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaChat +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                        }
-                    }else{
-                        caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaGenerico +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ grupoTematica.replace(' ', '_')+'&newtest=Y';
-                        //caso.CC_URL_Encuesta_3N__c = linkBase +'sid='+ idEncuestaGenerico +'&lang='+ caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_Tematica__c.replace(' ', '_')+'&et='+ caso.CC_Tematica__c.replace(' ', '_')+'&newtest=Y';
-                        
-                    }
-                }
-            }
-            
-        }
-        
+        Map<Id, String> encuesta = CC_MetodosUtiles.generarURLsLimeSurvey(listNewObj);
+        for(Case caso : listNewObj){
+             caso.CC_URL_Encuesta_3N__c = !encuesta.isEmpty() ? encuesta.get(caso.Id) : null;
+         }
     }
     
     private void cambioPropietarioColaConsultasOperativas(Map<Id, Case> mapOldObj, List<Case> listNewObj, List<Id> idsCAM) {

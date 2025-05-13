@@ -242,7 +242,7 @@ public with sharing class CC_Formulario_Consultas_Operativas implements Messagin
         }
     }
     
-    private Map<String,CC_Parametrizaciones_Consultas_Operativa__c> obtenerParametros (){
+    public static Map<String,CC_Parametrizaciones_Consultas_Operativa__c> obtenerParametros (){
         Map<String,CC_Parametrizaciones_Consultas_Operativa__c> mapaPrametrizaciones = new  Map<String,CC_Parametrizaciones_Consultas_Operativa__c>();
         List<CC_Parametrizaciones_Consultas_Operativa__c> colasConsultas = CC_Parametrizaciones_Consultas_Operativa__c.getall().values();
         if (!colasConsultas.isEmpty()) {

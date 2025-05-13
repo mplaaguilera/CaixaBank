@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Problema__c</fullName>
+    <label>Problema</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Alquiler</fullName>
+                <default>false</default>
+                <label>Alquiler</label>
+            </value>
+            <value>
+                <fullName>Amenazas oficina</fullName>
+                <default>false</default>
+                <label>Amenazas oficina</label>
+            </value>
+            <value>
+                <fullName>COVID 19</fullName>
+                <default>false</default>
+                <label>COVID 19</label>
+            </value>
+            <value>
+                <fullName>Lanzamiento</fullName>
+                <default>false</default>
+                <label>Lanzamiento</label>
+            </value>
+            <value>
+                <fullName>Ocupación</fullName>
+                <default>false</default>
+                <label>Ocupación</label>
+            </value>
+            <value>
+                <fullName>Okupación</fullName>
+                <default>false</default>
+                <label>Okupación</label>
+            </value>
+            <value>
+                <fullName>Prescripción deuda</fullName>
+                <default>false</default>
+                <label>Prescripción deuda</label>
+            </value>
+            <value>
+                <fullName>Procedimiento PJU</fullName>
+                <default>false</default>
+                <label>Procedimiento PJU</label>
+            </value>
+            <value>
+                <fullName>Queja / Reclamación</fullName>
+                <default>false</default>
+                <label>Queja / Reclamación</label>
+            </value>
+            <value>
+                <fullName>Reconsideracion DP</fullName>
+                <default>false</default>
+                <label>Reconsideracion DP</label>
+            </value>
+            <value>
+                <fullName>Refinanciación</fullName>
+                <default>false</default>
+                <label>Refinanciación</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

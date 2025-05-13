@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Mis_Lanzamientos_creados</fullName>
+    <columns>NAME</columns>
+    <columns>GRR_Codigo_UR__c</columns>
+    <columns>GRR_Fecha_Prevista_Posesion__c</columns>
+    <columns>GRR_Situacion__c</columns>
+    <columns>GRR_Direccion__c</columns>
+    <columns>GRR_Poblacion__c</columns>
+    <columns>GRR_Provincia__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Mine</filterScope>
+    <label>Mis Lanzamientos creados manualmente GRR</label>
+    <sharedTo>
+        <role>GRR</role>
+        <role>GRR_Agente</role>
+    </sharedTo>
+</ListView>

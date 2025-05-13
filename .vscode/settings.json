@@ -14,10 +14,72 @@
     "activityBar.background": null
   },
   "eslint.useFlatConfig": false,
-  "salesforce.einsteinForDevelopers.enableAutocompletions": true,
+  "salesforce.einsteinForDevelopers.enableAutocompletions": false,
   "salesforce.einsteinForDevelopers.autocompletionLength": "Short",
   "workbench.externalBrowser": "chrome",
   "CodeGPT.apiKey": "CodeGPT Plus Beta",
   "salesforcedx-vscode-slds.enhancements.autoSuggest": true,
-  "sarif-viewer.connectToGithubCodeScanning": "off"
+  "sarif-viewer.connectToGithubCodeScanning": "off",
+  "salesforce.einsteinForDevelopers.enable": true,
+  "chat.mcp.discovery.enabled": false,
+  "chat.mcp.enabled": true,
+  "mcp": {
+
+    "inputs": [],
+    "servers": {}
+  },
+  "squarl.groups": [
+    {
+      "id": "salesforce",
+      "name": "Salesforce"
+    },
+    {
+      "id": "component-blueprints",
+      "name": "Component blueprints"
+    },
+    {
+      "id": "lightning-design-system",
+      "name": "Lightning Design System"
+    }
+  ],
+  "squarl.bookmarks": [
+    {
+      "name": "> Lightning Design System v1",
+      "path": "https://v1.lightningdesignsystem.com",
+      "description": "",
+      "type": "link",
+      "groupId": "lightning-design-system"
+    },
+    {
+      "name": "> Icones",
+      "path": "https://v1.lightningdesignsystem.com/icons/",
+      "description": "",
+      "type": "link",
+      "groupId": "lightning-design-system"
+    },
+    {
+      "name": "Textarea",
+      "path": "https://v1.lightningdesignsystem.com/components/textarea/",
+      "description": "",
+      "type": "link",
+      "groupId": "lightning-design-system"
+    },
+    {
+      "name": "Button",
+      "path": "https://v1.lightningdesignsystem.com/components/buttons/",
+      "description": "",
+      "type": "link",
+      "groupId": "lightning-design-system"
+    }
+  ],
+  "salesforce.einsteinForDevelopers.enableAutocompletionsByFileType": {
+    "apex": false,
+    "javascript": true,
+    "css": true,
+    "html": true
+  },
+  "git.decorations.enabled": false,
+  "explorer.decorations.badges": false,
+  "explorer.decorations.colors": false,
+  "explorer.fileNesting.enabled": true
 }

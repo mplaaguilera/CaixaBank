@@ -8,16 +8,11 @@
     <columns>CASES.SUBJECT</columns>
     <columns>CASES.STATUS</columns>
     <columns>OWNER_NAME</columns>
-    <filterScope>Everything</filterScope>
+    <filterScope>Mine</filterScope>
     <filters>
         <field>CASES.STATUS</field>
         <operation>equals</operation>
         <value>Cerrado</value>
-    </filters>
-    <filters>
-        <field>CASES.RECORDTYPE</field>
-        <operation>equals</operation>
-        <value>Case.SEG_Cliente,Case.SEG_Seguimiento</value>
     </filters>
     <label>Casos cerrados</label>
     <sharedTo>

@@ -4,7 +4,9 @@
     <active>true</active>
     <description>Se evita que los usuarios no Admin o con perfil integrador (API) creen Intervinientes Formulario</description>
     <errorConditionFormula>AND(
- $Profile.Name != &apos;System Administrator&apos;,
+ !$Permission.CBK_BypassValidationRules,
+ !$Permission.SIR_ByPassValidationRules,
+	$Profile.Name != &apos;System Administrator&apos;,
  NOT(CONTAINS($Profile.Name, &apos;API&apos;)),
  NOT( CONTAINS(SIR_FormularioRefinanciacion__r.Name, &apos;Check-List de Refinanciación&apos;))
 )</errorConditionFormula>

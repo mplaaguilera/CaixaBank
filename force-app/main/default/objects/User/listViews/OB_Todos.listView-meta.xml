@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>OB_Todos</fullName>
+    <booleanFilter>1 OR 2 OR 3</booleanFilter>
     <columns>FULL_NAME</columns>
     <columns>CORE.USERS.ALIAS</columns>
     <columns>CORE.USERS.USERNAME</columns>
@@ -11,7 +12,17 @@
     <filters>
         <field>CORE.PROFILE.NAME</field>
         <operation>startsWith</operation>
-        <value>OB</value>
+        <value>OB Responsable</value>
+    </filters>
+    <filters>
+        <field>CORE.PROFILE.NAME</field>
+        <operation>startsWith</operation>
+        <value>OB Validador</value>
+    </filters>
+    <filters>
+        <field>CORE.PROFILE.NAME</field>
+        <operation>startsWith</operation>
+        <value>OB_Usuario</value>
     </filters>
     <label>Outbound</label>
     <language>en_US</language>

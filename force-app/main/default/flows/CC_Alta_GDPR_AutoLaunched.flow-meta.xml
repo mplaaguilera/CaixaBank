@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Enviar_solicitud_GDPR</name>
+        <label>Enviar solicitud de derecho a GDPR</label>
+        <locationX>100</locationX>
+        <locationY>200</locationY>
+        <actionName>CC_GDPR</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>derechosId</name>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <apiVersion>62.0</apiVersion>
+    <description>Envía a GDPR la solicitud de ejercicio de un derecho</description>
+    <label>CC_Alta_GDPR_AutoLaunched</label>
+    <processType>AutolaunchedFlow</processType>
+    <startElementReference>Enviar_solicitud_GDPR</startElementReference>
+    <status>Draft</status>
+</Flow>

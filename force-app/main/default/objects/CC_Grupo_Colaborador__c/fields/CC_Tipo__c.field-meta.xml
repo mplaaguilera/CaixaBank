@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo__c</fullName>
+    <label>Tipo</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Traslados</fullName>
+                <default>false</default>
+                <label>Traslados</label>
+            </value>
+            <value>
+                <fullName>Remitidos</fullName>
+                <default>false</default>
+                <label>Remitidos</label>
+            </value>
+            <value>
+                <fullName>Traslados y Remitidos</fullName>
+                <default>false</default>
+                <label>Traslados y Remitidos</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

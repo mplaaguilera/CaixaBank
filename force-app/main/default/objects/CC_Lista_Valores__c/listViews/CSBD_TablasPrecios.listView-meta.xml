@@ -3,9 +3,6 @@
     <fullName>CSBD_TablasPrecios</fullName>
     <columns>NAME</columns>
     <columns>CC_Activa__c</columns>
-    <columns>CSBD_TablaPrecios_Producto2__c</columns>
-    <columns>CSBD_TablaPrecios_Plazo__c</columns>
-    <columns>CSBD_TablaPrecios_CategoriaTitular__c</columns>
     <columns>LAST_UPDATE</columns>
     <columns>UPDATEDBY_USER</columns>
     <filterScope>Everything</filterScope>
@@ -16,6 +13,7 @@
     </filters>
     <label>Tablas de precios CSBD</label>
     <sharedTo>
+        <group>CSBD_Gerentes</group>
         <role>CSBD_Generico</role>
     </sharedTo>
 </ListView>

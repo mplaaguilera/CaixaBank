@@ -4,29 +4,14 @@
 		casos3nApex.setParam('sinCache', sinCache);
 		casos3nApex.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
-				const casos = response.getReturnValue();
-				const casos3nApex = component.get('c.casos3n');
-				casos3nApex.setParam('sinCache', sinCache);
-				casos3nApex.setCallback(this, response => {
-					if (response.getState() === 'SUCCESS') {
-						const casos3nApex = component.get('c.casos3n');
-						casos3nApex.setParam('sinCache', sinCache);
-						casos3nApex.setCallback(this, response => {
-							if (response.getState() === 'SUCCESS') {
-								const casos = response.getReturnValue();
-								const utilityBarApi = component.find('utilityBarApi');
-								utilityBarApi.setUtilityLabel({label: 'Casos 3N' + (casos.length ? ': ' + casos.length : '')});
-								if (component.get('v.esAdmin')) {
-									utilityBarApi.setUtilityHighlighted({highlighted: component.get('v.resaltar') && Boolean(casos.length)});
-								}
-								component.set('v.casos', casos);
-								component.set('v.fechaActualizacion', $A.localizationService.formatDateTime(new Date(), 'H:mm'));
-							}
-						});
-						$A.enqueueAction(casos3nApex);
-					}
-				});
-				$A.enqueueAction(casos3nApex);
+				const casos = response.getReturnValue().casos3n;
+				const utilityBarApi = component.find('utilityBarApi');
+				utilityBarApi.setUtilityLabel({label: 'Casos 3N' + (casos.length ? ': ' + casos.length : '')});
+				if (component.get('v.esAdmin')) {
+					utilityBarApi.setUtilityHighlighted({highlighted: component.get('v.resaltar') && Boolean(casos.length)});
+				}
+				component.set('v.casos', casos);
+				component.set('v.fechaActualizacion', $A.localizationService.formatDateTime(new Date(), 'H:mm'));
 			}
 		});
 		$A.enqueueAction(casos3nApex);
@@ -42,5 +27,17 @@
 		navEvent.fire();
 
 		component.find('utilityBarApi').minimizeUtility();
-	}
+	},
+
+	navigateToRecord: function(recordId) {
+		const navEvent = $A.get('e.force:navigateToSObject');
+		navEvent.setParams({recordId, slideDevName: 'detail'});
+		navEvent.fire();
+	},
+
+	toast: function(type, title, message) {
+		let toastEvent = $A.get('e.force:showToast');
+		toastEvent.setParams({type, title, message, mode: 'sticky'});
+		toastEvent.fire();
+	},
 });

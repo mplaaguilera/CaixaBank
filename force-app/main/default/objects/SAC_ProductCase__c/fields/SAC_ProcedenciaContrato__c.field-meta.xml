@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ProcedenciaContrato__c</fullName>
+    <description>Picklist con las posibles entidades de origen del contrato</description>
+    <label>Procedencia del contrato</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Caixa de Girona</fullName>
+                <default>false</default>
+                <label>Caixa de Girona</label>
+            </value>
+            <value>
+                <fullName>Bankpime</fullName>
+                <default>false</default>
+                <label>Bankpime</label>
+            </value>
+            <value>
+                <fullName>Banca Cívica</fullName>
+                <default>false</default>
+                <label>Banca Cívica</label>
+            </value>
+            <value>
+                <fullName>Banco de Valencia</fullName>
+                <default>false</default>
+                <label>Banco de Valencia</label>
+            </value>
+            <value>
+                <fullName>Barclays Bank SAU</fullName>
+                <default>false</default>
+                <label>Barclays Bank SAU</label>
+            </value>
+            <value>
+                <fullName>BPI</fullName>
+                <default>false</default>
+                <label>BPI</label>
+            </value>
+            <value>
+                <fullName>Bankia</fullName>
+                <default>false</default>
+                <label>Bankia</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

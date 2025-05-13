@@ -30,6 +30,11 @@
                 <label>CSI_Bankia</label>
             </value>
             <value>
+                <fullName>GRR</fullName>
+                <default>false</default>
+                <label>GRR</label>
+            </value>
+            <value>
                 <fullName>HDT</fullName>
                 <default>false</default>
                 <label>HDT</label>

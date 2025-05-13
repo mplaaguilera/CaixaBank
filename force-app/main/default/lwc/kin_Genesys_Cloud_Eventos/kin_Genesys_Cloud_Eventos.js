@@ -1,4 +1,3 @@
-/*eslint-disable @lwc/lwc/no-async-await, no-extra-parens */
 import {LightningElement, wire, track} from 'lwc';
 import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
 import {MessageContext, publish, subscribe, unsubscribe} from 'lightning/messageService';
@@ -119,7 +118,7 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 		//await this.logEvento(message, nombreMetodoApex);
 		await this.logHistorial( //Se registra el evento recibido en el historial
 			'evento', null, JSON.stringify(message, null, 3), {category: message.category, type: message.type},
-			(nombreMetodoApex ? {name: nombreMetodoApex, inbound: null} : null)
+			nombreMetodoApex ? {name: nombreMetodoApex, inbound: null} : null
 		);
 		if (nombreMetodoApex) {
 			try {

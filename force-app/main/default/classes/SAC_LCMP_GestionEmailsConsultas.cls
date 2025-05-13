@@ -20,7 +20,7 @@ public with sharing class SAC_LCMP_GestionEmailsConsultas {
 
         CC_Grupo_Colaborador__c grupo = [SELECT Id, SAC_Email__c, SAC_Email2__c, SAC_Email3__c, SAC_DeveloperName__c, SAC_PlantillaInteraccionId__c FROM CC_Grupo_Colaborador__c WHERE Id =: interaccion.SAC_GrupoColaborador__c];  //Obtener el para del email
 
-        Case reclamacion = [SELECT Id, Origin, OS_Email__c, SAC_DireccionPostal__c, CC_Canal_Respuesta__c, SuppliedEmail, Account.CC_Email__c, RecordTypeId,
+        List<Case> reclamacionList = [SELECT Id, Origin, OS_Email__c, SAC_DireccionPostal__c, CC_Canal_Respuesta__c, SuppliedEmail, Account.CC_Email__c, RecordTypeId,
                              Status, CaseNumber, RecordType.Name, AccountId, CC_Idioma__c, Account.RecordTypeId, SAC_Reclamacion__c, SAC_Reclamacion__r.CC_Canal_Respuesta__c
                                 FROM Case WHERE RecordTypeId =: RECTYPERECLAMACION AND Id =: interaccion.SAC_Reclamacion__c];
 
@@ -85,7 +85,11 @@ public with sharing class SAC_LCMP_GestionEmailsConsultas {
             para = para + ';' +  grupo.SAC_Email3__c;
         }
 
-        WrappedInfo result = new WrappedInfo(para, renderStored.getSubject(),  renderStored.getHtmlBody(),'', interaccion, reclamacion, noEsOficina);
+        WrappedInfo result;
+        
+        if(!reclamacionList.isEmpty()){
+            result= new WrappedInfo(para, renderStored.getSubject(),  renderStored.getHtmlBody(),'', interaccion, reclamacionList[0], noEsOficina);
+        }
 
          
         //System.debug(result);

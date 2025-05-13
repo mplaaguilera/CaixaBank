@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Opportunity_Facilitea_Listview</fullName>
+    <columns>OPPORTUNITY.CREATED_DATE</columns>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>OPPORTUNITY.STAGE_NAME</columns>
+    <columns>CSBD_Producto__c</columns>
+    <columns>CORE.USERS.FULL_NAME</columns>
+    <columns>OPPORTUNITY.LAST_UPDATE</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>OPPORTUNITY.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Opportunity.CSBD_Accion_Comercial,Opportunity.CSBD_CMB,Opportunity.CSBD_CMN,Opportunity.CSBD_Chat,Opportunity.CSBD_Desistimiento,Opportunity.CSBD_DesistimientoPAI,Opportunity.CSBD_Hipoteca,Opportunity.CSBD_Llamada_Servicio,Opportunity.CSBD_MAC,Opportunity.CSBD_PROAutomatica,Opportunity.CSBD_Prestamo,Opportunity.CSBD_Renting,Opportunity.CSBD_TPV,Opportunity.CSBD_Compra_Estrella</value>
+    </filters>
+    <filters>
+        <field>OPPORTUNITY.CREATED_DATE</field>
+        <operation>equals</operation>
+        <value>LAST_N_DAYS:30</value>
+    </filters>
+    <label>CSBD: Búsquedas en Facilitea Casa</label>
+    <sharedTo>
+        <group>CSBD_Desarrollo</group>
+        <group>CSBD_Empleados</group>
+    </sharedTo>
+</ListView>

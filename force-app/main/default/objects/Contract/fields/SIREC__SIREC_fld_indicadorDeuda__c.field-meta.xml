@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SIREC__SIREC_fld_indicadorDeuda__c</fullName>
     <deprecated>false</deprecated>
+    <description>Indicador deuda contrato ( S o N )</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Indicador deuda</label>

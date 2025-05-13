@@ -4,6 +4,7 @@
     <encryptionScheme>None</encryptionScheme>
     <label>URL evento completo</label>
     <required>false</required>
+    <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Url</type>
 </CustomField>

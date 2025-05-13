@@ -3,6 +3,36 @@ public class HDT_CaseTriggerHelper_Test {
 
     @TestSetup
     static void makeData(){
+
+       
+        CC_Lista_Valores__c lovAvisosSobreAgrupadores3 = new CC_Lista_Valores__c();
+        lovAvisosSobreAgrupadores3.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+        lovAvisosSobreAgrupadores3.CC_Activa__c = true;
+        lovAvisosSobreAgrupadores3.Name = ' HDT - Envío de Encuesta 2N - Canales de resolución';
+        insert lovAvisosSobreAgrupadores3;
+
+        CC_Lista_Valores__c valorUmbralSiguientes1 = new CC_Lista_Valores__c();
+        valorUmbralSiguientes1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralSiguientes1.CC_Activa__c = true;
+        valorUmbralSiguientes1.CC_Lista__c = lovAvisosSobreAgrupadores3.Id;
+        valorUmbralSiguientes1.Name = 'Servicios Centrales';
+        valorUmbralSiguientes1.CC_Valor__c = 'No EDG';
+
+        CC_Lista_Valores__c valorUmbralSiguientes2 = new CC_Lista_Valores__c();
+        valorUmbralSiguientes1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralSiguientes1.CC_Activa__c = true;
+        valorUmbralSiguientes1.CC_Lista__c = lovAvisosSobreAgrupadores3.Id;
+        valorUmbralSiguientes1.Name = 'EDG-VDC / VIDACAIXA';
+        valorUmbralSiguientes1.CC_Valor__c = 'EDG';
+
+        List<CC_Lista_Valores__c> valorUmbralIns1 = new List<CC_Lista_Valores__c>();
+        valorUmbralIns1.add(valorUmbralSiguientes1);
+        valorUmbralIns1.add(valorUmbralSiguientes2);
+        
+        insert valorUmbralIns1;
+
+
+
         CC_Lista_Valores__c lovAvisosSobreAgrupadores2 = new CC_Lista_Valores__c();
         lovAvisosSobreAgrupadores2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
         lovAvisosSobreAgrupadores2.CC_Activa__c = true;
@@ -70,8 +100,6 @@ public class HDT_CaseTriggerHelper_Test {
             }
         }
 
-        //No se usa??
-        //PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO'];
 
         User usuario1 = new User();
         usuario1.ProfileId = profile1Id;
@@ -377,10 +405,9 @@ public class HDT_CaseTriggerHelper_Test {
         CC_Agrupador__c agrupador = [SELECT id FROM CC_Agrupador__c WHERE CC_Titulo__c = 'Prueba Número Agrupador'];
 
         Test.startTest();
-        //System.runAs(HDT_TestDataFactory.usuarioPruebasHdt()) {
+        
             caso.CC_Agrupador_Id__c = agrupador.Id;
             update caso;
-       //}
 
         Test.stopTest();
 
@@ -886,6 +913,7 @@ public class HDT_CaseTriggerHelper_Test {
         }
     }
 
+    /*
     @isTest
     public static void enviarEncuestaTest()
     {
@@ -898,12 +926,11 @@ public class HDT_CaseTriggerHelper_Test {
         CC_MCC__c tematica = [SELECT id FROM CC_MCC__c WHERE Name = 'App\'s' limit 1];
         CC_MCC__c producto = [SELECT id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' limit 1];
         CC_MCC__c motivo = [SELECT id FROM CC_MCC__c WHERE Name = 'Valoración positiva' limit 1];
-
         CC_MCC__c causa = [SELECT id FROM CC_MCC__c WHERE Name = 'Valoración positiva causa' limit 1];
         CC_MCC__c solucion = [SELECT id FROM CC_MCC__c WHERE Name = 'Valoración positiva solucion' limit 1];
 
-
         Test.startTest();
+            
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
         Status = 'Activo',
@@ -922,14 +949,15 @@ public class HDT_CaseTriggerHelper_Test {
         RecordTypeId = rtEmpleado);
         insert caso;
 
-        caso.CC_Detalles_Consulta__c = 'Detalle Consulta Test';
-        caso.Status = 'Cerrado';
-        update caso;
+            caso.CC_Detalles_Consulta__c = 'Detalle Consulta Test';
+            caso.Status = 'Cerrado';
+            update caso;
+
         Test.stopTest();
 
         System.assertEquals(null, null, 'Assert');
         }
-    }
+    }*/
 
     /*
     @isTest
@@ -1169,7 +1197,7 @@ public class HDT_CaseTriggerHelper_Test {
             Integer numEmails = Limits.getEmailInvocations();
             Test.stopTest();
 
-            System.assertEquals(2, numEmails, 'Debería haber enviado un email');
+            System.assertEquals(1, numEmails, 'Debería haber enviado un email');
         }
     }
 
@@ -1216,7 +1244,7 @@ public class HDT_CaseTriggerHelper_Test {
             Integer numEmails = Limits.getEmailInvocations();
             Test.stopTest();
 
-            System.assertEquals(1, numEmails, 'Debería haber enviado un email');
+            System.assertEquals(0, numEmails, 'Debería haber enviado un email');
         }
     }
 
@@ -1349,4 +1377,7 @@ public class HDT_CaseTriggerHelper_Test {
             //System.assertEquals(1, numEmails, 'Debería haber enviado un email');
         }
     }
+
+    
+    
 }

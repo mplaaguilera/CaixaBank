@@ -296,10 +296,11 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void testCcCaseModificarAccountIdentificarClienteAlfExtensionBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCliente = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
 
         Account cuenta = [SELECT Id, PersonContactId, CC_OficinaGestoraId__c FROM Account WHERE RecordType.DeveloperName = 'CC_ClientePA'];
         cuenta.CC_NumPerso__c = '12';
+        cuenta.CC_Email__c = 'test@test.com';
         cuenta.CC_Numero_Documento__c = '45655665P';
         update cuenta;
         
@@ -323,7 +324,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
             case casoActualizado = [SELECT Id, ContactId,CC_MailTelfNotif__c,CC_Numero_Documento__c,CC_DAN__c,CC_DG__c FROM Case WHERE subject = 'pruebaAccount'];
             
             
-            System.AssertEquals(casoActualizado.CC_MailTelfNotif__c, cuenta.CC_NumPerso__c,'El numero de telefono no coinide' );
+            System.AssertEquals(casoActualizado.CC_MailTelfNotif__c, cuenta.CC_Email__c,'El numero de telefono no coinide' );
             System.AssertEquals(casoActualizado.CC_Numero_Documento__c, cuenta.CC_Numero_Documento__c,'Los numeros del DNI no coinciden' );
         }
    	}
@@ -336,10 +337,11 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void testCcCaseModificarAccountIdentificarClienteAlfBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCliente = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
 
         Account cuenta = [SELECT Id, PersonContactId, CC_OficinaGestoraId__c,CC_NumPerso__c,CC_Numero_Documento__c FROM Account WHERE RecordType.DeveloperName = 'CC_ClientePA'];
         cuenta.CC_NumPerso__c = '12';
+        cuenta.CC_Email__c = 'test@test.com';
         cuenta.CC_Numero_Documento__c = '45655665P';
         update cuenta;
 
@@ -371,7 +373,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
             
             case casoActualizado = [SELECT Id, ContactId,CC_MailTelfNotif__c,CC_Numero_Documento__c,CC_NumPerso__c FROM Case WHERE subject = 'pruebaAccount'];
 
-            System.AssertEquals(casoActualizado.CC_MailTelfNotif__c, cuenta.CC_NumPerso__c,'El numero de telefono no coinide' );
+            System.AssertEquals(casoActualizado.CC_MailTelfNotif__c, cuenta.CC_Email__c,'El numero de telefono no coinide' );
             System.AssertEquals(casoActualizado.CC_Numero_Documento__c, cuenta.CC_Numero_Documento__c,'Los numeros del DNI no coinciden' );
         }
    	}
@@ -383,10 +385,11 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void testCc_Case_Modificar_AccountIdentificarCambioClienteAlfBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCliente = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
 
-        Account cuenta = [SELECT Id, PersonContactId, CC_OficinaGestoraId__c,CC_NumPerso__c,CC_Numero_Documento__c FROM Account WHERE RecordType.DeveloperName = 'CC_ClientePA'];
+        Account cuenta = [SELECT Id, PersonContactId, CC_Email__c, CC_OficinaGestoraId__c,CC_NumPerso__c,CC_Numero_Documento__c FROM Account WHERE RecordType.DeveloperName = 'CC_ClientePA'];
         cuenta.CC_NumPerso__c = '12';
+        cuenta.CC_Email__c = 'test@test.com';
         cuenta.CC_Numero_Documento__c = '45655665P';
         update cuenta;
 
@@ -417,7 +420,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
             
             case casoActualizado = [SELECT Id, ContactId,CC_MailTelfNotif__c,CC_Numero_Documento__c,CC_NumPerso__c FROM Case WHERE subject = 'pruebaAccount'];
 
-            System.AssertEquals(casoActualizado.CC_MailTelfNotif__c, cuenta.CC_NumPerso__c,'El numero de telefono no coinide' );
+            System.AssertEquals(casoActualizado.CC_MailTelfNotif__c, cuenta.CC_Email__c,'El numero de telefono no coinide' );
             System.AssertEquals(casoActualizado.CC_Numero_Documento__c, cuenta.CC_Numero_Documento__c,'Los numeros del DNI no coinciden' );
             System.AssertEquals(casoActualizado.CC_NumPerso__c, cuenta.CC_Numero_Documento__c,'Los numeros del DNI no coinciden' );
         }
@@ -476,25 +479,23 @@ public with sharing class OS_CaseTriggerHelper_Test {
     public static void creacionCasoBI(){
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtEmpleado = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' limit 1];
-        Contact contacto = [SELECT id FROM Contact WHERE AccountId = :empleado.Id limit 1];
 
         System.runAs (usuarioOperador) {
             Case caso = new Case();
-            caso.AccountId = empleado.Id;
-            caso.ContactId = contacto.Id;
-            caso.Status = 'Activo';
-            caso.CC_Idioma__c = 'es';
-            caso.Subject = 'Prueba';
-            caso.CC_Tipo_Cliente__c = 'Cliente';
-            caso.Origin = 'Email';
-            caso.Description = 'Prueba Oliver2';
-            caso.CC_Detalles_Consulta__c = 'prueba oliver2';
-            caso.CC_Detalles_Solucion__c = 'prueba oliver2';
-            caso.CC_Tipo_Contacto__c ='Otros';
+            caso.Origin = 'Agenda de Riesgos';
             caso.CC_Canal_Procedencia__c = 'Buzón CCI Holabank';
+            caso.CC_Tipo_Contacto__c = 'Otros';
             caso.RecordTypeId = rtEmpleado;
+            caso.CC_MailTelfNotif__c = 'mailnotif@mail.com';
+            caso.CC_Numero_Documento__c = '45655665P';
+            caso.CC_NumPerso__c = '12';
+            caso.Subject = 'pruebaAccount';
+            caso.AccountId = empleado.Id;
+            caso.Description = 'Prueba Oliver1';
+            caso.CC_Detalles_Consulta__c = 'prueba oliver1';
+            caso.CC_Detalles_Solucion__c = 'prueba oliver1';
 
             Test.startTest();
             insert caso;

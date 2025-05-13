@@ -34,7 +34,7 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         User supervisor = SEG_Usuarios.usuarioSupervisor();
 
         CC_Grupo_Colaborador__c grupoOperativo = new CC_Grupo_Colaborador__c();
-        grupoOperativo.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo.Name = 'Grupo operativo Test';
         insert grupoOperativo;
         
@@ -49,7 +49,7 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         insert acc;
 
         Contact gestor = new Contact();
-        gestor.recordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+        gestor.recordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
         gestor.Email = 'colaborador@gmail.com';
         gestor.FirstName = 'Trevor';
         gestor.LastName = 'Smart';
@@ -89,12 +89,12 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         insert usuarioSegBo;
 
         CC_Grupo_Colaborador__c grupoOperativo1 = new CC_Grupo_Colaborador__c();
-        grupoOperativo1.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo1.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo1.Name = 'Grupo operativo Test 1';
         insert grupoOperativo1;
 
         CC_Grupo_Colaborador__c grupoOperativo2 = new CC_Grupo_Colaborador__c();
-        grupoOperativo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo2.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo2.Name = 'Grupo operativo Test 2';
         insert grupoOperativo2;
 
@@ -175,12 +175,12 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         insert usuarioSegBo;
 
         CC_Grupo_Colaborador__c grupoOperativo1 = new CC_Grupo_Colaborador__c();
-        grupoOperativo1.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo1.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo1.Name = 'Grupo operativo Test 1';
         insert grupoOperativo1;
 
         CC_Grupo_Colaborador__c grupoOperativo2 = new CC_Grupo_Colaborador__c();
-        grupoOperativo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo2.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo2.Name = 'Grupo operativo Test 2';
         insert grupoOperativo2;
 
@@ -243,12 +243,12 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         insert usuarioSegBo;
 
         CC_Grupo_Colaborador__c grupoOperativo1 = new CC_Grupo_Colaborador__c();
-        grupoOperativo1.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo1.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo1.Name = 'Grupo operativo Test 1';
         insert grupoOperativo1;
 
         CC_Grupo_Colaborador__c grupoOperativo2 = new CC_Grupo_Colaborador__c();
-        grupoOperativo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo2.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo2.Name = 'Grupo operativo Test 2';
         insert grupoOperativo2;
 
@@ -310,12 +310,12 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         insert usuarioSegBo;
 
         CC_Grupo_Colaborador__c grupoOperativo1 = new CC_Grupo_Colaborador__c();
-        grupoOperativo1.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo1.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo1.Name = 'Grupo operativo Test 1';
         insert grupoOperativo1;
 
         CC_Grupo_Colaborador__c grupoOperativo2 = new CC_Grupo_Colaborador__c();
-        grupoOperativo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo2.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo2.Name = 'Grupo operativo Test 2';
         insert grupoOperativo2;
 
@@ -377,12 +377,12 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         insert usuarioSegBo;
 
         CC_Grupo_Colaborador__c grupoOperativo1 = new CC_Grupo_Colaborador__c();
-        grupoOperativo1.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo1.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo1.Name = 'Grupo operativo Test 1';
         insert grupoOperativo1;
 
         CC_Grupo_Colaborador__c grupoOperativo2 = new CC_Grupo_Colaborador__c();
-        grupoOperativo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo2.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo2.Name = 'Grupo operativo Test 2';
         insert grupoOperativo2;
 
@@ -444,12 +444,12 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         insert usuarioSegBo;
 
         CC_Grupo_Colaborador__c grupoOperativo1 = new CC_Grupo_Colaborador__c();
-        grupoOperativo1.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo1.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo1.Name = 'Grupo operativo Test 1';
         insert grupoOperativo1;
 
         CC_Grupo_Colaborador__c grupoOperativo2 = new CC_Grupo_Colaborador__c();
-        grupoOperativo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo2.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo2.Name = 'Grupo operativo Test 2';
         insert grupoOperativo2;
 
@@ -511,12 +511,12 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         insert usuarioSegBo;
 
         CC_Grupo_Colaborador__c grupoOperativo1 = new CC_Grupo_Colaborador__c();
-        grupoOperativo1.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo1.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo1.Name = 'Grupo operativo Test 1';
         insert grupoOperativo1;
 
         CC_Grupo_Colaborador__c grupoOperativo2 = new CC_Grupo_Colaborador__c();
-        grupoOperativo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        grupoOperativo2.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         grupoOperativo2.Name = 'Grupo operativo Test 2';
         insert grupoOperativo2;
 
@@ -561,9 +561,11 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
 
     @isTest
     public static void definicionCamposCase() {
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE email = 'testSEGBI2@acme.com' LIMIT 1];
+
         User supervisor = SEG_Usuarios.usuarioSupervisor();
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
-            Test.startTest();
+        Test.startTest();
+        System.runAs(usuarioTest) { 
             List<SEG_Casos_Por_Grupo.Campo> definicionCamposCase = SEG_Casos_Por_Grupo.definicionCamposCase(); 
             Test.stopTest();
 
@@ -586,6 +588,8 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
 
     @isTest
     public static void tomarPropiedad() {
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE email = 'testSEGBI2@acme.com' LIMIT 1];
+
         User supervisor = SEG_Usuarios.usuarioSupervisor();
 
         User usuarioSegBo = new User();
@@ -634,19 +638,21 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
 
         List<Id> idCasos = new List<Id>{caso1.Id, caso2.Id};
 
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
-            Test.startTest();
+        Test.startTest();
+        System.runAs(usuarioTest) { 
             SEG_Casos_Por_Grupo.tomarPropiedad(idCasos);
             Test.stopTest();
 
             Map<Id, Case> casos = new Map<Id, Case>([SELECT OwnerId FROM Case WHERE Id IN :idCasos]);
-            System.assertEquals(UserInfo.getUserId(), casos.get(caso1.Id).OwnerId, 'No se ha tomado la propiedad del caso 1');
-            System.assertEquals(UserInfo.getUserId(), casos.get(caso2.Id).OwnerId, 'No se ha tomado la propiedad del caso 2');
+            System.assertEquals(usuarioTest.Id, casos.get(caso1.Id).OwnerId, 'No se ha tomado la propiedad del caso 1');
+            System.assertEquals(usuarioTest.Id, casos.get(caso2.Id).OwnerId, 'No se ha tomado la propiedad del caso 2');
         }
     }
 
     @isTest
     public static void rechazar() {
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE email = 'testSEGBI2@acme.com' LIMIT 1];
+
         User supervisor = SEG_Usuarios.usuarioSupervisor();
 
         SEG_ClasificacionRapida__c cr = new SEG_ClasificacionRapida__c();
@@ -671,8 +677,8 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
 
         List<Id> idCasos = new List<Id>{caso1.Id, caso2.Id};
 
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
-            Test.startTest(); 
+        Test.startTest();
+        System.runAs(usuarioTest) { 
             SEG_Casos_Por_Grupo.rechazar(idCasos);
             Test.stopTest();
 
@@ -714,6 +720,8 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
     
     @isTest
     public static void cambiarPropietarioMasivo(){
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE email = 'testSEGBI2@acme.com' LIMIT 1];
+
         User supervisor = SEG_Usuarios.usuarioSupervisor();
 
         List<Id> casos = new List<Id>();
@@ -739,8 +747,8 @@ public with sharing class SEG_Casos_Por_Grupo_Test{
         usuarioSegBo.isActive = true;       
         insert usuarioSegBo;
         
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
-            Test.startTest();
+        Test.startTest();
+        System.runAs(usuarioTest) { 
                 SEG_Casos_Por_Grupo.cambiarPropietarioMasivo(casos,usuarioSegBo.id);
             Test.stopTest();
             

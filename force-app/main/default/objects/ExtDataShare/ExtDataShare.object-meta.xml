@@ -74,18 +74,26 @@
     <enableFeeds>false</enableFeeds>
     <externalSharingModel>ReadWrite</externalSharingModel>
     <searchLayouts>
+        <customTabListAdditionalFields>DataSpace</customTabListAdditionalFields>
         <customTabListAdditionalFields>DataShareStatus</customTabListAdditionalFields>
         <customTabListAdditionalFields>ObjectCount</customTabListAdditionalFields>
         <customTabListAdditionalFields>CreatedDate</customTabListAdditionalFields>
+        <customTabListAdditionalFields>DataShareType</customTabListAdditionalFields>
+        <lookupDialogsAdditionalFields>DataSpace</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>DataShareStatus</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>ObjectCount</lookupDialogsAdditionalFields>
         <lookupDialogsAdditionalFields>CreatedDate</lookupDialogsAdditionalFields>
+        <lookupDialogsAdditionalFields>DataShareType</lookupDialogsAdditionalFields>
+        <lookupPhoneDialogsAdditionalFields>DataSpace</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>DataShareStatus</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>ObjectCount</lookupPhoneDialogsAdditionalFields>
         <lookupPhoneDialogsAdditionalFields>CreatedDate</lookupPhoneDialogsAdditionalFields>
+        <lookupPhoneDialogsAdditionalFields>DataShareType</lookupPhoneDialogsAdditionalFields>
+        <searchResultsAdditionalFields>DataSpace</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>DataShareStatus</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>ObjectCount</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>CreatedDate</searchResultsAdditionalFields>
+        <searchResultsAdditionalFields>DataShareType</searchResultsAdditionalFields>
     </searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
 </CustomObject>

@@ -14,7 +14,8 @@
     </div>
     <script>
       var getIDs= '{!updateIds}';
-
+	    var tiposDistintos= '{!distintosRT}';
+      var tipo = '{!tipoCaso}';
       // Para que se muestren los toast del componente sac_RechazarReclamacionMasiva
       document.addEventListener('lightning__showtoast', event => {
         sforce.one.showToast(event.toastAttributes);
@@ -27,12 +28,19 @@
           "type":"warning"
         })
        window.history.back();
+    }else if(tiposDistintos == 'true'){
+        sforce.one.showToast({
+          "title":"Aviso",
+          "message":"No se pueden seleccionar reclamaciones y consultas al mismo tiempo",
+          "type":"warning"
+        })
+       window.history.back();
       }else{
         if (getIDs.split(',').length > 0){
           setTimeout(function(){ document.getElementById('spinner').className += ' slds-hide' }, 6000);
           $Lightning.use("c:SAC_RechazarReclamacionMasivaApp", function() {
             $Lightning.createComponent("c:sac_RechazarReclamacionMasiva",
-              { casos : getIDs },
+              { casos : getIDs, tipoCaso: tipo },
               "lwc-container",
               function(cmp) {
                 

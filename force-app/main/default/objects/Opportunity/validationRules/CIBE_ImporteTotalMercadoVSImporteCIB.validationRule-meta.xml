@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_ImporteTotalMercadoVSImporteCIB</fullName>
+    <active>false</active>
+    <description>El valor &quot;Importe total en mercado&quot; no puede ser superior al campo &quot;Importe&quot;.</description>
+    <errorConditionFormula>AND(
+NOT($Permission.CIBE_BypassValidationRules),
+!$Permission.CBK_BypassValidationRules,
+NOT($Permission.AV_AvoidBulkApi),
+    OR(
+        RecordType.DeveloperName = &quot;CIBE_AccionComercialCIB&quot;,
+        RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoCIB&quot;,
+        RecordType.DeveloperName = &quot;CIBE_AlertaComercialCIB&quot;,
+        RecordType.DeveloperName = &quot;CIBE_SugerenciaCIB&quot;
+    ),
+    CIBE_OperationTotalAmount__c &gt; Amount
+)</errorConditionFormula>
+    <errorMessage>The total market amount cannot be greater than the Opportunity amount field.</errorMessage>
+</ValidationRule>

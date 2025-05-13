@@ -59,11 +59,8 @@
 }
 
 @keyframes cc_fade_in {
-    from {opacity: 0;}
-    to {opacity: 1;}
-
-    from {z-index: 9999;}
-    to {z-index: 9999;}
+    from {opacity: 0;} to {opacity: 1;}
+    from {z-index: 9999;} to {z-index: 9999;}
 }
 
 .THIS .slds-spinner_container {
@@ -101,4 +98,12 @@
 
 .THIS .resultadoTexto {
     font-weight: 500;
+}
+
+.THIS .slds-button:focus {
+    box-shadow: none;
+}
+
+.THIS .slds-button:active {
+    border-color: transparent;
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_DISCOUNTAPR__c</fullName>
+    <description>Campo que almacena el TAE de cuota fija por bonificación</description>
     <label>TAE cuota fija bonif.</label>
     <precision>12</precision>
     <required>false</required>

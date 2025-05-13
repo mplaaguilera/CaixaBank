@@ -1,0 +1,20 @@
+<template>
+
+	<span class="slds-pill slds-pill_link">
+
+		<span class="slds-pill__icon_container">
+			<lightning-icon icon-name={iconName} size="small" class="pillIconClass"></lightning-icon>
+		</span>
+
+		<span class="slds-pill__action slds-theme_alert-texture" style={pillActionStyle}>
+			<span class="slds-pill__label">{label}</span>
+		</span>
+
+		<!-- sldsValidatorIgnoreNextLine -->
+		<button lwc:if={botonCerrar} class="slds-button slds-button_icon slds-button_icon slds-pill__remove">
+			<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+		</button>
+
+	</span>
+
+</template>

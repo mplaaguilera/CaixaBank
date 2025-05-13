@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_LabelMuro__c</fullName>
+    <description>etiqueta muro</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Label Muro</label>

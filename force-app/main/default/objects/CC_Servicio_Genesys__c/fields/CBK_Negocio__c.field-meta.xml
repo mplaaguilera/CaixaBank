@@ -30,6 +30,11 @@
                 <default>false</default>
                 <label>HDT</label>
             </value>
+            <value>
+                <fullName>CAM</fullName>
+                <default>false</default>
+                <label>CAM</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

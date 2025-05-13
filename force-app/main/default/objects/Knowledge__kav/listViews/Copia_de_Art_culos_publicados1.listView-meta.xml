@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Copia_de_Art_culos_publicados1</fullName>
-    <booleanFilter>1 AND (2 OR 3 OR 4 OR 5 OR 6 OR 7)</booleanFilter>
     <columns>LAST_PUBLISHED_DATE</columns>
     <columns>CC_Canal_Resolucion__c</columns>
     <columns>ARTICLE_NUMBER</columns>
@@ -15,33 +14,9 @@
         <value>2</value>
     </filters>
     <filters>
-        <field>CC_Canal_Resolucion__c</field>
+        <field>CC_Tipo__c</field>
         <operation>equals</operation>
-        <value>Accionista,Activaciones CaixaCard,All In One,App,Apple Store,Atención al Cliente</value>
+        <value>Cliente</value>
     </filters>
-    <filters>
-        <field>CC_Canal_Resolucion__c</field>
-        <operation>equals</operation>
-        <value>Bloqueos,CaixaBank,CaixaBankNow,Caixa Protect TRF,Cajeros,Centralita,CEOE</value>
-    </filters>
-    <filters>
-        <field>CC_Canal_Resolucion__c</field>
-        <operation>equals</operation>
-        <value>Emisiones PromoCaixa,Formulario web,Google Play,ICO Alquiler,ImaginBank,Junta Andalucia</value>
-    </filters>
-    <filters>
-        <field>CC_Canal_Resolucion__c</field>
-        <operation>equals</operation>
-        <value>M2P Asistencia,M2P Bloqueos,M2P Distribuidores,Microbank,Oficina Preventiva,Omic</value>
-    </filters>
-    <filters>
-        <field>CC_Canal_Resolucion__c</field>
-        <operation>equals</operation>
-        <value>Pago Móvil,Postventa CompraEstrella,Redsys-Sermepa,SMS Transferencias,Soporte PSU,Tarjetas,Telf Comentarios Apps,Web,Valija digital</value>
-    </filters>
-    <filters>
-        <field>CC_Canal_Resolucion__c</field>
-        <operation>equals</operation>
-    </filters>
-    <label>CLIENTES - Artículos publicados 2022</label>
+    <label>CLIENTES - Artículos publicados</label>
 </ListView>

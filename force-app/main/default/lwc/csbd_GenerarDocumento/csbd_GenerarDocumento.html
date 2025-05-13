@@ -1,4 +1,4 @@
-<template> <!--<template lwc:render-mode='light'>-->
+<template>
 
 	<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-top_large slds-var-m-bottom_x-large">
 		<div class="slds-col">
@@ -51,7 +51,11 @@
 									<span>Vista previa desactualizada</span>
 								</span>
 							</template>
-							<c-seg_-Illustration lwc:else tipo="Desert" mensaje="Edita el documento y genera una vista previa."></c-seg_-Illustration>
+
+							<!--Ilustración si no hay vista previa-->
+							<div lwc:else style="width: 89%;">
+								<c-seg_-Illustration tipo="Open Road" mensaje="Edita el documento y genera una vista previa."></c-seg_-Illustration>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -63,13 +67,13 @@
 					</div>
 					<div class="slds-col">
 						<c-csbd_-generar-documento-plantilla
-															 lwc:ref="csbdGenerarDocumentoPlantilla"
-															 carpeta-raiz-developer-name="CSBD_Plantillas_Generar_Documento"
-															 record-id={recordId}
-															 onmodalabierto={modalPlantillasAbierto}
-															 onmodalcerrado={modalPlantillasCerrado}
-															 oneventoaplicar={modalPlantillasSeleccionada}
-															 style="display: inline-block;">
+							lwc:ref="csbdGenerarDocumentoPlantilla"
+							carpeta-raiz-developer-name="CSBD_Plantillas_Generar_Documento"
+							record-id={recordId}
+							onmodalabierto={modalPlantillasAbierto}
+							onmodalcerrado={modalPlantillasCerrado}
+							oneventoaplicar={modalPlantillasSeleccionada}
+							style="display: inline-block;">
 						</c-csbd_-generar-documento-plantilla>
 						<lightning-button class="botonVistaPrevia slds-var-m-left_small" label="Vista previa" icon-name="utility:preview" onclick={botonVistaPreviaOnclick} disabled></lightning-button>
 						<lightning-button class="botonGenerarPdf slds-var-m-left_small" label="Exportar PDF" variant="brand" icon-name="utility:pdf_ext" onclick={exportarPdf} disabled></lightning-button>

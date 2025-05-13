@@ -2,9 +2,10 @@
       <head>
             <style type="text/css" media="print">
                   @page {
-                        margin-top:     3cm;
-                        margin-bottom:    5cm;
-                        margin-left:    3cm;
+                        margin-top:     4.35cm;
+                        /*margin-top:     5.5cm; así estaba con margen superior*/
+                        margin-bottom:    3cm;
+                        margin-left:    3.5cm;
                         margin-right:    2.5cm;
                         line-height: normal;
 
@@ -17,43 +18,51 @@
                               content: element(footer);
                         }
 
-                        background-image: url(/resource/SAC_CartaPlantilla);
-                        background-position: left 100px;
+                        /*background-image: url(/resource/SAC_CartaPlantilla);*/
+                        background-image:url(/resource/{!SAC_DocumentoEnvio__c.SAC_NombrePlantillaLateral__c});
                         background-repeat: no-repeat;
+
                   }
                   div.header {
-                        display: block;
+                        /* display: block; */
+                        /*margin-top:     1.67cm; así estaba con margen superior*/
+                        margin-top:     0cm;
+                        margin-left:    -1cm;
+                        line-height: 0;
                         position: running(header);
                   }
                   div.footer {
-                        display: block;
+                        /* display: block; */
+                        line-height: 0.7;
+                        margin-bottom:    1cm;
                         text-align: justify;
+                        font-family: Arial !important; 
                         position: running(footer);
                   }
+
                   .pagenumber:before {
                         content: counter(page);
                   }
-                  /* div.body{ 
-                        font-family: 'Arial Unicode MS'; } */
+                  div.body { 
+                        font-family: Arial, Helvetica, sans-serif; 
+                  } 
                   .pagecount:before {
                         content: counter(pages);
                   }      
-                  /* p {
-                        margin-bottom: 0;
-                        margin-top: 0;
-                  }             */
+
             </style>
       </head>
-      <div class="header">
+
+      
+
+      <div id="div-0" class="header">
             <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_Header__c}" escape="false" ></apex:outputText>
       </div>
-      <div style="float: right;">
-            
-      </div>
       <div class="footer">
-            <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_Footer__c}" escape="false" ></apex:outputText>
+            <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_Footer__c}"  escape="false" ></apex:outputText>
       </div>
       <div class="body">
             <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_DocPDF__c}" escape="false" ></apex:outputText>
       </div>
+
 </apex:page>

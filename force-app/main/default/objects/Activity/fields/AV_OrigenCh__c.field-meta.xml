@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_OrigenCh__c</fullName>
+    <externalId>false</externalId>
+    <formula>CASE( AV_Chanel__c , 
+&quot;001&quot;,&quot;Now&quot;,
+&quot;002&quot;,&quot;Mis Clientes&quot;,
+&quot;003&quot;,&quot;Meeter&quot;,
+&quot;004&quot;,&quot;Contact Center&quot;,
+&quot;005&quot;,&quot;Noa App&quot;,
+&quot;Now&quot;, &quot;Now Old&quot;,
+&quot;MisClientes&quot;,&quot;MisClientes Old&quot;,
+&quot;Meeter&quot;,&quot;Meeter Old&quot;,
+&quot;ContactCenter&quot;,&quot;Contact Center Old&quot;,
+NULL)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Origen Chanel</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

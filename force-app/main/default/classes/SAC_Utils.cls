@@ -890,9 +890,14 @@ public without sharing class SAC_Utils {
 		String cuerpoEmailParseado = emailBody;
 		try{
 			if (String.isNotBlank(emailBody)) {
-				Pattern patronURLs = Pattern.compile('<img src=\\"https:\\/\\/caixabankcc([a-zA-Z0-9-=?&;%]|\\.|\\\\|:|\\/)+\\">');		
-				Pattern patronURLconDominio = Pattern.compile('<img src="(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/download\\/068[A-Za-z0-9]{12,15}">');
-				Pattern patronURLchatter = Pattern.compile('<img src="https:\\/\\/(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/renditionDownload.{0,200}">');
+				// Pattern patronURLs = Pattern.compile('<img src=\\"https:\\/\\/caixabankcc([a-zA-Z0-9-=?&;%]|\\.|\\\\|:|\\/)+\\">');		
+				Pattern patronURLs = Pattern.compile('<img src=\\"https:\\/\\/caixabankcc([a-zA-Z0-9-=?&;%]|\\.|\\\\|:|\\/)+\\" alt=\\"[^\\"]*\\"\\>');
+
+				// Pattern patronURLconDominio = Pattern.compile('<img src="(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/download\\/068[A-Za-z0-9]{12,15}">');
+				Pattern patronURLconDominio = Pattern.compile('<img src="(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/download\\/068[A-Za-z0-9]{12,15}" alt="[^"]*">');
+
+				// Pattern patronURLchatter = Pattern.compile('<img src="https:\\/\\/(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/renditionDownload.{0,200}">');
+				Pattern patronURLchatter = Pattern.compile('<img src="https:\\/\\/(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/renditionDownload.{0,200}" alt="[^"]*">');
 
 				//Expresión regular para buscar el ID del ContentVersion de la URL.
 				Pattern patronCV = Pattern.compile('\\/068[a-zA-Z0-9]+\\?');
@@ -1006,15 +1011,28 @@ public without sharing class SAC_Utils {
 				//Reemplazar el contenido del email con los links públicos.
 				for (String urlPrivadaCorreo : mapaReemplazoUrls.keySet()) {
 					String ficheroURL;
+					String altURL = '';
 					String nuevaURL;
+
 					if (mapaReemplazoUrls.containsKey(urlPrivadaCorreo)) {
 						ficheroURL = mapaReemplazoUrls.get(urlPrivadaCorreo);
+
+						if(urlPrivadaCorreo.contains('alt')){
+							Integer inicioAlt = urlPrivadaCorreo.indexOf('alt="') + 5;
+							Integer finAlt = urlPrivadaCorreo.indexOf('"', inicioAlt);
+							altURL = urlPrivadaCorreo.substring(inicioAlt, finAlt);
+						}
+						
 					}
 					if (!String.isBlank(ficheroURL) && mapaFilePublicURL.containsKey(ficheroURL)) {
 						nuevaURL = mapaFilePublicURL.get(ficheroURL);
 					}
 					if (!String.isBlank(nuevaURL) && String.isNotBlank(nuevaURL)) {
-						emailBody = emailBody.replace(urlPrivadaCorreo, '<img src="' + nuevaURL + '">');
+						if(altURL != ''){
+							emailBody = emailBody.replace(urlPrivadaCorreo, '<img src="' + nuevaURL + '" alt="' + altURL + '">');
+						}else{
+							emailBody = emailBody.replace(urlPrivadaCorreo, '<img src="' + nuevaURL + '">');
+						}
 					}
 				}
 
@@ -1076,6 +1094,7 @@ public without sharing class SAC_Utils {
 			if (!urlPublica){
 				//Parsear la url privada para encontrar el Identificador del fichero.
 				Matcher matcherCV = patronCV.matcher(urlImagen);
+
 				if (matcherCV.find()) {							
 					String fileId = matcherCV.group();
 					

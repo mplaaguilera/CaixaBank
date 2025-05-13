@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_FrecuenciaAvisosAuto__c</fullName>
+    <defaultValue>15</defaultValue>
+    <description>Frecuencia en minutos de los avisos automáticos (vacío o &quot;0&quot;: avisos desactivados)</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Frecuencia en minutos de los avisos automáticos (vacío o &quot;0&quot;: avisos desactivados)</inlineHelpText>
+    <label>Frecuencia avisos automaticos (min)</label>
+    <precision>2</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

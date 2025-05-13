@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Fecha_Proximo_Lanzamiento__c</fullName>
+    <description>Puntero para mostrar la fecha de lanzamiento más próxima (posterior a la fecha actual)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Próximo Lanzamiento</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_LinkTitular1__c</fullName>
+    <description>Campo que contiene el link del titular</description>
     <externalId>false</externalId>
     <formula>IF(ISBLANK(AV_Lead__c),&quot;&quot;,HYPERLINK(&quot;/&quot; &amp; AV_Lead__c, AV_Lead__r.FirstName + &quot; &quot;+ AV_Lead__r.LastName ,&quot;_self&quot;
 ))</formula>

@@ -183,7 +183,8 @@ public with sharing class SACH_EmailService_Utils {
     public static EmailMessage respuestaTrasladoColaborador(Messaging.InboundEmail email, Id whatIdTarea, String emailDestino) {
         Case caso = [SELECT Status, ContactId, IsClosed FROM Case WHERE Id = :whatIdTarea WITH SECURITY_ENFORCED];
 
-        gestionAdjuntos(email, caso, emailDestino);
+        //Se aplica el método duplicado que devuelve el emailmessage creado para así evitar duplicados
+        EmailMessage crearEmailMessage = gestionAdjuntosEmail(email, caso, emailDestino);
 
         caso.CC_Fecha_Ultima_Interaccion__c = System.now();
         caso.CC_Ultima_Interaccion__c = 'Respuesta de colaborador';
@@ -208,9 +209,9 @@ public with sharing class SACH_EmailService_Utils {
         Set<Id> listaContentVersionId = (Set<Id>)mapaGestionAdjuntos.get('listaContentVersionId');
         
         //Creamos el mail entrante y lo asociamos al caso
-        EmailMessage crearEmailMessage = SACH_EmailMessage.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
+        //EmailMessage crearEmailMessage = SACH_EmailMessage.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
         //Crear content document link
-        crearContentDocumentLink(listaContentVersionId, crearEmailMessage, caso);   
+        //crearContentDocumentLink(listaContentVersionId, crearEmailMessage, caso);   
         
         //Cierre de la actividad de envío del traslado a grupo colaborador
         CC_Activity.finalizarActividadCaso(whatIdTarea, 'Traslado Colaborador', null, null);
@@ -308,7 +309,7 @@ public with sharing class SACH_EmailService_Utils {
             update caso;
         }
 
-        gestionAdjuntos(email, caso, emailDestino);
+        EmailMessage crearEmailMessage = gestionAdjuntosEmail(email, caso, emailDestino);
 
         //Cierre de la actividad de envío del traslado a grupo colaborador
         SACH_Activity.finalizarActividadCaso(whatIdTarea, 'Remitir Colaborador', null, null);
@@ -324,12 +325,12 @@ public with sharing class SACH_EmailService_Utils {
         nuevoHtmlBody = (String)mapaGestionAdjuntos.get('nuevoHtmlBody');
         Set<Id> listaContentVersionId = (Set<Id>)mapaGestionAdjuntos.get('listaContentVersionId');
         //Creamos el mail entrante y lo asociamos al caso
-        EmailMessage crearEmailMessage = SACH_EmailMessage.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
+        // COMENTADO EN BASE A LA INCIDENCIA IN1235133 EmailMessage crearEmailMessage = SACH_EmailMessage.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
         //Crear content document link
-        crearContentDocumentLink(listaContentVersionId, crearEmailMessage, caso);
+        // COMENTADO EN BASE A LA INCIDENCIA IN1235133 crearContentDocumentLink(listaContentVersionId, crearEmailMessage, caso);
         return crearEmailMessage;
     }
-
+    
     public static EmailMessage respuestaGenerica(Messaging.InboundEmail email, Id whatIdTarea, String emailDestino, Task tareaOrigen) {
         //Encontramos caso según whatId de la tareaskf
         Case caso = [SELECT ContactId, Status, CC_Canal_Procedencia__c FROM Case WHERE Id = :whatIdTarea WITH SECURITY_ENFORCED];
@@ -355,6 +356,141 @@ public with sharing class SACH_EmailService_Utils {
         //Crear content document link
         crearContentDocumentLink(listaContentVersionId, crearEmailMessage, caso); 
         return crearEmailMessage;
+    }
+
+    
+    public static EmailMessage gestionAdjuntosEmail(Messaging.InboundEmail email, Case caso, String emailDestino) {
+
+        String htmlBody = '';
+        if (String.isNotBlank(email.htmlBody)) {
+            htmlBody = email.htmlBody.left(32000);
+        }
+
+        //Adjuntos del email se convierten en Files asociados al caso
+        List<Id> listaContentVersionIdEmail = new List<Id>();
+        List<ContentVersion> lstContentVersion = new List<ContentVersion>();
+        List<ContentDocumentLink> lstConentDocument = new List<ContentDocumentLink>();
+        Set<Id> setIdContent = new Set<Id>();
+
+        if (email.textAttachments != null) {
+            for (Messaging.Inboundemail.TextAttachment tAttachment : email.textAttachments) {
+                ContentVersion contentVersion = new ContentVersion();
+                contentVersion.ContentLocation = 'S';
+                contentVersion.PathOnClient = tAttachment.fileName;
+                contentVersion.Origin = 'H';
+                contentVersion.Title = tAttachment.fileName;
+                contentVersion.VersionData = Blob.valueOf(tAttachment.body);
+                lstContentVersion.add(contentVersion);
+            }
+        }
+
+        if(!lstContentVersion.isEmpty()){
+            if (Schema.sObjectType.ContentVersion.fields.Title.isCreateable()) {
+                List<Database.SaveResult> resultadosInsertados = CBK_DMLUtility.insertRecords(lstContentVersion, false);
+            }
+            
+
+            for(ContentVersion contentVersion :lstContentVersion){
+                setIdContent.add(contentVersion.Id);
+                listaContentVersionIdEmail.add(contentVersion.Id);//Aquí
+            }
+
+            if(!setIdContent.isEmpty()){
+                List<ContentVersion> listContent = [SELECT ContentDocumentId FROM ContentVersion WHERE Id in :setIdContent WITH SECURITY_ENFORCED];
+                for(ContentVersion contentVer  : listContent){
+                    ContentDocumentLink contentDocument = new ContentDocumentLink(LinkedEntityId = caso.Id, ContentDocumentId = contentVer.ContentDocumentId, ShareType = 'I');
+                    lstConentDocument.add(contentDocument);
+                }
+            }
+        }
+
+        if (!lstConentDocument.isEmpty()){
+            if (Schema.sObjectType.ContentDocumentLink.fields.LinkedEntityId.isCreateable()) {
+
+                List<Database.SaveResult> resultadosInsertados = CBK_DMLUtility.insertRecords(lstConentDocument, false);
+            }
+        }
+
+        if (email.binaryAttachments != null) {
+            List<ContentVersion> listaContentVersion = new List<ContentVersion>();
+            Map<String, String> mapaImagenes = new Map<String, String>();
+            for (Messaging.Inboundemail.BinaryAttachment bAttachment : email.binaryAttachments) {
+                ContentVersion cv = new ContentVersion();
+                cv.ContentLocation = 'S';
+                cv.PathOnClient = bAttachment.fileName;
+                cv.Origin = 'H';
+                cv.Title = bAttachment.fileName;
+                cv.VersionData = bAttachment.body;
+                //Se almacena el identificador de la imagen para poder realizar un reemplazo posterior
+                if (bAttachment.headers != null) {
+                    for (Integer i = 0; i < bAttachment.headers.size(); i++) {
+
+                        if (bAttachment.headers[i].name == 'Content-ID') {
+                            String headerValue = bAttachment.headers[i].value;
+                            headerValue = headerValue.replaceAll('<', '').replaceAll('>', '');
+                            cv.ExternalDocumentInfo1=headerValue;
+                        }
+                    }
+                }
+                listaContentVersion.add(cv);
+            }
+            insert listaContentVersion;
+
+            htmlBody = prepararImagenesInline(htmlBody, listaContentVersion);
+
+            //Recuperar ContentDocumentId de los registros Content Version insertados
+            List<Id> listaContentVersionId = new List<Id>();
+            for (ContentVersion cver : listaContentVersion) {
+                listaContentVersionId.add(cver.Id);
+                listaContentVersionIdEmail.add(cver.Id);
+            }
+            listaContentVersion = [SELECT ContentDocumentId FROM ContentVersion WHERE Id IN :listaContentVersionId WITH SECURITY_ENFORCED];
+
+            //Insertar registros ContentDocumentLink
+            List<ContentDocumentLink> listaContentDocumentLink = new List<ContentDocumentLink>();
+            for (ContentVersion cv : listaContentVersion) {
+                ContentDocumentLink cdLink = new ContentDocumentLink();
+                cdLink.LinkedEntityId = caso.Id;
+                cdLink.ContentDocumentId = cv.ContentDocumentId;
+                cdLink.ShareType = 'I';
+                listaContentDocumentLink.add(cdLink);
+            }
+            insert listaContentDocumentLink;
+        }
+
+        //Creamos el mail entrante y lo asociamos al caso
+        EmailMessage emailMessage = SACH_EmailMessage.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, htmlBody);
+
+        //Cuando entra un email (el cliente/colaborador) ha contestado, creamos una tarea para registrar la entrada de este email
+        Map<String, Object> camposTarea = new Map<String, Object>();
+        camposTarea.put('Type', 'Correo - Entrada');
+        camposTarea.put('TaskSubtype', 'Email');
+        camposTarea.put('Subject', email.subject);
+        camposTarea.put('ActivityDate', System.today());
+        camposTarea.put('Status', 'Completed');
+        camposTarea.put('WhatId', caso.Id);
+        camposTarea.put('WhoId', caso.ContactId);
+
+        if (String.isNotBlank(email.plainTextBody)) {
+            camposTarea.put('Description', email.plainTextBody.left(32000));
+        } else if (String.isNotBlank(email.htmlBody)) {
+            camposTarea.put('Description', email.htmlBody.stripHtmlTags().left(32000));
+        }
+
+        SACH_Activity.crearlstTareas(new List<Task>{SACH_Activity.crearTarea('SACH_Task', camposTarea)});
+
+        //Insertar registros ContentDocumentLink asociados al email
+        List<ContentDocumentLink> listaContentDocumentLink = new List<ContentDocumentLink>();
+        list<ContentVersion> listaContentVersionEmail = [SELECT ContentDocumentId FROM ContentVersion WHERE Id IN :listaContentVersionIdEmail WITH SECURITY_ENFORCED];
+        for (ContentVersion cv : listaContentVersionEmail) {
+            ContentDocumentLink cdLink = new ContentDocumentLink();
+            cdLink.LinkedEntityId = emailMessage.Id;
+            cdLink.ContentDocumentId = cv.ContentDocumentId;
+            cdLink.ShareType = 'V';
+            listaContentDocumentLink.add(cdLink);
+        }
+        insert listaContentDocumentLink;
+        return emailMessage;
     }
 
 }

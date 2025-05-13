@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_Conclusion__c</fullName>
+    <label>Conclusión</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SPV_001</fullName>
+                <default>false</default>
+                <label>Mal funcionamiento del SAC</label>
+            </value>
+            <value>
+                <fullName>SPV_002</fullName>
+                <default>false</default>
+                <label>Malas prácticas bancarias</label>
+            </value>
+            <value>
+                <fullName>SPV_003</fullName>
+                <default>false</default>
+                <label>Quebrantamiento Normativo</label>
+            </value>
+            <value>
+                <fullName>SPV_004</fullName>
+                <default>false</default>
+                <label>Incompetente</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

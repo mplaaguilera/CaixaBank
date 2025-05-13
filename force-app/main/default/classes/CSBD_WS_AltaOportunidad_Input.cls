@@ -263,6 +263,32 @@ global with sharing class CSBD_WS_AltaOportunidad_Input {
         global String prod_category_wivai {get;set;}
         global String prod_subcategory_wivai {get;set;}
         global String prod_subcategory2_wivai {get;set;}
+        global String situacionVivienda {get;set;}
+
+        //Nuevos campos para solicitudes "cmbHipotecas" 
+        global String capitalSubrogacion {get;set;}
+        global String startYearSubrogacion {get;set;}
+        global String finishYearSubrogacion {get;set;}
+        global String bankingEntitySubrogacion {get;set;}
+        global String monthlyFeeSubrogacion {get;set;}
+        global String cerAmountSubrogacion {get;set;}
+        global String reductionFeeSubrogacion {get;set;}
+        global String escalaMaestra {get;set;}
+        global String dti {get;set;}
+        global String veredicto {get;set;}
+        global String numeroTitulares {get;set;}
+        global String antiguedadViviendaHabitual1Tit {get;set;}
+        global String finalidadAdquisicion1Tit {get;set;}
+        global String profesion1Tit {get;set;}
+        global String antiguedadViviendaHabitual2Tit {get;set;}
+        global String finalidadAdquisicion2Tit {get;set;}
+        global String profesion2Tit {get;set;}
+        global String edad {get;set;}
+        global String estadoCivil1Tit {get;set;}
+        global String situacionViviendaActual1Tit {get;set;}
+        global String situacionViviendaActual2Tit {get;set;}
+        
+         
 
         //CDP
         global String journeyActionId {get;set;}

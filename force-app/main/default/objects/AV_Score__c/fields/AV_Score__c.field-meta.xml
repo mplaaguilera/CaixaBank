@@ -4,7 +4,7 @@
     <description>Peso de la tarea</description>
     <externalId>false</externalId>
     <label>Score</label>
-    <precision>6</precision>
+    <precision>10</precision>
     <required>false</required>
     <scale>0</scale>
     <trackHistory>false</trackHistory>

@@ -16,10 +16,5 @@
         <operation>equals</operation>
         <value>CC_FAQ__c.CC_FAQ,CC_FAQ__c.CC_FAQ_Custom</value>
     </filters>
-    <filters>
-        <field>CC_Lookup_App__c</field>
-        <operation>equals</operation>
-        <value>CC_OFICINAS</value>
-    </filters>
     <label>Faqs</label>
 </ListView>

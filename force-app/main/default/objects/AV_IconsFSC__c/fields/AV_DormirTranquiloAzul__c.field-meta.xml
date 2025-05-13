@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_DormirTranquiloAzul__c</fullName>
+    <description>icono dormir tranquilo azul</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Dormir Tranquilo Azul</label>

@@ -22,7 +22,7 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal {
         List<PlantillasWrapper> pickListValuesList= new List<PlantillasWrapper>();
          Schema.DescribeFieldResult fieldResult = SAC_DocumentoEnvio__c.SAC_Pais__c.getDescribe();
          List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
-         for( Schema.PicklistEntry pickListVal : ple){
+         for( Schema.PicklistEntry pickListVal : ple){ 
             PlantillasWrapper wrapper = new PlantillasWrapper(pickListVal.getValue(), pickListVal.getLabel());
             pickListValuesList.add(wrapper);
          }
@@ -37,7 +37,12 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal {
     *****************************************************************/
     @AuraEnabled
     public static void envioCartaPostal(Case caso, String direccion, String codigoPostal, String poblacion, String provincia, String pais){
-        
+
+        Id rt = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
+        Case registroActual = [SELECT Id, SAC_Entidad_Afectada__c, CC_Idioma__c
+          FROM Case WHERE RecordTypeId =: rt AND Id =: caso.Id];
+          SAC_LCMP_GeneracionCartaPostal.WrapperTemplate headeryFooter = SAC_LCMP_GeneracionCartaPostal.getHeaderAndFooterMTP(registroActual.CC_Idioma__c, registroActual.SAC_Entidad_Afectada__c, rt);
+
         String cuerpo = '<html><body><p>'
             + 'Asunto    CaixaBank – Acuse de recibo de formulario.' + /*'\n' +*/ '</p><br /><p>' //+ '<br />'
             + 'Cuerpo    Distinguido Sr./Sra. ' + caso.SAC_NombreContacto__c  + '</p><br /><p>'
@@ -55,8 +60,19 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal {
         }
         
         SAC_DocumentoEnvio__c carta = new SAC_DocumentoEnvio__c();
+        if(registroActual.SAC_Entidad_Afectada__c == 'SAC_010'){ // Para MoneyToPay
+            carta.SAC_NombrePlantillaLateral__c = null;
+        }else if(registroActual.CC_Idioma__c == 'en'){     //Si el idioma es inglés
+            carta.SAC_NombrePlantillaLateral__c = 'SAC_Lateral_ENG';
+        }else if(registroActual.CC_Idioma__c == 'ca'){       //Si el idioma es catalán
+            carta.SAC_NombrePlantillaLateral__c = 'SAC_Lateral_CAT';
+        }else{          //Si el idioma es Castellano o cualquier otro, se usa la plantilla en castellano
+            carta.SAC_NombrePlantillaLateral__c = 'SAC_CartaPlantilla';
+        }
+        carta.SAC_Header__c = headeryFooter.header;
+        carta.SAC_Footer__c = headeryFooter.footer;
         carta.SAC_Caso__c = caso.Id;
-        carta.SAC_Cuerpo__c = cuerpo;
+        carta.SAC_DocPDF__c = cuerpo;
         carta.SAC_Direccion__c = direccion;
         carta.SAC_CP__c = codigoPostal;
         carta.SAC_Poblacion__c = poblacion;
@@ -132,4 +148,6 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal {
             nombrePlantilla = nombre;
         }
     }
+
+    
 }

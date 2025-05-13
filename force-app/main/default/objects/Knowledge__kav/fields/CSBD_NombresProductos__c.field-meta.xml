@@ -6,7 +6,6 @@
     <required>false</required>
     <type>MultiselectPicklist</type>
     <valueSet>
-        <restricted>true</restricted>
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>

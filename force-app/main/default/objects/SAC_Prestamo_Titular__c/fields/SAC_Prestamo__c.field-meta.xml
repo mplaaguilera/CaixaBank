@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Prestamo__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Lookup a Préstamo (Préstamo RecordType).</description>
+    <label>Préstamo</label>
+    <referenceTo>SAC_Prestamo__c</referenceTo>
+    <relationshipLabel>Préstamos Titulares</relationshipLabel>
+    <relationshipName>Prestamos</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

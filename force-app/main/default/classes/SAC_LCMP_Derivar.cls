@@ -110,13 +110,14 @@ public without sharing class SAC_LCMP_Derivar {
             listaTemplate = [SELECT Id, Name, Subject, HtmlValue, RelatedEntityType FROM EmailTemplate WHERE Id = :plantillaConsulta];
         }
 
-        Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(listatemplate[0].Id, whoId, caseId);              
-
         TemplateWrapper tempWrapper = new TemplateWrapper('','','','','',grupo.Name,grupo.Id);
         if (String.isNotBlank(emailPara)) {
             tempWrapper.paraTemplate = emailPara;
         }
+
         if (!listatemplate.isEmpty()) {
+            Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(listatemplate[0].Id, whoId, caseId);              
+
             tempWrapper.idTemplate = listatemplate[0].Id;
             tempWrapper.nameTemplate = listatemplate[0].Name;
             tempWrapper.subjectTemplate = renderStored.getSubject();
@@ -183,33 +184,55 @@ public without sharing class SAC_LCMP_Derivar {
 
         //Busco el grupo que se ha seleccionado para traerlo con los campos que nos interesan (plantillas)
         CC_Grupo_Colaborador__c grupo = new CC_Grupo_Colaborador__c();
-        grupo = [SELECT Id, Name, SAC_Email__c, SAC_PlantillaReclamante__c, SAC_PlantillaReclamante__r.SAC_PlantillaCastellanoId__c, SAC_PlantillaReclamante__r.SAC_PlantillaCatalanId__c,SAC_PlantillaReclamante__r.SAC_PlantillaInglesId__c
+        grupo = [SELECT Id, Name, SAC_Email__c, SAC_PlantillaReclamante__c, SAC_PlantillaReclamante__r.SAC_PlantillaCastellanoId__c, SAC_PlantillaReclamante__r.SAC_PlantillaCatalanId__c,SAC_PlantillaReclamante__r.SAC_PlantillaInglesId__c,
+                        SAC_PlantillaReclamanteCartaPostal__c, SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaCastellanoId__c, SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaCatalanId__c,SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaInglesId__c
                 FROM CC_Grupo_Colaborador__c WHERE RecordType.DeveloperName = 'SAC_GrupoProveedores'
                 AND Id = :grupoSeleccionado LIMIT 1];
      
         //Guardo la id de el objeto plantillaRedaccion en una variable
-        String plantillaRedReclamante = grupo.SAC_PlantillaReclamante__c;
-
+        String plantillaRedReclamante;
         List<EmailTemplate> listatemplate = new List<EmailTemplate>();
-        //Si ha encontrado una plantilla para el reclamante
-        if (String.isNotBlank(plantillaRedReclamante)) {
-            //compruebo idioma
-            if (caso.CC_Idioma__c == 'es') {//Castellano
-                listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaCastellanoId__c];
-            } else if (caso.CC_Idioma__c == 'ca') {//Catalán
-                listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaCatalanId__c];
-            } else if (caso.CC_Idioma__c == 'en') {//Inglés
-                listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaInglesId__c];
+
+        if(caso.CC_Canal_Respuesta__c == 'SAC_CartaPostal' && grupo.SAC_PlantillaReclamanteCartaPostal__c != null) {
+            plantillaRedReclamante = grupo.SAC_PlantillaReclamanteCartaPostal__c;
+            //Si ha encontrado una plantilla para el reclamante
+            if (String.isNotBlank(plantillaRedReclamante)) {
+                //compruebo idioma
+                if (caso.CC_Idioma__c == 'es') {//Castellano
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaCastellanoId__c];
+                } else if (caso.CC_Idioma__c == 'ca') {//Catalán
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaCatalanId__c];
+                } else if (caso.CC_Idioma__c == 'en') {//Inglés
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaInglesId__c];
+                } else {
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaCastellanoId__c];
+                }
+            }
+        } else if(grupo.SAC_PlantillaReclamante__c != null){
+            plantillaRedReclamante = grupo.SAC_PlantillaReclamante__c;
+            //Si ha encontrado una plantilla para el reclamante
+            if (String.isNotBlank(plantillaRedReclamante)) {
+                //compruebo idioma
+                if (caso.CC_Idioma__c == 'es') {//Castellano
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaCastellanoId__c];
+                } else if (caso.CC_Idioma__c == 'ca') {//Catalán
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaCatalanId__c];
+                } else if (caso.CC_Idioma__c == 'en') {//Inglés
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaInglesId__c];
+                } else {
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaCastellanoId__c];
+                }
             }
         }
-
-        Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(listatemplate[0].Id, whoId, caseId);              
 
         TemplateWrapper tempWrapper = new TemplateWrapper('','','','','',grupo.Name,grupo.Id);
         if (String.isNotBlank(emailPara)) {
             tempWrapper.paraTemplate = emailPara;
         }
+
         if (!listatemplate.isEmpty()) {
+            Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(listatemplate[0].Id, whoId, caseId);                          
+        
             tempWrapper.idTemplate = listatemplate[0].Id;
             tempWrapper.nameTemplate = listatemplate[0].Name;
             tempWrapper.subjectTemplate = renderStored.getSubject();
@@ -409,7 +432,8 @@ public without sharing class SAC_LCMP_Derivar {
         SAC_DocumentoEnvio__c carta = [SELECT id FROM SAC_DocumentoEnvio__c WHERE  SAC_Caso__c =:caseId  AND SAC_Documento__c = null AND SAC_TipoDocumento__c = 'derivación' order by CreatedDate DESC  LIMIT 1]; 
 
         String vfHostname = DomainCreator.getVisualforceHostname(null);
-        String urlVF = 'https://' + vfHostname + '/apex/SAC_CartaPDF?id=' + carta.Id;
+        String urlVF = 'https://' + vfHostname + '/apex/SAC_CartaPDF?id=' + carta.Id; //        String urlVF = 'https://' + vfHostname + '/apex/SAC_CartaPDF?id=' + carta.Id;
+
         SAC_GeneracionCartas.adjuntarPDFaCaso2(urlVF, caseId, 'derivación');
 
         if(caso.SAC_CasoEspecial__c == 'SAC_Presidencia'){
@@ -446,7 +470,18 @@ public without sharing class SAC_LCMP_Derivar {
         SAC_DatabaseDML.insertDML(cdl, true);
 
         return tarea.Id;
+    }
 
+    @AuraEnabled
+    public static Boolean validarDocDerivacionCliente(String caseId) {
+       
+        List<SAC_DocumentoEnvio__c> carta = [SELECT id FROM SAC_DocumentoEnvio__c WHERE  SAC_Caso__c =:caseId  AND SAC_Documento__c = null AND SAC_TipoDocumento__c = 'derivación' order by CreatedDate DESC  LIMIT 1]; 
+    
+        if(carta.isEmpty()){
+            return false;
+        }else{
+            return true;
+        }
     }
 
     /*****************************************************************

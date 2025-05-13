@@ -1,0 +1,9 @@
+name: ACA_Agent_Test1
+subjectType: AGENT
+subjectName: AgentforceCompetitionAgent
+testCases:
+  - utterance: Quiero iniciar una autenticación segura
+    expectedTopic: p_16jgK000000CvKL_Secure_Authentication_Process
+    expectedActions:
+      - SvcCopilotTmpl__SendEmailVerificationCode
+    expectedOutcome: Agent requests customer email address

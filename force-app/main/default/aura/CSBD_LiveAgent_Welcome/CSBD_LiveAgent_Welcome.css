@@ -1,2 +1,17 @@
-.THIS {
+/*
+.THIS.lineaSeparacion {
+    height: 1px;
+    border-top-width: 1px;
+    border-top-color: transparent;
+    background-image: linear-gradient(
+        to right,
+        rgba(229, 229, 229, 60%),
+        rgba(228, 228, 228, 0.757),
+        rgba(229, 229, 229, 60%)
+    );
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 14px;
 }
+*/

@@ -3,7 +3,7 @@
     <fullName>AV_ProductSales__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Producto de la venta</description>
-    <label>Producto de la venta</label>
+    <label>Producto</label>
     <referenceTo>Product2</referenceTo>
     <relationshipLabel>Opportunities (Producto de la venta)</relationshipLabel>
     <relationshipName>Opportunities2</relationshipName>

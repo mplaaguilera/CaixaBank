@@ -6,16 +6,10 @@
     <label>Comunicación informativa</label>
     <lookupFilter>
         <active>true</active>
-        <booleanFilter>1 OR 2</booleanFilter>
         <filterItems>
             <field>CC_Agrupador__c.RecordTypeId</field>
             <operation>equals</operation>
             <value>Comunicación Informativa</value>
-        </filterItems>
-        <filterItems>
-            <field>CC_Agrupador__c.RecordTypeId</field>
-            <operation>equals</operation>
-            <value>Comunicación Informativa de Marca</value>
         </filterItems>
         <isOptional>true</isOptional>
     </lookupFilter>

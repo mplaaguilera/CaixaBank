@@ -7,7 +7,7 @@ public with sharing class SEG_WS_AORActualizarCaso_Test {
             SEG_Zona__c = 'Corporativa',
             SEG_Organizacion__C = 'Banca Corporativa',
         	Name = 'GrupoSegOp1',
-            RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId()      
+            RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId()
         );
 		insert grupoCol1;
 

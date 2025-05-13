@@ -3,6 +3,8 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
 
     @TestSetup
     private static void testSetup() {
+
+
 		User usuarioAdmin = [SELECT Id FROM User WHERE IsActive = TRUE
 							AND Profile.Name IN ('System Administrator', 'Administrador del sistema') LIMIT 1];
         System.runAs(usuarioAdmin) {
@@ -215,7 +217,29 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
 
             Map<String, Object> camposOportunidadCsbd = new Map<String, Object>{'OwnerId' => usuario1.Id, 'CSBD_Titulo__c' => 'Oportunidad Test'};
             Opportunity oportunidadCsbd = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo', camposOportunidadCsbd);
-        }
+
+            HDT_Parametros__c params2 = new HDT_Parametros__c();
+            params2.Name = 'HDT_Llamadas_Salientes_No_Atendidas';
+            params2.HDT_Activo__c = true;
+            params2.HDT_Configuracion_1__c = 'HDT_GenesysCloudOutboundDefault';
+            insert params2;
+
+            CC_Servicio_Genesys__c s2 = new CC_Servicio_Genesys__c();
+            s2.RecordTypeId = idRtServicioGenesys;
+            s2.Name = 'HDT Genesys Cloud Saliente Por Defecto';
+            s2.CC_Codigo__c = 'HDT_GenesysCloudOutboundDefault';
+            s2.CC_Tipo__C = 'Servicio';
+            s2.CBK_Negocio__c = 'HDT';
+            s2.CC_Tipo_Cliente__c = 'Empleado';
+            s2.CC_VDN__c = '4444444';
+            s2.CC_Canal_Procedencia__c = 'CaixaBankNow';
+            s2.CC_Prefijo__c = '0';
+            s2.CC_Fecha_Inicio_Salesforce__c = Date.today();
+            s2.CC_Principal__c = true;
+
+            insert s2;
+            
+            }
     }
 	}
 
@@ -264,6 +288,7 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
 
         String idOportunidadCsbd = [SELECT Id FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'].Id;
 
+
 		Case caso = new Case();
 		caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 		caso.Subject = 'Caso Test registrarLlamadaSaliente';
@@ -273,6 +298,17 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
 		caso.CC_No_Identificado__c = true;
 		caso.CC_Canal_Procedencia__c = 'CaixaBankNow';
 		insert caso;
+
+        Case caso2 = new Case();
+		caso2.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
+		caso2.Subject = 'Caso Test registrarLlamadaSaliente';
+		caso2.Origin = 'Phone';
+		caso2.CC_Canal_Respuesta__c = 'Phone';
+		caso2.CC_Tipo_Cliente__c = 'Cliente';
+		caso2.CC_No_Identificado__c = true;
+		caso2.CC_Canal_Procedencia__c = 'Servicios Centrales';
+		insert caso2;
+
 
         CC_Llamada_Input inputCc = new CC_Llamada_Input();
         inputCc.usuario = '';
@@ -310,15 +346,35 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
         inputCsbd.numPerso = '11111';
         inputCsbd.casoId = idOportunidadCsbd;
 
+        CC_Llamada_Input inputHdt2 = new CC_Llamada_Input();
+        inputHdt2.connId = 'ef208127-2e21-4086-b016-febfa4c43384';
+        inputHdt2.transferConnId = '';
+        inputHdt2.ani = '555666777';
+        inputHdt2.dnis = '888999000';
+        inputHdt2.servicio = 'ServicioCsbd';
+        inputHdt2.asunto = 'Asunto';
+        inputHdt2.numPerso = '11111';
+        inputHdt2.casoId = caso2.Id;
+
         User usuarioTest = [SELECT Id FROM User WHERE Lastname = 'Agente Test 1'];
         System.runAs(usuarioTest) {
             Test.startTest();
             KIN_Genesys_Cloud_Eventos_Controller.registrarLlamadaSaliente(JSON.serialize(inputCc));
             KIN_Genesys_Cloud_Eventos_Controller.registrarLlamadaSaliente(JSON.serialize(inputHdt));
+
             Map<String, Object> retornoCsbd = KIN_Genesys_Cloud_Eventos_Controller.registrarLlamadaSaliente(JSON.serialize(inputCsbd));
             CC_Llamada__c llamadaSalienteCsbd = (CC_Llamada__c)retornoCsbd.get('llamada');
             inputCsbd.llamadaId = llamadaSalienteCsbd.Id;
             KIN_Genesys_Cloud_Eventos_Controller.iniciarLlamadaSalienteClickToDial(JSON.serialize(inputCsbd));
+
+            
+            Map<String, Object> retornoHdt = KIN_Genesys_Cloud_Eventos_Controller.registrarLlamadaSaliente(JSON.serialize(inputHdt2));
+            CC_Llamada__c llamadaSalienteHdt2 = (CC_Llamada__c)retornoHdt.get('llamada');
+            inputHdt2.llamadaId = llamadaSalienteHdt2.Id;
+            KIN_Genesys_Cloud_Eventos_Controller.iniciarLlamadaSalienteClickToDial(JSON.serialize(inputHdt2));
+
+
+
             Test.stopTest();
         }
         System.assertEquals(true, true, 'PENDIENTE');
@@ -544,7 +600,7 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
     @isTest
     public static void completarConsulta() {
         User usuarioTest = [SELECT Id FROM User WHERE Lastname = 'Agente Test 1'];
-        System.runAs(usuarioTest) {
+        System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
             CC_Llamada_Input inputRegistrarLlamadaEntrante = new CC_Llamada_Input();
             inputRegistrarLlamadaEntrante.connId = 'ef208127-2e21-4086-b016-febfa4c43385';
             inputRegistrarLlamadaEntrante.ani = '555666777';
@@ -571,12 +627,16 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
                 Map<String, Object> respuestaRegistrarConsulta = KIN_Genesys_Cloud_Eventos_Controller.registrarConsulta(JSON.serialize(inputRegistrarConsulta));
             }
 
+            
+
             Test.startTest();
             KIN_Genesys_Cloud_Eventos_Controller.completarConsulta('ServicioCC', 'ef208127-2e21-4086-b016-febfa4c43385', agenteDestino.Id);
             Test.stopTest();
 
+
             caso = [SELECT OwnerId FROM Case WHERE Id = :caso.Id];
             System.assertEquals(agenteDestino.Id, caso.OwnerId, 'El propietario del caso debería ser el agente destino de la transferencia');
+            
         }
     }
 

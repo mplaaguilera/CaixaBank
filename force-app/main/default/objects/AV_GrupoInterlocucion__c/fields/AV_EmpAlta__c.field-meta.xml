@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_EmpAlta__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que contiene el empleado del alta</description>
     <label>Empleado de alta</label>
     <referenceTo>Contact</referenceTo>
     <relationshipLabel>Grupo Interlocución (Empleado de alta)</relationshipLabel>

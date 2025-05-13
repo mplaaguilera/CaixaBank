@@ -15,6 +15,7 @@ global with sharing class KIN_Genesys_Cloud_CTI_Extensions implements purecloud.
 			Map<String, Object> interactionAttributes = new Map<String, Object>{
 				'clickToDial' => false, 'casoId' => recordId //casoId puede ser un id de caso o de oportunidad
 			};
+
 			if (sObjectType == 'Opportunity') {
 				Opportunity oportunidad = [SELECT RecordType.DeveloperName, CSBD_Contact__r.AV_NumPerso__c FROM Opportunity WHERE Id = :recordId];
 				//clickToDial y llamadaRecordType
@@ -33,6 +34,30 @@ global with sharing class KIN_Genesys_Cloud_CTI_Extensions implements purecloud.
 					interactionAttributes.put('llamadaId', ((CC_Llamada__c)llamadaSaliente.get('llamada')).Id);
 				}
 			}
+
+
+			
+			if (sObjectType == 'Case') {
+				
+				//Implementacion para registrar llamada saliente en caso que sea de tipo HDT
+				HDT_Parametros__c emailRespuesta = HDT_Parametros__c.getInstance('HDT_Llamadas_Salientes_No_Atendidas');
+				Case casoNuevo = [SELECT RecordType.DeveloperName FROM Case WHERE Id = :recordId];
+				
+				if(emailRespuesta.HDT_Activo__c && casoNuevo.RecordType.DeveloperName.startsWith('HDT_')) {
+					//clickToDial y llamadaRecordType
+					interactionAttributes.put('clickToDial', true);
+					interactionAttributes.put('llamadaRecordType', casoNuevo.RecordType.DeveloperName);
+
+					//llamadaId
+					CC_Llamada_Input inputLlamadaSaliente = new CC_Llamada_Input();
+					inputLlamadaSaliente.casoId = recordId;
+					inputLlamadaSaliente.dnis = String.valueOf(clickToDialData.get('number'));
+					Map<String, Object> llamadaSaliente = HDT_Llamada_GC.registrarLlamadaSalienteNoAtendida(inputLlamadaSaliente);
+					interactionAttributes.put('llamadaId', ((CC_Llamada__c)llamadaSaliente.get('llamada')).Id);
+				}
+			}
+
+				
 			clickToDialData.put('interactionAttributes', interactionAttributes);
 			return JSON.serialize(clickToDialData);
 		}

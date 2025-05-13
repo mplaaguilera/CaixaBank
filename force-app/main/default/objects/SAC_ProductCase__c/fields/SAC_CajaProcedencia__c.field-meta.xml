@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_CajaProcedencia__c</fullName>
+    <description>Picklist que se informará en caso de que la procedencia del contrato sea Banca Cívica</description>
+    <label>Caja de procedencia</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Caja Navarra</fullName>
+                <default>false</default>
+                <label>Caja Navarra</label>
+            </value>
+            <value>
+                <fullName>Caja Canarias</fullName>
+                <default>false</default>
+                <label>Caja Canarias</label>
+            </value>
+            <value>
+                <fullName>Caja de Burgos</fullName>
+                <default>false</default>
+                <label>Caja de Burgos</label>
+            </value>
+            <value>
+                <fullName>Cajasol</fullName>
+                <default>false</default>
+                <label>Cajasol</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

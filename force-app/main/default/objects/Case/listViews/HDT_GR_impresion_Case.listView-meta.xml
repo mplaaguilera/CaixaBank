@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HDT_GR_impresion_Case</fullName>
+    <filterScope>Queue</filterScope>
+    <label>GR impresión</label>
+    <queue>HDT_GR_impresion</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

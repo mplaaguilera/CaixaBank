@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_ExternalId__c</fullName>
     <caseSensitive>true</caseSensitive>
+    <description>Identificcador caixa</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>true</externalId>
     <label>Id. Origen</label>

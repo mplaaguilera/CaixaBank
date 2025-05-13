@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_ChannelSales__c</fullName>
     <description>Canal de la venta</description>
-    <label>Canal de la venta</label>
+    <label>Canal</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>

@@ -51,7 +51,7 @@
                 <p>{historicoChat}</p>
             </div>
             <section role="log" class="slds-chat">
-                <div class="chat-body-container" data-id="chat-container">  
+                <div class="chat-body-container" data-id="chat-container">
                     <ul class="slds-chat-list">
                         <li class="slds-chat-listitem slds-chat-listitem_bookend">
                             <div class="slds-chat-bookend">
@@ -63,11 +63,11 @@
                             <p>Iniciado el chat del producto con IA</p>
                             </div>
                         </li>
-                        
+
                         <template for:each={messages} for:item="message">
                             <li key={message.id} class={message.class2}>
                                 <div class="slds-chat-message">
-                                    <div class="slds-chat-message__body">             
+                                    <div class="slds-chat-message__body">
                                         <template lwc:if={message.escribiendo}>
                                             <span class="slds-icon-typing slds-is-animated" title="Escribiendo...">
                                                 <span class="slds-icon-typing__dot"></span>
@@ -79,26 +79,26 @@
                                             <div class={message.class} role={message.alert}>
                                                 <lightning-formatted-rich-text
                                                     value={message.text}
-                                                    ></lightning-formatted-rich-text>        
+                                                    ></lightning-formatted-rich-text>
                                             </div>
                                         </template>
                                         <div class="slds-chat-message__meta">{message.user}</div>
                                     </div>
                                 </div>
-                            </li>     
+                            </li>
                         </template>
                     </ul>
                 </div>
             </section>
-        
+
             <div class="slds-grid slds-wrap">
                 <div class="slds-col slds-size_5-of-5 slds-m-bottom_x-small">
-                    <lightning-input 
-                        class="slds-col" 
-                        type="text" 
-                        value={userInput} 
-                        onkeydown={handleEnter} 
-                        onchange={handleInputChange} 
+                    <lightning-input
+                        class="slds-col"
+                        type="text"
+                        value={userInput}
+                        onkeydown={handleEnter}
+                        onchange={handleInputChange}
                         placeholder="Escribe tu pregunta..."
                         disabled={bloquearTexto}></lightning-input>
                 </div>

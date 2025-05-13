@@ -19,16 +19,16 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 			CC_Lista_Valores__c valor = new CC_Lista_Valores__c();
 			valor.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
 			valor.CC_Lista__c = listaValores.Id;
-			valor.Name = 'Préstamo';
+			valor.Name = 'Consumo';
 			valor.CC_Valor__c = '1';
 			insert valor;
 
 			Id idRecordTypeReglaAsignacion = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Regla_asignacion_oportunidad').getRecordTypeId();
 			CC_Lista_Valores__c reglaAsignacion = new CC_Lista_Valores__c();
 			reglaAsignacion.RecordTypeId = idRecordTypeReglaAsignacion;
-			reglaAsignacion.Name = 'Oportunidades - Préstamos I';
+			reglaAsignacion.Name = 'Oportunidades - Consumos I';
 			reglaAsignacion.CSBD_Cola_Oportunidad__c = 'CSBD_Prestamos_I';
-			reglaAsignacion.CSBD_Tipo_de_oportunidad__c = 'Préstamo';
+			reglaAsignacion.CSBD_Tipo_de_oportunidad__c = 'Consumo';
 			reglaAsignacion.CC_Orden__c = 1;
 			reglaAsignacion.CC_Activa__c = true;
 			CC_Lista_Valores__c reglaAsignacion2 = new CC_Lista_Valores__c();
@@ -86,7 +86,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 
 			CSBD_Gestor_Oportunidad__c gestorOpp = [SELECT OwnerId, CSBD_Estado__c FROM CSBD_Gestor_Oportunidad__c
 													WHERE CSBD_Oportunidad__c = :oportunidad.Id ORDER BY CreatedDate DESC LIMIT 1];
-			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOpp.OwnerId, 'El propietario no es el grupo de prestamos I');
+			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOpp.OwnerId, 'El propietario no es el grupo de Consumo I');
 			System.assertEquals('Activo', gestorOpp.CSBD_Estado__c, 'El estado no es activo');
 		}
 	}
@@ -117,7 +117,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 
 			CSBD_Gestor_Oportunidad__c gestorOpp = [SELECT OwnerId, CSBD_Estado__c FROM CSBD_Gestor_Oportunidad__c
 													WHERE CSBD_Oportunidad__c = :oportunidad.Id ORDER BY CreatedDate DESC LIMIT 1];
-			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOpp.OwnerId, 'El propietario no es el grupo de prestamos I');
+			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOpp.OwnerId, 'El propietario no es el grupo de Consumo I');
 			System.assertEquals('Activo', gestorOpp.CSBD_Estado__c, 'El estado no es activo');
 		}
 	}
@@ -147,7 +147,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 
 			CSBD_Gestor_Oportunidad__c gestorOportunidad = [SELECT OwnerId, CSBD_Estado__c FROM CSBD_Gestor_Oportunidad__c
 															WHERE CSBD_Oportunidad__c = :oportunidad.Id ORDER BY CreatedDate DESC LIMIT 1];
-			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOportunidad.OwnerId, 'El propietario no es el grupo de prestamos I');
+			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOportunidad.OwnerId, 'El propietario no es el grupo de Consumo I');
 			System.assertEquals('Activo', gestorOportunidad.CSBD_Estado__c, 'El estado no es activo');
 		}
 	}
@@ -181,7 +181,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 			CSBD_GestorOportunidad.sincronizarGestorOportunidad(new List<Opportunity>{oportunidad}, gestoresOpp, '');
 			Test.stopTest();
 
-			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestoresOpp[0].OwnerId, 'El propietario no es el grupo de prestamos I');
+			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestoresOpp[0].OwnerId, 'El propietario no es el grupo de Consumo I');
 		}
 	}
 
@@ -210,7 +210,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 			Test.stopTest();
 
 			CSBD_Gestor_Oportunidad__c gestorOportunidad = [SELECT OwnerId FROM CSBD_Gestor_Oportunidad__c WHERE CSBD_Oportunidad__c =: oportunidad.Id ORDER BY CreatedDate DESC LIMIT 1];
-			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOportunidad.OwnerId, 'El propietario no es el grupo de prestamos I');
+			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOportunidad.OwnerId, 'El propietario no es el grupo de Consumo I');
 		}
 	}
 
@@ -241,7 +241,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 
 			CSBD_Gestor_Oportunidad__c gestorOportunidad = [SELECT OwnerId FROM CSBD_Gestor_Oportunidad__c
 															WHERE CSBD_Oportunidad__c = :oportunidad.Id ORDER BY CreatedDate DESC LIMIT 1];
-			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOportunidad.OwnerId, 'El propietario no es el grupo de prestamos I');
+			System.assertEquals([SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Prestamos_I' LIMIT 1].Id, gestorOportunidad.OwnerId, 'El propietario no es el grupo de Consumo I');
 		}
 	}
 

@@ -1,38 +1,6 @@
 @isTest
 public with sharing class FRA_CaseTriggerHelper_Test {
 
-    // @TestSetup
-    // static void testSetup(){
-    //     String orgId = UserInfo.getOrganizationId();
-    //     String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
-    //     Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
-    //     String uniqueName = orgId + dateString + randomInt;
-    //     System.runAs(new User(Id = UserInfo.getUserId())) {
-    //         User usuario = new User();
-    //         usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'FRA_Usuario_Caixabank'].Id;
-    //         usuario.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'FRA'].Id;
-    //         usuario.FirstName = 'Fraude';
-    //         usuario.LastName = 'Prueba';
-    //         usuario.Alias = uniqueName.substring(18, 23);
-    //         usuario.Email = uniqueName + '@test' + orgId + '.org';
-    //         usuario.Username = uniqueName + '@test' + orgId + '.org';
-    //         usuario.EmailEncodingKey = 'UTF-8';
-    //         usuario.LanguageLocaleKey = 'es';
-    //         usuario.LocaleSidKey = 'es_ES';
-    //         usuario.TimezonesIdKey = 'Europe/Madrid';
-    //         insert usuario;
-    
-    //         List<PermissionSetAssignment> psAssignments = new List<PermissionSetAssignment>();
-    //         for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name IN ('FRA_PS_Operador')]) {
-    //             PermissionSetAssignment psAssignment = new PermissionSetAssignment();
-    //             psAssignment.AssigneeId = usuario.Id;
-    //             psAssignment.PermissionSetId = ps.Id;
-    //             psAssignments.add(psAssignment);
-    //         }
-    //         insert psAssignments;
-    //     }    
-    // }
-    
     @isTest
     public static void testInformarCanalResolucion() {
         // User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
@@ -62,5 +30,119 @@ public with sharing class FRA_CaseTriggerHelper_Test {
             Test.stopTest();
         }
     }
+
+    
+
+    @isTest
+    public static void testCambiarBuzones2() {
+        User uSup = FRA_TestDataFactory.usuarioAFRA();
+        System.runAs(uSup){
+
+        // Crear usuario de prueba
+        User testUser = [SELECT Id,Profile.Name FROM User WHERE Profile.Name = 'FRA_Usuario_Caixabank' LIMIT 1];
+        // Obtener IDs de colas
+        Id colaFraudeNow = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'FRA_BuzonFraudeNow' LIMIT 1].Id;
+        Id colaFraudeTarjetas = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'FRA_BuzonFraudeTarjetas' LIMIT 1].Id;
+        List<Case> lista = new List<Case>();
+        Case caso1 = new Case(
+            RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente'),
+            Subject = 'Test FRAUDE 1',
+            Origin = 'Phone',
+            CC_Idioma__c = 'es',
+            CC_Canal_Procedencia__c = 'Teléfono FRAUDE CaixaBankNow',
+            CC_Canal_Resolucion__c = 'Teléfono FRAUDE Canal Oficina'
+        );
+        lista.add(caso1);
+        Case caso2 = new Case(
+            RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente'),
+            Subject = 'Test FRAUDE 2',
+            Origin = 'Phone',
+            CC_Idioma__c = 'es',
+            CC_Canal_Procedencia__c = 'Teléfono FRAUDE CaixaBankNow',
+            CC_Canal_Resolucion__c = 'Teléfono FRAUDE Canal Oficina'
+        );
+        lista.add(caso2);
+        insert lista;
+
+         // Crear un Map simulando el estado previo
+         Map<Id, Case> mapOldObj = new Map<Id, Case>{
+            caso1.Id => new Case(Id = caso1.Id, OwnerId = testUser.Id, CC_CasoRelacionado__c = caso2.Id ) // Estado antes del cambio
+        };
+
+        Test.startTest();
+        // Simular el cambio de propietario a la colaFraudeNow
+        caso1.OwnerId = colaFraudeNow;
+        update caso1;
+
+         // Ejecutar el método a probar
+         List<Case> casos = [SELECT Id, OwnerId, CC_Canal_Procedencia__c, CC_Canal_Resolucion__c FROM Case WHERE Id = :caso1.Id];
+         FRA_CaseTriggerHelper.cambiarbuzonescolas(casos, mapOldObj);
+
+         System.assertEquals('Buzón FRAUDE Now', [SELECT CC_Canal_Resolucion__c FROM Case WHERE Id = :caso1.Id]?.CC_Canal_Resolucion__c);
+ 
+        Test.stopTest();
+    }
+
+    }
+
+    @isTest
+    public static void testCambiarBuzones3() {
+       
+        System.runAs(FRA_TestDataFactory.usuarioAFRA()){
+       
+        // Crear usuario de prueba
+        User testUser = [SELECT Id,Profile.NAME FROM User WHERE Profile.Name = 'FRA_Usuario_Caixabank' LIMIT 1];
+        // Obtener IDs de colas
+        Id colaFraudeNow = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'FRA_BuzonFraudeNow' LIMIT 1].Id;
+        Id colaFraudeTarjetas = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'FRA_BuzonFraudeTarjetas' LIMIT 1].Id;
+        List<Case> lista = new List<Case>();
+        Case caso1 = new Case(
+            RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente'),
+            Subject = 'Test FRAUDE 1',
+            Origin = 'Phone',
+            CC_Idioma__c = 'es',
+            CC_Canal_Procedencia__c = 'Teléfono FRAUDE CaixaBankNow',
+            CC_Canal_Resolucion__c = 'Teléfono FRAUDE Canal Oficina'
+        );
+        lista.add(caso1);
+
+        Case caso2 = new Case(
+            RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente'),
+            Subject = 'Test FRAUDE 1',
+            Origin = 'Phone',
+            CC_Idioma__c = 'es',
+            CC_Canal_Procedencia__c = 'Teléfono FRAUDE CaixaBankNow',
+            CC_Canal_Resolucion__c = 'Teléfono FRAUDE Canal Oficina'
+        );
+        lista.add(caso2);
+            insert lista;
+        // Crear un Map simulando el estado previo
+        Map<Id, Case> mapOldObj = new Map<Id, Case>{
+            caso1.Id => new Case(Id = caso1.Id, OwnerId = testUser.Id, CC_CasoRelacionado__c = caso2.Id) // Estado antes del cambio
+        };
+        
+        Test.startTest();
+        // Simular el cambio de propietario a la colaFraudeNow
+        caso1.OwnerId = colaFraudeTarjetas;
+        update caso1;
+
+         // Ejecutar el método a probar
+         List<Case> casos = [SELECT Id, OwnerId, CC_Canal_Procedencia__c, CC_Canal_Resolucion__c FROM Case WHERE Id = :caso1.Id];
+         FRA_CaseTriggerHelper.cambiarbuzonescolas(casos, mapOldObj);
+         
+
+            System.assertEquals('Buzón FRAUDE Tarjetas', [SELECT CC_Canal_Resolucion__c FROM Case WHERE Id = :caso1.Id]?.CC_Canal_Resolucion__c);
+            
+        
+        Test.stopTest();
+    
+        }
+    }
+
+    
+
+
+
+
 
 }

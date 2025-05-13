@@ -3,7 +3,7 @@ public with sharing class SEG_Case_Utilities_Test {
     @testSetup
     static void testSetup() { 
         
-        Id grupoOpSegId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        Id grupoOpSegId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'GrupoColabSeg';
         grupoColab.SEG_Tipologia__c = 'BO';
@@ -29,7 +29,7 @@ public with sharing class SEG_Case_Utilities_Test {
         contactoSEG.SEG_No_enviar_Acuse_Recibo__c = false;
         insert contactoSEG;
 
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Tematica1';
         mccTematica.CC_Tipo_Cliente__c = 'Segmentos';
@@ -38,7 +38,7 @@ public with sharing class SEG_Case_Utilities_Test {
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Producto1';
         mccProducto.CC_Tipo_Cliente__c = 'Segmentos';
@@ -48,7 +48,7 @@ public with sharing class SEG_Case_Utilities_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'FIRMA OK';
         mccMotivo.CC_Tipo_Cliente__c = 'Segmentos';
@@ -59,7 +59,7 @@ public with sharing class SEG_Case_Utilities_Test {
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         insert mccMotivo;
 
-        Id recordTypeIdDetalle = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
+        Id recordTypeIdDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
         CC_MCC__c mccDetalle = new CC_MCC__c();
         mccDetalle.Name = 'FIRMA OK';
         mccDetalle.CC_Tipo_Cliente__c = 'Segmentos';

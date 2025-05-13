@@ -91,6 +91,32 @@ public with sharing class CC_MetodosUtiles {
         return oData;
     }
 
+    // Método para recuperar valores de la LoV devolviendo un mapa con el value dinámico.
+    public static Map<String, Object> getLOVNameValue(List<String> oListaName, String fieldToMap) {
+        Map<String, Object> oData = new Map<String, Object>();
+
+        if (oListaName == null || oListaName.isEmpty() || String.isBlank(fieldToMap)) {
+            return oData;
+        }
+
+        // Construir la consulta SOQL dinámica
+        String query = 'SELECT Name, ' + fieldToMap + ' FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name IN :oListaNames AND CC_Activa__c = true';
+        Map<String, Object> bindParams = new Map<String, Object>{
+            'oListaNames' => oListaName
+        };
+
+        // Ejecutar la consulta utilizando Database.queryWithBinds con accessLevel
+        List<SObject> results = Database.queryWithBinds(query, bindParams, AccessLevel.SYSTEM_MODE);
+
+        for (SObject record : results) {
+            String name = (String)record.get('Name');
+            Object value = record.get(fieldToMap);
+            oData.put(name, value);
+        }
+
+        return oData;
+    }
+
     /*
         Método para recuperar valores configurados en LOV y Determinados valores de ella.
     */
@@ -128,7 +154,7 @@ public with sharing class CC_MetodosUtiles {
         List<CC_InterfaceSettings__mdt> oConfig = [SELECT CC_Certificado__c, CC_EndPoint__c, CC_TimeOut__c, CC_TipoPeticion__c, CC_TrazaActiva__c, CC_TrazaEntrada__c, CC_TrazaSalida__c, CC_ContentType__c
                                                     FROM CC_InterfaceSettings__mdt
                                                     WHERE DeveloperName = :sInterfaz AND CC_Activa__c = TRUE];
-        if (oConfig.size() == 1) {
+        if (!oConfig.isEmpty()) {
             return oConfig[0];
         } else {
             return oInterfaz;
@@ -140,7 +166,7 @@ public with sharing class CC_MetodosUtiles {
     */
     static public CC_InterfaceSettings__mdt getInterfazConfigBody(String sInterfaz) {
         List<CC_InterfaceSettings__mdt> oConfig = [SELECT CC_Certificado__c, CC_EndPoint__c, CC_TimeOut__c, CC_TipoPeticion__c, CC_CharSet__c, CC_ContentType__c, CC_HttpRequest__c, CC_SoapAction__c, CC_Body__c, CC_TrazaActiva__c, CC_TrazaEntrada__c, CC_TrazaSalida__c, CC_ALF_CliConf__c, CC_CliConfiErr__c FROM CC_InterfaceSettings__mdt WHERE DeveloperName = :sInterfaz AND CC_Activa__c = true];
-        if (oConfig.size() == 1 && oConfig[0] != null) {
+        if (!oConfig.isEmpty() && oConfig[0] != null) {
             return oConfig[0];
         } else {
             return null;
@@ -672,29 +698,24 @@ public with sharing class CC_MetodosUtiles {
     }
     
     //Metodo para obtener los festivos a partir de una lista de valores
-    static public Map<Integer, List<Integer>> sacarFestivosPorMes (){
-    List <CC_Lista_Valores__c> listaFestivos = new List < CC_Lista_Valores__c>();
-    Map<Integer, List<Integer>> festivos = new Map<Integer, List<Integer>> ();
+    static public Map<Integer, List<Integer>> sacarFestivosPorMes (){       
+        Map<Integer, List<Integer>> festivos = new Map<Integer, List<Integer>> ();
+        List <CC_Lista_Valores__c> listaFestivos = [SELECT Name, CC_Valor__c, CC_Valor2__c, CC_Valor_SFDC__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Festivos nacionales' AND CC_Activa__c = true ORDER BY CC_Valor2__c];
 
-    listaFestivos = [SELECT Name, CC_Valor__c, CC_Valor2__c, CC_Valor_SFDC__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Festivos nacionales' AND CC_Activa__c = true ORDER BY CC_Valor2__c];
-
-    Integer mes = 0;
-    Integer i = 0;
-    if (!listaFestivos.isEmpty()){
-        while (i < listaFestivos.size()){
-            List <Integer> dias = new List <Integer>();
-            while (i < listaFestivos.size() && mes == Integer.valueOf(listaFestivos[i].CC_Valor2__c)){
-                dias.add(Integer.valueOf(listaFestivos[i].CC_Valor__c));
-                i++;
+        if (!listaFestivos.isEmpty()){       
+            for(CC_Lista_Valores__c val : listaFestivos){
+                if (val.CC_Valor2__c != null && val.CC_Valor__c != null){
+                    Integer mes = Integer.valueOf(val.CC_Valor2__c);
+                    List <Integer> dias = new List <Integer>();
+                    if (!festivos.containsKey(mes)){
+                        festivos.put(mes, new List <Integer>());                 
+                    }
+                    festivos.get(mes).add(Integer.valueOf(val.CC_Valor__c)); 
+                }            
             }
-            if (dias.size() > 0){
-                festivos.put(mes, dias);
-            }
-            mes ++;
         }
-    }
 
-    return festivos;
+        return festivos;
     }
     
     static public List<Time> pasarHorasListaValores (CC_Lista_Valores__c listaHorarios){
@@ -729,4 +750,257 @@ public with sharing class CC_MetodosUtiles {
     }
         return result;
     }
+
+    public static User buscarGestor(String numeroGestor) {
+        List <User> gestorCliente = new List <User>();
+        String matriculaGestor;
+        String nameGestor;
+        String externalID;
+        if(numeroGestor != null && numeroGestor != 'generico') {
+            if(numeroGestor.startsWith('U01')) {
+                matriculaGestor = numeroGestor;
+            } else if (numeroGestor != '000000') {
+                matriculaGestor = 'U01'+ numeroGestor;
+            }            
+            gestorCliente = [SELECT Id, AV_ExternalID__c, Name FROM User WHERE AV_ExternalID__c = :matriculaGestor AND isActive = true LIMIT 1];
+        }
+        if(gestorCliente.isEmpty() || numeroGestor == 'generico') {
+            Map<String, String> retorno = buscarGestorGenerico();
+            String matricula = retorno.get('matricula');
+            gestorCliente = [SELECT Id, Name, AV_ExternalID__c FROM User WHERE AV_ExternalID__c = :matricula LIMIT 1];
+        }
+        return gestorCliente.isEmpty() ? null : gestorCliente[0];
+    }
+
+    public static Boolean gestorEsGenerico(User gestor) {
+        Map<String, String> retorno = buscarGestorGenerico();
+        return gestor.Name == retorno.get('nombre') && gestor.AV_ExternalID__c == retorno.get('matricula');
+    }
+
+     public static Map<String, User> buscarGestoresPorMatricula(List<String> numeroGestores) {
+        Map<String, User> gestores = new Map<String, User>();
+        //Construir matricula a partir del  numero de Gestor
+        List<String> matriculasGestor = new List<String>();
+        for(String numeroGestor : numeroGestores) {            
+            if(numeroGestor.startsWith('U01')) {
+                matriculasGestor.add(numeroGestor);
+            } else if (numeroGestor != '000000') {
+                matriculasGestor.add('U01'+ numeroGestor);
+            }    
+        }
+
+        //Buscar gestores por matricula
+        if(!matriculasGestor.isEmpty()) {
+            List<User> gestoresEncontrados = [SELECT Id, AV_ExternalID__c FROM User WHERE AV_ExternalID__c IN :matriculasGestor];
+            for(User gestor : gestoresEncontrados) {
+                gestores.put(gestor.AV_ExternalID__c, gestor);
+            }
+        }
+        
+        if(gestores.isEmpty()) {
+            Map<String, String> retorno = buscarGestorGenerico();
+            String matricula = retorno.get('matricula');
+            List<User> gestoresEncontrados = [SELECT Id, AV_ExternalID__c FROM User WHERE AV_ExternalID__c = :matricula LIMIT 1];
+            if(!gestoresEncontrados.isEmpty()) {
+                gestores.put(gestoresEncontrados[0].AV_ExternalID__c, gestoresEncontrados[0]);
+            }
+        }
+
+        return gestores;
+    }
+    
+    public static Map<String, String> buscarGestorGenerico() {
+        String nameGestor;
+        String externalID;
+        Map<String, String> retorno = new Map<String, String>();
+        List<CC_Lista_Valores__c> listaLOV = [SELECT CC_Valor__c, Name FROM CC_Lista_Valores__c  WHERE CC_Lista__r.name = 'Gestor por defecto CC'];
+        for(CC_Lista_Valores__c valor: listaLOV) {
+            if(valor.Name == 'ExternalID') {
+                externalID = valor.CC_Valor__c;
+            }
+            else if (valor.Name == 'Nombre') {
+                nameGestor = valor.CC_Valor__c;
+            }
+        }
+        retorno.put('nombre', nameGestor);
+        retorno.put('matricula', externalID);
+        return retorno;
+    }
+
+    public static List<Contact> buscarGestores(String oficina) {
+        if(!String.isEmpty(oficina)) {
+            List<Contact> gestores = [SELECT Id, Name FROM Contact WHERE AccountId = :oficina AND CC_Inactivo__c = false AND CC_Num_Empleado_Generico__c NOT IN('99999', '98999')];
+            return gestores;
+        } else {
+            return null;
+        }        
+    }
+
+
+    public static Map<Id, String> generarURLsLimeSurvey(List<Case> listaCasos) {
+        Map<Id, String> urlsEncuestas = new Map<Id, String>();
+    
+        if (listaCasos == null || listaCasos.isEmpty()) {
+            return urlsEncuestas;
+        }
+
+        List<Task> tasks = [
+            SELECT Id, CC_Grupo_Colaborador_Id__r.Name, WhatId
+            FROM Task
+            WHERE WhatId IN :listaCasos
+            AND Type IN ('Traslado Tercer Nivel', 'Traslado colaborador')
+            ORDER BY WhatId, CreatedDate DESC
+        ];
+        Map<Id, String> caseToGroupMap = new Map<Id, String>();
+        Set<Id> processedCaseIds = new Set<Id>();
+        for (Task t : tasks) {
+            if (!processedCaseIds.contains(t.WhatId)) {
+                caseToGroupMap.put(t.WhatId, t.CC_Grupo_Colaborador_Id__r.Name);
+                processedCaseIds.add(t.WhatId);
+            }
+        }
+    
+        // Obtener la configuración de encuestas
+        String linkBase = null, idEncuestaGenerico = null;
+        String idEncuestaLlamada = null, idEncuestaChat = null, idEncuestaTercerNivel = null, idFCO = null;
+    
+        List<CC_Envio_Encuesta__c> linkEncuestaEmpleado = [
+            SELECT CC_Link_LimeSurvey__c, CC_Id_Encuesta__c, CC_Tipo_Encuesta__c, Name 
+            FROM CC_Envio_Encuesta__c 
+            WHERE Name IN ('CC_URL_Encuesta', 'CC_TipoLlamada', 'TipoChat', 'CC_TercerNivel', 'CC_EncuestaFormularioOperativas')
+        ];
+    
+        for (CC_Envio_Encuesta__c e : linkEncuestaEmpleado) {
+            if (e.CC_Tipo_Encuesta__c == 'URL base') {
+                linkBase = e.CC_Link_LimeSurvey__c;
+                idEncuestaGenerico = e.CC_Id_Encuesta__c;
+            } else if (e.CC_Tipo_Encuesta__c == 'Phone') {
+                idEncuestaLlamada = e.CC_Id_Encuesta__c;
+            } else if (e.CC_Tipo_Encuesta__c == 'Chat') {
+                idEncuestaChat = e.CC_Id_Encuesta__c;
+            } else if (e.CC_Tipo_Encuesta__c == 'Caso Tercer Nivel') {
+                idEncuestaTercerNivel = e.CC_Id_Encuesta__c;
+            }else if(e.Name == 'CC_EncuestaFormularioOperativas'){
+                idFCO = e.CC_Id_Encuesta__c;
+            }
+        }
+    
+        if (linkBase == null) {
+            return urlsEncuestas;
+        }
+    
+        // Obtener información de LiveChatTranscript en una sola consulta
+        Map<Id, String> mapInfoChat = new Map<Id, String>();
+        Set<Id> caseIds = new Set<Id>();
+    
+        for (Case caso : listaCasos) {
+            if (caso != null && caso.Id != null) {
+                caseIds.add(caso.Id);
+            }
+        }
+    
+        if (!caseIds.isEmpty()) {
+            for (LiveChatTranscript chat : [SELECT CC_Espacio__c, CaseId FROM LiveChatTranscript WHERE CaseId IN :caseIds AND CC_Tipo__c = 'Agente' AND RecordTypeId = :getRecordTypeIdFromDeveloperName('LiveChatTranscript', 'CC_Empleados') 
+                ORDER BY CreatedDate DESC
+            ]) {
+                mapInfoChat.put(chat.CaseId, chat.CC_Espacio__c);
+            }
+        }
+    
+        // Procesar cada caso
+        for (Case caso : listaCasos) {
+            if (caso == null || caso.Id == null || caso.CC_Idioma__c == null || caso.CC_Matricula_Empleado__c == null || 
+                caso.CC_MCC_Tematica__c == null || caso.CC_Tematica__c == null) {
+                continue;
+            }
+    
+            // Determinar identificador de encuesta
+            String idEncuesta = idEncuestaGenerico;
+
+            if(caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas'){
+                idEncuesta = idFCO;
+            }else if (caso.CC_En_Tercer_Nivel__c) {
+                idEncuesta = idEncuestaTercerNivel;
+            } else if ('Phone'.equals(caso.Origin)) {
+                idEncuesta = idEncuestaLlamada;
+            } else if ('Chat'.equals(caso.Origin)) {
+                idEncuesta = idEncuestaChat;
+            }
+    
+            // Determinar identificador del espacio
+            String grupoTematica = (caseToGroupMap.containsKey(caso.Id) && !String.isEmpty(caseToGroupMap.get(caso.Id))) 
+            ? caseToGroupMap.get(caso.Id) 
+            : caso.CC_Tematica__c;
+
+            String idEspacio = mapInfoChat.containsKey(caso.Id) 
+                ? mapInfoChat.get(caso.Id).replace(' ', '_') 
+                : caso.CC_Tematica__c.replace(' ', '_');
+    
+            // Construcción de la URL
+            String encuestaURL = construirURL(linkBase, idEncuesta, caso, idEspacio, grupoTematica);
+    
+            // Agregar al mapa de resultados
+            urlsEncuestas.put(caso.Id, encuestaURL);
+        }
+    
+        return urlsEncuestas;
+    }
+    
+    // Método auxiliar para construir la URL
+    private static String construirURL(String base, String idEncuesta, Case caso, String idEspacio, String grupoTematica) {
+        return base + 'sid=' + idEncuesta 
+            + '&lang=' + caso.CC_Idioma__c 
+            + '&userid=' + caso.CC_Matricula_Empleado__c 
+            + '&ticketid=' + caso.CaseNumber 
+            + '&idet=' + idEspacio 
+            + '&et=' + grupoTematica.replace(' ', '_') 
+            + '&newtest=Y';
+    }
+    
+
+    public static List<String> getValoresCS(String nombreCS) {
+        CC_Settings__c cs = CC_Settings__c.getValues(nombreCS);
+        if (cs == null) return new List<String>(); 
+    
+        List<String> listaValores = new List<String>();
+    
+        // Iterar directamente sobre los campos poblados
+        for (String campo : cs.getPopulatedFieldsAsMap().keySet()) {
+            if (campo.startsWith('CC_Configuracion_')) {
+                listaValores.add(String.valueOf(cs.get(campo))); 
+            }
+        }
+    
+        return listaValores;
+    }
+    
+    public static Map<Id, String> recuperarNumpersoPorComunicaciones(List<CC_Comunicaciones__c> comunicaciones) {
+        Map<Id, String> idToNumPersoMap = new Map<Id, String>();
+    
+        for (CC_Comunicaciones__c comunicacion : comunicaciones) {
+            String numPerso = '';
+    
+            if (comunicacion.CC_Case__r.CC_Representante__c != null) {
+                // Si hay representante, se toma el NumPerso del representante
+                numPerso = !String.isEmpty(comunicacion.CC_Case__r.CC_Representante__r?.CC_Representante__r?.AV_NumPerso__c) ? comunicacion.CC_Case__r.CC_Representante__r?.CC_Representante__r?.AV_NumPerso__c : !String.isEmpty(comunicacion.CC_Case__r.CC_Representante__r?.CC_Representante__r?.CC_NumPerso__c) ? comunicacion.CC_Case__r.CC_Representante__r?.CC_Representante__r?.CC_NumPerso__c : '';
+            } else if (comunicacion.CC_Case__r.Account.RecordType.DeveloperName == 'CC_Cliente' && comunicacion.CC_Case__r.Contact.RecordType.DeveloperName == 'CIBE_Apoderado') {
+                // Si es cliente jurídico con apoderado
+                numPerso = !String.isEmpty(comunicacion.CC_Case__r.Contact?.CIBE_NumPerso__c) ? comunicacion.CC_Case__r.Contact?.CIBE_NumPerso__c : !String.isEmpty(comunicacion.CC_Case__r.Contact?.AV_NumPerso__c) ? comunicacion.CC_Case__r.Contact?.AV_NumPerso__c : !String.isEmpty(comunicacion.CC_Case__r.Contact?.CC_NumPerso__c) ? comunicacion.CC_Case__r.Contact?.CC_NumPerso__c : '';
+            } else if (comunicacion.CC_Case__r.Account.RecordType.DeveloperName == 'CC_Cliente' && comunicacion.CC_Case__r.Contact.RecordType.DeveloperName == 'CC_Cliente' && comunicacion.CC_Case__r.Account.AV_Segmento__c == 'RPF') {
+                // Si el segmento es RPF, se toma el AV_NumPerso de la cuenta
+                numPerso = !String.isEmpty(comunicacion.CC_Case__r.Account?.AV_NumPerso__c) ? comunicacion.CC_Case__r.Account?.AV_NumPerso__c : !String.isEmpty(comunicacion.CC_Case__r.Account?.CC_NumPerso__c) ? comunicacion.CC_Case__r.Account?.CC_NumPerso__c : '';
+            } else {
+                // Para otros casos, se toma el NumPerso de la cuenta
+                numPerso = !String.isEmpty(comunicacion.CC_Case__r.Account?.AV_NumPerso__c) ? comunicacion.CC_Case__r.Account?.AV_NumPerso__c : !String.isEmpty(comunicacion.CC_Case__r.Account?.CC_NumPerso__c) ? comunicacion.CC_Case__r.Account?.CC_NumPerso__c : '';
+            }
+    
+            // Agregar al mapa
+            idToNumPersoMap.put(comunicacion.Id, numPerso);
+        }
+    
+        return idToNumPersoMap;
+    }
+    
+    
+    
 }

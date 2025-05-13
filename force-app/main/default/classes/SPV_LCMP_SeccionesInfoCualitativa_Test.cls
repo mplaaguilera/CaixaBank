@@ -16,7 +16,7 @@ public with sharing class SPV_LCMP_SeccionesInfoCualitativa_Test {
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     //Rt para el maestro de temas que es la información cualitativa en SPV
-    private static final Id recTypeInfoCualitativa = mapRTsObjects.get('SAC_MaestroTemas__c').get('SPV_InformacionCualitativa').getRecordTypeId();
+    private static final Id RECTYPEINFOCUALITATIVA = mapRTsObjects.get('SAC_MaestroTemas__c').get('SPV_InformacionCualitativa').getRecordTypeId();
 
     @TestSetup
     static void makeData(){
@@ -57,7 +57,7 @@ public with sharing class SPV_LCMP_SeccionesInfoCualitativa_Test {
 
         SAC_MaestroTemas__c maestroT = new SAC_MaestroTemas__c();
         maestroT.Name = 'SPVTopic1';
-        maestroT.RecordTypeId = recTypeInfoCualitativa;
+        maestroT.RecordTypeId = RECTYPEINFOCUALITATIVA;
         maestroT.SAC_Seccion__c = 'Test maestro InforCual';
         SPV_DatabaseDML.insertDML(maestroT, false);
     }

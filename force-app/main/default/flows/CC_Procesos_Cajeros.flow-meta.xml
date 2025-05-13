@@ -4,7 +4,7 @@
         <name>SE_Agressio_Robatori_Frau</name>
         <label>SE_Agressio_Robatori_Frau</label>
         <locationX>3607</locationX>
-        <locationY>1349</locationY>
+        <locationY>1439</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -54,7 +54,7 @@
         <name>SE_Alarma_Disparada</name>
         <label>SE_Alarma_Disparada</label>
         <locationX>3294</locationX>
-        <locationY>1347</locationY>
+        <locationY>1437</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -104,7 +104,7 @@
         <name>SE_CaixerForaServeiDesplacats</name>
         <label>SE_CaixerForaServeiDesplacats</label>
         <locationX>4310</locationX>
-        <locationY>1459</locationY>
+        <locationY>1549</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -154,7 +154,7 @@
         <name>SE_CaixerForaServeiGenerica</name>
         <label>SE_CaixerForaServeiGenerica</label>
         <locationX>4313</locationX>
-        <locationY>1144</locationY>
+        <locationY>1234</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -204,7 +204,7 @@
         <name>SE_CaixetinsBitlletsIntencanviats</name>
         <label>SE_CaixetinsBitlletsIntencanviats</label>
         <locationX>4314</locationX>
-        <locationY>1299</locationY>
+        <locationY>1389</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -254,7 +254,7 @@
         <name>SE_Indigents_Recinte</name>
         <label>SE_Indigents_Recinte</label>
         <locationX>3762</locationX>
-        <locationY>1350</locationY>
+        <locationY>1440</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -304,7 +304,7 @@
         <name>SE_MalfuncionamentUnitat</name>
         <label>SE_MalFuncionamentUnitatGenerica</label>
         <locationX>4202</locationX>
-        <locationY>1821</locationY>
+        <locationY>1911</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -354,7 +354,7 @@
         <name>SE_MalFuncionamentUnitatDesplacats</name>
         <label>SE_MalFuncionamentUnitatDesplacats</label>
         <locationX>4311</locationX>
-        <locationY>826</locationY>
+        <locationY>916</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -398,7 +398,7 @@
         <name>SE_PosibleManipulacio</name>
         <label>SE_PosibleManipulació</label>
         <locationX>4308</locationX>
-        <locationY>1650</locationY>
+        <locationY>1740</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -448,7 +448,7 @@
         <name>SE_RuidoEnElCajero</name>
         <label>SE_RuidoEnElCajero</label>
         <locationX>4315</locationX>
-        <locationY>990</locationY>
+        <locationY>1080</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -498,7 +498,7 @@
         <name>SE_Vandalisme_a_Recinte_o_Caixer</name>
         <label>SE Vandalisme a Recinte o Caixer</label>
         <locationX>3165</locationX>
-        <locationY>1349</locationY>
+        <locationY>1439</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
@@ -550,7 +550,7 @@
         <name>OficinaAfectada_IdAssignment</name>
         <label>OficinaAfectada_IdAssignment</label>
         <locationX>1750</locationX>
-        <locationY>169</locationY>
+        <locationY>259</locationY>
         <assignmentItems>
             <assignToReference>Var_OficinaAfectada</assignToReference>
             <operator>Assign</operator>
@@ -566,7 +566,7 @@
         <name>Seguretat_Mate</name>
         <label>Seguretat_Mateniment_Assignment</label>
         <locationX>3513</locationX>
-        <locationY>835</locationY>
+        <locationY>925</locationY>
         <assignmentItems>
             <assignToReference>Var_Comentaris_ARF</assignToReference>
             <operator>Assign</operator>
@@ -1053,7 +1053,7 @@
         <name>OperativaSeleccionada</name>
         <label>OperativaSeleccionada</label>
         <locationX>3523</locationX>
-        <locationY>949</locationY>
+        <locationY>1039</locationY>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Vandalismo</name>
@@ -1309,7 +1309,7 @@
         <name>OperativaSeleccionadaPredeterminado</name>
         <label>OperativaSeleccionadaPredeterminado</label>
         <locationX>3297</locationX>
-        <locationY>618</locationY>
+        <locationY>708</locationY>
         <defaultConnector>
             <targetReference>Screen_Seguridad_Mantenimiento</targetReference>
         </defaultConnector>
@@ -1330,7 +1330,7 @@
             <label>OperativaSeleccionadaPredeterminado</label>
         </rules>
     </decisions>
-    <description>US1096280- completed</description>
+    <description>Parametrización emails - OK</description>
     <environments>Default</environments>
     <formulas>
         <name>Fecha_Actual</name>
@@ -1432,7 +1432,7 @@
         <name>CreateTaskEmail_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>3161</locationX>
-        <locationY>1518</locationY>
+        <locationY>1608</locationY>
         <connector>
             <targetReference>Registrar_Evento_0_0_0_0</targetReference>
         </connector>
@@ -1490,7 +1490,7 @@
         <name>CreateTaskEmail_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>3297</locationX>
-        <locationY>1521</locationY>
+        <locationY>1611</locationY>
         <connector>
             <targetReference>Registrar_Evento_0_0_0_0</targetReference>
         </connector>
@@ -1548,7 +1548,7 @@
         <name>CreateTaskEmail_0_0_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>3620</locationX>
-        <locationY>1530</locationY>
+        <locationY>1620</locationY>
         <connector>
             <targetReference>Registrar_Evento_0_0_0_0</targetReference>
         </connector>
@@ -1606,7 +1606,7 @@
         <name>CreateTaskEmail_0_0_0_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>3758</locationX>
-        <locationY>1529</locationY>
+        <locationY>1619</locationY>
         <connector>
             <targetReference>Registrar_Evento_0_0_0_0</targetReference>
         </connector>
@@ -1664,7 +1664,7 @@
         <name>CreateTaskEmail_0_0_0_0_0_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>4890</locationX>
-        <locationY>1829</locationY>
+        <locationY>1919</locationY>
         <connector>
             <targetReference>Registrar_Evento_0_0_0_0</targetReference>
         </connector>
@@ -1722,7 +1722,7 @@
         <name>CreateTaskEmail_0_0_0_0_0_0_0_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>4836</locationX>
-        <locationY>826</locationY>
+        <locationY>916</locationY>
         <inputAssignments>
             <field>Description</field>
             <value>
@@ -1777,7 +1777,7 @@
         <name>CreateTaskEmail_0_0_0_0_0_0_0_0_0_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>4838</locationX>
-        <locationY>990</locationY>
+        <locationY>1080</locationY>
         <inputAssignments>
             <field>Description</field>
             <value>
@@ -1832,7 +1832,7 @@
         <name>CreateTaskEmail_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>4609</locationX>
-        <locationY>1144</locationY>
+        <locationY>1234</locationY>
         <connector>
             <targetReference>Registrar_Evento_0_0_0_0</targetReference>
         </connector>
@@ -1890,7 +1890,7 @@
         <name>CreateTaskEmail_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>4871</locationX>
-        <locationY>1658</locationY>
+        <locationY>1748</locationY>
         <connector>
             <targetReference>Registrar_Evento_0_0_0_0</targetReference>
         </connector>
@@ -1948,7 +1948,7 @@
         <name>CreateTaskEmail_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>4788</locationX>
-        <locationY>1458</locationY>
+        <locationY>1548</locationY>
         <connector>
             <targetReference>Registrar_Evento_0_0_0_0</targetReference>
         </connector>
@@ -2006,7 +2006,7 @@
         <name>CreateTaskEmail_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0_0</name>
         <label>CreateTaskEmail</label>
         <locationX>4714</locationX>
-        <locationY>1285</locationY>
+        <locationY>1375</locationY>
         <connector>
             <targetReference>Registrar_Evento_0_0_0_0</targetReference>
         </connector>
@@ -2064,7 +2064,7 @@
         <name>Registrar_Evento_0_0_0_0</name>
         <label>Registrar_Evento</label>
         <locationX>3921</locationX>
-        <locationY>2438</locationY>
+        <locationY>2528</locationY>
         <inputAssignments>
             <field>Priority</field>
             <value>
@@ -2110,10 +2110,37 @@
         <object>Task</object>
     </recordCreates>
     <recordLookups>
+        <name>Emails</name>
+        <label>Emails</label>
+        <locationX>764</locationX>
+        <locationY>241</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>RecordtypeTask</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Name</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Email flow procesos</stringValue>
+            </value>
+        </filters>
+        <object>CC_Lista_Valores__c</object>
+        <outputAssignments>
+            <assignToReference>SegMan_Dest_ResponsableSeguridad</assignToReference>
+            <field>CC_Valor2__c</field>
+        </outputAssignments>
+        <outputAssignments>
+            <assignToReference>SegMan_Dest</assignToReference>
+            <field>CC_Valor__c</field>
+        </outputAssignments>
+    </recordLookups>
+    <recordLookups>
         <name>Get_Cuenta_Relacionada</name>
         <label>Cuenta Relacionada</label>
         <locationX>1637</locationX>
-        <locationY>271</locationY>
+        <locationY>361</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>OficinaAfectada_IdAssignment</targetReference>
@@ -2143,7 +2170,7 @@
         <name>Get_Current_cases</name>
         <label>Caso Actual</label>
         <locationX>1389</locationX>
-        <locationY>272</locationY>
+        <locationY>362</locationY>
         <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>getCurrentContact</targetReference>
@@ -2176,7 +2203,7 @@
         <name>Get_Oficina_Asset</name>
         <label>Get Oficina Asset</label>
         <locationX>2034</locationX>
-        <locationY>353</locationY>
+        <locationY>443</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Screen_Seguridad_Mantenimiento</targetReference>
@@ -2198,7 +2225,7 @@
         <name>Get_Oficina_Gestora</name>
         <label>Get Oficina Gestora</label>
         <locationX>2034</locationX>
-        <locationY>208</locationY>
+        <locationY>298</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>GetAsset</targetReference>
@@ -2220,7 +2247,7 @@
         <name>GetAsset</name>
         <label>GetAsset</label>
         <locationX>2237</locationX>
-        <locationY>306</locationY>
+        <locationY>396</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Get_Oficina_Asset</targetReference>
@@ -2244,7 +2271,7 @@
         <name>getCurrentContact</name>
         <label>Contacto Relacionado</label>
         <locationX>1501</locationX>
-        <locationY>271</locationY>
+        <locationY>361</locationY>
         <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Get_Cuenta_Relacionada</targetReference>
@@ -2275,7 +2302,7 @@
         <name>GetOficinaAfectada</name>
         <label>GetOficinaAfectada</label>
         <locationX>1843</locationX>
-        <locationY>278</locationY>
+        <locationY>368</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Get_Oficina_Gestora</targetReference>
@@ -2300,7 +2327,7 @@
         <name>GetOficinaAfectadaSeleccionada_0_0_0</name>
         <label>GetOficinaAfectadaSeleccionada</label>
         <locationX>3506</locationX>
-        <locationY>690</locationY>
+        <locationY>780</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Seguretat_Mate</targetReference>
@@ -2325,7 +2352,7 @@
         <name>RecordtypeTask</name>
         <label>RecordtypeTask</label>
         <locationX>1243</locationX>
-        <locationY>271</locationY>
+        <locationY>361</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Get_Current_cases</targetReference>
@@ -2354,8 +2381,8 @@
     <screens>
         <name>Screen_AnomaliaCajero</name>
         <label>Screen_AnomaliaCajero (Deleted)</label>
-        <locationX>665</locationX>
-        <locationY>474</locationY>
+        <locationX>494</locationX>
+        <locationY>50</locationY>
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
         <allowPause>false</allowPause>
@@ -2681,7 +2708,7 @@ REGEX({!Numero_Activador_TAjena},&quot;[0-9]{16}&quot;)
         <name>Screen_Seguridad_Mantenimiento</name>
         <label>Screen_Seguridad_Mantenimiento</label>
         <locationX>3507</locationX>
-        <locationY>562</locationY>
+        <locationY>652</locationY>
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
         <allowPause>true</allowPause>
@@ -2968,9 +2995,9 @@ REGEX({!Numero_Activador_TAjena},&quot;[0-9]{16}&quot;)
     </screens>
     <start>
         <locationX>50</locationX>
-        <locationY>132</locationY>
+        <locationY>222</locationY>
         <connector>
-            <targetReference>RecordtypeTask</targetReference>
+            <targetReference>Emails</targetReference>
         </connector>
     </start>
     <status>Active</status>
@@ -3813,9 +3840,6 @@ Contact Center Clients Grup CaixaBank</text>
         <isCollection>false</isCollection>
         <isInput>false</isInput>
         <isOutput>false</isOutput>
-        <value>
-            <stringValue>cga24x7@fujitsu.com</stringValue>
-        </value>
     </variables>
     <variables>
         <name>SegMan_Dest_ResponsableSeguridad</name>
@@ -3823,9 +3847,6 @@ Contact Center Clients Grup CaixaBank</text>
         <isCollection>false</isCollection>
         <isInput>false</isInput>
         <isOutput>false</isOutput>
-        <value>
-            <stringValue>isoc@caixabank.com</stringValue>
-        </value>
     </variables>
     <variables>
         <name>Subject_ACBloqueoCautelarTarjeta_9737_CAST</name>

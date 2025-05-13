@@ -5,6 +5,10 @@ public with sharing class CC_Contact_BI_TRHan extends CC_TriggerHandlerBase {
 	}
 	
     private void process(List<Contact> listNewObj, Map<Id, Contact> mapNewObj) {
+
+        //Comprobar si el contacto es confidencial
+        vaciarContactoConfidencial(listNewObj);
+
         //Se comprueba si el usuario tiene PS de CAM
         
         if(FeatureManagement.checkPermission('AM_Responsable')){
@@ -45,6 +49,9 @@ public with sharing class CC_Contact_BI_TRHan extends CC_TriggerHandlerBase {
                 }
             }
         }
+
+        //Comprobar si el contacto es confidencial
+        vaciarContactoConfidencial(listNewObj);
     }
 
     private static void evitarDuplicadosCAM(List<Contact> newContacts, Map<Id, Contact> mapIdContacts){
@@ -140,5 +147,35 @@ public with sharing class CC_Contact_BI_TRHan extends CC_TriggerHandlerBase {
         
         
     } 
+
+    private void vaciarContactoConfidencial(List<Contact> contactos) {
+
+		for (Contact contacto : contactos) {
+			if (contacto.CC_Confidencial__c == true) {
+				contacto.Birthdate = null;
+				contacto.CC_CuentaFacebook__c = '';
+				contacto.CC_CuentaTwitter__c = '';
+				contacto.CC_EmpleadoGestorId__c = null;
+				contacto.CC_FechaNac__c = null;
+				contacto.CC_Identificador_CBKNow__c = '';
+				contacto.CC_Idioma__c = null;
+				contacto.CC_OficinaGestoraId__c = null;
+				contacto.CC_Segmento__c = '';
+				contacto.CC_Sexo__c = null;
+				contacto.Email = '';
+				contacto.FirstName = '';
+				contacto.LastName = 'CONFIDENCIAL';
+				contacto.MailingCity = null;
+				contacto.MailingCountry = null;
+				contacto.MailingPostalCode = null;
+				contacto.MailingState = null;
+				contacto.MailingStreet = null;
+				contacto.MobilePhone = '';
+				contacto.Phone = '';
+				contacto.Salutation = null;
+
+			}
+		}
+	}
         
 }

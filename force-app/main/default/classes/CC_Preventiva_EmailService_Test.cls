@@ -314,7 +314,7 @@ public with sharing class CC_Preventiva_EmailService_Test {
         oCaso.CC_MCC_ProdServ__c = mccProducto.Id;
         oCaso.CC_MCC_Motivo__c = mccMotivo.Id;
         update oCaso;
-        
+                
         //Actividad de solicitud de información
         Task actividadSolicitudInfo = new Task();
         actividadSolicitudInfo.WhatId = oCaso.Id;
@@ -1278,7 +1278,7 @@ public with sharing class CC_Preventiva_EmailService_Test {
         System.assertEquals(emailId != null, true);
         Test.stopTest();
     }
-    
+
     @isTest
     public static void semillaRespuestaCSIBankia() {
         Account cuenta = new Account();

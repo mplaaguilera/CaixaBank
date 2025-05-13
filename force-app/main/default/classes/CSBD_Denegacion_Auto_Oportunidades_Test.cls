@@ -3,7 +3,8 @@ public class CSBD_Denegacion_Auto_Oportunidades_Test {
 
     @TestSetup
     private static void testSetup() {
-        System.runAs(CSBD_Usuarios.usuarioAdministrador()) {
+        User usuarioAdministrador = CSBD_TestDataFactory.usuarioAdministrador();
+        System.runAs(usuarioAdministrador) {
             Id recordTypeIdListaValores = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
             CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
             listaValores.RecordTypeId = recordTypeIdListaValores;
@@ -85,23 +86,21 @@ public class CSBD_Denegacion_Auto_Oportunidades_Test {
             regla2.CSBD_Scoring_Riesgo__c = 'Denegado SIR';
             insert new List<CSBD_Denegacion_Auto_Solicitud__c>{regla1, regla2};
 
-            User usuarioGestor = CSBD_Usuarios.usuarioGestor();
-            System.runAs(usuarioGestor) {
-                EmailTemplate plantillaCastellano = new EmailTemplate();
-                plantillaCastellano.isActive = true;
-                plantillaCastellano.Name = 'plantilla es';
-                plantillaCastellano.DeveloperName = 'CSBD_Test_' + System.now().getTime();
-                plantillaCastellano.TemplateType = 'text';
-                plantillaCastellano.FolderId = usuarioGestor.Id;
-                insert plantillaCastellano;
-            }
+            EmailTemplate plantillaCastellano = new EmailTemplate();
+            plantillaCastellano.isActive = true;
+            plantillaCastellano.Name = 'plantilla es';
+            plantillaCastellano.DeveloperName = 'CSBD_Test_' + System.now().getTime();
+            plantillaCastellano.TemplateType = 'text';
+            plantillaCastellano.FolderId = usuarioAdministrador.Id;
+            insert plantillaCastellano;
         }
     }
 
     @isTest
     private static void test() {
-        System.runAs(CSBD_Usuarios.usuarioAdministrador()) {
-            Contact contacto = (Contact)CSBD_TestDataFactory.crearCuentaContacto('123123123K', new Map<String, Object>{'CSBD_Escala_Maestra__c' => 3}).get('contacto');
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+            Map<String, Object> camposContacto = new Map<String, Object>{'CSBD_Escala_Maestra__c' => 3};
+            Contact contacto = (Contact)CSBD_TestDataFactory.crearCuentaContacto('123123123K', camposContacto).get('contacto');
 
             List<Opportunity> oportunidades = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo', new List<Map<String, Object>>{
                 new Map<String, Object>{
@@ -120,6 +119,7 @@ public class CSBD_Denegacion_Auto_Oportunidades_Test {
                     'CSBD_Email_Solicitud__c' => 'test@test.com'
                 }
             });
+
             Test.startTest();
             CSBD_Denegacion_Automatica_Oportunidades.denegacionAutomaticaOportunidades(new List<Id>{oportunidades[0].Id, oportunidades[1].Id});
             Test.stopTest();

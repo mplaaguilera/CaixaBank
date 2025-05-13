@@ -2,8 +2,11 @@
 <CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Opportunity</fullName>
     <fields>Name</fields>
-    <fields>RecordTypeId</fields>
+    <fields>AccountId</fields>
+    <fields>AV_PF__c</fields>
+    <fields>AV_ByProduct__c</fields>
     <fields>StageName</fields>
-    <fields>AV_Product__c</fields>
+    <fields>AV_Potencial__c</fields>
+    <fields>AV_PotencialityOpportunity__c</fields>
     <label>AV_Opportunity</label>
 </CompactLayout>

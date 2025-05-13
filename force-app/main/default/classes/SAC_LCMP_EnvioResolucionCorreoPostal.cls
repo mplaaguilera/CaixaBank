@@ -29,7 +29,7 @@ public with sharing class SAC_LCMP_EnvioResolucionCorreoPostal {
         }
 
         if(!Schema.sObjectType.ContentVersion.isAccessible()){ throw new AuraHandledException( 'Fallo al recuperar el content version.' ); }
-        List<ContentVersion> cv = [SELECT Id, VersionData, ContentDocumentId FROM ContentVersion WHERE SAC_StringRedaccion_fileupload__c = 'ResolucionRedaccion' AND ContentDocumentId IN: idsDocumentLink LIMIT 1];
+        List<ContentVersion> cv = [SELECT Id, VersionData, ContentDocumentId FROM ContentVersion WHERE SAC_StringRedaccion_fileupload__c IN ('ResolucionRedaccion', 'ReenvioNuevoRedaccion') AND ContentDocumentId IN: idsDocumentLink order by CreatedDate LIMIT 1];
 
         // if(!Schema.sObjectType.ContentDocument.isAccessible()){ throw new AuraHandledException( 'Fallo al recuperar el content document.' ); }
         // List<ContentDocument> cd = [SELECT Id, Title FROM ContentDocument WHERE Id =: cv[0].ContentDocumentId LIMIT 1];
@@ -246,7 +246,10 @@ public with sharing class SAC_LCMP_EnvioResolucionCorreoPostal {
             }
         }
 
+        System.debug('idsSeleccionados: ' + idsSeleccionados);
+        System.debug('caseId: ' + caseId);
         Case caso = [SELECT Id, SAC_CasoEspecial__c, CC_Canal_Procedencia__c FROM Case WHERE Id =: caseId];
+        System.debug('pasa caso: ' + caso);
 
         if(caso.SAC_CasoEspecial__c == 'SAC_Presidencia'){
             maestroTarea = 'SAC_ImprimirCartasAD';
@@ -257,7 +260,10 @@ public with sharing class SAC_LCMP_EnvioResolucionCorreoPostal {
         }
         //US1101520 crear tarea al subsanar por carta postal
         List<ContentVersion> listaCV = [SELECT Id, ContentDocumentId  FROM ContentVersion WHERE ContentDocumentId IN: idsSeleccionados ];
+        System.debug('pasa listaCV: ' + listaCV);
+
         SAC_MaestroAccionesReclamacion__c maestroTareaAutomatica = [SELECT Id, Name FROM SAC_MaestroAccionesReclamacion__c WHERE RecordTypeId = :RECTYPEMAESTROACCIONESREC AND SAC_Activo__c = true AND SAC_DeveloperName__c = :maestroTarea LIMIT 1];  
+        System.debug('pasa maestr' + maestroTareaAutomatica);
 
         // SAC_MaestroAccionesReclamacion__c maestroTareaAutomatica = [SELECT Id, Name FROM SAC_MaestroAccionesReclamacion__c WHERE RecordTypeId = :RECTYPEMAESTROACCIONESREC AND SAC_Activo__c = true AND SAC_DeveloperName__c = 'SAC_ImprimirCartasOrdinario' LIMIT 1];  
 

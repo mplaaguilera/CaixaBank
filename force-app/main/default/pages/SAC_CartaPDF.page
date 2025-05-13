@@ -1,41 +1,80 @@
-<apex:page renderAs="pdf" applyBodyTag="false" standardController="SAC_DocumentoEnvio__c">
-        <head>
-                <style type="text/css" media="print">
-                       @page {
-                                 @top-center {
-                                       content: element(header);
-                               }
-                               @bottom-left {
-                                     content: element(footer);
-                               }
-                            }
-                                     div.header {
-                                      padding: 10px;
-                                      position: running(header);
-                           }
-                       div.footer {
-                                display: block;
-                             padding: 5px;
-                               position: running(footer);
-                      }
-                                     .pagenumber:before {
-                                        content: counter(page);
-                       }
-                                   .pagecount:before {
-                             content: counter(pages);
-                        }
-                    </style>
-              </head>
-           <div class="header">
-                
-           </div>
-           <div style="float: right;">               
-            
-           </div>
-           <div class="footer">
+<apex:page renderAs="pdf" applyBodyTag="false" showHeader="false" sidebar="false" standardStylesheets="false" applyHtmlTag="false" standardController="SAC_DocumentoEnvio__c">
+      <head>
+            <style type="text/css" media="print">
+                  @page {
+                        margin-top:     4.35cm;
+                        /*margin-top:     5.5cm; así estaba con margen superior*/
+                        margin-bottom:    3cm;
+                        margin-left:    3.5cm;
+                        margin-right:    2.5cm;
+                        line-height: normal;
 
-          </div>
-          <div class="content">
-            <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_Cuerpo__c}" escape="false" ></apex:outputText>
-          </div>
+                        @top-center {
+                              width: 100%;
+                              content: element(header);
+                        }
+                        @bottom-left {
+                              width: 100%;
+                              content: element(footer);
+                        }
+
+                        /*background-image: url(/resource/SAC_CartaPlantilla);*/
+                        background-image:url(/resource/{!SAC_DocumentoEnvio__c.SAC_NombrePlantillaLateral__c});
+                        background-repeat: no-repeat;
+
+                  }
+                  div.header {
+                        /* display: block; */
+                        /*margin-top:     1.67cm; así estaba con margen superior*/
+                        margin-top:     0cm;
+                        margin-left:    -1cm;
+                        line-height: 0;
+                        position: running(header);
+                  }
+                  div.footer {
+                        /* display: block; */
+                        line-height: 0.7;
+                        margin-bottom:    1cm;
+                        text-align: justify;
+                        font-family: Arial !important; 
+                        position: running(footer);
+                  }
+
+                  /*div.footerEu {
+                        background-color: red;
+                        line-height: 0.8em;
+                        margin-bottom:    50cm;
+                        text-align: justify;
+                        font-family: Arial !important; 
+                        position: running(footer);
+                  }*/
+
+                  .pagenumber:before {
+                        content: counter(page);
+                  }
+                  div.body { 
+                        font-family: Arial, Helvetica, sans-serif; 
+                  } 
+                  .pagecount:before {
+                        content: counter(pages);
+                  }      
+
+            </style>
+      </head>
+
+      
+
+      <div id="div-0" class="header">
+            <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_Header__c}" escape="false" ></apex:outputText>
+      </div>
+      <!--<div class="{! IF(SAC_DocumentoEnvio__c.SAC_CP__c == 'eu', 'footerEu', 'footer') }">
+            <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_Footer__c}" escape="false" ></apex:outputText>  
+      </div>-->
+      <div class="footer">
+            <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_Footer__c}"  escape="false" ></apex:outputText>
+      </div>
+      <div class="body">
+            <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_DocPDF__c}" escape="false" ></apex:outputText>
+      </div>
+
 </apex:page>

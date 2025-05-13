@@ -98,14 +98,14 @@ public with sharing class SAC_LCMP_DespachoRepresentante_Test {
     static void verSiGestorTest(){
         User usuario = [SELECT Id FROM User WHERE username = 'useradmintest0@test.com.testSetup' and IsActive = true limit 1];
         Case reclamacion = [SELECT Id, OwnerId FROM Case WHERE Subject = 'TestRec'];
-        Boolean resultado = false;
+        SAC_LCMP_DespachoRepresentante.GestorLetradoWrapper resultado;
 
         Test.startTest();
         System.runAs(usuario){
             resultado= SAC_LCMP_DespachoRepresentante.verSiGestorLetrado(reclamacion.Id, reclamacion.OwnerId);
         }
 
-        Assert.areEqual(true, resultado, 'No se ha comprobado correctamente si es gestor/letrado');
+        Assert.areEqual(true, resultado.esUsuarioGestor, 'No se ha comprobado correctamente si es gestor/letrado');
         Test.stopTest();
     }
 

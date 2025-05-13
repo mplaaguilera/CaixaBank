@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Hist_ricos</fullName>
+    <columns>NAME</columns>
+    <columns>GRR_CodigoUR__c</columns>
+    <columns>GRR_UR__c</columns>
+    <columns>GRR_Caso__c</columns>
+    <columns>GRR_NIF__c</columns>
+    <columns>GRR_Informacion_Cliente__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>CREATEDBY_USER</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>GRR_RegistroCarga__c.GRR_Historico</value>
+    </filters>
+    <label>Históricos</label>
+    <sharedTo>
+        <role>GRR</role>
+        <role>GRR_Agente</role>
+    </sharedTo>
+</ListView>

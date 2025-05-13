@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_NamePrescriberId__c</fullName>
+    <description>Campo que contiene el código de identificación</description>
     <externalId>false</externalId>
     <formula>Name + &apos; - &apos;+ TEXT(AV_PrescriberId__c)</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>

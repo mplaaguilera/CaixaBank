@@ -3,7 +3,7 @@
     <fullName>CSBD_Now_Canal__c</fullName>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
-    <label>Canal (N/A)</label>
+    <label>Canal</label>
     <length>10</length>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>

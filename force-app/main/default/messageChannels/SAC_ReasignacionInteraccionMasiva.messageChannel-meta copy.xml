@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Send id of select record in a list view</description>
+    <isExposed>true</isExposed>
+    <lightningMessageFields>
+        <description>Array of records</description>
+        <fieldName>recordsSelected</fieldName>
+    </lightningMessageFields>
+    <masterLabel>SAC_ReasignacionInteraccionMasiva</masterLabel>
+</LightningMessageChannel>

@@ -1,0 +1,988 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_ToDo</fullName>
+    <active>true</active>
+    <label>To Do Task</label>
+    <picklistValues>
+        <picklist>AV_Chanel__c</picklist>
+        <values>
+            <fullName>001</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>002</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>003</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>004</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>005</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ContactCenter</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Meeter</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MisClientes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Now</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>AV_ContactGenerateAppointment__c</picklist>
+        <values>
+            <fullName>Cita generada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin cita</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>AV_InOutbound__c</picklist>
+        <values>
+            <fullName>001</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>002</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Entrada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Salida</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>AV_OrigenAct__c</picklist>
+        <values>
+            <fullName>AV_AccionComercial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_AlertaComercial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Avisos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_CitasNoCerradas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_CitasPrevias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_CloseDeLoop</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_ContactosGCF</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_ContactosGCF_Online</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_IniciativaGestora</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Llamadas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Morosidad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Muro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Normativo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_OnBoarding</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Priorizador</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_R2B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contact Center</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>AV_OrigenApp__c</picklist>
+        <values>
+            <fullName>AV_ACAsesorNoa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_AC_Vidacaixa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_AdobeCampaign</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_BackReport</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_CLI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_CallMe</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_ComesFromFlow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_DataPipelines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_GCF</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_NOATelefono</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_NowIn</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Outlook</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_SAC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_SFReportNoLocalizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_Salesforce</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_SalesforceClientReport</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_SalesforceReport</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_SalesforceTaskOpp</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_SalesforceTaskOpp_Iniciativa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AV_UpdateWallet</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>AV_Purpose__c</picklist>
+        <values>
+            <fullName>001</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>002</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comercial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GestionOperativa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Personalizada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tabulada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tabulada con gestión</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>AV_Tipo__c</picklist>
+        <values>
+            <fullName>001</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>030</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COTF</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CTF</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CTO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CTOOC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ESE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GSCC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LMD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OCL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OCX</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OFT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VLD</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CSBD_Evento_Estado__c</picklist>
+        <values>
+            <fullName>Cancelada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancelado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Completado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestionada Positiva</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Planificada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RCS Entregado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RCS Entregado %28SMS Alternativo%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RCS Enviado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RCS Envío Fallido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RCS Visto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Realizada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vencida</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>FinServ__Regarding__c</picklist>
+        <values>
+            <fullName>Gestión Comercial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Primera Visita</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Relaciones Institucionales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Revisión Resultados Financieros</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>OS_Tipo__c</picklist>
+        <values>
+            <fullName>Actividad manual</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Acuse de recibo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Alta manual de caso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de tipo del caso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Canal de procedencia modificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cerrado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Consulta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Correo - Entrada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Duplicar caso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fusionado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Llamada entrante</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Llamada saliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Llamada transferida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Notificación - Salida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Petición Encuesta Offline</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reactivación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reapertura por respuesta de cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reasignación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recepción de valija digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rechazado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reclamación Traslado Colaborador</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reclasificación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Remitir Colaborador</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Responder a cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud Información</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud autorización pago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud carga fichero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud creación pago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud revisión</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslado Colaborador</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Priority</picklist>
+        <values>
+            <fullName>A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>High</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>M</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Normal</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Y</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Status</picklist>
+        <values>
+            <fullName>Completed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Desactivada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestionada negativa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestionada positiva</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestionado no localizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No gestionada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Started</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Open</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Pendiente no localizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente revisar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rechazada</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Subject</picklist>
+        <values>
+            <fullName>158</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>164</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>165</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>38</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>39</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>58</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>700</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>736</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>739</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Acuse de recibo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Asignar a agente gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Colaboración</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Conforme sanción comité</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Documentación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Entrega Voluntaria %28EV%29 con%2Fsin condonación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Localización</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Regularización suministros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Solicitud CAE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Solicitud Cupo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Solicitud alquiler</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación Interna %28CI%29 %E2%80%93 Suspensión</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comunicación intermedia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Email</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Entrevista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestionado en el mes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestiones a realizar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gestión GRR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Llamada Entrante</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Llamada Saliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Llamada saliente Cliente no se identifica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Personalizada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reclamación de cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Remitido a canal telefónico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Respuesta al cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Revisión solución incidencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud de Compartición de pantalla</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solución</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TEAMS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Verificación cliente</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type</picklist>
+        <values>
+            <fullName>Actividad manual</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Acuse de recibo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Automática</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio de heredero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cambio empresa proveedora</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cerrado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cierre Automatico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cita gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cita rápida gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Correo no identificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Devolver Primer Nivel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Devuelto al Contact Center</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Duplicar caso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Envio correo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FRA_Cerrado_CGF</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FRA_Pendiente_Contactar_Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FRA_Traslado_Información_CGF</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fax entrante</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Flow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fraude</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fusionado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Identificación del cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No soportada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente Interno</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reactivación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reapertura</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reapertura por respuesta de cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reasignación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rechazar Primer Nivel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reclamación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reclamación Traslado Colaborador</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Remitir Colaborador</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Retipificación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud Información</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud autorización pago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud carga fichero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud creación pago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitud revisión</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarea Cambio Gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarea Cambio Oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarea Hub Gestión</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarea Hub Sales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarea Oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarea gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Time Out</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslado Colaborador</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslado Incidencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslado Tercer Nivel</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

@@ -49,9 +49,7 @@ public with sharing class SEG_trasladoColaboradorWSQueueable implements Queueabl
                 resultadoWS = SEG_trasladoColaboradorWS.realizarTrasladoValija(traslado);
             }
 
-        }catch (Exception ex){
-            // Registrar error en el tratamiento del traslado.
-            CBK_Log.error(ex);
+        }catch (Exception ex){ CBK_Log.error(ex);
             resultadoWS.status = 'NOK';
             resultadoWS.codigo = '9999';
             resultadoWS.detalle = ((String.isNotBlank(resultadoWS.detalle)) ? resultadoWS.detalle + '. ' + ex.getMessage() : ex.getMessage()) + ' (' + ex.getStackTraceString() + ')';
@@ -59,9 +57,7 @@ public with sharing class SEG_trasladoColaboradorWSQueueable implements Queueabl
 
         // Tratamiento final del traslado a colaborador. Los  datos del resultado lo tenemos en el objeto <resultadoWS>
         try{
-            if (resultadoWS.status == 'OK')
-            {
-                String descripcionChatter = 'Petición en ESPERA de recuperar los ficheros asociados al traslado al grupo <' + grupoTrasladoId + '> asociado a ' + traslado.tipoColaborador;
+            if (resultadoWS.status == 'OK'){String descripcionChatter = 'Petición en ESPERA de recuperar los ficheros asociados al traslado al grupo <' + grupoTrasladoId + '> asociado a ' + traslado.tipoColaborador;
 
                 /* FIX. Comentado. Aligerar la transacción.
                 Task createTask = new Task(
@@ -94,10 +90,7 @@ public with sharing class SEG_trasladoColaboradorWSQueueable implements Queueabl
                 descripcionChatter = descripcionChatter + '. Detalle: ' + resultadoWS.detalle;
                 SEG_Case_Operativas_Controller.postOnChatter(traslado.caseId, descripcionChatter, 'ERROR Autoasignar caso (Valija - WS)', null);
             }
-        }catch (Exception ex){
-            // Registrar error en el tratamiento del traslado.
-            CBK_Log.error(ex);
-        }
+        }catch (Exception ex){ CBK_Log.error(ex); }
 
         // Si hay datos, seguir en la ejecución encadenada del Queueable.
         this.listadoTrasladosColaborador.remove(0);

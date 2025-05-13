@@ -72,19 +72,39 @@
 		}
 	},
 
-	abrirOcp: function(component) {
+	abrirOcp: function(component, event, helper) {
 		let datosUrlGrabacion = component.get('c.datosUrlGrabacion');
 		datosUrlGrabacion.setParam('idLlamada', component.get('v.recordId'));
 		datosUrlGrabacion.setCallback(this, response => {
-			let resp = response.getReturnValue();
-			let validacion = 'idDoc:' + resp.tiquet + ';appId:' + resp.appid + ';username:' + resp.username + ';timestamp:' + resp.timestamp;
-			//eslint-disable-next-line no-undef
-			let crypt = new JSEncrypt();
-			crypt.setPublicKey(resp.publicKey);
-			let validacionb64 = encodeURIComponent(crypt.encrypt(validacion));
-			let authb64 = encodeURIComponent(btoa(resp.appid + ':' + resp.username + ':' + resp.canal));
-			let url = resp.baseUrl + '/?auth=' + authb64 + '&validacion=' + validacionb64;
-			window.open(url, '_blank');
+			if (response.getState() === 'SUCCESS') {
+				let resp = response.getReturnValue();
+
+				//Verificar si es una URL de Genesys Cloud
+				if (resp.genesysCloudUrl) {
+					//Si es una URL de Genesys Cloud, abrirla directamente
+					let urlEvent = $A.get('e.force:navigateToURL');
+					urlEvent.setParam('url', resp.genesysCloudUrl);
+					urlEvent.fire();
+				} else {
+					//Si no, seguir con el flujo tradicional de OCP
+					let validacion = 'idDoc:' + resp.tiquet + ';appId:' + resp.appid + ';username:' + resp.username + ';timestamp:' + resp.timestamp;
+					//eslint-disable-next-line no-undef
+					let crypt = new JSEncrypt();
+					crypt.setPublicKey(resp.publicKey);
+					let validacionb64 = encodeURIComponent(crypt.encrypt(validacion));
+					let authb64 = encodeURIComponent(btoa(resp.appid + ':' + resp.username + ':' + resp.canal));
+					let url = resp.baseUrl + '/?auth=' + authb64 + '&validacion=' + validacionb64;
+					window.open(url, '_blank');
+				}
+			} else if (response.getState() === 'ERROR') {
+				//Mostrar el mensaje de error si no tiene permisos para acceder a la grabación MIFID
+				let errors = response.getError();
+				if (errors && errors[0] && errors[0].message) {
+					helper.mostrarToast('error', 'Acceso denegado', errors[0].message);
+				} else {
+					helper.mostrarToast('error', 'Grabación no disponible', 'Ha ocurrido un error al intentar acceder a la grabación.');
+				}
+			}
 		});
 		$A.enqueueAction(datosUrlGrabacion);
 	}

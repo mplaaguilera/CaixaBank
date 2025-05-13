@@ -2,8 +2,6 @@ public with sharing class CC_WS_Onboarding {
     public static String recuperarClienteOnboarding(String recordId, String nif) {
         String retorno;
         try {
-            System.debug('::: recordId: ' + recordId);
-            System.debug('::: nif: ' + nif);
             // 77788590F
             // 29785500D
             String httpRequestBody = '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><m:ConsultaEstadoSolicitud xmlns:m="http://GDS707A/ConsultaEstadoSolicitud.tws"><m:consultaEstadoSolicitudRequest><m:numeroSolicitud>' + nif + '</m:numeroSolicitud><m:tipoIdentificacion>N</m:tipoIdentificacion><m:origenConsulta>C</m:origenConsulta></m:consultaEstadoSolicitudRequest></m:ConsultaEstadoSolicitud></soap:Body></soap:Envelope>';
@@ -24,22 +22,16 @@ public with sharing class CC_WS_Onboarding {
             } else {
                 // La integración nos devuelve un body en XML, asi que lo pasamos a JSON con los siguientes metodos
                 String xmlResponse = response.getBody();
-                System.debug('::: xmlResponse: ' + xmlResponse);
                 String jsonResponse = convertXMLToJSON(xmlResponse);
-                System.debug('::: jsonResponse: ' + jsonResponse);
                 Map<String, Object> jsonMap = (Map<String, Object>) JSON.deserializeUntyped(jsonResponse);
 
-                System.debug('::: jsonMap: ' + jsonMap);
-
                 Map<String, Object> body = (Map<String, Object>) jsonMap.get('Body');
-                Map<String, Object> ConsultaEstadoSolicitudResponse = (Map<String, Object>) body.get('ConsultaEstadoSolicitudResponse');
-                Map<String, Object> consultaEstadoSolicitudSalesforceResponse = (Map<String, Object>) ConsultaEstadoSolicitudResponse.get('consultaEstadoSolicitudSalesforceResponse');
+                Map<String, Object> consultaEstadoSolicitudResponse = (Map<String, Object>) body.get('ConsultaEstadoSolicitudResponse');
+                Map<String, Object> consultaEstadoSolicitudSalesforceResponse = (Map<String, Object>) consultaEstadoSolicitudResponse.get('consultaEstadoSolicitudSalesforceResponse');
 
                 Map<String, Object> resultado = (Map<String, Object>) consultaEstadoSolicitudSalesforceResponse.get('resultado');
                 String codigo = (String) resultado.get('codigo');
-                System.debug('::: codigo: ' + codigo);
                 Case caso = [SELECT CBK_Case_Extension_Id__c, AccountId FROM Case WHERE Id = :recordId LIMIT 1];
-                System.debug('::: caso: ' + caso);
                 Boolean actualizarCaso = false;
 
                 if (codigo != null && codigo == '-1') {

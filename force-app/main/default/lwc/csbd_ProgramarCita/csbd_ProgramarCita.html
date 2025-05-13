@@ -3,110 +3,125 @@
 	<section role="dialog" tabindex="-1" lwc:ref="modalProgramarCita" aria-modal class="modalProgramarCita slds-modal" onkeydown={modalTeclaPulsada}>
 		<div lwc:ref="modalContainer" class="slds-modal__container">
 
-				<header class="slds-modal__header">
-					<button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={componente.spinner}>
-						<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
-					</button>
-					<h2 class="slds-text-heading_medium slds-hyphenate">Programar cita</h2>
-					<p class="slds-var-m-top_x-small">Selecciona las opciones de programación para una próxima cita con el cliente.</p>
-				</header>
+			<header class="slds-modal__header">
+				<button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={componente.spinner}>
+					<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+				</button>
+				<h2 class="slds-text-heading_medium slds-hyphenate">Programar cita</h2>
+				<p class="slds-var-m-top_x-small">Selecciona las opciones de programación para una próxima cita con el cliente.</p>
+			</header>
 
-				<div lwc:ref="modalContent" class="modalContent slds-modal__content slds-var-p-horizontal_medium slds-var-p-top_xx-large slds-var-p-bottom_large slds-is-relative">
-					<div lwc:if={componente.spinner} align="center">
-						<lightning-spinner style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
-					</div>
+			<div lwc:ref="modalContent" class="modalContent slds-modal__content slds-var-p-horizontal_medium slds-var-p-top_xx-large">
+				<c-csbd_-spinner-kx lwc:ref="spinnerKx" lwc:if={componente.spinner} variant="brand" size="large"></c-csbd_-spinner-kx>
 
-					<div class="slds-grid" style="justify-content: center; height: 50px;">
-						<div class="slds-col slds-grow-none">
-							<lightning-input lwc:ref="inputFecha" type="datetime" variant="label-hidden" required onchange={inputFechaOnchange} message-when-bad-input="Indica una fecha y hora válidas." style="width: 320px;"></lightning-input>
-						</div>
-						<div class="slds-col slds-grow-none" style="min-width: 112px;">
-							<lightning-input lwc:ref="inputComprobarContacto" type="toggle" message-toggle-active="Contactado" message-toggle-inactive="No contactado" class="slds-var-m-bottom_xx-small" style="padding-left: 32px;"></lightning-input>
-						</div>
-					</div>
-
-					<!--Línea horizontal de separación-->
-					<div lwc:ref="lineaSeparacion" class="lineaSeparacion"></div>
-
-					<!--RadioGroup para seleccionar el tipo de asignación-->
-					<div class="slds-align_absolute-center slds-var-p-bottom_xx-large">
-						<span class="slds-form-element__label slds-var-m-right_x-small">
-							<abbr class="slds-required">*</abbr>Asignación
-						</span>
-						<lightning-radio-group label="Asignación" options={tiposAsignacion} value="A gestor específico" type="button" variant="label-hidden" onchange={radioGroupTiposAsignacionOnchange}></lightning-radio-group>
-					</div>
-
-					<!--Sección dinámica cuyo contenido depende del tipo de asignación-->
-					<div class="seccionDinamica slds-var-p-bottom_x-large">
-
-						<!--Lookup de propietario específico-->
-						<div lwc:ref="lookupGestor" class="lookupGestor slds-align_absolute-center slds-grid slds-grid_vertical-align-center slds-gutters_direct-xxx-small">
-							<div class="slds-col slds-grow-none">
-								<label class="slds-form-element__label slds-var-m-right_x-small"><abbr class="slds-required">*</abbr>Gestor</label>
+				<div class="slds-grid" style="justify-content: center; height: 50px;">
+					<div class="slds-col slds-grow-none">
+						<div class="slds-grid slds-gutters_direct-x-small">
+							<div class="slds-col slds-var-m-top_x-small">
+								<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Fecha</label>
 							</div>
-
 							<div class="slds-col">
-								<lightning-record-picker
-									lwc:ref="inputPropietario"
-									label="Gestor"
-									object-api-name="User"
-									value={idPropietarioSeleccionado}
-									required
+								<lightning-input
+									lwc:ref="inputFecha"
+									type="datetime"
+									pattern="^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$"
 									variant="label-hidden"
-									style="width: 345px;"
-									onchange={inputPropietarioOnchange}>
-								</lightning-record-picker>
+									required
+									onchange={inputFechaOnchange}
+									message-when-pattern-mismatch="El formato de la fecha es incorrecto"
+									message-when-range-underflow="Selecciona una fecha posterior"
+									message-when-bad-input="Fecha no válida"
+									style="width: 300px;">
+								</lightning-input>
 							</div>
 						</div>
-
-						<!--Mensaje informativo para la asignación automática-->
-						<div lwc:ref="infoAsignacionAuto" class="infoAsignacionAuto slds-align_absolute-center">
-							<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small slds-text-color_weak">
-								<div class="slds-col slds-grow-none">
-									<lightning-icon icon-name="utility:groups" size="small"></lightning-icon>
-								</div>
-								<div class="slds-col">
-									La oportunidad quedará en propiedad de un usuario genérico y en el momento de la cita se asignará automáticamente a un gestor disponible.
-								</div>
-							</div>
-						</div>
-
-						<!--Calendario de disponibilidad-->
-						<div lwc:ref="lwcDisponibilidadContainer" class="lwcDisponibilidadContainer slds-align_absolute-center">
-							<c-csbd_-disponibilidad-gestores
-								lwc:ref="lwcDisponibilidad"
-								class="lwcDisponibilidad slds-var-p-bottom_large"
-								id-gestor={idPropietarioSeleccionado}
-								onupdatecalendarios={lwcDisponibilidadOnupdatecalendarios}
-								onupdatefecha={lwcDisponibilidadOnupdatefecha}
-								ongestorseleccionado={lwcDisponibilidadOngestorseleccionado}>
-							</c-csbd_-disponibilidad-gestores>
-						</div>
-
 					</div>
-					<!--Fin sección variable en función del tipo de asignación-->
+					<div class="slds-col slds-grow-none" style="min-width: 112px;">
+						<lightning-input lwc:ref="inputComprobarContacto" type="toggle" message-toggle-active="Contactado" message-toggle-inactive="No contactado" class="slds-var-m-bottom_xx-small" style="padding-left: 32px;"></lightning-input>
+					</div>
 				</div>
 
-				<footer class="slds-modal__footer">
-					<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-						<div class="slds-col">
-							<!--
-							<span class="modoDesarrollo" lwc:if={componente.admin}>
-								<lightning-icon icon-name="utility:bug" size="x-small" class="slds-is-relative slds-var-m-right_small" style="top: -1px;"></lightning-icon>
-								MODO DE DESARROLLO
-							</span>
-							-->
+				<!--Línea horizontal de separación-->
+				<div lwc:ref="lineaSeparacion" class="lineaSeparacion"></div>
+
+				<!--RadioGroup para seleccionar el tipo de asignación-->
+				<div class="slds-align_absolute-center slds-var-p-bottom_xx-large">
+					<span class="slds-form-element__label slds-var-m-right_x-small">
+						<abbr class="slds-required">*</abbr>Asignación
+					</span>
+					<lightning-radio-group label="Asignación" options={tiposAsignacion} value="A gestor específico" type="button" variant="label-hidden" onchange={radioGroupTiposAsignacionOnchange}></lightning-radio-group>
+				</div>
+
+				<!--Sección dinámica cuyo contenido depende del tipo de asignación-->
+				<div class="seccionDinamica slds-var-p-bottom_xx-large">
+
+					<!--Lookup de propietario específico-->
+					<div lwc:ref="lookupGestor" class="lookupGestor slds-align_absolute-center slds-grid slds-grid_vertical-align-center slds-gutters_direct-xxx-small">
+						<div class="slds-col slds-grow-none">
+							<label class="slds-form-element__label slds-var-m-right_x-small"><abbr class="slds-required">*</abbr>Gestor</label>
 						</div>
+
 						<div class="slds-col">
-							<lightning-button lwc:ref="botonAceptar" variant="brand" label="Programar cita" icon-name="utility:event" onclick={programarCita} disabled={componente.spinner}></lightning-button>
-							<lightning-button lwc:ref="botonCancelar" class="slds-var-m-left_small" label="Cancelar" onclick={modalCerrar} disabled={componente.spinner}></lightning-button>
+							<lightning-record-picker
+								lwc:ref="inputPropietario"
+								label="Gestor"
+								object-api-name="User"
+								value={idPropietarioSeleccionado}
+								required
+								variant="label-hidden"
+								style="width: 345px;"
+								onchange={inputPropietarioOnchange}>
+							</lightning-record-picker>
 						</div>
 					</div>
-				</footer>
-				</footer>
-			</div>
-		</section>
 
-		<div lwc:ref="backdropModal" class="backdrop slds-backdrop" role="presentation"></div>
+					<!--Mensaje informativo para la asignación automática-->
+					<div lwc:ref="infoAsignacionAuto" class="infoAsignacionAuto slds-align_absolute-center">
+						<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small slds-text-color_weak">
+							<div class="slds-col slds-grow-none">
+								<lightning-icon icon-name="utility:groups" size="small"></lightning-icon>
+							</div>
+							<div class="slds-col">
+								La oportunidad quedará en propiedad de un usuario genérico y en el momento de la cita se asignará automáticamente a un gestor disponible.
+							</div>
+						</div>
+					</div>
+
+					<!--Calendario de disponibilidad-->
+					<div lwc:ref="lwcDisponibilidadContainer" class="lwcDisponibilidadContainer slds-align_absolute-center">
+						<c-csbd_-disponibilidad-gestores
+							lwc:ref="lwcDisponibilidad"
+							class="lwcDisponibilidad slds-var-p-bottom_large"
+							id-gestor={idPropietarioSeleccionado}
+							onupdatecalendarios={lwcDisponibilidadOnupdatecalendarios}
+							onupdatefecha={lwcDisponibilidadOnupdatefecha}
+							ongestorseleccionado={lwcDisponibilidadOngestorseleccionado}>
+						</c-csbd_-disponibilidad-gestores>
+					</div>
+
+				</div>
+				<!--Fin sección variable en función del tipo de asignación-->
+			</div>
+
+			<footer class="slds-modal__footer">
+				<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+					<div class="slds-col">
+						<!--
+						<span class="modoDesarrollo" lwc:if={componente.admin}>
+							<lightning-icon icon-name="utility:bug" size="x-small" class="slds-is-relative slds-var-m-right_small" style="top: -1px;"></lightning-icon>
+							MODO DE DESARROLLO
+						</span>
+						-->
+					</div>
+					<div class="slds-col">
+						<lightning-button lwc:ref="botonAceptar" variant="brand" label="Programar cita" icon-name="utility:event" onclick={programarCita} disabled={componente.spinner}></lightning-button>
+						<lightning-button lwc:ref="botonCancelar" class="slds-var-m-left_small" label="Cancelar" onclick={modalCerrar} disabled={componente.spinner}></lightning-button>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</section>
+
+	<div lwc:ref="backdropModal" class="backdrop slds-backdrop" role="presentation"></div>
 
 </template>

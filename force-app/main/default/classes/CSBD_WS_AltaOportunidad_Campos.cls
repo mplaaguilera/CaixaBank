@@ -130,6 +130,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Canal__c', solicitud.canal);
 				campos.put('CSBD_TipoBonificado__c', convertToDecimal(solicitud.scoring));
 				campos.put('CSBD_Idioma_Solicitud__c', formatearIdioma(solicitud?.idioma, solicitud.canal));
+				campos.put('CSBD_SituacionVivienda__c', solicitud.situacionVivienda);
 				informarHorario(solicitud?.horario1Tit, campos);
 				informarEmpresaFamiliaProducto(solicitud?.nombreProducto, campos);
 
@@ -228,7 +229,9 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_InteresVariable__c', convertToDecimal2(solicitud.tasaIntVarSimulacion));
 				campos.put('CSBD_CuotaMensualHipoteca__c', convertToIntegerOrDouble2(solicitud.importeMensualSimulacion));
 				campos.put('CSBD_TIN__c', convertToDecimal2(solicitud.tinSimulacion));
+				campos.put('CSBD_TIN_bonificado__c', convertToDecimal2(solicitud.tinDescuentoSimulacion));
 				campos.put('CSBD_TAE__c', convertToDecimal2(solicitud.taeSimulacion));
+				campos.put('CSBD_TAE_bonificado__c', convertToDecimal2(solicitud.taeDescuentoSimulacion));
 				campos.put('CSBD_Resolucion__c', solicitud.resolucionSimulacion);
 				campos.put('CSBD_Estado__c', solicitud.estado);
 				campos.put('CSBD_TipoDiferencial__c', convertToDecimal2(solicitud.diferencialSimulacion));
@@ -243,6 +246,13 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Email_Solicitud__c', solicitud.email1Tit);
 				campos.put('CSBD_TipoBonificado__c', convertToDecimal(solicitud.scoring));
 				campos.put('CSBD_OC_Canal_Entrada__c', 'Plataformas Hipotecarias');
+				campos.put('CSBD_Gastos_iniciales_sim__c', convertToDecimal2(solicitud.gastosInicialesSimulacion));
+				campos.put('CSBD_Aportacion_inicial_sim__c', convertToDecimal2(solicitud.contribucionInicialSimulacion));
+				campos.put('CSBD_Tasa_Fija_sim__c', convertToDecimal2(solicitud.diferencialDescuentoSimulacion));
+				campos.put('CSBD_Cuota_mensual_porcentaje__c', convertToDecimal2(solicitud.plazosDescuentoSimulacion));
+				campos.put('CSBD_Porcentaje_descuento__c', convertToDecimal2(solicitud.tasaDescuentoSimulacion));
+				campos.put('CSBD_Porcentaje_max_hipoteca_sim__c', convertToDecimal2(solicitud.maxHipotecaSimulacion));
+				campos.put('CSBD_Importe_max_hipoteca_sim__c', convertToDecimal2(solicitud.maxImporteHipotecaSimulacion));
 			}
 
 			//Renting
@@ -495,6 +505,18 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Now_Origen__c', solicitud.origen);
 				informarEmpresaFamiliaProducto(solicitud?.nombreProducto, campos);
 			}
+
+			when 'cmbHipotecas' {
+				recordTypeDeveloperName = 'CSBD_Hipoteca';
+				campos.put('CSBD_Telefono_Solicitud__c', solicitud.telefono1_1Tit);
+				campos.put('CSBD_Idioma_Solicitud__c', formatearIdioma(solicitud?.idioma, solicitud.canal));
+				campos.put('CSBD_Now_Nombre__c', solicitud.nombre1Tit);
+				campos.put('CSBD_Canal__c', solicitud.canal);
+				campos.put('CSBD_Now_Origen__c', solicitud.origen);
+				campos.put('CSBD_Email_Solicitud__c', solicitud.email1Tit);
+				informarEmpresaFamiliaProducto(solicitud?.nombreProducto, campos);
+				informarHorarioCMB(solicitud?.horaIni, solicitud?.minIni, solicitud?.horaFin, solicitud?.minFin, campos);
+			}
 		}
 		informarDescripcion(solicitud, campos);
 		identificarCliente(solicitud, campos, respuesta);
@@ -506,7 +528,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 
 		if(!String.isBlank(idContacto)){
 			List<Contact> contactosNumTel = [SELECT Phone, MobilePhone FROM Contact WHERE Id = :idContacto];
-			if (campos.get('CSBD_Telefono_Solicitud__c') == null && !contactosNumTel.isEmpty()) {
+			if (String.isBlank(String.valueOf(campos.get('CSBD_Telefono_Solicitud__c'))) && !contactosNumTel.isEmpty()) {
 				campos.put('CSBD_Telefono_Solicitud__c', (contactosNumTel[0].MobilePhone != null) ? contactosNumTel[0].MobilePhone : contactosNumTel[0].Phone);
 			}
 		}

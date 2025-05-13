@@ -3,8 +3,8 @@ public with sharing class SEG_WS_CanalBPO_Test {
     @testSetup
     static void datosIniciales ()
     { 
-        Id grupoOpSegId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
-        Id grupoAutoSegId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoAutomaticoSegmentos').getRecordTypeId();
+        Id grupoOpSegId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        Id grupoAutoSegId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoAutomaticoSegmentos').getRecordTypeId();
         Id recordTypeIdDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
         Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
@@ -139,7 +139,7 @@ public with sharing class SEG_WS_CanalBPO_Test {
         insert cdl;
 
         System.runAs ( new User(Id = UserInfo.getUserId()) ) {
-            Profile perfil = [SELECT Id FROM Profile WHERE Name='SEG_Usuario_CaixaBank'];
+            Profile perfil = [SELECT Id FROM Profile WHERE Name='System Administrator'];
             UserRole rol = [SELECT Id FROM UserRole WHERE Name='Segmentos + FFEE'];
             User thisUser = new User(alias = 'tsegmen', email='testSEGBI@acme.com', 
                     emailencodingkey='UTF-8', lastname='Smith', 
@@ -149,7 +149,7 @@ public with sharing class SEG_WS_CanalBPO_Test {
                     username='testSEGBI@acme.com');
             insert thisUser;
             
-            PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SEG_Operativo'];
+            PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SEG_Administrador'];
             insert new PermissionSetAssignment(AssigneeId = thisUser.id, PermissionSetId = ps.Id);
         }
     }
@@ -206,7 +206,7 @@ public with sharing class SEG_WS_CanalBPO_Test {
         RestContext.response = res;
 
         User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (usuarioTest) {
             Test.startTest();
 
             SEG_WS_CanalBPO.Output output = SEG_WS_CanalBPO.entradaCanalBPO();
@@ -268,7 +268,7 @@ public with sharing class SEG_WS_CanalBPO_Test {
 
         
         User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (usuarioTest) {
             Test.startTest();
 
             SEG_WS_CanalBPO.Output output = SEG_WS_CanalBPO.entradaCanalBPO();
@@ -330,7 +330,7 @@ public with sharing class SEG_WS_CanalBPO_Test {
 
         
         User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (usuarioTest) {
             Test.startTest();
 
             SEG_WS_CanalBPO.Output output = SEG_WS_CanalBPO.entradaCanalBPO();
@@ -391,7 +391,7 @@ public with sharing class SEG_WS_CanalBPO_Test {
         RestContext.response = res;
         
         User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (usuarioTest) {
             Test.startTest();
 
             SEG_WS_CanalBPO.Output output = SEG_WS_CanalBPO.entradaCanalBPO();
@@ -453,7 +453,7 @@ public with sharing class SEG_WS_CanalBPO_Test {
 
         
         User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (usuarioTest) {
             Test.startTest();
 
             SEG_WS_CanalBPO.Output output = SEG_WS_CanalBPO.entradaCanalBPO();
@@ -515,7 +515,7 @@ public with sharing class SEG_WS_CanalBPO_Test {
 
         
         User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (usuarioTest) {
             Test.startTest();
 
             SEG_WS_CanalBPO.Output output = SEG_WS_CanalBPO.entradaCanalBPO();

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_TipoAsistente__c</fullName>
+    <label>Tipo de Asistente</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Asistentes clientes</fullName>
+                <default>false</default>
+                <label>Asistentes clientes</label>
+            </value>
+            <value>
+                <fullName>Asistentes Caixabank</fullName>
+                <default>false</default>
+                <label>Asistentes Caixabank</label>
+            </value>
+            <value>
+                <fullName>Asistentes sin registrar</fullName>
+                <default>false</default>
+                <label>Asistentes sin registrar</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

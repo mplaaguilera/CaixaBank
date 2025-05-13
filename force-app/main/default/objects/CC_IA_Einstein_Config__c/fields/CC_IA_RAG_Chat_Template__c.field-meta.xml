@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_IA_RAG_Chat_Template__c</fullName>
+    <description>Almacena el nombre del Template a lanzar en el Chat mediante RAG.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <inlineHelpText>Introduce el Api name del template a llamar mediante RAG en el Chat Interactivo</inlineHelpText>
+    <label>RAG Chat Template</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

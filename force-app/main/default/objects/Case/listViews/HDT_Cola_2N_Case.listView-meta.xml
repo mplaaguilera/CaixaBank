@@ -11,6 +11,11 @@
     <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
     <columns>CC_Owner_Anterior__c</columns>
     <filterScope>Queue</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>notEqual</operation>
+        <value>Cerrado,Rechazado</value>
+    </filters>
     <label>2N Cola HDT</label>
     <queue>HDT_Cola_2N</queue>
     <sharedTo>

@@ -6,6 +6,7 @@
     <columns>EMPLOYEE_NUMBER</columns>
     <columns>CORE.USERS.USERNAME</columns>
     <columns>CORE.USERS.EMAIL</columns>
+    <columns>CORE.USERS.SAML_SUBJECT</columns>
     <columns>CORE.USER_ROLE.NAME</columns>
     <columns>CORE.PROFILE.NAME</columns>
     <columns>CORE.USERS.DEPARTMENT</columns>
@@ -13,8 +14,8 @@
     <filterScope>Everything</filterScope>
     <filters>
         <field>CORE.USERS.USERNAME</field>
-        <operation>startsWith</operation>
-        <value>sohalloran@salesforce.com</value>
+        <operation>contains</operation>
+        <value>prepremium.priorizar@caixabankops.com</value>
     </filters>
     <label>Búsqueda username</label>
     <language>en_US</language>

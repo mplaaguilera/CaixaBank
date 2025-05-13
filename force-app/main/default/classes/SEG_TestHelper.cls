@@ -20,7 +20,7 @@ public without sharing class SEG_TestHelper {
     }
     
     public static CC_Grupo_Colaborador__c createGrupoColaborador(String uniqueIdentifier,String Negocio,String Tipologia){    
-        Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColaboradorA  = new CC_Grupo_Colaborador__c();
         grupoColaboradorA.RecordTypeId = recordTypeGrupoColaborador;
         grupoColaboradorA.name=uniqueIdentifier;

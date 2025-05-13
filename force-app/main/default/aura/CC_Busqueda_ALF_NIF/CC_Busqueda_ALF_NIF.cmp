@@ -36,6 +36,7 @@
         <force:recordData aura:id="recordLoader" recordId="{!v.recordId}" fields="CC_Fecha_Fin__c, CC_No_Identificado__c" recordUpdated="{!c.recordUpdated}" />
         <aura:set attribute="else">
 			<aura:if isTrue="{!v.sObjectName == 'Opportunity'}">
+                <lightning:messageChannel type="CSBD_Opportunity_MessageChannel__c" onMessage="{!c.csbdMessageChannelOnmessage}"/>
 				<force:recordData aura:id="oppData" recordId="{!v.recordId}" fields="Id, AccountId, CSBD_Contact__c, CSBD_No_Identificado__c" targetFields="{!v.oportunidad}" targetError="{!v.errorLds}" mode="EDIT" recordUpdated="{!c.recordUpdated}"/>
 				<aura:set attribute="else">
 					<force:recordData aura:id="recordLoader" recordId="{!v.recordId}" fields="AccountId, ContactId, CC_No_Identificado__c, CC_Representante__c, Contact.RecordType.DeveloperName" targetFields="{!v.caso}" recordUpdated="{!c.recordUpdated}" />
@@ -46,7 +47,7 @@
 
     <!--UI-->
     <!--Card-->
-    <article class="slds-card" style="overflow: visible;">
+    <article class="slds-card slds-card_boundary" style="overflow: visible;">
 
         <!--Spinners-->
         <aura:if isTrue="{!v.bEsperaALF}">
@@ -79,7 +80,7 @@
                     <aura:if isTrue="{!v.sObjectName != 'Opportunity'}">
                         <lightning:button label="No se identifica" onclick="{!c.handleActualizarIdentificacion}" disabled="{! v.identificacionPrevia || v.llamadaFinalizada}" />
                         <aura:set attribute="else">
-                            <lightning:button label="No se identifica" variant="base" onclick="{!c.handleActualizarIdentificacionCliente}" disabled="{!v.oportunidad.CSBD_No_Identificado__c}" />
+                            <lightning:button label="No se identifica" iconName="{!v.oportunidad.CSBD_No_Identificado__c ? 'utility:check' : ''}" variant="base" onclick="{!c.handleActualizarIdentificacionCliente}" disabled="{!v.oportunidad.CSBD_No_Identificado__c}"/>
                         </aura:set>
                     </aura:if>
 

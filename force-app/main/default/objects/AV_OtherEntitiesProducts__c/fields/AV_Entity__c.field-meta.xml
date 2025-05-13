@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Entity__c</fullName>
     <defaultValue>false</defaultValue>
+    <description>Entidad de porductos de otras entidades</description>
     <label>Entidad</label>
     <trackTrending>false</trackTrending>
     <type>Checkbox</type>

@@ -37,7 +37,11 @@ public without sharing class SAC_MetodosSinSharing {
         integer registrosOK = 0;
         if(operacion == 'insert'){
             //unificar los dos bucles de errores en 1
+            try{
             srList = Database.insert(obj, false);
+            }catch(Exception e){
+                system.debug('***exc ' + e.getMessage());
+            }
             for (Integer i = 0; i < obj.size(); i++) {
                 Database.SaveResult sr = srList[i];
                 if(!sr.isSuccess() && !sr.getErrors().isEmpty()) {
@@ -74,7 +78,11 @@ public without sharing class SAC_MetodosSinSharing {
     //si hay un error en los datos de la operacion sera cazado por un catch superior
     public static void modificarInsertarObjetos(sObject obj, string operacion){
         if(operacion == 'insert'){
+            try{
             insert obj;
+            }catch(Exception e){
+                system.debug('***excep ' + e.getMessage());
+            }
         } else {
             update obj;
         }

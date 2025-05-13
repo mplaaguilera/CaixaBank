@@ -16,65 +16,60 @@ public class OS_feedbackCognitive implements Queueable, Database.AllowsCallouts{
         for(String caseNumber : mapCaseName.keySet()){
             String sDescError = '';
             String sDetalleError = '';
-            CC_TrazaInt__c oTraza;
+            CC_TrazaInt__c oTraza = new CC_TrazaInt__c();
+            
+            oTraza.Name = 'Feedback_Cognitive_COPS';
+            oTraza.CC_FechaInicio__c = datetime.now();
+            oTraza.CC_Identificador__c = caseNumber;
 
-            if (oConfig.CC_TrazaActiva__c || Test.isRunningTest())
-            {   
-                oTraza = new CC_TrazaInt__c();
-                oTraza.Name = 'Feedback_Cognitive_COPS';
-                oTraza.CC_FechaInicio__c = datetime.now();
-            }
             SEG_fbCognitive sendFeedback = new SEG_fbCognitive();
             sendFeedback.sr = caseNumber;
             sendFeedback.des_category_real = mapCaseName.get(caseNumber);  
             String jsonToCognitive = JSON.serialize(sendFeedback);
 
+            String intSetting = 'OS_fbCognitive'; //Nombre del name credential *************
+
             try {
-                Http http = new Http();
-                HttpRequest request = new HttpRequest();
-                request.setEndpoint(oConfig.CC_EndPoint__c );
-                request.setMethod('PUT');
-                request.setHeader('Content-Type', 'application/json;charset=UTF-8');
-                request.setClientCertificateName(oConfig.CC_Certificado__c);
-                request.setBody('[' + jsonToCognitive + ']');
+                // Crear HEADER 
+                Map<String,string> mHeaders =  new  Map<String,string>();  
+                mHeaders.put('Content-Type', 'application/json;charset=UTF-8'); 
+
+                CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
+                requestWrp.body = '[' + jsonToCognitive + ']';
+                requestWrp.intSetting = intSetting;
+                requestWrp.method = 'PUT';
+                requestWrp.mHeaders = mHeaders;
+                requestWrp.mUriParams = null;
+                requestWrp.mQueryParams = null;
+
+                HttpRequest request = CBK_HttpServiceIntegration.getRequest(requestWrp);
+
+                HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, intSetting, intSetting);
+                oTraza.CC_MensajeEntrada__c = String.valueOf(requestWrp.body);
                 
-                if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
-                    oTraza.CC_MensajeEntrada__c = String.valueOf(jsonToCognitive);
-                }
-                
-                HttpResponse response = http.send(request);
                 if (response.getStatusCode() == 200) {
                     OS_receiveFromCognitive results = new OS_receiveFromCognitive();
-                    
-                    if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
-                        oTraza.CC_MensajeSalida__c = response.getBody();
-                        oTraza.CC_FechaFin__c = datetime.now();
-                        oTraza.CC_FinOK__c = true;
-                        oListTrazas.add(oTraza);
-                    }              
-                }
-                else {
-                    if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
-                        sDescError = 'Error comunicaciones.';
-                        sDetalleError = response.getStatusCode() + ':' + response.getBody();
-                        oTraza.CC_FechaFin__c = datetime.now();
-                        oTraza.CC_FinOK__c = false;
-                        oTraza.CC_TipoError__c = sDescError;
-                        oTraza.CC_DetalleError__c = sDetalleError;
-                        oListTrazas.add(oTraza);
-                    }
-                }
-            } catch (Exception e) {
-                
-                if (oConfig.CC_TrazaActiva__c || Test.isRunningTest()){
-                    sDescError = 'Exception: Error comunicaciones.';
-                    sDetalleError = e.getMessage();
+                    oTraza.CC_MensajeSalida__c = response.getBody();
+                    oTraza.CC_FechaFin__c = datetime.now();
+                    oTraza.CC_FinOK__c = true;
+                    oListTrazas.add(oTraza);          
+                } else {
+                    sDescError = 'Error comunicaciones.';
+                    sDetalleError = response.getStatusCode() + ':' + response.getBody();
                     oTraza.CC_FechaFin__c = datetime.now();
                     oTraza.CC_FinOK__c = false;
                     oTraza.CC_TipoError__c = sDescError;
                     oTraza.CC_DetalleError__c = sDetalleError;
                     oListTrazas.add(oTraza);
-                }       
+                }
+            } catch (Exception e) {
+                sDescError = 'Exception: Error comunicaciones.';
+                sDetalleError = e.getMessage();
+                oTraza.CC_FechaFin__c = datetime.now();
+                oTraza.CC_FinOK__c = false;
+                oTraza.CC_TipoError__c = sDescError;
+                oTraza.CC_DetalleError__c = sDetalleError;
+                oListTrazas.add(oTraza);
             }
         }
         insert oListTrazas;

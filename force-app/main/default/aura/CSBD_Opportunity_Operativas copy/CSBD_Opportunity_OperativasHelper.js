@@ -2,20 +2,23 @@
 	refrescarBotones: function(component) {
 		const oportunidad = component.get('v.oportunidad');
 		const esPropietario = oportunidad.OwnerId === $A.get('$SObjectType.CurrentUser.Id');
+		const esHipoteca = oportunidad.RecordType.DeveloperName === 'CSBD_Hipoteca';
 		const isClosed = oportunidad.IsClosed;
 		const estado = oportunidad.CSBD_Estado__c;
 		const imaginBank = oportunidad.CSBD_Empresa_Proveedora__c === 'imaginBank';
 		const contactoInformado = Boolean(oportunidad.CSBD_Contact__c);
 		let botonesActivos = {};
 		component.set('v.esPropietario', esPropietario);
+		component.set('v.esHipoteca', esHipoteca);
 		if (esPropietario) {
 			botonesActivos.botonTrasladoImagin = !isClosed && imaginBank && ['CMB', 'CMN'].includes(oportunidad.RecordType.Name);
 			botonesActivos.botonPendienteInternoActivo = ['Activa', 'Pendiente Interno'].includes(estado);
 			botonesActivos.botonCerrarActivo = estado === 'Activa';
-			botonesActivos.botonReactivarActivo = isClosed && (component.get('v.esResponsable') && oportunidad.RecordType.Name !== 'Hipoteca' || oportunidad.RecordType.Name === 'Hipoteca' || oportunidad.RecordType.Name === 'Acción comercial');
+			botonesActivos.botonReactivarActivo = isClosed && (component.get('v.esResponsable') && !esHipoteca || esHipoteca || oportunidad.RecordType.Name === 'Acción comercial');
 			botonesActivos.botonAutenticarActivo = !isClosed && oportunidad.AccountId && oportunidad.CSBD_Contact__c;
 			botonesActivos.botonAmpliarVencimiento = ['Activa', 'Pendiente Interno', 'Pendiente Cita', 'Pendiente Cliente'].includes(estado);
 			botonesActivos.botonInformeSiaActivo = !isClosed && estado !== 'Nueva';
+			botonesActivos.botonDerechosGdpr = !isClosed && estado !== 'Nueva' && oportunidad.CSBD_Contact__c;
 
 			if (contactoInformado || !contactoInformado && oportunidad.CSBD_No_Identificado__c) { //identificado
 				botonesActivos.botonEnviarCorreoActivo = !isClosed && estado !== 'Nueva';
@@ -49,7 +52,7 @@
 		if (familiaProducto === 'Hipotecas') {
 			component.set('v.tipoOperativaConvertir', 'hipoteca');
 		} else if (familiaProducto === 'Préstamos') {
-			component.set('v.tipoOperativaConvertir', 'préstamo');
+			component.set('v.tipoOperativaConvertir', 'consumo');
 		}
 	},
 
@@ -126,6 +129,7 @@
         $A.localizationService.formatDate(startDateTime, 'k:mm') + ' horas.';
 	},
 
+	/*
 	formatearFechaTramo: function(startDateTime, endDateTime) {
 		return $A.localizationService.formatDate(startDateTime.valueOf(), 'EEEE d') + ' de ' +
             $A.localizationService.formatDate(startDateTime.valueOf(), 'MMMM') + ' de ' +
@@ -133,6 +137,7 @@
             $A.localizationService.formatDate(startDateTime.valueOf(), 'k:mm') + ' horas y las ' +
             $A.localizationService.formatDate(endDateTime.valueOf(), 'k:mm') + ' horas.';
 	},
+	*/
 
 	abrirTab: function(component, tabRecordId) {
 		component.find('workspace').openTab({recordId: tabRecordId, focus: true});
@@ -490,5 +495,263 @@ Expongo mi opinión favorable a la aprobación de la presente operación en base
 			});
 		}
 		return retorno;
+	},
+
+	/*
+	modalProgramarRedimensionar: function(component, segunDisponibilidad) {
+		return new Promise(resolve => {
+			const numCalendarios = component.find('modalProgramarCalendarioDisponibilidad').get('v.numCalendarios');
+
+			//Canviar dimensiones del modal de programar cita
+			const modalContainer = component.find('modalProgramarModalContainer');
+			const modalContainerElement = modalContainer.getElement();
+			//alert(JSON.stringify(modalContainerElement.classList, null, 3));
+			const modalContainerStyle = modalContainerElement.style;
+			//const modalContainerParentComputedStyle = window.getComputedStyle(modalContainer.parentElement);
+			const modalContainerComputedStyle = window.getComputedStyle(modalContainerElement);
+			const modalContainerParentComputedStyle = window.getComputedStyle(modalContainerElement.parentElement);
+			const widthIni = parseFloat(modalContainerComputedStyle.width, 10);
+			const widthFin = segunDisponibilidad ? parseFloat(modalContainerParentComputedStyle.width) / 2 + Math.max(numCalendarios - 3, 0) * 118 : 650;
+
+			const modalContentElement = component.find('modalProgramarModalContent').getElement();
+			const modalContentStyle = modalContentElement.style;
+			const modalContentComputedStyle = window.getComputedStyle(modalContentElement);
+			const heightIni = parseFloat(modalContentComputedStyle.height, 10);
+			const heightFin = segunDisponibilidad ? 560 : 155;
+
+			const calendarioContainer = component.find('modalProgramarCalendarioDisponibilidadContainer');
+			const calendarioContainerElement = calendarioContainer.getElement();
+			calendarioContainerElement.style.pointerEvents = 'none';
+			//calendarioContainerElement.style.display = segunDisponibilidad ? 'block' : 'none';
+			const calendarioContainerStyle = calendarioContainerElement.style;
+			const calendarioContainerComputedStyle = window.getComputedStyle(calendarioContainerElement);
+			const calendarioContainerHeightIni = parseFloat(calendarioContainerComputedStyle.height, 10);
+			const calendarioContainerHeightFin = segunDisponibilidad ? 511 : 0;
+			const calendarioContainerOpacityIni = parseFloat(calendarioContainerComputedStyle.opacity) || 0;
+			const calendarioContainerOpacityFin = segunDisponibilidad ? 1 : 0;
+
+			const ease = t => 1 - Math.pow(1 - t, 7);
+			let start = null;
+			const redimensionar = timestamp => {
+				!start && (start = timestamp);
+				let progress = (timestamp - start) / 320; //320ms de duración
+				progress > 1 && (progress = 1);
+
+				const easedProgress = ease(progress);
+				modalContainerStyle.width = widthIni + (widthFin - widthIni) * easedProgress + 'px';
+				modalContentStyle.height = heightIni + (heightFin - heightIni) * easedProgress + 'px';
+				calendarioContainerStyle.height = calendarioContainerHeightIni + (calendarioContainerHeightFin - calendarioContainerHeightIni) * easedProgress + 'px';
+				calendarioContainerStyle.opacity = (calendarioContainerOpacityIni + (calendarioContainerOpacityFin - calendarioContainerOpacityIni) * easedProgress).toString();
+				if (progress < 1) {
+					requestAnimationFrame(redimensionar);
+				} else {
+					if (segunDisponibilidad) {
+						calendarioContainerElement.style.pointerEvents = 'auto';
+						//calendarioContainerElement.style.display = 'block';
+						const calendarioDisponibilidad = component.find('modalProgramarCalendarioDisponibilidad');
+						calendarioDisponibilidad.scrollToHorarioLaboral();
+					} else {
+						//calendarioContainerElement.style.display = 'none';
+					}
+					resolve();
+				}
+			};
+			//eslint-disable-next-line compat/compat
+			window.requestAnimationFrame(redimensionar);
+		});
 	}
+	*/
+
+	cambiarSeccion: function(component, tipoActual, tipoNew) { //, acciones
+		component.find('modalProgramarModalContainer').getElement().style.pointerEvents = 'none';
+
+		const secciones = {
+			'A gestor específico': {
+				nombre: 'A gestor específico', display: 'flex',
+				elemento: component.find('modalProgramarLookupGestor').getElement()
+			},
+			'Según disponibilidad': {
+				nombre: 'Según disponibilidad', display: 'block',
+				elemento: component.find('modalProgramarCalendarioDisponibilidadContainer').getElement()
+			},
+			'Automática': {
+				nombre: 'Automática', display: 'flex',
+				elemento: component.find('modalProgramarInfoAsignacionAuto').getElement()
+			}
+		};
+
+		const seccionActual = secciones[tipoActual];
+		const seccionNew = secciones[tipoNew];
+
+		//Preparar listener para mostrar la nueva sección tras ocultar la actual
+		const seccionActualElemento = seccionActual.elemento;
+		const funcionesBind = component.get('v.funcionesBind');
+		const seccionOcultarOntransitionendBind = this.seccionOcultarOntransitionend.bind(this, component, seccionActual, seccionNew);
+		funcionesBind.seccionOcultarOntransitionend = seccionOcultarOntransitionendBind;
+		component.set('v.funcionesBind', funcionesBind);
+
+		const calendarioElement = component.find('modalProgramarCalendarioDisponibilidadContainer').getElement();
+		if (tipoActual === 'Según disponibilidad') {
+			calendarioElement.style.maxHeight = calendarioElement.getBoundingClientRect().height + 'px';
+			window.setTimeout($A.getCallback(() => {
+				calendarioElement.style.maxHeight = '0px';
+				seccionActualElemento.style.opacity = 0;
+
+				window.setTimeout($A.getCallback(() => {
+					//Sección actual transparente
+					seccionActualElemento.addEventListener('transitionend', component.get('v.funcionesBind').seccionOcultarOntransitionend);
+					//seccionActualElemento.style.opacity = 0;
+				}), 300);
+			}), 0);
+
+		//} else if (tipoNew === 'Según disponibilidad') {
+			//calendarioElement.style.maxHeight = '0px';
+			//window.setTimeout($A.getCallback(() => {
+			//calendarioElement.style.maxHeight = calendarioElement.getBoundingClientRect().height + 'px';
+			//window.setTimeout($A.getCallback(() => {
+			//Sección actual transparente
+			//seccionActualElemento.addEventListener('transitionend', component.get('v.funcionesBind').seccionOcultarOntransitionend);
+			//seccionActualElemento.style.opacity = 1;
+			//}), 190);//
+		//}), 190);
+		} else {
+			window.setTimeout($A.getCallback(() => {
+				//Sección actual transparente
+				seccionActualElemento.addEventListener('transitionend', component.get('v.funcionesBind').seccionOcultarOntransitionend);
+				seccionActualElemento.style.opacity = 0;
+			}), 0);
+		}
+
+
+
+
+
+	},
+
+	seccionOcultarOntransitionend: function(component, seccionActual, seccionNew) {
+		//Eliminar listener
+		const funcionesBind = component.get('v.funcionesBind');
+		seccionActual.elemento.removeEventListener('transitionend', funcionesBind.seccionOcultarOntransitionend);
+		funcionesBind.seccionOcultarOntransitionend = null;
+		component.set('v.funcionesBind', funcionesBind);
+
+		const modalContainerElement = component.find('modalProgramarModalContainer').getElement();
+		const modalContainerWidthOld = modalContainerElement.scrollWidth || 0;
+		const modalContentElement = component.find('modalProgramarModalContent').getElement();
+		const modalContentHeightOld = modalContentElement.scrollHeight || 0;
+		const calendarioElement = component.find('modalProgramarCalendarioDisponibilidad').getElement();
+		const calendarioHeightOld = calendarioElement.scrollHeight || 0;
+
+		//Sección actual oculta
+		seccionActual.elemento.style.display = 'none';
+
+		this.seccionMostrar(component, seccionActual, seccionNew, modalContainerWidthOld, modalContentHeightOld, calendarioHeightOld);
+	},
+
+	seccionMostrar: function(component, seccionActual, seccionNew, modalContainerWidthOld, modalContentHeightOld, calendarioHeightOld) {
+		//Sección nueva visible (pero aún transparente)
+		const seccionNewElemento = seccionNew.elemento;
+		seccionNewElemento.style.display = seccionNew.display;
+
+		window.setTimeout($A.getCallback(() => {
+			//Sección nueva visible y opaca
+			seccionNewElemento.style.opacity = 1;
+
+			//Redimensionar modal para adaptarlo al contenido de la nueva sección
+			//const segunDisponibilidad = component.get('v.programarCitaTipoAsignacion') === 'Según disponibilidad';
+
+			const modalContainerElement = component.find('modalProgramarModalContainer').getElement();
+			const modalContainerWidthNew = modalContainerElement.scrollWidth || 0;
+			const modalContentElement = component.find('modalProgramarModalContent').getElement();
+			const modalContentHeightNew = modalContentElement.scrollHeight || 0;
+			const calendarioElement = component.find('modalProgramarCalendarioDisponibilidadContainer').getElement();
+			const calendarioHeightNew = calendarioElement.scrollHeight || 0;
+
+			//Posem com a valor inicial la max-height antiga
+			modalContainerElement.style.width = modalContainerWidthOld + 'px';
+			modalContentElement.style.maxHeight = modalContentHeightOld + 'px';
+			calendarioElement.style.maxHeight = calendarioHeightOld + 'px';
+
+			//Forcem reflow
+			modalContainerElement.offsetWidth; //NO eliminar, provoca reflow
+			modalContentElement.offsetHeight; //NO eliminar, provoca reflow
+			calendarioElement.offsetHeight; //NO eliminar, provoca reflow
+
+			//4) Assignem la max-height final
+			//modalContentElement.style.transition = 'max-height 300ms ease';
+			modalContainerElement.style.width = modalContainerWidthNew + 'px';
+			modalContentElement.style.maxHeight = modalContentHeightNew + 'px';
+			calendarioElement.style.maxHeight = calendarioHeightNew + 'px';
+
+			//5) Al final de la transició, ressetegem si volem
+			modalContentElement.addEventListener('transitionend', $A.getCallback(() => {
+				//modalContainerElement.style.width = 'fit-content';
+				modalContentElement.style.maxHeight = 'none';
+				calendarioElement.style.maxHeight = 'none';
+				//modalContentElement.style.transition = '';
+				component.find('modalProgramarModalContainer').getElement().style.pointerEvents = 'auto';
+			}), {once: true});
+		}), 0);
+	},
+
+	openLightningConfirm: function() {
+		//eslint-disable-next-line @locker/locker/distorted-xml-http-request-window-open
+		return this.LightningConfirm.open({
+			theme: 'alt-inverse',
+			label: 'Producto no informado',
+			message: 'La operativa de cierre de oportunidad requiere informar previamente los campos de producto. ¿Quieres informarlos ahora?'
+		});
+	}
+
+	/*
+	seccionMostrar: function(component, seccionActual, seccionNew) {
+		//Sección nueva visible (pero aún transparente)
+		const seccionNewElemento = seccionNew.elemento;
+		seccionNewElemento.style.display = seccionNew.display;
+
+		window.setTimeout($A.getCallback(() => {
+			//Sección nueva visible y opaca
+			seccionNewElemento.style.opacity = 1;
+
+			//Redimensionar modal para adaptarlo al contenido de la nueva sección
+			const modalContainer = component.find('modalProgramarModalContainer').getElement();
+			const modalContent = component.find('modalProgramarModalContent').getElement();
+			const modalContainerWidth = modalContainer.scrollWidth;
+			const modalContentHeight = modalContent.scrollHeight;
+
+			//Forçar reflow per aplicar dimensions inicials
+			modalContainer.offsetWidth;
+			modalContent.offsetHeight;
+			modalContainer.style.width = modalContainerWidth + 'px';
+			modalContent.style.maxHeight = modalContentHeight + 'px';
+			modalContainer.offsetWidth;
+			modalContent.offsetHeight;
+
+			//Configurar transicions
+			modalContainer.style.willChange = 'width';
+			modalContainer.style.transition = 'width 320ms ease-in-out';
+			modalContent.style.willChange = 'max-height';
+			modalContent.style.transition = 'max-height 320ms ease-in-out';
+
+			//Aplicar noves dimensions
+			const modalContainerWidthNew = modalContainer.scrollWidth;
+			const modalContentHeightNew = modalContent.scrollHeight;
+			modalContainer.style.width = modalContainerWidthNew + 'px';
+			modalContent.style.maxHeight = modalContentHeightNew + 'px';
+
+			//Netejar estils després de la transició
+			const onTransitionEnd = () => {
+				modalContainer.style.willChange = '';
+				modalContainer.style.transition = '';
+				modalContainer.style.width = '';
+				modalContent.style.willChange = '';
+				modalContent.style.transition = '';
+				modalContent.style.maxHeight = '';
+				modalContainer.removeEventListener('transitionend', onTransitionEnd);
+			};
+
+			modalContainer.addEventListener('transitionend', onTransitionEnd);
+		}), 0);
+	}
+	*/
 });

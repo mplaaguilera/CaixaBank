@@ -1,0 +1,42 @@
+li {
+    margin: 0;
+    padding: 3px 4px 3px 6px;
+    border-radius: 4px;
+    transition: background-color 100ms ease;
+    cursor: default;
+}
+
+.listaAvisos {
+    padding: 3px;
+    height: 395px;
+    overflow-y: auto;
+    border: 1px solid #c9c9c9;
+    border-radius: 5px;
+    background-color: #fdfdfd;
+}
+
+.iconoHeader {
+    --slds-c-icon-color-background: #247eb2;
+}
+
+.avisoHora {
+    position: relative;
+    top: -4px;
+    font-size: 12.1px;
+}
+
+.avisoTexto {
+	font-size: 12.9px;
+	line-height: 15.8px;
+	margin: 6px 1px 0 12px;
+    border: solid 1px #c9c9c94d;
+	border-radius: 8px 8px 8px 0px;
+	padding: 9px 10px 8px 10px;
+	background-color: #e3ecf2;
+	will-change: filter;
+	transition: filter 90ms linear;
+}
+
+.avisoTexto:hover {
+	filter: brightness(0.98) saturate(1.6);
+}

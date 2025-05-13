@@ -3,7 +3,7 @@
     personAccount.FirstName = 'MARC';
     personAccount.LastName = 'PLA AGUILERA';
     personAccount.PersonEmail = 'marc.pla@ibm.com';
-    personAccount.Email = 'marc.pla@ibm.com';
+    personAccount.CC_Email__c = 'marc.pla@ibm.com';
     personAccount.CC_Idioma__pc = 'ca';
     personAccount.PersonBirthdate = Date.newInstance(1984, 5, 11);
     personAccount.PersonMailingCity = 'Barcelona';
@@ -16,5 +16,5 @@
     personAccount.PersonMobilePhone = '650399855';
     personAccount.CC_OficinaGestoraId__c = [SELECT Id FROM Account WHERE CC_Numero_Oficina_Empresa__c = '001-00615' LIMIT 1].Id;
     personAccount.AV_OficinaPrincipal__c = [SELECT Id FROM Account WHERE CC_Numero_Oficina_Empresa__c = '001-00615' LIMIT 1].Id;
-    personAccount.AV_EAPGestor__c = [SELECT Id FROM Contact WHERE Name = 'TREVOR SMART' AND Account.CC_Numero_Oficina_Empresa__c = '001-00615' LIMIT 1].Id;
+    personAccount.AV_EAPGestor__c = [SELECT Id FROM Contact WHERE LastName = 'SMART' AND Account.CC_Numero_Oficina_Empresa__c = '001-00615' LIMIT 1].Id;
     insert personAccount;

@@ -15,14 +15,14 @@ private class CSBD_Oppty_Operativas_Controller_Test { //Nombre abreviado porque 
 			CC_Lista_Valores__c valor = new CC_Lista_Valores__c();
 			valor.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
 			valor.CC_Lista__c = listaValores.Id;
-			valor.Name = 'Préstamo';
+			valor.Name = 'Consumo';
 			valor.CC_Valor__c = '1';
 
 			CC_Lista_Valores__c reglaAsignacion = new CC_Lista_Valores__c();
 			reglaAsignacion.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Regla_asignacion_oportunidad').getRecordTypeId();
-			reglaAsignacion.Name = 'Oportunidades - Préstamos I';
+			reglaAsignacion.Name = 'Oportunidades - Consumos I';
 			reglaAsignacion.CSBD_Cola_Oportunidad__c = 'CSBD_Prestamos_I';
-			reglaAsignacion.CSBD_Tipo_de_oportunidad__c = 'Préstamo';
+			reglaAsignacion.CSBD_Tipo_de_oportunidad__c = 'Consumo';
 			reglaAsignacion.CC_Orden__c = 1;
 			reglaAsignacion.CC_Activa__c = true;
 
@@ -120,7 +120,7 @@ private class CSBD_Oppty_Operativas_Controller_Test { //Nombre abreviado porque 
 		insert psAdmin; //Para poder editar oportunidades cerradas
 
 		System.runAs(usuarioGestor) {
-			List<Opportunity> prestamos = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo', new List<Map<String, Object>>{
+			List<Opportunity> hipotecas = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', new List<Map<String, Object>>{
 				new Map<String, Object>{'AccountId' => cuenta.Id},
 				new Map<String, Object>{'AccountId' => cuenta.Id},
 				new Map<String, Object>{'AccountId' => cuenta.Id},
@@ -133,19 +133,19 @@ private class CSBD_Oppty_Operativas_Controller_Test { //Nombre abreviado porque 
 			prestamos[3] = CSBD_Opportunity.cerrarOportunidad(prestamos[3].Id, 'Perdida', 'Resolución perdida');
 			*/
 
-			prestamos = CSBD_Opportunity.cerrarOportunidad(prestamos, 'Perdida', 'Resolución perdida');
+			hipotecas = CSBD_Opportunity.cerrarOportunidad(hipotecas, 'Perdida', 'Resolución perdida');
 
 			Date hoy = System.today();
-			prestamos[0].CloseDate = hoy.addDays(-360);
-			prestamos[1].CloseDate = hoy.addDays(-25);
-			prestamos[2].CloseDate = hoy.addDays(-25);
-			update new List<Opportunity>{prestamos[0], prestamos[1], prestamos[2]};
+			hipotecas[0].CloseDate = hoy.addDays(-360);
+			hipotecas[1].CloseDate = hoy.addDays(-25);
+			hipotecas[2].CloseDate = hoy.addDays(-25);
+			update new List<Opportunity>{hipotecas[0], hipotecas[1], hipotecas[2]};
 
 			Test.startTest();
-			Map<String, String> oppsAnteriores = CSBD_Opportunity_Operativas_Controller.numeroOportunidadesAnteriores(cuenta.Id, 'CSBD_Prestamo');
+			Map<String, String> oppsAnteriores = CSBD_Opportunity_Operativas_Controller.numeroOportunidadesAnteriores(cuenta.Id, 'CSBD_Hipoteca');
 			Test.stopTest();
 
-			System.assertEquals('Préstamos recientes', oppsAnteriores.get('titulo'), 'Título incorrecto');
+			System.assertEquals('Hipotecas recientes', oppsAnteriores.get('titulo'), 'Título incorrecto');
 			System.assertEquals('Solicitados en los últimos 365 días: 4\nDenegados últimos 365 días: 4\nDenegados últimos 30 días: 3', oppsAnteriores.get('mensaje'), 'Mensaje incorrecto');
 		}
 	}
@@ -193,7 +193,7 @@ private class CSBD_Oppty_Operativas_Controller_Test { //Nombre abreviado porque 
 	@IsTest
 	private static void pluralRecordTypeNameTest() {
 		System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
-			System.assertEquals('Préstamos', CSBD_Opportunity_Operativas_Controller.pluralRecordTypeName('CSBD_Prestamo'), 'Plural incorrecto');
+			System.assertEquals('Hipotecas', CSBD_Opportunity_Operativas_Controller.pluralRecordTypeName('CSBD_Hipoteca'), 'Plural incorrecto');
 			System.assertEquals('CMN', CSBD_Opportunity_Operativas_Controller.pluralRecordTypeName('CSBD_CMN'), 'Plural incorrecto');
 			System.assertEquals('Acciones comerciales', CSBD_Opportunity_Operativas_Controller.pluralRecordTypeName('CSBD_Accion_Comercial'), 'Plural incorrecto');
 		}

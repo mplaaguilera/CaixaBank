@@ -137,6 +137,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SIR_IndicadorProbationPeriod__c</picklist>
+        <values>
+            <fullName>N</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>S</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SIR_IndicadorVtoCtaCredito__c</picklist>
         <values>
             <fullName>N</fullName>
@@ -149,6 +160,28 @@
     </picklistValues>
     <picklistValues>
         <picklist>SIR_Moratoria__c</picklist>
+        <values>
+            <fullName>N</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>S</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SIR_SuperaUmbralAbsoluto__c</picklist>
+        <values>
+            <fullName>N</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>S</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SIR_SuperaUmbralRelativo__c</picklist>
         <values>
             <fullName>N</fullName>
             <default>false</default>

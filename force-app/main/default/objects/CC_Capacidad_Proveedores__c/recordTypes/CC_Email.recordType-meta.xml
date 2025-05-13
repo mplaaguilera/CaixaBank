@@ -57,10 +57,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Chat NOA WhatsApp</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Código de Buenas Prácticas</fullName>
             <default>false</default>
         </values>
@@ -218,10 +214,6 @@
         </values>
         <values>
             <fullName>OESIA</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>SIN PROVEEDOR</fullName>
             <default>false</default>
         </values>
     </picklistValues>

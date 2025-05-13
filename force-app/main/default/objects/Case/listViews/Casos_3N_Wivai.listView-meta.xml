@@ -25,7 +25,7 @@
         <operation>equals</operation>
         <value>Marketing,Postventa CompraEstrella</value>
     </filters>
-    <label>Casos usuarios 3N Facilitea</label>
+    <label>Casos usuario 3N Facilitea</label>
     <sharedTo>
         <group>PublicGroup_3N_PromoCaixa_Interno</group>
     </sharedTo>

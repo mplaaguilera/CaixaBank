@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Consultas_SAC_PteAsignar_Grupos</fullName>
+    <booleanFilter>1 AND 4 AND ((2 AND 3) OR (5 AND 6))</booleanFilter>
+    <columns>SAC_FechaRecepcion__c</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>NAME</columns>
+    <columns>SEG_Grupo__c</columns>
+    <columns>SAC_GrupoLetrado__c</columns>
+    <columns>CASES.PRIORITY</columns>
+    <columns>CC_CasoRelacionado__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CASES.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Case.SAC_ConsultaSAC</value>
+    </filters>
+    <filters>
+        <field>SAC_Es_mi_grupo__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>OWNER_NAME</field>
+        <operation>equals</operation>
+        <value>Pte. Asignar</value>
+    </filters>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>notEqual</operation>
+        <value>Rechazado,SAC_013</value>
+    </filters>
+    <filters>
+        <field>SAC_MigrupoLetrado__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>SAC_Letrado__c</field>
+        <operation>equals</operation>
+        <value>Pte. Asignar</value>
+    </filters>
+    <label>SAC-Consultas SAC Pte.Asignar mis grupos</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

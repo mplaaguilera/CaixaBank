@@ -1,0 +1,10 @@
+@import 'c/csbd_lwcStyle';
+
+section.slds-modal > div.slds-modal__container {
+	width: 36rem;
+	min-width: 36rem;
+}
+
+lightning-icon.iconoEtapas {
+	--slds-c-icon-color-foreground-default: gray;
+}

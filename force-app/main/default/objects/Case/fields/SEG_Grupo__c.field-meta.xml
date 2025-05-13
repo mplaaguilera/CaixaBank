@@ -10,7 +10,7 @@
         <filterItems>
             <field>CC_Grupo_Colaborador__c.RecordTypeId</field>
             <operation>equals</operation>
-            <value>Grupo Operativo Segmentos</value>
+            <value>Grupo colaborador, Grupo Operativo Segmentos</value>
         </filterItems>
         <filterItems>
             <field>$Source.RecordTypeId</field>

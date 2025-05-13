@@ -37,6 +37,46 @@
                 <default>false</default>
                 <label>Desistimiento</label>
             </value>
+            <value>
+                <fullName>SAC_006</fullName>
+                <default>false</default>
+                <label>Allanamiento</label>
+            </value>
+            <value>
+                <fullName>SAC_007</fullName>
+                <default>false</default>
+                <label>Errónea</label>
+            </value>
+            <value>
+                <fullName>SAC_008</fullName>
+                <default>false</default>
+                <label>Incompetente</label>
+            </value>
+            <value>
+                <fullName>SAC_009</fullName>
+                <default>false</default>
+                <label>Sin pronunciamiento</label>
+            </value>
+            <value>
+                <fullName>SPV_FavorableEntidad</fullName>
+                <default>false</default>
+                <label>Favorable a Entidad</label>
+            </value>
+            <value>
+                <fullName>SPV_DesfavorableEntidadTotal</fullName>
+                <default>false</default>
+                <label>Desfavorable a Entidad Total</label>
+            </value>
+            <value>
+                <fullName>SPV_DesfavorableEntidadParcial</fullName>
+                <default>false</default>
+                <label>Desfavorable a Entidad Parcial</label>
+            </value>
+            <value>
+                <fullName>SPV_Inadmitida</fullName>
+                <default>false</default>
+                <label>Inadmitida</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

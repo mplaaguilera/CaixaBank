@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_Visto__c</fullName>
     <description>Campo del componente de listado de la Oportunidad CIB</description>
-    <label>Visto</label>
+    <label>Revisión C.P. Analysis</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
@@ -13,13 +13,25 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
+                <fullName>SI</fullName>
+                <default>false</default>
+                <label>SI</label>
+            </value>
+            <value>
+                <fullName>NO</fullName>
+                <default>false</default>
+                <label>NO</label>
+            </value>
+            <value>
                 <fullName>EG</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>EG</label>
             </value>
             <value>
                 <fullName>IG</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>IG</label>
             </value>
         </valueSetDefinition>

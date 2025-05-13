@@ -32,14 +32,7 @@ public with sharing class CC_WS_Autenticacion_SAU {
                 
                 String tipoBody = clienteImagin ? 'CNI' : 'CNC';
                 String httpRequestBody = '{"validationName": "' + tipoBody + '"}';
-
-                CBK_HttpServiceIntegration.RequestWapper integracion = new CBK_HttpServiceIntegration.RequestWapper();
-                integracion.body = httpRequestBody;
-                integracion.intSetting = integracionElegida;
-                integracion.mHeaders = mHeaders;
-                HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
-                HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, null, integracionElegida);
-
+                HttpResponse response = invocacionServicio(httpRequestBody, integracionElegida, mHeaders);
                 if (response.getStatusCode() != 200) { //KO
                     retorno = 'Ha habido un problema con la integración';
                 } else { //OK
@@ -50,7 +43,25 @@ public with sharing class CC_WS_Autenticacion_SAU {
                     // Validacion de si existContract no encuentra nada.
                     if (jsonMap.containsKey('existContract')) {
                         String existContract = (String) jsonMap.get('existContract');
-                        retorno = existContract.toLowerCase(); // Debe devolver -> EXIST_CONTRACT / NO_CONTRACT
+                        if(existContract =='EXIST_CONTRACT'){
+                            retorno = existContract.toLowerCase();
+                        } else if(existContract == 'NO_CONTRACT'){
+                            tipoBody = tipoBody == 'CNC' ? 'CNI' : 'CNC';
+                            httpRequestBody = '{"validationName": "' + tipoBody + '"}';
+                            response = invocacionServicio(httpRequestBody, integracionElegida, mHeaders);
+                            jsonResponse = response.getBody();
+                            jsonMap = (Map<String, Object>) JSON.deserializeUntyped(jsonResponse);
+                            if (response.getStatusCode() != 200) { //KO
+                                retorno = 'Ha habido un problema con la integración';
+                            } else { //OK
+                                 if (jsonMap.containsKey('existContract')) {
+                                    existContract = (String) jsonMap.get('existContract');
+                                    retorno = existContract.toLowerCase();
+                                 } else {
+                                    retorno = 'Ha habido un problema con los datos';
+                                }
+                            }
+                        }
                     } else {
                         retorno = 'Ha habido un problema con los datos';
                     }
@@ -61,6 +72,28 @@ public with sharing class CC_WS_Autenticacion_SAU {
         } catch (Exception e) {
             CBK_Log.error(e);
         }
+
+        if(traza) {
+            CBK_HttpServiceIntegration.registroTrazaIntegracion();
+        }
         return retorno;
     }
+
+    private static HttpResponse invocacionServicio(String httpRequestBody, String integracionElegida, Map<String, String> mHeaders) {
+        HttpResponse response;
+        try {
+            CBK_HttpServiceIntegration.RequestWapper integracion = new CBK_HttpServiceIntegration.RequestWapper();
+            integracion.body = httpRequestBody;
+            integracion.intSetting = integracionElegida;
+            integracion.mHeaders = mHeaders;
+            HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
+            response =  CBK_HttpServiceIntegration.multiCallHttpService(request, null, integracionElegida);            
+        } catch (Exception e) {
+            CBK_Log.error(e);
+        }
+
+    return response;
+
+    }
+
 }

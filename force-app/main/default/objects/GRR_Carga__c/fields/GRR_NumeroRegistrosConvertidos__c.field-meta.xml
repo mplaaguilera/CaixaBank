@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_NumeroRegistrosConvertidos__c</fullName>
+    <label>Número registros convertidos</label>
+    <summaryFilterItems>
+        <field>GRR_RegistroCarga__c.GRR_Caso__c</field>
+        <operation>notEqual</operation>
+        <value></value>
+    </summaryFilterItems>
+    <summaryForeignKey>GRR_RegistroCarga__c.GRR_Fichero__c</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

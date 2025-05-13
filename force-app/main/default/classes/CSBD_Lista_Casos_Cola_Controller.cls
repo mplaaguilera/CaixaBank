@@ -1,7 +1,7 @@
 public with sharing class CSBD_Lista_Casos_Cola_Controller {
 
     @AuraEnabled
-    public static List<Case> casos3n(Boolean sinCache) {
+    public static Map<String, List<Case>> casos3n(Boolean sinCache) {
         List<Case> listaCasos3NdeCSBD =  new List<Case>();
 
         // Se mira la caché, si tiene datos guardados los recoge, sino, se lanza la query
@@ -14,7 +14,9 @@ public with sharing class CSBD_Lista_Casos_Cola_Controller {
             Cache.Org.put('local.CSBD.Casos3NCSBD', listaCasos3NdeCSBD, 300);
         }
 
-        return listaCasos3NdeCSBD;
+        return new Map<String, List<Case>>{
+            'casos3n' => listaCasos3NdeCSBD
+        };
     }
 
     @AuraEnabled(cacheable=true)

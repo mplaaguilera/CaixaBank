@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_ResultadoNegociacion__c</fullName>
+    <description>Campo que almacena el resultado de la negociación realizada en la reclamación</description>
+    <label>Resultado de negociación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Acuerdo aceptado</fullName>
+                <default>false</default>
+                <label>Acuerdo aceptado</label>
+            </value>
+            <value>
+                <fullName>Acuerdo rechazado</fullName>
+                <default>false</default>
+                <label>Acuerdo rechazado</label>
+            </value>
+            <value>
+                <fullName>Acuerdo revocado</fullName>
+                <default>false</default>
+                <label>Acuerdo revocado</label>
+            </value>
+            <value>
+                <fullName>Cliente no localizado</fullName>
+                <default>false</default>
+                <label>Cliente no localizado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

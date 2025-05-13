@@ -101,6 +101,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>AV_SFReportNoLocalizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>AV_Salesforce</fullName>
             <default>false</default>
         </values>

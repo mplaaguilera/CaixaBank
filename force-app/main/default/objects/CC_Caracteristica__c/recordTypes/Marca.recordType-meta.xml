@@ -21,7 +21,23 @@
     <picklistValues>
         <picklist>HDT_Iconos_Caracteristicas__c</picklist>
         <values>
+            <fullName>custom%3Acustom25</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>custom%3Acustom34</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>custom%3Acustom43</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>custom%3Acustom73</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>custom%3Acustom77</fullName>
             <default>false</default>
         </values>
         <values>
@@ -33,8 +49,16 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>utility%3Aapex_plugin</fullName>
+            <fullName>standard%3Acoaching</fullName>
             <default>false</default>
+        </values>
+        <values>
+            <fullName>standard%3Aworkforce_engagement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>utility%3Aapex_plugin</fullName>
+            <default>true</default>
         </values>
     </picklistValues>
     <picklistValues>

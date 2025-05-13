@@ -22,11 +22,6 @@
         <operation>notEqual</operation>
         <value>Soporte PSU</value>
     </filters>
-    <filters>
-        <field>CASES.RECORDTYPE</field>
-        <operation>equals</operation>
-        <value>Case.CC_Cliente</value>
-    </filters>
     <label>Cola 3N CSBD</label>
     <queue>Cola_3N_CSBD</queue>
     <sharedTo>

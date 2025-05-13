@@ -52,11 +52,23 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>SAC_Analisis</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>SAC_Ejecucion</fullName>
             <default>false</default>
         </values>
         <values>
+            <fullName>SAC_Negociacion</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>SAC_Resolucion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Subsanacion</fullName>
             <default>false</default>
         </values>
         <values>

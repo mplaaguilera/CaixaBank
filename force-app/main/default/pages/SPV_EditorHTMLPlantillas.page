@@ -1,0 +1,87 @@
+<apex:page controller="SPV_LCMP_GeneracionDocumento">
+    <apex:includeScript value="{!URLFOR($Resource.TinyMCE, 'tinymce/js/tinymce/tinymce.min.js')}"/>
+
+    <apex:slds />
+    <script>
+        var bm;
+        var cuerpoEditado = false;
+
+   		window.onload = function(){
+            tinymce.init({
+                license_key: "gpl",
+                selector : "#textAreaId",
+                toolbar: "undo redo | fontfamily fontsizeinput | forecolor bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat | preview",
+                font_family_formats: "Arial=arial,helvetica,sans-serif;",
+                font_size_input_default_unit: "px",
+                content_style:"body { font-family: Arial; }",
+                font_size_formats: '8px 10px 12px 14px 16px 18px 24px 36px 48px',
+                image_advtab: true,
+                skin: 'oxide',
+                paste_data_images: false,
+                plugins: [
+                    "advlist","autolink","lists","preview",
+                    "searchreplace","wordcount","visualchars",
+                    "insertdatetime","table","template"
+                ], 
+                init_instance_callback: function (editor) {
+                    editor.on('blur', function (e) {
+                        bm = tinymce.activeEditor.selection.getBookmark();
+                    });
+                }, 
+                setup: function (editor) {
+                    editor.on('change keyup', function () {
+                        if(!cuerpoEditado) {
+                            onChangeBodyLWC();
+                            cuerpoEditado = true;
+                        }
+                    });
+                },
+            });
+
+            previousContent = tinyMCE.get('textAreaId').getContent();
+        };
+    
+        var lexOrigin ='{!lexOrigin}';
+                
+        window.addEventListener("message",function(event){            
+            if(event.origin !== lexOrigin){
+                //Not the expected origin
+                return;
+            }
+            if(event.data.origen == "imagen") {
+                tinymce.activeEditor.selection.moveToBookmark(bm);
+                tinymce.activeEditor.insertContent(event.data.datos);
+            } else {
+                tinyMCE.get('textAreaId').setContent(event.data.datos); 
+            }
+        },false);
+    	
+    	function sendToLWC() {
+            var payload = tinyMCE.get('textAreaId').getContent();
+            var idCaso ='{!idCaso}';
+            var message = {
+                name:'{!idCaso}',
+                guardado:true,
+                payload:payload
+            };
+           
+            parent.postMessage(message,lexOrigin);
+        }
+
+        function onChangeBodyLWC() {
+            var payload = true;
+            var idCaso ='{!idCaso}';
+            var message = {
+                name:'{!idCaso}',
+                guardado:false,
+                payload:payload
+            };
+           
+            parent.postMessage(message,lexOrigin);
+        }
+    </script> 
+
+    <textarea id="textAreaId" style="height: 90vh;">{!cuerpoDocumento}</textarea> 
+    <button class="slds-button slds-button_brand slds-float_right" style="margin-right:10px;margin-top:10px;" onclick="sendToLWC()">Guardar</button>
+         
+</apex:page>

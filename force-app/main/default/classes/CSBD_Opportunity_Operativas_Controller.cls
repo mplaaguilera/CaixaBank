@@ -293,7 +293,7 @@ public with sharing class CSBD_Opportunity_Operativas_Controller {
 	@AuraEnabled(cacheable=true)
 	public static List<String> obtenerResoluciones(String producto, String nombreRecordType, String etapa) {
 		return CSBD_Utils.listaCampo([SELECT CC_Lista__r.Name FROM CC_Lista_Valores__c WHERE RecordType.Name = 'Valor' AND Name = :producto
-												AND CC_Lista__r.CSBD_Tipo_de_oportunidad__c INCLUDES (:nombreRecordType)
+										AND CC_Lista__r.CSBD_Tipo_de_oportunidad__c INCLUDES (:nombreRecordType)
 										AND CC_Lista__r.CSBD_Etapa_Resolucion__c INCLUDES (:etapa) ORDER BY CC_Lista__r.Name], 'CC_Lista__r.Name');
 	}
 
@@ -303,15 +303,14 @@ public with sharing class CSBD_Opportunity_Operativas_Controller {
 										AND CC_Lista__r.Name = 'CSBD: Entidades competencia' ORDER BY Name], 'Name');
 	}
 
-	@AuraEnabled
-	public static Opportunity crearTareaGestor(String recordId, String numeroGestor, String idGestor, String comentarios) {
+    @AuraEnabled
+    public static Opportunity crearTareaGestor(String recordId, String numeroGestor, String idGestor, String comentarios) {
 
-		List<Opportunity> oportunidad = [SELECT ContactId, AccountId, AV_PF__c, Account.AV_EAPGestor__r.Account.CC_Numero_Oficina__c, AV_Comentarios__c, Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c
+		List<Opportunity> oportunidad = [SELECT ContactId, AccountId, AV_PF__c, Account.AV_EAPGestor__r.Account.CC_Numero_Oficina__c, AV_Comentarios__c, Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c, Account.AV_OfficeManager__r.CC_Numero_Oficina__c
 										FROM Opportunity WHERE Id = :recordId];
 
 		List<User> gestorCliente = new List<User>();
 		List<Contact> contactoGestor = new List<Contact>();
-		String centro = oportunidad[0].Account.AV_EAPGestor__r.Account.CC_Numero_Oficina__c != null ? oportunidad[0].Account.AV_EAPGestor__r.Account.CC_Numero_Oficina__c  : oportunidad[0].Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c;
 
 		if (String.isNotBlank(numeroGestor) && String.isNotBlank(idGestor)) {
 			if (!numeroGestor.startsWith('U01')) {
@@ -327,6 +326,8 @@ public with sharing class CSBD_Opportunity_Operativas_Controller {
 				idGestor = contactoGestor[0].Id;
 			}
 		}
+
+		String centro = CSBD_MetodosComunes.buscarCentro(oportunidad[0], numeroGestor);
 
 		Opportunity opp = new Opportunity();
 		opp.recordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('AV_AlertaComercial').getRecordTypeId();

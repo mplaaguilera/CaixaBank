@@ -104,4 +104,74 @@ public with sharing class CSBD_MetodosComunes {
         correo.setOrgWideEmailAddressId(idBuzonSalida);
         return correo;
     }
+
+    public static String buscarCentro(Opportunity oportunidad, String numeroGestor){
+		String centro = '';
+    Boolean gestorPool = false; 
+		if(!String.isBlank(numeroGestor)){        
+			if(comprobarGestor(numeroGestor)){
+				centro = obtenerCentroPool(oportunidad);
+			}else{
+				centro = obtenerCentroNoPool(oportunidad);
+			}
+		}else{
+			centro = obtenerCentroNoPool(oportunidad);
+		}    
+		return centro;
+	}
+
+	public static String obtenerCentroPool(Opportunity oportunidad){
+		String centro = 
+		oportunidad.Account.AV_OfficeManager__r.CC_Numero_Oficina__c != null ? 
+		oportunidad.Account.AV_OfficeManager__r.CC_Numero_Oficina__c  : 
+		getCentroGenerico();
+		return centro;
+	}
+
+	public static String obtenerCentroNoPool(Opportunity oportunidad){
+		String centro = 
+		oportunidad.Account.AV_EAPGestor__r.Account.CC_Numero_Oficina__c != null ? 
+		oportunidad.Account.AV_EAPGestor__r.Account.CC_Numero_Oficina__c  : 
+		oportunidad.Account.AV_OficinaPrincipal__r?.CC_Numero_Oficina__c;
+		return centro;
+	}
+
+    public static String getCentroGenerico(){
+        String centroDefault = '';
+        List<CC_Lista_Valores__c> centrosDefault = [
+            SELECT CC_Activa__c, CC_Valor__c, Name 
+            FROM CC_Lista_Valores__c 
+            WHERE RecordType.DeveloperName = 'CC_Valor'
+            AND CC_Lista__r.Name = 'Gestion Oficinas del Pool' 
+            AND Name = 'Centro Genérico'
+        ];
+
+        if(!centrosDefault.isEmpty()){
+            centroDefault = centrosDefault[0].CC_Valor__c;
+        }
+        return centroDefault;       
+    }
+
+	public static Boolean comprobarGestor(String numeroGestor){
+		Boolean esGestorPool = false; 
+		try{
+            //buscar si el gestor es de un pool
+            List<AV_MultiEmployees__mdt> gestoresPool = [ 
+                SELECT AV_Alias__c
+                FROM AV_MultiEmployees__mdt 
+                ORDER BY AV_Alias__c
+            ];
+            for(AV_MultiEmployees__mdt gestor : gestoresPool){
+                String aliasU01 = 'U01' + gestor.AV_Alias__c;
+                if(aliasU01 == numeroGestor){
+                    esGestorPool = true;
+                    break;
+                }
+            }
+	
+		}catch(Exception e){
+			CBK_Log.error('Error al comprobar si la matrícula es de un gestor del Pool: ' + e.getMessage());
+		}
+        return esGestorPool;
+	}
 }

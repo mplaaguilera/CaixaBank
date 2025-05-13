@@ -191,7 +191,6 @@ public with sharing class SAC_LCMP_RedaccionReclamacion {
                 pretension.Status = 'Cerrado';
                 pretension.SAC_StatusAuxiliar__c = 'Cerrado';
             }
-            gestionarTareas(tareas, reclamacion.CaseNumber);
         }
         else{
             for(Case pretension : pretensiones){
@@ -224,44 +223,6 @@ public with sharing class SAC_LCMP_RedaccionReclamacion {
         message.HtmlBody = texto;
         Messaging.SingleEmailMessage[] messages =   new List<Messaging.SingleEmailMessage> {message};
         Messaging.SendEmailResult[] results = Messaging.sendEmail(messages);
-    }
-
-    @AuraEnabled
-    public static void gestionarTareas(List<SAC_Accion__c> acciones, String numCaso){
-    /*****************************************************************
-    * Proposito: Lanzar el email con la redacción al reclamante
-    * 
-    * Historial
-    * -------
-    * VERSION        USER_STORY       AUTHOR         DATE         Description
-    * 1.0            US248482         Luis Mesa      06/08/21     Creación
-    *****************************************************************/ 
-        List<Id> idListaGrupos = new List<Id>();
-        List<CC_Grupo_Colaborador__c> listaGrupos = new List<CC_Grupo_Colaborador__c>();
-        for(SAC_Accion__c accion : acciones){
-            accion.SAC_Estado__c = 'SAC_EnGestion';
-            idListaGrupos.add(accion.SAC_EquipoResponsable__c);
-        }
-        listaGrupos = [SELECT Id, SAC_Email__c FROM CC_Grupo_Colaborador__c WHERE Id IN: idListaGrupos];
-        
-        String [] arrayAddress = new List<String>();
-        for(CC_Grupo_Colaborador__c grupo : listaGrupos){
-            arrayAddress.add(grupo.SAC_Email__c);
-        }
-
-        //falta crear el texto desde una plantilla
-        EmailTemplate emailTemplate = [SELECT Id,Subject,Description,HtmlValue,DeveloperName,Body FROM EmailTemplate WHERE name = 'SAC Notificar equipo red'];
-
-
-        Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
-        message.toAddresses = arrayAddress;
-        message.optOutPolicy = 'FILTER';
-        message.Subject = emailTemplate.Subject;
-        message.HtmlBody = /*texto*/ emailTemplate.Body + ' ' + numCaso;
-        Messaging.SingleEmailMessage[] messages =   new List<Messaging.SingleEmailMessage> {message};
-        Messaging.SendEmailResult[] results = Messaging.sendEmail(messages);
-
-        update acciones;
     }
     
     @AuraEnabled

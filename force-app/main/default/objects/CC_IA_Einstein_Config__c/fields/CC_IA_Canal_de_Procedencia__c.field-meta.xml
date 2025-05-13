@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_IA_Canal_de_Procedencia__c</fullName>
+    <description>Canal de Procedencia del caso para el que van a estar activas las funcionalidades de Einstein IA</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Este campo debe tener el mismo valor definido en Canal de Procedencia del caso</inlineHelpText>
+    <label>Canal de Procedencia</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>TextArea</type>
+</CustomField>

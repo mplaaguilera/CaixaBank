@@ -186,7 +186,7 @@ public with sharing class SEG_Case_AU_TRHan extends CC_TriggerHandlerBase {
 				//Si se modifica el propietario sin cambiar de grupo y tanto el nuevo propietario como viejo son usuarios se indicará el propietario viejo en el campo "Propietario anterior del grupo" 
 				if (mapNewObj.get(casoId).OwnerId != mapOldObj.get(casoId).OwnerId 
 				&& mapNewObj.get(casoId).SEG_Grupo__c == mapOldObj.get(casoId).SEG_Grupo__c 
-				&& mapOldObj.get(casoId).OwnerId.getSobjectType() == Schema.getGlobalDescribe().get('User')){					
+				&& mapOldObj.get(casoId).OwnerId.getSobjectType() == Schema.SObjectType.User.getSobjectType()){					
 					casosOwnerModificado.add(casoId);
 				}
 			}
@@ -575,7 +575,7 @@ public with sharing class SEG_Case_AU_TRHan extends CC_TriggerHandlerBase {
 		}
 		//DS1315 - Eliminar planificaciones canceladas
 		if (!lstScheduleDel.isEmpty()) {
-			delete lstScheduleDel;
+			CBK_DMLUtility.deleteRecords(lstScheduleDel);
 		}
 	}
 

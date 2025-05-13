@@ -3,7 +3,7 @@
     <fullName>CSBD_CodigoPostal__c</fullName>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
-    <label>Código postal</label>
+    <label>Código Postal</label>
     <length>5</length>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>

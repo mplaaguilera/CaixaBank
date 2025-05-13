@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Case_Participante__c</fullName>
+    <description>Campo master-detail con el caso</description>
+    <label>Case Participante</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>1 AND 2</booleanFilter>
+        <filterItems>
+            <field>Case.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Cliente (GRR)</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.GRR_Cliente_Participante__c</field>
+            <operation>notEqual</operation>
+            <value>Centro CaixaBank, Buzón COPS</value>
+        </filterItems>
+        <isOptional>true</isOptional>
+    </lookupFilter>
+    <referenceTo>Case</referenceTo>
+    <relationshipLabel>Participantes GRR</relationshipLabel>
+    <relationshipName>Participantes_GRR</relationshipName>
+    <relationshipOrder>1</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

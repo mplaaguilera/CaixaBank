@@ -82,11 +82,6 @@
                 <label>2N UAFE CNF PNA</label>
             </value>
             <value>
-                <fullName>2N UAFE FAG INDRA ZONA 1</fullName>
-                <default>false</default>
-                <label>2N UAFE FAG INDRA</label>
-            </value>
-            <value>
                 <fullName>2N UAFE FAG PNA ZONA 1</fullName>
                 <default>false</default>
                 <label>2N UAFE FAG PNA</label>
@@ -347,14 +342,9 @@
                 <label>Cola Efectivo INDRA</label>
             </value>
             <value>
-                <fullName>3N CCI Holabank</fullName>
+                <fullName>Cola Efectivo Clara</fullName>
                 <default>false</default>
-                <label>3N CCI Holabank</label>
-            </value>
-            <value>
-                <fullName>Cola Efectivo COPS</fullName>
-                <default>false</default>
-                <label>Cola Efectivo COPS</label>
+                <label>Cola Efectivo Clara</label>
             </value>
             <value>
                 <fullName>Cola Efectivo Inés</fullName>
@@ -362,19 +352,19 @@
                 <label>Cola Efectivo Inés</label>
             </value>
             <value>
-                <fullName>Cola Efectivo Mireia</fullName>
+                <fullName>Cola Efectivo Leticia</fullName>
                 <default>false</default>
-                <label>Cola Efectivo Mireia</label>
+                <label>Cola Efectivo Leticia</label>
             </value>
             <value>
-                <fullName>Cola Efectivo Clara</fullName>
+                <fullName>Cola Efectivo COPS</fullName>
                 <default>false</default>
-                <label>Cola Efectivo Clara</label>
+                <label>Cola Efectivo COPS</label>
             </value>
             <value>
-                <fullName>Cola Efectivo Francisco</fullName>
+                <fullName>3N CCI Holabank</fullName>
                 <default>false</default>
-                <label>Cola Efectivo Francisco</label>
+                <label>3N CCI Holabank</label>
             </value>
             <value>
                 <fullName>Cola Efectivo Oriol</fullName>
@@ -382,9 +372,14 @@
                 <label>Cola Efectivo Oriol</label>
             </value>
             <value>
-                <fullName>Cola Efectivo Leticia</fullName>
+                <fullName>Cola Efectivo Mireia</fullName>
                 <default>false</default>
-                <label>Cola Efectivo Leticia</label>
+                <label>Cola Efectivo Mireia</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo Francisco</fullName>
+                <default>false</default>
+                <label>Cola Efectivo Francisco</label>
             </value>
             <value>
                 <fullName>Cola Efectivo Robert</fullName>
@@ -395,6 +390,11 @@
                 <fullName>Cola Efectivo Marta</fullName>
                 <default>false</default>
                 <label>Cola Efectivo Marta</label>
+            </value>
+            <value>
+                <fullName>2N UAFE FAG INDRA</fullName>
+                <default>false</default>
+                <label>2N UAFE FAG INDRA</label>
             </value>
         </valueSetDefinition>
     </valueSet>

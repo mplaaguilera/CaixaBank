@@ -16,6 +16,10 @@
         <default>false</default>
     </values>
     <values>
+        <fullName>No Gestionada</fullName>
+        <default>false</default>
+    </values>
+    <values>
         <fullName>No apto</fullName>
         <default>false</default>
     </values>
@@ -25,6 +29,14 @@
     </values>
     <values>
         <fullName>Potencial</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Producto Contratado</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Producto Rechazado</fullName>
         <default>false</default>
     </values>
     <values>

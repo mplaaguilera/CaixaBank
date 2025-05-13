@@ -1,0 +1,13 @@
+:host {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}
+
+.slds-notify_alert {
+    background-color: rgba(95, 158, 160, 0.23);
+    text-align: left;
+    border-radius: 6px;
+    border: 1px solid rgb(226, 226, 226);
+    line-height: 1.5;
+    font-size: 11.9px;
+    background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.03) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.03) 75%, transparent 75%);
+}

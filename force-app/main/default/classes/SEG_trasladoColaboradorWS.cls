@@ -86,10 +86,33 @@ public with sharing class SEG_trasladoColaboradorWS{
      */
     public class SEG_RequestValija
     {
+        public String action {get;set;}
+        public String originId {get;set;}
+        public String operationId {get;set;}
+        public String branchId {get;set;}
+        public String sourceApp {get;set;}
+        public List<Map<String,String>> Metadatas {get;set;}
+        public List<Adjuntos> Documents {get;set;}
+    }
+
+     public class SEG_RequestValijaOld
+    {
         public SEG_Credenciales credenciales {get;set;}
         public Map<String,String> metadata {get;set;}
         public List<SEG_InfoData> infodata {get;set;}
         public Map<String,String> imagenesArray {get;set;}
+    }
+
+
+    /**
+     * @description Estructura del response de la respuesta de Valija.
+     */
+    public class SEG_ResponseValija
+    {
+        public Boolean ok {get;set;}
+        public String id {get;set;}
+        public String errorCode {get;set;}
+        public String message {get;set;}
     }
 
     public class SEG_Credenciales
@@ -101,6 +124,7 @@ public with sharing class SEG_trasladoColaboradorWS{
         public String canal {get;set;}
     }
 
+
     public class SEG_InfoData 
     {
         public String nombre {get;set;}
@@ -108,14 +132,13 @@ public with sharing class SEG_trasladoColaboradorWS{
     }
 
     /**
-     * @description Estructura del response de la respuesta de Valija.
-     */
-    public class SEG_ResponseValija
+    * @description Estructura del los archivos enviados a valija
+    */
+    public class Adjuntos
     {
-        public Boolean ok {get;set;}
-        public String id {get;set;}
-        public String errorCode {get;set;}
-        public String message {get;set;}
+        public String fileName {get;set;}
+        public String format {get;set;}
+        public String content {get;set;}
     }
 
     /**
@@ -245,98 +268,6 @@ public with sharing class SEG_trasladoColaboradorWS{
 
         // -------------------------------------------------------------------------------------------------------------------
         // -------------------------------------------------------------------------------------------------------------------
-        // Generar un fichero con el cuerpo del primer correo entrante que tiene anexado el caso.
-        //      UPDATE: Queda descartado. NO se enviarán correos en formato HTML a Valija, ya que no los procesa.
-        // -------------------------------------------------------------------------------------------------------------------
-        // -------------------------------------------------------------------------------------------------------------------
-        /*for (Case caso : [SELECT Id, (SELECT Id, TextBody, HtmlBody FROM EmailMessages WHERE Incoming = true AND Status = '1' ORDER BY CreatedDate ASC LIMIT 1) 
-                            FROM Case 
-                            WHERE Id IN :mapaDatosTraslados.keySet()])
-        {
-            // Iteramos el posible resultado del primer correo entrante.
-            for (EmailMessage email : caso.EmailMessages)
-            {
-                String dateMS = String.valueOf(Datetime.now().getTime());
-                String nombreFile = 'Correo entrante (Valija) ' + dateMS;
-                String cuerpoMail = email.HtmlBody;
-                cuerpoMail = (String.isBlank(cuerpoMail)) ? email.TextBody : cuerpoMail;
-
-                // Preparar la creación del fichero.
-                ContentVersion newFile = new ContentVersion();
-                newFile.ContentLocation = 'S';
-                newFile.PathOnClient = nombreFile + '.html';
-                newFile.Origin = 'C';
-                newFile.Title = nombreFile;
-                newFile.VersionData = Blob.valueOf(cuerpoMail);
-                newFile.Description = 'TRASLADO_VALIJA_CORREO_ENTRANTE_' + caso.Id;
-                newFile.SEG_ValijaSalienteId__c = null;
-                //newFile.SEG_Tipo__c = 'ENVIADO A VALIJA';
-                newFile.SEG_EnviadoValija__c = true;
-                filesToInsert.add(newFile);
-                setCasosFilesCreados.add(caso.Id);
-
-                break;
-            }
-        }*/
-
-        // -------------------------------------------------------------------------------------------------------------------
-        // -------------------------------------------------------------------------------------------------------------------
-        // Generar un fichero con la posible nota de traslado a colaborador
-        //      UPDATE: Queda descartado, dado que un traslado manual ya no funciona como en Siebel, a partir de la escritura de un correo.
-        // -------------------------------------------------------------------------------------------------------------------
-        // -------------------------------------------------------------------------------------------------------------------
-        /*for (Id caseId : mapaDatosTraslados.keySet())
-        {
-            String cuerpoTraslado = mapaDatosTraslados.get(caseId).cuerpoTraslado;
-            if (String.isNotBlank(cuerpoTraslado))
-            {
-                ContentVersion newFile = new ContentVersion();
-                newFile.ContentLocation = 'S';
-                newFile.PathOnClient = 'Datos traslado (Valija).html';
-                newFile.Origin = 'C';
-                newFile.Title = 'Datos traslado (Valija)';
-                newFile.VersionData = Blob.valueOf(cuerpoTraslado);
-                newFile.Description = 'TRASLADO_VALIJA_' + caseId;
-                newFile.SEG_ValijaSalienteId__c = null;
-                newFile.SEG_Tipo__c = 'ENVIADO A VALIJA';
-                filesToInsert.add(newFile);
-                setCasosFilesCreados.add(caseId);
-            }
-        }
-
-        if (!filesToInsert.isEmpty())
-        {
-            insert filesToInsert;
-
-            // Recuperar los documentos generados para vincularlos al caso.
-            List<Id> listadoVersiones = new List<Id>();
-            for (ContentVersion versionDocumento : filesToInsert)
-            {
-                listadoVersiones.add(versionDocumento.Id);
-            }
-
-            // Recuperar los ContentDocument creados para vincularlos con su caso asociado.
-            List<ContentDocumentLink> listadoLinksFiles = new List<ContentDocumentLink>();
-            for (ContentVersion versionDocumento : [SELECT Id, ContentDocumentId, Description FROM ContentVersion WHERE Id IN :listadoVersiones AND IsLatest = true])
-            {
-                String caseId = versionDocumento.Description;
-                caseId = (String.isNotBlank(caseId)) ? caseId.replaceAll('TRASLADO_VALIJA_CORREO_ENTRANTE_', '') : caseId;
-
-                ContentDocumentLink linkFile = new ContentDocumentLink();
-                linkFile.LinkedEntityId = caseId;
-                linkFile.ContentDocumentId = versionDocumento.ContentDocumentId;
-                linkFile.ShareType = 'I';
-                listadoLinksFiles.add(linkFile);
-            }
-
-            if (!listadoLinksFiles.isEmpty())
-            {
-                insert listadoLinksFiles;
-            }
-        }*/
-
-        // -------------------------------------------------------------------------------------------------------------------
-        // -------------------------------------------------------------------------------------------------------------------
         // Creación del fichero dummy para todos aquellos casos que no tienen ningún fichero.
         // -------------------------------------------------------------------------------------------------------------------
         // -------------------------------------------------------------------------------------------------------------------
@@ -356,13 +287,9 @@ public with sharing class SEG_trasladoColaboradorWS{
         // Recuperar todos los ficheros anexos del caso que NO se han detectado inicialmente ficheros a enviar.
         if (!mapaCasosPosiblesSinFiles.isEmpty())
         {
-            for (ContentDocumentLink linkFile : [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN :mapaCasosPosiblesSinFiles.keySet()])
-            {
+            for (ContentDocumentLink linkFile : [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN :mapaCasosPosiblesSinFiles.keySet()]) {
                 // FIX. Excluir los ficheros HTML.
-                if (linkFile.ContentDocument.FileExtension <> 'snote' && linkFile.ContentDocument.FileExtension <> 'htm' && linkFile.ContentDocument.FileExtension <> 'html')
-                {
-                    mapaCasosPosiblesSinFiles.put(linkFile.LinkedEntityId,true);
-                }
+                if (linkFile.ContentDocument.FileExtension <> 'snote' && linkFile.ContentDocument.FileExtension <> 'htm' && linkFile.ContentDocument.FileExtension <> 'html'){ mapaCasosPosiblesSinFiles.put(linkFile.LinkedEntityId,true); }
             }
 
             // Generar los ficheros dummy de los casos que no se ha detectado ningún fichero a enviar a Valija.
@@ -449,20 +376,13 @@ public with sharing class SEG_trasladoColaboradorWS{
             }
 
             // Crear el objeto de traza
-            if (retornoTraslado.objetoTraza != null)
-            {
-                Database.SaveResult insertTrazaResultado = Database.insert(retornoTraslado.objetoTraza, false);
-            }
+            if (retornoTraslado.objetoTraza != null){ Database.SaveResult insertTrazaResultado = Database.insert(retornoTraslado.objetoTraza, false);}
 
             // Si la petición se ha enviado correctamente. Marcar el caso y los ficheros con la referencia Valija obtenida.
             if (retornoTraslado.status == 'OK')
             {
                 Map<String,String> estadoUpdate = actualizarCasoDerivadoValija(datosTraslado, datosCalculadosTraslado, retornoTraslado.referenciaValija);
-                if (estadoUpdate.get('codigo') != '0')
-                {
-                    retornoTraslado.status = 'NOK';
-                    retornoTraslado.codigo = '0003';
-                    retornoTraslado.detalle = estadoUpdate.get('detalle');
+                if (estadoUpdate.get('codigo') != '0'){retornoTraslado.status = 'NOK'; retornoTraslado.codigo = '0003'; retornoTraslado.detalle = estadoUpdate.get('detalle');
                 }
             }
         }
@@ -615,69 +535,142 @@ public with sharing class SEG_trasladoColaboradorWS{
         datosRetorno.codigo = '0001';
         datosRetorno.detalle = 'Traslado no enviado (enviarTrasladoValija)';
 
-        CC_TrazaInt__c trazaWS;
+        CC_TrazaInt__c trazaWS = new CC_TrazaInt__c();
+        trazaWS.Name = 'SEG_Int_Valija';
+        trazaWS.CC_FechaInicio__c = datetime.now();
+
         Boolean bError = false;
         String jsonRequest = '';
         String jsonResponse = '';
 
-        string intSetting = 'SEG_Int_Valija';
+        string intSetting;
+
+        SEG_Settings__c flujoValija = SEG_Settings__c.getValues('SEG_Flujo_Valija_Viejo');
+
+        if (flujoValija != null && flujoValija.SEG_Activo__c) {
+            intSetting = 'SEG_Int_Valija_2';
+        }else {
+            intSetting = 'SEG_Int_Valija';
+        }
 
         try{
 
-            // Generar el mensaje de request a Valija.
-            jsonRequest = generarJSONValija (informacionTraslado);
-            datosRetorno.mensajeEnviado = jsonRequest;
+            //Generar el mensaje de request a Valija.
+            if (flujoValija != null && flujoValija.SEG_Activo__c) {
+                jsonRequest = generarJSONValija(informacionTraslado);
 
-            // Crear HEADER
-            Map<String,string> mHeaders =  new  Map<String,string>();
-            mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
+                datosRetorno.mensajeEnviado = jsonRequest;
 
-            HttpRequest request = CBK_HttpServiceIntegration.getRequest(jsonRequest, intSetting, 'POST', mHeaders);
+                String boundary = String.valueOf(Crypto.getRandomLong()).replace('-', '');
 
-            HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, intSetting, intSetting);
+                // Crear HEADER
+                Map<String,string> mHeaders =  new  Map<String,string>();
+                mHeaders.put('Accept-Encoding', 'gzip, deflate, br');
+                mHeaders.put('Content-Type', 'multipart/form-data; boundary=' + boundary);
 
+                // Construcción del cuerpo multipart/form-data
+                String body = '--' + boundary + '\r\n';
+                body = body + 'Content-Disposition: form-data; name="inputBody"\r\n';
+                body = body + 'Content-Type: application/json\r\n\r\n';
+                body = body + jsonRequest + '\r\n';
+                body = body + '--' + boundary + '--';
+  
+                CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
+                requestWrp.body = body;
+                requestWrp.intSetting = intSetting;
+                requestWrp.method = 'PUT';
+                requestWrp.mHeaders = mHeaders;
+                requestWrp.mUriParams = null;
+                requestWrp.mQueryParams = null;
 
-            // Preparar retorno.
-            jsonResponse = response.getBody();
-            String statusWS = 'OK';
-            String detalleWS = '';
-            Integer httpCodeWS = 200;
-            String codigoWS = '0000';
-            SEG_ResponseValija datosRespuestaWS;
-            String valijaIdSaliente = '';
+                HttpRequest request = CBK_HttpServiceIntegration.getRequest(requestWrp);
+                HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, intSetting, intSetting);
 
-            if (response.getStatusCode() != 200) {
-                // Error respuesta.
-                statusWS = 'NOK';
-                codigoWS = '0004';
-                httpCodeWS = response.getStatusCode();
-                detalleWS = 'Error en la integración con el servicio REST Valija (Callout - enviarTrasladoValija). ' + response.getStatus() + ' (' + response.getStatusCode() + ')';
-            }else{
-                // Respuesta OK. Convertir JSON.
-                datosRespuestaWS = (SEG_ResponseValija)JSON.deserialize(jsonResponse, SEG_trasladoColaboradorWS.SEG_ResponseValija.class);
-                statusWS = (datosRespuestaWS.ok == false) ? 'NOK' : statusWS;
-                codigoWS = (datosRespuestaWS.ok == false) ? datosRespuestaWS.errorCode : statusWS;
-                detalleWS = 'Error en la integración con el servicio REST Valija (Respuesta NOK - enviarTrasladoValija). ' + datosRespuestaWS.message + ' (' + datosRespuestaWS.errorCode + ')';
+                // Preparar retorno.
+                jsonResponse = response.getBody();
+                String statusWS = 'OK';
+                String detalleWS = '';
+                Integer httpCodeWS = 200;
+                String codigoWS = '0000';
+                SEG_ResponseValija datosRespuestaWS;
+                String valijaIdSaliente = '';
 
-                // FIX. Tratar la indisponibilidad / asíncromismo de Valija.
-                valijaIdSaliente = (datosRespuestaWS.ok == false) ? '' : datosRespuestaWS.id;
-                valijaIdSaliente = (valijaIdSaliente == 'UNKNOWN') ? 'UNKNOWN' + Datetime.now().getTime() : valijaIdSaliente;
+                if (response.getStatusCode() != 200 && response.getStatusCode() != 201) {
+                    // Error respuesta.
+                    statusWS = 'NOK';codigoWS = '0004';httpCodeWS = response.getStatusCode();
+                    detalleWS = 'Error en la integración con el servicio REST Valija (Callout - enviarTrasladoValija). ' + response.getStatus() + ' (' + response.getStatusCode() + ')';
+                }else{
+                    // Respuesta OK. Convertir JSON.
+                    datosRespuestaWS = (SEG_ResponseValija)JSON.deserialize(jsonResponse, SEG_trasladoColaboradorWS.SEG_ResponseValija.class);
+                    statusWS = (datosRespuestaWS.ok == false) ? 'NOK' : statusWS;
+                    codigoWS = (datosRespuestaWS.ok == false) ? datosRespuestaWS.errorCode : statusWS;
+                    detalleWS = 'Error en la integración con el servicio REST Valija (Respuesta NOK - enviarTrasladoValija). ' + datosRespuestaWS.message + ' (' + datosRespuestaWS.errorCode + ')';
+
+                    // FIX. Tratar la indisponibilidad / asíncromismo de Valija.
+                    valijaIdSaliente = (datosRespuestaWS.ok == false) ? '' : datosRespuestaWS.id;  valijaIdSaliente = (valijaIdSaliente == 'UNKNOWN') ? 'UNKNOWN' + Datetime.now().getTime() : valijaIdSaliente;
+                } try{
+                    Boolean finOK = (statusWS == 'OK') ? true : false; trazaWS = SEG_MetodosComunes.finTrazaNoInsert(trazaWS, jsonResponse, finOK, codigoWS, detalleWS);
+                }catch(Exception e){CBK_Log.error(e);}
+
+                // Preparar retorno método.
+                datosRetorno.status = statusWS;
+                datosRetorno.detalle = detalleWS;
+                datosRetorno.codigo = codigoWS;
+                datosRetorno.httpCode = httpCodeWS;
+                datosRetorno.mensajeRecibido = jsonResponse;
+                datosRetorno.objetoTraza = trazaWS;
+                datosRetorno.referenciaValija = valijaIdSaliente;
+
+            } else {
+                jsonRequest = generarJSONValijaOld(informacionTraslado);
+
+                datosRetorno.mensajeEnviado = jsonRequest;
+
+                // Crear HEADER
+                Map<String,string> mHeaders =  new  Map<String,string>();
+                mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
+
+                HttpRequest request = CBK_HttpServiceIntegration.getRequest(jsonRequest, intSetting, 'PUT', mHeaders);
+
+                HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, intSetting, intSetting);
+
+                
+                // Preparar retorno.
+                jsonResponse = response.getBody();
+                String statusWS = 'OK';
+                String detalleWS = '';
+                Integer httpCodeWS = 200;
+                String codigoWS = '0000';
+                SEG_ResponseValija datosRespuestaWS;
+                String valijaIdSaliente = '';
+
+                if (response.getStatusCode() != 200) {
+                    // Error respuesta.
+                    statusWS = 'NOK'; codigoWS = '0004'; httpCodeWS = response.getStatusCode(); detalleWS = 'Error en la integración con el servicio REST Valija (Callout - enviarTrasladoValija). ' + response.getStatus() + ' (' + response.getStatusCode() + ')';
+                }else{
+                    // Respuesta OK. Convertir JSON.
+                    datosRespuestaWS = (SEG_ResponseValija)JSON.deserialize(jsonResponse, SEG_trasladoColaboradorWS.SEG_ResponseValija.class);
+                    statusWS = (datosRespuestaWS.ok == false) ? 'NOK' : statusWS;
+                    codigoWS = (datosRespuestaWS.ok == false) ? datosRespuestaWS.errorCode : statusWS;
+                    detalleWS = 'Error en la integración con el servicio REST Valija (Respuesta NOK - enviarTrasladoValija). ' + datosRespuestaWS.message + ' (' + datosRespuestaWS.errorCode + ')';
+
+                    // FIX. Tratar la indisponibilidad / asíncromismo de Valija.
+                    valijaIdSaliente = (datosRespuestaWS.ok == false) ? '' : datosRespuestaWS.id; valijaIdSaliente = (valijaIdSaliente == 'UNKNOWN') ? 'UNKNOWN' + Datetime.now().getTime() : valijaIdSaliente;
+                } try{
+                    Boolean finOK = (statusWS == 'OK') ? true : false;
+                    trazaWS = SEG_MetodosComunes.finTrazaNoInsert(trazaWS, jsonResponse, finOK, codigoWS, detalleWS);
+                }catch(Exception e){CBK_Log.error(e);}
+
+                // Preparar retorno método.
+                datosRetorno.status = statusWS;
+                datosRetorno.detalle = detalleWS;
+                datosRetorno.codigo = codigoWS;
+                datosRetorno.httpCode = httpCodeWS;
+                datosRetorno.mensajeRecibido = jsonResponse;
+                datosRetorno.objetoTraza = trazaWS;
+                datosRetorno.referenciaValija = valijaIdSaliente;
+
             }
-
-            try{
-                Boolean finOK = (statusWS == 'OK') ? true : false;
-                trazaWS = SEG_MetodosComunes.finTrazaNoInsert(trazaWS, jsonResponse, finOK, codigoWS, detalleWS);
-            }catch(Exception e){CBK_Log.error(e);}
-
-            // Preparar retorno método.
-            datosRetorno.status = statusWS;
-            datosRetorno.detalle = detalleWS;
-            datosRetorno.codigo = codigoWS;
-            datosRetorno.httpCode = httpCodeWS;
-            datosRetorno.mensajeRecibido = jsonResponse;
-            datosRetorno.objetoTraza = trazaWS;
-            datosRetorno.referenciaValija = valijaIdSaliente;
-
         }catch(Exception e){
             // Error en la llamada httpRequest.
             bError = true;
@@ -686,7 +679,7 @@ public with sharing class SEG_trasladoColaboradorWS{
             datosRetorno.detalle = 'Error en la integración con el servicio REST (enviarTrasladoValija). ' + e.getMessage() + ' (' + e.getStackTraceString() + ')';
             CBK_Log.error(e);
         }
-
+        insert trazaWS;
         return datosRetorno;
     }
 
@@ -698,6 +691,103 @@ public with sharing class SEG_trasladoColaboradorWS{
     public static String generarJSONValija (SEG_trasladoColaboradorWS.SEG_DataTrasladoValija informacionTraslado)
     {
         String jsonSalida = '';
+
+        if (informacionTraslado != null){
+
+            // Estructura metadata. Separado por proceso.
+            Map<String,String> metadata = new Map<String,String>();
+
+            // Cualquier otro proceso no tratado arriba, no enviará datos en la estructura metadata.
+            switch on informacionTraslado.procesoValija {
+                when '02' {
+                    metadata.put('TIPO_CARGO',informacionTraslado.tipoCargo);
+                    metadata.put('FECHA_CARGO',informacionTraslado.fechaCargo);
+                    metadata.put('CIF_ORDENANTE',informacionTraslado.cifOrdenante);
+                    metadata.put('PAGO_AGRUPADO_RSS',informacionTraslado.pagoAgrupado);
+                    metadata.put('SF_IDENTIFICADOR_VALIJA',informacionTraslado.paqueteriaId);
+                    metadata.put('SF_MAIL_CLIENT',informacionTraslado.email);
+                    metadata.put('SF_ID_CASO',informacionTraslado.caseId);
+                    metadata.put('SF_NOTAS',informacionTraslado.notas);
+                }
+                when '08' {
+                    metadata.put('TIPO_CARGO',informacionTraslado.tipoCargo);
+                    metadata.put('FECHA_CARGO',informacionTraslado.fechaCargo);
+                    metadata.put('CIF_ORDENANTE',informacionTraslado.cifOrdenante);
+                    metadata.put('SF_IDENTIFICADOR_VALIJA',informacionTraslado.paqueteriaId);
+                    metadata.put('SF_NOTAS',informacionTraslado.notas);
+                    metadata.put('SF_MAIL_CLIENT',informacionTraslado.email);
+                    metadata.put('SF_ID_CASO',informacionTraslado.caseId);
+                }
+                when '09' {
+                    metadata.put('TIPO_CARGO',informacionTraslado.tipoCargo);
+                    metadata.put('FECHA_CARGO',informacionTraslado.fechaCargo);
+                    metadata.put('CIF_ORDENANTE',informacionTraslado.cifOrdenante);
+                    metadata.put('SF_IDENTIFICADOR_VALIJA',informacionTraslado.paqueteriaId);
+                    metadata.put('SF_NOTAS',informacionTraslado.notas);
+                    metadata.put('SF_MAIL_CLIENT',informacionTraslado.email);
+                    metadata.put('SF_ID_CASO',informacionTraslado.caseId);
+                }
+                when '47' {
+                    metadata.put('TIPO_CARGO',informacionTraslado.tipoCargo);
+                    metadata.put('FECHA_CARGO',informacionTraslado.fechaCargo);
+                    metadata.put('CIF_ORDENANTE',informacionTraslado.cifOrdenante);
+                    metadata.put('SF_IDENTIFICADOR_VALIJA',informacionTraslado.paqueteriaId);
+                    metadata.put('SF_NOTAS',informacionTraslado.notas);
+                    metadata.put('SF_MAIL_CLIENT',informacionTraslado.email);
+                    metadata.put('SF_ID_CASO',informacionTraslado.caseId);
+                }
+                when '64' {
+                    metadata.put('SF_IDENTIFICADOR_VALIJA',informacionTraslado.paqueteriaId);
+                    metadata.put('SF_NOTAS',informacionTraslado.notas);
+                    metadata.put('SF_MAIL_CLIENT',informacionTraslado.email);
+                    metadata.put('SF_ID_CASO',informacionTraslado.caseId);
+                    metadata.put('COMUNIDAD',informacionTraslado.comunidadAutonoma);
+                }
+            }
+
+            // Lista para almacenar los objetos Metadatas
+            List<Map<String, String>> metadatasList = new List<Map<String, String>>();
+
+            // Convertir el mapa a la lista de objetos con key-value
+            for (String key : metadata.keySet()) {
+                Map<String, String> metadataEntry = new Map<String, String>();
+                metadataEntry.put('key', key);
+                metadataEntry.put('value', metadata.get(key));
+                metadatasList.add(metadataEntry);
+            }
+
+            List<Adjuntos> blank = new List<Adjuntos>();
+
+            // Generar la estructura de la request.
+            SEG_RequestValija requestValija = new SEG_RequestValija();
+            requestValija.action = 'NEW';
+            requestValija.originId = 'SALESFORCE';
+            requestValija.operationId = '08';
+            requestValija.branchId = informacionTraslado.sucursalCredencial; //Confirmar con negocio/valija
+            requestValija.sourceApp = 'SEGMENTOS_SF';
+            requestValija.Metadatas = metadatasList;
+            requestValija.Documents = blank;
+
+            if (!String.isBlank(informacionTraslado.ficherosBase64)) {
+                List<Adjuntos> documentosCaso = new List<Adjuntos>();
+                Adjuntos documento = new Adjuntos();
+                documento.fileName = 'JSON Adjuntos';
+                documento.format = 'JSON';
+                documento.content = informacionTraslado.ficherosBase64;
+                documentosCaso.add(documento);
+                requestValija.Documents = documentosCaso;
+            }
+
+            // Generar el JSON de envío a Valija.
+            jsonSalida = JSON.serialize(requestValija);
+        }
+
+        return jsonSalida;
+    }
+
+    public static String generarJSONValijaOld (SEG_trasladoColaboradorWS.SEG_DataTrasladoValija informacionTraslado)
+    {
+       String jsonSalida = '';
 
         if (informacionTraslado != null)
         {
@@ -764,15 +854,10 @@ public with sharing class SEG_trasladoColaboradorWS{
             if (informacionTraslado.procesoValija == '02')
             {
                 // Seguros Sociales.
-                metadata.put('0',informacionTraslado.tipoCargo);
-                metadata.put('1',informacionTraslado.fechaCargo);
-                metadata.put('2',informacionTraslado.cifOrdenante);
-                metadata.put('3',informacionTraslado.pagoAgrupado);
+                metadata.put('0',informacionTraslado.tipoCargo); metadata.put('1',informacionTraslado.fechaCargo); metadata.put('2',informacionTraslado.cifOrdenante); metadata.put('3',informacionTraslado.pagoAgrupado);
             }else if (informacionTraslado.procesoValija == '08' || informacionTraslado.procesoValija == '09' || informacionTraslado.procesoValija == '47'){
                 // Impuestos AEAT (08), Impuestos Municipales (09), Recibos No Domiciliados - RIN (47)
-                metadata.put('0',informacionTraslado.tipoCargo);
-                metadata.put('1',informacionTraslado.fechaCargo);
-                metadata.put('2',informacionTraslado.cifOrdenante);
+                metadata.put('0',informacionTraslado.tipoCargo); metadata.put('1',informacionTraslado.fechaCargo); metadata.put('2',informacionTraslado.cifOrdenante);
             }else if (informacionTraslado.procesoValija == '64'){
                 // Impuestos comunidades autónomas.
                 metadata.put('0',informacionTraslado.comunidadAutonoma);
@@ -781,7 +866,7 @@ public with sharing class SEG_trasladoColaboradorWS{
             // Cualquier otro proceso no tratado arriba, no enviará datos en la estructura metadata.
 
             // Generar la estructura de la request.
-            SEG_RequestValija requestValija = new SEG_RequestValija();
+            SEG_RequestValijaOld requestValija = new SEG_RequestValijaOld();
             requestValija.credenciales = credenciales;
             requestValija.metadata = metadata;
             requestValija.infodata = listaInfoData;

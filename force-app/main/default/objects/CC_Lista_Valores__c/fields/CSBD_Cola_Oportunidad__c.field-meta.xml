@@ -20,21 +20,6 @@
                 <label>CSBD - CMB</label>
             </value>
             <value>
-                <fullName>CSBD_Prestamos_I</fullName>
-                <default>false</default>
-                <label>CSBD - Préstamos I</label>
-            </value>
-            <value>
-                <fullName>CSBD_Prestamos_II</fullName>
-                <default>false</default>
-                <label>CSBD - Préstamos II</label>
-            </value>
-            <value>
-                <fullName>CSBD_Prestamos_III</fullName>
-                <default>false</default>
-                <label>CSBD - Préstamos III</label>
-            </value>
-            <value>
                 <fullName>CSBD_Turno_contacto</fullName>
                 <default>false</default>
                 <label>CSBD - Turno de contacto</label>
@@ -48,6 +33,41 @@
                 <fullName>CSBD_Hipotecas</fullName>
                 <default>false</default>
                 <label>CSBD - Hipotecas</label>
+            </value>
+            <value>
+                <fullName>CSBD_CSCC_Centralita</fullName>
+                <default>false</default>
+                <label>CSBD - CSCC Centralita</label>
+            </value>
+            <value>
+                <fullName>CSBD_CSCC</fullName>
+                <default>false</default>
+                <label>CSBD - CSCC</label>
+            </value>
+            <value>
+                <fullName>CSBD_CMN_CMB_Hipotecas</fullName>
+                <default>false</default>
+                <label>CSBD - Call me hipoteca</label>
+            </value>
+            <value>
+                <fullName>CSBD_Prestamos_I</fullName>
+                <default>false</default>
+                <label>CSBD - Consumos I</label>
+            </value>
+            <value>
+                <fullName>CSBD_Prestamos_II</fullName>
+                <default>false</default>
+                <label>CSBD - Consumos II</label>
+            </value>
+            <value>
+                <fullName>CSBD_Prestamos_III</fullName>
+                <default>false</default>
+                <label>CSBD - Consumos III</label>
+            </value>
+            <value>
+                <fullName>CSBD_CMN_CMB_Intouch</fullName>
+                <default>false</default>
+                <label>CSBD - Call me Intouch</label>
             </value>
         </valueSetDefinition>
     </valueSet>

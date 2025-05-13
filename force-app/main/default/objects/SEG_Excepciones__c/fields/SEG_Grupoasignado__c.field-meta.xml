@@ -8,7 +8,7 @@
         <filterItems>
             <field>CC_Grupo_Colaborador__c.RecordTypeId</field>
             <operation>equals</operation>
-            <value>Grupo Operativo Segmentos, Grupo Automático Segmentos</value>
+            <value>Grupo colaborador, Grupo Automático Segmentos, Grupo Operativo Segmentos</value>
         </filterItems>
         <isOptional>false</isOptional>
     </lookupFilter>

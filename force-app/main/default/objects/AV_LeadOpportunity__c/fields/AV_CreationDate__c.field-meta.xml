@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_CreationDate__c</fullName>
+    <description>Campo en el que muestra la fecha de inicio</description>
     <encryptionScheme>None</encryptionScheme>
     <label>Fecha inicio</label>
     <required>false</required>

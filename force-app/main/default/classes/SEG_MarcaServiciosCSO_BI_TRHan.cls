@@ -4,7 +4,8 @@ public with sharing class SEG_MarcaServiciosCSO_BI_TRHan extends CC_TriggerHandl
     }
     private void process(List<SEG_MarcasCSO__c> listNewObj, Map<Id, EmailMessage> mapNewObj) {
         activacionMarca(listNewObj);
-     }
+        concatenacionMarcaServicio(listNewObj);
+    }
 
     public static void activacionMarca(List<SEG_MarcasCSO__c> listNewObj){
         // Iterar sobre los registros insertados o actualizados
@@ -19,6 +20,20 @@ public with sharing class SEG_MarcaServiciosCSO_BI_TRHan extends CC_TriggerHandl
                 // Actualizar el campo SEG_FechaDesactivacion__c con la fecha actual
                 marca.SEG_FechaDesactivacion__c = datetime.now();                   
             }
+        }
+    }
+
+    public static void concatenacionMarcaServicio(List<SEG_MarcasCSO__c> listNewObj){
+        // Iterar sobre los registros insertados o actualizados
+        for (SEG_MarcasCSO__c marca : listNewObj) {
+            String valorFinal = '';
+            if (marca.SEG_Marca__c != null) {
+                valorFinal = valorFinal + String.valueOf(marca.SEG_Marca__c);
+            }
+            if (marca.SEG_ServiciosCSO__c != null) {
+                valorFinal = valorFinal + String.valueOf(marca.SEG_ServiciosCSO__c);
+            }
+            marca.SEG_MarcasCSO__c = valorFinal;
         }
     }
 }

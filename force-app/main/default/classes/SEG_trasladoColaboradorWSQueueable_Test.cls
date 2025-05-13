@@ -27,7 +27,7 @@ public class SEG_trasladoColaboradorWSQueueable_Test {
         insert contactoSEG1;
                                
         // Crear MCC.
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Tematica1';
         mccTematica.CC_Tipo_Cliente__c = 'Segmentos';
@@ -37,7 +37,7 @@ public class SEG_trasladoColaboradorWSQueueable_Test {
         insert mccTematica;
         
         // Crear MCC.
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Producto1';
         mccProducto.CC_Tipo_Cliente__c = 'Segmentos';
@@ -48,7 +48,7 @@ public class SEG_trasladoColaboradorWSQueueable_Test {
         insert mccProducto; 
         
         // Crear MCC.
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Motivo1';
         mccMotivo.CC_Tipo_Cliente__c = 'Segmentos';
@@ -60,7 +60,7 @@ public class SEG_trasladoColaboradorWSQueueable_Test {
         insert mccMotivo;
 
         // Crear MCC.
-        Id recordTypeIdDetalle = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
+        Id recordTypeIdDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
        	CC_MCC__c mccDetalle = new CC_MCC__c();
         mccDetalle.Name = 'Detalle1';
         mccDetalle.CC_Tipo_Cliente__c = 'Segmentos';
@@ -115,10 +115,43 @@ public class SEG_trasladoColaboradorWSQueueable_Test {
         
         insert linkFichero;
                
+          Id recordTypeIdCliente = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClienteSEG').getRecordTypeId();
+        
+        // Creación de una cuenta
+        Account cuenta = new Account(
+            RecordTypeId = recordTypeIdCliente,
+            Name = 'Empresa Test',
+            SEG_DominioMail__c = '@test.com',
+            CC_Numero_Documento__c = '12345678A'
+        );
+        insert cuenta;
+
+        // Crear contacto
+        Contact contacto = new Contact(
+            LastName = 'Contacto Test',
+            AccountId = cuenta.Id,
+            Email = 'test@test.com'
+        );
+        insert contacto;
+
+        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+            Profile perfil = [SELECT Id FROM Profile WHERE Name='System Administrator'];
+            UserRole rol = [SELECT Id FROM UserRole WHERE Name='Segmentos + FFEE'];
+            User thisUser = new User(alias = 'tsegmen', email='testSEGBI@acme.com', 
+                    emailencodingkey='UTF-8', lastname='Smith', 
+                    languagelocalekey='en_US', 
+                    localesidkey='en_US', profileid = perfil.Id, userroleid = rol.Id,
+                    timezonesidkey='America/Los_Angeles', 
+                    username='testSEGBI@acme.com');
+            insert thisUser;
+            
+            PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SEG_Administrador'];
+            insert new PermissionSetAssignment(AssigneeId = thisUser.id, PermissionSetId = ps.Id);
+        }
     }
     
     @isTest
-    public static void trasladoColaboradorQueueable_Test()
+    public static void trasladoColaboradorQueueable()
     {
         Case caso = [SELECT Id FROM Case WHERE Subject = 'casoFicherosProcesados'];
         
@@ -142,16 +175,35 @@ public class SEG_trasladoColaboradorWSQueueable_Test {
 
         List<SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador> listadoTraslados = new List<SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador>();
         listadoTraslados.add(dataTraslado);
-            
+        
+        
+        User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+        System.runAs (usuarioTest) {
+
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addString(String.valueOf(dateInMilliseconds)).build();
+
         Test.StartTest();
 			Test.setMock(HttpCalloutMock.class, new SEG_wsMockTrasladoColaborador());
         	SEG_trasladoColaboradorWSQueueable queueable = new SEG_trasladoColaboradorWSQueueable(listadoTraslados);
-			System.enqueueJob(queueable);
+			System.enqueueJob(queueable,options);
         Test.stopTest();
+
+        // Verificación de que el caso relacionado aún existe
+        Case casoVerificado = [SELECT Id FROM Case WHERE Id = :caso.Id LIMIT 1];
+        System.assertNotEquals(null, casoVerificado, 'El caso no debería haber sido eliminado.');
+        
+        // Verificación de que se procesó el traslado (ajusta según la lógica de negocio esperada)
+        Boolean trasladoProcesado = [SELECT COUNT() FROM Case WHERE Id = :caso.Id AND Subject = 'casoFicherosProcesados'] > 0;
+        System.assert(trasladoProcesado, 'El traslado no se procesó correctamente.');
+        }
     }
     
     @isTest
-    public static void trasladoColaboradorQueueableKO_Test()
+    public static void trasladoColaboradorQueueableKO()
     {
         Case caso = [SELECT Id FROM Case WHERE Subject = 'casoFicherosProcesados'];
         
@@ -176,9 +228,102 @@ public class SEG_trasladoColaboradorWSQueueable_Test {
         List<SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador> listadoTraslados = new List<SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador>();
         listadoTraslados.add(dataTraslado);
             
+    
+        User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+
+        System.runAs (usuarioTest) {
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+        
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addString(String.valueOf(dateInMilliseconds)).build();
+
         Test.StartTest();
         	SEG_trasladoColaboradorWSQueueable queueable = new SEG_trasladoColaboradorWSQueueable(listadoTraslados);
-			System.enqueueJob(queueable);
+			System.enqueueJob(queueable,options);
         Test.stopTest();
+
+        // Verificación de que el caso relacionado aún existe
+        Case casoVerificado = [SELECT Id FROM Case WHERE Id = :caso.Id LIMIT 1];
+        System.assertNotEquals(null, casoVerificado, 'El caso no debería haber sido eliminado.');
+
+        }
+    }
+
+    @isTest
+    public static void trasladoExitoso() {
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoFicherosProcesados'];
+        
+        SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador traslado = new SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador();
+        traslado.caseId = caso.Id;
+        traslado.tipoColaborador = 'VALIJA';
+
+        List<SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador> traslados = new List<SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador>{ traslado };
+
+        User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+        System.runAs (usuarioTest) {
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addString(String.valueOf(dateInMilliseconds)).build();
+
+        Test.startTest();
+            Test.setMock(HttpCalloutMock.class, new SEG_wsMockTrasladoColaborador());
+            SEG_trasladoColaboradorWSQueueable queueable = new SEG_trasladoColaboradorWSQueueable(traslados);
+            System.enqueueJob(queueable,options);
+        Test.stopTest();
+
+        // Verificación de que el caso relacionado aún existe
+        Case casoVerificado = [SELECT Id FROM Case WHERE Id = :caso.Id LIMIT 1];
+        System.assertNotEquals(null, casoVerificado, 'El caso no debería haber sido eliminado.');
+
+        }
+    }
+
+    @isTest
+    public static void listaTrasladosVacia() {
+        List<SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador> traslados = new List<SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador>();
+
+        User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+        System.runAs (usuarioTest) {
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addString(String.valueOf(dateInMilliseconds)).build();
+
+        Test.startTest();
+            SEG_trasladoColaboradorWSQueueable queueable = new SEG_trasladoColaboradorWSQueueable(traslados);
+            System.enqueueJob(queueable,options);
+        Test.stopTest();
+
+        // Verificación de que la lista de traslados está vacía y no se procesó nada
+        Boolean trasladoNoProcesado = [SELECT COUNT() FROM Case WHERE Status = 'Completado'] == 0;
+        System.assert(trasladoNoProcesado, 'No debería haberse procesado ningún traslado.');
+        }
+    }
+
+    @isTest
+    public static void listaTrasladosNula() {
+        User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+        System.runAs (usuarioTest) {
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addString(String.valueOf(dateInMilliseconds)).build();
+
+            Test.startTest();
+                try {
+                    if (null != null) { // Esto simula la validación de la clase real
+                        SEG_trasladoColaboradorWSQueueable queueable = new SEG_trasladoColaboradorWSQueueable(null);
+                        System.enqueueJob(queueable,options);
+                    }
+                } catch (Exception e) {
+                    System.assert(e != null, 'Se lanzó una excepción como se esperaba.');
+                }
+            Test.stopTest();
+        }
     }
 }

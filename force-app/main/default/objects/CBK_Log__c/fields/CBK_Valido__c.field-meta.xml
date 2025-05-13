@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Valido__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Check que indica si la entrada es válida o no. Generalmente utilizado en entradas de RT &apos;CBK_AutditEmail&apos;</description>
+    <inlineHelpText>Check que indica si la entrada es válida o no. Generalmente utilizado en entradas de RT &apos;CBK_AutditEmail&apos;</inlineHelpText>
+    <label>Válido</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -6,7 +6,11 @@
     <errorConditionFormula>AND(
 				NOT($Permission.AV_AvoidBulkApi),
 				$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
-    ISPICKVAL(AV_Resolution__c, &quot;Venta desestimada&quot;)
+    ISPICKVAL(AV_Resolution__c, &quot;Venta desestimada&quot;),
+AND(
+!$Permission.AV_ByPassValidationRules,
+!$Permission.CBK_BypassValidationRules
+)
 )</errorConditionFormula>
     <errorDisplayField>AV_Resolution__c</errorDisplayField>
     <errorMessage>No es posible cambiar la resolución a Venta desestimada, es una resolución automática.</errorMessage>

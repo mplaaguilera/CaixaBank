@@ -133,5 +133,22 @@ public with sharing class FRA_TestDataFactory {
 
         return usuario;
     }
+
+    public static User usuarioAFRA() {
+        User usuario = new User();
+        usuario.IsActive = true;
+        usuario.Alias = 'usr_test';
+        usuario.Email = 'usuario_test@test.com';
+        usuario.EmailEncodingKey = 'ISO-8859-1';
+        usuario.LastName = 'Usuario Test';
+        usuario.LanguageLocaleKey = 'es';
+        usuario.LocaleSidKey = 'es_ES';
+        usuario.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'FRA'].Id;
+        usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
+        usuario.TimeZoneSidKey = 'Europe/Madrid';
+        usuario.UserName = 'usuariotest_' + UserInfo.getOrganizationId() + '_' + System.currentTimeMillis() + '@test.com';
+        insert usuario;
+        return usuario;
+    }
     
 }

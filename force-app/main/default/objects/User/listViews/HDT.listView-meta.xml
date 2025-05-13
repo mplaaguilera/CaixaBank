@@ -11,7 +11,7 @@
     <filters>
         <field>CORE.USER_ROLE.NAME</field>
         <operation>equals</operation>
-        <value>HDT</value>
+        <value>FRA</value>
     </filters>
     <label>HDT</label>
     <language>en_US</language>

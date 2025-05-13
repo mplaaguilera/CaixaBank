@@ -15,16 +15,17 @@ public with sharing class CC_WS_Autenticacion {
 
 			Datetime fechaCaducidad = Datetime.valueOf(datos.get('fechaCaducidad'));
 			String body = '{"operationKey": "' + String.valueOf(datos.get('operationKey')) + '",';
-			body += '"taskData": {"phone": "' + String.valueOf(datos.get('telefono')) + '","prefix": ""},';
+			body += '"taskData":{"telephone": "' + String.valueOf(datos.get('telefono')) + '","language": "' + String.valueOf(datos.get('idioma')) + '", "casoId":"' + String.valueOf(datos.get('casoId')) + '", "casoUso":"' + String.valueOf(datos.get('casoUso')) + '"},';
 			body += '"expirationDate": "' + String.valueOf(fechaCaducidad.date()) + '",';
 			body += '"expirationTime": "' + String.valueOf(fechaCaducidad.time()).substring(0, 5) + '",';
-			body += '"customerInternalId": "' + String.valueOf(datos.get('numperso')) + '",';
-			body += '"personType": "' + String.valueOf(datos.get('tipoPersona')) + '", ';
-			body += '"visualizationData": {"tickets": [{"datum": "telefonoCliente", "ticketvalue": "' + String.valueOf(datos.get('ticketvalue')) + '"}]}}';
+			body += '"customerInternalId": "' + CC_MetodosUtiles.encriptarSHA('SHA-512', String.valueOf(datos.get('numperso'))).toLowerCase() + '",';
+			body += '"personType": "' + String.valueOf(datos.get('tipoPersona')) + '", "appName": "' + String.valueOf(datos.get('app')) + '",';
+			body += '"visualizationData": {"tickets": [{"datum": "' + String.valueOf(datos.get('telefono')) + '","ticketvalue": "' + String.valueOf(datos.get('ticketvalue')) + '"}]},';
+			body += '"customerId" : "' + String.valueOf(datos.get('documento')) + '"}';
 
 			CC_TrazaInt__c traza = new CC_TrazaInt__c();
 			traza.Name = 'CC_WS_Envio_Autenticacion';
-			traza.CC_Identificador__c = autenticacionId;
+			traza.CC_Identificador__c = autenticacionId + ' - ' + datos.get('numperso');
 			traza.CC_FechaInicio__c = Datetime.now();
 			traza.CC_MensajeEntrada__c = body;
 
@@ -46,11 +47,13 @@ public with sharing class CC_WS_Autenticacion {
 				traza.CC_MensajeSalida__c = response.getBody();
 
 				if (response.getStatusCode() != 200) { //KO
-					resultado = response.getStatus() + ' (' + response.getStatusCode() + ')';
+					
 					if (tipoObjeto == 'Case') {
+						resultado = 'KO';
 						caso.CC_Status_Autorizacion__c = 'ERROR';
 					} else if (tipoObjeto == 'Opportunity') {
 						oportunidad.CSBD_EstadoAutenticacion__c = 'ERROR';
+						resultado = response.getStatus() + ' (' + response.getStatusCode() + ')';
 					}
 					autenticacion.CC_Estado__c = 'Error';
 					autenticacion.CC_Mensaje_Error__c = resultado;
@@ -59,10 +62,9 @@ public with sharing class CC_WS_Autenticacion {
 
 				} else { //OK
 					Map<String, Object> mapRespuesta = (Map<String, Object>)JSON.deserializeUntyped(response.getBody());
-
 					Map<String, Map<String, String>> infoEstadosEnvio = getInfoEstadosEnvio();
-					//String estado = JSON.serialize(mapRespuesta.get('status')).replaceAll('"', '');
-					String estadoEnvio = 'INPROGRESS';
+                    String estadoEnvio = JSON.serialize(mapRespuesta.get('status')).replaceAll('"', '');
+                    //String estadoEnvio = 'INPROGRESS';
 					if (infoEstadosEnvio.containsKey(estadoEnvio)) {
 						if (tipoObjeto == 'Case') {
 							caso.CC_Status_Autorizacion__c = esValorPicklist('Case', 'CC_Status_Autorizacion__c', estadoEnvio) ? estadoEnvio : null;
@@ -109,31 +111,59 @@ public with sharing class CC_WS_Autenticacion {
 		//Account, representant y teléfono
 		String tipoObjeto = recordId.getSObjectType().getDescribe().getName();
 		if (tipoObjeto == 'Case') {
-			caso = [SELECT Account.RecordType.DeveloperName, Account.CC_NumPerso__c, Account.AV_NumPerso__c,
+			caso = [SELECT Id, CC_MCC_Motivo__c, Account.RecordType.DeveloperName, Account.CC_NumPerso__c, Account.CC_Numero_Documento__c, Account.AV_NumPerso__c,
+					Contact.CC_NumPerso__c, Contact.CC_Numero_Documento__c, Contact.AV_NumPerso__c, Contact.CIBE_NumPerso__c, Contact.RecordType.DeveloperName,
 					CC_Representante__r.RecordType.DeveloperName,
-					CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
-					CC_Telefono_Contacto__c FROM Case WHERE Id = :recordId];
+					CC_Representante__r.CC_Representante__r.CC_NumPerso__c,CC_Representante__r.CC_Representante__r.CC_Numero_Documento__c,
+					CC_Telefono_Contacto__c, CC_Idioma__c, Account.AV_Segmento__c, CC_Representante__r.CC_Representante__r.AV_NumPerso__c FROM Case WHERE Id = :recordId];
 
+    	// Usar el método CC_OTP.recuperarNumperso para obtener el numperso
+    	String numper = CC_OTP.recuperarNumperso(caso);
+		
 			datos = new Map<String, Object>{
 				'accountRecordType' => caso.Account?.RecordType.DeveloperName,
-				'accountNumperso' => !String.isEmpty(caso.Account.AV_NumPerso__c) ? caso.Account.AV_NumPerso__c : caso.Account.CC_NumPerso__c,
+				'accountDoc' => caso.Account?.CC_Numero_Documento__c,
+				// 'accountNumperso' => !String.isEmpty(caso.Account?.AV_NumPerso__c) ? caso.Account?.AV_NumPerso__c : caso.Account?.CC_NumPerso__c,
+				'accountNumperso' => numper, 
+				// 'contactNumperso' => !String.isEmpty(caso.Contact?.CIBE_NumPerso__c) ? caso.Contact?.CIBE_NumPerso__c : !String.isEmpty(caso.Contact?.AV_NumPerso__c) ? caso.Contact?.AV_NumPerso__c : caso.Contact?.CC_NumPerso__c,
+				'contactNumperso' => numper,
+                'contactRecordType' => caso.Contact?.RecordType.DeveloperName,
+				'contactDoc' => caso.Contact?.CC_Numero_Documento__c,
 				'representanteRecordType' => caso.CC_Representante__r?.RecordType.DeveloperName,
-				'representanteNumperso' => caso.CC_Representante__r?.CC_Representante__r?.CC_NumPerso__c,
-				'telefono' => caso.CC_Telefono_Contacto__c
+				'representanteNumperso' => numper,
+				'representanteDocumento' => caso.CC_Representante__r?.CC_Representante__r?.CC_Numero_Documento__c,
+				'telefono' => caso.CC_Telefono_Contacto__c,
+				'idioma' => caso.CC_Idioma__c == 'en' ? 'en' : caso.CC_Idioma__c == 'ca' ? 'ca' : 'es',
+				'casoId' => caso.Id,
+				'casoUso' => caso.CC_MCC_Motivo__c,
+				'app' => 'CBCCSF',
+				'segmento'=> caso.Account?.AV_Segmento__c				
 			};
 
 		} else if (tipoObjeto == 'Opportunity') {
-			oportunidad = [SELECT Account.RecordType.DeveloperName, Account.CC_NumPerso__c,
+			oportunidad = [SELECT Id, Account.RecordType.DeveloperName, Account.CC_NumPerso__c, Account.CC_Numero_Documento__c, 
+							CSBD_Contact__r.CC_NumPerso__c, CSBD_Contact__r.CC_Numero_Documento__c, CSBD_Contact__r.RecordType.DeveloperName,
 							CSBD_CasoOrigen__r.CC_Representante__r.RecordType.DeveloperName,
 							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
+							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_Numero_Documento__c,
 							CSBD_Telefono_Solicitud__c FROM Opportunity WHERE Id = :recordId];
 
 			datos = new Map<String, Object>{
 				'accountRecordType' => oportunidad.Account?.RecordType.DeveloperName,
-				'accountNumperso' => oportunidad.Account.CC_NumPerso__c,
+				'accountDoc' => oportunidad.Account?.CC_Numero_Documento__c,
+				'accountNumperso' => oportunidad.Account?.CC_NumPerso__c,
+				'contactNumperso' => oportunidad.Account?.CC_NumPerso__c,
+				'contactDoc' => oportunidad.CSBD_Contact__r?.CC_Numero_Documento__c,
+				'contactRecordType' => oportunidad.CSBD_Contact__r.RecordType.DeveloperName, 
 				'representanteRecordType' => oportunidad?.CSBD_CasoOrigen__r.CC_Representante__r?.RecordType.DeveloperName,
 				'representanteNumperso' => oportunidad.CSBD_CasoOrigen__r?.CC_Representante__r?.CC_Representante__r?.CC_NumPerso__c,
-				'telefono' => oportunidad.CSBD_Telefono_Solicitud__c
+				'representanteDocumento' => oportunidad.CSBD_CasoOrigen__r?.CC_Representante__r?.CC_Representante__r?.CC_Numero_Documento__c,
+				'telefono' => oportunidad.CSBD_Telefono_Solicitud__c,
+				'idioma' => 'es',
+				'casoId' => oportunidad.Id,
+				'casoUso' => '',
+				'app' => 'CSBD',
+				'segmento'=> ''	
 			};
 		}
 
@@ -158,14 +188,22 @@ public with sharing class CC_WS_Autenticacion {
 
 		//personType y customerInternalId
 		if (datos.get('representanteRecordType') != null) { //PENDIENTE
-			datos.put('tipoPersona', 'F');
+			datos.put('tipoPersona', 'FISICA');
 			datos.put('numperso', datos.get('representanteNumperso'));
-		} else if (datos.get('accountRecordType') == 'CC_Cliente' || datos.get('representanteRecordType') == 'CC_Cliente') {
-			datos.put('tipoPersona', 'J');
-			datos.put('numperso', String.valueOf(datos.get('accountNumperso')));
+			datos.put('documento', datos.get('representanteDocumento'));
+		} else if (datos.get('accountRecordType') == 'CC_Cliente' && datos.get('contactRecordType') == 'CIBE_Apoderado' && datos.get('segmento') != 'RPF') {
+			datos.put('tipoPersona', 'JURIDICA');
+			datos.put('numperso', String.valueOf(datos.get('contactNumperso')));
+			datos.put('documento', datos.get('contactDoc'));
+		} else if (datos.get('accountRecordType') == 'CC_Cliente' && datos.get('contactRecordType') == 'CC_Cliente' && datos.get('segmento') == 'RPF') {
+			datos.put('tipoPersona', 'JURIDICA');
+			datos.put('numperso', String.valueOf(datos.get('contactNumperso')));
+			datos.put('documento', datos.get('accountDoc'));
 		} else {
-			datos.put('tipoPersona', 'F');
+			datos.put('tipoPersona', 'FISICA');
 			datos.put('numperso', datos.get('accountNumperso'));
+			datos.put('documento', datos.get('accountDoc'));
+
 		}
 
 		return new Map<String, Object>{
@@ -215,7 +253,7 @@ public with sharing class CC_WS_Autenticacion {
 
 			HttpResponse responseConsulta = CBK_HttpServiceIntegration.callHttpService(request, idAutenticacion, 'CC_Autenticacion_Robusta_Estado');
 			responseConsulta.setStatusCode(200);//DPK comentar
-			String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"EXPIRED"}';
+			String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"REJECTED"}';
 			responseConsulta.setBody(body);//DPK comentar
 
 			if (tipoObjeto == 'Case') {
@@ -231,12 +269,9 @@ public with sharing class CC_WS_Autenticacion {
 				autenticacion.CC_Mensaje_Error__c = resultado;
 				if (tipoObjeto == 'Case') {
 					caso.CC_Status_Autorizacion__c = 'ERROR';
+					resultado = resultado + '(ERROR)';
 				} else if (tipoObjeto == 'Opportunity') {
 					oportunidad.CSBD_EstadoAutenticacion__c = 'ERROR';
-				}
-				
-				if (responseConsulta.getStatusCode() == 504 || responseConsulta.getStatusCode() == 0) {
-					resultado = resultado + '(timeout)';
 				}
 			} else {
 				Map<String, Object> mapRespuesta = (Map<String, Object>)JSON.deserializeUntyped(responseConsulta.getBody());
@@ -265,6 +300,9 @@ public with sharing class CC_WS_Autenticacion {
 						oportunidad.CSBD_EstadoAutenticacion__c = statusAux;
 					}
 					resultado = infoEstadosValidacion.get(statusConsulta).get('CC_Detalle__c');
+					if (statusAux == 'ERROR') {
+						resultado = resultado + '(ERROR)';
+					}
 				} else {
 					resultado = 'Estado desconocido';
 				}

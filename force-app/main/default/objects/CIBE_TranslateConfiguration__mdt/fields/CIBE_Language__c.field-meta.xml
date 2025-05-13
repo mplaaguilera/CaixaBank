@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_Language__c</fullName>
+    <description>Metatdata con la información del idioma</description>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Language</label>
     <required>false</required>
@@ -8,7 +9,7 @@
     <valueSet>
         <restricted>true</restricted>
         <valueSetDefinition>
-            <sorted>true</sorted>
+            <sorted>false</sorted>
             <value>
                 <fullName>en_US</fullName>
                 <default>false</default>

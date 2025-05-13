@@ -158,10 +158,10 @@
     <externalSharingModel>Private</externalSharingModel>
     <label>Data Manager</label>
     <nameField>
-        <displayFormat>DM-{000000}</displayFormat>
+        <encryptionScheme>None</encryptionScheme>
         <label>Data Name</label>
-        <trackHistory>true</trackHistory>
-        <type>AutoNumber</type>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
     </nameField>
     <pluralLabel>Data Manager</pluralLabel>
     <profileSearchLayouts>
@@ -174,13 +174,9 @@
     </profileSearchLayouts>
     <recordTypeTrackHistory>false</recordTypeTrackHistory>
     <searchLayouts>
-        <searchResultsAdditionalFields>Status__c</searchResultsAdditionalFields>
+        <searchResultsAdditionalFields>RECORDTYPE</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>API_Name__c</searchResultsAdditionalFields>
-        <searchResultsAdditionalFields>Object_Name__c</searchResultsAdditionalFields>
-        <searchResultsAdditionalFields>Field_Name__c</searchResultsAdditionalFields>
-        <searchResultsAdditionalFields>Data_Type__c</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>Proyectos__c</searchResultsAdditionalFields>
-        <searchResultsAdditionalFields>UPDATEDBY_USER</searchResultsAdditionalFields>
     </searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>

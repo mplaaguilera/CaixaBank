@@ -256,4 +256,15 @@ public with sharing class SPV_TestDataFactory {
         contentVersion.SAC_StringRedaccion_fileupload__c = 'ResolucionRedaccion';
         return contentVersion;  
     }
+
+    public static List<SAC_DocumentoEnvio__c> crearDocumentoEnvio(Integer numDoc, Case caso){
+        List<SAC_DocumentoEnvio__c> listaDocs = new List<SAC_DocumentoEnvio__c>();
+        for(Integer i=0;i<numDoc;i++){
+            SAC_DocumentoEnvio__c documento = new SAC_DocumentoEnvio__c(
+                SAC_Caso__c = caso.Id
+            );
+            listaDocs.add(documento);
+        }
+        return listaDocs;
+    }
 }

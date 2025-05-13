@@ -10,9 +10,10 @@
     <columns>EMPLOYEE_NUMBER</columns>
     <filterScope>Everything</filterScope>
     <filters>
-        <field>CORE.USERS.EMAIL</field>
-        <operation>equals</operation>
-        <value>rafaela.fernandez@externos.caixabankops.com</value>
+        <field>CORE.PROFILE.NAME</field>
+        <operation>contains</operation>
+        <value>Operador</value>
     </filters>
     <label>Operadores</label>
+    <language>es</language>
 </ListView>

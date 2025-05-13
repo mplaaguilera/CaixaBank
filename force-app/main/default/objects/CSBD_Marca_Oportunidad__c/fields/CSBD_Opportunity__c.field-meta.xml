@@ -3,7 +3,7 @@
     <fullName>CSBD_Opportunity__c</fullName>
     <label>Oportunidad</label>
     <referenceTo>Opportunity</referenceTo>
-    <relationshipLabel>Marcas de la oportunidad</relationshipLabel>
+    <relationshipLabel>Marcas Oportunidad</relationshipLabel>
     <relationshipName>Marcas_Oportunidad</relationshipName>
     <relationshipOrder>1</relationshipOrder>
     <reparentableMasterDetail>false</reparentableMasterDetail>

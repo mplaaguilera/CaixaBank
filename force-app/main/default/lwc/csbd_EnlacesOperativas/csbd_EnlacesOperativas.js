@@ -1,7 +1,7 @@
 /*eslint-disable dot-notation */
 import {LightningElement, api, wire} from 'lwc';
 import {getRecord, getFieldValue, updateRecord} from 'lightning/uiRecordApi';
-import getOportunidadChat from '@salesforce/apex/CSBD_EnlacesOperativasController.getOportunidadChat';
+import getRegistroRelacionado from '@salesforce/apex/CSBD_EnlacesOperativasController.getRegistroRelacionado';
 
 import OPP_ACCOUNT_ID from '@salesforce/schema/Opportunity.AccountId';
 import OPP_ACCOUNT_NUMPERSO from '@salesforce/schema/Opportunity.Account.CC_NumPerso__c';
@@ -70,7 +70,7 @@ export default class csbdEnalacesOperativas extends LightningElement {
 
 	connectedCallback() {
 		if (this.objectApiName !== 'Opportunity') {
-			getOportunidadChat({recordId: this.recordId, campoLookup: this.campoBusqueda, nombreObjeto: this.objectApiName})
+			getRegistroRelacionado({recordId: this.recordId, campoLookup: this.campoBusqueda, nombreObjeto: this.objectApiName})
 				.then(result => {
 					this.recordIdCalculado = result[this.campoBusqueda];
 				})

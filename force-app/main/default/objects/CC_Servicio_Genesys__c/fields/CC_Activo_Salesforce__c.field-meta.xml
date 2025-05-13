@@ -3,7 +3,6 @@
     <fullName>CC_Activo_Salesforce__c</fullName>
     <formula>IF((NOT(ISBLANK(CC_Fecha_Inicio_Salesforce__c))) &amp;&amp; TODAY() &gt;= CC_Fecha_Inicio_Salesforce__c, true, false)</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-    <inlineHelpText>Indicar una &quot;Fecha de inicio en Salesforce&quot;</inlineHelpText>
     <label>Activo en Salesforce</label>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>

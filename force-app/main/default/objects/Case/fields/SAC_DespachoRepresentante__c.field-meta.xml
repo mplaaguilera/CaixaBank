@@ -44,17 +44,22 @@
                 <label>Durán</label>
             </value>
             <value>
+                <fullName>SAC_DefensorVivienda</fullName>
+                <default>false</default>
+                <label>El defensor de tu vivienda</label>
+            </value>
+            <value>
                 <fullName>SAC_Ezaro</fullName>
                 <default>false</default>
                 <label>Ezaro Legal</label>
             </value>
             <value>
-                <fullName>Grupo Alega</fullName>
+                <fullName>SAC_GrupoAlega</fullName>
                 <default>false</default>
                 <label>Grupo Alega</label>
             </value>
             <value>
-                <fullName>Herrero Abogados</fullName>
+                <fullName>SAC_HerreroAbogados</fullName>
                 <default>false</default>
                 <label>Herrero Abogados</label>
             </value>
@@ -79,7 +84,7 @@
                 <label>Los Robinjud Servicios Legales, SL</label>
             </value>
             <value>
-                <fullName>Monclus &amp; Busto-Landin</fullName>
+                <fullName>SAC_MonclusBustoLandin</fullName>
                 <default>false</default>
                 <label>Monclus &amp; Busto-Landin</label>
             </value>
@@ -100,6 +105,11 @@
                 <label>Preico Jurídicos Abogados</label>
             </value>
             <value>
+                <fullName>SAC_ReclamadorEs</fullName>
+                <default>false</default>
+                <label>Reclamador.es</label>
+            </value>
+            <value>
                 <fullName>SAC_Reclamapormi</fullName>
                 <default>false</default>
                 <label>Reclama Por Mi, SL</label>
@@ -113,6 +123,11 @@
                 <fullName>SAC_RespuestaJuridica</fullName>
                 <default>false</default>
                 <label>Respuesta Jurídica</label>
+            </value>
+            <value>
+                <fullName>SAC_SimplyLegal</fullName>
+                <default>false</default>
+                <label>Simply Legal</label>
             </value>
         </valueSetDefinition>
         <valueSettings>
@@ -141,15 +156,19 @@
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>SAC_Abogado</controllingFieldValue>
+            <valueName>SAC_DefensorVivienda</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_Abogado</controllingFieldValue>
             <valueName>SAC_Ezaro</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>SAC_Abogado</controllingFieldValue>
-            <valueName>Grupo Alega</valueName>
+            <valueName>SAC_GrupoAlega</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>SAC_Abogado</controllingFieldValue>
-            <valueName>Herrero Abogados</valueName>
+            <valueName>SAC_HerreroAbogados</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>SAC_Abogado</controllingFieldValue>
@@ -169,7 +188,7 @@
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>SAC_Abogado</controllingFieldValue>
-            <valueName>Monclus &amp; Busto-Landin</valueName>
+            <valueName>SAC_MonclusBustoLandin</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>SAC_Abogado</controllingFieldValue>
@@ -178,6 +197,10 @@
         <valueSettings>
             <controllingFieldValue>SAC_Abogado</controllingFieldValue>
             <valueName>SAC_PreicoJuridicos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_Abogado</controllingFieldValue>
+            <valueName>SAC_ReclamadorEs</valueName>
         </valueSettings>
         <valueSettings>
             <controllingFieldValue>SAC_Abogado</controllingFieldValue>
@@ -190,6 +213,10 @@
         <valueSettings>
             <controllingFieldValue>SAC_Abogado</controllingFieldValue>
             <valueName>SAC_RespuestaJuridica</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_Abogado</controllingFieldValue>
+            <valueName>SAC_SimplyLegal</valueName>
         </valueSettings>
     </valueSet>
 </CustomField>

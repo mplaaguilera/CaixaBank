@@ -3,6 +3,7 @@
     <fullName>SIREC__SIREC_fld_masterRecordI__c</fullName>
     <caseSensitive>true</caseSensitive>
     <deprecated>false</deprecated>
+    <description>Identificador de Sirec</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>true</externalId>
     <label>Master Record Id</label>

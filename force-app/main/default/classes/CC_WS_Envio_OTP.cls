@@ -5,8 +5,18 @@ public with sharing class CC_WS_Envio_OTP {
 		List<CC_Comunicaciones__c> autenticaciones = [SELECT CC_Case__c, CC_Case__r.CC_Idioma__c, //Name, CC_Case__r.CC_NumPerso__c
 														CC_Case__r.Account.CC_NumPerso__c, CC_Case__r.Account.AV_NumPerso__c,
 														CSBD_Opportunity__c, CSBD_Opportunity__r.CSBD_Idioma_Solicitud__c,
-														CSBD_Opportunity__r.Account.CC_NumPerso__c, CSBD_Opportunity__r.Account.AV_NumPerso__c
+														CSBD_Opportunity__r.Account.CC_NumPerso__c, CSBD_Opportunity__r.Account.AV_NumPerso__c, CC_Case__r.Account.RecordType.DeveloperName,
+														CC_Case__r.Account.AV_Segmento__c,
+														CC_Case__r.Contact.RecordType.DeveloperName,
+														CC_Case__r.Contact.CIBE_NumPerso__c,
+														CC_Case__r.Contact.AV_NumPerso__c,
+														CC_Case__r.Contact.CC_NumPerso__c,
+														CC_Case__r.CC_Representante__c,
+														CC_Case__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c,
+														CC_Case__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c
 														FROM CC_Comunicaciones__c WHERE Id IN :idAutenticaciones]; //AND RecordType.DeveloperName = 'CC_OTPSMS'];
+	
+		
 
 		CC_InterfaceSettings__mdt cfgIntegracion = CC_MetodosUtiles.getInterfazConfigBody('CC_Envio_OTP');
 		if (cfgIntegracion != null) {
@@ -21,10 +31,16 @@ public with sharing class CC_WS_Envio_OTP {
                 String tipoObjeto = recordId.getSObjectType().getDescribe().getName();
 
 				//Comprobar que tenemos el numperso informado para poder realizar el envío
-				String numperso = autenticacion.CC_Case__r.Account.CC_NumPerso__c;
-				numperso = numperso ?? autenticacion.CC_Case__r.Account.AV_NumPerso__c;
-				numperso = numperso ?? autenticacion.CSBD_Opportunity__r.Account.CC_NumPerso__c;
-				numperso = numperso ?? autenticacion.CSBD_Opportunity__r.Account.AV_NumPerso__c;
+				String numperso;
+
+				if (autenticacion.CSBD_Opportunity__r != null) {
+						// Si la autenticación está relacionada con una oportunidad
+						numperso = numperso ?? autenticacion.CSBD_Opportunity__r.Account.CC_NumPerso__c;
+						numperso = numperso ?? autenticacion.CSBD_Opportunity__r.Account.AV_NumPerso__c;
+				} else if (autenticacion.CC_Case__c != null) {
+					Map<Id, String> idToNumPersoMap = CC_MetodosUtiles.recuperarNumpersoPorComunicaciones(autenticaciones);
+					numperso = idToNumPersoMap.get(autenticacion.Id);
+				}
                 if (String.isBlank(numperso)) { //Sin NUMPERSO informado
 					traza.CC_FinOK__c = false;
 					traza.CC_TipoError__c = 'Datos entrada no informados.';
@@ -59,8 +75,6 @@ public with sharing class CC_WS_Envio_OTP {
                             oportunidad.CSBD_EstadoAutenticacion__c = responseOk ? 'INPROGRESS' : 'ERROR';
                             oportunidades.add(oportunidad);
                         }
-
-						System.debug('autenticacion.CC_Fecha_Envio__c = Datetime.now()');
 						autenticacion.CC_Fecha_Envio__c = System.now();
 						autenticacion.CC_Respuesta_OTP__c = (httpResponse.getBody() ?? '').left(255);
 						if (responseOk) {

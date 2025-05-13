@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Servicios_HDT</fullName>
+    <columns>CC_Fecha_Inicio_Salesforce__c</columns>
     <columns>NAME</columns>
-    <columns>CC_Tipo_Cliente__c</columns>
     <columns>CC_Codigo__c</columns>
     <columns>CC_Activo_Salesforce__c</columns>
     <columns>CC_Tipo__c</columns>
@@ -12,6 +12,7 @@
     <columns>CC_Encuesta__c</columns>
     <columns>CC_Primer_Aviso__c</columns>
     <columns>CC_Segundo_Aviso__c</columns>
+    <columns>CC_Tipo_Cliente__c</columns>
     <filterScope>Everything</filterScope>
     <filters>
         <field>RECORDTYPE</field>

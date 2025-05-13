@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_CasoReabierto__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo que se marca a True si el caso ha sido reabierto y a False si no ha tenido reapertura.</description>
+    <label>Caso reabierto</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_ControlClosingDateEMP</fullName>
+    <active>true</active>
+    <description>La fecha de cierre no puede ser una fecha pasada ni una fecha superior a 18 meses</description>
+    <errorConditionFormula>AND(
+NOT($Permission.CIBE_BypassValidationRules),
+!$Permission.CBK_BypassValidationRules,
+NOT($Permission.AV_AvoidBulkApi),
+OR( 
+							RecordType.DeveloperName = &quot;CIBE_AlertaComercialEMP&quot;, 
+							RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoEMP&quot;, 
+							RecordType.DeveloperName = &quot;CIBE_AccionComercialEMP&quot; ), 
+				OR(CloseDate &lt; TODAY(), 
+        CloseDate - TODAY() &gt; 547
+				),
+				NOT(ISPICKVAL(PRIORVALUE(StageName), &apos;CIBE_Vencido&apos;)),
+				NOT(ISPICKVAL(StageName, &quot;CIBE_Vencido&quot;)),
+NOT(ISCHANGED(CIBE_ComiteDirector__c)),
+NOT(ISPICKVAL( CIBE_Visto__c , &quot;SI&quot;)))</errorConditionFormula>
+    <errorMessage>Introduzca una fecha de cierre no inferior desde la fecha actual o superior a 18 meses.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_BloqueoTotalVisibilidad__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica si el fichero debe tener la visibilidad bloqueda para cualquier usuario</description>
+    <label>Bloqueo Total Visibilidad</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

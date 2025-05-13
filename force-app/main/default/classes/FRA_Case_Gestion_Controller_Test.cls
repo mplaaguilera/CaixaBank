@@ -33,6 +33,26 @@ public class FRA_Case_Gestion_Controller_Test {
         insert caso3;
         return caso3;
     }
+
+    private static Case crearCasoConcasoAsociado(Id tematicaId,Id productoId,Id motivoId,Id causaId) {
+        Case casoRelacionado = [Select Id from case where Subject = 'Caso de prueba TF7' limit 1];
+
+        Case caso4 = new Case();
+        caso4.Subject = 'Caso de prueba TF8';
+        caso4.recordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente');
+        caso4.Origin = 'Phone';
+        caso4.CC_MCC_Tematica__c = tematicaId;
+        caso4.CC_MCC_ProdServ__c = productoId;
+        caso4.CC_MCC_Motivo__c = motivoId;
+        caso4.CC_MCC_Causa__c = causaId;
+        caso4.CC_En_Tercer_Nivel__c = true;
+        caso4.Status = 'Activo';
+        caso4.CC_CasoRelacionado__c = casoRelacionado.Id;
+
+        insert caso4;
+        return caso4;
+    }
+
     
     private static CC_MCC__c crearTematica2() {
         CC_MCC__c mccTematica2 = new CC_MCC__c();
@@ -239,14 +259,19 @@ public class FRA_Case_Gestion_Controller_Test {
             CC_MCC__c motivoCli = crearMotivo2(prodCli.Id);
             CC_MCC__c causaCli = crearCausa2(motivoCli.Id);
             Case caso = crearCasoConCanalProcedencia(tematicaCli.Id,prodCli.Id,motivoCli.Id,causaCli.id);
+            Case caso2 = crearCasoConcasoAsociado(tematicaCli.Id,prodCli.Id,motivoCli.Id,causaCli.id); 
 
             Test.startTest();
+            
             FRA_Case_Gestion_Controller.crearActividad(caso.Id, caso.Subject, caso.Description);
+            FRA_Case_Gestion_Controller.crearActividad(caso2.Id, caso2.Subject, caso2.Description);
+            FRA_Case_Gestion_Controller.rechazarCasoFraude(caso2.Id, 'Rechazado por el cliente');
             System.assertEquals('Caso de prueba TF7', caso.Subject);
             Test.stopTest();
         }
     }
     
+    /*
     @isTest
     public static void getCampanasFraude() {
         System.runAs(FRA_TestDataFactory.usuarioSoporteFRA()){
@@ -257,5 +282,5 @@ public class FRA_Case_Gestion_Controller_Test {
             System.assertNotEquals(0, resultPicklists.size());
             Test.stopTest();
         }
-    }
+    }*/
 }

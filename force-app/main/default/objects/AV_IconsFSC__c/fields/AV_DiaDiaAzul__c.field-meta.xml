@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_DiaDiaAzul__c</fullName>
+    <description>Icono día a día azul</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Día a Día Azul</label>

@@ -6,6 +6,7 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
     private static final Id RECTYPETIPOADJUNTOS = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_TipoAdjuntos').getRecordTypeId();
     private static final Id RECTYPEIMAGENES = mapRTsObjects.get('SAC_ImagenDocumento__c').get('SAC_ImagenDocumento').getRecordTypeId();
     private static final Id RECTYPERECLAMACIONSPV = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
+    final static Id RECTYPEADJUNTOSSPV = mapRTsObjects.get('SAC_MaestroTemas__c').get('SPV_TipoAdjuntos').getRecordTypeId();
 
     @AuraEnabled
     public static SAC_DocumentoEnvio__c compruebaDocumentoRedaccion(String id){
@@ -75,7 +76,8 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
         cvs = [SELECT Id, Title, ContentDocumentId, SAC_StringRedaccion_fileupload__c FROM ContentVersion WHERE FirstPublishLocationId =: parentId AND SAC_StringRedaccion_fileupload__c IN ('ResolucionRedaccion', 'ReenvioNuevoRedaccion')];
         SAC_MaestroTemas__c maestro = new SAC_MaestroTemas__c();
         if(caso.recordType.DeveloperName == 'SPV_Reclamacion') {
-            maestro = [SELECT Id FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPETIPOADJUNTOS AND SAC_DeveloperName__c = 'RESOLUCIONSPV' LIMIT 1];
+            //maestro = [SELECT Id FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPETIPOADJUNTOS AND SAC_DeveloperName__c = 'RESOLUCIONSPV' LIMIT 1];
+            maestro = [SELECT Id FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPEADJUNTOSSPV AND SAC_DeveloperName__c = 'RESOLUCIONSPV' LIMIT 1];
         } else {
             maestro = [SELECT Id FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPETIPOADJUNTOS AND SAC_DeveloperName__c = 'RESOLUCION' LIMIT 1];
         }

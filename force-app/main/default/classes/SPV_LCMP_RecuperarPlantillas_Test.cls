@@ -14,13 +14,13 @@ public with sharing class SPV_LCMP_RecuperarPlantillas_Test {
         Test.startTest();
 
         User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(usuarioAdmin);
+        SPV_DatabaseDML.insertDML(usuarioAdmin, true);
 
         List<User> listUsuarios ;
 
         System.runAs(usuarioAdmin){
             listUsuarios  = SPV_TestDataFactory.crearUsuarioSPVGeneral(2);
-            Database.insert(listUsuarios );
+            SPV_DatabaseDML.insertListDML(listUsuarios, true);
         }
 
         Test.stopTest();
@@ -36,7 +36,7 @@ public with sharing class SPV_LCMP_RecuperarPlantillas_Test {
 
         Case casoReclamacion = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion);
         listaReclamaciones.add(casoReclamacion);
-        Database.insert(listaReclamaciones);
+        SPV_DatabaseDML.insertListDML(listaReclamaciones, true);
     }
 
     @isTest
@@ -62,7 +62,7 @@ public with sharing class SPV_LCMP_RecuperarPlantillas_Test {
             Test.stopTest();
         }
     }
-
+    
     @isTest
     static void cambioCarpetaTest(){
 
@@ -93,19 +93,20 @@ public with sharing class SPV_LCMP_RecuperarPlantillas_Test {
 
     @isTest
     static void obtenerTemplateBodyTest(){
+        Datetime d = System.today();
+        String formattedDate = d.day() + '-' + d.month()  + '-' + d.year();
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
-
         Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRecCrearRec1' LIMIT 1];
 
         EmailTemplate e = new EmailTemplate(
             developerName = 'paraClasetest', 
             FolderId = usuario.id, 
-            TemplateType= 'Text', 
+            TemplateType= 'custom', 
             Name = 'test',
-            HtmlValue = 'test cuerpo'
+            HtmlValue = 'test cuerpo (FECHAACTUAL)'
         ); 
     
-        Database.insert(e);
+        SPV_DatabaseDML.insertDML(e, true);
 
         String idPlantilla = e.Id;
         String idReclamacion = reclamacion.Id;
@@ -113,7 +114,7 @@ public with sharing class SPV_LCMP_RecuperarPlantillas_Test {
         System.RunAs(usuario){   
             Test.startTest();
             String result = SPV_LCMP_RecuperarPlantillas.obtenerTemplateBody(idPlantilla, idReclamacion, idReclamacion);
-            Assert.areEqual(null, result, 'Obtener la plantilla raiz ha fallado.');
+            Assert.areEqual('test cuerpo ' + formattedDate, result, 'Obtener la plantilla raiz ha fallado.');
             Test.stopTest();
         }
     }
@@ -127,13 +128,13 @@ public with sharing class SPV_LCMP_RecuperarPlantillas_Test {
         EmailTemplate e = new EmailTemplate(
             developerName = 'paraClasetest', 
             FolderId = usuario.id, 
-            TemplateType= 'Text', 
+            TemplateType= 'custom', 
             Name = 'test',
             HtmlValue = 'cuerpo prueba',
             Subject = 'test'
         ); 
     
-        Database.insert(e);
+        SPV_DatabaseDML.insertDML(e, true);
 
         String idPlantilla = e.Id;
         String idReclamacion = reclamacion.Id; 
@@ -155,13 +156,13 @@ public with sharing class SPV_LCMP_RecuperarPlantillas_Test {
         EmailTemplate e = new EmailTemplate(
             developerName = 'paraClasetest', 
             FolderId = usuario.id, 
-            TemplateType= 'Text', 
+            TemplateType= 'custom', 
             Name = 'test',
             HtmlValue = 'cuerpo prueba',
             Subject = 'test'
         ); 
     
-        Database.insert(e);
+        SPV_DatabaseDML.insertDML(e, true);
 
         String idPlantilla = e.Id;
         String idReclamacion = reclamacion.Id; 
@@ -171,6 +172,82 @@ public with sharing class SPV_LCMP_RecuperarPlantillas_Test {
             Test.startTest();
             String result = SPV_LCMP_RecuperarPlantillas.obtenerTemplateSubject(idPlantilla, excepcion, idReclamacion);
             Assert.areNotEqual(null, result, 'Obtener la plantilla raiz ha fallado.');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void recuperarDirectorioRaizTest(){
+        SPV_LCMP_RecuperarPlantillas.WrapperDirectorioRaiz infoRaiz; 
+
+        Folder parametro = [SELECT Id, developerName FROM Folder WHERE DeveloperName = 'PlantillasSPV' LIMIT 1];
+
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        System.RunAs(usuario){   
+            Test.startTest();
+            infoRaiz = SPV_LCMP_RecuperarPlantillas.recuperarDirectorioRaiz(parametro.developerName);
+            Assert.areNotEqual(null, infoRaiz.elementosDirectorio, 'Obtener los datos del directorio raiz ha fallado.');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void buscarPlantillasTest(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+
+        Folder carpeta = [SELECT Id, DeveloperName FROM Folder WHERE DeveloperName = 'PlantillasSPV' LIMIT 1];
+        Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRecCrearRec1' LIMIT 1];
+        String idReclamacion = reclamacion.Id; 
+        SPV_LCMP_RecuperarPlantillas.WrapperTemplate infoTemplate; 
+
+        EmailTemplate e = new EmailTemplate(
+            developerName = 'paraClasetest', 
+            FolderId = usuario.id, 
+            TemplateType= 'custom', 
+            Name = 'test',
+            HtmlValue = 'cuerpo prueba',
+            Subject = 'test'
+        ); 
+    
+        SPV_DatabaseDML.insertDML(e, true);
+
+        System.RunAs(usuario){   
+            Test.startTest();
+            String plantillas = SPV_LCMP_RecuperarPlantillas.buscarPlantillas('test', e.FolderId, e.Name);
+            Assert.areNotEqual(null, plantillas, 'Ha fallado la busqueda de las plantillas');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void obtenerDatosTemplateTest(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+
+        Id parametro = [SELECT Id FROM Folder WHERE DeveloperName = 'PlantillasSPV' LIMIT 1].Id;
+        Case reclamacion = [SELECT Id, RecordTypeId FROM Case WHERE Subject = 'TestRecCrearRec1' LIMIT 1];
+        String idReclamacion = reclamacion.Id; 
+        SPV_LCMP_RecuperarPlantillas.WrapperTemplate infoTemplate; 
+
+        EmailTemplate e = new EmailTemplate(
+            developerName = 'paraClasetest3', 
+            FolderId = usuario.id, 
+            TemplateType= 'custom',
+            Name = 'test',
+            HtmlValue = 'cuerpo prueba (FECHAACTUAL)',
+            Subject = 'test'
+        ); 
+    
+        SPV_DatabaseDML.insertDML(e, false);
+        
+        EnhancedLetterhead letterhead = new EnhancedLetterhead(Name = 'PlantillaSPV', LetterheadFooter = 'Test Footer', LetterheadHeader = 'Test Header');
+        SPV_DatabaseDML.insertDML(letterhead, false);
+
+        String idPlantilla = e.Id;
+
+        System.RunAs(usuario){   
+            Test.startTest();
+            infoTemplate = SPV_LCMP_RecuperarPlantillas.obtenerDatosTemplate(idPlantilla, idReclamacion, 'es', reclamacion.RecordTypeId);
+            Assert.areNotEqual(null, infoTemplate, 'Ha fallado la obtención de datos de la plantilla');
             Test.stopTest();
         }
     }

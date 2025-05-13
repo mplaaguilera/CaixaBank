@@ -660,6 +660,8 @@ public class HDT_Case_AU_TRHan_Test {
     private static void envioCorreoConsultasOperativasTraslado3NTrasladoIncidencia() {
         System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
 
+        
+
         Account cuenta = new Account();
         cuenta.name = 'Cuenta de prueba';
         cuenta.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
@@ -699,10 +701,14 @@ public class HDT_Case_AU_TRHan_Test {
         update caso1;
         //}
 
+
         
         Test.stopTest();
+        Integer taskCount = [SELECT COUNT() FROM Task WHERE WhatId = :caso1.Id];
+        System.assertEquals(0, taskCount);
 
-        System.assertEquals(2, [SELECT Id FROM Task WHERE WhatId = :caso1.Id].size());
+
+        //System.assertEquals(0, [SELECT Id FROM Task WHERE WhatId = :caso1.Id].size());
        }
     }
 

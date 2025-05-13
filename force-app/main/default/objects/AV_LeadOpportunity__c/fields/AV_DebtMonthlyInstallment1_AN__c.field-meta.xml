@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_DebtMonthlyInstallment1_AN__c</fullName>
+    <description>Campo que almacena la cuota mensual de deuda del titular  1 AN</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Cuota mensual deuda titular AN</label>

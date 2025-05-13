@@ -13,6 +13,7 @@ export default class csbdAlertaTelefonia extends LightningElement {
 
 	cargaInicial = true;
 
+
 	@track alertas = {
 		productoMifid: {mostrar: false, visto: false},
 		tipoBonificado: {mostrar: false, visto: false}
@@ -33,7 +34,7 @@ export default class csbdAlertaTelefonia extends LightningElement {
 				}
 				if (getFieldValue(data, OPP_PRODUCTO_MIFID)) {
 					this.alertas.productoMifid.mostrar = true;
-					this.datos.telefonoSolicitud = getFieldValue(data, OPP_TELEFONO);
+					this.datos.telefonoSolicitud = getFieldValue(data, OPP_TELEFONO)?.replace(/\s/g, '').replace(/^\+34/, '');
 				}
 
 				if (this.cargaInicial) {
@@ -44,7 +45,7 @@ export default class csbdAlertaTelefonia extends LightningElement {
 						} else if (this.alertas.productoMifid.mostrar && !this.alertas.productoMifid.visto) {
 							this.abrirModal('productoMifid');
 						}
-					}, 700);
+					}, 400);
 				}
 				this.cargaInicial = false;
 			}
@@ -59,13 +60,15 @@ export default class csbdAlertaTelefonia extends LightningElement {
 			this.alertas[nombreModal].visto = true;
 			this.template.querySelector('.slds-backdrop').classList.add('slds-backdrop_open');
 			modal.classList.add('modalAbierto');
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
-			window.setTimeout(() => this.template.querySelector('.' + nombreModal + 'BotonCerrar').disabled = false, 1100);
-		}, 180);
+			const botonCerrar = this.template.querySelector('.' + nombreModal + 'BotonCerrar');
+			window.setTimeout(() => {
+				botonCerrar.disabled = false;
+				botonCerrar.focus();
+			}, 210);
+		}, 40);
 	}
 
-	cerrarModal(event) {
-		const nombreModal = event.currentTarget.dataset.nombreModal;
+	cerrarModal(nombreModal) {
 		const modal = this.template.querySelector('section.' + nombreModal);
 		if (modal) {
 			modal.classList.remove('modalAbierto');
@@ -78,5 +81,17 @@ export default class csbdAlertaTelefonia extends LightningElement {
 				this.template.querySelector('.slds-backdrop').classList.remove('slds-backdrop_open');
 			}
 		}
+	}
+
+	botonCerrarModalOnclick({currentTarget: {dataset: {nombreModal}}}) {
+		this.cerrarModal(nombreModal);
+	}
+
+	modalContainerOnclick({currentTarget}) {
+		currentTarget.querySelector('button.botonCerrar').focus();
+	}
+
+	modalTeclaPulsada({currentTarget: {dataset: {nombreModal}}, keyCode}) {
+		keyCode === 27 && this.cerrarModal(nombreModal); //Tecla ESC
 	}
 }

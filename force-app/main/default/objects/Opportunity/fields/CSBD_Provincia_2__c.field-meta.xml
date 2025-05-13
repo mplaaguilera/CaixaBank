@@ -264,15 +264,15 @@
             </value>
         </valueSetDefinition>
         <valueSettings>
-            <controllingFieldValue>Valencia</controllingFieldValue>
+            <controllingFieldValue>Comunidad Valenciana</controllingFieldValue>
             <valueName>Alicante</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>Valencia</controllingFieldValue>
+            <controllingFieldValue>Comunidad Valenciana</controllingFieldValue>
             <valueName>Castellón</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>Valencia</controllingFieldValue>
+            <controllingFieldValue>Comunidad Valenciana</controllingFieldValue>
             <valueName>Valencia</valueName>
         </valueSettings>
         <valueSettings>
@@ -444,7 +444,7 @@
             <valueName>Toledo</valueName>
         </valueSettings>
         <valueSettings>
-            <controllingFieldValue>Murcia</controllingFieldValue>
+            <controllingFieldValue>Región de Murcia</controllingFieldValue>
             <valueName>Murcia</valueName>
         </valueSettings>
         <valueSettings>

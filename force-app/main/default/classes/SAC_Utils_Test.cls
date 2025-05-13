@@ -489,7 +489,7 @@ public with sharing class SAC_Utils_Test {
             cntDocument2.Id = documents[0].Id;
             SAC_DatabaseDML.updateDML(cntDocument2, true);
 
-            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '"></p><p>';
+            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '" alt="test1"></p><p>';
         
             Test.startTest();
                 String htmlResult = SAC_Utils.gestionarImagenesInlineRedactarMail(emailBody);
@@ -534,14 +534,14 @@ public with sharing class SAC_Utils_Test {
             cntDocument2.ContentAssetId = assetId.Id;
             SAC_DatabaseDML.updateDML(cntDocument2, true);
 
-            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '"></p><p>';
+            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '" alt="test2"></p><p>';
         
             Test.startTest();
                 String htmlResult = SAC_Utils.gestionarImagenesInlineRedactarMail(emailBody);
             Test.stopTest();
 
             Assert.areNotEqual(emailBody, htmlResult, 'Error al parsear la imagen del email body');
-            Assert.areEqual(true, htmlResult.contains(developerNameFinal), 'Errir al convertir la imagen del email body');
+            Assert.areEqual(true, htmlResult.contains(developerNameFinal), 'Error al convertir la imagen del email body');
         }
     }
 }

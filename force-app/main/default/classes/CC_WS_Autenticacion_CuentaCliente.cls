@@ -16,7 +16,8 @@ public with sharing class CC_WS_Autenticacion_CuentaCliente {
             integracion.mHeaders = mHeaders;
             HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
 
-            HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, null, 'CC_Autenticacion_Cuenta');
+            HttpResponse response = CBK_HttpServiceIntegration.multiCallHttpService(request, null, 'CC_Autenticacion_Cuenta');
+
             if (response.getStatusCode() != 200) {
                 CBK_Log.debug('::: Error Status Code: ' + response.getStatusCode());
             } else {

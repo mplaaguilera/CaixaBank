@@ -728,5 +728,14 @@
 		} else {
 			$A.enqueueAction(component.get('c.handleActualizarIdentificacion'));
 		}
+	},
+
+	csbdMessageChannelOnmessage: function(component, message) {
+		const {recordId, type} = message.getParams();
+		if (recordId === component.get('v.recordId') && type === 'identificarFocus') {
+			const inputBusqueda = component.find('valorBusqueda');
+			window.addEventListener('scrollend', () => inputBusqueda.focus(), {once: true});
+			inputBusqueda.getElement().scrollIntoView({block: 'center', behavior: 'smooth'});
+		}
 	}
 });

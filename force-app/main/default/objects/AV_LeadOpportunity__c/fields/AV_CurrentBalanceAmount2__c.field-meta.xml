@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_CurrentBalanceAmount2__c</fullName>
+    <description>Campo que muestra el importe de deuda del titular 2</description>
     <label>Importe deuda titular 2</label>
     <precision>17</precision>
     <required>false</required>

@@ -258,4 +258,30 @@ public class CC_Int_ObtInfCarterizaCliente_Test {
             System.assertEquals('KO', respuesta.get('resultado'));
          }
     }
+
+    @isTest
+    private static void esClienteDigitalSinGestorDerivar(){
+        User u = [SELECT Id FROM User WHERE IsActive = true AND LastName = 'Testing' AND UserRole.DeveloperName = 'Contact_Center' AND Email = 'standarduser1@testorg.com'];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center 2'];
+         System.RunAs(u){
+            Test.startTest();
+            Test.setMock(HttpCalloutMock.class, new MockHttpResponseExitoSinGestor());
+            Map<Object, Object> respuesta = CC_Operativa_Oficina_Controller.esClienteDigital(caso.Id, 'Cita gestor');      
+            Test.stopTest();
+            System.assertEquals('OK', respuesta.get('resultado'));
+            System.assertEquals(null, respuesta.get('empleado1'));
+        }
+    }
+
+    @isTest
+    private static void llamadaKODerivar(){
+        User u = [SELECT Id FROM User WHERE IsActive = true AND LastName = 'Testing' AND UserRole.DeveloperName = 'Contact_Center' AND Email = 'standarduser1@testorg.com'];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso de Contact Center 2'];
+        System.RunAs(u){
+            Test.startTest();
+            Map<Object, Object> respuesta = CC_Operativa_Oficina_Controller.esClienteDigital(caso.Id, 'Cita gestor');      
+            Test.stopTest();
+            System.assertEquals('KO', respuesta.get('resultado'));
+         }
+    }
 }

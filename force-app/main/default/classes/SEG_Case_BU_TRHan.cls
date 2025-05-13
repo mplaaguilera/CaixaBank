@@ -155,7 +155,7 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 					Id idCRFinal = null;
 					Integer nivelExactitud = 0;
 					for(Id idCR : mapNuevaCR.keySet()) {
-						if (mapNuevaCR.get(idCR).SEG_Organizacion__c != null &&  mapNuevaCR.get(idCR).SEG_Organizacion__c.contains(mapNewObj.get(casoId).SEG_Organizacion__c)) {
+						if (mapNewObj.get(casoId).SEG_Organizacion__c != null && mapNuevaCR.get(idCR).SEG_Organizacion__c != null &&  mapNuevaCR.get(idCR).SEG_Organizacion__c.contains(mapNewObj.get(casoId).SEG_Organizacion__c)) {
 							if (mapNewObj.get(casoId).CC_MCC_Tematica__c != null && mapNewObj.get(casoId).CC_MCC_Tematica__c == mapNuevaCR.get(idCR).SEG_Tematica__c &&
 							mapNewObj.get(casoId).CC_MCC_ProdServ__c != null && mapNewObj.get(casoId).CC_MCC_ProdServ__c == mapNuevaCR.get(idCR).SEG_Producto__c &&
 							mapNewObj.get(casoId).CC_MCC_Motivo__c != null && mapNewObj.get(casoId).CC_MCC_Motivo__c == mapNuevaCR.get(idCR).SEG_Motivo__c &&
@@ -236,7 +236,7 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 						(mapOldObj.get(casoId).SEG_Grupo__c != null)) {
 						mapNewObj.get(casoId).SEG_Grupo_Anterior__c = mapOldObj.get(casoId).SEG_Grupo__c;
 					}
-					if (mapOldObj.get(casoId).OwnerId.getSObjectType() == Schema.getGlobalDescribe().get('User')) {
+					if (String.valueOf(mapOldObj.get(casoId).OwnerId.getSobjectType()).EqualsIgnoreCase('User')) {
 						if (agrupadosCaso.containsKey(casoId)) {
 							//Busca registro y lo actualiza
 							for (SEG_Grupos_por_caso__c grupoCasos : agrupadosCaso.get(casoId)) {
@@ -1154,7 +1154,7 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 	public static void actualizarPropietarioAnterior(List<Id> casosSEG, Map<Id, Case> mapNewObj, Map<Id, Case> mapOldObj){
 		for (Id casoId : casosSEG){
 			if (mapNewObj.containsKey(casoId) && mapNewObj.get(casoId).OwnerId != mapOldObj.get(casoId).OwnerId && mapNewObj.get(casoId).CC_Owner_Anterior__c != mapOldObj.get(casoId).OwnerId) {		
-				mapNewObj.get(casoId).CC_Owner_Anterior__c=(mapOldObj.get(casoId).OwnerId.getSobjectType() == Schema.getGlobalDescribe().get('User')) ? mapOldObj.get(casoId).OwnerId : mapOldObj.get(casoId).CC_Owner_Anterior__c;
+				mapNewObj.get(casoId).CC_Owner_Anterior__c=(String.valueOf(mapOldObj.get(casoId).OwnerId.getSobjectType()).EqualsIgnoreCase('User')) ? mapOldObj.get(casoId).OwnerId : mapOldObj.get(casoId).CC_Owner_Anterior__c;
 			}
 		}
 	}
@@ -1169,7 +1169,7 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 		for (Id casoId : casosSEG){
 			if (mapNewObj.containsKey(casoId) && mapNewObj.get(casoId).OwnerId != mapOldObj.get(casoId).OwnerId 
 			&& mapNewObj.get(casoId).SEG_Grupo__c == mapOldObj.get(casoId).SEG_Grupo__c 
-			&& mapOldObj.get(casoId).OwnerId.getSobjectType() == Schema.getGlobalDescribe().get('User')){
+			&& String.valueOf(mapOldObj.get(casoId).OwnerId.getSobjectType()).EqualsIgnoreCase('User')){
 				//Si se modifica el propietario sin cambiar de grupo y tanto el nuevo propietario como viejo son usuarios se indicará el propietario viejo en el campo "Propietario anterior del grupo" 				
 				mapNewObj.get(casoId).SEG_PropAnteriorGrupo__c = mapOldObj.get(casoId).SEG_Case_Owner__c;
 			}
@@ -1191,16 +1191,23 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 
 		if (!listCasosModificados.isEmpty() && !listaCRs.isEmpty()) {
 			Map<Id, SEG_ClasificacionRapida__c> mapCognitive = new Map<Id, SEG_ClasificacionRapida__c>([SELECT Name, SEG_Nombre_CR_Cognitive__c FROM SEG_ClasificacionRapida__c WHERE Id IN :listaCRs]);
+			
 			if(mapCognitive.size() > 0){
 				for (Id casoModificado : listCasosModificados) {
 					if(mapCognitive.containsKey(mapNewObj.get(casoModificado).SEG_ClasificacionRapida__c) && mapCognitive.get(mapNewObj.get(casoModificado).SEG_ClasificacionRapida__c) != null){
+						DateTime dt = DateTime.now();
+						Long dateInMilliseconds = dt.getTime();
+
+						AsyncOptions options = new AsyncOptions();
+						options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(casoModificado).addString(String.valueOf(dateInMilliseconds)).build();
+						
 						if(mapNewObj.get(casoModificado).SEG_Organizacion__c == 'Financiación Estructurada'){
 							SEG_feedbackCogFFEE fbCognitiveFFEE = new SEG_feedbackCogFFEE(mapNewObj.get(casoModificado).CaseNumber, mapCognitive.get(mapNewObj.get(casoModificado).SEG_ClasificacionRapida__c).SEG_Nombre_CR_Cognitive__c);
-							System.enqueueJob(fbCognitiveFFEE);
+							System.enqueueJob(fbCognitiveFFEE,options);
 						}
 						else{
 							SEG_feedbackCognitive fbCognitive = new SEG_feedbackCognitive(mapNewObj.get(casoModificado).CaseNumber, mapCognitive.get(mapNewObj.get(casoModificado).SEG_ClasificacionRapida__c).SEG_Nombre_CR_Cognitive__c);
-							System.enqueueJob(fbCognitive);
+							System.enqueueJob(fbCognitive,options);
 						}
 						
 					}

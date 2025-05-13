@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_NotEditCampaignPromotor</fullName>
+    <active>true</active>
+    <description>VR para controlar que tanto el promotor interno como el externo, que tendrán el PS EV_NotEditCampaignPromotor, no puedan editar campañas de las que no sean propietarios o que no dependan de sus catálofgos.</description>
+    <errorConditionFormula>AND(PRIORVALUE(LastModifiedDate) != NOW(),
+	AND(!$Permission.CBK_BypassValidationRules,
+     !$Permission.EV_ByPassValidationRules),
+	$Permission.EV_NotEditCampaignPromotor,
+ NOT( OR(OwnerId = $User.Id , Parent.OwnerId = $User.Id,  EV_PromotorDelEvento__r.AV_UsuarioAsociado__c = $User.Id))
+)</errorConditionFormula>
+    <errorMessage>No puede modificar campañas de las que no es propietario o que no dependen de sus catálogos.</errorMessage>
+</ValidationRule>

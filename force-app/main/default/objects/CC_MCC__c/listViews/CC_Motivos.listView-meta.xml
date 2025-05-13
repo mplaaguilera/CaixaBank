@@ -22,11 +22,6 @@
         <operation>equals</operation>
         <value>1</value>
     </filters>
-    <filters>
-        <field>CC_Permitir_traslado_2_oficina__c</field>
-        <operation>equals</operation>
-        <value>1</value>
-    </filters>
     <label>Motivos</label>
     <sharedTo>
         <role>Contact_Center</role>

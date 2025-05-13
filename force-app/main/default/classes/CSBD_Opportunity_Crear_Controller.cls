@@ -27,5 +27,4 @@ public with sharing class CSBD_Opportunity_Crear_Controller {
             }
         } catch (Exception e) { throw new AuraHandledException(e.getMessage()); }
     }
-
 }

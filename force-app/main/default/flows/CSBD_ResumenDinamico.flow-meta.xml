@@ -5,7 +5,7 @@
         <label>Ampliacion resumen Acción 1</label>
         <locationX>314</locationX>
         <locationY>1190</locationY>
-        <actionName>0hfKA000000000BNotFound</actionName>
+        <actionName>CSBD_AmpliacionResumen</actionName>
         <actionType>generatePromptResponse</actionType>
         <connector>
             <targetReference>Guardar_resumen</targetReference>
@@ -17,6 +17,7 @@
                 <elementReference>CSBD_RegistroOportunidad</elementReference>
             </value>
         </inputParameters>
+        <nameSegment>CSBD_AmpliacionResumen</nameSegment>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <actionCalls>
@@ -24,7 +25,7 @@
         <label>resumen oportunidad v2</label>
         <locationX>50</locationX>
         <locationY>350</locationY>
-        <actionName>0hfKA000000000ENotFound</actionName>
+        <actionName>CSBD_ResumenOportunidad</actionName>
         <actionType>generatePromptResponse</actionType>
         <connector>
             <targetReference>Asignaci_n_4</targetReference>
@@ -36,6 +37,7 @@
                 <elementReference>CSBD_RegistroOportunidad</elementReference>
             </value>
         </inputParameters>
+        <nameSegment>CSBD_ResumenOportunidad</nameSegment>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <apiVersion>60.0</apiVersion>

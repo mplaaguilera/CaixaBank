@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_BuyingPriceAmountF__c</fullName>
+    <description>Campo que muestra el precio de compra del inmueble F</description>
     <externalId>false</externalId>
     <formula>IF(
 AV_BuyingPriceAmount__c&gt;= 1000000,

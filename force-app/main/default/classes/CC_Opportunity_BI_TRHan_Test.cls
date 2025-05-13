@@ -233,7 +233,42 @@ public with sharing class CC_Opportunity_BI_TRHan_Test {
             Test.stopTest();
 
             System.assertEquals('13', oppHipoteca[0].CSBD_OC_Prioridad__c, 'Error');
+
         }
     }
 
+    @isTest
+    public static void actualizarIdOportunidadEnCase() {
+        Account cuenta = [SELECT Id, Name FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
+        Contact contacto = [SELECT Id FROM Contact WHERE AccountId =: cuenta.Id];
+        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+
+        Case caso = new Case(
+            Description = 'casoTest',
+            Subject = 'casoTest',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuenta.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente')
+        );
+        insert caso;
+
+        System.runAs (usuarioGestor) {
+            List <case> casos = new list <case>();
+            Map<String, Object> hipoteca = new Map<String, Object>();
+            Test.startTest();
+            hipoteca.put('CSBD_CasoOrigen__c', caso.Id);
+            Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_MAC', hipoteca);
+            Test.stopTest();
+            List<Opportunity> oppHipoteca = [SELECT CSBD_CasoOrigen__c FROM Opportunity WHERE RecordType.DeveloperName = 'CSBD_MAC' AND IsClosed = FALSE];
+            casos = [SELECT Id, CBK_Case_Extension_Id__c FROM Case WHERE Subject = 'casoTest' LIMIT 1];
+            System.assertNotEquals(null, casos[0].CBK_Case_Extension_Id__c, 'Error');
+
+        }
+    }
 }

@@ -17,7 +17,7 @@
             </value>
             <value>
                 <fullName>Custom</fullName>
-                <default>true</default>
+                <default>false</default>
                 <label>Custom</label>
             </value>
         </valueSetDefinition>

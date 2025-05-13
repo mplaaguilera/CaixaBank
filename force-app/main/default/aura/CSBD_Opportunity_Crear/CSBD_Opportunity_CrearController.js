@@ -1,22 +1,31 @@
 ({
 	doInit: function(component, event, helper) {
-		let getRecordTypesCSBD = component.get('c.getRecordTypesCSBD');
-		getRecordTypesCSBD.setCallback(this, response => {
-			if (response.getState() === 'SUCCESS') {
-				const recordTypes = response.getReturnValue();
-				component.set('v.opcionesRecordType', recordTypes);
-				for (let i = 0; i < recordTypes.length; i++) {
-					if (recordTypes[i].label === 'Hipoteca') {
-						component.set('v.recordTypeIdForHipoteca', recordTypes[i].value);
-						break;
+		window.setTimeout($A.getCallback(() => {
+			let getRecordTypesCSBD = component.get('c.getRecordTypesCSBD');
+			getRecordTypesCSBD.setCallback(this, response => {
+				if (response.getState() === 'SUCCESS') {
+					const recordTypes = response.getReturnValue();
+					component.set('v.opcionesRecordType', recordTypes);
+					for (let i = 0; i < recordTypes.length; i++) {
+						if (recordTypes[i].label === 'Hipoteca') {
+							component.set('v.recordTypeIdForHipoteca', recordTypes[i].value);
+							break;
+						}
 					}
+				} else if (response.getState() === 'ERROR') {
+					console.error(response.getError()[0].message);
+					helper.mostrarToast('error', 'Se ha encontrado un problema', response.getError()[0].message);
 				}
-			} else if (response.getState() === 'ERROR') {
-				console.error(response.getError()[0].message);
-				helper.mostrarToast('error', 'Se ha encontrado un problema', response.getError()[0].message);
+			});
+			$A.enqueueAction(getRecordTypesCSBD);
+
+			const viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+			if (viewportHeight > 844) {
+				$A.util.addClass(component.find('divCampos'), 'dropdownMuyAlto');
+			} else if (viewportHeight > 778) {
+				$A.util.addClass(component.find('divCampos'), 'dropdownAlto');
 			}
-		});
-		$A.enqueueAction(getRecordTypesCSBD);
+		}), 700);
 	},
 
 	seleccionarOpcionRecordType: function(component, event, helper) {

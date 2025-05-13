@@ -58,7 +58,7 @@
 	</script>
 
 	<apex:slds />
-	<div style="height: 534px;">
+	<div style="height: 533px;">
 		<textarea id="textarea"></textarea>
 	</div>
 

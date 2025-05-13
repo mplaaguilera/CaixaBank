@@ -10,6 +10,7 @@
     <columns>CC_Fecha_Ultima_Interaccion__c</columns>
     <columns>CC_Canal_Procedencia__c</columns>
     <columns>OWNER_NAME</columns>
+    <columns>CC_Grupo_Colaborador__c</columns>
     <filterScope>Everything</filterScope>
     <filters>
         <field>CC_Canal_Procedencia__c</field>

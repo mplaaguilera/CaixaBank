@@ -126,6 +126,11 @@
                 <label>Escalado devuelto</label>
             </value>
             <value>
+                <fullName>SAC_024</fullName>
+                <default>false</default>
+                <label>Caso pendiente envío prórroga</label>
+            </value>
+            <value>
                 <fullName>SPV_001</fullName>
                 <default>false</default>
                 <label>SPV Devolución reclamación a Alta</label>
@@ -214,6 +219,31 @@
                 <fullName>SPV_018</fullName>
                 <default>false</default>
                 <label>SPV Formulario de reclamación modificado</label>
+            </value>
+            <value>
+                <fullName>SPV_020</fullName>
+                <default>false</default>
+                <label>SPV Concesión de prórroga</label>
+            </value>
+            <value>
+                <fullName>SPV_021</fullName>
+                <default>false</default>
+                <label>SPV Reapertura reclamación</label>
+            </value>
+            <value>
+                <fullName>SPV_022</fullName>
+                <default>false</default>
+                <label>SPV Respuesta a la negociación</label>
+            </value>
+            <value>
+                <fullName>SPV_023</fullName>
+                <default>false</default>
+                <label>SPV Nuevo correo asociado a la reclamación</label>
+            </value>
+            <value>
+                <fullName>SPV_024</fullName>
+                <default>false</default>
+                <label>SPV Negociación Activa</label>
             </value>
         </valueSetDefinition>
     </valueSet>

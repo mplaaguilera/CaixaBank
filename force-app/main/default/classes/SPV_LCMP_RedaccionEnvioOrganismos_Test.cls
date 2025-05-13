@@ -68,8 +68,7 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
         List<Case> listaReclamaciones = new List<Case>();
         Case caso = new Case();
         caso.Subject = 'ReclamacionTest';
-        caso.Status = 'SPV_EnvioOrganismos';
-        caso.SEG_Subestado__c = 'Envio Organismos';
+        caso.Status = 'SPV_AnalisisDecision';
         caso.SEG_Grupo__c = grupoColaborador.id;
         caso.AccountId = cuenta.Id;
         caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SPV_Reclamacion').getRecordTypeId();
@@ -117,6 +116,10 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
         SAC_MaestroAccionesReclamacion__c maestro2 = SPV_TestDataFactory.crearMaestroAcciones(1,listaGrupos[0].Id)[0];
         maestro2.SAC_DeveloperName__c ='SPV_TareaEnvioOrganismo';
         SPV_DatabaseDML.insertDML(maestro2, true);
+
+        SAC_MaestroAccionesReclamacion__c maestro3 = SPV_TestDataFactory.crearMaestroAcciones(1,listaGrupos[0].Id)[0];
+        maestro3.SAC_DeveloperName__c ='SPV_TareaRevisionOrganismo';
+        SPV_DatabaseDML.insertDML(maestro3, true);
     }
 
 
@@ -134,11 +137,13 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
             for(ContentVersion cv: seleccionados){
                 idSeleccionados.add(cv.id);
             }
-            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_BDE', caso.Status, caso.SEG_Subestado__c, idSeleccionados);
+            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_BDE', caso.Status, idSeleccionados);
         }
-        Case casoActualizado = [SELECT id, Status FROM Case WHERE subject = 'ReclamacionTest' limit 1];
+
+        List<SAC_Accion__c> listTarea = [SELECT id FROM SAC_Accion__c WHERE SAC_Reclamacion__c = :caso.Id LIMIT 1];
+
         Test.stopTest();
-        system.assertEquals('SPV_PendienteRespuestaOrganismos', casoActualizado.Status, 'No se ha podido enviar la documentacion');
+        system.assertEquals(false, listTarea.isEmpty(), 'No se ha podido enviar la documentacion');
     }
 
 
@@ -151,17 +156,22 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
 
         System.runAs(usuario) {
 
-            List<ContentVersion> seleccionados = [SELECT id FROM ContentVersion];
-        List<String> idSeleccionados = new List<String>();
+            caso.Status = 'SPV_Envio';
+            SPV_DatabaseDML.updateDML(caso, true);
 
-        for(ContentVersion cv: seleccionados){
-            idSeleccionados.add(cv.id);
+            List<ContentVersion> seleccionados = [SELECT id FROM ContentVersion];
+            List<String> idSeleccionados = new List<String>();
+
+            for(ContentVersion cv: seleccionados){
+                idSeleccionados.add(cv.id);
+            }
+            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_CNMV', caso.Status, idSeleccionados);
         }
-            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_CNMV', caso.Status, caso.SEG_Subestado__c, idSeleccionados);
-        }
-        Case casoActualizado = [SELECT id, Status FROM Case WHERE subject = 'ReclamacionTest' limit 1];
+
+        List<SAC_Accion__c> listTarea = [SELECT id FROM SAC_Accion__c WHERE SAC_Reclamacion__c = :caso.Id LIMIT 1];
+
         Test.stopTest();
-        system.assertEquals('SPV_PendienteRespuestaOrganismos', casoActualizado.Status, 'No se ha podido enviar la documentacion');
+        system.assertEquals(false, listTarea.isEmpty(), 'No se ha podido enviar la documentacion');
     }
 
     @isTest
@@ -176,5 +186,19 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
         }
         Test.stopTest();
         system.assertNotEquals(null , resultado, 'No se ha podido enviar la documentacion');
+    }
+
+    @isTest
+    static void comprobarPermisosUsuarioTest() {
+
+        Test.startTest();
+        User usuario = [SELECT Id FROM User WHERE Username = 'userageneral@test.com.testdata' AND IsActive = true LIMIT 1];
+        Case caso = [SELECT id, OwnerId FROM Case WHERE subject = 'ReclamacionTest' limit 1];
+        Boolean resultado = false;
+        System.runAs(usuario) {
+            resultado = SPV_LCMP_RedaccionEnvioOrganismos.comprobarPermisosUsuario(caso.id, usuario.Id);
+        }
+        Test.stopTest();
+        Assert.areEqual(false , resultado, 'No se ha podido comprobar los permisos del usuario');
     }
 }

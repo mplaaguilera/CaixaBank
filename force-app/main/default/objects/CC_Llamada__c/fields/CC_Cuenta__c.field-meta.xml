@@ -9,7 +9,7 @@
         <filterItems>
             <field>$Source.RecordTypeId</field>
             <operation>equals</operation>
-            <value>Cliente, Cliente (Outbound), Cliente (CSBD), Cliente (COPS), Cliente (SACH)</value>
+            <value>Cliente, Cliente (Outbound), Cliente (CSBD), Cliente (COPS), Cliente (SACH), Cliente (CAM)</value>
         </filterItems>
         <filterItems>
             <field>Account.RecordTypeId</field>

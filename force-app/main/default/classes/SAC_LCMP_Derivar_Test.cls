@@ -15,29 +15,31 @@ public with sharing class SAC_LCMP_Derivar_Test {
     @TestSetup
     static void makeData(){
 
+        List<User> usuarios = new List<User>();
+        List<PermissionSetAssignment> permisos = new List<PermissionSetAssignment>();
         //Usuario SAC Admin
 		User usuarioAdmin = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
         usuarioAdmin.Username = 'usertestadmin@test.com.testSetup';
-        SAC_DatabaseDML.insertDML(usuarioAdmin, false);      
-        //Database.insert(usuarioAdmin);
+        usuarios.add(usuarioAdmin);
 
         PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
         PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
         permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
         permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-        SAC_DatabaseDML.insertDML(permiSetAssiAdmin, false);
-        //Database.insert(permiSetAssiAdmin);
+        permisos.add(permiSetAssiAdmin);
 
         //Usuario SAC General
-		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];   
-        SAC_DatabaseDML.insertDML(usuarioGeneral, false);   
+		User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0]; 
+        usuarios.add(usuarioGeneral);  
+        SAC_DatabaseDML.insertListDML(usuarios, false);   
         //Database.insert(usuarioGeneral);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+        permisos.add(permiSetAssi);
+        SAC_DatabaseDML.insertListDML(permisos, false);   
         //Database.insert(permiSetAssi);
 
         System.runAs(usuarioAdmin){
@@ -100,16 +102,17 @@ public with sharing class SAC_LCMP_Derivar_Test {
             camposRecl.put('AccountId', cuenta.Id);
             camposRecl.put('CC_Idioma__c', 'es');
 
+            List<Case> casos = new List<Case>();
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            SAC_DatabaseDML.insertDML(reclamacion, false);
-            //Database.insert(reclamacion);
+            casos.add(reclamacion);
 
             //Consulta
             Map<String, Object> camposCons = new Map<String, Object>();
             camposCons.put('Subject', 'consulta');
 
             Case consulta = SAC_TestDataFactory.crearCaso('Consulta',camposCons);
-            SAC_DatabaseDML.insertDML(consulta, false);
+            casos.add(consulta);
+            SAC_DatabaseDML.insertListDML(casos, false);
             //Database.insert(consulta);
 
             //Pretension
@@ -350,5 +353,25 @@ public with sharing class SAC_LCMP_Derivar_Test {
             Test.stopTest();
         }
         System.assertNotEquals('SampleTitle.pdf', content.PathOnClient, 'Fallo en la obtencion del path del cliente');
+    }
+
+    @isTest
+    static void validarDocDerivacionClienteTest() {
+        User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'testRec1'];
+        Boolean resultado;
+      
+        System.runAs(usuarioGeneral){
+            Test.startTest();
+            SAC_DocumentoEnvio__c doc = new SAC_DocumentoEnvio__c();
+            doc.SAC_Caso__c = caso.Id;
+            doc.SAC_TipoDocumento__c = 'derivación';
+            SAC_DatabaseDML.insertDML(doc, false);
+
+            resultado = SAC_LCMP_Derivar.validarDocDerivacionCliente(caso.Id);
+            Test.stopTest();
+        }
+
+        Assert.areEqual(true, resultado, 'Fallo al recuperar el documento de envio del caso');
     }
 }

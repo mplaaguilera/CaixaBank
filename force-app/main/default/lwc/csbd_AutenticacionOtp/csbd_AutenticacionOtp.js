@@ -876,7 +876,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 
 		if (tiempoCierre) {
 			window.setTimeout(() => {
-				this.modalMensajeCerrar();
+				//this.modalMensajeCerrar();
 				typeof callback === 'function' && window.setTimeout(callback, 100);
 			}, tiempoCierre);
 		} else {

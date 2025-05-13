@@ -1,6 +1,6 @@
 import {LightningElement, api, wire} from 'lwc';
-import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
-import {errorApex, publicarEvento, toast} from 'c/csbd_lwcUtils';
+import {getRecord, getFieldValue, notifyRecordUpdateAvailable} from 'lightning/uiRecordApi';
+import {errorApex, publicarEvento, toast, transitionThenCallback} from 'c/csbd_lwcUtils';
 
 import crearOportunidadGestor from '@salesforce/apex/CSBD_Opportunity_Operativas_Controller.crearTareaGestor';
 import cerrarOportunidad from '@salesforce/apex/CSBD_Opportunity_Operativas_Controller.cerrarOportunidad';
@@ -12,7 +12,7 @@ import OPP_NUM_GESTOR from '@salesforce/schema/Opportunity.Account.AV_EAPGestor_
 import OPP_ID_GESTOR from '@salesforce/schema/Opportunity.Account.AV_EAPGestor__c';
 import OPP_IDENTIFICADOR from '@salesforce/schema/Opportunity.CSBD_Identificador__c';
 
-const OPP_FIELDS_GETRECORD = [OPP_GESTOR_NAME, OPP_PRODUCTO_PF, OPP_DESCRIPTION, OPP_NUM_GESTOR, OPP_ID_GESTOR];
+const OPP_FIELDS_GETRECORD = [OPP_GESTOR_NAME, OPP_PRODUCTO_PF, OPP_DESCRIPTION, OPP_NUM_GESTOR, OPP_ID_GESTOR, OPP_IDENTIFICADOR];
 
 export default class csbdDerivarGestor extends LightningElement {
 
@@ -24,19 +24,18 @@ export default class csbdDerivarGestor extends LightningElement {
 
 	cargandoGestor = false;
 
-	nombreGestor;
-
 	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS_GETRECORD})
 	wiredRecord({error, data: oportunidad}) {
 		if (oportunidad) {
-			this.oportunidad = oportunidad;
-			this.nombreGestor = getFieldValue(oportunidad, OPP_GESTOR_NAME);
-
-			if (this.modalAbierto) {
-				this.abrirModal();
+			let _nombreGestor = getFieldValue(oportunidad, OPP_GESTOR_NAME);
+			if (_nombreGestor === 'No asignado') {
+				_nombreGestor = null;
 			}
+			this.oportunidad = {...oportunidad, _nombreGestor};
+			this.modalAbierto && this.abrirModal();
+
 		} else if (error) {
-			errorApex(this, error, 'Error recuperando los datos de la oportunidad');
+			errorApex(this, error, 'Problema recuperando los datos de la oportunidad');
 		}
 	}
 
@@ -50,26 +49,32 @@ export default class csbdDerivarGestor extends LightningElement {
 			return; //Si el getRecord no ha acabado, el modal se abrirá cuando acabe
 		}
 
-		this.template.querySelector('.comentariosTarea').value = getFieldValue(this.oportunidad, OPP_DESCRIPTION);
-		if (getFieldValue(this.oportunidad, OPP_PRODUCTO_PF)) {
-			this.refs.backdropModal.classList.add('slds-backdrop_open');
-			modalDerivarGestor.classList.add('slds-fade-in-open');
-			window.setTimeout(() => this.refs.botonCancelar.focus(), 50);
+		if (!getFieldValue(this.oportunidad, OPP_PRODUCTO_PF)) {
+			toast('info', 'Operativa no disponible', 'La oportunidad no se puede derivar a un gestor porque no tiene producto PF');
 		} else {
-			toast('info', 'Operativa no disponible', 'La oportunidad no se puede derivar a gestor porque no tiene producto PF');
+			this.refs.inputComentarios.value = getFieldValue(this.oportunidad, OPP_DESCRIPTION);
+
+			this.refs.backdropModal.classList.add('slds-backdrop_open');
+			transitionThenCallback(modalDerivarGestor, 'slds-fade-in-open', () => {
+				this.refs.inputComentarios.focus();
+				publicarEvento(this, 'modalabierto', {nombreModal: 'modalDerivarGestor'});
+			}, 'opacity');
 		}
 	}
 
 	modalCerrar() {
-		this.refs.modalDerivarGestor.addEventListener('transitionend', () => {
-			publicarEvento(this, 'modalcerrado', {nombreModal: 'modalDerivarGestor'});
-		}, {once: true});
-		this.refs.modalDerivarGestor.classList.remove('slds-fade-in-open');
+		transitionThenCallback(
+			this.refs.modalDerivarGestor, 'slds-fade-in-open',
+			() => publicarEvento(this, 'modalcerrado', {nombreModal: 'modalDerivarGestor'}),
+			'opacity'
+		);
 		this.refs.backdropModal.classList.remove('slds-backdrop_open');
 	}
 
 	modalTeclaPulsada({keyCode}) {
-		keyCode === 27 && this.modalCerrar();
+		if (keyCode === 27 && this.refs.modalDerivarGestor.classList.contains('slds-fade-in-open')) {
+			this.modalCerrar();
+		}
 	}
 
 	crearOportunidadGestor() {
@@ -80,23 +85,19 @@ export default class csbdDerivarGestor extends LightningElement {
 		}
 
 		this.cargandoGestor = true;
+
+		const conGestorAsignado = (getFieldValue(this.oportunidad, OPP_GESTOR_NAME) ?? 'No asignado') !== 'No asignado';
 		crearOportunidadGestor({
 			recordId: this.recordId,
-			numeroGestor: getFieldValue(this.oportunidad, OPP_NUM_GESTOR),
-			idGestor: getFieldValue(this.oportunidad, OPP_ID_GESTOR),
+			numeroGestor: conGestorAsignado ? getFieldValue(this.oportunidad, OPP_NUM_GESTOR) : null,
+			idGestor: conGestorAsignado ? getFieldValue(this.oportunidad, OPP_ID_GESTOR) : null,
 			comentarios: comentariosTarea
 		}).then(() => {
-			toast('success', 'Oportunidad para el gestor creada con éxito', 'Podrá localizar la oportunidad en la ficha del cliente');
-
-			cerrarOportunidad({
-				recordId: this.recordId,
-				nombreEtapaVentas: 'Perdida',
-				resolucion: 'Traslado a oficina'
-			}).then(() => {
+			toast('success', 'Oportunidad para el gestor creada con éxito', 'Puedes ver la nueva oportunidad en la ficha del cliente');
+			cerrarOportunidad({recordId: this.recordId, nombreEtapaVentas: 'Perdida', resolucion: 'Traslado a oficina'}).then(() => {
+				notifyRecordUpdateAvailable([{recordId: this.recordId}]);
 				toast('info', `Oportunidad ${getFieldValue(this.oportunidad, OPP_IDENTIFICADOR)} cerrada con éxito`, 'La oportunidad se cerró como Perdida');
 				this.modalCerrar();
-				//Recargar el registro de la oportunidad
-				this.template.querySelector('lightning-record-view-form').reloadRecord();
 			}).catch(error => errorApex(this, error, 'Error cerrando la oportunidad'))
 			.finally(() => this.cargandoGestor = false);
 

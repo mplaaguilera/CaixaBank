@@ -1,0 +1,42 @@
+<template>
+
+    <article lwc:ref="banner" class={bannerClass}>
+        <div class="slds-card__body">
+            <div class="slds-scoped-notification slds-media slds-media_center" role="status">
+
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning-icon class="icono" icon-name={iconName} size={iconSize}></lightning-icon>
+                    </span>
+                </div>
+
+                <div class="slds-media__body slds-is-relative" style="top: 1px;">
+
+                    <div class="slds-grid slds-grid_vertical-align-center">
+
+                        <div class="slds-col slds-grow-none slds-truncate">
+                            <span lwc:ref="texto" lwc:dom="manual"></span>
+                        </div>
+
+                        <div lwc:if={enlace} class="slds-col slds-grow-none slds-shrink-none">
+                            <span class="slds-var-m-left_small slds-text-link" style="cursor: pointer;" onclick={enlaceOnclick} data-id-banner={idBanner} data-id-enlace={enlace.idEnlace}>
+                                {enlace.label}
+                            </span>
+                            <lightning-helptext lwc:if={enlace.helptext} content={enlace.helptext} icon-name="utility:info_alt" class="slds-var-m-left_x-small slds-is-relative" style="display: inline-block; top: -4px; height: 16px;"></lightning-helptext>
+                        </div>
+
+                        <div lwc:if={clickToDialNumTelefono} class="slds-col slds-grow-none slds-shrink-none">
+                            <!--sldsValidatorIgnoreNextLine-->
+                            <lightning-click-to-dial value={clickToDialNumTelefono} record-id={recordId} class="slds-var-m-left_small"></lightning-click-to-dial>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!--sldsValidatorIgnoreNextLine-->
+                <lightning-button-icon lwc:if={descartable} icon-name="utility:close" variant="bare" title="Ocultar" onclick={cerrarBanner} class="botonCerrar"></lightning-button-icon>
+            </div>
+        </div>
+    </article>
+
+</template>

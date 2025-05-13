@@ -7,6 +7,6 @@
     <fields>CC_Canal_Procedencia__c</fields>
     <fields>SAC_SentidoResolucion__c</fields>
     <fields>SAC_CasoEspecial__c</fields>
-    <fields>SAC_FechaVencimientoSLA__c</fields>
+    <fields>SAC_DiaVencimientoSLA__c</fields>
     <label>SAC Reclamación compact layout</label>
 </CompactLayout>

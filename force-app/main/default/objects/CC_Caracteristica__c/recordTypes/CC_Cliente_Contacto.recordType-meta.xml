@@ -75,5 +75,9 @@
             <fullName>COPS</fullName>
             <default>false</default>
         </values>
+        <values>
+            <fullName>FRA</fullName>
+            <default>false</default>
+        </values>
     </picklistValues>
 </RecordType>

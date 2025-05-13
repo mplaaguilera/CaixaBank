@@ -4,6 +4,15 @@
     <deleteConstraint>SetNull</deleteConstraint>
     <description>lookup a contact menor de edad.</description>
     <label>Menor de edad</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Contact.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>CSBD_MenorEdad</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
     <referenceTo>Contact</referenceTo>
     <relationshipLabel>Opportunities (Menor de edad)</relationshipLabel>
     <relationshipName>Opportunities5</relationshipName>

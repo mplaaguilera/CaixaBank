@@ -7,12 +7,6 @@
     <columns>Object__c</columns>
     <columns>Proyectos__c</columns>
     <columns>Status__c</columns>
-    <columns>Field_Type__c</columns>
     <filterScope>Everything</filterScope>
-    <filters>
-        <field>RECORDTYPE</field>
-        <operation>equals</operation>
-        <value>CBK_DataManager__c.Field</value>
-    </filters>
     <label>Fields</label>
 </ListView>

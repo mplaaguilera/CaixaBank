@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_ProductoNivelPFName__c</fullName>
+    <description>Producto nivel PF</description>
     <externalId>false</externalId>
-    <formula>IF( AV_Producto__r.AV_Nivel__c = &apos;10&apos;, AV_Producto__r.AV_NombrePF__r.AV_NombrePF__r.Name,
-IF( AV_Producto__r.AV_Nivel__c = &apos;1&apos;, AV_Producto__r.AV_NombrePF__r.AV_NombrePF__r.AV_NombrePF__r.Name, &apos;&apos;))</formula>
+    <formula>IF((AV_Producto__r.AV_Nivel__c = &apos;20&apos;), AV_Producto__r.AV_NombrePF__r.Name,
+IF((AV_Producto__r.AV_Nivel__c = &apos;10&apos; &amp;&amp; AV_Producto__r.AV_NombrePF__r.AV_Nivel__c = &apos;20&apos;), AV_Producto__r.AV_NombrePF__r.AV_NombrePF__r.Name,
+IF((AV_Producto__r.AV_Nivel__c = &apos;10&apos; &amp;&amp; AV_Producto__r.AV_NombrePF__r.AV_Nivel__c &lt;&gt; &apos;20&apos;), AV_Producto__r.AV_NombrePF__r.Name,
+IF((AV_Producto__r.AV_Nivel__c = &apos;1&apos; &amp;&amp; AV_Producto__r.AV_NombrePF__r.AV_NombrePF__r.AV_Nivel__c &lt;&gt; &apos;20&apos;), AV_Producto__r.AV_NombrePF__r.AV_NombrePF__r.Name,
+IF( AV_Producto__r.AV_Nivel__c = &apos;1&apos;, AV_Producto__r.AV_NombrePF__r.AV_NombrePF__r.AV_NombrePF__r.Name, &apos;&apos;)))))</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Producto Nivel PF</label>
     <required>false</required>

@@ -120,6 +120,29 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SPV_AnalisisSedeOrganismo__c</picklist>
+        <values>
+            <fullName>Allanamiento consciente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Allanamiento tardio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mal funcionamiento del SAC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No aplica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No ha pasado por el SAC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SPV_Imputable__c</picklist>
         <values>
             <fullName>SPV_Entidad</fullName>

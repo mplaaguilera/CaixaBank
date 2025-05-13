@@ -267,8 +267,19 @@
             <fullName>OESIA</fullName>
             <default>false</default>
         </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Tipo__c</picklist>
         <values>
-            <fullName>SIN PROVEEDOR</fullName>
+            <fullName>Remitidos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslados y Remitidos</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -318,6 +329,10 @@
         </values>
         <values>
             <fullName>CSI_Bankia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GRR</fullName>
             <default>false</default>
         </values>
         <values>

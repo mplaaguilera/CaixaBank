@@ -1,0 +1,8 @@
+.slds-p-around_medium {
+    height: 100%;
+}
+
+/* Utilitzem classe d'utilitat SLDS en lloc de CSS directe a l'HTML */
+textarea {
+    font-family: monospace;
+}

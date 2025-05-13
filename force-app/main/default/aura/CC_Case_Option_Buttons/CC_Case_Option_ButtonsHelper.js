@@ -4,8 +4,9 @@
 		let accionApex;
 		if (lista === 'grupo') {
 			accionApex = component.get('c.buscarGruposColaboradores');
+			const remitir = component.get('v.remitir');
 			const negocio = component.get('v.tipoRegistro') === 'CC_CSI_Bankia' ? 'CSI_Bankia' : 'CC';
-			accionApex.setParams({'cadenaBusqueda': cadenaBusqueda, 'negocio': negocio});
+			accionApex.setParams({'cadenaBusqueda': cadenaBusqueda, 'negocio': negocio, 'remitir' : remitir, 'tipoCaso' : component.get('v.tipoRegistro')});
 			accionApex.setCallback(this, response => {
 				if (response.getState() === 'SUCCESS') {
 					let storeResponse = response.getReturnValue();
@@ -162,7 +163,8 @@
 				component.set('v.casoEnTercerNivel', caso.CC_En_Tercer_Nivel__c);
 				component.set('v.casoEnSegundoNivel', caso.CC_En_Segundo_Nivel__c);
 				component.set('v.tipoRegistro', caso.RecordType.DeveloperName);
-				component.set('v.derivadaCSBD', caso.CC_Oportunidad_Creada__c);
+				//CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c != null
+				component.set('v.derivadaCSBD', caso.CC_Oportunidad_creada__c);
 				this.obtenerPermisos(component, caso);
 
 				if (caso.CC_Detalles_Consulta__c) {
@@ -178,7 +180,8 @@
 					component.set('v.oficinaName', caso.Account.Name);
 					component.set('v.accountRecordtypeDeveloperName', caso.Account.RecordType.DeveloperName);
 					component.set('v.accountRecordtypeId', caso.Account.RecordTypeId);
-					component.set('v.numPerso', caso.Account.CC_NumPerso__c);
+					//component.set('v.numPerso', caso.Account.CC_NumPerso__c);
+					component.set('v.numPerso', caso.Account.AV_NumPerso__c || caso.Account.CC_NumPerso__c || '');
 
 					if (caso.Account.AV_OficinaPrincipal__c) {
 						component.set('v.oficinaGestoraSeleccionadaId', caso.Account.AV_OficinaPrincipal__c);
@@ -286,7 +289,7 @@
 
 	getPicklistMCCGrupo: function(component) {
 		let getMCCGrupoList = component.get('c.getMCCGrupoList');
-		getMCCGrupoList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': ''});
+		getMCCGrupoList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '', 'remitir' : component.get('v.remitir'), 'grupoColaboradorDerivarFraude' : component.get('v.grupoColaboradorFraude')});
 		getMCCGrupoList.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				component.set('v.optionsGrupo', response.getReturnValue());
@@ -297,7 +300,7 @@
 
 	getPicklistMCCGrupo3N: function(component) {
 		let getMCCGrupo3NList = component.get('c.getMCCGrupoList');
-		getMCCGrupo3NList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '3N'});
+		getMCCGrupo3NList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '3N', 'remitir' : component.get('v.remitir'), 'grupoColaboradorDerivarFraude' : component.get('v.grupoColaboradorFraude')});
 		getMCCGrupo3NList.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				let options = response.getReturnValue();
@@ -311,7 +314,7 @@
 
 	getPicklistMCCGrupo2N: function(component) {
 		let getMCCGrupo2NList = component.get('c.getMCCGrupoList');
-		getMCCGrupo2NList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '2N'});
+		getMCCGrupo2NList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '2N', 'remitir' : component.get('v.remitir'), 'grupoColaboradorDerivarFraude' : component.get('v.grupoColaboradorFraude')});
 		getMCCGrupo2NList.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				let options = response.getReturnValue();
@@ -342,8 +345,9 @@
 		let tipoRegistro = component.get('v.tipoRegistro');
 		let carpetaOperativa;
 		let carpetaGenerica;
-
-		if (operativa === 'responder') {
+		console.log('LOG load carpetas idioma ' + Date.now());
+		if (operativa === 'responder' || operativa === 'responderClienteDerivar') {
+			console.log('LOG load carpetas idioma 1 ' + Date.now());
 			//idioma = 'CC_Responder_' + canalProcedencia+'_' + idioma;
 			if (tipoRegistro === 'CC_Empleado') {
 				if (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa') {
@@ -357,6 +361,7 @@
 			} else if (tipoRegistro === 'CC_Cliente' && (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa')) {
 				carpetaOperativa = 'CC_Responder_EmisionesPromoCaixa';
 			} else {
+				console.log('LOG load carpetas idioma 2 ' + Date.now());
 				carpetaOperativa = 'CC_Responder_' + canalProcedencia;
 			}
 		} else if (operativa === 'solicitar') {
@@ -375,7 +380,8 @@
 		existeCarpeta.setCallback(this, function(response) {
 			if (response.getState() === 'SUCCESS') {
 				if (response.getReturnValue()) {
-					if (operativa === 'responder') {
+					if (operativa === 'responder' || operativa === 'responderClienteDerivar') {
+						console.log('LOG load carpetas idioma 3 ' + Date.now());
 						if (tipoRegistro === 'CC_Empleado') {
 							if (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa') {
 								idioma = 'CC_Responder_Empleado_Wivai_' + idioma;
@@ -391,6 +397,7 @@
 							idioma = 'CC_Responder_EmisionesPromoCaixa_' + idioma;
 							carpetaGenerica = 'CC_Responder_EmisionesPromoCaixa';
 						} else {
+							console.log('LOG load carpetas idioma 4 ' + Date.now());
 							idioma = 'CC_Responder_' + canalProcedencia + '_' + idioma;
 							carpetaGenerica = 'CC_Responder';
 						}
@@ -407,7 +414,7 @@
 						}
 					}
 				} else {
-					if (operativa === 'responder') {
+					if (operativa === 'responder'  || operativa === 'responderClienteDerivar') {
 						if (tipoRegistro === 'CC_Empleado') {
 							if (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa') {
 								idioma = 'CC_Responder_Empleado_Wivai_' + idioma;
@@ -441,6 +448,7 @@
 				}
 				let opcionesIdiomaFolder = [];
 				let getCarpetas = component.get('c.getCarpetas');
+				console.log('LOG ' + carpetaOperativa);
 				getCarpetas.setParams({
 					'carpetaDeveloperName': carpetaOperativa,
 					'carpetaGenerica': carpetaGenerica
@@ -452,7 +460,7 @@
 						component.set('v.opcionesIdiomaFolder', opcionesIdiomaFolder);
 						component.set('v.carpetaIdiomaSeleccionada', true);
 						component.set('v.idiomaPlantilla', idioma);
-						if (operativa === 'responder') {
+						if (operativa === 'responder'  || operativa === 'responderClienteDerivar') {
 							component.find('selectItemIdioma').set('v.value', idioma);
 						} else if (operativa === 'solicitar') {
 							component.find('selectItemIdiomaSol').set('v.value', idioma);
@@ -463,7 +471,7 @@
 						if (operativa === 'solicitar') {
 							//eslint-disable-next-line @lwc/lwc/no-async-operation
 							window.setTimeout($A.getCallback(() => component.find('selectItemTratamientoSol').focus()), 50);
-						} else if (operativa === 'responder') {
+						} else if (operativa === 'responder'  || operativa === 'responderClienteDerivar') {
 							//eslint-disable-next-line @lwc/lwc/no-async-operation
 							window.setTimeout($A.getCallback(() => component.find('selectItemTratamiento').focus()), 50);
 						}
@@ -503,12 +511,14 @@
 		let recordId = component.get('v.recordId');
 		let tratamiento = component.get('v.tratamiento');
 		let action = component.get('c.getPlantillasResponder');
+		console.log('LOG getPlantillas ' + tratamiento);
 		action.setParams({
 			'recordId': recordId,
 			'carpeta': tratamiento
 		});
 		action.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
+				console.log('LOG getPlantillas ' + JSON.stringify(response.getReturnValue()));
 				let options = response.getReturnValue();
 				component.set('v.optionsPlantillaResponder', options);
 			}
@@ -1029,17 +1039,45 @@
 		$A.enqueueAction(reiniciarDerivar);
 	},
 
-	visibilidadBotonOnboarding: function(component) {
-		let visibilidadBoton = component.get('c.comprobarVisibilidadBotonOnboarding');
-		visibilidadBoton.setParam('recordId', component.get('v.recordId'));
-		visibilidadBoton.setCallback(this, response => {
-			if (response.getState() === 'SUCCESS') {
-				let respuesta = response.getReturnValue();
-				component.set('v.mostrarOnboarding', respuesta);
-			}
-		});
-		$A.enqueueAction(visibilidadBoton);
-	}
+	abrirEmailColaboradorActionHelper: function(component, listPara, listCC, listBcc, plantillaName, segundaOficinaName, grupocolaborador, procedencia) {
+		console.log('DMV HELPER abrirEmailColaboradorActionHelper');
+		component.set('v.listPara', listPara);
+		component.set('v.listCC', listCC);
+		component.set('v.listBcc', listBcc);
+		component.set('v.plantillaName', plantillaName);
+		component.set('v.segundaOficinaName', segundaOficinaName);
+		component.set('v.grupoColaborador', grupocolaborador);
+		component.set('v.procedencia', procedencia);
+
+		//const emailColaborador = component.find("emailColaboradorAction");
+		//emailColaborador.abrirEmailColaboradorAction();		
+		//cerrar modal trasladar colaborador
+		//$A.util.removeClass(component.find('ModalboxColab'), 'slds-fade-in-open');
+		//$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
+		//$A.util.removeClass(component.find('ModalboxColab'), 'slds-fade-in-open');
+		//$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
+		
+		var payload = {
+            recordId: component.get('v.recordId'),
+			origen: 'caseOptionButtons',
+			destino: 'enviarCorreoColaboradorAction',
+		    datosAdicionales: ''
+        };
+        component.find("derivarInteraccionChannel").publish(payload);
+		
+	},
+
+	/*publicarSolicitarInformacionMessage: function(component, solicitudInformacion) {
+		console.log('DMV HELPER publicarSolicitarInformacionMessage');
+		var payload = {
+            recordId: component.get('v.recordId'),
+			origen: 'caseOptionButtons',
+			destino: 'socialPublisherAction',
+		    datosAdicionales: solicitudInformacion
+        };
+        component.find("derivarInteraccionChannel").publish(payload);
+		
+	}*/
 
 	/*obtenerEmpleadosOficina: function(component) {
 		if (!component.get('v.comboboxEmpleadosOptions').length) { //Si no se han cargado ya previamente

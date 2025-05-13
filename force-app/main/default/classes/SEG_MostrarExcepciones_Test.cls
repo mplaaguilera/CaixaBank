@@ -29,10 +29,10 @@ public class SEG_MostrarExcepciones_Test {
 
         insert recl;
         
-        Id recordTypeIdDetalle = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         
         //Crear MCC para CR
 
@@ -179,8 +179,8 @@ public class SEG_MostrarExcepciones_Test {
     @isTest
     public static void excepcionTexto_Test()
     {
-        Id exTextoId = Schema.getGlobalDescribe().get('SEG_Excepciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
-        Id exContratoId = Schema.getGlobalDescribe().get('SEG_Excepciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Contratos').getRecordTypeId();
+        Id exTextoId = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
+        Id exContratoId = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Contratos').getRecordTypeId();
         SEG_Contratos__c contrato = [Select Id,SEG_SR_Seguimiento__c from SEG_Contratos__c where Name = 'Number1' LIMIT 1];
 
 
@@ -214,8 +214,8 @@ public class SEG_MostrarExcepciones_Test {
     @isTest
     public static void excepcionContrato_Test()
     {
-        Id exTextoId = Schema.getGlobalDescribe().get('SEG_Excepciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
-        Id exContratoId = Schema.getGlobalDescribe().get('SEG_Excepciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Contratos').getRecordTypeId();
+        Id exTextoId = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
+        Id exContratoId = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Contratos').getRecordTypeId();
         SEG_Contratos__c contrato = [Select Id,SEG_SR_Seguimiento__c from SEG_Contratos__c where Name = 'Number1' LIMIT 1];
 
         SEG_Excepciones__c ex = new SEG_Excepciones__c();
@@ -247,9 +247,9 @@ public class SEG_MostrarExcepciones_Test {
     @isTest
     public static void sinTextoExcepcion_Test()
     {
-        Id exTextoId = Schema.getGlobalDescribe().get('SEG_Excepciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
-        Id exContratoId = Schema.getGlobalDescribe().get('SEG_Excepciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Contratos').getRecordTypeId();
-		/*
+        Id exTextoId = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
+        Id exContratoId = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Contratos').getRecordTypeId();
+        /*
         SEG_Excepciones__c ex = new SEG_Excepciones__c();
         ex.RecordTypeId = exTextoId;
         insert ex;
@@ -278,9 +278,9 @@ public class SEG_MostrarExcepciones_Test {
     public static void excepcionCase_Test()
     {
 		
-        Id exTextoId = Schema.getGlobalDescribe().get('SEG_Excepciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
-        Id exContratoId = Schema.getGlobalDescribe().get('SEG_Excepciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Contratos').getRecordTypeId();
-
+        Id exTextoId = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
+        Id exContratoId = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Contratos').getRecordTypeId();
+        
 	    SEG_Contratos__c contrato = [Select Id,SEG_SR_Seguimiento__c from SEG_Contratos__c where Name = 'Number1' LIMIT 1];
         
         SEG_Excepciones__c ex = new SEG_Excepciones__c();

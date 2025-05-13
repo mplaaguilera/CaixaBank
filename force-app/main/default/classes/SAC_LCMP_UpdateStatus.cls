@@ -214,9 +214,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 }
                 
             } else{ throw new AuraHandledException( 'Fallo al actualizar.' ); }
-        } else {
-            throw new AuraHandledException( 'No se ha encontrado el caso' );
-        }
+        } else {throw new AuraHandledException( 'No se ha encontrado el caso' );}
     }
 
     /*****************************************************************
@@ -255,10 +253,11 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         SAC_DatabaseDML.updateDML(casoPorActualizar, false); 
         //Database.update(casoPorActualizar);  
 
-        // Si el correo electrónico web del caso no es nulo se tiene que enviar un email indicando que se ha enviado la subsanación del caso
-        if(String.isNotBlank(casoPorActualizar.SuppliedEmail)) {  
+        // Si el canal de respuesta es email y la dirección del correo electrónico web no coincide con la del email del caso se tiene que enviar un email indicando que se ha enviado la subsanación
+        if(String.isNotBlank(casoPorActualizar.SuppliedEmail) && casoPorActualizar.SuppliedEmail != casoPorActualizar.OS_Email__c && casoPorActualizar.CC_Canal_Respuesta__c == 'Email') {  
             comunicarResolucion(casoPorActualizar);
         }
+
         
         SAC_LCMP_GestionEmails.enviarEmail(record, para, copia, copiaOculta,cuerpo, asunto, ficherosAdjuntos, null);
 
@@ -279,7 +278,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         Case casoPorActualizar = new Case();
        // updateRecordStatus(record, newStatus);
        listaCasos = [SELECT Id, Status, SAC_MotivoInadmision__c, CC_AcuseRecibo__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c, SAC_NombreContacto__c, CaseNumber, Origin, CC_Idioma__c, 
-                                        SuppliedEmail, OS_Email__c, CreatedDate, RecordTypeId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, CC_Canal_Respuesta__c
+                                        SuppliedEmail, OS_Email__c, CreatedDate, RecordTypeId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, CC_Canal_Respuesta__c, SAC_Reclamacion__C
                                     FROM Case 
                                     WHERE Id =: record LIMIT 1];
 
@@ -302,7 +301,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
 
             SAC_DocumentoEnvio__c carta = new SAC_DocumentoEnvio__c();
             listaDocumentoEnvio = [SELECT id FROM SAC_DocumentoEnvio__c WHERE  SAC_Caso__c =:record  AND SAC_Documento__c = null AND SAC_TipoDocumento__c =: 'subsanación' LIMIT 1];
-           
+
             if(!listaDocumentoEnvio.isEmpty()){
                 carta = listaDocumentoEnvio[0];
 
@@ -320,8 +319,8 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 SAC_DatabaseDML.updateDML(casoPorActualizar, false); 
                 //Database.update(casoPorActualizar);  
 
-                // Si el correo electrónico web del caso no es nulo se tiene que enviar un email indicando que se ha enviado la subsanación del caso
-                if(String.isNotBlank(casoPorActualizar.SuppliedEmail)) {  
+                // Si el canal de entrada es email, en TF9 no tiene email y el canal de respuesta es Carta postal se tiene que enviar un email indicando que se ha enviado la subsanación
+                if(String.isNotBlank(casoPorActualizar.SuppliedEmail) && casoPorActualizar.Origin == 'Email' && casoPorActualizar.CC_Canal_Respuesta__c == 'SAC_CartaPostal' && String.isBlank(casoPorActualizar.OS_Email__c)) {  
                     comunicarResolucion(casoPorActualizar);
                 }
         
@@ -354,7 +353,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
 
                 tarea.SAC_MaestroAccionesReclamacion__c = maestroTareaAutomatica.Id;
                 tarea.RecordTypeId = RECTYPEMAESTROTAREAS;
-                tarea.SAC_Reclamacion__c = record;
+
+                if(casoPorActualizar.RecordTypeId == RECTYPERECLAMACION){
+                    tarea.SAC_Reclamacion__c = record;
+                }else if(casoPorActualizar.RecordTypeId == RECTYPEPRETENSION){
+                    tarea.SAC_Reclamacion__c = casoPorActualizar.SAC_Reclamacion__C;
+                    tarea.SAC_Pretension__c = record;
+                }
                 
                 try {
                     if (!Schema.sObjectType.SAC_Accion__c.isCreateable()) { throw new AuraHandledException( 'No tienes permisos para realizar esta accion.' ); }
@@ -363,7 +368,6 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     CBK_log.error(e);
                 }
 
-                // FALLA POR List has more than 1 row for assignment to SObject ya que recupera la carta del acuse de recibo y la del envio de subsanacion
                 ContentVersion cv = [SELECT Id, Title, ContentDocumentId FROM ContentVersion WHERE FirstPublishLocationId =: record order by CreatedDate DESC LIMIT 1];
                 ContentDocumentLink cdl = new ContentDocumentLink();
 
@@ -376,12 +380,8 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 return tarea.Id;
 
     
-            }else{
-                throw new AuraHandledException( 'Es necesario asociar un cliente y generar la carta correspondiente a la hora de subsanar.' );
-            }
-        }else{
-            throw new AuraHandledException( 'No se ha podido encontrar el caso.' );
-        }
+            }else{throw new AuraHandledException( 'Es necesario asociar un cliente y generar la carta correspondiente a la hora de subsanar.' );}
+        }else{throw new AuraHandledException( 'No se ha podido encontrar el caso.' );}
 
        
 
@@ -557,13 +557,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         if (casoPorActualizar.RecordTypeId == RECTYPEPRETENSION) {
             if(!listaPretensionesSubsanacion.isEmpty()) {
                 if(reclamacion.SAC_DetenidoHasta__c != null && reclamacion.SAC_DetenidoHasta__c > casoPorActualizar.SAC_DetenidoDesde__c && reclamacion.SAC_DetenidoHasta__c < System.now()) {
-                    milliseconds = System.now().getTime() - reclamacion.SAC_DetenidoHasta__c.getTime();
+                    milliseconds = reclamacion.SAC_DetenidoHasta__c.getTime() - casoPorActualizar.SAC_DetenidoDesde__c.getTime();
                     minutes = milliseconds / (1000 * 60);
                     // Si la subsanación empezó en el mismo día que terminó la anterior no se debe sumar ese primer día
                     if(casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaUltimaSubsanacion__c || (casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaRecepcion__c.date() && reclamacion.SAC_DetenidoHasta__c.date() == reclamacion.SAC_FechaRecepcion__c.date())) {
-                        dias = reclamacion.SAC_DetenidoHasta__c.date().daysBetween(Date.today());
+                        dias = casoPorActualizar.SAC_DetenidoDesde__c.date().daysBetween(reclamacion.SAC_DetenidoHasta__c.date());
                     } else {
-                        dias = reclamacion.SAC_DetenidoHasta__c.date().daysBetween(Date.today()) + 1;
+                        dias = casoPorActualizar.SAC_DetenidoDesde__c.date().daysBetween(reclamacion.SAC_DetenidoHasta__c.date()) + 1;
                     }
                     // Si se produce una segunda subsanación en el mismo día que una anterior no debe sumar un día más al SLA regulatorio
                     if(dias == 1 && reclamacion.SAC_FechaUltimaSubsanacion__c == Date.today()) {dias = 0;}
@@ -592,20 +592,18 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                         }  
                         listaCasosActualizar.add(reclamacion);
                     }
-                } else {
-                    throw new AuraHandledException('No se puede salir de subsanación sin tener el campo Detenido hasta de la reclamación informado correctamente.');
-                }
+                } else {throw new AuraHandledException('No se puede salir de subsanación sin tener el campo Detenido hasta de la reclamación informado correctamente.');}
             }
         } else if(casoPorActualizar.RecordTypeId == RECTYPERECLAMACION) {
             for(Case caso : listaPretensionesSubsanacion) {
                 if(reclamacion.SAC_DetenidoHasta__c != null && reclamacion.SAC_DetenidoHasta__c > caso.SAC_DetenidoDesde__c && reclamacion.SAC_DetenidoHasta__c < System.now()) {
-                    milliseconds = System.now().getTime() - reclamacion.SAC_DetenidoHasta__c.getTime();
+                    milliseconds = reclamacion.SAC_DetenidoHasta__c.getTime() - reclamacion.SAC_DetenidoDesde__c.getTime();
                     minutes = milliseconds / (1000 * 60);
                     // Si la subsanación empezó en el mismo día que terminó la anterior no se debe sumar ese primer día
                     if(casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaUltimaSubsanacion__c || (casoPorActualizar.SAC_DetenidoDesde__c.date() == reclamacion.SAC_FechaRecepcion__c.date() && reclamacion.SAC_DetenidoHasta__c.date() == reclamacion.SAC_FechaRecepcion__c.date())) {
-                        dias = reclamacion.SAC_DetenidoHasta__c.date().daysBetween(Date.today());
+                        dias = reclamacion.SAC_DetenidoDesde__c.date().daysBetween(reclamacion.SAC_DetenidoHasta__c.date());
                     } else {
-                        dias = reclamacion.SAC_DetenidoHasta__c.date().daysBetween(Date.today()) + 1;
+                        dias = reclamacion.SAC_DetenidoDesde__c.date().daysBetween(reclamacion.SAC_DetenidoHasta__c.date()) + 1;
                     }
                     // Si se produce una segunda subsanación en el mismo día que una anterior no debe sumar un día más al SLA regulatorio
                     if(dias == 1 && reclamacion.SAC_FechaUltimaSubsanacion__c == Date.today()) {dias = 0;}
@@ -620,18 +618,16 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                         caso.SAC_FechaUltimaSubsanacion__c = Date.today();
                     }
                     listaCasosActualizar.add(caso);
-                } else {
-                    throw new AuraHandledException('No se puede salir de subsanación sin tener el campo Detenido hasta de la reclamación informado correctamente.');
-                }
+                } else { throw new AuraHandledException('No se puede salir de subsanación sin tener el campo Detenido hasta de la reclamación informado correctamente.');}
             }
             if(casoPorActualizar.SAC_DetenidoHasta__c != null && casoPorActualizar.SAC_DetenidoHasta__c > casoPorActualizar.SAC_DetenidoDesde__c && casoPorActualizar.SAC_DetenidoHasta__c < System.now()) {
-                milliseconds = System.now().getTime() - casoPorActualizar.SAC_DetenidoHasta__c.getTime();
+                milliseconds = casoPorActualizar.SAC_DetenidoHasta__c.getTime() - casoPorActualizar.SAC_DetenidoDesde__c.getTime();
                 minutes = milliseconds / (1000 * 60);
                 // Si la subsanación empezó en el mismo día que terminó la anterior no se debe sumar ese primer día
                 if(casoPorActualizar.SAC_DetenidoDesde__c.date() == casoPorActualizar.SAC_FechaUltimaSubsanacion__c || (casoPorActualizar.SAC_DetenidoDesde__c.date() == casoPorActualizar.SAC_FechaRecepcion__c.date() && casoPorActualizar.SAC_DetenidoHasta__c.date() == casoPorActualizar.SAC_FechaRecepcion__c.date())) {
-                    dias = casoPorActualizar.SAC_DetenidoHasta__c.date().daysBetween(Date.today());
+                    dias = casoPorActualizar.SAC_DetenidoDesde__c.date().daysBetween(casoPorActualizar.SAC_DetenidoHasta__c.date());
                 } else {
-                    dias = casoPorActualizar.SAC_DetenidoHasta__c.date().daysBetween(Date.today()) + 1;
+                    dias = casoPorActualizar.SAC_DetenidoDesde__c.date().daysBetween(casoPorActualizar.SAC_DetenidoHasta__c.date()) + 1;
                 }
                 // Si se produce una segunda subsanación en el mismo día que una anterior no debe sumar un día más al SLA regulatorio
                 if(dias == 1 && casoPorActualizar.SAC_FechaUltimaSubsanacion__c == Date.today()) {dias = 0;}
@@ -646,9 +642,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     casoPorActualizar.SAC_FechaUltimaSubsanacion__c = Date.today();
                 }
                 listaCasosActualizar.add(casoPorActualizar);
-            } else {
-                throw new AuraHandledException('No se puede salir de subsanación sin tener el campo Detenido hasta de la reclamación informado correctamente.');
-            }
+            } else {throw new AuraHandledException('No se puede salir de subsanación sin tener el campo Detenido hasta de la reclamación informado correctamente.');}
         }
         return listaCasosActualizar;
     }
@@ -981,9 +975,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             }
             return stringFinal;
             
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-        }
+        } catch (Exception e) { throw new AuraHandledException(e.getMessage());}
     }
 
     /**********************************************************************************
@@ -1003,9 +995,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             mail.setSubject(subject);
             mail.setHtmlBody(motivoProrroga);
             Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
-        }catch(Exception ex){
-            throw new AuraHandledException(ex.getMessage());
-        }
+        }catch(Exception ex){ throw new AuraHandledException(ex.getMessage());}
     }
 
     /**********************************************************************************
@@ -1026,9 +1016,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                                 LIMIT 1];  
 
             return !casoActual.SAC_Prorrogado__c;
-        }catch(Exception ex){
-            throw new AuraHandledException(ex.getMessage());
-        }
+        }catch(Exception ex){ throw new AuraHandledException(ex.getMessage());}
     }
 
        /**********************************************************************************
@@ -1218,9 +1206,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             }
             
         } else{ throw new AuraHandledException( 'Fallo al actualizar.' ); }
-        } else {
-            throw new AuraHandledException( 'No se ha encontrado el caso' );
-        }
+        } else { throw new AuraHandledException( 'No se ha encontrado el caso' );}
     }
 
     @AuraEnabled
@@ -1280,6 +1266,15 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             }
             
         } else{ throw new AuraHandledException( 'Fallo al actualizar.' ); }
+        System.debug('HAce llamada SAC_ComportamientoSLAs.cerrarMilestoneLetradoAltaBaja desde update status');
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+        .addId(UserInfo.getUserId())
+        .addString('listaFamiliaCasos')
+        .build();
+        try {
+            System.enqueueJob(new SAC_QueueableCerrarMilestoneLetrado(listaFamiliaCasos), options);    
+        } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);                 }     
     }
 
     /*****************************************************************
@@ -1403,7 +1398,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
 
 
     @AuraEnabled
-    public static templateWrapper getPlantillaSubsanacion(Id record, String idiomaPlantilla, String motivoSubsanacion){
+    public static templateWrapper getPlantillaSubsanacion(Id record, String idiomaPlantilla, String motivoSubsanacion, String canalRespuesta){
         TemplateWrapper tempWrapper = new TemplateWrapper('','','','','');        //Valor a retornar
 
         if(!Schema.sObjectType.SAC_PlantillaRedaccion__c.isAccessible() || !Schema.sObjectType.EmailTemplate.isAccessible()){ throw new AuraHandledException( 'Fallo al acutalizar.' ); }
@@ -1417,14 +1412,17 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         List<SAC_PlantillaRedaccion__c> listaMaestroPlantilla = new List<SAC_PlantillaRedaccion__c>();
 
         listaMaestroPlantilla = [SELECT Id, SAC_PlantillaCatalanId__c, SAC_PlantillaCastellanoId__c, SAC_PlantillaInglesId__c, 
-                            SAC_PlantillaEuskeraId__c, SAC_PlantillaValencianoId__c, SAC_PlantillaGallegoId__c
+                            SAC_PlantillaEuskeraId__c, SAC_PlantillaValencianoId__c, SAC_PlantillaGallegoId__c, SAC_CanalRespuesta__c
                             FROM SAC_PlantillaRedaccion__c 
-                            WHERE SAC_TipoPlantilla__c =: 'SAC_Subsanacion' AND SAC_MotivoSubsanacion__c =: motivoSubsanacion LIMIT 1];
-
+                            WHERE SAC_TipoPlantilla__c =: 'SAC_Subsanacion' AND SAC_MotivoSubsanacion__c =: motivoSubsanacion ORDER BY SAC_CanalRespuesta__c DESC];
 
         if(!listaMaestroPlantilla.isEmpty()){
-
             maestroPlantilla = listaMaestroPlantilla[0];
+            for(SAC_PlantillaRedaccion__c plantilla : listaMaestroPlantilla) {
+                if(String.isNotBlank(canalRespuesta) && canalRespuesta == plantilla.SAC_CanalRespuesta__c) {
+                    maestroPlantilla = plantilla;
+                }
+            }
 
             switch on idiomaPlantilla {
                 when 'ES'{
@@ -1445,31 +1443,34 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 when 'GAL'{
                     idPlantilla = maestroPlantilla.SAC_PlantillaGallegoId__c;
                 }
+                when else {		 
+                    idPlantilla = maestroPlantilla.SAC_PlantillaCastellanoId__c;
+                }
             }
     
             EmailTemplate template = new EmailTemplate();
             List<EmailTemplate> listaTemplate = new List<EmailTemplate>();
+            if(idPlantilla != null) {
+                listaTemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id =: idPlantilla LIMIT 1];
 
-            listaTemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id =: idPlantilla LIMIT 1];
+                if(!listaTemplate.isEmpty()){
+                    template = listaTemplate[0];
 
-            if(!listaTemplate.isEmpty()){
-                template = listaTemplate[0];
-
-                // body.add(template.HtmlValue);
-        
-                // List<Messaging.RenderEmailTemplateBodyResult> resList = Messaging.renderEmailTemplate(whoId, whatId, body);
-                Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(idPlantilla, whoId, record);              
-                // if(!resList.isEmpty()){
-                //     stringFinal = resList[0].getMergedBody();
-                // }
-                String emailPara = 'emailfijo@ibm.com';
-        
-                
-        
-                TemplateWrapper tempWrapperCreado = new TemplateWrapper(template.Id, template.Name, renderStored.getSubject(), renderStored.getHtmlBody(), emailPara);
-                tempWrapper = tempWrapperCreado;
+                    // body.add(template.HtmlValue);
+            
+                    // List<Messaging.RenderEmailTemplateBodyResult> resList = Messaging.renderEmailTemplate(whoId, whatId, body);
+                    Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(idPlantilla, whoId, record);              
+                    // if(!resList.isEmpty()){
+                    //     stringFinal = resList[0].getMergedBody();
+                    // }
+                    String emailPara = 'emailfijo@ibm.com';
+            
+                    
+            
+                    TemplateWrapper tempWrapperCreado = new TemplateWrapper(template.Id, template.Name, renderStored.getSubject(), renderStored.getHtmlBody(), emailPara);
+                    tempWrapper = tempWrapperCreado;
+                }
             }
-
         }
         
         return tempWrapper;
@@ -1683,7 +1684,10 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             Cache.Org.put('local.SAC.SACCalendario', String.valueOf(ideBH),300);
         }
 
-        Datetime fechaFin = fechaInicial.addDays(duracion);
+        Datetime fechaFin; 
+        if(fechaInicial != null) {
+            fechaFin = fechaInicial.addDays(duracion);
+        }
         Boolean esDiaHabil = BusinessHours.isWithin(ideBH, fechaFin);
 
         if(!esDiaHabil){//Si no entra en horario de BH necesitamos calcular el siguiente día hábil
@@ -1894,9 +1898,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             if (String.isNotBlank(reclamacion.CC_Canal_Respuesta__c) && reclamacion.CC_Canal_Respuesta__c == 'SAC_CartaPostal' && (reclamacion.SAC_DireccionContacto__c == null || reclamacion.SAC_CodigoPostalContacto__c == null || reclamacion.SAC_PoblacionContacto__c == null || reclamacion.SAC_ProvinciaContacto__c == null || reclamacion.SAC_PaisContacto__c == null)) {
                 throw new AuraHandledException('Debe informar la dirección postal de notificación completa para que se pueda crear la carta postal');
             }
-        } else {
-            throw new AuraHandledException('No puede pasar a Análisis con Fast track activado si tiene más de una pretensión');
-        }
+        } else { throw new AuraHandledException('No puede pasar a Análisis con Fast track activado si tiene más de una pretensión');}
     }
 
     /*****************************************************************
@@ -2012,9 +2014,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             tarea.recordTypeId = RECTYPEMAESTROTAREAS;
             if(!maestroImprimirOrdinario.isEmpty()) {
                 tarea.SAC_MaestroAccionesReclamacion__c = maestroImprimirOrdinario[0].Id;
-            } else {
-                throw new AuraHandledException('No se ha encontrado el maestro de tareas imprimir cartas: ' + developerNameMaestroAccion);
-            }
+            } else { throw new AuraHandledException('No se ha encontrado el maestro de tareas imprimir cartas: ' + developerNameMaestroAccion);}
             
             listaAcciones.add(tarea);
             //Se pasa a ejecución la reclamación
@@ -2172,9 +2172,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             }
             
             return listoFinalizar;
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-        } 
+        } catch (Exception e) { throw new AuraHandledException(e.getMessage());} 
     }
 
 
@@ -2235,9 +2233,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 }
                 
             } else{ throw new AuraHandledException( 'Fallo al actualizar.' ); }
-        } else {
-            throw new AuraHandledException( 'No se ha encontrado el caso' );
-        }
+        } else { throw new AuraHandledException( 'No se ha encontrado el caso' );}
     }
 
 
@@ -2290,9 +2286,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 }
                 
             } else{ throw new AuraHandledException( 'Fallo al actualizar.' ); }
-        } else {
-            throw new AuraHandledException( 'No se ha encontrado el caso' );
-        }
+        } else { throw new AuraHandledException( 'No se ha encontrado el caso' );}
     }
     
 
@@ -2363,9 +2357,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             SAC_DatabaseDML.updateListDML(listaCasosUpdatear, true); 
             //Database.update(listaCasosUpdatear);  
 
-        } else{
-            throw new AuraHandledException('Para resolver es necesario informar el cliente.');
-        }
+        } else{ throw new AuraHandledException('Para resolver es necesario informar el cliente.');}
     }
 
 

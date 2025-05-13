@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Modificacion_Datos_Draft</fullName>
+    <active>true</active>
+    <description>Sólo deben poderme modificar los datos si el estado del registro está en Draft</description>
+    <errorConditionFormula>AND( OR(ISCHANGED(API_Name__c),ISCHANGED(Proyectos__c),ISCHANGED(Name)),NOT(ISPICKVAL(Status__c, &apos;Draft&apos;))
+,RecordType.DeveloperName = &quot;CBK_Traspaso&quot;
+,!$Permission.CBK_BypassValidationRules
+)</errorConditionFormula>
+    <errorMessage>Para poder editar el registro debe de estar en estado &quot;Draft&quot;. Solicitar el cambio de estado.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_ControlCierreNeg</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+	!$Permission.CBK_BypassValidationRules,
+	!$Permission.AV_AvoidBulkApi,
+	!$Permission.CIBE_BypassValidationRules,
+	OR(
+		ISCHANGED(StageName)
+	),
+	OR(
+		RecordType.DeveloperName = &quot;CIBE_AccionComercialCIB&quot;,
+		RecordType.DeveloperName = &quot;CIBE_AccionComercialEMP&quot;,
+		RecordType.DeveloperName = &quot;CIBE_AlertaComercialCIB&quot;,
+		RecordType.DeveloperName = &quot;CIBE_AlertaComercialEMP&quot;,
+		RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleado&quot;,
+		RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoCIB&quot;,
+		RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoEMP&quot;,
+		RecordType.DeveloperName = &quot;CIBE_OportunidadCentralizada&quot;,
+		RecordType.DeveloperName = &quot;CIBE_SugerenciaCIB&quot;,
+		RecordType.DeveloperName = &quot;CIBE_SugerenciaEMP&quot;
+	),
+	AND(
+		ISPICKVAL(StageName, &apos;Cerrado negativo&apos;),
+		ISBLANK(TEXT(CIBE_CerradoNegativo__c))
+	)
+)</errorConditionFormula>
+    <errorMessage>Es necesario rellenar el campo Motivo.</errorMessage>
+</ValidationRule>

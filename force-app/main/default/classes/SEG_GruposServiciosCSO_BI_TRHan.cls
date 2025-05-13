@@ -5,6 +5,7 @@ public with sharing class SEG_GruposServiciosCSO_BI_TRHan extends CC_TriggerHand
 
     private void process(List<SEG_GruposServiciosCSO__c> listNewObj, Map<Id, EmailMessage> mapNewObj) {
         activacionGrupo(listNewObj);
+        grupoServicioCSO(listNewObj);
      }
 
     public static void activacionGrupo(List<SEG_GruposServiciosCSO__c> listNewObj){
@@ -21,5 +22,19 @@ public with sharing class SEG_GruposServiciosCSO_BI_TRHan extends CC_TriggerHand
                 grupo.SEG_FechaDesactivacion__c = datetime.now();                   
             }
         }
+    }
+
+    public static void grupoServicioCSO(List<SEG_GruposServiciosCSO__c> listNewObj){
+
+        for (SEG_GruposServiciosCSO__c grupoServicio : listNewObj) {
+            String valorFinal = '';
+            if(grupoServicio.SEG_GrupoCSO__c != null){
+                valorFinal = String.valueOf(grupoServicio.SEG_GrupoCSO__c);
+            }
+            if(grupoServicio.SEG_ServiciosCSO__c != null){
+                valorFinal = valorFinal + String.valueOf(grupoServicio.SEG_ServiciosCSO__c);
+            }
+            grupoServicio.SEG_GruposServiciosCSO__c = valorFinal;      
+        } 
     }
 }

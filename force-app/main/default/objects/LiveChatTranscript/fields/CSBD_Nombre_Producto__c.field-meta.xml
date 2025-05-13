@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Nombre_Producto__c</fullName>
+    <externalId>false</externalId>
+    <formula>TEXT(CSBD_Oportunidad_Id__r.CSBD_Producto__c)</formula>
+    <label>Nombre del producto</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

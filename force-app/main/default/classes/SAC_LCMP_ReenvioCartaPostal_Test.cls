@@ -10,7 +10,7 @@
  * 1.0            US330921     Marcela Neira     14/02/22      Creación
 *****************************************************************/
 @istest
-public without sharing class SAC_LCMP_ReenvioCartaPostal_Test {
+public with sharing class SAC_LCMP_ReenvioCartaPostal_Test {
     @TestSetup
     static void makeData(){
 
@@ -51,6 +51,30 @@ public without sharing class SAC_LCMP_ReenvioCartaPostal_Test {
             SAC_DocumentoEnvio__c documento = new SAC_DocumentoEnvio__c(SAC_Caso__c = caso.id, SAC_TipoDocumento__c = 'redacción');
             SAC_DatabaseDML.insertDML(documento, false);
             //Database.insert(documento);
+            
+            Blob vd =  blob.valueOf('Unit.Test');
+            List<ContentVersion> cvs = new List<ContentVersion>();
+            ContentVersion cv = new ContentVersion(VersionData = vd, PathOnClient = 'SampleTitle.pdf' , Title = 'tituloTest', FirstPublishLocationId = caso.Id, SAC_StringRedaccion_fileupload__c = 'ResolucionRedaccion');
+            cvs.add(cv);
+            SAC_DatabaseDML.insertListDML(cvs, false);
+
+            //ContentVersion
+            ContentVersion adjunto = SAC_TestDataFactory.crearContentVersion(caso);
+            List<ContentVersion> listaCV = new List<ContentVersion>();
+            listaCV.add(adjunto);
+            SAC_DatabaseDML.insertListDML(listaCV, true);
+
+            //grupo colaborador
+            List<CC_Grupo_Colaborador__c> listaGrupos = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion',1);
+            listaGrupos[0].Name = 'grupo de tareas';
+            listaGrupos[0].SAC_PermiteTareas__c = true;
+            listaGrupos[0].SAC_Email__c = 'test@test.com';
+            SAC_DatabaseDML.insertListDML(listaGrupos, true);
+            
+            SAC_MaestroAccionesReclamacion__c maestroTema = SAC_TestDataFactory.crearMaestroAcciones(1,listaGrupos[0].Id)[0];
+            maestroTema.SAC_DeveloperName__c ='SAC_ImprimirCartasOrdinario';
+            SAC_DatabaseDML.insertDML(maestroTema, true);
+
         }
     }
     
@@ -58,10 +82,18 @@ public without sharing class SAC_LCMP_ReenvioCartaPostal_Test {
     static void reenvioRedaccionCartaPostalTest() {
         Case caso = [SELECT id FROM case WHERE Subject = 'Reclamacion'];
         User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
+        string tareaId;
 
         System.runAs(usuarioGeneral){
             Test.startTest();
-            SAC_LCMP_ReenvioCartaPostal.reenvioRedaccionCartaPostal(caso.id);        
+            List <ContentVersion> seleccionados = [SELECT id FROM ContentVersion Limit 1];
+            String idSeleccionados;
+    
+            for(ContentVersion cv: seleccionados){
+                idSeleccionados = cv.id;
+            }
+            String idAdjuntosJson = '["' + idSeleccionados + '"]'; 
+            tareaId = SAC_LCMP_ReenvioCartaPostal.reenvioRedaccionCartaPostal(caso.id, 'test', 'test', 'test', 'test', '011', '[]');        
             Test.stopTest();
         }
         SAC_DocumentoEnvio__c documentoEnvio = [SELECT Id FROM SAC_DocumentoEnvio__c WHERE SAC_Caso__c = :caso.id 
@@ -75,16 +107,31 @@ public without sharing class SAC_LCMP_ReenvioCartaPostal_Test {
         Boolean hayError;
         Case caso = [SELECT id FROM case WHERE Subject = 'Sin RT'];
         User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
+        string tareaId;
 
         System.runAs(usuarioGeneral){
             Test.startTest();
             try {
-                SAC_LCMP_ReenvioCartaPostal.reenvioRedaccionCartaPostal(caso.id);        
+                tareaId = SAC_LCMP_ReenvioCartaPostal.reenvioRedaccionCartaPostal(caso.id, 'test', 'test', 'test', 'test', 'test', '');        
             } catch (Exception e) {
                 hayError= true;
             } 
             Test.stopTest();
         }
         System.assertEquals(true, hayError, 'No ha saltado el error');
+    }
+
+    @isTest
+    static void obtenerDatosDireccionTest(){
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'Reclamacion' LIMIT 1];
+        User usuarioGeneral = [SELECT Id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        SAC_LCMP_ReenvioCartaPostal.DatosDireccionWrapper informacion;
+
+        System.runAs(usuarioGeneral){
+            Test.startTest();
+            informacion = SAC_LCMP_ReenvioCartaPostal.obtenerDatosDireccion(reclamacion.Id);
+            Test.stopTest();
+        }
+        System.assertNotEquals(informacion, null, 'El objeto wrapper con datos de la carta postal no se ha instanciado correctamente.');
     }
 }

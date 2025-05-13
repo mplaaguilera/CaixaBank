@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Gestor__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>Contiene el valor del empleado/a asignado de tarea oportunidad</description>
     <label>Empleado/a Asignado</label>
     <referenceTo>Contact</referenceTo>
     <relationshipLabel>Tarea-Oportunidad</relationshipLabel>

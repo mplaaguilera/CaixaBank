@@ -8,7 +8,15 @@
         <default>true</default>
     </values>
     <values>
-        <fullName>Análisis</fullName>
+        <fullName>Análisis Complementaria Organismo</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Análisis y Decisión</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Baja</fullName>
         <default>false</default>
     </values>
     <values>
@@ -20,19 +28,27 @@
         <default>false</default>
     </values>
     <values>
-        <fullName>Envío Organismos</fullName>
+        <fullName>Envío</fullName>
         <default>false</default>
     </values>
     <values>
-        <fullName>Negociación</fullName>
+        <fullName>Envío Complementaria</fullName>
         <default>false</default>
     </values>
     <values>
-        <fullName>Pendiente respuesta Organismos</fullName>
+        <fullName>Envío Rectificación</fullName>
         <default>false</default>
     </values>
     <values>
-        <fullName>Rectificacion</fullName>
+        <fullName>Pendiente respuesta Organismo</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Recepción Resolución</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Rectificación</fullName>
         <default>false</default>
     </values>
 </BusinessProcess>

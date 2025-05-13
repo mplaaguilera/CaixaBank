@@ -30,6 +30,11 @@
                 <default>false</default>
                 <label>Externalizada</label>
             </value>
+            <value>
+                <fullName>Traspasada a Imagin</fullName>
+                <default>false</default>
+                <label>Traspasada a Imagin</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

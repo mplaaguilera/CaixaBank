@@ -1,0 +1,17 @@
+.chat-body-container {
+    max-height: 400px; /* Puedes ajustar la altura máxima según tus necesidades */
+    overflow-y: auto;
+    overflow-x: hidden; /* Ocultar scroll horizontal si no es necesario */
+    padding: 0 1rem; /* Añadir padding para el contenido */
+}
+
+/* Ajustar estilo del chat-list si es necesario */
+.slds-chat-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.slds-chat-listitem:first-child {
+    margin-top: 0;
+}

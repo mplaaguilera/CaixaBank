@@ -25,7 +25,7 @@
                 <label>Inglés</label>
             </value>
             <value>
-                <fullName>val</fullName>
+                <fullName>va</fullName>
                 <default>false</default>
                 <label>Valenciano</label>
             </value>
@@ -35,7 +35,7 @@
                 <label>Euskera</label>
             </value>
             <value>
-                <fullName>gal</fullName>
+                <fullName>ga</fullName>
                 <default>false</default>
                 <label>Gallego</label>
             </value>

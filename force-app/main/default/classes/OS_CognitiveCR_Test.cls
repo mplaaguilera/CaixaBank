@@ -1,5 +1,17 @@
 @isTest
-public with sharing class OS_CognitiveCR_Test{
+Global class OS_CognitiveCR_Test implements HttpCalloutMock{
+
+    global HTTPResponse respond(HTTPRequest req) 
+    {   
+        String sFakeRespuesta = '';
+
+        sFakeRespuesta = '{cat=0.777, eng=0.591, esp=1.000, language=esp}';
+        HttpResponse res = new HttpResponse();
+        res.setHeader('Content-Type', 'application/json');
+        res.setBody(sFakeRespuesta);
+        res.setStatusCode(200);
+        return res;
+    }
 
     @TestSetup
     static void makeData(){
@@ -126,6 +138,11 @@ public with sharing class OS_CognitiveCR_Test{
             SELECT Id, Title, LatestPublishedVersionId 
             FROM ContentDocument
         ];
+
+        CBK_IntegrationSetting__c csCognitive = new CBK_IntegrationSetting__c();
+        csCognitive.Name = 'OS_COGNITIVE';
+        csCognitive.NamedCredential__c = 'callout:API_OS_PRE/operationalServices/cognitive/mails/categories/predict';
+        insert csCognitive;
     }
 
     @isTest public static void getCROK(){
@@ -179,7 +196,15 @@ public with sharing class OS_CognitiveCR_Test{
         }
     } 
     
-    
+    private class HttpCalloutMockImpl implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            HttpResponse response = new HttpResponse();
+            response.setStatusCode(200);
+            response.setBody('{"idiomaDetectado": "es"}');
+            return response;
+        }
+    }
+
     @isTest public static void getCRKO(){
         User usuarioAdmin = [SELECT Id FROM User WHERE FirstName = 'AdministradorOS' AND Profile.Name = 'System Administrator' LIMIT 1];
 

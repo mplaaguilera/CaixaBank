@@ -35,7 +35,7 @@ public with sharing class SPV_LCMP_Reclamantes {
 
             //Esta lista recupera todos los reclamantes que pertenezcan a la reclamación, sin tener en cuenta los de las pretensiones
             List<SAC_CaseReclamante__c> listaReclamantes = [SELECT Id, SAC_Account__c, SAC_Case__c, SAC_Account__r.Name, SAC_ReclamantePrincipal__c, SAC_Pretension__c, SAC_Empleado__c,
-                                                            SAC_Account__r.AV_EAPGestor__c, SAC_Account__r.CC_OficinaGestoraId__c, SAC_Account__r.AV_EAPGestor__r.AccountId,
+                                                            SAC_Account__r.AV_EAPGestor__c, SAC_Account__r.CC_OficinaGestoraId__c, SAC_Account__r.AV_OfficeManager__c,
                                                             SAC_TelefonoNoAlf__c, SAC_EmailNoAlf__c, SAC_DireccionNoAlf__c, SAC_TieneDatosNoAlf__c
                                                             FROM SAC_CaseReclamante__c 
                                                             WHERE SAC_Case__c = :caseId
@@ -109,7 +109,7 @@ public with sharing class SPV_LCMP_Reclamantes {
     public static void cambiarReclaPrincipal(String reclamanteId){
         try {
             
-            SAC_CaseReclamante__c reclamanteActualizar = [SELECT Id, SAC_ReclamantePrincipal__c, SAC_Pretension__c, SAC_Case__c, SAC_Account__c, SAC_Contact__c, SAC_Account__r.CC_Idioma__pc, SAC_Account__r.AV_EAPGestor__r.AccountId  FROM SAC_CaseReclamante__c WHERE Id = :reclamanteId LIMIT 1];
+            SAC_CaseReclamante__c reclamanteActualizar = [SELECT Id, SAC_ReclamantePrincipal__c, SAC_Pretension__c, SAC_Case__c, SAC_Account__c, SAC_Contact__c, SAC_Account__r.CC_Idioma__pc, SAC_Account__r.AV_OfficeManager__c  FROM SAC_CaseReclamante__c WHERE Id = :reclamanteId LIMIT 1];
             
             reclamanteActualizar.SAC_ReclamantePrincipal__c = true;
 
@@ -122,7 +122,7 @@ public with sharing class SPV_LCMP_Reclamantes {
                     caso.ContactId = reclamanteActualizar.SAC_Contact__c;
                 } else if(caso.RecordTypeId == RECTYPERECLAMACION) {
                     caso.CC_Idioma__c = reclamanteActualizar.SAC_Account__r.CC_Idioma__pc;
-                    caso.CC_Oficina__c = reclamanteActualizar.SAC_Account__r.AV_EAPGestor__r.AccountId;
+                    caso.CC_Oficina__c = reclamanteActualizar.SAC_Account__r.AV_OfficeManager__c;
                 }
             }
             SPV_DatabaseDML.updateListDML(casos, true);
@@ -211,7 +211,7 @@ public with sharing class SPV_LCMP_Reclamantes {
 
         
 
-        SAC_CaseReclamante__c reclamanteActualizar = [SELECT Id, SAC_Account__c, SAC_Contact__c, SAC_Account__r.CC_Idioma__pc, SAC_Account__r.AV_EAPGestor__r.AccountId FROM SAC_CaseReclamante__c WHERE Id = :idReclamanteCambiarAPrincipal LIMIT 1];
+        SAC_CaseReclamante__c reclamanteActualizar = [SELECT Id, SAC_Account__c, SAC_Contact__c, SAC_Account__r.CC_Idioma__pc, SAC_Account__r.AV_OfficeManager__c FROM SAC_CaseReclamante__c WHERE Id = :idReclamanteCambiarAPrincipal LIMIT 1];
 
         List<Case> casos = [SELECT Id, AccountId, ContactId, RecordTypeId FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND (SAC_Reclamacion__c =: caseId OR Id =: caseId)];
         for(Case caso : casos) {
@@ -220,7 +220,7 @@ public with sharing class SPV_LCMP_Reclamantes {
                 caso.ContactId = reclamanteActualizar.SAC_Contact__c;
             } else if(caso.RecordTypeId == RECTYPERECLAMACION) {
                 caso.CC_Idioma__c = reclamanteActualizar.SAC_Account__r.CC_Idioma__pc;
-                caso.CC_Oficina__c = reclamanteActualizar.SAC_Account__r.AV_EAPGestor__r.AccountId;
+                caso.CC_Oficina__c = reclamanteActualizar.SAC_Account__r.AV_OfficeManager__c;
 
                 if(numRecEliminarDatosNoAlf == numRecDatosNoAlf){
                     caso.SAC_ReclamantesConDatosNoAlf__c = false;

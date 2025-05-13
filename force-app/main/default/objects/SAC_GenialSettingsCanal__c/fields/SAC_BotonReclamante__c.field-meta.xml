@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_BotonReclamante__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Configuración para la aparición que permite asignar los reclamantes sugeridos por la IA mediante un botón en la vista de Datos IA</description>
+    <label>SAC_BotonReclamante</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -9,13 +9,11 @@
 			</button>
 			<div class="slds-modal__header">
 				<h1 class="slds-modal__title slds-hyphenate" tabindex="-1">Derechos GDPR</h1>
-				<p class="slds-var-m-top_x-small">Alta de un nuevo derecho GDPR y historial de derechos ya ejercidos previamente.</p>
+				<p class="slds-var-m-top_x-small">Ejercer un nuevo derecho GDPR o consultar el historial de los ya ejercidos.</p>
 			</div>
 
 			<div class="slds-modal__content slds-is-relative slds-var-p-vertical_x-large slds-var-p-horizontal_xx-large">
-				<div lwc:if={componente.spinner} align="center">
-					<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
-				</div>
+				<c-csbd_-spinner-kx lwc:ref="spinnerKx" lwc:if={componente.spinner}></c-csbd_-spinner-kx>
 
 				<article class="slds-card">
 					<div class="slds-page-header">
@@ -46,7 +44,7 @@
 									</div>
 									<div class="slds-page-header__control slds-is-relative" style="top: 3px;">
 										<!-- sldsValidatorIgnoreNextLine -->
-										<button class="botonActualizar slds-button slds-button_icon slds-button_icon-bare" title="Actualizar" onclick={botonRefrescarOnclick}>
+										<button class="botonActualizar slds-button slds-button_icon slds-button_icon-bare slds-is-relative" title="Actualizar" onclick={botonRefrescarOnclick} style="top: -1px;">
 											<lightning-icon icon-name="utility:refresh" size="xx-small"></lightning-icon>
 										</button>
 									</div>
@@ -101,7 +99,7 @@
 									</div>
 									<div class="slds-page-header__control slds-is-relative" style="top: 3px;">
 										<!-- sldsValidatorIgnoreNextLine -->
-										<button class="botonActualizar slds-button slds-button_icon slds-button_icon-bare" title="Actualizar" onclick={botonRefrescarOnclick}>
+										<button class="botonActualizar slds-button slds-button_icon slds-button_icon-bare slds-is-relative" title="Actualizar" onclick={botonRefrescarOnclick} style="top: -1px;">
 											<lightning-icon icon-name="utility:refresh" size="xx-small"></lightning-icon>
 										</button>
 									</div>
@@ -127,7 +125,7 @@
 			</div>
 
 			<footer class="slds-modal__footer">
-				<lightning-button lwc:ref="botonNuevo" label="Nuevo derecho" icon-name="utility:locker_service_console" variant="brand" onclick={modalNuevoDerechoAbrir}></lightning-button>
+				<lightning-button lwc:ref="botonNuevo" label="Ejercer nuevo derecho" icon-name="utility:locker_service_console" variant="brand" onclick={modalNuevoDerechoAbrir}></lightning-button>
 				<lightning-button lwc:ref="botonCancelar" label="Cancelar" onclick={cerrarModal} class="slds-var-m-left_small"></lightning-button>
 			</footer>
 		</div>
@@ -145,7 +143,8 @@
 
 			<div class="slds-modal__content slds-var-p-vertical_x-large slds-var-p-horizontal_xx-large">
 				<div class="slds-box" style="padding-bottom: 11px;">
-					<lightning-combobox lwc:ref="comboboxTiposDerecho" label="Tipo del nuevo derecho a ejercer" options={tiposDerecho} required></lightning-combobox>
+					<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Derecho a ejercer</label>
+					<lightning-combobox lwc:ref="comboboxTiposDerecho" options={tiposDerecho} variant="label-hidden" onchange={comboboxTiposDerechoOnchange}></lightning-combobox>
 				</div>
 
 				<div lwc:if={oportunidad} class="slds-box slds-var-m-top_x-large" style="padding-bottom: 0; padding-left: 12px; padding-right: 12px;">
@@ -217,8 +216,19 @@
 			</div>
 
 			<footer class="slds-modal__footer">
-				<lightning-button label="Ejercer nuevo derecho" icon-name="utility:locker_service_console" variant="brand" onclick={modalNuevoDerechoEjercer}></lightning-button>
-				<lightning-button lwc:ref="modalNuevoDerechoCancelar" label="Cancelar" onclick={modalNuevoDerechoCerrar} class="slds-var-m-left_small"></lightning-button>
+				<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center" >
+					<div class="slds-col">
+						<label lwc:ref="labelDatosVerificados" class="slds-form-element__label slds-var-m-left_x-small" style="font-weight: 500;">
+							<abbr class="slds-required">*</abbr>
+							He verificado los datos del cliente
+						</label>
+						<lightning-input lwc:ref="inputDatosVerificados" type="checkbox" variant="label-hidden" class="slds-is-relative slds-var-p-left_x-small" style="display: inline-block; top: -1px;" onchange={inputDatosVerificadosOnchange} disabled></lightning-input>
+					</div>
+					<div class="slds-col">
+						<lightning-button label="Ejercer nuevo derecho" icon-name="utility:locker_service_console" variant="brand" onclick={modalNuevoDerechoEjercer}></lightning-button>
+						<lightning-button lwc:ref="modalNuevoDerechoCancelar" label="Cancelar" onclick={modalNuevoDerechoCerrar} class="slds-var-m-left_small"></lightning-button>
+					</div>
+				</div>
 			</footer>
 		</div>
 	</section>

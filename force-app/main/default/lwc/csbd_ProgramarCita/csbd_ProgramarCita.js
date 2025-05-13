@@ -1,7 +1,7 @@
 import {LightningElement, api, wire} from 'lwc';
 import LightningConfirm from 'lightning/confirm';
-import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
-import {errorApex, publicarEvento, toast} from 'c/csbd_lwcUtils';
+import {getRecord, getFieldValue, notifyRecordUpdateAvailable} from 'lightning/uiRecordApi';
+import {errorApex, publicarEvento, toast, transitionThenCallback} from 'c/csbd_lwcUtils';
 import {cambiarSeccion} from './utils';
 
 import programarCitaApex from '@salesforce/apex/CSBD_Opportunity_Operativas_Controller.programarCita';
@@ -57,41 +57,55 @@ export default class csbdProgramarCita extends LightningElement {
 	}
 
 	@api abrirModal() {
-		let fechaInicial = new Date();
+		try {
+			let fechaInicial = new Date();
 
-		let hours = fechaInicial.getHours();
-		if (hours < 9) {
-			//Si la hora actual es anterior a las 9:00, se cambia a las 9:00
-			fechaInicial.setHours(9, 0, 0, 0);
-		} else if (hours > 19) {
-			//Si la hora actual es posterior a las 19:00, se cambia a las 9:00 del siguiente día laborable
-			fechaInicial.setDate(fechaInicial.getDate() + (8 - fechaInicial.getDay()) % 7);
-			fechaInicial.setHours(9, 0, 0, 0);
+			let hours = fechaInicial.getHours();
+			if (hours < 9) {
+				//Si la hora actual es anterior a las 9:00, se cambia a las 9:00
+				fechaInicial.setHours(9, 0, 0, 0);
+			} else if (hours > 19) {
+				//Si la hora actual es posterior a las 19:00, se cambia a las 9:00 del siguiente día laborable
+				fechaInicial.setDate(fechaInicial.getDate() + (8 - fechaInicial.getDay()) % 7);
+				fechaInicial.setHours(9, 0, 0, 0);
+			}
+			fechaInicial.setMinutes(fechaInicial.getMinutes() + 5);
+			const inputFecha = this.refs.inputFecha;
+			inputFecha.min = fechaInicial.toISOString();
+			inputFecha.value = fechaInicial.toISOString();
+			this.inputFechaValueAnterior = inputFecha.value;
+
+			this.refs.backdropModal.classList.add('slds-backdrop_open');
+			this.refs.modalProgramarCita.classList.add('slds-fade-in-open');
+			window.setTimeout(() => this.refs.botonCancelar.focus(), 90);
+			publicarEvento(this, 'modalabierto', {nombreModal: 'modalProgramarCita'});
+		} catch (error) {
+			errorApex(this, error, 'Problema al iniciar la operariva');
+			this.modalCerrar();
 		}
-		this.refs.inputFecha.value = fechaInicial.toISOString();
-		this.inputFechaValueAnterior = this.refs.inputFecha.value;
-
-		this.refs.backdropModal.classList.add('slds-backdrop_open');
-		this.refs.modalProgramarCita.classList.add('slds-fade-in-open');
-		window.setTimeout(() => this.refs.botonCancelar.focus(), 90);
 	}
 
 	modalCerrar() {
-		this.refs.modalProgramarCita.classList.remove('slds-fade-in-open');
+		transitionThenCallback(
+			this.refs.modalProgramarCita, 'slds-fade-in-open',
+			() => publicarEvento(this, 'modalcerrado', {nombreModal: 'modalProgramarCita'}),
+			'opacity'
+		);
 		this.refs.backdropModal.classList.remove('slds-backdrop_open');
-
-		window.setTimeout(() => publicarEvento(this, 'modalcerrado', {nombreModal: 'modalProgramarCita'}), 200);
 	}
 
-	inputFechaOnchange(event) {
-		const fechaNewIso = event.detail.value;
-		this.inputFechaValueAnterior = fechaNewIso;
-
-		if (this.tipoAsignacion === 'Según disponibilidad') {
-			const lwcDisponibilidad = this.refs.lwcDisponibilidad;
+	inputFechaOnchange({currentTarget: inputFecha, detail: {value: fechaNewIso}}) {
+		if (fechaNewIso) {
 			const fechaNew = new Date(fechaNewIso);
-			lwcDisponibilidad.fecha = fechaNew;
+			this.inputFechaValueAnterior = fechaNewIso;
+
+			if (this.tipoAsignacion === 'Según disponibilidad') {
+				const lwcDisponibilidad = this.refs.lwcDisponibilidad;
+				lwcDisponibilidad.fecha = fechaNew;
+			}
 		}
+		inputFecha.checkValidity();
+		inputFecha.reportValidity();
 	}
 
 	async radioGroupTiposAsignacionOnchange({detail: {value: tipoAsignacionDestino}}) {
@@ -106,14 +120,14 @@ export default class csbdProgramarCita extends LightningElement {
 
 	async programarCita() {
 		const asignacionAuto = this.tipoAsignacion === 'Automática';
-		const inputFecha = this.refs.inputFecha;
-
 		if (!asignacionAuto && typeof this.idPropietarioSeleccionado !== 'string') {
 			this.refs.inputPropietario.reportValidity();
 			return;
 		}
-		if (!inputFecha.validity.valid) {
-			inputFecha.reportValidity();
+
+		const inputFecha = this.refs.inputFecha;
+		inputFecha.reportValidity();
+		if (!inputFecha.validity.valid && !inputFecha.validity.rangeUnderflow) {
 			return;
 		}
 
@@ -137,14 +151,18 @@ export default class csbdProgramarCita extends LightningElement {
 			startDateTime: inputFecha.value
 		}).then(() => {
 			toast('success', 'Se programó cita', `Se programó una cita con el cliente para el ${fechaTexto.toUpperCase()}.`);
-			publicarEvento(this, 'oportunidadactualizada');
+			notifyRecordUpdateAvailable([{recordId: this.recordId}]);
 			this.modalCerrar();
-		}).catch(error => errorApex(this, error, 'Problema programando la cita'))
-		.finally(() => this.componente = {...this.componente, spinner: false});
+		}).catch(error => {
+			errorApex(this, error, 'Problema programando la cita');
+			this.componente = {...this.componente, spinner: false};
+		});
 	}
 
 	modalTeclaPulsada({keyCode}) {
-		keyCode === 27 && this.modalCerrar();
+		if (keyCode === 27 && this.refs.modalProgramarCita.classList.contains('slds-fade-in-open')) {
+			this.modalCerrar();
+		}
 	}
 
 	lwcDisponibilidadOnupdatecalendarios(event) {
@@ -157,12 +175,14 @@ export default class csbdProgramarCita extends LightningElement {
 
 	lwcDisponibilidadOnupdatefecha({detail: {fecha}}) {
 		this.refs.inputFecha.value = fecha.toISOString();
+		// this.inputFechaValidarEsFechaFutura(fecha);
 	}
 
 	async lwcDisponibilidadOngestorseleccionado({detail: {fecha, idGestor, disponible}}) {
 		const inputFecha = this.refs.inputFecha;
 		const cambioFecha = inputFecha.value !== fecha.toISOString();
 		inputFecha.value = fecha.toISOString();
+		// this.inputFechaValidarEsFechaFutura(fecha);
 		this.idPropietarioSeleccionado = idGestor;
 		if (!disponible) {
 			const mensaje = `${this.nombrePropietarioSeleccionado} no está disponible a la hora seleccionada.`;
@@ -189,7 +209,7 @@ export default class csbdProgramarCita extends LightningElement {
 		}
 	}
 
-	inputPropietarioOnchange(event) {
-		this.idPropietarioSeleccionado = event.detail.value;
+	inputPropietarioOnchange({detail: {recordId}}) {
+		this.idPropietarioSeleccionado = recordId;
 	}
 }

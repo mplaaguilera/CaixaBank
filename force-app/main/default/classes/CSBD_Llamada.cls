@@ -1,10 +1,10 @@
 public with sharing class CSBD_Llamada {
-
+    /*
     public static Opportunity registrarLlamadaEntrante(CC_Llamada_Input inputLlamada) {
 
         CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Canal_Procedencia__c, CC_Tipo_Cliente__c, CC_Codigo__c,CSBD_Empresa_Proveedora__c,CSBD_Familia_Producto__c,CSBD_Producto__c,CSBD_Now_Codigo_Producto__c,CSBD_Canal__c,CSBD_Now_Origen__c
                                                     FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :inputLlamada.servicio LIMIT 1];
-    
+
         //Creamos el objeto llamada mapeando diferentes campos
 
         CC_Llamada__c llamada = new CC_Llamada__c(
@@ -38,13 +38,13 @@ public with sharing class CSBD_Llamada {
 
         //Se mapean los campos requeridos para el objeto oportunidad
         Map<String, Object> campos = new Map<String, Object>();
-        campos.put('CSBD_Empresa_Proveedora__c', servicioGenesys.CSBD_Empresa_Proveedora__c); 
-        campos.put('CSBD_Familia_Producto__c', servicioGenesys.CSBD_Familia_Producto__c); 
-        campos.put('CSBD_Producto__c', servicioGenesys.CSBD_Producto__c); 
+        campos.put('CSBD_Empresa_Proveedora__c', servicioGenesys.CSBD_Empresa_Proveedora__c);
+        campos.put('CSBD_Familia_Producto__c', servicioGenesys.CSBD_Familia_Producto__c);
+        campos.put('CSBD_Producto__c', servicioGenesys.CSBD_Producto__c);
         campos.put('CSBD_Telefono_Solicitud__c', llamada.CC_ANI__c);
-        campos.put('CSBD_Now_Codigo_Producto__c', servicioGenesys.CSBD_Now_Codigo_Producto__c); 
-        campos.put('CSBD_Canal__c', servicioGenesys.CSBD_Canal__c); 
-        campos.put('CSBD_Now_Origen__c', servicioGenesys.CSBD_Now_Origen__c); 
+        campos.put('CSBD_Now_Codigo_Producto__c', servicioGenesys.CSBD_Now_Codigo_Producto__c);
+        campos.put('CSBD_Canal__c', servicioGenesys.CSBD_Canal__c);
+        campos.put('CSBD_Now_Origen__c', servicioGenesys.CSBD_Now_Origen__c);
         campos.put('CSBD_Estado__c','Activa');
         campos.put('AccountId',llamada.CC_Cuenta__c);
         campos.put('CSBD_Contact__c',llamada.CC_Contacto__c);
@@ -54,18 +54,18 @@ public with sharing class CSBD_Llamada {
             campos.put('CSBD_Turno_Contacto__c', 'Mañana');
         }
         else{
-            campos.put('CSBD_Turno_Contacto__c', 'Tarde'); 
+            campos.put('CSBD_Turno_Contacto__c', 'Tarde');
         }
 
         //Llamamos al método para crear la oportunidad
         Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Llamada_Servicio', campos);
-            
+
         //Llamamos al método para crear la actividad
         Id idTask = crearActividad(llamada, oportunidad.Id, 'Llamada entrante', servicioGenesys.Name);
-          
+
         return oportunidad;
     }
-    
+
     public static CC_Llamada__c registrarLlamadaSaliente(CC_Llamada_Input inputLlamada) {
         finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 
@@ -91,7 +91,7 @@ public with sharing class CSBD_Llamada {
         return llamada;
     }
 
-    private static void identificarPorNumPerso(CC_Llamada__c llamada, String numPerso) { 
+    private static void identificarPorNumPerso(CC_Llamada__c llamada, String numPerso) {
         //Realizamos una búsqueda para informar el contacto y la cuenta
         if (!String.isEmpty(numPerso)) {
             List<Contact> contactos = new List<Contact>();
@@ -117,7 +117,7 @@ public with sharing class CSBD_Llamada {
             }
         }
     }
-    private static Id crearActividad(CC_Llamada__c llamada, Id idOportunidad, String tipoActividad, String detalle) { 
+    private static Id crearActividad(CC_Llamada__c llamada, Id idOportunidad, String tipoActividad, String detalle) {
         Task actividad = crearObjetoActividad(llamada.Id, idOportunidad, tipoActividad, detalle);
         actividad.WhoId = llamada.CC_Contacto__c;
         insert actividad;
@@ -138,22 +138,22 @@ public with sharing class CSBD_Llamada {
         return actividad;
     }
 
-    public static void finalizarLlamada(CC_Llamada_Input inputLlamada, String tipoCierre) { 
+    public static void finalizarLlamada(CC_Llamada_Input inputLlamada, String tipoCierre) {
         Id recordId = String.valueOf(inputLlamada.llamadaId);
         if(String.valueOf(recordId?.getSobjectType()) == 'Opportunity') {
-            List<Task> tarea = [SELECT Id, CC_Llamada_Id__c FROM Task 
-                                    WHERE WhatId = :inputLlamada.llamadaId AND CC_Llamada_Id__c != null AND RecordType.DeveloperName = 'CSBD_Task' AND Status = 'Open' 
+            List<Task> tarea = [SELECT Id, CC_Llamada_Id__c FROM Task
+                                    WHERE WhatId = :inputLlamada.llamadaId AND CC_Llamada_Id__c != null AND RecordType.DeveloperName = 'CSBD_Task' AND Status = 'Open'
                                     ORDER BY CreatedDate DESC LIMIT 1];
             if(!tarea.isEmpty()) {
-                inputLlamada.llamadaId = tarea[0].CC_Llamada_Id__c;                 
+                inputLlamada.llamadaId = tarea[0].CC_Llamada_Id__c;
             }
         }
         String llamadaId = buscarLlamada(inputLlamada);
         finalizarLlamadaActividades(new CC_Llamada__c(Id = llamadaId), 'Llamada%', tipoCierre != '' ? tipoCierre : 'Llamada finalizada');
     }
 
-    /** Cuando no nos llega el Id de llamada, lo buscamos por connId, usuario y extensión */
-    private static String buscarLlamada(CC_Llamada_Input jsonLlamada) { 
+    //Cuando no nos llega el Id de llamada, lo buscamos por connId, usuario y extensión
+    private static String buscarLlamada(CC_Llamada_Input jsonLlamada) {
         String resultado = jsonLlamada.llamadaId;
         if (String.isEmpty(resultado)) {
             List<CC_Llamada__c> llamadas = [SELECT Id FROM CC_Llamada__c
@@ -164,12 +164,12 @@ public with sharing class CSBD_Llamada {
         }
         return resultado;
     }
-    
-    private static void finalizarLlamadaActividades(CC_Llamada__c llamada, String tipoActividad, String tipoCierre) { 
+
+    private static void finalizarLlamadaActividades(CC_Llamada__c llamada, String tipoActividad, String tipoCierre) {
         finalizarLlamadasActividades(new List<CC_Llamada__c>{llamada}, tipoActividad, tipoCierre);
     }
 
-    private static void finalizarLlamadasActividades(List<CC_Llamada__c> llamadas, String tipoActividad, String tipoCierre) { 
+    private static void finalizarLlamadasActividades(List<CC_Llamada__c> llamadas, String tipoActividad, String tipoCierre) {
         if (!llamadas.isEmpty()) {
             finalizarLlamadas(llamadas, tipoCierre);
             finalizarActividades(llamadas, tipoActividad, tipoCierre);
@@ -183,20 +183,20 @@ public with sharing class CSBD_Llamada {
         }
         update llamadas;
     }
-    
+
     private static void finalizarLlamadasActividadesAbiertas(Id userId) { //OK
         List<CC_Llamada__c> llamadas = [SELECT Id FROM CC_Llamada__c WHERE CC_Fecha_Fin__c = null AND OwnerId = :userId];
         if (!llamadas.isEmpty()) {
             finalizarLlamadas(llamadas, 'Llamada finalizada');
             finalizarActividades(llamadas, 'Llamada%', 'Llamada finalizada');
-            finalizarActividades(llamadas, 'Consulta%', 'Consulta cancelada');        
+            finalizarActividades(llamadas, 'Consulta%', 'Consulta cancelada');
         }
     }
 
     private static void finalizarActividades(CC_Llamada__c llamada, String tipoActividad, String tipoCierre) {
         finalizarActividades(new List<CC_Llamada__c>{llamada}, tipoActividad, tipoCierre);
     }
-    
+
     private static void finalizarActividades(List<CC_Llamada__c> llamadas, String tipoActividad, String tipoCierre) {
         Set<Id> llamadaIds = new Set<Id>();
         for (CC_Llamada__c llamada : llamadas) {
@@ -205,7 +205,7 @@ public with sharing class CSBD_Llamada {
         if (!llamadaIds.isEmpty()) {
             List<Task> actividades = [SELECT Id FROM Task WHERE CC_Llamada_Id__c IN :llamadaIds AND Status = 'Open' AND Type LIKE :tipoActividad
                                         AND RecordTypeId = :Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CSBD_Task').getRecordTypeId()];
-            
+
             if(!actividades.isEmpty()) {
                 for (Task actividad : actividades){
                     actividad.CC_Fecha_Fin__c = System.now();
@@ -233,6 +233,7 @@ public with sharing class CSBD_Llamada {
                 return tipo.getLabel();
             }
         }
-		return tipoCierre;        
+		return tipoCierre;
     }
+    */
 }

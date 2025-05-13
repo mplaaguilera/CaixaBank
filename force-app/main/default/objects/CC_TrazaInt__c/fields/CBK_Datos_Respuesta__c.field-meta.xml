@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CBK_Datos_Respuesta__c</fullName>
-    <description>Datos de respuesta</description>
+    <description>Sirve para almacenar los datos de recepción para la recogida de datos de vuelta en la llamada a las integraciones.</description>
     <encryptionScheme>None</encryptionScheme>
     <label>Datos Respuesta Header</label>
     <length>10000</length>

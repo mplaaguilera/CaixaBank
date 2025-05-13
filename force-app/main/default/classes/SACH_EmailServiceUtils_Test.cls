@@ -141,6 +141,63 @@ public with sharing class SACH_EmailServiceUtils_Test {
         System.assertEquals('Correo - Entrada', tarea.Type, 'Tipo de tarea correcta.');
         
     }
+    
+    @isTest
+    private static void testGestionAdjuntosEmail() {
+       
+		System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
+        Case caso = [Select id, ContactId from Case where Subject = 'Caso Test' limit 1];
+        // create a new email and envelope object
+        Messaging.InboundEmail email = new Messaging.InboundEmail() ;
+        Messaging.InboundEnvelope env = new Messaging.InboundEnvelope();
+
+        // setup the data for the email
+        email.subject = 'Create Contact';
+        email.fromAddress = 'someaddress@email.com';
+        email.plainTextBody = 'email body #@n2225256325# Title';
+
+        //add an Binary attachment
+        Messaging.InboundEmail.BinaryAttachment attachment = new Messaging.InboundEmail.BinaryAttachment();
+        attachment.body = blob.valueOf('my attachment text');
+        attachment.fileName = 'textfileone.txt';
+        attachment.mimeTypeSubType = 'text/plain';
+        email.binaryAttachments = new Messaging.inboundEmail.BinaryAttachment[] { attachment };
+
+        //add an Text atatchment
+
+        Messaging.InboundEmail.TextAttachment attachmenttext = new Messaging.InboundEmail.TextAttachment();
+        attachmenttext.body = 'my attachment text';
+        attachmenttext.fileName = 'textfiletwo3.txt';
+        attachmenttext.mimeTypeSubType = 'texttwo/plain';
+        email.textAttachments =   new Messaging.inboundEmail.TextAttachment[] { attachmenttext };
+        
+
+        Test.startTest();
+        //Ejecución de la prueba
+        EmailMessage emailMessage = SACH_EmailService_Utils.gestionAdjuntosEmail(email, caso, 'test@test.com');
+        Test.stopTest();
+
+
+        ContentDocumentLink contentDocument = [Select id, ShareType from ContentDocumentLink where LinkedEntityId = :caso.Id limit 1];
+
+        //Comprobar el documento
+        System.assert(contentDocument.Id != null, 'Content document creado.');
+        System.assertEquals('I', contentDocument.ShareType, 'Tipo de documento correcto.');
+
+        EmailMessage emailGenerado = [Select id from EmailMessage where ParentId = :caso.Id limit 1];
+
+        //Comprobar el email
+        System.assert(emailGenerado.Id != null,'Email generado.');
+
+        Task tarea = [Select id, Type from Task where whatId = :caso.Id limit 1];
+            
+      
+
+        //Comprobar la tarea
+        System.assert(tarea.Id != null, 'Tarea creada.');
+        System.assertEquals('Correo - Entrada', tarea.Type, 'Tipo de tarea correcta.');
+        }
+    }
 
      /**
      * Comprobación de la actualización del caso con la respuesta del colaborador.

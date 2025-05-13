@@ -84,7 +84,7 @@ public with sharing class SEG_Case_AI_TRHan extends CC_TriggerHandlerBase{
                 grupoCasoNuevo.SEG_GrupoId__c = caso.SEG_Grupo__c;
                 grupoCasoNuevo.SEG_CaseId__c = caso.Id;
                 
-                if(caso.OwnerId.getSObjectType() == Schema.getGlobalDescribe().get('User')){
+                if(caso.OwnerId.getSObjectType() == Schema.SObjectType.User.getSObjectType()){
                     grupocasoNuevo.SEG_PropAnteriorGrupo__c = caso.OwnerId;
                 }
 

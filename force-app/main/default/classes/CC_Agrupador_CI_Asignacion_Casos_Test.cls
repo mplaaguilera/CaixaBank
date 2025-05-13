@@ -62,7 +62,7 @@ public class CC_Agrupador_CI_Asignacion_Casos_Test {
         System.runAs(usuarioAdmin) {
         //Alta de datos para la prueba
         String recordTypeDeveloperName = 'CC_Comunicacion_Informativa';
-        /*CC_Lista_Valores__c lovAvisosSobreAgrupadores = new CC_Lista_Valores__c();
+        CC_Lista_Valores__c lovAvisosSobreAgrupadores = new CC_Lista_Valores__c();
         lovAvisosSobreAgrupadores.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
         lovAvisosSobreAgrupadores.CC_Activa__c = true;
         lovAvisosSobreAgrupadores.Name = 'Avisos sobre agrupadores';
@@ -82,7 +82,7 @@ public class CC_Agrupador_CI_Asignacion_Casos_Test {
         valorUmbralSiguientesAvisos.CC_Valor__c = '50';
         insert valorUmbralSiguientesAvisos;
         String umbralPrimerAvisoString = [SELECT CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Avisos sobre agrupadores' AND Name = :CC_MetodosUtiles.getRecordTypeNameFromDeveloperName('CC_Agrupador__c', recordTypeDeveloperName) + ' - Umbral primer aviso'].CC_Valor__c;
-        Integer umbralPrimerAviso = Integer.valueOf(umbralPrimerAvisoString);*/
+        Integer umbralPrimerAviso = Integer.valueOf(umbralPrimerAvisoString);
         Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
     	mccTematica.Name = 'Ahorro a la vista';

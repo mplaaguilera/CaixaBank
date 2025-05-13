@@ -17,11 +17,11 @@ public with sharing class SPV_LCMP_SeccionesInfoCualitativa {
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     //RT de la reclamación y las pretensiones
-    private static final Id recTypeReclamacion = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
-    private static final Id recTypePretension = mapRTsObjects.get('Case').get('SPV_Pretension').getRecordTypeId();
+    private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
+    private static final Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SPV_Pretension').getRecordTypeId();
 
     //Rt para el maestro de temas que es la información cualitativa en SPV
-    private static final Id recTypeInfoCualitativa = mapRTsObjects.get('SAC_MaestroTemas__c').get('SPV_InformacionCualitativa').getRecordTypeId();
+    private static final Id RECTYPEINFOCUALITATIVA = mapRTsObjects.get('SAC_MaestroTemas__c').get('SPV_InformacionCualitativa').getRecordTypeId();
 
 
     /*****************************************************************
@@ -39,7 +39,7 @@ public with sharing class SPV_LCMP_SeccionesInfoCualitativa {
 
         if(!listaTopicsCaso.isempty()){
             List<SAC_MaestroTemas__c> listTopics =  [SELECT Name FROM SAC_MaestroTemas__c 
-                                                                                    WHERE RecordTypeId =:recTypeInfoCualitativa 
+                                                                                    WHERE RecordTypeId =:RECTYPEINFOCUALITATIVA 
                                                                                     AND SAC_Activo__c = true];
  
             if(!listTopics.isEmpty()){
@@ -60,7 +60,6 @@ public with sharing class SPV_LCMP_SeccionesInfoCualitativa {
 
     @AuraEnabled
     public static Map<String, List<WrapperInfoCuali>> getSeccionesYInfoCualitativaManual(String idUsuario, String idCaso) { 
-        System.debug('entra a manual  ' + idUsuario + '  ' + idCaso);
         Map<String, List<WrapperInfoCuali>> resultado = getSeccionesYInfoCualitativa(idUsuario, idCaso);
         return resultado;
     }
@@ -109,10 +108,10 @@ public with sharing class SPV_LCMP_SeccionesInfoCualitativa {
                 for(SAC_MaestroTemas__c maestro : listaTemasInfoCualitativa){
                     if(maestro.SAC_Activo__c || topicsCasoAsignadosNombreGenerico.contains(maestro.Name.toLowerCase().replace(' ', ''))){    //Solo coger los activos, o aquel que, en caso de no estar activo, ya está asignado a una pretensión
                         WrapperInfoCuali valor = new WrapperInfoCuali('val',true,true, tienePermisos);
-                        valor.Name = maestro.Name;
-                        valor.Activo = maestro.SAC_Activo__c;
+                        valor.name = maestro.Name;
+                        valor.activo = maestro.SAC_Activo__c;
                        // valor.Selecionado = topicsCasoAsignados.contains(maestro.Name); //True si alguna pretensión lo tiene asignado (Si está en una oretensión, solo se tiene en cuenta la propia pretensión, no el resto)
-                       valor.Selecionado = topicsCasoAsignadosNombreGenerico.contains(maestro.Name.toLowerCase().replace(' ', '')); //True si alguna pretensión lo tiene asignado (Si está en una oretensión, solo se tiene en cuenta la propia pretensión, no el resto)
+                       valor.selecionado = topicsCasoAsignadosNombreGenerico.contains(maestro.Name.toLowerCase().replace(' ', '')); //True si alguna pretensión lo tiene asignado (Si está en una oretensión, solo se tiene en cuenta la propia pretensión, no el resto)
                         if(!wrappersMap.containsKey(maestro.SAC_Seccion__c)){
                             wrappersMap.put(maestro.SAC_Seccion__c, new List<WrapperInfoCuali>{valor});
                         }else{
@@ -231,7 +230,7 @@ public with sharing class SPV_LCMP_SeccionesInfoCualitativa {
             SPV_DatabaseDML.insertListDML(taParaCaso, true);
 
             List<SAC_Marca_Case__c> marcaCaseInfo = new List<SAC_Marca_Case__c>();
-            List<SAC_MaestroTemas__c> temaEnMaestro = [SELECT id, name, SAC_Activo__c FROM SAC_MaestroTemas__c WHERE Name = :listaNTopisInsert AND RecordTypeId =:recTypeInfoCualitativa];
+            List<SAC_MaestroTemas__c> temaEnMaestro = [SELECT id, name, SAC_Activo__c FROM SAC_MaestroTemas__c WHERE Name = :listaNTopisInsert AND RecordTypeId =:RECTYPEINFOCUALITATIVA];
             if (!temaEnMaestro.isEmpty()) {
                 for (SAC_MaestroTemas__c tema : temaEnMaestro) {
                     // Creación del registro del objeto junction SAC_Marca_Case__c que relaciona la marca con el caso
@@ -266,7 +265,7 @@ public with sharing class SPV_LCMP_SeccionesInfoCualitativa {
 
             List<TopicAssignment>  listaTACaso = [SELECT id, TopicId FROM TopicAssignment WHERE EntityId =: caso.id AND TopicId IN: tBBDD];
             SPV_DatabaseDML.deleteListDML(listaTACaso, true);
-            List<SAC_MaestroTemas__c> temaEnMaestro = [SELECT id, name FROM SAC_MaestroTemas__c WHERE Name IN :listaNTopisDelete AND RecordTypeId =:recTypeInfoCualitativa];
+            List<SAC_MaestroTemas__c> temaEnMaestro = [SELECT id, name FROM SAC_MaestroTemas__c WHERE Name IN :listaNTopisDelete AND RecordTypeId =:RECTYPEINFOCUALITATIVA];
             List<SAC_Marca_Case__c> listaMarcaCaso = [SELECT id 
                                                     FROM SAC_Marca_Case__c
                                                     WHERE SAC_Case__c =: caso.id AND SAC_Marca__c IN: temaEnMaestro];
@@ -291,14 +290,14 @@ public with sharing class SPV_LCMP_SeccionesInfoCualitativa {
 
     public class WrapperInfoCuali {
         @AuraEnabled public Boolean esPropietario {get; set;}
-		@AuraEnabled public String Name {get;set;}
-		@AuraEnabled public boolean Activo {get;set;}
-		@AuraEnabled public boolean Selecionado {get;set;}
+		@AuraEnabled public String name {get;set;}
+		@AuraEnabled public boolean activo {get;set;}
+		@AuraEnabled public boolean selecionado {get;set;}
         
-        public WrapperInfoCuali(String Name, boolean Activo, boolean Selecionado, Boolean esPropietario) {
-            this.Name = Name;
-            this.Activo = Activo;
-            this.Selecionado = Selecionado;
+        public WrapperInfoCuali(String name, boolean activo, boolean selecionado, Boolean esPropietario) {
+            this.name = name;
+            this.activo = activo;
+            this.selecionado = selecionado;
             this.esPropietario = esPropietario;
         }
 	}

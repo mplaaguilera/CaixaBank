@@ -1,5 +1,6 @@
 import {LightningElement, api, wire} from 'lwc';
 import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
+import LightningConfirm from 'lightning/confirm';
 import {NavigationMixin} from 'lightning/navigation';
 import {encodeDefaultFieldValues} from 'lightning/pageReferenceUtils';
 
@@ -117,7 +118,7 @@ export default class csbdDerechosGdpr extends NavigationMixin(LightningElement) 
 	@api abrirModal() {
 		this.refs.backdropModal.classList.add('slds-backdrop_open');
 		this.refs.modalDerechosGdpr.classList.add('slds-fade-in-open');
-		window.setTimeout(() => this.refs.botonCancelar.focus(), 90);
+		setTimeout(() => this.refs.botonCancelar.focus(), 90);
 	}
 
 	botonRefrescarOnclick(event) {
@@ -144,7 +145,7 @@ export default class csbdDerechosGdpr extends NavigationMixin(LightningElement) 
 		}
 		this.refs.backdropModal.classList.remove('slds-backdrop_open');
 
-		window.setTimeout(() => publicarEvento(this, 'modalcerrado', {nombreModal: 'modalDerechosGdpr'}), 200);
+		setTimeout(() => publicarEvento(this, 'modalcerrado', {nombreModal: 'modalDerechosGdpr'}), 200);
 	}
 
 	modalTeclaPulsada({keyCode}) {
@@ -155,26 +156,47 @@ export default class csbdDerechosGdpr extends NavigationMixin(LightningElement) 
 
 	modalNuevoDerechoAbrir() {
 		this.refs.modalDerechosGdpr.classList.remove('slds-fade-in-open');
-		this.refs.modalNuevoDerecho.classList.add('slds-fade-in-open');
-		window.setTimeout(() => this.refs.modalNuevoDerechoCancelar.focus(), 90);
+		setTimeout(() => {
+			this.refs.comboboxTiposDerecho.setCustomValidity('');
+			this.refs.comboboxTiposDerecho.reportValidity();
+			this.refs.inputDatosVerificados.checked = false;
+			this.refs.labelDatosVerificados.classList.remove('slds-text-color_error');
+			this.refs.modalNuevoDerecho.classList.add('slds-fade-in-open');
+			setTimeout(() => this.refs.comboboxTiposDerecho.focus(), 90);
+		}, 50);
 	}
 
 	modalNuevoDerechoCerrar() {
 		this.refs.modalNuevoDerecho.classList.remove('slds-fade-in-open');
 		this.refs.modalDerechosGdpr.classList.add('slds-fade-in-open');
+		setTimeout(() => this.refs.botonCancelar.focus(), 100);
 	}
 
 	modalNuevoDerechoOnkeydown(event) {
 		if (event.keyCode === 27) {
-			this.modalNuevoDerechoCancelar();
+			this.modalNuevoDerechoCerrar();
 		}
 	}
 
-	modalNuevoDerechoEjercer() {
-		const idTipoDerecho = this.refs.comboboxTiposDerecho.value;
-		if (!idTipoDerecho) {
-			this.refs.comboboxTiposDerecho.showHelpMessageIfInvalid();
-		} else {
+	async modalNuevoDerechoEjercer() {
+		const comboboxTiposDerecho = this.refs.comboboxTiposDerecho;
+		if (!comboboxTiposDerecho.value) {
+			comboboxTiposDerecho.setCustomValidity('Selecciona el tipo de derecho a ejercer');
+			comboboxTiposDerecho.reportValidity();
+			return;
+		}
+		const inputDatosVerificados = this.refs.inputDatosVerificados;
+		if (!inputDatosVerificados.checked) {
+			this.refs.labelDatosVerificados.classList.add('slds-text-color_error');
+			inputDatosVerificados.focus();
+			return;
+		}
+
+		const tipoDerecho = this.tiposDerecho.find(tipo => tipo.value === comboboxTiposDerecho.value)?.label;
+		if (await LightningConfirm.open({
+			variant: 'header', theme: 'alt-inverse', label: 'Ejercer "' + tipoDerecho + '"',
+			message: '¿Confirmas que has verificado que los datos del cliente son correctos y que quieres continuar?'
+		})) {
 			this[NavigationMixin.Navigate]({
 				type: 'standard__objectPage',
 				attributes: {objectApiName: 'CC_Derecho__c', actionName: 'new'},
@@ -189,7 +211,7 @@ export default class csbdDerechosGdpr extends NavigationMixin(LightningElement) 
 					'CSBD_Opportunity__c': this.recordId,
 					'CC_Cliente__c': getFieldValue(this.oportunidad, OPPTY_ACCOUNT_ID)
 				})}
-			});
+			}, false);
 			this.cerrarModal();
 		}
 	}
@@ -200,5 +222,18 @@ export default class csbdDerechosGdpr extends NavigationMixin(LightningElement) 
 			objectApiName: 'Account',
 			attributes: {recordId: getFieldValue(this.oportunidad, OPPTY_ACCOUNT_ID), actionName: 'view'}
 		});
+	}
+
+	comboboxTiposDerechoOnchange(event) {
+		event.currentTarget.setCustomValidity('');
+		event.currentTarget.reportValidity();
+		this.refs.labelDatosVerificados.classList.remove('slds-text-color_error');
+		const inputDatosVerificados = this.refs.inputDatosVerificados;
+		inputDatosVerificados.disabled = false;
+		inputDatosVerificados.checked = false;
+	}
+
+	inputDatosVerificadosOnchange() {
+		this.refs.labelDatosVerificados.classList.remove('slds-text-color_error');
 	}
 }

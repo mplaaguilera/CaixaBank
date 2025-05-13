@@ -22,16 +22,46 @@ public with sharing class SAC_CaseCalcularImporte_Test {
         SAC_DatabaseDML.insertDML(usuarioGeneral, false);     
         //Database.insert(usuarioGeneral);
 
-        //Reclamación Padre
+
         Map<String, Object> camposRecl = new Map<String, Object>();
+        
+        camposRecl.clear();
+        camposRecl.put('Subject', 'reclamacionVinc');
+        camposRecl.put('Status', 'SAC_001');
+        camposRecl.put('SAC_StatusAuxiliar__c', 'SAC_001');
+        camposRecl.put('OwnerId', usuarioGeneral.id);
+
+        Case reclamacionVinc = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
+        SAC_DatabaseDML.insertDML(reclamacionVinc, false);
+
+
+
+        List<Case> listaReclamaciones = new List<Case>();
+        //Reclamación Padre
+        camposRecl.clear();
         camposRecl.put('Subject', 'Tarjeta');
         camposRecl.put('Status', 'SAC_001');
         camposRecl.put('SAC_StatusAuxiliar__c', 'SAC_001');
         camposRecl.put('OwnerId', usuarioGeneral.id);
 
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-        SAC_DatabaseDML.insertDML(reclamacion, false);
+        listaReclamaciones.add(reclamacion);
+
+        //Reclamación 2
+        camposRecl.clear();
+        camposRecl.put('Subject', 'Tarjeta2');
+        camposRecl.put('Status', 'SAC_001');
+        camposRecl.put('SAC_Naturaleza__c', 'SAC_007');
+        camposRecl.put('SAC_StatusAuxiliar__c', 'SAC_001');
+        camposRecl.put('CC_CasoRelacionado__c', reclamacionVinc.Id);
+        camposRecl.put('OwnerId', usuarioGeneral.id);
+
+        Case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
+        listaReclamaciones.add(reclamacion2);
+
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false);
         //Database.insert(reclamacion);
+
         Test.startTest();
         //Pretensiones
         List<Case> listaPretensiones = new List<Case>();
@@ -67,6 +97,19 @@ public with sharing class SAC_CaseCalcularImporte_Test {
         Case pretensionHija3 = SAC_TestDataFactory.crearCaso('Pretension',camposPretHija3);
         listaPretensiones.add(pretensionHija3);
 
+        //Pretensión 4
+        Map<String, Object> camposPretHija4 = new Map<String, Object>();
+        camposPretHija4.put('SAC_Reclamacion__c', reclamacion2.id);
+        camposPretHija4.put('SuppliedCompany', 'pruebaComplementaria');
+        camposPretHija4.put('CC_Importe_Reclamado__c', 0);
+        camposPretHija4.put('CC_Importe_Abonado__c', 0);
+        camposPretHija4.put('SAC_Importe_Resuelto__c', 0);
+        camposPretHija4.put('OwnerId', usuarioGeneral.id);
+
+        Case pretensionHija4 = SAC_TestDataFactory.crearCaso('Pretension',camposPretHija4);
+        listaPretensiones.add(pretensionHija4);
+
+        
         SAC_DatabaseDML.insertListDML(listaPretensiones, false);
         //Database.insert(listaPretensiones);
 
@@ -122,6 +165,31 @@ public with sharing class SAC_CaseCalcularImporte_Test {
         System.assertEquals(400, resultado, 'No se han sumado los importes de las reclamaciones');
         
     }
+
+
+    @isTest
+    static void comprobarElCalculoTest2(){
+
+        Id recorType = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();        
+        User usuario = [SELECT id FROM User WHERE Email = 'email0@test.com' AND isActive = true];
+
+        PermissionSet ps = [select id from PermissionSet where  PermissionSet.Label ='SAC_General'];
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
+        SAC_DatabaseDML.insertDML(psa, false);       
+        //Database.insert(psa);
+
+       Case pretension = [SELECT Id, RecordTypeId, SAC_Reclamacion__c FROM Case WHERE SuppliedCompany = 'pruebaComplementaria'];
+
+        System.runAs(usuario){    
+             pretension.CC_Importe_Abonado__c = 5;
+             SAC_DatabaseDML.updateDML(pretension, false);
+        }
+
+        Case resultado = [SELECT CC_Importe_Abonado__c, CC_CasoRelacionado__r.CC_Importe_Abonado__c FROM Case WHERE Subject = 'Tarjeta2'];
+        System.assertEquals(5, resultado.CC_Importe_Abonado__c, 'No se han sumado los importes de las reclamaciones');
+        
+    }
+
 
     /*
     @isTest

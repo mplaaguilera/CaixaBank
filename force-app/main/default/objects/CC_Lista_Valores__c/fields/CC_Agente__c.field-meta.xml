@@ -3,7 +3,7 @@
     <fullName>CC_Agente__c</fullName>
     <defaultValue>false</defaultValue>
     <description>Check que indica si los casos se deben pasa a agente (que entren en la cola de Comentarios Apps y estado Activo), en caso contrario que queden cerrados y sin contar SLA.</description>
-    <label>¿Entra a agente?</label>
+    <label>Entra a Agente</label>
     <trackTrending>false</trackTrending>
     <type>Checkbox</type>
 </CustomField>

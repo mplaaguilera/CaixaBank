@@ -79,6 +79,8 @@
             <controllingFieldValue>Buzón KYC Renewal</controllingFieldValue>
             <controllingFieldValue>Buzón Service Desk</controllingFieldValue>
             <controllingFieldValue>Teléfono COPS atención empleados</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
             <controllingFieldValue>Buzón Export Finance</controllingFieldValue>
             <controllingFieldValue>Buzón Operativa Comex</controllingFieldValue>
             <controllingFieldValue>Buzón Financiación Comex</controllingFieldValue>
@@ -104,6 +106,8 @@
             <controllingFieldValue>Buzón KYC Renewal</controllingFieldValue>
             <controllingFieldValue>Buzón Service Desk</controllingFieldValue>
             <controllingFieldValue>Teléfono COPS atención empleados</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
             <controllingFieldValue>Buzón Export Finance</controllingFieldValue>
             <controllingFieldValue>Buzón Operativa Comex</controllingFieldValue>
             <controllingFieldValue>Buzón Financiación Comex</controllingFieldValue>
@@ -118,6 +122,8 @@
             <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
             <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
             <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
             <valueName>Respuesta de cliente</valueName>
         </valueSettings>
         <valueSettings>
@@ -128,6 +134,8 @@
             <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
             <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
             <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Swift</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Ficheros</controllingFieldValue>
             <valueName>Reasignación del caso</valueName>
         </valueSettings>
     </valueSet>

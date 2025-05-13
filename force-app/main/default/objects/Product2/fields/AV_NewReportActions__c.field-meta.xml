@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_NewReportActions__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Si el valor del campo es true las acciones que aparecen en los reportes serán ‘Producto Contratado’ y ‘Producto Rechazado’ y si es false aparecerán ‘Cerrada positiva’ y ‘Cerrada negativa’</description>
+    <label>Nuevas acciones en el reporte</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

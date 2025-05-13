@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_MotivoOrigen__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que informa el MCC origen para la tabla de equivalencias</description>
+    <label>Motivo origen</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>1 AND 2 AND (3 OR 4)</booleanFilter>
+        <errorMessage>El MCC seleccionado debe tener Record Type &apos;C - Motivo&apos;, tipo cliente &apos;Cliente&apos; y ámbito derivación caixabank e imagin igual a &apos;Caso a Fraude&apos;</errorMessage>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>C - Motivo</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.CC_Tipo_Cliente__c</field>
+            <operation>equals</operation>
+            <value>Cliente</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.CC_Ambito_Tareas_Caixa__c</field>
+            <operation>equals</operation>
+            <value>Caso a Fraude, Phising/Smishing/Malware</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.CC_Ambito_Tareas_Imagin__c</field>
+            <operation>equals</operation>
+            <value>Caso a Fraude, Phising/Smishing/Malware</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Listas de valores</relationshipLabel>
+    <relationshipName>Listas_de_valores</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

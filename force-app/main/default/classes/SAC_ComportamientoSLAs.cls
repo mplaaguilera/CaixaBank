@@ -243,6 +243,7 @@ public without sharing class SAC_ComportamientoSLAs {
      * 1.1             DE101079     Sergio Martín     05/09/24     Modificado
     *****************************************************************/
     public static void cerrarMilestoneLetradoAltaBaja(List<Case> listNewCase) {
+        System.debug('Entra en llamada a cerrarMilestoneLetradoAltaBaja ');
         AsyncOptions options = new AsyncOptions();
         options.DuplicateSignature = QueueableDuplicateSignature.Builder()
         .addId(UserInfo.getUserId())

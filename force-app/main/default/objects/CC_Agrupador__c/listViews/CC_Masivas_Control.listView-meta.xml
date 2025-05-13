@@ -13,5 +13,10 @@
         <operation>equals</operation>
         <value>CC_Agrupador__c.CC_Masiva_Control</value>
     </filters>
+    <filters>
+        <field>CC_Estado__c</field>
+        <operation>notEqual</operation>
+        <value>Cerrado,Rechazado</value>
+    </filters>
     <label>Masivas de control</label>
 </ListView>

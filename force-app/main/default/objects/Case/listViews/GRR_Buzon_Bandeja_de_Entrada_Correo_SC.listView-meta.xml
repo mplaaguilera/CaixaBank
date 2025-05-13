@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Buzon_Bandeja_de_Entrada_Correo_SC</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>GRR_Codigo_UR__c</columns>
+    <columns>NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>CORE.USERS.ALIAS</columns>
+    <filterScope>Queue</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>equals</operation>
+        <value>Activo</value>
+    </filters>
+    <label>Buzón/Bandeja de Entrada Correo SC GRR</label>
+    <queue>GRR_Buzon_Servicios_Centrales</queue>
+    <sharedTo>
+        <role>GRR</role>
+    </sharedTo>
+</ListView>

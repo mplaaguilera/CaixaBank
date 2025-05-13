@@ -21,6 +21,7 @@ public with sharing class SAC_LCMP_ControlAltas {
         Map<String, List<WrapperControlAltas>> wrappersMap = new Map<String, List<WrapperControlAltas>>();
         Set<String> controlesCaso = new Set<String>();
         Boolean desactivarEdiccion = false;
+        Boolean cargarDatos = false;
         String estadoCaso;
 
         List<SAC_MaestroTemas__c> listControles = [SELECT Id, Name, SAC_Descripcion__c, SAC_Seccion__c, SAC_Activo__c FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPECONTROLALTAS AND SAC_Seccion__c <> null ORDER BY SAC_Seccion__c, Name];
@@ -30,6 +31,7 @@ public with sharing class SAC_LCMP_ControlAltas {
             List<SAC_Marca_Case__c> listMarcasCaso = [SELECT Id, SAC_Marca__r.Name, SAC_Case__r.Status, SAC_Case__r.OwnerId FROM SAC_Marca_Case__c WHERE SAC_Marca__r.RecordTypeId = : RECTYPECONTROLALTAS AND SAC_Case__c = :idCaso];
             if(!listMarcasCaso.isEmpty()){
                 estadoCaso = listMarcasCaso[0].SAC_Case__r.Status;
+                cargarDatos = true;
 
                 for(SAC_Marca_Case__c marcaCaso : listMarcasCaso){
                     controlesCaso.add(marcaCaso.SAC_Marca__r.Name);
@@ -38,35 +40,41 @@ public with sharing class SAC_LCMP_ControlAltas {
                 desactivarEdiccion = comprobarPermisosEdicion(listMarcasCaso[0].SAC_Case__r.Status, listMarcasCaso[0].SAC_Case__r.OwnerId);
 
             }else{
-                Case caso = [SELECT Id, OwnerId, Status FROM Case WHERE RecordTypeId = :RECTYPERECLAMACION AND Id = :idCaso LIMIT 1];
-                estadoCaso = caso.Status;
+                List<Case> listCaso = [SELECT Id, OwnerId, Status FROM Case WHERE RecordTypeId = :RECTYPERECLAMACION AND Id = :idCaso LIMIT 1];
 
-                desactivarEdiccion = comprobarPermisosEdicion(caso.Status, caso.OwnerId);
+                if(!listCaso.isEmpty()){
+                    estadoCaso = listCaso[0].Status;
+                    cargarDatos = true;
+
+                    desactivarEdiccion = comprobarPermisosEdicion(listCaso[0].Status, listCaso[0].OwnerId);
+                }
             }
 
-            for(SAC_MaestroTemas__c control : listControles) {
+            if(cargarDatos){
+                for(SAC_MaestroTemas__c control : listControles) {
 
-                if((estadoCaso == 'SAC_001' || estadoCaso == 'SAC_006') && (control.SAC_Activo__c || controlesCaso.contains(control.Name))){
+                    if((estadoCaso == 'SAC_001' || estadoCaso == 'SAC_006') && (control.SAC_Activo__c || controlesCaso.contains(control.Name))){
 
-                    WrapperControlAltas valor = new WrapperControlAltas(control.Id, control.Name, control.SAC_Descripcion__c, desactivarEdiccion, false);
-                
-                    if(controlesCaso.contains(control.Name)){
-                        // Si se encuentra una coincidencia, cambia el valor de Selecionado a true
-                        valor.selecionadoControl = true;
-                    }
+                        WrapperControlAltas valor = new WrapperControlAltas(control.Id, control.Name, control.SAC_Descripcion__c, desactivarEdiccion, false);
+                    
+                        if(controlesCaso.contains(control.Name)){
+                            // Si se encuentra una coincidencia, cambia el valor de Selecionado a true
+                            valor.selecionadoControl = true;
+                        }
 
-                    if(!wrappersMap.containsKey(control.SAC_Seccion__c)){
-                        wrappersMap.put(control.SAC_Seccion__c, new List<WrapperControlAltas>{valor} );
-                    }else{
-                        wrappersMap.get(control.SAC_Seccion__c).add(valor);
-                    }
-                }else if(estadoCaso != 'SAC_001' && estadoCaso != 'SAC_006' && controlesCaso.contains(control.Name)){
-                    WrapperControlAltas valor = new WrapperControlAltas(control.Id, control.Name, control.SAC_Descripcion__c, desactivarEdiccion, true);
+                        if(!wrappersMap.containsKey(control.SAC_Seccion__c)){
+                            wrappersMap.put(control.SAC_Seccion__c, new List<WrapperControlAltas>{valor} );
+                        }else{
+                            wrappersMap.get(control.SAC_Seccion__c).add(valor);
+                        }
+                    }else if(estadoCaso != 'SAC_001' && estadoCaso != 'SAC_006' && controlesCaso.contains(control.Name)){
+                        WrapperControlAltas valor = new WrapperControlAltas(control.Id, control.Name, control.SAC_Descripcion__c, desactivarEdiccion, true);
 
-                    if(!wrappersMap.containsKey(control.SAC_Seccion__c)){
-                        wrappersMap.put(control.SAC_Seccion__c, new List<WrapperControlAltas>{valor} );
-                    }else{
-                        wrappersMap.get(control.SAC_Seccion__c).add(valor);
+                        if(!wrappersMap.containsKey(control.SAC_Seccion__c)){
+                            wrappersMap.put(control.SAC_Seccion__c, new List<WrapperControlAltas>{valor} );
+                        }else{
+                            wrappersMap.get(control.SAC_Seccion__c).add(valor);
+                        }
                     }
                 }
             }

@@ -1,12 +1,4 @@
-section.slds-modal {
-    will-change: transform, opacity, visibility;
-    transition: all 300ms cubic-bezier(0, 0.3, 0.15, 1);
-    transform: scale(0.92);
-}
-
-section.slds-modal.slds-fade-in-open {
-    transform: scale(1);
-}
+@import 'c/csbd_lwcStyle';
 
 section.modalProgramarCita > div.slds-modal__container {
     /* max-width: min-content; */
@@ -25,10 +17,6 @@ section.modalProgramarCita div.slds-modal__content {
     overflow-y: auto;
     will-change: width, max-height;
     transition: width 420ms cubic-bezier(0, 0.3, 0.15, 1), max-height 420ms cubic-bezier(0, 0.3, 0.15, 1);
-}
-
-section.modalProgramarCita lightning-input div.slds-form-element__help {
-    display: none;
 }
 
 section.modalProgramarCita lightning-input lightning-datepicker {
@@ -104,16 +92,8 @@ div.lineaSeparacion {
     background-size: 100% 1px;
     background-repeat: no-repeat;
     background-position: center;
+    margin-top: 4px;
     margin-bottom: 18px;
-}
-
-
-lightning-input.seleccionado {
-   /*  animation-name: inputBlinkKf;
-    animation-direction: alternate;
-    animation-iteration-count: 4;
-    animation-timing-function: ease-in-out;
-    animation-duration: 150ms; */
 }
 
 @keyframes inputBlinkKf {

@@ -7,13 +7,13 @@ public class CSBD_FamiliaProductoPicklist_Test {
         familia.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Familias').getRecordTypeId();
         familia.Name = 'Familia prueba';
         familia.CC_Activa__c = true;
-        familia.CSBD_Tipo_de_oportunidad__c = 'Hipoteca;Préstamo;Renting;TPV;PRO Automática;Llamada Servicio';
+        familia.CSBD_Tipo_de_oportunidad__c = 'Hipoteca;Consumo;Renting;TPV;PRO Automática;Llamada Servicio';
         familia.CSBD_Empresa_Proveedora_Multi__c ='CaixaBank;imaginBank;inTouch;Now In Empleado;Now In Soporte';
         CC_Lista_Valores__c empresa = new CC_Lista_Valores__c();
         empresa.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Empresas').getRecordTypeId();
         empresa.Name = 'CaixaBank';
         empresa.CC_Activa__c = true;
-        empresa.CSBD_Tipo_de_oportunidad__c = 'Hipoteca;Préstamo;Renting;TPV;PRO Automática;Llamada Servicio';
+        empresa.CSBD_Tipo_de_oportunidad__c = 'Hipoteca;Consumo;Renting;TPV;PRO Automática;Llamada Servicio';
 		CC_Lista_Valores__c motivosAC = new CC_Lista_Valores__c();
         motivosAC.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Motivos_CSCC').getRecordTypeId();
         motivosAC.Name = 'Motivo AC 1';
@@ -37,7 +37,7 @@ public class CSBD_FamiliaProductoPicklist_Test {
     public static void getEmpresasTest() {
         System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
-            List<CC_Lista_Valores__c> empresas = CSBD_FamiliaProductoPicklistController.getEmpresas('Préstamo');
+            List<CC_Lista_Valores__c> empresas = CSBD_FamiliaProductoPicklistController.getEmpresas('Consumo');
             Test.stopTest();
 
             System.assertEquals(CC_MetodosUtiles.listaCampo(empresas, 'Name').contains('CaixaBank'), true, 'Empresa no encontrada');
@@ -48,7 +48,7 @@ public class CSBD_FamiliaProductoPicklist_Test {
     public static void getFamiliasTest() {
         System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
-            List<CC_Lista_Valores__c> familias = CSBD_FamiliaProductoPicklistController.getFamilias('Préstamo', 'CaixaBank');
+            List<CC_Lista_Valores__c> familias = CSBD_FamiliaProductoPicklistController.getFamilias('Consumo', 'CaixaBank');
             Test.stopTest();
 
             System.assertEquals(CC_MetodosUtiles.listaCampo(familias, 'Name').contains('Familia prueba'), true, 'Familia no encontrada');

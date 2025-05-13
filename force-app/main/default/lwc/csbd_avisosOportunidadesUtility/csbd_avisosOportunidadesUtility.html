@@ -1,0 +1,44 @@
+<template>
+
+	<div class="slds-var-m-top_x-small slds-var-m-horizontal_x-large">
+        <header class="slds-media slds-media_center slds-has-flexi-truncate slds-var-m-left_xxx-small" style="padding-top: 9px;">
+            <div class="slds-media__figure">
+                <lightning-icon icon-name="custom:custom53" size="small" class="iconoHeader"></lightning-icon>
+            </div>
+            <div class="slds-media__body">
+                <div class="slds-card__header-title slds-is-relative" style="top: 1px;">
+                    <span class="slds-truncate">Avisos sobre oportunidades</span>
+					<span lwc:if={avisos} class="slds-text-color_weak" style="font-weight: 400;">&nbsp;({avisos.length})</span>
+                </div>
+            </div>
+			<!-- sldsValidatorIgnoreNextLine -->
+			<lightning-button-icon icon-name="utility:refresh" variant="bare" onclick={getAvisos}></lightning-button-icon>
+			<!-- sldsValidatorIgnoreNextLine -->
+			<lightning-button-icon icon-name="utility:delete" tooltip="Eliminar" variant="bare" class="slds-var-m-left_small slds-var-m-right_x-small" onclick={eliminarAvisos}></lightning-button-icon>
+        </header>
+
+        <div class="listaAvisos slds-var-m-top_medium">
+            <ul>
+				<template for:each={avisos} for:item="aviso">
+					<li key={aviso.id} class="slds-var-m-top_x-small">
+						<div class="slds-grid slds-grid_vertical-align-end slds-gutters_direct-xx-small slds-var-m-left_xxx-small slds-var-m-right_x-small" onclick={aviso.enlaceFuncion}>
+							<div class="slds-col slds-grow-none" style="width: 43px;">
+								<span class="avisoHora slds-text-title_caps">{aviso.fechaFormat}</span>
+							</div>
+							<div class="slds-col avisoTexto">
+								<span class="slds-text-link_faux" title="Ver listado" onclick={aviso.enlaceFuncion}>{aviso.titulo}</span>
+							</div>
+						</div>
+					</li>
+				</template>
+			</ul>
+        </div>
+
+        <!--
+		<footer class="slds-card__footer slds-var-m-top_medium slds-var-p-right_x-small" style="text-align: right;">
+            <lightning-button label="Cerrar" onclick={cerrarPanel}></lightning-button>
+        </footer>
+        -->
+	</div>
+
+</template>

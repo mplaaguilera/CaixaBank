@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_FinalPermiso__c</fullName>
+    <description>indica la fecha de finalización del permiso de oficina</description>
     <encryptionScheme>None</encryptionScheme>
     <label>Final Permiso</label>
     <required>false</required>

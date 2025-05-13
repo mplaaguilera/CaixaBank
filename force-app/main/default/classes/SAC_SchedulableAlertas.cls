@@ -123,6 +123,7 @@ public without sharing class SAC_SchedulableAlertas extends CBK_SCH_Queueable_Ab
                                 } else {
                                     oActor0 = sobjConsulta.get(actores[0]);
                                 }
+                                
                                 if(actores[1] == '=') {if(bsActor && string.valueof(oActor0) != sActor || bdActor && decimal.valueof(string.valueof(oActor0)) != dActor) {bPlantilla = false;}
                                 }else if(actores[1] == '>') {if(bsActor && string.valueof(oActor0) <= sActor || bdActor && decimal.valueof(string.valueof(oActor0)) <= dActor) {bPlantilla = false;}
 
@@ -137,6 +138,7 @@ public without sharing class SAC_SchedulableAlertas extends CBK_SCH_Queueable_Ab
 
                                 }
                             }
+
                             if(bPlantilla) {
                                 wrapAlerta = new SAC_WrapperAlerta(consulta.SAC_Reclamacion__c, maestro.DeveloperName, '', '', '', '', consulta.Id);
                                 

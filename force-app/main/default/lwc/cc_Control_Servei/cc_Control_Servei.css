@@ -33,3 +33,20 @@ lightning-input {
 :host {
     --slds-g-color-border-base-4: rgb(201, 201, 201);
 }
+
+/* Elimina estilos inline en los elementos dentro del editor */
+:host ::slotted(span[style]),
+:host ::slotted(div[style]),
+:host ::slotted(p[style]) {
+    all: unset !important; /* Borra cualquier estilo inline */
+}
+
+/* Forzar el estilo de la fuente y espaciado */
+:host ::slotted(p),
+:host ::slotted(div) {
+    font-family: 'Century Gothic', sans-serif !important;
+    font-size: 10pt !important;
+    line-height: 1.5 !important;
+    margin: 8px 0 !important;
+    color: #000000 !important;
+}

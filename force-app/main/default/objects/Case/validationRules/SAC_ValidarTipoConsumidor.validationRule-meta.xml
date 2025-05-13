@@ -2,18 +2,17 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SAC_ValidarTipoConsumidor</fullName>
     <active>true</active>
-    <description>Validar que cuando se pase a análisis el tipo de consumidor esta relleno.</description>
-    <errorConditionFormula>IF( 
-				AND(
-								RecordType.DeveloperName = &apos;SAC_Reclamacion&apos;,
-								ISCHANGED(Status),
-								OR(
-        ISPICKVAL(Status, &apos;SAC_002&apos;),
-								ISPICKVAL(Status, &apos;SAC_003&apos;)),
-								ISBLANK(TEXT(SAC_TipoConsumidor__c))
-				), 
-				true, 
-				false
+    <description>Validar que cuando se pase a resolución el tipo de consumidor esta relleno.</description>
+    <errorConditionFormula>IF(
+AND(
+RecordType.DeveloperName = &apos;SAC_Reclamacion&apos;,
+ISCHANGED(Status),
+OR(
+ISPICKVAL(Status, &apos;SAC_003&apos;)),
+ISBLANK(TEXT(SAC_TipoConsumidor__c))
+),
+true,
+false
 )</errorConditionFormula>
     <errorMessage>Debe informar el tipo de consumidor</errorMessage>
 </ValidationRule>

@@ -4,7 +4,7 @@
     <description>Comunidad autónoma</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
-    <label>Comunidad autónoma (código)</label>
+    <label>Comunidad autónoma</label>
     <length>255</length>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>

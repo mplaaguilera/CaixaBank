@@ -36,8 +36,6 @@ public with sharing class SPV_CaseAUTRHan extends CC_TriggerHandlerBase{
             SPV_CaseHelper.cambioOwnerReclamacion(listCasosSPV, mapOldObj); //Probar
             //Detectar cambio de estado //Probar
             SPV_CaseHelper.cambioAltaAnalisisReclamacion(listCasosSPV, mapOldObj, mapaDatosCasosActualizar); //Probar
-            //Si el SEG_Subestado__c de la reclamación viene Negociación
-            SPV_CaseHelper.actualizarEstado(listCasosSPV, mapOldObj);
             // Si se cierra la reclamación
             SPV_CaseHelper.finalizarConsultasReclamacion(listCasosSPV, mapOldObj);
             //Si se actualiza la fecha de recepción de una reclamación, se actualiza la de sus pretensiones
@@ -66,7 +64,8 @@ public with sharing class SPV_CaseAUTRHan extends CC_TriggerHandlerBase{
             //Si cambia la entidad productora de la pretensión principal
             SPV_CaseHelper.actualizarEntidadProductoraReclamacion(listCasosSPV, mapOldObj, mapaDatosCasosActualizar);
             SPV_CaseHelper.calcular(listCasosSPV, mapOldObj, mapaDatosCasosActualizar); //Cuando se actualiza el importe de una pretensión, se calculará el de la reclamación padre
-            SPV_CaseHelper.actualizarOwnerPretensionesHermanas(lstPretensiones, mapOldObj, mapaDatosCasosActualizar);     //Cuando se actualiza el owner una pretensión, se actualiza el owner de sus pretensiones hermanas 
+            SPV_CaseHelper.actualizarOwnerPretensionesHermanas(lstPretensiones, mapOldObj, mapaDatosCasosActualizar);     //Cuando se actualiza el owner una pretensión, se actualiza el owner de sus pretensiones hermanas
+            SPV_CaseHelper.actualizarResumenManual(lstPretensiones, mapOldObj, mapaDatosCasosActualizar); 
             }
 
         if(!mapaDatosCasosActualizar.isEmpty()){

@@ -849,4 +849,35 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
             System.assert(contactoTitular1.AccountId == contactoTitular2.AccountId);
         }
     }
+
+    @isTest
+    public static void cambiarProductoAIA() {
+        User usuarioIA = CSBD_Usuarios.usuarioGestor(); //la funcion ya hace el insert
+
+        List<PermissionSet> permiSets = [SELECT Id FROM PermissionSet WHERE Name IN ('CSBD_PromptUser')];
+        PermissionSet permiSet1 = permiSets[0];
+        PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
+        permiSetAssi.AssigneeId = usuarioIA.Id;
+        permiSetAssi.PermissionSetId = permiSet1.Id;
+        insert(permiSetAssi);
+
+        boolean resultado = false;
+
+        System.runAs(usuarioIA){
+            //opportunity 1
+            Map<String, Object> camposOppl = new Map<String, Object>();
+            camposOppl.put('CSBD_Producto__c', null);
+            Opportunity opp = CSBD_Opportunity.crearOportunidad('CSBD_CMB', camposOppl); //la funcion ya hace el insert
+
+            Test.startTest();
+            opp.CSBD_Producto__c = 'MyBox Auto TR';
+            update opp;
+            Test.stopTest();
+
+            Opportunity oppResultado = [SELECT CSBD_CumpleCondicionesPrompts__c FROM Opportunity WHERE Id =:opp.Id];
+            resultado = oppResultado.CSBD_CumpleCondicionesPrompts__c;
+        }
+        boolean resultadoesperado = true;
+        System.assertEquals(resultadoEsperado, resultado, 'El check de CumpleCondiciones no se marca correctamente');
+    }
 }

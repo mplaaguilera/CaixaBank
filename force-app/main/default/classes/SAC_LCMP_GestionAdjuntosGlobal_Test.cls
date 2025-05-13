@@ -3,6 +3,7 @@ public with sharing class SAC_LCMP_GestionAdjuntosGlobal_Test {
     @TestSetup
     static void makeData(){
 
+        Test.startTest();
         List<User> usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
         usuarioGeneral[0].Username = 'ustestesteo@test.com';
         SAC_DatabaseDML.insertListDML(usuarioGeneral, false);        
@@ -44,6 +45,7 @@ public with sharing class SAC_LCMP_GestionAdjuntosGlobal_Test {
         maestrosTemas[0].Name = 'TestMaestro';
         SAC_DatabaseDML.insertListDML(maestrosTemas, false);
         //Database.insert(maestrosTemas);
+        Test.stopTest();
     }
     
     @isTest
@@ -224,7 +226,7 @@ public with sharing class SAC_LCMP_GestionAdjuntosGlobal_Test {
 
 		System.runAs(usuario){
             Test.startTest();
-            List<SAC_MaestroTemas__c> resultado = SAC_LCMP_GestionAdjuntosGlobal.recuperaTipoAdjuntos(reclamacion.id);
+            List<SAC_MaestroTemas__c> resultado = SAC_LCMP_GestionAdjuntosGlobal.recuperaTipoAdjuntos(reclamacion.id, 'SAC_Reclamacion');
             Test.stopTest();
             
             Assert.areNotEqual(null, resultado, 'No se ha recuperado el tipo de documento correctamente.'); 

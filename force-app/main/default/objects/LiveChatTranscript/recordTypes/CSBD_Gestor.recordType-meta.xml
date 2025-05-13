@@ -155,10 +155,6 @@
             <fullName>OESIA</fullName>
             <default>false</default>
         </values>
-        <values>
-            <fullName>SIN PROVEEDOR</fullName>
-            <default>false</default>
-        </values>
     </picklistValues>
     <picklistValues>
         <picklist>CC_Proveedor_Inicial_Reparto__c</picklist>
@@ -180,10 +176,6 @@
         </values>
         <values>
             <fullName>OESIA</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>SIN PROVEEDOR</fullName>
             <default>false</default>
         </values>
     </picklistValues>

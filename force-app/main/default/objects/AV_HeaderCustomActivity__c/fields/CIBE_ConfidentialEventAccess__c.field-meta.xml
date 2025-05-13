@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_ConfidentialEventAccess__c</fullName>
+    <description>acceso a un evento confidencial</description>
     <formula>IF(CONTAINS( CIBE_ConfidentialEvent__c,  $User.Id ), true, false)</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Access to confidential event</label>

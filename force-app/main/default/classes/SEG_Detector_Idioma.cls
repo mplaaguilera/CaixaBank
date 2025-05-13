@@ -57,7 +57,14 @@ public with sharing class SEG_Detector_Idioma
                 Map<String,string> mHeaders =  new  Map<String,string>();
                 mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
 
-                HttpRequest request = CBK_HttpServiceIntegration.getRequest(cuerpo, intSetting, 'POST', mHeaders);
+                CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
+                requestWrp.intSetting = intSetting;
+                requestWrp.method = 'POST';
+                requestWrp.mHeaders = mHeaders;
+                requestWrp.mUriParams = null;
+                requestWrp.mQueryParams = null;
+
+                HttpRequest request = CBK_HttpServiceIntegration.getRequest(requestWrp);
 
                 HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, intSetting, intSetting);
               
@@ -435,6 +442,7 @@ public with sharing class SEG_Detector_Idioma
                         acuseRecibofinal.setUseSignature(false);
                         acuseRecibofinal.setBccSender(false);
                         acuseRecibofinal.setSaveAsActivity(true);
+						body = SEG_redactarEmail_Controller.gestionarImagenesInlineRedactarMail(caso.Id , body);
                         acuseRecibofinal.setHtmlBody(body);
                         acuseRecibofinal.setToAddresses(listEmails);
                         acuseRecibofinal.setWhatId(caso.Id);

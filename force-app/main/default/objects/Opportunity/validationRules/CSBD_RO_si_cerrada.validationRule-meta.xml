@@ -23,6 +23,8 @@ AND(
     NOT(ISCHANGED(CSBD_Estado__c)),
     NOT(ISCHANGED(OwnerId)),
       NOT(ISCHANGED(CSBD_Alta_omnichannel__c)),
+    NOT(ISCHANGED(CSBD_ResumenCierre__c)),
+    NOT(ISCHANGED(CSBD_HaUsadoIA__c)),
     IsClosed
   )
     )

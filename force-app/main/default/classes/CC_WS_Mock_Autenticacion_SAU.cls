@@ -18,7 +18,19 @@ public with sharing class CC_WS_Mock_Autenticacion_SAU implements HttpCalloutMoc
             
             res.setBody(responseBody);
             res.setStatusCode(200);
-        } else if (this.statusCode == 404) {
+        }  else if (this.statusCode == 202) {
+            String responseBody = '{'
+            + '"existContract":"NO_CONTRACT"'
+            + '}';
+            res.setBody(responseBody);
+            res.setStatusCode(200);
+        }else if (this.statusCode == 203) {
+            String responseBody = '{'
+            + '"NoexistContract":"NO_CONTRACT"'
+            + '}';
+            res.setBody(responseBody);
+            res.setStatusCode(200);
+        }else if (this.statusCode == 404) {
             String responseBody = '{'
             + '"existContract":"NO_CONTRACT"'
             + '}';

@@ -1,5 +1,7 @@
 import {LightningElement, api, wire} from 'lwc';
 import {NavigationMixin} from 'lightning/navigation';
+import {copiarTextoAlPortapapeles, errorApex} from 'c/csbd_lwcUtils';
+
 import getSolicitud from '@salesforce/apex/CSBD_Datos_Formulario_Controller.getSolicitud';
 
 //eslint-disable-next-line new-cap
@@ -19,7 +21,7 @@ export default class csbdDatosFormulario2 extends NavigationMixin(LightningEleme
 	@wire(getSolicitud, {idOportunidad: '$recordId'})
 	wiredSolicitud({error, data}) {
 		if (error) {
-			console.error(error);
+			errorApex(error, 'Problema obteniendo los datos de la petición');
 		} else {
 			if (data && data.datosFormulario.length) {
 				this.solicitudReferencia = data.datosFormulario.find(atributo => atributo.nombre === 'referencia_usuario')?.valor;
@@ -35,12 +37,7 @@ export default class csbdDatosFormulario2 extends NavigationMixin(LightningEleme
 
 	copiarJsonAlPortapapeles(event) {
 		const cuerpoPeticion = JSON.stringify(JSON.parse(this.tareaSolicitudRecibida.Description), null, 3);
-		const textarea = document.createElement('textarea');
-		textarea.value = cuerpoPeticion;
-		document.body.appendChild(textarea);
-		textarea.select();
-		document.execCommand('copy');
-		document.body.removeChild(textarea);
+		copiarTextoAlPortapapeles(cuerpoPeticion);
 
 		//Feedback visual
 		const boton = event.target;
@@ -64,11 +61,6 @@ export default class csbdDatosFormulario2 extends NavigationMixin(LightningEleme
 	}
 
 	copiarValor(event) {
-		let hiddenElement = document.createElement('input');
-		hiddenElement.setAttribute('value', event.target.dataset.valor);
-		document.body.appendChild(hiddenElement);
-		hiddenElement.select();
-		document.execCommand('copy');
-		document.body.removeChild(hiddenElement);
+		copiarTextoAlPortapapeles(event.target.dataset.valor);
 	}
 }

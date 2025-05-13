@@ -10,7 +10,9 @@
       "options": {
         "parser": "apex",
         "tabWidth": 4,
-        "useTabs": true
+        "useTabs": true,
+        "wrapAttributes": "auto",
+        "wrapLineLength": 150
       }
     }
   ]

@@ -34,28 +34,18 @@ public with sharing class CC_Servicio_Genesys {
 	}
 
     public static String obtenerQueueId(String registroId, String tipoRegistro) {
-		System.debug('obtenerQueueId: ' + registroId + ' ' + tipoRegistro);
+		//System.debug('obtenerQueueId: ' + registroId + ' ' + tipoRegistro);
 
         String queueId = '';
 
         if (tipoRegistro == 'Case') {
-            List<Case> casos = [SELECT CC_Canal_Procedencia__c, Recordtype.DeveloperName FROM Case WHERE Id = :registroId];
-            List<CC_Servicio_Genesys__c> servicios = [SELECT KIN_Cola_Id_GC__c  FROM CC_Servicio_Genesys__c
-														WHERE CC_Canal_Procedencia__c = :casos[0].CC_Canal_Procedencia__c LIMIT 1];
-            if (!servicios.isEmpty() && servicios[0].KIN_Cola_Id_GC__c != null) {
-                queueId = servicios[0].KIN_Cola_Id_GC__c;
-            } else {
-                String servicioPorDefecto = '';
-                if (casos[0].Recordtype.DeveloperName == 'HDT_Empleado') {
-					servicioPorDefecto = 'HDT_GenesysCloudOutboundDefault';
-                } else {
-					servicioPorDefecto = 'CC_GenesysCloudOutboundDefault';
-                }
-                List<CC_Servicio_Genesys__c> serviciosDefault = [SELECT KIN_Cola_Id_GC__c  FROM CC_Servicio_Genesys__c
-																	WHERE CC_Codigo__c = :servicioPorDefecto LIMIT 1];
-                if (!serviciosDefault.isEmpty() && serviciosDefault[0].KIN_Cola_Id_GC__c != null) {
+            List<Case> casos = [SELECT CC_Canal_Procedencia__c, Recordtype.DeveloperName FROM Case WHERE Id = :registroId LIMIT 1];
+			String prefix = casos[0]?.Recordtype.DeveloperName.split('_')[0];
+			String servicioPorDefecto = (!String.isEmpty(prefix) && casos[0]?.Recordtype.DeveloperName == 'CC_Empleados') ? prefix + '_GenesysCloudOutboundDefaultEmpleados' : !String.isEmpty(prefix) ? (prefix + '_GenesysCloudOutboundDefault') : 'CC_GenesysCloudOutboundDefault';
+
+            List<CC_Servicio_Genesys__c> serviciosDefault = [SELECT KIN_Cola_Id_GC__c  FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :servicioPorDefecto LIMIT 1];
+			if (!serviciosDefault.isEmpty() && serviciosDefault[0].KIN_Cola_Id_GC__c != null) {
                     queueId = serviciosDefault[0].KIN_Cola_Id_GC__c;
-                }
             }
 
         } else if (tipoRegistro == 'Opportunity') {
@@ -109,10 +99,10 @@ public with sharing class CC_Servicio_Genesys {
 				} else {
 					servicioPorDefecto = servicios.get('Con grabación');
 				}
-				System.debug('servicioPorDefecto: ' + servicioPorDefecto);
 				return queueIdServicioGenesysCsbd(CC_Listas_Valores.lookupValue('CSBD: Servicios Genesys por defecto', servicioPorDefecto));
 			}
         }
+		//System.debug('queueId: ' + queueId);
         return queueId;
 	}
 

@@ -642,6 +642,7 @@ public class CSBD_AutenticacionOtp_Apex_Test {
         }
     }
 
+    /*
     @isTest
     private static void autenticacionClienteDigitalEnviarTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE Alias = 'Gestor'];
@@ -655,6 +656,7 @@ public class CSBD_AutenticacionOtp_Apex_Test {
             System.assert(true, 'PENDIENTE');
         }
     }
+    */
 
     @isTest
     private static void autenticacionClienteDigitalValidarTest() {

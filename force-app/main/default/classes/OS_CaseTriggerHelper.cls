@@ -110,7 +110,7 @@ public with sharing class OS_CaseTriggerHelper {
         for (Case caso : lstCasos) {
             if (mapAccount.containsKey(caso.AccountId)) {
                 if(cambioDocumen || (!cambioDocumen && caso.CC_Canal_Procedencia__c != 'Formulario web')){
-                    caso.CC_MailTelfNotif__c = mapAccount.get(caso.AccountId).CC_NumPerso__c;
+                    caso.CC_MailTelfNotif__c = mapAccount.get(caso.AccountId).CC_Email__c;
                     caso.CC_Numero_Documento__c = mapAccount.get(caso.AccountId).CC_Numero_Documento__c;
                     if(!cambioDocumen && caso.CC_Canal_Procedencia__c != 'Formulario web'){
                         caso.CC_NumPerso__c = mapAccount.get(caso.AccountId).CC_Numero_Documento__c;

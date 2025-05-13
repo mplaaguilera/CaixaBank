@@ -515,7 +515,7 @@ public inherited sharing class CSBD_Opportunity {
 		List<Opportunity> oportunidades = [SELECT Name, CSBD_Asignacion_Auto_Pendiente__c, CSBD_Empresa_Proveedora__c,
 											CSBD_Idioma_Solicitud__c, RecordtypeId, RecordType.Name, CSBD_Turno_Contacto__c,
 											CSBD_Familia_Producto__c, CSBD_Skill__c, CSBD_Horario_Contacto__c,
-											CSBD_Alta_omnichannel__c, CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c,OwnerId
+											CSBD_Alta_omnichannel__c, CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c,OwnerId, CSBD_Producto__c
 											FROM Opportunity WHERE Id IN :mapaFinalizaciones.keySet()];
 
 		List<CSBD_Gestor_Oportunidad__c> gestoresOportunidadActualizar = new List<CSBD_Gestor_Oportunidad__c>();
@@ -735,7 +735,7 @@ public inherited sharing class CSBD_Opportunity {
 			titular1.AccountId = idTitularMap.get(oportunidad.Id).Id;
 			titular1.RecordTypeId = recordTypeIdContact;
 			titular1.CC_Numero_Documento__c = cliente.CC_Numero_Documento__c;
-			
+
 			if(cliente.RecordTypeId == recordTypeIdAccountClientePA) {
 				titular1.FirstName = cliente.FirstName;
 				titular1.LastName = cliente.LastName;

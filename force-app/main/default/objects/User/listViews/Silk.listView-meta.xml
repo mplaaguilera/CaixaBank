@@ -13,15 +13,9 @@
     <columns>MANAGER</columns>
     <filterScope>Everything</filterScope>
     <filters>
-        <field>CORE.USER_ROLE.NAME</field>
+        <field>EMPLOYEE_NUMBER</field>
         <operation>equals</operation>
-        <value>Contact Center</value>
-    </filters>
-    <filters>
-        <field>CORE.USERS.COMPANY_NAME</field>
-        <operation>equals</operation>
-        <value>KOPS</value>
+        <value>U01A7503</value>
     </filters>
     <label>KOPS</label>
-    <language>es</language>
 </ListView>

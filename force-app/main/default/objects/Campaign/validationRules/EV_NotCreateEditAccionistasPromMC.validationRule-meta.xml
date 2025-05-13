@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_NotCreateEditAccionistasPromMC</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+OR(AND(ISNEW(), RecordType.DeveloperName = &apos;EV_Eventos_Accionistas&apos;),
+AND(PRIORVALUE(LastModifiedDate) != NOW(),RecordType.DeveloperName = &apos;EV_Eventos_Accionistas&apos;)),
+$Permission.EV_NotAccionistasPromMC,
+AND(!$Permission.CBK_BypassValidationRules,
+!$Permission.EV_ByPassValidationRules))</errorConditionFormula>
+    <errorMessage>No tiene permiso para crear o editar campañas de Accionistas.</errorMessage>
+</ValidationRule>

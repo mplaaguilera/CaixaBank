@@ -99,15 +99,17 @@ public without sharing class SEG_Case_Operativas_Controller {
 	}
 
 	@AuraEnabled
-	static public Boolean comprobacionGrupo(String caseId){
+	public static Boolean comprobacionGrupo(String caseId) {
 		Boolean deshabilitado = false;
-		Case caso = [SELECT id, SEG_Organizacion__c, SEG_Zona__c, SEG_Grupo__r.SEG_Organizacion__c, SEG_Grupo__r.SEG_Zona__c FROM Case WHERE id = :caseId LIMIT 1];
+		
+		List<Case> caso = [SELECT Id, SEG_Organizacion__c, SEG_Zona__c, SEG_Grupo__r.SEG_Organizacion__c, SEG_Grupo__r.SEG_Zona__c FROM Case WHERE Id = :caseId LIMIT 1];
 
-		if(caso.SEG_Grupo__r.SEG_Organizacion__c == null || caso.SEG_Grupo__r.SEG_Zona__c == null || !caso.SEG_Grupo__r.SEG_Organizacion__c.contains(caso.SEG_Organizacion__c) || !caso.SEG_Grupo__r.SEG_Zona__c.contains(caso.SEG_Zona__c)){
+		if (!caso.isEmpty() && (caso[0].SEG_Grupo__r == null || caso[0].SEG_Grupo__r.SEG_Organizacion__c == null || caso[0].SEG_Grupo__r.SEG_Zona__c == null || (caso[0].SEG_Organizacion__c != null && !caso[0].SEG_Grupo__r.SEG_Organizacion__c.contains(caso[0].SEG_Organizacion__c)) || (caso[0].SEG_Zona__c != null && !caso[0].SEG_Grupo__r.SEG_Zona__c.contains(caso[0].SEG_Zona__c)))) {
 			deshabilitado = true;
 		}
 		return deshabilitado;
 	}
+
 
 	@AuraEnabled
 	static public void rechazarCaso(Id caseId){
@@ -278,7 +280,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 						SEG_Tipolog_a_de_Grupo_Operativo__c,  Subject,SEG_Resultado__c, SEG_Organizacion__c,
 						SEG_Zona__c, Status, SEG_Numero_de_centro__c, SEG_Grupo__c, SEG_Grupo_Empresa__c,
 						SEG_ClasificacionRapida__c, SEG_Subestado__c, CC_Detalles_Consulta__c, CC_MCC_Motivo__c,
-						CC_MCC_ProdServ__c, CC_MCC_Tematica__c, SEG_Detalle__c, Canal_del_Empleado__c, SEG_SRAuditoria__c, CC_No_Identificado__c, RecordType.DeveloperName
+						CC_MCC_ProdServ__c, CC_MCC_Tematica__c, SEG_Detalle__c, Canal_del_Empleado__c, SEG_SRAuditoria__c, CC_No_Identificado__c, RecordType.DeveloperName, SEG_Buz_n_de_la_zona__c
 						FROM Case WHERE Id =: caseId LIMIT 1];
 
 		if(casoEntrante[0].RecordType.DeveloperName == 'SEG_Seguimiento'){
@@ -431,7 +433,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 		Case caso = [SELECT ContactId, AccountId, CC_Idioma__c, CaseNumber, SEG_N_case_y_subject__c, Subject, SEG_Resultado__c,
 						SEG_Organizacion__c, SEG_Zona__c, Status, SEG_Numero_de_centro__c, SEG_Grupo__c, SEG_Grupo_Empresa__c,
 						SEG_ClasificacionRapida__c, SEG_Subestado__c, CC_Detalles_Consulta__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c,
-						CC_MCC_Tematica__c, Canal_del_Empleado__c, SEG_SRAuditoria__c
+						CC_MCC_Tematica__c, Canal_del_Empleado__c, SEG_SRAuditoria__c, SEG_Buz_n_de_la_zona__c
 						FROM Case WHERE Id = :caseId];
 
 		caso.Status = 'Cerrado';
@@ -499,6 +501,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 			datosContacto.put(contactoCasoId, caso.AccountId);
 			Map<String,Map<String,Set<String>>> destinatariosCorreo = SEG_MetodosComunes.getDestinatariosContactos (datosContacto);
 			Map<String,Set<String>> contactoCasoDestinoCorreo = (destinatariosCorreo != null) ? destinatariosCorreo.get(contactoCasoId) : null;
+			List<String> listBuzones = new List<String>{caso.SEG_Buz_n_de_la_zona__c};
 
 			Map<Id, List<SEG_Plantilla__c>> plantillas = SEG_PlantillasHandler.determinarPlantillas(new List<Case>{caso}, 'Cierre', resultado);
 			if (plantillas.size() == 1) {
@@ -543,27 +546,41 @@ public without sharing class SEG_Case_Operativas_Controller {
 				if (String.isNotBlank(plantillaIdioma)) {
 					/*EmailTemplate emailTemplate = [SELECT Subject, Description, HtmlValue, DeveloperName, Body
 													FROM EmailTemplate WHERE Id = :plantillaIdioma];*/
-					if(resultado == 'Respuesta a peticionario'){
-						if(emails?.get(0)?.FromAddress != null){
+					if(emails != null && resultado == 'Respuesta a peticionario'){
+						/*if(emails?.get(0)?.FromAddress != null){
 							adresses.add(emails[0].FromAddress);
+						}*/
+						//Sustituimos el if anterior por el siguiente, de manera que solo accede a FromAddress si el primer elemento existe y no es null.
+						if (!emails.isEmpty() && emails.get(0).FromAddress != null) {
+    						adresses.add(emails.get(0).FromAddress);
 						}
-						if(emails?.get(0)?.CcAddress != null){
+						if(!emails.isEmpty() && emails.get(0).CcAddress != null){
 							string[] subs = emails[0].CcAddress.Split(';');
 							for(String s : subs){
 								adresses.add(s);
 							}
 						}
+						if(!emails.isEmpty() && emails.get(0).ToAddress != null){
+							string[] subs = emails[0].ToAddress.Split(';');
+							List<String> listMail = new List<String>();
+							for(String s : subs){
+								listMail.add(s);	
+							}
+							
+							listMail =  SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(listMail, listBuzones);
+							adresses.addAll(listMail);
+						}
 						message.setToAddresses(adresses);
-
+						
 						//Contact contactoPeticion = [SELECT Id, Name, Email, CC_Idioma__c FROM contact WHERE Email = :emails[0].FromAddress LIMIT 1];
 						Id contactoMail = (String.isNotBlank(contactoCasoId)) ? Id.valueOf(contactoCasoId) : null;
-						if (contactoMail == null)
+						/*if (contactoMail == null)
 						{
 							if (String.isNotBlank(emails?.get(0)?.FromAddress))
 							{
 								Contact contactoPeticion = [SELECT Id, Name, Email, CC_Idioma__c FROM contact WHERE Email = :emails[0].FromAddress LIMIT 1];
 							}
-						}
+						} */
 
 						Messaging.SingleEmailMessage email = Messaging.renderStoredEmailTemplate(plantillaIdioma, contactoMail, caso.Id);
 						//message.setSenderDisplayName('Segmentos CaixaBank - TO CHANGE');
@@ -1572,7 +1589,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 		}
 
 		if(Limits.getDMLStatements() < Limits.getLimitDMLStatements()){
-			CBK_Log.error(listadoCasosData[0].Id , trazabilidadAsignacion);
+			CBK_Log.debug(listadoCasosData[0].Id , trazabilidadAsignacion);
 		}
 		return retorno;
 	}
@@ -2522,7 +2539,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 		Id rtSeguimiento = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Seguimiento').getRecordTypeId();
 		String resultado='OK';
 		List<Id> wrapperSet = new List<Id>();
-		if(listFiles!='["0"]'){
+		if(listFiles!= null && listFiles!='["0"]'){
 			Type idTypeListId = Type.forName('List<Id>');
 			wrapperSet = (List<Id>) JSON.deserialize(listFiles, idTypeListId);
 		}
@@ -3195,12 +3212,17 @@ Pattern patCasenum = Pattern.compile('^[0-9]{8}$');
 		PicklistWrapper pw = new PicklistWrapper();
 		pw.pickListMap = pickListMap;
 
-		if (Schema.getGlobalDescribe().get(objectName) ==null || String.isBlank(parentField) || String.isBlank(ChildField)){
+		if (String.isBlank(parentField) || String.isBlank(ChildField)){
 			return pw;
 		}
 
-		Schema.sObjectType objType = Schema.getGlobalDescribe().get(objectName).newSObject().getSObjectType();
-		Map<String, Schema.SObjectField> objFieldMap = objType.getDescribe().fields.getMap();
+		Map<String,Map<String, Schema.SObjectField>> mapObjectFields = SEG_GetRT.getFieldsObjects(new Set<String>{objectName});
+
+		if (mapObjectFields == null || mapObjectFields.isEmpty() || !mapObjectFields.containsKey(objectName)) {
+			return pw;
+		}
+
+		Map<String, Schema.SObjectField> objFieldMap = mapObjectFields.get(objectName);
 
 		if (!objFieldMap.containsKey(parentField) || !objFieldMap.containsKey(childField)){
 			return pw;

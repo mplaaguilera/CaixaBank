@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_StreetType__c</fullName>
+    <description>Campo que contiene el tipo de via</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Tipo de vía</label>

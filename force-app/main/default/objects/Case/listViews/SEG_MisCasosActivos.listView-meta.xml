@@ -20,7 +20,12 @@
     <filters>
         <field>CASES.STATUS</field>
         <operation>equals</operation>
-        <value>Abierto,Activo</value>
+        <value>Activo,Abierto</value>
+    </filters>
+    <filters>
+        <field>UPDATEDBY_USER.ALIAS</field>
+        <operation>notEqual</operation>
+        <value>Bluewolf</value>
     </filters>
     <label>Mis casos activos</label>
     <sharedTo>

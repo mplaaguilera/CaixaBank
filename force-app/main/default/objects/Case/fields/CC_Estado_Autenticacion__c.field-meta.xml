@@ -3,32 +3,32 @@
     <fullName>CC_Estado_Autenticacion__c</fullName>
     <externalId>false</externalId>
     <formula>IF(
-ISPICKVAL(CC_Status_Autorizacion__c, &apos;DENIED&apos;), IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15) + &apos; Autenticación denegada por sistema&apos;,
-IF(OR(ISPICKVAL(CC_Status_Autorizacion__c, &apos;PENDING&apos;),ISPICKVAL(CC_Status_Autorizacion__c, &apos;INPROGRESS&apos;)),
+				ISPICKVAL(CC_Status_Autorizacion__c, &apos;DENIED&apos;), IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15) + &apos; Autenticación denegada por sistema&apos;,
+          IF(OR(ISPICKVAL(CC_Status_Autorizacion__c, &apos;PENDING&apos;),ISPICKVAL(CC_Status_Autorizacion__c, &apos;INPROGRESS&apos;)),
 IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15) + &apos; Autenticación en curso&apos;,
 IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;APPROVED&apos;),IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15) + &apos; Autenticación aprobada&apos;,
 IF(OR(ISPICKVAL(CC_Status_Autorizacion__c, &apos;UNAUTHORIZED&apos;),ISPICKVAL(CC_Status_Autorizacion__c, &apos;TIMEOUT&apos;),ISPICKVAL(CC_Status_Autorizacion__c, &apos;ABORTED&apos;), ISPICKVAL(CC_Status_Autorizacion__c, &apos;EXPIRED&apos;), ISPICKVAL(CC_Status_Autorizacion__c, &apos;NOT_IDENTIFIED&apos;), ISPICKVAL(CC_Status_Autorizacion__c, &apos;NOTIFICATIONS_OFF&apos;)),
 IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15) + &apos; Autenticación no finalizada&apos;,
-IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;IS_A_COMPANY&apos;),
-IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15) + &apos; Autenticación no finalizada (EMPRESA)&apos;,
-IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;IS_MINOR&apos;),
-IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15) + &apos; Autenticación no finalizada (MENOR)&apos;,
-IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;SIN ESTADO&apos;),
-IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15) + &apos; Autenticación pendiente&apos;,
-IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;REJECTED&apos;),
+														IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;IS_A_COMPANY&apos;),
+																	IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15) + &apos; Autenticación no finalizada (EMPRESA)&apos;,
+																	IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;IS_MINOR&apos;),
+																				IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15) + &apos; Autenticación no finalizada (MENOR)&apos;,
+																				IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;SIN ESTADO&apos;),
+																							IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15) + &apos; Autenticación pendiente&apos;,
+																							IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;REJECTED&apos;),
 IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15) + &apos; Autenticación rechazada&apos;,
-IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;NOT_DIGITAL_OR_BLOCKED&apos;),
-IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15) + &apos; Sin contrato SAU / Identificador bloqueado&apos;,
+																										IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;NOT_DIGITAL_OR_BLOCKED&apos;),
+																													IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15) + &apos; Sin contrato SAU / Identificador bloqueado&apos;,
 IF(ISPICKVAL(CC_Status_Autorizacion__c, &apos;ERROR&apos;),IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15) + &apos; Autenticación no finalizada por incidencia técnica&apos;,
-IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15) + &apos; Autenticación pendiente&apos;
-)
-)
-)
-)
-)
-)
-)
-)
+																													IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15) + &apos; Autenticación pendiente&apos;
+																												) 
+																									)
+																						)
+																			)
+              ) 
+            )
+        )
+    )
 )
 )</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>

@@ -249,9 +249,18 @@ public with sharing class SPV_GrupoColaboradorContactHelper {
         String usuarioActual = UserInfo.getUserId();
         List<Id> idGruposColaboradores = new List<Id>();
 
+        Map<Id, Case> mapListOwners = new Map<Id, Case>();
+        for(Case caso : listOwners){
+            if(!mapListOwners.containsKey(caso.Id)){
+                mapListOwners.put(caso.Id, caso);
+            }
+        }
+
         //Se almacena los ids de los grupos de los que son los casos
-        for(Case caso: listOwners){
+        for(Id idCaso: mapOld.keySet()){
+            Case caso = mapOld.get(idCaso);
             idGruposColaboradores.add(caso.SEG_Grupo__c);
+            System.debug(caso.SEG_Grupo__c);
         }
 
         Map<Id, List<CC_Grupo_Colaborador_Contact__c>> mapGrupoCol = new Map <Id, List<CC_Grupo_Colaborador_Contact__c>>();
@@ -285,23 +294,26 @@ public with sharing class SPV_GrupoColaboradorContactHelper {
 
 
         //Para cada caso de los casos mmodificados
-        for(Case caso : listOwners){
+        for(Id idCaso : mapOld.keySet()){
             //Si el grupo se encuentra en el mapa y si se encuentra no está vacío, y el nuevo owner no es el de cola ni supervisores (Pte. Asignar ni Pte. supervisores), se
             //va a comprobar si el usuario forma parte de la cola/ grupo
+            Case caso = mapOld.get(idCaso);
             Id grupoCaso = caso.SEG_Grupo__c;
     
             if(mapGrupoCol.containsKey(grupoCaso) && !mapGrupoCol.get(grupoCaso).isEmpty() && caso.OwnerId != cola.Id){
                 Boolean formaParte = false;
-
                 for(CC_Grupo_Colaborador_Contact__c colaborador : mapGrupoCol.get(grupoCaso)){
                         //Si el usuario actual se encuentra en alguno de esos registros  y o es administrador o supervisor, entonces forma parte
-                        if(usuarioActual == colaborador.CC_Usuario__c && colaborador.SAC_Administrador__c == true){
+                        if(usuarioActual == colaborador.CC_Usuario__c /*&& colaborador.SAC_Administrador__c == true*/){
                         formaParte = true;
                         }
                 }
 
                 if(formaParte == false){
-                    caso.addError('Usted no pertenece a la cola de trabajo, o no es administrador de el mismo.');
+                    if(mapListOwners.containsKey(caso.Id)){
+                        Case casoError = mapListOwners.get(caso.Id);
+                        casoError.addError('Usted no pertenece a la cola de trabajo.');
+                    }
                 }
             }
 

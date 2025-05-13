@@ -113,6 +113,10 @@
 	border-color: rgb(201, 201, 201);
 }
 
+.THIS .modalCerrarOportunidad lightning-button-group.buttonGroupEtapas.slds-has-error lightning-button.selected button.slds-button {
+	border-color: var(--lwc-colorBorderError, rgb(234, 0, 30)) !important;
+}
+
 .THIS div.slds-radio_button-group {
     border-color: rgb(201, 201, 201);;
     --slds-g-color-border-base-4: rgb(201, 201, 201);

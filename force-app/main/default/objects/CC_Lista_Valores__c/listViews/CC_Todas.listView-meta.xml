@@ -11,10 +11,5 @@
         <operation>equals</operation>
         <value>CC_Lista_Valores__c.CC_Valor</value>
     </filters>
-    <filters>
-        <field>CC_Valor__c</field>
-        <operation>contains</operation>
-        <value>cuenta</value>
-    </filters>
     <label>Todas</label>
 </ListView>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MarcaIdioma__c</fullName>
+    <description>Establece una imagen según el idioma de la llamada.</description>
+    <externalId>false</externalId>
+    <formula>CASE(
+    CC_Idioma__c,
+    &quot;es&quot;, IMAGE(&quot;/resource/CC_Idioma_Castellano&quot;, &quot;es&quot;, 50, 120),
+    &quot;ca&quot;, IMAGE(&quot;/resource/CC_Idioma_Catalan&quot;, &quot;ca&quot;, 50, 120),
+    &quot;en&quot;, IMAGE(&quot;/resource/CC_Idioma_Ingles&quot;, &quot;en&quot;, 50, 120),
+	   &quot;va&quot;, IMAGE(&quot;/resource/CC_Idioma_Valenciano&quot;, &quot;va&quot;, 50, 120),
+    &quot;eu&quot;, IMAGE(&quot;/resource/CC_Idioma_Euskera&quot;, &quot;eu&quot;, 50, 120),
+    &quot;ga&quot;, IMAGE(&quot;/resource/CC_Idioma_Gallego&quot;, &quot;ga&quot;, 50, 120),
+				&quot;&quot;
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Idioma llamada</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

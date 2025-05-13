@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_IA_Estado__c</fullName>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Estado</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Activo</fullName>
+                <default>true</default>
+                <label>Activo</label>
+            </value>
+            <value>
+                <fullName>New</fullName>
+                <default>false</default>
+                <label>New</label>
+            </value>
+            <value>
+                <fullName>Cerrado</fullName>
+                <default>false</default>
+                <label>Cerrado</label>
+            </value>
+            <value>
+                <fullName>Rechazado</fullName>
+                <default>false</default>
+                <label>Rechazado</label>
+            </value>
+            <value>
+                <fullName>Pendiente Colaborador</fullName>
+                <default>false</default>
+                <label>Pendiente Colaborador</label>
+            </value>
+            <value>
+                <fullName>Pendiente Cliente</fullName>
+                <default>false</default>
+                <label>Pendiente Cliente</label>
+            </value>
+            <value>
+                <fullName>Pendiente Incidencia</fullName>
+                <default>false</default>
+                <label>Pendiente Incidencia</label>
+            </value>
+            <value>
+                <fullName>Pendiente Interno</fullName>
+                <default>false</default>
+                <label>Pendiente Interno</label>
+            </value>
+            <value>
+                <fullName>Pendiente Revisión</fullName>
+                <default>false</default>
+                <label>Pendiente Revisión</label>
+            </value>
+            <value>
+                <fullName>Pendiente Alerta</fullName>
+                <default>false</default>
+                <label>Pendiente Alerta</label>
+            </value>
+            <value>
+                <fullName>Abierto</fullName>
+                <default>false</default>
+                <label>Abierto</label>
+            </value>
+            <value>
+                <fullName>Pendiente</fullName>
+                <default>false</default>
+                <label>Pendiente</label>
+            </value>
+            <value>
+                <fullName>Reabierto</fullName>
+                <default>false</default>
+                <label>Reabierto</label>
+            </value>
+            <value>
+                <fullName>Descartado</fullName>
+                <default>false</default>
+                <label>Descartado</label>
+            </value>
+            <value>
+                <fullName>Merged</fullName>
+                <default>false</default>
+                <label>Merged</label>
+            </value>
+            <value>
+                <fullName>Planificado</fullName>
+                <default>false</default>
+                <label>Planificado</label>
+            </value>
+            <value>
+                <fullName>Rechazado Email</fullName>
+                <default>false</default>
+                <label>Rechazado Email</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -18,19 +18,19 @@
         <value>CBK_Log__c.CBK_AutditEmail</value>
     </filters>
     <filters>
-        <field>Apex_Class__c</field>
-        <operation>equals</operation>
-        <value>OS_EmailService</value>
-    </filters>
-    <filters>
         <field>CREATED_DATE</field>
         <operation>equals</operation>
-        <value>TODAY</value>
+        <value>1/25/2024 12:00 AM</value>
     </filters>
     <filters>
         <field>CBK_sfdcResultStatus__c</field>
         <operation>equals</operation>
         <value>KO</value>
+    </filters>
+    <filters>
+        <field>Apex_Class__c</field>
+        <operation>startsWith</operation>
+        <value>CC_</value>
     </filters>
     <label>Audit Emails</label>
 </ListView>

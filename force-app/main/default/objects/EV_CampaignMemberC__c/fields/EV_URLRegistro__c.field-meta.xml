@@ -3,9 +3,17 @@
     <fullName>EV_URLRegistro__c</fullName>
     <description>URL de Registro</description>
     <externalId>false</externalId>
-    <formula>IF( EV_CampaignId__r.RecordType.DeveloperName == &apos;EV_Eventos_Accionistas&apos;, $CustomMetadata.EV_URL_portal__mdt.URLs.urlAccionistaPortal__c , $CustomMetadata.EV_URL_portal__mdt.URLs.urlPortal__c ) &amp; IF( EV_CampaignId__r.RecordType.DeveloperName == &apos;EV_Eventos_Accionistas&apos;, $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_index__c, $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_Inscripcion__c) &amp;
+    <formula>CASE(EV_CampaignId__r.RecordType.DeveloperName, 
+						&apos;EV_Eventos_Accionistas&apos;,
+						 $CustomMetadata.EV_URL_portal__mdt.URLs.urlAccionistaPortal__c &amp; $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_index__c, 
+						&apos;EV_FestivalesYexperiencias&apos;,
+						$CustomMetadata.EV_URL_portal__mdt.URLreturn.urlPortal__c &amp; $CustomMetadata.EV_URL_portal__mdt.URLreturn.URL_param_index__c,
+						$CustomMetadata.EV_URL_portal__mdt.URLs.urlPortal__c &amp; $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_Inscripcion__c) &amp;
 IF(ISBLANK(EV_LeadId__c),
-IF(ISBLANK(EV_ContactId__c),IF(ISBLANK(EV_AccountId__c),&apos;es&apos;,CASE(EV_AccountId__r.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)), CASE(EV_ContactId__r.Account.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)),
+IF(ISBLANK(EV_ContactId__c),
+IF(ISBLANK(EV_AccountId__c),
+&apos;es&apos;,CASE(EV_AccountId__r.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)), 
+CASE(EV_ContactId__r.Account.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)),
 CASE(EV_LeadId__r.EV_Idiomas__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;))
 &amp; $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_html__c &amp; &apos;?idEvento=&apos; &amp; EV_CampaignId__r.EV_ExternalID__c &amp; &apos;&amp;idInvitacion=&apos;&amp; EV_ExternalID__c</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>

@@ -89,7 +89,7 @@ div.gridCalendariosColumnaHorasTramo {
     height: 36px;
     background-color: #fbfbfb;
     will-change: background-color;
-    transition: background-color 100ms ease-in-out;
+    transition: background-color 80ms ease-in-out;
 }
 
 div.gridCalendariosColumnaHorasTramo[data-es-horario-laboral="false"] {
@@ -116,7 +116,7 @@ div.slds-col.cabeceraColumnaCalendario {
     background-color: #fafafa;
     font-weight: 600;
     will-change: background-color;
-    transition: background-color 100ms ease-in-out;
+    transition: background-color 80ms ease-in-out;
 }
 
 div.gridCalendariosFilaCabecera > div.cabeceraColumnaCalendario:last-child {
@@ -126,7 +126,7 @@ div.gridCalendariosFilaCabecera > div.cabeceraColumnaCalendario:last-child {
 div.gridCalendariosColumnaCalendarView {
     min-width: 75px;
     will-change: background-color;
-    transition: background-color 100ms ease-in-out;
+    transition: background-color 80ms ease-in-out;
 }
 
 div.gridCalendariosColumnaCalendarView:hover > div.slds-grid > div.slds-col.cabeceraColumnaCalendario {
@@ -143,7 +143,7 @@ div.calendarViewTramo {
     height: 18px;
     cursor: pointer;
     will-change: filter, background-color;
-    transition: filter 0ms ease, background-color 100ms ease-in-out;
+    transition: filter 0ms ease, background-color 80ms ease-in-out;
 }
 
 div.calendarViewTramo > div.slds-grid,
@@ -157,7 +157,7 @@ div.calendarViewTramo.blink {
     animation-iteration-count: 7;
     animation-fill-mode: forwards;
     animation-timing-function: ease;
-    animation-duration: 100ms;
+    animation-duration: 80ms;
 }
 
 div.calendarViewTramo.seleccionado {

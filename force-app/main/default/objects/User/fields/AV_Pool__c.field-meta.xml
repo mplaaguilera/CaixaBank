@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Pool__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo para saber si el usuario pertenece al pool</description>
+    <label>Pool BPA</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

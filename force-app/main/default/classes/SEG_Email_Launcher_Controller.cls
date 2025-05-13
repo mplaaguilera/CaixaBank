@@ -84,6 +84,11 @@ public class SEG_Email_Launcher_Controller {
 	@AuraEnabled
 	static public Case recuperarCaso(String caseId){
 		List<Case> caso = [SELECT Subject, SEG_Idioma__c, Status, SEG_Grupo__c FROM Case WHERE id = :caseId LIMIT 1];
+
+		if (caso.isEmpty()) {
+        	return null; 
+    	}
+
 		return caso[0];
 
 	}

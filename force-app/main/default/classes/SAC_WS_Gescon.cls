@@ -109,6 +109,6 @@ public with sharing class SAC_WS_Gescon{
 
     private static Object parseJsonToObject(String jsonData, String jsonType){
         Type typeClass = Type.forName(jsonType);
-        return System.JSON.deserializeStrict(jsonData, typeClass);
+        return System.JSON.deserialize(jsonData, typeClass);
     }
 }

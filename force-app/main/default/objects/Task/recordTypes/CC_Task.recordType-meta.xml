@@ -20,6 +20,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>AV_ContactGenerateAppointment__c</picklist>
+        <values>
+            <fullName>Cita generada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin cita</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>AV_InOutbound__c</picklist>
         <values>
             <fullName>Entrada</fullName>
@@ -131,25 +142,6 @@
         </values>
         <values>
             <fullName>Pendiente</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
-        <picklist>FinServ__Regarding__c</picklist>
-        <values>
-            <fullName>Client Retention</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Onboarding</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Prospecting</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Service</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -368,6 +360,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Cita rápida gestor</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Correo no identificado</fullName>
             <default>false</default>
         </values>
@@ -380,6 +376,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Fraude</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Fusionado</fullName>
             <default>false</default>
         </values>
@@ -388,19 +388,11 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Oportunidad CSBD</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Reactivación</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Reapertura</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Reapertura automatica</fullName>
             <default>false</default>
         </values>
         <values>

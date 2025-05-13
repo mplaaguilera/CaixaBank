@@ -23,7 +23,7 @@ private class SEG_Case_Test {
 
         List<CC_MCC__c> mccsLista = new List<CC_MCC__c>();
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematicaSEG = new CC_MCC__c();
 		mccTematicaSEG.Name = 'Tematica1SEG';
         mccTematicaSEG.CC_Tipo_Cliente__c = 'Segmentos';
@@ -33,7 +33,7 @@ private class SEG_Case_Test {
         mccsLista.add(mccTematicaSEG);
         insert mccsLista;
 
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProductoSEG = new CC_MCC__c();
         mccProductoSEG.Name = 'Producto1SEG';
         mccProductoSEG.CC_Tipo_Cliente__c = 'Segmentos';
@@ -44,7 +44,7 @@ private class SEG_Case_Test {
         
         insert mccProductoSEG; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivoSEG = new CC_MCC__c();
         mccMotivoSEG.Name = 'Motivo1SEG';
         mccMotivoSEG.CC_Tipo_Cliente__c = 'Segmentos';
@@ -55,7 +55,7 @@ private class SEG_Case_Test {
         mccMotivoSEG.CC_Codigo_Externo__c = 'MO-000007';
         insert mccMotivoSEG;
 
-        Id recordTypeIdDetalle = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
+        Id recordTypeIdDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
        	CC_MCC__c mccDetalleSEG = new CC_MCC__c();
         mccDetalleSEG.Name = 'Detalle1SEG';
         mccDetalleSEG.CC_Tipo_Cliente__c = 'Segmentos';
@@ -77,7 +77,7 @@ private class SEG_Case_Test {
         regla3.CBK_Negocio__c = 'Segmentos';
         insert regla3;
 
-        Id grupoOpSegId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
+        Id grupoOpSegId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SEG_GrupoOperativoSegmentos').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoCol1 = new CC_Grupo_Colaborador__c(
             SEG_Zona__c = 'Corporativa',
             SEG_Organizacion__C = 'Banca Corporativa',
@@ -195,7 +195,7 @@ private class SEG_Case_Test {
     
     @isTest
     static void testRechazar() {
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematicaSEG = new CC_MCC__c();
 		mccTematicaSEG.Name = 'Segmentos';
         mccTematicaSEG.CC_Tipo_Cliente__c = 'Segmentos';
@@ -204,7 +204,7 @@ private class SEG_Case_Test {
         mccTematicaSEG.CC_Codigo_Externo__c = 'TE-000008';
         insert mccTematicaSEG;
 
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProductoSEG = new CC_MCC__c();
         mccProductoSEG.Name = 'No procede';
         mccProductoSEG.CC_Tipo_Cliente__c = 'Segmentos';
@@ -215,7 +215,7 @@ private class SEG_Case_Test {
         
         insert mccProductoSEG; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivoSEG = new CC_MCC__c();
         mccMotivoSEG.Name = 'No procede';
         mccMotivoSEG.CC_Tipo_Cliente__c = 'Segmentos';
@@ -226,7 +226,7 @@ private class SEG_Case_Test {
         mccMotivoSEG.CC_Codigo_Externo__c = 'MO-000008';
         insert mccMotivoSEG;
 
-        Id recordTypeIdDetalle = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
+        Id recordTypeIdDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
        	CC_MCC__c mccDetalleSEG = new CC_MCC__c();
         mccDetalleSEG.Name = 'No procede';
         mccDetalleSEG.CC_Tipo_Cliente__c = 'Segmentos';

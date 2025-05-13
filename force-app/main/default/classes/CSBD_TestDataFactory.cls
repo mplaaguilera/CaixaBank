@@ -98,7 +98,7 @@ public with sharing class CSBD_TestDataFactory {
         insert new GroupMember(GroupId = grp.Id, UserOrGroupId = admin.Id);
 
         List<PermissionSetAssignment> nuevosPermisos = new List<PermissionSetAssignment>();
-        for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name LIKE 'CSBD%' AND Type != 'Group']) {
+        for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name LIKE 'CSBD%' AND Type != 'Group' AND License.Name != 'Salesforce Integration']) {
             PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
             nuevoPermiso.PermissionSetId = ps.Id;
             nuevoPermiso.AssigneeId = admin.Id;
@@ -244,7 +244,7 @@ public with sharing class CSBD_TestDataFactory {
     public static Map<String, SObject> crearCuentaContacto(String nif, Map<String, Object> campos) {
         //Cuenta
         Account cuenta = new Account();
-        cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
         cuenta.Name = 'test@test.com';
         cuenta.CC_Numero_Documento__c = nif;
         cuenta.Phone = '123456789';
@@ -260,7 +260,7 @@ public with sharing class CSBD_TestDataFactory {
 
         //Contacto
         Contact contacto = new Contact();
-        contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
         contacto.Email = 'test@test.com';
         contacto.FirstName = 'Nombre';
         contacto.LastName = 'Apellido';
@@ -286,7 +286,7 @@ public with sharing class CSBD_TestDataFactory {
     public static Map<String, SObject> crearEmpleadoOficina(String numeroOficina, Map<String, Object> campos) {
         //Oficina
         Account oficina = new Account();
-        oficina.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        oficina.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
         oficina.Name = 'Oficina Test';
         oficina.CC_Numero_Empresa__c = '001';
         oficina.CC_Numero_Oficina__c = numeroOficina;
@@ -305,7 +305,7 @@ public with sharing class CSBD_TestDataFactory {
 
         //Empleado
         Contact empleado = new Contact();
-        empleado.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        empleado.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
         empleado.AccountId = oficina.Id;
         empleado.CC_Cargo__c = 'DIRECCION';
         empleado.FirstName = 'Nombre';

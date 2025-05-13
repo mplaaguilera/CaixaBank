@@ -20,6 +20,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>AV_ContactGenerateAppointment__c</picklist>
+        <values>
+            <fullName>Cita generada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin cita</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>AV_InOutbound__c</picklist>
         <values>
             <fullName>Entrada</fullName>
@@ -198,25 +209,6 @@
         </values>
     </picklistValues>
     <picklistValues>
-        <picklist>FinServ__Regarding__c</picklist>
-        <values>
-            <fullName>Client Retention</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Onboarding</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Prospecting</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Service</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
         <picklist>OS_Tipo__c</picklist>
         <values>
             <fullName>Actividad manual</fullName>
@@ -371,6 +363,42 @@
     </picklistValues>
     <picklistValues>
         <picklist>Subject</picklist>
+        <values>
+            <fullName>158</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>164</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>165</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>38</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>39</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>58</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>700</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>736</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>739</fullName>
+            <default>false</default>
+        </values>
         <values>
             <fullName>Acuse de recibo</fullName>
             <default>false</default>

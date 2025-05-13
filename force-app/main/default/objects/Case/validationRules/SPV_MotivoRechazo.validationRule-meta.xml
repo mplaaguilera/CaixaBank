@@ -10,11 +10,8 @@
         $UserRole.DeveloperName = &apos;SPV_General&apos;,
         RecordType.DeveloperName = &apos;SPV_Reclamacion&apos;,
         ISPICKVAL(Status, &apos;Descartado&apos;),
-        OR(
-            ISPICKVAL(PRIORVALUE(Status), &apos;SAC_001&apos;),
-            ISPICKVAL(PRIORVALUE(Status), &apos;SAC_002&apos;)
-        ),
-        ISPICKVAL(SAC_MotivoRechazo__c, &apos;&apos;)
+        ISPICKVAL(PRIORVALUE(Status), &apos;SAC_001&apos;),
+        ISPICKVAL(SAC_MotivoDescarte__c, &apos;&apos;)
     )</errorConditionFormula>
-    <errorMessage>Solo se puede rechazar en Alta o Análisis y el campo &quot;motivo rechazo&quot; debe estar informado</errorMessage>
+    <errorMessage>Solo se puede rechazar en Alta y el campo &quot;motivo descarte&quot; debe estar informado</errorMessage>
 </ValidationRule>

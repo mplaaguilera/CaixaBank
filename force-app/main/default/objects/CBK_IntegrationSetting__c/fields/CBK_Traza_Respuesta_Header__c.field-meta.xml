@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CBK_Traza_Respuesta_Header__c</fullName>
     <defaultValue>false</defaultValue>
-    <description>Por si queremos la traza de respuesta</description>
+    <description>Campo que se usa para guardar la respuesta de la peticion en el CBK_Log.</description>
     <label>Traza Respuesta Header</label>
     <trackTrending>false</trackTrending>
     <type>Checkbox</type>

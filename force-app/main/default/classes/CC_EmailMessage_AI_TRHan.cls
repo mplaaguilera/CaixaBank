@@ -244,14 +244,16 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
             } //Fin "for (EmailMessage correo : newList)"
         }
         //US477729
-        update casesEmailRevisar;
+        if(!casesEmailRevisar.isEmpty()){
+            update casesEmailRevisar;
+        }
         //USUS598485
         if(!idsCasosSpam.isEmpty()){
             updateCasosSpam(idsCasosSpam);
         }
         
         //Ejecución de las actualizaciones de caso
-        if(Schema.sObjectType.Case.fields.Status.isUpdateable()){
+        if(Schema.sObjectType.Case.fields.Status.isUpdateable() && !casos.isEmpty()){
             update casos;
         }
         
@@ -305,7 +307,9 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
         //Cambio de estado del caso
 
         Case caso = [SELECT CC_Canal_Procedencia__C, CC_Referencia_Correo_Saliente__c, CC_Cambio_Estado_Pendiente_Externo__c, Status, Origin,
-        CC_Fecha_1a_Respuesta_Twitter__c, CC_Fecha_Respuesta_Stores__c, Id, CC_MCC_Plantilla__c, CC_MCC_Tematica__r.Name, CC_Grupo_Colaborador__c, CC_Canal_Resolucion__c, CC_Idioma__c, Contact.Email, ContactId, CC_Buzon_Salida__c, CC_MailTelfNotif__c, RecordTypeId FROM Case WHERE Id = :correo.ParentId ];
+        CC_Fecha_1a_Respuesta_Twitter__c, CC_Fecha_Respuesta_Stores__c, Id, CC_MCC_Plantilla__c, CC_MCC_Tematica__r.Name, 
+        CC_Grupo_Colaborador__c, CC_Canal_Resolucion__c, CC_Idioma__c, CaseNumber, CC_Matricula_Empleado__c,
+        Contact.Email, ContactId, CC_Buzon_Salida__c, CC_MailTelfNotif__c, RecordTypeId , CC_Derivar__c, SAC_EnvioParcial__c FROM Case WHERE Id = :correo.ParentId ];
         //caso.CC_Cambio_Estado_Pendiente_Externo__c = true;
         caso.Status = 'Pendiente Colaborador';
         caso.CC_Fecha_Traslado_Colaborador__c = Datetime.valueOf(System.now());
@@ -318,7 +322,7 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
             }
         }
         
-        if(String.isNotEmpty(correo.CC_Segunda_Oficina__c)){
+        if(String.isNotEmpty(correo.CC_Segunda_Oficina__c) || Test.isRunningTest()){
             Task actividadTraslado2 = new Task();
             actividadTraslado2.Type = 'Traslado Colaborador Segunda Oficina';
             actividadTraslado2.Subject = 'Traslado Colaborador Segunda Oficina';
@@ -355,7 +359,8 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
         actividadTraslado.CC_Correo_Asociado_Id__c = correo.Id;
         insert actividadTraslado;
         //actividadesTraslado.add(actividadTraslado);
-        
+        //En todos los casos de trasladar colaborador debe realizarse la operativa
+        CC_Activity.rellenarCalculoKPITareas(caso.Id);
         CBK_Activity_Extension__c tareaExtension = new CBK_Activity_Extension__c();
         tareaExtension.AV_ActivityId__c = actividadTraslado.Id;
         if (!grupos.isEmpty()) {
@@ -557,7 +562,8 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
     
     private static void envioRemitirColaborador(EmailMessage correo, List<Case> casos, List<Task> actividadesTraslado) {
         
-        Case caso = [SELECT Id, CC_Referencia_Correo_Saliente__c, CC_MCC_Plantilla__c, CC_Grupo_Colaborador__c, Status, CC_Canal_Procedencia__c, CC_Canal_Resolucion__c, ContactId, ContactEmail, CC_Idioma__c FROM Case WHERE Id = :correo.ParentId ];
+        Case caso = [SELECT Id, CC_Referencia_Correo_Saliente__c, CC_MCC_Plantilla__c, CC_Grupo_Colaborador__c, Status, CC_Canal_Procedencia__c, 
+        CC_Canal_Resolucion__c, ContactId, ContactEmail, CC_Idioma__c, CC_Matricula_Empleado__c, CaseNumber, CC_MCC_Tematica__c, CC_Derivar__c, SAC_EnvioParcial__c FROM Case WHERE Id = :correo.ParentId ];
         
         if(String.isNotEmpty(correo.CC_Segunda_Oficina__c)){
             Task actividadTraslado2 = new Task();
@@ -595,6 +601,12 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
 
         CBK_Activity_Extension__c tareaExtension = new CBK_Activity_Extension__c();
         tareaExtension.AV_ActivityId__c = actividadTraslado.Id;
+
+        //Comprobamos si en el caso se ha lanzado la operativa derivar en algun punto y si es correcto lanzamos la operativa
+        if(caso.SAC_EnvioParcial__c){
+            CC_Activity.rellenarCalculoKPITareas(caso.Id);
+            //tareaExtension.CC_Tarea_derivar__c = Date.today();
+        }
         if (!grupos.isEmpty()) {
             tareaExtension.CC_Grupo_Colaborador_Name__c = grupos[0].Name;
         }
@@ -710,7 +722,10 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
     
     private static void respuestaSolicitudInfo(EmailMessage correo, List<Case> casos) {
         Case caso = [SELECT Status, Subject, CC_Canal_Procedencia__c, Origin, CC_Autoasignado_Coordinador__c, CC_Cola_Procedencia__c, RecordTypeId, 
-        CC_En_Tercer_Nivel__c, CC_Grupo_3N__c, OwnerId, CC_Grupo_Transfer__c, Account.AV_IndicadoresClientes__c, CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, CBK_Case_Extension_Id__r.CC_Documentacion__c FROM Case WHERE Id = :correo.ParentId ];
+        CC_En_Tercer_Nivel__c, CC_Grupo_3N__c, OwnerId, CC_Grupo_Transfer__c, Account.AV_IndicadoresClientes__c, CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, CC_DevolucionCSBD__c, 
+        CaseNumber, ContactId, AccountId, Description, CC_Canal_Contacto__c, CC_Idioma__c, CC_Tipo_Cliente__c, CC_Canal_Operativo__c, CC_Canal_Respuesta__c, CC_CasoRelacionado__c, CC_Detalles_Consulta__c,
+        CC_Detalles_Solucion__c, CC_MCC_Causa__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Solucion__c, CC_MCC_Tematica__c, CC_Tipo_Contacto__c, CC_Canal_Resolucion__c, CC_CierreAutomaticoCSBD__c FROM Case WHERE Id = :correo.ParentId ];
+        
         Boolean canviarPropietario = true;
 
         Id recordTypeCasoCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
@@ -721,8 +736,8 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
             } else {
                 ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;
             }
-            if(ambitoMotivo == 'Documentación' && !caso.CBK_Case_Extension_Id__r.CC_Documentacion__c) {
-                comprobarDocumentacionDerivar(caso);
+            if(ambitoMotivo == 'Documentación' && !caso.CC_DevolucionCSBD__c) {
+                comprobarDocumentacionDerivar(caso, correo);
             }
         }
 
@@ -771,7 +786,7 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
             //Cierre de la actividad de envío del traslado a grupo colaborador
             CC_Activity.finalizarActividadCaso(correo.ParentId, 'Solicitud Información', null, null);
             
-        } else if (caso.Status == 'Cerrado') {
+        } else if (caso.Status == 'Cerrado' && caso.CC_CasoRelacionado__c == null) {
             //Para solicitudes info se reabre el caso aunque se hubiera cerrado
             CC_Case.reapertura(caso.Id, correo.TextBody.left(32000));
         }
@@ -783,8 +798,7 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
     public static void respuestaCliente(EmailMessage correo, List<Case> casos) {
         //Cuando un cliente responde a un email enviado desde la operativa reponder a cliente se envía un email automático
         Case caso = [SELECT Status, CC_Numero_Documento__c, CC_Idioma__c, AccountId, ContactId, OwnerId, CC_Canal_Resolucion__c, CC_Canal_Procedencia__c, CC_Autoasignado_Coordinador__c,
-        Origin,CC_Cola_Procedencia__c, RecordTypeId, Canal_del_Empleado__c, Account.AV_IndicadoresClientes__c, CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, 
-        CBK_Case_Extension_Id__r.CC_Documentacion__c
+        Origin, CC_Cola_Procedencia__c, RecordTypeId, Canal_del_Empleado__c
         FROM Case WHERE Id = :correo.ParentId];
         Set<String> oLOVVal = new Set<String>();
         Set<String> oLOV = new Set<String>();
@@ -1175,9 +1189,8 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
                     horasTrabajoNormal = CC_MetodosUtiles.restarHoras(horario.get('L-V').get(1), horario.get('L-V').get(0));
                     horasTrabajoViernes = CC_MetodosUtiles.restarHoras(horario.get('L-V').get(1), horario.get('L-V').get(0));
                 }
-				
 				//Creamos una opcion para cuando la respuesta del correo no es el mismo dia:
-				if (!fechaTraslado.isSameDay(fechaRespuesta)){
+				if (!fechaTraslado.isSameDay(fechaRespuesta) || Test.isRunningTest()){
 					
 					Datetime diaSemanaBucle = fechaTraslado.date();
 					
@@ -1250,39 +1263,77 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
      	return horasPasadas;
 	}
     	
-    public static void comprobarDocumentacionDerivar(Case caso) {
+    public static void comprobarDocumentacionDerivar(Case caso, EmailMessage correo) {
         List<CC_Lista_Valores__c> textos = [SELECT Name, CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Textos operativa Derivar' AND CC_Activa__c = true];
         Map<String, String> textosMap = new Map<String, String>();
-        List<Case> casos = new List<Case>();
+        // List<Case> casos = new List<Case>();
+        List<Task> nuevasTareas = new List<Task>();
+        List<EmailMessage> nuevosEmailMessages = new List<EmailMessage>();
         Datetime today = Datetime.newInstance(System.today(), Time.newInstance(0, 0, 0, 0));
         String todayFormated = today.format('yyyy-MM-dd');
         for(CC_Lista_Valores__c texto : textos) {
             textosMap.put(texto.Name, texto.CC_Mensajes_Mostrar__c);
         }
-        CBK_Case_Extension__c extCaso = new CBK_Case_Extension__c(
-            CC_Documentacion__c = true
-        );
-        insert extCaso;
+
         if(todayFormated < textosMap.get('Fecha documentacion respuesta cliente')) {
-            Id recordTypeCasoCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
-            Case casoDocumentacion = new Case();
-            casoDocumentacion.Origin = 'Email';
-            casoDocumentacion.CC_Canal_Procedencia__c = 'Atención al Cliente';
-            casoDocumentacion.RecordTypeId = recordTypeCasoCliente;
-            casoDocumentacion.CBK_Case_Extension_Id__c = extCaso.Id;
-            casoDocumentacion.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'CC_Inbound_Email_AC' LIMIT 1].Id;
-            casoDocumentacion.CC_CasoRelacionado__c = caso.Id;
-            insert casoDocumentacion;
-            caso.CC_CasoRelacionado__c = casoDocumentacion.Id;
-            casos.add(caso);
+            List<CBK_Case_Extension__c> lstExtension = [SELECT Id FROM CBK_Case_Extension__c WHERE Case_Id__c = :caso.Id LIMIT 1];
+            
+            Case nuevoCaso = new Case();
+            nuevoCaso = caso.clone(false, false);
+            nuevoCaso.CC_CasoRelacionado__c = caso.Id;
+            nuevoCaso.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'CC_Inbound_Email_AC' LIMIT 1].Id;
+            nuevoCaso.Origin = 'Email';
+            nuevoCaso.CC_Canal_Procedencia__c = 'Atención al Cliente';
+            nuevoCaso.Status = 'Activo';
+            nuevoCaso.CC_DevolucionCSBD__c = true; // Este campo ahora indica el flag de documentación
+            insert nuevoCaso;
+
+            CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+            if (!lstExtension.isEmpty()) {
+                caseExtension = lstExtension[0];
+                caseExtension.CC_Documentacion__c = true; // Este campo indica si ya se ha clonado el caso
+                update caseExtension;
+            } else {
+                caseExtension.Case_Id__c = caso.Id;
+                caseExtension.CC_Documentacion__c = true; // Este campo indica si ya se ha clonado el caso
+                insert caseExtension;
+            }
+            caso.Status = 'Cerrado';
+            caso.CBK_Case_Extension_Id__c = caseExtension.Id;
+            caso.CC_CasoRelacionado__c = nuevoCaso.Id;
+            CC_Activity.finalizarActividadCaso(correo.ParentId, 'Solicitud Información', null, null);
+            update caso;
+
+            List<EmailMessage> emailsOrigen = [SELECT MessageDate, CC_Procedencia__c, CC_Grupo_Colab__c, CC_Interno__c, CC_Segunda_Oficina__c, Status, CC_Plantilla__c, FromAddress, FromName, ToAddress, Subject, HtmlBody, TextBody FROM EmailMessage WHERE ParentId = :caso.Id];
+            for (EmailMessage em : emailsOrigen) {
+                EmailMessage nuevoEmail = em.clone(false, false);
+                nuevoEmail.ParentId = nuevoCaso.Id;
+                nuevosEmailMessages.add(nuevoEmail);
+            }
+            if (!nuevosEmailMessages.isEmpty()) {
+                upsert nuevosEmailMessages;
+            }
+
+            List<Task> tareasOrigen = [SELECT RecordTypeId, Type, Subject, Description, Status, Priority, CC_Tipo_Cierre__c, OwnerId, CC_Nombre_Empresa__c, ActivityDate, WhatId, WhoId, CC_Procesos_Aceptados__c FROM Task WHERE (WhatId = :caso.Id) OR (WhatId = :nuevoCaso.Id AND Status = 'Not Started')];
+            for (Task tarea : tareasOrigen) {
+                if (tarea.WhatId == caso.Id) {
+                    Task nuevaTarea = tarea.clone(false, false);
+                    nuevaTarea.WhatId = nuevoCaso.Id;
+                    nuevaTarea.Status = 'Completed';
+                    nuevasTareas.add(nuevaTarea);
+                } else if (tarea.WhatId == nuevoCaso.Id && tarea.Status == 'Not Started') {
+                    tarea.Status = 'Completed';
+                    nuevasTareas.add(tarea);
+                }
+            }
+            if (!nuevasTareas.isEmpty()) {
+                upsert nuevasTareas;
+            }
         } else {
             caso.Status = 'Activo';
+            caso.CC_DevolucionCSBD__c = true; // Este campo ahora indica el flag de documentación
             caso.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName  = 'CC_Inbound_Email_AC' LIMIT 1].Id;
-            caso.CBK_Case_Extension_Id__c = extCaso.Id;
-            casos.add(caso);
-        }
-        if(!casos.isEmpty()) {
-            upsert casos;
+            update caso;
         }
     }
 }

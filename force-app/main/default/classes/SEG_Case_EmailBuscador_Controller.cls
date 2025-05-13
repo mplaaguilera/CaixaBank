@@ -5,14 +5,14 @@ public with sharing class SEG_Case_EmailBuscador_Controller {
         //Sacar datos del destinatario
         Map<String, String> datosDestinatario = new Map<String, String>();
 
-        if ((recordId).getSObjectType() == Schema.getGlobalDescribe().get('AccountContactRelation')) {
+        if ((recordId).getSObjectType() == Schema.SObjectType.AccountContactRelation.getSObjectType()){
             AccountContactRelation c = [SELECT Contact.Name, Contact.Email FROM AccountContactRelation WHERE id = :recordId];
             if (c.Contact.Email == null) {
                 datosDestinatario.put(c.Contact.Name, 'Sin correo');
             } else{
                 datosDestinatario.put(c.Contact.Name, c.Contact.Email);
             }
-        } else if ((recordId).getSObjectType() == Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c')){
+        } else if ((recordId).getSObjectType() == Schema.SObjectType.CC_Grupo_Colaborador__c.getSObjectType()){
             CC_Grupo_Colaborador__c g = [SELECT Name, CC_Cuenta__r.CC_Email__c FROM CC_Grupo_Colaborador__c WHERE Id = :recordId];
             datosDestinatario.put(g.Name, g.CC_Cuenta__r.CC_Email__c);
             if(datosDestinatario.get(g.Name) == null){
@@ -25,7 +25,7 @@ public with sharing class SEG_Case_EmailBuscador_Controller {
     @AuraEnabled(cacheable=true)
     public static sObject datosRegistro(Id recordId) {
         sObject retorno;
-        if ((recordId).getSObjectType() == Schema.getGlobalDescribe().get('Case')) {
+        if ((recordId).getSObjectType() == Schema.SObjectType.Case.getSObjectType()){
             retorno = [SELECT CC_No_Identificado__c, AccountId, ContactId, RecordType.DeveloperName FROM Case WHERE Id = :recordId];
         }
         return retorno;
@@ -35,7 +35,7 @@ public with sharing class SEG_Case_EmailBuscador_Controller {
     public static Boolean getEsPropietarioObjeto(Id recordId) {
         Id propietarioRegistro;
         //Comparamos el usuario logado con el propietario del registro y devolvemos si coinciden o no
-        if ((recordId).getSObjectType() == Schema.getGlobalDescribe().get('Case')) {
+        if ((recordId).getSObjectType() == Schema.SObjectType.Case.getSObjectType()){
             propietarioRegistro = [SELECT OwnerId FROM Case WHERE Id = :recordId].OwnerId;
         }
         return (propietarioRegistro == UserInfo.getUserId());
@@ -53,7 +53,7 @@ public with sharing class SEG_Case_EmailBuscador_Controller {
         Set<String> listaCc = new Set<String>();
         Set<String> listaCco = new Set<String>();
             
-        if ((idContacto).getSObjectType() == Schema.getGlobalDescribe().get('Contact')) {
+        if ((idContacto).getSObjectType() == Schema.SObjectType.Contact.getSObjectType()){
             List<Contact> contactos = [SELECT Email FROM Contact WHERE Id = :idContacto];
             if (!contactos.isEmpty()) {
                 String direccionCorreoPrincipal = [SELECT Email FROM Contact WHERE Id = :idContacto].Email;
@@ -77,7 +77,7 @@ public with sharing class SEG_Case_EmailBuscador_Controller {
                 }
             }
         }
-        else if ((idContacto).getSObjectType() == Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c')) {
+        else if ((idContacto).getSObjectType() == Schema.SObjectType.CC_Grupo_Colaborador__c.getSObjectType()) {
             List<CC_Grupo_Colaborador_Contact__c> grupocolab = [SELECT Id, CC_Contacto__r.Name, CC_Contacto__r.Id, CC_Email__c, toLabel(CC_Para_CC__c) FROM CC_Grupo_Colaborador_Contact__c WHERE CC_Grupo_Colaborador__c =:idContacto];
             List<Id> contacts = new List<Id>();
             for (CC_Grupo_Colaborador_Contact__c colabo : grupocolab) {

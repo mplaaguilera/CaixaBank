@@ -1,32 +1,90 @@
 <template>
-    <section role="dialog" lwc:ref="modalCerrarOportunidad" class="slds-modal" tabindex="-1" aria-modal="true" onkeydown={modalTeclaPulsada}>
+    <section role="dialog" lwc:ref="modalCerrarOportunidad" class="slds-modal modalCerrarOportunidad cargando" tabindex="-1" aria-modal="true" onkeydown={modalTeclaPulsada}>
         <div class="slds-modal__container">
             <header class="slds-modal__header">
                 <!-- sldsValidatorIgnoreNextLine -->
-                <button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar}>
+                <button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={spinner}>
                     <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
                 </button>
                 <h2 class="slds-text-heading_medium slds-hyphenate">Cerrar oportunidad</h2>
                 <p class="slds-var-m-top_x-small">Finalizar la gestión de la oportunidad.</p>
             </header>
 
-            <div class="slds-modal__content slds-var-p-horizontal_xx-large slds-var-p-vertical_large">
-                <div lwc:if={mostrarNotificacion} style="padding-bottom: 16px; padding-left: 5px; padding-right: 5px; font-weight: 200;">
-                    <c-cc-scoped-notification tema="Claro" icono="info" mensaje="La oportunidad no tiene contacto informado. Solo es posible rechazarla."></c-cc-scoped-notification>
-                </div>
+            <div lwc:ref="modalContent" class="slds-modal__content">
+                <c-csbd_-spinner-kx lwc:if={spinner} size="large" variant="brand"></c-csbd_-spinner-kx>
 
-                <lightning-combobox lwc:ref="inputEtapa" class="inputEtapa slds-var-m-bottom_large" label="Etapa de ventas final" options={cerrarEtapas} required onchange={inputEtapaOnchange}></lightning-combobox>
-                <lightning-combobox lwc:ref="inputResolucion" class="inputResolucion slds-var-m-bottom_large" label="Resolución" options={cerrarResoluciones} required onchange={inputResolucionOnchange}></lightning-combobox>
-                <lightning-textarea lwc:if={mostrarMotivoRechazo} class="inputMotivoRechazo slds-var-m-bottom_large" label="Motivo de rechazo" required></lightning-textarea>
-                <template lwc:if={mostrarTipoBonificado}>
-                    <lightning-input lwc:ref="inputTipoOfertado" class="inputTipoOfertado slds-var-m-bottom_large" type="number" formatter="percent-fixed" min="0" max="100" step="0.01" label="Tipo ofertado"></lightning-input>
-                    <lightning-combobox lwc:ref="inputEntidadCompetencia" class="inputEntidadCompetencia slds-var-m-bottom_medium" label="Entidad de la competencia" options={entidadesCompetencia}></lightning-combobox>
-                </template>
+                <div class="contenedor">
+
+                    <article class="bannerClienteNoIdentificado slds-card slds-scoped-notification_light slds-align_absolute-center">
+                        <div class="slds-card__body" style="margin: unset;">
+                            <div class="slds-scoped-notification slds-media slds-media_center" role="status">
+                                <div class="slds-media__figure">
+                                    <div class="slds-icon_container">
+                                        <lightning-icon icon-name="utility:resource_absence" size="x-small"></lightning-icon>
+                                    </div>
+                                </div>
+                                <div class="slds-media__body" style="line-height: 19px; font-weight: 300;">
+                                    <p>Oportunidad <span style="font-weight: 400">sin contacto informado</span>. Solo es posible rechazarla.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <div class="slds-align_absolute-center">
+                        <div class="slds-grid slds-grid_vertical slds-var-m-bottom_x-large">
+                            <div class="slds-col">
+                                <lightning-button-group lwc:ref="buttonGroupEtapas" class="buttonGroupEtapas">
+                                    <lightning-button lwc:ref="botonFormalizada" label="Formalizada" icon-name="utility:success" onclick={botonEtapaOnclick} data-etapa="Formalizada" disabled class="botonFormalizada"></lightning-button>
+                                    <lightning-button lwc:ref="botonPerdida" label="Perdida" icon-name="utility:clear" onclick={botonEtapaOnclick} data-etapa="Perdida" class="botonPerdida" disabled></lightning-button>
+                                    <lightning-button lwc:ref="botonRechazada" label="Rechazada" icon-name="utility:close" onclick={botonEtapaOnclick} data-etapa="Rechazada" class="botonRechazada" ></lightning-button>
+                                </lightning-button-group>                        </div>
+                            <div lwc:if={botonesEtapaMensajeError} class="slds-col slds-has-error slds-var-m-top_x-small">
+                                <span class="slds-form-element__help" role="status">{botonesEtapaMensajeError}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slds-align_absolute-center slds-var-m-top_medium slds-var-m-bottom_medium">
+                        <div style="width: 430px;">
+                            <label class="labelInputResolucion slds-form-element__label slds-var-m-right_x-small"><abbr class="slds-required">*</abbr>Resolución</label>
+                            <lightning-combobox lwc:ref="inputResolucion" class="inputResolucion" options={inputResolucionOptions} variant="label-hidden" onchange={inputResolucionOnchange} placeholder="Selecciona una resolución"></lightning-combobox>
+
+                            <div lwc:ref="camposDevolucionContact" class="camposDevolucionContact slds-hide">
+                                <label class="slds-form-element__label slds-var-m-right_x-small"><abbr class="slds-required">*</abbr>Motivo de rechazo</label>
+                                <lightning-textarea lwc:ref="inputMotivoRechazo" class="inputMotivoRechazo" variant="label-hidden" onchange={inputMotivoRechazoOnchange}></lightning-textarea>
+                            </div>
+
+                            <div lwc:ref="camposCompetencia" class="camposCompetencia slds-grid slds-gutters_direct-small slds-hide">
+                                <div class="slds-col">
+                                    <lightning-input lwc:ref="inputTipoOfertado" class="inputTipoOfertado" type="number" formatter="percent-fixed" min="0" max="100" step="0.01" label="Tipo ofertado" placeholder="Tipo ofrecido al cliente" ></lightning-input>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-combobox lwc:ref="inputEntidadCompetencia" class="inputEntidadCompetencia" label="Entidad de la competencia" options={entidadesCompetencia} placeholder="Selecciona una entidad"></lightning-combobox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mensajeSinResoluciones slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small slds-var-m-bottom_small slds-align_absolute-center">
+                        <div class="slds-col slds-grow-none">
+                            <lightning-icon icon-name="utility:deprecate" size="small" variant="error"></lightning-icon>
+                        </div>
+                        <div class="slds-col">
+                            <span>No hay resoluciones configuradas para oportunidades </span><span class="negrita">{mensajeSinResoluciones.etapaName}</span>
+                            <span> de tipo </span><span class="negrita">{mensajeSinResoluciones.recordTypeName}</span>
+                            <span> y producto </span><span class="negrita">{mensajeSinResoluciones.producto}</span>.
+                        </div>
+                    </div>
+
+                    <!-- <div lwc:if={diasAbierta} class="slds-align_absolute-center slds-var-m-top_x-large">
+                        <p style="font-size: 12px; color: gray;">La oportunidad ha estado {diasAbierta} días abierta.</p>
+                    </div> -->
+                </div>
             </div>
 
             <footer class="slds-modal__footer">
-                <lightning-button lwc:ref="botonAceptar" variant="brand" label="Cerrar oportunidad" icon-name="action:close" onclick={cerrarOportunidad} class="botonAceptar"></lightning-button>
-                <lightning-button label="Cancelar" onclick={modalCerrar} class="slds-var-m-left_small"></lightning-button>
+                <lightning-button lwc:ref="botonAceptar" variant="brand" label="Cerrar oportunidad" icon-name="action:close" onclick={cerrarOportunidad} class="botonAceptar" disabled={spinner}></lightning-button>
+                <lightning-button label="Cancelar" onclick={modalCerrar} class="slds-var-m-left_small" disabled={spinner}></lightning-button>
             </footer>
         </div>
     </section>

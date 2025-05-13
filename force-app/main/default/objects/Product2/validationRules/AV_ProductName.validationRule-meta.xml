@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ProductName</fullName>
+    <active>true</active>
+    <description>Validation rule para evitar la modificación del product name de la listView URL Argumentario</description>
+    <errorConditionFormula>ISCHANGED(Name) &amp;&amp;
+    !$Permission.AV_AvoidBulkApi &amp;&amp;
+    !$Permission.AV_ByPassValidationRules &amp;&amp;
+    !$Permission.CBK_BypassValidationRules</errorConditionFormula>
+    <errorDisplayField>Name</errorDisplayField>
+    <errorMessage>No es posible modificar el nombre del producto</errorMessage>
+</ValidationRule>

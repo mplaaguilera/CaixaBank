@@ -266,10 +266,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Chat NOA WhatsApp</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Clases Pasivas</fullName>
             <default>false</default>
         </values>
@@ -279,6 +275,62 @@
         </values>
         <values>
             <fullName>Código de Buenas Prácticas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Andalucía Occidental</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Andalucía Oriental</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Balears</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Barcelona</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Canarias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Castilla la Mancha-Extremadura</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Castilla y León</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Catalunya</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Comunidad Valenciana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Ebro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Madrid</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Murcia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Norte</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DT Servicios Centrales</fullName>
             <default>false</default>
         </values>
         <values>
@@ -295,10 +347,6 @@
         </values>
         <values>
             <fullName>EDG - Externos</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>EDG-BANKIA MEDIACIÓN</fullName>
             <default>false</default>
         </values>
         <values>
@@ -383,6 +431,10 @@
         </values>
         <values>
             <fullName>EDG-VDC %2F VIDACAIXA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EDG-VIDACAIXA MEDIACIÓN</fullName>
             <default>false</default>
         </values>
         <values>
@@ -680,8 +732,19 @@
             <fullName>OESIA</fullName>
             <default>false</default>
         </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Tipo__c</picklist>
         <values>
-            <fullName>SIN PROVEEDOR</fullName>
+            <fullName>Remitidos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslados y Remitidos</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -731,6 +794,10 @@
         </values>
         <values>
             <fullName>CSI_Bankia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GRR</fullName>
             <default>false</default>
         </values>
         <values>

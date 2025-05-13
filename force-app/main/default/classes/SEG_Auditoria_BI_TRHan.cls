@@ -23,13 +23,14 @@ public with sharing class SEG_Auditoria_BI_TRHan extends CC_TriggerHandlerBase{
             }
         }
 
-        if(segAuditorias.size()>0){
+        if(!segAuditorias.isEmpty()){
             process(segAuditorias, (Map<ID, SEG_Auditoria__c>)tp.newMap);
         }
     }
-    private void process(List<SEG_Auditoria__c> listObj, Map<ID, SEG_Auditoria__c> mapObj)
+    private void process(List<SEG_Auditoria__c> listNewObj, Map<ID, SEG_Auditoria__c> mapObj)
     {
-        setNifAndDateAuditorias(listObj);
+        setNifAndDateAuditorias(listNewObj);
+        concatFechaNif(listNewObj);
     }
     
     private void setNifAndDateAuditorias (List<SEG_Auditoria__c> listNewObj)
@@ -48,6 +49,18 @@ public with sharing class SEG_Auditoria_BI_TRHan extends CC_TriggerHandlerBase{
             auditorias.SEG_FAuditoria__c = auditorias.SEG_FechaAuditoriaFormato__c;
             if(caseMap.get(auditorias.SEG_NumeroSR__c).Account.CC_Numero_Documento__c != null && auditorias.SEG_NIF__c == null){
                 auditorias.SEG_NIF__c = caseMap.get(auditorias.SEG_NumeroSR__c).Account.CC_Numero_Documento__c;                
+            }
+        }
+    }
+
+    public static void concatFechaNif(List<SEG_Auditoria__c> listNewObj) {
+        for (SEG_Auditoria__c auditoria : listNewObj) {
+            if(auditoria.SEG_FechaAuditoriaFormato__c != null ){
+                String fechaAuditoria = '';
+                if(auditoria.SEG_NIF__c != null ){
+                    fechaAuditoria = fechaAuditoria + auditoria.SEG_NIF__c;
+                }
+                auditoria.NIF_FechaAuditoria__c = fechaAuditoria + String.valueOf(auditoria.SEG_FechaAuditoriaFormato__c);
             }
         }
     }

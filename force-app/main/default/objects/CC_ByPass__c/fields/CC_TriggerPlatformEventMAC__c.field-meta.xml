@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TriggerPlatformEventMAC__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Utilizado para el tr de PE de CC</description>
+    <label>Trigger Platform Event MAC</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

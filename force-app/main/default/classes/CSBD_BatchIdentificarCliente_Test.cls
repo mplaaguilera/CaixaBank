@@ -14,7 +14,7 @@ public class CSBD_BatchIdentificarCliente_Test {
     }
 
     @isTest
-    public static void batchAnonimar() {
+    public static void batchIdentificarCliente() {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
 
         System.runAs(usuarioGestor) {
@@ -29,8 +29,6 @@ public class CSBD_BatchIdentificarCliente_Test {
 
             Opportunity hipoteca = [SELECT AccountId, CSBD_Contact__c, CSBD_Now_NIF__c
                                             FROM Opportunity WHERE CSBD_Now_NIF__c != null];
-
-            Contact contacto = [select CC_Numero_Documento__c, AV_NumPerso__c from contact limit 1];
 
             Task[] tareaIdentificacion = [SELECT Id FROM Task WHERE Type =: 'Identificación del cliente'];
 

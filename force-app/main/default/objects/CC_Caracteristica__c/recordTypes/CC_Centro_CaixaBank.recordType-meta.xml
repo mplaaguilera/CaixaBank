@@ -76,6 +76,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>FRA</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>HDT</fullName>
             <default>false</default>
         </values>

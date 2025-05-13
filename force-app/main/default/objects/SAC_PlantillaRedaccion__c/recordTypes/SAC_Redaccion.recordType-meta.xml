@@ -55,25 +55,6 @@
         </values>
     </picklistValues>
     <picklistValues>
-        <picklist>SAC_Motivo_Inadmision__c</picklist>
-        <values>
-            <fullName>Antigüedad reclamación</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Empleados</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>No consumidor</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Prescripción</fullName>
-            <default>false</default>
-        </values>
-    </picklistValues>
-    <picklistValues>
         <picklist>SAC_Origen__c</picklist>
         <values>
             <fullName>Email</fullName>
@@ -104,6 +85,14 @@
         </values>
         <values>
             <fullName>SAC_AvisoResolucion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_AvisoResolucionCartaPostal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_AvisoResolucionSubsanacion</fullName>
             <default>false</default>
         </values>
         <values>

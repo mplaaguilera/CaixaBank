@@ -3,7 +3,7 @@
     <fullName>SAC_Resumen__c</fullName>
     <description>Resumen de la pretensión devuelto por cognitive en la integración de Genial</description>
     <encryptionScheme>None</encryptionScheme>
-    <label>Resumen</label>
+    <label>Resumen IA</label>
     <length>32768</length>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>

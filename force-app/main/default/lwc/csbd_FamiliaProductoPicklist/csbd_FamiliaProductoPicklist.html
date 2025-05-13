@@ -1,6 +1,5 @@
 <template>
 	<lightning-card lwc:ref="cardComponente" class="cardComponente slds-is-relative" onclick={cardComponenteOnclick}>
-
 		<div lwc:ref="seccion" class="seccion slds-section slds-is-relative section-layout-container slds-is-open">
 			<h3 class="label slds-truncate slds-var-p-around_small slds-theme_shade" onclick={tituloSeccionOnclick}>
 				<button aria-expanded="true" class="slds-button slds-section__title-action">
@@ -12,6 +11,13 @@
 				<div lwc:if={spinner} align="center">
 					<lightning-spinner style="position: absolute;" alternative-text="Guardando..."></lightning-spinner>
 				</div>
+
+				<!--
+				<div lwc:if={editando} class="slds-var-m-top_medium slds-var-m-bottom_x-large">
+					<c-csbd_-buscador-producto record-id={recordId} onresultadoseleccionado={buscadorResultadoSeleccionado}></c-csbd_-buscador-producto>
+				</div>
+				-->
+
 				<div class="slds-form" role="list">
 					<div class="slds-form__row">
 						<div class="slds-form__item" role="listitem">
@@ -20,7 +26,7 @@
 									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer} data-campo="empresaProveedora"></lightning-button-icon>
 									<label class="slds-form-element__label">Empresa proveedora</label>
 									<div class="slds-form-element__control">
-										<lightning-combobox class="comboboxEmpresas" options={opcionesEmpresaProveedora} value={empresaProveedora.value} onchange={comboboxEmpresasOnchange} onfocus={comboboxEmpresasOnfocus}> </lightning-combobox>
+										<lightning-combobox lwc:ref="comboboxEmpresas" class="comboboxEmpresas" options={opcionesEmpresaProveedora} value={empresaProveedora.value} onchange={comboboxEmpresasOnchange} onfocus={comboboxEmpresasOnfocus}> </lightning-combobox>
 									</div>
 								</div>
 							</template>
@@ -62,7 +68,7 @@
 									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer} data-campo="familiaProducto"></lightning-button-icon>
 									<label class="slds-form-element__label">Familia de producto</label>
 									<div  class="slds-form-element__control">
-										<lightning-combobox class="comboboxFamilias" options={opcionesFamiliaProducto} value={familiaProducto.value} onchange={comboboxFamiliasProductoOnchange} onfocus={comboboxFamiliasProductoOnfocus}></lightning-combobox>
+										<lightning-combobox lwc:ref="comboboxFamilias" class="comboboxFamilias" options={opcionesFamiliaProducto} value={familiaProducto.value} onchange={comboboxFamiliasProductoOnchange} onfocus={comboboxFamiliasProductoOnfocus}></lightning-combobox>
 									</div>
 								</div>
 							</template>
@@ -96,7 +102,7 @@
 									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer} data-campo="producto"></lightning-button-icon>
 									<label class="slds-form-element__label">Producto</label>
 									<div lwc:if={editando} class="slds-form-element__control">
-										<lightning-combobox class="comboboxProductos" options={opcionesProducto} value={producto.value} onchange={comboboxProductosOnchange} onfocus={comboboxProductosOnfocus}></lightning-combobox>
+										<lightning-combobox lwc:ref="comboboxProductos" class="comboboxProductos" options={opcionesProducto} value={producto.value} onchange={comboboxProductosOnchange} onfocus={comboboxProductosOnfocus}></lightning-combobox>
 									</div>
 								</div>
 							</template>
@@ -111,7 +117,7 @@
 						<div class="slds-form__item" role="listitem"></div>
 					</div>
 					<div class="slds-form__row">
-						<div class="slds-form__item" role="listitem"  lwc:if={mostrar.motivoMac} >
+						<div class="slds-form__item" role="listitem" lwc:if={mostrar.motivoMac} >
 							<template lwc:if={editando}>
 								<div class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
 									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer} data-campo="motivoMac"></lightning-button-icon>
@@ -259,7 +265,7 @@
 					</div>
 					<div class="slds-col">
 						<lightning-button label="Cancelar" onclick={cancelar}></lightning-button>
-						<lightning-button label="Guardar" variant="brand" class="slds-var-m-left_small" onclick={guardar}></lightning-button>
+						<lightning-button label="Guardar" variant="brand" class="slds-var-m-left_medium" onclick={guardar}></lightning-button>
 					</div>
 				</div>
 

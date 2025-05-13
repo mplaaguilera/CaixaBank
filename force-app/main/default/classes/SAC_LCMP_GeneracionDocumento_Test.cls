@@ -103,13 +103,15 @@ public with sharing class SAC_LCMP_GeneracionDocumento_Test {
     @isTest
     static void generarDocumentoRedaccionTest(){
         SAC_DocumentoEnvio__c documentoEnvio = [SELECT Id  FROM SAC_DocumentoEnvio__c WHERE Name = 'TestDocumentoEnvio' LIMIT 1];
+
         SAC_DocumentoEnvio__c documentoEnvio2;
 
         User usuarioGeneral = [SELECT Id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true LIMIT 1];
         
         System.runAs(usuarioGeneral){
             Test.startTest();
-            SAC_LCMP_GeneracionDocumento.generarDocumentoRedaccion(documentoEnvio.Id);
+            SAC_LCMP_GeneracionDocumento.generarDocumentoRedaccion(documentoEnvio.Id, false);
+            SAC_LCMP_GeneracionDocumento.generarDocumentoRedaccion(documentoEnvio.Id, true);
             Test.stopTest();
             documentoEnvio2 = [SELECT Id, SAC_URL__c  FROM SAC_DocumentoEnvio__c WHERE Name = 'TestDocumentoEnvio' LIMIT 1];
         }

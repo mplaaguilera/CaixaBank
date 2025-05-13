@@ -2,6 +2,7 @@
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>TMS_Cases</fullName>
     <columns>CASES.CASE_NUMBER</columns>
+    <columns>TMS_Numexp__c</columns>
     <columns>NAME</columns>
     <columns>CASES.SUBJECT</columns>
     <columns>CASES.STATUS</columns>
@@ -16,6 +17,6 @@
     </filters>
     <label>Testamentarías</label>
     <sharedTo>
-        <group>TMS_Admin</group>
+        <role>TMS_Testamentarias</role>
     </sharedTo>
 </ListView>

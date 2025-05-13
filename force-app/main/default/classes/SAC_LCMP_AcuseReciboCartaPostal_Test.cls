@@ -71,13 +71,9 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
         Case casoResult = [SELECT Id, CaseNumber FROM Case WHERE Subject = 'testRecnew'];
         System.assertEquals(myInfo.caso.CaseNumber, casoResult.CaseNumber, 'La búsqueda previa ha fallado.');
     }
-
+    
     @isTest
     static void envioCartaPostalTest(){
-        Case c = [SELECT Id, CaseNumber, CreatedDate, Status, SAC_RedaccionFinal__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, 
-            SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c, SAC_NombreContacto__c, Origin, CC_AcuseRecibo__c
-                FROM Case WHERE Subject = 'testRec1'];
-
         User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
 
         PermissionSet ps = [select id from PermissionSet where PermissionSet.Label ='SAC_General'];
@@ -87,14 +83,42 @@ public with sharing class SAC_LCMP_AcuseReciboCartaPostal_Test {
             SAC_DatabaseDML.insertDML(psa, false);
 			//Database.insert(psa);
 		}
-
+        
+        EmailTemplate e = new EmailTemplate(
+            developerName = 'paraClasetest', 
+            FolderId = usuario.id, 
+            TemplateType= 'Text', 
+            Name = 'test',
+            HtmlValue = 'cuerpo prueba',
+            Subject = 'test'
+        ); 
+    
+        SAC_DatabaseDML.insertDML(e, false);
+        
+        EnhancedLetterhead letterhead = new EnhancedLetterhead(Name = 'PlantillaSAC', LetterheadFooter = 'Test Footer', LetterheadHeader = 'Test Header');
+        SAC_DatabaseDML.insertDML(letterhead, false);
+        SAC_DocumentoEnvio__c documento;
+        
         System.RunAs((usuario)){   
+            //Reclamacion
+            Map<String, Object> camposRecl = new Map<String, Object>();
+            camposRecl.put('Subject', 'testRecTest');
+            camposRecl.put('Status', 'SAC_001');
+            camposRecl.put('Origin', 'Email');
+            camposRecl.put('SuppliedEmail', 'sactest@sactest.sactest');
+            
+            Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);
+            
+            Case c = [SELECT Id, CaseNumber, CreatedDate, Status, SAC_RedaccionFinal__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, 
+                      SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c, SAC_NombreContacto__c, Origin, CC_AcuseRecibo__c
+                      FROM Case WHERE Subject = 'testRecTest'];
+            
             Test.startTest();
             SAC_LCMP_AcuseReciboCartaPostal.envioCartaPostal(c, 'direccion', 'codigoPostal', 'poblacion', 'provincia', '011');
+            documento = [SELECT Id FROM SAC_DocumentoEnvio__c WHERE SAC_Caso__c = :c.Id];
             Test.stopTest();
         }
-        
-        SAC_DocumentoEnvio__c documento = [SELECT Id FROM SAC_DocumentoEnvio__c WHERE SAC_Caso__c = :c.Id];
         
         System.assertNotEquals(null, documento.Id, 'La búsqueda previa ha fallado.');
     }

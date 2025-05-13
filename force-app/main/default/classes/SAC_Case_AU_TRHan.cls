@@ -108,6 +108,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         }
     }
     private void processSAC(List<Case> listNewObj, Map<Id, Case> mapNewObj, List<Case> listOldObj, Map<Id, Case> mapOldObj) {
+        Boolean recalcularSharesReclamaciones = false;
         Boolean recalcularSharesPretensiones = false;
         List<SObject> objetos =new list<SObject>();
         List<Case> listaPretensiones = new List<Case>();
@@ -285,7 +286,11 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     listaOwnersCambiados.add(caso);
                     idesReclaGlobal.add(caso.SAC_Reclamacion__c);
                 }
+                System.debug('Entra en el if de pretensiones');
+                System.debug('mapOldObj.get(caso.Id).Status ' + mapOldObj.get(caso.Id).Status);
+                System.debug('caso.Status ' + caso.Status);
                 if(mapOldObj.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SAC_009'){
+                    System.debug('Entra en if listaPretensionControlarMilestone ');
                     listaPretensionControlarMilestone.add(caso);
                 }
                  if (mapOldObj.containsKey(caso.Id) && (mapOldObj.get(caso.Id).SAC_Entidad_Afectada__c != caso.SAC_Entidad_Afectada__c || mapOldObj.get(caso.Id).SAC_EntidadProductora__c != caso.SAC_EntidadProductora__c)) {
@@ -308,6 +313,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 if (mapOldObj.get(caso.Id).OwnerId != caso.OwnerId) {
                     listaPretOwnerCola.add(caso);
                     setIdRecPadre.add(caso.SAC_Reclamacion__c);
+                    recalcularSharesReclamaciones = true;
                 }
                 if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SAC_007') { //negociación
                     if (mapOldObj.get(caso.Id).Status == 'SAC_003') { // Negociacion despues de resolución
@@ -528,7 +534,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     idesReclaGlobal.add(mapOldObj.get(caso.Id).CC_CasoRelacionado__c);
                 }
 
-                if(mapOldObj.get(caso.Id).SAC_Naturaleza__c != caso.SAC_Naturaleza__c && caso.SAC_Naturaleza__c == 'SAC_005'){
+                if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).SAC_Naturaleza__c != caso.SAC_Naturaleza__c && caso.SAC_Naturaleza__c == 'SAC_005'){
                     listaRecCambioNaturaleza.add(caso);
                    
                 }
@@ -540,7 +546,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
             }
         }
 
-        List<Case> listaCasosSelect = [SELECT Id, Subject, SEG_Detalle__c, SAC_Reclamacion__r.OwnerId, SAC_Reclamacion__r.SEG_Detalle__c, SAC_Reclamacion__r.SEG_Detalle__r.SAC_EndToEnd__c,
+        List<Case> listaCasosSelect = [SELECT Id, Subject, SEG_Detalle__c, SAC_Naturaleza__c, SAC_Reclamacion__r.OwnerId, SAC_Reclamacion__r.SEG_Detalle__c, SAC_Reclamacion__r.SEG_Detalle__r.SAC_EndToEnd__c,
                                   OwnerId, SAC_Reclamacion__r.SEG_Grupo__c, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Detalle__c, SAC_TiempoSLALetradoAlta__c, 
                                       SAC_Reclamacion__r.SAC_PretensionPrincipal__r.OwnerId, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_Reclamacion__r.SEG_Grupo__r.SAC_EndToEnd__c,
                                       SAC_SentidoResolucion__c, Status, SAC_StatusAuxiliar__c, SAC_Reclamacion__r.SAC_SentidoResolucion__c, CC_Importe_Reclamado__c, CaseNumber, OS_Email__c,CC_Telefono_Contacto__c, SAC_DireccionPostalNotificacion__c,
@@ -565,7 +571,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                                       OR ((RecordTypeId = :RECTYPECONSULTA OR RecordTypeId = :RECTYPECONSULTASAC) AND CC_CasoRelacionado__c IN: idesReclaGlobal 
                                             AND (Status != 'SAC_008' OR Status != 'SAC_012' OR Status != 'SAC_013')) 
                                       OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN: listaReclamacionEspecial)
-                                      OR (RecordTypeId = :RECTYPERECLAMACION AND (Id IN: setIdRecPadre OR Id IN: idesReclaGlobal))
+                                      OR (RecordTypeId = :RECTYPERECLAMACION AND (Id IN: setIdRecPadre OR Id IN: idesReclaGlobal OR Id IN: setIdesRec))
                                       OR (RecordTypeId = :RECTYPERECLAMACION AND  Id IN: listaIdsCambiaIdioma)
                                       OR (RecordTypeId = :RECTYPERECLAMACION AND  Id IN: idsComprobarDespachoRepresentante)
                                       OR (RecordTypeId = :RECTYPERECLAMACION AND  (Id IN: idsCambiaVinculacion OR Id IN: idsAddVinculacion OR Id IN: idsComplementariasCambiaImporteAbonado))
@@ -683,7 +689,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                if(!listaReclaAddVinculacion.isEmpty()){
                     SAC_Reclamacion.arrastrarImporteReclamacionVinculada(listaCasosSelect, listaReclaAddVinculacion, mapaDatosCasosActualizar);
                 }
-
                 if(!listaReclaCambiaVinculacion.isEmpty()){
                     SAC_Reclamacion.actualizarImporteCambioVinculacion(listaCasosSelect, mapOldObj, listaReclaCambiaVinculacion, mapaDatosCasosActualizar);
                 }
@@ -799,12 +804,14 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         }   
 
         if (!listaPretOwnerCola.isEmpty()) {SAC_Reclamacion.insertarCaseShare(listaPretOwnerCola, listaCasosSelect);}         
-        
 
         if(!mapaDatosCasosActualizar.isEmpty()){
             // Database.update(mapaDatosCasosActualizar.values());
             if(recalcularSharesPretensiones){
-                SAC_Reclamacion.insertarCaseShareByReclamacion(mapaDatosCasosActualizar.values());
+                SAC_Reclamacion.insertarCaseSharePorReclamacionOPretension(mapaDatosCasosActualizar.values());
+            }
+            if(recalcularSharesReclamaciones){
+                SAC_Reclamacion.insertarCaseSharePorReclamacionOPretension(mapaDatosCasosActualizar.values());
             }
             SAC_DatabaseDML.updateListDML(mapaDatosCasosActualizar.values(), false);
         }

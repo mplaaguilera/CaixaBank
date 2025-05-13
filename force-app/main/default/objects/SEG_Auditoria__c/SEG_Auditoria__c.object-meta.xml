@@ -165,7 +165,6 @@
         <excludedStandardButtons>Accept</excludedStandardButtons>
         <excludedStandardButtons>ChangeOwner</excludedStandardButtons>
         <excludedStandardButtons>MassChangeOwner</excludedStandardButtons>
-        <excludedStandardButtons>IsotopeSubscription</excludedStandardButtons>
         <excludedStandardButtons>PrintableListView</excludedStandardButtons>
         <listViewButtons>SAC_CrearAuditoria</listViewButtons>
         <listViewButtons>SAC_ProgramarAuditoria</listViewButtons>

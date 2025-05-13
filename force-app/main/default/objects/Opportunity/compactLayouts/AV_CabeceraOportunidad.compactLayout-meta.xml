@@ -7,5 +7,6 @@
     <fields>AV_Product__c</fields>
     <fields>AV_ImportDisponiblePrestamosOficinas__c</fields>
     <fields>CSBD_Empresa_Proveedora__c</fields>
+    <fields>AV_PotencialityOpportunity__c</fields>
     <label>Cabecera Oportunidad</label>
 </CompactLayout>

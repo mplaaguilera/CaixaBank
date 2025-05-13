@@ -7,7 +7,11 @@
 				NOT($Permission.AV_AvoidBulkApi),
 				$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
 				ISPICKVAL(AV_Resolution__c, &quot;Otros&quot;),
-				( ISBLANK(AV_Comment__c) )
+				( ISBLANK(AV_Comment__c) ),
+AND(
+!$Permission.AV_ByPassValidationRules,
+!$Permission.CBK_BypassValidationRules
+)
 			)</errorConditionFormula>
     <errorDisplayField>AV_Comment__c</errorDisplayField>
     <errorMessage>Por favor, debe añadir algun comentario.</errorMessage>

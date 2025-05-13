@@ -4,7 +4,7 @@
     <description>Campo para establecer la URL a través de texto.</description>
     <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Link_Name</label>
-    <length>1000</length>
+    <length>2500</length>
     <type>LongTextArea</type>
     <visibleLines>5</visibleLines>
 </CustomField>

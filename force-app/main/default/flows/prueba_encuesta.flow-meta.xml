@@ -24,6 +24,20 @@
             <assignToReference>pageNamesInOrder</assignToReference>
             <operator>Add</operator>
             <value>
+                <stringValue>p_d3a334c8_0722_43ba_b362_2e137e055a68</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>pageNamesInOrder</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>p_90b02800_4c85_4966_a7b0_cf2ee5db9783</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>pageNamesInOrder</assignToReference>
+            <operator>Add</operator>
+            <value>
                 <stringValue>thank_you_page</stringValue>
             </value>
         </assignmentItems>
@@ -32,31 +46,85 @@
         </connector>
     </assignments>
     <choices>
-        <name>c_0829adb9_6272_4c44_9ddb_2a44152165c1</name>
-        <choiceText>ewrererew</choiceText>
-        <dataType>String</dataType>
+        <name>c_04acf54f_e373_4708_9ee3_4feffa71e30d</name>
+        <choiceText>4</choiceText>
+        <dataType>Number</dataType>
         <value>
-            <stringValue>ewrererew</stringValue>
+            <numberValue>4.0</numberValue>
         </value>
     </choices>
     <choices>
-        <name>c_3f0ff3af_00be_48b3_8995_fdcffbe0acb2</name>
-        <choiceText>erewrererw</choiceText>
-        <dataType>String</dataType>
+        <name>c_0882122c_e82a_4ad0_ba61_44f4995c58cf</name>
+        <choiceText>2</choiceText>
+        <dataType>Number</dataType>
         <value>
-            <stringValue>erewrererw</stringValue>
+            <numberValue>2.0</numberValue>
         </value>
     </choices>
     <choices>
-        <name>c_f588ae3e_6012_4fd4_b1ab_89f5f726fb63</name>
-        <choiceText>ewrewrer</choiceText>
+        <name>c_22066305_1f78_4437_8ca6_9cf23135741b</name>
+        <choiceText>Good</choiceText>
+        <dataType>Number</dataType>
+        <value>
+            <numberValue>5.0</numberValue>
+        </value>
+    </choices>
+    <choices>
+        <name>c_42206ada_36a0_4905_9b27_22a2545a70a4</name>
+        <choiceText>Excelente</choiceText>
         <dataType>String</dataType>
         <value>
-            <stringValue>ewrewrer</stringValue>
+            <stringValue>Excelente</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <name>c_5f88bac2_7725_487a_8169_76102d7c77bb</name>
+        <choiceText>Bueno</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Bueno</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <name>c_8775fcdd_88e4_4ab4_8dc8_af0348b2e37f</name>
+        <choiceText>Bad</choiceText>
+        <dataType>Number</dataType>
+        <value>
+            <numberValue>1.0</numberValue>
+        </value>
+    </choices>
+    <choices>
+        <name>c_a054e354_6523_4c3f_9578_a3a9aeb5422f</name>
+        <choiceText>Malo</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Malo</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <name>c_acde0adc_ee81_473a_860f_e56668c4e44d</name>
+        <choiceText>Indiferente</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Indiferente</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <name>c_e2d2d22f_e506_48de_8cf1_759ae7d122dd</name>
+        <choiceText>3</choiceText>
+        <dataType>Number</dataType>
+        <value>
+            <numberValue>3.0</numberValue>
         </value>
     </choices>
     <interviewLabel>prueba encuesta</interviewLabel>
     <label>prueba encuesta</label>
+    <processMetadataValues>
+        <name>BrandingSet</name>
+        <value>
+            <stringValue>sb_prueba_encuesta_1_05bbec52_5093_4a0b_86d0_f8b33611bd9a</stringValue>
+        </value>
+    </processMetadataValues>
     <processMetadataValues>
         <name>advanceThankYouPageEnabled</name>
         <value>
@@ -101,6 +169,102 @@
     </processMetadataValues>
     <processType>Survey</processType>
     <screens>
+        <name>p_90b02800_4c85_4966_a7b0_cf2ee5db9783</name>
+        <label>Page 3</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <backButtonLabel>Anterior</backButtonLabel>
+        <fields>
+            <processMetadataValues>
+                <name>autoProgressAction</name>
+                <value>
+                    <stringValue>NONE</stringValue>
+                </value>
+            </processMetadataValues>
+            <processMetadataValues>
+                <name>defaultValue</name>
+                <value>
+                    <elementReference>var_q_9055d236_a656_4a1e_98d0_b0e018206a75_defaultValue</elementReference>
+                </value>
+            </processMetadataValues>
+            <processMetadataValues>
+                <name>max</name>
+                <value>
+                    <stringValue>10</stringValue>
+                </value>
+            </processMetadataValues>
+            <processMetadataValues>
+                <name>min</name>
+                <value>
+                    <stringValue>0</stringValue>
+                </value>
+            </processMetadataValues>
+            <name>q_9055d236_a656_4a1e_98d0_b0e018206a75</name>
+            <dataType>Number</dataType>
+            <extensionName>survey:cmpInputRuntimeCsat</extensionName>
+            <fieldText>&lt;p&gt;&lt;strong&gt;Puntúe de 1 a 10 la satisfacción en cuanto a las soluciones ofrecidas por el servicio.&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>ComponentInput</fieldType>
+            <isRequired>false</isRequired>
+            <scale>0</scale>
+        </fields>
+        <nextOrFinishButtonLabel>Finalizar</nextOrFinishButtonLabel>
+        <pausedText>To pick up where you left off, refresh this page, or open the survey again.</pausedText>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>p_d3a334c8_0722_43ba_b362_2e137e055a68</name>
+        <label>Page 2</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <backButtonLabel>Anterior</backButtonLabel>
+        <connector>
+            <targetReference>p_90b02800_4c85_4966_a7b0_cf2ee5db9783</targetReference>
+        </connector>
+        <fields>
+            <processMetadataValues>
+                <name>autoProgressAction</name>
+                <value>
+                    <stringValue>NONE</stringValue>
+                </value>
+            </processMetadataValues>
+            <processMetadataValues>
+                <name>defaultValue</name>
+                <value>
+                    <elementReference>var_q_f948fbf1_920a_4cf2_8403_49f4f339cb23_defaultValue</elementReference>
+                </value>
+            </processMetadataValues>
+            <processMetadataValues>
+                <name>iconType</name>
+                <value>
+                    <stringValue>star</stringValue>
+                </value>
+            </processMetadataValues>
+            <name>q_f948fbf1_920a_4cf2_8403_49f4f339cb23</name>
+            <choiceReferences>c_8775fcdd_88e4_4ab4_8dc8_af0348b2e37f</choiceReferences>
+            <choiceReferences>c_0882122c_e82a_4ad0_ba61_44f4995c58cf</choiceReferences>
+            <choiceReferences>c_e2d2d22f_e506_48de_8cf1_759ae7d122dd</choiceReferences>
+            <choiceReferences>c_04acf54f_e373_4708_9ee3_4feffa71e30d</choiceReferences>
+            <choiceReferences>c_22066305_1f78_4437_8ca6_9cf23135741b</choiceReferences>
+            <dataType>Number</dataType>
+            <extensionName>survey:runtimeRating</extensionName>
+            <fieldText>&lt;p&gt;&lt;strong&gt;Puntúe de 1 a 5 estrellas la ayuda facilitada para resolver sus problemas.&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>ComponentChoice</fieldType>
+            <isRequired>false</isRequired>
+            <scale>0</scale>
+        </fields>
+        <nextOrFinishButtonLabel>Siguiente</nextOrFinishButtonLabel>
+        <pausedText>To pick up where you left off, refresh this page, or open the survey again.</pausedText>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
         <name>p_e90c9881_cd45_4f47_8a84_a518a615cd40</name>
         <label>Page 1</label>
         <locationX>0</locationX>
@@ -108,6 +272,10 @@
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
         <allowPause>true</allowPause>
+        <backButtonLabel>Anterior</backButtonLabel>
+        <connector>
+            <targetReference>p_d3a334c8_0722_43ba_b362_2e137e055a68</targetReference>
+        </connector>
         <fields>
             <processMetadataValues>
                 <name>autoProgressAction</name>
@@ -116,14 +284,16 @@
                 </value>
             </processMetadataValues>
             <name>q_67e5f52e_9e5b_406f_90c9_1865247b9cd1</name>
-            <choiceReferences>c_3f0ff3af_00be_48b3_8995_fdcffbe0acb2</choiceReferences>
-            <choiceReferences>c_f588ae3e_6012_4fd4_b1ab_89f5f726fb63</choiceReferences>
-            <choiceReferences>c_0829adb9_6272_4c44_9ddb_2a44152165c1</choiceReferences>
+            <choiceReferences>c_a054e354_6523_4c3f_9578_a3a9aeb5422f</choiceReferences>
+            <choiceReferences>c_acde0adc_ee81_473a_860f_e56668c4e44d</choiceReferences>
+            <choiceReferences>c_5f88bac2_7725_487a_8169_76102d7c77bb</choiceReferences>
+            <choiceReferences>c_42206ada_36a0_4905_9b27_22a2545a70a4</choiceReferences>
             <dataType>String</dataType>
-            <fieldText>&lt;p&gt;&lt;strong&gt;fsdfdsfdsfdsfds&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldText>&lt;p&gt;&lt;strong&gt;¿Cómo describiría el servicio ofrecido?&lt;/strong&gt;&lt;/p&gt;</fieldText>
             <fieldType>MultiSelectCheckboxes</fieldType>
             <isRequired>false</isRequired>
         </fields>
+        <nextOrFinishButtonLabel>Siguiente</nextOrFinishButtonLabel>
         <pausedText>To pick up where you left off, refresh this page, or open the survey again.</pausedText>
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
@@ -151,11 +321,12 @@
             </inputParameters>
             <isRequired>true</isRequired>
         </fields>
+        <nextOrFinishButtonLabel>Siguiente</nextOrFinishButtonLabel>
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
     </screens>
     <startElementReference>pageNamesInOrder_Assignment</startElementReference>
-    <status>Active</status>
+    <status>Draft</status>
     <textTemplates>
         <name>thankYouDescriptionTextTemplate</name>
         <isViewedAsPlainText>false</isViewedAsPlainText>
@@ -164,12 +335,12 @@
     <textTemplates>
         <name>thankYouLabelTextTemplate</name>
         <isViewedAsPlainText>false</isViewedAsPlainText>
-        <text>&lt;p&gt;&lt;strong&gt;erewrewrewrerwrrew&lt;/strong&gt;&lt;/p&gt;</text>
+        <text>&lt;p&gt;&lt;strong&gt;Muchas gracias por emplear su tiempo en dar su opinión.&lt;/strong&gt;&lt;/p&gt;</text>
     </textTemplates>
     <textTemplates>
         <name>welcome_question_lref_tt</name>
         <isViewedAsPlainText>false</isViewedAsPlainText>
-        <text>&lt;p&gt;&lt;strong&gt;errewrewrewrewrer&lt;/strong&gt;&lt;/p&gt;</text>
+        <text>&lt;p&gt;&lt;strong&gt;Bienvenido a la encuesta Caixabank&lt;/strong&gt;&lt;/p&gt;</text>
     </textTemplates>
     <variables>
         <name>guestUserLang</name>
@@ -224,5 +395,20 @@
         <value>
             <stringValue>{!thankYouLabelTextTemplate}</stringValue>
         </value>
+    </variables>
+    <variables>
+        <name>var_q_9055d236_a656_4a1e_98d0_b0e018206a75_defaultValue</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <scale>2</scale>
+    </variables>
+    <variables>
+        <name>var_q_f948fbf1_920a_4cf2_8403_49f4f339cb23_defaultValue</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
     </variables>
 </Flow>

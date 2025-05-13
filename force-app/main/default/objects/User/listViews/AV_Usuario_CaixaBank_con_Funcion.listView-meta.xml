@@ -23,6 +23,11 @@
         <operation>equals</operation>
         <value>Oficina,Gestor</value>
     </filters>
-    <label>AV_Usuario_CaixaBank_con_Funcion_Gestor</label>
+    <filters>
+        <field>AV_NumeroOficinaEmpresa__c</field>
+        <operation>equals</operation>
+        <value>001-07363</value>
+    </filters>
+    <label>AV_Piloto</label>
     <language>en_US</language>
 </ListView>

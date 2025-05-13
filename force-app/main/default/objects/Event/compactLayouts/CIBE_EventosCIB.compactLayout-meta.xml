@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_EventosCIB</fullName>
+    <fields>Subject</fields>
+    <fields>StartDateTime</fields>
+    <fields>EndDateTime</fields>
+    <fields>WhatId</fields>
+    <fields>AV_Tipo__c</fields>
+    <fields>FinServ__Regarding__c</fields>
+    <fields>OwnerId</fields>
+    <fields>CSBD_Evento_Estado__c</fields>
+    <label>CIBE_EventosCIB</label>
+</CompactLayout>

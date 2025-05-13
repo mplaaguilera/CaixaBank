@@ -1,5 +1,6 @@
 ({
 	init: function(component) {
+		//Casos 3N
 		const isMemberQueue = component.get('c.checkIsMember');
 		isMemberQueue.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {

@@ -20,11 +20,23 @@
         <default>false</default>
     </values>
     <values>
+        <fullName>No Gestionada</fullName>
+        <default>false</default>
+    </values>
+    <values>
         <fullName>No apto</fullName>
         <default>false</default>
     </values>
     <values>
         <fullName>No interesado</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Producto Contratado</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Producto Rechazado</fullName>
         <default>false</default>
     </values>
     <values>

@@ -16,9 +16,14 @@
         <value>Cerrado,Rechazado</value>
     </filters>
     <filters>
-        <field>CASES.SUBJECT</field>
-        <operation>notContain</operation>
-        <value>Respuesta de Estoy ausente,Respuesta automática,Automatic reply</value>
+        <field>CASES.ORIGIN</field>
+        <operation>equals</operation>
+        <value>Email - Revisar</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente_Formula__c</field>
+        <operation>equals</operation>
+        <value>Cliente</value>
     </filters>
     <label>Cola Correos Entrantes</label>
     <queue>CC_Inbound_Email</queue>

@@ -3,6 +3,7 @@
     <fullName>SIREC__SIREC_fld_contratoDeuda__c</fullName>
     <defaultValue>false</defaultValue>
     <deprecated>false</deprecated>
+    <description>Codigo Contrato en Deuda</description>
     <label>Cod Contrato en Deuda</label>
     <trackHistory>false</trackHistory>
     <type>Checkbox</type>

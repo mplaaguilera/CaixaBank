@@ -60,6 +60,16 @@
                 <default>false</default>
                 <label>Resolución express</label>
             </value>
+            <value>
+                <fullName>SAC_AvisoResolucionCartaPostal</fullName>
+                <default>false</default>
+                <label>Aviso resolución carta postal</label>
+            </value>
+            <value>
+                <fullName>SAC_AvisoResolucionSubsanacion</fullName>
+                <default>false</default>
+                <label>Aviso resolución subsanación</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

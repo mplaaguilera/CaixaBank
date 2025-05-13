@@ -2,32 +2,44 @@ public with sharing class OS_Case_Gestion_Controller {
 
     @AuraEnabled
     public static Map<String, Object> init(Id recordId) {
-        Map<String, Object> retorno = new Map<String, Object>();
-        Case caso = [SELECT RecordType.Name,
-                        CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name,
-                        CC_MCC_Causa__c, CC_MCC_Causa__r.Name, CC_MCC_Solucion__c, CC_MCC_Solucion__r.Name, OS_Departamento__c, Origin, CC_Canal_Procedencia__c
-                        FROM Case WHERE Id = :recordId];
 
-        retorno.put('RecordTypeName', caso.RecordType.Name);
-        retorno.put('Tematica_Caso', String.valueOf(caso.CC_MCC_Tematica__c));
-        retorno.put('Tematica_Caso_Name', String.valueOf(caso.CC_MCC_Tematica__r.Name));
-        retorno.put('Producto_Caso', String.valueOf(caso.CC_MCC_ProdServ__c));
-        retorno.put('Producto_Caso_Name', String.valueOf(caso.CC_MCC_ProdServ__r.Name));
-        retorno.put('Motivo_Caso', String.valueOf(caso.CC_MCC_Motivo__c));
-        retorno.put('Motivo_Caso_Name', String.valueOf(caso.CC_MCC_Motivo__r.Name));
-        retorno.put('Causa_Caso', nullValue(String.valueOf(caso.CC_MCC_Causa__c), 'NULL'));
-        retorno.put('Causa_Caso_Name', nullValue(String.valueOf(caso.CC_MCC_Causa__r.Name), 'NULL'));
-        retorno.put('Solucion_Caso', nullValue(String.valueOf(caso.CC_MCC_Solucion__c), 'NULL'));
-        retorno.put('Solucion_Caso_Name', nullValue(String.valueOf(caso.CC_MCC_Solucion__r.Name), 'NULL'));
-        retorno.put('Departamento', caso.OS_Departamento__c);
-        retorno.put('Canal_Entrada', caso.Origin);
-        retorno.put('Canal_Procedencia', caso.CC_Canal_Procedencia__c);
-        retorno.put('Tarea_Traslado', false);
+        List<Case> casos = new List<Case>();
 
-        if([SELECT Count() FROM Task WHERE WhatId = :caso.Id AND OS_Tipo__c = 'Traslado Colaborador'] > 0){
-            retorno.put('Tarea_Traslado', true);
+        // Comprobamos que el recorId no venga nulo
+        if (recordId != null) {
+            casos = [SELECT RecordType.Name,
+            CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name,
+            CC_MCC_Causa__c, CC_MCC_Causa__r.Name, CC_MCC_Solucion__c, CC_MCC_Solucion__r.Name, OS_Departamento__c, Origin, CC_Canal_Procedencia__c
+            FROM Case WHERE Id = :recordId];
         }
 
+        Map<String, Object> retorno = new Map<String, Object>();
+
+        // Verificar que la lista 'caso' no está vacía antes de intentar acceder a sus campos
+        if (!casos.isEmpty()) {
+            // Asignamos al caso el registro de la lista
+            Case caso = casos[0];
+    
+            retorno.put('RecordTypeName', caso.RecordType.Name);
+            retorno.put('Tematica_Caso', String.valueOf(caso.CC_MCC_Tematica__c));
+            retorno.put('Tematica_Caso_Name', String.valueOf(caso.CC_MCC_Tematica__r.Name));
+            retorno.put('Producto_Caso', String.valueOf(caso.CC_MCC_ProdServ__c));
+            retorno.put('Producto_Caso_Name', String.valueOf(caso.CC_MCC_ProdServ__r.Name));
+            retorno.put('Motivo_Caso', String.valueOf(caso.CC_MCC_Motivo__c));
+            retorno.put('Motivo_Caso_Name', String.valueOf(caso.CC_MCC_Motivo__r.Name));
+            retorno.put('Causa_Caso', nullValue(String.valueOf(caso.CC_MCC_Causa__c), 'NULL'));
+            retorno.put('Causa_Caso_Name', nullValue(String.valueOf(caso.CC_MCC_Causa__r.Name), 'NULL'));
+            retorno.put('Solucion_Caso', nullValue(String.valueOf(caso.CC_MCC_Solucion__c), 'NULL'));
+            retorno.put('Solucion_Caso_Name', nullValue(String.valueOf(caso.CC_MCC_Solucion__r.Name), 'NULL'));
+            retorno.put('Departamento', caso.OS_Departamento__c);
+            retorno.put('Canal_Entrada', caso.Origin);
+            retorno.put('Canal_Procedencia', caso.CC_Canal_Procedencia__c);
+            retorno.put('Tarea_Traslado', false);
+    
+            if([SELECT Count() FROM Task WHERE WhatId = :caso.Id AND OS_Tipo__c = 'Traslado Colaborador'] > 0){
+                retorno.put('Tarea_Traslado', true);
+            }
+        }
         return retorno;
     }
 
@@ -143,42 +155,53 @@ public with sharing class OS_Case_Gestion_Controller {
 
     @AuraEnabled
     public static Map<String, Object> validarGuardar(Id recordId, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, Boolean esCierre,
-                                                        String nuevoTipoContacto, String referenciaOperacion, String nuevaCausa, String nuevaSolucion) {
-        
-        Case caso = [SELECT CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name
-                        FROM Case WHERE Id = :recordId];
+                                                    String nuevoTipoContacto, String referenciaOperacion, String nuevaCausa, String nuevaSolucion) {
 
-        Map<String, Object> resultado = new Map<String, Object>();
-        if (caso.CC_MCC_Tematica__c == nuevaTematica && caso.CC_MCC_ProdServ__c == nuevoProducto && caso.CC_MCC_Motivo__c == nuevoMotivo) {
-            resultado.put('retipificar', false);
-        } else {
-            resultado.put('retipificar', true);
-            resultado.put('tematicaAnteriorName', caso.CC_MCC_Tematica__r.Name);
-            resultado.put('productoAnteriorName', caso.CC_MCC_ProdServ__r.Name);
-            resultado.put('motivoAnteriorName', caso.CC_MCC_Motivo__r.Name);            
+        List<Case> casos = new List<Case>();
+
+        // Comprobamos que el recorId no venga nulo
+        if (recordId != null) {
+        casos = [SELECT CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name
+                        FROM Case WHERE Id = :recordId];
         }
 
-        //Validaciones específicas para cierre
-        if (esCierre) {
-            String erroresCierre = '';
-            //Tipo de contacto
-            if (String.isEmpty(nuevoTipoContacto)) {
-                erroresCierre = '· Es necesario indicar el "Tipo de contacto" antes de cerrar el caso.\n';
-            }
-                        
-            //Causa y solución
-            if (String.isEmpty(nuevaCausa) || String.isEmpty(nuevaSolucion)) {
-                erroresCierre += '· Es necesario indicar una "Causa" y una "Solución" antes de cerrar el caso.\n';
-            }
-            
-            //Referencia de la operación
-            if (String.isNotEmpty(nuevoMotivo) && String.isEmpty(referenciaOperacion)
-            && [SELECT OS_Requiere_Ref_Operacion__c FROM CC_MCC__c WHERE Id = :nuevoMotivo].OS_Requiere_Ref_Operacion__c) {
-                erroresCierre += '· La clasificación actual requiere informar la "Referencia de la operación" antes de cerrar el caso.\n';
+        Map<String, Object> resultado = new Map<String, Object>();
+        // Verificar que la lista 'caso' no está vacía antes de intentar acceder a sus campos
+        if (!casos.isEmpty()) {
+            // Asignamos al caso el registro de la lista
+            Case caso = casos[0];
+
+            if (caso.CC_MCC_Tematica__c == nuevaTematica && caso.CC_MCC_ProdServ__c == nuevoProducto && caso.CC_MCC_Motivo__c == nuevoMotivo) {
+                resultado.put('retipificar', false);
+            } else {
+                resultado.put('retipificar', true);
+                resultado.put('tematicaAnteriorName', caso.CC_MCC_Tematica__r.Name);
+                resultado.put('productoAnteriorName', caso.CC_MCC_ProdServ__r.Name);
+                resultado.put('motivoAnteriorName', caso.CC_MCC_Motivo__r.Name);            
             }
 
-            if (String.isNotBlank(erroresCierre)) {
-                throw new AuraHandledException(erroresCierre.removeEnd('\n'));
+            //Validaciones específicas para cierre
+            if (esCierre) {
+                String erroresCierre = '';
+                //Tipo de contacto
+                if (String.isEmpty(nuevoTipoContacto)) {
+                    erroresCierre = '· Es necesario indicar el "Tipo de contacto" antes de cerrar el caso.\n';
+                }
+                            
+                //Causa y solución
+                if (String.isEmpty(nuevaCausa) || String.isEmpty(nuevaSolucion)) {
+                    erroresCierre += '· Es necesario indicar una "Causa" y una "Solución" antes de cerrar el caso.\n';
+                }
+                
+                //Referencia de la operación
+                if (String.isNotEmpty(nuevoMotivo) && String.isEmpty(referenciaOperacion)
+                && [SELECT OS_Requiere_Ref_Operacion__c FROM CC_MCC__c WHERE Id = :nuevoMotivo].OS_Requiere_Ref_Operacion__c) {
+                    erroresCierre += '· La clasificación actual requiere informar la "Referencia de la operación" antes de cerrar el caso.\n';
+                }
+
+                if (String.isNotBlank(erroresCierre)) {
+                    throw new AuraHandledException(erroresCierre.removeEnd('\n'));
+                }
             }
         }
         return resultado;

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_DueDate__c</fullName>
+    <description>Campo que almacena la fecha de vencimiento</description>
     <encryptionScheme>None</encryptionScheme>
     <label>Fecha de vencimiento</label>
     <required>false</required>

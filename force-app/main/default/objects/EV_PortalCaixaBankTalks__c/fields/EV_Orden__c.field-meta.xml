@@ -3,6 +3,7 @@
     <fullName>EV_Orden__c</fullName>
     <label>Orden</label>
     <required>false</required>
+    <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>

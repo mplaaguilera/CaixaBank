@@ -67,7 +67,7 @@ public without sharing class SAC_HandlerMethods {
 		else if (!listNewObj.isEmpty() && mapOldObj != null) {
 			for (Case casoNuevo : listNewObj) {
 				Boolean cuentaInformada = String.isNotBlank(casoNuevo.AccountId);
-				if ((casoNuevo.RecordTypeId == recTypeReclamacion || casoNuevo.RecordTypeId == recTypeConsulta || casoNuevo.RecordTypeId == recTypeConsultaSAC)&& cuentaInformada && mapOldObj.get(casoNuevo.Id).AccountId != casoNuevo.AccountId) {
+				if (mapOldObj.containsKey(casoNuevo.Id) && (casoNuevo.RecordTypeId == recTypeReclamacion || casoNuevo.RecordTypeId == recTypeConsulta || casoNuevo.RecordTypeId == recTypeConsultaSAC)&& cuentaInformada && mapOldObj.get(casoNuevo.Id).AccountId != casoNuevo.AccountId) {
 					SAC_CaseReclamante__c reclamante = new SAC_CaseReclamante__c(SAC_Account__c = casoNuevo.AccountId,
 					                                                             SAC_Contact__c = casoNuevo.ContactId,
 					                                                             SAC_Case__c = casoNuevo.Id,

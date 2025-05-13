@@ -324,4 +324,66 @@ public class CC_Contact_BI_BU_TRHan_TEST {
             System.assertEquals('13', oppHipoteca[0].CSBD_OC_Prioridad__c, 'Error');
         }
     }
+    @IsTest
+    static void testContactoConfidencial() {
+        User admin = CC_TestDataFactory.getUserAdmin();
+        
+        System.runAs(admin) {
+            Test.startTest();
+            // Crear contacto confidencial
+            Contact contactoConf = new Contact(
+                FirstName = 'Test',
+                LastName = 'No Confidencial',
+                Email = 'test@test.com',
+                Phone = '123456789',
+                MobilePhone = '987654321',
+                CC_Confidencial__c = true,
+                MailingStreet = 'Calle Test',
+                MailingCity = 'Ciudad Test',
+                MailingState = 'Estado Test',
+                MailingCountry = 'País Test',
+                MailingPostalCode = '12345',
+                CC_Identificador_CBKNow__c = 'TEST123',
+                CC_CuentaFacebook__c = 'facebook',
+                CC_CuentaTwitter__c = 'twitter'
+            );
+            
+           
+            insert contactoConf;
+            
+            // Debug para verificar acceso a campos
+            Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.Contact.fields.getMap();
+            for(String fieldName : fieldMap.keySet()) {
+                Schema.DescribeFieldResult dfr = fieldMap.get(fieldName).getDescribe();
+                System.debug('Campo: ' + fieldName + ' - Accesible: ' + dfr.isAccessible());
+            }
+
+            Test.stopTest();
+            
+            // Verificar que los campos se vaciaron - Hacemos el query DESPUÉS del Test.stopTest()
+            Contact contactoActualizado = [SELECT LastName, FirstName, Email, Phone, MobilePhone, 
+                                         MailingStreet, MailingCity, MailingState, MailingCountry, MailingPostalCode,
+                                         CC_Identificador_CBKNow__c, CC_CuentaFacebook__c, CC_CuentaTwitter__c 
+                                         FROM Contact WHERE Id = :contactoConf.Id];
+
+            System.debug('Contacto actualizado COMPLETO: ' + contactoActualizado);
+            // Verificamos cada campo individualmente para mejor debugging
+            System.debug('FirstName: ' + contactoActualizado.FirstName);
+            System.debug('LastName: ' + contactoActualizado.LastName);
+            System.debug('Email: ' + contactoActualizado.Email);
+            System.debug('Phone: ' + contactoActualizado.Phone);
+            System.debug('MobilePhone: ' + contactoActualizado.MobilePhone);
+            
+            // Aserciones
+            System.assertEquals('', contactoActualizado.FirstName, 'El nombre no es confidencial');
+            System.assertEquals('CONFIDENCIAL', contactoActualizado.LastName, 'El apellido no es confidencial');
+            System.assertEquals('', contactoActualizado.Email, 'El email no es confidencial');
+            System.assertEquals('', contactoActualizado.Phone, 'El telefono no es confidencial');
+            System.assertEquals('', contactoActualizado.MobilePhone, 'El movil no es confidencial');
+            System.assertEquals(null, contactoActualizado.MailingStreet, 'La calle no es confidencial');
+            System.assertEquals('', contactoActualizado.CC_Identificador_CBKNow__c, 'El identificador no es confidencial');
+            System.assertEquals('', contactoActualizado.CC_CuentaFacebook__c, 'El facebook no es confidencial');
+            System.assertEquals('', contactoActualizado.CC_CuentaTwitter__c, 'El twitter no es confidencial');
+        }
+    }
 }

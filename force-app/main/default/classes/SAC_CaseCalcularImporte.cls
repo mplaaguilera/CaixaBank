@@ -26,6 +26,10 @@ public without sharing class SAC_CaseCalcularImporte {
     private static final Id RECTYPEPRETENSION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
 
     public static void calcular(List<Case> listaCasosSelect, Set<Id> setIdesRec, Map<Id,Case> mapaDatosCasosActualizar) {
+        
+        List<Case> listaReclaCambiaImporteAbonado = new List<Case>();
+
+        Map<Id, Case> mapaCasosSelect = new Map<Id, Case>();
 
         if (setIdesRec == null) {
             setIdesRec = new Set<Id>();
@@ -43,6 +47,10 @@ public without sharing class SAC_CaseCalcularImporte {
                 if (mapListPretensiones.containsKey(csPre.SAC_Reclamacion__c)) {
                     mapListPretensiones.get(csPre.SAC_Reclamacion__c).add(csPre);
                 }
+            }else{  //Obtener las reclamaciones 
+                if(!mapaCasosSelect.containsKey(csPre.Id) && setIdesRec.contains(csPre.Id)){
+                    mapaCasosSelect.put(csPre.Id, csPre);
+                }
             }
 		}
 
@@ -57,8 +65,24 @@ public without sharing class SAC_CaseCalcularImporte {
             }else{
                 mapaDatosCasosActualizar.put(caso.id, caso);
             }
+            //Se crea una lista con los casos y su nuevo importe abonado
+            if(mapaCasosSelect.containsKey(caso.Id) && mapaCasosSelect.get(caso.Id).SAC_Naturaleza__c == 'SAC_007' && caso.CC_Importe_Abonado__c != mapaCasosSelect.get(caso.Id).CC_Importe_Abonado__c){
+                Case nCaso = new Case(Id = caso.Id, CC_Importe_Abonado__c = caso.CC_Importe_Abonado__c, CC_CasoRelacionado__c = mapaCasosSelect.get(caso.Id).CC_CasoRelacionado__c);
+                listaReclaCambiaImporteAbonado.add(nCaso);
+            }
+            
         }
-
+        
+        //AÑADIDO: En caso de que se haya cambiado el importe abonado de una complementaria, habrá que actualizar el de la reclamación a la que esté vinculada 
+        Map<Id, Case> mapaComplementarias = new Map<Id, Case>();    //Aquí están las complementarias con su antiguo importe abonado
+        for(Case caso : mapaCasosSelect.values()){
+            if(caso.SAC_Naturaleza__c == 'SAC_007' && mapaDatosCasosActualizar.containsKey(caso.Id) && caso.CC_Importe_Abonado__c != mapaDatosCasosActualizar.get(caso.Id).CC_Importe_Abonado__c){    //Si la naturaleza de la reclamación es complementaria, se añade al mapa de complementarias
+                mapaComplementarias.put(caso.Id, caso);
+            }
+        }
+        if(!mapaComplementarias.isEmpty() && !listaReclaCambiaImporteAbonado.isEmpty()){
+            SAC_Reclamacion.calcularNuevoImporteAbonado(listaCasosSelect, mapaComplementarias, listaReclaCambiaImporteAbonado, mapaDatosCasosActualizar);
+        }
     }
     /************************************************************************************************************
      * Proposito:  Con el Set de Ides hacer una consulta de todas sus pretensiones para luego sumar los importes

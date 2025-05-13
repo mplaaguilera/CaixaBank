@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Lista_de_valores</fullName>
+    <active>true</active>
+    <description>Registros de tipo lista</description>
+    <label>Lista de valores</label>
+    <picklistValues>
+        <picklist>CBK_Negocio__c</picklist>
+        <values>
+            <fullName>GRR</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

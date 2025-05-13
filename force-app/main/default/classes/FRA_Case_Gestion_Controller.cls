@@ -20,7 +20,6 @@ public with sharing class FRA_Case_Gestion_Controller {
         retorno.put('Solucion_Caso', nullValue(String.valueOf(caso.CC_MCC_Solucion__c), 'NULL'));
         retorno.put('Solucion_Caso_Name', nullValue(String.valueOf(caso.CC_MCC_Solucion__r.Name), 'NULL'));
         retorno.put('FRA_CampanaFraude__c', caso.FRA_CampanaFraude__c);
-        CBK_log.debug('Fin FRA_Case_Gestion_Controller - init'); 
         return retorno; 
     }
 
@@ -32,7 +31,6 @@ public with sharing class FRA_Case_Gestion_Controller {
     @AuraEnabled(cacheable=true)
     public static List<OT_Picklist.Item> getTematicas(String tipoCliente, Id recordId) {
         List<OT_Picklist.Item> tematicas = new List<OT_Picklist.Item>();
-
         String buzonOrigen;
         Case[] casoOrigen = [SELECT CC_Canal_Procedencia__c FROM Case WHERE Id=:recordId];
         
@@ -62,7 +60,7 @@ public with sharing class FRA_Case_Gestion_Controller {
 
     @AuraEnabled(cacheable=true)
     public static List<OT_Picklist.Item> getProductos(String tipoCliente, String tematica) {
-        if (String.isBlank(tematica)) {
+        if (String.isBlank(tematica)) {        
             return new List<OT_Picklist.Item>();
         } else {
             List<OT_Picklist.Item> productos = new List<OT_Picklist.Item>();
@@ -72,7 +70,7 @@ public with sharing class FRA_Case_Gestion_Controller {
                                        AND CC_Activo__c = true ORDER BY Name ASC]) {
                 OT_Picklist.Item wrap = new OT_Picklist.Item( producto.Id,producto.Name);
                 productos.add(wrap);
-            }               
+            }             
             return productos;
         }
     }
@@ -96,6 +94,7 @@ public with sharing class FRA_Case_Gestion_Controller {
 
     @AuraEnabled(cacheable=true)
     public static List<OT_Picklist.Item> getCausas(String tipoCliente, String motivo) {
+    
         if (String.isBlank(motivo)) {
             return new List<OT_Picklist.Item>();
         } else {
@@ -129,16 +128,12 @@ public with sharing class FRA_Case_Gestion_Controller {
     }
 
     private static String nullValue(String valor, String valorSiNulo) {
-        //Si la cadena es nula se retorna valorSiNulo (si éste es nulo se retorna una cadena vacía)
         return valor != null ? valor : valorSiNulo != null ? valorSiNulo : '';
     }
 
     @AuraEnabled
     public static Map<String, Object> validarGuardar(Id recordId, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, Boolean esCierre,
                                                      String nuevoTipoContacto, String referenciaOperacion, String nuevaCausa, String nuevaSolucion) {
-        CBK_log.debug('Inicio FRA_Case_Gestion_Controller - validarGuardar (recordId: ' + recordId + ', nuevaTematica: ' + nuevaTematica + ', nuevoProducto: ' + nuevoProducto +
-                      ', nuevoMotivo: ' + nuevoMotivo + ', esCierre: ' + esCierre + ', nuevoTipoContacto: ' + nuevoTipoContacto + ', referenciaOperacion: ' + referenciaOperacion +
-                      ', nuevaCausa: ' + nuevaCausa + ', nuevaSolucion: ' + nuevaSolucion + ')');
         Case caso = [SELECT Status,CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name
                         FROM Case WHERE Id = :recordId];
 
@@ -178,7 +173,20 @@ public with sharing class FRA_Case_Gestion_Controller {
     // Creación de actividades
     @AuraEnabled @future
     public static void crearActividad(Id recordId, String tipo, String motivo) {
-        CBK_log.debug('Inicio FRA_Case_Gestion_Controller - crearActividad (recordId: ' + recordId + ', tipo: ' + tipo + ', motivo: ' + motivo + ')');
+        Case caso = [SELECT Id, Status, CC_CasoRelacionado__c FROM Case WHERE Id = :recordId LIMIT 1];
+    
+        if (caso.CC_CasoRelacionado__c != null) {     //Caso que sea derivado del contact
+            insert new Task(
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'FRA_Task'), 
+                WhatId = recordId, //idCaso
+                Type = 'Devuelto al Contact Center',
+                Status = 'Rechazada',
+                Subject = (tipo=='Reclasificación')?'Reclasificación del caso':tipo,
+                Description = motivo,
+                ActivityDate = System.today()
+    
+            );
+        }else{
         insert new Task(
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'FRA_Task'), 
             WhatId = recordId, //idCaso
@@ -189,4 +197,31 @@ public with sharing class FRA_Case_Gestion_Controller {
             ActivityDate = System.today()
         );
     }
+}
+@AuraEnabled @future
+    public static void rechazarCasoFraude(Id recordId, String motivo) {
+        
+            // Obtener el caso de Fraude rechazado
+            Case casoFraude = [SELECT Id, Status, CC_CasoRelacionado__c FROM Case WHERE Id = :recordId LIMIT 1];
+            
+            
+            // (Opcional) Cerrar el caso de Fraude si ya no es necesario
+            casoFraude.Status = 'Rechazado';
+
+            // Actualizar los casos
+            update new List<Case>{casoFraude};
+            if (casoFraude.CC_CasoRelacionado__c != null){
+
+                Map<String, Object> parametro = new Map<String, Object>{
+                        'casoId' => casoFraude.CC_CasoRelacionado__c,
+                        'motivo' => motivo
+                };
+                CC_Gestion_Derivar_Fraude.devolverCasoCC(parametro);
+
+            }
+           
+
+            
+    }
+
 }

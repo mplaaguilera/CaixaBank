@@ -142,29 +142,29 @@ public with sharing class SPV_LCMP_BusquedaCliente {
             sContactId = sID;
             
             // Buscamos el cliente asociado al contacto.
-            Contact oContacto = [SELECT CC_CuentaRepresentada__c, Account.CC_Idioma__pc, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.AccountId FROM Contact WHERE Id = :sContactId];
+            Contact oContacto = [SELECT CC_CuentaRepresentada__c, Account.CC_Idioma__pc, Account.AV_EAPGestor__c, Account.AV_OfficeManager__c FROM Contact WHERE Id = :sContactId];
 
             if (oContacto.CC_CuentaRepresentada__c != null) {
                 sCuentaId = oContacto.CC_CuentaRepresentada__c;
                 sIdioma = oContacto.Account.CC_Idioma__pc;
-                sOficina = oContacto.Account.AV_EAPGestor__r.AccountId;
+                sOficina = oContacto.Account.AV_OfficeManager__c;
             }
         } else if (sTipo == 'Contacto') {
 
             sContactId = sID;
             
             // Buscamos el cliente asociado al contacto.
-            Contact oContacto = [SELECT AccountId, Account.CC_Idioma__pc, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.AccountId FROM Contact WHERE Id = :sContactId];
+            Contact oContacto = [SELECT AccountId, Account.CC_Idioma__pc, Account.AV_EAPGestor__c, Account.AV_OfficeManager__c FROM Contact WHERE Id = :sContactId];
             if (oContacto.AccountId != null) {
                 sCuentaId = oContacto.AccountId;
                 sIdioma = oContacto.Account.CC_Idioma__pc;
-                sOficina = oContacto.Account.AV_EAPGestor__r.AccountId;
+                sOficina = oContacto.Account.AV_OfficeManager__c;
             }
 
         } else {
             sCuentaId = sID;
 
-            List<Contact> oContactos = [SELECT Id, Account.CC_Idioma__pc, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.AccountId FROM Contact WHERE AccountId = :sID];
+            List<Contact> oContactos = [SELECT Id, Account.CC_Idioma__pc, Account.AV_EAPGestor__c, Account.AV_OfficeManager__c FROM Contact WHERE AccountId = :sID];
             
             Integer numeroDeContactos = 0;
 
@@ -175,7 +175,7 @@ public with sharing class SPV_LCMP_BusquedaCliente {
             if (numeroDeContactos == 1) {
                 sContactId = oContactos[0].Id;
                 sIdioma = oContactos[0].Account.CC_Idioma__pc;
-                sOficina = oContactos[0].Account.AV_EAPGestor__r.AccountId;
+                sOficina = oContactos[0].Account.AV_OfficeManager__c;
             }
 
         }

@@ -11,7 +11,6 @@
     <columns>CASES.SUBJECT</columns>
     <columns>CASES.STATUS</columns>
     <columns>SEG_Subestado__c</columns>
-    <columns>SEG_ClasificacionRapida__c</columns>
     <columns>SEG_Grupo__c</columns>
     <columns>OWNER_NAME</columns>
     <columns>SEG_Numero_OSN__c</columns>
@@ -20,7 +19,12 @@
     <filters>
         <field>CASES.STATUS</field>
         <operation>equals</operation>
-        <value>Activo,Pendiente,Planificado</value>
+        <value>Activo,Pendiente Incidencia,Pendiente,Planificado</value>
+    </filters>
+    <filters>
+        <field>UPDATEDBY_USER.ALIAS</field>
+        <operation>notEqual</operation>
+        <value>Bluewolf</value>
     </filters>
     <label>Mis casos</label>
     <sharedTo>

@@ -88,12 +88,6 @@
                 <label>Portal Facilitea</label>
             </value>
             <value>
-                <fullName>Portal Facilitea</fullName>
-                <default>false</default>
-                <isActive>false</isActive>
-                <label>Portal Facilitea</label>
-            </value>
-            <value>
                 <fullName>RRSS</fullName>
                 <default>false</default>
                 <label>RRSS</label>

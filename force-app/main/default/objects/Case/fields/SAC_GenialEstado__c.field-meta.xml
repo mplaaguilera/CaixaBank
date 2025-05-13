@@ -40,6 +40,11 @@
                 <default>false</default>
                 <label>Error Respuesta</label>
             </value>
+            <value>
+                <fullName>SAC_007</fullName>
+                <default>false</default>
+                <label>No Enviado</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

@@ -3,6 +3,32 @@ public with sharing class SEG_Auditoria_TRHan_Test {
     @testSetup
     static void datosIniciales ()
     {
+        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+            Profile perfil = [SELECT Id FROM Profile WHERE Name='System Administrator'];
+            UserRole rol = [SELECT Id FROM UserRole WHERE Name='Sistemática Comercial'];
+            String orgId = UserInfo.getOrganizationId();
+            String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
+            Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
+            String uniqueName = orgId + dateString + randomInt;
+            User thisUser = new User(alias = 'user2', email='testSEGBI2@acme.com',
+                emailencodingkey='UTF-8', lastname='Smith',
+                languagelocalekey='en_US',
+                localesidkey='en_US', profileid = perfil.Id, userroleid = rol.Id,
+                timezonesidkey='America/Los_Angeles',
+                Username = uniqueName + '@test' + orgId + '.org');
+            insert thisUser;
+            List<PermissionSetAssignment> listPermissionSetAssignment = new List<PermissionSetAssignment>();
+            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('CBK_Framework_Login','CBK_Framework_Admin')]){
+                PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
+                nuevoPermiso.PermissionSetId = permisoUnitario.PermissionSetId;
+                nuevoPermiso.AssigneeId = thisUser.id;
+                listPermissionSetAssignment.add(nuevoPermiso);
+            }
+            if (listPermissionSetAssignment.isEmpty()){
+                insert listPermissionSetAssignment;
+            }
+        }
+
         Id recordTypeSEG = Schema.SObjectType.SEG_Auditoria__c.getRecordTypeInfosByDeveloperName().get('SEG_Auditorias').getRecordTypeId(); 
         Id recordDet = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
         Id grColId = Schema.SObjectType.CC_Grupo_Colaborador__C.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
@@ -57,7 +83,7 @@ public with sharing class SEG_Auditoria_TRHan_Test {
         insert plantillagrupo;
 
 
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Tematica1';
         mccTematica.CC_Tipo_Cliente__c = 'Segmentos';
@@ -66,7 +92,7 @@ public with sharing class SEG_Auditoria_TRHan_Test {
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Producto1';
         mccProducto.CC_Tipo_Cliente__c = 'Segmentos';
@@ -76,7 +102,7 @@ public with sharing class SEG_Auditoria_TRHan_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Motivo1';
         mccMotivo.CC_Tipo_Cliente__c = 'Segmentos';
@@ -87,7 +113,7 @@ public with sharing class SEG_Auditoria_TRHan_Test {
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         insert mccMotivo;
 
-        Id recordTypeIdDetalle = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
+        Id recordTypeIdDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SEG_Detalle').getRecordTypeId();
        	CC_MCC__c mccDetalle = new CC_MCC__c();
         mccDetalle.Name = 'Detalle1';
         mccDetalle.CC_Tipo_Cliente__c = 'Segmentos';
@@ -254,5 +280,69 @@ public with sharing class SEG_Auditoria_TRHan_Test {
         System.assert(audit1.SEG_Resultado__c == 'NOK');
 
         }
-    } 
-}
+    }
+    
+    //Se comprueban el traspaso de Workflow SEG_FAuditoria a trigger de BI y BU
+    @isTest
+    public static void concatFechaNifTest(){
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE email = 'testSEGBI2@acme.com' LIMIT 1];
+        Account cuentaSeg = [SELECT Id  FROM Account WHERE CC_Numero_Documento__c = '11111111H' LIMIT 1];
+        Contact contactSeg = [SELECT Id, Email FROM Contact WHERE email = 'test@test.com' LIMIT 1];
+        
+        Test.startTest();
+        System.runAs(usuarioTest) { 
+        Case casoAu = new Case();
+        casoAu.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
+        casoAu.AccountId = cuentaSeg.Id;
+        casoAu.ContactId = contactSeg.Id;
+        casoAu.CC_MailTelfNotif__c = contactSeg.Email;
+        casoAu.SEG_Idioma__c = 'en';
+        casoAu.CC_AcuseRecibo__c ='1';
+        casoAu.Subject = 'test 8';
+        casoAu.Status = 'Pendiente';
+        casoAu.SEG_SRAuditoria__c = true;
+        insert casoAu;
+
+        Id recordTypeSEG = Schema.SObjectType.SEG_Auditoria__c.getRecordTypeInfosByDeveloperName().get('SEG_Auditorias').getRecordTypeId(); 
+        Case casoAudit = [SELECT Id FROM Case WHERE Subject = 'test 8' LIMIT 1];
+        List<Seg_auditoria__c> listAdutiroias = new List<Seg_auditoria__c>();
+        Seg_auditoria__c segauditoriacObj = new Seg_auditoria__c (
+			SEG_NumeroSR__c = casoAudit.Id, 
+			SEG_Resultado__c = 'test auditoria nif+fecha',
+            RecordTypeId = recordTypeSEG,
+            SEG_FechaAuditoria__c = Date.today(),
+            SEG_NIF__c = '93826409W'
+		);
+        listAdutiroias.add(segauditoriacObj);
+        Seg_auditoria__c segauditoriacObjFecha = new Seg_auditoria__c (
+			SEG_NumeroSR__c = casoAudit.Id, 
+			SEG_Resultado__c = 'test auditoria fecha',
+            RecordTypeId = recordTypeSEG,
+            SEG_FechaAuditoria__c = Date.today()
+		);
+        listAdutiroias.add(segauditoriacObjFecha);
+        insert listAdutiroias;
+
+        List<Seg_auditoria__c> listAdutiroiasPostInserts = [SELECT Id, NIF_FechaAuditoria__c, SEG_FechaAuditoriaFormato__c, SEG_Resultado__c, SEG_NIF__c FROM Seg_auditoria__c WHERE SEG_Resultado__c IN ('test auditoria nif+fecha','test auditoria fecha')];
+        for (Seg_auditoria__c auditoriaInsertada : listAdutiroiasPostInserts) {
+            if (auditoriaInsertada.SEG_Resultado__c == 'test auditoria nif+fecha') {
+                System.assertEquals(auditoriaInsertada.NIF_FechaAuditoria__c, auditoriaInsertada.SEG_NIF__c + String.valueOf(auditoriaInsertada.SEG_FechaAuditoriaFormato__c), 'No se ha concatenado correctamente.');
+                auditoriaInsertada.SEG_NIF__c = null;
+            } else if(auditoriaInsertada.SEG_Resultado__c == 'test auditoria fecha'){
+                //Se concatenan el número de DNI de la cuenta asociada a la auditoría cuando ésta se crea con el NIF a nulo.
+                System.assertEquals(auditoriaInsertada.NIF_FechaAuditoria__c, '11111111H' + String.valueOf(auditoriaInsertada.SEG_FechaAuditoriaFormato__c), 'No se ha concatenado correctamente.');
+                auditoriaInsertada.SEG_NIF__c = '38797868L';
+            }
+        }
+        update listAdutiroiasPostInserts;
+
+        List<Seg_auditoria__c> listAdutiroiasPostUpdates = [SELECT Id, NIF_FechaAuditoria__c, SEG_FechaAuditoriaFormato__c, SEG_Resultado__c, SEG_NIF__c FROM Seg_auditoria__c WHERE SEG_Resultado__c IN ('test auditoria nif+fecha','test auditoria fecha')];
+        for (Seg_auditoria__c auditoriaInsertada : listAdutiroiasPostUpdates) {
+            if (auditoriaInsertada.SEG_Resultado__c == 'test auditoria fecha') {
+                System.assertEquals(auditoriaInsertada.NIF_FechaAuditoria__c, auditoriaInsertada.SEG_NIF__c + String.valueOf(auditoriaInsertada.SEG_FechaAuditoriaFormato__c), 'No se ha concatenado correctamente.');
+            } else if(auditoriaInsertada.SEG_Resultado__c == 'test auditoria nif+fecha'){
+                System.assertEquals(auditoriaInsertada.NIF_FechaAuditoria__c, String.valueOf(auditoriaInsertada.SEG_FechaAuditoriaFormato__c), 'No se ha concatenado correctamente.');
+            }
+        }
+    }
+    }}

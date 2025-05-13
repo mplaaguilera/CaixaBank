@@ -1,20 +1,24 @@
 public with sharing class CC_WS_Recuperar_Tarjetas {
     public static List<String> recuperarTarjetasPorCliente(String numPerso) {
-        // numPerso = '1608138';
+        //numPerso = '23101752';
         List<String> tarjetas = new List<String>();
         if(!String.isEmpty(numPerso)){
             try {
                 String outputField = recuperarYformatearParametros('CC_Recuperar_Tarjetas_Datos');
                 String cardStatusFilter = recuperarYformatearParametros('CC_Recuperar_Tarjetas_Filtro');
+                String isBizum;
+                if(CC_Settings__c.getValues('CC_Recuperar_Tarjetas_Bizum')?.CC_Activa__c && CC_Settings__c.getValues('CC_Recuperar_Tarjetas_Bizum')?.CC_Configuracion_1__c  != null){
+                    isBizum = CC_Settings__c.getValues('CC_Recuperar_Tarjetas_Bizum')?.CC_Configuracion_1__c;
+                }
 
                if(!String.isEmpty(outputField) && !String.isEmpty(outputField)){
-                   String httpRequestBody = '{"InputFiltersCardUniqueList":{"CardStatusFilter":['+ cardStatusFilter +']}, "OutputField": ['+outputField+']}';
+                   String httpRequestBody = '{"InputFiltersCardUniqueList":{"isBizum":'+ isBizum +',"CardStatusFilter":['+ cardStatusFilter +']}, "OutputField": ['+outputField+']}';
                    Map<String, String> mHeaders = new Map<String, String>();
                  
                    mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
                    mHeaders.put('x-absis-customerInternalId',  CC_MetodosUtiles.decimalToHex(Decimal.valueOf(numPerso)));
                     //SOLO PARA TEST
-                    //mHeaders.put('x-api-actor-simulated', 'CBCCSF');
+                    // mHeaders.put('x-api-actor-simulated', 'CBCCSF');
        
                    CBK_HttpServiceIntegration.RequestWapper integracion = new CBK_HttpServiceIntegration.RequestWapper();
                    integracion.body = httpRequestBody;
@@ -23,7 +27,8 @@ public with sharing class CC_WS_Recuperar_Tarjetas {
                    integracion.mHeaders = mHeaders;
                    HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
        
-                   HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, null, 'CC_Recuperar_Tarjetas');
+                   HttpResponse response = CBK_HttpServiceIntegration.multiCallHttpService(request, null, 'CC_Recuperar_Tarjetas');
+
                    if (response.getStatusCode() != 200) {
                      CBK_Log.debug('::: Error Status Code: ' + response.getStatusCode());
                    } else {

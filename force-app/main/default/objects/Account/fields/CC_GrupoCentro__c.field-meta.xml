@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_GrupoCentro__c</fullName>
+    <description>US1110917 - Marca de gestores de centros Wealth</description>
+    <externalId>false</externalId>
+    <formula>IF(
+    CC_Tipo_Oficina__c = &quot;W&quot;,
+    IMAGE(&quot;/resource/CC_Wealth&quot;, &quot;Centro Wealth&quot;, 80, 76),
+    NULL
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Grupo Centro</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

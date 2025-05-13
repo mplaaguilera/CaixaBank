@@ -1,6 +1,8 @@
 import {LightningElement, api, wire} from 'lwc';
+import {MessageContext, subscribe, unsubscribe} from 'lightning/messageService';
+import csbdOpportunityMessageChannel from '@salesforce/messageChannel/CSBD_Opportunity_MessageChannel__c';
 import currentUserId from '@salesforce/user/Id';
-import {getRecord, updateRecord, getFieldValue} from 'lightning/uiRecordApi';
+import {getRecord, updateRecord, getFieldValue, notifyRecordUpdateAvailable} from 'lightning/uiRecordApi';
 import LightningConfirm from 'lightning/confirm';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 import {errorApex, formatExcepcion} from 'c/csbd_lwcUtils';
@@ -40,7 +42,9 @@ const OPP_FIELDS = [
 export default class csbdFamiliaProductoPicklist extends LightningElement {
 	@api recordId;
 
-	getRecordTimestamp;
+	subscription;
+	boundHandleClick;
+	boundHandleWindowClick;
 
 	oportunidad;
 
@@ -92,9 +96,12 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 	mostrar = {motivoMac: false, finalidad: false, detalleProducto: false, vehiculo: false};
 
-	funcionEventListener = this.windowOnclick.bind(this);
+	// funcionEventListener = this.windowOnclick;
 
-	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS, timestamp: '$getRecordTimestamp'})
+	@wire(MessageContext) messageContext;
+
+
+	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS})
 	wiredRecord({error, data}) {
 		if (data) {
 			this.oportunidad = data;
@@ -176,6 +183,17 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 		}
 	}
 
+	connectedCallback() {
+		!this.subscription && (this.subscription = subscribe(
+			this.messageContext, csbdOpportunityMessageChannel, message => this.messageChannelOnmessage(message)
+		));
+	}
+
+	disconnectedCallback() {
+		unsubscribe(this.subscription);
+		this.subscription = null;
+	}
+
 	comboboxEmpresasOnfocus() {
 		if (!this.opcionesCargadas.empresas) {
 			this.getEmpresas();
@@ -191,7 +209,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 			if (!empresasProveedorasAux.some(e => e.value === this.empresaProveedora.value)) {
 				empresasProveedorasAux.push(this.valueToOpcion(this.empresaProveedora.value));
 			}
-			empresasProveedorasAux.sort((a, b) => a.label.localeCompare(b.label));
+			empresasProveedorasAux.sort((a, b) => a?.label?.localeCompare(b?.label));
 			this.opcionesEmpresaProveedora = empresasProveedorasAux;
 			this.opcionesCargadas.empresas = true;
 		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de empresas proveedoras seleccionables'))
@@ -232,7 +250,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 			if (!familiasProductoAux.some(f => f.value === this.familiaProducto.value)) {
 				familiasProductoAux.push(this.valueToOpcion(this.familiaProducto.value));
 			}
-			familiasProductoAux.sort((a, b) => a.label.localeCompare(b.label));
+			familiasProductoAux.sort((a, b) => a?.label?.localeCompare(b?.label));
 			this.opcionesFamiliaProducto = familiasProductoAux;
 			this.opcionesCargadas.familiasProducto = true;
 		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de familias de producto seleccionables'))
@@ -269,7 +287,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 			if (!productosAux.some(p => p.value === this.producto.value)) {
 				productosAux.push(this.valueToOpcion(this.producto.value));
 			}
-			productosAux.sort((a, b) => a.label.localeCompare(b.label));
+			productosAux.sort((a, b) => a?.label?.localeCompare(b?.label));
 			this.opcionesProducto = productosAux;
 			this.opcionesCargadas.productos = true;
 		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de productos seleccionables'))
@@ -299,7 +317,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 			if (!motivosMacAux.some(m => m.value === this.motivoMac.value)) {
 				motivosMacAux.push(this.valueToOpcion(this.motivoMac.value));
 			}
-			motivosMacAux.sort((a, b) => a.label.localeCompare(b.label));
+			motivosMacAux.sort((a, b) => a?.label?.localeCompare(b?.label));
 			this.opcionesMotivoMac = motivosMacAux;
 			this.opcionesCargadas.motivosMac = true;
 		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de Motivos CSCC seleccionables'))
@@ -313,9 +331,69 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 	inicioEditando() {
 		this.editando = true;
-		//this.funcionEventListener = this.windowOnclick.bind(this);
-		window.addEventListener('click', this.funcionEventListener, {once: true});
+		this.boundHandleClick = this.handleClick.bind(this);
+		this.boundHandleWindowClick = this.handleWindowClick.bind(this);
+		this.template.addEventListener('click', this.boundHandleClick);
+		window.addEventListener('click', this.boundHandleWindowClick);
 		this.refs.cardComponente.classList.add('editando');
+	}
+
+	handleClick(event) {
+		console.log('Component click');
+		// Si el click és dins del component, l'aturem aquí
+		event.stopPropagation();
+	}
+
+	handleWindowClick(event) {
+		console.log('Window click');
+		// Si l'event ha arribat aquí és que ve de fora del component
+		event.preventDefault();
+		event.stopPropagation();
+
+		if (this.spinner) {
+			return;
+		}
+
+		if (!this.hayCambiosSinGuardar()) {
+			this.finEditando(false);
+			return;
+		}
+
+		this.mostrarDialogConfirmacion();
+	}
+
+	mostrarDialogConfirmacion() {
+		// Eliminem els listeners abans de mostrar el diàleg
+		this.removeEventListeners();
+
+		// Guardem la posició actual del scroll
+		const scrollPos = {
+			x: window.scrollX,
+			y: window.scrollY
+		};
+
+		LightningConfirm.open({
+			variant: 'header',
+			theme: 'warning',
+			label: 'Descartar cambios',
+			message: '¿Quieres descartar los cambios sin guardar?'
+		}).then(result => {
+			if (result) {
+				this.finEditando(false);
+			} else {
+				// Esperem una mica abans de tornar a afegir els listeners
+				// per evitar que capturin el click del botó de cancel
+				window.setTimeout(() => {
+					// Restaurem la posició del scroll
+					window.scrollTo(scrollPos.x, scrollPos.y);
+
+					this.boundHandleClick = this.handleClick.bind(this);
+					this.boundHandleWindowClick = this.handleWindowClick.bind(this);
+					this.template.addEventListener('click', this.boundHandleClick);
+					window.addEventListener('click', this.boundHandleWindowClick);
+				}, 0);
+			}
+		});
 	}
 
 	async finEditando(guardarCambios = true) {
@@ -339,7 +417,18 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 		this.editando = false;
 		this.refs.cardComponente.classList.remove('editando', 'error');
-		window.removeEventListener('click', this.funcionEventListener);
+		this.removeEventListeners();
+	}
+
+	removeEventListeners() {
+		if (this.boundHandleClick) {
+			this.template.removeEventListener('click', this.boundHandleClick);
+			this.boundHandleClick = null;
+		}
+		if (this.boundHandleWindowClick) {
+			window.removeEventListener('click', this.boundHandleWindowClick);
+			this.boundHandleWindowClick = null;
+		}
 	}
 
 	hayCambiosSinGuardar() {
@@ -363,6 +452,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 		let updateOk = true;
 		try {
 			await updateRecord(recordInput);
+			notifyRecordUpdateAvailable([{recordId: this.recordId}]); //Evita un problema de refresco del Aura CSBD_Opportunity_Operativas
 		} catch (error) {
 			console.error(error);
 			this.abrirPopoverError(formatExcepcion(error));
@@ -390,25 +480,6 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 	cardComponenteOnclick(event) {
 		this.cerrarPopoverError();
 		event.stopPropagation();
-	}
-
-	async windowOnclick() {
-		if (!this.hayCambiosSinGuardar()) {
-			this.finEditando(false);
-			return;
-		}
-
-		window.removeEventListener('click', this.funcionEventListener);
-		if (await LightningConfirm.open({
-			variant: 'header', theme: 'warning', label: 'Descartar cambios',
-			message: '¿Quieres descartar los cambios sin guardar?'
-		})) {
-			this.finEditando(false);
-		} else {
-			window.setTimeout(() => {
-				window.addEventListener('click', this.funcionEventListener, {once: true});
-			}, 0);
-		}
 	}
 
 	toast(variant, title, message) {
@@ -462,5 +533,59 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 	cerrarPopoverError() {
 		this.refs.popoverError.classList.remove('visible');
+	}
+
+	buscadorResultadoSeleccionado({detail: {resultado: {empresa, familia, producto}}}) {
+		this.opcionesCargadas = {empresas: false, familiasProducto: false, productos: false};
+
+		const cambios = {
+			empresaProveedora: this.empresaProveedora.value !== empresa,
+			familiaProducto: this.familiaProducto.value !== familia,
+			producto: this.producto.value !== producto
+		};
+
+		this.opcionesEmpresaProveedora = [this.valueToOpcion(empresa)];
+		this.opcionesFamiliaProducto = [this.valueToOpcion(familia)];
+		this.opcionesProducto = [this.valueToOpcion(producto)];
+
+		this.empresaProveedora = this.valueToOpcion(empresa);
+		this.familiaProducto = this.valueToOpcion(familia);
+		this.producto = this.valueToOpcion(producto);
+
+		let comboboxesSelector = [];
+		if (cambios.empresaProveedora) {
+			comboboxesSelector.push('.comboboxEmpresas');
+		}
+		if (cambios.familiaProducto) {
+			comboboxesSelector.push('.comboboxFamilias');
+		}
+		if (cambios.producto) {
+			comboboxesSelector.push('.comboboxProductos');
+		}
+
+		const comboboxes = this.template.querySelectorAll('div.slds-form-element:has(' + comboboxesSelector.join(', ') + ')');
+		comboboxes.forEach(c => c.classList.add('slds-is-edited'));
+	}
+
+	messageChannelOnmessage({recordId, type}) {
+		if (recordId === this.recordId && type === 'editarProducto') {
+			setTimeout(() => {
+				this.inicioEditando();
+				setTimeout(() => {
+					let comboboxFocus;
+					if ((this.empresaProveedora?.value ?? '--Ninguno--') !== '--Ninguno--') {
+						if ((this.familiaProducto?.value ?? '--Ninguno--') !== '--Ninguno--') {
+							comboboxFocus = this.refs.comboboxProductos;
+						} else {
+							comboboxFocus = this.refs.comboboxFamilias;
+						}
+					} else {
+						comboboxFocus = this.refs.comboboxEmpresas;
+					}
+					window.addEventListener('scrollend', () => comboboxFocus.focus(), {once: true});
+					comboboxFocus.scrollIntoView({behavior: 'smooth', block: 'center'});
+				}, 10);
+			}, 0);
+		}
 	}
 }

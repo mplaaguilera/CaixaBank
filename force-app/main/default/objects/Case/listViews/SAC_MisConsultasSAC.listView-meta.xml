@@ -16,6 +16,11 @@
         <operation>equals</operation>
         <value>Case.SAC_ConsultaSAC</value>
     </filters>
+    <filters>
+        <field>SAC_GestionadaProveedor__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
     <label>SAC-Mis Consultas SAC</label>
     <sharedTo>
         <role>SAC_General</role>

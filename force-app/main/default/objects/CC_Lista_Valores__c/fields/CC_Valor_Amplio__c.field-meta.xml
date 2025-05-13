@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CC_Valor_Amplio__c</fullName>
     <encryptionScheme>None</encryptionScheme>
-    <label>Valor amplio</label>
+    <label>Valor Amplio</label>
     <length>1200</length>
     <trackTrending>false</trackTrending>
     <type>LongTextArea</type>

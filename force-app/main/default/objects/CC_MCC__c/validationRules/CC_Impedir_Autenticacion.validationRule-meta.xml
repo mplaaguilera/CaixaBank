@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Impedir_Autenticacion</fullName>
+    <active>true</active>
+    <description>Solo se permite tener &apos;Impedir Nivel 2&apos; o &apos;Imepdir Cliente Digital&apos; activo en un motivo, no los 2 a la vez.</description>
+    <errorConditionFormula>AND(RecordType.DeveloperName = &apos;CC_Motivo&apos;,
+CC_ImpedirClienteDigital__c = true,
+CC_ImpedirNivel2__c = true)</errorConditionFormula>
+    <errorMessage>Solo puede estar un campo de Impedir activo a la vez.</errorMessage>
+</ValidationRule>

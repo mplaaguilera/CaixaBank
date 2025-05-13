@@ -9,9 +9,9 @@ public with sharing class CC_EmailSendController {
                 Account.AV_OficinaPrincipal__r.Name, Account.PersonEmail, Account.RecordType.DeveloperName, Account.RecordTypeId,
                 Account.CC_MarcaSenior__c, CC_Tipo_Cliente__c, CC_Canal_Procedencia__c, Contact.Phone, CC_Tipo_Cliente_Formula__c,
                 CC_MCC_Motivo__c, Origin, Status, Subject, CreatedDate, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, CC_Grupo_3N__c,
-                CC_No_Identificado__c, CC_En_Segundo_Nivel__c, CC_Traslado_2N__c, CC_En_Tercer_Nivel__c, CC_Canal_Operativo__c,
+                CC_No_Identificado__c, CC_En_Segundo_Nivel__c, CC_Traslado_2N__c, CC_En_Tercer_Nivel__c, CC_Canal_Operativo__c, 
                 CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c,CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c , CC_MCC_Causa__c,
-                CC_MCC_Solucion__c,CC_Oportunidad_Creada__c,ParentId, Parent.RecordType.DeveloperName, CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_Representante__c
+                CC_MCC_Solucion__c, CC_Oportunidad_creada__c,CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c,ParentId, Parent.RecordType.DeveloperName, CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_Representante__c
                 FROM Case WHERE Id = :recordId];
     }
 
@@ -283,7 +283,14 @@ public with sharing class CC_EmailSendController {
             if (casos[0].SuppliedEmail != '' && casos[0].SuppliedEmail != null) {
                 sAuxMail = casos[0].SuppliedEmail;
             } else if (casos[0].CC_MailTelfNotif__c != '' && casos[0].CC_MailTelfNotif__c != null) {
-                sAuxMail = casos[0].CC_MailTelfNotif__c;
+                String emailRegex = '([a-zA-Z0-9_\\-\\.]+)@((\\[a-z]{1,3}\\.[a-z]{1,3}\\.[a-z]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})';
+                Pattern MyPattern = Pattern.compile(emailRegex);
+                Matcher MyMatcher = MyPattern.matcher(casos[0].CC_MailTelfNotif__c);
+                if(MyMatcher.matches()){
+                    sAuxMail = casos[0].CC_MailTelfNotif__c;
+                }else {
+                    sAuxMail = casos[0].Contact.Email;
+                } 
             } else {
                 sAuxMail = casos[0].Contact.Email;
             }
@@ -927,10 +934,7 @@ public with sharing class CC_EmailSendController {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<PickListWrapperTraslados> getMCCGrupoList(String recordId, String tipoGrupo, Boolean remitir) {
-        System.debug('recordId MMC ' + recordId);
-        System.debug('tipoGrupo MMC ' + tipoGrupo);
-        System.debug('REMITIR MMC ' + remitir);
+    public static List<PickListWrapperTraslados> getMCCGrupoList(String recordId, String tipoGrupo, Boolean remitir, String grupoColaboradorDerivarFraude) {
         List<Case> casos = [SELECT CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Motivo__c, CC_Canal_Operativo__c, RecordTypeId FROM Case WHERE Id = :recordId LIMIT 1];
         String tematica;
         String prodServicio;
@@ -1003,11 +1007,21 @@ public with sharing class CC_EmailSendController {
             }
         } else {
             if(recordTypecaso != null && recordTypecaso == recordTypeIdCliente){
-                grupos = [SELECT CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
-                      FROM CC_MCC_Grupo_Colaborador__c
-                      WHERE CC_MCC__c IN :idsMCC
-                      AND CC_Grupo_Colaborador__r.RecordtypeId != :recordTypeIdGrupo AND CC_Grupo_Colaborador__r.CC_Tipo__c IN :trasladarORemitir
-                      ORDER BY Name ASC];
+                if(grupoColaboradorDerivarFraude != '' && grupoColaboradorDerivarFraude != null){
+                    grupos = [SELECT CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
+                    FROM CC_MCC_Grupo_Colaborador__c
+                    WHERE CC_MCC__c IN :idsMCC 
+                    AND CC_Grupo_Colaborador__r.RecordtypeId != :recordTypeIdGrupo 
+                    AND CC_Grupo_Colaborador__r.CC_Tipo__c IN :trasladarORemitir AND CC_Grupo_Colaborador__r.Name =: grupoColaboradorDerivarFraude
+                    ORDER BY Name ASC];
+                } else {
+                    grupos = [SELECT CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
+                    FROM CC_MCC_Grupo_Colaborador__c
+                    WHERE CC_MCC__c IN :idsMCC
+                    AND CC_Grupo_Colaborador__r.RecordtypeId != :recordTypeIdGrupo AND CC_Grupo_Colaborador__r.CC_Tipo__c IN :trasladarORemitir
+                    ORDER BY Name ASC];
+                }
+
             } else {
                 grupos = [SELECT CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
                     FROM CC_MCC_Grupo_Colaborador__c
@@ -1038,9 +1052,11 @@ public with sharing class CC_EmailSendController {
     @AuraEnabled
     public static void actualizarCaso(Id idCaso, String plantilla, Boolean informarReferenciaCorreo, String tratamiento, String operativa, String canalRespuesta, String canalProcedencia, String tipoRegistro) {
 		Case caso = new Case(Id = idCaso);
-        vaciarPlantilla(idCaso);
-        Case casoRef = [SELECT Id, CC_Matricula_Empleado__c, CaseNumber, CC_MCC_Tematica__r.name, CC_MCC_Tematica__c, CC_Tematica__c, CC_Idioma__c, Origin, CC_Canal_Procedencia__c FROM Case WHERE Id = :idCaso LIMIT 1];
-        String casoNumber = casoRef.CaseNumber;
+        List<Case> casoRef = [SELECT Id, CC_MCC_Plantilla__c,CC_Email_Cabecera__c, CC_Email_Pie__c, CC_Matricula_Empleado__c, CaseNumber, CC_MCC_Tematica__r.name, CC_MCC_Tematica__c, CC_Tematica__c, CC_Idioma__c, Origin, CC_Canal_Procedencia__c, CC_Grupo_Colaborador__c, RecordtypeId, CC_En_Tercer_Nivel__c FROM Case WHERE Id = :idCaso LIMIT 1];
+        if(casoRef[0].CC_MCC_Plantilla__c != null || casoRef[0].CC_Email_Cabecera__c != null || casoRef[0].CC_Email_Pie__c != null){
+            vaciarPlantilla(idCaso);
+            }
+        String casoNumber = casoRef[0].CaseNumber;
 
         if (idCaso != null && (plantilla != null || informarReferenciaCorreo)) {
             String nombrePlantillaCabecera;
@@ -1066,7 +1082,7 @@ public with sharing class CC_EmailSendController {
                 }
 
                 if (!mdts.isEmpty()) {
-                     if(casoRef.CC_Canal_Procedencia__c != 'Formulario Consultas Operativas'){
+                     if(casoRef[0].CC_Canal_Procedencia__c != 'Formulario Consultas Operativas'){
                         nombrePlantillaCabecera = mdts.get(0).CC_Nombre_plantilla_cabecera__c;
                     }
                     nombrePlantillaPie = mdts.get(0).CC_Nombre_plantilla_pie__c;
@@ -1100,12 +1116,18 @@ public with sharing class CC_EmailSendController {
 
             caso.CC_Ultima_Operativa_Correo__c = operativa;
 
-            if(String.isBlank(caso.CC_URL_Encuesta_Formulario__c) && casoRef.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas'){
-                List<CC_Envio_Encuesta__c> linkEncuestaEmpleado = [SELECT CC_Link_LimeSurvey__c, CC_Id_Encuesta__c FROM CC_Envio_Encuesta__c WHERE Name = 'CC_EncuestaFormularioOperativas' LIMIT 1];
-                if(!linkEncuestaEmpleado.isEmpty()){
-                    //Actualizar URL de la encuesta en el caso
-                    caso.CC_URL_Encuesta_Formulario__c = (String)linkEncuestaEmpleado[0].CC_Link_LimeSurvey__c+'sid='+(String)linkEncuestaEmpleado[0].CC_Id_Encuesta__c+'&lang='+
-                    casoRef.CC_Idioma__c+'&userid='+casoRef.CC_Matricula_Empleado__c+'&ticketid='+casoRef.CaseNumber+'&idet='+casoRef.CC_MCC_Tematica__c+'&et='+ casoRef.CC_MCC_Tematica__r.name.replace(' ', '_')+ '&newtest=Y';
+            Id rtCaseEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+
+            Map<Id, String> encuesta = new Map<Id, String>();
+            if(casoRef[0].RecordTypeId == rtCaseEmpleado){
+                encuesta = CC_MetodosUtiles.generarURLsLimeSurvey(casoRef);
+            }
+            if(!encuesta.isEmpty()){
+                if(String.isBlank(caso.CC_URL_Encuesta_Formulario__c) && casoRef[0].CC_Canal_Procedencia__c == 'Formulario Consultas Operativas'){
+                        caso.CC_URL_Encuesta_Formulario__c = encuesta.get(idCaso);
+                }else if (casoRef[0].RecordTypeId == rtCaseEmpleado && casoRef[0].CC_Canal_Procedencia__c != 'Formulario Consultas Operativas'){
+                    caso.CC_URL_Encuesta_3N__c = encuesta.get(idCaso);
+    
                 }
             }
             update caso;
@@ -1458,7 +1480,7 @@ public with sharing class CC_EmailSendController {
 
     @AuraEnabled
     public static void devolverCasoAlSAC(String motivo, Case casoContactCenter){
-        CC_Revincular_Caso_Controller.f3(motivo, casoContactCenter);
+        CC_Revincular_Caso_Controller.devolverCasoAlSAC(motivo, casoContactCenter);
     }
 
     @AuraEnabled
@@ -1542,7 +1564,7 @@ public with sharing class CC_EmailSendController {
         String matriculaGestor;
         String mensaje;
         Account resultado = new Account();
-        User[] gestorCliente;
+        List<User> gestorCliente = new List<User>();
         List<Task> lstTask = new List<Task>();
         CC_Settings__c configuracionToast = CC_Settings__c.getValues('CC_ToastTareaGestor');
         Date fechaActividadDate = date.valueOf(fechaActividad);
@@ -1638,8 +1660,8 @@ public with sharing class CC_EmailSendController {
                 }
                 gestorCliente = [SELECT Id FROM User WHERE AV_ExternalID__c =: matriculaGestor];
             }
-            if(gestorCliente != null) {
-                tareaGestorAccount.OwnerId = gestorCliente[0].Id;
+            if(gestorCliente != null && !gestorCliente.isEmpty()) {
+                tareaGestorAccount.OwnerId = gestorCliente[0]?.Id;
             } else {
                 gestorGenerico = true;
             }
@@ -1916,13 +1938,11 @@ public with sharing class CC_EmailSendController {
     }
 
     // @AuraEnabled
-    // public static Boolean comprobarVisibilidadBotonOnboarding(Id recordId) {
-    //     return [SELECT CC_MCC_Motivo__r.CC_AplicaOnboarding__c FROM Case WHERE Id = :recordId LIMIT 1].CC_MCC_Motivo__r.CC_AplicaOnboarding__c;
-    // }
-
-    // @AuraEnabled
-    // public static void llamadaWSOnboarding() {
-    //     CC_WS_Onboarding.test();
+    // public static String llamadaWSOnboardingApex(String recordId, String nif) {
+    //     if (nif == null || nif == '') {
+    //         nif = [SELECT Account.CC_Numero_Documento__c FROM Case WHERE Id = :recordId LIMIT 1].Account.CC_Numero_Documento__c;
+    //     }
+    //     return CC_WS_Onboarding.recuperarClienteOnboarding(recordId, nif);
     // }
 
 }

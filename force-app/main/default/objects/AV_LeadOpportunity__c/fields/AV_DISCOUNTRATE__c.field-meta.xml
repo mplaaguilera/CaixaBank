@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_DISCOUNTRATE__c</fullName>
+    <description>Campo que almacena el tipo de interes fijo por bonificación</description>
     <label>Tipo interés fija bonif.</label>
     <precision>11</precision>
     <required>false</required>

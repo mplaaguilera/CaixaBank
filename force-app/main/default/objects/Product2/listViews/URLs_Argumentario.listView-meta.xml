@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>URLs_Argumentario</fullName>
+    <columns>PRODUCT2.NAME</columns>
+    <columns>AV_URLArgumentario__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>PRODUCT2.RECORD_TYPE</field>
+        <operation>equals</operation>
+        <value>Product2.AV_PF</value>
+    </filters>
+    <label>URLs Argumentario</label>
+    <sharedTo>
+        <group>AV_URLPFParametrization</group>
+    </sharedTo>
+</ListView>

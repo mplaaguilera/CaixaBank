@@ -147,4 +147,19 @@ public without sharing class SEG_GetRT {
         }
         return mapObjectRT;
     }
+
+    /*
+    @description Método para recuperar los campos de un Set de objetos.
+    @param setObjetos -> Set con los objetos de los que se requiere información
+    @return Mapa con la información de los campos de cada objeto
+    */
+    public static Map<String,Map<String, Schema.SObjectField>> getFieldsObjects (Set<String> setObjetos) {
+        Map<String,Map<String, Schema.SObjectField>> mapObjectFields = new Map<String,Map<String, Schema.SObjectField>>();
+        for(String objeto : setObjetos){
+            if (Type.forName(objeto) != null) {
+                mapObjectFields.put(objeto, ((SObject)Type.forName(objeto).newInstance()).getSObjectType().getDescribe().fields.getMap());
+            }
+        }
+        return mapObjectFields;
+    }
 }

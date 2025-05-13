@@ -4,7 +4,6 @@
     <columns>NAME</columns>
     <columns>CC_Activo__c</columns>
     <columns>CC_Codigo_Externo__c</columns>
-    <columns>SAC_EndToEnd__c</columns>
     <columns>CC_Tematica__c</columns>
     <filterScope>Everything</filterScope>
     <filters>

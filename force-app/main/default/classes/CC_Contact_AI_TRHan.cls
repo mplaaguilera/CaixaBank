@@ -18,5 +18,7 @@ public with sharing class CC_Contact_AI_TRHan extends CC_TriggerHandlerBase {
 				CC_Grupo_Colaborador_Contact.tratarColaborador(idsEmpleadosCc);
 			}
 		}
+
 	}
+
 }

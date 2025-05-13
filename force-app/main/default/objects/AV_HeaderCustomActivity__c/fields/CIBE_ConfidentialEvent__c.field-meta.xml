@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CIBE_ConfidentialEvent__c</fullName>
+    <description>evento confidencial</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
     <label>Confidential Event</label>

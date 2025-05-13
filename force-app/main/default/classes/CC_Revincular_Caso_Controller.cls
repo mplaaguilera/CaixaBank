@@ -17,19 +17,19 @@ public without sharing class CC_Revincular_Caso_Controller {
         }
         //Saber si es recordType de CC
             esRecTypeCC = caso.RecordType.DeveloperName.startsWith('CC_');
-
+      
         //Si el canal de entrada es chat y de tipo empleado
         if (caso.RecordType.DeveloperName == 'CC_Empleado'|| caso.RecordType.DeveloperName == 'CC_Cliente' || caso.RecordType.DeveloperName == 'HDT_Empleado' || (caso.Origin == 'Chat' && caso.RecordType.DeveloperName == 'CC_CSI_Bankia')) {
             operativaHabilitada = true;
         } else if (caso.CC_Cola_Procedencia__c != '') {
             List<CC_Fusion_Casos__mdt> procedencias = [SELECT Id FROM CC_Fusion_Casos__mdt WHERE MasterLabel = :caso.CC_Cola_Procedencia__c];
             operativaHabilitada = !procedencias.isEmpty();
-        }
+        } 
 
         /*if (caso.CC_Canal_Procedencia__c == 'Atención al Cliente') {
             operativaHabilitada = true;
         }*/
-
+        
         if (String.valueOf(caso.OwnerId).startsWith('00G')) {
             operativaHabilitada = false;
             mensaje = 'Para poder fusionar este caso acepte primero su propiedad.';
@@ -63,7 +63,7 @@ public without sharing class CC_Revincular_Caso_Controller {
             Case mergeCase = [SELECT CC_Ultima_Interaccion__c, Status, CC_Cola_Procedencia__c, CC_Fecha_Ultima_Interaccion__c, CC_Canal_Procedencia__c,
                                     CC_Fecha_Activo_Formulario__c, CC_Fecha_Traslado_Colaborador__c, Origin, CC_MailTelfNotif__c, CreatedDate, RecordType.DeveloperName
                                 FROM Case WHERE Id = :mergeCaseId];
-
+                                
             List<Task> listaTareasOrigen = [SELECT Type FROM Task WHERE WhatId = :mergeCaseId AND CC_Referencia_Correo_Saliente__c != ''
                                             AND Status = 'Open' AND Type IN ('Solicitud Información', 'Traslado Colaborador', 'Remitir Colaborador')];
 
@@ -96,10 +96,10 @@ public without sharing class CC_Revincular_Caso_Controller {
             Id recordtypeIdTask = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
             List<Task> mergeClosedTasklst = Database.query('SELECT ' + String.join(new List<String>(Schema.getGlobalDescribe().get('Task').getDescribe().fields.getMap().keySet()), ',') + ' FROM Task WHERE WhatId = :mergeCaseId AND RecordTypeId = :recordtypeIdTask');
             List<Task> masterClosedTasklst = new List<Task>();
-
+            
             CBK_Activity_Extension__c extTask;
             map<Id,CBK_Activity_Extension__c> mapExtension = new map<Id,CBK_Activity_Extension__c>();
-
+            
             //recuperamos los IDs de las tareas a hacer merge/eliminar
             Set<Id> mergeClosedTasklstIds = (new Map<Id,Task>(mergeClosedTasklst)).keySet();
 
@@ -108,33 +108,33 @@ public without sharing class CC_Revincular_Caso_Controller {
             for (CBK_Activity_Extension__c x : lstExtension){
                 setExtensionIds.add(x.AV_ActivityId__c);
             }
-
-
+                
+            
             for (Task tk: mergeClosedTasklst) {
                 Task newRecord = tk.clone(false);
                 newRecord.WhatId = masterCaseId;
                 masterClosedTasklst.add(newRecord);
 //                tk.CBK_Eliminable__c = true;
-//  				list<CBK_Activity_Extension__c> lstExt = [Select Id from CBK_Activity_Extension__c where AV_ActivityId__c = :tk.Id];
+//  				list<CBK_Activity_Extension__c> lstExt = [Select Id from CBK_Activity_Extension__c where AV_ActivityId__c = :tk.Id];              
 	            //creación de extensión que no existen, para poder eliminar las tasks
-            if (!(setExtensionIds.contains(tk.Id))){
+            if (!(setExtensionIds.contains(tk.Id))){        
                     extTask = new CBK_Activity_Extension__c();
 			        extTask.AV_ActivityId__c=tk.id;
-                    extTask.CBK_Eliminable__c=true;
-        			lstExtension.add(extTask);
-                }
+                    extTask.CBK_Eliminable__c=true;                           
+        			lstExtension.add(extTask);                    
+                } 
             }
 
-            //marcamos las tareas a eliminar
+            //marcamos las tareas a eliminar            
             for (CBK_Activity_Extension__c tk: lstExtension) {
-                tk.CBK_Eliminable__c=true;
-            }
-            upsert lstExtension;
-
+                tk.CBK_Eliminable__c=true;                           
+            }   
+            upsert lstExtension; 
+			
 
             if (OT_Proyectos.registroProyecto(mergeCaseId) == 'OS') {
 
-
+                
                 Set<Id> setMergedId = new Set<Id>();
                 setMergedId.add(mergeCaseId);
                 List<ContentDocumentLink> archivosCaso = [SELECT LinkedEntityId, ContentDocumentId, ContentDocument.Title FROM ContentDocumentLink WHERE LinkedEntityId IN :setMergedId];
@@ -149,14 +149,14 @@ public without sharing class CC_Revincular_Caso_Controller {
                     delete archivosCaso;
                     insert listaContentDocumentLink;
                 }
-
+                
             }
-
+            
             //Update para poder realizar el delete
             update mergeClosedTasklst;
             delete mergeClosedTasklst;
-
-
+            
+           
             //insert masterClosedTasklst;
             CC_Activity.crearActividades(masterClosedTasklst);
 
@@ -167,14 +167,14 @@ public without sharing class CC_Revincular_Caso_Controller {
 
             merge masterCase mergeCase;
             resultado = 'Ok';
-
+		
            //Tarea para el mastercase
            Task createTask = new Task();
-           createTask.Type = 'Fusionado';
+           createTask.Type = 'Fusionado'; 
            createTask.Subject = 'Fusión de caso';
            createTask.ActivityDate = System.today();
            createTask.Status = 'Completed';
-
+            
             //Para CC los casos no se borran tras fusionarlos así que se recupera y se pone a cerrado
             Boolean recordTypeCC = Schema.SObjectType.Case.getRecordTypeInfosById().get(mergeCase.RecordTypeId).getDeveloperName().startsWith('CC_');
             if (recordTypeCC){
@@ -188,46 +188,46 @@ public without sharing class CC_Revincular_Caso_Controller {
                     System.debug ('Origen correcto');
                     if (masterCase.CC_MCC_Tematica__c != null && masterCase.CC_MCC_ProdServ__c != null && masterCase.CC_MCC_Motivo__c != null){
                         System.debug('Entra al IF');
-
+                        
                         //se cambia el case origin para poder cerrarlo
                         //trasFusion.Origin = masterCase.Origin;
 
-                        trasFusion.CC_MCC_Tematica__c = masterCase.CC_MCC_Tematica__c ;
-                        trasFusion.CC_MCC_ProdServ__c = masterCase.CC_MCC_ProdServ__c ;
+                        trasFusion.CC_MCC_Tematica__c = masterCase.CC_MCC_Tematica__c ; 
+                        trasFusion.CC_MCC_ProdServ__c = masterCase.CC_MCC_ProdServ__c ; 
                         trasFusion.CC_MCC_Motivo__c = masterCase.CC_MCC_Motivo__c ;
                     }
                     else {
                         System.debug('Entra al ELSE');
                          //se envía un mensaje de error si el caso master no está clasificado
-                        List<CC_Aviso_Case__e> avisos = new List<CC_Aviso_Case__e>();
+                        List<CC_Aviso_Case__e> avisos = new List<CC_Aviso_Case__e>();         
                         String tipoToast = 'error';
                         String mensaje = 'El caso al que intentas asociar debe estar clasificado ()';
                         System.debug('Crea el aviso');
-                        avisos.add(new CC_Aviso_Case__e(Mensaje__c = mensaje, Case_Id__c = Id.valueOf(mergeCaseId),  Tipo__c = tipoToast));
-                        System.debug('Aviso añadido');
+                        avisos.add(new CC_Aviso_Case__e(Mensaje__c = mensaje, Case_Id__c = Id.valueOf(mergeCaseId),  Tipo__c = tipoToast));  
+                        System.debug('Aviso añadido');              
                         EventBus.publish(avisos);
                         System.debug('Aviso publicado');
                     }
-
+                    
                 } */
-
+                
                 update trasFusion;
-
+                
                 createTask.Description = 'El número del caso asociado es '+trasFusion.CaseNumber;
 
             }
             else {
                 createTask.Description = '';
             }
-
+            
             createTask.WhatId = masterCase.Id;
             //insert createTask;
 			CC_Activity.crearActividad(createTask);
+            
+            return resultado; 
 
-            return resultado;
-
-
-
+           
+        
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
@@ -315,10 +315,10 @@ public without sharing class CC_Revincular_Caso_Controller {
             olstCaso = [SELECT CaseNumber, Subject, Description,CreatedDate FROM Case
                         WHERE ContactId = :sRecordId AND Id != :sIgnoreId ORDER BY CreatedDate DESC LIMIT 20];
         }
-
+        
         return olstCaso;
     }
-
+    
     @AuraEnabled
     public static String getParentIdRecordTypeDeveloperName(Case caso){
         String developerName = '';
@@ -334,7 +334,7 @@ public without sharing class CC_Revincular_Caso_Controller {
     public static Boolean comprobarRecordType(Id recordTypeId){
         /*****************************************************************
          * Proposito: Método para comprobar que el record type es CC al crear un nuevo caso y salga el mensaje correcto de aviso
-         *
+         * 
          * Historial
          * -------
          * VERSION        USER_STORY       AUTHOR           DATE            Description
@@ -346,7 +346,7 @@ public without sharing class CC_Revincular_Caso_Controller {
         return recordTypeActual[0].DeveloperName.startsWith('CC_') ? true : false;
     }
 
-    public static void f3(String motivo, Case casoContactCenter){
+    public static void devolverCasoAlSAC(String motivo, Case casoContactCenter){
         try {
             List<Case> casos = new List<Case>();
             Case casoSAC = [SELECT Id, CaseNumber, Status, CC_Motivo__c, OwnerId FROM Case WHERE Id =: casoContactCenter.ParentId LIMIT 1];
@@ -362,18 +362,18 @@ public without sharing class CC_Revincular_Caso_Controller {
 
             if (listadoHistoricoCaso.size() > 0 || Test.isRunningTest())
             {
-                for (CaseHistory historicoCaso : listadoHistoricoCaso){
+                for (CaseHistory historicoCaso : listadoHistoricoCaso){ 
                     if (historicoCaso.OldValue == 'Cerrado' || historicoCaso.OldValue == 'SAC_006')
-                    {
-                        Integer posicion = listadoHistoricoCaso.indexOf(historicoCaso); pos.add(posicion);
-                    }
+                    { 
+                        Integer posicion = listadoHistoricoCaso.indexOf(historicoCaso); pos.add(posicion); 
+                    } 
                 }
                 for (Integer posicion : pos)
-                {
+                { 
                     listadoHistoricoCaso.remove(posicion - resta); resta = resta + 1;
                 }
             }
-            if (Test.isRunningTest())
+            if (Test.isRunningTest()) 
             {
                 casoSAC.Status = 'SAC_001';
                 casoSAC.SAC_StatusAuxiliar__c = 'SAC_001';
@@ -382,7 +382,7 @@ public without sharing class CC_Revincular_Caso_Controller {
                casoSAC.SAC_MotivoReabrir__c = motivo;
 
 
-            } else
+            } else 
             {
                 casoSAC.Status = listadoHistoricoCaso[0].OldValue.toString();
                 casoSAC.SAC_StatusAuxiliar__c = listadoHistoricoCaso[0].OldValue.toString();
@@ -390,7 +390,7 @@ public without sharing class CC_Revincular_Caso_Controller {
                 // Comentado para las pruebas de funcionamiento: casoSAC.SAC_MotivoReabrir__c = motivo;
                 casoSAC.SAC_MotivoReabrir__c = motivo;
             }
-
+            
             Case casoCC = new Case();
             casoCC.Id = casoContactCenter.Id;
             casoCC.RecordTypeId = casoContactCenter.RecordTypeId;
@@ -400,7 +400,7 @@ public without sharing class CC_Revincular_Caso_Controller {
             casoCC.CC_Cerrado_Operativa__c = System.now();
             casos.add(casoCC);
 
-            //Creación ActividadCC 'Devolver a SAC'
+            //Creación ActividadCC 'Devolver a SAC' 
             Task tareaCC = new Task();
             tareaCC.WhatId = casoContactCenter.Id;
             tareaCC.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
@@ -411,12 +411,12 @@ public without sharing class CC_Revincular_Caso_Controller {
             tareaCC.Status = 'Completed';
             //Comentarios = motivo
             insert tareaCC;
-
+            
             casos.add(casoSAC);
             update casos;
             System.debug('Pablo: casos '+casos);
             SAC_Notificacion.enviarNotificacion(casoSAC.OwnerId, casoSAC.Id, 'Reclamación reabierta', 'La reclamación ' + casoSAC.CaseNumber + ' ha sido reabierta desde CC.');
-
+             
         } catch (Exception e) {
             AuraHandledException a = new AuraHandledException(e.getMessage());
             a.setMessage(e.getMessage());
@@ -446,22 +446,22 @@ public without sharing class CC_Revincular_Caso_Controller {
             }
             List<ContentVersion> adjuntosParaSAC = [SELECT Id, Title, VersionData, PathOnClient, ContentDocumentId FROM ContentVersion WHERE ContentDocumentId IN: fileId];
             //System.debug('lista de adjuntos ' + adjuntosParaCC);
-
+            
             //Obtencion de Emails del cliente
-            //List<EmailMessage> emailsParaSAC = [SELECT Status, Incoming, MessageDate, FromAddress, FromName, CcAddress, Subject, HtmlBody, ToAddress, ValidatedFromAddress, BccAddress FROM EmailMessage WHERE ParentId =: casoContactCenter.Id];
+            //List<EmailMessage> emailsParaSAC = [SELECT Status, Incoming, MessageDate, FromAddress, FromName, CcAddress, Subject, HtmlBody, ToAddress, ValidatedFromAddress, BccAddress FROM EmailMessage WHERE ParentId =: casoContactCenter.Id];    
+        
 
-
-
+        
             // Creación del caso de SAC
             Case casoSac = new Case();
-            casoSac.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
-            casoSac.Origin = 'CC';
-            casoSac.Subject = casoContactCenter.Subject;
+            casoSac.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId(); 
+            casoSac.Origin = 'CC'; 
+            casoSac.Subject = casoContactCenter.Subject; 
             casoSac.CC_Idioma__c = casoContactCenter.CC_Idioma__c;
-            casoSac.Description = casoContactCenter.Description;
-            casoSac.AccountId = casoContactCenter.AccountId;
-            casoSac.ContactId = casoContactCenter.ContactId;
-            casoSac.Status = 'SAC_001';
+            casoSac.Description = casoContactCenter.Description; 
+            casoSac.AccountId = casoContactCenter.AccountId; 
+            casoSac.ContactId = casoContactCenter.ContactId; 
+            casoSac.Status = 'SAC_001'; 
             casoSac.SAC_StatusAuxiliar__c = 'SAC_001';
             casoSac.CC_CasoRelacionado__c = casoContactCenter.Id;
             casoSac.ParentId = casoContactCenter.Id;
@@ -470,7 +470,7 @@ public without sharing class CC_Revincular_Caso_Controller {
             casoSac.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PendienteAsignar' LIMIT 1].Id;
             insert casoSac;
 
-            //Creación ActividadCC 'Derivado a SAC'
+            //Creación ActividadCC 'Derivado a SAC' 
             Task tareaCC = new Task();
             tareaCC.WhatId = casoContactCenter.Id;
             tareaCC.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
@@ -480,7 +480,7 @@ public without sharing class CC_Revincular_Caso_Controller {
             tareaCC.ActivityDate = System.today();
             tareaCC.Status = 'Completed';
             insert tareaCC;
-
+            
             Case casoCC = new Case();
             casoCC.Id = casoContactCenter.Id;
             casoCC.CC_Motivo__c = motivo;
@@ -491,7 +491,7 @@ public without sharing class CC_Revincular_Caso_Controller {
 
             addAdjuntos(casoSac, adjuntosParaSAC/*, emailsParaSAC*/);
 
-
+            
 
             //insert listadoAuxiliarRegistro;
         }
@@ -502,7 +502,7 @@ public without sharing class CC_Revincular_Caso_Controller {
         if(!adjuntosParaSAC.isEmpty()){
             for(ContentVersion cv: adjuntosParaSAC){
                 /*ContentVersion cvCopy = new ContentVersion(
-                    Title= cv.Title,
+                    Title= cv.Title, 
                     PathOnClient = cv.PathOnClient,
                     VersionData = cv.VersionData,
                     FirstPublishLocationId = casoSac.Id
@@ -529,7 +529,7 @@ public without sharing class CC_Revincular_Caso_Controller {
                 emailMsg.Incoming = em.Incoming;
                 //listadoAuxiliarRegistro.add(emailMsg);
             }
-        }        */
+        }        */    
 
         // Strip fields that are not creatable
         SObjectAccessDecision decision = Security.stripInaccessible(

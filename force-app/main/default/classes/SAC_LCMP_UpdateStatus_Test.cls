@@ -655,13 +655,14 @@ public with sharing class SAC_LCMP_UpdateStatus_Test {
             SAC_PlantillaRedaccion__c plantilla = new SAC_PlantillaRedaccion__c();
             plantilla.SAC_TipoPlantilla__c = 'SAC_Subsanacion';
             plantilla.SAC_MotivoSubsanacion__c = 'Varios';
+            plantilla.SAC_CanalRespuesta__c = 'Email';
             plantilla.SAC_PlantillaCastellanoId__c = validEmailTemplate.Id;
             plantilla.SAC_PlantillaCatalanId__c = validEmailTemplate.Id;
             plantilla.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
             plantilla.Name = 'testPlantilla';
             SAC_DatabaseDML.insertDML(plantilla, false);
             //Database.insert(plantilla);
-            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'ES', 'Varios');
+            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'ES', 'Varios', 'Email');
         }
         Test.stopTest();
         System.assertNotEquals(null, reclamacion.Id, 'No se ha podido recupear la plantilla');
@@ -681,13 +682,14 @@ public with sharing class SAC_LCMP_UpdateStatus_Test {
             SAC_PlantillaRedaccion__c plantilla = new SAC_PlantillaRedaccion__c();
             plantilla.SAC_TipoPlantilla__c = 'SAC_Subsanacion';
             plantilla.SAC_MotivoSubsanacion__c = 'Varios';
+            plantilla.SAC_CanalRespuesta__c = 'SAC_Email';
             plantilla.SAC_PlantillaCastellanoId__c = validEmailTemplate.Id;
             plantilla.SAC_PlantillaCatalanId__c = validEmailTemplate.Id;
             plantilla.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
             plantilla.Name = 'testPlantilla';
             SAC_DatabaseDML.insertDML(plantilla, false);
             //Database.insert(plantilla);
-            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'CAT', 'Varios');
+            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'CAT', 'Varios', 'SAC_Email');
         }
         Test.stopTest();
         System.assertNotEquals(null, reclamacion.Id, 'No se ha podido recupear la plantilla');
@@ -707,6 +709,7 @@ public with sharing class SAC_LCMP_UpdateStatus_Test {
             SAC_PlantillaRedaccion__c plantilla = new SAC_PlantillaRedaccion__c();
             plantilla.SAC_TipoPlantilla__c = 'SAC_Subsanacion';
             plantilla.SAC_MotivoSubsanacion__c = 'Varios';
+            plantilla.SAC_CanalRespuesta__c = 'Email';
             plantilla.SAC_PlantillaCastellanoId__c = validEmailTemplate.Id;
             plantilla.SAC_PlantillaCatalanId__c = validEmailTemplate.Id;
             plantilla.SAC_PlantillaInglesId__c = validEmailTemplate.Id;
@@ -716,10 +719,10 @@ public with sharing class SAC_LCMP_UpdateStatus_Test {
             plantilla.Name = 'testPlantilla';
             SAC_DatabaseDML.insertDML(plantilla, false);
             //Database.insert(plantilla);
-            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'ING', 'Varios');
-            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap2 = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'EUSK', 'Varios');
-            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap3 = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'VAL', 'Varios');
-            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap4 = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'GAL', 'Varios');
+            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'ING', 'Varios', 'Email');
+            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap2 = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'EUSK', 'Varios', 'Email');
+            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap3 = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'VAL', 'Varios', 'Email');
+            SAC_LCMP_UpdateStatus.TemplateWrapper templateWrap4 = SAC_LCMP_UpdateStatus.getPlantillaSubsanacion(reclamacion.id, 'GAL', 'Varios', 'Email');
 
         }
         Test.stopTest();

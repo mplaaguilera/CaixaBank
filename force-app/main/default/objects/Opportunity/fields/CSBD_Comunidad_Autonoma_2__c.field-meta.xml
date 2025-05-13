@@ -12,6 +12,11 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
+                <fullName>ES-CT</fullName>
+                <default>false</default>
+                <label>ES-CT</label>
+            </value>
+            <value>
                 <fullName>Andalucía</fullName>
                 <default>false</default>
                 <label>Andalucía</label>
@@ -62,6 +67,11 @@
                 <label>Ceuta</label>
             </value>
             <value>
+                <fullName>Comunidad Valenciana</fullName>
+                <default>false</default>
+                <label>Comunidad Valenciana</label>
+            </value>
+            <value>
                 <fullName>Extremadura</fullName>
                 <default>false</default>
                 <label>Extremadura</label>
@@ -87,11 +97,6 @@
                 <label>Melilla</label>
             </value>
             <value>
-                <fullName>Murcia</fullName>
-                <default>false</default>
-                <label>Murcia</label>
-            </value>
-            <value>
                 <fullName>Navarra</fullName>
                 <default>false</default>
                 <label>Navarra</label>
@@ -102,9 +107,9 @@
                 <label>País Vasco</label>
             </value>
             <value>
-                <fullName>Valencia</fullName>
+                <fullName>Región de Murcia</fullName>
                 <default>false</default>
-                <label>Valencia</label>
+                <label>Región de Murcia</label>
             </value>
         </valueSetDefinition>
     </valueSet>

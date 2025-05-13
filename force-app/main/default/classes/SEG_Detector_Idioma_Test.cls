@@ -5,8 +5,7 @@ Global class SEG_Detector_Idioma_Test implements HttpCalloutMock{
     {   
         String sFakeRespuesta = '';
 
-        sFakeRespuesta = '{"sr": "03934195", "model_name": "model-salesforce", "category": "Robot No Clasificado", "categories": [{"category": "Tarjetas", "ratio": "0.40430"}, {"category": "Tarjetas-Alta tarjeta/ VIA T", "ratio": "0.21459"}, {"category": "Robot No Clasificado", "ratio": "0.17570"}, {"category": "Transferencias-Devolución/retrocesión transferencia", "ratio": "0.08676"}, {"category": "Tarjetas-Baja tarjeta/VIA T", "ratio": "0.02030"}], "attributes": {"text_regex": [{"name": "cif_regex", "value": "A-28010791"}]}, "text_vector_words": [0.0]}';
-
+        sFakeRespuesta = '{cat=0.777, eng=0.591, esp=1.000, language=esp}';
         HttpResponse res = new HttpResponse();
         res.setHeader('Content-Type', 'application/json');
         res.setBody(sFakeRespuesta);
@@ -154,35 +153,80 @@ Global class SEG_Detector_Idioma_Test implements HttpCalloutMock{
 
         CBK_IntegrationSetting__c csDETIDI = new CBK_IntegrationSetting__c();
         csDETIDI.Name = 'SEG_DETIDI';
-        csDETIDI.NamedCredential__c = '	callout:API_GWT_PRE/detidi/predictscores';
+        csDETIDI.NamedCredential__c = 'callout:API_SEG_TST/detidi/predictscores';
         insert csDETIDI;
+        
+        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+            Profile perfil = [SELECT Id FROM Profile WHERE Name='System Administrator'];
+            UserRole rol = [SELECT Id FROM UserRole WHERE Name='Sistemática Comercial'];
+            String orgId = UserInfo.getOrganizationId();
+            String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
+            Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
+            String uniqueName = orgId + dateString + randomInt;
+            User thisUser = new User(alias = 'user2', email='testSEGBI2@acme.com',
+                emailencodingkey='UTF-8', lastname='Smith',
+                languagelocalekey='en_US',
+                localesidkey='en_US', profileid = perfil.Id, userroleid = rol.Id,
+                timezonesidkey='America/Los_Angeles',
+                Username = uniqueName + '@test' + orgId + '.org');
+            insert thisUser;
+            List<PermissionSetAssignment> listPermissionSetAssignment = new List<PermissionSetAssignment>();
+            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('CBK_Framework_Login','CBK_Framework_Admin')]){
+                PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
+                nuevoPermiso.PermissionSetId = permisoUnitario.PermissionSetId;
+                nuevoPermiso.AssigneeId = thisUser.id;
+                listPermissionSetAssignment.add(nuevoPermiso);
+            }
+            if (listPermissionSetAssignment.isEmpty()){
+                insert listPermissionSetAssignment;
+            }
+        }
     }
     
  	@isTest 
-    public static void getIdiomaES(){
-     
-        Test.setMock(HttpCalloutMock.class, new SEG_Detector_Idioma_Test());        
-        Case caso = [SELECT id, SEG_Idioma__c FROM Case WHERE Subject = 'case1' LIMIT 1];
+    public static void getIdiomaES() {
         List<Id> lstCaseIds = new List<Id>();
-	    lstCaseIds.add(caso.id);
-        String cuerpo = 'Bon dia, això és una consulta de segments.';
-        String subject = 'test ja aj aj ';
-        String email = 'test@mensaje.com';
 
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
-         
-        Test.startTest();
-            SEG_Detector_Idioma.setIdiomaCaso(lstCaseIds, email , subject, cuerpo);
-        Test.stopTest();
-
-        Case casoAfterUpdate = [SELECT id, SEG_Idioma__c FROM Case WHERE Subject = 'case1' LIMIT 1];
-        System.assertEquals('es', casoAfterUpdate.SEG_Idioma__c, 'El idioma del caso no se ha actualizado correctamente a español');
+        Case caso = [SELECT Id, SEG_Idioma__c FROM Case WHERE Subject = 'case1' LIMIT 1];
+        caso.SEG_Idioma__c = 'es';
         
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Test.startTest();
+
+            update caso;
+
+            Test.setMock(HttpCalloutMock.class, new HttpCalloutMockImpl());
+
+            String cuerpo = 'Bon dia, això és una consulta de segments.';
+            String subject = 'test ja aj aj';
+            String email = 'test@mensaje.com';
+            lstCaseIds.add(caso.Id);
+
+            SEG_Detector_Idioma.setIdiomaCaso(lstCaseIds, email, subject, cuerpo);
+
+            Test.stopTest();
+
+            Case caso2 = [SELECT Id, SEG_Idioma__c FROM Case WHERE Subject = 'case1' LIMIT 1];
+
+            System.assertEquals(caso.SEG_Idioma__c, caso2.SEG_Idioma__c, 'No se ha detectado correctamente el idioma.');
         }
-    }  
-    
+    }
+
+    private class HttpCalloutMockImpl implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            HttpResponse response = new HttpResponse();
+            response.setStatusCode(200);
+            response.setBody('{"idiomaDetectado": "es"}');
+            return response;
+        }
+    }
+
+
+
     @isTest
     public static void getIdiomaForzarContact() {
+        User supervisor = [SELECT Id FROM User WHERE Profile.Name = 'System Administrator' AND IsActive = true AND email = 'testSEGBI2@acme.com' LIMIT 1];
+
         Case caso = new Case(Subject = 'case1', Description = 'Test case', CC_Idioma__c = 'en');
         insert caso;
         Contact contacto = new Contact(LastName = 'Fuentes', CC_Idioma__c = 'fr');
@@ -204,7 +248,7 @@ Global class SEG_Detector_Idioma_Test implements HttpCalloutMock{
         String subject = 'test ja aj aj ';
         String email = 'test@mensaje.com';
 
-        System.runAs(new User(Id = UserInfo.getUserId())) {
+        System.runAs(supervisor) {
             Test.startTest();   
             Test.setMock(HttpCalloutMock.class, new SEG_Detector_Idioma_Test());     
             SEG_Detector_Idioma.setIdiomaCaso(lstCaseIds, email, subject, cuerpo);

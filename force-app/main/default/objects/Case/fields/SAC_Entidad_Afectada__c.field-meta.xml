@@ -113,6 +113,11 @@
                 <default>false</default>
                 <label>Vidacaixa, S.A. de Seguros y Reaseguros</label>
             </value>
+            <value>
+                <fullName>SAC_021</fullName>
+                <default>false</default>
+                <label>Wivai Selectplace, S.A.U.</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

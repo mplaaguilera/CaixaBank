@@ -1,0 +1,25 @@
+<template>
+    <section lwc:if={alertas.productoMifid.mostrar} role="dialog" tabindex="0" aria-modal="true" class="slds-modal slds-modal_prompt productoMifid popupAlerta slds-hide" onkeydown={modalTeclaPulsada} data-nombre-modal="productoMifid">
+		<div class="slds-modal__container">
+			<div class="slds-modal__header slds-theme_alert-texture">
+				<h1 class="slds-text-heading_medium">{titulo}</h1>
+			</div>
+			<div class="slds-modal__content slds-var-p-bottom_xx-large slds-var-p-top_xx-large" style="padding-left: 24px; padding-right: 24px;">
+				<p class="slds-align_absolute-center mensaje">
+					<lightning-icon icon-name="utility:info" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+					{mensaje}
+				</p>
+
+				<p lwc:if={datos.telefonoSolicitud} class="slds-align_absolute-center slds-var-p-top_large">
+					<span class="slds-var-m-right_small slds-text-color_weak">Llamar ahora:</span>
+					<!-- sldsValidatorIgnoreNextLine -->
+					<lightning-click-to-dial value={datos.telefonoSolicitud} record-id={recordId} onclick={cerrarModal} data-nombre-modal="productoMifid"></lightning-click-to-dial>
+				</p>
+			</div>
+			<div class="slds-modal__footer slds-theme_default">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<button class="productoMifidBotonCerrar botonCerrar slds-button slds-button_neutral slds-var-m-bottom_x-small" onclick={botonCerrarModalOnclick} disabled data-nombre-modal="productoMifid">Cerrar</button>
+			</div>
+		</div>
+	</section>
+</template>

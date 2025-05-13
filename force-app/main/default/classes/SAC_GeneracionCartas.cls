@@ -8,6 +8,7 @@ public without sharing class SAC_GeneracionCartas {
         Id idCarta;
 
         List<SAC_DocumentoEnvio__c> carta = [SELECT id, SAC_CP__c, SAC_Direccion__c, SAC_Pais__c, SAC_Poblacion__c, SAC_Provincia__c, SAC_Cuerpo__c FROM SAC_DocumentoEnvio__c WHERE  SAC_Caso__c =:caseId  AND SAC_TipoDocumento__c =:tipoCarta AND SAC_Documento__c = null LIMIT 1];
+
         //Case caso = [SELECT SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c, SAC_NombreContacto__c FROM Case WHERE Id =: caseId LIMIT 1];
         
         /*

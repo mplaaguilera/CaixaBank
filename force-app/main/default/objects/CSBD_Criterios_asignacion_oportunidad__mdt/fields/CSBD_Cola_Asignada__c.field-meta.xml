@@ -50,6 +50,26 @@
                 <default>false</default>
                 <label>CSBD_Hipotecas</label>
             </value>
+            <value>
+                <fullName>CSBD_CSCC_Centralita</fullName>
+                <default>false</default>
+                <label>CSBD_CSCC_Centralita</label>
+            </value>
+            <value>
+                <fullName>CSBD_CSCC</fullName>
+                <default>false</default>
+                <label>CSBD_CSCC</label>
+            </value>
+            <value>
+                <fullName>CSBD_CMN_CMB_Hipotecas</fullName>
+                <default>false</default>
+                <label>CSBD - Call me hipoteca</label>
+            </value>
+            <value>
+                <fullName>CSBD_CMN_CMB_Intouch</fullName>
+                <default>false</default>
+                <label>CSBD - Call me Intouch</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

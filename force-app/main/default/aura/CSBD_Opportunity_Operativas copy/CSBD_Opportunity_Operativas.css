@@ -2,7 +2,7 @@
     color: red;
 }
 
-.THIS .slds-modal__content {
+.THIS section.slds-modal:not(.modalProgramar) .slds-modal__content {
     overflow: initial;
 }
 
@@ -17,7 +17,8 @@
 }
 
 .THIS div.divBotones button {
-    /* transition: background-color 100ms linear; */
+    will-change: background-color;
+    transition: background-color 100ms ease;
 }
 
 .THIS div.divBotones button.botonOtrasOperativas:hover,
@@ -35,13 +36,13 @@
 }
 
 .THIS button.botonOtrasOperativas {
-    width: 50px;
+    width: 40px;
     color: var(--slds-c-button-text-color, var(--sds-c-button-text-color, var(--lwc-brandAccessible, rgb(1, 118, 211))));
 }
 
 .THIS div.divBotones div.popoverOtrasOperativas {
     position: absolute;
-    left: -84px;
+    left: -89px;
     top: 14px;
     z-index: 92;
     will-change: visibility, opacity, top;
@@ -112,8 +113,13 @@
 	border-color: rgb(201, 201, 201);
 }
 
+.THIS .modalCerrarOportunidad lightning-button-group.buttonGroupEtapas.slds-has-error lightning-button.selected {
+	border-color: unset;
+}
+
 .THIS div.slds-radio_button-group {
-    border-color: rgb(130, 130, 130);
+    border-color: rgb(201, 201, 201);;
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
 }
 
 .THIS.modalTrasladoSia lightning-textarea > div > textarea.slds-textarea,
@@ -194,6 +200,114 @@
     padding-bottom: 32px;
 }
 
-.THIS.modalboxProgramar > div.slds-modal__container {
-    min-width: 755px;
+.THIS.modalProgramar > div.slds-modal__container {
+    max-width: min-content;
+    width: fit-content;
+    will-change: width;
+    transition: width 300ms ease-in-out;
+}
+
+.THIS.modalProgramar div.slds-modal__content {
+    min-width: 40rem;
+    width: fit-content;
+    min-height: 224px;
+    /* overflow: hidden; */
+    overflow-y: hidden;
+    will-change: max-height;
+    transition: width 300ms ease-in-out, max-height 300ms ease-in-out;
+}
+
+.THIS.modalProgramar lightning-input div.slds-form-element__help {
+    display: none;
+}
+
+.THIS.modalProgramar lightning-input lightning-datepicker {
+    border-radius: 4px;
+    will-change: box-shadow;
+}
+
+.THIS.modalProgramar lightning-input.csbd_flash_dia lightning-datepicker input.slds-input {
+    animation-name: flashKf;
+    animation-direction: alternate;
+    animation-iteration-count: 6;
+    animation-timing-function: ease;
+    animation-duration: 100ms;
+}
+
+.THIS.modalProgramar lightning-input.csbd_flash_hora lightning-timepicker input.slds-input {
+    animation-name: flashKf;
+    animation-direction: alternate;
+    animation-iteration-count: 6;
+    animation-timing-function: ease;
+    animation-duration: 100ms;
+}
+
+
+.THIS.modalProgramar .modalProgramarLookupGestor {
+    transition: opacity 300ms ease-in-out;
+}
+
+.THIS.modalProgramar div.modalProgramarCalendarioDisponibilidadContainer {
+    width: fit-content;
+    padding: 0 18px;
+    /* overflow-y: hidden; */
+    display: none;
+    opacity: 0;
+    max-height: 0;
+    transition: width 300ms ease-in-out, opacity 300ms ease-in-out, max-height 300ms ease-in-out;
+}
+
+.THIS.modalProgramar .modalProgramarCalendarioDisponibilidad {
+    /* display: none; */
+    /* width: 0; */
+    /* max-height: 0; */
+    /* opacity: 0; */
+    /* transition: width 320ms ease-in-out, max-height 320ms ease-in-out, opacity 320ms ease-out; */
+}
+
+.THIS.modalProgramar .modalProgramarInfoAsignacionAuto {
+    display: none;
+    opacity: 0;
+    transition: opacity 300ms ease-in-out;
+}
+
+@keyframes flashKf {
+    from {box-shadow: none}
+    to {box-shadow: 0 0 8px 1px rgb(112 157 216)}
+}
+
+.THIS button.pointerEventsNone {
+    pointer-events: none;
+}
+
+.THIS div.infoAsignacionAuto > div.slds-grid {
+    font-size: 12.6px;
+    line-height: 19px;
+    background-color: #f3f3f3;
+    padding: 7px;
+    border-radius: 6px;
+}
+
+.THIS.modalAsignarAuto footer div.slds-button_last > button {
+    background-color: rgb(33, 97, 134);
+    color: white;
+}
+
+.THIS .csbd-var-p-top_xxx-large {
+    padding-top: 32px;
+}
+
+.THIS .csbd-var-p-bottom_xxxx-large {
+    padding-bottom: 36px;
+}
+
+.THIS .csbd-var-p-horizontal_xxxx-large {
+    padding-left: 36px;
+    padding-right: 36px;
+}
+
+.THIS.modalCerrar lightning-combobox div.slds-form-element__help,
+.THIS.modalCerrar lightning-input div.slds-form-element__help,
+.THIS.modalCerrar lightning-textarea div.slds-form-element__help {
+    min-height: 15px;
 }

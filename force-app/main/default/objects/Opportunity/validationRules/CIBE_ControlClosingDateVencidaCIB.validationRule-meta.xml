@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_ControlClosingDateVencidaCIB</fullName>
+    <active>true</active>
+    <description>Solo aplica a CIB</description>
+    <errorConditionFormula>AND(
+!$Permission.CIBE_BypassValidationRules,
+!$Permission.AV_AvoidBulkApi,
+!$Permission.CBK_BypassValidationRules,
+OR(
+RecordType.DeveloperName = &quot;CIBE_AccionComercialCIB&quot;,
+RecordType.DeveloperName = &quot;CIBE_AlertaComercialCIB&quot;,
+RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoCIB&quot;
+),
+OR(
+CloseDate &gt; TODAY(),
+CloseDate &lt; (TODAY() - 60)
+),
+AND(
+ISPICKVAL(PRIORVALUE(StageName), &apos;CIBE_Vencido&apos;),
+OR(
+ISPICKVAL(StageName, &quot;CIBE_Cerrado positivo&quot;),
+ISPICKVAL(StageName, &quot;Cerrado Negativo&quot;),
+ISPICKVAL(StageName, &quot;CIBE_Vencido&quot;)
+)
+)
+)</errorConditionFormula>
+    <errorMessage>La fecha de cierre no debe ser anterior a los últimos dos meses ni mayor a hoy.</errorMessage>
+</ValidationRule>

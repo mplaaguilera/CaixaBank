@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CBK_Datos_Envio__c</fullName>
-    <description>Datos de envio</description>
+    <description>Campo que sirve para guardar el header de envio en una peticion de integración.</description>
     <encryptionScheme>None</encryptionScheme>
     <label>Datos Envio Header</label>
     <length>10000</length>

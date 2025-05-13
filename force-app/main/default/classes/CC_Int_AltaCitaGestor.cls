@@ -36,92 +36,100 @@ public with sharing class CC_Int_AltaCitaGestor {
         String salida;
         Boolean finOk = false;
         Case[] caso = [SELECT Account.CC_Numperso__c, OwnerId, Account.Name, Account.AV_OficinaPrincipal__c, Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c FROM Case WHERE Id =: recordId];
-        
+        CC_Lista_Valores__c listaValorTareaCita = [SELECT Id, CC_Activa__c, CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE Name = 'Texto cita o tarea existe' LIMIT 1];
+        Boolean existenTareasCitas = CC_Activity.identificarTareasCitasExistentes( caso[0], listaValorTareaCita);
         if(!caso.isEmpty()) {
-            numperso = caso[0].Account.CC_Numperso__c;
-            numpersoDecimal = Decimal.valueOf(numperso);
-            
-            Date fechaIniDate = Date.valueOf(fecContacto);
-            String[] timeSplit = horaIni.split(':');
-            Time horaIniTime = Time.newInstance(Integer.valueOf(timeSplit[0]),
-                                                Integer.valueOf(timeSplit[1]),
-                                                0,                            
-                                                0);  
-            Datetime fechaIniDateTime = Datetime.newInstance(fechaIniDate,horaIniTime);
-            String fecContactoFormato = fechaIniDateTime.format('ddMMyyyy'); //Llega con formato 2022-06-23
-            
-            String horaIniFormato = horaIni.replace(':', ''); //Llega con formato 09:30
-            
-            Datetime horaFin = fechaIniDateTime.addMinutes(30);
-            String horaFinFormato = horaFin.format('HHmm');
-            
-            AltaContacto datosCita = crearDatosCita(empleadoEx, centroEx, asunto, fecContactoFormato, horaIniFormato, horaFinFormato, medio, numperso, caso[0].Account.Name);
-            String bodyRequestAltaCita = JSON.serialize(datosCita);
-            
-            CC_InterfaceSettings__mdt configAltaCitaMdt = CC_MetodosUtiles.getInterfazConfigBody('CC_Int_AltaCitaGestor');
-            
-            HttpRequest req = new HttpRequest();
-            req.setEndpoint(configAltaCitaMdt.CC_EndPoint__c);
-            req.setClientCertificateName(configAltaCitaMdt.CC_Certificado__c);
-            req.setMethod(configAltaCitaMdt.CC_TipoPeticion__c);
-            req.setHeader('x-absis-customerInternalId', CC_MetodosUtiles.decimalToHex(numpersoDecimal));
-            req.setHeader('Content-Type', configAltaCitaMdt.CC_ContentType__c);
-            //Descomentar la linea del actor SOLO PARA DEVSER2  para que no falle el llamado.
-            //req.setHeader('HTTP-HEADER-ACTOR', 'CBCCSF');
-            req.setBody(bodyRequestAltaCita);
-            endpoint = String.valueOf(req.getEndpoint()).right(94);
-            entrada = 'CC_Numperso__c : ' + numpersoDecimal + ' Hexa: ' + CC_MetodosUtiles.decimalToHex(numpersoDecimal);
-            
-            Http http = new Http();
-            HTTPResponse respuesta = http.send(req);
-            statusCode = String.valueOf(respuesta.getStatusCode());
-            salida = String.valueOf(respuesta.getBody());
-            
-            if(String.isNotBlank(respuesta.getBody()) && respuesta.getStatusCode() == 200){
-                RespuestaAltaContacto resultadoAltaContacto = (RespuestaAltaContacto) System.JSON.deserialize(respuesta.getBody(), RespuestaAltaContacto.class);
-                resultadoAltaCitaGestor.put('resultat', resultadoAltaContacto.resultat);
-                resultadoAltaCitaGestor.put('txtError', resultadoAltaContacto.txtError);
+            if(!existenTareasCitas){
 
-                if(medio == '42') {
-                    mensaje = configuracionToast.CC_Configuracion_12__c.replace('XX:XX', horaIni);
-                    mensaje = mensaje.replace('XX', fecContacto);
-                } else {
-                    mensaje = configuracionToast.CC_Configuracion_14__c.replace('XX:XX', horaIni);
-                    mensaje = mensaje.replace('XX', fecContacto);
-                }
-                resultadoAltaCitaGestor.put('mensaje', mensaje);
-                resultadoAltaCitaGestor.put('cuenta', caso[0].Account.AV_OficinaPrincipal__c);
+                numperso = caso[0].Account.CC_Numperso__c;
+                numpersoDecimal = Decimal.valueOf(numperso);
                 
-                //Si OK crear tarea para dejar constancia de que se ha solicitado la cita correctamente
-                if(resultadoAltaContacto.resultat == 'OK') {
-                    Task tarea = new Task();
-                    tarea.RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId();
-                    tarea.Subject = 'Cita gestor solicitada correctamente';
-                    tarea.Description = 'Se ha generado la cita correctamente.' + '\n' + '\n';
-                    tarea.Description += 'Asunto: ' + asunto + '\n';
-                    tarea.Description += 'Fecha: ' + fechaIniDateTime.format('dd-MM-yyyy') + '\n';
-                    tarea.Description += 'Hora: ' + horaIni + '-' + horaFin.format('HH:mm') + '\n';
-                    tarea.Description += 'Gestor: ' + nombreGestor + '\n';
-                    tarea.Status = 'Completed';
-                    tarea.Priority = 'Normal';
-                    tarea.ActivityDate = date.today();
-                    tarea.WhatId = recordId;
-                    tarea.OwnerId = caso[0].OwnerId;
-                    tarea.Type = 'Cita gestor';
-                    insert tarea;
-                    CBK_Activity_Extension__c tareaExtension = new CBK_Activity_Extension__c();
-                    tareaExtension.CC_Tipo_de_cita__c = medio == String.valueOf(42) ? 'Cita presencial' : 'Cita telefónica';
-                    tareaExtension.AV_ActivityId__c = tarea.Id;
-                    insert tareaExtension;
-                    finOk = true;
+                Date fechaIniDate = Date.valueOf(fecContacto);
+                String[] timeSplit = horaIni.split(':');
+                Time horaIniTime = Time.newInstance(Integer.valueOf(timeSplit[0]),
+                                                    Integer.valueOf(timeSplit[1]),
+                                                    0,                            
+                                                    0);  
+                Datetime fechaIniDateTime = Datetime.newInstance(fechaIniDate,horaIniTime);
+                String fecContactoFormato = fechaIniDateTime.format('ddMMyyyy'); //Llega con formato 2022-06-23
+                
+                String horaIniFormato = horaIni.replace(':', ''); //Llega con formato 09:30
+                
+                Datetime horaFin = fechaIniDateTime.addMinutes(30);
+                String horaFinFormato = horaFin.format('HHmm');
+                
+                AltaContacto datosCita = crearDatosCita(empleadoEx, centroEx, asunto, fecContactoFormato, horaIniFormato, horaFinFormato, medio, numperso, caso[0].Account.Name);
+                String bodyRequestAltaCita = JSON.serialize(datosCita);
+                
+                CC_InterfaceSettings__mdt configAltaCitaMdt = CC_MetodosUtiles.getInterfazConfigBody('CC_Int_AltaCitaGestor');
+                
+                HttpRequest req = new HttpRequest();
+                req.setEndpoint(configAltaCitaMdt.CC_EndPoint__c);
+                req.setClientCertificateName(configAltaCitaMdt.CC_Certificado__c);
+                req.setMethod(configAltaCitaMdt.CC_TipoPeticion__c);
+                req.setHeader('x-absis-customerInternalId', CC_MetodosUtiles.decimalToHex(numpersoDecimal));
+                req.setHeader('Content-Type', configAltaCitaMdt.CC_ContentType__c);
+                //Descomentar la linea del actor SOLO PARA DEVSER2  para que no falle el llamado.
+                //req.setHeader('HTTP-HEADER-ACTOR', 'CBCCSF');
+                req.setBody(bodyRequestAltaCita);
+                endpoint = String.valueOf(req.getEndpoint()).right(94);
+                entrada = 'CC_Numperso__c : ' + numpersoDecimal + ' Hexa: ' + CC_MetodosUtiles.decimalToHex(numpersoDecimal);
+                
+                Http http = new Http();
+                HTTPResponse respuesta = http.send(req);
+                statusCode = String.valueOf(respuesta.getStatusCode());
+                salida = String.valueOf(respuesta.getBody());
+
+                if(String.isNotBlank(respuesta.getBody()) && respuesta.getStatusCode() == 200){
+                    RespuestaAltaContacto resultadoAltaContacto = (RespuestaAltaContacto) System.JSON.deserialize(respuesta.getBody(), RespuestaAltaContacto.class);
+                    resultadoAltaCitaGestor.put('resultat', resultadoAltaContacto.resultat);
+                    resultadoAltaCitaGestor.put('txtError', resultadoAltaContacto.txtError);
+
+                    if(medio == '42') {
+                        mensaje = configuracionToast.CC_Configuracion_12__c.replace('XX:XX', horaIni);
+                        mensaje = mensaje.replace('XX', fecContacto);
+                    } else {
+                        mensaje = configuracionToast.CC_Configuracion_14__c.replace('XX:XX', horaIni);
+                        mensaje = mensaje.replace('XX', fecContacto);
+                    }
+                    resultadoAltaCitaGestor.put('mensaje', mensaje);
+                    resultadoAltaCitaGestor.put('cuenta', caso[0].Account.AV_OficinaPrincipal__c);
+                    
+                    //Si OK crear tarea para dejar constancia de que se ha solicitado la cita correctamente
+                    if(resultadoAltaContacto.resultat == 'OK') {
+                        Task tarea = new Task();
+                        tarea.RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId();
+                        tarea.Subject = 'Cita gestor solicitada correctamente';
+                        tarea.Description = 'Se ha generado la cita correctamente.' + '\n' + '\n';
+                        tarea.Description += 'Asunto: ' + asunto + '\n';
+                        tarea.Description += 'Fecha: ' + fechaIniDateTime.format('dd-MM-yyyy') + '\n';
+                        tarea.Description += 'Hora: ' + horaIni + '-' + horaFin.format('HH:mm') + '\n';
+                        tarea.Description += 'Gestor: ' + nombreGestor + '\n';
+                        tarea.Status = 'Completed';
+                        tarea.Priority = 'Normal';
+                        tarea.ActivityDate = date.today();
+                        tarea.WhatId = recordId;
+                        tarea.OwnerId = caso[0].OwnerId;
+                        tarea.Type = 'Cita gestor';
+                        insert tarea;
+                        CBK_Activity_Extension__c tareaExtension = new CBK_Activity_Extension__c();
+                        tareaExtension.CC_Tipo_de_cita__c = medio == String.valueOf(42) ? 'Cita presencial' : 'Cita telefónica';
+                        tareaExtension.AV_ActivityId__c = tarea.Id;
+                        insert tareaExtension;
+                        finOk = true;
+                    }
+                } else {
+                    error = 'El proceso de consulta de alta de cita ha funcionado pero no se ha obtenido una respuesta válida.';
+                    salida = String.valueOf(resultadoAltaCitaGestor.get('resultat'));
+                    finOk = false;
+                    throw new DefaultException('El proceso de consulta de alta de cita ha funcionado pero no se ha obtenido una respuesta válida. Por favor, vuelva a intentarlo o póngase en contacto con su administrador. ');
                 }
-            } else {
-                error = 'El proceso de consulta de alta de cita ha funcionado pero no se ha obtenido una respuesta válida.';
-                salida = String.valueOf(resultadoAltaCitaGestor.get('resultat'));
-                finOk = false;
-                throw new DefaultException('El proceso de consulta de alta de cita ha funcionado pero no se ha obtenido una respuesta válida. Por favor, vuelva a intentarlo o póngase en contacto con su administrador. ');
+            }else{
+                resultadoAltaCitaGestor.put('textoTareaCitaCreada', listaValorTareaCita.CC_Mensajes_Mostrar__c);
+                resultadoAltaCitaGestor.put('existeTareaCitaCreada', 'true');
             }
         }
+
         CC_TrazaInt__c traza = CC_TrazaInt.generarTraza('CC_Int_ObtInfCarterizaCliente', endpoint, statusCode, entrada, error, salida, finOK);
         if(traza != null){
             insert traza;

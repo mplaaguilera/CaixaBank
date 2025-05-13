@@ -13,7 +13,10 @@ ISPICKVAL(Status, &quot;005&quot;),
 ISPICKVAL(Status, &quot;006&quot;),
 ISPICKVAL(Status, &quot;007&quot;)),
 EV_URLDelEventoVirtual__c = null,
+OR(
 RecordType.DeveloperName = &apos;EV_EventoVirtual&apos;,
+RecordType.DeveloperName = &apos;EV_TechSummitVirtual&apos;
+),
 $Profile.Name = &quot;EV_Eventos&quot;
 )</errorConditionFormula>
     <errorMessage>Necesitas tener infomada la URL del Evento virtual para poder cambiar de estado.</errorMessage>

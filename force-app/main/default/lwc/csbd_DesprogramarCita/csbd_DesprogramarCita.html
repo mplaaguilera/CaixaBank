@@ -1,0 +1,55 @@
+<template>
+	<section role="dialog" tabindex="-1" lwc:ref="modalDesprogramarCita"  class="slds-modal" aria-modal="true" onkeydown={modalTeclaPulsada}>
+		<div class="slds-modal__container">
+			<header class="slds-modal__header">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={spinner}>
+					<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+				</button>
+				<h2 class="slds-text-heading_medium slds-hyphenate">Desprogramar cita</h2>
+			</header>
+
+			<div class="slds-modal__content slds-var-p-vertical_xx-large slds-var-p-horizontal_large" style="text-align: center;">
+				<c-csbd_-spinner-kx lwc:if={spinner} variant="brand"></c-csbd_-spinner-kx>
+
+				<div class="slds-text-color_destructive" style="font-size: 13.5px;">
+					¿Quieres&nbsp;
+					<span style="font-weight: 500;">desprogramar</span>
+					&nbsp;la siguiente cita?
+				</div>
+
+				<div class="slds-box slds-var-m-top_x-large" style="display: inline-block; background-color: #fcfcfc; border-radius: 5px; padding: 11px 14px; font-weight: 300;">
+					<div class="slds-grid slds-grid_align-center slds-grid_vertical-align-center slds-gutters_direct-xx-small">
+						<div class="slds-col slds-grow-none">
+							<lightning-icon icon-name="standard:event" size="x-small" class="slds-is-relative" style="top: -1px;"></lightning-icon>
+						</div>
+						<div class="slds-col">
+							Cita con&nbsp;
+							<span style="font-weight: 500;">{accountName}</span>
+							&nbsp;el&nbsp;
+							<span style="font-weight: 500;">
+								<lightning-formatted-date-time value={fechaCita} day="numeric" month="long" year="numeric"></lightning-formatted-date-time>
+							</span>
+							&nbsp;a las&nbsp;
+							<span style="font-weight: 500;">
+								<lightning-formatted-date-time value={fechaCita} hour="numeric" minute="2-digit"></lightning-formatted-date-time>
+							</span>.
+						</div>
+					</div>
+				</div>
+
+				<div class="slds-text-color_weak slds-var-m-bottom_medium" style="font-size: 13.2px; margin-top: 21px;">
+					El evento quedará en estado <i>Cancelado</i> y la oportunidad en estado <i>Activa</i>.
+				</div>
+
+			</div>
+
+			<footer class="slds-modal__footer">
+				<lightning-button lwc:ref="botonDesprogramarCita" label="Desprogramar cita" variant="brand" icon-name="utility:event" onclick={desprogramarCita} disabled={spinner}></lightning-button>
+				<lightning-button lwc:ref="botonCancelar" label="Cancelar" onclick={modalCerrar} class="slds-var-m-left_small" disabled={spinner}></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<div lwc:ref="backdropModal" class="backdrop slds-backdrop" role="presentation"></div>
+</template>

@@ -28,5 +28,6 @@
     <label>TES - Acreditación Heredero</label>
     <sharedTo>
         <group>TMS_Admin</group>
+        <group>TMS_Generico</group>
     </sharedTo>
 </ListView>

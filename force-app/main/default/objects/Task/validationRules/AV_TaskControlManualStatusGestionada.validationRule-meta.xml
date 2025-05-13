@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_TaskControlManualStatusGestionada</fullName>
-    <active>true</active>
+    <active>false</active>
     <description>No se puede cambiar manualmente del estado &quot;Gestionada positiva&quot; , &quot;Gestionada negativa&quot;, &quot;Gestionado no localizado&quot;,&quot;No gestionada&quot; y &quot;Desactivada&quot; a ningún otro.
 Sí se puede cambiar hasta el mismo día de la fecha de vencimiento.</description>
     <errorConditionFormula>AND( 

@@ -111,6 +111,14 @@ public class CC_Envio_Encuestas_3N_Test {
         
         List<Id> idcases= new List<Id>();
         idcases.add(caso.Id);
+
+        CC_Settings__c settingPlantilla = new CC_Settings__c(
+                Name = 'CC_Encuesta_CCO',
+                CC_Activa__c = true,
+                CC_Configuracion_10__c = 'Plantilla Test',
+                CC_Configuracion_11__c = 'Plantilla Test'
+            );
+            insert settingPlantilla; 
                
         Test.startTest();
             CC_Envio_Encuestas_3N.enviarEncuesta(idcases);

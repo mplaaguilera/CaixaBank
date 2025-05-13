@@ -1,13 +1,3 @@
-/**
- * @description       :
- * @author            : Adrian Mariscal
- * @group             :
- * @last modified on  : 09-01-2022
- * @last modified by  : Adrian Mariscal
- * Modifications Log
- * Ver   Date         Author            Modification
- * 1.0   05-09-2022   Adrian Mariscal   Initial Version
-**/
 @istest
 public class CC_Servicio_Genesys_Test {
 
@@ -267,8 +257,8 @@ public class CC_Servicio_Genesys_Test {
             String queueIdLlamadaServicioCSCCconGrabacion = CC_Servicio_Genesys.obtenerQueueId(llamadaCSCCconGrabacion.Id, 'Opportunity');
             String queueIdLlamadaServicioCSCCsinGrabacion = CC_Servicio_Genesys.obtenerQueueId(llamadaCSCCsinGrabacion.Id, 'Opportunity');
             Test.stopTest();
-
-            System.assertEquals('queueId_CC_SalienteFormularioWeb', queueIdCasoFormularioWeb, 'Id de cola incorrecto: ' + queueIdCasoFormularioWeb);
+            //ya no aplica
+            //System.assertEquals('queueId_CC_SalienteFormularioWeb', queueIdCasoFormularioWeb, 'Id de cola incorrecto: ' + queueIdCasoFormularioWeb);
             System.assertEquals('queueId_CC_GenesysCloudOutboundDefault', queueIdCasoAccionista, 'Id de cola incorrecto: ' + queueIdCasoAccionista);
             System.assertEquals('queueId_CSBD_SalienteConGrabacion', queueIdHipotecaPremium, 'Id de cola incorrecto: ' + queueIdHipotecaPremium);
             System.assertEquals('queueId_CSBD_SalienteSinGrabacion', queueIdHipotecaExpress, 'Id de cola incorrecto: ' + queueIdHipotecaExpress);

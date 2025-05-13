@@ -1053,15 +1053,21 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
         AND ((RecordTypeId IN :listIdRecordTypeSegmentos 
         AND SEG_Organizacion__c = :organizacionBuzon 
         AND SEG_Zona__c = :zonaBuzon) 
-        OR (RecordType.DeveloperName = 'OS_Cliente' 
+        OR (RecordType.DeveloperName IN ('OS_Cliente','OS_Empleado')
         AND CC_CasoRelacionado__c != NULL)) 
         ORDER BY createdDate DESC]);
 
-        Set<Case> setCasosUpdatear = new set<Case>();
-        Set<Case> setCasosSemilla = new set<Case>();
+        Set<Id> setCasosUpdateId = new Set<Id>();
         List<case> listaCasosUp = new List<Case>();
 
         List<Case> casosNumFiltrados = new List<Case>();
+
+        if(!casosSemilla.isEmpty()){
+            casosSemilla[0].SEG_OldStatus__c = casosSemilla[0].status;
+            casosSemilla[0].SEG_OldSubStatus__c = casosSemilla[0].SEG_Subestado__c;
+            listaCasosUp.add(casosSemilla[0]);
+            setCasosUpdateId.add(casosSemilla[0].Id);
+        }
 
         for (Case casoEncontrado : casosNumber) {
             if (casoEncontrado.RecordTypeId == recordTypeSEG || casoEncontrado.RecordTypeId == recordTypeSeguimiento) {
@@ -1073,21 +1079,15 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
             }
         }
         
-        if(!casosSemilla.isEmpty()){
-            casosSemilla[0].SEG_OldStatus__c = casosSemilla[0].status;
-            casosSemilla[0].SEG_OldSubStatus__c = casosSemilla[0].SEG_Subestado__c;
-            setCasosUpdatear.add(casosSemilla[0]);
-            setCasosSemilla.add(casosSemilla[0]);
-        }
-        
         for (Case casonum : casosNumFiltrados) {
-            if (!setCasosSemilla.contains(casonum)){
+            if (!setCasosUpdateId.contains(casonum.Id)){
                 casonum.SEG_OldStatus__c = casonum.status;
                 casonum.SEG_OldSubStatus__c = casonum.SEG_Subestado__c;
-                setCasosUpdatear.add(casonum);
+                listaCasosUp.add(casonum);
+                setCasosUpdateId.add(casonum.Id);
             }
         }
-        listaCasosUp.addAll(setCasosUpdatear);
+
         if (!listaCasosUp.isEmpty()){
             update listaCasosUp;
         }

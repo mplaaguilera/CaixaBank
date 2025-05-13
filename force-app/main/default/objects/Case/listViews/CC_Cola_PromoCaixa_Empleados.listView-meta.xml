@@ -19,7 +19,7 @@
         <operation>notEqual</operation>
         <value>Cerrado,Rechazado</value>
     </filters>
-    <label>Cola Facilitea Oficinas</label>
+    <label>Cola PromoCaixa Oficinas</label>
     <queue>CC_Inbound_Email_PromoCaixa_Empleados</queue>
     <sharedTo>
         <group>PublicGroup_PromoCaixa_Empleados</group>

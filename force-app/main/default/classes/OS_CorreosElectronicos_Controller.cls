@@ -84,10 +84,21 @@ public with sharing class OS_CorreosElectronicos_Controller {
                 idsCorreos.add(eMessage.Id);
                 mapaTieneAdjuntos.put(eMessage.Id, false);
             }
+            // Verificamos si la lista de correos electrónicos tiene elementos antes de ejecutar la consulta de ContentDocumentLink
+            if (!idsCorreos.isEmpty()) {
                 
-            for (ContentDocumentLink cdl : [SELECT LinkedEntityId, ContentDocumentId  FROM ContentDocumentLink WHERE LinkedEntityId IN :idsCorreos]) {
-                mapaTieneAdjuntos.put(cdl.LinkedEntityId,true);                                
+            //for (ContentDocumentLink cdl : [SELECT LinkedEntityId, ContentDocumentId  FROM ContentDocumentLink WHERE LinkedEntityId IN :idsCorreos]) {
+            //    mapaTieneAdjuntos.put(cdl.LinkedEntityId,true);                                
+            //}
+
+            // Asegurémonos de que la consulta para ContentDocumentLink filtre correctamente usando el operador 'IN' y tenga la restricción adecuada.
+            List<ContentDocumentLink> listaCDL = [SELECT LinkedEntityId, ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId IN :idsCorreos];
+
+                for (ContentDocumentLink cdl : listaCDL) {
+                    mapaTieneAdjuntos.put(cdl.LinkedEntityId, true); // Marcamos que tiene adjuntos
+                }
             }
+            
             correosElectronicos = listaCorreos;
 
         }

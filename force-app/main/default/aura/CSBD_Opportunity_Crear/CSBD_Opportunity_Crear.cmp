@@ -7,6 +7,9 @@
     <aura:attribute name="recordTypeId" type="String"/>
     <aura:attribute name="recordTypeIdForHipoteca" type="String"/>
 
+    <aura:attribute name="cuenta" type="Account"/>
+
+
     <aura:attribute name="contador" type="Integer" default="0"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
@@ -34,7 +37,7 @@
             </div>
         </aura:if>
 
-        <div class="slds-var-p-horizontal_small slds-var-p-top_large" style="height: 313px;">
+        <div aura:id="divCampos" class="divCampos slds-var-p-horizontal_small slds-var-p-top_large" style="height: 313px;">
             <lightning:combobox aura:id="comboboxRecordTypes" label="Tipo de oportunidad" options="{!v.opcionesRecordType}" value="{!v.recordTypeId}" onchange="{!c.seleccionarOpcionRecordType}" required="true" dropdownAlignment="bottom-left"/>
             <!-- <aura:if isTrue="{!!empty(v.recordTypeId)}"> -->
                 <div style="height: 9px;"/>

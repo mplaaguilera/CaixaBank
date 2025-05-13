@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_VueltaAlta__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Este campo valdrá true si la reclamación ha pasado de análisis a alta en algún momento. Si no, valdrá false.</description>
+    <label>Vuelta alta</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

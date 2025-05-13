@@ -24,14 +24,9 @@
         <value>DIGITEX</value>
     </filters>
     <filters>
-        <field>OB_Campanya_Id__c</field>
-        <operation>contains</operation>
-        <value>CJ RMKT Consumo</value>
-    </filters>
-    <filters>
-        <field>OB_Resultado_Nivel_2__c</field>
+        <field>CC_Agente__c</field>
         <operation>equals</operation>
-        <value>100</value>
+        <value>8888888</value>
     </filters>
     <label>Llamadas COMDATA BCN</label>
     <sharedTo>

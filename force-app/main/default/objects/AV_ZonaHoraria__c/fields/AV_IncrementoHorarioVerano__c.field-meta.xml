@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_IncrementoHorarioVerano__c</fullName>
+    <description>Almacena el incremento de horario de verano</description>
     <externalId>false</externalId>
     <label>AV_IncrementoHorarioVerano</label>
     <precision>1</precision>

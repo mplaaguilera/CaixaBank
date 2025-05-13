@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Expiration__c</fullName>
     <defaultValue>false</defaultValue>
+    <description>Vencimiento de los productos de otras entidades</description>
     <label>Vencimiento</label>
     <trackTrending>false</trackTrending>
     <type>Checkbox</type>

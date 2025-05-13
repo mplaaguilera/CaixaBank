@@ -1,0 +1,158 @@
+:host {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+    --lwc-squareIconMediumContentAlt: 15px;
+}
+
+lightning-button:not(lightning-button-group lightning-button) + lightning-button:not(lightning-button-group lightning-button),
+lightning-button-icon + lightning-button-icon,
+lightning-button-icon + lightning-button,
+lightning-button + lightning-button-icon {
+    margin-left: var(--lwc-varSpacingHorizontalSmall, 0.75rem);
+}
+
+div.datatableContainer {
+    border: solid var(--slds-g-sizing-border-1, 1px) var(--slds-g-color-neutral-base-80, #c9c9c9);
+    border-radius: 0 0 4px 4px;
+    height: 199px;
+    overflow-y: auto;
+    box-shadow: var(--slds-c-card-shadow, var(--sds-c-card-shadow, 0 2px 2px 0 rgba(0, 0, 0, 0.10)));
+}
+
+
+lightning-datepicker div.slds-form-element__help,
+lightning-input div.slds-form-element__help {
+    display: none !important;
+}
+
+section.slds-modal {
+    will-change: transform, opacity, visibility;
+    transition: transform 250ms cubic-bezier(0, 0.3, 0.15, 1), opacity 250ms cubic-bezier(0, 0.3, 0.15, 1), visibility 250ms linear;
+    transform: scale(0.92) translateY(14px);
+}
+
+section.slds-modal.slds-fade-in-open {
+    transform: scale(1) translateY(0);
+}
+
+section.slds-modal > div.slds-modal__container > header.slds-modal__header {
+	cursor: default;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+section.slds-modal > div.slds-modal__container > div.slds-modal__content {
+    position: relative;
+}
+
+section.slds-modal > div.slds-modal__container > div.slds-modal__content lightning-spinner {
+    will-change: opacity, backdrop-filter;
+    position: absolute;
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    animation: spinnerFadeinKf 200ms ease-out;
+    animation-fill-mode: forwards;
+    transition-delay: 0s;
+    background-color: rgba(255, 255, 255, 0.65);
+}
+
+section.slds-modal > div.slds-modal__container > footer.slds-modal__footer {
+    position: relative;
+    z-index: -1;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+@keyframes spinnerFadeinKf {
+    from {opacity: 0; backdrop-filter: blur(0px);}
+    to {opacity: 1; backdrop-filter: blur(0.8px);}
+}
+
+button.slds-button.slds-modal__close {
+    border-radius: 5px;
+}
+
+button.slds-button.slds-modal__close:disabled {
+    background-color: var(--slds-g-color-neutral-base-100, rgb(255, 255, 255));
+}
+
+button.slds-button.slds-modal__close:disabled lightning-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-neutral-base-80, var(--lwc-colorTextButtonDefaultDisabled, rgb(201, 201, 201)));
+}
+
+div.slds-backdrop {
+    will-change: opacity;
+    transition-duration: 270ms;
+}
+
+.csbd-var-m-top_xxx-large {
+    margin-top: 32px;
+}
+
+.csbd-var-m-bottom_xxx-large {
+    margin-bottom: 32px;
+}
+
+.csbd-var-m-left_xxx-large {
+    margin-left: 32px;
+}
+
+.csbd-var-m-right_xxx-large {
+    margin-right: 32px;
+}
+
+.csbd-var-m-horizontal_xxx-large {
+    margin-left: 32px;
+    margin-right: 32px;
+}
+
+.csbd-var-p-top_xxx-large {
+    padding-top: 32px;
+}
+
+.csbd-var-p-bottom_xxx-large {
+    padding-bottom: 32px;
+}
+
+.csbd-var-p-vertical_xxx-large {
+    padding-top: 32px;
+    padding-bottom: 32px;
+}
+
+.csbd-var-p-left_xxx-large {
+    padding-left: 32px;
+}
+
+.csbd-var-p-right_xxx-large {
+    padding-right: 32px;
+}
+
+.csbd-var-p-horizontal_xxx-large {
+    padding-left: 32px;
+    padding-right: 32px;
+}
+
+.csbd-var-p-top_xxxx-large {
+    padding-top: 36px;
+}
+
+.csbd-var-p-bottom_xxxx-large {
+    padding-bottom: 36px;
+}
+
+.csbd-var-p-vertical_xxxx-large {
+    padding-top: 36px;
+    padding-bottom: 36px;
+}
+
+.csbd-var-p-left_xxxx-large {
+    padding-left: 36px;
+}
+
+.csbd-var-p-right_xxxx-large {
+    padding-right: 36px;
+}
+
+.csbd-var-p-horizontal_xxxx-large {
+    padding-left: 36px;
+    padding-right: 36px;
+}

@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SIREC__SIREC_fld_deudaVencidaImpagada__c</fullName>
     <deprecated>false</deprecated>
+    <description>Deuda vencida ( se corresponde con impagada)</description>
     <label>Deuda vencida</label>
     <precision>18</precision>
     <required>false</required>

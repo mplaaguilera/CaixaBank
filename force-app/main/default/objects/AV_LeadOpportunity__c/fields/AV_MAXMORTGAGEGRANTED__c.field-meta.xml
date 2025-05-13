@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_MAXMORTGAGEGRANTED__c</fullName>
+    <description>Campo que contiene el porcentaje de concesión</description>
     <label>Porcentaje concesión</label>
     <precision>10</precision>
     <required>false</required>

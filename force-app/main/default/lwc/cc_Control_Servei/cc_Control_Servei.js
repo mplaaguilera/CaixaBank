@@ -9,6 +9,9 @@ import AGRUPADOR_ESTADO from '@salesforce/schema/CC_Agrupador__c.CC_Estado__c';
 import initApex from '@salesforce/apex/CC_Control_Servei_Controller.init';
 import getCasosApex from '@salesforce/apex/CC_Control_Servei_Controller.getCasos';
 import enviarComunicacionApex from '@salesforce/apex/CC_Control_Servei_Controller.enviarComunicacion';
+import gestionarImagenes from '@salesforce/apex/CC_Control_Servei_Controller.gestionarImagenesInlineRedactarMail';
+//import gestionarImagenes from '@salesforce/apex/CC_Control_Servei_Controller.testImagenesGestionar';
+
 
 const COLUMNS = [
 	{label: 'Fecha', fieldName: 'CreatedDate', type: 'date', sortable: true, initialWidth: 138,
@@ -31,6 +34,13 @@ export default class ccControlServei extends LightningElement {
 	datatableData = [];
 
 	datatableSelectedRows = [];
+
+	cuerpo;
+
+	formats = [
+		'font', 'size', 'bold', 'italic', 'underline', 'strike', 'list', 'indent',
+		'align', 'link', 'image', 'clean', 'table', 'header', 'color', 'background'
+	];
 
 	fechasBusqueda = {
 		desde: new Date().toISOString(),
@@ -60,10 +70,10 @@ export default class ccControlServei extends LightningElement {
 					this.toast('error', 'Permisos de usuario insuficientes', 'Contacta con su responsable para realizar esta operación');
 				} else {
 					if (!retorno.casos.length) {
-						this.toast('info', 'El agrupador no tiene casos', `El agrupador ${getFieldValue(data, AGRUPADOR_NAME)} no tiene casos asociados`);
+						this.toast('info', 'El agrupador no tiene casos -    ' + retorno.casos.length , `El agrupador ${getFieldValue(data, AGRUPADOR_NAME)} no tiene casos asociados`);
 					} else {
 						this.datatableData = this.formatDatatableData(retorno.casos);
-						this.template.querySelector('lightning-input-rich-text').value = retorno.htmlPlantilla;
+						this.cuerpo = retorno.htmlPlantilla;
 						cerrarQuickAction = false;
 					}
 				}
@@ -77,18 +87,36 @@ export default class ccControlServei extends LightningElement {
 		}
 	}
 
-	enviarComunicacion() {
+	async enviarComunicacion() {
+
 		this.spinner = true;
-		let plantilla = this.template.querySelector('lightning-input-rich-text').value;
+		let plantilla;
+		gestionarImagenes({cuerpoMail: this.cuerpo})
+		.then(result => {
+			this.cuerpo = result;
+			this.toast('success', 'Imágenes parseadas con éxito');
+			this.cerrarQuickAction();
+		}).catch(error => {
+			console.error(error);
+			this.spinner = false;
+			this.toast('error', 'Problema preparando imágenes parseadas con éxito', error);
+		});
+
+		plantilla = this.cuerpo;
+		
 		enviarComunicacionApex({plantilla: plantilla, casos: this.datatableSelectedRows})
 		.then(() => {
 			this.toast('success', 'Comunicaciones enviadas con éxito');
 			this.cerrarQuickAction();
 		}).catch(error => {
 			console.error(error);
-			this.spinner = false;
 			this.toast('error', 'Problema preparando el envío de las comunicaciones', error);
-		});
+		}).finally(() => this.spinner = false);
+	}
+
+	handleChange(event) {
+		this.cuerpo = this.template.querySelector('lightning-input-rich-text').value;
+
 	}
 
 	buscarCasosPorFecha() {

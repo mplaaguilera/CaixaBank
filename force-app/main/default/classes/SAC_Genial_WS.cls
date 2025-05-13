@@ -8,6 +8,7 @@
  * -------
  * VERSION        USER_STORY       AUTHOR            DATE         Description
  * 1.0            genIAl           Alexandre Pérez   16/10/23     Creación
+ * 1.1            US-0009818       Iria AN-PC        17/02/25     Añadir Umbrales MCCs (encapsulando pretensiones en pretensionWrapper) y Documento + Página (reclamantes)
 *****************************************************************/
 @RestResource(urlMapping='/ActualizacionCasoPretensiones')
 global with sharing class SAC_Genial_WS extends CBK_HttpServiceIntegration_Abstract{
@@ -105,7 +106,7 @@ global with sharing class SAC_Genial_WS extends CBK_HttpServiceIntegration_Abstr
             }*/
             genialRequest.jsonRequest = jsonEntrada;
             genialRequest.reclamaOriginal = reclamaOriginal.get(0);
-            genialRequest.pdteIA = (colaIA.Id == reclamaOriginal[0].ownerId);
+            genialRequest.pdteIA = true; //(colaIA.Id == reclamaOriginal[0].ownerId);
             System.enqueueJob(new SAC_GenialQueueable(genialRequest, 0));
 
             res.statusCode = 200;
@@ -122,22 +123,34 @@ global with sharing class SAC_Genial_WS extends CBK_HttpServiceIntegration_Abstr
     }
 
     public class GenialRequest {
-        public list<datosReclamante> reclamantes;
+        public list<DatosReclamante> reclamantes;
         public case reclamacion;
-        public contactoReclamacion contactoReclamacion;
-        public list<case> pretensiones;
+        public ContactoReclamacion contactoReclamacion;
+        public list<PretensionWrapper> pretensiones;
         public case reclamantePrincipal;
         public case reclamaOriginal;
         public boolean pdteIA;
         public string jsonRequest;
         public Id idShadow;
         public DatosRecPrincipal datosRecPrincipal;
-        public Umbrales umbrales;
     }
 
+    public class PretensionWrapper{
+        public case pretension;
+        public list<Umbral> umbrales;
+    }
+    
+    public class Umbral{
+        public string nivel;
+        public decimal valor;
+    }
+    
     public class DatosReclamante {
         public boolean reclamantePrincipal;
         public account reclamante;
+        public string document;
+        public string page;
+        public string tipo;
     }
 
     public class DatosRecPrincipal {
@@ -155,13 +168,6 @@ global with sharing class SAC_Genial_WS extends CBK_HttpServiceIntegration_Abstr
         string provincia;
         string pais;
         string direccionNoti;
-    }
-    
-    public class Umbrales {
-        public Decimal tematica;
-        public Decimal producto;
-        public Decimal motivo;
-        public Decimal detalle;
     }
 
 }

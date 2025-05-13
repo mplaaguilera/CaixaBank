@@ -1,7 +1,7 @@
 /*eslint-disable @salesforce/aura/ecma-intrinsics, @lwc/lwc/no-for-of, @lwc/lwc/no-async-await, arrow-body-style*/
 import {LightningElement, api, wire, track} from 'lwc';
 import {NavigationMixin} from 'lightning/navigation';
-import {getRecord, getFieldValue, updateRecord} from 'lightning/uiRecordApi';
+import {getRecord, getFieldValue, updateRecord, notifyRecordUpdateAvailable} from 'lightning/uiRecordApi';
 import LightningConfirm from 'lightning/confirm';
 import {loadStyle} from 'lightning/platformResourceLoader';
 import currentUserId from '@salesforce/user/Id';
@@ -82,7 +82,7 @@ export default class csbdCalculadoraDti extends NavigationMixin(LightningElement
 		}
 	};
 
-	getRecordTimestamp;
+	//getRecordTimestamp;
 
 	oportunidad;
 
@@ -129,7 +129,7 @@ export default class csbdCalculadoraDti extends NavigationMixin(LightningElement
 
 	@track datatableTiposBonificados = {columns: DATATABLE_TIPOS_BONIFICADOS_COLUMNS, data: []};
 
-	@wire(getRecord, {recordId: '$recordId', fields: OPPTY_FIELDS, timestamp: '$getRecordTimestamp'})
+	@wire(getRecord, {recordId: '$recordId', fields: OPPTY_FIELDS}) //, timestamp: '$getRecordTimestamp'
 	async wiredRecord({data: wiredOpportunity, error: errorGetRecord}) {
 		try {
 			if (wiredOpportunity) {
@@ -426,7 +426,8 @@ export default class csbdCalculadoraDti extends NavigationMixin(LightningElement
 			toast('info', 'Se descartaron los cambios sin guardar', 'Se descartaron correctamente las modificaciones realizadas desde el último guardado');
 		}
 		this.data = null;
-		this.getRecordTimestamp = new Date();
+		//this.getRecordTimestamp = new Date();
+		notifyRecordUpdateAvailable([{recordId: this.recordId}]);
 		this.cambiosSinGuardar = false;
 	}
 

@@ -34,7 +34,7 @@
             <value>
                 <fullName>Fraude</fullName>
                 <default>false</default>
-                <label>Fraude</label>
+                <label>Remitido a Fraude</label>
             </value>
             <value>
                 <fullName>Cajeros</fullName>
@@ -55,11 +55,6 @@
                 <fullName>Cajeros Incidencias</fullName>
                 <default>false</default>
                 <label>Cajeros Incidencias</label>
-            </value>
-            <value>
-                <fullName>Enrollment Sign</fullName>
-                <default>false</default>
-                <label>Enrollment Sign</label>
             </value>
             <value>
                 <fullName>CSBD No Contratar</fullName>
@@ -85,6 +80,12 @@
                 <fullName>CaixaBank Talks</fullName>
                 <default>false</default>
                 <label>CaixaBank Talks</label>
+            </value>
+            <value>
+                <fullName>Enrollment Sign</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Enrollment Sign</label>
             </value>
         </valueSetDefinition>
     </valueSet>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Usuario__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Usuario que ha accedido a la grabación MIFID</description>
+    <externalId>false</externalId>
+    <label>Usuario</label>
+    <referenceTo>User</referenceTo>
+    <relationshipName>Logs_Acceso_MIFID</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

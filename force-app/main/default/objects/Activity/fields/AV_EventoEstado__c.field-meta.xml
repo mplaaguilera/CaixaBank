@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_EventoEstado__c</fullName>
+    <externalId>false</externalId>
+    <formula>CASE( CSBD_Evento_Estado__c ,&quot;Pendiente&quot;,&quot;Pendiente&quot;,&quot;Gestionada Positiva&quot;,&quot;Cerrado&quot;, &quot;Cancelado&quot;, &quot;Cancelado&quot;,NULL)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Estado</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

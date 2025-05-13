@@ -49,14 +49,8 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 		List<ContentVersion> contentVersionData {get; set; }
 		Map<String,String> mapaBuzonesOrgaZona {get;set;}
 	}
-
-   // private String caseId;
     
     public void procesarCasos(set<String> setCaseId) {
-       // this.caseId = caseId;
-
-		////CBK_Log.debug('Start - Batch reclamaciones automáticas-Case ', logginglevel.INFO);
-
         try{
             Date todayDate = date.today();
             list<SEG_Contratos__c> scope =[SELECT Id, CreatedById, CreatedDate, Name, OwnerId, LastModifiedById,SEG_1a_Reclamacion_ejecutada_manualmente__c, 
@@ -83,13 +77,10 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
                                             OR (SEG_Fecha_3_Reclamacion__c <= TODAY AND SEG_3a_Reclamacion_ejecutada_manualmente__c = false AND SEG_Fecha_3a_Reclamacion_Proceso__c = null)
                                             OR (SEG_Fecha_Envio_Gestor__c <= TODAY))
                                             ORDER BY SEG_SR_Seguimiento__c DESC];
-			//CBK_Log.debug('Dmls used on execute start ' + Limits.getQueries());
             if (scope.isEmpty()) {
                 return;
             }
             // Indicar el número de registros a tratar en el lote.
-            //CBK_Log.debug('Execute - Batch reclamaciones automáticas-Case. Número registros lote: ' + scope.size(), logginglevel.INFO);
-
             //Modificador para deshabilitar eltrigger
             SEG_Modificadores_Trigger.activarModificador('SEG_EmailMessage_AI_TRHan: bypass');
             //SEG_Modificadores_Trigger.activarModificador('AV_Task_BI_TRHan: bypass');
@@ -116,8 +107,7 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
                 }
                 if (!mapCaseIdContactId.containsKey(contrato.SEG_SR_Seguimiento__c)) {
                     mapCaseIdContactId.put(contrato.SEG_SR_Seguimiento__c, contrato.SEG_SR_Seguimiento__r.ContactId);
-                }
-                else {
+                } else {
                     handlePostChatterbyContract(lstFeedsInsert, contrato, 'PreConditionFailed', null);
 					if(!casosConError.contains(contrato.SEG_SR_Seguimiento__c)){
 						Case csSegumiento = new Case();
@@ -132,34 +122,15 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
             //Map<Id, Case> mapCases = new Map<Id, Case> ();
             Map<String, List<SEG_Contratos__c>> mapContractsOk = new Map<String, List<SEG_Contratos__c>> ();
             //rellenamos el mapa de datos en cada metodo
-            if (mapCaseContracts.size() > 0) {
+            if (!mapCaseContracts.isEmpty()) {
                 //Rellenamos el CaseWrapper con el contacto del contrato si coincide con el del caso.
-				// Cambiamos los System.debug por CBK.log
-				//CBK_Log.debug('Dmls used before fillContactsMap ' + Limits.getQueries(), logginglevel.INFO);
-				//CBK_Log.debug('Heap used before fillContactsMap ' + Limits.getHeapSize(), logginglevel.INFO);
                 fillContactsMap(mapCaseIdContactId, mapCaseContracts);
-                //CBK_Log.debug('Dmls used after fillContactsMap ' + Limits.getQueries(), logginglevel.INFO);
-				//CBK_Log.debug('Heap used before fillContactsMap ' + Limits.getHeapSize(), logginglevel.INFO);
-
                 //Rellenamos el ContractWrapper con la plantilla para cada tipo de reclamacion.
                 fillTemplates(mapCaseContracts);
-                //CBK_Log.debug('Dmls used after fillContactsMap ' + Limits.getQueries(), logginglevel.INFO);
-				//CBK_Log.debug('Heap used before fillContactsMap ' + Limits.getHeapSize(), logginglevel.INFO);
-
                 //Rellenamos el contractWrapper con el listado de id's de los adjuntos
                 fillAttachments(mapCaseContracts);
-                //CBK_Log.debug('Dmls used after fillContactsMap ' + Limits.getQueries(), logginglevel.INFO);
-				//CBK_Log.debug('Heap used before fillContactsMap ' + Limits.getHeapSize(), logginglevel.INFO);
-                //
-                //mapCases = asignarGrupos(mapCaseContracts);
-                //
                 fillColaboradores(mapCaseContracts);
-                //CBK_Log.debug('Dmls used after fillColaboradores ' + Limits.getQueries());
-                //CBK_Log.debug('Heap used before fillColaboradores ' + Limits.getHeapSize());
-                
                 mapContractsOk = sendEmailsContracts(mapCaseContracts, lstFeedsInsert);
-                //CBK_Log.debug('Dmls used after sendEmailsContracts ' + Limits.getQueries());
-                //CBK_Log.debug('Heap used before sendEmailsContracts ' + Limits.getHeapSize());
             }
 
             //Actualizar fields Proceso de los contratos con la fecha de procesado
@@ -180,9 +151,6 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 				// pasar a lista casosConError
 				Database.update(casosUpd, false);
 			}
-
-
-
         } catch (Exception e) {
             CBK_Log.error(String.valueOf(setCaseId),e);
         }
@@ -557,6 +525,7 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 		Map<Id, String> mapaCasoSubject = new Map<Id,String>();
 		Map<Id, String> mapaCasoOWA = new Map<Id,String>();
 		Map<Id,List<Id>> mapaCasoContents = new Map<Id,List<Id>>();
+		List<SEG_Contratos__c> contratosSinEmail = new List<SEG_Contratos__c>();
 		
 		for (EmailWrapper datos : listadoDatos) {
 			if (String.isNotBlank(datos.contacto.Email) || String.IsNotBlank(datos.colabEmail)){
@@ -578,8 +547,6 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 				}
 				
 				Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
-                //CBK_Log.debug('Address ' + address);
-                
 				Messaging.SingleEmailMessage messageRendered = Messaging.renderStoredEmailTemplate(datos.plantillaIdioma, datos.contacto.Id, datos.caseId);
 
 				String subject = messageRendered.getSubject();
@@ -599,10 +566,7 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 					for (ContentVersion content : datos.contentVersionData) {
 						contentVersIds.add(content.id);
 					}
-					//message.setFileAttachments(datos.attachments);
-					//CBK_Log.debug('Heap used before setEntityAttachments ' + Limits.getHeapSize(), logginglevel.INFO);
 					message.setEntityAttachments(contentVersIds);
-					//CBK_Log.debug('Heap used after setEntityAttachments ' + Limits.getHeapSize(), logginglevel.INFO);
 					mapaCasoContents.put(datos.caseId, contentVersIds);
 				}
 				message.setSubject(subject);
@@ -615,34 +579,39 @@ public with Sharing class SEG_ReclamacionesAutomaticas_Case {
 				message.setHtmlBody(body);
     			messages.add(message);
                 
+			} else {
+				for (SEG_Contratos__c contrato : datos.listaContratos){
+					contratosSinEmail.add(contrato);
+				}
 			}
 		}
 
-        //CBK_Log.debug('Messages.Size ' + messages.size());
-		if(messages.size()!= 0){
-//			Messaging.SendEmailResult[] results = Messaging.sendEmail(messages, false);
+		if(!messages.isEmpty()){
+			//Messaging.SendEmailResult[] results = Messaging.sendEmail(messages, false);
             //Cambiamos de false a true. para forzar Rollback(Los emails son del mismo caso)  
-            Messaging.SendEmailResult[] results = Messaging.sendEmail(messages, true);
-            //CBK_Log.debug('Results ' + results);
+            List<Messaging.SendEmailResult> results = Messaging.sendEmail(messages, true);
 			// Vincular los ficheros con el email enviado.
-			if (results != null && !results.isEmpty() && results?.get(0)?.isSuccess() == true){				
-				linkAttachmentsToEmail(mapaCasoContents);		
-			}
-			else{
+			if (results != null && !results.isEmpty() && results[0].isSuccess() == true){				
+				linkAttachmentsToEmail(mapaCasoContents);
+			} else{
 				// Error enviando el correo.
-				Messaging.SendEmailError[] errorMail = results?.get(0)?.getErrors();
-                //CBK_Log.Error(String.valueOf(errorMail));
-			}
-		} else{
-			List<FeedItem> lstFeedsInsert= new List<FeedItem>();
-			for (EmailWrapper datos : listadoDatos) {
-				for (SEG_Contratos__c contrato : datos.listaContratos){
-					String message = 'Reclamación Contrato - El contacto de la reclamacion: ' + contrato.Name + ' no tiene email assignado. No se ha podido mandar la reclamacion';
-					FeedItem feed = new FeedItem();
-					feed.ParentId = contrato.SEG_SR_Seguimiento__c;
-					feed.Body = message;
-					lstFeedsInsert.add(feed);
+				for (Messaging.SendEmailResult resultado : results) {
+					if (!resultado.isSuccess()) {
+						CBK_Log.addError('SEG Reclamaciones Emails', null, 'Send Email result: ' + resultado.getErrors(), results,null);
+					}
 				}
+                CBK_Log.insertDML();
+			}
+		} 
+		
+		if(!contratosSinEmail.isEmpty()){
+			List<FeedItem> lstFeedsInsert= new List<FeedItem>();
+			for (SEG_Contratos__c contrato : contratosSinEmail){
+				String message = 'Reclamación Contrato - El contacto de la reclamacion: ' + contrato.Name + ' no tiene email assignado. No se ha podido mandar la reclamacion';
+				FeedItem feed = new FeedItem();
+				feed.ParentId = contrato.SEG_SR_Seguimiento__c;
+				feed.Body = message;
+				lstFeedsInsert.add(feed);
 			}
 			insert lstFeedsInsert;
 		}

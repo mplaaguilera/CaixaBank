@@ -4,11 +4,10 @@
     <active>true</active>
     <description>Regla de validación para que no permita guardar y asociar una cuenta y contacto de tipo cliente si es un caso de empleados y viceversa.</description>
     <errorConditionFormula>AND(
+  CC_Admin__c != TRUE,
 				OR(
-								AND(
-		        CC_Admin__c != TRUE,
 										$User.LastName &lt;&gt; &apos;Bluewolf&apos;,
-		        $User.LastName &lt;&gt; &apos;System&apos;),
+  $User.LastName &lt;&gt; &apos;System&apos;,
 				      $Permission.CC_ByPassVR != TRUE),
   OR(
     AND(
@@ -20,16 +19,15 @@
 								AND(Contact.RecordType.DeveloperName &lt;&gt; &apos;CC_Empleado&apos;, 
 												NOT(ISNULL(ContactId)),
 												NOT(ISBLANK(ContactId)))
-      ) 
-    )  
-    , 
+      )
+    )
+    ,
     AND(
       RecordType.DeveloperName == &apos;CC_Cliente&apos;,
       OR(
         Account.RecordType.DeveloperName == &apos;CC_CentroCaixaBank&apos;,
         Account.RecordType.DeveloperName == &apos;CC_Generico&apos;,
         Contact.RecordType.DeveloperName == &apos;CC_Empleado&apos;
-      
       )
     )
   )

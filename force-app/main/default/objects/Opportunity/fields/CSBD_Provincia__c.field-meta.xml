@@ -4,7 +4,7 @@
     <description>Provincia</description>
     <encryptionScheme>None</encryptionScheme>
     <externalId>false</externalId>
-    <label>Provincia (código)</label>
+    <label>Provincia</label>
     <length>255</length>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>

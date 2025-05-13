@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HDT_Restrict_Queue_Change</fullName>
+    <active>true</active>
+    <description>Sirve para que no se le puedan asignar casos a estas colas si no es de HDT el usuario</description>
+    <errorConditionFormula>AND(
+				OR(
+        Owner:Queue.QueueName = &apos;Nivel 2&apos;, 
+        Owner:Queue.QueueName = &apos;Pendiente de Service Now&apos;,
+        Owner:Queue.QueueName = &apos;Atención Prioritaria&apos;,
+								Owner:Queue.QueueName = &apos;Enrollment HDT&apos;,
+								Owner:Queue.QueueName = &apos;GR impresión&apos;,
+        Owner:Queue.QueueName = &apos;SMO&apos;
+    ),
+    $UserRole.Name &lt;&gt; &quot;HDT&quot;,
+    ISCHANGED(OwnerId)
+)</errorConditionFormula>
+    <errorMessage>Usted no tiene permisos para añadir casos a esta cola porque no es del equipo de HDT</errorMessage>
+</ValidationRule>

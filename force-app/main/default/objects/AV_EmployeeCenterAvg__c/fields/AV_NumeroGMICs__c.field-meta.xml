@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_NumeroGMICs__c</fullName>
+    <description>Número de GMIC&apos;s</description>
     <externalId>false</externalId>
     <label>Número de GMIC&apos;s</label>
     <precision>18</precision>

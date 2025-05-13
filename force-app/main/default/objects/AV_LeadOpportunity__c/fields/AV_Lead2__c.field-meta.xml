@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_Lead2__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que contiene el titular 2</description>
     <label>Titular 2</label>
     <referenceTo>Lead</referenceTo>
     <relationshipLabel>Lead Opportunity (Titular 2)</relationshipLabel>

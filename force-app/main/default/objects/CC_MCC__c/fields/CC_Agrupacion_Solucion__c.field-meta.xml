@@ -9,26 +9,11 @@
     <valueSet>
         <restricted>true</restricted>
         <valueSetDefinition>
-            <sorted>false</sorted>
-            <value>
-                <fullName>No se realiza operativa</fullName>
-                <default>false</default>
-                <label>No se realiza operativa</label>
-            </value>
-            <value>
-                <fullName>Se deriva a otros servicios</fullName>
-                <default>false</default>
-                <label>Se deriva a otros servicios</label>
-            </value>
+            <sorted>true</sorted>
             <value>
                 <fullName>Se facilita información</fullName>
                 <default>false</default>
                 <label>Aporta información</label>
-            </value>
-            <value>
-                <fullName>Se realiza operativa</fullName>
-                <default>false</default>
-                <label>Realiza operativa</label>
             </value>
             <value>
                 <fullName>Derivar a fraude</fullName>
@@ -46,9 +31,24 @@
                 <label>Derivar a oficina: Limitación protocolo</label>
             </value>
             <value>
+                <fullName>No se realiza operativa</fullName>
+                <default>false</default>
+                <label>No se realiza operativa</label>
+            </value>
+            <value>
+                <fullName>Se realiza operativa</fullName>
+                <default>false</default>
+                <label>Realiza operativa</label>
+            </value>
+            <value>
                 <fullName>Resto</fullName>
                 <default>false</default>
                 <label>Resto</label>
+            </value>
+            <value>
+                <fullName>Se deriva a otros servicios</fullName>
+                <default>false</default>
+                <label>Se deriva a otros servicios</label>
             </value>
         </valueSetDefinition>
     </valueSet>

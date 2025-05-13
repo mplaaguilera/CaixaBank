@@ -19,6 +19,11 @@
                 <default>false</default>
                 <label>Catalán</label>
             </value>
+            <value>
+                <fullName>Inglés</fullName>
+                <default>false</default>
+                <label>Inglés</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

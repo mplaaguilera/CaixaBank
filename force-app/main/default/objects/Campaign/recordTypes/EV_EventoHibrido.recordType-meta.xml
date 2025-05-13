@@ -789,14 +789,6 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>010</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>011</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>012</fullName>
             <default>false</default>
         </values>

@@ -28,10 +28,11 @@ public with sharing class HDT_Case_AU_TRHan extends CC_TriggerHandlerBase {
             HDT_CaseTriggerHelper.enviarEncuestaAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.actualizarAgrupadorAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.asociaActivoAU(lstCasesCC, mapOldObj);
-            HDT_CaseTriggerHelper.envioCorreoAcuseRecibo(lstCasesCC);
+            HDT_CaseTriggerHelper.envioCorreoAcuseRecibo(lstCasesCC,mapOldObj);
             HDT_CaseTriggerHelper.cierreCasoHDT1N(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.cierreCasoAU(lstCasesCC, mapOldObj);
-            // HDT_CaseTriggerHelper.cierreCasoHDT2N(lstCasesCC, mapOldObj);
+            HDT_CaseTriggerHelper.cierreCasoHDT2N(lstCasesCC, mapOldObj);
+            HDT_CaseTriggerHelper.asociarAssetaCuenta(lstCasesCC, mapOldObj);
         }
     }
 

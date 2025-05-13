@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>M2P_Todas_las_reclamaciones</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>SAC_FechaRecepcion__c</columns>
+    <columns>SAC_FechaVencimientoSLA__c</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>SAC_GrupoLetrado__c</columns>
+    <columns>SEG_Detalle__c</columns>
+    <columns>SAC_Entidad_Afectada__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CASES.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Case.SAC_Reclamacion</value>
+    </filters>
+    <filters>
+        <field>SAC_M2P__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>M2P - Todas las reclamaciones</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

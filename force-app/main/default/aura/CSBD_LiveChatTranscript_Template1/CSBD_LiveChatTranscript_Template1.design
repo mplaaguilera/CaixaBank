@@ -1,23 +1,23 @@
 <design:component label="CSBD Template 1">
 
 	<flexipage:template >
-		<flexipage:region name="top" label="Top Region" defaultWidth="Large">
+		<flexipage:region name="top" label="Top region" defaultWidth="Large">
 			<flexipage:formfactor type="Medium" width="Medium" />
 			<flexipage:formfactor type="Large" width="Large" />
 		</flexipage:region>
-		<flexipage:region name="left" label="Left Region" defaultWidth="Large">
+		<flexipage:region name="left" label="Left region" defaultWidth="Large">
 			<flexipage:formfactor type="Medium" width="Medium" />
 			<flexipage:formfactor type="Large" width="Large" />
 		</flexipage:region>
-		<flexipage:region name="leftCol1" label="Left Column 1" defaultWidth="Large">
+		<flexipage:region name="leftCol1" label="Left region column 1" defaultWidth="Large">
 			<flexipage:formfactor type="Medium" width="Medium" />
 			<flexipage:formfactor type="Large" width="Large" />
 		</flexipage:region>
-		<flexipage:region name="leftCol2" label="Left Column 2" defaultWidth="Large">
+		<flexipage:region name="leftCol2" label="Left region column 2" defaultWidth="Large">
 			<flexipage:formfactor type="Medium" width="Medium" />
 			<flexipage:formfactor type="Large" width="Large" />
 		</flexipage:region>
-		<flexipage:region name="right" label="Right Region" defaultWidth="Large">
+		<flexipage:region name="right" label="Right region" defaultWidth="Large">
 			<flexipage:formfactor type="Medium" width="Medium" />
 			<flexipage:formfactor type="Large" width="Large" />
 		</flexipage:region>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_DAN_OficinaAfectada__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>DAN de la oficina afectada que se ha establecido en su correspondiente campo de este objeto.</description>
+    <label>DAN de la oficina afectada</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Imagenes Documento Resolución (DAN de la oficina afectada)</relationshipLabel>
+    <relationshipName>Imagenes_Documento_Resoluci_n1</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

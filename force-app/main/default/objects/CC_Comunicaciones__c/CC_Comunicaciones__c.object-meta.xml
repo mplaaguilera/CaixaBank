@@ -141,7 +141,7 @@
         <type>Default</type>
     </actionOverrides>
     <allowInChatterGroups>false</allowInChatterGroups>
-    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <compactLayoutAssignment>CC_Comunicaciones_CompactLayout</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
     <description>Entidad para poder guardar comunicaciones con el cliente, otp, sms, etc...</description>
     <enableActivities>false</enableActivities>
@@ -150,18 +150,18 @@
     <enableHistory>false</enableHistory>
     <enableLicensing>false</enableLicensing>
     <enableReports>true</enableReports>
-    <enableSearch>false</enableSearch>
+    <enableSearch>true</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>Private</externalSharingModel>
-    <label>Comunicaciones</label>
+    <label>Comunicación</label>
     <nameField>
-        <encryptionScheme>None</encryptionScheme>
-        <label>Comunicaciones Name</label>
-        <type>Text</type>
+        <displayFormat>AUT-{0000000}</displayFormat>
+        <label>Identificador</label>
+        <type>AutoNumber</type>
     </nameField>
     <pluralLabel>Comunicaciones</pluralLabel>
     <searchLayouts></searchLayouts>
-    <sharingModel>ReadWrite</sharingModel>
+    <sharingModel>Private</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

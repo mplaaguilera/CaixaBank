@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>AV_PFExperiencia__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que contiene el prodcuto ficha experiencia</description>
     <label>ProductoFicha-Experiencia</label>
     <referenceTo>AV_ProductExperience__c</referenceTo>
     <relationshipLabel>Ventas</relationshipLabel>

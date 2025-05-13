@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Account__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Lookup al account identificado en la llamada que entra o desde donde se lanza la llamada. SFId o Numper.</description>
+    <label>Cliente / Numper</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Llamadas (Cliente / Numper)</relationshipLabel>
+    <relationshipName>LlamadasCTI</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

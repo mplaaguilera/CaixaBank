@@ -314,7 +314,7 @@ public with sharing class SPV_LCMP_InsertarPretension {
                     nuevaPretension.OwnerId = reclamacionActual.OwnerId;
                     }
                     nuevasPretensiones.add(nuevaPretension);    
-                } else if (reclamacionActual.Status == 'SAC_002') { //Si la reclamación padre está en Análisis, se crea con el owner y el grupo de la pretensión principal
+                } else if (reclamacionActual.Status == 'SPV_AnalisisDecision') { //Si la reclamación padre está en Análisis, se crea con el owner y el grupo de la pretensión principal
                     nuevaPretension.SEG_Grupo__c = reclamacionActual.SAC_PretensionPrincipal__r.SEG_Grupo__c;      
                     nuevaPretension.OwnerId = reclamacionActual.SAC_PretensionPrincipal__r.OwnerId;
                     nuevasPretensiones.add(nuevaPretension);
@@ -344,7 +344,7 @@ public with sharing class SPV_LCMP_InsertarPretension {
                     }
 
                     nuevasPretensiones.add(nuevaPretension);    
-                } else if (reclamacionActual.Status == 'SAC_002') { //Si la reclamación padre está en Análisis, se crea con el owner y el grupo de la pretensión principal
+                } else if (reclamacionActual.Status == 'SPV_AnalisisDecision') { //Si la reclamación padre está en Análisis, se crea con el owner y el grupo de la pretensión principal
                     nuevaPretension.SEG_Grupo__c = reclamacionActual.SAC_PretensionPrincipal__r.SEG_Grupo__c;     
                     
                     //Descomentar la siguiente linea
@@ -394,7 +394,7 @@ public with sharing class SPV_LCMP_InsertarPretension {
              
              if(!reclamacion.isEmpty()){
                 for(Case recla : reclamacion){
-                    if(recla.Status == 'SAC_001' || recla.Status == 'SAC_002'){
+                    if(recla.Status == 'SAC_001' || recla.Status == 'SPV_AnalisisDecision'){
                         tienePermisoEstado = true;
                         break;
                     }
