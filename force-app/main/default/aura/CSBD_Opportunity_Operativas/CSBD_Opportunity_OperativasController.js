@@ -1108,7 +1108,6 @@
 				helper.mostrarToast('Se clonó Oportunidad', 'Se clonó correctamente la oportunidad.', 'success');
 				$A.enqueueAction(component.get('c.cerrarModalDuplicar'));
 			} else if (response.getState() === 'ERROR') {
-				console.error(duplicar.getError());
 				helper.mostrarToast('No se pudo clonar Oportunidad', duplicar.getError()[0].message, 'error');
 				component.find('botonDuplicarOportunidad').set('v.disabled', false);
 			}
