@@ -10,7 +10,7 @@
     "tab.activeForeground": "#ffffff",
     "tab.activeBorder": "#006bc9",
     "tab.activeModifiedBorder": "#f4a238",
-    "statusBar.background": null,
+    "statusBar.background": "#158F8B",
     "activityBar.background": null
   },
   "eslint.useFlatConfig": false,
