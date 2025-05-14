@@ -78,7 +78,11 @@ export default class csbdListaBanners extends LightningElement {
 				pillContainer.classList.add('oculto');
 			} else {
 				this._verBanners = true;
-				setTimeout(() => this.refs.cardBanners.classList.remove('oculto'), 80);
+				setTimeout(() => {
+					if (this.refs.cardBanners) {
+						this.refs.cardBanners.classList.remove('oculto');
+					}
+				}, 80);
 			}
 		}
 	}

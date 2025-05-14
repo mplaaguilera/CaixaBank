@@ -48,7 +48,7 @@ section.slds-modal article.bannerClienteNoIdentificado {
 
 section.slds-modal div.mensajeSinResoluciones {
 	display: none;
-	max-width: 450px;
+	max-width: 385px;
 	line-height: 21px;
 	font-size: 12.7px;
 	font-weight: 300;
@@ -66,7 +66,7 @@ section.slds-modal div.mensajeSinResoluciones lightning-icon {
 	top: 2px;
 }
 
-section.slds-modal div.mensajeSinResoluciones span.negrita {
+section.slds-modal div.mensajeSinResoluciones strong {
 	font-weight: 500;
 }
 

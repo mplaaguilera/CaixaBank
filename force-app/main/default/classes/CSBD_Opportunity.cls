@@ -515,7 +515,7 @@ public inherited sharing class CSBD_Opportunity {
 		List<Opportunity> oportunidades = [SELECT Name, CSBD_Asignacion_Auto_Pendiente__c, CSBD_Empresa_Proveedora__c,
 											CSBD_Idioma_Solicitud__c, RecordtypeId, RecordType.Name, CSBD_Turno_Contacto__c,
 											CSBD_Familia_Producto__c, CSBD_Skill__c, CSBD_Horario_Contacto__c,
-											CSBD_Alta_omnichannel__c, CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c,OwnerId, CSBD_Producto__c
+											CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c,OwnerId, CSBD_Producto__c
 											FROM Opportunity WHERE Id IN :mapaFinalizaciones.keySet()];
 
 		List<CSBD_Gestor_Oportunidad__c> gestoresOportunidadActualizar = new List<CSBD_Gestor_Oportunidad__c>();
@@ -533,6 +533,7 @@ public inherited sharing class CSBD_Opportunity {
 						gestor.OwnerId = oportunidad.OwnerId;
 						gestor.CSBD_Estado__c = 'Activo';
 						gestoresOportunidadActualizar.add(gestor);
+						oportunidad.CSBD_Alta_omnichannel__c = true;
 					}
 				}
 			}

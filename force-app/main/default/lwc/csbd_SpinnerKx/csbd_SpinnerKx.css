@@ -16,8 +16,8 @@
 
 .slds-spinner {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: calc(50% - 6px);
+    left: calc(50% - 10px);
     z-index: 9051;
     transform: translate(-50%, -50%) rotate(90deg);
 }

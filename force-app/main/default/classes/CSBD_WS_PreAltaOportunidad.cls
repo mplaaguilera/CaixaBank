@@ -12,11 +12,10 @@ public with sharing class CSBD_WS_PreAltaOportunidad extends CBK_HttpServiceInte
         public String detalleOportunidad {get;set;}
     }
 
-
     // @HttpGet
     public static Output preAltaOportunidad() {
         Output output = new Output();
-        output.referenciaUsuario =  UUID.randomUUID().toString();
+        output.referenciaUsuario = UUID.randomUUID().toString();
         output.resultado = 'OK';
         output.codigoError = '0';
         output.detalleError = null;

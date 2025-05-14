@@ -161,7 +161,7 @@
 						</aura:set>
 					</aura:if>
 
-					<lightning:button aura:id="botonTareaGestor" label="Derivar a gestor" iconName="utility:workforce_engagement" onclick="{!c.abrirModalDerivarGestor}" disabled="{!!v.botonesActivos.botonTareaGestorActivo}" />
+					<lightning:button aura:id="botonTareaGestor" label="Derivar" iconName="utility:workforce_engagement" onclick="{!c.abrirModalDerivarGestor}" disabled="{!!v.botonesActivos.botonTareaGestorActivo}" />
 
 					<aura:if isTrue="{!v.esHipoteca}">
 						<lightning:buttonGroup>
