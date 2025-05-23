@@ -1,0 +1,30 @@
+@import 'c/csbd_lwcStyle';
+
+div.datatableContainer {
+    border-radius: 6px;
+    height: 175px;
+}
+
+lightning-record-picker {
+    --slds-g-color-neutral-base-100: var(--slds-g-color-neutral-base-95, rgb(243, 243, 243)) !important;
+    --slds-g-color-border-base-1: var(--slds-g-color-neutral-base-95, rgb(243, 243, 243)) !important;
+}
+
+lightning-radio-group {
+    padding-left: 4px;
+}
+
+div.radioGroupContainer {
+    border: 1px solid var(--slds-g-color-border-base-1, rgb(212, 212, 212));
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 0;
+    background-color: #fafafa;
+}
+
+div.radioGroupContainer > div {
+    height: 200px;
+    padding: 4px 4px 4px 7px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}

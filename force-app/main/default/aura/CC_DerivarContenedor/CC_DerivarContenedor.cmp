@@ -1,0 +1,20 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome">
+
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="mostrarDerivar" type="Boolean" default="false"/>
+
+    <!-- <c:cc_Operativa_Oficina aura:id="lwcOperativa" recordId="{!v.recordId}" onrealizartrasladocolaborador="{!c.realizarTrasladoDesdeDerivar}" />-->
+
+    <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.onDerivarInteraccionChannel}" /> <!--scope="APPLICATION"-->
+
+    <ltng:require styles="{!$Resource.CC_CaseRecordPageNoScroll}" />
+
+    <div class="slds-hidden" style="height: 0px;">
+        <c:CC_Case_Option_Buttons recordId="{!v.recordId}"/>
+    </div>
+
+    <aura:if isTrue="{!v.mostrarDerivar}">
+        <c:cc_Operativa_Oficina_Popup aura:id="lwcDerivar" recordId="{!v.recordId}" otpDerivar="true" onmodalcerrado="{!c.handleCerrarModalDerivar}" class="slds-hide"/>
+    </aura:if>
+
+</aura:component>

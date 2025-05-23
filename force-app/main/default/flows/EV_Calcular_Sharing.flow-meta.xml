@@ -24,7 +24,6 @@
         </outputParameters>
     </actionCalls>
     <apiVersion>53.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>EV_Build_Apex_Calcular</name>
         <label>Build Apex Calcular</label>

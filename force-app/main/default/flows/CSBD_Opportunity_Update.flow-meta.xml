@@ -512,7 +512,6 @@ Importe total: {!myVariable_current.Amount} (Diferencial: {!myVariable_current.C
         </inputParameters>
     </actionCalls>
     <apiVersion>51.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>myAssignment_myWaitEvent_myWait_myRule_3_event_0_SA1</name>
         <label>myAssignment_myWaitEvent_myWait_myRule_3_event_0_SA1</label>

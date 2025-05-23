@@ -61,7 +61,6 @@
         <nameSegment>CC_Case_Reclamaciones_Cliente</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <name>isChangedDecision5_myRule_4_Status</name>
         <label>isChangedDecision5_myRule_4_Status</label>
@@ -1147,7 +1146,7 @@ NOT(ISBLANK( {!myVariable_current.RecordTypeId})),
         <object>Task</object>
     </recordUpdates>
     <startElementReference>isChangedDecision5_myRule_4_Status</startElementReference>
-    <status>Active</status>
+    <status>Obsolete</status>
     <variables>
         <name>myVariable_current</name>
         <dataType>SObject</dataType>

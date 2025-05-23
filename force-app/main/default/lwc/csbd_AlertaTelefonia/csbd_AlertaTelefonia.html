@@ -53,7 +53,7 @@
 				<p lwc:if={datos.telefonoSolicitud} class="slds-align_absolute-center slds-var-p-top_large">
 					<span class="slds-var-m-right_small slds-text-color_weak">Llamar ahora:</span>
 					<!-- sldsValidatorIgnoreNextLine -->
-					<lightning-click-to-dial value={datos.telefonoSolicitud} record-id={recordId} onclick={cerrarModal} data-nombre-modal="productoMifid"></lightning-click-to-dial>
+					<lightning-click-to-dial value={datos.telefonoSolicitud} record-id={recordId} onclick={botonCerrarModalOnclick} data-nombre-modal="productoMifid"></lightning-click-to-dial>
 				</p>
 			</div>
 			<div class="slds-modal__footer slds-theme_default">

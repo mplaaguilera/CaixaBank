@@ -107,3 +107,14 @@
 .THIS .slds-button:active {
     border-color: transparent;
 }
+
+.THIS div.divNoSeIdentifica {
+    position: relative;
+    top: -1px;
+}
+
+.THIS div.divNoSeIdentifica button.divNoSeIdentificaButton svg {
+    position: relative;
+    left: 2px;
+    fill: #e37d00;
+}

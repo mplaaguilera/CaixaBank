@@ -344,7 +344,10 @@
 
 	validacionesOperativa: function(component, event, helper) {
 		component.set('v.botonOperativa', '');
-		let nombreBoton = event.getSource().getLocalId();
+		let nombreBoton = event!==null&&event!==undefined?event.getSource().getLocalId():null;
+		if(nombreBoton === null || nombreBoton === undefined) {
+			nombreBoton = component.get('v.botonName');
+		}
 		let recordId = component.get('v.recordId');
 		if (nombreBoton === 'operativaOficina' || ['Trasladar Colaborador', 'Remitir Colaborador'].includes(nombreBoton)) {
 			if (nombreBoton === 'operativaOficina') {
@@ -480,14 +483,21 @@
 													} else {
 														$A.enqueueAction(component.get('c.abrirModalTrasladar3N'));
 													}
-												} else if (nombreBoton === 'Devolver Nivel 1' || nombreBoton === 'Rechazar Nivel 1') {
+												} else if (nombreBoton === 'Rechazar Nivel 1') {
 													$A.enqueueAction(component.get('c.abrirModalDevolver1N'));
-												} else if (nombreBoton === 'Trasladar Incidencia') {
+												} else if(nombreBoton === 'Devolver Nivel 1' ){
+													let grupoValido = component.get('v.permisos.CC_Devolver_1N_LOV');
+													if(grupoValido){
+														$A.enqueueAction(component.get('c.abrirModalDevolver1N'));
+													}else{
+														helper.mostrarToast('error', 'Devolver Nivel 1', 'El grupo 3N del caso no está configurado para devolver al nivel 1');
+													}
+												}else if (nombreBoton === 'Trasladar Incidencia') {
 
 													//Obligatoriedad de campos al trasladar incidencia
 													if ((!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) && !component.get('v.noIdentificado') ||
-													!component.get('v.canalProcedencia') || !component.get('v.canalEntrada') || !component.get('v.canalOperativo') || !component.get('v.causa') || !component.get('v.solucion')) {
-														helper.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Canal de entrada, Canal de procedencia, Idioma, Tipo de contacto, Canal operativo, Causa y Solución, Cuenta y Contacto');
+													!component.get('v.canalProcedencia') || !component.get('v.canalEntrada') || !component.get('v.canalOperativo') || !component.get('v.causa')){ //|| (!component.get('v.solucion') && component.get('v.tipoRegistro') != 'CC_Cliente')
+														helper.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Canal de entrada, Canal de procedencia, Idioma, Tipo de contacto, Canal operativo, Causa, Cuenta y Contacto');
 													} else {
 														$A.enqueueAction(component.get('c.abrirQuickActionIncidencia'));
 													}
@@ -522,17 +532,29 @@
 												} else if (nombreBoton === 'FinLync') {
 													helper.finalizarLync(component, event, recordId);
 												} else if (nombreBoton === 'derivarAlSAC') {
-													if (!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) {
-														helper.mostrarToast('error', 'Datos del Caso', 'Debe informar los siguientes campos obligatorios: Cuenta, Contacto o Representante');
-													} else {
-														$A.enqueueAction(component.get('c.onClickDerivarAlSac'));
+													let grupoValido = component.get('v.permisos.permisoDerivarAlSac');
+													if(grupoValido){
+														if (!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) {
+															helper.mostrarToast('error', 'Datos del Caso', 'Debe informar los siguientes campos obligatorios: Cuenta, Contacto o Representante');
+														} else {
+															$A.enqueueAction(component.get('c.onClickDerivarAlSac'));
+														}
+													}else{
+														helper.mostrarToast('error', 'Derivar Al SAC', 'No cumple con las condiciones para poder Derivar al SAC');
 													}
+
 												} else if (nombreBoton === 'devolverAlSAC') {
-													if (!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) {
-														helper.mostrarToast('error', 'Datos del Caso', 'Debe informar los siguientes campos obligatorios: Cuenta, Contacto o Representante');
-													} else {
-														$A.enqueueAction(component.get('c.onClickDevolverAlSac'));
+													let grupoValido = component.get('v.permisos.permisoDevolverAlSac');
+													if(grupoValido){
+														if (!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) {
+															helper.mostrarToast('error', 'Datos del Caso', 'Debe informar los siguientes campos obligatorios: Cuenta, Contacto o Representante');
+														} else {
+															$A.enqueueAction(component.get('c.onClickDevolverAlSac'));
+														}
+													}else{
+														helper.mostrarToast('error', 'Devolver al SAC', 'No cumple con las condiciones para poder Devolver al SAC');
 													}
+
 												} else if (nombreBoton === 'verClienteConfidencial') {
 													//Ini: Condicion añadida por JH para US504352
 													$A.enqueueAction(component.get('c.mostrarInfoConfidencial'));
@@ -553,12 +575,13 @@
 														} else if (nombreBoton === 'citaGestor') {
 															$A.enqueueAction(component.get('c.mmodalCitaGestorAbrir'));
 														} else if (nombreBoton === 'operativaOficina') {
-															if (!component.get('v.solucion')) {
-																helper.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Causa y Solución');
-																component.set('v.bloqueadoBotonDerivar', false);
-															} else {
-																$A.enqueueAction(component.get('c.handleModalOficina'));													
-															}
+															//Eliminado campo solucion MMC
+															// if (!component.get('v.solucion')) {
+															// 	helper.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Causa y Solución');
+															// 	component.set('v.bloqueadoBotonDerivar', false);
+															// } else {
+																$A.enqueueAction(component.get('c.handleModalOficina'));
+															// }
 														}
 													}
 												} else if (nombreBoton === 'cancelarCita') {
@@ -604,6 +627,7 @@
 		$A.enqueueAction(getEsPropietarioCaso);
 	},
 
+
 	//Funciones referentes al Traslado Colaborador
 	abrirModalTrasladarColaborador: function(component, event, helper) {
 		if (component.get('v.botonOperativa') === 'Trasladar Colaborador') {
@@ -614,20 +638,21 @@
 			component.set('v.remitir', true);
 		}
 			try {
-				let myData = event.getParam('data') || {};
-				if(myData && myData.grupoColaboradorFraude != null) {
-					component.set('v.grupoColaboradorFraude', myData.grupoColaboradorFraude);
+				if (event) {
+					let eventData = event.getParam('data');
+					if (eventData && eventData.grupoColaboradorFraude) {
+						component.set('v.grupoColaboradorFraude', eventData.grupoColaboradorFraude);
+					}
 				}
 			} catch(e) {
 				console.error('Error ' + e);
 			}
 		helper.getPicklistMCCGrupo(component, event, helper);
-		$A.util.addClass(component.find('ModalboxColab'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
+		$A.util.addClass(component.find('ModalboxColab'), 'slds-fade-in-open');
 
 		//Poner el foco en el desplegable de grupos al abrir el modal
 		if (component.find('selectGroups')) {
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
 			window.setTimeout($A.getCallback(() => component.find('selectGroups').focus()), 1);
 		}
 	},
@@ -759,21 +784,7 @@
 						}
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-							//helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.oficinaGestoraSeleccionadaName'), 'Traslado Colaborador');
-							component.set('v.listPara', listPara);
-							component.set('v.listCC', listCC);
-							component.set('v.listBcc', '');
-							component.set('v.plantillaName', plantillaName);
-							component.set('v.segundaOficinaName', segundaOficinaName);
-							component.set('v.grupoColaborador', component.get('v.oficinaGestoraSeleccionadaName'));
-							component.set('v.procedencia', 'Traslado Colaborador');
-							var payload = {
-								recordId: component.get('v.recordId'),
-								origen: 'caseOptionButtons',
-								destino: 'enviarCorreoColaboradorAction',
-								datosAdicionales: ''
-							};
-							component.find("derivarInteraccionChannel").publish(payload);
+							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.oficinaGestoraSeleccionadaName'), 'Traslado Colaborador');
 						}else{
 							let args = {
 								actionName: 'Case.Email_Colaborador',
@@ -788,10 +799,10 @@
 								}
 							};
 							component.find('quickActionAPI').setActionFieldValues(args);
-	
+
 							//Cerrar modal de traslado a colaborador
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-	
+
 							//Refrescar la vista
 							$A.get('e.force:refreshView').fire();
 						}
@@ -856,21 +867,8 @@
 						}
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-							//helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.selectedRecord').Name, 'Traslado Colaborador');
-							component.set('v.listPara', listPara);
-							component.set('v.listCC', listCC);
-							component.set('v.listBcc', '');
-							component.set('v.plantillaName', plantillaName);
-							component.set('v.segundaOficinaName', segundaOficinaName);
-							component.set('v.grupoColaborador', component.get('v.selectedRecord').Name);
-							component.set('v.procedencia', 'Traslado Colaborador');
-							var payload = {
-								recordId: component.get('v.recordId'),
-								origen: 'caseOptionButtons',
-								destino: 'enviarCorreoColaboradorAction',
-								datosAdicionales: ''
-							};
-							component.find("derivarInteraccionChannel").publish(payload);
+							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.selectedRecord').Name, 'Traslado Colaborador');
+
 						}else{
 							let args = {
 								actionName: 'Case.Email_Colaborador',
@@ -885,14 +883,14 @@
 								}
 							};
 							component.find('quickActionAPI').setActionFieldValues(args);
-	
+
 							//Cerrar modal de traslado a colaborador
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-	
+
 							//Refrescar la vista
 							$A.get('e.force:refreshView').fire();
 						}
-						
+
 					}
 				});
 
@@ -969,21 +967,8 @@
 								*/
 								if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-									//helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Traslado Colaborador');
-									component.set('v.listPara', listPara);
-									component.set('v.listCC', listCC);
-									component.set('v.listBcc', '');
-									component.set('v.plantillaName', plantillaName);
-									component.set('v.segundaOficinaName', segundaOficinaName);
-									component.set('v.grupoColaborador', grupoColab);
-									component.set('v.procedencia', 'Traslado Colaborador');
-									var payload = {
-										recordId: component.get('v.recordId'),
-										origen: 'caseOptionButtons',
-										destino: 'enviarCorreoColaboradorAction',
-										datosAdicionales: ''
-									};
-									component.find("derivarInteraccionChannel").publish(payload);
+									helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Traslado Colaborador');
+
 								}else{
 									let args = {
 										actionName: 'Case.Email_Colaborador',
@@ -998,14 +983,14 @@
 										}
 									};
 									component.find('quickActionAPI').setActionFieldValues(args);
-	
+
 									//Cerrar modal de traslado a colaborador
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-	
+
 									//Refrescar la vista
 									$A.get('e.force:refreshView').fire();
 								}
-								
+
 							}
 						});
 						$A.enqueueAction(obtenerParaOficinaEmpleado);
@@ -1065,21 +1050,8 @@
 								}
 								if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-									//helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Traslado Colaborador');
-									component.set('v.listPara', listPara);
-									component.set('v.listCC', listCC);
-									component.set('v.listBcc', '');
-									component.set('v.plantillaName', plantillaName);
-									component.set('v.segundaOficinaName', segundaOficinaName);
-									component.set('v.grupoColaborador', grupoColab);
-									component.set('v.procedencia', 'Traslado Colaborador');
-									var payload = {
-										recordId: component.get('v.recordId'),
-										origen: 'caseOptionButtons',
-										destino: 'enviarCorreoColaboradorAction',
-										datosAdicionales: ''
-									};
-									component.find("derivarInteraccionChannel").publish(payload);
+									helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Traslado Colaborador');
+
 								}else{
 									let args = {
 										actionName: 'Case.Email_Colaborador',
@@ -1094,14 +1066,14 @@
 										}
 									};
 									component.find('quickActionAPI').setActionFieldValues(args);
-	
+
 									//Cerrar modal de traslado a colaborador
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-	
+
 									//Refrescar la vista
 									$A.get('e.force:refreshView').fire();
 								}
-								
+
 							}
 
 						});
@@ -1143,21 +1115,8 @@
 
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-							//(component, listPara, listCC, '', plantillaName, '', component.get('v.grupoSeleccionadoName'), 'Traslado Colaborador');
-							component.set('v.listPara', listPara);
-							component.set('v.listCC', listCC);
-							component.set('v.listBcc', '');
-							component.set('v.plantillaName', plantillaName);
-							component.set('v.segundaOficinaName', segundaOficinaName);
-							component.set('v.grupoColaborador', component.get('v.grupoSeleccionadoName'));
-							component.set('v.procedencia', 'Traslado Colaborador');
-							var payload = {
-								recordId: component.get('v.recordId'),
-								origen: 'caseOptionButtons',
-								destino: 'enviarCorreoColaboradorAction',
-								datosAdicionales: ''
-							};
-							component.find("derivarInteraccionChannel").publish(payload);
+							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', component.get('v.grupoSeleccionadoName'), 'Traslado Colaborador');
+
 						}else{
 							let args = {
 								actionName: 'Case.Email_Colaborador',
@@ -1172,14 +1131,14 @@
 								}
 							};
 							component.find('quickActionAPI').setActionFieldValues(args);
-	
+
 							//Cerrar modal de traslado a colaborador
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-	
+
 							//Refrescar la vista
 							$A.get('e.force:refreshView').fire();
 						}
-						
+
 					}
 				});
 				$A.enqueueAction(buscarColaborador);
@@ -1242,21 +1201,8 @@
 						}
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-							//helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.oficinaGestoraSeleccionadaName'), 'Remitir Colaborador');
-							component.set('v.listPara', listPara);
-							component.set('v.listCC', listCC);
-							component.set('v.listBcc', '');
-							component.set('v.plantillaName', plantillaName);
-							component.set('v.segundaOficinaName', segundaOficinaName);
-							component.set('v.grupoColaborador', component.get('v.oficinaGestoraSeleccionadaName'));
-							component.set('v.procedencia', 'Remitir Colaborador');
-							var payload = {
-								recordId: component.get('v.recordId'),
-								origen: 'caseOptionButtons',
-								destino: 'enviarCorreoColaboradorAction',
-								datosAdicionales: ''
-							};
-							component.find("derivarInteraccionChannel").publish(payload);
+							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.oficinaGestoraSeleccionadaName'), 'Remitir Colaborador');
+
 						}else{
 							let args = {
 								actionName: 'Case.Email_Colaborador',
@@ -1340,21 +1286,8 @@
 						}
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-							//helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.selectedRecord').Name, 'Remitir Colaborador');
-							component.set('v.listPara', listPara);
-							component.set('v.listCC', listCC);
-							component.set('v.listBcc', '');
-							component.set('v.plantillaName', plantillaName);
-							component.set('v.segundaOficinaName', segundaOficinaName);
-							component.set('v.grupoColaborador', component.get('v.selectedRecord').Name);
-							component.set('v.procedencia', 'Remitir Colaborador');
-							var payload = {
-								recordId: component.get('v.recordId'),
-								origen: 'caseOptionButtons',
-								destino: 'enviarCorreoColaboradorAction',
-								datosAdicionales: ''
-							};
-							component.find("derivarInteraccionChannel").publish(payload);
+							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.selectedRecord').Name, 'Remitir Colaborador');
+
 						}else{
 							let args = {
 								actionName: 'Case.Email_Colaborador',
@@ -1369,14 +1302,14 @@
 								}
 							};
 							component.find('quickActionAPI').setActionFieldValues(args);
-	
+
 							//Cerrar modal de traslado a colaborador
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-	
+
 							//Refrescar la vista
 							$A.get('e.force:refreshView').fire();
 						}
-						
+
 					}
 				});
 
@@ -1433,21 +1366,7 @@
 
 								if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-									//helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Remitir Colaborador');
-									component.set('v.listPara', listPara);
-									component.set('v.listCC', listCC);
-									component.set('v.listBcc', '');
-									component.set('v.plantillaName', plantillaName);
-									component.set('v.segundaOficinaName', segundaOficinaName);
-									component.set('v.grupoColaborador', grupoColab);
-									component.set('v.procedencia', 'Remitir Colaborador');
-									var payload = {
-										recordId: component.get('v.recordId'),
-										origen: 'caseOptionButtons',
-										destino: 'enviarCorreoColaboradorAction',
-										datosAdicionales: ''
-									};
-									component.find("derivarInteraccionChannel").publish(payload);
+									helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Remitir Colaborador');
 								}else{
 									let args = {
 										actionName: 'Case.Email_Colaborador',
@@ -1462,14 +1381,14 @@
 										}
 									};
 									component.find('quickActionAPI').setActionFieldValues(args);
-	
+
 									//Cerrar modal de traslado a colaborador
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-	
+
 									//Refrescar la vista
 									$A.get('e.force:refreshView').fire();
 								}
-								
+
 							}
 						});
 						$A.enqueueAction(obtenerParaOficinaEmpleado);
@@ -1530,21 +1449,8 @@
 								}
 								if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-									//helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Remitir Colaborador');
-									component.set('v.listPara', listPara);
-									component.set('v.listCC', listCC);
-									component.set('v.listBcc', '');
-									component.set('v.plantillaName', plantillaName);
-									component.set('v.segundaOficinaName', segundaOficinaName);
-									component.set('v.grupoColaborador', grupoColab);
-									component.set('v.procedencia', 'Remitir Colaborador');
-									var payload = {
-										recordId: component.get('v.recordId'),
-										origen: 'caseOptionButtons',
-										destino: 'enviarCorreoColaboradorAction',
-										datosAdicionales: ''
-									};
-									component.find("derivarInteraccionChannel").publish(payload);
+									helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Remitir Colaborador');
+
 								}else{
 									let args = {
 										actionName: 'Case.Email_Colaborador',
@@ -1559,15 +1465,15 @@
 										}
 									};
 									component.find('quickActionAPI').setActionFieldValues(args);
-	
+
 									//Cerrar modal de traslado a colaborador
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
-	
+
 									//Refrescar la vista
 									$A.get('e.force:refreshView').fire();
 								}
-								
-								
+
+
 							}
 
 						});
@@ -1611,21 +1517,8 @@
 
 						//Preparar borrador de correo con la plantilla seleccionada
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-							//helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoSeleccionadoName, 'Remitir Colaborador');
-							component.set('v.listPara', listPara);
-							component.set('v.listCC', listCC);
-							component.set('v.listBcc', '');
-							component.set('v.plantillaName', plantillaName);
-							component.set('v.segundaOficinaName', segundaOficinaName);
-							component.set('v.grupoColaborador', grupoSeleccionadoName);
-							component.set('v.procedencia', 'Remitir Colaborador');
-							var payload = {
-								recordId: component.get('v.recordId'),
-								origen: 'caseOptionButtons',
-								destino: 'enviarCorreoColaboradorAction',
-								datosAdicionales: ''
-							};
-							component.find("derivarInteraccionChannel").publish(payload);
+							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoSeleccionadoName, 'Remitir Colaborador');
+
 						}else{
 							let args = {
 								actionName: 'Case.Email_Colaborador',
@@ -1641,7 +1534,7 @@
 							};
 							component.find('quickActionAPI').setActionFieldValues(args);
 						}
-						
+
 					}
 				});
 				$A.enqueueAction(buscarColaborador);
@@ -2008,18 +1901,18 @@
 			helper.loadCarpetasIdioma(component, event, helper);
 			$A.util.addClass(component.find('ModalboxSolicitarInfo'), 'slds-fade-in-open');
 			$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
-		} else if (canalRespuesta === 'Twitter' && canalOperativo !== null) {		
-			
-		//	if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-		//		helper.publicarSolicitarInformacionMessage(component, 'true');
-		//	}else{
+		} else if (canalRespuesta === 'Twitter' && canalOperativo !== null) {
+
+			if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+				helper.publicarSolicitarInformacionMessage(component, 'true');
+			}else{
 			let actionAPI = component.find('quickActionAPI');
 			let args = {actionName: 'Case.SocialPublisher', targetFields: {'CC_Solicitud_Informacion__c': {value: true}}};
 			actionAPI.selectAction(args).then(() => {
 				actionAPI.setActionFieldValues(args);
 			});
-		//	}
-			
+			}
+
 		}
 	},
 
@@ -2058,22 +1951,14 @@
 		$A.util.removeClass(cmpBack, 'slds-backdrop--open');
 	},
 
-solicitarInfo: function(component, helper, event) {
-		console.log('Iniciando solicitarInfo');
-		console.log('Helper disponible:', helper);
+
+	solicitarInfo: function(component, event, helper) {
+
 		let recordId = component.get('v.recordId');
 		let plantilla = component.get('v.plantillaSeleccionadaValue');
 		let plantillaName = component.get('v.plantillaSeleccionadaName');
 		let operativa = component.get('v.tipoOperativa');
 		let canalProcedencia = component.get('v.canalProcedencia');
-
-		console.log('Valores iniciales:', {
-			recordId,
-			plantilla,
-			plantillaName,
-			operativa,
-			canalProcedencia
-		});
 
 		let update = component.get('c.actualizarCaso');
 		update.setParams({
@@ -2087,30 +1972,13 @@ solicitarInfo: function(component, helper, event) {
 			'tipoRegistro': component.get('v.tipoRegistro')
 		});
 		$A.enqueueAction(update);
-		
+
 		let action = component.get('c.buscarCorreoContacto');
 		action.setParams({'idCaso': component.get('v.recordId')});
-		action.setCallback(this, response => {
+		action.setCallback(this, function(response) {
 			if (response.getState() === 'SUCCESS') {
-				console.log('Correo encontrado:', response.getReturnValue());
 				if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-					console.log('Intentando abrir email con helper:', helper);
 					helper.abrirEmailColaboradorActionHelper(component, response.getReturnValue(), '', '', plantillaName, '', '', 'Solicitud Información');
-					
-					/*	component.set('v.listPara', response.getReturnValue());
-					component.set('v.listCC', '');
-					component.set('v.listBcc', '');
-					component.set('v.plantillaName', plantillaName);
-					component.set('v.segundaOficinaName', '');
-					component.set('v.grupoColaborador', '');
-					component.set('v.procedencia', 'Solicitud Información');
-					var payload = {
-						recordId: component.get('v.recordId'),
-						origen: 'caseOptionButtons',
-						destino: 'enviarCorreoColaboradorAction',
-						datosAdicionales: ''
-					};
-					component.find("derivarInteraccionChannel").publish(payload);*/
 				}else{
 					let actionAPI = component.find('quickActionAPI');
 					let args = {
@@ -2125,14 +1993,14 @@ solicitarInfo: function(component, helper, event) {
 					};
 					actionAPI.setActionFieldValues(args);
 				}
-						
+
 			}
 		});
 		$A.enqueueAction(action);
-			
-		
 
-	
+
+
+
 
 		//Cierre del modal
 		let close = component.get('c.cerrarModalSolicitarInfo');
@@ -2584,7 +2452,7 @@ solicitarInfo: function(component, helper, event) {
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
-	responderCliente: function(component) {
+	responderCliente: function(component, event, helper) {
 		let update = component.get('c.actualizarCaso');
 		let plantillaName = component.get('v.plantillaSeleccionadaName');
 		//añadir valor del campo url formulario del registro
@@ -2605,10 +2473,10 @@ solicitarInfo: function(component, helper, event) {
 		action.setCallback(this, response => {
 			let state = response.getState();
 			if (state === 'SUCCESS') {
-				//if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-				//	helper.abrirEmailColaboradorActionHelper(component, response.getReturnValue(), '', '', plantillaName, '', '', 'Responder Cliente');
-				
-				//}else{
+				if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+					helper.abrirEmailColaboradorActionHelper(component, response.getReturnValue(), '', '', plantillaName, '', '', 'Responder Cliente');
+
+				}else{
 					let actionAPI = component.find('quickActionAPI');
 					let args = {
 						actionName: 'Case.Email_Colaborador',
@@ -2621,8 +2489,8 @@ solicitarInfo: function(component, helper, event) {
 						}
 					};
 					actionAPI.setActionFieldValues(args);
-				//}
-					
+				}
+
 			}
 		});
 		$A.enqueueAction(action);
@@ -2632,7 +2500,7 @@ solicitarInfo: function(component, helper, event) {
 		$A.get('e.force:refreshView').fire();
 	},
 
-	responderCliente22: function(component) {
+	responderCliente22: function(component, event, helper) {
 		let plantilla = '';
 		let nombrePlantilla = '';
 		let plantillaName = component.get('v.plantillaSeleccionadaName');
@@ -2668,21 +2536,8 @@ solicitarInfo: function(component, helper, event) {
 			let state = response.getState();
 			if (state === 'SUCCESS') {
 				if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-					//helper.abrirEmailColaboradorActionHelper(component, response.getReturnValue(), '', '', plantillaName, '', '', 'Responder Cliente');
-					component.set('v.listPara', response.getReturnValue());
-					component.set('v.listCC', '');
-					component.set('v.listBcc', '');
-					component.set('v.plantillaName', plantillaName);
-					component.set('v.segundaOficinaName', '');
-					component.set('v.grupoColaborador', '');
-					component.set('v.procedencia', 'Responder Cliente');
-					var payload = {
-						recordId: component.get('v.recordId'),
-						origen: 'caseOptionButtons',
-						destino: 'enviarCorreoColaboradorAction',
-						datosAdicionales: ''
-					};
-					component.find("derivarInteraccionChannel").publish(payload);
+					helper.abrirEmailColaboradorActionHelper(component, response.getReturnValue(), '', '', plantillaName, '', '', 'Responder Cliente');
+
 				}else{
 					let actionAPI = component.find('quickActionAPI');
 					let args = {
@@ -2697,7 +2552,7 @@ solicitarInfo: function(component, helper, event) {
 					};
 					actionAPI.setActionFieldValues(args);
 				}
-				
+
 			}
 		});
 		$A.enqueueAction(action);
@@ -2938,15 +2793,16 @@ solicitarInfo: function(component, helper, event) {
 		}
 	},
 
-	abrirQuickActionIncidencia: function(component) {
-	/*	if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+	abrirQuickActionIncidencia: function(component, event, helper) {
+		if(component.get('v.tipoRegistro') == 'CC_Cliente'){
 			//DMV: Agregar el quick action de Incidencia
-			component.set('v.modalIdencencia', true);
-		}else{*/
+			//component.set('v.modalIdencencia', true);
+			helper.publicarTrasladarIncidenciaMessage(component);
+		}else{
 			let args = {actionName: 'Case.CC_Indicencia'};
 			component.find('quickActionAPI').selectAction(args);
-		//}
-		
+		}
+
 	},
 
 	onClickAutoasignarme: function(component) {
@@ -3363,10 +3219,10 @@ solicitarInfo: function(component, helper, event) {
 		}
 	},
 
-	abrirModalAutenticacion: function(component) {
-		component.set('v.modalAutenticacionVisible', true);
-		$A.util.addClass(component.find('modalboxAutenticacion'), 'slds-fade-in-open');
-		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
+	abrirModalAutenticacion: function(component, event, helper) {
+			component.set('v.modalAutenticacionVisible', true);
+			$A.util.addClass(component.find('modalboxAutenticacion'), 'slds-fade-in-open');
+			$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
 	cerrarModalAutenticacion: function(component) {
@@ -3893,12 +3749,17 @@ solicitarInfo: function(component, helper, event) {
 		}
 	},
 
-	handleModalOficina: function(component) {
-		component.set('v.mostrarModalOficina', true);
-		component.set('v.spinnerActivado', true);
+	handleModalOficina: function(component, event, helper) {
+		if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+			//DMV: Agregar el quick action de Derivar
+			helper.publicarDerivarMessage(component);
+		}else{
+			component.set('v.mostrarModalOficina', true);
+			component.set('v.spinnerActivado', true);
+		}
 	},
 
-	handleModalOficinaCerrado: function(component, event) {	
+	handleModalOficinaCerrado: function(component, event) {
 		component.set('v.bloqueadoBotonDerivar', false);
 		component.set('v.mostrarModalOficina', false);
 	},
@@ -3913,31 +3774,110 @@ solicitarInfo: function(component, helper, event) {
 	//},
 
 	onDerivarInteraccionChannel: function(component, message, helper) {
-		console.log('DMV onDerivarInteraccionChannel BOTONERA Suscripcion ', JSON.stringify(message));
-		console.log('DMV onDerivarInteraccionChannel BOTONERA Suscripcion message.getParam("datosAdicionales")', message.getParam("datosAdicionales"));
-		console.log('DMV onDerivarInteraccionChannel BOTONERA Suscripcion message.getParam("origen")', message.getParam("origen"));
-		console.log('DMV onDerivarInteraccionChannel BOTONERA Suscripcion message.getParam("destino")', message.getParam("destino"));
 
 		let datosAdicionales = message.getParam("datosAdicionales");
 		let origen = message.getParam("origen");
-		let destino = message.getParam("destino");		
+		let destino = message.getParam("destino");
+		let recordId = message.getParam("recordId");
+		let recordLocalId = component.get('v.recordId');
 
-		if(destino == "realizartrasladocolaborador" && origen == "operativaDerivar") {		
+		if(recordId !== recordLocalId) {
+			//No se ejecuta porque no es el case que se esta mostrando en el modal
+			return;
+		}
+
+		if(destino == "realizartrasladocolaborador" && origen == "operativaDerivar") {
 			if(datosAdicionales != null && datosAdicionales !== undefined && datosAdicionales !== '') {
 				component.set('v.grupoColaboradorFraude', datosAdicionales);
-			}	
-			let realizarTraslado = component.get('c.realizarTrasladoDesdeDerivarRefactor');	
+			}
+			let realizarTraslado = component.get('c.realizarTrasladoDesdeDerivarRefactor');
 			$A.enqueueAction(realizarTraslado);
 		}else if(destino == "realizarremitido" && origen == "operativaDerivar") {
 			component.set('v.botonOperativa', 'Remitir a Colaborador');
 			if(datosAdicionales != null && datosAdicionales !== undefined && datosAdicionales !== '') {
 				component.set('v.grupoColaboradorFraude', datosAdicionales);
-			}	
+			}
 			$A.enqueueAction(component.get('c.abrirModalTrasladarColaborador'));
 		}else if(destino == "solicitarinfo" && origen == "operativaDerivar") {
 			$A.enqueueAction(component.get('c.abrirModalSolicitarInfo'));
 		}else if(message.getParam("datosAdicionales") == "remitidoDesdeDerivar") {
 			//$A.enqueueAction(component.get('c.realizarRemitidoDesdeDerivar'));
+		}else if(destino == "responderClienteBotonera" && origen == "responderClienteButton"){
+			let nombreBoton = '';
+			if (component.get('v.canalRespuesta') !== 'SMS' && component.get('v.canalRespuesta') !== 'Twitter' && component.get('v.canalRespuesta') !== 'Comentarios Apps') {
+				nombreBoton = 'Responder Cliente Email';
+			} else if (component.get('v.canalRespuesta') === 'SMS' && component.get('v.tipoRegistro') !== 'CC_CSI_Bankia') {
+				nombreBoton = 'Responder Cliente SMS';
+			} else if (component.get('v.canalRespuesta') === 'Twitter' && component.get('v.tipoRegistro') !== 'CC_CSI_Bankia') {
+				nombreBoton = 'Responder Cliente Twitter';
+			} else if (component.get('v.canalRespuesta') === 'Comentarios Apps' && component.get('v.tipoRegistro') !== 'CC_CSI_Bankia') {
+				nombreBoton = 'Responder Cliente Apps';
+			}
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "solicitarInfoBotonera" && origen == "solicitarInfoButton"){
+			let nombreBoton = '';
+			if (component.get('v.canalRespuesta') !== 'SMS' && component.get('v.canalRespuesta') !== 'Twitter' && component.get('v.canalRespuesta') !== 'Comentarios Apps') {
+				nombreBoton = 'Solicitud Info Email';
+			} else if (component.get('v.canalRespuesta') === 'SMS' && component.get('v.tipoRegistro') !== 'CC_CSI_Bankia') {
+				nombreBoton = 'Solicitud Info SMS';
+			} else if (component.get('v.canalRespuesta') === 'Twitter' && component.get('v.tipoRegistro') !== 'CC_CSI_Bankia') {
+				nombreBoton = 'Solicitud Info Twitter';
+			}
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "remitirColaboradorBotonera" && origen == "remitirColaboradorButton"){
+			let nombreBoton = 'Remitir Colaborador';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "derivarBotonera" && origen == "derivarButton"){
+			let nombreBoton = 'operativaOficina';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "trasladar3NBotonera" && origen == "trasladar3NButton"){
+			let nombreBoton = 'Trasladar 3N';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "poseidonBotonera" && origen == "poseidonButton"){
+			let nombreBoton = 'botonDeepLinking';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "trasladarIncidenciaBotonera" && origen == "trasladarIncidenciaButton"){
+			let nombreBoton = 'Trasladar Incidencia';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "notificacionBotonera" && origen == "notificacionButton"){
+			let nombreBoton = 'botonNotificacionPush';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "autenticarBotonera" && origen == "autenticarButton"){
+			let nombreBoton = 'OTP';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "gdprBotonera" && origen == "gdprButton"){
+			let nombreBoton = 'GDPR';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "trasladarColaboradorBotonera" && origen == "trasladarColaboradorButton"){
+			let nombreBoton = 'Trasladar Colaborador';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "rechazarTrasladoBotonera" && origen == "rechazarTrasladoButton"){
+			let nombreBoton = 'Rechazar Nivel 1';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "devolverNivel1Botonera" && origen == "devolverNivel1Button"){
+			let nombreBoton = 'Devolver Nivel 1';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "devolverSACBotonera" && origen == "devolverSACButton"){
+			let nombreBoton = 'devolverAlSAC';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "derivarSACBotonera" && origen == "derivarSACButton"){
+			let nombreBoton = 'derivarAlSAC';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
 		}
 	},
 	realizarTrasladoDesdeDerivarRefactor: function(component, event, helper) {
@@ -3954,7 +3894,8 @@ solicitarInfo: function(component, helper, event) {
 		$A.enqueueAction(component.get('c.abrirModalTrasladarColaborador'));
 	},
 
-	realizarRemitidoDesdeDerivar: function(component) {
+	messageChannelOnmessage: function(component) {
+		/*
 		let recuperarPlantilla = component.get('c.plantillaRemitirDesdeDerivar');
 		recuperarPlantilla.setParams({recordId: component.get('v.recordId')});
 		recuperarPlantilla.setCallback(this, responseRecuperarPlantilla => {
@@ -3966,7 +3907,10 @@ solicitarInfo: function(component, helper, event) {
 			}
 		});
 		$A.enqueueAction(recuperarPlantilla);
+		*/
 		$A.enqueueAction(component.get('c.abrirModalTrasladarColaborador'));
+
+		setTimeout($A.getCallback(() => component.find('botonDummy').getElement().offsetHeight), 0);
 	},
 
 	refreshTab: function(component, event) {

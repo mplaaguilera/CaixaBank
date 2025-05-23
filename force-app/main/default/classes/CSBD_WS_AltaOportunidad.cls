@@ -176,7 +176,7 @@ global with sharing class CSBD_WS_AltaOportunidad {
 
 					respuestaLog += 'Producto oportunidad: ' + producto + '. ';
 
-					//Solo se comprueba la lógica de traspasar si indInTouch == 'S' 
+					//Solo se comprueba la lógica de traspasar si indInTouch == 'S'
 
 					if (solicitud.indInTouch == 'S'){
 
@@ -380,4 +380,77 @@ global with sharing class CSBD_WS_AltaOportunidad {
 		System.debug('detalleOportunidad: ' + outputRespuesta.detalleOportunidad);
 
     }
+
+	// Lògica per a la creació d'oportunitat de Préstec Online PJ (empreses)
+	if (solicitud.tipoSolicitud == 'prestamoOnlinePJ') {
+		// 1. Buscar o crear Account (empresa)
+		Account empresa;
+		List<Account> empreses = [SELECT Id FROM Account WHERE NIF_Empresa__c = :solicitud.nif1Tit LIMIT 1];
+		if (!empreses.isEmpty()) {
+			empresa = empreses[0];
+		} else {
+			empresa = new Account();
+			empresa.Name = solicitud.nombre1Tit;
+			empresa.NIF_Empresa__c = solicitud.nif1Tit;
+			empresa.Numper_Empresa__c = solicitud.numperso;
+			insert empresa;
+		}
+
+		// 2. Buscar o crear Contact (apoderat)
+		Contact apoderado;
+		List<Contact> apoderados = [SELECT Id FROM Contact WHERE NIF_Apoderado__c = :solicitud.nif2Tit LIMIT 1];
+		if (!apoderados.isEmpty()) {
+			apoderado = apoderados[0];
+		} else {
+			apoderado = new Contact();
+			apoderado.FirstName = solicitud.nombre2Tit;
+			apoderado.LastName = solicitud.apellidos1_2Tit;
+			apoderado.SecondLastName__c = solicitud.apellidos2_2Tit;
+			apoderado.NIF_Apoderado__c = solicitud.nif2Tit;
+			apoderado.Numper_Apoderado__c = solicitud.numperso2Tit;
+			apoderado.Email = solicitud.email2Tit;
+			apoderado.Phone = solicitud.telefono1_2Tit;
+			insert apoderado;
+		}
+
+		// 3. Crear Opportunity i assignar camps
+		Opportunity opp = new Opportunity();
+		opp.AccountId = empresa.Id;
+		opp.ContactId = apoderado.Id;
+		opp.Name = 'Préstamo Online PJ - ' + empresa.Name;
+		opp.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_Prestamo');
+		opp.StageName = 'Prospect';
+		opp.CloseDate = Date.today().addMonths(1);
+
+		// Camps existents i nous (ajusta els API Name segons convingui)
+		opp.Tipo_Solicitud__c = solicitud.tipoSolicitud;
+		opp.Producto__c = solicitud.nombreProducto;
+		opp.Delimitador__c = solicitud.delimitador;
+		opp.Importe__c = solicitud.importe;
+		opp.Plazo__c = solicitud.plazo;
+		opp.Finalidad__c = solicitud.finalidad;
+		opp.Garantia__c = solicitud.garantia;
+		opp.Canal__c = solicitud.canal;
+		opp.Origen__c = solicitud.origen;
+		opp.Horario_Contacto__c = solicitud.horario1Tit;
+		opp.Idioma__c = solicitud.idioma;
+		opp.Email_Empresa__c = solicitud.email1Tit;
+		opp.Telefono_Empresa__c = solicitud.telefono1_1Tit;
+		opp.Nombre_Empresa__c = solicitud.nombre1Tit;
+
+		// Identificadors i dades addicionals
+		opp.Numper_Empresa__c = solicitud.numperso;
+		opp.NIF_Empresa__c = solicitud.nif1Tit;
+		opp.Numper_Apoderado__c = solicitud.numperso2Tit;
+		opp.NIF_Apoderado__c = solicitud.nif2Tit;
+
+		// Dades apoderat
+		opp.Nombre_Apoderado__c = solicitud.nombre2Tit;
+		opp.Apellido1_Apoderado__c = solicitud.apellidos1_2Tit;
+		opp.Apellido2_Apoderado__c = solicitud.apellidos2_2Tit;
+		opp.Email_Apoderado__c = solicitud.email2Tit;
+		opp.Telefono_Apoderado__c = solicitud.telefono1_2Tit;
+
+		insert opp;
+	}
 }

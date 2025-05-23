@@ -62,7 +62,6 @@
         <nameSegment>SEG_MetodosComunes</nameSegment>
     </actionCalls>
     <apiVersion>50.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>myWaitAssignment_myWait_myRule_1</name>
         <label>myWaitAssignment_myWait_myRule_1</label>

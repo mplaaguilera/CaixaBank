@@ -17,7 +17,6 @@
         <nameSegment>SAC_Interaccion__c.SAC_AvisoEscalado</nameSegment>
     </actionCalls>
     <apiVersion>52.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <name>RecordTypeSAC_Escalado</name>
         <label>Si RecordType es SAC_Escalado</label>

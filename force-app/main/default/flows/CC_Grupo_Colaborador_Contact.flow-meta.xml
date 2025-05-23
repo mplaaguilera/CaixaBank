@@ -59,7 +59,6 @@
         <nameSegment>CC_Grupo_Colaborador_Contact_Anadir</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <processMetadataValues>
             <name>index</name>
@@ -108,7 +107,7 @@ ISPICKVAL({!myVariable_current.CC_Grupo_Colaborador__r.OS_Negocio__c}, &apos;CC&
 NOT(ISBLANK({!myVariable_current.CC_Usuario__c}))
 )</expression>
     </formulas>
-    <interviewLabel>CC_Grupo_Colaborador_Contact-5_InterviewLabel</interviewLabel>
+    <interviewLabel>CC_Grupo_Colaborador_Contact-6_InterviewLabel</interviewLabel>
     <label>CC_Grupo_Colaborador_Contact__c</label>
     <processMetadataValues>
         <name>ObjectType</name>
@@ -136,7 +135,7 @@ NOT(ISBLANK({!myVariable_current.CC_Usuario__c}))
     </processMetadataValues>
     <processType>Workflow</processType>
     <startElementReference>myDecision</startElementReference>
-    <status>Active</status>
+    <status>Draft</status>
     <variables>
         <name>myVariable_current</name>
         <dataType>SObject</dataType>

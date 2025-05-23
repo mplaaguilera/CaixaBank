@@ -822,7 +822,6 @@
         <nameSegment>routeWork</nameSegment>
     </actionCalls>
     <apiVersion>58.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>Asignar_FinNombreES</name>
         <label>Asignar FinNombreES</label>

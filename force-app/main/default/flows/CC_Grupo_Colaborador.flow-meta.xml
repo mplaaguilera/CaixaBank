@@ -118,7 +118,6 @@
         <nameSegment>CC_Grupo_Colaborador_Anadir</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <processMetadataValues>
             <name>index</name>

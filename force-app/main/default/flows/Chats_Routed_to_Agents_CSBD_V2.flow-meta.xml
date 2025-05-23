@@ -649,7 +649,6 @@ This example shows routing to a collection of Skill Requirements which were defi
         <nameSegment>routeWork</nameSegment>
     </actionCalls>
     <apiVersion>61.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>VariableSkillCastellano</name>
         <label>VariableSkillCastellano</label>

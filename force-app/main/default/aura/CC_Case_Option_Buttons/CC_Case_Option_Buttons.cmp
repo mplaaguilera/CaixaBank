@@ -250,6 +250,9 @@
     <aura:attribute name="grupoColaborador" type="String" default="" />
     <aura:attribute name="procedencia" type="String" default="" />
 
+    <!--GLM-->
+    <aura:attribute name="botonName" type="String" default="" />
+
 
     <!--Handlers-->
     <aura:handler name="init" value="this" action="{!c.doInit}" />
@@ -272,14 +275,15 @@
     <aura:method name="remitirPublico" action="{!c.abrirModalRemitirColaboradorPublico}"/>
     <aura:method name="metodoCerrarTest" action="{!c.cerrarModalPreguntasNivel2}"/>
 
-    <!-- <aura:handler event="c:cc_DerivarEvent" action="{!c.realizarTrasladoDesdeDerivar}" /> -->
-    <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.onDerivarInteraccionChannel}" scope="APPLICATION" aura:id="derivarInteraccionChannel"/>
+    <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.messageChannelOnmessage}" aura:id="derivarInteraccionChannel"/>
+
     <!--Lightning Data Service-->
     <force:recordData aura:id="recordDataCase" recordId="{!v.recordId}" layoutType="COMPACT" targetFields="{!v.caso}"
         fields="OwnerId, CC_MCC_Motivo__c,CaseNumber, CC_MCC_Plantilla__c, CC_Derivar__c,
                 CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_MCC_Motivo__r.CC_AmbitoTareas__c, CC_MCC_Solucion__r.CC_AmbitoTareas__c"
         recordUpdated="{!c.recordDataUpdated}" targetError="{!v.recordDataError}"/>
 
+    <button aura:id="botonDummy" class="sldd-hidden" />
     <div class="slds-backdrop" aura:id="backdrop" />
 
     <!--Spinner-->
@@ -294,7 +298,7 @@
     <!-- <aura:if isTrue="{!!v.cargando}"> -->
         <div class="slds-var-m-vertical_x-small">
             <div class="filaBotones">
-                
+
                 <aura:if isTrue="{!and(v.permisos.CC_Trasladar_Colaborador, NOT(v.tipoRegistro == 'CC_Cliente'))}">
                     <lightning:button aura:id="Trasladar Colaborador" label="Trasladar a colaborador" iconName="action:email" onclick="{!c.validacionesOperativa}" />
                 </aura:if>
@@ -413,13 +417,13 @@
                     <lightning:button aura:id="tareaGestor" label="Tarea gestor" iconName="utility:task" onclick="{!c.validacionesOperativa}" />
                 </aura:if>
 
-                <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
+                 <!-- <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
                     <lightning:button aura:id="operativaOficina" label="Derivar" iconName="utility:company" onclick="{!c.validacionesOperativa}" disabled="{!v.bloqueadoBotonDerivar}"/>
-                    <aura:if isTrue="{!v.mostrarModalOficina}">                    
-                           <c:cc_Operativa_Oficina_Popup aura:id="lwcOperativa" recordId="{!v.recordId}" oportunidadCreadaAPI="{!v.derivadaCSBD}" onmodalcerrado="{!c.handleModalOficinaCerrado}" onrealizartrasladocolaborador="{!c.realizarTrasladoDesdeDerivar}" onrealizarremitido="{!c.abrirModalTrasladarColaborador}" onsolicitarinfo="{!c.abrirModalSolicitarInfo}" onrefrescartab="{!c.refreshTab}" ondesactivarspinner="{!c.desactivarSpinnerDerivar}"/>                      
+                    <aura:if isTrue="{!v.mostrarModalOficina}">
+                            <c:cc_Operativa_Oficina_Popup aura:id="lwcOperativa" recordId="{!v.recordId}" oportunidadCreadaAPI="{!v.derivadaCSBD}" onmodalcerrado="{!c.handleModalOficinaCerrado}" onrealizartrasladocolaborador="{!c.realizarTrasladoDesdeDerivar}" onrealizarremitido="{!c.abrirModalTrasladarColaborador}" onsolicitarinfoparent="{!c.abrirModalSolicitarInfo}" onrefrescartab="{!c.refreshTab}" ondesactivarspinner="{!c.desactivarSpinnerDerivar}"/>
                     </aura:if>
-                </aura:if> 
-                 
+                </aura:if>   -->
+
                 <!-- <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
                     <lightning:button aura:id="cancelarCita" label="Cancelar cita" iconName="utility:company" onclick="{!c.validacionesOperativa}"/>
                     <aura:if isTrue="{!v.mostrarModalCancelarCita}">
@@ -434,11 +438,10 @@
         <!--Modal para trasladar/remitir a colaborador-->
         <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="ModalboxColab" onkeydown="{!c.modalTrasladarColaboradorTeclaPulsada}">
             <div class="slds-modal__container">
-                <!--Cabecera del modal-->
                 <header class="slds-modal__header">
-                    <!--Icono de cierre-->
-                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalTrasladarColaborador }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
-                    <!--Título-->
+					<button class="slds-button slds-button_icon slds-modal__close" onclick="{!c.cerrarModalTrasladarColaborador}">
+						<lightning:icon iconName="utility:close" size="small"></lightning:icon>
+					</button>
                     <h2 class="slds-text-heading_medium slds-hyphenate">{!!v.remitir ? 'Trasladar a grupo colaborador' :
                         'Remitir a grupo colaborador'}</h2>
                     <p class="slds-var-m-top_x-small">{!!v.remitir ? 'Seleccione el grupo colaborador al que trasladar la
@@ -1294,7 +1297,7 @@
                         </p>
                     </header>
                     <!--Contenido del modal-->
-                    <div class="slds-modal__content slds-var-p-around_medium">              
+                    <div class="slds-modal__content slds-var-p-around_medium">
                         <c:CC_OTP />
                     </div>
 
@@ -1306,18 +1309,18 @@
             </section>
         </aura:if>
 
-        <!--GLM Modal para Autenticación-->
+        <!-- Modal para Incidencia-->
         <aura:if isTrue="{!v.modalIdencencia}">
             <!--Contenido del modal-->
-            <div class="slds-modal__content slds-var-p-around_medium">              
-                <c:CC_CrearAgrupador />
+            <div class="slds-modal__content slds-var-p-around_medium">
+                <c:CC_CrearAgrupador recordId="{!v.recordId}" />
             </div>
         </aura:if>
 
-        <!--GLM Modal para Autenticación-->
+        <!-- Modal para Autenticación-->
         <aura:if isTrue="{!v.modalStores}">
             <!--Contenido del modal-->
-            <div class="slds-modal__content slds-var-p-around_medium">              
+            <div class="slds-modal__content slds-var-p-around_medium">
                 <c:CC_ST_Respuesta />
             </div>
         </aura:if>

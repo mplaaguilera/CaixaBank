@@ -523,7 +523,6 @@
         <nameSegment>OS_Milestone_Caso_Manual</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>myAssignment_myRule_15_A1</name>
         <label>myAssignment_myRule_15_A1</label>

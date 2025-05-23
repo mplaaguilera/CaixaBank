@@ -617,10 +617,14 @@
 			if (state === 'SUCCESS') {
 				let datos = response.getReturnValue();
 				if (datos.productoGDPR && datos.tipoContacto === 'Petición de servicio' && datos.numPerso !== '' && datos.numeroDocumento !== '' && datos.edad >= 14 && !datos.confidencial && !datos.fallecido && datos.tipoPersona === 'F' && !datos.incapacitado) {
-					//Abrimos la QuickAction de GDPR
-					let actionAPI = component.find('quickActionAPI');
-					let args = {actionName: 'Case.CC_GDPR'};
-					actionAPI.selectAction(args);
+					if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+						this.publicarGDPRMessage(component);
+					}else{
+						//Abrimos la QuickAction de GDPR
+						let actionAPI = component.find('quickActionAPI');
+						let args = {actionName: 'Case.CC_GDPR'};
+						actionAPI.selectAction(args);
+					}
 				} else {
 					let mensaje = 'Para poder realizar esta operativa:';
 					if (!datos.productoGDPR) {
@@ -710,11 +714,16 @@
 							let canalValido = responseValidarCanalAutenticacion.getReturnValue();
 							if (canalValido != null) {
 								if (canalValido) {
-									let actionAPI = component.find('quickActionAPI');
-									let args = {actionName: 'Case.CC_OTP'};
-									actionAPI.selectAction(args).catch(error => {
-										console.error('Error selecting action:', error);
-									});
+									if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+										//DMV: Agregar el quick action de Autenticacion
+										this.publicarAutenticacionMessage(component);
+									}else{
+										let actionAPI = component.find('quickActionAPI');
+										let args = {actionName: 'Case.CC_OTP'};
+										actionAPI.selectAction(args).catch(error => {
+											console.error('Error selecting action:', error);
+										});
+									}
 								} else {
 									let toastEvent = $A.get('e.force:showToast');
 									toastEvent.setParams({
@@ -1040,23 +1049,15 @@
 	},
 
 	abrirEmailColaboradorActionHelper: function(component, listPara, listCC, listBcc, plantillaName, segundaOficinaName, grupocolaborador, procedencia) {
-		console.log('DMV HELPER abrirEmailColaboradorActionHelper');
+		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
 		component.set('v.listPara', listPara);
 		component.set('v.listCC', listCC);
-		component.set('v.listBcc', listBcc);
+		//component.set('v.listBcc', listBcc);
 		component.set('v.plantillaName', plantillaName);
 		component.set('v.segundaOficinaName', segundaOficinaName);
 		component.set('v.grupoColaborador', grupocolaborador);
 		component.set('v.procedencia', procedencia);
 
-		//const emailColaborador = component.find("emailColaboradorAction");
-		//emailColaborador.abrirEmailColaboradorAction();		
-		//cerrar modal trasladar colaborador
-		//$A.util.removeClass(component.find('ModalboxColab'), 'slds-fade-in-open');
-		//$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
-		//$A.util.removeClass(component.find('ModalboxColab'), 'slds-fade-in-open');
-		//$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
-		
 		var payload = {
             recordId: component.get('v.recordId'),
 			origen: 'caseOptionButtons',
@@ -1067,8 +1068,8 @@
 		
 	},
 
-	/*publicarSolicitarInformacionMessage: function(component, solicitudInformacion) {
-		console.log('DMV HELPER publicarSolicitarInformacionMessage');
+	publicarSolicitarInformacionMessage: function(component, solicitudInformacion) {
+		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
 		var payload = {
             recordId: component.get('v.recordId'),
 			origen: 'caseOptionButtons',
@@ -1077,7 +1078,55 @@
         };
         component.find("derivarInteraccionChannel").publish(payload);
 		
-	}*/
+	}, 
+
+	publicarTrasladarIncidenciaMessage: function(component) {
+		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
+		var payload = {
+            recordId: component.get('v.recordId'),
+			origen: 'caseOptionButtons',
+			destino: 'trasladarIncidenciaAction',
+		    datosAdicionales: ''
+        };
+        component.find("derivarInteraccionChannel").publish(payload);
+		
+	},
+
+	publicarAutenticacionMessage: function(component) {
+		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
+		var payload = {
+            recordId: component.get('v.recordId'),
+			origen: 'caseOptionButtons',
+			destino: 'autenticacionAction',
+		    datosAdicionales: ''
+        };
+        component.find("derivarInteraccionChannel").publish(payload);
+		
+	},
+
+	publicarDerivarMessage: function(component) {
+		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
+		var payload = {
+            recordId: component.get('v.recordId'),
+			origen: 'caseOptionButtons',
+			destino: 'derivarAction',
+		    datosAdicionales: ''
+        };
+        component.find("derivarInteraccionChannel").publish(payload);
+		
+	},
+
+	publicarGDPRMessage: function(component) {
+		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
+		var payload = {
+            recordId: component.get('v.recordId'),
+			origen: 'caseOptionButtons',
+			destino: 'gdprAction',
+		    datosAdicionales: ''
+        };
+        component.find("derivarInteraccionChannel").publish(payload);
+		
+	}
 
 	/*obtenerEmpleadosOficina: function(component) {
 		if (!component.get('v.comboboxEmpleadosOptions').length) { //Si no se han cargado ya previamente

@@ -30,7 +30,8 @@
 				botonesActivos.botonCancelarFirmaActivo = botonesActivos.botonAgendarFirmaActivo;
 			}
 
-			botonesActivos.botonTareaGestorActivo = contactoInformado && !isClosed && estado !== 'Nueva' ;
+			botonesActivos.botonDerivarGestorActivo = contactoInformado && !isClosed && estado !== 'Nueva';
+			botonesActivos.botonProgramaCitaGestorActivo = botonesActivos.botonDerivarGestorActivo;
 		}
 		botonesActivos.botonCopiarNIFActivo = contactoInformado;
 		botonesActivos.botonHistorialSolicitudesActivo = contactoInformado;
@@ -42,6 +43,7 @@
 		} else if (['Nueva', 'Activa'].includes(estado)) {
 			botonesActivos.botonAsignacionAutoActivo = component.get('v.esAdministrador');
 		}
+		
 		component.set('v.botonesActivos', botonesActivos);
 
 		if (oportunidad.CSBD_Fecha_Firma__c) {
@@ -496,71 +498,6 @@ Expongo mi opinión favorable a la aprobación de la presente operación en base
 		}
 		return retorno;
 	},
-
-	/*
-	modalProgramarRedimensionar: function(component, segunDisponibilidad) {
-		return new Promise(resolve => {
-			const numCalendarios = component.find('modalProgramarCalendarioDisponibilidad').get('v.numCalendarios');
-
-			//Canviar dimensiones del modal de programar cita
-			const modalContainer = component.find('modalProgramarModalContainer');
-			const modalContainerElement = modalContainer.getElement();
-			//alert(JSON.stringify(modalContainerElement.classList, null, 3));
-			const modalContainerStyle = modalContainerElement.style;
-			//const modalContainerParentComputedStyle = window.getComputedStyle(modalContainer.parentElement);
-			const modalContainerComputedStyle = window.getComputedStyle(modalContainerElement);
-			const modalContainerParentComputedStyle = window.getComputedStyle(modalContainerElement.parentElement);
-			const widthIni = parseFloat(modalContainerComputedStyle.width, 10);
-			const widthFin = segunDisponibilidad ? parseFloat(modalContainerParentComputedStyle.width) / 2 + Math.max(numCalendarios - 3, 0) * 118 : 650;
-
-			const modalContentElement = component.find('modalProgramarModalContent').getElement();
-			const modalContentStyle = modalContentElement.style;
-			const modalContentComputedStyle = window.getComputedStyle(modalContentElement);
-			const heightIni = parseFloat(modalContentComputedStyle.height, 10);
-			const heightFin = segunDisponibilidad ? 560 : 155;
-
-			const calendarioContainer = component.find('modalProgramarCalendarioDisponibilidadContainer');
-			const calendarioContainerElement = calendarioContainer.getElement();
-			calendarioContainerElement.style.pointerEvents = 'none';
-			//calendarioContainerElement.style.display = segunDisponibilidad ? 'block' : 'none';
-			const calendarioContainerStyle = calendarioContainerElement.style;
-			const calendarioContainerComputedStyle = window.getComputedStyle(calendarioContainerElement);
-			const calendarioContainerHeightIni = parseFloat(calendarioContainerComputedStyle.height, 10);
-			const calendarioContainerHeightFin = segunDisponibilidad ? 511 : 0;
-			const calendarioContainerOpacityIni = parseFloat(calendarioContainerComputedStyle.opacity) || 0;
-			const calendarioContainerOpacityFin = segunDisponibilidad ? 1 : 0;
-
-			const ease = t => 1 - Math.pow(1 - t, 7);
-			let start = null;
-			const redimensionar = timestamp => {
-				!start && (start = timestamp);
-				let progress = (timestamp - start) / 320; //320ms de duración
-				progress > 1 && (progress = 1);
-
-				const easedProgress = ease(progress);
-				modalContainerStyle.width = widthIni + (widthFin - widthIni) * easedProgress + 'px';
-				modalContentStyle.height = heightIni + (heightFin - heightIni) * easedProgress + 'px';
-				calendarioContainerStyle.height = calendarioContainerHeightIni + (calendarioContainerHeightFin - calendarioContainerHeightIni) * easedProgress + 'px';
-				calendarioContainerStyle.opacity = (calendarioContainerOpacityIni + (calendarioContainerOpacityFin - calendarioContainerOpacityIni) * easedProgress).toString();
-				if (progress < 1) {
-					requestAnimationFrame(redimensionar);
-				} else {
-					if (segunDisponibilidad) {
-						calendarioContainerElement.style.pointerEvents = 'auto';
-						//calendarioContainerElement.style.display = 'block';
-						const calendarioDisponibilidad = component.find('modalProgramarCalendarioDisponibilidad');
-						calendarioDisponibilidad.scrollToHorarioLaboral();
-					} else {
-						//calendarioContainerElement.style.display = 'none';
-					}
-					resolve();
-				}
-			};
-			//eslint-disable-next-line compat/compat
-			window.requestAnimationFrame(redimensionar);
-		});
-	}
-	*/
 
 	cambiarSeccion: function(component, tipoActual, tipoNew) { //, acciones
 		component.find('modalProgramarModalContainer').getElement().style.pointerEvents = 'none';

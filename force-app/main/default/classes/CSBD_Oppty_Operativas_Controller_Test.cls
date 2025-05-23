@@ -1,5 +1,5 @@
 @IsTest
-private class CSBD_Oppty_Operativas_Controller_Test { //Nombre abreviado porque Apex tiene un límite de carácteres
+public class CSBD_Oppty_Operativas_Controller_Test { //Nombre abreviado porque Apex tiene un límite de carácteres
 
 	@TestSetup
 	private static void altaDatosPrueba() {
@@ -107,7 +107,7 @@ private class CSBD_Oppty_Operativas_Controller_Test { //Nombre abreviado porque 
 	}
 
 	@IsTest
-	private static void numeroOportunidadesAnterioresTest() {
+	public static void numeroOportunidadesAnterioresTest() {
 		Account cuenta;
 		System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
 			cuenta = (Account)(CSBD_TestDataFactory.crearCuentaContacto('12345678N')).get('cuenta');
@@ -151,7 +151,7 @@ private class CSBD_Oppty_Operativas_Controller_Test { //Nombre abreviado porque 
 	}
 
 	@IsTest
-	private static void cerrarReactivarOportunidadTest() {
+	public static void cerrarReactivarOportunidadTest() {
 		System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
 			Opportunity prestamo = CSBD_Opportunity.crearOportunidad('CSBD_Prestamo');
 

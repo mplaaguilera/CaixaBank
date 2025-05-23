@@ -118,7 +118,6 @@
         <nameSegment>CC_Agrupador_Numero_Casos</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <processMetadataValues>
             <name>index</name>

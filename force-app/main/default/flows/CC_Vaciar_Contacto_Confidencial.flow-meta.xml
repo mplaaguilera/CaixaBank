@@ -118,7 +118,6 @@
         <nameSegment>CC_Canal_Com_Borrado</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <name>isChangedDecision2_myRule_1_CC_Confidencial_c</name>
         <label>isChangedDecision2_myRule_1_CC_Confidencial_c</label>

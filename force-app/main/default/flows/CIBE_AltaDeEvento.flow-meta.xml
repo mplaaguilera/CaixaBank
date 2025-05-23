@@ -91,7 +91,6 @@
         <nameSegment>CIBE_EventAttendeesController</nameSegment>
     </actionCalls>
     <apiVersion>55.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>AddColectionHOppo</name>
         <label>AddColectionHOppo</label>

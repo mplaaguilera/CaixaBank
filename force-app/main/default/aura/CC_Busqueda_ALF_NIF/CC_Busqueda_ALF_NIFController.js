@@ -709,14 +709,19 @@
 
 	handleActualizarIdentificacionCliente: function(component, event, helper) {
 		component.find('oppData').reloadRecord(true, $A.getCallback(() => {
-			component.set('v.oportunidad.CSBD_No_Identificado__c', true);
-			component.set('v.oportunidad.CSBD_Contact__c', null);
+			const noSeIdentificaNew = !component.get('v.oportunidad.CSBD_No_Identificado__c');
+			component.set('v.oportunidad.CSBD_No_Identificado__c', noSeIdentificaNew);
 			component.set('v.oportunidad.AccountId', null);
+			component.set('v.oportunidad.CSBD_Contact__c', null);
+
 			component.find('oppData').saveRecord($A.getCallback(saveResult => {
 				if (saveResult.state === 'SUCCESS') {
-					helper.mostrarToast('info', 'Cliente no identificado', 'El cliente no se ha identificado.');
+					const title = component.get('v.sObjectName') === 'Opportunity' ? 'Se actualizó la oportunidad' : 'Se actualizó el caso';
+					const message = noSeIdentificaNew ? 'Marca "Cliente no se identifica" guardada correctamente' : 'Marca "Cliente no se identifica" desmarcada correctamente';
+					helper.mostrarToast('success', title, message);
 				} else if (saveResult.state === 'ERROR') {
-					helper.mostrarToast('error', 'Error actualizando el caso', 'Error actualizando el caso.');
+					const title = component.get('v.sObjectName') === 'Opportunity' ? 'Problema actualizando la oportunidad' : 'Problema actualizando el caso';
+					helper.mostrarToast('error', title, saveResult.getError()[0].message);
 				}
 			}));
 		}));

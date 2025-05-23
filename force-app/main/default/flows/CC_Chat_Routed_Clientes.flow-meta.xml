@@ -705,7 +705,6 @@
         </outputParameters>
     </actionCalls>
     <apiVersion>53.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>Asignar_SkillRequirementsMenosProveedor1</name>
         <label>Asignar SkillRequirementsMenosProveedor1</label>

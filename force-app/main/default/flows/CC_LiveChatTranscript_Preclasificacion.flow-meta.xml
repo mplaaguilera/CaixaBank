@@ -115,7 +115,6 @@
         <nameSegment>CC_MCC_Preclasificacion</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <name>isChangedDecision4_myRule_3_CaseId</name>
         <label>isChangedDecision4_myRule_3_CaseId</label>

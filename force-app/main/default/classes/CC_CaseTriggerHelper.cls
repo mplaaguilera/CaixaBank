@@ -179,15 +179,15 @@ public with sharing class CC_CaseTriggerHelper {
                             casosExcepcionar = true;
                         }
                     }
-
-                    for (String key : mapKeyCatalogo.keySet()) {
-                        if(key.contains(casoCerrado.CC_MCC_Tematica__c) && key.contains(casoCerrado.CC_MCC_ProdServ__c) && key.contains(casoCerrado.CC_Canal_Operativo__c)){
-                            if (!mapAccount.isEmpty()) {
-                                String valorIndicadoresClientes = mapAccount.get(casoCerrado.AccountId).AV_IndicadoresClientes__c;
-                                if (valorIndicadoresClientes!=null && valorIndicadoresClientes.contains('28') && !casosExcepcionar) {
-                                    if (mapKeyCatalogo.get(key).CC_Area_Negocio__c == 'IMAGINBANK') {
-                                        casoCerrado.CC_Area_Negocio__c = mapKeyCatalogo.get(key).CC_Area_Negocio__c;
-                                        casoCerrado.CC_Catalogo_Facturacion__c = mapKeyCatalogo.get(key).Id;
+                    if(!mapKeyCatalogo.isEmpty()){
+                        for (String key : mapKeyCatalogo.keySet()) {
+                            if(casoCerrado.CC_MCC_Tematica__c != null && casoCerrado.CC_MCC_ProdServ__c != null && casoCerrado.CC_Canal_Operativo__c != null && key.contains(casoCerrado.CC_MCC_Tematica__c) && key.contains(casoCerrado.CC_MCC_ProdServ__c) && key.contains(casoCerrado.CC_Canal_Operativo__c)){
+                                if (!mapAccount.isEmpty() && casoCerrado.AccountId != null ) {
+                                    String valorIndicadoresClientes = mapAccount.get(casoCerrado.AccountId)?.AV_IndicadoresClientes__c;
+                                    if (valorIndicadoresClientes!=null && valorIndicadoresClientes.contains('28') && !casosExcepcionar) {
+                                        if (mapKeyCatalogo.get(key).CC_Area_Negocio__c == 'IMAGINBANK') {
+                                            casoCerrado.CC_Area_Negocio__c = mapKeyCatalogo.get(key).CC_Area_Negocio__c;
+                                            casoCerrado.CC_Catalogo_Facturacion__c = mapKeyCatalogo.get(key).Id;
                                         setAreaNegocio.add(casoCerrado.CC_Area_Negocio__c);
 
                                     }
@@ -207,6 +207,7 @@ public with sharing class CC_CaseTriggerHelper {
                             }
                         }
                     }
+                }
                 }
 
                 //Calculamos el precio
@@ -416,7 +417,7 @@ public with sharing class CC_CaseTriggerHelper {
                 setIdCasos.add(caso.Id);
             }
         }
-        
+
         if(!casosTraspasados.isEmpty()){
             Map<ID, Case> mapCasos = new Map<ID, Case>([SELECT Id, Owner.Name FROM Case WHERE Id IN :setIdCasos ORDER BY Owner.Name]);
             Id rtEmpleados = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
@@ -433,7 +434,7 @@ public with sharing class CC_CaseTriggerHelper {
                         }else if((!casoTrasladado.CC_En_Segundo_Nivel__c && !casoTrasladado.CC_En_Tercer_Nivel__c) && (!String.isEmpty(mapOldObj.get(casoTrasladado.Id).CC_Grupo_Transfer__c) && String.isEmpty(casoTrasladado.CC_Grupo_Transfer__c))){
                             tipo = tipo + ' Nivel 1';
                         }
-                        
+
                 }
                 Task createTask = new Task(Type = tipo , Subject = titulo, ActivityDate = System.today(), Status = 'Completed', WhatId = casoTrasladado.Id ,Priority = 'Normal');
                 lstTareas.add(createTask);
@@ -734,24 +735,20 @@ public with sharing class CC_CaseTriggerHelper {
 		return (isWeekend);
 	}
 
-    public static void permiteCambioOwnerCC(List<Case> listNewCases, Map<Id, Case> mapOldObj, List<Id> idsCAM){
-        List<Id> usuarioNuevo = new List<Id>();
-        Map<Id, Case> usuarioNuevoPorCase = new Map<Id, Case>();
-        for(Case caso : listNewCases){
-            if (!idsCAM.contains(caso.Id) && caso.OwnerId != mapOldObj.get(caso.Id).OwnerId && String.valueof(caso.OwnerId).startsWithIgnoreCase('005')){
-                usuarioNuevo.add(caso.OwnerId);
-                usuarioNuevoPorCase.put(caso.OwnerId, caso);
+    public static void permiteCambioOwnerCC(List<Case> listNewCases, Map<Id, Case> mapOldObj, List<Id> idsCAM) {
+        Map<Id, Case> casosNuevosOwners = new Map<Id, Case>();
+        for (Case caso : listNewCases) {
+            if (caso.OwnerId != mapOldObj.get(caso.Id).OwnerId
+                && String.valueof(caso.OwnerId).startsWithIgnoreCase('005') && !idsCAM.contains(caso.Id)) {
+                casosNuevosOwners.put(caso.OwnerId, caso);
             }
         }
-        if(!usuarioNuevo.isEmpty()){
-            List<UserRole> roles = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center' or DeveloperName = 'Contact_Center_sin_acceso_a_Directorio'];
-            List<User> usuarios = [SELECT Id, Name, UserRoleId FROM User WHERE Id IN: usuarioNuevo AND (UserRoleId NOT IN :roles AND Name != 'System' AND Name != 'Automated Process'AND Name != 'Administrador de sistema')];
-            if(!usuarios.isEmpty()){
-                for(User usuario : usuarios){
-                    ///if(usuario.UserRoleId != rol.Id && (usuario.Name != 'System' && usuario.Name != 'Automated Process' && usuario.Name != 'Administrador de sistema')){
-                        usuarioNuevoPorCase.get(usuario.Id).addError('Únicamente se pueden vincular a trabajadores del Contact Center');
-                    //}
-                }
+        if (!casosNuevosOwners.isEmpty()){
+            for (User nuevoOwner : [SELECT Id FROM User WHERE Id IN :casosNuevosOwners.keySet()
+                                    AND UserRoleId NOT IN (SELECT Id FROM UserRole WHERE DeveloperName IN ('Contact_Center', 'Contact_Center_sin_acceso_a_Directorio'))
+                                    AND ProfileId NOT IN (SELECT Id FROM Profile WHERE Name IN ('System Administrator', 'Administrador de sistema'))
+                                    AND Name NOT IN ('System', 'Automated Process', 'Administrador de sistema', 'System Administrator')]) {
+                casosNuevosOwners.get(nuevoOwner.Id).addError('Únicamente se pueden vincular a trabajadores del Contact Center');
             }
         }
     }
@@ -1025,7 +1022,7 @@ public with sharing class CC_CaseTriggerHelper {
             }
         }
     }
-    
+
     public static void informarOficinaAfectadaBU(List<Case> lstCasos, Map<Id, Case> mapOldObj, List<Id> idsCAM) {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         Id rtBankia = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_CSI_Bankia').getRecordTypeId();
@@ -1337,25 +1334,25 @@ public with sharing class CC_CaseTriggerHelper {
                     }
             }
         }
-        
+
         Map<String,Boolean> procesos = new Map<String, Boolean>();
-        List <CC_Settings__c> procesosComunicacionesInformativas = [SELECT Name, CC_Activa__c FROM CC_Settings__c 
+        List <CC_Settings__c> procesosComunicacionesInformativas = [SELECT Name, CC_Activa__c FROM CC_Settings__c
                                                  WHERE Name IN ('CC_Agrupador_CI_Asignacion_Casos',
                                                                 'CC_Agrupador_CIC_Asignacion_Casos',
                                                                 'CC_Agrupador_CIM_Asignacion_Casos')];
 
         for(CC_Settings__c setting : procesosComunicacionesInformativas){
             procesos.put(setting.Name, setting.CC_Activa__c);
-        
+
         }
 
-        if (!idsCasos.isEmpty() && procesos.get('CC_Agrupador_CI_Asignacion_Casos')) {
+        if (!idsCasos.isEmpty() && !procesos.isEmpty() && procesos.get('CC_Agrupador_CI_Asignacion_Casos')) {
             CC_Agrupador_CI_Asignacion_Casos.asociarCasosAComunicacionInformativa(idsCasos);
         }
-        if(!idsCasosC.isEmpty() && procesos.get('CC_Agrupador_CIC_Asignacion_Casos')) {
+        if(!idsCasosC.isEmpty() && !procesos.isEmpty() && procesos.get('CC_Agrupador_CIC_Asignacion_Casos')) {
             CC_Agrupador_CIC_Asignacion_Casos.asociarCasosAComunicacionInformativa(idsCasosC);
         }
-        if(!idsCasosM.isEmpty() && procesos.get('CC_Agrupador_CIM_Asignacion_Casos')) {
+        if(!idsCasosM.isEmpty() && !procesos.isEmpty() && procesos.get('CC_Agrupador_CIM_Asignacion_Casos')) {
             CC_Agrupador_CIM_Asignacion_Casos.asociarCasosAComunicacionInformativa(idsCasosM);
         }
     }
@@ -1603,7 +1600,8 @@ public with sharing class CC_CaseTriggerHelper {
                     idCasosInformar.add(caso.Id);
                 }
             }
-            if (!idCasosInformar.isEmpty()) {
+            if (!idCasosInformar.isEmpty() && !System.isBatch()) {
+
                 CC_Aviso_Cierre_GestorInTouch.avisoGestor(idCasosInformar);
             }
         }
@@ -2215,50 +2213,50 @@ public with sharing class CC_CaseTriggerHelper {
         if (lstCasos.isEmpty()) return;
         Set<Id> setIdContacto = new Set<Id>();
         List<Case> casosReapertura = new List<Case>();
-    
+
         for (Case caso : lstCasos) {
             if (caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'Cerrado' && caso.CC_Reapertura_Valida__c == 'No' && caso.ContactId != null) {
                 setIdContacto.add(caso.ContactId);
                 casosReapertura.add(caso);
             }
         }
-    
+
         if (setIdContacto.isEmpty() || casosReapertura.isEmpty()) return;
-    
+
         Map<Id, Contact> mapContacts = new Map<Id, Contact>(
             [SELECT Email FROM Contact WHERE Id IN :setIdContacto]
         );
-    
+
         Map<String, OrgWideEmailAddress> owasMap = new Map<String, OrgWideEmailAddress>();
         for (OrgWideEmailAddress owa : [SELECT Id, Address FROM OrgWideEmailAddress]) {
             owasMap.put(owa.Address, owa);
         }
-    
+
         List<CC_Buzones_Por_Defecto__mdt> owaPorDefecto = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano' AND CC_Activo__c = true LIMIT 1];
-    
+
         if (owaPorDefecto.isEmpty() || !owasMap.containsKey(owaPorDefecto[0].CC_Direccion_Correo__c)) return;
         OrgWideEmailAddress owaDefault = owasMap.get(owaPorDefecto[0].CC_Direccion_Correo__c);
-    
+
         Map<String, EmailTemplate> templates = new Map<String, EmailTemplate>();
         for (EmailTemplate template : [SELECT Subject, HtmlValue, DeveloperName FROM EmailTemplate WHERE DeveloperName IN ('CC_ReaperturaNoValida_FCO_cas', 'CC_ReaperturaNoValida_FCO_cat', 'CC_ReaperturaNoValida_CCO_cas', 'CC_ReaperturaNoValida_CCO_cat')]) {
             templates.put(template.DeveloperName, template);
         }
-    
+
         if (templates.isEmpty()) return;
-    
-    
+
+
         List<Messaging.SingleEmailMessage> allmsg = new List<Messaging.SingleEmailMessage>();
-    
+
         for (Case caso : casosReapertura) {
             if (!mapContacts.containsKey(caso.ContactId) || String.isEmpty(mapContacts.get(caso.ContactId).Email)) continue;
-    
+
             Boolean isFCO = caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas';
             String templateKey = 'CC_ReaperturaNoValida_' + (isFCO ? 'FCO' : 'CCO') + '_' + (caso.CC_Idioma__c == 'ca' ? 'cat' : 'cas');
             EmailTemplate template = templates.get(templateKey);
-            
+
 
             if (template == null) continue;
-    
+
             Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
             email.setHtmlBody(template.HtmlValue);
             email.setSubject(template.Subject);
@@ -2269,10 +2267,10 @@ public with sharing class CC_CaseTriggerHelper {
             email.setTreatTargetObjectAsRecipient(false);
             email.setOrgWideEmailAddressId(owaDefault.Id);
             email.setToAddresses(new List<String>{ mapContacts.get(caso.ContactId).Email });
-    
+
             allmsg.add(email);
         }
-    
+
         if (!allmsg.isEmpty()) {
             try {
                 Messaging.sendEmail(allmsg, false);

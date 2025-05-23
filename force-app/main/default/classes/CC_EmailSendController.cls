@@ -284,9 +284,9 @@ public with sharing class CC_EmailSendController {
                 sAuxMail = casos[0].SuppliedEmail;
             } else if (casos[0].CC_MailTelfNotif__c != '' && casos[0].CC_MailTelfNotif__c != null) {
                 String emailRegex = '([a-zA-Z0-9_\\-\\.]+)@((\\[a-z]{1,3}\\.[a-z]{1,3}\\.[a-z]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})';
-                Pattern MyPattern = Pattern.compile(emailRegex);
-                Matcher MyMatcher = MyPattern.matcher(casos[0].CC_MailTelfNotif__c);
-                if(MyMatcher.matches()){
+                Pattern myPattern = Pattern.compile(emailRegex);
+                Matcher myMatcher = myPattern.matcher(casos[0].CC_MailTelfNotif__c);
+                if(myMatcher.matches()){
                     sAuxMail = casos[0].CC_MailTelfNotif__c;
                 }else {
                     sAuxMail = casos[0].Contact.Email;

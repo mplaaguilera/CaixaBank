@@ -1,0 +1,64 @@
+<template>
+    <section role="dialog" lwc:ref="modalProgramarCitaGestor" class="slds-modal" tabindex="-1" aria-modal="true" onkeydown={modalTeclaPulsada}>
+        <div class="slds-modal__container" style="max-width: 585px;">
+            <header class="slds-modal__header">
+                <!-- sldsValidatorIgnoreNextLine -->
+                <button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={spinner}>
+                    <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                </button>
+                <h2 class="slds-text-heading_medium slds-hyphenate">Programar cita con el gestor</h2>
+				<p class="slds-var-m-top_x-small">Selecciona las opciones para una próxima cita entre el cliente y el gestor.</p>
+            </header>
+
+            <div class="slds-modal__content" style="padding: 18px 40px 30px; overflow-x: hidden;">
+                <c-csbd_-spinner-kx lwc:if={spinner} size="large" variant="brand"></c-csbd_-spinner-kx>
+
+                <div>
+                    <div class="slds-grid slds-gutters_direct-small slds-var-m-bottom_x-large slds-grid_vertical-align-end">
+                        <div class="slds-col slds-grow-none slds-shrink-none">
+                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Tipo</label>
+                            <lightning-radio-group options={tipoCitaOptions} value="Cita presencial" type="button" variant="label-hidden" required></lightning-radio-group>
+                        </div>
+
+                        <div class="slds-col">
+                            <div style="display: inline-block; width: 100%;">
+                                <lightning-record-picker object-api-name="Contact" fields="Name" label="Gestor asignado" value="003KN000004APAaYAO" variant="label-inline" disabled></lightning-record-picker>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="height: 78px;">
+                        <lightning-input lwc:ref="inputAsunto" label="Asunto" placeholder="Asunto de la cita" required></lightning-input>
+                    </div>
+
+                    <div class="slds-grid slds-wrap slds-gutters_direct-small slds-text-color_weak" style="margin: auto;">
+                        <div class="slds-col" style="padding-left: 0">
+                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Fecha</label>
+                            <div class="radioGroupContainer">
+                                <div>
+                                    <lightning-radio-group lwc:ref="inputFecha" options={fechasOptions.dias} value="Lunes 1 de junio" variant="label-hidden" required style="line-height: 24px;"></lightning-radio-group>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col" style="width: 132px; padding-right: 0">
+                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Hora</label>
+                            <div class="radioGroupContainer">
+                                <div>
+                                    <lightning-radio-group lwc:ref="inputHora" options={fechasOptions.horas} value="10:00" variant="label-hidden" required style="line-height: 24px;"></lightning-radio-group>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slds-modal__footer">
+                <lightning-button label="Programar cita" variant="brand" icon-name="utility:date_input" onclick={programarCitaGestor} disabled={spinner}></lightning-button>
+                <lightning-button lwc:ref="botonCancelar" label="Cancelar" onclick={modalCerrar} disabled={spinner} class="slds-var-m-left_small"></lightning-button>
+            </div>
+        </div>
+    </section>
+
+    <div lwc:ref="backdropModal" class="backdrop slds-backdrop" role="presentation"></div>
+</template>

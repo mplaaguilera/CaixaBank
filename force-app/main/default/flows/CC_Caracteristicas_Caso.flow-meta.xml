@@ -185,7 +185,6 @@
         </inputParameters>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>myWaitAssignment_myWait_myRule_6</name>
         <label>myWaitAssignment_myWait_myRule_6</label>

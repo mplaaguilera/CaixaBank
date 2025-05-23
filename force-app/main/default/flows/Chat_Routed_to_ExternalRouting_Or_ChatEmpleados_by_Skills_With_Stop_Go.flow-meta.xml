@@ -1544,7 +1544,6 @@
         <nameSegment>routeWork</nameSegment>
     </actionCalls>
     <apiVersion>53.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>Asignar_FinNombreCA</name>
         <label>Asignar FinNombreCA</label>

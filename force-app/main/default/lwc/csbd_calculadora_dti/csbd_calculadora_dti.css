@@ -43,6 +43,7 @@ div.datatableContainer {
     border-color: rgba(201, 201, 201, 0.816);
     border-radius: 7px;
     overflow: hidden;
+    height: auto;
 }
 
 div.datatableContainer lightning-datatable {
@@ -633,6 +634,10 @@ div.tooltipCalculos ul {
 
 div.tooltipCalculos ul > li {
     display: list-item;
+}
+
+.csbd-var-m-top_xxx-large {
+    margin-top: 30px;
 }
 
 div.datosTitular lightning-badge + lightning-badge {

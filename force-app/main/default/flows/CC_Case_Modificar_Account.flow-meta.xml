@@ -184,7 +184,6 @@
         <nameSegment>CC_Informar_DG_DAN_Caso</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <name>isChangedDecision11_myRule_10_CC_IdentCliente_c</name>
         <label>isChangedDecision11_myRule_10_CC_IdentCliente_c</label>

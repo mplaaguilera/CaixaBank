@@ -35,21 +35,32 @@ public with sharing class CSBD_Llamada_GC {
 		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 		insert llamada;
 
-		Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Llamada_Servicio', new Map<String, Object>{
-            'CSBD_Empresa_Proveedora__c' => servicioGenesys.CSBD_Empresa_Proveedora__c,
-            'CSBD_Familia_Producto__c' => servicioGenesys.CSBD_Familia_Producto__c,
-            'CSBD_Producto__c' => servicioGenesys.CSBD_Producto__c,
-            'CSBD_Telefono_Solicitud__c' => llamada.CC_ANI__c,
-            'CSBD_Now_Codigo_Producto__c' => servicioGenesys.CSBD_Now_Codigo_Producto__c,
-            'CSBD_Canal__c' => servicioGenesys.CSBD_Canal__c,
-            'CSBD_Now_Origen__c' => servicioGenesys.CSBD_Now_Origen__c,
-            'CSBD_Estado__c' => 'Activa',
-            'AccountId' => llamada.CC_Cuenta__c,
-            'CSBD_Contact__c' => llamada.CC_Contacto__c,
-            'CSBD_Idioma_Solicitud__c' => inputLlamada.idioma,
-            'OwnerId' => UserInfo.getUserId(),
-            'CSBD_Turno_Contacto__c' => llamada.CC_Fecha_Inicio__c.hour() < 15 ? 'Mañana': 'Tarde'
-        });
+		Opportunity oportunidad = CSBD_WS_PreAltaOportunidad.calcularOportunidad(inputLlamada.ani);
+		if (oportunidad != null) {
+			// Se reutiliza la oportunidad existente
+			if (oportunidad.OwnerId != UserInfo.getUserId()) {
+				oportunidad.OwnerId = UserInfo.getUserId();
+				update oportunidad;
+			}
+
+		} else {
+			// Se crea una nueva oportunidad
+			oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Llamada_Servicio', new Map<String, Object>{
+				'CSBD_Empresa_Proveedora__c' => servicioGenesys.CSBD_Empresa_Proveedora__c,
+				'CSBD_Familia_Producto__c' => servicioGenesys.CSBD_Familia_Producto__c,
+				'CSBD_Producto__c' => servicioGenesys.CSBD_Producto__c,
+				'CSBD_Telefono_Solicitud__c' => llamada.CC_ANI__c,
+				'CSBD_Now_Codigo_Producto__c' => servicioGenesys.CSBD_Now_Codigo_Producto__c,
+				'CSBD_Canal__c' => servicioGenesys.CSBD_Canal__c,
+				'CSBD_Now_Origen__c' => servicioGenesys.CSBD_Now_Origen__c,
+				'CSBD_Estado__c' => 'Activa',
+				'AccountId' => llamada.CC_Cuenta__c,
+				'CSBD_Contact__c' => llamada.CC_Contacto__c,
+				'CSBD_Idioma_Solicitud__c' => inputLlamada.idioma,
+				'OwnerId' => UserInfo.getUserId(),
+				'CSBD_Turno_Contacto__c' => llamada.CC_Fecha_Inicio__c.hour() < 15 ? 'Mañana': 'Tarde'
+			});
+		}
 		Id idTask = crearActividad(llamada, oportunidad.Id, 'Llamada entrante', servicioGenesys.Name);
 
 		return new Map<String, Object>{
@@ -265,7 +276,7 @@ public with sharing class CSBD_Llamada_GC {
 				oportunidad.CSBD_PrimerContactoSLA__c = tiempoFinal;
 			}
 			if(tiempoOrigen < System.now()){
-				oportunidad.CSBD_SLA_Primera_Respuesta__c = (Integer)(tiempoFinal.getTime() - tiempoOrigen.getTime())/(1000 * 60);
+				oportunidad.CSBD_SLA_Primera_Respuesta__c = (Integer)(tiempoFinal.getTime() - tiempoOrigen.getTime())/(1000);
 				oportunidad.CSBD_PrimerContactoSLA__c = tiempoFinal;
 			}
 		}
@@ -418,7 +429,7 @@ public with sharing class CSBD_Llamada_GC {
 					actividad.CC_Tipo_Cierre__c = obtenerTipoCierre(tipoCierre);
 					actividad.Status = 'Completed';
 
-					Integer duracionMinutos = (Integer)((System.now().getTime() - actividad.CC_Fecha_Inicio__c.getTime()) / (1000 * 60));
+					Integer duracionMinutos = (Integer)((CBK_UtilsDate.nowSYS().getTime() - actividad.CC_Fecha_Inicio__c.getTime()) / (1000));
 					oppDuracionMapa.put(actividad.WhatId, duracionMinutos);
 				}
 				update actividades;

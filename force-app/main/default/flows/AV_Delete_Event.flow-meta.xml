@@ -24,7 +24,6 @@
         </outputParameters>
     </actionCalls>
     <apiVersion>51.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>AV_BuildApexInputNoRecurrence</name>
         <label>Build Apex Input No Recurrence</label>

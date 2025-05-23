@@ -428,7 +428,6 @@
         <nameSegment>CC_Configuracion_Reclamaciones_Auto</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>myWaitAssignment_myWait_myRule_13</name>
         <label>myWaitAssignment_myWait_myRule_13</label>

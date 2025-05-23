@@ -24,7 +24,6 @@
         </outputParameters>
     </actionCalls>
     <apiVersion>61.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <name>decissionresult</name>
         <label>decissionresult</label>

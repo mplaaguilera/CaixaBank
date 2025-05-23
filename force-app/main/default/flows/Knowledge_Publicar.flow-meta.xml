@@ -310,7 +310,6 @@
         <nameSegment>CC_Knowledge_Publicar</nameSegment>
     </actionCalls>
     <apiVersion>51.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>myWaitAssignment_myWait_myRule_1</name>
         <label>myWaitAssignment_myWait_myRule_1</label>
@@ -402,7 +401,7 @@
                 <leftValueReference>myVariable_current.CC_Fecha_Inicio_Publicacion__c</leftValueReference>
                 <operator>GreaterThanOrEqualTo</operator>
                 <rightValue>
-                    <elementReference>formula_2_myRule_1_1289917742</elementReference>
+                    <elementReference>formula_2_myRule_1_0637596838</elementReference>
                 </rightValue>
             </conditions>
             <conditions>
@@ -563,7 +562,7 @@
                 <leftValueReference>myVariable_current.CC_Fecha_Inicio_Publicacion__c</leftValueReference>
                 <operator>GreaterThanOrEqualTo</operator>
                 <rightValue>
-                    <elementReference>formula_2_myRule_1_1289917742</elementReference>
+                    <elementReference>formula_2_myRule_1_0637596838</elementReference>
                 </rightValue>
             </conditions>
             <conditions>
@@ -689,7 +688,7 @@
                 <leftValueReference>myVariable_old.CC_Fecha_Inicio_Publicacion__c</leftValueReference>
                 <operator>GreaterThanOrEqualTo</operator>
                 <rightValue>
-                    <elementReference>formula_3_myRule_1_pmetrule_0402709386</elementReference>
+                    <elementReference>formula_3_myRule_1_pmetrule_9057816951</elementReference>
                 </rightValue>
             </conditions>
             <conditions>
@@ -764,7 +763,7 @@
                 <stringValue>NOW()</stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_2_myRule_1_1289917742</name>
+        <name>formula_2_myRule_1_0637596838</name>
         <dataType>DateTime</dataType>
         <expression>NOW()</expression>
     </formulas>
@@ -775,11 +774,11 @@
                 <stringValue>NOW()</stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_3_myRule_1_pmetrule_0402709386</name>
+        <name>formula_3_myRule_1_pmetrule_9057816951</name>
         <dataType>DateTime</dataType>
         <expression>NOW()</expression>
     </formulas>
-    <interviewLabel>Knowledge_Publicar-1_InterviewLabel</interviewLabel>
+    <interviewLabel>Knowledge_Publicar-2_InterviewLabel</interviewLabel>
     <label>Knowledge Publicar</label>
     <processMetadataValues>
         <name>ObjectType</name>
@@ -807,7 +806,7 @@
     </processMetadataValues>
     <processType>Workflow</processType>
     <startElementReference>myPreWaitDecision_myWait_myRule_1</startElementReference>
-    <status>Active</status>
+    <status>Draft</status>
     <variables>
         <name>cancelWaits</name>
         <dataType>String</dataType>

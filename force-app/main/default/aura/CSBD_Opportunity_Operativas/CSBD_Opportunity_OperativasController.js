@@ -131,7 +131,7 @@
 		component.find('opportunityData').reloadRecord();
 
 		if (!component.get('v.oportunidad.CSBD_Email_Solicitud__c')) {
-			helper.mostrarToast('Debe informar el destinatario', 'Debe informar una dirección de correo en el campo "Email solicitud" de la oportunidad.', 'error');
+			helper.mostrarToast('Dirección de correo requerida', 'Informa una dirección de correo en el campo "Email solicitud" de la oportunidad', 'info');
 		} else {
 			//Recuperar carpetas de idioma
 			let subdirectoriosOperativas = component.get('c.subdirectorios');
@@ -261,7 +261,7 @@
 		component.find('opportunityData').reloadRecord();
 
 		if (!component.get('v.oportunidad.CSBD_Telefono_Solicitud__c')) {
-			helper.mostrarToast('Debe informar el destinatario', 'Debe informar un número de teléfono en el campo "Teléfono solicitud" de la oportunidad.', 'error');
+			helper.mostrarToast('Teléfono no informado', 'Informa un número de teléfono en el campo "Teléfono solicitud" de la oportunidad', 'info');
 		} else {
 			component.find('inputEnviarNotificacionDestinatario').set('v.value', component.get('v.oportunidad.CSBD_Telefono_Solicitud__c'));
 
@@ -1152,6 +1152,8 @@
 	},
 
 	abrirModalTrasladoSia: function(component, event, helper) {
+		$A.enqueueAction(component.get('c.menuSiaCerrar'));
+
 		component.set('v.cargarModales', true);
 
 		//Traslados
@@ -1303,6 +1305,7 @@
 
 	// modalTareaGestorAbrir: function(component) {
 	abrirModalDerivarGestor: function(component) {
+		$A.enqueueAction(component.get('c.menuGestorCerrar'));
 		component.set('v.cargarModales', true);
 		component.set('v.modalDerivarGestor', true);
 		window.setTimeout($A.getCallback(() => component.find('modalDerivarGestor').abrirModal(true)), 50);
@@ -1377,59 +1380,60 @@
 		}
 	},
 
-	buttonmenuSiaOnselect: function(component, event) {
-		if (event.getParam('value') === 'Informe SIA') {
-			$A.enqueueAction(component.get('c.abrirModalInformeSia'));
-		} else if (event.getParam('value') === 'Traslado SIA') {
-			$A.enqueueAction(component.get('c.abrirModalTrasladoSia'));
-		}
-	},
-
-	abrirModalConvertirAHipoteca: function(component) {
+	abrirModalConvertirAHipoteca: function(component, event, helper) {
 		component.set('v.cargarModales', true);
-		$A.util.addClass(component.find('modalConvertirAHipoteca'), 'slds-fade-in-open');
-		$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
-		window.setTimeout($A.getCallback(() => component.find('modalConvertirAHipotecaCancelar').focus()), 200);
+
+		component.find('opportunityData').reloadRecord(true);
+		if ((component.get('v.oportunidad.RecordType.DeveloperName') !== 'CSBD_MAC') ||
+				component.get('v.oportunidad.RecordType.DeveloperName') === 'CSBD_MAC' && component.get('v.oportunidad.CSBD_Motivo_MAC__c')) {
+
+			$A.util.addClass(component.find('modalConvertirAHipoteca'), 'slds-fade-in-open');
+			$A.util.addClass(component.find('modalBackdrop'), 'slds-backdrop_open');
+			window.setTimeout($A.getCallback(() => component.find('modalConvertirAHipotecaCancelar').focus()), 200);
+		} else {
+			helper.mostrarToast('Operativa no disponible', 'Es necesario informar el campo Motivo CSCC', 'info');
+		}
 	},
 
 	convertir: function(component, event, helper) {
 		component.find('botonConvertirOportunidad').set('v.disabled', true);
 		const familiaProducto = component.get('v.oportunidad.CSBD_Familia_Producto__c');
 		const nuevoRecordType = familiaProducto === 'Hipotecas' ? 'CSBD_Hipoteca' : 'CSBD_Prestamo';
-		let convertirOportunidadApex = component.get('c.convertirOportunidad');
-		convertirOportunidadApex.setParams({
-			oportunidad: component.get('v.oportunidad'),
-			recordTypeDeveloperName: nuevoRecordType
+		let cerrarOportunidadApex = component.get('c.cerrarOportunidad');
+		cerrarOportunidadApex.setParams({
+			recordId: component.get('v.recordId'),
+			nombreEtapaVentas: 'Perdida',
+			resolucion: 'Traslado a CSBD'
 		});
-		convertirOportunidadApex.setCallback(this, responseConvertirOportunidad => {
-			if (responseConvertirOportunidad.getState() === 'SUCCESS') {
-				helper.mostrarToast('Se creó la oportunidad', 'La oportunidad de tipo ' + component.get('v.tipoOperativaConvertir') + ' se creó correctamente.', 'success');
+		cerrarOportunidadApex.setCallback(this, responseCerrarOportunidad => {
+			if (responseCerrarOportunidad.getState() === 'SUCCESS') {
+				helper.mostrarToast('Se cerró oportunidad', 'La oportunidad ' + component.get('v.oportunidad.CSBD_Identificador__c') + ' se ha cerrado con etapa "Perdida"', 'info');
 
-				let cerrarOportunidadApex = component.get('c.cerrarOportunidad');
-				cerrarOportunidadApex.setParams({
-					recordId: component.get('v.recordId'),
-					nombreEtapaVentas: 'Perdida',
-					resolucion: 'Traslado a CSBD'
+				let convertirOportunidadApex = component.get('c.convertirOportunidad');
+				convertirOportunidadApex.setParams({
+					oportunidad: component.get('v.oportunidad'),
+					recordTypeDeveloperName: nuevoRecordType
 				});
-				cerrarOportunidadApex.setCallback(this, responseCerrarOportunidad => {
-					if (responseCerrarOportunidad.getState() === 'SUCCESS') {
-						helper.mostrarToast('Se cerró oportunidad', 'La oportunidad ' + component.get('v.oportunidad.CSBD_Identificador__c') + ' se ha cerrado con etapa "Perdida"', 'info');
+				convertirOportunidadApex.setCallback(this, responseConvertirOportunidad => {
+					if (responseConvertirOportunidad.getState() === 'SUCCESS') {
+						helper.mostrarToast('Se creó la oportunidad', 'La oportunidad de tipo ' + component.get('v.tipoOperativaConvertir') + ' se creó correctamente.', 'success');
+
 						$A.enqueueAction(component.get('c.cerrarModalConvertirAHipoteca'));
 						component.find('opportunityData').reloadRecord(true);
 						helper.abrirTab(component, responseConvertirOportunidad.getReturnValue().Id);
-					} else {
-						console.error(responseCerrarOportunidad.getError());
-						helper.mostrarToast('Problema cerrando la oportunidad', JSON.stringify(responseCerrarOportunidad.getError()), 'error');
+					} else if (responseConvertirOportunidad.getState() === 'ERROR') {
+						console.error(convertirOportunidadApex.getError());
+						helper.mostrarToast('Problema convirtiendo la oportunidad en hipoteca', convertirOportunidadApex.getError()[0].message, 'error');
+						component.find('botonConvertirOportunidad').set('v.disabled', false);
 					}
 				});
-				$A.enqueueAction(cerrarOportunidadApex);
-			} else if (responseConvertirOportunidad.getState() === 'ERROR') {
-				console.error(convertirOportunidadApex.getError());
-				helper.mostrarToast('Problema convirtiendo la oportunidad en hipoteca', convertirOportunidadApex.getError()[0].message, 'error');
-				component.find('botonConvertirOportunidad').set('v.disabled', false);
+				$A.enqueueAction(convertirOportunidadApex);
+			} else {
+				console.error(responseCerrarOportunidad.getError());
+				helper.mostrarToast('Problema cerrando la oportunidad', JSON.stringify(responseCerrarOportunidad.getError()), 'error');
 			}
 		});
-		$A.enqueueAction(convertirOportunidadApex);
+		$A.enqueueAction(cerrarOportunidadApex);
 	},
 
 	abrirModalAutenticacionOtp: function(component) {
@@ -1502,19 +1506,74 @@
 		}
 	},
 
-	buttonMenuProgramarOnselect: function(component, event) {
-		if (event.getParam('value') === 'programarCita') {
-			$A.enqueueAction(component.get('c.abrirModalProgramar'));
-		} else if (event.getParam('value') === 'programarFirma') {
-			$A.enqueueAction(component.get('c.abrirModalAgendarFirma'));
-		}
-	},
-
 	botonProgramarOnclick: function(component) {
 		component.find('menuProgramar').focus();
 	},
 
 	botonSiaOnclick: function(component) {
 		component.find('menuSia').focus();
+	},
+
+	abrirModalProgramarCitaGestor: function(component) {
+		$A.enqueueAction(component.get('c.menuGestorCerrar'));
+		component.set('v.cargarModales', true);
+		component.set('v.modalProgramarCitaGestor', true);
+		window.setTimeout($A.getCallback(() => component.find('modalProgramarCitaGestor').abrirModal(true)), 50);
+	},
+
+	menuGestorAbrir: function(component) {
+		const menuGestor = component.find('menuGestor');
+		const menuGestorAbierto = menuGestor.getElement().classList.contains('slds-is-open');
+
+		if (menuGestorAbierto) {
+			$A.enqueueAction(component.get('c.menuGestorCerrar'));
+		} else {
+			$A.util.addClass(menuGestor, 'slds-is-open');
+
+			const funcionesBind = component.get('v.funcionesBind');
+			funcionesBind.menuGestorCerrar = $A.getCallback(() => {
+				$A.util.removeClass(component.find('menuGestor'), 'slds-is-open');
+			});
+			component.set('v.funcionesBind', funcionesBind);
+
+			setTimeout($A.getCallback(() => {
+				window.addEventListener('click', funcionesBind.menuGestorCerrar, {once: true});
+			}), 0);
+		}
+	},
+
+	menuGestorCerrar: function(component) {
+		window.removeEventListener('click', component.get('v.funcionesBind').menuGestorCerrar);
+		$A.util.removeClass(component.find('menuGestor'), 'slds-is-open');
+	},
+
+	eventStopPropagation: function(component, event) {
+		event.stopPropagation();
+	},
+
+	menuSiaAbrir: function(component) {
+		const menuSia = component.find('menuSia');
+		const menuSiaAbierto = menuSia.getElement().classList.contains('slds-is-open');
+
+		if (menuSiaAbierto) {
+			$A.enqueueAction(component.get('c.menuSiaCerrar'));
+		} else {
+			$A.util.addClass(menuSia, 'slds-is-open');
+
+			const funcionesBind = component.get('v.funcionesBind');
+			funcionesBind.menuSiaCerrar = $A.getCallback(() => {
+				$A.util.removeClass(component.find('menuSia'), 'slds-is-open');
+			});
+			component.set('v.funcionesBind', funcionesBind);
+
+			setTimeout($A.getCallback(() => {
+				window.addEventListener('click', funcionesBind.menuSiaCerrar, {once: true});
+			}), 0);
+		}
+	},
+
+	menuSiaCerrar: function(component) {
+		window.removeEventListener('click', component.get('v.funcionesBind').menuSiaCerrar);
+		$A.util.removeClass(component.find('menuSia'), 'slds-is-open');
 	}
 });

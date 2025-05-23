@@ -112,7 +112,6 @@
         <nameSegment>emailSimple</nameSegment>
     </actionCalls>
     <apiVersion>53.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>AsignarAccionModificada</name>
         <label>AsignarAccionModificada</label>

@@ -41,7 +41,6 @@
         <nameSegment>customNotificationAction</nameSegment>
     </actionCalls>
     <apiVersion>54.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>Recepients_Notif</name>
         <label>Recepients Notif</label>

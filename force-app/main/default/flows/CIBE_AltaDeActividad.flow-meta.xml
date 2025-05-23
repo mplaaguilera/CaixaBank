@@ -12,7 +12,6 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <apiVersion>50.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <choices>
         <name>AV_NewEvent</name>
         <choiceText>&lt;b style=&quot;font-size: 16px;&quot;&gt;Planificar un Evento&lt;/b&gt;&lt;p&gt;{!AV_EventDescription}&lt;/p&gt;</choiceText>

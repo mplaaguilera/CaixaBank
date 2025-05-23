@@ -26,7 +26,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -76,7 +76,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -126,7 +126,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -176,7 +176,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -226,7 +226,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -276,7 +276,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -326,7 +326,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -370,7 +370,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -420,7 +420,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -470,7 +470,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -520,7 +520,7 @@
         <inputParameters>
             <name>senderAddress</name>
             <value>
-                <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+                <elementReference>Email_Atencion_Clientes_CC</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -545,7 +545,6 @@
         <offset>0</offset>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>OficinaAfectada_IdAssignment</name>
         <label>OficinaAfectada_IdAssignment</label>
@@ -1330,7 +1329,7 @@
             <label>OperativaSeleccionadaPredeterminado</label>
         </rules>
     </decisions>
-    <description>Parametrización emails - OK</description>
+    <description>Parametrización emails - OK - + corrección hardcodeados</description>
     <environments>Default</environments>
     <formulas>
         <name>Fecha_Actual</name>
@@ -2127,6 +2126,10 @@
             </value>
         </filters>
         <object>CC_Lista_Valores__c</object>
+        <outputAssignments>
+            <assignToReference>Email_Atencion_Clientes_CC</assignToReference>
+            <field>CC_Mensajes_Mostrar__c</field>
+        </outputAssignments>
         <outputAssignments>
             <assignToReference>SegMan_Dest_ResponsableSeguridad</assignToReference>
             <field>CC_Valor2__c</field>
@@ -3732,6 +3735,17 @@ Contact Center Clients Grup CaixaBank</text>
         <isInput>true</isInput>
         <isOutput>true</isOutput>
         <objectType>Case</objectType>
+    </variables>
+    <variables>
+        <description>atencion.clientes@contactcenter.caixabank.com</description>
+        <name>Email_Atencion_Clientes_CC</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <value>
+            <stringValue>atencion.clientes@contactcenter.caixabank.com</stringValue>
+        </value>
     </variables>
     <variables>
         <name>Literal_Body</name>

@@ -319,7 +319,6 @@
         <nameSegment>EV_LinkExternoUnicoEncuestas</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <name>isChangedDecision4_myRule_3_Status</name>
         <label>isChangedDecision4_myRule_3_Status</label>

@@ -14,11 +14,17 @@
     row-gap: 7px;
     align-items: center;
     padding-bottom: 2px;
+    position: relative;
+    z-index: 5;
 }
 
 .THIS div.divBotones button {
     will-change: background-color;
     transition: background-color 100ms ease;
+}
+
+.THIS div.divBotones > button.slds-button + button.slds-button {
+    margin-left: 6px;
 }
 
 .THIS div.divBotones button.botonOtrasOperativas:hover,
@@ -92,6 +98,7 @@
 .THIS div.divBotones div.popoverOtrasOperativas button > lightning-primitive-icon {
     top: -1px;
     position: relative;
+    transform: scale(1.05);
 }
 
 .THIS div.divBotones div.popoverOtrasOperativas hr {
@@ -292,4 +299,72 @@
 .THIS.modalAsignarAuto footer div.slds-button_last > button {
     background-color: rgb(33, 97, 134);
     color: white;
+}
+
+.THIS button.csbdButtonMenu {
+    padding-left: 12px;
+    padding-right: 9px;
+    height: 32px;
+    z-index: -1;
+    transition: background-color 100ms linear, box-shadow 210ms cubic-bezier(0.8, 0, 0.57, 0.73) !important;
+}
+
+.THIS button.csbdButtonMenu .csbdButtonMenuIcono {
+    margin-right: 8px;
+}
+
+.THIS button.csbdButtonMenu .csbdButtonMenuIcono svg,
+.THIS button.csbdButtonMenu .csbdButtonMenuIconoDown svg {
+    position: relative;
+    top: 1px;
+    fill: currentColor;
+}
+
+.THIS button.csbdButtonMenu:disabled .csbdButtonMenuIconoDown svg {
+    color: var(--slds-g-color-neutral-base-80, rgb(201, 201, 201));
+}
+
+.THIS button.csbdButtonMenu .csbdButtonMenuIconoDown {
+    margin-left: 6px;
+    transform: scale(0.82);
+}
+
+.THIS button.csbdButtonMenu div.slds-dropdown-trigger {
+    height: 32px;
+}
+
+.THIS button.csbdButtonMenu div.slds-dropdown-trigger div.slds-dropdown {
+    transform: translateX(13px) translateY(-10px);
+    transition: transform 70ms ease-in, opacity 70ms cubic-bezier(0.46, 0.32, 0, 0.98);
+    opacity: 0;
+    display: block;
+    visibility: hidden;
+    will-change: transform, opacity;
+    z-index: -2;
+}
+
+.THIS button.csbdButtonMenu div.slds-dropdown-trigger.slds-is-open div.slds-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(13px) translateY(0);
+}
+
+.THIS button.csbdButtonMenu div.slds-dropdown-trigger div.slds-dropdown a {
+    color: var(--slds-g-color-neutral-base-10, var(--lwc-colorTextDefault,rgb(24, 24, 24)));
+}
+
+.THIS button.csbdButtonMenu div.slds-dropdown-trigger div.slds-dropdown a:hover {
+    color: var(--lwc-brandTextLink, rgba(33, 97, 134, 1));
+}
+
+.THIS button.csbdButtonMenu div.slds-dropdown-trigger div.slds-dropdown li.itemDisabled,
+.THIS button.csbdButtonMenu div.slds-dropdown-trigger div.slds-dropdown li.itemDisabled a,
+.THIS button.csbdButtonMenu div.slds-dropdown-trigger div.slds-dropdown li.itemDisabled a svg {
+    cursor: default;
+    color: var(--slds-g-color-neutral-base-80, rgb(201, 201, 201));
+    fill: currentColor;
+}
+
+.THIS button.csbdButtonMenu div.slds-dropdown-trigger div.slds-dropdown li.itemDisabled a {
+    pointer-events: none;
 }

@@ -236,7 +236,7 @@
             </processMetadataValues>
             <name>mensaje</name>
             <value>
-                <elementReference>formula_2_myRule_1_A1_5688336025</elementReference>
+                <elementReference>formula_2_myRule_1_A1_2909635132</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -339,7 +339,7 @@
             </processMetadataValues>
             <name>mensaje</name>
             <value>
-                <elementReference>formula_6_myRule_4_A1_9607488642</elementReference>
+                <elementReference>formula_6_myRule_4_A1_5745967145</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -448,7 +448,6 @@
         <nameSegment>CC_Agrupador</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <name>isChangedDecision14_myRule_13_CC_Numero_Casos_c</name>
         <label>isChangedDecision14_myRule_13_CC_Numero_Casos_c</label>
@@ -716,7 +715,7 @@
                 <leftValueReference>myVariable_current.CC_Numero_Casos__c</leftValueReference>
                 <operator>GreaterThanOrEqualTo</operator>
                 <rightValue>
-                    <elementReference>formula_15_myRule_13_5112567512</elementReference>
+                    <elementReference>formula_15_myRule_13_9526419672</elementReference>
                 </rightValue>
             </conditions>
             <conditions>
@@ -1236,7 +1235,7 @@
                 <stringValue>$CustomMetadata.CC_Parametros__mdt.CC_Actualizacion_Automatica_Volumen.Valor_Numerico_Entero__c </stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_15_myRule_13_5112567512</name>
+        <name>formula_15_myRule_13_9526419672</name>
         <dataType>Number</dataType>
         <expression>{!$CustomMetadata.CC_Parametros__mdt.CC_Actualizacion_Automatica_Volumen.Valor_Numerico_Entero__c}</expression>
         <scale>18</scale>
@@ -1248,7 +1247,7 @@
                 <stringValue>&apos;Se ha generado un nueva incidencia pública: &apos; &amp; [CC_Agrupador__c].Name  &amp; &apos; - &apos;  &amp;[CC_Agrupador__c].CC_Titulo__c</stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_2_myRule_1_A1_5688336025</name>
+        <name>formula_2_myRule_1_A1_2909635132</name>
         <dataType>String</dataType>
         <expression>&apos;Se ha generado un nueva incidencia pública: &apos; &amp; {!myVariable_current.Name}  &amp; &apos; - &apos;  &amp;{!myVariable_current.CC_Titulo__c}</expression>
     </formulas>
@@ -1259,7 +1258,7 @@
                 <stringValue>&apos;Se ha generado un nueva incidencia pública: &apos; &amp; [CC_Agrupador__c].Name  &amp; &apos; - &apos;  &amp;[CC_Agrupador__c].CC_Titulo__c</stringValue>
             </value>
         </processMetadataValues>
-        <name>formula_6_myRule_4_A1_9607488642</name>
+        <name>formula_6_myRule_4_A1_5745967145</name>
         <dataType>String</dataType>
         <expression>&apos;Se ha generado un nueva incidencia pública: &apos; &amp; {!myVariable_current.Name}  &amp; &apos; - &apos;  &amp;{!myVariable_current.CC_Titulo__c}</expression>
     </formulas>
@@ -1285,7 +1284,7 @@
         <dataType>Boolean</dataType>
         <expression>ISNEW() &amp;&amp; {!myVariable_current.RecordType.DeveloperName} &lt;&gt; &apos;CC_Comunicacion_Informativa&apos; &amp;&amp; {!myVariable_current.RecordType.DeveloperName} &lt;&gt; &apos;CC_Comunicacion_Informativa_de_Campana&apos;</expression>
     </formulas>
-    <interviewLabel>CC_Gestion_Agrupadores-17_InterviewLabel</interviewLabel>
+    <interviewLabel>CC_Gestion_Agrupadores-18_InterviewLabel</interviewLabel>
     <label>CC_Gestion_Agrupadores</label>
     <processMetadataValues>
         <name>ObjectType</name>
@@ -1397,7 +1396,7 @@
         <object>CC_Agrupador__c</object>
     </recordUpdates>
     <startElementReference>isChangedDecision5_myRule_4_CC_Publica_c</startElementReference>
-    <status>Active</status>
+    <status>Draft</status>
     <variables>
         <name>myVariable_current</name>
         <dataType>SObject</dataType>

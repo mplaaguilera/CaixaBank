@@ -65,7 +65,6 @@
         <nameSegment>CC_Correo_No_Identificado</nameSegment>
     </actionCalls>
     <apiVersion>51.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
         <processMetadataValues>
             <name>index</name>

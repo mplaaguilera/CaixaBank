@@ -1,0 +1,4 @@
+.github/
+.vscode/
+.sfdx/
+/force-app/main/default/classes/*.cls-meta.xml

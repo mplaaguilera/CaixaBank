@@ -17,7 +17,6 @@
         <nameSegment>CC_MCC_Automatize_Date</nameSegment>
     </actionCalls>
     <apiVersion>57.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>Set_Inactivos</name>
         <label>Set Inactivos</label>

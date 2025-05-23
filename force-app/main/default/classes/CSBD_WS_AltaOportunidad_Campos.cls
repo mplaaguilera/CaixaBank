@@ -39,6 +39,38 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				informarEmpresaFamiliaProducto(solicitud?.nombreProducto, campos);
 			}
 
+			when 'prestamoPJ' {
+				recordTypeDeveloperName = 'CSBD_Prestamo';
+
+				campos.put('CSBD_Now_Origen__c', solicitud.origen);
+				campos.put('CSBD_Now_NUMPERSO__c', formatearNumperso(solicitud.numperso));
+				campos.put('CSBD_Now_NIF__c', solicitud.nif1Tit);
+				campos.put('CSBD_Now_Nombre__c', solicitud.nombre1Tit);
+				campos.put('CSBD_Now_Apellido1__c', solicitud.apellidos1_1Tit);
+				campos.put('CSBD_Now_Apellido2__c', solicitud.apellidos2_1Tit);
+				campos.put('CSBD_Idioma_Solicitud__c', formatearIdioma(solicitud?.idioma, solicitud.canal));
+				campos.put('CSBD_Email_Solicitud__c', solicitud.email1Tit);
+				campos.put('CSBD_Telefono_Solicitud__c', solicitud.telefono1_1Tit);
+				campos.put('CSBD_Finalidad__c', solicitud.finalidad);
+				campos.put('CSBD_Now_Importe__c', convertToIntegerOrDouble(solicitud.importe));
+				campos.put('CSBD_Now_Plazo__c', convertToIntegerOrDouble(solicitud.plazo));
+				campos.put('CSBD_Canal__c', solicitud.canal);
+				//campos.put('???', solicitud.garantia);
+				//campos.put('???', solicitud.delimitador);
+				informarHorario(solicitud?.horario1Tit, campos);
+				informarEmpresaFamiliaProducto(solicitud?.nombreProducto, campos);
+
+				/*
+				"nombre2Tit": "",
+				"a	pellidos1_2Tit": "",
+				"apellidos2_2Tit": "",
+				"email2Tit": "",
+				"telefono1_2Tit": "",
+				"numperso2Tit": "",
+				"nif2Tit": "",
+				*/
+			}
+
 			//Hipoteca
 			when 'hipoteca' {
 				//Alta titulares
@@ -541,7 +573,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 		String valorBusqueda;
 
 		switch on solicitud.tipoSolicitud {
-			when 'prestamo' {
+			when 'prestamo', 'prestamoPJ' {
 				if (String.isNotBlank(solicitud?.numperso)) {
 					tipoBusqueda = 'NP'; //(NUMPERSO)
 					valorBusqueda = formatearNumperso(solicitud.numperso);
@@ -562,13 +594,13 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 			when 'cmn', 'cmb' {
 				List<String> condiciones = new List<String>();
 				if (String.isNotBlank(solicitud?.numperso)) {
-					condiciones.add(' CC_NumPerso__c = \'' + (solicitud?.buzonCajeros == true ? solicitud?.numperso : formatearNumperso(solicitud?.numperso))+ '\'');
+					condiciones.add(' AV_NumPerso__c = \'' + (solicitud?.buzonCajeros == true ? solicitud?.numperso : formatearNumperso(solicitud?.numperso))+ '\'');
 				}
-				
+
 				if (String.isNotBlank(solicitud?.nif)) {
 					condiciones.add(' CC_Numero_Documento__c = \'' + solicitud.nif + '\'');
 				}
-				
+
 				if (String.isNotBlank(solicitud?.telefono)) {
 					condiciones.add(' Phone = \'' + solicitud.telefono + '\' OR MobilePhone = \'' + solicitud.telefono + '\'');
 				}
@@ -632,22 +664,26 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 			if (!identificacionALF || cuentas.isEmpty()) {
 				//Identificación contra BD (también cuando identificación ALF sin resultados)
 				if (tipoIdentificacion.get('tipoBusqueda') == 'NP') {
-					contactos = [SELECT AccountId FROM Contact
+					contactos = [SELECT AccountId, Account.AV_IndicadoresClientes__c FROM Contact
 							WHERE (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_ClientePA')
-							AND CC_NumPerso__c = :tipoIdentificacion.get('valorBusqueda')];
+							AND AV_NumPerso__c = :tipoIdentificacion.get('valorBusqueda')];
 				} else if (tipoIdentificacion.get('tipoBusqueda') == 'DOC') {
-					contactos = [SELECT AccountId FROM Contact
+					contactos = [SELECT AccountId, Account.AV_IndicadoresClientes__c FROM Contact
 							WHERE (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_ClientePA')
 							AND CC_Numero_Documento__c = :tipoIdentificacion.get('valorBusqueda')];
 				} else{
-					contactos = Database.query('SELECT AccountId FROM Contact WHERE (RecordType.DeveloperName = \'CC_Cliente\' OR Account.RecordType.DeveloperName = \'CC_ClientePA\') AND (' 
-													+ tipoIdentificacion.get('valorBusqueda')  + ')', 
+					contactos = Database.query('SELECT AccountId, Account.AV_IndicadoresClientes__c FROM Contact WHERE (RecordType.DeveloperName = \'CC_Cliente\' OR Account.RecordType.DeveloperName = \'CC_ClientePA\') AND ('
+													+ tipoIdentificacion.get('valorBusqueda')  + ')',
 												AccessLevel.USER_MODE);
 				}
 
 				if (contactos.size() == 1) {
 					campos.put('AccountId', contactos[0].AccountId);
 					campos.put('CSBD_Contact__c', contactos[0].Id);
+
+					if(contactos[0].Account.AV_IndicadoresClientes__c != null) {
+						campos.put('AV_IndicadoresClientes__c', contactos[0].Account.AV_IndicadoresClientes__c);
+					}
 				}
 			}
 		}

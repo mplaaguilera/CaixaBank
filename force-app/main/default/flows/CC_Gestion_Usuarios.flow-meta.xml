@@ -184,7 +184,6 @@
         <nameSegment>OS_Cola_Backup</nameSegment>
     </actionCalls>
     <apiVersion>49.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>myWaitAssignment_myWait_myRule_3</name>
         <label>myWaitAssignment_myWait_myRule_3</label>

@@ -23,7 +23,6 @@
         </outputParameters>
     </actionCalls>
     <apiVersion>50.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <name>AV_AssignApexParameters</name>
         <label>Assign Apex Parameters</label>

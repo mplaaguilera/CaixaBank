@@ -76,11 +76,11 @@
                 </div>
 
                 <!--Botón "No se identifica"-->
-                <div class="slds-no-flex slds-is-relative slds-var-m-right_xxx-small" style="top: -1px;">
+                <div class="divNoSeIdentifica slds-no-flex slds-is-relative slds-var-m-right_xxx-small">
                     <aura:if isTrue="{!v.sObjectName != 'Opportunity'}">
                         <lightning:button label="No se identifica" onclick="{!c.handleActualizarIdentificacion}" disabled="{! v.identificacionPrevia || v.llamadaFinalizada}" />
                         <aura:set attribute="else">
-                            <lightning:button label="No se identifica" iconName="{!v.oportunidad.CSBD_No_Identificado__c ? 'utility:check' : ''}" variant="base" onclick="{!c.handleActualizarIdentificacionCliente}" disabled="{!v.oportunidad.CSBD_No_Identificado__c}"/>
+                            <lightning:button class="divNoSeIdentificaButton" label="No se identifica" iconName="{!v.oportunidad.CSBD_No_Identificado__c ? 'utility:successs' : ''}" variant="base" onclick="{!c.handleActualizarIdentificacionCliente}" />
                         </aura:set>
                     </aura:if>
 

@@ -88,12 +88,12 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 			Boolean cmnDerivacionPorCorreo = false;
 			Boolean cmnDerivacionComdataPorWS = false;
 
-			//US Facilitea: Verificar para hipotecas, cmn y cmb, sólo si el origen es faciliteacasa			
+			//US Facilitea: Verificar para hipotecas, cmn y cmb, sólo si el origen es faciliteacasa
 			List<String> tiposSolicitudChequear = CSBD_IdentificarOppsPHDSettingManager.getInstance().getSolicitudWSAltaOppList();
 			List<String> origenesChequear = CSBD_IdentificarOppsPHDSettingManager.getInstance().getOrigenList();
 			Boolean origenChequear = String.isNotBlank((String)campos.get('CSBD_Now_Origen__c')) && origenesChequear.contains((String)campos.get('CSBD_Now_Origen__c'));
 			if(tiposSolicitudChequear.contains(solicitud.tipoSolicitud) && origenChequear){
-				List<String> numDocumentos = new List<String>();	
+				List<String> numDocumentos = new List<String>();
 				if(String.isNotBlank(solicitud.nif)){
 					numDocumentos.add(solicitud.nif);
 				}
@@ -109,14 +109,14 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 					if(resultadoChequeo.containsKey('existLead') && (Boolean)resultadoChequeo.get('existLead') == true){
 						estadoInicial = 'Rechazada';
 						etapaVentasInicial = 'Rechazada';
-						resolucionInicial = 'Lead existente con origen: ' + (resultadoChequeo.get('origenLead') != null ? resultadoChequeo.get('origenLead') : 'N/I'); 
+						resolucionInicial = 'Lead existente con origen: ' + (resultadoChequeo.get('origenLead') != null ? resultadoChequeo.get('origenLead') : 'N/I');
 						rechazadoLeadExiste = true;
 						leadExistenteOpp = (String)resultadoChequeo.get('opportunityName');
-					}			
-				}			
+					}
+				}
 			}
 			//END US Facilitea
-		
+
 
 			//Solo se ejecuta si no se ha rechazado en la blacklist
 			if (!rechazadoBlacklist && !rechazadoLeadExiste) {
@@ -169,7 +169,7 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 			//Creación de la tarea de tipo "Solicitud recibida"
 			String cuerpoTarea = JSON.serializePretty(inputSolicitudOriginal, true);
 			CSBD_Activity.crearActividad(oportunidad.Id, 'Solicitud recibida', 'Completed', 'Solicitud recibida', cuerpoTarea.left(30000));
-			
+
 			if(rechazadoLeadExiste){
 				CSBD_Activity.crearActividad(oportunidad.Id, 'Rechazada Lead existente', 'Completed', 'Rechazada Lead existente', resolucionInicial + '\n\nOportunidad encontrada: ' + leadExistenteOpp);
 			}
@@ -314,7 +314,7 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 				AND CC_Activa__c = true], 'Name'
 		);
 
-		List<Opportunity> oportunidades = [SELECT Name, CSBD_Empresa_Proveedora__c, CSBD_Idioma_Solicitud__c, RecordtypeId, CSBD_Turno_Contacto__c, CSBD_Familia_Producto__c, CSBD_Skill__c, 
+		List<Opportunity> oportunidades = [SELECT Name, CSBD_Empresa_Proveedora__c, CSBD_Idioma_Solicitud__c, RecordtypeId, CSBD_Turno_Contacto__c, CSBD_Familia_Producto__c, CSBD_Skill__c,
 											CSBD_Horario_Contacto__c, CSBD_OC_Canal_Entrada__c, CSBD_OC_Prioridad__c, RecordType.Name, CSBD_Producto__c
 											FROM Opportunity WHERE Id = :idOportunidades AND RecordType.Name = :nombreRecordTypesOmnichannel AND IsClosed = FALSE];
 		if (!oportunidades.isEmpty()) {
@@ -379,7 +379,7 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 
 	private static List<String> tiposSolicitudAdmitidos() {
 		return new List<String>{
-			'prestamo', 'hipoteca', 'hipotecaPlataforma', 'renting', 'tpv', 'compraEstrella', 'cmn',
+			'prestamo', 'prestamoPJ', 'hipoteca', 'hipotecaPlataforma', 'renting', 'tpv', 'compraEstrella', 'cmn',
 			'cmb', 'desistimiento', 'desistimiento PAI', 'proAutomatica', 'soporteDigital', 'mac', 'macCentralita', 'cmbHipotecas'
 		};
 	}

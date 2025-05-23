@@ -201,6 +201,7 @@ global with sharing class CSBD_WS_AltaOportunidad_Input {
         global String deeplink_origin {get;set;}
         global String asunto {get;set;}
         global String mensaje {get;set;}
+        global String garantia {get;set;}
 
         //Nuevos campos para solicitudes "hipotecaPlataforma" (hipotecas de plataformas digitales)
         global String plataforma {get;set;}
@@ -265,7 +266,7 @@ global with sharing class CSBD_WS_AltaOportunidad_Input {
         global String prod_subcategory2_wivai {get;set;}
         global String situacionVivienda {get;set;}
 
-        //Nuevos campos para solicitudes "cmbHipotecas" 
+        //Nuevos campos para solicitudes "cmbHipotecas"
         global String capitalSubrogacion {get;set;}
         global String startYearSubrogacion {get;set;}
         global String finishYearSubrogacion {get;set;}
@@ -287,8 +288,8 @@ global with sharing class CSBD_WS_AltaOportunidad_Input {
         global String estadoCivil1Tit {get;set;}
         global String situacionViviendaActual1Tit {get;set;}
         global String situacionViviendaActual2Tit {get;set;}
-        
-         
+
+
 
         //CDP
         global String journeyActionId {get;set;}

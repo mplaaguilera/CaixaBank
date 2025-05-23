@@ -47,6 +47,7 @@
 		]
 	},
 	"dependencies": {
+		"-": "^0.0.1",
 		"clang-format": "^1.8.0",
 		"eslint-plugin-compat": "^6.0.1",
 		"eslint-plugin-marc": "file:../eslint-plugin-marc",
