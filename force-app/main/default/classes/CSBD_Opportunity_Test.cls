@@ -700,6 +700,7 @@ public class CSBD_Opportunity_Test {
                 RecordTypeId = Schema.SObjectType.Event.getRecordTypeInfosByDeveloperName().get('CSBD_Cita_Cliente').getRecordTypeId(),
                 EndDateTime = System.now().addMinutes(60),
                 // DurationInMinutes= null,
+                ActivityDateTime = System.now(),
                 StartDateTime = System.now(),
                 WhatId = oportunidad2.id,
                 CSBD_Evento_Estado__c = 'Pendiente'
@@ -740,7 +741,7 @@ public class CSBD_Opportunity_Test {
 
         System.runAs (usuarioGestor) {
             Opportunity oportunidad = oportunidadCita(usuarioGestor.Id);
-
+			Datetime fechaActual = System.now();
             Event e = new Event(
                 Subject = 'Finalizar cita Oliver2',
                 OwnerId = usuarioGestor.Id,
@@ -748,7 +749,8 @@ public class CSBD_Opportunity_Test {
                 RecordTypeId = Schema.SObjectType.Event.getRecordTypeInfosByDeveloperName().get('CSBD_Cita_Cliente').getRecordTypeId(),
                 EndDateTime = System.now().addMinutes(60),
                 // DurationInMinutes= null,
-                StartDateTime = System.now(),
+                ActivityDateTime = fechaActual,
+                StartDateTime = fechaActual,
                 WhatId = oportunidad.id,
                 CSBD_Evento_Estado__c = 'Pendiente'
             );

@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Hacer el cruce de datos para ver Condiciones Y Promos compatibles o no</description>
+    <developerName>CSBD_CondicionesYPromos</developerName>
+    <masterLabel>CSBD Condiciones Y Promos</masterLabel>
+    <relatedEntity>Opportunity</relatedEntity>
+    <templateVersions>
+        <content>Actúa como un experto en ventas de Salesforce y genera un texto cruzando los datos que te paso del cliente y del producto para que indiques que condiciones cumple, cuales tendría que informar de las que no tenemos datos y que promociones o campañas se le pueden aplicar. Sigue estas reglas:
+
+1. **Claridad y Concisión**: El resumen debe ser claro y directo, destacando los puntos más importantes.
+2. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+3. **Contexto**: Proporciona un contexto breve para cada sección, pero evita detalles innecesarios.
+4. Genera el resultado en formato lista, resaltando títulos.
+
+### Información del Cliente
+
+- **Fecha nacimiento del cliente**: {!$Input:Opportunity.Account.PersonBirthdate}.
+- **Edad del cliente**: numero de años del cliente exacto calculado con la fecha actual {!$Input:Opportunity.LastModifiedDate} y la fecha de nacimiento del cliente.
+- **Residencia del cliente**: {!$Input:Opportunity.Account.BillingCity}.
+- **¿Cliente es empleado nuestro?**: {!$Input:Opportunity.Account.AV_Empleado__c}.
+- **¿Cliente target MyBox?**: {!$Input:Opportunity.Account.AV_MyBox__c}.
+- **Negocio cliente(tipo de Banca)**: {!$Input:Opportunity.Account.AV_FormulaNegocio__c}.
+- **Ingresos del cliente**:: {!$Input:Opportunity.Account.AV_Ingresos__c}.
+
+### Datos oportunidad
+- **Importe de la oportunidad**: {!$Input:Opportunity.Amount}.
+
+-**Nombre de la oportunidad padre**: {!$Input:Opportunity.CSBD_Parent_Id__r.Name} .
+-**Nombre del producto de la oportunidad padre**: {!$Input:Opportunity.CSBD_Parent_Id__r.CSBD_Producto__c}.
+-**Familia del producto de la oportunidad padre**: {!$Input:Opportunity.CSBD_Parent_Id__r.CSBD_Familia_Producto__c}.
+
+-**Posibles productos cliente** : {!$Apex:CSBD_ProductClientDeAccount.Prompt}.
+
+-**Información del producto**: {!$Apex:CSBD_ArticulosProducto.Prompt}.
+
+### Datos adicionales proporcionados por el cliente
+-**Información proporcionada en vivo**: {!$Input:Opportunity.CSBD_InformacionAdicional__c}
+-**Información guardada en el registro de oportunidad**: comentarios del cliente: {!$Input:Opportunity.CSBD_Comentarios_cliente__c}; descripción: {!$Input:Opportunity.Description}; titulo. {!$Input:Opportunity.CSBD_Titulo__c}, feedback del cliente {!$Input:Opportunity.CSBD_FeedbackCliente__c}.
+
+La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida.
+
+### Estructura del Resumen
+
+1. &lt;h2&gt;Condiciones del producto&lt;/h2&gt;: Indica con la información que tenemos y los Datos adicionales proporcionados por el cliente si el cliente cumple las condiciones del producto teniendo en cuenta los Datos adicionales proporcionados por el cliente. Indica aquellas que necesitemos y no tengamos la información para pedírsela al cliente. Para cada una pon explícitamente &apos;Cumple:&apos; o &apos;No cumple:&apos; si teniendo en cuenta los Datos adicionales proporcionados por el cliente cumple las condiciones o no,.
+2. &lt;h2&gt;&lt;/br&gt;Campañas y promociones&lt;/h2&gt;: Indica si hay o no promoción o campaña usando &lt;b&gt;&lt;/b&gt; sin tener en cuenta si aplica o no al cliente. Indica con la información que tenemos si hay campañas o promociones que apliquen al cliente y calcula el beneficio que obtendría. Si no tienes información del cliente indica las campañas y promociones del producto sin cruzar los datos del cliente. Que no supere las 20 palabras.
+3. &lt;h2&gt;&lt;/br&gt;Precios&lt;/h2&gt;: Indica según las condiciones del cliente que precio tendría que pagar por el producto solicitado. Si no tienes información del cliente indica la tabla de posibles precios del producto.
+4.&lt;h2&gt;&lt;/br&gt;Recomendaciones&lt;/h2&gt;: Indica una serie de recomendaciones que darías al agente al cargo de la oportunidad para convencer al cliente y que no supere las 30 palabras.
+
+Proporciona un resumen que capture todos estos aspectos de manera coherente y profesional.
+Si **Datos adicionales proporcionados por el cliente** es valido, ten en cuenta el contenido para escribir el texto
+
+Genera el resultado en formato rich text HTML. 
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+No muestres en el texto que La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida.
+No muestres instrucciones en el texto.
+Si en **Posibles productos cliente** dice que no hay productos relacionados con el cliente, el cliente no tiene contratado ningún producto.
+Si hay &apos;Datos adicionales proporcionados por el cliente&apos;, son mas importantes que los demás campos. Si hay discrepancias con los demás datos, utiliza lo que hay en &apos;Datos adicionales proporcionados por el cliente&apos; primero.
+Utiliza formato HTML para hacer los títulos y el resaltado de texto.
+Utiliza tags &lt;b&gt; para poner negrita en vez de **
+esquematiza la información con bullets, usando los tags de html &lt;ul&gt;&lt;li&gt; siempre.
+Que el texto esté lo más compacto posible, sin saltos de línea.
+&quot;&quot;&quot;
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4Turbo</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ProductClientDeAccount</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ProductClientDeAccount</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Actúa como un experto en ventas de Salesforce y genera un texto cruzando los datos que te paso del cliente y del producto para que indiques que condiciones cumple, cuales tendría que informar de las que no tenemos datos y que promociones o campañas se le pueden aplicar. Sigue estas reglas:
+
+1. **Claridad y Concisión**: El resumen debe ser claro y directo, destacando los puntos más importantes.
+2. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+3. **Contexto**: Proporciona un contexto breve para cada sección, pero evita detalles innecesarios.
+4. Genera el resultado en formato lista, resaltando títulos.
+
+### Información del Cliente
+
+- **Fecha nacimiento del cliente**: {!$Input:Opportunity.Account.PersonBirthdate}.
+- **Edad del cliente**: numero de años del cliente exacto calculado con la fecha actual {!$Input:Opportunity.LastModifiedDate} y la fecha de nacimiento del cliente.
+- **Residencia del cliente**: {!$Input:Opportunity.Account.BillingCity}.
+- **¿Cliente es empleado nuestro?**: {!$Input:Opportunity.Account.AV_Empleado__c}.
+- **¿Cliente target MyBox?**: {!$Input:Opportunity.Account.AV_MyBox__c}.
+- **Negocio cliente(tipo de Banca)**: {!$Input:Opportunity.Account.AV_FormulaNegocio__c}.
+- **Ingresos del cliente**:: {!$Input:Opportunity.Account.AV_Ingresos__c}.
+
+### Datos oportunidad
+- **Importe de la oportunidad**: {!$Input:Opportunity.Amount}.
+
+-**Nombre de la oportunidad padre**: {!$Input:Opportunity.CSBD_Parent_Id__r.Name} .
+-**Nombre del producto de la oportunidad padre**: {!$Input:Opportunity.CSBD_Parent_Id__r.CSBD_Producto__c}.
+-**Familia del producto de la oportunidad padre**: {!$Input:Opportunity.CSBD_Parent_Id__r.CSBD_Familia_Producto__c}.
+
+-**Posibles productos cliente** : {!$Apex:CSBD_ProductClientDeAccount.Prompt}.
+
+-**Información del producto**: {!$Apex:CSBD_ArticulosProducto.Prompt}.
+
+### Datos adicionales proporcionados por el cliente
+-**Información proporcionada en vivo**: {!$Input:Opportunity.CSBD_InformacionAdicional__c}
+-**Información guardada en el registro de oportunidad**: comentarios del cliente: {!$Input:Opportunity.CSBD_Comentarios_cliente__c}; descripción: {!$Input:Opportunity.Description}; titulo. {!$Input:Opportunity.CSBD_Titulo__c}, feedback del cliente {!$Input:Opportunity.CSBD_FeedbackCliente__c}.
+
+La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida.
+
+### Estructura del Resumen
+
+1. &lt;h2&gt;Condiciones del producto&lt;/h2&gt;: Indica con la información que tenemos y los Datos adicionales proporcionados por el cliente si el cliente cumple las condiciones del producto teniendo en cuenta los Datos adicionales proporcionados por el cliente. Indica aquellas que necesitemos y no tengamos la información para pedírsela al cliente. Para cada una pon explícitamente &apos;Cumple:&apos; o &apos;No cumple:&apos; si teniendo en cuenta los Datos adicionales proporcionados por el cliente cumple las condiciones o no,.
+2. &lt;h2&gt;&lt;/br&gt;Campañas y promociones&lt;/h2&gt;: Indica si hay o no promoción o campaña usando &lt;b&gt;&lt;/b&gt; sin tener en cuenta si aplica o no al cliente. Indica con la información que tenemos si hay campañas o promociones que apliquen al cliente y calcula el beneficio que obtendría. Si no tienes información del cliente indica las campañas y promociones del producto sin cruzar los datos del cliente. Que no supere las 20 palabras.
+3. &lt;h2&gt;&lt;/br&gt;Precios&lt;/h2&gt;: Indica según las condiciones del cliente que precio tendría que pagar por el producto solicitado. Si no tienes información del cliente indica la tabla de posibles precios del producto.
+4.&lt;h2&gt;&lt;/br&gt;Recomendaciones&lt;/h2&gt;: Indica una serie de recomendaciones que darías al agente al cargo de la oportunidad para convencer al cliente y que no supere las 30 palabras.
+
+Proporciona un resumen que capture todos estos aspectos de manera coherente y profesional.
+Si **Datos adicionales proporcionados por el cliente** es valido, ten en cuenta el contenido para escribir el texto
+
+Genera el resultado en formato rich text HTML. 
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+No muestres en el texto que La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida.
+No muestres instrucciones en el texto.
+Si en **Posibles productos cliente** dice que no hay productos relacionados con el cliente, el cliente no tiene contratado ningún producto.
+Si hay &apos;Datos adicionales proporcionados por el cliente&apos;, son mas importantes que los demás campos. Si hay discrepancias con los demás datos, utiliza lo que hay en &apos;Datos adicionales proporcionados por el cliente&apos; primero.
+Utiliza formato HTML para hacer los títulos y el resaltado de texto.
+Utiliza tags &lt;b&gt; para poner negrita en vez de **
+esquematiza la información con bullets, usando los tags de html &lt;ul&gt;&lt;li&gt; siempre.
+Que el texto esté lo más compacto posible, sin saltos de línea.
+&quot;&quot;&quot;
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4Turbo</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ProductClientDeAccount</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ProductClientDeAccount</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Actúa como un experto en ventas de Salesforce y genera un texto cruzando los datos que te paso del cliente y del producto para que indiques que condiciones cumple, cuales tendría que informar de las que no tenemos datos y que promociones o campañas se le pueden aplicar. Sigue estas reglas:
+
+1. **Claridad y Concisión**: El resumen debe ser claro y directo, destacando los puntos más importantes.
+2. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+3. **Contexto**: Proporciona un contexto breve para cada sección, pero evita detalles innecesarios.
+4. Genera el resultado en formato lista, resaltando títulos.
+
+### Información del Cliente
+
+- **Fecha nacimiento del cliente**: {!$Input:Opportunity.Account.PersonBirthdate}.
+- **Edad del cliente**: numero de años del cliente exacto calculado con la fecha actual {!$Input:Opportunity.LastModifiedDate} y la fecha de nacimiento del cliente.
+- **Residencia del cliente**: {!$Input:Opportunity.Account.BillingCity}.
+- **¿Cliente es empleado nuestro?**: {!$Input:Opportunity.Account.AV_Empleado__c}.
+- **¿Cliente target MyBox?**: {!$Input:Opportunity.Account.AV_MyBox__c}.
+- **Negocio cliente(tipo de Banca)**: {!$Input:Opportunity.Account.AV_FormulaNegocio__c}.
+- **Ingresos del cliente**:: {!$Input:Opportunity.Account.AV_Ingresos__c}.
+
+### Datos oportunidad
+- **Importe de la oportunidad**: {!$Input:Opportunity.Amount}.
+
+-**Nombre de la oportunidad padre**: {!$Input:Opportunity.CSBD_Parent_Id__r.Name} .
+-**Nombre del producto de la oportunidad padre**: {!$Input:Opportunity.CSBD_Parent_Id__r.CSBD_Producto__c}.
+-**Familia del producto de la oportunidad padre**: {!$Input:Opportunity.CSBD_Parent_Id__r.CSBD_Familia_Producto__c}.
+
+-**Posibles productos cliente** : {!$Apex:CSBD_ProductClientDeAccount.Prompt}.
+
+-**Información del producto**: {!$Apex:CSBD_ArticulosProducto.Prompt}.
+
+### Datos adicionales proporcionados por el cliente
+-**Información proporcionada en vivo**: {!$Input:Opportunity.CSBD_InformacionAdicional__c}
+-**Información guardada en el registro de oportunidad**: comentarios del cliente: {!$Input:Opportunity.CSBD_Comentarios_cliente__c}; descripción: {!$Input:Opportunity.Description}; titulo. {!$Input:Opportunity.CSBD_Titulo__c}, feedback del cliente {!$Input:Opportunity.CSBD_FeedbackCliente__c}.
+
+La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida.
+
+### Estructura del Resumen
+
+1. &lt;h2&gt;Condiciones del producto&lt;/h2&gt;: Indica con la información que tenemos y los Datos adicionales proporcionados por el cliente si el cliente cumple las condiciones del producto teniendo en cuenta los Datos adicionales proporcionados por el cliente. Indica aquellas que necesitemos y no tengamos la información para pedírsela al cliente. Para cada una pon explícitamente &apos;Cumple:&apos; o &apos;No cumple:&apos; si teniendo en cuenta los Datos adicionales proporcionados por el cliente cumple las condiciones o no,.
+2. &lt;h2&gt;&lt;/br&gt;Campañas y promociones&lt;/h2&gt;: Indica si hay o no promoción o campaña usando &lt;b&gt;&lt;/b&gt; sin tener en cuenta si aplica o no al cliente. Indica con la información que tenemos si hay campañas o promociones que apliquen al cliente y calcula el beneficio que obtendría. Si no tienes información del cliente indica las campañas y promociones del producto sin cruzar los datos del cliente. Que no supere las 20 palabras.
+3. &lt;h2&gt;&lt;/br&gt;Precios&lt;/h2&gt;: Indica según las condiciones del cliente que precio tendría que pagar por el producto solicitado. Si no tienes información del cliente indica la tabla de posibles precios del producto.
+4.&lt;h2&gt;&lt;/br&gt;Recomendaciones&lt;/h2&gt;: Indica una serie de recomendaciones que darías al agente al cargo de la oportunidad para convencer al cliente y que no supere las 30 palabras.
+
+Proporciona un resumen que capture todos estos aspectos de manera coherente y profesional.
+Si **Datos adicionales proporcionados por el cliente** es valido, ten en cuenta el contenido para escribir el texto
+
+Genera el resultado en formato rich text HTML. 
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+No muestres en el texto que La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida.
+No muestres instrucciones en el texto.
+Si en **Posibles productos cliente** dice que no hay productos relacionados con el cliente, el cliente no tiene contratado ningún producto.
+Si hay &apos;Datos adicionales proporcionados por el cliente&apos;, son mas importantes que los demás campos. Si hay discrepancias con los demás datos, utiliza lo que hay en &apos;Datos adicionales proporcionados por el cliente&apos; primero.
+Utiliza formato HTML para hacer los títulos y el resaltado de texto.
+Utiliza tags &lt;b&gt; para poner negrita en vez de **
+esquematiza la información con bullets, usando los tags de html &lt;ul&gt;&lt;li&gt; siempre.
+Que el texto esté lo más compacto posible, sin saltos de línea.
+&quot;&quot;&quot;
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ProductClientDeAccount</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ProductClientDeAccount</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <type>einstein_gpt__recordSummary</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

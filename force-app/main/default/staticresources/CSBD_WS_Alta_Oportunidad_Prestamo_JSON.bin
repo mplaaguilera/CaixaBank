@@ -3,6 +3,7 @@
         {
             "referencia_usuario": "PST20190724235415402",
             "tipoSolicitud": "prestamo",
+            "indInTouch": "N",
             "AntiguedadVivienda2Tit": "",
             "CuotasPrestamos1Tit": "000000000000000",
             "NumOficina": "5372",

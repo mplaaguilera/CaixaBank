@@ -113,4 +113,25 @@ public with sharing class CSBD_Utils {
         }
         return sumaListas;
 	}
+
+    public static String normalizarNumeroTelefono(String numeroTelefono) {
+        return numeroTelefono.replace('+34', '').replaceAll('\\s+', '');
+    }
+
+    public static String hexToDec(String hex) {
+        if (String.isBlank(hex)) {
+            return null;
+        }
+
+        hex = hex.trim().toUpperCase();
+        Integer dec = 0;
+        for (Integer i = 0; i < hex.length(); i++) {
+            Integer valor = '0123456789ABCDEF'.indexOf(hex.substring(i, i + 1));
+            if (valor == -1) {
+                throw new IllegalArgumentException('El valor no es un número hexadecimal válido');
+            }
+            dec = dec * 16 + valor;
+        }
+        return String.valueOf(dec);
+    }
 }

@@ -29,6 +29,8 @@ import OPP_NOW_ORIGEN_PAGINA from '@salesforce/schema/Opportunity.CSBD_Now_Orige
 import OPP_NOW_ORIGEN_TIPO_CAMPAÑA from '@salesforce/schema/Opportunity.CSBD_Now_Origen_Tipo_Campanya__c';
 import OPP_NOW_ORIGEN_MEDIO from '@salesforce/schema/Opportunity.CSBD_Now_Origen_Medio__c';
 import OPP_NOW_ORIGEN_NOMBRE_CAMPAÑA from '@salesforce/schema/Opportunity.CSBD_Now_Origen_Nombre_Campanya__c';
+import OPP_DELIMITADOR from '@salesforce/schema/Opportunity.CSBD_Delimitador__c';
+import OPP_GARANTIA from '@salesforce/schema/Opportunity.CSBD_Garantia__c';
 
 const OPP_FIELDS = [
 	OPP_RT_NAME, OPP_OWNER_ID,
@@ -36,14 +38,17 @@ const OPP_FIELDS = [
 	OPP_FINALIDAD, OPP_DETALLE_PROD, OPP_VEHICULO, OPP_CANAL,
 	OPP_NOW_ORIGEN, OPP_NOW_ORIGEN_FUENTE, OPP_NOW_ORIGEN_ENTORNO,
 	OPP_NOW_ORIGEN_PAGINA, OPP_NOW_ORIGEN_TIPO_CAMPAÑA,
-	OPP_NOW_ORIGEN_MEDIO, OPP_NOW_ORIGEN_NOMBRE_CAMPAÑA
+	OPP_NOW_ORIGEN_MEDIO, OPP_NOW_ORIGEN_NOMBRE_CAMPAÑA,
+	OPP_DELIMITADOR, OPP_GARANTIA
 ];
 
 export default class csbdFamiliaProductoPicklist extends LightningElement {
 	@api recordId;
 
 	subscription;
+
 	boundHandleClick;
+
 	boundHandleWindowClick;
 
 	oportunidad;
@@ -80,6 +85,10 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 	detalleProducto;
 
+	delimitador;
+
+	garantia;
+
 	canal;
 
 	origen;
@@ -94,7 +103,13 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 		nombreCampaña: null
 	};
 
-	mostrar = {motivoMac: false, finalidad: false, detalleProducto: false, vehiculo: false};
+	mostrar = {
+		motivoMac: false,
+		finalidad: false,
+		detalleProducto: false,
+		vehiculo: false,
+		camposPrestamoPersonaJuridica: false
+	};
 
 	// funcionEventListener = this.windowOnclick;
 
@@ -162,6 +177,12 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 			this.mostrar.vehiculo = familiaProducto === 'Renting' || producto === 'Renting';
 			if (this.mostrar.vehiculo) {
 				this.vehiculo = getFieldValue(data, OPP_VEHICULO);
+			}
+
+			this.mostrar.camposPrestamoPersonaJuridica = getFieldValue(data, OPP_RT_NAME) === 'Consumo';
+			if (this.mostrar.camposPrestamoPersonaJuridica) {
+				this.delimitador = getFieldValue(data, OPP_DELIMITADOR);
+				this.garantia = getFieldValue(data, OPP_GARANTIA);
 			}
 
 			this.canal = getFieldValue(data, OPP_CANAL);

@@ -1,0 +1,16 @@
+{
+    "solicitudes": [
+        {
+            "nombreProducto" : "macCentralita",
+            "tipoSolicitud" : "macCentralita",
+			"idioma" : "Castellano",
+			"origen" : "Asistencia Comercial Centralita",
+			"nombre" : "nombre",
+			"apellidos" : "apellido",			
+			"canal" : "Llamada entrante",
+			"telefono" : "665784524"
+        }
+    ]
+}
+
+

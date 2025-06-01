@@ -7,7 +7,7 @@
 
     <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.onDerivarInteraccionChannel}" /> <!--scope="APPLICATION"-->
 
-    <ltng:require styles="{!$Resource.CC_CaseRecordPageNoScroll}" />
+    <!-- <ltng:require styles="{!$Resource.CC_CaseRecordPageNoScroll}" /> -->
 
     <div class="slds-hidden" style="height: 0px;">
         <c:CC_Case_Option_Buttons recordId="{!v.recordId}"/>

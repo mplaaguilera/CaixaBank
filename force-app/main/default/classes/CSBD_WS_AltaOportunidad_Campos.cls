@@ -11,7 +11,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 
 				campos.put('CSBD_Now_Num_Oficina__c', convertToIntegerOrDouble(solicitud.numOficina));
 				campos.put('CSBD_Now_Origen__c', solicitud.origen);
-				campos.put('CSBD_Now_NUMPERSO__c', formatearNumperso(solicitud.numperso));
+				campos.put('CSBD_Now_NUMPERSO__c', hexToDec(solicitud.numperso));
 				campos.put('CSBD_Now_NIF__c', solicitud.nif1Tit);
 				campos.put('CSBD_Now_DirVivienda__c', solicitud.dirVivienda);
 				campos.put('CSBD_Now_ValorVivienda__c', dividirPorCien(solicitud?.valorVivienda));
@@ -42,8 +42,9 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 			when 'prestamoPJ' {
 				recordTypeDeveloperName = 'CSBD_Prestamo';
 
+				campos.put('CSBD_RecordType_DeveloperName__c', 'CSBD_Prestamo');
 				campos.put('CSBD_Now_Origen__c', solicitud.origen);
-				campos.put('CSBD_Now_NUMPERSO__c', formatearNumperso(solicitud.numperso));
+				campos.put('CSBD_Now_NUMPERSO__c', CSBD_Utils.hexToDec(solicitud.numperso));
 				campos.put('CSBD_Now_NIF__c', solicitud.nif1Tit);
 				campos.put('CSBD_Now_Nombre__c', solicitud.nombre1Tit);
 				campos.put('CSBD_Now_Apellido1__c', solicitud.apellidos1_1Tit);
@@ -55,8 +56,8 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Now_Importe__c', convertToIntegerOrDouble(solicitud.importe));
 				campos.put('CSBD_Now_Plazo__c', convertToIntegerOrDouble(solicitud.plazo));
 				campos.put('CSBD_Canal__c', solicitud.canal);
-				//campos.put('???', solicitud.garantia);
-				//campos.put('???', solicitud.delimitador);
+				campos.put('CSBD_Garantia__c', solicitud.garantia);
+				campos.put('CSBD_Delimitador__c', solicitud.delimitador);
 				informarHorario(solicitud?.horario1Tit, campos);
 				informarEmpresaFamiliaProducto(solicitud?.nombreProducto, campos);
 
@@ -137,7 +138,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Finalidad__c', solicitud.finalidad);
 				campos.put('CSBD_Now_EmailGestor__c', solicitud.emailGestor);
 				campos.put('CSBD_Now_Origen__c', solicitud.origen);
-				campos.put('CSBD_Now_NUMPERSO__c', formatearNumperso(solicitud.numperso));
+				campos.put('CSBD_Now_NUMPERSO__c', hexToDec(solicitud.numperso));
 				campos.put('CSBD_Now_DirVivienda__c', solicitud.dirVivienda);
 				campos.put('CSBD_Now_ValorVivienda__c', dividirPorCien(solicitud?.valorVivienda));
 				campos.put('CSBD_Email_Solicitud__c', solicitud.email1Tit);
@@ -233,7 +234,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_ContactoTitular2__c', titulares.size() > 1 ? titulares[1].Id : null);
 				campos.put('CSBD_NumPeticion__c', solicitud.numSolicitud);
 				campos.put('CSBD_Now_Origen__c', solicitud.plataforma);
-				campos.put('CSBD_Now_NUMPERSO__c', formatearNumperso(solicitud.numperso));
+				campos.put('CSBD_Now_NUMPERSO__c', hexToDec(solicitud.numperso));
 				campos.put('CSBD_TipoOperacion2__c', solicitud.tipoOperacion);
 				campos.put('CSBD_Idioma_Solicitud__c', formatearIdioma(solicitud?.idioma, solicitud.canal));
 				campos.put('CSBD_Now_Plazo__c', convertToIntegerOrDouble(solicitud.plazo));
@@ -316,7 +317,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Now_Apellido2__c', solicitud.apellido2);
 				campos.put('CSBD_Email_Solicitud__c', solicitud.emailCliente);
 				campos.put('CSBD_Now_Num_Oficina__c', convertToIntegerOrDouble(solicitud.oficina));
-				campos.put('CSBD_Now_NUMPERSO__c', formatearNumperso(solicitud.numperso));
+				campos.put('CSBD_Now_NUMPERSO__c', hexToDec(solicitud.numperso));
 				campos.put('CSBD_Now_EmailGestor__c', solicitud.emailGestor);
 				campos.put('CSBD_Now_Nombre__c', solicitud.nombre);
 				campos.put('CSBD_Now_Hora__c', convertToTime(solicitud.hora));
@@ -360,7 +361,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Now_Apellido1__c', solicitud.apellidos);
 				campos.put('CSBD_Now_NIF__c', solicitud.nif);
 				campos.put('CSBD_Canal__c', solicitud.canal);
-				campos.put('CSBD_Now_NUMPERSO__c', solicitud?.buzonCajeros == true ? solicitud.numperso : formatearNumperso(solicitud.numperso));
+				campos.put('CSBD_Now_NUMPERSO__c', solicitud?.buzonCajeros == true ? solicitud.numperso : hexToDec(solicitud.numperso));
 				campos.put('CSBD_Now_Apellido2__c', solicitud.apellidos_2);
 				campos.put('CSBD_Now_Campanya__c', solicitud.idCampanya);
 				campos.put('CSBD_Now_Num_Oficina__c', convertToIntegerOrDouble(solicitud.numOficina));
@@ -392,7 +393,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Now_Apellido1__c', solicitud.apellidos);
 				campos.put('CSBD_Now_NIF__c', solicitud.nif);
 				campos.put('CSBD_Canal__c', solicitud.canal);
-				campos.put('CSBD_Now_NUMPERSO__c', formatearNumperso(solicitud.numperso));
+				campos.put('CSBD_Now_NUMPERSO__c', hexToDec(solicitud.numperso));
 				campos.put('CSBD_Now_Apellido2__c', solicitud.apellidos_2);
 				campos.put('CSBD_Now_Boton__c', solicitud.boton);
 				campos.put('CSBD_Idioma_Solicitud__c', formatearIdioma(solicitud?.idioma, solicitud.canal));
@@ -453,7 +454,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Now_Nombre__c', solicitud.nombre);
 				campos.put('CSBD_Telefono_Solicitud__c', solicitud.telefono);
 				campos.put('CSBD_Pantalla_Abandono__c', solicitud.proceso);
-				campos.put('CSBD_Now_NUMPERSO__c', formatearNumperso(solicitud.numperso));
+				campos.put('CSBD_Now_NUMPERSO__c', hexToDec(solicitud.numperso));
 				campos.put('CSBD_Now_Apellido1__c', solicitud.apellido1);
 				campos.put('CSBD_Now_NIF__c', solicitud.nif);
 				campos.put('CSBD_Canal__c', solicitud.canal);
@@ -492,7 +493,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				menor.Birthdate = convertToDate(solicitud.fechaNacimiento1Tit);
 				menor.Email = solicitud.email1Tit;
 				menor.Phone = solicitud.telefono1_1Tit;
-				menor.CC_NumPersoAsoc__c = formatearNumperso(solicitud.numperso);
+				menor.CC_NumPersoAsoc__c = hexToDec(solicitud.numperso);
 				insert menor;
 
 				recordTypeDeveloperName = 'CSBD_Soporte_Digital';
@@ -504,7 +505,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('CSBD_Telefono_Solicitud__c', solicitud.telefono1_2Tit);
 				campos.put('CSBD_Email_Solicitud__c', solicitud.email2Tit);
 				campos.put('CSBD_Now_NIF__c', solicitud.nif2Tit);
-				campos.put('CSBD_Now_NUMPERSO__c', formatearNumperso(solicitud.identificador));
+				campos.put('CSBD_Now_NUMPERSO__c', hexToDec(solicitud.identificador));
 				if(CBK_UtilsDate.todaySYS().addYears(-12) < menor.Birthdate){
 					campos.put('CSBD_Now_Origen__c', 'Contratación pack imaginKids');
 				}else{
@@ -550,8 +551,15 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				informarHorarioCMB(solicitud?.horaIni, solicitud?.minIni, solicitud?.horaFin, solicitud?.minFin, campos);
 			}
 		}
+
 		informarDescripcion(solicitud, campos);
-		identificarCliente(solicitud, campos, respuesta);
+
+		if (solicitud.tipoSolicitud != 'prestamoPJ') {
+			identificarCliente(solicitud, campos, respuesta);
+		} else {
+			identificarClientePj(solicitud, campos, respuesta);
+		}
+
 		if (solicitud.tipoSolicitud == 'proAutomatica' && String.isBlank(String.valueOf(campos.get('CSBD_Contact__c')))) {
 			campos.put('CSBD_No_Identificado__c', true);
 		}
@@ -576,7 +584,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 			when 'prestamo', 'prestamoPJ' {
 				if (String.isNotBlank(solicitud?.numperso)) {
 					tipoBusqueda = 'NP'; //(NUMPERSO)
-					valorBusqueda = formatearNumperso(solicitud.numperso);
+					valorBusqueda = hexToDec(solicitud.numperso);
 				} else if (String.isNotBlank(solicitud?.nif1Tit)) {
 					tipoBusqueda = 'DOC';
 					valorBusqueda = solicitud.nif1Tit;
@@ -585,7 +593,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 			when 'tpv' {
 				if (String.isNotBlank(solicitud?.numperso)) {
 					tipoBusqueda = 'NP'; //(NUMPERSO)
-					valorBusqueda = formatearNumperso(solicitud.numperso);
+					valorBusqueda = hexToDec(solicitud.numperso);
 				} else if (String.isNotBlank(solicitud?.identificador)) {
 					tipoBusqueda = 'DOC';
 					valorBusqueda = solicitud.identificador;
@@ -594,7 +602,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 			when 'cmn', 'cmb' {
 				List<String> condiciones = new List<String>();
 				if (String.isNotBlank(solicitud?.numperso)) {
-					condiciones.add(' AV_NumPerso__c = \'' + (solicitud?.buzonCajeros == true ? solicitud?.numperso : formatearNumperso(solicitud?.numperso))+ '\'');
+					condiciones.add(' AV_NumPerso__c = \'' + (solicitud?.buzonCajeros == true ? solicitud?.numperso : hexToDec(solicitud?.numperso))+ '\'');
 				}
 
 				if (String.isNotBlank(solicitud?.nif)) {
@@ -621,17 +629,17 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 			}
 			when 'proAutomatica', 'hipotecaPlataforma' {
 				tipoBusqueda = 'NP';
-				valorBusqueda = formatearNumperso(solicitud.numperso);
+				valorBusqueda = hexToDec(solicitud.numperso);
 			}
 			when 'soporteDigital' {
 				tipoBusqueda = 'NP';
-				valorBusqueda = formatearNumperso(solicitud.identificador);
+				valorBusqueda = hexToDec(solicitud.identificador);
 			}
 		}
 		return new Map<String, String>{'tipoBusqueda' => tipoBusqueda, 'valorBusqueda' => valorBusqueda};
 	}
 
-	public static void identificarCliente(CSBD_WS_AltaOportunidad_Input.Solicitud solicitud, Map<String, Object> campos, CSBD_WS_AltaOportunidad_Output.Respuesta respuesta) {
+	public static Map<String, Object> identificarCliente(CSBD_WS_AltaOportunidad_Input.Solicitud solicitud, Map<String, Object> campos, CSBD_WS_AltaOportunidad_Output.Respuesta respuesta) {
 		//Obtener cuenta y contacto a partir del NUMPERSO o NIF
 		Map<String, String> tipoIdentificacion = tipoIdentificacionCliente(solicitud);
 		if (!String.isEmpty(tipoIdentificacion.get('valorBusqueda'))) {
@@ -682,7 +690,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 					campos.put('CSBD_Contact__c', contactos[0].Id);
 
 					if(contactos[0].Account.AV_IndicadoresClientes__c != null) {
-						campos.put('AV_IndicadoresClientes__c', contactos[0].Account.AV_IndicadoresClientes__c);
+						return new Map<String, Object> {'AV_IndicadoresClientes__c' => contactos[0].Account.AV_IndicadoresClientes__c};
 					}
 				}
 			}
@@ -724,7 +732,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 			}
 
 		} else if (solicitud.tipoSolicitud == 'hipotecaPlataforma' && String.isNotBlank(solicitud.numperso2Tit)) {
-			String numperso2TitDecimal = formatearNumperso(solicitud.numperso2Tit);
+			String numperso2TitDecimal = hexToDec(solicitud.numperso2Tit);
 
 			List<Account> cuentas = new List<Account>();
 			List<Contact> contactos = new List<Contact>();
@@ -760,6 +768,76 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				}
 			}
 		}
+
+		return campos;
+	}
+
+	public static Map<String, Object> identificarClientePj(CSBD_WS_AltaOportunidad_Input.Solicitud solicitud, Map<String, Object> campos, CSBD_WS_AltaOportunidad_Output.Respuesta respuesta) {
+		//Obtener cuenta y contacto a partir del NUMPERSO o NIF
+		Map<String, String> tipoIdentificacion = tipoIdentificacionCliente(solicitud);
+		if (!String.isEmpty(tipoIdentificacion.get('valorBusqueda'))) {
+			List<Contact> contactos = new List<Contact>();
+
+			//Identificación contra BD (también cuando identificación ALF sin resultados)
+			/*
+			if (tipoIdentificacion.get('tipoBusqueda') == 'NP') {
+				contactos = [SELECT AccountId, Account.AV_IndicadoresClientes__c FROM Contact
+								WHERE (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_Cliente')
+								AND Account.AV_NumPerso__c = :tipoIdentificacion.get('valorBusqueda')];
+			} else if (tipoIdentificacion.get('tipoBusqueda') == 'DOC') {
+				contactos = [SELECT AccountId, Account.AV_IndicadoresClientes__c FROM Contact
+								WHERE (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_Cliente')
+								AND Account.CC_Numero_Documento__c = :tipoIdentificacion.get('valorBusqueda')];
+			} else {
+				contactos = Database.query('SELECT AccountId, Account.AV_IndicadoresClientes__c FROM Contact WHERE (RecordType.DeveloperName = \'CC_Cliente\' OR Account.RecordType.DeveloperName = \'CC_ClientePA\') AND ('
+												+ tipoIdentificacion.get('valorBusqueda')  + ')', AccessLevel.USER_MODE);
+			}
+			*/
+
+			List<Account> cuentas = new List<Account>();
+			if (tipoIdentificacion.get('tipoBusqueda') == 'NP') {
+				cuentas = [SELECT AV_IndicadoresClientes__c FROM Account
+							WHERE RecordType.DeveloperName = 'CC_Cliente'
+							AND AV_NumPerso__c = :tipoIdentificacion.get('valorBusqueda')
+							LIMIT 1];
+
+			} else if (tipoIdentificacion.get('tipoBusqueda') == 'DOC') {
+				cuentas = [SELECT AV_IndicadoresClientes__c FROM Account
+							WHERE RecordType.DeveloperName = 'CC_Cliente'
+							AND CC_Numero_Documento__c = :tipoIdentificacion.get('valorBusqueda')
+							LIMIT 1];
+			}
+
+			if (cuentas.size() == 1) {
+				Account cuenta = cuentas[0];
+				campos.put('AccountId', cuenta.Id);
+
+				String apoderadoNumperso = CSBD_Utils.hexToDec(solicitud.numperso2Tit);
+				if (String.isNotBlank(apoderadoNumperso)) {
+					contactos = [SELECT Id FROM Contact WHERE RecordType.DeveloperName = 'CIBE_Apoderado'
+									AND CIBE_Carrec__c != '00016' AND AccountId = :cuenta.Id AND AV_NumPerso__c = :apoderadoNumperso
+									AND (CIBE_FechaVencimiento__c >= :System.today() OR CIBE_FechaVencimiento__c = NULL) LIMIT 1];
+
+					if (contactos.size() == 1) {
+						Contact contacto = contactos[0];
+						campos.put('CSBD_Contact__c', contacto.Id);
+					}
+				}
+			}
+
+			/*
+			if (contactos.size() == 1) {
+				campos.put('AccountId', contactos[0].AccountId);
+				campos.put('CSBD_Contact__c', contactos[0].Id);
+
+				if(contactos[0].Account.AV_IndicadoresClientes__c != null) {
+					return new Map<String, Object> {'AV_IndicadoresClientes__c' => contactos[0].Account.AV_IndicadoresClientes__c};
+				}
+			}
+			*/
+		}
+
+		return campos;
 	}
 
 	private static Boolean comprobarNotNull(String valor) {
@@ -870,41 +948,23 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 		return retorno;
 	}
 
-	private static String formatearNumperso(String texto) {
+	private static String hexToDec(String texto) {
 		try {
 			if (String.isBlank(texto)) {
 				return '';
 			} else {
-				Map<String, Integer> mapa = new Map<String, Integer>();
-				mapa.put('0', 0);
-				mapa.put('1', 1);
-				mapa.put('2', 2);
-				mapa.put('3', 3);
-				mapa.put('4', 4);
-				mapa.put('5', 5);
-				mapa.put('6', 6);
-				mapa.put('7', 7);
-				mapa.put('8', 8);
-				mapa.put('9', 9);
-				mapa.put('A', 10);
-				mapa.put('B', 11);
-				mapa.put('C', 12);
-				mapa.put('D', 13);
-				mapa.put('E', 14);
-				mapa.put('F', 15);
-				mapa.put('a', 10);
-				mapa.put('b', 11);
-				mapa.put('c', 12);
-				mapa.put('d', 13);
-				mapa.put('e', 14);
-				mapa.put('f', 15);
-
 				Double retorno = 0;
+
+				Map<String, Integer> mapa = new Map<String, Integer>{
+					'0' => 0, '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5, '6' => 6, '7' => 7,
+					'8' => 8, '9' => 9, 'A' => 10, 'B' => 11, 'C' => 12, 'D' => 13, 'E' => 14,
+					'F' => 15, 'a' => 10, 'b' => 11, 'c' => 12, 'd' => 13, 'e' => 14, 'f' => 15
+				};
 				for (Integer i = 0; i < texto.length(); i++)  {
 					retorno += (mapa.get(texto.substring(i, i + 1)) * Math.pow(16, texto.length() - (i + 1))) ;
 				}
+
 				//El numperso retornado puede tener un número diferente de 8 caracteres. Si tiene menos caracteres, no están guardados con 0 delante
-				//return String.valueOf(Integer.valueOf(retorno)).leftPad(8, '0');
 				return String.valueOf(Integer.valueOf(retorno));
 			}
 		} catch (Exception e) {

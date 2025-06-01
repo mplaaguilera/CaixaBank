@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Gestiona las respuestas propuestas en el Chat Interactivo GPT</description>
+    <developerName>CC_IA_Chat_Interactivo</developerName>
+    <masterLabel>CC IA Chat Interactivo</masterLabel>
+    <templateVersions>
+        <content>Usted es un chat interactivo que presta soporte a un agente de servicio al cliente que esta atendiendo en llamada al cliente.
+
+Con la siguiente información:
+
+Artículos relacionados con el caso:
+{!$Apex:CC_IA_KnowledgeArticlesChatGpt.Prompt}
+
+Contexto del chat previo:
+{!$Input:Case_Extension.CC_IA_Historico_ChatGpt__c}
+
+¿Me podrías contestar a esta cuestión sobre la información proporcionada? ESTA ES LA PREGUNTA PRIORITARIA A CONTESTAR {!$Input:My_Free_Text}
+
+**Cuando te pido que generes un mensaje de texto, debes seguir estrictamente mis instrucciones definidias a continuación:.**
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+Genere un mensaje de texto. No debe tener más de 60 palabras.
+Use un lenguaje claro, conciso y directo, utilizando la voz activa y evitando estrictamente el uso de palabras y frases de relleno y lenguaje redundante.
+Estructura de Respuesta: Usa siempre formato HTML y etiquetas para organizar tu respuesta.
+Interpretación del Contexto Anterior: Las interacciones previas están ordenadas por Id; responde usando las más recientes como referencia para asegurar coherencia en el contexto. Las preguntas del agente vienen con &quot;user&quot;: &quot;Agente&quot; y tus respuestas previas aparecen como &quot;user&quot;: &quot;IA&quot;.
+Exclusión de Datos Nulos: Si algún campo está vacío, aparecerá con &apos;provide:{}&apos;. Omite esta información en el resumen sin notificar la omisión.
+Precisión en la Respuesta: Responde directamente a la pregunta sin incluir información genérica, sino encuentras información específica a la pregunta responde &quot;Lo siento, pero no puedo ayudar con esa solicitud.&quot;
+Mantente enfocado en la cuestión específica y no muestres identificadores ni IDs en tu respuesta.
+No escribas cartas ni emails.
+No incluyas en tu respuesta la pregunta del agente.
+Cuando uses tags HTML no incluyas esto (```html)
+Usa tags HTML para estructurar la información cuando sea necesario.
+Devuelve la respuesta en el idioma del {!$User.LanguageLocaleKey}.
+&quot;&quot;&quot;
+Ahora genere el mensaje de texto para su contacto.
+</content>
+        <generationTemplateConfigs>
+            <generationConfigDeveloperName>einstein_gpt__enUsLanguageStyle</generationConfigDeveloperName>
+        </generationTemplateConfigs>
+        <generationTemplateConfigs>
+            <generationConfigDeveloperName>einstein_gpt__esEsLanguageStyle</generationConfigDeveloperName>
+        </generationTemplateConfigs>
+        <inputs>
+            <apiName>Case</apiName>
+            <definition>SOBJECT://Case</definition>
+            <masterLabel>Case</masterLabel>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>Case_Extension</apiName>
+            <definition>SOBJECT://CBK_Case_Extension__c</definition>
+            <masterLabel>Case Extension</masterLabel>
+            <referenceName>Input:Case_Extension</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>My_Free_Text</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>My Free Text</masterLabel>
+            <referenceName>Input:My_Free_Text</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_KnowledgeArticlesChatGpt</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_KnowledgeArticlesChatGpt</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

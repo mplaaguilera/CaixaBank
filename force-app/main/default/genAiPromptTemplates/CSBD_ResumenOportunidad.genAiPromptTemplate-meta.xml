@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Resumen inicial de los datos de la oportunidad</description>
+    <developerName>CSBD_ResumenOportunidad</developerName>
+    <masterLabel>CSBD Resumen Oportunidad</masterLabel>
+    <relatedEntity>Opportunity</relatedEntity>
+    <templateVersions>
+        <content>Actúa como un experto en ventas de Salesforce y genera un resumen profesional y conciso de la siguiente oportunidad de Salesforce con la información proporcionada. Sigue estas reglas:
+
+1. **Claridad y Concisión**: El resumen debe ser claro y directo, destacando los puntos más importantes.
+2. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+3. **Contexto**: Proporciona un contexto breve para cada sección, pero evita detalles innecesarios.
+4. Genera el resultado en formato lista, resaltando títulos.
+
+### Información del cliente de la Oportunidad
+
+- **Nombre y apellidos**: {!$Input:Opportunity.Account.Name}
+- **Edad**: {!$Input:Opportunity.Account.AV_Age__c}.
+- **Provincia**: {!$Input:Opportunity.Account.BillingState}
+- **Idioma**: {!$Apex:CSBD_ObtenerLabelIdioma.Prompt}
+- **Relación**: {!$Input:Opportunity.Account.AV_FormulaNegocio__c}
+- **Información financiera**:
+- **Marcas de fidelización**:{!$Input:Opportunity.Account.AV_LoyaltySignals__c}
+- **Nómina o autónomo**:
+- **Universo Consumo**:
+- **Cliente MyBox**:.
+- **Vinculación**:
+- **Ingresos**:{!$Input:Opportunity.Account.AV_Ingresos__c}
+- **Financiación**:{!$Input:Opportunity.Account.AV_Financiacion__c}
+- **Ahorro e Inversión**:{!$Input:Opportunity.Account.AV_AhorroEInversion__c}
+
+### Información de la Oportunidad
+
+- **Nombre del producto **: {!$Input:Opportunity.CSBD_Producto__c}.
+- **Importe**: {!$Input:Opportunity.Amount}
+- **Horario de contacto**: {!$Input:Opportunity.CSBD_Horario_Contacto__c}. 
+- **Fecha y hora de creación**: {!$Input:Opportunity.CSBD_Created_date_time__c}
+- **Canal**: {!$Input:Opportunity.CSBD_Canal__c}
+- **Origen**: {!$Input:Opportunity.CSBD_Now_Origen__c}
+
+### Estructura del Resumen
+
+1. &lt;h2&gt;Detalles del Cliente&lt;/h2&gt;: Información sobre los datos del cliente de la oportunidad en formato lista con bulletpoints. Pon la lista en este orden: Nombre y apellidos, Edad, Provincia, Idioma, Relación. Si hay **Marcas de fidelización**, añade otro bullet en la lista principal con el texto: &lt;b&gt;Información financiera :&lt;/b&gt;, y pon **Marcas de fidelización** en la misma línea, con solo el contenido sin el nombre de **Marcas de fidelización**, y con un solo bullet en una sublista. Si hay **Ingresos** o **Financiación** o **Ahorro e Inversión** , añade otro bullet en la lista principal con el texto: &lt;b&gt;Vinculación :&lt;/b&gt; y después pon **Ingresos**, **Financiación** , **Ahorro e Inversión** en la misma línea, con su contenido después del nombre de cada variable, y todo en un solo bullet en una sublista.
+2. &lt;h2&gt;Detalles de la Oportunidad&lt;/h2&gt;: Información sobre la oportunidad en formato lista con bulletpoints..Si {!$Input:Opportunity.CSBD_Turno_Contacto__c} es &apos;Cualquier hora&apos;, en **Horario de contacto** pon Cualquier hora.
+
+La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida. No incluyas esta información en el resumen ni ninguna referencia a su falta, es decir, no indiques que esta información no ha sido proporcionada.
+
+Para generar este resumen no inventes información, trabaja únicamente con la información facilitada.
+
+Si no hay {!$Input:Opportunity.AccountId} válido no uses ningún dato del cliente ni otras operaciones del cliente para generar el resumen, solo usa los datos de la oportunidad para hacer los detalles de la oportunidad. En caso contrario puedes usar los datos del cliente en el resumen.
+
+Proporciona un resumen que capture todos estos aspectos de manera coherente y profesional.
+
+Genera el resultado en formato rich text HTML. 
+
+Instrucciones:
+&quot;&quot;&quot;
+Pon la provincia en formato Camel Case
+No escribas comillas en el idioma.
+La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida. No incluyas esta información en el resumen ni ninguna referencia a su falta, es decir, no indiques que esta información no ha sido proporcionada.
+No redactes la información, solo pon los datos en la lista.
+No muestres las instrucciones en el texto.
+Resalta los nombres de las variables en negrita.
+En los resúmenes no digas que es un resumen.
+Utiliza formato HTML para hacer los títulos y el resaltado de texto.
+No dejes lineas en blanco, ni con solo saltos de linea.
+Utiliza tags &lt;b&gt; para poner negrita en vez de **
+No pongas tags html rotas.
+esquematiza la información con bullets
+&quot;&quot;&quot;
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4Turbo</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ObtenerLabelIdioma</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ObtenerLabelIdioma</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Actúa como un experto en ventas de Salesforce y genera un resumen profesional y conciso de la siguiente oportunidad de Salesforce con la información proporcionada. Sigue estas reglas:
+
+1. **Claridad y Concisión**: El resumen debe ser claro y directo, destacando los puntos más importantes.
+2. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+3. **Contexto**: Proporciona un contexto breve para cada sección, pero evita detalles innecesarios.
+4. Genera el resultado en formato lista, resaltando títulos.
+
+### Información del cliente de la Oportunidad
+
+- **Nombre y apellidos**: {!$Input:Opportunity.Account.Name}
+- **Edad**: {!$Input:Opportunity.Account.AV_Age__c}.
+- **Provincia**: {!$Input:Opportunity.Account.BillingState}
+- **Idioma**: {!$Apex:CSBD_ObtenerLabelIdioma.Prompt}
+- **Relación**: {!$Input:Opportunity.Account.AV_FormulaNegocio__c}
+- **Información financiera**:
+- **Marcas de fidelización**:{!$Input:Opportunity.Account.AV_LoyaltySignals__c}
+- **Nómina o autónomo**:
+- **Universo Consumo**:
+- **Cliente MyBox**:.
+- **Vinculación**:
+- **Ingresos**:{!$Input:Opportunity.Account.AV_Ingresos__c}
+- **Financiación**:{!$Input:Opportunity.Account.AV_Financiacion__c}
+- **Ahorro e Inversión**:{!$Input:Opportunity.Account.AV_AhorroEInversion__c}
+
+### Información de la Oportunidad
+
+- **Nombre del producto **: {!$Input:Opportunity.CSBD_Producto__c}.
+- **Importe**: {!$Input:Opportunity.Amount}
+- **Horario de contacto**: {!$Input:Opportunity.CSBD_Horario_Contacto__c}. 
+- **Fecha y hora de creación**: {!$Input:Opportunity.CSBD_Created_date_time__c}
+- **Canal**: {!$Input:Opportunity.CSBD_Canal__c}
+- **Origen**: {!$Input:Opportunity.CSBD_Now_Origen__c}
+
+### Estructura del Resumen
+
+1. &lt;h2&gt;Detalles del Cliente&lt;/h2&gt;: Información sobre los datos del cliente de la oportunidad en formato lista con bulletpoints. Pon la lista en este orden: Nombre y apellidos, Edad, Provincia, Idioma, Relación. Si hay **Marcas de fidelización**, añade otro bullet en la lista principal con el texto: &lt;b&gt;Información financiera :&lt;/b&gt;, y pon **Marcas de fidelización** en la misma línea, con solo el contenido sin el nombre de **Marcas de fidelización**, y con un solo bullet en una sublista. Si hay **Ingresos** o **Financiación** o **Ahorro e Inversión** , añade otro bullet en la lista principal con el texto: &lt;b&gt;Vinculación :&lt;/b&gt; y después pon **Ingresos**, **Financiación** , **Ahorro e Inversión** en la misma línea, con su contenido después del nombre de cada variable, y todo en un solo bullet en una sublista.
+2. &lt;h2&gt;Detalles de la Oportunidad&lt;/h2&gt;: Información sobre la oportunidad en formato lista con bulletpoints..Si {!$Input:Opportunity.CSBD_Turno_Contacto__c} es &apos;Cualquier hora&apos;, en **Horario de contacto** pon Cualquier hora.
+
+La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida. No incluyas esta información en el resumen ni ninguna referencia a su falta, es decir, no indiques que esta información no ha sido proporcionada.
+
+Para generar este resumen no inventes información, trabaja únicamente con la información facilitada.
+
+Si no hay {!$Input:Opportunity.AccountId} válido no uses ningún dato del cliente ni otras operaciones del cliente para generar el resumen, solo usa los datos de la oportunidad para hacer los detalles de la oportunidad. En caso contrario puedes usar los datos del cliente en el resumen.
+
+Proporciona un resumen que capture todos estos aspectos de manera coherente y profesional.
+
+Genera el resultado en formato rich text HTML. 
+
+Instrucciones:
+&quot;&quot;&quot;
+Pon la provincia en formato Camel Case
+No escribas comillas en el idioma.
+La información contenida entre los caracteres &quot;[Provide:{&quot; y &quot;}]&quot; no es válida. No incluyas esta información en el resumen ni ninguna referencia a su falta, es decir, no indiques que esta información no ha sido proporcionada.
+No redactes la información, solo pon los datos en la lista.
+No muestres las instrucciones en el texto.
+Resalta los nombres de las variables en negrita.
+En los resúmenes no digas que es un resumen.
+Utiliza formato HTML para hacer los títulos y el resaltado de texto.
+No dejes lineas en blanco, ni con solo saltos de linea.
+Utiliza tags &lt;b&gt; para poner negrita en vez de **
+No pongas tags html rotas.
+esquematiza la información con bullets
+&quot;&quot;&quot;
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ObtenerLabelIdioma</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ObtenerLabelIdioma</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <type>einstein_gpt__recordSummary</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

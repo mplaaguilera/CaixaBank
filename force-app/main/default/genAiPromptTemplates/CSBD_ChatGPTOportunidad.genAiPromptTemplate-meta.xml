@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Para responder a preguntas del agente simulando ChatGPT</description>
+    <developerName>CSBD_ChatGPTOportunidad</developerName>
+    <masterLabel>CSBD ChatGPT Oportunidad</masterLabel>
+    <relatedEntity>Opportunity</relatedEntity>
+    <templateVersions>
+        <content>Sobre esta información que te proporciono a continuación:
+Información del cliente: Nombre {!$Input:Opportunity.Account.Name}, edad {!$Input:Opportunity.Account.PersonBirthdate} Residencia: {!$Input:Opportunity.Account.BillingCity}. Ingresos: {!$Input:Opportunity.Account.AV_Ingresos__c}. Es empleado de nuestro: {!$Input:Opportunity.Account.AV_Empleado__c}.
+
+ Información del producto: {!$Apex:CSBD_ArticulosProducto.Prompt}.
+
+y teniendo en cuenta las preguntas anteriores con las respuestas hechas por ti para tener un contexto del chat previo: {!$Input:Opportunity.CSBD_GptHistorico__c},
+
+¿Me podrías contestar a esta cuestión sobre la información proporcionada? ESTA ES LA PREGUNTA PRIORITARIA A CONTESTAR {!$Input:Opportunity.CSBD_Pregunta__c}. 
+Ten en cuenta las instrucciones antes de contestar a la pregunta.
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+Utiliza siempre formato y tags HTML
+Sobre el contexto de preguntas previas, están clasificadas por Id; las de mayor número son las más recientes; tus respuestas son las que vienen con &quot;user&quot;:&quot;IA&quot; y las preguntas del agente vienen por &quot;user&quot;:&quot;Agente&quot;.
+Lo que venga en este formato &apos;provide:{}&apos; es que no contiene datos. Por lo tanto no lo incluyas en el resumen.
+no informes de la informacion que omitas.
+no enseñes IDs.
+Sé preciso contestando a la pregunta, no muestres información general del producto ni del cliente. Responde solo a la pregunta.
+No informes sobre promociones o campañas caducadas, inactivas o sin vigencia(que se encuentra fuera de plazo), teniendo en cuenta la fecha actual que te proporciono: {!$Input:Opportunity.LastModifiedDate}. Si informas sobre promociones caducadas serás penalizado.
+###ejemplo###
+&apos;La promoción actual está caducada ya que no cumple los requisitos de fecha&apos;
+&quot;&quot;&quot;
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4Turbo</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Sobre esta información que te proporciono a continuación:
+Información del cliente: Nombre {!$Input:Opportunity.Account.Name}, edad {!$Input:Opportunity.Account.PersonBirthdate} Residencia: {!$Input:Opportunity.Account.BillingCity}. Ingresos: {!$Input:Opportunity.Account.AV_Ingresos__c}. Es empleado de nuestro: {!$Input:Opportunity.Account.AV_Empleado__c}.
+
+ Información del producto: {!$Apex:CSBD_ArticulosProducto.Prompt}.
+
+y teniendo en cuenta las preguntas anteriores con las respuestas hechas por ti para tener un contexto del chat previo: {!$Input:Opportunity.CSBD_GptHistorico__c},
+
+¿Me podrías contestar a esta cuestión sobre la información proporcionada? ESTA ES LA PREGUNTA PRIORITARIA A CONTESTAR {!$Input:Opportunity.CSBD_Pregunta__c}. 
+Ten en cuenta las instrucciones antes de contestar a la pregunta.
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+Utiliza siempre formato y tags HTML
+Sobre el contexto de preguntas previas, están clasificadas por Id; las de mayor número son las más recientes; tus respuestas son las que vienen con &quot;user&quot;:&quot;IA&quot; y las preguntas del agente vienen por &quot;user&quot;:&quot;Agente&quot;.
+Lo que venga en este formato &apos;provide:{}&apos; es que no contiene datos. Por lo tanto no lo incluyas en el resumen.
+no informes de la informacion que omitas.
+no enseñes IDs.
+Sé preciso contestando a la pregunta, no muestres información general del producto ni del cliente. Responde solo a la pregunta.
+No informes sobre promociones o campañas caducadas, inactivas o sin vigencia(que se encuentra fuera de plazo), teniendo en cuenta la fecha actual que te proporciono: {!$Input:Opportunity.LastModifiedDate}. Si informas sobre promociones caducadas serás penalizado.
+###ejemplo###
+&apos;La promoción actual está caducada ya que no cumple los requisitos de fecha&apos;
+&quot;&quot;&quot;
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <type>einstein_gpt__recordSummary</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

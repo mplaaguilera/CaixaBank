@@ -77,7 +77,7 @@ public class CSBD_Llamada_GC_Test {
             c.CC_NumPerso__c = 'TestNumPer54321';
             c.CC_Numero_Documento__c = '12312312K';
             insert c;
-            
+
             CC_Servicio_Genesys__c svcEncuesta = new CC_Servicio_Genesys__c();
 			svcEncuesta.RecordTypeId = Schema.SObjectType.CC_Servicio_Genesys__c.getRecordTypeInfosByDeveloperName().get('CC_Encuesta').getRecordTypeId();
 			svcEncuesta.Name = 'Servicio Encuesta';
@@ -88,10 +88,10 @@ public class CSBD_Llamada_GC_Test {
 			insert svcEncuesta;
 
             CC_Lista_Valores__c listaValores4 = new CC_Lista_Valores__c();
-        	listaValores4.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-        	listaValores4.Name = 'CSBD: Horarios comerciales por tipología';
-        	listaValores4.CC_Activa__c = true;
-        	insert listaValores4;
+			listaValores4.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
+			listaValores4.Name = 'CSBD: Horarios comerciales por tipología';
+			listaValores4.CC_Activa__c = true;
+			insert listaValores4;
 
             CC_Lista_Valores__c valor4 = new CC_Lista_Valores__c();
             valor4.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
@@ -150,7 +150,7 @@ public class CSBD_Llamada_GC_Test {
 			System.assert(llamadaEntrante != null, 'La llamada no debería ser nula');
 
 			Task actividad = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaEntrante.Id AND Type = 'Llamada entrante' AND Status = 'Open' LIMIT 1];
-			System.assert(actividad != null);
+			System.assert(actividad != null, 'La actividad no debería ser nula');
 			inputLlamada.llamadaId = llamadaEntrante.Id;
 			CSBD_Llamada_GC.finalizarLlamada(inputLlamada, 'Llamada finalizada');
 			Test.stopTest();
@@ -174,7 +174,7 @@ public class CSBD_Llamada_GC_Test {
 			CSBD_Llamada_GC.finalizarLlamada(inputLlamadaSaliente, 'Llamada finalizada');
 			Test.stopTest();
 
-			System.assert([SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada'] != null);
+			System.assert([SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada'] != null, 'La llamada no debería ser nula');
 		}
 	}
 
@@ -215,7 +215,7 @@ public class CSBD_Llamada_GC_Test {
 			CSBD_Llamada_GC.finalizarLlamada(inputLlamadaSaliente, 'Llamada finalizada');
 			Test.stopTest();
 
-			System.assert([SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada'] != null);
+			System.assert([SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada'] != null, 'La llamada no debería ser nula');
 		}
 	}
 
@@ -236,7 +236,7 @@ public class CSBD_Llamada_GC_Test {
             Test.stopTest();
 
 			List<Task> actividad2 = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaEntrante1.Id AND Status = 'Completed' AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
-			System.assert(!actividad2.isEmpty());
+			System.assert(!actividad2.isEmpty(), 'La actividad no debería ser nula');
 		}
 	}
 
@@ -268,12 +268,12 @@ public class CSBD_Llamada_GC_Test {
 									AND WhatId = :oportunidad.Id AND Type = 'Llamada saliente'
 									AND Status = 'Completed' AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
 
-			System.assert(!tarea1.isEmpty());
-			System.assert(!tarea2.isEmpty());
+			System.assert(!tarea1.isEmpty(), 'La tarea no debería ser nula');
+			System.assert(!tarea2.isEmpty(), 'La tarea no debería ser nula');
 
 			llamadaSaliente = [SELECT CC_Fecha_Fin__c, CC_Tipo_Cierre__c FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id];
-			System.assert(llamadaSaliente.CC_Fecha_Fin__c != null);
-			System.assertEquals('Llamada finalizada', llamadaSaliente.CC_Tipo_Cierre__c);
+			System.assert(llamadaSaliente.CC_Fecha_Fin__c != null, 'La fecha de fin no debería ser nula');
+			System.assertEquals('Llamada finalizada', llamadaSaliente.CC_Tipo_Cierre__c, 'El tipo de cierre no debería ser nulo');
 
 
 
@@ -284,14 +284,14 @@ public class CSBD_Llamada_GC_Test {
             Datetime tiempoOrigen = Datetime.valueOf(rangoFinal);
 
             if(tiempoOrigen >= System.now()) {
-                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c == 0);
-                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null);
-                System.assert(oportunidad2.CSBD_SLA_TGT__c != null);
+                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c == 0, 'La primera respuesta no debería ser nula');
+                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null, 'El primer contacto no debería ser nulo');
+                System.assert(oportunidad2.CSBD_SLA_TGT__c != null, 'El TGT no debería ser nulo');
             }
             if(tiempoOrigen < System.now()){
-                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c != null);
-                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null);
-                System.assert(oportunidad2.CSBD_SLA_TGT__c != null);
+                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c != null, 'La primera respuesta no debería ser nula');
+                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null, 'El primer contacto no debería ser nulo');
+                System.assert(oportunidad2.CSBD_SLA_TGT__c != null, 'El TGT no debería ser nulo');
             }
 
 		}
@@ -324,12 +324,12 @@ public class CSBD_Llamada_GC_Test {
 									AND WhatId = :oportunidad.Id AND Type = 'Llamada saliente'
 									AND Status = 'Completed' AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
 
-			System.assert(!tarea1.isEmpty());
-			System.assert(!tarea2.isEmpty());
+			System.assert(!tarea1.isEmpty(), 'La tarea no debería ser nula');
+			System.assert(!tarea2.isEmpty(), 'La tarea no debería ser nula');
 
 			llamadaSaliente = [SELECT CC_Fecha_Fin__c, CC_Tipo_Cierre__c FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id];
-			System.assert(llamadaSaliente.CC_Fecha_Fin__c != null);
-			System.assertEquals('Llamada finalizada', llamadaSaliente.CC_Tipo_Cierre__c);
+			System.assert(llamadaSaliente.CC_Fecha_Fin__c != null, 'La fecha de fin no debería ser nula');
+			System.assertEquals('Llamada finalizada', llamadaSaliente.CC_Tipo_Cierre__c, 'El tipo de cierre no debería ser nulo');
 
 
 
@@ -337,14 +337,14 @@ public class CSBD_Llamada_GC_Test {
             Opportunity oportunidad2 = [SELECT Id,CreatedDate,CSBD_Horario_Contacto__c,CSBD_SLA_Primera_Respuesta__c,CSBD_PrimerContactoSLA__c,CSBD_SLA_TGT__c FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test 2'];
 
             if(oportunidad2.CreatedDate >= System.now()) {
-                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c == 0);
-                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null);
-                System.assert(oportunidad2.CSBD_SLA_TGT__c != null);
+                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c == 0, 'La primera respuesta no debería ser nula');
+                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null, 'El primer contacto no debería ser nulo');
+                System.assert(oportunidad2.CSBD_SLA_TGT__c != null, 'El TGT no debería ser nulo');
             }
             if(oportunidad2.CreatedDate < System.now()){
-                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c != null);
-                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null);
-                System.assert(oportunidad2.CSBD_SLA_TGT__c != null);
+                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c != null, 'La primera respuesta no debería ser nula');
+                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null, 'El primer contacto no debería ser nulo');
+                System.assert(oportunidad2.CSBD_SLA_TGT__c != null, 'El TGT no debería ser nulo');
             }
 
 		}
@@ -378,12 +378,12 @@ public class CSBD_Llamada_GC_Test {
 									AND WhatId = :oportunidad.Id AND Type = 'Llamada saliente'
 									AND Status = 'Completed' AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
 
-			System.assert(!tarea1.isEmpty());
-			System.assert(!tarea2.isEmpty());
+			System.assert(!tarea1.isEmpty(), 'La tarea no debería ser nula');
+			System.assert(!tarea2.isEmpty(), 'La tarea no debería ser nula');
 
 			llamadaSaliente = [SELECT CC_Fecha_Fin__c, CC_Tipo_Cierre__c FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id];
-			System.assert(llamadaSaliente.CC_Fecha_Fin__c != null);
-			System.assertEquals('Llamada finalizada', llamadaSaliente.CC_Tipo_Cierre__c);
+			System.assert(llamadaSaliente.CC_Fecha_Fin__c != null, 'La fecha de fin no debería ser nula');
+			System.assertEquals('Llamada finalizada', llamadaSaliente.CC_Tipo_Cierre__c, 'El tipo de cierre no debería ser nulo');
 
 
 
@@ -391,22 +391,22 @@ public class CSBD_Llamada_GC_Test {
             Opportunity oportunidad2 = [SELECT Id,CreatedDate,CSBD_Horario_Contacto__c,CSBD_SLA_Primera_Respuesta__c,CSBD_PrimerContactoSLA__c,CSBD_SLA_TGT__c FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test 2'];
 
             if(oportunidad2.CreatedDate >= System.now()) {
-                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c == 0);
-                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null);
-                System.assert(oportunidad2.CSBD_SLA_TGT__c != null);
+                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c == 0, 'La primera respuesta no debería ser nula');
+                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null, 'El primer contacto no debería ser nulo');
+                System.assert(oportunidad2.CSBD_SLA_TGT__c != null, 'El TGT no debería ser nulo');
             }
             if(oportunidad2.CreatedDate < System.now()){
-                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c != null);
-                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null);
-                System.assert(oportunidad2.CSBD_SLA_TGT__c != null);
+                System.assert(oportunidad2.CSBD_SLA_Primera_Respuesta__c != null, 'La primera respuesta no debería ser nula');
+                System.assert(oportunidad2.CSBD_PrimerContactoSLA__c != null, 'El primer contacto no debería ser nulo');
+                System.assert(oportunidad2.CSBD_SLA_TGT__c != null, 'El TGT no debería ser nulo');
             }
 
 		}
 	}
 
-      @isTest
+    @isTest
 	public static void finalizarLlamadaSinId() {
-         User gestorCsbd = [SELECT Id FROM User WHERE LastName = 'Gestor CSBD Test'];
+        User gestorCsbd = [SELECT Id FROM User WHERE LastName = 'Gestor CSBD Test'];
 
 		System.runAs(gestorCsbd) {
 			CC_Servicio_Genesys__c s1 = [SELECT CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = 'S1'];
@@ -424,7 +424,7 @@ public class CSBD_Llamada_GC_Test {
 			System.assert(llamadaEntrante != null, 'La llamada no debería ser nula');
 
 			Task actividad = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaEntrante.Id AND Type = 'Llamada entrante' AND Status = 'Open' LIMIT 1];
-			System.assert(actividad != null);
+			System.assert(actividad != null, 'La actividad no debería ser nula');
 
 			inputLlamada.llamadaId = null;
 			CSBD_Llamada_GC.finalizarLlamada(inputLlamada, 'Llamada finalizada');
@@ -435,13 +435,9 @@ public class CSBD_Llamada_GC_Test {
     @isTest
 	public static void finalizarLlamadaOportunidad() {
         User gestorCsbd = [SELECT Id FROM User WHERE LastName = 'Gestor CSBD Test'];
-
         Opportunity oportunidad = [SELECT Id FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
 
-
-
 		System.runAs(gestorCsbd) {
-
 			CC_Servicio_Genesys__c s1 = [SELECT CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = 'S1'];
 
 			Test.startTest();
@@ -453,7 +449,7 @@ public class CSBD_Llamada_GC_Test {
 			System.assert(llamadaEntrante != null, 'La llamada no debería ser nula');
 
 			Task actividad = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaEntrante.Id AND Type = 'Llamada entrante' AND Status = 'Open' LIMIT 1];
-			System.assert(actividad != null);
+			System.assert(actividad != null, 'La actividad no debería ser nula');
 
             Id idRtTask = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CSBD_Task').getRecordTypeId();
             Task tarea = new Task();
@@ -468,75 +464,70 @@ public class CSBD_Llamada_GC_Test {
 			Test.stopTest();
 		}
 	}
-    
-       @isTest
+
+    @isTest
 	public static void registrarEncuestaTest() {
 		User gestorCsbd = [SELECT Id FROM User WHERE LastName = 'Gestor CSBD Test'];
 		System.runAs(gestorCsbd) {
-            
+
             Opportunity oportunidad = [SELECT Id FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
             CC_Servicio_Genesys__c s1 = [SELECT CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = 'NIS_GenesysCloudOutboundDefault'];
             CC_Servicio_Genesys__c encuesta = [SELECT Id FROM CC_Servicio_Genesys__c WHERE Name = 'Servicio Encuesta' LIMIT 1];
 			s1.CC_Encuesta__c = encuesta.Id;
 			update s1;
-            
+
             CC_Llamada_Input inputLlamadaSaliente = obtenerInputLlamada(s1.CC_Codigo__c, '', oportunidad.Id);
 			Map<String, Object> responseRegistrarLlamadaSaliente = CSBD_Llamada_GC.registrarLlamadaSaliente(inputLlamadaSaliente);
 			CC_Llamada__c llamadaSaliente = (CC_Llamada__c)responseRegistrarLlamadaSaliente.get('llamada');
 			inputLlamadaSaliente.llamadaId = llamadaSaliente.Id;
 			Map<String, Object> responseIniciarLlamadaSalienteClickToDial = CSBD_Llamada_GC.iniciarLlamadaSalienteClickToDial(inputLlamadaSaliente);
-            
+
             CC_Llamada_Input inputFinalizarLlamada = obtenerInputLlamada(null, llamadaSaliente.Id, oportunidad.Id);
 			CSBD_Llamada_GC.finalizarLlamada(inputFinalizarLlamada, 'Llamada finalizada');
-            
+
             Test.startTest();
 			Map<String, Object> nombreEncuesta = CSBD_Llamada_GC.registrarEncuesta(inputFinalizarLlamada);
 			Test.stopTest();
-            
+
 			System.assertEquals('Servicio Encuesta',nombreEncuesta.get('nombreEncuesta'), 'No se ha encontrado la encuesta');
 		}
 	}
-    
-    
-    @isTest
+
+	@isTest
     public static void slaHorarioComercialTest() {
-		User gestorCsbd = [SELECT Id FROM User WHERE LastName = 'Gestor CSBD Test'];
-		System.runAs(gestorCsbd) {
-            
-            Date myDatetime = Datetime.now().date().toStartofWeek();
-            Date domingo = myDatetime.addDays(-1);
-            
-            Map<String, Object> camposOportunidad = new Map<String, Object>{};
-			Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', camposOportunidad);
-            
-            Test.setCreatedDate(oportunidad.Id, domingo);
-            
-            CC_Servicio_Genesys__c s1 = [SELECT CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = 'NIS_GenesysCloudOutboundDefault'];
-            CC_Servicio_Genesys__c encuesta = [SELECT Id FROM CC_Servicio_Genesys__c WHERE Name = 'Servicio Encuesta' LIMIT 1];
-			s1.CC_Encuesta__c = encuesta.Id;
-			update s1;
-            
-            Test.startTest();
-            
-            oportunidad.CSBD_HorarioComercial__c = 'NO';
-            update oportunidad;
-            
-            CC_Llamada_Input inputLlamadaSaliente = obtenerInputLlamada(s1.CC_Codigo__c, '', oportunidad.Id);
-			Map<String, Object> responseRegistrarLlamadaSaliente = CSBD_Llamada_GC.registrarLlamadaSaliente(inputLlamadaSaliente);
-			CC_Llamada__c llamadaSaliente = (CC_Llamada__c)responseRegistrarLlamadaSaliente.get('llamada');
-			inputLlamadaSaliente.llamadaId = llamadaSaliente.Id;
-			Map<String, Object> responseIniciarLlamadaSalienteClickToDial = CSBD_Llamada_GC.iniciarLlamadaSalienteClickToDial(inputLlamadaSaliente);
-            
-            
-            
-            CC_Llamada_Input inputFinalizarLlamada = obtenerInputLlamada(null, llamadaSaliente.Id, oportunidad.Id);
-			CSBD_Llamada_GC.finalizarLlamada(inputFinalizarLlamada, 'Llamada finalizada');
-            
-            Test.stopTest();
-            
-            List<Opportunity> oppList = [select id, createdDate, CSBD_SLA_Primera_Respuesta__c, CSBD_HorarioComercial__c, Recordtype.DeveloperName from Opportunity where id =: oportunidad.id];
-          
-			System.assert(oppList[0].CSBD_SLA_Primera_Respuesta__c > 0, 'No se ha calculado correctamente el SLA');
+		System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+			CC_Servicio_Genesys__c svcGenesysSalida = [SELECT CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = 'NIS_GenesysCloudOutboundDefault' LIMIT 1];
+			svcGenesysSalida.CC_Encuesta__c = [SELECT Id FROM CC_Servicio_Genesys__c WHERE Name = 'Servicio Encuesta' LIMIT 1].Id;
+			update svcGenesysSalida;
+
+			System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+				Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', new Map<String, Object>{
+					'CSBD_Horario_Contacto__c' => 'NO'
+				});
+
+				Date hoy = System.today();
+				Date domingp = hoy.toStartOfWeek();
+				if (domingp == hoy) {
+					domingp = domingp.addDays(-7);
+				}
+
+				domingp = domingp.addDays(-1);
+				Test.setCreatedDate(oportunidad.Id, domingp);
+
+				Test.startTest();
+				CC_Llamada_Input inputLlamadaSaliente = obtenerInputLlamada(svcGenesysSalida.CC_Codigo__c, '', oportunidad.Id);
+				Map<String, Object> responseRegistrarLlamadaSaliente = CSBD_Llamada_GC.registrarLlamadaSaliente(inputLlamadaSaliente);
+				CC_Llamada__c llamadaSaliente = (CC_Llamada__c)responseRegistrarLlamadaSaliente.get('llamada');
+				inputLlamadaSaliente.llamadaId = llamadaSaliente.Id;
+				Map<String, Object> responseIniciarLlamadaSalienteClickToDial = CSBD_Llamada_GC.iniciarLlamadaSalienteClickToDial(inputLlamadaSaliente);
+
+				CC_Llamada_Input inputFinalizarLlamada = obtenerInputLlamada(null, llamadaSaliente.Id, oportunidad.Id);
+				CSBD_Llamada_GC.finalizarLlamada(inputFinalizarLlamada, 'Llamada finalizada');
+				Test.stopTest();
+
+				oportunidad = [SELECT CSBD_SLA_Primera_Respuesta__c FROM Opportunity WHERE Id = :oportunidad.Id];
+				System.assert(oportunidad.CSBD_SLA_Primera_Respuesta__c > 0, 'No se ha calculado correctamente el SLA (valor: ' + oportunidad.CSBD_SLA_Primera_Respuesta__c + ')');
+			}
 		}
 	}
 }

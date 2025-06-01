@@ -192,6 +192,38 @@
 							<div class="slds-form__item" role="listitem"></div>
 						</template>
 					</div>
+
+					<div lwc:if={mostrar.camposPrestamoPersonaJuridica} class="slds-form__row slds-var-m-top_xx-large">
+						<div class="slds-form__item" role="listitem">
+							<div lwc:if={editando} class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent">
+								<label class="slds-form-element__label">Delimitador</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">{delimitador}</div>
+								</div>
+							</div>
+							<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+								<label class="slds-form-element__label">Delimitador</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">{delimitador}</div>
+								</div>
+							</div>
+						</div>
+						<div class="slds-form__item" role="listitem">
+							<div lwc:if={editando} class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent">
+								<label class="slds-form-element__label">Garantía</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">{garantia}</div>
+								</div>
+							</div>
+							<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+								<label class="slds-form-element__label">Garantía</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">{garantia}</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
 				</div>
 
 				<!--Detalles del origen-->

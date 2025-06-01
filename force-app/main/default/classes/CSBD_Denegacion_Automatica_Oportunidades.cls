@@ -56,7 +56,7 @@ public with sharing class CSBD_Denegacion_Automatica_Oportunidades {
         return [SELECT RecordType.DeveloperName, CSBD_Contact__c, CSBD_Empresa_Proveedora__c, CSBD_Idioma_Solicitud__c,
                 Amount, CSBD_Contact__r.CSBD_Escala_Maestra__c, CSBD_Email_Solicitud__c,
                 CSBD_Circuito_Contratacion_Online__c, CSBD_Dispone_Importe_Preconcedido__c, CSBD_Scoring_Riesgo__c
-                FROM Opportunity WHERE Id IN :idOportunidades AND IsClosed = FALSE];
+                FROM Opportunity WHERE Id IN :idOportunidades AND IsClosed = FALSE AND CSBD_Account_Tipo_Persona__c != 'J'];
     }
 
     private static void enviarCorreoDenegacionAutomatica(Id idOportunidad, String empresaProveedora, String idContacto, String destinatario, String nombrePlantilla) {

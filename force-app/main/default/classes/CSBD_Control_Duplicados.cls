@@ -57,7 +57,7 @@ public with sharing class CSBD_Control_Duplicados {
         }
         //Se solicita la baja a omnichannel de las oportunidades duplicadas
         if(!idOportunidadesDuplicadas.isEmpty()) {
-            CSBD_GestorOportunidad.desactivarGestorOportunidad(idOportunidadesDuplicadas); 
+            CSBD_GestorOportunidad.desactivarGestorOportunidad(idOportunidadesDuplicadas);
         }
         //Se marca el campo "Con duplicados" de las nuevas oportunidad con duplicados
         for (Opportunity oportunidadConDuplicados : oportunidadesConDuplicados) {
@@ -69,7 +69,7 @@ public with sharing class CSBD_Control_Duplicados {
     private static String controlDuplicadosSoql(Opportunity oportunidad, CSBD_Control_Duplicados__mdt configControlDuplicados) {
         String querySoql = 'SELECT Id, CSBD_Alta_omnichannel__c FROM Opportunity WHERE Id != \'' + oportunidad.Id + '\' AND RecordTypeId = \'' + oportunidad.RecordTypeId + '\'';
         if (String.isNotBlank(configControlDuplicados.CSBD_Empresa_Proveedora__c)) {
-            querySoql += ' AND CSBD_Empresa_Proveedora__c = \'' + oportunidad.CSBD_Empresa_Proveedora__c + '\' AND IsClosed = FALSE';
+            querySoql += ' AND CSBD_Empresa_Proveedora__c = \'' + oportunidad.CSBD_Empresa_Proveedora__c + '\' AND IsClosed = FALSE AND CSBD_Account_Tipo_Persona__c != \'J\'';
         }
 
         //Valor campos
@@ -81,7 +81,7 @@ public with sharing class CSBD_Control_Duplicados {
         Datetime fecha = oportunidad.CreatedDate;
         fecha = fecha.addMinutes(-(Integer)configControlDuplicados.CSBD_Minutos__c);
         querySoql += ' AND CreatedDate > ' + fecha.formatGmt('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'');
-        
+
         return querySoql;
     }
 
@@ -107,7 +107,7 @@ public with sharing class CSBD_Control_Duplicados {
 
             if (!esCheckbox) {
                 retorno += ' AND ' + nombreCampoOportunidad + ' != NULL';
-            } 
+            }
         }
 
         return retorno;

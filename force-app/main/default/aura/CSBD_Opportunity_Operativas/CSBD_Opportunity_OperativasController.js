@@ -103,7 +103,7 @@
 		if (oportunidad.Account.CC_Numero_Documento__c) {
 			helper.copiarTextoAlPortapapeles(oportunidad.Account.CC_Numero_Documento__c, 'Se ha copiado el NIF ' + oportunidad.Account.CC_Numero_Documento__c + ' (' + oportunidad.Account.Name + ') al portapapeles');
 		} else {
-			helper.mostrarToast('El NIF del cliente no está informado', 'La cuenta no tiene el número de documento de identidad informado', 'info');
+			helper.mostrarToast('El NIF del cliente no está informado', 'La cuenta no tiene el número de documento de identidad informado', 'success');
 		}
 	},
 
@@ -1121,7 +1121,8 @@
 			if (saveResult.state === 'SUCCESS') {
 				helper.mostrarToast('Se reasignó Oportunidad', 'Ahora es el propietario de la oportunidad ' + component.get('v.oportunidad.CSBD_Identificador__c'), 'success');
 			} else if (saveResult.state === 'ERROR') {
-				helper.mostrarToast('error', 'No se reasignó Oportunidad', JSON.stringify(saveResult.error));
+				console.error(saveResult.error);
+				helper.mostrarToast('No se reasignó Oportunidad', JSON.stringify(saveResult.error), 'error');
 			}
 		}));
 	},

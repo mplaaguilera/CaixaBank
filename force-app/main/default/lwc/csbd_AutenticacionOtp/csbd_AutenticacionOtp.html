@@ -10,9 +10,10 @@
 				<p class="slds-var-m-top_x-small">Iniciar un proceso de autenticación segura para verificar la identidad del cliente.</p>
 			</div>
 
-			<div class="slds-modal__content slds-var-p-vertical_medium slds-var-p-horizontal_xx-large">
-				<c-csbd_-spinner-kx lwc:ref="spinnerKx" lwc:if={componente.spinner}></c-csbd_-spinner-kx>
-
+			<div class="slds-modal__content slds-is-relative slds-var-p-vertical_medium slds-var-p-horizontal_xx-large">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+				</div>
 				<article class="slds-card slds-var-m-top_large">
 					<div class="slds-grid slds-grid_vertical-align-center slds-gutters_x-small" style="text-align: end;">
 						<div class="slds-col">
@@ -217,15 +218,17 @@
 				</h2>
 				<p class="slds-var-m-top_x-small">Introduce las respuestas que proporcione el cliente a fin de confirmar su identidad.</p>
 			</header>
-			<div class="slds-modal__content slds-var-p-top_x-small slds-var-p-bottom_large slds-var-p-horizontal_x-large">
-				<c-csbd_-spinner-kx lwc:ref="spinnerKx" lwc:if={componente.spinner}></c-csbd_-spinner-kx>
+			<div class="slds-modal__content slds-is-relative slds-var-p-top_x-small slds-var-p-bottom_large slds-var-p-horizontal_x-large">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+				</div>
 
 				<div class="slds-var-m-top_large slds-var-m-bottom_medium slds-align_absolute-center">
 					<div class="slds-grid slds-wrap" style="width: 87%;">
 
 						<!-- Pregunta 1 -->
 						<template lwc:if={preguntasNivel2.pregunta1.inputLabel} >
-							<div class="slds-col slds-size_3-of-5 slds-is-relative slds-var-m-top_medium" style="top: 6px;">
+							<div class="slds-col slds-size_3-of-5 slds-is-relative slds-var-m-top_medium" style="top: 6px; white-space: nowrap;">
 								<span class="numPregunta numPregunta1">1</span>
 								<label class="slds-form-element__label negrita" style="font-size: 13px;">
 									<abbr class="slds-required">*</abbr>{preguntasNivel2.pregunta1.inputLabel}
@@ -318,9 +321,10 @@
 				<p class="slds-var-m-top_x-small">
 					Validar el código de un solo uso (<i>One Time Password</i>) enviado al cliente.</p>
 			</header>
-			<div class="slds-modal__content" style="text-align: center;">
-				<c-csbd_-spinner-kx lwc:ref="spinnerKx" lwc:if={componente.spinner}></c-csbd_-spinner-kx>
-
+			<div class="slds-modal__content slds-is-relative" style="text-align: center;">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;"></lightning-spinner>
+				</div>
 				<div lwc:if={autenticacionPendValidar} class="slds-var-p-top_x-large slds-var-p-bottom_xx-large slds-align_absolute-center" style="display: block;">
 					<div class="slds-form-element slds-form-element_stacked slds-var-m-top_small">
 						<label class="slds-form-element__label slds-var-m-bottom_large"><abbr class="slds-required" style="margin-right: 3px;">*</abbr>Código OTP recibido por el cliente</label>
@@ -382,8 +386,10 @@
 					Validar la notificación <i>push</i> enviada al dispositivo del cliente.
 				</p>
 			</header>
-			<div class="slds-modal__content" style="text-align: center;">
-				<c-csbd_-spinner-kx lwc:ref="spinnerKx" lwc:if={componente.spinner}></c-csbd_-spinner-kx>
+			<div class="slds-modal__content slds-is-relative" style="text-align: center;">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;"></lightning-spinner>
+				</div>
 
 				<div lwc:if={autenticacionPendValidar} class="slds-grid slds-grid_align-center slds-gutters_direct-xx-small slds-var-m-top_xx-large slds-text-color_weak">
 					<div class="slds-col">
@@ -423,9 +429,10 @@
 				</h2>
 				<p class="slds-var-m-top_x-small">Confirma la identidad del cliente a partir de sus respuestas a las preguntas.</p>
 			</header>
-			<div class="slds-modal__content slds-var-p-vertical_medium slds-var-p-horizontal_x-large" style="overflow-y: auto;">
-				<c-csbd_-spinner-kx lwc:ref="spinnerKx" lwc:if={componente.spinner}></c-csbd_-spinner-kx>
-
+			<div class="slds-modal__content slds-is-relative slds-var-p-vertical_medium slds-var-p-horizontal_x-large" style="overflow-y: auto;">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+				</div>
 				<div lwc:if={preguntasEmergencia.basicas.length} class="slds-section slds-is-open">
 					<h3 class="slds-section__title slds-theme_shade">
 						<span class="slds-truncate slds-var-p-horizontal_small">Preguntas básicas</span>
@@ -508,8 +515,8 @@
 
 	<!-- Modal de mensaje informativo -->
 	<section lwc:ref="modalMensaje" role="dialog" tabindex="-1" aria-modal="true" class="modalMensaje slds-modal">
-		<div class="slds-modal__container slds-align_absolute-center">
-			<div class="slds-modal__content" style="border-radius: 7px; padding: 22px 45px 19px 45px; width: fit-content;">
+		<div class="slds-modal__container slds-align--absolute-center">
+			<div class="slds-modal__content slds-is-relative" style="border-radius: 7px; padding: 22px 45px 19px 45px; width: fit-content;">
 				<div class="slds-align_absolute-center">
 					<div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center">
 						<div class="slds-col slds-shrink-none" style="margin-left: -5px; font-size: 13.5px; letter-spacing: 0.1px;">
@@ -518,10 +525,9 @@
 							</span>
 							{modalMensaje.mensaje}
 						</div>
-						<!-- <div lwc:if={modalMensaje.spinner} class="slds-col slds-is-relative" style="top: -1px;">
+						<div lwc:if={modalMensaje.spinner} class="slds-col slds-is-relative" style="top: -1px;">
 							<lightning-spinner size="x-small" variant="brand"></lightning-spinner>
-						</div> -->
-						<c-csbd_-spinner-kx lwc:if={modalMensaje.spinner} size="small"></c-csbd_-spinner-kx>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Realiza un Etiquetado con las palabras claves para el contenido de la respueta de un artículo.</description>
+    <developerName>CC_IA_Etiquetado_GPT_Knowledge</developerName>
+    <masterLabel>CC IA Etiquetado GPT Knowledge</masterLabel>
+    <relatedEntity>Knowledge__kav</relatedEntity>
+    <relatedField>Knowledge__kav.CC_IA_EtiquetadoGPT__c</relatedField>
+    <templateVersions>
+        <content>Analiza el campo {!$Input:Knowledge__kav.Answer__c} que esta en formato HTML y {!$Input:Knowledge__kav.Title}, teniendo en cuenta que son campos que guardan información sobre artículos relacionados con incidencias de un departamento de Contact Center para un banco y el ámbito va a estar relacionado con la banca y sus productos , extrae las etiquetas más relevantes que puedan guardar relación con el motivo del artículo. 
+Ten en cuenta las instrucciones a continuación antes de contestar.
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+Crea **solo** una serie de etiquetas en singular y minúscula en formato texto y separadas por &quot;;&quot; , cada una de estas etiquetas **solo** se compondran de una palabra excepto aquellas que sean nombre de productos bancarios o deban ir juntas como por ejemplo &quot;Mi Hucha&quot;, &quot;Google Pay&quot;, &quot;CaixaBank Sign&quot;, &quot;banca digital&quot;.
+Eliminar detalles secundarios: Omite cualquier información que no sea esencial para el motivo principal de la incidencia.
+Lenguaje claro y directo: Usa una palabra comprensible y sin términos técnicos innecesarios, salvo que sean fundamentales para el motivo.
+Ignorar información redundante: Si el texto incluye palabras repetitivas o sin valor, ignóralas.
+Crea entre 5 y 8 etiquetas.
+No incluyas etiquetas genéricas como &apos;error&apos;, &apos;queja&apos;, &apos;soporte&apos;, &apos;problema&apos;, &apos;gestionar&apos;,&apos;consulta&apos;, &apos;mensaje&apos;, &apos;información&apos;, &apos;incidencia&apos;, &apos;CaixaBank&apos;.
+Genera las etiquetas **Solo** en español, independientemente del idioma que detectes en los datos proporcionados.
+&quot;&quot;&quot;
+</content>
+        <generationTemplateConfigs>
+            <generationConfigDeveloperName>einstein_gpt__esEsLanguageStyle</generationConfigDeveloperName>
+        </generationTemplateConfigs>
+        <inputs>
+            <apiName>RelatedEntity</apiName>
+            <definition>SOBJECT://Knowledge__kav</definition>
+            <referenceName>Input:Knowledge__kav</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <templateVersions>
+        <content>Analiza el campo {!$Input:Knowledge__kav.Answer__c} que esta en formato HTML y {!$Input:Knowledge__kav.Title}, teniendo en cuenta que son campos que guardan información sobre artículos relacionados con incidencias de un departamento de Contact Center para un banco y el ámbito va a estar relacionado con la banca y sus productos , extrae las etiquetas más relevantes que puedan guardar relación con el motivo del artículo. 
+Ten en cuenta las instrucciones a continuación antes de contestar.
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+Las etiquetas que generes **solo** deben estar en singular y en minúsculas.
+Crea **solo** una serie de etiquetas en formato texto y separadas por &quot;;&quot; , cada una de estas etiquetas **solo** se compondran de una palabra excepto aquellas que sean nombre de productos bancarios o deban ir juntas como por ejemplo &quot;Mi Hucha&quot;, &quot;Google Pay&quot;, &quot;CaixaBank Sign&quot;, &quot;banca digital&quot;.
+Eliminar detalles secundarios: Omite cualquier información que no sea esencial para el motivo principal de la incidencia.
+Lenguaje claro y directo: Usa una palabra comprensible y sin términos técnicos innecesarios, salvo que sean fundamentales para el motivo.
+Ignorar información redundante: Si el texto incluye palabras repetitivas o sin valor, ignóralas.
+Crea entre 5 y 8 etiquetas.
+No incluyas etiquetas genéricas como &apos;error&apos;, &apos;queja&apos;, &apos;soporte&apos;, &apos;problema&apos;, &apos;gestionar&apos;,&apos;consulta&apos;, &apos;mensaje&apos;, &apos;información&apos;, &apos;incidencia&apos;, &apos;CaixaBank&apos;.
+Genera las etiquetas **Solo** en español, independientemente del idioma que detectes en los datos proporcionados.
+&quot;&quot;&quot;
+</content>
+        <generationTemplateConfigs>
+            <generationConfigDeveloperName>einstein_gpt__esEsLanguageStyle</generationConfigDeveloperName>
+        </generationTemplateConfigs>
+        <inputs>
+            <apiName>RelatedEntity</apiName>
+            <definition>SOBJECT://Knowledge__kav</definition>
+            <referenceName>Input:Knowledge__kav</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <templateVersions>
+        <content>Analiza el campo {!$Input:Knowledge__kav.Answer__c} que esta en formato HTML y {!$Input:Knowledge__kav.Title}, teniendo en cuenta que son campos que guardan información sobre artículos relacionados con incidencias de un departamento de Contact Center para un banco y el ámbito va a estar relacionado con la banca y sus productos , extrae las etiquetas más relevantes que puedan guardar relación con el motivo del artículo. 
+Ten en cuenta las instrucciones a continuación antes de contestar.
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+Crea **solo** una serie de etiquetas en singular y minúscula en formato texto y separadas por &quot;;&quot; , cada una de estas etiquetas **solo** se compondran de una palabra excepto aquellas que sean nombre de productos bancarios o deban ir juntas como por ejemplo &quot;Mi Hucha&quot;, &quot;Google Pay&quot;, &quot;CaixaBank Sign&quot;, &quot;banca digital&quot;.
+Eliminar detalles secundarios: Omite cualquier información que no sea esencial para el motivo principal de la incidencia.
+Lenguaje claro y directo: Usa una palabra comprensible y sin términos técnicos innecesarios, salvo que sean fundamentales para el motivo.
+Ignorar información redundante: Si el texto incluye palabras repetitivas o sin valor, ignóralas.
+Crea entre 5 y 8 etiquetas.
+No incluyas etiquetas genéricas como &apos;error&apos;, &apos;queja&apos;, &apos;soporte&apos;, &apos;problema&apos;, &apos;gestionar&apos;,&apos;consulta&apos;, &apos;mensaje&apos;, &apos;información&apos;, &apos;incidencia&apos;, &apos;CaixaBank&apos;.
+Genera las etiquetas **Solo** en español, independientemente del idioma que detectes en los datos proporcionados.
+No metas espacios despues de los &quot;;&quot;, un ejemplo válido: Etiqueta 1;Etiqueta 2;Etiqueta 3;Etiqueta 4 
+&quot;&quot;&quot;
+</content>
+        <generationTemplateConfigs>
+            <generationConfigDeveloperName>einstein_gpt__esEsLanguageStyle</generationConfigDeveloperName>
+        </generationTemplateConfigs>
+        <inputs>
+            <apiName>RelatedEntity</apiName>
+            <definition>SOBJECT://Knowledge__kav</definition>
+            <referenceName>Input:Knowledge__kav</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <templateVersions>
+        <content>Analiza el campo {!$Input:Knowledge__kav.Answer__c} que esta en formato HTML y teniendo en cuenta que son artículos relacionados con incidencias de un departamento de Contact Center crea **solo** una serie de etiquetas en formato texto y separadas por &quot;;&quot; , cada una de estas etiquetas se compondran de una palabra.
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+Eliminar detalles secundarios: Omite cualquier información que no sea esencial para el motivo principal de la incidencia.
+Lenguaje claro y directo: Usa una palabra comprensible y sin términos técnicos innecesarios, salvo que sean fundamentales para el motivo.
+Ignorar información redundante: Si el texto incluye palabras repetitivas o sin valor, ignóralas.
+Crea entre 5 y 8 etiquetas.
+&quot;&quot;&quot;
+</content>
+        <inputs>
+            <apiName>RelatedEntity</apiName>
+            <definition>SOBJECT://Knowledge__kav</definition>
+            <referenceName>Input:Knowledge__kav</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <templateVersions>
+        <content>Analiza el campo {!$Input:Knowledge__kav.Answer__c} que esta en formato HTML y {!$Input:Knowledge__kav.Title}, teniendo en cuenta que son campos que guardan información sobre artículos relacionados con incidencias de un departamento de Contact Center para un banco y el ámbito va a estar relacionado con la banca y sus productos , extrae las etiquetas más relevantes que puedan guardar relación con el motivo del artículo. 
+Ten en cuenta las instrucciones a continuación antes de contestar.
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+
+Crea **solo** una serie de etiquetas en formato texto y separadas por &quot;;&quot; , cada una de estas etiquetas **solo** se compondran de una palabra excepto aquellas que sean nombre de productos bancarios o deban ir juntas como por ejemplo &quot;Mi Hucha&quot;, &quot;Google Pay&quot;, &quot;CaixaBank Sign&quot;, &quot;banca digital&quot;.
+Eliminar detalles secundarios: Omite cualquier información que no sea esencial para el motivo principal de la incidencia.
+Lenguaje claro y directo: Usa una palabra comprensible y sin términos técnicos innecesarios, salvo que sean fundamentales para el motivo.
+Ignorar información redundante: Si el texto incluye palabras repetitivas o sin valor, ignóralas.
+Crea entre 5 y 8 etiquetas.
+No incluyas etiquetas genéricas como &apos;error&apos;, &apos;queja&apos;, &apos;soporte&apos;, &apos;problema&apos;, &apos;gestionar&apos;,&apos;consulta&apos;, &apos;mensaje&apos;, &apos;información&apos;, &apos;incidencia&apos;, &apos;CaixaBank&apos;.
+&quot;&quot;&quot;
+</content>
+        <generationTemplateConfigs>
+            <generationConfigDeveloperName>einstein_gpt__esEsLanguageStyle</generationConfigDeveloperName>
+        </generationTemplateConfigs>
+        <inputs>
+            <apiName>RelatedEntity</apiName>
+            <definition>SOBJECT://Knowledge__kav</definition>
+            <referenceName>Input:Knowledge__kav</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <templateVersions>
+        <content>Analiza el campo {!$Input:Knowledge__kav.Answer__c} que esta en formato HTML y {!$Input:Knowledge__kav.Title}, teniendo en cuenta que son campos que guardan información sobre artículos relacionados con incidencias de un departamento de Contact Center para un banco y el ámbito va a estar relacionado con la banca y sus productos , extrae las etiquetas más relevantes que puedan guardar relación con el motivo del artículo. 
+Ten en cuenta las instrucciones a continuación antes de contestar.
+
+###INSTRUCCIONES###
+&quot;&quot;&quot;
+
+Crea **solo** una serie de etiquetas en formato texto y separadas por &quot;;&quot; , cada una de estas etiquetas **solo** se compondran de una palabra excepto aquellas que sean nombre de productos bancarios o deban ir juntas como por ejemplo &quot;Mi Hucha&quot;, &quot;Google Pay&quot;, &quot;CaixaBank Sign&quot;, &quot;banca digital&quot;.
+Eliminar detalles secundarios: Omite cualquier información que no sea esencial para el motivo principal de la incidencia.
+Lenguaje claro y directo: Usa una palabra comprensible y sin términos técnicos innecesarios, salvo que sean fundamentales para el motivo.
+Ignorar información redundante: Si el texto incluye palabras repetitivas o sin valor, ignóralas.
+Crea entre 5 y 8 etiquetas.
+No incluyas etiquetas genéricas como &apos;error&apos;, &apos;queja&apos;, &apos;soporte&apos;, &apos;problema&apos;, &apos;gestionar&apos;,&apos;consulta&apos;, &apos;mensaje&apos;, &apos;información&apos;, &apos;incidencia&apos;, &apos;CaixaBank&apos;.
+Genera las etiquetas **Solo** en español, independientemente del idioma que detectes en los datos proporcionados.
+&quot;&quot;&quot;
+</content>
+        <generationTemplateConfigs>
+            <generationConfigDeveloperName>einstein_gpt__esEsLanguageStyle</generationConfigDeveloperName>
+        </generationTemplateConfigs>
+        <inputs>
+            <apiName>RelatedEntity</apiName>
+            <definition>SOBJECT://Knowledge__kav</definition>
+            <referenceName>Input:Knowledge__kav</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__fieldCompletion</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

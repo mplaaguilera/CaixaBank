@@ -2,7 +2,7 @@ import {LightningElement, api, wire, track} from 'lwc';
 import {getRecord, getFieldValue, getFieldDisplayValue} from 'lightning/uiRecordApi';
 import {NavigationMixin} from 'lightning/navigation';
 import LightningConfirm from 'lightning/confirm';
-import {errorApex, publicarEvento} from 'c/csbd_lwcUtils';
+import {errorApex} from 'c/csbd_lwcUtils';
 import {DATATABLE_COLUMNS, NAME_COLUMN, confirmarInicioAutenticacion, toast} from './utils.js';
 import {n2ValidarOtpMockOk, n2ValidarOtpMockKo} from './mocks.js';
 
@@ -341,7 +341,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 	}
 
 	async abrirModalValidacionesOk() {
-		//Condiciones para iniciar la operativa que no requiren invocar método Apex
+		//Condiciones para iniciar la operativa que no requieren invocar método Apex
 		if (getFieldValue(this.oportunidad, OPP_RT_DEVELOPERNAME) === 'CSBD_MAC' && !getFieldValue(this.oportunidad, OPP_CASO_ORIGEN_ID)) {
 			this.modalMensajeCerrar();
 			toast('error', 'Operativa de autenticación segura no disponible', 'La oportunidad no está vinculada a un caso origen de contact center');
@@ -406,14 +406,11 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		}
 	}
 
-	cerrarModal(cierreComponente = true) {
+	async cerrarModal(ocultarBackdrop = true) {
 		if (!this.componente.spinner) {
 			this.componente.abierto = false;
 			this.refs.modalAutenticacionOtp.classList.remove('slds-fade-in-open');
-			if (cierreComponente) {
-				this.refs.backdropModal.classList.remove('slds-backdrop_open');
-				window.setTimeout(() => publicarEvento(this, 'modalcerrado', {nombreModal: 'modalAutenticacionOtp'}), 200);
-			}
+			ocultarBackdrop && this.refs.backdropModal.classList.remove('slds-backdrop_open');
 		}
 	}
 
@@ -876,7 +873,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 
 		if (tiempoCierre) {
 			window.setTimeout(() => {
-				//this.modalMensajeCerrar();
+				this.modalMensajeCerrar();
 				typeof callback === 'function' && window.setTimeout(callback, 100);
 			}, tiempoCierre);
 		} else {

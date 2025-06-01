@@ -15,6 +15,7 @@ lightning-radio-group {
 }
 
 div.radioGroupContainer {
+    position: relative;
     border: 1px solid var(--slds-g-color-border-base-1, rgb(212, 212, 212));
     border-radius: 6px;
     overflow: hidden;
@@ -27,4 +28,48 @@ div.radioGroupContainer > div {
     padding: 4px 4px 4px 7px;
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+div.radioGroupContainer > div > c-csbd_-spinner-kx {
+    transform: scale(0.7);
+}
+
+lightning-icon.iconoGestor {
+    --slds-c-icon-color-background: #be74a8;
+}
+
+div.contenedorBannerGestorGenerico > article.slds-card.slds-scoped-notification_light {
+    cursor: default;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border: 1px solid #efefef;
+    font-size: 13.2px;
+}
+
+div.contenedorBannerGestorGenerico div.slds-scoped-notification {
+    padding: var(--lwc-spacingXSmall, 0.5rem) var(--lwc-spacingSmall, 1rem);
+}
+
+div.slds-input_faux {
+    background-color: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundInputDisabled, rgb(243, 243, 243)));
+    color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextInputDisabled, rgb(68, 68, 68)));
+}
+
+lightning-icon.iconoWarning {
+	--slds-c-icon-color-foreground-default: #f38800;
+}
+
+.debug {
+    --slds-c-icon-color-foreground: brown;
+    --slds-c-icon-color-foreground-default: brown;
+}
+
+lightning-radio-group {
+    transition: opacity 100ms ease-in-out;
+}
+
+lightning-radio-group.fadeOut {
+    opacity: 0;
 }

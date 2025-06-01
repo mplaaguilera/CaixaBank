@@ -4,6 +4,7 @@
     <label>CSBD_Genesys</label>
     <oauthConfig>
         <callbackUrl>https://login.salesforce.com/services/oauth2/callback</callbackUrl>
+        <consumerKey>3MVG96MLzwkgoRzmKvinbMbdRhCR8OGzIHby3aBRRfGyE_LAx_vs_AzcL5TcnuluQNDIzANFkRBYjcDPcOSOT</consumerKey>
         <isAdminApproved>true</isAdminApproved>
         <isClientCredentialEnabled>true</isClientCredentialEnabled>
         <isCodeCredentialEnabled>false</isCodeCredentialEnabled>

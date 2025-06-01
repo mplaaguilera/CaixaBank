@@ -1,85 +1,102 @@
 {
-  "search.exclude": {
-    "**/node_modules": true,
-    "**/bower_components": true,
-    "**/.sfdx": true
-  },
-  "workbench.colorCustomizations": {
-    "editor.selectionBackground": "#e788ff7c",
-    "editor.selectionHighlightBackground": "#ff00005b",
-    "tab.activeForeground": "#ffffff",
-    "tab.activeBorder": "#006bc9",
-    "tab.activeModifiedBorder": "#f4a238",
-    "statusBar.background": "#158F8B",
-    "activityBar.background": null
-  },
-  "eslint.useFlatConfig": false,
-  "salesforce.einsteinForDevelopers.enableAutocompletions": false,
-  "salesforce.einsteinForDevelopers.autocompletionLength": "Short",
-  "workbench.externalBrowser": "chrome",
-  "CodeGPT.apiKey": "CodeGPT Plus Beta",
-  "salesforcedx-vscode-slds.enhancements.autoSuggest": true,
-  "sarif-viewer.connectToGithubCodeScanning": "off",
-  "salesforce.einsteinForDevelopers.enable": true,
-  "chat.mcp.discovery.enabled": false,
-  "chat.mcp.enabled": true,
-  "mcp": {
-
-    "inputs": [],
-    "servers": {}
-  },
-  "squarl.groups": [
-    {
-      "id": "salesforce",
-      "name": "Salesforce"
-    },
-    {
-      "id": "component-blueprints",
-      "name": "Component blueprints"
-    },
-    {
-      "id": "lightning-design-system",
-      "name": "Lightning Design System"
-    }
-  ],
-  "squarl.bookmarks": [
-    {
-      "name": "> Lightning Design System v1",
-      "path": "https://v1.lightningdesignsystem.com",
-      "description": "",
-      "type": "link",
-      "groupId": "lightning-design-system"
-    },
-    {
-      "name": "> Icones",
-      "path": "https://v1.lightningdesignsystem.com/icons/",
-      "description": "",
-      "type": "link",
-      "groupId": "lightning-design-system"
-    },
-    {
-      "name": "Textarea",
-      "path": "https://v1.lightningdesignsystem.com/components/textarea/",
-      "description": "",
-      "type": "link",
-      "groupId": "lightning-design-system"
-    },
-    {
-      "name": "Button",
-      "path": "https://v1.lightningdesignsystem.com/components/buttons/",
-      "description": "",
-      "type": "link",
-      "groupId": "lightning-design-system"
-    }
-  ],
-  "salesforce.einsteinForDevelopers.enableAutocompletionsByFileType": {
-    "apex": false,
-    "javascript": true,
-    "css": true,
-    "html": true
-  },
-  "git.decorations.enabled": false,
-  "explorer.decorations.badges": false,
-  "explorer.decorations.colors": false,
-  "explorer.fileNesting.enabled": true
+	"search.exclude": {
+		"**/node_modules": true,
+		"**/bower_components": true,
+		"**/.sfdx": true
+	},
+	"workbench.colorCustomizations": {
+		"editor.selectionBackground": "#e788ff7c",
+		"editor.selectionHighlightBackground": "#ff00005b",
+		"tab.activeForeground": "#ffffff",
+		"tab.activeBorder": "#006bc9",
+		"tab.activeModifiedBorder": "#f4a238",
+		"statusBar.background": "#158F8B",
+		"activityBar.background": null
+	},
+	"eslint.useFlatConfig": false,
+	"salesforce.einsteinForDevelopers.enableAutocompletions": false,
+	"salesforce.einsteinForDevelopers.autocompletionLength": "Short",
+	"workbench.externalBrowser": "chrome",
+	"CodeGPT.apiKey": "CodeGPT Plus Beta",
+	"salesforcedx-vscode-slds.enhancements.autoSuggest": true,
+	"sarif-viewer.connectToGithubCodeScanning": "off",
+	"salesforce.einsteinForDevelopers.enable": true,
+	"chat.mcp.discovery.enabled": false,
+	"chat.mcp.enabled": true,
+	"mcp": {
+		"inputs": [],
+		"servers": {}
+	},
+	"squarl.groups": [
+		{
+			"id": "salesforce",
+			"name": "Salesforce"
+		},
+		{
+			"id": "component-blueprints",
+			"name": "Component blueprints"
+		},
+		{
+			"id": "lightning-design-system",
+			"name": "Lightning Design System"
+		}
+	],
+	"squarl.bookmarks": [
+		{
+			"name": "> Lightning Design System v1",
+			"path": "https://v1.lightningdesignsystem.com",
+			"description": "",
+			"type": "link",
+			"groupId": "lightning-design-system"
+		},
+		{
+			"name": "> Icones",
+			"path": "https://v1.lightningdesignsystem.com/icons/",
+			"description": "",
+			"type": "link",
+			"groupId": "lightning-design-system"
+		},
+		{
+			"name": "Textarea",
+			"path": "https://v1.lightningdesignsystem.com/components/textarea/",
+			"description": "",
+			"type": "link",
+			"groupId": "lightning-design-system"
+		},
+		{
+			"name": "Button",
+			"path": "https://v1.lightningdesignsystem.com/components/buttons/",
+			"description": "",
+			"type": "link",
+			"groupId": "lightning-design-system"
+		}
+	],
+	"salesforce.einsteinForDevelopers.enableAutocompletionsByFileType": {
+		"apex": false,
+		"javascript": true,
+		"css": true,
+		"html": true
+	},
+	"git.decorations.enabled": false,
+	"explorer.decorations.badges": false,
+	"explorer.decorations.colors": false,
+	"explorer.fileNesting.enabled": true,
+	"actionButtons": {
+		"commands": [
+			{
+				"name": "$(diff) Diff",
+				"color": "currentColor",
+				"useVsCodeApi": true,
+				"command": "sf.diff"
+			},
+			{
+				"name": "$(symbol-method) Object Manager",
+				"useVsCodeApi": false,
+				"command": "open https://caixabankcc--devservice.sandbox.my.salesforce-setup.com/lightning/setup/ObjectManager/home"
+			}
+		],
+		"defaultColor": "currentColor",
+		"reloadButton": null,
+		"loadNpmCommands": false
+	}
 }

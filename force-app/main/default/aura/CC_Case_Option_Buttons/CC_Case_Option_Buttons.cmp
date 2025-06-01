@@ -275,15 +275,14 @@
     <aura:method name="remitirPublico" action="{!c.abrirModalRemitirColaboradorPublico}"/>
     <aura:method name="metodoCerrarTest" action="{!c.cerrarModalPreguntasNivel2}"/>
 
-    <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.messageChannelOnmessage}" aura:id="derivarInteraccionChannel"/>
-
+    <!-- <aura:handler event="c:cc_DerivarEvent" action="{!c.realizarTrasladoDesdeDerivar}" /> -->
+    <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.onDerivarInteraccionChannel}" scope="APPLICATION" aura:id="derivarInteraccionChannel"/>
     <!--Lightning Data Service-->
     <force:recordData aura:id="recordDataCase" recordId="{!v.recordId}" layoutType="COMPACT" targetFields="{!v.caso}"
         fields="OwnerId, CC_MCC_Motivo__c,CaseNumber, CC_MCC_Plantilla__c, CC_Derivar__c,
                 CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_MCC_Motivo__r.CC_AmbitoTareas__c, CC_MCC_Solucion__r.CC_AmbitoTareas__c"
         recordUpdated="{!c.recordDataUpdated}" targetError="{!v.recordDataError}"/>
 
-    <button aura:id="botonDummy" class="sldd-hidden" />
     <div class="slds-backdrop" aura:id="backdrop" />
 
     <!--Spinner-->
@@ -438,10 +437,11 @@
         <!--Modal para trasladar/remitir a colaborador-->
         <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="ModalboxColab" onkeydown="{!c.modalTrasladarColaboradorTeclaPulsada}">
             <div class="slds-modal__container">
+                <!--Cabecera del modal-->
                 <header class="slds-modal__header">
-					<button class="slds-button slds-button_icon slds-modal__close" onclick="{!c.cerrarModalTrasladarColaborador}">
-						<lightning:icon iconName="utility:close" size="small"></lightning:icon>
-					</button>
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalTrasladarColaborador }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
                     <h2 class="slds-text-heading_medium slds-hyphenate">{!!v.remitir ? 'Trasladar a grupo colaborador' :
                         'Remitir a grupo colaborador'}</h2>
                     <p class="slds-var-m-top_x-small">{!!v.remitir ? 'Seleccione el grupo colaborador al que trasladar la

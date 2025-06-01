@@ -184,7 +184,8 @@ public with sharing class CSBD_SIR {
     }
 
     public static void actualizarDatosRiesgoClientesOportunidades(List<Id> idOportunidades, Boolean actualizarOportunidades) {
-        List<Opportunity> oportunidades = [SELECT CSBD_Contact__c, CSBD_Contact_2__c, CSBD_Now_Presolicitud__c FROM Opportunity WHERE Id IN :idOportunidades];
+        List<Opportunity> oportunidades = [SELECT CSBD_Contact__c, CSBD_Contact_2__c, CSBD_Now_Presolicitud__c
+                                            FROM Opportunity WHERE Id IN :idOportunidades AND CSBD_Account_Tipo_Persona__c != 'J'];
 
         Map<Id, List<Opportunity>> idContactoOportunidadesMap = new Map<Id, List<Opportunity>>();
         List<Opportunity> oportunidadesContactoList = new List<Opportunity>();

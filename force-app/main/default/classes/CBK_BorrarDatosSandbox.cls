@@ -25,10 +25,10 @@ public with sharing class CBK_BorrarDatosSandbox implements Schedulable {
     @future @TestVisible
     private static void borrarTrazas() {
         //Conserva solo los 4000 registros más recientes dentro de los creados en los últimos 5 días
-        Database.delete([SELECT Id FROM CBK_Log__c WHERE LastModifiedDate < LAST_N_DAYS:5], false);
+        Database.delete([SELECT Id FROM CBK_Log__c WHERE LastModifiedDate < LAST_N_DAYS:4 LIMIT 9000], false);
         Database.delete([SELECT Id FROM CBK_Log__c ORDER BY CreatedDate ASC LIMIT :Math.max(0, [SELECT COUNT() FROM CBK_Log__c] - 4000)], false);
 
-        Database.delete([SELECT Id FROM CC_TrazaInt__c WHERE LastModifiedDate < LAST_N_DAYS:5], false);
+        Database.delete([SELECT Id FROM CC_TrazaInt__c WHERE LastModifiedDate < LAST_N_DAYS:4 LIMIT 9000], false);
         Database.delete([SELECT Id FROM CC_TrazaInt__c ORDER BY CreatedDate ASC LIMIT :Math.max(0, [SELECT COUNT() FROM CC_TrazaInt__c] - 4000)], false);
     }
 
@@ -55,16 +55,18 @@ public with sharing class CBK_BorrarDatosSandbox implements Schedulable {
         Database.delete([SELECT Id FROM SEG_Marcasdeuncaso__c WHERE SEG_Caso__c = NULL OR SEG_Caso__r.LastModifiedDate < LAST_N_DAYS:7], false);
         Database.delete([SELECT Id FROM CBK_CaseHistory__c WHERE CBK_CaseId__c = NULL OR CBK_CaseId__r.LastModifiedDate < LAST_N_DAYS:7], false);
         Database.delete([SELECT Id FROM Task WHERE WhatId = NULL OR LastModifiedDate < LAST_N_DAYS:7 ORDER BY LastModifiedDate ASC LIMIT 4000], false);
+        Database.delete([SELECT Id FROM CBK_Case_Extension__c WHERE LastModifiedDate < LAST_N_DAYS:7 AND Case_Id__r.LastModifiedDate < LAST_N_DAYS:7 ORDER BY LastModifiedDate ASC LIMIT 4000], false);
         Database.delete([SELECT Id FROM Case WHERE LastModifiedDate < LAST_N_DAYS:7 ORDER BY LastModifiedDate ASC LIMIT 4000], false);
     }
 
     @future @TestVisible
     private static void borrarOtros() {
-        Database.delete([SELECT Id FROM EmailMessage WHERE LastModifiedDate < LAST_N_DAYS:7], false);
-        Database.delete([SELECT Id FROM SAC_Antecedentes__c WHERE LastModifiedDate < LAST_N_DAYS:5], false);
-        Database.delete([SELECT Id FROM SAC_AdjuntoAntecedente__c WHERE SAC_Antecedente__r.LastModifiedDate < LAST_N_DAYS:5], false);
-        Database.delete([SELECT Id FROM SAC_TMECaso__c WHERE LastModifiedDate < LAST_N_DAYS:5], false);
-        Database.delete([SELECT Id FROM CBK_SCH_PendingProcess__c WHERE Schedule_Time__c < LAST_N_DAYS:5], false);
+        Database.delete([SELECT Id FROM EmailMessage WHERE LastModifiedDate < LAST_N_DAYS:7 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM SAC_Antecedentes__c WHERE LastModifiedDate < LAST_N_DAYS:7 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM SAC_AdjuntoAntecedente__c WHERE SAC_Antecedente__r.LastModifiedDate < LAST_N_DAYS:7 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM SAC_TMECaso__c WHERE LastModifiedDate < LAST_N_DAYS:7 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM CBK_SCH_PendingProcess__c WHERE Schedule_Time__c < LAST_N_DAYS:7 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM Account WHERE Id NOT IN (SELECT AccountId FROM Case) AND Id NOT IN (SELECT AccountId FROM Entitlement) AND LastModifiedDate < LAST_N_DAYS:7 LIMIT 1000], false);
     }
 
     @TestVisible

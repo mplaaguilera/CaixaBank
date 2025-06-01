@@ -114,6 +114,30 @@ public with sharing class CSBD_TestDataFactory {
         return admin;
     }
 
+    public static User usuarioIntegracion() {
+        User usuario = new User();
+        usuario.FirstName = 'IntegracionCSBD';
+        usuario.LastName = '1';
+        usuario.IsActive = true;
+        usuario.Alias = 'api_user';
+        usuario.Email = 'usuario_api_test@test.com';
+        usuario.EmailEncodingKey = 'ISO-8859-1';
+        usuario.LanguageLocaleKey = 'es';
+        usuario.LocaleSidKey = 'es_ES';
+        // usuario.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'CSBD Genérico'].Id;
+        usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'CBK_Connected_Apps_Integration' LIMIT 1].Id;
+        usuario.TimeZoneSidKey = 'Europe/Madrid';
+        usuario.UserName = 'usuario_int_test_' + UserInfo.getOrganizationId() + '_' + System.currentTimeMillis() + '@test.com';
+        insert usuario;
+
+        PermissionSetAssignment psa = new PermissionSetAssignment();
+        psa.PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'CSBD_API_ONLY' LIMIT 1].Id;
+        psa.AssigneeId = usuario.Id;
+        insert psa;
+
+        return usuario;
+    }
+
     private static void asignarPublicGroup(String nombreGroup, Id idUsuario) {
         GroupMember miembroGrupo = new GroupMember();
         miembroGrupo.GroupId = [SELECT Id FROM Group WHERE DeveloperName = :nombreGroup].Id;

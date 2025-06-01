@@ -1,13 +1,20 @@
 @RestResource(urlMapping='/AltaOportunidad/*')
 global with sharing class CSBD_WS_AltaOportunidad {
+	public static String respuestaLog = '';
 
-	private static List<CSBD_IdentificacionImagin__c> identificacionImagin = [SELECT CSBD_AplicarLogica__c FROM CSBD_IdentificacionImagin__c LIMIT 1];
+	private static List<CSBD_IdentificacionImagin__c> identificacionImagin = [SELECT CSBD_AplicarLogica__c
+																				FROM CSBD_IdentificacionImagin__c
+																				LIMIT 1];
 	//Método principal de la integración
 	@HttpPost
 	global static CSBD_WS_AltaOportunidad_Output altaOportunidad() {
 		RestRequest req = RestContext.request;
 		String requestString = req.requestBody.toString();
-		CSBD_WS_AltaOportunidad_Input input = (CSBD_WS_AltaOportunidad_Input)JSON.deserializeStrict(requestString, CSBD_WS_AltaOportunidad_Input.class);
+
+		CSBD_WS_AltaOportunidad_Input input = (CSBD_WS_AltaOportunidad_Input)JSON.deserializeStrict(
+			requestString, CSBD_WS_AltaOportunidad_Input.class
+		);
+
 		return gestionEntradaOportunidad(input, 'WS', requestString);
 	}
 	public static CSBD_WS_AltaOportunidad_Output gestionEntradaOportunidad(CSBD_WS_AltaOportunidad_Input input, String origen) {
@@ -29,10 +36,6 @@ global with sharing class CSBD_WS_AltaOportunidad {
 		Map<String, List<CC_Lista_Valores__c>> empresaHorario = new Map<String, List<CC_Lista_Valores__c>>();
 		Map<String, BusinessHours> nombreHorario = new Map<String, BusinessHours>();
 		String centro;
-		Set<Id> accountIds = new Set<Id>();
-		Set<Id> accountsIdsCaixabank = new Set<Id>();
-		List<Account> accountsQuery= new List<Account>();
-		Map<String, Id> oportunidadCuentaMap = new  Map<String, Id>();
 
 
 		for (CSBD_WS_AltaOportunidad_Input.Solicitud solicitud : input.solicitudes) {
@@ -49,65 +52,34 @@ global with sharing class CSBD_WS_AltaOportunidad {
 			else if (String.isNotBlank(solicitud.nombreProducto)) {
 				productosOportunidadSet.add(solicitud.nombreProducto);
 			}
-
-			//Obtener los accountsIds pertenecientes a cada oportunidad mediante el método identificarCliente.
-			//Creación de un mapa relacionando el numsolicitud de la futura oportunidad con su accountId.
-
-			if (!identificacionImagin.isEmpty() && identificacionImagin[0].CSBD_AplicarLogica__c == true) {
-				Map<String, Object> campos = new  Map<String, Object>();
-				CSBD_WS_AltaOportunidad_Output.Respuesta respuesta = new CSBD_WS_AltaOportunidad_Output.Respuesta();
-				CSBD_WS_AltaOportunidad_Campos.identificarCliente(solicitud,campos,respuesta);
-
-				String accountIdString = (String) campos.get('AccountId');
-
-				if (accountIdString != null) {
-					Id accountId = Id.valueOf(accountIdString);
-					accountIds.add(accountId);
-					oportunidadCuentaMap.put(solicitud.numsolicitud, accountId);
-				}
-			}
-
 		}
-
-		//Obtenemos los accountIds que pertenecen a un account Imaginbank.
-		if (!identificacionImagin.isEmpty() && identificacionImagin[0].CSBD_AplicarLogica__c == true) {
-
-			if (!accountIds.isEmpty()) {
-				List<Account> selectedAccounts = [SELECT Id FROM Account WHERE AV_IndicadoresClientes__c INCLUDES (';11;') AND Id IN :accountIds];
-
-				for (Account acc : selectedAccounts) {
-					accountsIdsCaixabank.add(acc.Id);
-				}
-			}
-
-		//Eliminación del mapa de las claves cuyo valor sea un AccountId perteneciente a un account Imaginbank.
-		Set<String> keysToRemove = new Set<String>();
-
-		for (String key : oportunidadCuentaMap.keySet()) {
-			if (accountsIdsCaixabank.contains(oportunidadCuentaMap.get(key))) {
-			keysToRemove.add(key);
-		}
-		}
-
-		oportunidadCuentaMap.keySet().removeAll(keysToRemove);
-		}
-
-
 
 		//Cuando llega un desistimientoPrestamo buscamos la oportunidad existente para cerrarla
 		if (!idsNumSolicitud.isEmpty()) {
-			prestamosFiltrados = [SELECT CSBD_Identificador__c, IsClosed, CSBD_Alta_omnichannel__c, CSBD_Now_Presolicitud__c FROM Opportunity
-													WHERE RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_Prestamo')
-													AND CSBD_Now_Presolicitud__c IN :idsNumSolicitud];
+			prestamosFiltrados = [SELECT CSBD_Identificador__c, IsClosed, CSBD_Alta_omnichannel__c,
+									CSBD_Now_Presolicitud__c, CSBD_Empresa_Proveedora__c
+									FROM Opportunity
+									WHERE RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_Prestamo')
+									AND CSBD_Now_Presolicitud__c IN :idsNumSolicitud];
 		}
 		if (!productosOportunidadSet.isEmpty()) {
 			//Listado de productos y horarios que deben trasladarse
-			for (CC_Lista_Valores__c valorLista: [SELECT Name, CSBD_Aplica_horario__c, CSBD_Empresa_proveedora__c, CSBD_Tipo_regla__c, RecordType.DeveloperName, CSBD_Hora_inicio_turno__c, CSBD_Hora_fin_turno__c, CSBD_Centro__c FROM CC_Lista_Valores__c
+			for (CC_Lista_Valores__c valorLista: [SELECT Name, CSBD_Aplica_horario__c,
+													CSBD_Empresa_proveedora__c, CSBD_Tipo_regla__c,
+													RecordType.DeveloperName, CSBD_Hora_inicio_turno__c,
+													CSBD_Hora_fin_turno__c, CSBD_Centro__c
+													FROM CC_Lista_Valores__c
 													WHERE
-														(RecordType.DeveloperName = 'CC_Valor' AND CC_Lista__r.Name = 'CSBD: Relación de valores Now - Salesforce: Empresa, familia y producto'
-														AND Name = :productosOportunidadSet AND CC_Activa__c = TRUE AND CC_Valor_SFDC__c = 'imaginBank')
+														(RecordType.DeveloperName = 'CC_Valor'
+														AND CC_Lista__r.Name = 'CSBD: Relación de valores Now - Salesforce: Empresa, familia y producto'
+														AND Name = :productosOportunidadSet
+														AND CC_Activa__c = TRUE
+														AND CC_Valor_SFDC__c = 'imaginBank')
 													OR
-														(Recordtype.DeveloperName = 'CSBD_Regla_traspaso_oportunidad' AND CC_Activa__c = true AND CC_Fecha_Vigencia_Inicio__c < :CBK_UtilsDate.nowSYS()  AND CC_Fecha_Vigencia_Fin__c > :CBK_UtilsDate.nowSYS()
+														(Recordtype.DeveloperName = 'CSBD_Regla_traspaso_oportunidad'
+														AND CC_Activa__c = true
+														AND CC_Fecha_Vigencia_Inicio__c < :CBK_UtilsDate.nowSYS()
+														AND CC_Fecha_Vigencia_Fin__c > :CBK_UtilsDate.nowSYS()
 														AND ((Name = :productosOportunidadSet AND CSBD_Tipo_regla__c = 'Producto') OR CSBD_Tipo_regla__c = 'Horario' OR CSBD_Tipo_regla__c = 'Tipo oportunidad')) ]) {
 
 				//Listado de productos para evaluar si la oportunidad entrante es imaginBank o CaixaBank
@@ -148,7 +120,6 @@ global with sharing class CSBD_WS_AltaOportunidad {
 			//Para cada solicitud
 			CSBD_WS_AltaOportunidad_Input.Solicitud inputSolicitudOriginal = solicitud; //Para la descripción de la tarea si se crea oportunidad
 			CSBD_WS_AltaOportunidad_Output.Respuesta respuesta = new CSBD_WS_AltaOportunidad_Output.Respuesta();
-			String respuestaLog = '';
 			Boolean finOK = false;
 
 
@@ -157,13 +128,14 @@ global with sharing class CSBD_WS_AltaOportunidad {
 				String empresaProveedora = 'Now In Sales';
 				Boolean aplicaHorario = false;
 
-				respuestaLog = 'Tipo oportunidad: ' + solicitud.tipoSolicitud + '. ';
+				respuestaLog += 'Tipo oportunidad: ' + solicitud.tipoSolicitud + '. ';
 				respuestaLog += 'Fecha entrada: ' + CBK_UtilsDate.nowSYS().date()+ '. ';
 				respuestaLog += 'Hora entrada: ' + CBK_UtilsDate.nowSYS().time()+ '. ';
 
 				//Lógica Oportunidad Now In Sales vs traslado a Mis Clientes AV_CreateOpportunityCallMe
 				//El tipo de oportunidad está dado de alta, si no nunca se trasladará
 				if (tiposOportunidad.contains(solicitud.tipoSolicitud)) {
+
 					//Unificamos el valor de producto, dependiendo del tipo de solicitud llega en un valor u otro
 					String producto = '';
 
@@ -176,75 +148,82 @@ global with sharing class CSBD_WS_AltaOportunidad {
 
 					respuestaLog += 'Producto oportunidad: ' + producto + '. ';
 
+					//Obtener los accountsIds pertenecientes a cada oportunidad mediante el método identificarCliente.
+					//Creación de un mapa relacionando el numsolicitud de la futura oportunidad con su accountId.
+
+					Map<String, Object> campos = new  Map<String, Object>();
+					if(String.isBlank(solicitud.indInTouch)){
+						campos = CSBD_WS_AltaOportunidad_Campos.identificarCliente(solicitud,campos,respuesta);
+					}
+
 					//Solo se comprueba la lógica de traspasar si indInTouch == 'S'
+					if (solicitud.indInTouch == 'S' || (campos.containsKey('AV_IndicadoresClientes__c') && campos.get('AV_IndicadoresClientes__c') == '8')) {
 
-					if (solicitud.indInTouch == 'S'){
-
-					//¿Es empresa imagin?  -- el producto está dado de alta en la lista de valores -- no tenemos en cuenta indInTouch = S/N
-					if (oportunidadNowInSales) {
-						//Evaluamos producto si es imagin o caixa
-						if (!productosImagin.isEmpty() && productosImagin.contains(producto) && (!oportunidadCuentaMap.containsKey(solicitud.numsolicitud) || (!identificacionImagin.isEmpty() && identificacionImagin[0].CSBD_AplicarLogica__c == false) )) {
-							oportunidadNowInSales = false;
-							empresaProveedora = 'imaginBank';
-						}
-					}
-					//Si no es imagin y se cumple indInTouch == 'S' --> Es cliente intouch
-					if (oportunidadNowInSales && solicitud.indInTouch == 'S') {
-						oportunidadNowInSales = false;
-						empresaProveedora = 'inTouch';
-					}
-
-					respuestaLog += 'Empresa identificada: ' + empresaProveedora + '. ';
-
-					//OportunidadNowInSales == false --> Pertenece a inTouch o imaginBank
-					//Evaluamos producto
-					if (!oportunidadNowInSales) {
-						//Lo devolvemos a true para evaluar si se cumple la nueva condición
-						oportunidadNowInSales = true;
-						if (empresaProductoValor.containsKey(empresaProveedora)) {
-							Map<String, CC_Lista_Valores__c> productoValor = empresaProductoValor.get(empresaProveedora);
-							if (productoValor.containsKey(producto)) {
+						//¿Es empresa imagin?  -- el producto está dado de alta en la lista de valores -- no tenemos en cuenta indInTouch = S/N
+						if (oportunidadNowInSales) {
+							//Evaluamos producto si es imagin o caixa
+							if (!productosImagin.isEmpty() && productosImagin.contains(producto) && ((!identificacionImagin.isEmpty() && identificacionImagin[0].CSBD_AplicarLogica__c == false) || campos.get('AV_IndicadoresClientes__c') == '11' )) {
 								oportunidadNowInSales = false;
-								centro = String.isNotBlank(productoValor.get(producto).CSBD_Centro__c) ? productoValor.get(producto).CSBD_Centro__c : empresaProveedora;
-								aplicaHorario = productoValor.get(producto).CSBD_Aplica_horario__c;
+								empresaProveedora = 'imaginBank';
 							}
 						}
-						respuestaLog += '¿Encuentra producto? ' + !oportunidadNowInSales + '. ';
+						//Si no es imagin y se cumple indInTouch == 'S' --> Es cliente intouch
+						if (oportunidadNowInSales && (solicitud.indInTouch == 'S' || (campos.containsKey('AV_IndicadoresClientes__c') && campos.get('AV_IndicadoresClientes__c') == '8'))) {
+							oportunidadNowInSales = false;
+							empresaProveedora = 'inTouch';
+						}
+
+						respuestaLog += 'Empresa identificada: ' + empresaProveedora + '. ';
+
+						//OportunidadNowInSales == false --> Pertenece a inTouch o imaginBank
+						//Evaluamos producto
 						if (!oportunidadNowInSales) {
-							respuestaLog += '¿Aplica horario? ' + aplicaHorario + '. ';
-							respuestaLog += 'Centro: ' + centro + '. ';
-						}
-					}
-
-					//OportunidadNowInSales == false --> Pertenece a inTouch o imaginBank
-					//aplicaHorario == true ---> lo evaluamos
-					if (!oportunidadNowInSales && aplicaHorario) {
-						//Lo devolvemos a true para evaluar si se cumple la nueva condición
-						oportunidadNowInSales = true;
-						Datetime fechaEfectiva = CBK_UtilsDate.nowSYS();
-						if (solicitud.tipoSolicitud == 'cmb') {
-							fechaEfectiva = CSBD_WS_AltaOportunidad_NowInSales.calcularHoraCMB(solicitud);
-						}
-						if (empresaHorario.containsKey(empresaProveedora)) {
-							//Sacar business hours que aplican
-							String nombreHorarioLista = '';
-							for (CC_Lista_Valores__c valorHorario: empresaHorario.get(empresaProveedora)) {
-								if (valorHorario.CSBD_Hora_inicio_turno__c <= fechaEfectiva.time() && fechaEfectiva.time() <= valorHorario.CSBD_Hora_fin_turno__c) {
-									nombreHorarioLista = valorHorario.Name;
-								}
-							}
-							if (String.isNotBlank(nombreHorarioLista) && nombreHorario.containsKey(nombreHorarioLista)) {
-								Businesshours horarioVigente = nombreHorario.get(nombreHorarioLista);
-
-								if (BusinessHours.isWithin(horarioVigente.Id, fechaEfectiva)) {
+							//Lo devolvemos a true para evaluar si se cumple la nueva condición
+							oportunidadNowInSales = true;
+							if (empresaProductoValor.containsKey(empresaProveedora)) {
+								Map<String, CC_Lista_Valores__c> productoValor = empresaProductoValor.get(empresaProveedora);
+								if (productoValor.containsKey(producto)) {
 									oportunidadNowInSales = false;
+									centro = String.isNotBlank(productoValor.get(producto).CSBD_Centro__c) ? productoValor.get(producto).CSBD_Centro__c : empresaProveedora;
+									aplicaHorario = productoValor.get(producto).CSBD_Aplica_horario__c;
 								}
 							}
+							respuestaLog += '¿Encuentra producto? ' + !oportunidadNowInSales + '. ';
+							if (!oportunidadNowInSales) {
+								respuestaLog += '¿Aplica horario? ' + aplicaHorario + '. ';
+								respuestaLog += 'Centro: ' + centro + '. ';
+							}
 						}
-						respuestaLog += '¿Está dentro de horario? ' + !oportunidadNowInSales + '. ';
-						respuestaLog += 'Fecha asignación: ' + fechaEfectiva.date() + '. ';
-						respuestaLog += 'Hora asignación: ' + fechaEfectiva.time() + '. ';
-					}
+
+						//OportunidadNowInSales == false --> Pertenece a inTouch o imaginBank
+						//aplicaHorario == true ---> lo evaluamos
+						if (!oportunidadNowInSales && aplicaHorario) {
+							//Lo devolvemos a true para evaluar si se cumple la nueva condición
+							oportunidadNowInSales = true;
+							Datetime fechaEfectiva = CBK_UtilsDate.nowSYS();
+							if (solicitud.tipoSolicitud == 'cmb') {
+								fechaEfectiva = CSBD_WS_AltaOportunidad_NowInSales.calcularHoraCMB(solicitud);
+							}
+							if (empresaHorario.containsKey(empresaProveedora)) {
+								//Sacar business hours que aplican
+								String nombreHorarioLista = '';
+								for (CC_Lista_Valores__c valorHorario: empresaHorario.get(empresaProveedora)) {
+									if (valorHorario.CSBD_Hora_inicio_turno__c <= fechaEfectiva.time() && fechaEfectiva.time() <= valorHorario.CSBD_Hora_fin_turno__c) {
+										nombreHorarioLista = valorHorario.Name;
+									}
+								}
+								if (String.isNotBlank(nombreHorarioLista) && nombreHorario.containsKey(nombreHorarioLista)) {
+									Businesshours horarioVigente = nombreHorario.get(nombreHorarioLista);
+
+									if (BusinessHours.isWithin(horarioVigente.Id, fechaEfectiva)) {
+										oportunidadNowInSales = false;
+									}
+								}
+							}
+							respuestaLog += '¿Está dentro de horario? ' + !oportunidadNowInSales + '. ';
+							respuestaLog += 'Fecha asignación: ' + fechaEfectiva.date() + '. ';
+							respuestaLog += 'Hora asignación: ' + fechaEfectiva.time() + '. ';
+						}
 					}
 				}
 				else {
@@ -262,18 +241,26 @@ global with sharing class CSBD_WS_AltaOportunidad {
 					//Llamada a altaOportunidad Mis Clientes
 					AV_CreateOpportunityCallMe.statusResponse statusResponseAV = AV_CreateOpportunityCallMe.createOpp(requestString,centro);
 
-					respuesta.resultado = 'OK Traspasada: ' + empresaProveedora;
-					respuesta.opportunityId = statusResponseAV.idOpp;
-					respuesta.detalleError = statusResponseAV.errorMessage;
-					respuestaLog += '¿Se ha creado la oportunidad en la aplicación Mis Clientes? ' + statusResponseAV.isSuccess;
-					finOK = Boolean.valueOf(statusResponseAV.isSuccess);
+					System.debug('statusResponseAV: ' + statusResponseAV);
 
-				}
-				else {
+					if (Boolean.valueOf(statusResponseAV.isSuccess)) {
+						finOK = true;
+						respuesta.resultado = 'OK Traspasada: ' + empresaProveedora;
+						respuesta.opportunityId = statusResponseAV.idOpp;
+						respuesta.detalleError = statusResponseAV.errorMessage;
+						respuestaLog += '¿Se ha creado la oportunidad en la aplicación Mis Clientes? ' + statusResponseAV.isSuccess;
+					} else {
+						finOK = false;
+						respuesta.resultado = 'KO';
+						respuesta.codigoError = 'KO';
+						respuesta.detalleError = statusResponseAV.errorMessage;
+					}
+
+				} else {
 					//Llamada altaOportunidad Now In Sales
-					Map<String, Object> respuestaAltaOportunidadNowInSales = CSBD_WS_AltaOportunidad_NowInSales.altaOportunidad_NowInSales(solicitud, inputSolicitudOriginal, respuesta, camposComprobarMetadato, prestamosFiltrados);
-					respuesta = (CSBD_WS_AltaOportunidad_Output.Respuesta)respuestaAltaOportunidadNowInSales.get('respuesta');
-					oportunidadesCreadas = (List<Opportunity>)respuestaAltaOportunidadNowInSales.get('oportunidadesCreadas');
+					Map<String, Object> retornoAlta = CSBD_WS_AltaOportunidad_NowInSales.altaOportunidad_NowInSales(solicitud, inputSolicitudOriginal, respuesta, camposComprobarMetadato, prestamosFiltrados);
+					respuesta = (CSBD_WS_AltaOportunidad_Output.Respuesta)retornoAlta.get('respuesta');
+					oportunidadesCreadas = (List<Opportunity>)retornoAlta.get('oportunidadesCreadas');
 					finOK = true;
 				}
 			} catch (Exception e) {
@@ -342,10 +329,10 @@ global with sharing class CSBD_WS_AltaOportunidad {
         CSBD_AltaOportunidadMac__e evento = new CSBD_AltaOportunidadMac__e();
         evento.CSBD_CaseId__c = idCaso;
         Database.SaveResult resultado = EventBus.publish(evento);
-        return new Map<String, Object>{
-            'success' => resultado.isSuccess(),
-            'errorMessage' => resultado.isSuccess() ? null : resultado.getErrors()[0].getMessage()
-        };
+        Map<String, Object> retorno = new Map<String, Object>();
+        retorno.put('success', resultado.isSuccess());
+        retorno.put('errorMessage', resultado.isSuccess() ? null : resultado.getErrors()[0].getMessage());
+        return retorno;
     }
 
 	public static void altaOportunidadMacEvento(Id recordId) {
@@ -380,77 +367,4 @@ global with sharing class CSBD_WS_AltaOportunidad {
 		System.debug('detalleOportunidad: ' + outputRespuesta.detalleOportunidad);
 
     }
-
-	// Lògica per a la creació d'oportunitat de Préstec Online PJ (empreses)
-	if (solicitud.tipoSolicitud == 'prestamoOnlinePJ') {
-		// 1. Buscar o crear Account (empresa)
-		Account empresa;
-		List<Account> empreses = [SELECT Id FROM Account WHERE NIF_Empresa__c = :solicitud.nif1Tit LIMIT 1];
-		if (!empreses.isEmpty()) {
-			empresa = empreses[0];
-		} else {
-			empresa = new Account();
-			empresa.Name = solicitud.nombre1Tit;
-			empresa.NIF_Empresa__c = solicitud.nif1Tit;
-			empresa.Numper_Empresa__c = solicitud.numperso;
-			insert empresa;
-		}
-
-		// 2. Buscar o crear Contact (apoderat)
-		Contact apoderado;
-		List<Contact> apoderados = [SELECT Id FROM Contact WHERE NIF_Apoderado__c = :solicitud.nif2Tit LIMIT 1];
-		if (!apoderados.isEmpty()) {
-			apoderado = apoderados[0];
-		} else {
-			apoderado = new Contact();
-			apoderado.FirstName = solicitud.nombre2Tit;
-			apoderado.LastName = solicitud.apellidos1_2Tit;
-			apoderado.SecondLastName__c = solicitud.apellidos2_2Tit;
-			apoderado.NIF_Apoderado__c = solicitud.nif2Tit;
-			apoderado.Numper_Apoderado__c = solicitud.numperso2Tit;
-			apoderado.Email = solicitud.email2Tit;
-			apoderado.Phone = solicitud.telefono1_2Tit;
-			insert apoderado;
-		}
-
-		// 3. Crear Opportunity i assignar camps
-		Opportunity opp = new Opportunity();
-		opp.AccountId = empresa.Id;
-		opp.ContactId = apoderado.Id;
-		opp.Name = 'Préstamo Online PJ - ' + empresa.Name;
-		opp.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_Prestamo');
-		opp.StageName = 'Prospect';
-		opp.CloseDate = Date.today().addMonths(1);
-
-		// Camps existents i nous (ajusta els API Name segons convingui)
-		opp.Tipo_Solicitud__c = solicitud.tipoSolicitud;
-		opp.Producto__c = solicitud.nombreProducto;
-		opp.Delimitador__c = solicitud.delimitador;
-		opp.Importe__c = solicitud.importe;
-		opp.Plazo__c = solicitud.plazo;
-		opp.Finalidad__c = solicitud.finalidad;
-		opp.Garantia__c = solicitud.garantia;
-		opp.Canal__c = solicitud.canal;
-		opp.Origen__c = solicitud.origen;
-		opp.Horario_Contacto__c = solicitud.horario1Tit;
-		opp.Idioma__c = solicitud.idioma;
-		opp.Email_Empresa__c = solicitud.email1Tit;
-		opp.Telefono_Empresa__c = solicitud.telefono1_1Tit;
-		opp.Nombre_Empresa__c = solicitud.nombre1Tit;
-
-		// Identificadors i dades addicionals
-		opp.Numper_Empresa__c = solicitud.numperso;
-		opp.NIF_Empresa__c = solicitud.nif1Tit;
-		opp.Numper_Apoderado__c = solicitud.numperso2Tit;
-		opp.NIF_Apoderado__c = solicitud.nif2Tit;
-
-		// Dades apoderat
-		opp.Nombre_Apoderado__c = solicitud.nombre2Tit;
-		opp.Apellido1_Apoderado__c = solicitud.apellidos1_2Tit;
-		opp.Apellido2_Apoderado__c = solicitud.apellidos2_2Tit;
-		opp.Email_Apoderado__c = solicitud.email2Tit;
-		opp.Telefono_Apoderado__c = solicitud.telefono1_2Tit;
-
-		insert opp;
-	}
 }

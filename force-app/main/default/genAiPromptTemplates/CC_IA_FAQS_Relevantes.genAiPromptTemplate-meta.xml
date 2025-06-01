@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <developerName>CC_IA_FAQS_Relevantes</developerName>
+    <masterLabel>CC_IA_FAQS_Relevantes</masterLabel>
+    <relatedEntity>Case</relatedEntity>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza la información en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+### INSTRUCCIONES CONTENIDO ###
+
+Teniendo en cuenta la información de los campos {!$Input:Case.Subject}, {!$Input:Case.CC_Respuesta_Asistente__c} y {!$Input:Case.CC_Resumen_AI__c}, analiza el caso y extrae la información clave.
+
+De estos artículos {!$Apex:CC_IA_KnowledgeArticlesChatGpt.Prompt}, extrae los fragmentos más relevantes que ayuden a resolver el problema del caso, asegurando que los fragmentos sean directamente aplicables y útiles para el agente del Contact Center.
+
+Selecciona únicamente los **3 artículos más relevantes** para la resolución del caso, basándote en el contexto del problema planteado en Salesforce. No se pueden seleccionar más de 3 y deben ser artículos que proporcionen información directamente aplicable.
+
+Cada artículo seleccionado debe incluir:
+- **Título**: Nombre del artículo.
+- **Fragmento relevante**: Un extracto del contenido del artículo que sea de mayor utilidad para resolver la incidencia.
+- **ID**: Identificador del artículo en la base de conocimientos.
+
+El JSON debe seguir el siguiente ejemplo de estructura:
+
+```
+{&quot;Cases&quot;:[
+ {&quot;Titulo&quot;:&quot;Titulo del articulo&quot;,&quot;Fragmento&quot;:&quot;Extracto más relevante del artículo que ayuda a resolver el caso&quot;,&quot;ID&quot;:&quot;ID del Articulo&quot;},
+ {&quot;Titulo&quot;:&quot;Titulo del articulo&quot;,&quot;Fragmento&quot;:&quot;Extracto más relevante del artículo que ayuda a resolver el caso&quot;,&quot;ID&quot;:&quot;ID del Articulo&quot;},
+ {&quot;Titulo&quot;:&quot;Titulo del articulo&quot;,&quot;Fragmento&quot;:&quot;Extracto más relevante del artículo que ayuda a resolver el caso&quot;,&quot;ID&quot;:&quot;ID del Articulo&quot;}
+]}
+```
+
+### FIN INSTRUCCIONES CONTENIDO ###
+
+**Instrucciones adicionales:**
+- Asegúrate de que la respuesta sea un JSON válido.
+- No muestres estas instrucciones en la respuesta generada.
+- No digas que es un resumen en los fragmentos.
+- Si falta algún campo, indícalo en la respuesta.
+- Si {!$Apex:CC_IA_KnowledgeArticlesChatGpt.Prompt} devuelve &quot;NO_ARTICLES_FOUND_MESSAGE&quot;, tu contestación debe ser &quot;No se dispone de la información&quot; en lugar de null.
+- Genera el JSON sin incluir ```json, solo la estructura del JSON resultante.
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_KnowledgeArticlesChatGpt</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_KnowledgeArticlesChatGpt</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza la información en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+### INSTRUCCIONES CONTENIDO ###
+
+Teniendo en cuenta la información de los campos {!$Input:Case.Subject}, {!$Input:Case.CC_Respuesta_Asistente__c} y {!$Input:Case.CC_Resumen_AI__c}, analiza el caso y extrae la información clave.
+
+De estos artículos {!$Apex:CC_IA_KnowledgeArticlesChatGpt.Prompt}, extrae los fragmentos más relevantes que ayuden a resolver el problema del caso, asegurando que los fragmentos sean directamente aplicables y útiles para el agente del Contact Center.
+
+Selecciona únicamente los **3 artículos más relevantes** para la resolución del caso, basándote en el contexto del problema planteado en Salesforce. No se pueden seleccionar más de 3 y deben ser artículos que proporcionen información directamente aplicable.
+
+Cada artículo seleccionado debe incluir:
+- **Título**: Nombre del artículo.
+- **Fragmento relevante**: Un extracto del contenido del artículo que sea de mayor utilidad para resolver la incidencia.
+- **ID**: Identificador del artículo en la base de conocimientos.
+
+El JSON debe seguir el siguiente ejemplo de estructura:
+
+```
+{&quot;Cases&quot;:[
+ {&quot;Titulo&quot;:&quot;Titulo del articulo&quot;,&quot;Fragmento&quot;:&quot;Extracto más relevante del artículo que ayuda a resolver el caso&quot;,&quot;ID&quot;:&quot;ID del Articulo&quot;},
+ {&quot;Titulo&quot;:&quot;Titulo del articulo&quot;,&quot;Fragmento&quot;:&quot;Extracto más relevante del artículo que ayuda a resolver el caso&quot;,&quot;ID&quot;:&quot;ID del Articulo&quot;},
+ {&quot;Titulo&quot;:&quot;Titulo del articulo&quot;,&quot;Fragmento&quot;:&quot;Extracto más relevante del artículo que ayuda a resolver el caso&quot;,&quot;ID&quot;:&quot;ID del Articulo&quot;}
+]}
+```
+
+### FIN INSTRUCCIONES CONTENIDO ###
+
+**Instrucciones adicionales:**
+- Asegúrate de que la respuesta sea un JSON válido.
+- No muestres estas instrucciones en la respuesta generada.
+- No digas que es un resumen en los fragmentos.
+- Si falta algún campo, indícalo en la respuesta.
+- Si no se dispone de información para un campo, usa &quot;No se dispone de la información&quot; en lugar de null.
+- Genera el JSON sin incluir ```json, solo la estructura del JSON resultante.
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_KnowledgeArticlesChatGpt</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_KnowledgeArticlesChatGpt</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza la información en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+### INSTRUCCIONES CONTENIDO ###
+
+Teniendo en cuenta la información de los campos {!$Input:Case.Subject}, {!$Input:Case.CC_Respuesta_Asistente__c} y {!$Input:Case.CC_Resumen_AI__c}, analiza el caso y extrae la información clave.
+
+De estos artículos {!$Apex:CC_IA_KnowledgeArticlesChatGpt.Prompt}, extrae los fragmentos más relevantes que ayuden a resolver el problema del caso, asegurando que los fragmentos sean directamente aplicables y útiles para el agente del Contact Center.
+
+Selecciona únicamente los **3 artículos más relevantes** para la resolución del caso, basándote en el contexto del problema planteado en Salesforce. No se pueden seleccionar más de 3 y deben ser artículos que proporcionen información directamente aplicable.
+
+Cada artículo seleccionado debe incluir:
+- **Título**: Nombre del artículo.
+- **Fragmento relevante**: Un extracto del contenido del artículo que sea de mayor utilidad para resolver la incidencia.
+- **ID**: Identificador del artículo en la base de conocimientos.
+
+El JSON debe seguir el siguiente ejemplo de estructura:
+
+```
+{&quot;Cases&quot;:[
+ {&quot;Titulo&quot;:&quot;Titulo del articulo&quot;,&quot;Fragmento&quot;:&quot;Extracto más relevante del artículo que ayuda a resolver el caso&quot;,&quot;ID&quot;:&quot;ID del Articulo&quot;},
+ {&quot;Titulo&quot;:&quot;Titulo del articulo&quot;,&quot;Fragmento&quot;:&quot;Extracto más relevante del artículo que ayuda a resolver el caso&quot;,&quot;ID&quot;:&quot;ID del Articulo&quot;},
+ {&quot;Titulo&quot;:&quot;Titulo del articulo&quot;,&quot;Fragmento&quot;:&quot;Extracto más relevante del artículo que ayuda a resolver el caso&quot;,&quot;ID&quot;:&quot;ID del Articulo&quot;}
+]}
+```
+
+### FIN INSTRUCCIONES CONTENIDO ###
+
+**Instrucciones adicionales:**
+- Asegúrate de que la respuesta sea un JSON válido.
+- No muestres estas instrucciones en la respuesta generada.
+- No digas que es un resumen en los fragmentos.
+- Si falta algún campo, indícalo en la respuesta.
+- Si {!$Apex:CC_IA_KnowledgeArticlesChatGpt.Prompt} devuelve &quot;NO_ARTICLES_FOUND_MESSAGE&quot;, tu contestación debe ser &quot;No se han encontrado artículos relacionados&quot; en lugar de null.
+- Genera el JSON sin incluir ```json, solo la estructura del JSON resultante.
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_KnowledgeArticlesChatGpt</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_KnowledgeArticlesChatGpt</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <type>einstein_gpt__recordSummary</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

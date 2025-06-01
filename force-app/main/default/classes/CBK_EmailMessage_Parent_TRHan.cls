@@ -22,16 +22,16 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 				checkRTExistsSet.add(rtInfo.SobjectType);
 			}
 		}
-		
+
 		Request reqInfo = Request.getCurrent();
-		Quiddity currentType = reqInfo.getQuiddity();  
+		Quiddity currentType = reqInfo.getQuiddity();
 		String result = String.valueOf(currentType);
 		CBK_log.debug('Parent Handler CBK_EmailMessage_Parent_TRHan - getQuiddity: ' + result, LoggingLevel.INFO);
 
 		if (String.valueOf(eventype) == 'beforeDelete' || String.valueOf(eventype) == 'afterDelete'){
 			correos = correosOld;
 		}
-		
+
 		for (EmailMessage correo : correos) {
 			if (correo.Incoming) {
 				if(INBOUND_QUIDDITY.contains(result) || Test.isRunningTest()){
@@ -87,7 +87,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 			if(checkRTExistsSet.contains(sObjectName)){
 				Set<String> idSet = SObjectsIdsBySObjectType.get(sObjectName);
 				Map<Id, SObject> newSObjectMap = new Map<Id, SObject>(Database.query(String.format('SELECT Id, RecordTypeId FROM {0} WHERE Id IN : idSet', new List<String>{sObjectName})));
-				
+
 				if(!newSObjectMap.isEmpty()){
 					sObjectMapsBySObjectType.put(sObjectName, newSObjectMap);
 				}
@@ -142,7 +142,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 						tp.oldMap = generateMap(tp.oldList, eventype);
 					}
 				}
-				
+
 				if (Test.isRunningTest()) {
 					active = true;
 				}
@@ -166,7 +166,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 				tp = new CC_TriggerParameters();
 				tp.newList = mSobjectInfo.get('Otros').get('Otros');
 				tp.newMap = generateMap(mSobjectInfo.get('Otros').get('Otros'), eventype);
-			
+
 				if (String.valueOf(eventype) == 'beforeDelete' || String.valueOf(eventype) == 'afterDelete'){
 					tp.newList = new List<EmailMessage>();
 					tp.newMap = new Map<Id,EmailMessage>();
@@ -211,7 +211,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 			List<string> localPart  = emailHeader.split('@');
 			lstLocalPart.add(localPart[0]);
 		}
-		
+
 		//Get info EmailService
 		Map<String,string> mEmailServiceInfo = new Map<String,string>();
 		mEmailServiceInfo = getEmailServiceAndEmailToCase(lstLocalPart);
@@ -221,7 +221,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 			inputEmail = correo.ToAddress;
 			string emailHeader = getToAddresHeader(correo.Headers, inputEmail, emailTocaseInfo);
 
-			emailHeader = mEmailServiceInfo.containsKey(emailHeader) ? mEmailServiceInfo.get(emailHeader) : '';	
+			emailHeader = mEmailServiceInfo.containsKey(emailHeader) ? mEmailServiceInfo.get(emailHeader) : '';
 			if (!mapInfoMdt.containsKey(emailHeader)) {
 				emailHeader = 'Otros';
 			}
@@ -231,18 +231,18 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 				mSobjectInfo.get(emailHeader).addAll(lstem);
 			} else {
 				mSobjectInfo.put(emailHeader, lstem);
-			}	
+			}
 		}
 		CBK_log.debug('Entrada Map --> EmailServices: ' + JSON.serialize(mSobjectInfo), LoggingLevel.INFO);
-		
+
 		String inEmail;
 		String className;
 		String typeEm;
 		String eventtrigger;
 		Boolean active = false;
 		CC_TriggerParameters tp;
-		
-		//Ejecucion de handler clasificados por: Email Entrante -> Handler class 
+
+		//Ejecucion de handler clasificados por: Email Entrante -> Handler class
 		List<Id> configHandlerSort = new List<Id>(mcs.keySet());
 		for (string mt : configHandlerSort){
 			inEmail = String.isBlank(mcs.get(mt).CBK_Email__c) ? '' : mcs.get(mt).CBK_Email__c;
@@ -265,11 +265,11 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 						tp.oldList =  generateOldList(tp.newList, mapaCorreosOld);
 						tp.oldMap = generateMap(tp.oldList, eventype);
 					}
-					
+
 					if (Test.isRunningTest()) {
 						active = true;
 					}
-					
+
 					if (((tp.newList != null && tp.newList.size() > 0) || (tp.oldList != null && tp.oldList.size() > 0 ))  && active) {
 						Type handlerClassType = Type.forName(className);
 						if(handlerClassType != null){
@@ -293,7 +293,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 				tp = new CC_TriggerParameters();
 				tp.newList = mSobjectInfo.get('Otros');
 				tp.newMap = generateMap(mSobjectInfo.get('Otros'), eventype);
-				
+
 				if (mc.CBK_Active__c){
 					if(handlerClassType != null){
 					CBK_log.debug('\n Emails Entrada Fuera del FWK: '+ eventype + ' - EmailService: Otros ' + JSON.serialize(tp.newList), LoggingLevel.INFO);
@@ -377,22 +377,22 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 	}
 
 	public static Map<String,string> getEmailServiceAndEmailToCase(Set<string> slocalPart){
-	
-		List<EmailServicesAddress> lstEmailService = [SELECT LocalPart, DeveloperName, EmailDomainName,Function.FunctionName FROM EmailServicesAddress 
+
+		List<EmailServicesAddress> lstEmailService = [SELECT LocalPart, DeveloperName, EmailDomainName,Function.FunctionName FROM EmailServicesAddress
 													WHERE LocalPart IN :slocalPart limit 200];
 
 		Map<String,string> mEmailServiceInfo = new Map<String,string>();
 
 		if (lstEmailService != null && lstEmailService.size() > 0){
-			
+
 			for(EmailServicesAddress ems : lstEmailService){
-			
+
 				if (ems.Function.FunctionName != 'EmailToCase'){
 					mEmailServiceInfo.put(ems.LocalPart + '@' + ems.EmailDomainName, ems.Function.FunctionName);
 				}else{
 					mEmailServiceInfo.put(ems.LocalPart + '@' + ems.EmailDomainName, ems.DeveloperName);
 				}
-			}		
+			}
 		}
 		return mEmailServiceInfo;
 	}
@@ -403,7 +403,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 			lstHeaderDTO = (List<HeaderDTO>) JSON.deserialize(header, List<HeaderDTO>.class);
 		}catch(Exception e){
 			if(String.isNotBlank(header)){
-				List<String> refactor =  header.split('\n'); 
+				List<String> refactor =  header.split('\n');
 				lstHeaderDTO = new List<HeaderDTO>();
 				for (String key: refactor){
 					if (key.contains('X-SFDC-Original-RCPT')){
@@ -413,10 +413,10 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 						head.value = headerEmail.trim();
 						lstHeaderDTO.add(head);
 						break;
-					}	
+					}
 				}
 			}else{
-				CBK_Log.addError(null, e, 'Error Header Vacio', new List<Object>() , null);		
+				CBK_Log.addError(null, e, 'Error Header Vacio', new List<Object>() , null);
 			}
 		}
 		Map<String, String> mheaderInfo = new Map<String, String> ();
@@ -456,7 +456,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 			if (string.valueOf(eventype) =='afterInsert' || string.valueOf(eventype) =='beforeDelete' || string.valueOf(eventype) =='afterDelete' || string.valueOf(eventype) =='beforeUpdate' || string.valueOf(eventype) =='afterUpdate'){
 				for(EmailMessage em : lstEmail){
 					mEmailMessage.put(em.Id, em);
-				}	
+				}
 			}else{
 				mEmailMessage = null;
 			}
@@ -486,7 +486,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 			}else if(String.isNotBlank(cs.RelatedToId)){
 				sObjName = cs.RelatedToId.getSObjectType().getDescribe().getName();
 				if(checkRTExistsSet.contains(sObjName)){
-					Id rtId = (Id) sObjectMapsBySObjectType.get(sObjName).get(cs.RelatedToId).get('RecordtypeId');
+					Id rtId = (Id) sObjectMapsBySObjectType.get(sObjName)?.get(cs.RelatedToId)?.get('RecordtypeId');
 					rt = mapRTInfo.get(rtId);
 					lstem.add(cs);
 				}
@@ -497,7 +497,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 				sObjName = 'Otros';
 				rt = 'Otros';
 			}
-			
+
 			if (!mSobjectInfo.containsKey(sObjName)) {
 				mSobjectInfo.put(sObjName, new Map<String, List<EmailMessage>>());
 				mSobjectInfo.get(sObjName).put(rt,lstem);
@@ -514,7 +514,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 
 	public static List<String> getEmailToCaseinfo(){
 		List<String> emails = new List<String>();
-		List<EmailServicesAddress> lstEmailCase = [SELECT Id,LocalPart,  EmailDomainName,Function.FunctionName,DeveloperName FROM EmailServicesAddress where Function.FunctionName = 'EmailToCase'];	
+		List<EmailServicesAddress> lstEmailCase = [SELECT Id,LocalPart,  EmailDomainName,Function.FunctionName,DeveloperName FROM EmailServicesAddress where Function.FunctionName = 'EmailToCase'];
 		if(!lstEmailCase.isEmpty()){
 			for(EmailServicesAddress ems : lstEmailCase){
 				emails.add(ems.localPart + '@' + ems.EmailDomainName);
@@ -534,7 +534,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 		}
 		return lstOld;
 	}
-	
+
 	public class HeaderDTO {
 		public string value { get; set; }
 		public string name { get; set; }

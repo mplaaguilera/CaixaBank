@@ -112,7 +112,7 @@
 					<lightning:button aura:id="botonPendienteInterno" label="{!v.oportunidad.CSBD_Estado__c == 'Pendiente Interno' ? 'Reanudar' : 'Pendiente'}" iconName="{!v.oportunidad.CSBD_Estado__c == 'Pendiente Interno' ? 'utility:play' : 'utility:stop'}" onclick="{!c.abrirModalPendienteInterno}" disabled="{!!v.botonesActivos.botonPendienteInternoActivo}" variant="{!v.oportunidad.CSBD_Estado__c == 'Pendiente Interno' ? 'destructive-text' : 'neutral'}" />
 
 					<aura:if isTrue="{!!v.esHipoteca}">
-						<lightning:button aura:id="botonEnviarCorreo" label="Correo" iconName="action:email" onclick="{!c.abrirModalEnviarCorreo}" disabled="{!!v.botonesActivos.botonEnviarCorreoActivo}" />
+						<lightning:button aura:id="botonEnviarCorreo" label="Enviar correo" iconName="action:email" onclick="{!c.abrirModalEnviarCorreo}" disabled="{!!v.botonesActivos.botonEnviarCorreoActivo}" />
 					</aura:if>
 
 					<lightning:button aura:id="botonEnviarNotificacion" label="SMS" iconName="utility:sms" onclick="{!c.abrirModalEnviarNotificacion}" disabled="{!!v.botonesActivos.botonEnviarNotificacionActivo}" />
@@ -165,7 +165,7 @@
 					<!-- <lightning:button label="Gestor" iconName="utility:workforce_engagement" onclick="{!c.botonGestorOnclick}"/> -->
 					<button class="csbdButtonMenu slds-button slds-button_neutral" onclick="{!c.menuGestorAbrir}" disabled="{!and(!v.botonesActivos.botonDerivarGestorActivo, !v.botonesActivos.botonProgramaCitaGestorActivo)}">
 						<lightning:icon class="csbdButtonMenuIcono" iconName="utility:workforce_engagement" size="xx-small"/>
-						<span class="slds-truncate">Gestor</span>
+						<span class="slds-truncate">Derivar a oficina</span>
 						<lightning:icon iconName="utility:down" size="xx-small" class="csbdButtonMenuIconoDown"/>
 
 						<div aura:id="menuGestor" class="slds-dropdown-trigger slds-dropdown-trigger_click slds-button_last">
@@ -174,13 +174,13 @@
 									<li class="{!'slds-dropdown__item' + (!v.botonesActivos.botonDerivarGestorActivo ? ' itemDisabled' : '')}" role="presentation">
 										<a aura:id="Derivar" role="menuitem" tabindex="-1" style="display: flex; justify-content: start;" onclick="{!c.abrirModalDerivarGestor}">
 											<lightning:icon iconName="utility:workforce_engagement" size="x-small" style="margin-right: 10px;"/>
-											<span class="slds-truncate">Derivar</span>
+											<span class="slds-truncate">Derivar tarea</span>
 										</a>
 									</li>
 									<li class="{!'slds-dropdown__item' + (!v.botonesActivos.botonProgramaCitaGestorActivo ? ' itemDisabled' : '')}" role="presentation">
 										<a aura:id="Cita" role="menuitem" tabindex="-1" style="display: flex; justify-content: start;" onclick="{!c.abrirModalProgramarCitaGestor}">
 											<lightning:icon iconName="utility:event" size="xx-small" style="margin-right: 10px;"/>
-											<span class="slds-truncate">Cita</span>
+											<span class="slds-truncate">Programar cita</span>
 										</a>
 									</li>
 								</ul>
@@ -198,7 +198,7 @@
 						</lightning:buttonGroup> -->
 
 						<button class="csbdButtonMenu slds-button slds-button_neutral" onclick="{!c.menuSiaAbrir}" disabled="{!!v.botonesActivos.botonInformeSiaActivo}">
-							<lightning:icon class="csbdButtonMenuIcono" iconName="utility:copy_to_clipboard" size="xx-small"/>
+							<lightning:icon class="csbdButtonMenuIcono" iconName="utility:form" size="xx-small"/>
 							<span class="slds-truncate">SIA</span>
 							<lightning:icon iconName="utility:down" size="xx-small" class="csbdButtonMenuIconoDown"/>
 
@@ -207,13 +207,13 @@
 									<ul role="menu" onclick="{!c.eventStopPropagation}">
 										<li class="slds-dropdown__item" role="presentation">
 											<a aura:id="Traslado SIA" role="menuitem" tabindex="-1" style="display: flex; justify-content: start;" onclick="{!c.abrirModalTrasladoSia}">
-												<lightning:icon iconName="utility:copy_to_clipboard" size="x-small" style="margin-right: 10px;"/>
+												<lightning:icon iconName="utility:form" size="x-small" style="margin-right: 10px;"/>
 												<span class="slds-truncate">Traslado SIA</span>
 											</a>
 										</li>
 										<li class="slds-dropdown__item" role="presentation">
 											<a aura:id="Informe SIA" role="menuitem" tabindex="-1" style="display: flex; justify-content: start;" onclick="{!c.abrirModalInformeSia}">
-												<lightning:icon iconName="utility:copy_to_clipboard" size="x-small" style="margin-right: 10px;"/>
+												<lightning:icon iconName="utility:form" size="x-small" style="margin-right: 10px;"/>
 												<span class="slds-truncate">Informe SIA</span>
 											</a>
 										</li>

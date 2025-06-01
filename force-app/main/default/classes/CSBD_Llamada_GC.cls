@@ -35,9 +35,12 @@ public with sharing class CSBD_Llamada_GC {
 		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 		insert llamada;
 
-		Opportunity oportunidad = CSBD_WS_PreAltaOportunidad.calcularOportunidad(inputLlamada.ani);
-		if (oportunidad != null) {
-			// Se reutiliza la oportunidad existente
+		Opportunity oportunidad = CSBD_WS_GetGestorRoutingLlamada.calcularOportunidad(inputLlamada.ani);
+		if (oportunidad != null) { //Se reutiliza la oportunidad existente
+			oportunidad = [SELECT CSBD_Empresa_Proveedora__c, CSBD_Familia_Producto__c, CSBD_Producto__c,
+							CSBD_Telefono_Solicitud__c, CSBD_Now_Codigo_Producto__c, CSBD_Canal__c, CSBD_Now_Origen__c,
+							CSBD_Estado__c, AccountId, CSBD_Contact__c, CSBD_Idioma_Solicitud__c, OwnerId,
+							CSBD_Turno_Contacto__c, CSBD_Identificador__c FROM Opportunity WHERE Id = :oportunidad.Id];
 			if (oportunidad.OwnerId != UserInfo.getUserId()) {
 				oportunidad.OwnerId = UserInfo.getUserId();
 				update oportunidad;
@@ -226,7 +229,7 @@ public with sharing class CSBD_Llamada_GC {
 
 	private static Opportunity informarSla(CC_Llamada__c llamada, Opportunity oportunidad) {
 		//Primera actividad de llamada saliente, por lo que hay que calcular el campo CSBD_SLA_Primera_Respuesta__c de la oportunidad vinculada.
-		if ([SELECT RecordTypeId, CC_Llamada_Id__c FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'].size() == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
+		if ([SELECT COUNT(Id) FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'] == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
 			// Guardo la fecha de creación de la Oportunidad
 			Datetime tiempoOrigen;
 			Datetime tiempoFinal = System.now();
@@ -375,7 +378,7 @@ public with sharing class CSBD_Llamada_GC {
 		if (String.isEmpty(resultado)) {
 			List<CC_Llamada__c> llamadas = [SELECT Id FROM CC_Llamada__c
 											WHERE CC_ConnId__c = :jsonLlamada.connId AND CC_Agente__c = :jsonLlamada.usuario
-											AND CC_Extension__c = :jsonLlamada.extension AND CC_Fecha_Fin__c = null];
+											AND CC_Extension__c = :jsonLlamada.extension AND CC_Fecha_Fin__c = NULL LIMIT 2];
 			if (llamadas.size() == 1) {
 				resultado = llamadas[0].Id;
 			}

@@ -7,6 +7,7 @@
 		const estado = oportunidad.CSBD_Estado__c;
 		const imaginBank = oportunidad.CSBD_Empresa_Proveedora__c === 'imaginBank';
 		const contactoInformado = Boolean(oportunidad.CSBD_Contact__c);
+		const tieneGestor = Boolean(oportunidad.Account) && Boolean(oportunidad.Account.AV_EAPGestor__c);
 		let botonesActivos = {};
 		component.set('v.esPropietario', esPropietario);
 		component.set('v.esHipoteca', esHipoteca);
@@ -31,7 +32,7 @@
 			}
 
 			botonesActivos.botonDerivarGestorActivo = contactoInformado && !isClosed && estado !== 'Nueva';
-			botonesActivos.botonProgramaCitaGestorActivo = botonesActivos.botonDerivarGestorActivo;
+			botonesActivos.botonProgramaCitaGestorActivo = botonesActivos.botonDerivarGestorActivo && tieneGestor;
 		}
 		botonesActivos.botonCopiarNIFActivo = contactoInformado;
 		botonesActivos.botonHistorialSolicitudesActivo = contactoInformado;
@@ -43,7 +44,7 @@
 		} else if (['Nueva', 'Activa'].includes(estado)) {
 			botonesActivos.botonAsignacionAutoActivo = component.get('v.esAdministrador');
 		}
-		
+
 		component.set('v.botonesActivos', botonesActivos);
 
 		if (oportunidad.CSBD_Fecha_Firma__c) {

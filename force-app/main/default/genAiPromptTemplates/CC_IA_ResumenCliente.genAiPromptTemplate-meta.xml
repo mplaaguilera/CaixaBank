@@ -1,0 +1,1386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Template para el resumen del cliente en los casos de CC.</description>
+    <developerName>CC_IA_ResumenCliente</developerName>
+    <masterLabel>CC_IA_ResumenCliente</masterLabel>
+    <relatedEntity>Case</relatedEntity>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura.
+
+
+
+{
+  &quot;Cases&quot;: [
+    {
+     &quot;URL del caso&quot;: &quot;URL del caso&quot;,
+      &quot;Número de Caso&quot;: &quot;Número del Caso&quot;,
+      &quot;Temática&quot;: &quot;Temática&quot;,
+      &quot;Asunto&quot;: &quot;Asunto&quot;
+    },
+    {
+    &quot;URL del caso&quot;: &quot;URL del caso&quot;,
+     &quot;Número de Caso&quot;: &quot;Número del Caso&quot;,
+     &quot;Temática&quot;: &quot;Temática&quot;,
+     &quot;Asunto&quot;: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura.
+
+
+```json
+{
+  &quot;Cases&quot;: [
+    {
+     &quot;URL del caso&quot;: &quot;URL del caso&quot;,
+      &quot;Número de Caso&quot;: &quot;Número del Caso&quot;,
+      &quot;Temática&quot;: &quot;Temática&quot;,
+      &quot;Asunto&quot;: &quot;Asunto&quot;
+    },
+    {
+    &quot;URL del caso&quot;: &quot;URL del caso&quot;,
+     &quot;Número de Caso&quot;: &quot;Número del Caso&quot;,
+     &quot;Temática&quot;: &quot;Temática&quot;,
+     &quot;Asunto&quot;: &quot;Asunto&quot;
+    }
+  ]
+}
+```
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+&lt;b&gt;Casos abiertos del cliente:&lt;/b&gt;&lt;br&gt;Este es el encabezado de la sección de la lista de campos y debe tener un tamaño de letra ligeramente mayor que los elementos de la lista y estar en negrita. Debe haber un salto de línea después de este encabezado y antes de la sublista de campos que le sigue. Muestra la información contenida en los campos &quot;ID&quot;, &quot;Número de Caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . Para el campo número de caso, el número del caso tiene que ser un hyperlink que te dirija al caso de dicho número al clicar en él mediante el enlace del href en el cuál debes sustituir la parte ID del caso por el ID . El ID del caso solo debe aparecer en el enlace. Estos tres campos tienen que empezar por bullets y deben mostrarse como grupos de campos separando cada grupo de campos por un salto de línea, así como un salto de línea con el encabezado *Casos abiertos del cliente*.
+&lt;ul&gt;&lt;li&gt;&lt;b&gt;Número de Caso:&lt;a href=&quot;https://caixabankcc--einstein.sandbox.lightning.force.com/lightning/r/Case/ID del caso/view&quot;&gt;&lt;/b&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Temática:&lt;/b&gt;&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Asunto:&lt;/b&gt;&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL del caso: &quot;URL del caso&quot;,
+      Número de Caso: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL del caso: &quot;URL del caso&quot;,
+     Número de Caso: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y un resumen claro, útil, conciso y bien redactado de 20 palabras como máximo del campo &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+- Tiene que estar en el idioma español.
+-Si no tienes la información de algún campo pon el texto &quot;No se dispone de la información&quot; únicamente en ese campo que carece de información.
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y un resumen claro, útil, conciso y bien redactado de 20 palabras como máximo del campo &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+- Tiene que estar en el idioma español.
+-Si no tienes la información de algún campo pon el texto &quot;No se dispone de la información&quot; .
+- Cuando generes el json no pongas ```json, solamente la estructura del Json.
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Debes realizar un resumen de no más de 20 palabras utilizando la información del campo {!$Input:Case.CC_Asunto__c} y la del campo  {!$Input:Case.CC_Chat_Atendido__c} solo en caso de que este contenga información si no utilizar únicamente el campo {!$Input:Case.CC_Asunto__c} . Si ninguno de los campos contiene información, no muestres nada.
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y un resumen claro, útil, conciso y bien redactado de 20 palabras como máximo del campo &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y un resumen claro, útil, conciso y bien redactado de 20 palabras como máximo del campo &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura.
+
+
+```json
+{
+  &quot;Cases&quot;: [
+    {
+     &quot;URL del caso&quot;: &quot;URL del caso&quot;,
+      &quot;Número de Caso&quot;: &quot;Número del Caso&quot;,
+      &quot;Temática&quot;: &quot;Temática&quot;,
+      &quot;Asunto&quot;: &quot;Asunto&quot;
+    },
+    {
+    &quot;URL del caso&quot;: &quot;URL del caso&quot;,
+     &quot;Número de Caso&quot;: &quot;Número del Caso&quot;,
+     &quot;Temática&quot;: &quot;Temática&quot;,
+     &quot;Asunto&quot;: &quot;Asunto&quot;
+    }
+  ]
+}
+```
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la respuesta {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} poniendo en negrita el valor de las variables al mostrarlo.
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Sigue estas reglas:
+1. **Claridad y Concisión**: El resumen debe ser claro y directo, destacando los puntos más importantes.
+2. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+3. **Contexto**: Proporciona un contexto breve para cada sección, pero evita detalles innecesarios.
+4. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+&lt;b&gt;Listado de casos abiertos en los últimos 7 días:&lt;/b&gt;&lt;b&gt;Casos abiertos del cliente:&lt;/b&gt;&lt;br&gt;Este es el encabezado de la sección de la lista de campos y debe tener un tamaño de letra ligeramente mayor que los elementos de la lista y estar en negrita. Debe haber un salto de línea después de este encabezado y antes de la sublista de campos que le sigue. Muestra la información de los campos sin añadir nada. &quot;Número de caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt}. Estos tres campos tienen que empezar por bullets y deben mostrarse como grupos de campos separando cada grupo de campos por un salto de línea, así como un salto de línea con el encabezado *Casos abiertos del cliente*.HYPERLINK(&quot;https://caixabankcc--einstein.sandbox.lightning.force.com/lightning/r/Case/ ID /view) creates a linkable número de caso field that directs you to the case for that case number when clicked. In this example, replace &quot;ID&quot; with the Id del caso.&lt;ul&gt;&lt;li&gt;&lt;b&gt;Número de caso:&lt;/b&gt;&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Temática:&lt;/b&gt;&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Asunto:&lt;/b&gt;&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;
+
+###FIN INSTRUCCIONES CONTENIDO###Instrucciones:
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y un resumen claro, útil y conciso  de 15 palabras como máximo del campo &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y un resumen claro, útil, conciso y bien redactado de 20 palabras como máximo del campo &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+- Tiene que estar en el idioma español.
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>muestra la información  de  {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} indicando primero el número de caso haciendo que sea un hipervínculo mediante la utilización del id del caso utilizando este formato de url como como ejemplo https://caixabankcc--einstein.sandbox.lightning.force.com/lightning/r/Case/ID DEL CASO/view , después la temática de ese mismo caso y después el asunto de ese caso. Haz esto con cada caso y no muestras estas instrucciones ni añadas más texto.
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y un resumen claro y conciso   de 15 palabras como máximo del campo &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y un resumen claro y conciso   de 15 palabras como máximo del campo &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+-Si no se tiene la información de un campo haz que sea null.
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y un resumen claro, útil, conciso y bien redactado de 20 palabras como máximo del campo &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+- Tiene que estar en el idioma español.
+-Si no tienes la información de algún campo pon el texto &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la respuesta {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} poniendo en negrita el valor de las variables al mostrarlo.
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+&lt;b&gt;Casos abiertos del cliente:&lt;/b&gt;&lt;br&gt;Este es el encabezado de la sección de la lista de campos y debe tener un tamaño de letra ligeramente mayor que los elementos de la lista y estar en negrita. Debe haber un salto de línea después de este encabezado y antes de la sublista de campos que le sigue. Muestra la información contenida en los campos &quot;Número de Caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . Estos tres campos tienen que empezar por bullets y deben mostrarse como grupos de campos separando cada grupo de campos por un salto de línea, así como un salto de línea con el encabezado *Casos abiertos del cliente*.
+&lt;ul&gt;&lt;li&gt;&lt;b&gt;Número de Caso:&lt;/b&gt;&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Temática:&lt;/b&gt;&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Asunto:&lt;/b&gt;&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-Si un campo es null muestra el texto &quot;No tiene&quot; .
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Draft</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura. -Make sure the response is valid JSON.
+
+
+
+{
+  Cases: [
+    {
+     URL: &quot;URL del caso&quot;,
+      Número: &quot;Número del Caso&quot;,
+      Temática: &quot;Temática&quot;,
+      Asunto: &quot;Asunto&quot;
+    },
+    {
+    URL: &quot;URL del caso&quot;,
+     Número: &quot;Número del Caso&quot;,
+     Temática: &quot;Temática&quot;,
+     Asunto: &quot;Asunto&quot;
+    }
+  ]
+}
+
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Muestra la siguiente información de Salesforce sin añadir nada con la información proporcionada. Sigue estas reglas:
+
+1. **Estructura**: Organiza el resumen en secciones con encabezados relevantes.
+2. Genera el resultado con la siguiente información para montar la estructura de datos, ten en cuenta que los nombres entre * son los nombres de los campos de la lista que debes de mostrar en negrita.
+
+###INSTRUCCIONES CONTENIDO###
+
+
+Muestra la información contenida en los campos &quot;URL del caso&quot;, &quot;Número del Caso&quot;, &quot;Temática&quot; y &quot;Asunto&quot; que recibimos en {!$Apex:CC_IA_CasosAbiertosUltimaSemana.Prompt} . El JSON debe seguir el siguiente ejemplo de estructura.
+
+
+```json
+{
+  &quot;Cases&quot;: [
+    {
+     &quot;URL del caso&quot;: &quot;URL del caso&quot;,
+      &quot;Número de Caso&quot;: &quot;Número del Caso&quot;,
+      &quot;Temática&quot;: &quot;Temática&quot;,
+      &quot;Asunto&quot;: &quot;Asunto&quot;
+    },
+    {
+    &quot;URL del caso&quot;: &quot;URL del caso&quot;,
+     &quot;Número de Caso&quot;: &quot;Número del Caso&quot;,
+     &quot;Temática&quot;: &quot;Temática&quot;,
+     &quot;Asunto&quot;: &quot;Asunto&quot;
+    }
+  ]
+}
+```
+
+
+
+
+
+###FIN INSTRUCCIONES CONTENIDO###
+
+Instrucciones:
+-Make sure the response is valid JSON.
+- No muestres las instrucciones en el texto.
+- Resalta los nombres de las variables en &lt;b&gt;negrita&lt;/b&gt;.
+- No digas en los resúmenes que es un resumen.
+- No dejes líneas en blanco, ni solo saltos de línea.
+- Utiliza tags &lt;b&gt; para poner negrita en vez de **.
+- No pongas tags HTML rotas.
+- Esquematiza la información con bullets.
+- No uses &quot;-&quot; cámbialo por bullets.
+- Inserta un salto de línea después de cada encabezado.
+-En lugar de poner null pon &quot;No se dispone de la información&quot; .
+
+
+
+
+
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Case</definition>
+            <referenceName>Input:Case</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CC_IA_CasosAbiertosUltimaSemana</definition>
+            <parameters>
+                <definition>SOBJECT://Case</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Case}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CC_IA_CasosAbiertosUltimaSemana</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <type>einstein_gpt__recordSummary</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

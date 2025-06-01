@@ -3,50 +3,108 @@
         <div class="slds-modal__container" style="max-width: 585px;">
             <header class="slds-modal__header">
                 <!-- sldsValidatorIgnoreNextLine -->
-                <button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={spinner}>
+                <button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={componente.spinner}>
                     <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
                 </button>
                 <h2 class="slds-text-heading_medium slds-hyphenate">Programar cita con el gestor</h2>
-				<p class="slds-var-m-top_x-small">Selecciona las opciones para una próxima cita entre el cliente y el gestor.</p>
+				<p class="slds-var-m-top_x-small">Selecciona las opciones para una próxima cita del cliente con el gestor.</p>
             </header>
 
             <div class="slds-modal__content" style="padding: 18px 40px 30px; overflow-x: hidden;">
-                <c-csbd_-spinner-kx lwc:if={spinner} size="large" variant="brand"></c-csbd_-spinner-kx>
+                <c-csbd_-spinner-kx lwc:if={componente.spinner} size="small" variant="brand"></c-csbd_-spinner-kx>
 
-                <div>
-                    <div class="slds-grid slds-gutters_direct-small slds-var-m-bottom_x-large slds-grid_vertical-align-end">
-                        <div class="slds-col slds-grow-none slds-shrink-none">
-                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Tipo</label>
-                            <lightning-radio-group options={tipoCitaOptions} value="Cita presencial" type="button" variant="label-hidden" required></lightning-radio-group>
-                        </div>
+                <div class="slds-grid slds-var-m-bottom_x-large slds-grid_vertical-align-end">
+                    <div class="slds-col slds-grow-none" style="flex: 0 1 220px; max-width: 220px;">
+                        <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Tipo de cita</label>
+                        <lightning-radio-group lwc:ref="inputTipoCita" options={componente.tipoCitaOptions} value={tipoCitaSeleccionada} type="button" variant="label-hidden" required onchange={handleTipoCitaChange}></lightning-radio-group>
+                    </div>
 
-                        <div class="slds-col">
-                            <div style="display: inline-block; width: 100%;">
-                                <lightning-record-picker object-api-name="Contact" fields="Name" label="Gestor asignado" value="003KN000004APAaYAO" variant="label-inline" disabled></lightning-record-picker>
+                    <div if:false={gestorPool} class="slds-col" style="flex: 1 1 0; min-width: 0;">
+                        <div style="display: inline-block; width: 100%;">
+                            <!-- Lookup de gestor AVE -->
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Gestor AVE</label>
+                                    <div class="slds-combobox_container slds-has-selection">
+                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left" role="none">
+                                                <span lwc:if={gestorAve.cargado} class="slds-icon_container slds-combobox__input-entity-icon slds-var-m-left_xx-small">
+                                                    <lightning-icon icon-name="standard:workforce_engagement" size="xx-small" class="iconoGestor"></lightning-icon>
+                                                </span>
+                                                <div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                    <template lwc:if={gestorAve.cargado}>
+                                                        <span lwc:if={gestorAve.matricula.length} class="slds-truncate" title={gestorAve.label}>{gestorAve.label}</span>
+                                                        <span lwc:else class="slds-truncate" title="No asignado">No asignado</span>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div style="height: 78px;">
-                        <lightning-input lwc:ref="inputAsunto" label="Asunto" placeholder="Asunto de la cita" required></lightning-input>
+                    <div lwc:if={mostrarBannerPool} class="slds-col" style="flex: 1 1 0; min-width: 0;">
+                        <div class="contenedorBannerGestorGenerico slds-align_absolute-center slds-var-m-top_medium">
+                            <article class="slds-card slds-scoped-notification_light">
+                                <div class="slds-card__body" style="margin: unset;">
+                                    <div class="slds-scoped-notification slds-media slds-media_center" role="status">
+                                        <div class="slds-media__figure">
+                                            <div class="slds-icon_container">
+                                                <lightning-icon icon-name="utility:warning" size="x-small" class="iconoWarning"></lightning-icon>
+                                            </div>
+                                        </div>
+                                        <div class="slds-media__body" style="line-height: 20px; font-weight: 300;">
+                                            <p>La cita se realizará con la oficina <span style="font-weight: 500;">{gestorLegoOficina}</span> .</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
                     </div>
 
-                    <div class="slds-grid slds-wrap slds-gutters_direct-small slds-text-color_weak" style="margin: auto;">
-                        <div class="slds-col" style="padding-left: 0">
-                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Fecha</label>
-                            <div class="radioGroupContainer">
-                                <div>
-                                    <lightning-radio-group lwc:ref="inputFecha" options={fechasOptions.dias} value="Lunes 1 de junio" variant="label-hidden" required style="line-height: 24px;"></lightning-radio-group>
+
+                </div>
+
+                <div lwc:if={mostrarBannerGestor} class="contenedorBannerGestorGenerico slds-align_absolute-center slds-var-m-top_medium slds-var-m-bottom_xx-large">
+                    <article class="slds-card slds-scoped-notification_light">
+                        <div class="slds-card__body" style="margin: unset;">
+                            <div class="slds-scoped-notification slds-media slds-media_center" role="status">
+                                <div class="slds-media__figure">
+                                    <div class="slds-icon_container">
+                                        <lightning-icon icon-name="utility:warning" size="x-small" class="iconoWarning"></lightning-icon>
+                                    </div>
+                                </div>
+                                <div class="slds-media__body" style="line-height: 20px; font-weight: 300;">
+                                    <p>El gestor asignado en Salesforce <span style="font-weight: 500;">no coincide</span> con el gestor en AVE.</p>
                                 </div>
                             </div>
                         </div>
+                    </article>
+                </div>
 
-                        <div class="slds-col" style="width: 132px; padding-right: 0">
-                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Hora</label>
-                            <div class="radioGroupContainer">
-                                <div>
-                                    <lightning-radio-group lwc:ref="inputHora" options={fechasOptions.horas} value="10:00" variant="label-hidden" required style="line-height: 24px;"></lightning-radio-group>
-                                </div>
+                <div style="height: 78px;">
+                    <lightning-input lwc:ref="inputAsunto" label="Asunto" placeholder="Asunto de la cita" required></lightning-input>
+                </div>
+
+                <div class="slds-grid slds-wrap slds-gutters_direct-small slds-text-color_weak" style="margin: auto;">
+                    <div class="slds-col" style="padding-left: 0">
+                        <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Fecha</label>
+                        <div class="radioGroupContainer">
+                            <div>
+                                <c-csbd_-spinner-kx lwc:if={componente.spinnerDisponibilidad} size="small"></c-csbd_-spinner-kx>
+                                <lightning-radio-group lwc:else lwc:ref="inputFecha" options={componente.fechasOptions.dias} value={fechaSeleccionada} variant="label-hidden" required style="line-height: 24px;" onchange={handleFechaChange}></lightning-radio-group>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slds-col" style="width: 132px; padding-right: 0">
+                        <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Hora</label>
+                        <div class="radioGroupContainer">
+                            <div>
+                                <c-csbd_-spinner-kx lwc:if={componente.spinnerDisponibilidad} size="small"></c-csbd_-spinner-kx>
+                                <lightning-radio-group lwc:else lwc:ref="inputHora" class="inputHora" options={componente.fechasOptions.horas} value={horaSeleccionada} variant="label-hidden" required style="line-height: 24px;" onchange={handleHoraChange}></lightning-radio-group>
                             </div>
                         </div>
                     </div>
@@ -54,8 +112,15 @@
             </div>
 
             <div class="slds-modal__footer">
-                <lightning-button label="Programar cita" variant="brand" icon-name="utility:date_input" onclick={programarCitaGestor} disabled={spinner}></lightning-button>
-                <lightning-button lwc:ref="botonCancelar" label="Cancelar" onclick={modalCerrar} disabled={spinner} class="slds-var-m-left_small"></lightning-button>
+                <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                    <div class="slds-col">
+                        <lightning-button-icon lwc:if={componente.usuarioDesarrollador} icon-name="utility:bug" variant="border-filled" tooltip="PARA DESARROLLO" class="debug" onclick={botonDebugOnclick}></lightning-button-icon>
+                    </div>
+                    <div class="slds-col">
+                        <lightning-button label="Programar cita" variant="brand" icon-name="utility:date_input" onclick={programarCitaGestor} disabled={componente.spinner}></lightning-button>
+                        <lightning-button lwc:ref="botonCancelar" label="Cancelar" onclick={modalCerrar} disabled={componente.spinner}></lightning-button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Resumen del producto asociado a la oportunidad, usando los artículos de knowledge del producto</description>
+    <developerName>CSBD_ResumenProducto</developerName>
+    <masterLabel>CSBD Resumen Producto</masterLabel>
+    <relatedEntity>Opportunity</relatedEntity>
+    <templateVersions>
+        <content>Eres un gestor de una entidad bancaria 
+Tu objetivo es generar un resumen en lenguaje natural de un producto asociado a la oportunidad actual.
+El nombre del producto es: {!$Input:Opportunity.CSBD_Producto__c}, la descripción del producto esta en:{!$Apex:CSBD_ArticulosProducto.Prompt}.
+Redacta información detallada del producto a partir de la descripción obtenida.
+Genera un resumen de un producto con solo los datos proporcionados para tener una visión compacta de la información disponible siguiendo el siguiente esquema:
+
+&lt;H2&gt;Resumen General&lt;/H2&gt;
+Pon un resumen general del producto lo más reducido posible(50 palabras máximo)
+
+&lt;H2&gt;Características&lt;/H2&gt;
+Presenta la información detallada y bien estructurada de las características principales del producto.
+Si hay algún enlace en {!$Apex:CSBD_EnlaceArgumentario.Prompt}.muéstralo, si no lo hay no lo muestres.
+Pon en &lt;b&gt;&lt;/b&gt; el título de cada característica.
+
+&lt;H2&gt;Promociones&lt;/H2&gt;
+Indica si hay o no hay promociones indicándolo en negrita &lt;b&gt;&lt;/b&gt;. Si existe haz un breve resumen de 30 palabras máximo.
+
+
+Instrucciones:
+&quot;&quot;&quot;
+No inventes contenido, si algún recurso está vacío no lo muestres en el resumen.
+No uses la otra oportunidad del cliente que tenga nombre {!$Input:Opportunity.Name}.
+No escribas cartas ni emails.
+No escribas formatos especiales como negrita o subrayado.
+Pon saltos de línea después de cada parágrafo.
+No pongas contenido redundante en diferentes parágrafos.
+Usa tags HTML para estructurar la información cuando sea necesario
+No muestres los nombres de las oportunidades, solo los productos.
+Menciona si uno de los productos de otras oportunidades están en la promoción, y que cantidad de beneficio concreta conlleva para la promoción.
+Genera el resultado en formato &quot;listado con viñetas&quot;, cada una con un punto inicial a la izquierda, y cada subsección sean puntos. Usa HTML(&lt;lu&gt; y &lt;li&gt;) para los puntos de cada subsección y negrita(&lt;b&gt;&lt;/b&gt;) para el título de cada subsección.
+Proporciona un contexto breve para cada sección, pero evita detalles innecesarios.
+&quot;&quot;&quot;
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4Turbo</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>apex://CSBD_EnlaceArgumentario</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_EnlaceArgumentario</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Eres un gestor de una entidad bancaria 
+Tu objetivo es generar un resumen en lenguaje natural de un producto asociado a la oportunidad actual.
+El nombre del producto es: {!$Input:Opportunity.CSBD_Producto__c}, la descripción del producto esta en:{!$Apex:CSBD_ArticulosProducto.Prompt}.
+Redacta información detallada del producto a partir de la descripción obtenida.
+Genera un resumen de un producto con solo los datos proporcionados para tener una visión compacta de la información disponible siguiendo el siguiente esquema:
+
+&lt;H2&gt;Resumen General&lt;/H2&gt;
+Pon un resumen general del producto lo más reducido posible(50 palabras máximo)
+
+&lt;H2&gt;Características&lt;/H2&gt;
+Presenta la información detallada y bien estructurada de las características principales del producto.
+Si hay algún enlace en {!$Apex:CSBD_EnlaceArgumentario.Prompt}.muéstralo, si no lo hay no lo muestres.
+Pon en &lt;b&gt;&lt;/b&gt; el título de cada característica.
+
+&lt;H2&gt;Promociones&lt;/H2&gt;
+Indica si hay o no hay promociones indicándolo en negrita &lt;b&gt;&lt;/b&gt;. Si existe haz un breve resumen de 30 palabras máximo.
+
+
+Instrucciones:
+&quot;&quot;&quot;
+No inventes contenido, si algún recurso está vacío no lo muestres en el resumen.
+No uses la otra oportunidad del cliente que tenga nombre {!$Input:Opportunity.Name}.
+No escribas cartas ni emails.
+No escribas formatos especiales como negrita o subrayado.
+Pon saltos de línea después de cada parágrafo.
+No pongas contenido redundante en diferentes parágrafos.
+Usa tags HTML para estructurar la información cuando sea necesario
+No muestres los nombres de las oportunidades, solo los productos.
+Menciona si uno de los productos de otras oportunidades están en la promoción, y que cantidad de beneficio concreta conlleva para la promoción.
+Genera el resultado en formato &quot;listado con viñetas&quot;, cada una con un punto inicial a la izquierda, y cada subsección sean puntos. Usa HTML(&lt;lu&gt; y &lt;li&gt;) para los puntos de cada subsección y negrita(&lt;b&gt;&lt;/b&gt;) para el título de cada subsección.
+Proporciona un contexto breve para cada sección, pero evita detalles innecesarios.
+&quot;&quot;&quot;
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>apex://CSBD_EnlaceArgumentario</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_EnlaceArgumentario</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <type>einstein_gpt__recordSummary</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

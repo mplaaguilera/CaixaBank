@@ -86,4 +86,15 @@ public class CSBD_Utils_Test {
             System.assertEquals(9, lista[2], 'El tercer elemento de la lista no es el esperado');
         }
     }
+
+    @isTest
+    private static void hexToDec() {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+            Test.startTest();
+            String dec = CSBD_Utils.hexToDec('1A');
+            Test.stopTest();
+
+            System.assertEquals('26', dec, 'El valor devuelto no es el esperado');
+        }
+    }
 }

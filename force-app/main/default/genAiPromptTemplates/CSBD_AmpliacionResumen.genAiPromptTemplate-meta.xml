@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Ampliacion resumen oportunidad</description>
+    <developerName>CSBD_AmpliacionResumen</developerName>
+    <masterLabel>CSBD Ampliacion Resumen</masterLabel>
+    <relatedEntity>Opportunity</relatedEntity>
+    <templateVersions>
+        <content>Somos un banco que ofrece productos a nuestros clientes. Necesitamos ampliar un resumen de una oportunidad que ya se ha generado anteriormente con mas datos.
+
+### Resumen inicial
+
+- **Resumen inicial**:{!$Input:Opportunity.CSBD_GptResumenInicialRich__c}
+
+### Datos de la oportunidad 
+
+Los datos del producto están en {!$Apex:CSBD_ArticulosProducto.Prompt}.
+Extrae los &apos;Datos del cliente&apos; de los siguientes campos: el nombre es {!$Input:Opportunity.Account.Name}, la fecha de nacimiento es: {!$Input:Opportunity.Account.PersonBirthdate} incluyendo el numero de años exacto calculado con la fecha actual, la residencia es: {!$Input:Opportunity.Account.BillingCity}. los Ingresos son: {!$Input:Opportunity.Account.AV_Ingresos__c}. Es empleado de nuestro: {!$Input:Opportunity.Account.AV_Empleado__c}.
+Extrae los &apos;Datos de la Oportunidad&apos; de los siguientes campos solo si el contenido del campo no es nulo: canal: {!$Input:Opportunity.CSBD_Canal__c}. L. Motivo:{!$Input:Opportunity.CSBD_Now_DescripMotivo__c}. El nombre del producto: {!$Input:Opportunity.CSBD_Producto__c}. código del producto: {!$Input:Opportunity.CSBD_Now_Codigo_Producto__c}. familia del producto: {!$Input:Opportunity.CSBD_Familia_Producto__c}. Tipo de solicitud: {!$Input:Opportunity.CSBD_TipoOperacion__c}, {!$Input:Opportunity.CSBD_TipoOperacion2__c}. el idioma con el que realiza la solicitud: {!$Input:Opportunity.CSBD_Idioma_Solicitud__c}. Horario de contacto: {!$Input:Opportunity.CSBD_Horario_Contacto__c}. Empresa proveedora: {!$Input:Opportunity.CSBD_Empresa_Proveedora__c}. importe: {!$Input:Opportunity.Amount}.
+Extrae los datos de las otras operaciones relacionadas con el cliente de: {!$Apex:CSBD_OtrasOportunidadesSubset.Prompt} y de la lista recibida, pero no uses la oportunidad que coincida con este Id: {!$Input:Opportunity.Id} .
+
+### InstruccionesGPT
+
+- **InstruccionesGPT**:{!$Input:Opportunity.CSBD_InstruccionesGPT__c},
+
+Modifica el **Resumen inicial**:cumpliendo **InstruccionesGPT**, usando los datos disponibles.
+
+Sigue las instrucciones estrictamente para generar solo el resumen.
+
+Instrucciones:
+&quot;&quot;&quot;
+**InstruccionesGPT** tiene prioridad sobre todas las instrucciones.
+Si no se pide cambiar el formato mantén todo el **Resumen inicial**, pero le puedes añadir texto nuevo.
+**Resumen inicial** es el dato mas importante a usar, pero se puede modificar si en **InstruccionesGPT** se pida alguna modificación o haya un cambio de formato del contenido.
+Modifica el resumen inicial de **Resumen inicial** para añadir los datos que se obtienen a partir de cumplir las instrucciones en **InstruccionesGPT** y que se hagan las modificaciones que se pidan, usando los datos disponibles. Si se especifica una posición de los nuevos datos, puedes modificar esa parte del resumen para introducir los nuevos datos.
+Usa los datos proporcionados cuando se pida alguna ampliación de contenido.
+No digas que vas a ampliar el resumen, solo muestra el resultado.
+&quot;&quot;&quot;
+Edita **Resumen inicial**
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4Turbo</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>apex://CSBD_OtrasOportunidadesSubset</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_OtrasOportunidadesSubset</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Somos un banco que ofrece productos a nuestros clientes. Necesitamos ampliar un resumen de una oportunidad que ya se ha generado anteriormente con mas datos.
+
+### Resumen inicial
+
+- **Resumen inicial**:{!$Input:Opportunity.CSBD_GptResumenInicialRich__c}
+
+### Datos de la oportunidad 
+
+Los datos del producto están en {!$Apex:CSBD_ArticulosProducto.Prompt}.
+Extrae los &apos;Datos del cliente&apos; de los siguientes campos: el nombre es {!$Input:Opportunity.Account.Name}, la fecha de nacimiento es: {!$Input:Opportunity.Account.PersonBirthdate} incluyendo el numero de años exacto calculado con la fecha actual, la residencia es: {!$Input:Opportunity.Account.BillingCity}. los Ingresos son: {!$Input:Opportunity.Account.AV_Ingresos__c}. Es empleado de nuestro: {!$Input:Opportunity.Account.AV_Empleado__c}.
+Extrae los &apos;Datos de la Oportunidad&apos; de los siguientes campos solo si el contenido del campo no es nulo: canal: {!$Input:Opportunity.CSBD_Canal__c}. L. Motivo:{!$Input:Opportunity.CSBD_Now_DescripMotivo__c}. El nombre del producto: {!$Input:Opportunity.CSBD_Producto__c}. código del producto: {!$Input:Opportunity.CSBD_Now_Codigo_Producto__c}. familia del producto: {!$Input:Opportunity.CSBD_Familia_Producto__c}. Tipo de solicitud: {!$Input:Opportunity.CSBD_TipoOperacion__c}, {!$Input:Opportunity.CSBD_TipoOperacion2__c}. el idioma con el que realiza la solicitud: {!$Input:Opportunity.CSBD_Idioma_Solicitud__c}. Horario de contacto: {!$Input:Opportunity.CSBD_Horario_Contacto__c}. Empresa proveedora: {!$Input:Opportunity.CSBD_Empresa_Proveedora__c}. importe: {!$Input:Opportunity.Amount}.
+Extrae los datos de las otras operaciones relacionadas con el cliente de: {!$Apex:CSBD_OtrasOportunidadesSubset.Prompt} y de la lista recibida, pero no uses la oportunidad que coincida con este Id: {!$Input:Opportunity.Id} .
+
+### InstruccionesGPT
+
+- **InstruccionesGPT**:{!$Input:Opportunity.CSBD_InstruccionesGPT__c},
+
+Modifica el **Resumen inicial**:cumpliendo **InstruccionesGPT**, usando los datos disponibles.
+
+Sigue las instrucciones estrictamente para generar solo el resumen.
+
+Instrucciones:
+&quot;&quot;&quot;
+**InstruccionesGPT** tiene prioridad sobre todas las instrucciones.
+Si no se pide cambiar el formato mantén todo el **Resumen inicial**, pero le puedes añadir texto nuevo.
+Utiliza formato HTML para hacer los títulos y el resaltado de texto.
+Utiliza tags &lt;b&gt; para poner negrita en vez de **
+No pongas tags html rotas.
+**Resumen inicial** es el dato mas importante a usar, pero se puede modificar si en **InstruccionesGPT** se pida alguna modificación o haya un cambio de formato del contenido.
+Modifica el resumen inicial de **Resumen inicial** para añadir los datos que se obtienen a partir de cumplir las instrucciones en **InstruccionesGPT** y que se hagan las modificaciones que se pidan, usando los datos disponibles. Si se especifica una posición de los nuevos datos, puedes modificar esa parte del resumen para introducir los nuevos datos.
+No digas que vas a ampliar el resumen, solo muestra el resultado.
+&quot;&quot;&quot;
+Edita **Resumen inicial**
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4Turbo</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>apex://CSBD_OtrasOportunidadesSubset</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_OtrasOportunidadesSubset</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <templateVersions>
+        <content>Somos un banco que ofrece productos a nuestros clientes. Necesitamos ampliar un resumen de una oportunidad que ya se ha generado anteriormente con mas datos.
+
+### Resumen inicial
+
+- **Resumen inicial**:{!$Input:Opportunity.CSBD_GptResumenInicialRich__c}
+
+### Datos de la oportunidad 
+
+Los datos del producto están en {!$Apex:CSBD_ArticulosProducto.Prompt}.
+Extrae los &apos;Datos del cliente&apos; de los siguientes campos: el nombre es {!$Input:Opportunity.Account.Name}, la fecha de nacimiento es: {!$Input:Opportunity.Account.PersonBirthdate} incluyendo el numero de años exacto calculado con la fecha actual, la residencia es: {!$Input:Opportunity.Account.BillingCity}. los Ingresos son: {!$Input:Opportunity.Account.AV_Ingresos__c}. Es empleado de nuestro: {!$Input:Opportunity.Account.AV_Empleado__c}.
+Extrae los &apos;Datos de la Oportunidad&apos; de los siguientes campos solo si el contenido del campo no es nulo: canal: {!$Input:Opportunity.CSBD_Canal__c}. L. Motivo:{!$Input:Opportunity.CSBD_Now_DescripMotivo__c}. El nombre del producto: {!$Input:Opportunity.CSBD_Producto__c}. código del producto: {!$Input:Opportunity.CSBD_Now_Codigo_Producto__c}. familia del producto: {!$Input:Opportunity.CSBD_Familia_Producto__c}. Tipo de solicitud: {!$Input:Opportunity.CSBD_TipoOperacion__c}, {!$Input:Opportunity.CSBD_TipoOperacion2__c}. el idioma con el que realiza la solicitud: {!$Input:Opportunity.CSBD_Idioma_Solicitud__c}. Horario de contacto: {!$Input:Opportunity.CSBD_Horario_Contacto__c}. Empresa proveedora: {!$Input:Opportunity.CSBD_Empresa_Proveedora__c}. importe: {!$Input:Opportunity.Amount}.
+Extrae los datos de las otras operaciones relacionadas con el cliente de: {!$Apex:CSBD_OtrasOportunidadesSubset.Prompt} y de la lista recibida, pero no uses la oportunidad que coincida con este Id: {!$Input:Opportunity.Id} .
+
+### InstruccionesGPT
+
+- **InstruccionesGPT**:{!$Input:Opportunity.CSBD_InstruccionesGPT__c},
+
+Modifica el **Resumen inicial**:cumpliendo **InstruccionesGPT**, usando los datos disponibles.
+
+Sigue las instrucciones estrictamente para generar solo el resumen.
+
+Instrucciones:
+&quot;&quot;&quot;
+**InstruccionesGPT** tiene prioridad sobre todas las instrucciones.
+Si no se pide cambiar el formato mantén todo el **Resumen inicial**, pero le puedes añadir texto nuevo.
+Utiliza formato HTML para hacer los títulos y el resaltado de texto.
+Utiliza tags &lt;b&gt; para poner negrita en vez de **
+No pongas tags html rotas.
+**Resumen inicial** es el dato mas importante a usar, pero se puede modificar si en **InstruccionesGPT** se pida alguna modificación o haya un cambio de formato del contenido.
+Modifica el resumen inicial de **Resumen inicial** para añadir los datos que se obtienen a partir de cumplir las instrucciones en **InstruccionesGPT** y que se hagan las modificaciones que se pidan, usando los datos disponibles. Si se especifica una posición de los nuevos datos, puedes modificar esa parte del resumen para introducir los nuevos datos.
+No digas que vas a ampliar el resumen, solo muestra el resultado.
+&quot;&quot;&quot;
+Edita **Resumen inicial**
+</content>
+        <inputs>
+            <apiName>objectToSummarize</apiName>
+            <definition>SOBJECT://Opportunity</definition>
+            <referenceName>Input:Opportunity</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultGPT4Omni</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>apex://CSBD_ArticulosProducto</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_ArticulosProducto</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>apex://CSBD_OtrasOportunidadesSubset</definition>
+            <parameters>
+                <definition>SOBJECT://Opportunity</definition>
+                <isRequired>true</isRequired>
+                <parameterName>objectToSummarize</parameterName>
+                <valueExpression>{!$Input:Opportunity}</valueExpression>
+            </parameters>
+            <referenceName>Apex:CSBD_OtrasOportunidadesSubset</referenceName>
+        </templateDataProviders>
+    </templateVersions>
+    <type>einstein_gpt__recordSummary</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

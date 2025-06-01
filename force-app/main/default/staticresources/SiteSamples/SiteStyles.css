@@ -23,13 +23,6 @@
 	margin:12px 8px 8px 0;
 }
 
-.rotatedText {
-    transform: rotate(-90deg);
-    transform-origin: left top;
-    white-space: nowrap;
-    display: inline-block;
-}
-
 img {
     border: none;
 }
