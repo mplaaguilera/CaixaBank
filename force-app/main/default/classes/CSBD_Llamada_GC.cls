@@ -229,7 +229,9 @@ public with sharing class CSBD_Llamada_GC {
 
 	private static Opportunity informarSla(CC_Llamada__c llamada, Opportunity oportunidad) {
 		//Primera actividad de llamada saliente, por lo que hay que calcular el campo CSBD_SLA_Primera_Respuesta__c de la oportunidad vinculada.
-		if ([SELECT COUNT(Id) FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'] == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
+		//if ([SELECT RecordTypeId, CC_Llamada_Id__c FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'].size() == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
+		if ([SELECT COUNT() FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'] == 1
+		&& oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
 			// Guardo la fecha de creación de la Oportunidad
 			Datetime tiempoOrigen;
 			Datetime tiempoFinal = System.now();

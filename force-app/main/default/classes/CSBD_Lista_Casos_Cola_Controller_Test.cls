@@ -11,7 +11,7 @@ public class CSBD_Lista_Casos_Cola_Controller_Test {
             insert caso;
 
             Test.startTest();
-            List<Case> casos3n = CSBD_Lista_Casos_Cola_Controller.casos3n(false);
+            List<Case> casos3n = CSBD_Lista_Casos_Cola_Controller.casos3n(false).get('casos3n');
 
             casos3n.add(caso);
             Cache.Org.put('local.CSBD.Casos3NCSBD', casos3n, 300);

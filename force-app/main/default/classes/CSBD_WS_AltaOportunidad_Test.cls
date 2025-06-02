@@ -227,7 +227,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
         System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415402',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'prestamo',
                 'indInTouch' => 'N',
                 'AntiguedadVivienda2Tit' => '',
@@ -347,6 +347,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
             cuentaJuridica.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
             cuentaJuridica.AV_NumPerso__c = '21500670';
             cuentaJuridica.CC_Numero_Documento__c = 'A05005608';
+            cuentaJuridica.CC_TipoPersona__c = 'J';
             insert cuentaJuridica;
 
             Contact apoderado = new Contact();
@@ -397,11 +398,13 @@ public class CSBD_WS_AltaOportunidad_Test  {
                 idOportunidades.add(respuesta.opportunityId);
             }
 
-            for (Opportunity oportunidad : [SELECT CSBD_SistemaOrigen__c, AccountId, CSBD_Contact__c, CSBD_Garantia__c FROM Opportunity WHERE Id = :idOportunidades]) {
-                System.assertEquals('WS', oportunidad.CSBD_SistemaOrigen__c, 'El sistema origen de la oportunidad no es WS: ' + oportunidad.CSBD_SistemaOrigen__c);
+            for (Opportunity oportunidad : [SELECT AccountId, CSBD_Contact__c, CSBD_Account_Tipo_Persona__c, CSBD_Garantia__c, CSBD_SistemaOrigen__c
+                                            FROM Opportunity WHERE Id = :idOportunidades]) {
                 System.assertEquals(cuentaJuridica.Id, oportunidad.AccountId, 'La cuenta de la oportunidad no es la cuenta jurídica: ' + oportunidad.AccountId);
                 System.assertEquals(apoderado.Id, oportunidad.CSBD_Contact__c, 'El contacto de la oportunidad no es el apoderado: ' + oportunidad.CSBD_Contact__c);
-                System.assertEquals('garantia2', oportunidad.CSBD_Garantia__c, 'La garantía de la oportunidad no es la garantia1: ' + oportunidad.CSBD_Garantia__c);
+                System.assertEquals('garantia1', oportunidad.CSBD_Garantia__c, 'La garantía de la oportunidad no es "garantia1": ' + oportunidad.CSBD_Garantia__c);
+                System.assertEquals('J', oportunidad.CSBD_Account_Tipo_Persona__c, 'El tipo de persona de la cuenta no es "J" (Jurídica): ' + oportunidad.CSBD_Account_Tipo_Persona__c);
+                System.assertEquals('WS', oportunidad.CSBD_SistemaOrigen__c, 'El sistema origen de la oportunidad no es "WS": ' + oportunidad.CSBD_SistemaOrigen__c);
             }
         }
     }
@@ -440,7 +443,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
                 'horaIni' => '0',
                 'indInTouch' => '',
                 'apellidos_2' => 'NOGUERA',
-                'referencia_usuario' => 'PST202101251022282525',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'agenteInTouch' => '',
                 'origen' => 'Consulta',
                 'colectivo' => '',
@@ -473,7 +476,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
         System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415402',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'prestamo',
                 'AntiguedadVivienda2Tit' => '',
                 'CuotasPrestamos1Tit' => '0',
@@ -588,7 +591,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
         System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415403',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'hipoteca',
                 'CuotasPrestamos1Tit' => '0',
                 'NumOficina' => '4223',
@@ -686,7 +689,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
             insert setting;
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415403',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'hipoteca',
                 'CuotasPrestamos1Tit' => '0',
                 'NumOficina' => '4223',
@@ -799,7 +802,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
                 'catalogo' => '1',
                 'nombreSolicitante' => 'JUANA PALAU CLARAMUNT',
                 'oferta' => '12747674',
-                'referencia_usuario' => 'REN20210112090842735',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'NIFSolicitante' => '12312312K',
                 'Pobl1Tit' => 'BANYOLES',
                 'ingresosMensuales' => '1.500,00 EUR',
@@ -826,7 +829,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
     private static void altaOportunidadTestTpv() {
         System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415405',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'tpv',
                 'apellido' => 'MARTI',
                 'apellido2' => 'FLORIT',
@@ -867,7 +870,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
         System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
 
             activarMockAltaOportunidadInput(new Map<String, String>{
-                'referencia_usuario' => 'PST20190724235415406',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'compraEstrella',
                 'Fecha' => '',
                 'Referencia' => '6497163',
@@ -942,7 +945,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
                 'horaIni' => '0',
                 'indInTouch' => 'N',
                 'apellidos_2' => 'NOGUERA',
-                'referencia_usuario' => 'PST202101251022282525',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'agenteInTouch' => '',
                 'origen' => 'Consulta',
                 'colectivo' => '',
@@ -1007,7 +1010,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
                 'horaIni' => '0',
                 'indInTouch' => 'N',
                 'apellidos_2' => 'NOGUERA',
-                'referencia_usuario' => 'PST202101251022282525',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'agenteInTouch' => '',
                 'origen' => 'Consulta',
                 'idCampanya' => 'valor',
@@ -1048,7 +1051,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
             insert valorHazteCliente;
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415407',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'cmn',
                 'nombre' => 'prova',
                 'telefono' => '0034600000000',
@@ -1103,7 +1106,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
             insert contacto;
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415408',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'cmb',
                 'nombre' => 'JOSE MARIA FERNANDEZ MARTIN',
                 'telefono' => '680707336',
@@ -1184,7 +1187,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
                                             WHERE CSBD_Tipo_regla__c = 'Horario' AND Name = 'imaginBank - Horario invierno - Mañana' LIMIT 1];
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415408',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'cmb',
                 'nombre' => 'JOSE MARIA FERNANDEZ MARTIN',
                 'telefono' => '680707336',
@@ -1240,7 +1243,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
             });
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415409',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'desistimientoPrestamo',
                 'Fecha' => '26-9-2019',
                 'NombreOficina' => 'CENTRO INTOUCH CAST.LA MANCHA-',
@@ -1284,7 +1287,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
             insert contacto;
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'DPR20200615235446456',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'desistimiento',
                 'usuclo' => '08089705300',
                 'nombreProducto' => 'CancelaciÃ³n retos Imagin',
@@ -1320,7 +1323,7 @@ public class CSBD_WS_AltaOportunidad_Test  {
         System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
 
             activarMockAltaOportunidadInput(new Map<String, Object>{
-                'referencia_usuario' => 'PST20190724235415409',
+                'referencia_usuario' => UUID.randomUUID().toString(),
                 'tipoSolicitud' => 'desistimiento PAI',
                 'Fecha' => '26-9-2019',
                 'NombreOficina' => 'CENTRO INTOUCH CAST.LA MANCHA-',

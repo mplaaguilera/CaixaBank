@@ -557,7 +557,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 		if (solicitud.tipoSolicitud != 'prestamoPJ') {
 			identificarCliente(solicitud, campos, respuesta);
 		} else {
-			identificarClientePj(solicitud, campos, respuesta);
+			identificarClientePj(solicitud, campos);
 		}
 
 		if (solicitud.tipoSolicitud == 'proAutomatica' && String.isBlank(String.valueOf(campos.get('CSBD_Contact__c')))) {
@@ -772,71 +772,38 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 		return campos;
 	}
 
-	public static Map<String, Object> identificarClientePj(CSBD_WS_AltaOportunidad_Input.Solicitud solicitud, Map<String, Object> campos, CSBD_WS_AltaOportunidad_Output.Respuesta respuesta) {
+	public static Map<String, Object> identificarClientePj(CSBD_WS_AltaOportunidad_Input.Solicitud solicitud, Map<String, Object> campos) {
 		//Obtener cuenta y contacto a partir del NUMPERSO o NIF
 		Map<String, String> tipoIdentificacion = tipoIdentificacionCliente(solicitud);
-		if (!String.isEmpty(tipoIdentificacion.get('valorBusqueda'))) {
-			List<Contact> contactos = new List<Contact>();
+		if (!String.isEmpty(tipoIdentificacion.get('tipoBusqueda'))) {
+			List<Account> empresas = new List<Account>();
 
-			//Identificación contra BD (también cuando identificación ALF sin resultados)
-			/*
-			if (tipoIdentificacion.get('tipoBusqueda') == 'NP') {
-				contactos = [SELECT AccountId, Account.AV_IndicadoresClientes__c FROM Contact
-								WHERE (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_Cliente')
-								AND Account.AV_NumPerso__c = :tipoIdentificacion.get('valorBusqueda')];
-			} else if (tipoIdentificacion.get('tipoBusqueda') == 'DOC') {
-				contactos = [SELECT AccountId, Account.AV_IndicadoresClientes__c FROM Contact
-								WHERE (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_Cliente')
-								AND Account.CC_Numero_Documento__c = :tipoIdentificacion.get('valorBusqueda')];
-			} else {
-				contactos = Database.query('SELECT AccountId, Account.AV_IndicadoresClientes__c FROM Contact WHERE (RecordType.DeveloperName = \'CC_Cliente\' OR Account.RecordType.DeveloperName = \'CC_ClientePA\') AND ('
-												+ tipoIdentificacion.get('valorBusqueda')  + ')', AccessLevel.USER_MODE);
-			}
-			*/
-
-			List<Account> cuentas = new List<Account>();
-			if (tipoIdentificacion.get('tipoBusqueda') == 'NP') {
-				cuentas = [SELECT AV_IndicadoresClientes__c FROM Account
-							WHERE RecordType.DeveloperName = 'CC_Cliente'
-							AND AV_NumPerso__c = :tipoIdentificacion.get('valorBusqueda')
-							LIMIT 1];
-
-			} else if (tipoIdentificacion.get('tipoBusqueda') == 'DOC') {
-				cuentas = [SELECT AV_IndicadoresClientes__c FROM Account
-							WHERE RecordType.DeveloperName = 'CC_Cliente'
-							AND CC_Numero_Documento__c = :tipoIdentificacion.get('valorBusqueda')
-							LIMIT 1];
+			String tipoBusqueda = tipoIdentificacion.get('tipoBusqueda');
+			String valorBusqueda = tipoIdentificacion.get('valorBusqueda');
+			if (tipoBusqueda == 'NP') {
+				empresas = [SELECT AV_IndicadoresClientes__c FROM Account WHERE RecordType.DeveloperName = 'CC_Cliente'
+							AND AV_NumPerso__c = :valorBusqueda LIMIT 2];
+			} else if (tipoBusqueda == 'DOC') {
+				empresas = [SELECT AV_IndicadoresClientes__c FROM Account WHERE RecordType.DeveloperName = 'CC_Cliente'
+							AND CC_Numero_Documento__c = :valorBusqueda LIMIT 2];
 			}
 
-			if (cuentas.size() == 1) {
-				Account cuenta = cuentas[0];
-				campos.put('AccountId', cuenta.Id);
+			if (empresas.size() == 1) {
+				Account empresa = empresas[0];
+				campos.put('AccountId', empresa.Id);
 
 				String apoderadoNumperso = CSBD_Utils.hexToDec(solicitud.numperso2Tit);
 				if (String.isNotBlank(apoderadoNumperso)) {
-					contactos = [SELECT Id FROM Contact WHERE RecordType.DeveloperName = 'CIBE_Apoderado'
-									AND CIBE_Carrec__c != '00016' AND AccountId = :cuenta.Id AND AV_NumPerso__c = :apoderadoNumperso
-									AND (CIBE_FechaVencimiento__c >= :System.today() OR CIBE_FechaVencimiento__c = NULL) LIMIT 1];
-
-					if (contactos.size() == 1) {
-						Contact contacto = contactos[0];
-						campos.put('CSBD_Contact__c', contacto.Id);
+					List<Contact> apoderados = [SELECT Id FROM Contact WHERE RecordType.DeveloperName = 'CIBE_Apoderado'
+												AND CIBE_Carrec__c != '00016' AND AccountId = :empresa.Id AND AV_NumPerso__c = :apoderadoNumperso
+												AND (CIBE_FechaVencimiento__c >= :System.today() OR CIBE_FechaVencimiento__c = NULL) LIMIT 2];
+					if (apoderados.size() == 1) {
+						Contact apoderado = apoderados[0];
+						campos.put('CSBD_Contact__c', apoderado.Id);
 					}
 				}
 			}
-
-			/*
-			if (contactos.size() == 1) {
-				campos.put('AccountId', contactos[0].AccountId);
-				campos.put('CSBD_Contact__c', contactos[0].Id);
-
-				if(contactos[0].Account.AV_IndicadoresClientes__c != null) {
-					return new Map<String, Object> {'AV_IndicadoresClientes__c' => contactos[0].Account.AV_IndicadoresClientes__c};
-				}
-			}
-			*/
 		}
-
 		return campos;
 	}
 

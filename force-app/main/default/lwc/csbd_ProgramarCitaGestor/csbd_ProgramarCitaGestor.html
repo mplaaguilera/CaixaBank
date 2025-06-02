@@ -3,7 +3,7 @@
         <div class="slds-modal__container" style="max-width: 585px;">
             <header class="slds-modal__header">
                 <!-- sldsValidatorIgnoreNextLine -->
-                <button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={componente.spinner}>
+                <button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={botonesDisabled}>
                     <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
                 </button>
                 <h2 class="slds-text-heading_medium slds-hyphenate">Programar cita con el gestor</h2>
@@ -16,7 +16,7 @@
                 <div class="slds-grid slds-var-m-bottom_x-large slds-grid_vertical-align-end">
                     <div class="slds-col slds-grow-none" style="flex: 0 1 220px; max-width: 220px;">
                         <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Tipo de cita</label>
-                        <lightning-radio-group lwc:ref="inputTipoCita" options={componente.tipoCitaOptions} value={tipoCitaSeleccionada} type="button" variant="label-hidden" required onchange={handleTipoCitaChange}></lightning-radio-group>
+                        <lightning-radio-group lwc:ref="inputTipoCita" options={componente.tipoCitaOptions} value={tipoCitaSeleccionada} type="button" variant="label-hidden" required onchange={handleTipoCitaChange} disabled={botonesDisabled}></lightning-radio-group>
                     </div>
 
                     <div if:false={gestorPool} class="slds-col" style="flex: 1 1 0; min-width: 0;">
@@ -112,14 +112,14 @@
             </div>
 
             <div class="slds-modal__footer">
-                <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-                    <div class="slds-col">
+                <!-- <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center"> -->
+                    <!-- <div class="slds-col">
                         <lightning-button-icon lwc:if={componente.usuarioDesarrollador} icon-name="utility:bug" variant="border-filled" tooltip="PARA DESARROLLO" class="debug" onclick={botonDebugOnclick}></lightning-button-icon>
-                    </div>
-                    <div class="slds-col">
-                        <lightning-button label="Programar cita" variant="brand" icon-name="utility:date_input" onclick={programarCitaGestor} disabled={componente.spinner}></lightning-button>
-                        <lightning-button lwc:ref="botonCancelar" label="Cancelar" onclick={modalCerrar} disabled={componente.spinner}></lightning-button>
-                    </div>
+                    </div> -->
+                    <!-- <div class="slds-col"> -->
+                        <lightning-button label="Programar cita" variant="brand" icon-name="utility:date_input" onclick={programarCitaGestor} disabled={botonesDisabled}></lightning-button>
+                        <lightning-button lwc:ref="botonCancelar" label="Cancelar" onclick={modalCerrar} disabled={botonesDisabled}></lightning-button>
+                    <!-- </div> -->
                 </div>
             </div>
         </div>

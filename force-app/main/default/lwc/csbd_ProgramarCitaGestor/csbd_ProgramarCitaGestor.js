@@ -57,9 +57,11 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 
 	gestorPool = true;
 
+	/*
 	get mostrarBannerInfo() {
 		return this.mostrarBannerGestor || this.mostrarBannerPool;
 	}
+	*/
 
 	get mostrarBannerGestor() {
 		return (!this.gestorPool && !this.gestorAve.coincide) && !this.componente.spinnerDisponibilidad;
@@ -67,6 +69,10 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 
 	get mostrarBannerPool() {
 		return this.gestorPool && !this.componente.spinnerDisponibilidad;
+	}
+
+	get botonesDisabled() {
+		return this.componente.spinner || this.componente.spinnerDisponibilidad;
 	}
 
 	@wire(getRecord, { recordId: '$recordId', fields: OPP_FIELDS })
@@ -92,7 +98,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 
 			}).catch(error => {
 				errorApex(this, error, 'Error al obtener los parámetros de la operativa');
-				this.modalCerrar()	;
+				this.modalCerrar();
 			});
 
 		} else if (error) {
@@ -144,18 +150,21 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 				this.componente.modalAbierto && this.abrirModal();
 
 			} else {
-				errorApex(this, result.errorMessage, 'Problema obteniendo las fechas disponibles');
+				throw new Error(result.errorMessage);
 			}
 		})
-			.catch(error => errorApex(this, error, 'Error al obtener la disponibilidad'))
-			.finally(() => {
-				this.componente = { ...this.componente, spinnerDisponibilidad: false };
-				requestAnimationFrame(() => {
-					this.refs.inputFecha && this.refs.inputFecha.classList.remove('fadeOut');
-					const inputHora = this.refs.inputHora;
-					inputHora && inputHora.classList.remove('fadeOut');
-				});
+		.catch(error => {
+			errorApex(this, error, 'Problema obteniendo las fechas disponibles');
+			this.modalCerrar();
+		})
+		.finally(() => {
+			this.componente = { ...this.componente, spinnerDisponibilidad: false };
+			requestAnimationFrame(() => {
+				this.refs.inputFecha && this.refs.inputFecha.classList.remove('fadeOut');
+				const inputHora = this.refs.inputHora;
+				inputHora && inputHora.classList.remove('fadeOut');
 			});
+		});
 	}
 
 	async actualizarOpcionesFechasHoras() {
@@ -369,7 +378,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 		}
 	}
 
-	botonDebugOnclick() {
-		alert(JSON.stringify(this.gestorAve, null, 3));
-	}
+// 	botonDebugOnclick() {
+// 		console.log(JSON.stringify(this.gestorAve, null, 3));
+// 	}
 }
