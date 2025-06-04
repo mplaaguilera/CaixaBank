@@ -98,5 +98,8 @@
 		"defaultColor": "currentColor",
 		"reloadButton": null,
 		"loadNpmCommands": false
-	}
+	},
+	"conventionalCommits.scopes": [
+		"default"
+	]
 }
