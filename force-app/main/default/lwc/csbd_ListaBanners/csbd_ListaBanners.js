@@ -269,7 +269,6 @@ export default class csbdListaBanners extends LightningElement {
 			} else if (idEnlace === 'identificarFocus') {
 				this.publicarEvento('identificarFocus');
 			} else if (idBanner === 'hipotecaFaciliteaOrNuevaBusquedaPhd' && idEnlace === 'noAvisarNuevamente') {
-				//eslint-disable-next-line @locker/locker/distorted-xml-http-request-window-open
 				if (await LightningConfirm.open({
 					variant: 'header', theme: 'alt-inverse', label: 'No incluir en avisos automáticos',
 					message: '¿Quieres que el recuento de los futuros avisos automáticos deje de incluir esta hipoteca?'

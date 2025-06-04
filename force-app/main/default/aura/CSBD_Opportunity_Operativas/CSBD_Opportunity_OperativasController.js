@@ -551,7 +551,7 @@
 
 	abrirModalCerrar: function(component, event, helper) {
 		if (component.get('v.oportunidad.IsClosed')) {
-			// eslint-disable-next-line no-useless-return
+			//eslint-disable-next-line no-useless-return
 			return;
 		} else if (!component.get('v.oportunidad.CSBD_Producto__c')) {
 			helper.mostrarToast('Oportunidad sin producto', 'Es necesario que la oportunidad tenga un producto para poder cerrarla', 'info');
@@ -1304,7 +1304,7 @@
 		helper.modalSiaAnimarBotonCopiar(component, idBoton);
 	},
 
-	// modalTareaGestorAbrir: function(component) {
+	//modalTareaGestorAbrir: function(component) {
 	abrirModalDerivarGestor: function(component) {
 		$A.enqueueAction(component.get('c.menuGestorCerrar'));
 		component.set('v.cargarModales', true);
@@ -1385,7 +1385,7 @@
 		component.set('v.cargarModales', true);
 
 		component.find('opportunityData').reloadRecord(true);
-		if ((component.get('v.oportunidad.RecordType.DeveloperName') !== 'CSBD_MAC') ||
+		if (component.get('v.oportunidad.RecordType.DeveloperName') !== 'CSBD_MAC' ||
 				component.get('v.oportunidad.RecordType.DeveloperName') === 'CSBD_MAC' && component.get('v.oportunidad.CSBD_Motivo_MAC__c')) {
 
 			$A.util.addClass(component.find('modalConvertirAHipoteca'), 'slds-fade-in-open');

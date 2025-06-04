@@ -111,7 +111,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 		camposPrestamoPersonaJuridica: false
 	};
 
-	// funcionEventListener = this.windowOnclick;
+	//funcionEventListener = this.windowOnclick;
 
 	@wire(MessageContext) messageContext;
 
@@ -360,14 +360,12 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 	}
 
 	handleClick(event) {
-		console.log('Component click');
-		// Si el click és dins del component, l'aturem aquí
+		//Si el click és dins del component, l'aturem aquí
 		event.stopPropagation();
 	}
 
 	handleWindowClick(event) {
-		console.log('Window click');
-		// Si l'event ha arribat aquí és que ve de fora del component
+		//Si l'event ha arribat aquí és que ve de fora del component
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -384,10 +382,10 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 	}
 
 	mostrarDialogConfirmacion() {
-		// Eliminem els listeners abans de mostrar el diàleg
+		//Eliminem els listeners abans de mostrar el diàleg
 		this.removeEventListeners();
 
-		// Guardem la posició actual del scroll
+		//Guardem la posició actual del scroll
 		const scrollPos = {
 			x: window.scrollX,
 			y: window.scrollY
@@ -402,10 +400,10 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 			if (result) {
 				this.finEditando(false);
 			} else {
-				// Esperem una mica abans de tornar a afegir els listeners
-				// per evitar que capturin el click del botó de cancel
+				//Esperem una mica abans de tornar a afegir els listeners
+				//per evitar que capturin el click del botó de cancel
 				window.setTimeout(() => {
-					// Restaurem la posició del scroll
+					//Restaurem la posició del scroll
 					window.scrollTo(scrollPos.x, scrollPos.y);
 
 					this.boundHandleClick = this.handleClick.bind(this);

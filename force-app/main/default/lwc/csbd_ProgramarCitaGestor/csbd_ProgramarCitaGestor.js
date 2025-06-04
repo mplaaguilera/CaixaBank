@@ -1,7 +1,7 @@
-import { LightningElement, api, wire, track } from 'lwc';
-import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+import {LightningElement, api, wire, track} from 'lwc';
+import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
 import currentUserId from '@salesforce/user/Id';
-import { publicarEvento, transitionThenCallback, toast, errorApex, usuarioDesarrollador } from 'c/csbd_lwcUtils';
+import {publicarEvento, transitionThenCallback, toast, errorApex, usuarioDesarrollador} from 'c/csbd_lwcUtils';
 
 import obtenerConfiguracionesApex from '@salesforce/apex/CSBD_CitaGestorController.obtenerConfiguraciones';
 import obtenerDisponibilidadApex from '@salesforce/apex/CSBD_CitaGestorController.obtenerDisponibilidad';
@@ -26,8 +26,8 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 		spinner: false,
 		spinnerDisponibilidad: false,
 		tipoCitaOptions: [
-			{ label: 'Presencial', value: '42' },
-			{ label: 'Telefónica', value: '43' }
+			{label: 'Presencial', value: '42'},
+			{label: 'Telefónica', value: '43'}
 		],
 		fechasOptions: {
 			dias: [],
@@ -57,14 +57,8 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 
 	gestorPool = true;
 
-	/*
-	get mostrarBannerInfo() {
-		return this.mostrarBannerGestor || this.mostrarBannerPool;
-	}
-	*/
-
 	get mostrarBannerGestor() {
-		return (!this.gestorPool && !this.gestorAve.coincide) && !this.componente.spinnerDisponibilidad;
+		return !this.gestorPool && !this.gestorAve.coincide && !this.componente.spinnerDisponibilidad;
 	}
 
 	get mostrarBannerPool() {
@@ -75,17 +69,22 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 		return this.componente.spinner || this.componente.spinnerDisponibilidad;
 	}
 
-	@wire(getRecord, { recordId: '$recordId', fields: OPP_FIELDS })
-	wiredRecord({ error, data: oportunidad }) {
+	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS})
+	wiredRecord({error: errorGetRecord, data: oportunidad}) {
 		if (oportunidad) {
-			this.gestorPool = getFieldValue(oportunidad, OPP_GESTOR_POOL); // ?? true;
+			this.gestorPool = getFieldValue(oportunidad, OPP_GESTOR_POOL);
 			this.oportunidad = oportunidad;
+			if (this.gestorPool == null) {
+				//NO se tuvo acceso al campo por temas de visibilidad
+				toast('error', 'Problema obteniendo los parámetros de la operativa', 'No se han podido obtener los datos del gestor de la cuenta');
+				this.modalCerrar();
+			}
 
-			obtenerConfiguracionesApex({ esPool: this.gestorPool })
+			obtenerConfiguracionesApex({esPool: this.gestorPool})
 			.then(configuraciones => {
-				const { tiposCita, tipoCitaDefault, oficinasNoPresenciales } = configuraciones;
+				const {tiposCita, tipoCitaDefault, oficinasNoPresenciales} = configuraciones;
 				if (Object.keys(tiposCita).length) {
-					this.componente.tipoCitaOptions = Object.entries(tiposCita).map(([value, label]) => ({ value, label }));
+					this.componente.tipoCitaOptions = Object.entries(tiposCita).map(([value, label]) => ({value, label}));
 					this.tipoCitaSeleccionada = this.componente.tipoCitaOptions[0].value;
 				} else {
 					this.componente.tipoCitaOptions = [];
@@ -101,8 +100,9 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 				this.modalCerrar();
 			});
 
-		} else if (error) {
-			errorApex(this, error, 'Error al obtener los datos de la oportunidad');
+		} else if (errorGetRecord) {
+			errorApex(this, errorGetRecord, 'Error al obtener los datos de la oportunidad');
+			this.modalCerrar();
 		}
 	}
 
@@ -111,7 +111,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 	}
 
 	async obtenerDisponibilidad(tipoCitaDefault) {
-		this.componente = { ...this.componente, spinnerDisponibilidad: true };
+		this.componente = {...this.componente, spinnerDisponibilidad: true};
 
 		obtenerDisponibilidadApex({
 			recordId: this.recordId,
@@ -130,7 +130,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 						fullName: `${result.name ?? ''} ${result.lastname || ''}`.trim(),
 						matricula: result.matricula || '',
 						oficina: result.gestorAVEOficina || '',
-						coincide: result.matricula?.toUpperCase() == oppMatriculaGestor?.toUpperCase()
+						coincide: result.matricula?.toUpperCase() === oppMatriculaGestor?.toUpperCase()
 					};
 
 					this.gestorAve.label = this.gestorAve.fullName || this.gestorAve.matricula;
@@ -158,7 +158,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 			this.modalCerrar();
 		})
 		.finally(() => {
-			this.componente = { ...this.componente, spinnerDisponibilidad: false };
+			this.componente = {...this.componente, spinnerDisponibilidad: false};
 			requestAnimationFrame(() => {
 				this.refs.inputFecha && this.refs.inputFecha.classList.remove('fadeOut');
 				const inputHora = this.refs.inputHora;
@@ -168,33 +168,33 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 	}
 
 	async actualizarOpcionesFechasHoras() {
-		// Transformar las fechas
+		//Transformar las fechas
 		const dias = Object.keys(this.disponibilidadPorFecha).map(fecha => {
 			const fechaObj = new Date(fecha);
-			const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
+			const opciones = {weekday: 'long', day: 'numeric', month: 'long'};
 			let label = fechaObj.toLocaleDateString('es-ES', opciones);
-			// Capitalizar primera letra del día y del mes
+			//Capitalizar primera letra del día y del mes
 			label = label.split(' ').map((palabra, index) => {
-				if (index === 0 || index === 3) { // día de la semana o mes
+				if (index === 0 || index === 3) { //día de la semana o mes
 					return palabra.charAt(0).toUpperCase() + palabra.slice(1);
 				}
 				return palabra;
 			}).join(' ');
 
-			return { label, value: fecha };
+			return {label, value: fecha};
 		});
 
-		// Ordenar las fechas
+		//Ordenar las fechas
 		dias.sort((a, b) => new Date(a.value) - new Date(b.value));
 
-		// Actualizar las opciones de fechas
-		this.componente.fechasOptions = { ...this.componente.fechasOptions, dias };
+		//Actualizar las opciones de fechas
+		this.componente.fechasOptions = {...this.componente.fechasOptions, dias};
 		const inputFecha = this.refs.inputFecha;
 		inputFecha && inputFecha.classList.remove('fadeOut');
 
-		// Si hay fechas disponibles, actualizar las horas con la primera fecha
+		//Si hay fechas disponibles, actualizar las horas con la primera fecha
 		if (dias.length) {
-			// Establecer la primera fecha como valor por defecto
+			//Establecer la primera fecha como valor por defecto
 			this.fechaSeleccionada = dias[0].value;
 			this.actualizarHorasDisponibles(dias[0].value);
 		}
@@ -207,17 +207,17 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 			value: slot.horaInicio
 		}));
 
-		this.componente.fechasOptions = { ...this.componente.fechasOptions, horas };
+		this.componente.fechasOptions = {...this.componente.fechasOptions, horas};
 		const inputHora = this.refs.inputHora;
 		inputHora && inputHora.classList.remove('fadeOut');
 
-		// Establecer la primera hora como valor por defecto si hay horas disponibles
+		//Establecer la primera hora como valor por defecto si hay horas disponibles
 		if (horas.length) {
 			this.horaSeleccionada = horas[0].value;
 		}
 	}
 
-	handleFechaChange({ detail: { value: fechaSeleccionada } }) {
+	handleFechaChange({detail: {value: fechaSeleccionada}}) {
 		this.fechaSeleccionada = fechaSeleccionada;
 
 		const inputHora = this.refs.inputHora;
@@ -226,11 +226,11 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 		}, 'opacity');
 	}
 
-	handleHoraChange({ detail: { value: horaSeleccionada } }) {
+	handleHoraChange({detail: {value: horaSeleccionada}}) {
 		this.horaSeleccionada = horaSeleccionada;
 	}
 
-	handleTipoCitaChange({ detail: { value: tipoCitaSeleccionada } }) {
+	handleTipoCitaChange({detail: {value: tipoCitaSeleccionada}}) {
 		this.tipoCitaSeleccionada = tipoCitaSeleccionada;
 		if (!this.gestorPool) {
 			this.obtenerDisponibilidadAve();
@@ -239,7 +239,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 
 	obtenerDisponibilidadLego() {
 		//sustituir por fecha seleccionada si se pone un datepicker
-		this.componente = { ...this.componente, spinnerDisponibilidad: true };
+		this.componente = {...this.componente, spinnerDisponibilidad: true};
 		let dateToday = new Date();
 		let dateString = dateToday.getFullYear() + '-' +
 			String(dateToday.getMonth() + 1).padStart(2, '0') + '-' +
@@ -253,14 +253,16 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 				this.disponibilidadPorFecha = result.disponibilidadPorFecha;
 				this.actualizarOpcionesFechasHoras();
 			} else {
-				errorApex(this, result.errorMessage, 'Problema obteniendo las fechas disponibles');
+				throw new Error(result.errorMessage);
 			}
-		}).catch(error => errorApex(this, error, 'Error al obtener la disponibilidad'))
-			.finally(() => this.componente = { ...this.componente, spinnerDisponibilidad: false });
+		}).catch(error => {
+			errorApex(this, error, 'Error al obtener la disponibilidad');
+			this.modalCerrar();
+		}).finally(() => this.componente = {...this.componente, spinnerDisponibilidad: false});
 	}
 
 	obtenerDisponibilidadAve() {
-		this.componente = { ...this.componente, spinnerDisponibilidad: true };
+		this.componente = {...this.componente, spinnerDisponibilidad: true};
 		obtenerDisponibilidadAveApex({
 			matriculaGestorAVE: this.gestorAve.matricula,
 			numPerso: getFieldValue(this.oportunidad, OPP_NUM_PERSO),
@@ -270,10 +272,12 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 				this.disponibilidadPorFecha = result.disponibilidadPorFecha;
 				this.actualizarOpcionesFechasHoras();
 			} else {
-				errorApex(this, result.errorMessage, 'Problema obteniendo las fechas disponibles');
+				throw new Error(result.errorMessage);
 			}
-		}).catch(error => errorApex(this, error, 'Error al obtener la disponibilidad'))
-			.finally(() => this.componente = { ...this.componente, spinnerDisponibilidad: false });
+		}).catch(error => {
+			errorApex(this, error, 'Error al obtener la disponibilidad');
+			this.modalCerrar();
+		}).finally(() => this.componente = {...this.componente, spinnerDisponibilidad: false});
 	}
 
 	@api abrirModal() {
@@ -289,7 +293,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 
 		this.refs.backdropModal.classList.add('slds-backdrop_open');
 		transitionThenCallback(modalProgramarCitaGestor, 'slds-fade-in-open', () => {
-			publicarEvento(this, 'modalabierto', { nombreModal: 'modalProgramarCitaGestor' });
+			publicarEvento(this, 'modalabierto', {nombreModal: 'modalProgramarCitaGestor'});
 			this.refs.inputTipoCita.focus();
 		}, 'opacity');
 	}
@@ -297,13 +301,13 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 	modalCerrar() {
 		transitionThenCallback(
 			this.refs.modalProgramarCitaGestor, 'slds-fade-in-open',
-			() => publicarEvento(this, 'modalcerrado', { nombreModal: 'modalProgramarCitaGestor' }),
+			() => publicarEvento(this, 'modalcerrado', {nombreModal: 'modalProgramarCitaGestor'}),
 			'opacity'
 		);
 		this.refs.backdropModal.classList.remove('slds-backdrop_open');
 	}
 
-	modalTeclaPulsada({ keyCode }) {
+	modalTeclaPulsada({keyCode}) {
 		if (keyCode === 27
 			&& !this.componente.spinner
 			&& this.refs.modalProgramarCitaGestor.classList.contains('slds-fade-in-open')) {
@@ -312,18 +316,18 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 	}
 
 	programarCitaGestor() {
-		const { inputAsunto, inputFecha, inputHora } = this.refs;
-		const ok = [inputAsunto, inputFecha, inputHora].reduce((ok, input) => {
+		const {inputAsunto, inputFecha, inputHora} = this.refs;
+		const ok = [inputAsunto, inputFecha, inputHora].reduce((okSoFar, input) => {
 			input.reportValidity();
-			return ok && input.validity.valid;
+			return okSoFar && input.validity.valid;
 		}, true);
 
 		if (ok) {
 			const horaLabel = this.componente.fechasOptions.horas.find(hora => hora.value === this.horaSeleccionada)?.label;
-			this.componente = { ...this.componente, spinner: true };
+			this.componente = {...this.componente, spinner: true};
 
 			if (this.gestorPool) {
-				// Alta cita LEGO
+				//Alta cita LEGO
 				const params = {
 					numOficina: this.gestorLegoOficina,
 					numPer: getFieldValue(this.oportunidad, OPP_NUM_PERSO),
@@ -334,7 +338,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 					recordId: this.recordId
 				};
 
-				altaCitaGestorLegoApex({ params })
+				altaCitaGestorLegoApex({params})
 					.then(result => {
 						if (result.result === 'OK') {
 							this.modalCerrar();
@@ -347,10 +351,10 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 						errorApex(this, error, 'Error al programar la cita');
 					})
 					.finally(() => {
-						this.componente = { ...this.componente, spinner: false };
+						this.componente = {...this.componente, spinner: false};
 					});
 			} else {
-				// Alta cita AVE
+				//Alta cita AVE
 				const params = {
 					empleadoEx: this.gestorAve.matricula.replace('U01', ''),
 					centroEx: this.gestorAve.oficina,
@@ -364,7 +368,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 					gestorMatricula: this.gestorAve.matricula,
 				};
 
-				altaCitaGestorAveApex({ params })
+				altaCitaGestorAveApex({params})
 					.then(result => {
 						if (result.result !== 'OK') {
 							throw new Error(result.errorMessage);
@@ -373,12 +377,12 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 						toast('success', 'Se programó cita con el gestor', 'Se programó correctamente la cita con el gestor para el día ' + this.fechaSeleccionada + ' a las ' + horaLabel);
 					})
 					.catch(error => errorApex(this, error, 'Error al programar la cita'))
-					.finally(() => this.componente = { ...this.componente, spinner: false });
+					.finally(() => this.componente = {...this.componente, spinner: false});
 			}
 		}
 	}
 
-// 	botonDebugOnclick() {
-// 		console.log(JSON.stringify(this.gestorAve, null, 3));
-// 	}
+//botonDebugOnclick() {
+//console.log(JSON.stringify(this.gestorAve, null, 3));
+//}
 }

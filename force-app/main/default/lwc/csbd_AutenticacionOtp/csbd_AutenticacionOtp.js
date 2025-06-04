@@ -476,7 +476,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			if (this.autenticacionPendValidar) {
 				this.autenticacionPendValidar = enCurso.find(a => a.Id === this.autenticacionPendValidar.Id);
 			}
-			return;
+
 
 		} catch (error) {
 			errorApex(this, error, 'Problema recuperando la lista de autenticaciones');
