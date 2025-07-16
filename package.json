@@ -6,7 +6,8 @@
 	"scripts": {
 		"test": "sf apex run -f scripts/apex/CSBD_RunTestSuite.apex",
 		"tail": "sf apex tail log --debug-level ApexUserDebug --color",
-		"browser-tools": "concurrently -k -s first -n server,mcp -c blue,green \"npx @agentdeskai/browser-tools-server@latest\" \"wait-on http://localhost:PORT && npx @agentdeskai/browser-tools-mcp@1.2.0\""
+		"browser-tools": "concurrently -k -s first -n server,mcp -c blue,green \"npx @agentdeskai/browser-tools-server@latest\" \"wait-on http://localhost:PORT && npx @agentdeskai/browser-tools-mcp@1.2.0\"",
+		"precommit": "echo 'No precommit script defined'"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.27.4",
