@@ -1,0 +1,58 @@
+<template>
+    <!--Si está informado algún campo del apartado de representante en el caso, paso a comprobar las validaciones-->
+    <template if:true={validarRepresentante}>
+        <!--Si alguno de los campos que hay que validar estan vacíos, pasamos a validarlos uno por uno-->
+        <template if:true={validarCampos}>
+            <template if:false={usarDatos}>
+                <p style="color:red; font-size:12px;">Para validar el representante es obligatorio tener los siguientes campos de contacto informados:</p>
+                <br/>
+                <div class="slds-grid slds-wrap"> 
+                    <template if:true={tipoRepresentante}>
+                        <div class="slds-size_1-of-2">    
+                            <p style="color:red; font-size:12px;">- Tipo de representante</p>
+                        </div>
+                    </template>
+
+                    <template if:true={tipoDeDocumento}>
+                        <div class="slds-size_1-of-2"> 
+                            <p style="color:red; font-size:12px;">- Tipo de documento</p>
+                        </div>
+                    </template>
+
+                    <template if:true={nombreRepresentante}>
+                        <div class="slds-size_1-of-2"> 
+                            <p style="color:red; font-size:12px;">- Nombre completo</p>
+                        </div>
+                    </template>
+
+                    <template if:true={numeroDelDocumento}>
+                        <div class="slds-size_1-of-2"> 
+                            <p style="color:red; font-size:12px;">- Número del documento</p>
+                        </div>
+                    </template>
+
+                    <template if:false={direccionPostalInformada}>
+                        <div class="slds-size_1-of-2"> 
+                            <p style="color:red; font-size:12px;">- Todos los campos de dirección postal</p>
+                        </div>
+                    </template>
+
+                    <template if:true={emailRepresentante}>
+                        <div class="slds-size_1-of-2"> 
+                            <p style="color:red; font-size:12px;">- Correo electrónico</p>
+                        </div>
+                    </template>
+                    <template if:true={poderRepresentante}>
+                        <div class="slds-size_1-of-2"> 
+                            <p style="color:red; font-size:12px;">- Poder representante</p>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </template>
+    </template>
+    <template if:true={validarCheckALF}>
+        <p style="color:red; font-size:12px;">No puede validar el representante y arrastrar los datos de contacto ya que están seleccionados los datos del reclamante, por favor desactive la marca “Usar los datos del reclamante ” de la sección Datos de contacto de la reclamación si quiere usar los datos del representante</p>
+    </template>
+    
+</template>

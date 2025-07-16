@@ -208,7 +208,6 @@ export default class Sac_InsertarEscalado extends LightningElement {
             this.spinnerLoading = false;
         })
             .catch(error => {
-
                 const evt = new ShowToastEvent({
                     title: 'Fallo al crear el escalado',
                     message: error.body.message,

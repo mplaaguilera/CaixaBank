@@ -31,6 +31,7 @@ import { loadStyle } from 'lightning/platformResourceLoader';
 import CUSTOMCSS from '@salesforce/resourceUrl/SAC_ReclamanteCSS';
 import NAMECARACT_FIELD from '@salesforce/schema/CC_Caracteristica__c.Name';
 import DESCCARACT_FIELD from '@salesforce/schema/CC_Caracteristica__c.CC_Descripcion__c';
+import informarDatosNoAlf from '@salesforce/apex/SPV_LCMP_Reclamantes.informarDatosNoAlf';
 
 
 
@@ -172,8 +173,8 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                                 caractElement.push(element); 
                             }
                         });
-                        if(this.reclamantes[i].SAC_Account__r.AV_EAPGestor__c != null) {
-                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId != null) {
+                        if(this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
+                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
                                 listCaract = Object.assign({caracteristicas : caractElement}, {OficinaDiferente : true}, this.reclamantes[i]);
                             } else {
                                 listCaract = Object.assign({caracteristicas : caractElement}, {OficinaDiferente : false}, this.reclamantes[i]);
@@ -184,8 +185,8 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                         this.reclamantePrincipal.push(listCaract);
                     }else{
                         let listaReclamantes = [];
-                        if(this.reclamantes[i].SAC_Account__r.AV_EAPGestor__c != null) {
-                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId != null) {
+                        if(this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
+                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
                                 listaReclamantes = Object.assign({OficinaDiferente : true}, this.reclamantes[i]);
                             } else {
                                 listaReclamantes = Object.assign({OficinaDiferente : false}, this.reclamantes[i]);
@@ -205,8 +206,8 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                                 caractElement.push(element); 
                             }
                         });
-                        if(this.reclamantes[i].SAC_Account__r.AV_EAPGestor__c != null) {
-                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId != null) {
+                        if(this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
+                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
                                 listCaract = Object.assign({caracteristicas : caractElement}, {OficinaDiferente : true}, this.reclamantes[i]);
                             } else {
                                 listCaract = Object.assign({caracteristicas : caractElement}, {OficinaDiferente : false}, this.reclamantes[i]);
@@ -217,8 +218,8 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                         this.reclamantesSecundarios.push(listCaract);
                     }else{
                         let listaReclamantes = [];
-                        if(this.reclamantes[i].SAC_Account__r.AV_EAPGestor__c != null) {
-                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId != null) {
+                        if(this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
+                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
                                 listaReclamantes = Object.assign({OficinaDiferente : true}, this.reclamantes[i]);
                             } else {
                                 listaReclamantes = Object.assign({OficinaDiferente : false}, this.reclamantes[i]);
@@ -490,4 +491,156 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
         this.mostrarInfo = null;
     }
 
+    mostrarDatosNoAlfabetizados(event){
+        const registroId = event.target.dataset.id;
+        this.idReclamante = registroId;
+
+        const emailNoAlf = event.currentTarget.dataset.emailnoalf;
+        const tlfNoAlf = event.currentTarget.dataset.tlfnoalf;
+        const direccionNoAlf = event.currentTarget.dataset.direccionnoalf;
+
+        if(emailNoAlf){
+            this.emailNoAlf = emailNoAlf;
+        }
+        if(tlfNoAlf){
+            this.telefonoNoAlf = tlfNoAlf;
+        }
+        if(direccionNoAlf){
+            const partesDireccion = direccionNoAlf.split(',');
+            this.direccionNoAlf = partesDireccion[0].trim();
+            this.codigoPostalNoAlf = partesDireccion[1].trim();
+            this.poblacionNoAlf = partesDireccion[2].trim();
+            this.provinciaNoAlf = partesDireccion[3].trim();
+            this.paisNoAlf = partesDireccion[4].trim();
+        }
+       
+        this.modalDatosNoAlf = true;
+    }
+
+    cerrarModalDatosNoAlf(){
+        this.emailNoAlf = '';
+        this.telefonoNoAlf = '';
+        this.direccionNoAlf = '';
+        this.codigoPostalNoAlf = '';
+        this.poblacionNoAlf = '';
+        this.provinciaNoAlf = '';
+        this.paisNoAlf = '';
+        this.modalDatosNoAlf = false;
+    }
+
+    handleInputChange(event) {
+        const inputId = event.target.dataset.myId;
+        const inputValue = event.target.value;
+    
+        switch (inputId) {
+          case 'telefonoNoAlf':
+            this.telefonoNoAlf = inputValue;
+            break;
+          case 'emailNoAlf':
+            this.emailNoAlf = inputValue;
+            break;
+          case 'direccionNoAlf':
+            this.direccionNoAlf = inputValue;
+            break;
+          case 'codigoPostalNoAlf':
+            this.codigoPostalNoAlf = inputValue;
+            break;
+          case 'poblacionNoAlf':
+            this.poblacionNoAlf = inputValue;
+            break;
+          case 'provinciaNoAlf':
+            this.provinciaNoAlf = inputValue;
+            break;
+          case 'paisNoAlf':
+            this.paisNoAlf = inputValue;
+            break;
+        }
+    
+        // this.guardarDeshabilitar = this.telefonoNoAlf.trim() === '' && this.emailNoAlf.trim() === '' && this.direccionNoAlf.trim() === '' && this.codigoPostalNoAlf.trim() === '' && this.poblacionNoAlf.trim() === '' && this.provinciaNoAlf.trim() === '' && this.paisNoAlf.trim() === '';
+      }
+
+    guardarDatosNoAlf(){
+        this.abrirSpinner();
+        
+
+        const direccionPostal = this.construirDireccionPostal(this.direccionNoAlf, this.codigoPostalNoAlf, this.poblacionNoAlf, this.provinciaNoAlf, this.paisNoAlf);
+
+        if ((this.direccionNoAlf === '' && this.codigoPostalNoAlf === '' && this.poblacionNoAlf === '' && this.provinciaNoAlf === '' && this.paisNoAlf === '') ||
+            (this.direccionNoAlf !== '' && this.codigoPostalNoAlf !== '' && this.poblacionNoAlf !== '' && this.provinciaNoAlf !== '' && this.paisNoAlf !== '')){
+            
+            this.modalDatosNoAlf = false;
+
+            informarDatosNoAlf({ idReclamacion: this.recordId, idReclamante: this.idReclamante, emailNoAlf : this.emailNoAlf, tlfNoAlf: this.telefonoNoAlf, direccionNoAlf: direccionPostal })
+                .then(result => {
+                    this.dispatchEvent(new ShowToastEvent({
+                        title: 'Éxito!',
+                        message: 'Datos no alfabetizados asociados correctamente al reclamante',
+                        variant: 'success'
+                    }),);
+                    this.cerrarSpinner();
+                    this.emailNoAlf = '';
+                    this.telefonoNoAlf = '';
+                    this.direccionNoAlf = '';
+                    this.codigoPostalNoAlf = '';
+                    this.poblacionNoAlf = '';
+                    this.provinciaNoAlf = '';
+                    this.paisNoAlf = '';
+                    refreshApex(this._wiredResult);
+                    this.dispatchEvent(new RefreshEvent());
+                })
+                .catch(error => {
+                    this.dispatchEvent(new ShowToastEvent({
+                        title: 'Error al asociar los datos no alfabetizados al reclamante',
+                        message: 'Revise que los campos informados son correctos',
+                        variant: 'error'
+                    }),);
+                    this.cerrarSpinner();
+                });
+        }else{
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Advertencia!',
+                message: 'Informe la dirección postal completa',
+                variant: 'warning'
+            }),);
+            this.cerrarSpinner();
+        }
+    }
+
+    construirDireccionPostal(direccion, codigoPostal, poblacion, provincia, pais){
+        let direccionPostal = '';
+
+        if (direccion) {
+            direccionPostal += direccion;
+        }
+
+        if (codigoPostal) {
+            if (direccionPostal) {
+            direccionPostal += ', ';
+            }
+            direccionPostal += codigoPostal;
+        }
+
+        if (poblacion) {
+            if (direccionPostal) {
+            direccionPostal += ', ';
+            }
+            direccionPostal += poblacion;
+        }
+
+        if (provincia) {
+            if (direccionPostal) {
+            direccionPostal += ', ';
+            }
+            direccionPostal += provincia;
+        }
+
+        if (pais) {
+            if (direccionPostal) {
+            direccionPostal += ', ';
+            }
+            direccionPostal += pais;
+        }
+
+        return direccionPostal;
+    }
 }

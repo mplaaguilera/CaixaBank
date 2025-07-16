@@ -20,9 +20,6 @@
     <aura:attribute name="opcionesNombrePlantilla" type="List" />
     <aura:attribute name="nombrePlantilla" type="String"/>
     <aura:attribute name="nombrePlantillaElegido" type="Boolean" default="false"/>
-    <aura:handler name="init" value="{! this }" action="{! c.buscarPlantillaSDOC }"/>
-
-    <!---->
 
     <aura:attribute name="recordId" type="Id" />    
     <aura:attribute name="opcionesPlantilla" type="List" default="[]"/>
@@ -61,42 +58,6 @@
                 </aura:iteration>
         </lightning:select>
         <br/>
-
-        <!-- //Elegir formato de la plantilla de S-Docs -->
-        <aura:if isTrue="{!v.tipoplantilla == 'SDOCS'}">
-            <lightning:select name="selectItemPlantillaFormato" label="Selecciona el formato de plantilla" value="{!v.tipoplantillaFormato}" onchange="{!c.buscarPlantillaSDOC}">
-                <aura:iteration items="{!v.optionsItemPlantillaFormato}" var="item">
-                    <option text="{!item.label}" value="{!item.value}" selected="{!item.selected}"/>
-                </aura:iteration>
-            </lightning:select>
-            <br/>
-            
-        <!-- Elegir idioma plantilla S-Docs -->
-            <lightning:select name="selectItemPlantillaLenguaje" label="Selecciona el idioma de la plantilla" value="{!v.tipoplantillaLenguaje}" onchange="{!c.buscarPlantillaSDOC}">
-                <aura:iteration items="{!v.optionsItemPlantillaLenguaje}" var="item">
-                    <option text="{!item.label}" value="{!item.value}" selected="{!item.selected}"/>
-                </aura:iteration>
-            </lightning:select>
-            <br/>
-
-        <!-- Elegir plantilla S-Docs -->
-            <lightning:combobox aura:id="selectItem" name="plantillaPDF" label="Plantilla S-Docs"
-                                        placeholder="Selecciona la plantilla"
-                                        required="false"
-                                        dropdownAlignment="right"
-                                        variant="standard"
-                                        value="{!v.nombrePlantilla}"
-                                        onchange="{!c.handleValidarPlantillaElegida}"
-                                        options="{!v.opcionesNombrePlantilla}"/>
-            <br/>
-            
-            <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.handleClickCancelar}"/>
-            <aura:if isTrue="{!v.nombrePlantillaElegido}">
-                <lightning:button class="slds-float_right slds-button slds-button_brand" label="Asignar" onclick="{!c.handleClickAceptar}" />
-            </aura:if>
-
-        </aura:if>        
-        <!-- Fin buscar plantillas de S-Docs -->
 
         <aura:if isTrue="{!v.tipoplantilla == 'SALESFORCE'}">
             <lightning:combobox aura:id="selectItem" name="operativa" label="Operativa"

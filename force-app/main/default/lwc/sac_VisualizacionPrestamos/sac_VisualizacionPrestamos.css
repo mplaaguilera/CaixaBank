@@ -1,105 +1,186 @@
 .slds-tile {
-    border: 1px solid #cccccc !important; /* Borde */
-    border-radius: 0.5rem !important; /* Esquinas redondeadas */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important; /* Sombra */
-    padding: 1rem !important; /* Espaciado interno */
-    background-color: #ffffff !important; /* Fondo blanco */
-    transition: border-color 0.3s, box-shadow 0.3s !important;
-  }
-  
-  .slds-tile p {
-    margin-top: 0.5rem !important; /* Espacio título-contenido */
-  }
-  
-  .bold-text {
-    font-weight: bold; /* Negrita */
-  }
-  lightning-card {
-    width: 100%;
-  }
-  
-  /* Ajustar el ancho de la tabla al 100% */
-  .slds-table {
-    width: 100%;
-    table-layout: fixed;
-  }
-  
-  /* Ajustar el contenido de las celdas para que se muestre en varias líneas si es necesario */
-  .slds-table td {
-    white-space: normal;
-    word-wrap: break-word;
-  }
-  
-  .slds-table td.record-link {
-    color: rgb(23, 152, 193);
-    cursor: pointer;
-  }
-    
-  .slds-table td.record-link:hover {
-    text-decoration: underline;
-  }
-  
-  .custom-bg-color {
-    background-color:  rgb(250, 250, 250);
-  }
-  
-  .titulo {
-    font-size: 16px;
-  }
-  
-  .slds-grid {
-  margin: 1rem;
-  }
-  
-  .slds-card {
-  padding: 1rem;
-  }
-  
-  .slds-col {
-  margin-bottom: 1rem;
-  }
-  
-  p {
-  margin: 0.5rem 0;
-  }
-  
-  a {
-  color: #0070d2;
-  text-decoration: none;
-  }
-  
-  a:hover {
-  text-decoration: underline;
-  }
-  .field-title {
-    font-size: .75rem;
-    padding-right:0.5rem;
-    padding-top:0.25rem;
-    margin-bottom:0.125rem;
-    color: #444444;
-  }
-  .field-value {
-    font-size: .875rem;
-    font-weight: 400;
-    color: #181818;
-  }
-  .underlined {
-    position: relative;
-    padding-bottom: 0.15rem; 
-    border-bottom: 0.5px solid #d3d3d3; 
-  }
-  .underlinedTransparent {
-    position: relative;
-    padding-bottom: 0.15rem; 
-    border-bottom: 0.5px solid #ffffff;
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  .no-horizontal-borders td {
-    border-bottom: none;
-    border-top: none;
-    padding-right: 20px;
-    margin-bottom: 1px;
-  }
+	border: 1px solid #cccccc !important;
+	/* Borde */
+	border-radius: 0.5rem !important;
+	/* Esquinas redondeadas */
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+	/* Sombra */
+	padding: 1rem !important;
+	/* Espaciado interno */
+	background-color: #ffffff !important;
+	/* Fondo blanco */
+	transition: border-color 0.3s, box-shadow 0.3s !important;
+}
+
+.slds-tile p {
+	margin-top: 0.5rem !important;
+	/* Espacio título-contenido */
+}
+
+.bold-text {
+	font-weight: bold;
+	/* Negrita */
+}
+
+lightning-card {
+	display: block;
+	width: 100%;
+}
+
+article.slds-card {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+/* Ajustar el ancho de la tabla al 100% */
+.slds-table {
+	width: 100%;
+	table-layout: fixed;
+}
+
+/* Ajustar el contenido de las celdas para que se muestre en varias líneas si es necesario */
+.slds-table td {
+	white-space: normal;
+	word-wrap: break-word;
+}
+
+.slds-table td.record-link {
+	color: rgb(23, 152, 193);
+	cursor: pointer;
+}
+
+.slds-table td.record-link:hover {
+	text-decoration: underline;
+}
+
+.custom-bg-color {
+	background-color: rgb(250, 250, 250);
+}
+
+.titulo {
+	font-size: 16px;
+}
+
+.slds-grid {
+	margin: 1rem;
+}
+
+article.slds-card + article.slds-card {
+	margin-top: 2.1rem;
+}
+
+.slds-col {
+	margin-bottom: 1rem;
+}
+
+p {
+	margin: 0.5rem 0;
+}
+
+a {
+	color: #0070d2;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.field-title {
+	font-size: .75rem;
+	padding-right: 0.5rem;
+	padding-top: 0.25rem;
+	margin-bottom: 0.125rem;
+	color: #444444;
+}
+
+.field-value {
+	font-size: .875rem;
+	font-weight: 400;
+	color: #181818;
+}
+
+.underlined {
+	position: relative;
+	padding-bottom: 0.15rem;
+	border-bottom: 0.5px solid #d3d3d3;
+}
+
+.underlinedTransparent {
+	position: relative;
+	padding-bottom: 0.15rem;
+	border-bottom: 0.5px solid #ffffff;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.slds-table thead th {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+thead > tr > th:not(:first-child) {
+	border-left: solid 1px #c8c8c8;
+}
+
+.no-horizontal-borders td {
+	border-bottom: none;
+	border-top: none;
+	padding-right: 20px;
+	margin-bottom: 1px;
+}
+
+article.slds-card div.divToggle {
+	position: relative;
+	top: -1px;
+	transition: transform 110ms ease-in-out;
+}
+
+article.slds-card div.divToggle > lightning-button-icon {
+	--slds-g-shadow-outline-focus-1: none;
+	--slds-c-icon-color-foreground: rgb(33, 97, 134);
+}
+
+article.slds-card.detallesVisibles div.divToggle {
+	transform: rotate(90deg);
+}
+
+div.divFormDetalles {
+	background-color: #fefefe;
+	display: block;
+	overflow: hidden;
+	visibility: hidden;
+	max-height: 0;
+	opacity: 0;
+	padding: 0 1rem 0;
+	transition: visibility 0s, max-height 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 310ms linear, padding 300ms linear;
+	will-change: visibility, max-height, opacity, padding;
+}
+
+article.slds-card.detallesVisibles div.divFormDetalles {
+	padding: 0 1rem 1rem;
+	visibility: visible;
+	max-height: 1400px;
+	opacity: 1;
+}
+
+article.slds-card td.tdDetalles {
+	padding: 0;
+	transition: border-top 200ms ease;
+	border-top-style: solid;
+	border-top-color: #d0d0d0;
+	border-top-width: 1px;
+}
+
+article.slds-card:not(.detallesVisibles) td.tdDetalles {
+	border-top-width: 0px;
+	border-top-color: #f0f0f0;
+}
+
+div.slds-media__figure {
+	margin-right: 9px;
+}

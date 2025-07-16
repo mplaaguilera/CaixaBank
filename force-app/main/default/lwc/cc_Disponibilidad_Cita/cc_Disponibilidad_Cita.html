@@ -1,12 +1,14 @@
 <template>
     <div class="slds-grid slds-gutters">
         <div class="slds-col slds-size_1-of-1 slds-var-m-top_medium">
-            <lightning-input class="fechaBuscar" type="date" value={fechaDefault} label="Seleccione una fecha" required="true"></lightning-input>
+            <lightning-input class="fechaBuscar" type="date" value={fechaDefault} label="Seleccione una fecha" required="true" 
+            min={fechaMin}          
+            onchange={validarDisponibilidad}></lightning-input>
         </div>
     </div>
     <div class="slds-grid slds-gutters">
         <div class="slds-col slds-size_1-of-1 slds-var-m-top_medium">
-            <lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Buscar disponibilidad" onclick={disponibilidadCitas}></lightning-button>
+            <lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Buscar disponibilidad" onclick={disponibilidadCitas} disabled={isDisponibilidadDisable}></lightning-button>
         </div>
     </div>
     <div lwc:if={mostrarHoras} class="slds-grid slds-gutters">
@@ -14,4 +16,14 @@
             <lightning-combobox class="franjaSeleccionada" name="horarioDisponible" label="Seleccione una hora disponible" placeholder="Seleccione una hora" options={opcionesDisponibles} onchange={onChangeFranjaSeleccionada}></lightning-combobox>
         </div>
     </div>
+    <div>
+        <div class="slds-var-m-top_xx-large slds-var-m-bottom_large" style="font-size: 14px; font-weight: 700;">
+            Asignada 
+        </div>
+        <div>
+            <lightning-icon class="slds-var-m-right_small" icon-name="standard:user" size="x-small"></lightning-icon> Oficina del gestor.
+        </div>
+        
+    </div>
+   
 </template>

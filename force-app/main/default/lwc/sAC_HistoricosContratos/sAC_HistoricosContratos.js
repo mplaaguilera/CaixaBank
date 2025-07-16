@@ -49,6 +49,10 @@ export default class Sac_Contratos extends LightningElement {
             this.isLoaded = !this.isLoaded;
             this.showBackdrop = !this.showBackdrop;
         }).catch(error => {
+            console.log('RSR -  error ' + error);
+            console.log('RSR -  error ' + JSON.stringify(error));
+
+            
 			this.mostrarToast('error', 'Problema recuperando los contratos', JSON.stringify(error));
         });
     }
@@ -74,7 +78,9 @@ export default class Sac_Contratos extends LightningElement {
             idRecord: this.recordId,
             tipo: event.currentTarget.dataset.product,
             numContrato: event.currentTarget.dataset.id,
-            descripcion: event.currentTarget.dataset.description
+            descripcion: event.currentTarget.dataset.description,
+            fechaApertura: event.currentTarget.dataset.apertura,
+            fechaCancelacion: event.currentTarget.dataset.cancelacion
         }).then(data => {
             this.mostrarToast('success', 'Producto creado.', 'El contrato ha sido relacionado correctamente con la pretensión.');
         }).catch(error => {

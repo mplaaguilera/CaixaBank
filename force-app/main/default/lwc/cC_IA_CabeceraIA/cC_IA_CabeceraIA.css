@@ -1,0 +1,18 @@
+.title-container {
+    background-color: #f4f4f4; /* Fondo gris claro */
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.icon {
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.title {
+    display: inline;
+    font-size: 20px;
+    font-weight: bold;
+}

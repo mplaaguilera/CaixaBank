@@ -17,6 +17,7 @@
     <aura:attribute name="cuerpoProrroga" type="String" />
     <aura:attribute name="cartaPostalProrroga" type="String" />
     <aura:attribute name="modalParaProrrogar" type="Boolean" default="false" />
+    <lightning:navigation aura:id="navService"/>
 
     <aura:attribute name="procedenciaEC" type="String" default="comunicación" />
 
@@ -37,9 +38,11 @@
     <div class="slds-grid slds-gutters">
         <div class="slds-col slds-box myClass" style="padding: 14px; margin: 9px;" >
             <aura:if isTrue="{!v.cartaPostalProrroga == true}">
-                <c:SAC_GeneracionCartas caseId="{!v.recordId}" nombreTitular="{!v.nombreTitularEC}" direccion="{!v.direccionEC}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoProrroga}" procedencia="{!v.procedenciaEC}"/>
+                <c:sac_GeneracionCartaPostal recordId="{!v.recordId}" nombreTitular="{!v.nombreTitular}" direccion="{!v.direccionEC}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoProrroga}" procedencia="{!v.procedenciaEC}"/>
+                <!-- <c:SAC_GeneracionCartas caseId="{!v.recordId}" nombreTitular="{!v.nombreTitularEC}" direccion="{!v.direccionEC}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoProrroga}" procedencia="{!v.procedenciaEC}"/> -->
                 <aura:set attribute="else">
-                    <c:SAC_GeneracionCartas caseId="{!v.recordId}" nombreTitular="{!v.nombreTitularEC}" direccion="{!v.direccionEC}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoEC}" procedencia="{!v.procedenciaEC}"/>
+                    <c:sac_GeneracionCartaPostal recordId="{!v.recordId}" nombreTitular="{!v.nombreTitular}" direccion="{!v.direccionEC}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoEC}" procedencia="{!v.procedenciaEC}"/>
+                    <!-- <c:SAC_GeneracionCartas caseId="{!v.recordId}" nombreTitular="{!v.nombreTitularEC}" direccion="{!v.direccionEC}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoEC}" procedencia="{!v.procedenciaEC}"/> -->
 
                 </aura:set>
             </aura:if>

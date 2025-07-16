@@ -3,6 +3,7 @@ import insertTarea from '@salesforce/apex/SPV_LCMP_CrearTarea.insertarTarea';
 import camposRequeridos from '@salesforce/apex/SPV_LCMP_CrearTarea.camposRequeridos';
 import camposRequeridosMaestro from '@salesforce/apex/SPV_LCMP_CrearTarea.camposRequeridosMaestro';
 import tienePermisos from '@salesforce/apex/SPV_LCMP_CrearTarea.tienePermisos';
+import comprobarPosibleOficina from '@salesforce/apex/SPV_LCMP_CrearTarea.comprobarPosibleOficina';
 import { getRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from 'lightning/navigation';
@@ -43,6 +44,10 @@ export default class Spv_CrearTarea extends LightningElement {
 	@api required = false;
 	@track controlador = true;
 	@track controladorDos = false;
+	@track idOficinaSeleccionada = '';
+    @track listOficinasMostrar = [];
+    @track mostrarOficinas = false;
+    @track selectOficina;
 	
 
     _wiredResult;  
@@ -60,7 +65,7 @@ export default class Spv_CrearTarea extends LightningElement {
     @wire(tienePermisos, { idCaso: '$recordId'}) 
     mapaPermisos(result){ 
         if(result.data){ 
-            this.tienePermisosEditar = result.data;          
+            this.tienePermisosEditar = result.data;   			       
         }
 		//else{
         //     this.ownerId == Id ? this.tienePermisosEditar = true :  this.tienePermisosEditar = false;
@@ -156,6 +161,8 @@ export default class Spv_CrearTarea extends LightningElement {
 		this.seleccionRealizada = false;
 		this.descripcion = '';
 		this.campoVacio = false;
+		this.mostrarOficinas = false;
+		this.idOficinaSeleccionada = '';
     }
 
     anterior() {
@@ -167,6 +174,8 @@ export default class Spv_CrearTarea extends LightningElement {
 		this.campoVacio = false;
 		this.seleccionRealizada = false;
 		this.descripcion = '';
+		this.mostrarOficinas = false;
+		this.idOficinaSeleccionada = '';
     }
 
     handleChange(e) {
@@ -233,7 +242,7 @@ export default class Spv_CrearTarea extends LightningElement {
     }
 
     guardarTarea() {
-        if((this.modalOtrasTareas === true && (this.descripcion === '' || this.descripcion === 'undefined'  || this.seleccionRealizada === false)) || (this.modalMaestroTareas === true && this.seleccionRealizada === false)){
+        if((this.modalOtrasTareas === true && (this.descripcion === '' || this.descripcion === 'undefined'  || this.seleccionRealizada === false || (this.mostrarOficinas && this.idOficinaSeleccionada === ''))) || (this.modalMaestroTareas === true && (this.seleccionRealizada === false || (this.mostrarOficinas && this.idOficinaSeleccionada === '')))){
             this.campoVacio = true;
         }else{
             this.spinnerLoading = true;
@@ -243,7 +252,7 @@ export default class Spv_CrearTarea extends LightningElement {
 			this.campoVacio = false;
 			this.seleccionRealizada = false;
 					
-            insertTarea({tareaId: this.recordId, descripcion: this.descripcion, equipoResponsableId: this.equipoResponsableId, esMaestroOrOtras: this.otratareaORmaestro}).then(result => {
+            insertTarea({tareaId: this.recordId, descripcion: this.descripcion, equipoResponsableId: this.equipoResponsableId, idOficina: this.idOficinaSeleccionada, esMaestroOrOtras: this.otratareaORmaestro}).then(result => {
             	const evt = new ShowToastEvent({
                 	title: 'Tarea creada',
                 	message: 'Se ha creado la tarea con éxito',
@@ -266,6 +275,8 @@ export default class Spv_CrearTarea extends LightningElement {
 				this.descripcion= '';
 				this.equipoResponsableId = '';	
 				this.spinnerLoading = false;
+				this.mostrarOficinas = false;
+				this.idOficinaSeleccionada = '';
 				
 				this.dispatchEvent(new RefreshEvent());
             })
@@ -347,16 +358,55 @@ export default class Spv_CrearTarea extends LightningElement {
 	}
 
 	handleSelect(event) {
+		
+		var comprobarOficinasReclamacion = false;
 		this.isOpen = false;
 		this.allowBlur();
-		this._value = event.currentTarget.dataset.value;
+		this._value = event.currentTarget.dataset.value;		
 
 		let idSeleccion;
-		this._options.forEach( function(element, index) {
-            if(element.Name === event.currentTarget.dataset.value) {
+		this._options.forEach( function(element, index) {			
+            if(element.Name === event.currentTarget.dataset.value) {				
 				idSeleccion = element.Id;
+
+				if(element.Name === 'GENERAL PARA OFICINAS' || element.Name === 'Oficina'){
+					comprobarOficinasReclamacion = true;
+				}else{
+					comprobarOficinasReclamacion = false;
+				}
             }
         });
+		
+		if(comprobarOficinasReclamacion){
+			var oficinasReclamacion = [];
+
+            comprobarPosibleOficina({idGrupoOrMaestro: idSeleccion, idRegistro: this.recordId})
+                .then(result => {
+                    oficinasReclamacion = result;
+
+                    if(oficinasReclamacion.length > 0){
+                        if(oficinasReclamacion.length === 1){							
+                            this.idOficinaSeleccionada = oficinasReclamacion[0].SPV_OficinaAfectada_Lookup__r.Id;
+                            this.mostrarOficinas = false;
+                        }else{							
+                            this.mostrarOficinas = true;
+
+                            this.listOficinasMostrar = oficinasReclamacion.map(item => ({                                
+                                label: item.SPV_OficinaAfectada_Lookup__r.Name,
+                                value: item.SPV_OficinaAfectada_Lookup__r.Id
+                            }));
+                        }
+                    }else{
+                        this.mostrarOficinas = false;
+                        this.idOficinaSeleccionada = '';
+                    }               
+                })
+                .catch(error => {
+                    this.showToast('Fallo al seleccionar el grupo de la consulta', error.body.message, 'error');
+                })
+		}else{
+			this.mostrarOficinas = false;
+		}
 
 		this.controlador = false;
 		this.equipoResponsableId = idSeleccion; 
@@ -365,6 +415,10 @@ export default class Spv_CrearTarea extends LightningElement {
 	
 		this.fireChange();
 	}
+
+	handleChangeOficina(event){
+        this.idOficinaSeleccionada = event.detail.value
+    }
 
 	highLightOption(options) {
 		let classes = "slds-media slds-listbox__option slds-listbox__option_plain slds-media_small";

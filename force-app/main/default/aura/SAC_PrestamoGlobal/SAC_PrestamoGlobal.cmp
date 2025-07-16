@@ -1,30 +1,32 @@
-<aura:component controller="SAC_LCMP_PrestamoGlobal"
-                implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+<aura:component controller="SAC_LCMP_PrestamoGlobal" implements="force:hasRecordId,flexipage:availableForRecordHome">
+
     <aura:attribute name="recordId" type="String" />
-    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
-    <aura:attribute name="hayPrestamos" type="Boolean" default="false"/>
+    <aura:attribute name="spinner" type="Boolean" default="true"/>
+    <aura:attribute name="hayPrestamos" type="Boolean" default="true"/>
     <aura:attribute name="cumpleCriterio" type="Boolean" default="false"/>
-    <aura:attribute name="isLoading" type="Boolean" default="true"/>
-    
-    <aura:if isTrue="{!v.isLoading}">
-        <div class="slds-p-around_x-large">
-            <lightning:spinner alternative-text="Loading" size="large" variant="brand"></lightning:spinner>
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+
+    <article class="slds-card">
+        <div class="slds-card__body slds-card__body_inner slds-is-relative" style="min-height: 200px;">
+            <aura:if isTrue="{!v.spinner}">
+                <lightning:spinner alternativeText="Cargando..." size="small"/>
+            </aura:if>
+
+            <aura:if isTrue="{!v.hayPrestamos}">
+                <aura:if isTrue="{!v.cumpleCriterio}">
+                    <c:SAC_PrestamoBotonInadmision recordId="{!v.recordId}" cumpleCriterio="{!v.cumpleCriterio}"/>
+                </aura:if>
+
+                <c:sac_VisualizacionPrestamos recordId="{!v.recordId}" onvalidationcheck="{!c.handleValidationCheck}"/>
+
+                <aura:set attribute="else">
+                    <p class="slds-align_absolute-center">No hay préstamos relacionados con los reclamantes de esta reclamación.</p>
+                </aura:set>
+            </aura:if>
+
         </div>
-    </aura:if>
-    
-    <aura:if isTrue="{!v.hayPrestamos}">
-        <aura:if isTrue="{!v.cumpleCriterio}">
-            <div style="margin-bottom: 20px;">
-                <c:SAC_PrestamoBotonInadmision recordId="{!v.recordId}" cumpleCriterio="{!v.cumpleCriterio}"/>
-            </div>
-        </aura:if>
-        <div style="margin-bottom: 20px;">
-            <c:sac_VisualizacionPrestamos recordId="{!v.recordId}" onvalidationcheck="{!c.handleValidationCheck}"/> 
-        </div>
-        <aura:set attribute="else">
-            <div style="margin-bottom: 20px;">
-                No hay préstamos relacionados con los reclamantes de esta reclamación.
-            </div>
-        </aura:set>
-    </aura:if>
+    </article>
+
+
 </aura:component>

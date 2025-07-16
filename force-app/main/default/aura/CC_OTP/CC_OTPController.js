@@ -7,7 +7,6 @@
                 label: { fieldName: "nombreBoton" },
                 name: { fieldName: "nombreBoton" },
                 title: { fieldName: "nombreBoton" },
-                //disabled: { fieldName: "isActive"},
                 value: { fieldName: "nombreBoton" },
                 iconPosition: "left"
             }
@@ -72,28 +71,63 @@
 
     //Boton Nivel 2
     segundoNivelAut: function (component, event, helper) {
-        component.set("v.nivelSeleccionado", event.getSource().getLocalId());
+        if (component.get('v.nuevaLogicaAut') === false) {
+            component.set("v.nivelSeleccionado", event.getSource().getLocalId());
+        } else {
+            component.set("v.nivelSeleccionado", 'Nivel 2');
+        }
         component.set("v.disabledBotones", true);
         $A.enqueueAction(component.get("c.cerrarModalValidarDos"));
+        $A.enqueueAction(component.get("c.cerrarModalMecanismoAutenticacion"));
+        var listaPreguntas;
+        if (component.get("v.ambitoMotivoCaixa") === 'Onboarding' || component.get("v.ambitoMotivoImagin") === 'Onboarding') {
+            listaPreguntas = 'Preguntas Autenticación Nivel 2 (Onboarding)';
+        } else {
+            listaPreguntas = 'Preguntas OTPSMS 2 Nivel';
+        }
                 var comprobarDatos2Nivel = component.get("c.comprobarDatos2Nivel");
-                comprobarDatos2Nivel.setParams({ "recordId": component.get("v.recordId") });
+                comprobarDatos2Nivel.setParams({ "recordId": component.get("v.recordId"), "nombreLista": listaPreguntas });
                 comprobarDatos2Nivel.setCallback(this, function (response) {
                     if (response.getState() === "SUCCESS") {
                         var respuesta = response.getReturnValue();
-                        if (respuesta === "SIN DATOS") {
-                            helper.recuperarMensajeToast(component, "error", "DATOS_VACIOS");
-                        }else if(respuesta === "CLIENTE BLOQUEADO") {
-                            helper.recuperarMensajeToast(component, "error", "CLIENTE_BLOQUEADO");
-                        }else if(respuesta === "SIN LLAMADAS") {
-                            helper.recuperarMensajeToast(component, "error", "SIN_LLAMADAS");
-                        }else if (respuesta === "OK") {
-                            helper.obtenerPreguntasAleatorias(component);
-
-                        }else{
-                            console.error(response.getError());
+                        for (let key in respuesta) {
+                            if (key === "Pregunta1") {
+                                component.set("v.labelPregunta1", respuesta[key]);
+                            }else if (key === "Pregunta2") {
+                                component.set("v.labelPregunta2", respuesta[key]);
+                            }else if (key === "TextoAyudaPregunta1") {
+                                component.set("v.textoAyudaPregunta1", respuesta[key]);
+                            }else if (key === "TextoAyudaPregunta2") {
+                                component.set("v.textoAyudaPregunta2", respuesta[key]);
+                            }else if (key === "error") {
+                                component.set("v.datosVacios", respuesta[key]);
+                            }else if(key === "OmitirPreguntas"){
+                                component.set("v.omitirPreguntasNvl2", respuesta[key]);
+                            }else if(key === "listaCuentas"){
+                                component.set("v.listaCuentas", respuesta[key]);
+                            }else if(key === "listaTarjetas"){
+                                component.set("v.listaTarjetas", respuesta[key]);
+                            }
                         }
-                    }else{
-                        console.error(response.getError());
+
+                        if (component.get("v.datosVacios") === "SIN DATOS") {
+                            helper.recuperarMensajeToast(component, "error", "DATOS_VACIOS");
+                            component.set("v.disabledBotones", false);
+                        }else if(component.get("v.datosVacios") === "CLIENTE BLOQUEADO") {
+                            helper.recuperarMensajeToast(component, "error", "CLIENTE_BLOQUEADO");
+                            component.set("v.disabledBotones", false);
+                        }else if(component.get("v.datosVacios") === "SIN LLAMADAS") {
+                            helper.recuperarMensajeToast(component, "error", "SIN_LLAMADAS");
+                            component.set("v.disabledBotones", false);
+                        }else if(component.get("v.datosVacios") === "SIN DATOS API") {
+                            helper.recuperarMensajeToast(component, "error", "SIN_DATOS_API");
+                            component.set("v.disabledBotones", false);
+                        } else if (component.get("v.labelPregunta1") == null || component.get("v.labelPregunta2") == null) {
+                            helper.recuperarMensajeToast(component, "error", "DATOS_VACIOS");
+                            component.set("v.disabledBotones", false);
+                        } else if (component.get("v.datosVacios") === "OK") {
+                            helper.obtenerPreguntasAleatorias(component);
+                        }
                     }
                 });
                 $A.enqueueAction(comprobarDatos2Nivel);
@@ -111,32 +145,34 @@
 
     //Boton Cliente Digital
     clienteDigitalAut: function(component, event, helper) {
-    component.set("v.disabledBotones", true);
-    component.set("v.nivelSeleccionado", event.getSource().getLocalId());
-    $A.enqueueAction(component.get("c.cerrarModalValidarDos"));
-                if (component.get("v.idCliente") === undefined) {
-                    component.set("v.idCliente", datos[0].AccountId);
-                }
-                let validarCanalAutenticacion = component.get("c.validarCanalAutenticacion");
-                validarCanalAutenticacion.setParam("recordId", component.get("v.recordId"));
-                validarCanalAutenticacion.setCallback(this, responseValidarCanalAutenticacion => {
-                    if (responseValidarCanalAutenticacion.getState() === "SUCCESS") {
-                        let canalValido = responseValidarCanalAutenticacion.getReturnValue();
-                        if (canalValido != null) {
-                            if (canalValido) {
-                                $A.enqueueAction(helper.enviarSegundoNivelAux(component, event));
-    
-                            } else {
-                                this.mostrarToast("error", "Operativa no disponible", "Operativa no disponible para este canal de entrada o tipo de cliente del caso.");
-                        }
-    
+        if (component.get('v.nuevaLogicaAut') === false) {
+            component.set("v.nivelSeleccionado", event.getSource().getLocalId());
+        } else {
+            component.set("v.nivelSeleccionado", 'Cliente Digital');
+        }
+        component.set("v.disabledBotones", true);
+        $A.enqueueAction(component.get("c.cerrarModalValidarDos"));
+        $A.enqueueAction(component.get("c.cerrarModalMecanismoAutenticacion"));
+        let validarCanalAutenticacionApex = component.get("c.validarCanalAutenticacion");
+        validarCanalAutenticacionApex.setParam("recordId", component.get("v.recordId"));
+        validarCanalAutenticacionApex.setCallback(this, function (responseValidarCanalAutenticacion) {
+            if (responseValidarCanalAutenticacion.getState() === "SUCCESS") {
+                let canalValido = responseValidarCanalAutenticacion.getReturnValue();
+                if (canalValido != null) {
+                    if (canalValido) {
+                        $A.enqueueAction(helper.enviarSegundoNivelAux(component, event));
                     } else {
-                        component.set("v.disabledBotones", false);
-                        this.mostrarToast("error", "Operativa no disponible", "Operativa no disponible para este canal de entrada o tipo de cliente del caso.");
+                        helper.mostrarToast("error", "Operativa no disponible", "Operativa no disponible para este canal de entrada o tipo de cliente del caso.");
                     }
+                } else {
+                    component.set("v.disabledBotones", false);
+                    helper.mostrarToast("error", "Operativa no disponible", "Operativa no disponible para este canal de entrada o tipo de cliente del caso.");
                 }
-                });
-                $A.enqueueAction(validarCanalAutenticacion);
+            }
+        });
+        if (validarCanalAutenticacionApex) {
+            $A.enqueueAction(validarCanalAutenticacionApex);
+        }
     },
     
     //Boton Enviar/Validar de nivel 2
@@ -163,7 +199,7 @@
             $A.enqueueAction(component.get("c.abrirModalValidarRegistro"));
         } else if (actionName === "Cancelar") {
             component.set("v.recordIdPdteValidar", id);
-             $A.enqueueAction(component.get("c.cancelarAut"));
+            $A.enqueueAction(component.get("c.cancelarAut"));
         }
     },
 
@@ -223,6 +259,7 @@
                     toastEvent.fire();
                     $A.enqueueAction(component.get("c.cerrarModalValidar"));
                     $A.enqueueAction(component.get("c.doInit"));
+                    helper.cerrarModalQuickAction(component);
                 } else if (resultado === "La autorización ha sido aprobada por el cliente" || resultado === "La autorización ha finalizado correctamente") {
                     let toastEvent = $A.get("e.force:showToast");
                     toastEvent.setParams({
@@ -232,6 +269,7 @@
                     toastEvent.fire();
                     $A.enqueueAction(component.get("c.cerrarModalValidar"));
                     $A.enqueueAction(component.get("c.doInit"));
+                    helper.cerrarModalQuickAction(component);
                 } else if (resultado === "La autorización está pendiente (pendiente cliente)" || resultado == "La autorización está en progreso (pendiente cliente)") {
                     let toastEvent = $A.get("e.force:showToast");
                     toastEvent.setParams({
@@ -240,19 +278,43 @@
                     });
                     toastEvent.fire();
                     component.set("v.disabledBotonValidar", false);
+                } else if (resultado === "Se identifica riesgo alto de fraude (NO se permite nuevo intento)") {
+                    helper.recuperarMensajeToast(component, "error", "DERIVAR_DENIED");
+                    $A.enqueueAction(component.get("c.cerrarModalValidar"));
+                    $A.enqueueAction(component.get("c.handleModalOficinaAbierto"));
+                } else if (resultado === 'La autorización ha expirado (se permite un nuevo intento)') {
+                    $A.enqueueAction(component.get("c.doInit"));
+                    window.setTimeout($A.getCallback(() => {
+                        let edadLimite = component.get("v.edadLimite");  
+                        if (!component.get("v.clienteBloqueado") && component.get('v.impedirClienteDigital') === false && (component.get("v.edadCliente") >= edadLimite || (component.get("v.edadCliente") < edadLimite && component.get("v.menorDe65")))){
+                            helper.modalNuevoMecanismo(component, 'CLIENTE_DIGITAL_EXPIRED');
+                        }
+                        component.set("v.disabledBotonValidar", false);
+                        $A.enqueueAction(component.get("c.cerrarModalValidar"));
+                    }), 2000);
+
                 } else {
-                    component.set("v.nuevoIntento", true);
                     let toastEvent = $A.get("e.force:showToast");
                     if (nivel === "Cliente Digital") {
-                        toastEvent.setParams({
-                            message: resultado,
-                            key: "info_alt", type: "error", mode: "dismissible", duration: "10000"
-                        });
+                        if (resultado.includes('(ERROR)') || resultado === 'Estado desconocido') {
+                            if (component.get("v.impedirNivel2")) {
+                            	helper.recuperarMensajeToast(component, "warning", "DERIVAR_ERROR");
+                                $A.enqueueAction(component.get("c.cerrarModalValidar"));
+                                $A.enqueueAction(component.get("c.handleModalOficinaAbierto"));
+                            } else {
+                    			helper.recuperarMensajeToast(component, "warning", "NIVEL_2_ERROR");
+                                $A.enqueueAction(component.get("c.segundoNivelAut"));
+                            }
+                        }
                     } else {
-                        toastEvent.setParams({
-                            title: "Error: " + resultado, message: "Se he producido un error en la validación.",
-                            key: "info_alt", type: "error", mode: "dismissible", duration: "10000"
-                        });
+                        if(resultado ==='OTP fallo en la integración'){
+                            helper.recuperarMensajeToast(component, "warning", "LLAMADA_SALIENTE");
+                        }else{
+                            toastEvent.setParams({
+                                title: "Error: " + resultado, message: "Se he producido un error en la validación.",
+                                key: "info_alt", type: "error", mode: "dismissible", duration: "10000"
+                            });
+                        }
                     }
 
                     toastEvent.fire();
@@ -284,16 +346,24 @@
     },
 
     //Cerrar modal de preguntas Nivel 2 y Emergencia
-    cerrarModalPreguntas: function (component) {
+    cerrarModalPreguntas: function (component, event, helper) {
+        component.set("v.valorInputPregunta1", null);
         component.set("v.valorInputPregunta1", null);
         component.set("v.valorInputPregunta2", null);
         component.set("v.noValidado", false);
         component.set("v.disabledBotonesValidar", false);
         component.set("v.disabledBotones", false);
+        component.set("v.nivelDosCancelada", false);
 
         $A.util.removeClass(component.find("ModalboxPreguntas"), "slds-fade-in-open");
         $A.util.removeClass(component.find("ModalBackdropPreguntas"), "slds-backdrop--open");
-        //$A.enqueueAction(component.get("c.doInit"));
+    },
+
+    cerrarModalPreguntasBotonCancelar: function (component, event, helper) {
+        component.set("v.nivelDosCancelada", true);
+        helper.generarComunicacionNivelDos(component, event, helper);
+        $A.enqueueAction(component.get("c.cerrarModalPreguntas"));
+        component.set("v.disabledBotones", false);
     },
 
     //Icono de cruz
@@ -308,14 +378,17 @@
         component.set("v.nuevoIntento", false);
     },
 
+    cerrarModalMecanismoAutenticacion: function (component) {
+        $A.util.removeClass(component.find("ModalboxMecanismoAutenticacion"), "slds-fade-in-open");
+        $A.util.removeClass(component.find("ModalBackdropMecanismoAutenticacion"), "slds-backdrop--open");
+    },
 
     // Boton Validado de modal de Autenticacion de Emergencia
     enviarSegunNivel: function (component, event, helper) {
         component.set("v.disabledBotones", true);
-        //let canalValido = false;
-        let validarCanalAutenticacion = component.get("c.validarCanalAutenticacion");
-        validarCanalAutenticacion.setParam("recordId", component.get("v.recordId"));
-        validarCanalAutenticacion.setCallback(this, responseValidarCanalAutenticacion => {
+        let validarCanalAutenticacionApex = component.get("c.validarCanalAutenticacion");
+        validarCanalAutenticacionApex.setParam("recordId", component.get("v.recordId"));
+        validarCanalAutenticacionApex.setCallback(this, responseValidarCanalAutenticacion => {
             if (responseValidarCanalAutenticacion.getState() === "SUCCESS") {
                 let canalValido = responseValidarCanalAutenticacion.getReturnValue();
                 if (canalValido != null) {
@@ -330,7 +403,7 @@
                 helper.mostrarToast("error", "Operativa no disponible", "Operativa no disponible para este canal de entrada o tipo de cliente del caso.");
             }
         });
-        $A.enqueueAction(validarCanalAutenticacion);
+        $A.enqueueAction(validarCanalAutenticacionApex);
 
     },
 
@@ -355,92 +428,94 @@
             }
         }
         if (!respuestasErroneas) {
-        let validacionPreguntas = component.get("c.validacionPreguntas");
-        validacionPreguntas.setParams({
-            "recordId": component.get("v.recordId"),
-            "pregunta1": component.get("v.labelPregunta1"),
-            "pregunta2": component.get("v.labelPregunta2"),
-            "respuesta1": component.get("v.valorInputPregunta1"),
-            "respuesta2": component.get("v.valorInputPregunta2")
-        });
-        validacionPreguntas.setCallback(this, function (response) {
-            if (response.getState() === "SUCCESS") {
-                let resultado = validacionPreguntas.getReturnValue();
-                component.set("v.validacionPregunta1", resultado[0]);
-                component.set("v.validacionPregunta2", resultado[1]);
-                component.set("v.OmitirSMSNvl2", resultado[2]);
+            let validacionPreguntas = component.get("c.validacionPreguntas");
+            validacionPreguntas.setParams({
+                "recordId": component.get("v.recordId"),
+                "pregunta1": component.get("v.labelPregunta1"),
+                "pregunta2": component.get("v.labelPregunta2"),
+                "respuesta1": component.get("v.valorInputPregunta1"),
+                "respuesta2": component.get("v.valorInputPregunta2"),
+                "listaCuentas" : component.get("v.listaCuentas"),
+                "listaTarjetas" : component.get("v.listaTarjetas")
+            });
+            validacionPreguntas.setCallback(this, function (response) {
+                if (response.getState() === "SUCCESS") {
+                    let resultado = validacionPreguntas.getReturnValue();
+                    component.set("v.validacionPregunta1", resultado[0]);
+                    component.set("v.validacionPregunta2", resultado[1]);
+                    component.set("v.OmitirSMSNvl2", resultado[2]);
 
-                if ((component.get("v.validacionPregunta1") === false || component.get("v.validacionPregunta2") === false) && component.get("v.omitirPreguntasNvl2") === false) {
-                    helper.generarComunicacionNivelDos(component, event, helper).then(() => {
-                        helper.recuperarMensajeToast(component, "error", "NOK");
-                    }).catch(error => {
-                        console.error("Error en validacionesBasicas:", error);
-                    });
-                } else {
-                    if(component.get("v.omitirPreguntasNvl2") === false){
-                        helper.recuperarMensajeToast(component, "success", "OK");                            
-                    }
-                    let validarCanalAutenticacion = component.get("c.validarCanalAutenticacion");
-                    validarCanalAutenticacion.setParam("recordId", component.get("v.recordId"));
-                    validarCanalAutenticacion.setCallback(this, function (response) {
-                        if (response.getState() === "SUCCESS") {
-                            let canalValido = response.getReturnValue();
-                            if (canalValido != null) {
-                                if (canalValido) {
-                                    helper.generarComunicacionNivelDos(component, event, helper).then(() => {
-                                        if ((component.get("v.validacionPregunta1") === true && component.get("v.validacionPregunta2") === true) || component.get("v.omitirPreguntasNvl2") === 'true') {
-                                            if(component.get("v.OmitirSMSNvl2") === false){
-                                                let id = component.get("v.recordIdPdteValidar");
-                                                let enviarRegistro = component.get("c.enviarRegistro");
-                                                enviarRegistro.setParams({ "recordId": id });
-                                                enviarRegistro.setCallback(this, function (response) {
-                                                    if (response.getState() === "SUCCESS") {
-                                                        component.set("v.validarRegistro", true);            
-                                                        $A.enqueueAction(component.get("c.abrirModalValidarRegistro"));
-                                                    }
-                                                });
-                                                $A.enqueueAction(enviarRegistro);
-                                                
-                                            }else{
-                                                $A.enqueueAction(component.get("c.cerrarModalPreguntas"));
-                                            }
-                                        }
-                                    }).catch(error => {
-                                        console.error("Error en validacionesBasicas:", error);
-                                    });
-                            
-                                } else {
-                                    helper.mostrarToast("error", "Operativa no disponible", "Operativa no disponible para este canal de entrada o tipo de cliente del caso.");
-                                }
-                            }
-
-                        } else {
-                            component.set("v.disabledBotones", false);
-                            helper.mostrarToast("error", "Operativa no disponible", "Operativa no disponible para este canal de entrada o tipo de cliente del caso.");
+                    if ((component.get("v.validacionPregunta1") === false || component.get("v.validacionPregunta2") === false) && component.get("v.omitirPreguntasNvl2") === false) {
+                        helper.generarComunicacionNivelDos(component, event, helper).then(() => {
+                            helper.recuperarMensajeToast(component, "error", "NOK");
+                        });
+                    } else {
+                        if(component.get("v.omitirPreguntasNvl2") === false){
+                            helper.recuperarMensajeToast(component, "success", "OK");                            
                         }
-                    });
-                    $A.enqueueAction(validarCanalAutenticacion);
+                        let validarCanalAutenticacionApex = component.get("c.validarCanalAutenticacion");
+                        validarCanalAutenticacionApex.setParam("recordId", component.get("v.recordId"));
+                        validarCanalAutenticacionApex.setCallback(this, function (response) {
+                            if (response.getState() === "SUCCESS") {
+                                let canalValido = response.getReturnValue();
+                                if (canalValido != null) {
+                                    if (canalValido) {
+                                        helper.generarComunicacionNivelDos(component, event, helper).then(() => {
+                                            if ((component.get("v.validacionPregunta1") === true && component.get("v.validacionPregunta2") === true) || component.get("v.omitirPreguntasNvl2") === 'true') {
+                                                if(component.get("v.OmitirSMSNvl2") === false){
+                                                    let id = component.get("v.recordIdPdteValidar");
+                                                    let enviarRegistro = component.get("c.enviarRegistro");
+                                                    enviarRegistro.setParams({ "recordId": id });
+                                                    enviarRegistro.setCallback(this, function (response) {
+                                                        if (response.getState() === "SUCCESS") {
+                                                            component.set("v.validarRegistro", true);            
+                                                            $A.enqueueAction(component.get("c.abrirModalValidarRegistro"));
+                                                        }
+                                                    });
+                                                    $A.enqueueAction(enviarRegistro);
+                                                    
+                                                }else{
+                                                    $A.enqueueAction(component.get("c.cerrarModalPreguntas"));
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        helper.mostrarToast("error", "Operativa no disponible", "Operativa no disponible para este canal de entrada o tipo de cliente del caso.");
+                                    }
+                                }
+
+                            } else {
+                                component.set("v.disabledBotones", false);
+                                helper.mostrarToast("error", "Operativa no disponible", "Operativa no disponible para este canal de entrada o tipo de cliente del caso.");
+                            }
+                        });
+                        $A.enqueueAction(validarCanalAutenticacionApex);
+                    }
                 }
-            }
-        });
-        $A.enqueueAction(validacionPreguntas);
+            });
+            $A.enqueueAction(validacionPreguntas);
         }
     },
 
     //Cancelar autenticación
     cancelarAut: function (component, event, helper) {
+        let edadLimite = component.get("v.edadLimite");
         let recordId = component.get("v.recordId");
         component.set("v.disabledBotones", false);
         var id = component.get("v.recordIdPdteValidar");
-            let mensajeCancelar = component.get("c.autenticacionCancelada");
-            mensajeCancelar.setParams({"recordId": id, "casoId": recordId});
-        	$A.enqueueAction(mensajeCancelar);
-            $A.enqueueAction(component.get("c.doInit"));    
-            helper.mostrarToast("warning","", "Se ha cancelado la validación.");
+        let mensajeCancelar = component.get("c.autenticacionCancelada");
+        mensajeCancelar.setParams({"recordId": id, "casoId": recordId});
+        $A.enqueueAction(mensajeCancelar);
+        $A.enqueueAction(component.get("c.doInit"));    
+        helper.mostrarToast("warning","", "Se ha cancelado la validación.");
 
-            if(event.getSource().get("v.name") === "cancelarModal") {
-                $A.enqueueAction(component.get("c.cerrarModalValidar"));
-            }
+       if (component.get("v.nivelSeleccionado") === 'Cliente Digital' && !component.get("v.clienteBloqueado") && component.get('v.impedirClienteDigital') === false &&
+            ((component.get("v.edadCliente") >= edadLimite) || (component.get("v.edadCliente") < edadLimite && component.get("v.menorDe65")))) {
+                helper.modalNuevoMecanismo(component, 'CLIENTE_DIGITAL_CANCELAR');
+        }
+        if(event.getSource().get("v.name") === "cancelarModal") {
+            $A.enqueueAction(component.get("c.cerrarModalValidar"));
+        }
     },
 
     noRecibido: function (component) {
@@ -467,7 +542,7 @@
         }
     },
 
-    enviarAutenticacionClienteDigital: function (component) {
+    enviarAutenticacionClienteDigital: function (component, event, helper) {
         let enviarRegistro;
         var recupOTP = component.get("c.getOTP");
         recupOTP.setParams({ "casoId": component.get("v.recordId"), "nivel": "Cliente Digital", "status": "Pdte. Envío" });
@@ -487,6 +562,10 @@
                             key: "info_alt", type: "Error", mode: "dismissible", duration: "10000"
                         });
                         toastEvent.fire();
+                        let edadLimite = component.get("v.edadLimite");  
+                        if (!component.get("v.clienteBloqueado") && ((component.get("v.edadCliente") >= edadLimite) || (component.get("v.edadCliente") < edadLimite && component.get("v.menorDe65")))) {
+                            helper.modalNuevoMecanismo(component, 'CLIENTE_DIGITAL_ERROR');
+                        }
                     } 
                     else if (response.getReturnValue() === "NOK"){
                         let toastEvent = $A.get("e.force:showToast");
@@ -526,16 +605,118 @@
 
 
     //---------------------------
-    test : function(component, event, helper) {
-        console.log('::: dentro test');
-        let test = component.get("c.testAut");
-        // test.setParams({});
-        test.setCallback(this, function (response) {
-            if (response.getState() === "SUCCESS") {
-                console.log('::: dentro success');
-            }
-        });
-        $A.enqueueAction(test);
-    }
+    validarContrato : function(component, event, helper) {
+        component.set("v.disabledBotones", true);
+        if (component.get("v.ambitoMotivoCaixa") !== 'Onboarding' || component.get("v.ambitoMotivoImagin") !== 'Onboarding') {
+            let comprobarCaracteristicas = component.get("c.comprobarCaracteristicasCliente");
+            comprobarCaracteristicas.setParams({"recordId": component.get('v.recordId')});
+            comprobarCaracteristicas.setCallback(this, function (response) {
+                if (response.getState() === "SUCCESS") {
+                    if (response.getReturnValue() === 'restriccion_total' || response.getReturnValue() === 'restriccion_parcial') {
+                        if (response.getReturnValue() === 'restriccion_total') {
+                            helper.recuperarMensajeToast(component, "error", "RESTRICCION_TOTAL");
+                        } else {
+                            helper.recuperarMensajeToast(component, "error", "RESTRICCION_PARCIAL");
+                        }
+                        $A.enqueueAction(component.get("c.cerrarModalValidar"));
+                        component.set("v.disabledBotones", false);
+                        $A.enqueueAction(component.get("c.handleModalOficinaAbierto"));
+                    } else {
+                        let validarContrato = component.get("c.validarContratoSAU");
+                        validarContrato.setParams({"recordId": component.get('v.recordId')});
+                        validarContrato.setCallback(this, function (response) {
+                            if (response.getState() === "SUCCESS") {
+                                if (response.getReturnValue().includes('numperso')) { //Numperso vacio
+                                    helper.recuperarMensajeToast(component, "error", "NUMPERSO_VACIO");
+                                    component.set("v.disabledBotones", false);
+                                } else if (response.getReturnValue().includes('problema')) {
+                                    helper.mostrarToast("error","Autenticación fallida", response.getReturnValue());
+                                    component.set("v.disabledBotones", false);
+                                } else {
+                                    if (component.get('v.impedirClienteDigital') === true) { // Campo 'Impedir Cliente Digital' del motivo en True
+                                        helper.recuperarMensajeToast(component, "warning", "IMPEDIR_CLIENTE_DIGITAL");
+                                        component.set("v.nivel", "Nivel 2");
+                                        component.set("v.nuevaLogicaAut", true);
+                                        $A.enqueueAction(component.get("c.cerrarModalValidar"));
+                                        $A.enqueueAction(component.get("c.segundoNivelAut"));
+                                    } else if (component.get('v.impedirNivel2') === true) { // Campo 'Impedir Nivel 2' del motivo en True
+                                        if (response.getReturnValue() === 'exist_contract') { // Cliente Digital
+                                            component.set("v.nivel", "Cliente Digital");
+                                            component.set("v.nuevaLogicaAut", true);
+                                            $A.enqueueAction(component.get("c.clienteDigitalAut"));
+                                        } else { //Derivar
+                                            helper.recuperarMensajeToast(component, "warning", "DERIVAR_CONTRATO");
+                                            $A.enqueueAction(component.get("c.cerrarModalValidar"));
+                                            $A.enqueueAction(component.get("c.handleModalOficinaAbierto"));
+                                            component.set("v.disabledBotones", false);
+                                        }
+                                    } else { // Campo 'Impedir Nivel 2' y 'Impedir Cliente Digital' del motivo en False
+                                        if (response.getReturnValue() === 'exist_contract') { // Cliente Digital
+                                            component.set("v.nivel", "Cliente Digital");
+                                            component.set("v.nuevaLogicaAut", true);
+                                            $A.enqueueAction(component.get("c.clienteDigitalAut"));
+                                        } else if (response.getReturnValue() === 'no_contract') { // Nivel 2
+                                            helper.recuperarMensajeToast(component, "warning", "NIVEL_2_CONTRATO");
+                                            component.set("v.nivel", "Nivel 2");
+                                            component.set("v.nuevaLogicaAut", true);
+                                            $A.enqueueAction(component.get("c.cerrarModalValidar"));
+                                            $A.enqueueAction(component.get("c.segundoNivelAut"));
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        $A.enqueueAction(validarContrato);
+                    }
+                }
+            });
+            $A.enqueueAction(comprobarCaracteristicas);
+        } else {
+            component.set("v.nivel", "Nivel 2");
+            component.set("v.nuevaLogicaAut", true);
+            $A.enqueueAction(component.get("c.cerrarModalValidar"));
+            $A.enqueueAction(component.get("c.segundoNivelAut"));
+        }
+    },
 
+    handleModalOficinaAbierto: function(component, event, helper) {
+        $A.enqueueAction(component.get("c.cerrarModalMecanismoAutenticacion"));
+        //llamar un metodo que pone el campo CC Derivar en true
+        let reiniciarDerivar = component.get('c.reiniciarDerivar');
+        reiniciarDerivar.setParam('recordId', component.get('v.recordId'));
+        reiniciarDerivar.setCallback(this, response => {
+                if (response.getState() === 'SUCCESS') {
+               //publicar mensaje en el channel
+               helper.publicarMensajeChannel(component, 'otp', 'derivarPopup', '');
+               helper.cerrarModalQuickAction(component);
+               
+            }
+        });	
+        $A.enqueueAction(reiniciarDerivar);
+	},
+
+    handleModalOficinaCerrado: function(component, event) {
+		component.set('v.mostrarModalOficina', false);
+        component.set("v.disabledBotones", false);
+	},
+
+    refreshTab: function(component) {
+		let workspaceAPI = component.find('workspace');
+		workspaceAPI.getFocusedTabInfo().then(response => {
+			let focusedTabId = response.tabId;
+			workspaceAPI.refreshTab({
+				tabId: focusedTabId,
+				includeAllSubtabs: true
+			});
+		})
+		.catch();
+	},
+
+    desactivarSpinnerDerivar: function(component) {
+		component.set('v.spinnerActivado', false);
+    },
+
+    onDerivarInteraccionChannel: function(component, message, helper) {
+
+    }
 });

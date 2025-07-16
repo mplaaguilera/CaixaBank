@@ -1,0 +1,17 @@
+<template>
+    <lightning-card title="Producto de la pretensión">
+        <div class="slds-p-horizontal_medium">
+            <template for:each={fields} for:item="field">
+                <lightning-input
+                    key={field.name}
+                    label={field.label}
+                    name={field.name}
+                    value={field.value}
+                    onchange={handleInputChange}
+                ></lightning-input>
+            </template>
+
+            <lightning-button variant="brand" label="Save" onclick={handleSave}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

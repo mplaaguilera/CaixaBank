@@ -1,34 +1,34 @@
-<aura:component controller="SAC_LCMP_PrestamoGlobal"
-                implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+<aura:component controller="SAC_LCMP_PrestamoGlobal" implements="force:hasRecordId,flexipage:availableForRecordHome">
+
     <aura:attribute name="recordId" type="String" />
     <aura:attribute name="archivoSubido" type="Boolean" default="false" />
     <aura:attribute name="usarComponente" type="Boolean" default="false" />
-    
+
     <aura:attribute name="senRes" type="String" default="SAC_004"/>
     <aura:attribute name="argRes" type="String" />
     <aura:attribute name="motivoInad" type="String"/>
-    
+
     <aura:attribute name="fechaRes" type="String" />
     <aura:attribute name="checkMail" type="Boolean" default="false" />
     <aura:attribute name="showEmailSender" type="Boolean" default="false" />
-    
+
     <aura:attribute name="caso" type="Case" />
     <aura:attribute name="metodoEnvio" type="String" />
-    
+
     <aura:attribute name="asunto" type="String" />
     <aura:attribute name="cuerpo" type="String" />
     <aura:attribute name="para" type="String" />
     <aura:attribute name="CCO" type="String" />
-    
+
     <aura:attribute name="procedencia" type="String" default="Inadmision" />
     <aura:attribute name="ficherosAdjuntos" type="ContentDocument[]" default="[]" />
     <aura:attribute name="documentoResolucion" type="ContentDocumentLink" />
     <aura:attribute name="mensaje" type="String" />
-    
+
     <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
     <aura:attribute name="haySeleccion" type="Boolean" default="false"/>
     <aura:attribute name="isLoading" type="Boolean" default="false"/>
-    
+
     <lightning:workspaceAPI aura:id="workspace" />
     <aura:handler name ="cmpEmail" event="c:SAC_PrestamoShowEmailSender" action="{!c.handleApplicationEvent}" />
     <aura:handler event="force:refreshView" action="{!c.doInit}" />
@@ -37,15 +37,15 @@
             <lightning:spinner alternative-text="Loading" size="large" variant="brand"></lightning:spinner>
         </div>
     </aura:if>
-    
+
     <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
-    <!-- Comprobación de permiso --> 
+    <!-- Comprobación de permiso -->
     <aura:if isTrue="{!v.usarComponente}">
-        <br></br><br></br> 
+        <br></br><br></br>
     	<!-- Selección préstamo -->
-        <div> 
+        <div>
             <c:SAC_customLookup idReclamacion="{!v.recordId}" objectAPIName="SAC_Prestamo__c" IconName="doctype:word" selectedRecord="{!v.selectedLookUpRecord}" label="Selecciona Préstamo"/>
-        </div>   
+        </div>
         <br></br><br></br>
         <!--Comprobación de que se ha seleccionado el préstamo -->
         <aura:if isTrue="{!v.haySeleccion}">
@@ -57,13 +57,13 @@
             <div>
                 <c:SAC_PrestamoDocumentacionInadmision recordId="{!v.recordId}" documentoResolucion="{!v.documentoResolucion}" caso="{!v.caso}" motivo="{!v.motivoInad}"
                                                        usarComponente="{!v.usarComponente}"/>
-            </div>        
+            </div>
             <!-- Motivo Inadmisión -->
-            <div> 
+            <div>
                 <c:SAC_PrestamoSentidoInadmision recordId="{!v.recordId}" senRes="{!v.senRes}" argRes="{!v.argRes}" motivoInad="{!v.motivoInad}"/>
             </div>
             <!-- Email -->
-            <div>                               
+            <div>
                 <aura:if isTrue="{!v.mensaje}">
                     <div class="slds-align_absolute-center">
                         <h1 style="color: red;">No puede resolver. {!v.mensaje}</h1>

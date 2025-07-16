@@ -1,0 +1,17 @@
+<template>
+    <lightning-card title="Tareas relacionadas con la reclamación" icon-name="custom:custom19">
+        <template if:true={tareas.data}>
+            <lightning-datatable
+                data={tareas.data}
+                columns={columns}
+                hide-checkbox-column
+                key-field="Id">
+            </lightning-datatable>
+        </template>
+        <template if:true={tareas.error}>
+            <div class="slds-text-color_error">
+                Error loading Tareas: {tareas.error}
+            </div>
+        </template>
+    </lightning-card>
+</template>

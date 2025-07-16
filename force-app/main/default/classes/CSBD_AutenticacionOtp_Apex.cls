@@ -3,7 +3,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 	@AuraEnabled
 	public static Map<String, Boolean> getDatos(Id idOportunidad, Id idCliente) {
 		return new Map<String, Boolean>{
-			'llamadaEnCurso' => llamadaEnCurso(idOportunidad) || tienePermisoAutenticacion(),
+			//'llamadaEnCurso' => llamadaEnCurso(idOportunidad) || tienePermisoAutenticacion(),
 			'clienteBloqueado' => clienteBloqueado(idOportunidad, idCliente),
 			'usuarioDesarrollador' => ![SELECT Id FROM PermissionSetAssignment WHERE AssigneeId = :UserInfo.getUserId()
 										AND PermissionSet.Name = 'CSBD_Desarrollo' LIMIT 1].isEmpty()
@@ -11,10 +11,11 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 	}
 
 	@AuraEnabled(cacheable=true)
-	public static Map<String, Boolean> getDatosAsync(String canalEntradaCaso) {
+	// public static Map<String, Boolean> getDatosAsync(String canalEntradaCaso) {
+	public static Map<String, Boolean> getDatosAsync() {
 		return new Map<String, Boolean>{
-			'autEmergenciaHabilitada' => !([SELECT CC_Activa__c FROM CC_Settings__c WHERE Name = 'CC_VisibilidadBotonEmergenciaAut']?.CC_Activa__c ?? false),
-			'canalAutenticable' => canalAutenticable(canalEntradaCaso)
+			'autEmergenciaHabilitada' => !([SELECT CC_Activa__c FROM CC_Settings__c WHERE Name = 'CC_VisibilidadBotonEmergenciaAut']?.CC_Activa__c ?? false)
+			// 'canalAutenticable' => canalAutenticable(canalEntradaCaso)
 		};
 
 		/*
@@ -44,14 +45,16 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 	@AuraEnabled
 	public static Map<String, String> getPreguntasNivel2(Id recordId) {
 		Opportunity oportunidad = [SELECT Account.RecordType.DeveloperName, Account.AV_Age__c, Account.PersonMobilePhone,
+									/*
 									CSBD_CasoOrigen__r.CC_Representante__c,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
+									CSBD_CasoOrigen__r.CC_MCC_Causa__r.CC_Omitir_preguntas_Nivel_2__c,
+									*/
 									CSBD_Contact__r.RecordType.DeveloperName, CSBD_Contact__r.CIBE_Telefono1__c,
-									Account.AV_NumPerso__c, Account.CC_NumPerso__c,
-									CSBD_CasoOrigen__r.CC_MCC_Causa__r.CC_Omitir_preguntas_Nivel_2__c
+									Account.AV_NumPerso__c, Account.CC_NumPerso__c
 									FROM Opportunity WHERE Id = :recordId];
 
 		List<CC_Lista_Valores__c> listaPreguntas = [SELECT CC_Valor__c, CC_Orden__c, CC_Servicio__c, CC_Mensajes_Mostrar__c
@@ -68,45 +71,47 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 		// if (oportunidad.CSBD_CasoOrigen__r.CC_MCC_Causa__r.CC_Omitir_preguntas_Nivel_2__c) {
 		// 	preguntas.put('OmitirPreguntas', 'true');
 		// } else {
-			if (!listaPreguntas.isEmpty()) {
-				if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__c != null) {
-					if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c == null
-					&& oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone == null) {
-						error = true;
-					} else if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c == null) {
-						preguntaForzada = 'telefono';
-					} else if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone == null) {
-						preguntaForzada = 'edad';
+		if (!listaPreguntas.isEmpty()) {
+			/*
+			if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__c != null) {
+				if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c == null
+				&& oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone == null) {
+					error = true;
+				} else if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c == null) {
+					preguntaForzada = 'telefono';
+				} else if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone == null) {
+					preguntaForzada = 'edad';
+				}
+			*/
+
+			if (oportunidad.Account.RecordType.DeveloperName == 'CC_Cliente'
+			&& oportunidad.CSBD_Contact__r.RecordType.DeveloperName == 'CIBE_Apoderado') {
+				//Cuenta juridica con apoderado
+				if (oportunidad.CSBD_Contact__r.CIBE_Telefono1__c == null) {
+					error = true;
+				}
+			} else {
+				//Cuenta fisica
+				if (oportunidad.Account.AV_Age__c == null
+				&& oportunidad.Account.PersonMobilePhone == null) {
+					error = true;
+				} else if (oportunidad.Account.AV_Age__c == null) {
+					preguntaForzada = 'telefono';
+				} else if (oportunidad.Account.PersonMobilePhone == null) {
+					preguntaForzada = 'edad';
+				}
+			}
+			for (CC_Lista_Valores__c listaPregunta : listaPreguntas) {
+				if (listaPregunta.CC_Servicio__c == 'Pregunta 1') {
+					for (Integer i = 0; i < listaPregunta.CC_Orden__c; i++) {
+						preguntas1.add(listaPregunta.CC_Valor__c);
 					}
-				} else if (oportunidad.Account.RecordType.DeveloperName == 'CC_Cliente'
-				&& oportunidad.CSBD_Contact__r.RecordType.DeveloperName == 'CIBE_Apoderado') {
-					//Cuenta juridica con apoderado
-					if (oportunidad.CSBD_Contact__r.CIBE_Telefono1__c == null) {
-						error = true;
-					}
-				} else {
-					//Cuenta fisica
-					if (oportunidad.Account.AV_Age__c == null
-					&& oportunidad.Account.PersonMobilePhone == null) {
-						error = true;
-					} else if (oportunidad.Account.AV_Age__c == null) {
-						preguntaForzada = 'telefono';
-					} else if (oportunidad.Account.PersonMobilePhone == null) {
-						preguntaForzada = 'edad';
+				} else if (listaPregunta.CC_Servicio__c == 'Pregunta 2') {
+					for (Integer i = 0; i < listaPregunta.CC_Orden__c; i++) {
+						preguntas2.add(listaPregunta.CC_Valor__c);
 					}
 				}
-				for (CC_Lista_Valores__c listaPregunta : listaPreguntas) {
-					if (listaPregunta.CC_Servicio__c == 'Pregunta 1') {
-						for (Integer i = 0; i < listaPregunta.CC_Orden__c; i++) {
-							preguntas1.add(listaPregunta.CC_Valor__c);
-						}
-					} else if (listaPregunta.CC_Servicio__c == 'Pregunta 2') {
-						for (Integer i = 0; i < listaPregunta.CC_Orden__c; i++) {
-							preguntas2.add(listaPregunta.CC_Valor__c);
-						}
-					}
-				}
-			// }
+			}
 		}
 
 		if (!preguntas1.isEmpty()) {
@@ -199,11 +204,13 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 	public static Map<String, String> segundoNivel(Id recordId, Boolean valido, String nivel, String pregunta1, String pregunta2, String respuesta1, String respuesta2, String validacion1, String validacion2, Boolean enviarSMS) { //Boolean enviarPreguntas
 		String resultado = 'OK';
 		Opportunity oportunidad = [SELECT AccountId, Account.RecordType.DeveloperName, Account.AV_Age__c, Account.PersonMobilePhone,
+									/*
 									CSBD_CasoOrigen__r.CC_Representante__c,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c,
+									*/
 									CSBD_Contact__r.RecordType.DeveloperName,
 									CSBD_Contact__r.CIBE_Telefono1__c, Account.AV_NumPerso__c,
 									CSBD_Contact__r.AV_NumPerso__c, Account.CC_NumPerso__c,
@@ -332,16 +339,19 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 		return bloqueado;
 	}
 
+	/*
 	private static Boolean llamadaEnCurso(Id idOportunidad) {
 		return ![SELECT Id FROM Task WHERE RecordType.DeveloperName = 'CSBD_Task' AND Status = 'Open'
 					AND WhatId = :idOportunidad AND CreatedDate = TODAY AND CC_Llamada_Id__c != NULL LIMIT 1].isEmpty();
 	}
+	*/
 
 	private static Boolean tienePermisoAutenticacion() {
 		return ![SELECT Id FROM PermissionSetAssignment WHERE Assignee.Id = :UserInfo.getUserId()
 					AND PermissionSet.Name = 'CC_Autenticacion' LIMIT 1].isEmpty();
 	}
 
+	/*
 	@AuraEnabled(cacheable=true)
 	public static Boolean canalAutenticable(String canal) {
 		return String.isNotBlank(canal)
@@ -349,11 +359,13 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 				AND CC_Activa__c = TRUE AND CC_Valor__c = :canal LIMIT 1].isEmpty();
 	}
 
+	*/
+
 	@AuraEnabled
 	public static String autenticacionEmergencia(Id idOportunidad, String nivel, Boolean valido) {
 		String resultado;
 		Opportunity oportunidad = [SELECT AccountId, CSBD_Idioma_Solicitud__c, CSBD_Email_Solicitud__c, CSBD_Contact__c,
-									CSBD_Contact__r.Phone, CSBD_CasoOrigen__r.CC_Canal_Procedencia__c, CSBD_CasoOrigen__c
+									CSBD_Contact__r.Phone //, CSBD_CasoOrigen__r.CC_Canal_Procedencia__c, CSBD_CasoOrigen__c
 									FROM Opportunity WHERE Id = :idOportunidad];
 
 		String resultadoValidacion = '';
@@ -362,6 +374,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 				resultadoValidacion = 'Identificación emergencia';
 			}
 
+			/*
 			if (oportunidad.CSBD_CasoOrigen__c != null) {
 				//Envío de correo
 				String proceso = oportunidad.CSBD_CasoOrigen__r.CC_Canal_Procedencia__c == 'ImaginBank' ? 'Notificacion OTP Imagin OK' : 'Notificacion OTP OK' ;
@@ -387,6 +400,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 					resultado = 'Email';
 				}
 			}
+			*/
 		} else {
 			if (String.isBlank(oportunidad.CSBD_Email_Solicitud__c)
 			&& oportunidad.CSBD_Contact__r.Phone == null) {
@@ -403,7 +417,8 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 				}
 			} else {
 				resultadoValidacion = 'Identificación NOK';
-				String procesoKo = oportunidad.CSBD_CasoOrigen__r.CC_Canal_Procedencia__c == 'ImaginBank' ? 'Notificacion OTP Imagin KO' : 'Notificacion OTP KO' ;
+				//String procesoKo = oportunidad.CSBD_CasoOrigen__r.CC_Canal_Procedencia__c == 'ImaginBank' ? 'Notificacion OTP Imagin KO' : 'Notificacion OTP KO' ;
+				String procesoKo = 'Notificacion OTP KO';
 				List<CC_ConfigNotifCliente__mdt> mdtsKO = [SELECT CC_Texto_Plantilla__c FROM CC_ConfigNotifCliente__mdt
 															WHERE CC_Proceso__c = :procesoKo AND CC_Canal__c = 'Email'
 															AND CC_Idioma__c = :oportunidad.CSBD_Idioma_Solicitud__c AND CC_Activa__c = true LIMIT 1];
@@ -445,13 +460,18 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 
 		if (clienteBloqueado(idOportunidad, idCliente)) {
 			resultado = 'Cliente bloqueado';
+
+		/*
 		} else if (llamadaEnCurso == null && !tienePermisoAutenticacion()) {
 			resultado = 'NOK';
+		*/
+
 		} else {
-			//Tipo de llamada
+			/*
 			String llamadaEnCursoTipo = [SELECT CC_Llamada_Id__r.CC_Tipo__c FROM Task WHERE RecordType.DeveloperName = 'CSBD_Task'
 											AND WhatId = :idOportunidad AND Status = 'Open' AND CC_Llamada_Id__r.CC_Tipo__c != NULL
 											AND CreatedDate = TODAY ORDER BY CreatedDate DESC LIMIT 1]?.CC_Llamada_Id__r.CC_Tipo__c;
+			*/
 
 			autenticacion = new CC_Comunicaciones__c();
 			autenticacion.RecordTypeId = Schema.SObjectType.CC_Comunicaciones__c.getRecordTypeInfosByDeveloperName().get('CSBD_Autenticacion').getRecordTypeId();
@@ -460,7 +480,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 			autenticacion.CC_Nivel__c = 'Cliente Digital';
 			autenticacion.CC_Estado__c = 'Pdte. Envío';
 			autenticacion.CC_Perfil_empleado__c = perfilUsuarioFormat();
-			autenticacion.CC_Tipo_Llamada__c = llamadaEnCurso?.CC_Llamada_Id__r.CC_Tipo__c;
+			// autenticacion.CC_Tipo_Llamada__c = llamadaEnCurso?.CC_Llamada_Id__r.CC_Tipo__c;
 			insert autenticacion;
 
 			Opportunity oportunidad = new Opportunity(Id = idOportunidad);
@@ -502,17 +522,19 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 	public static Map<String, Object> nivel2ValidacionInicial(Id recordId) {
 		String resultado = 'OK';
 
-		Opportunity oportunidad = [SELECT CSBD_CasoOrigen__r.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c,
-									AccountId, Account.RecordType.DeveloperName, Account.AV_Age__c, Account.PersonMobilePhone,
+		Opportunity oportunidad = [SELECT AccountId, Account.RecordType.DeveloperName, Account.AV_Age__c, Account.PersonMobilePhone,
 									Account.PersonBirthdate, Account.AV_NumPerso__c, Account.CC_NumPerso__c,
 									CSBD_Contact__r.RecordType.DeveloperName, CSBD_Contact__r.CIBE_Telefono1__c,
-									CSBD_Contact__r.AV_NumPerso__c, CSBD_Contact__r.CC_NumPerso__c,
+									CSBD_Contact__r.AV_NumPerso__c, CSBD_Contact__r.CC_NumPerso__c
+									/*
+									CSBD_CasoOrigen__r.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c,
 									CSBD_CasoOrigen__r.CC_Representante__c,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonBirthdate,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
 									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c
+									*/
 									FROM Opportunity WHERE Id = :recordId];
 
 		CC_Comunicaciones__c autPendienteValidar = [SELECT Id FROM CC_Comunicaciones__c WHERE CC_Nivel__c = 'Nivel 2'
@@ -530,13 +552,15 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 			resultado = 'SIN LLAMADAS';
 
 		} else {
+			/*
 			if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__c != null) {
 				if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c == null
 				&& oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone == null) {
 					resultado = 'SIN DATOS';
 				}
 			//Cuenta juridica con apoderado
-			} else if (oportunidad.Account.RecordType.DeveloperName == 'CC_Cliente' && oportunidad.CSBD_Contact__r.RecordType.DeveloperName == 'CIBE_Apoderado') {
+			*/
+			if (oportunidad.Account.RecordType.DeveloperName == 'CC_Cliente' && oportunidad.CSBD_Contact__r.RecordType.DeveloperName == 'CIBE_Apoderado') {
 				if (oportunidad.CSBD_Contact__r.CIBE_Telefono1__c == null) {
 					resultado = 'SIN DATOS';
 				}
@@ -546,7 +570,8 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 			}
 		}
 
-		return new Map<String, Object>{'resultado' => resultado, 'omitirOtp' => nivel2OmitirOtp(oportunidad)};
+		// return new Map<String, Object>{'resultado' => resultado, 'omitirOtp' => nivel2OmitirOtp(oportunidad)};
+		return new Map<String, Object>{'resultado' => resultado, 'omitirOtp' => false};
 	}
 
 	@AuraEnabled
@@ -557,17 +582,19 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 	@AuraEnabled
 	public static Map<String, Boolean> validacionRespuestasNivel2(Id recordId, String pregunta1, String pregunta2, String respuesta1, String respuesta2) {
 		SavePoint sp = Database.setSavepoint();
-		Opportunity opp = [SELECT CSBD_CasoOrigen__r.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c,
-							AccountId, Account.RecordType.DeveloperName, Account.AV_Age__c, Account.PersonMobilePhone,
+		Opportunity opp = [SELECT AccountId, Account.RecordType.DeveloperName, Account.AV_Age__c, Account.PersonMobilePhone,
 							Account.PersonBirthdate, Account.AV_NumPerso__c, Account.CC_NumPerso__c,
 							CSBD_Contact__r.RecordType.DeveloperName, CSBD_Contact__r.CIBE_Telefono1__c,
-							CSBD_Contact__r.AV_NumPerso__c, CSBD_Contact__r.CC_NumPerso__c,
+							CSBD_Contact__r.AV_NumPerso__c, CSBD_Contact__r.CC_NumPerso__c
+							/*
+							CSBD_CasoOrigen__r.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c,
 							CSBD_CasoOrigen__r.CC_Representante__c,
 							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone,
 							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonBirthdate,
 							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c,
 							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
 							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c
+							*/
 							FROM Opportunity WHERE Id = :recordId];
 
 		String numperso = getNumpersoClienteOportunidad(opp);
@@ -583,10 +610,13 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 	}
 
 	private static String getNumpersoClienteOportunidad(Opportunity opp) {
+		/*
 		if (opp.CSBD_CasoOrigen__r?.CC_Representante__c != null) {
 			return opp.CSBD_CasoOrigen__r?.CC_Representante__r.CC_Representante__r?.AV_NumPerso__c != null ? opp.CSBD_CasoOrigen__r?.CC_Representante__r.CC_Representante__r.AV_NumPerso__c : opp.CSBD_CasoOrigen__r?.CC_Representante__r.CC_Representante__r.CC_NumPerso__c != null ? opp.CSBD_CasoOrigen__r?.CC_Representante__r.CC_Representante__r.CC_NumPerso__c : '';
-		} else if (opp.Account.RecordType.DeveloperName == 'CC_Cliente' && opp.CSBD_Contact__r.RecordType.DeveloperName == 'CIBE_Apoderado') {
+		*/
+		if (opp.Account.RecordType.DeveloperName == 'CC_Cliente' && opp.CSBD_Contact__r.RecordType.DeveloperName == 'CIBE_Apoderado') {
 			return opp.CSBD_Contact__r.AV_NumPerso__c ?? (opp.CSBD_Contact__r.CC_NumPerso__c != null ? opp.CSBD_Contact__r.CC_NumPerso__c : '');
+
 		} else {
 			return opp.Account.AV_NumPerso__c ?? (opp.Account.CC_NumPerso__c != null ? opp.Account.CC_NumPerso__c : '');
 		}
@@ -612,6 +642,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 	}
 
 	private static Boolean validarNacimiento(Opportunity oportunidad, String respuesta) {
+		/*
 		if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__c != null) {
 			String fechaNacimiento = String.valueOf(oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonBirthdate);
 			if (String.isBlank(fechaNacimiento)) {
@@ -620,31 +651,37 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 				return fechaNacimiento.split('-')[0] == respuesta;
 			}
 		} else {
-			String fechaNacimiento = String.valueOf(oportunidad.Account.PersonBirthdate);
-			if (String.isBlank(fechaNacimiento)) {
-				return false;
-			} else {
-				return fechaNacimiento.split('-')[0] == respuesta;
-			}
+		*/
+		String fechaNacimiento = String.valueOf(oportunidad.Account.PersonBirthdate);
+		if (String.isBlank(fechaNacimiento)) {
+			return false;
+		} else {
+			return fechaNacimiento.split('-')[0] == respuesta;
 		}
+		//}
 	}
 
 	private static Boolean validarEdad(Opportunity oportunidad, String respuesta) {
+		/*
 		if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__c != null) {
 			return String.valueOf(oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c) == respuesta;
 		} else {
 			return String.valueOf(oportunidad.Account.AV_Age__c) == respuesta;
 		}
+		*/
+		return String.valueOf(oportunidad.Account.AV_Age__c) == respuesta;
 	}
 
 	private static Boolean validarTelefono(Opportunity oportunidad, String respuesta) {
+		/*
 		if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__c != null) {
 			String tlf = oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone;
 			if (tlf != null && tlf.startsWith('+34 ')) {
 				tlf = tlf.replace(' ', '').right(9);
 			}
 			return tlf == respuesta || oportunidad.CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone == respuesta;
-		} else if (oportunidad.Account.RecordType.DeveloperName == 'CC_Cliente' && oportunidad.CSBD_Contact__r.RecordType.DeveloperName == 'CIBE_Apoderado') {
+		*/
+		if (oportunidad.Account.RecordType.DeveloperName == 'CC_Cliente' && oportunidad.CSBD_Contact__r.RecordType.DeveloperName == 'CIBE_Apoderado') {
 			return oportunidad.CSBD_Contact__r.CIBE_Telefono1__c == respuesta;
 		} else {
 			String tlf = oportunidad.Account.PersonMobilePhone;
@@ -685,6 +722,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 		return false;
 	}
 
+	/*
 	private static Boolean nivel2OmitirOtp(Opportunity oportunidad) {
 		Case casoOrigen = oportunidad.CSBD_CasoOrigen__r;
 		Task llamada = [SELECT CC_Llamada_Id__r.CC_Tipo__c, CC_Llamada_Id__r.CC_DNIS__c FROM Task
@@ -722,6 +760,7 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 			}
 		}
 	}
+	*/
 
 	@AuraEnabled
 	public static void codigoAutenticacionNoRecibido(Id idOportunidad, Id idAutenticacion, String nivel) {

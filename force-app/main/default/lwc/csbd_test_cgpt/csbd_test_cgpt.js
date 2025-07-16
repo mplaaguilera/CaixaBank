@@ -1,6 +1,11 @@
 import {LightningElement, track, api, wire} from 'lwc';
+import {RefreshEvent} from 'lightning/refresh';
 
 import ejecutarPrompt from '@salesforce/apex/CSBD_ChatGPT_Controller.einsteinGPT';
+import updateHistorico from '@salesforce/apex/CSBD_ChatGPT_Controller.updateHistorico';
+import obtenerHistorico from '@salesforce/apex/CSBD_ChatGPT_Controller.obtenerHistorico';
+//import resolverPrompt from '@salesforce/apex/CSBD_ChatGPT_Controller.resolverPrompt';
+//import RESUMEN_PRODUCTO from '@salesforce/schema/Opportunity.CSBD_GptResumenProducto__c';
 import ID_FIELD from '@salesforce/schema/Opportunity.Id';
 //import IDPRODUCTO from "@salesforce/schema/Opportunity.CSBD_Producto__c";
 import HISTORICO_CHAT from '@salesforce/schema/Opportunity.CSBD_GptHistorico__c';
@@ -11,7 +16,7 @@ import {getRecord, getFieldValue, updateRecord} from 'lightning/uiRecordApi'; //
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 
 
-export default class csbdChatGPT extends LightningElement {
+export default class csbd_ChatGPT extends LightningElement {
 
 	@api recordId;
 

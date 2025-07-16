@@ -85,14 +85,14 @@
                                 </lightning-button>
                             </template> -->
 
-                            <lightning-button style="padding-left:8px" label="Análisis" iconname="" onclick={mostrarAvisoIdioma}
+                            <lightning-button style="padding-left:8px" label="Análisis" iconname="" onclick={clickAnalisisInadmision}
                                 id="SAC_002">
                             </lightning-button>   
                             
                             <lightning-button style="padding-left:8px" label="Rechazar" iconname="" onclick={openModalRechazar}>
                             </lightning-button>
                             <template if:true={pretConMcc}>
-                                <lightning-button style="padding-left:8px" label="Inadmisión" iconname="" onclick={mostrarAvisoIdioma} id="Inadmisión">
+                                <lightning-button style="padding-left:8px" label="Inadmisión" iconname="" onclick={clickAnalisisInadmision} id="Inadmisión">
                                 </lightning-button>
                             </template>
 
@@ -570,10 +570,9 @@
 
 
                 <!--Modal de aviso revisar idioma-->
-                <template if:true={avisoIdioma}> 
+                <!--<template if:true={avisoIdioma}> 
                     <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
                         <div class="slds-modal__container">
-                            <!-- Modal/Popup Box LWC header here -->
                             <header class="slds-modal__header">
                                 <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeAvisoIdioma}>
                                     <lightning-icon icon-name="utility:close"
@@ -584,7 +583,6 @@
                                 </button>
                                 <h3 id="modal-heading-07" class="slds-text-heading_medium slds-hyphenate">Revisión del idioma de la reclamación</h3>
                             </header>
-                            <!-- Modal/Popup Box LWC body starts here -->
                             <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-avisoIdioma">
                                 <p>Para <b>asegurar la correcta finalización del alta </b> , recuerde realizar las siguientes validaciones:</p><br/>
                                 <p>&ensp;&ensp;1. El campo <b>IDIOMA </b>de la pestaña <b>Detalles</b> se corresponde con el idioma del escrito del reclamante.</p>
@@ -604,7 +602,6 @@
                                     <b>¿Está seguro que quiere ejecutar la operación y ha realizado las comprobaciones anteriores?</b>
                                 </p> 
                             </div>
-                            <!-- Modal/Popup Box LWC footer starts here -->
                             <footer class="slds-modal__footer">
                                 <button class="slds-button slds-button_neutral" onclick={closeAvisoIdioma} title="Cancel">Cancelar</button>
                                 <button class="slds-button slds-button_brand" onclick={aceptarAvisoIdioma} title="OK">Aceptar</button>
@@ -612,7 +609,7 @@
                         </div>
                     </section>
                     <div class="slds-backdrop slds-backdrop_open"></div>
-                </template>
+                </template>-->
 
             </template>
         </template>

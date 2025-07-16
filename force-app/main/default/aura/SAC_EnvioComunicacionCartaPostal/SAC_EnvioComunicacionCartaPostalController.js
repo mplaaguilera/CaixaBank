@@ -77,7 +77,6 @@
         component.set('v.isLoading', true);
         let guardarDocumento = component.get('c.envioCartaProrroga');
         guardarDocumento.setParams({'record': component.get('v.recordId')});
-        console.log('record ' + component.get('v.recordId'));
         guardarDocumento.setCallback(this, function(response) {
 			let state = response.getState();
             if (state === "SUCCESS") {
@@ -91,6 +90,17 @@
                 let toastEvent = $A.get("e.force:showToast");
                 toastEvent.setParams(toastParams);
                 toastEvent.fire();
+
+                let navService = component.find("navService");
+                var pageReference = {
+                    type: 'standard__recordPage',
+                    attributes: {
+                        objectApiName: 'SAC_Accion__c',
+                        actionName: 'view',
+                        recordId: response.getReturnValue()
+                    },
+                };
+                navService.navigate(pageReference);
             }
             else{
                 component.set('v.isLoading', false);

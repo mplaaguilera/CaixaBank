@@ -52,6 +52,7 @@
     <aura:attribute name="grupoAbuscar"   type="String" default=""/>
     <aura:attribute name="grupoAbuscarId"   type="String" default=""/>
     <aura:attribute name="mensaje"   type="String" default="" />
+    <lightning:navigation aura:id="navService"/>
 
     <!-- US545410 atributos para el nuevo buscador de oficinas -->
     <aura:attribute name="activarBuscadorOficinas" type="Boolean" default="false"/>
@@ -61,6 +62,12 @@
 
     <!-- US670077 atributos para el desarrollo de adjuntar los archivos de la reclamacion a la derivacion automaticamente -->
     <aura:attribute name="adjuntosDerivar" type="Boolean" default="true"/>
+
+    <!-- Atributos para el desarrollo de añadir un tag a las imágenes insertadas -->
+    <aura:attribute name="imageTagsMapPadre" type="Map" />
+    <aura:attribute name="imageTagsMapPadreCopia" type="Map" />
+    <aura:attribute name="todasImgConTag" type="Boolean" default="true"/>
+
 
 
     <!--doInit-->
@@ -165,7 +172,8 @@
         <div>
             <p><strong>Grupo seleccionado: {!v.nombreGrupoSeleccionado}</strong></p>
             <!--Llamada al componente SAC_GestionEmails-->
-            <c:SAC_GestionEmails para="{!v.paraGrupo}" copia="{!v.CC}" copiaOculta="{!v.CCO}" asunto="{!v.asuntoGrupo}" cuerpo="{!v.cuerpoGrupo}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}" derivarAQuien='grupo' idsFicherosAdjuntos="{!v.idsFicherosAdjuntosGrupo}" ficherosAdjuntos="{!v.ficherosAdjuntosGrupo}" ficherosBorrados="{!v.idsFicherosBorradosGrupo}" recordId="{!v.recordId}" adjuntosDerivar="{!v.adjuntosDerivar}"/>
+            <c:SAC_GestionEmails aura:id="sac_gestionEmails1" para="{!v.paraGrupo}" copia="{!v.CC}" copiaOculta="{!v.CCO}" asunto="{!v.asuntoGrupo}" cuerpo="{!v.cuerpoGrupo}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}" derivarAQuien='grupo' idsFicherosAdjuntos="{!v.idsFicherosAdjuntosGrupo}" ficherosAdjuntos="{!v.ficherosAdjuntosGrupo}" ficherosBorrados="{!v.idsFicherosBorradosGrupo}" recordId="{!v.recordId}" adjuntosDerivar="{!v.adjuntosDerivar}" imageTagsMap="{!v.imageTagsMapPadre}"/>
+
             <!--Botón siguiente-->
             <div class="slds-float--right slds-p-top_x-large">
                 <lightning:button variant="brand" label="Siguiente" title="Siguiente" onclick="{! c.validarEnvioGrupo }" />
@@ -211,11 +219,11 @@
             <p><strong>Grupo seleccionado: {!v.nombreGrupoSeleccionado}</strong></p>
             <!--Llamada al componente SAC_GestionEmails-->
             <aura:if isTrue="{!v.metodoEnvio == 'Email'}">
-                <c:SAC_GestionEmails para="{!v.paraCliente}" copia="{!v.CCCliente}" copiaOculta="{!v.CCOCliente}" asunto="{!v.asuntoCliente}" cuerpo="{!v.cuerpoCliente}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}" derivarAQuien='cliente' idsFicherosAdjuntos="{!v.idsFicherosAdjuntosCliente}" ficherosAdjuntos="{!v.ficherosAdjuntosCliente}" ficherosBorrados="{!v.idsFicherosBorradosCliente}" recordId="{!v.recordId}" adjuntosDerivar="{!v.adjuntosDerivar}"/>
+                <c:SAC_GestionEmails para="{!v.paraCliente}" copia="{!v.CCCliente}" copiaOculta="{!v.CCOCliente}" asunto="{!v.asuntoCliente}" cuerpo="{!v.cuerpoCliente}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}" derivarAQuien='cliente' idsFicherosAdjuntos="{!v.idsFicherosAdjuntosCliente}" ficherosAdjuntos="{!v.ficherosAdjuntosCliente}" ficherosBorrados="{!v.idsFicherosBorradosCliente}" recordId="{!v.recordId}" adjuntosDerivar="{!v.adjuntosDerivar}" imageTagsMap="{!v.imageTagsMapPadre}"/>
             </aura:if>
             <!--Llamada al componente SAC_EnvioCartaPostal-->
             <aura:if isTrue="{!v.metodoEnvio == 'SAC_CartaPostal'}">
-                <c:SAC_EnvioCartaPostal recordId="{!v.recordId}" nombreTitular="{!v.nombreClientePostal}" direccionEnvio="{!v.callePostal}" poblacionEC="{!v.direccionEnvioPostal}" codigoPostalEC="{!v.codigoPostal}" procedencia="derivación"/>
+                <c:SAC_EnvioCartaPostal recordId="{!v.recordId}" nombreTitular="{!v.nombreClientePostal}" direccionEnvio="{!v.callePostal}" poblacionEC="{!v.direccionEnvioPostal}" codigoPostalEC="{!v.codigoPostal}" cuerpoCliente="{!v.cuerpoCliente}" procedencia="derivación"/>
             </aura:if>
             <!--Botón siguiente-->
             <div class="slds-float--right slds-p-top_x-large">

@@ -1,61 +1,248 @@
 <template>
     <lightning-record-edit-form record-id={idFormularioCaso} object-api-name="SPV_Formulario__c" onsubmit={handleSubmit} onsuccess={handleSuccess}>
     <lightning-messages> </lightning-messages>
-        <!-- Seccion Información General -->
+        <!-- =============================================================
+            SECCIÓN  INFORMACIÓN  GENERAL   (incluye Pendiente/Revisión)
+        ============================================================= -->
         <div class={toggleIconGeneral}>
             <h1 class="slds-section__title">
-                <button aria-controls="expando-unique-id-general" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableGeneral}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-                </svg>
-                <span class="slds-truncate" title="Section Title"> Información general</span>
+                <button class="slds-button slds-section__title-action"
+                        aria-controls="expando-unique-id-general"
+                        aria-expanded="true"
+                        onclick={handleExpandableGeneral}>
+                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                    </svg>
+                    <span class="slds-truncate"> Información General </span>
                 </button>
             </h1>
+
+            <!-- ───── Datos del caso (solo lectura) ───── -->
             <div class="slds-section__content" id="expando-unique-id-reclamante">
                 <lightning-record-view-form record-id={recordId} object-api-name="Case">
-                    <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                        <div class="slds-col slds-size_5-of-12">
-                            <lightning-output-field field-name="CC_RefExterna__c"> </lightning-output-field>
+                    <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;">
+                        <!-- Campo Referencia Externa -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="SPV_NumExpediente__c"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
                         </div>
-                        <div class="slds-col slds-size_7-of-12">
-                            <lightning-output-field field-name="SAC_NombreContacto__c"> </lightning-output-field>
+                        
+                        <!-- Campo Nombre Cuenta -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="AccountId"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
                         </div>
-                        <div class="slds-col slds-size_5-of-12">
-                            <lightning-output-field field-name="CC_SuppliedNIF__c"> </lightning-output-field>
+                        
+                        <!-- Campo NIF -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="CC_SuppliedNIF__c"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
                         </div>
-                        <div class="slds-col slds-size_7-of-12">
-                            <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
-                                <lightning-output-field field-name="SEG_Grupo__c"> </lightning-output-field>
-                            </lightning-record-view-form>
+                        
+                        <!-- Campo Entidad Afectada -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="SAC_Entidad_Afectada__c"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
                         </div>
-                        <div class="slds-col slds-size_5-of-12">
-                            <lightning-output-field field-name="SAC_Letrado__c"> </lightning-output-field>
+                        
+                        <!-- Caso relacionado -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="CC_CasoRelacionado__c"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
                         </div>
-                        <div class="slds-col slds-size_7-of-12">
-                            <lightning-output-field field-name="OwnerId"> </lightning-output-field>
+                        
+                        <!-- Grupo letrado SAC -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
+                                        <lightning-output-field field-name="SEG_Grupo__c"></lightning-output-field>
+                                    </lightning-record-view-form>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+                        
+                        <!-- Campo Letrado -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="SAC_GrupoLetrado__c"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+                        
+                        <!-- Campo Propietario -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="SAC_Letrado__c"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
                         </div>
                     </div>
                 </lightning-record-view-form>
-                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+
+                <!-- ───── Campos editables + adicionales ───── -->
+                <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;">
                     <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
-                    <div class="slds-col slds-size_5-of-12">
-                        <lightning-output-field field-name="SPV_FechaPropuesta__c"> </lightning-output-field>
+
+                    <!-- 9. Pendiente revisar -->
+                    <div class="slds-col slds-size_6-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_Pendiente_revisar__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_Pendiente_revisar__c" onchange={handlePendienteRevisarChange}></lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="slds-col slds-size_7-of-12">
-                        <lightning-input-field field-name="SPV_Importe__c" read-only={camposReadOnly}> </lightning-input-field>
+
+                    <!-- 10. Revisión finalizada -->
+                    <div class="slds-col slds-size_6-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_Revision_finalizada__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field 
+                                    field-name="SPV_Revision_finalizada__c" 
+                                    onchange={handleRevisionFinalizadaChange}>
+                                </lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_LetradoRevisor__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_LetradoRevisor__c"> </lightning-input-field>
-                        </template>
+
+                    <!-- 11. Letrado Revisor (SIEMPRE solo-lectura) -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <lightning-output-field field-name="SPV_LetradoRevisor__c"></lightning-output-field>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+
+                    <!-- 12. Resumen Reclamación -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Resumen Reclamación</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{resumenReclamacionAutomatico}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+
+                    <!-- 13. Importe Reclamado (solo lectura en origen) -->
+                    <div class="slds-col slds-size_6-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Importe Reclamado</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{importeTotalReclamado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+
+                    <!-- Fechas informativas -->
+
+                    
+                    <div class="slds-col slds-size_6-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <lightning-output-field field-name="SPV_FechaEscaladoAJ__c"></lightning-output-field>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <div class="slds-col slds-size_6-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <lightning-output-field field-name="SPV_FechaValidacionAJ__c"></lightning-output-field>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <div class="slds-col slds-size_6-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <lightning-output-field field-name="SPV_FechaRevisionEnvio__c"></lightning-output-field>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Seccion Antecedentes SAC -->
+        <!-- ===== FIN SECCIÓN INFORMACIÓN GENERAL ===== -->
+
+        <!-- ======================================== -->
+        <!-- SECCION DE ANTECEDENTES SAC (Este bloque ya tiene los cambios correspondientes para que se genere en automagico)  -->
+        <!-- ======================================== -->
+
         <div class={toggleIconAntecentes}>
             <h1 class="slds-section__title">
                 <button aria-controls="expando-unique-id-antecedentes" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableAntecentes}>
@@ -66,70 +253,219 @@
                 </button>
             </h1>
             <div class="slds-section__content" id="expando-unique-id-antecedentes">
-                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                    <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ResumenResolucion__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ResumenResolucion__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ResolucionRemitidaEnPlazo__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ResolucionRemitidaEnPlazo__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
-                            <lightning-output-field field-name="SAC_FechaRecepcion__c"> </lightning-output-field>
-                        </lightning-record-view-form>
-                    </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
-                            <lightning-output-field field-name="ClosedDate"> </lightning-output-field>
-                        </lightning-record-view-form>
-                    </div>
-                    <div class="slds-col slds-size_5-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ReclamacionMalFuncionamiento__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ReclamacionMalFuncionamiento__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_7-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ObservacionesMalFuncionamiento__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ObservacionesMalFuncionamiento__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_5-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ActuacionCumpleCriterios__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ActuacionCumpleCriterios__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_7-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ObservacionesCriteriosBDE__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ObservacionesCriteriosBDE__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                </div> 
+                <!-- Usar lightning-record-view-form para campos siempre de solo lectura -->
+                <lightning-record-view-form record-id={idFormularioCaso} object-api-name="SPV_Formulario__c">
+                    <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;"> 
+                        <!-- 1. Resumen resolución SAC (argumentos) -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Resumen resolución SAC (argumentos)</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{resumenResolucionSACAgregado}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+                        
+                        <!-- 2. Emisión de respuesta del SAC -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Emisión de respuesta del SAC</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{emisionRespuestaSACAgregado}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+
+                        <!-- 3. ¿La resolución SAC se remitió al cliente dentro de plazo? -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">¿La resolución SAC se remitió al cliente dentro de plazo?</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{resolucionRemitidaEnPlazoAgregado}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+
+                        <!-- 4. Congruencia de la respuesta del SAC -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Congruencia de la respuesta del SAC</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{congruenciaRespuestaSACAgregado}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+
+                        <!-- 5. Calidad de la respuesta -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Calidad de la respuesta</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{calidadRespuestaAgregado}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+
+                        <!-- Referencia de campos SAC que ya son de solo lectura -->
+                        <!-- Nº Caso SAC + Fecha recepción SAC -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-record-view-form record-id={recordId} object-api-name="Case">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-container">
+                                        <div class="slds-form-element">
+                                            <span class="slds-form-element__label">Nº Caso SAC + Fecha recepción SAC</span>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-grid">
+                                                    <div class="slds-col slds-size_4-of-12">
+                                                        <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
+                                                            <lightning-output-field field-name="CaseNumber" variant="label-hidden"></lightning-output-field>
+                                                        </lightning-record-view-form>
+                                                    </div>
+                                                    <div class="slds-col slds-size_8-of-12">
+                                                        <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
+                                                            <lightning-output-field field-name="SAC_FechaRecepcion__c" variant="label-hidden"></lightning-output-field>
+                                                        </lightning-record-view-form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="campo-separador"></div>
+                                    </div>
+                                </lightning-layout-item>
+                            </lightning-record-view-form>
+                        </div>
+
+                        <!-- Nº Caso SAC + Fecha Resolución SAC -->
+                        <div class="slds-col slds-size_6-of-12 elemento-form">
+                            <lightning-record-view-form record-id={recordId} object-api-name="Case">
+
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-container">
+                                        <div class="slds-form-element">
+                                            <span class="slds-form-element__label">Nº Caso SAC + Fecha Resolución SAC</span>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-grid">
+                                                    <div class="slds-col slds-size_4-of-12">
+                                                        <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
+                                                            <lightning-output-field field-name="CaseNumber" variant="label-hidden"></lightning-output-field>
+                                                        </lightning-record-view-form>
+                                                    </div>
+                                                    <div class="slds-col slds-size_8-of-12">
+                                                        <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
+                                                            <lightning-output-field field-name="OS_Fecha_Resolucion__c" variant="label-hidden"></lightning-output-field>
+                                                        </lightning-record-view-form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="campo-separador"></div>
+                                    </div>
+                                </lightning-layout-item>
+                            </lightning-record-view-form>
+                        </div>
+                        
+                        <!-- 8. Referencia expresa al mal funcionamiento del SAC -->
+                        <div class="slds-col slds-size_5-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Referencia expresa al mal funcionamiento del SAC</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{reclamacionMalFuncionamientoAgregado}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+
+                        <!-- 9. Observaciones reclamación DEC mal funcionamiento del SAC -->
+                        <div class="slds-col slds-size_7-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Observaciones reclamación DEC mal funcionamiento del SAC</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{observacionesMalFuncionamientoAgregado}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+
+                        <!-- 10. ¿La actuación del SAC cumple criterios BdE? -->
+                        <div class="slds-col slds-size_5-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">¿La actuación del SAC cumple criterios BdE?</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{actuacionCumpleBdEAgregado}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+
+                        <!-- 11. Observaciones actuación SAC -->
+                        <div class="slds-col slds-size_7-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Observaciones actuación SAC</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{observacionesActuacionSACAgregado}</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+                    </div> 
+                </lightning-record-view-form>
             </div>
         </div>
-        <!-- Seccion Valoración documentación disponible -->
+
+        <!-- ======================================== -->
+        <!-- SECCION VALORACION DE LA DOCUMENTACION POSIBLE Lista -->
+        <!-- ======================================== -->
+
         <div class={toggleIconValoracion}>
             <h1 class="slds-section__title">
                 <button aria-controls="expando-unique-id-valoracion" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableValoracion}>
@@ -140,38 +476,61 @@
                 </button>
             </h1>
             <div class="slds-section__content" id="expando-unique-id-valoracion">
-                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                    <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
-                    <div class="slds-col slds-size_5-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_DisponeDocumentacion__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_DisponeDocumentacion__c" onchange={handleOptionChangeDisponeDocumentacion}> </lightning-input-field>
-                        </template>
+                <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;">
+                    <!-- 1. Dispone de documentación -->
+                    <div class="slds-col slds-size_5-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Dispone de documentación</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{disponeDocumentacionAgregado}</div>
+                                    </div>
+
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
                     </div>
-                    <div class="slds-col slds-size_7-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ObservacionesDocumentacion__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ObservacionesDocumentacion__c"> </lightning-input-field>
-                        </template>
+                    
+                    <!-- 2. Observaciones documentación disponible -->
+                    <div class="slds-col slds-size_7-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Observaciones documentación disponible</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{observacionesDocumentacionAgregado}</div>
+                                    </div>
+
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
                     </div>
-                    <template lwc:if={mostrarDocumentacionNecesaria}>
-                        <div class="slds-col slds-size_12-of-12">
-                            <template lwc:if={camposReadOnly}>
-                                <lightning-output-field field-name="SPV_DocumentacionNecesaria__c"> </lightning-output-field>
-                            </template>
-                            <template lwc:else>
-                                <lightning-input-field field-name="SPV_DocumentacionNecesaria__c"> </lightning-input-field>
-                            </template>
-                        </div>
-                    </template>
-                </div> 
+                    
+                    <!-- 3. Documentación necesaria -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Documentación necesaria</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{documentacionNecesariaAgregado}</div>
+                                    </div>
+
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- Seccion Comprobaciones realizadas -->
+
+        <!-- ======================================== -->
+        <!-- Comprobaciones realizadas -->
+        <!-- ======================================== -->
         <div class={toggleIconComprobaciones}>
             <h1 class="slds-section__title">
                 <button aria-controls="expando-unique-id-comprobaciones" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableComprobaciones}>
@@ -182,78 +541,865 @@
                 </button>
             </h1>
             <div class="slds-section__content" id="expando-unique-id-comprobaciones">
-                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;"> 
+                    <!-- 1. Información precontractual -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Información precontractual</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{informacionPrecontractualAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 2. Número Contrato -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Número Contrato</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{numeroContratoAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 3. Comunicaciones cambios de condiciones -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Comunicaciones cambios de condiciones</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{comunicacionesCambiosCondicionesAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 4. Comunicaciones con liquidaciones, extrac -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Comunicaciones con liquidaciones, extractos</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{comunicacionesLECAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 5. Justificantes de operaciones -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Justificantes de operaciones</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{justificantesOperacionesAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 6. Comunicaciones entre oficina y cliente -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Comunicaciones entre oficina y cliente</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{comunicacionesOficinaClienteAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 7. Antecedentes y cumplimiento de resol -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Antecedentes y cumplimiento de resoluciones</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{antecedentesCumplimientoResolAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 8. Cumplimiento condiciones pactadas -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Cumplimiento condiciones pactadas</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{cumplimientoCondicionesPactadasAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 9. Informe de la oficina -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Informe de la oficina</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{informeOficinaAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================== -->
+        <!-- PRETENSIONES -->
+        <!-- ======================================== -->
+        <div class={toggleIconAnalisisLetrado}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-analisis-letrado" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableAnalisisLetrado}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title">Pretensiones</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-analisis-letrado">
+                <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;"> 
+                    <!-- 1. Mencionar el criterio del BdE -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Mencionar el criterio del BdE sobre esta materia y fuente (resoluciones anteriores, memoria del BdE, etc…)</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{mencionarCriterioBdEAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 2. Decisión de pretensión Letrado -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Decisión de pretensión Análisis Letrado</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{decisionPretensionLetradoAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 3. Observaciones Decisión pretensión Letrado -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Observaciones Decisión pretensión Letrado</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{observacionesDecisionPretLetradoAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                    
+                    <!-- 4. Documentación -->
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                            <div class="campo-container">
+                                <div class="slds-form-element">
+                                    <span class="slds-form-element__label">Documentación</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static" style="white-space: pre-line">{documentacionAgregado}</div>
+                                    </div>
+                                </div>
+                                <div class="campo-separador"></div>
+                            </div>
+                        </lightning-layout-item>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- =============================================================
+            SECCIÓN  VALORACIÓN  FONDO  (8 campos editables)
+        ============================================================= -->
+        <div class={toggleIconFondo}>
+            <h1 class="slds-section__title">
+                <button class="slds-button slds-section__title-action" aria-controls="expando-unique-id-fondo" aria-expanded="true"
+                        onclick={handleExpandableFondo}>
+                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                    </svg>
+                    <span class="slds-truncate"> Valoración sobre el fondo de la reclamación </span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-fondo">
+                <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;">
                     <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_InformacionPrecontractual__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_InformacionPrecontractual__c"> </lightning-input-field>
-                        </template>
+
+                    <!-- ========== 1 ========= -->
+                    <div class="slds-col slds-size_5-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_ExisteDefensaJuridicaSuficiente__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_ExisteDefensaJuridicaSuficiente__c" onchange={handleFieldChange}></lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
                     </div>
-                    <!-- ▫	Contratos: Se visualizarán mediante la integración con Contratos y será una lista relacionada visible donde se agruparán los contratos del reclamante relativos al expediente informados por el letrado en las pretensiones. -->
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_CambiosDeCondiciones__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_CambiosDeCondiciones__c"> </lightning-input-field>
-                        </template>
+                    
+                    <!-- ========== 2 ========= -->
+                    <div class="slds-col slds-size_7-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_ObservacionesDefensaJuridica__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_ObservacionesDefensaJuridica__c" onchange={handleFieldChange}></lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ComunicacionLiquidaciones__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ComunicacionLiquidaciones__c"> </lightning-input-field>
-                        </template>
+                    
+                    <!-- ========== 3 ========= -->
+                    <div class="slds-col slds-size_5-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_ConllevaRiesgoReputacional__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_ConllevaRiesgoReputacional__c" onchange={handleFieldChange}></lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_JustificantesOperaciones__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_JustificantesOperaciones__c"> </lightning-input-field>
-                        </template>
+                    
+                    <!-- ========== 4 ========= -->
+                    <div class="slds-col slds-size_7-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_ObservacionesRiesgoReputacional__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_ObservacionesRiesgoReputacional__c" onchange={handleFieldChange}></lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ComunicacionOficinaCliente__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ComunicacionOficinaCliente__c"> </lightning-input-field>
-                        </template>
+                    
+                    <!-- ========== 5 ========= -->
+                    <div class="slds-col slds-size_5-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_ExisteCriterioRespectoTipologia__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_ExisteCriterioRespectoTipologia__c" onchange={handleFieldChange}></lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_AntecedentesCumplimiento__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_AntecedentesCumplimiento__c"> </lightning-input-field>
-                        </template>
+                    
+                    <!-- ========== 6 ========= -->
+                    <div class="slds-col slds-size_7-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_ObservacionesExisteCriterio__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_ObservacionesExisteCriterio__c" onchange={handleFieldChange}></lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_CumplimientoCondicionesPactadas__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_CumplimientoCondicionesPactadas__c"> </lightning-input-field>
-                        </template>
+                    
+                    <!-- ========== 7 ========= -->
+                    <div class="slds-col slds-size_5-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_RiesgoInformeDesfavorable__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_RiesgoInformeDesfavorable__c" onchange={handleFieldChange}></lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
                     </div>
-                    <div class="slds-col slds-size_12-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_InformeOficina__c"> </lightning-output-field>
+                    
+                    <!-- ========== 8 ========= -->
+                    <div class="slds-col slds-size_7-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_ObservacionesInformeDesfavorable__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_ObservacionesInformeDesfavorable__c" onchange={handleFieldChange}></lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- =============================================================
+                SECCIÓN  PROPUESTA DEL LETRADO  
+        ============================================================= -->
+
+        <div class={toggleIconPropuesta}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-propuesta" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandablePropuesta}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Propuesta del Letrado</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-propuesta">
+                <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;"> 
+                    <div class="slds-col slds-size_1-of-1 elemento-form">
+                        <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+
+                        <template lwc:if={noDecisionFound}>
+                            <div class="slds-box slds-theme_warning slds-text-align_center slds-m-around_medium">
+                                <lightning-icon icon-name="utility:warning" alternative-text="Advertencia" size="small" class="slds-m-right_small"></lightning-icon>
+                                No se ha definido una decisión de pretensión para este caso. 
+                                <br/>
+                                <template lwc:if={hasCaseExtension}>
+                                    Compruebe el campo "Decisión Pretensión Letrado" en la Case Extension.
+                                </template>
+                                <template lwc:else>
+                                    Este caso no tiene una Case Extension asociada.
+                                </template>
+                            </div>
                         </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_InformeOficina__c"> </lightning-input-field>
+
+                        <!-- Contenido específico para Alegaciones (sin cambios) -->
+                        <template lwc:if={estadoAlegaciones}>
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Propuesta del Letrado: </span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">Alegaciones</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                        </template>
+
+
+                        <!-- Contenido específico para Allanamiento (actualizado con campos de Case Extension) -->
+                        <template lwc:if={estadoAllanamiento}>
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Propuesta del Letrado: </span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">Allanamiento</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 1. Tipo Allanamiento -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Tipo Allanamiento</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{tipoAllanamientoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 2. Motivo de Allanamiento -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Motivo de Allanamiento</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{motivoAllanamientoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 3. Análisis Allanamiento -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Análisis Allanamiento</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{analisisAllanamientoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 4. Importe Allanamiento Propuesto -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Importe Allanamiento Propuesto</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{importeAllanamientoPropuestoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 5. Imputable Allanamiento -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Imputable Allanamiento</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{imputableAllanamientoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                        </template>                        
+                        
+                        <!-- Contenido específico para Desistimiento (actualizado con campos de Case Extension) -->
+                        <template lwc:if={estadoDesistimiento}>
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Propuesta del Letrado: </span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">Desistimiento</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 1. Motivo de Desistimiento -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Motivo de Desistimiento</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{motivoDesistimientoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 2. Análisis Desistimiento -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Análisis Desistimiento</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{analisisDesistimientoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 3. Tipo actuación desistimiento -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Tipo actuación desistimiento</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{tipoActuacionDesistimientoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 4. Importe desistimiento propuesto -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Importe desistimiento propuesto</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{importeDesistimientoPropuestoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                            
+                            <!-- 5. Imputable desistimiento -->
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Imputable desistimiento</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{imputableDesistimientoAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
+                        </template>
+
+                        <!-- Contenido específico para Inadmisión (sin cambios) -->
+                        <template lwc:if={estadoInadmision}>
+                            <div class="campo-container">
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Propuesta del Letrado: </span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">Inadmisión</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </div>
                         </template>
                     </div>
                 </div> 
             </div>
         </div>
+
+        <!-- =============================================================
+            SECCIÓN  DECISIÓN FINAL  /  RESOLUCIÓN  AJ 
+ESTE BLOQUE VIENE DE ESCALADO AHORA MISMO HAY VARIABLES Y MUESTRAS DE EJEMPLO PERO HABRIA QUE CAMBIARLO 
+        ============================================================= -->
+        <div class={toggleIconResolucion}>
+            <h1 class="slds-section__title">
+                <button class="slds-button slds-section__title-action"
+                        aria-controls="expando-unique-id-resolucion" aria-expanded="true"
+                        onclick={handleExpandableResolucion}>
+                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                    </svg>
+                    <span class="slds-truncate"> Decisión Final (Los campos de aqui vienen de escalado que no esta ahora mismo los mostrados son de prueba) </span>
+                </button>
+            </h1>
+
+            <div class="slds-section__content" id="expando-unique-id-resolucion">
+                <!-- ───── Parte solo-lectura: datos de resolución AJ ───── -->
+                <lightning-record-view-form record-id={idFormularioCaso} object-api-name="SPV_Formulario__c">
+                    <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;">
+                        <!-- Tipo de respuesta -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="SPV_TipoRespuesta__c"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+                        
+
+
+                        <!-- Decisión AJ -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="SPV_DecisionAJ__c"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+                        
+                        <!-- Instrucciones AJ -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <lightning-output-field field-name="SPV_InstruccionesAJ__c"></lightning-output-field>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+                        
+                        <!-- Decisión de pretensión AJ (modificado para venir de Case Extension) -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Decisión de pretensión (AJ)</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{decisionPretensionAJAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+
+                        <!-- Observaciones Decisión pretensión AJ (modificado para venir de Case) -->
+                        <div class="slds-col slds-size_12-of-12 elemento-form">
+                            <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                <div class="campo-container">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">Observaciones Decisión pretensión (AJ)</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static" style="white-space: pre-line">{observacionesDecisionPretAJAgregado}</div>
+                                        </div>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+                    </div>
+                </lightning-record-view-form>
+
+                <!-- ───── Campo editable: Decisión Final ───── -->
+                <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;">
+                    <div class="slds-col slds-size_12-of-12 elemento-form">
+                        <div class="campo-container">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-layout-item class="slds-form-element_readonly campo-info" size="12">
+                                    <div class="campo-con-boton">
+                                        <lightning-output-field field-name="SPV_DecisionFinal__c"></lightning-output-field>
+                                        <lightning-button-icon 
+                                            icon-name="utility:edit" 
+                                            variant="bare" 
+                                            alternative-text="Editar"
+                                            title="Editar" 
+                                            onclick={handleOutputEditClick}
+                                            class="boton-editar">
+                                        </lightning-button-icon>
+                                    </div>
+                                    <div class="campo-separador"></div>
+                                </lightning-layout-item>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field 
+                                    field-name="SPV_DecisionFinal__c"
+                                    onchange={handleFieldChange}>
+                                </lightning-input-field>
+                                <div class="campo-separador"></div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ========== FIN SECCIÓN DECISIÓN FINAL ========== -->
+
+        <!-- Seccion Observaciones esto estaba comentado antes de que yo tocara nada  -->
+        <!-- <div class={toggleIconObservaciones}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-observaciones" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableObservaciones}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Observaciones</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-observaciones">
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                        <template lwc:if={camposReadOnly}>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ObservacionesAJ__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                </div>   
+            </div>
+            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                <div lwc:if={tienePermisosEditar} class="slds-col slds-size_1-of-1">   
+                    <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- spinner -->
+        <template lwc:if={spinnerLoading}>
+            <div class="slds-p-around_x-large">
+                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+            </div>
+        </template>
+        <template lwc:if={isEditing}>
+            <template lwc:if={isEditing}>
+                <div class="footer-fixed">
+                    <div class="slds-grid slds-grid_align-center slds-p-around_small">
+                        <lightning-button 
+                            label="Cancelar" 
+                            variant="neutral" 
+                            onclick={cancelEdit} 
+                            class="slds-m-right_small btn-accion">
+                        </lightning-button>
+                        <lightning-button 
+                            label="Guardar" 
+                            variant="brand" 
+                            onclick={saveAll} 
+                            class="btn-accion">
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+        </template>
+    </lightning-record-edit-form>
+</template>
+
+
+       <!--*********************************************************************************-->
+        <!--ESTE BLOQUE YA ESTABA PERTENECE A Sub-Bloque Pretensiones pero ya no lo piden--> 
+        <!--*********************************************************************************-->
+
+
         <!-- Seccion Pretensiones/Alegaciones -->
-        <!-- Se debe mostrar solo cuando la reclamación está en alegaciones -->
+        <!-- Se debe mostrar solo cuando la reclamación está en alegaciones  
         <template lwc:if={estadoAlegaciones}>
             <div class={toggleIconAlegaciones}>
                 <h1 class="slds-section__title">
@@ -286,16 +1432,17 @@
                                 <div class="slds-col slds-size_12-of-12">
                                     <lightning-output-field field-name="SPV_ObservacionesDecisionAlegaciones__c"> </lightning-output-field>
                                 </div>
-                                <!-- o	Observaciones Documentación: (un campo por cada documento) A rellenar por el letrado en la pretensión. -->
                                 <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
                             </div> 
                         </lightning-record-view-form>
                     </template>
                 </div>
             </div>
-        </template>
+        </template> -->
+
+
         <!-- Seccion Pretensiones/Allanamiento -->
-        <!-- Se debe mostrar solo cuando la reclamación está en allanamiento -->
+        <!-- Se debe mostrar solo cuando la reclamación está en allanamiento 
         <template lwc:if={estadoAllanamiento}>
             <div class={toggleIconAllanamiento}>
                 <h1 class="slds-section__title">
@@ -332,186 +1479,4 @@
                 </div>
             </div>
         </template>
-        <!-- Seccion Valoración sobre el fondo de la reclamación -->
-        <div class={toggleIconFondo}>
-            <h1 class="slds-section__title">
-                <button aria-controls="expando-unique-id-fondo" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableFondo}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-                </svg>
-                <span class="slds-truncate" title="Section Title"> Valoración sobre el fondo de la reclamación</span>
-                </button>
-            </h1>
-            <div class="slds-section__content" id="expando-unique-id-fondo">
-                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                    <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
-                    <div class="slds-col slds-size_5-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ExisteDefensaJuridicaSuficiente__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ExisteDefensaJuridicaSuficiente__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_7-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ObservacionesDefensaJuridica__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ObservacionesDefensaJuridica__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_5-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ConllevaRiesgoReputacional__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ConllevaRiesgoReputacional__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_7-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ObservacionesRiesgoReputacional__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ObservacionesRiesgoReputacional__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_5-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ExisteCriterioRespectoTipologia__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ExisteCriterioRespectoTipologia__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_7-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ObservacionesExisteCriterio__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ObservacionesExisteCriterio__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_5-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_RiesgoInformeDesfavorable__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_RiesgoInformeDesfavorable__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                    <div class="slds-col slds-size_7-of-12">
-                        <template lwc:if={camposReadOnly}>
-                            <lightning-output-field field-name="SPV_ObservacionesInformeDesfavorable__c"> </lightning-output-field>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ObservacionesInformeDesfavorable__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                </div> 
-            </div>
-        </div>
-        <!-- Seccion Propuesta del letrado -->
-        <div class={toggleIconPropuesta}>
-            <h1 class="slds-section__title">
-                <button aria-controls="expando-unique-id-propuesta" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandablePropuesta}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-                </svg>
-                <span class="slds-truncate" title="Section Title"> Propuesta del letrado</span>
-                </button>
-            </h1>
-            <div class="slds-section__content" id="expando-unique-id-propuesta">
-                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                    <div class="slds-col slds-size_1-of-1">
-                        <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
-                        <template lwc:if={estadoAllanamiento}>
-                            <template lwc:if={camposReadOnly}>
-                                <lightning-output-field field-name="SPV_PropuestaLetradoAllanamiento__c"> </lightning-output-field>
-                            </template>
-                            <template lwc:else>
-                                <lightning-input-field field-name="SPV_PropuestaLetradoAllanamiento__c"> </lightning-input-field>
-                            </template>
-                        </template>
-                        <template lwc:if={estadoAlegaciones}>
-                            <template lwc:if={camposReadOnly}>
-                                <lightning-output-field field-name="SPV_PropuestaLetradoAlegaciones__c"> </lightning-output-field>
-                            </template>
-                            <template lwc:else>
-                                <lightning-input-field field-name="SPV_PropuestaLetradoAlegaciones__c"> </lightning-input-field>
-                            </template>
-                        </template>
-                    </div>
-                </div> 
-            </div>
-        </div>
-        <!-- Seccion Resolución AJN -->
-        <div class={toggleIconResolucion}>
-            <h1 class="slds-section__title">
-                <button aria-controls="expando-unique-id-resolucion" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableResoluciona}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-                </svg>
-                <span class="slds-truncate" title="Section Title"> Resolución AJN</span>
-                </button>
-            </h1>
-            <div class="slds-section__content" id="expando-unique-id-resolucion">
-                <lightning-record-view-form record-id={idFormularioCaso} object-api-name="SPV_Formulario__c">
-                    <lightning-messages> </lightning-messages>
-                    <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                        <div class="slds-col slds-size_1-of-1">
-                            <lightning-output-field field-name="SPV_TipoRespuesta__c"> </lightning-output-field>
-                        </div>
-                        <div class="slds-col slds-size_1-of-1">
-                            <lightning-output-field field-name="SPV_MotivoRechazo__c"> </lightning-output-field>
-                        </div>
-                        <div class="slds-col slds-size_1-of-1">
-                            <lightning-output-field field-name="SPV_ObservacionesAJ__c"> </lightning-output-field>
-                        </div>
-                    </div> 
-                </lightning-record-view-form>
-            </div>
-            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                <div lwc:if={tienePermisosEditar} class="slds-col slds-size_1-of-1">   
-                    <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
-                </div>
-            </div>
-        </div>
-        <!-- Seccion Observaciones -->
-        <!-- <div class={toggleIconObservaciones}>
-            <h1 class="slds-section__title">
-                <button aria-controls="expando-unique-id-observaciones" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableObservaciones}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-                </svg>
-                <span class="slds-truncate" title="Section Title"> Observaciones</span>
-                </button>
-            </h1>
-            <div class="slds-section__content" id="expando-unique-id-observaciones">
-                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                    <div class="slds-col slds-size_1-of-1">
-                        <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
-                        <template lwc:if={camposReadOnly}>
-                        </template>
-                        <template lwc:else>
-                            <lightning-input-field field-name="SPV_ObservacionesAJ__c"> </lightning-input-field>
-                        </template>
-                    </div>
-                </div>   
-            </div>
-            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                <div lwc:if={tienePermisosEditar} class="slds-col slds-size_1-of-1">   
-                    <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
-                </div>
-            </div>
-        </div> -->
-
-        <!-- spinner -->
-        <template lwc:if={spinnerLoading}>
-            <div class="slds-p-around_x-large">
-                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
-            </div>
-        </template>
-    </lightning-record-edit-form>
-</template>
+-->

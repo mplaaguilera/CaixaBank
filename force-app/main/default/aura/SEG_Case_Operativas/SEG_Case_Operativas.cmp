@@ -127,6 +127,10 @@
     <aura:attribute name="consultPeticionAOR" type="string"/>
     <aura:attribute name="comentarioAOR" type="string"/>
 
+    <!-- Control botón Enviar en AOR para pulsado -->
+    <aura:attribute name="botonPulsado" type="boolean" default="false"/>
+
+
     <!--Handlers-->
     <!--Init
     <aura:handler name="init" value="{!this}" action="{!c.checkOrgZona}"/>
@@ -235,7 +239,7 @@
                 </lightning:buttonGroup>
             </span>
             <lightning:button label="Crear contratos" iconName="utility:edit_form" onclick="{!c.modalCrearContratosAbrir}" disabled="{!or(v.caso.Status == 'Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup}"/>
-            <lightning:button label="Operaciones CSO" iconName="utility:number_input" onclick="{!c.modalAnyadirOperacionAbrir}" disabled="{!or(v.caso.Status == 'Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup || v.esUsuarioBO}"/>
+            <lightning:button label="Num. Operaciones" iconName="utility:number_input" onclick="{!c.modalAnyadirOperacionAbrir}" disabled="{!or(v.caso.Status == 'Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup}"/>
             <lightning:button aura:id="botonImportar" label="Importar" iconName="utility:attach" onclick="{!c.modalImportarArchivosAbrir}" disabled="{!or(v.caso.Status=='Descartado',v.caso.Status=='Cerrado') || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup}"/>
             <lightning:button label="Canal BPO" iconName="utility:anywhere_alert" onclick="{!c.modalCanalBpoAbrir}" disabled="{!or(v.caso.Status == 'Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup}"/>
             <lightning:button label="Asesoría Jurídica" iconName="utility:anywhere_alert" onclick="{!c.modalAORAbrir}" disabled="{!or(v.caso.Status == 'Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || !v.aorActivo}"/>
@@ -729,6 +733,15 @@
                     <p class="slds-var-m-top_x-small">Se creará el caso en la aplicación externa de Asesoría Jurídica.</p>
                 </header>
                 <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <aura:if isTrue="{!v.loadingCreandoCaso}">
+                        <div class="slds-spinner_container">
+                            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                                <span class="slds-assistive-text">Comunicando con Asesoría Jurídica</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </aura:if>
                     <!-- ampos seleccionables de tipología -->
                     <aura:if isTrue ="{!!v.caso.SEG_Identificador_AOR__c}">
                         <div class="slds-var-m-top_x-small">
@@ -778,10 +791,10 @@
                 </div>
                 <footer class="slds-modal__footer">
                     <aura:if isTrue="{!v.caso.SEG_Identificador_AOR__c}">
-                        <lightning:button aura:id="modalAORBotonIniciarRitm" label="Enviar" variant="brand" iconName="utility:anywhere_alert" onclick="{!c.enviarAOR}"/>
+                        <lightning:button aura:id="modalAORBotonIniciarRitm" label="Enviar" variant="brand" iconName="utility:anywhere_alert" onclick="{!c.enviarAOR}" disabled = "{v.botonPulsado}"/>
                         <lightning:button aura:id="modalAORBotonCancelarRitm" label="Cancelar" onclick="{!c.modalAORCerrar}"/>
                         <aura:set attribute="else">
-                            <lightning:button aura:id="modalAORBotonIniciar" label="Enviar" variant="brand" iconName="utility:anywhere_alert" onclick="{!c.enviarAOR}" disabled="{!!(v.selectedValueN1 &amp;&amp; v.selectedValueN2)}"/>
+                            <lightning:button aura:id="modalAORBotonIniciar" label="Enviar" variant="brand" iconName="utility:anywhere_alert" onclick="{!c.enviarAOR}" disabled="{!empty(v.selectedValueN2) || v.botonPulsado}"/>
                             <lightning:button aura:id="modalAORBotonCancelar" label="Cancelar" onclick="{!c.modalAORCerrar}"/>
                         </aura:set>
                     </aura:if>

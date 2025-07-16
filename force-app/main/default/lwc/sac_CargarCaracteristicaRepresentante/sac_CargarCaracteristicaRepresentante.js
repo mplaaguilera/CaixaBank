@@ -9,7 +9,7 @@ import getAsignacionesCaracteristica from '@salesforce/apex/SAC_LCMP_CargarCarac
 import deleteAsignacion from '@salesforce/apex/SAC_LCMP_CargarCaractRepresentante.eliminarAsignacion';
 import updateAsignacion from '@salesforce/apex/SAC_LCMP_CargarCaractRepresentante.actualizarAsignacion';
 import newAsignacion from '@salesforce/apex/SAC_LCMP_CargarCaractRepresentante.crearAsignacion';
-
+import obtenerValoresDespachoRepresentante from '@salesforce/apex/SAC_LCMP_CargarCaractRepresentante.obtenerValoresDespachoRepresentante';
 
 const actions = [
     { label: 'Edit', name: 'show_edit' },
@@ -69,12 +69,30 @@ export default class Sac_CargarCaracteristicaRepresentante extends NavigationMix
         }
     }
 
-    @wire(getPicklistValues, { recordTypeId: '012000000000000AAA', fieldApiName: PICKLIST_DESPACHOS })
+    /*@wire(getPicklistValues, { recordTypeId: '012000000000000AAA', fieldApiName: PICKLIST_DESPACHOS })
     valoresPicklistDespachoRepresentante({data}) {
         if (data) {
             this.picklistDespachoValues = data.values;
         }
+    }*/
+
+    @wire(obtenerValoresDespachoRepresentante)
+    wiredDespachosRepresentantes(result){
+        if(result.data){
+            this.picklistDespachoValues = result.data.map(item => ({
+                label: item,
+                value: item
+            }));
+        }
     }
+
+    handleChangeDespacho(event){
+        const selectedValue = event.detail.value;
+        const selectedOption = this.picklistDespachoValues.find(option => option.value === selectedValue);
+        this.valorAsignacion = selectedOption.label;
+
+    }
+
 
     renderedCallback() {
         if (this.cargaMasiva) {
@@ -213,11 +231,7 @@ export default class Sac_CargarCaracteristicaRepresentante extends NavigationMix
         this.mostrarDespacho = true;
     }
 
-    handleChangeDespacho(event){
-        const selectedValue = event.detail.value;
-        const selectedOption = this.picklistDespachoValues.find(option => option.value === selectedValue);
-        this.valorAsignacion = selectedOption.label;
-    }
+
 
     handleCrearAsignacion(){
         if(this.valorAsignacion === '' || this.valorAsignacion === undefined){

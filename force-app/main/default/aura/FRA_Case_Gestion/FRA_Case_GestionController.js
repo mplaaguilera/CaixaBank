@@ -69,6 +69,8 @@
 
 			component.set('v.casoCerrado', component.get('v.caso.Status') === 'Cerrado' || component.get('v.caso.Status') === 'Rechazado' );
 			component.set('v.esPropietario', $A.get('$SObjectType.CurrentUser.Id') === component.get('v.caso.OwnerId'));
+
+
 		} else if (event.getParams().changeType === 'ERROR') {
 			helper.mostrarToast('error', 'Error', component.get('v.recordDataError'));
 		}
@@ -304,38 +306,98 @@
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
+
 	modalRechazarRechazar: function(component, event, helper) {
+		//console.log('>> modalRechazarRechazar: Inicio');
+	
 		let inputMotivo = component.find('inputEnviarMotivoRechazo');
+	
+		// Validación del campo de motivo
 		if (!inputMotivo.checkValidity()) {
 			inputMotivo.reportValidity();
-		} else {
-			component.set('v.guardando', true);			
-
-			component.set('v.caso.Status', 'Rechazado');
-			component.find('recordData').saveRecord($A.getCallback(saveResult => {
-				if (saveResult.state === 'SUCCESS') {
-					//Creación de la actividad de rechazo (@future)
-					let crearActividadRechazo = component.get('c.crearActividad');
-					crearActividadRechazo.setParams({
-						'recordId': component.get('v.recordId'),
-						'tipo': 'Rechazado',
-						'motivo': inputMotivo.get('v.value')
-					});
-					$A.enqueueAction(crearActividadRechazo);
-
-					helper.mostrarToast('success', 'Se rechazó Caso', 'Se rechazó correctamente el caso ' + component.get('v.caso.CaseNumber') + '.');
-
-					//Refrescar vista
-					component.find('recordData').reloadRecord(false);
-					$A.enqueueAction(component.get('c.modalRechazarCerrar'));
-				} else {
-					helper.mostrarToast('error', 'No se pudo rechazar el caso', saveResult.error[0].message);
-				}
-				component.set('v.guardando', false);
-			}));
-
+			return;
 		}
+	
+		component.set('v.guardando', true);
+		component.set('v.caso.Status', 'Rechazado');
+	
+		// Llamada a Apex para validar si tiene caso en Contact Center
+		let action = component.get("c.validarCasoEnContactCenter");
+		action.setParams({
+			recordId: component.get("v.recordId")
+		});
+	
+		action.setCallback(this, function(response) {
+			if (response.getState() === "SUCCESS") {
+				let tieneCasoAnterior = response.getReturnValue();
+				//console.log('>> Tiene caso anterior:', tieneCasoAnterior);
+	
+				// Guardar el caso
+				component.find('recordData').saveRecord($A.getCallback(saveResult => {
+					if (saveResult.state === 'SUCCESS') {
+	
+						let crearActividadRechazo = component.get('c.crearActividad');
+						crearActividadRechazo.setParams({
+							recordId: component.get('v.recordId'),
+							tipo: 'Rechazado',
+							motivo: inputMotivo.get('v.value')
+						});
+	
+						crearActividadRechazo.setCallback(this, function(response) {
+							if (response.getState() !== "SUCCESS") {
+								let errors = response.getError();
+								let message = errors && errors[0] && errors[0].message ? errors[0].message : "Error desconocido.";
+								helper.mostrarToast("error", "Error al crear actividad", message);
+							}
+						});
+	
+						if (tieneCasoAnterior) {
+							let actualizarOtroCaso = component.get('c.rechazarCasoFraude');
+							actualizarOtroCaso.setParams({
+								recordId: component.get('v.recordId'),
+								motivo: inputMotivo.get('v.value')
+							});
+	
+							actualizarOtroCaso.setCallback(this, function(response) {
+								if (response.getState() === "SUCCESS") {
+									helper.mostrarToast("success", "Caso actualizado", "El caso original se ha reabierto y se ha cerrado el caso de fraude.");
+								} else {
+									let errors = response.getError();
+									let message = errors && errors[0] && errors[0].message ? errors[0].message : "Error desconocido.";
+									helper.mostrarToast("error", "Error al rechazar caso", message);
+								}
+							});
+	
+							$A.enqueueAction(crearActividadRechazo);
+							$A.enqueueAction(actualizarOtroCaso);
+	
+						} else {
+							//console.log('>> No tiene caso anterior, solo se crea la actividad');
+							$A.enqueueAction(crearActividadRechazo);
+							helper.mostrarToast('success', 'Se rechazó Caso', 'Se rechazó correctamente el caso ' + component.get('v.caso.CaseNumber') + '.');
+						}
+	
+						component.find('recordData').reloadRecord(false);
+						$A.enqueueAction(component.get('c.modalRechazarCerrar'));
+	
+					} else {
+						let errorMsg = saveResult.error && saveResult.error[0] && saveResult.error[0].message ? saveResult.error[0].message : "Error desconocido.";
+						helper.mostrarToast('error', 'No se pudo rechazar el caso', errorMsg);
+					}
+					component.set('v.guardando', false);
+				}));
+	
+			} else {
+				let errors = response.getError();
+				let message = errors && errors[0] && errors[0].message ? errors[0].message : "Error desconocido.";
+				helper.mostrarToast('error', 'Error al consultar el caso', message);
+				component.set('v.guardando', false);
+			}
+		});
+	
+		$A.enqueueAction(action);
 	},
+	
 
 	// FRA -> para realizar la funcionalidad final de Cerrar
 	modalCerrarFinal: function(component, event, helper) {

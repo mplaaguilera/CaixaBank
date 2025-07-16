@@ -30,8 +30,9 @@
     <aura:attribute name="showDetalle" type="Boolean" default="false"/>
     <aura:attribute name="esAuditorSAC" type="Boolean" default="false"/>
 
-    <aura:registerEvent name="refresh" type="c:CC_Refresh_MCC_Clasificar" />
     <aura:registerEvent name="refreshCops" type="c:OS_Refresh_Case_Gestion" />
+
+    <aura:handler event="c:CC_Refresh_MCC_Clasificar" action="{!c.handleRefresh}" />
 
     <!--Paginación Segmentos-->
     <aura:attribute name="pagina" type="Integer" default="1" />

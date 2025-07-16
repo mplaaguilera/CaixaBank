@@ -85,7 +85,7 @@
                 </template>
                 <template if:true={mostrarDespacho}>
                     <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-11">
-                        <lightning-combobox name="despachorepresentantes" label="Seleccione el despacho deseado." placeholder=" - Select -"  onchange={handleChangeDespacho} options={picklistDespachoValues}></lightning-combobox>
+                        <lightning-combobox id="comboDespacho" name="despachorepresentantes" label="Seleccione el despacho deseado." placeholder=" - Select -"  onchange={handleChangeDespacho} options={picklistDespachoValues}></lightning-combobox>
                     </div>
                 </template>
                 

@@ -83,7 +83,7 @@ export async function conversionApexInputs(nombreMetodoApex, message, interactio
 				ani: message.data.ani ?? '',
 				dnis: message.data.calledNumber ?? '',
 				servicio: message.data.queueName ?? '',
-				// asunto: message.data.attributes['Participant.asunto'] ?? '',
+				asunto: message.data.attributes['Participant.servicio'] ?? '',
 				// numPerso: message.data.attributes['Participant.numPerso'] ?? '',
 				// idioma: message.data.attributes['Participant.idioma'] ?? '',
 				// datos: message.data.attributes['Participant.datos'] ?? '',

@@ -1,6 +1,7 @@
 import { LightningElement, api, wire, track } from 'lwc';
 import contextualizador from '@salesforce/apex/CC_WS_Contextualizador.ccWSContextualizador';
 import NUMPERSON from '@salesforce/schema/Case.Account.CC_NumPerso__c';
+import NUMPERSONAV from '@salesforce/schema/Case.Account.AV_NumPerso__c';
 import CASEID from '@salesforce/schema/Case.Id';
 import CUENTA from '@salesforce/schema/CC_Llamada__c.CC_Cuenta__c';
 import LLAMADA from '@salesforce/schema/CC_Llamada__c.Id';
@@ -23,7 +24,10 @@ export default class cc_Contextualizador extends LightningElement {
             //this.mostrarToast('error', 'Problema recuperando los datos la cuenta', JSON.stringify(error));
         } else if (data) {
             if (this.objectApiName === 'Case') {
-                this.idCuenta = getFieldValue(data, NUMPERSON);
+                let numper = getFieldValue(data, NUMPERSONAV) ?? getFieldValue(data, NUMPERSON) ?? '';
+                console.log('DPK --->', numper);
+                
+                this.idCuenta = numper;
                 this.idObjeto = getFieldValue(data, CASEID);
                 this.tipoObjeto = 'Case';
                 if (this.idCuenta == null && this.idObjeto == null) {
@@ -62,11 +66,11 @@ export default class cc_Contextualizador extends LightningElement {
     }
 
     get cargarCampos() {
-        console.log("cargarCampos: ", this.objectApiName);
+        // console.log("cargarCampos: ", this.objectApiName);
         if (this.objectApiName === 'CC_Llamada__c') {
             return [LLAMADA, CUENTA];
         } else {
-            return [NUMPERSON, CASEID];
+            return [NUMPERSONAV,NUMPERSON, CASEID];
         }
 
     };

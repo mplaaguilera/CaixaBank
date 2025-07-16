@@ -58,7 +58,8 @@ export default class csbdProgramarCita extends LightningElement {
 
 	@api abrirModal() {
 		try {
-			let fechaInicial = new Date();
+			const fechaActual = new Date();
+			let fechaInicial = new Date(fechaActual);
 
 			let hours = fechaInicial.getHours();
 			if (hours < 9) {
@@ -69,9 +70,9 @@ export default class csbdProgramarCita extends LightningElement {
 				fechaInicial.setDate(fechaInicial.getDate() + (8 - fechaInicial.getDay()) % 7);
 				fechaInicial.setHours(9, 0, 0, 0);
 			}
-			fechaInicial.setMinutes(fechaInicial.getMinutes() + 5);
+			fechaInicial.setMinutes(fechaInicial.getMinutes() + 1);
 			const inputFecha = this.refs.inputFecha;
-			inputFecha.min = fechaInicial.toISOString();
+			inputFecha.min = fechaActual.toISOString();
 			inputFecha.value = fechaInicial.toISOString();
 			this.inputFechaValueAnterior = inputFecha.value;
 
@@ -79,6 +80,7 @@ export default class csbdProgramarCita extends LightningElement {
 			this.refs.modalProgramarCita.classList.add('slds-fade-in-open');
 			window.setTimeout(() => this.refs.botonCancelar.focus(), 90);
 			publicarEvento(this, 'modalabierto', {nombreModal: 'modalProgramarCita'});
+
 		} catch (error) {
 			errorApex(this, error, 'Problema al iniciar la operariva');
 			this.modalCerrar();
@@ -126,8 +128,9 @@ export default class csbdProgramarCita extends LightningElement {
 		}
 
 		const inputFecha = this.refs.inputFecha;
+		inputFecha.min = new Date().toISOString();
 		inputFecha.reportValidity();
-		if (!inputFecha.validity.valid && !inputFecha.validity.rangeUnderflow) {
+		if (!inputFecha.validity.valid) {
 			return;
 		}
 
@@ -153,6 +156,7 @@ export default class csbdProgramarCita extends LightningElement {
 			toast('success', 'Se programó cita', `Se programó una cita con el cliente para el ${fechaTexto.toUpperCase()}.`);
 			notifyRecordUpdateAvailable([{recordId: this.recordId}]);
 			this.modalCerrar();
+
 		}).catch(error => {
 			errorApex(this, error, 'Problema programando la cita');
 			this.componente = {...this.componente, spinner: false};

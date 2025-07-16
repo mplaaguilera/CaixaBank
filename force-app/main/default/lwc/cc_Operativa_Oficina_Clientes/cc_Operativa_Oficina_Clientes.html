@@ -1,0 +1,18 @@
+<template>
+    <lightning-quick-action-panel variant="headerless">
+        <!--c-cc-operativa-oficina></c-cc-operativa-oficina-->
+        <c-cc_-operativa_-oficina 
+            record-id={recordId} 
+            oportunidad-creada-api={oportunidadCreadaAPI} 
+            derivar-b={derivar}
+            otp-derivar={otpDerivar}
+            onmodalcerrado={handleModalOficinaCerrado}
+            onrealizartrasladocolaborador={realizarTrasladoDesdeDerivar}
+            onrealizarremitido={abrirModalTrasladarColaborador}
+            onsolicitarinfo={abrirModalSolicitarInfo}
+            onrefrescartab={refreshTab}
+            ondesactivarspinner={desactivarSpinnerDerivar}>
+        </c-cc_-operativa_-oficina>
+        <div class="backdrop slds-backdrop_open"></div>
+    </lightning-quick-action-panel>
+</template>

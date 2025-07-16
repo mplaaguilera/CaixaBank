@@ -185,6 +185,8 @@
         if(component.get("v.procedencia") != 'redacción'){
             console.log('dentro del if');
             component.set("v.cuerpo", component.get("v.plantilla"));  
+            console.log('CGR test cuerpo'+ component.get("v.cuerpo"));
+            
         }
         $A.get('e.force:refreshView').fire();
     },

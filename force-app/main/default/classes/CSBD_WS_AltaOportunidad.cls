@@ -2,19 +2,13 @@
 global with sharing class CSBD_WS_AltaOportunidad {
 	public static String respuestaLog = '';
 
-	private static List<CSBD_IdentificacionImagin__c> identificacionImagin = [SELECT CSBD_AplicarLogica__c
-																				FROM CSBD_IdentificacionImagin__c
-																				LIMIT 1];
+	private static List<CSBD_IdentificacionImagin__c> identificacionImagin = [SELECT CSBD_AplicarLogica__c FROM CSBD_IdentificacionImagin__c LIMIT 1];
 	//Método principal de la integración
 	@HttpPost
 	global static CSBD_WS_AltaOportunidad_Output altaOportunidad() {
 		RestRequest req = RestContext.request;
 		String requestString = req.requestBody.toString();
-
-		CSBD_WS_AltaOportunidad_Input input = (CSBD_WS_AltaOportunidad_Input)JSON.deserializeStrict(
-			requestString, CSBD_WS_AltaOportunidad_Input.class
-		);
-
+		CSBD_WS_AltaOportunidad_Input input = (CSBD_WS_AltaOportunidad_Input)JSON.deserializeStrict(requestString, CSBD_WS_AltaOportunidad_Input.class);
 		return gestionEntradaOportunidad(input, 'WS', requestString);
 	}
 	public static CSBD_WS_AltaOportunidad_Output gestionEntradaOportunidad(CSBD_WS_AltaOportunidad_Input input, String origen) {
@@ -56,30 +50,18 @@ global with sharing class CSBD_WS_AltaOportunidad {
 
 		//Cuando llega un desistimientoPrestamo buscamos la oportunidad existente para cerrarla
 		if (!idsNumSolicitud.isEmpty()) {
-			prestamosFiltrados = [SELECT CSBD_Identificador__c, IsClosed, CSBD_Alta_omnichannel__c,
-									CSBD_Now_Presolicitud__c, CSBD_Empresa_Proveedora__c
-									FROM Opportunity
-									WHERE RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_Prestamo')
-									AND CSBD_Now_Presolicitud__c IN :idsNumSolicitud];
+			prestamosFiltrados = [SELECT CSBD_Identificador__c, IsClosed, CSBD_Alta_omnichannel__c, CSBD_Now_Presolicitud__c FROM Opportunity
+													WHERE RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_Prestamo')
+													AND CSBD_Now_Presolicitud__c IN :idsNumSolicitud];
 		}
 		if (!productosOportunidadSet.isEmpty()) {
 			//Listado de productos y horarios que deben trasladarse
-			for (CC_Lista_Valores__c valorLista: [SELECT Name, CSBD_Aplica_horario__c,
-													CSBD_Empresa_proveedora__c, CSBD_Tipo_regla__c,
-													RecordType.DeveloperName, CSBD_Hora_inicio_turno__c,
-													CSBD_Hora_fin_turno__c, CSBD_Centro__c
-													FROM CC_Lista_Valores__c
+			for (CC_Lista_Valores__c valorLista: [SELECT Name, CSBD_Aplica_horario__c, CSBD_Empresa_proveedora__c, CSBD_Tipo_regla__c, RecordType.DeveloperName, CSBD_Hora_inicio_turno__c, CSBD_Hora_fin_turno__c, CSBD_Centro__c FROM CC_Lista_Valores__c
 													WHERE
-														(RecordType.DeveloperName = 'CC_Valor'
-														AND CC_Lista__r.Name = 'CSBD: Relación de valores Now - Salesforce: Empresa, familia y producto'
-														AND Name = :productosOportunidadSet
-														AND CC_Activa__c = TRUE
-														AND CC_Valor_SFDC__c = 'imaginBank')
+														(RecordType.DeveloperName = 'CC_Valor' AND CC_Lista__r.Name = 'CSBD: Relación de valores Now - Salesforce: Empresa, familia y producto'
+														AND Name = :productosOportunidadSet AND CC_Activa__c = TRUE AND CC_Valor_SFDC__c = 'imaginBank')
 													OR
-														(Recordtype.DeveloperName = 'CSBD_Regla_traspaso_oportunidad'
-														AND CC_Activa__c = true
-														AND CC_Fecha_Vigencia_Inicio__c < :CBK_UtilsDate.nowSYS()
-														AND CC_Fecha_Vigencia_Fin__c > :CBK_UtilsDate.nowSYS()
+														(Recordtype.DeveloperName = 'CSBD_Regla_traspaso_oportunidad' AND CC_Activa__c = true AND CC_Fecha_Vigencia_Inicio__c < :CBK_UtilsDate.nowSYS()  AND CC_Fecha_Vigencia_Fin__c > :CBK_UtilsDate.nowSYS()
 														AND ((Name = :productosOportunidadSet AND CSBD_Tipo_regla__c = 'Producto') OR CSBD_Tipo_regla__c = 'Horario' OR CSBD_Tipo_regla__c = 'Tipo oportunidad')) ]) {
 
 				//Listado de productos para evaluar si la oportunidad entrante es imaginBank o CaixaBank
@@ -151,24 +133,24 @@ global with sharing class CSBD_WS_AltaOportunidad {
 					//Obtener los accountsIds pertenecientes a cada oportunidad mediante el método identificarCliente.
 					//Creación de un mapa relacionando el numsolicitud de la futura oportunidad con su accountId.
 
-					Map<String, Object> campos = new  Map<String, Object>();
+					Map<String, Object> datosCliente = new  Map<String, Object>();
 					if(String.isBlank(solicitud.indInTouch)){
-						campos = CSBD_WS_AltaOportunidad_Campos.identificarCliente(solicitud,campos,respuesta);
+						datosCliente = CSBD_WS_AltaOportunidad_Campos.identificarCliente(solicitud, datosCliente, respuesta);
 					}
 
 					//Solo se comprueba la lógica de traspasar si indInTouch == 'S'
-					if (solicitud.indInTouch == 'S' || (campos.containsKey('AV_IndicadoresClientes__c') && campos.get('AV_IndicadoresClientes__c') == '8')) {
+					if (solicitud.indInTouch == 'S' || (datosCliente.containsKey('AV_IndicadoresClientes__c') && datosCliente.get('AV_IndicadoresClientes__c').toString().contains('8'))) {
 
 						//¿Es empresa imagin?  -- el producto está dado de alta en la lista de valores -- no tenemos en cuenta indInTouch = S/N
 						if (oportunidadNowInSales) {
 							//Evaluamos producto si es imagin o caixa
-							if (!productosImagin.isEmpty() && productosImagin.contains(producto) && ((!identificacionImagin.isEmpty() && identificacionImagin[0].CSBD_AplicarLogica__c == false) || campos.get('AV_IndicadoresClientes__c') == '11' )) {
+							if (!productosImagin.isEmpty() && productosImagin.contains(producto) && ((!identificacionImagin.isEmpty() && identificacionImagin[0].CSBD_AplicarLogica__c == false) || (datosCliente.containsKey('AV_IndicadoresClientes__c') && datosCliente.get('AV_IndicadoresClientes__c').toString().contains('11')))) {
 								oportunidadNowInSales = false;
 								empresaProveedora = 'imaginBank';
 							}
 						}
 						//Si no es imagin y se cumple indInTouch == 'S' --> Es cliente intouch
-						if (oportunidadNowInSales && (solicitud.indInTouch == 'S' || (campos.containsKey('AV_IndicadoresClientes__c') && campos.get('AV_IndicadoresClientes__c') == '8'))) {
+						if (oportunidadNowInSales && (solicitud.indInTouch == 'S' || (datosCliente.containsKey('AV_IndicadoresClientes__c') && datosCliente.get('AV_IndicadoresClientes__c').toString().contains('8')))) {
 							oportunidadNowInSales = false;
 							empresaProveedora = 'inTouch';
 						}
@@ -245,10 +227,10 @@ global with sharing class CSBD_WS_AltaOportunidad {
 
 					if (Boolean.valueOf(statusResponseAV.isSuccess)) {
 						finOK = true;
-						respuesta.resultado = 'OK Traspasada: ' + empresaProveedora;
-						respuesta.opportunityId = statusResponseAV.idOpp;
-						respuesta.detalleError = statusResponseAV.errorMessage;
-						respuestaLog += '¿Se ha creado la oportunidad en la aplicación Mis Clientes? ' + statusResponseAV.isSuccess;
+					respuesta.resultado = 'OK Traspasada: ' + empresaProveedora;
+					respuesta.opportunityId = statusResponseAV.idOpp;
+					respuesta.detalleError = statusResponseAV.errorMessage;
+					respuestaLog += '¿Se ha creado la oportunidad en la aplicación Mis Clientes? ' + statusResponseAV.isSuccess;
 					} else {
 						finOK = false;
 						respuesta.resultado = 'KO';

@@ -24,11 +24,16 @@
     <aura:attribute name="envioEmail" type="Boolean" default="false" />
     <aura:attribute name="envioAcusePulsado" type="Boolean" default="false" />
     <aura:attribute name="modalAcuseYaEnviado" type="Boolean" default="false" />
+    <aura:attribute name="correoCasoInformado" type="Boolean" default="false" />
+    <aura:attribute name="webEmailInformado" type="Boolean" default="false" />
 
     <!--PARA GestionEmails-->
     <aura:attribute name="asunto" type="String" />
     <aura:attribute name="cuerpo" type="String" />
     <aura:attribute name="para" type="String" />
+    <aura:attribute name="correoDelCaso" type="String" />
+    <aura:attribute name="webEmail" type="String" />
+    <aura:attribute name="viaEnvio" type="String" default=""/>
     <aura:attribute name="procedencia" type="String" default="subsanacion" />
     <aura:attribute name="usarComponente" type="Boolean" default="true" />
     <aura:attribute name="ficherosAdjuntos" type="ContentVersion[]" />
@@ -176,37 +181,48 @@
         <div class="slds-backdrop slds-backdrop_open"></div>
     </aura:if>
 
-<!--    
     <aura:if isTrue="{!v.envioEmail}">
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
             aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">
                 <header class="slds-modal__header">
-                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.ocultaModal }" alternativeText="close"
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.cerrar }" alternativeText="close"
                         variant="bare-inverse" class="slds-modal__close" />
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
                         Confirme la operación</h2>
                 </header>
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                    
-                    <c:SAC_GestionEmails usarComponente="{!v.usarComponente}"
-                    procedencia="{!v.procedencia}" para="{!v.para}" copia="{!v.copia}"
-                    cuerpo="{!v.cuerpo}" asunto="{!v.asunto}" caso="{!v.caso}"
-                    ficherosAdjuntos="{!v.ficherosAdjuntos}"
-                    ficherosBorrados="{!v.ficherosBorrados}"
-                    idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" />
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="max-height:350px;">
 
+                    <p style="text-align: center;">
+                        Seleccione el correo al que efectuar el envío
+                    </p>
+                    <br />
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_3of-12">
+                            <lightning:buttonIcon iconName="utility:send" class="slds-float_right" variant="brand" onclick="{! c.enviarCorreoCaso }" alternativeText="Enviar" title="Enviar al correo del caso" />
+                        </div>  
+                        <div class="slds-col slds-size_9-of-12">
+                            <p class="slds-float_left alinear-text"><b>Correo del caso: </b>{!v.correoDelCaso}</p>
+                        </div>  
+                    </div>
+                    <br/>
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_3-of-12">
+                            <lightning:buttonIcon iconName="utility:send" class="slds-float_right" variant="brand" onclick="{! c.enviarWebEmail }" alternativeText="Enviar" title="Enviar al correo electrónico web" />
+                       </div>   
+                        <div class="slds-col slds-size_9-of-12">
+                            <p class="slds-float_left alinear-text"><b>Correo electrónico web: </b>{!v.webEmail}</p>
+                        </div>             
+                    </div>
                 </div>
                 <footer class="slds-modal__footer">
-                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar"
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar" 
                         onclick="{! c.cerrar }" />
                     <lightning:button variant="neutral" label="Volver" title="Volver"
                         onclick="{! c.volver }" />
-                    <lightning:button variant="brand" label="Enviar" title="OK" onclick="{!c.guardarDatosEmail}" />
                 </footer>
             </div>
         </section>
         <div class="slds-backdrop slds-backdrop_open"></div>
     </aura:if>
--->
 </aura:component>

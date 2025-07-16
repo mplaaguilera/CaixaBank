@@ -14,12 +14,16 @@ import ESTADO_FIELD from "@salesforce/schema/SAC_Interaccion__c.SAC_Estado__c";
 import CREATEDBYID_FIELD from "@salesforce/schema/SAC_Interaccion__c.CreatedById";
 import CASOESCALADO_FIELD from "@salesforce/schema/SAC_Interaccion__c.SAC_CasoEscalado__c";
 import MOTIVOESCALADO_FIELD from "@salesforce/schema/SAC_Interaccion__c.SAC_MotivoEscalado__c";
+import CONCLUSIONESCALADO_FIELD from "@salesforce/schema/SAC_Interaccion__c.SAC_Conclusion__c";
 
 //Métodos apex
 import tomarPropiedadEscaladoApex from '@salesforce/apex/SPV_LCMP_EscaladoOperativas.tomarPropiedadEscalado';
 import devolverEscaladoAlGrupoApex from '@salesforce/apex/SPV_LCMP_EscaladoOperativas.devolverEscaladoAlGrupo';
 import responderEscaladoApex from '@salesforce/apex/SPV_LCMP_EscaladoOperativas.responderEscalado';
 import enviarEscaladoApex from '@salesforce/apex/SPV_LCMP_EscaladoOperativas.enviarEscalado';
+import cancelarEscalado from '@salesforce/apex/SPV_LCMP_EscaladoOperativas.cancelarEscalado';
+import volverAEscalar from '@salesforce/apex/SPV_LCMP_EscaladoOperativas.volverAEscalar';
+import obtenerEscalado from '@salesforce/apex/SPV_LCMP_EscaladoOperativas.obtenerEscalado';
 
 const escaladoFields = [RECORDTYPEID_FIELD, OWNERID_FIELD, TIPODERESPUESTA_FIELD, MOTIVORECHAZO_FIELD, GRUPOESCALADO_FIELD, ESTADO_FIELD, CREATEDBYID_FIELD, CASOESCALADO_FIELD, MOTIVOESCALADO_FIELD];
 
@@ -27,14 +31,19 @@ export default class Spv_EscaladoOperativas extends LightningElement {
     @api recordId; //Id del registro en el que se encuentra el componente
     @track userId = idUsuario; //Id del usuario actual
     @track mostrarModalResponder = false; //Mostrar el modal de responder escalado
-    @track picklistTipoRespuestaValues; //Valores de la picklist tipo de respuesta
-    @track selectedValueTipoRespuesta; //Valor seleccionado en el tipo de respuesta
+    @track picklistConclusionValues; //Valores de la picklist tipo de respuesta
+    @track selectedValueConclusion; //Valor seleccionado en el tipo de respuesta
     @track picklistMotivoRechazoValues; //Valores de la picklist motivo de rechazo
     @track selectedValueMotivoRechazo; //Valor seleccionado en el motivo de rechazo
     @track mostrarComentarios = false; //Mostrar el campo comentarios al responder el escalado
     @track mostrarMotivoRechazo = false; //Mostrar el campo motivo de rechazo al responder el escalado
     @track mostrarSpinner = false; //Mostrar el spinner
     @track comentarios; //Valor de los comentarios introducidos al responder escalado
+
+    @track mostrarModalVolverEscalar = false;
+    @track inputPropuestaLetrado = '';
+    @track grupoDelEscaladoRT = '';
+    @track recordTypeEscalado = '';
 
     //Recuperar registro con los campos definidos en la constante escaladoFields
     @wire(getRecord, {
@@ -44,11 +53,11 @@ export default class Spv_EscaladoOperativas extends LightningElement {
     record;
 
     //Recuperar los valores de la picklist SPV_TipoRespuesta a través del recordtypeid del registro (recuperado con getrecord)
-    @wire(getPicklistValues, { recordTypeId: '$record.data.recordTypeId', fieldApiName: TIPODERESPUESTA_FIELD })
+    @wire(getPicklistValues, { recordTypeId: '$record.data.recordTypeId', fieldApiName: CONCLUSIONESCALADO_FIELD })
     valoresPicklistTipoRespuesta({data}) {
         if (data) {
             //Recuperar valores ordenandolos
-            this.picklistTipoRespuestaValues = data.values;
+            this.picklistConclusionValues = data.values;
         }
     }
 
@@ -58,6 +67,14 @@ export default class Spv_EscaladoOperativas extends LightningElement {
         if (data) {
             //Recuperar valores ordenandolos
             this.picklistMotivoRechazoValues = data.values;
+        }
+    }
+
+    @wire(obtenerEscalado, {escaladoId: '$recordId'})
+    getEscalado(result){
+        if(result.data){
+            this.grupoDelEscaladoRT = result.data.SAC_GrupoColaborador__r.RecordType.DeveloperName;
+            this.recordTypeEscalado = result.data.RecordType.DeveloperName;
         }
     }
 
@@ -81,6 +98,8 @@ export default class Spv_EscaladoOperativas extends LightningElement {
         return getFieldValue(this.record.data, MOTIVOESCALADO_FIELD);
     }
 
+
+    
     //Getters visibilidad botones
     get disableBotonTomarPropiedad() {
         //Si el usuario es el mismo que ya tiene el escalado o el estado está en pendiente de enviar, se debe deshabilitar
@@ -88,6 +107,13 @@ export default class Spv_EscaladoOperativas extends LightningElement {
             return true;
         } else {
             return false;
+        }
+    }
+    get disableBotonResponderEscalado() {
+        if (this.escaladoOwnerId == this.userId && this.estadoEscalado == 'SAC_PendienteRespuesta') {
+            return false;
+        } else {
+            return true;
         }
     }
     get disableBotonDevolverEscalado() {
@@ -106,6 +132,22 @@ export default class Spv_EscaladoOperativas extends LightningElement {
             return false;
         }
     }
+    get disableBotonCancelarEscalado() {
+        //Si es el propietario del escalado, este botón está activo
+        if (this.escaladoOwnerId == this.userId && ((this.estadoEscalado == 'SAC_Devuelto' && this.recordTypeEscalado == 'SPV_Escalado') || (this.escaladoOwnerId == this.userId && this.estadoEscalado == 'SAC_Devuelto' && this.grupoDelEscaladoRT == 'SPV_GrupoLetrado' && this.recordTypeEscalado == 'SPV_Reescalado') || (this.estadoEscalado == 'SAC_PendienteRespuesta') || (this.estadoEscalado == 'SPV_PendienteEnviar'))) {
+            return false;   //Se activa si cumple estos criterios
+        } else {
+            return true;
+        }
+    }
+    get disableBotonVolverAEscalar() {
+        if((this.escaladoOwnerId == this.userId && this.recordTypeEscalado == 'SPV_Escalado' && this.estadoEscalado == 'SAC_Devuelto') || (this.escaladoOwnerId == this.userId && this.estadoEscalado == 'SAC_Devuelto' && this.grupoDelEscaladoRT == 'SPV_GrupoLetrado' && this.recordTypeEscalado == 'SPV_Reescalado')){
+            return false;   //Estará activo
+        }else{
+            return true;
+        }
+    }
+
 
     //Botón tomar en propiedad (llamada a apex)
     handleTomarPropiedad() {
@@ -128,6 +170,24 @@ export default class Spv_EscaladoOperativas extends LightningElement {
                 this.handleDesactivarSpinner();
             });
     }
+
+    //Botón Cancelar escalado (llamada a apex)
+    handleCancelarEscalado() {
+        //Activar el spinner
+        this.handleActivarSpinner();
+        //LLamada a apex
+        cancelarEscalado({escaladoId: this.recordId })
+            .then(result => {
+                this.lanzarToast('Éxito', 'Se ha cancelado el escalado', 'success');
+                this.refrescarComponente();
+                this.handleDesactivarSpinner();
+            })
+            .catch(error => {
+                this.lanzarToast('Error', 'Error al cancelar el escalado: ' + error.body.message, 'error');
+                this.handleDesactivarSpinner();
+            });
+    }
+    
 
     //Botón devolver escalado (llamada a apex)
     handleDevolverEscalado() {
@@ -180,7 +240,7 @@ export default class Spv_EscaladoOperativas extends LightningElement {
             //Activar el spinner
             this.handleActivarSpinner();
             //LLamada a apex
-            responderEscaladoApex({ escaladoId: this.recordId, tipoRespuesta: this.selectedValueTipoRespuesta, comentarios: this.comentarios, motivoRechazo: this.selectedValueMotivoRechazo, creadorEscaladoId: this.createdById, casoId: this.reclamacionId })
+            responderEscaladoApex({ 'escaladoId': this.recordId, 'conclusionEscalado': this.selectedValueConclusion, 'comentarios': this.comentarios, 'motivoRechazo': this.selectedValueMotivoRechazo, 'creadorEscaladoId': this.createdById, 'casoId': this.reclamacionId })
             .then(result => {
                 //Mensaje de éxito
                 this.lanzarToast('Éxito', 'Se ha respondido el escalado', 'success');
@@ -191,7 +251,7 @@ export default class Spv_EscaladoOperativas extends LightningElement {
             })
             .catch(error => {
                 //Mensaje de error
-                this.lanzarToast('Error', 'Error al responder: ' + error.body.message, 'error');
+                this.lanzarToast('Error', 'Error al responder: ' + this.extractErrorMessage(error), 'error');
                 //Desactivar el spinner
                 this.handleDesactivarSpinner();
             });
@@ -200,18 +260,55 @@ export default class Spv_EscaladoOperativas extends LightningElement {
         }
     }
 
+    //Botón volver a escalar (llamada a apex)
+    handleVolverEscalar(){
+        this.handleActivarSpinner();
+        volverAEscalar({ 'interaccionId': this.recordId, 'propuestaLet': this.inputPropuestaLetrado})
+        .then(result => {
+                //Mensaje de éxito
+                this.lanzarToast('Éxito', 'Se ha vuelto a escalar correctamente', 'success');
+                //Refrescar el componente
+                this.refrescarComponente();
+                //Desactivar el spinner
+                this.handleDesactivarSpinner();
+        })
+        .catch(error => {
+                //Mensaje de error
+                this.lanzarToast('Error', 'Error al responder: ' + this.extractErrorMessage(error), 'error');
+                //Desactivar el spinner
+                this.handleDesactivarSpinner();
+        });
+        //Cerrar modal de vovler a escalar
+        this.cerrarModalVolverEscalar();
+    }
+
+
+    // Método para extraer el mensaje de error de la regla de validación
+    extractErrorMessage(error) {
+        if(error.body.message.includes('first error: FIELD_CUSTOM_VALIDATION_EXCEPTION')){
+            let partes = error.body.message.split('first error: FIELD_CUSTOM_VALIDATION_EXCEPTION')[1].trim();
+            if(partes.includes(',')){
+                return partes.split(',')[1].trim().split(':')[0];
+            }else{
+                return partes;
+            }
+        }else{
+            return error.body.message;
+        }
+    }
+
     //Comprobar que todos los campos se han rellenado al responder el escalado
     comprobarCamposRellenos() {
         let camposCompletos = true;
         let mensaje = '';
     
-        if (!this.selectedValueTipoRespuesta) {
+        if (!this.selectedValueConclusion) {
             camposCompletos = false;
             mensaje = 'Debes seleccionar un tipo de respuesta';
-        } else if (this.selectedValueTipoRespuesta === 'SPV_AceptadoConModificaciones' && !this.comentarios) {
+        } else if (this.selectedValueConclusion === 'SPV_AceptadoConModificaciones' && !this.comentarios) {
             camposCompletos = false;
             mensaje = 'Debes completar el campo respuesta';
-        } else if (this.selectedValueTipoRespuesta === 'SPV_Rechazado') {
+        } else if (this.selectedValueConclusion === 'SPV_Rechazado') {
             if (!this.selectedValueMotivoRechazo) {
                 camposCompletos = false;
                 mensaje = 'Debes seleccionar un motivo de rechazo';
@@ -234,21 +331,21 @@ export default class Spv_EscaladoOperativas extends LightningElement {
     }
 
     //Manejar el tipo de respuesta seleccionado por el usuario
-    handleTipoRespuestaChange(event) {
-        this.selectedValueTipoRespuesta = event.detail.value;
+    handleConclusionChange(event) {
+        this.selectedValueConclusion = event.detail.value;
 
         //Si el motivo es aceptado, se cierran los comentarios y el motivo rechazo
-        if (this.selectedValueTipoRespuesta == 'SPV_Aceptado') {
+        if (this.selectedValueConclusion == 'SPV_Aceptado') {
             this.mostrarComentarios = false;
             this.mostrarMotivoRechazo = false;
         }
         //Si el motivo es aceptado con modificaciones, se muestra el campo comentarios y se cierra el motivo rechazo
-        else if (this.selectedValueTipoRespuesta == 'SPV_AceptadoConModificaciones') {
+        else if (this.selectedValueConclusion == 'SPV_AceptadoConModificaciones') {
             this.mostrarComentarios = true;
             this.mostrarMotivoRechazo = false;
         }
         //Si el motivo es rechazado, se cierran los comentarios y se muestra el motivo rechazo (con la variable mostrar motivo rezhazo ya se añade un campo comentarios)
-        else if (this.selectedValueTipoRespuesta == 'SPV_Rechazado') {
+        else if (this.selectedValueConclusion == 'SPV_Rechazado') {
             this.mostrarComentarios = false;
             this.mostrarMotivoRechazo = true;
         }
@@ -257,6 +354,10 @@ export default class Spv_EscaladoOperativas extends LightningElement {
     //Manejar el motivo de rechazo seleccionado por el usuario
     handleMotivoRechazoChange(event) {
         this.selectedValueMotivoRechazo = event.detail.value;
+    }
+
+    handleChangePropuestaLetrado(event){
+        this.inputPropuestaLetrado = event.target.value;
     }
 
     //Manejar los comentarios introducidos por el usuario
@@ -277,10 +378,20 @@ export default class Spv_EscaladoOperativas extends LightningElement {
     abrirModalResponder() {
         this.mostrarModalResponder = true;
     }
+    
 
     //Cierra el modal de responder
     cerrarModalResponder() {
         this.mostrarModalResponder = false;
+    }
+
+    abrirModalVolverEscalar(){
+        this.mostrarModalVolverEscalar = true;
+    }
+
+    cerrarModalVolverEscalar(){
+        this.mostrarModalVolverEscalar = false;
+        this.inputPropuestaLetrado = '';
     }
 
     //Activar el spinner

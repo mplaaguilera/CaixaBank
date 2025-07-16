@@ -199,6 +199,7 @@ export default class Sac_InformacionReclamacion extends NavigationMixin(Lightnin
                         Prioridad: caso.reclamacion.Priority || '',
                         CanalEntrada: caso.reclamacion.Origin || '',
                         TipoContacto: caso.reclamacion.CC_Tipo_Contacto__c || '',
+                        NaturalezaReclamacion: caso.reclamacion.SAC_Naturaleza__c || '',
                         showDetails: false
                     };
                 });

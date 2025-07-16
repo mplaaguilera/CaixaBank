@@ -3,7 +3,7 @@
     comprobarSLA: function (component, event, helper) {
         var idCase = component.get("v.recordId");
         let comprobarSLA = component.get("c.comprobarSLARegulatorio");
-        comprobarSLA.setParams({ 'idCaso': idCase });
+        comprobarSLA.setParams({ 'idCaso': idCase});
         comprobarSLA.setCallback(this, function(response){
             let state = response.getState();
                 if (state === "SUCCESS") {

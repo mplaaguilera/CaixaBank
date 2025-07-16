@@ -3,7 +3,9 @@
     <aura:attribute name="spinner" type="Boolean" default="false"/>
     <aura:attribute name="llamada" type="CC_Llamada__c"/>
     <aura:attribute name="errorLds" type="String"/>
-
+    <aura:attribute name="esHDTEmpleado" type="Boolean" default="false"/>
+    <aura:attribute name="isModalOpen" type="Boolean" default="false" />
+    
     <aura:registerEvent name="casoCreado" type="c:CC_Llamada_Caso_Creado_Event"/>
 
     <lightning:workspaceAPI aura:id="workspace" />
@@ -47,6 +49,47 @@
                 <div class="slds-col slds-grow-none">
                     <lightning:button aura:id="botonCrearCaso" variant="brand" label="Crear caso" onclick="{!c.handleClickAceptar}" iconName="utility:case"/>
                 </div>
+
+               <!-- Botón para abrir LWC (solo si es HDT_Empleado) -->
+                <aura:if isTrue="{!v.esHDTEmpleado}">
+                    <div class="slds-col slds-grow-none">
+                        <lightning:button aura:id="botonAsociarMasiva" 
+                            variant="neutral" 
+                            label="Asociar caso a masiva"
+                            onclick="{!c.handleAsociarMasiva}" 
+                            iconName="utility:add"/>
+                    </div>
+                </aura:if>
+
+                <!-- Modal para el LWC -->
+                <aura:if isTrue="{!v.isModalOpen}">
+                    <section role="dialog" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Encabezado -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                    onclick="{!c.closeModal}">
+                                    <lightning:icon iconName="utility:close" size="small"/>
+                                </button>
+                                <h2 class="slds-text-heading_medium">Seleccionar Agrupador</h2>
+                            </header>
+
+                            <!-- Contenido del modal con el LWC -->
+                            <div class="slds-modal__content slds-p-around_medium">
+                                <c:hdt_llamada_caso_a_masiva llamada="{!v.llamada}" onclosemodal="{!c.closeModal}"/>
+                            </div>
+
+                            <!-- Pie del modal -->
+                            <footer class="slds-modal__footer">
+                                <lightning:button label="Cerrar" onclick="{!c.closeModal}" />
+                            </footer>
+                        </div>
+                    </section>
+
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </aura:if>
+
+    
             </div>
         </div>
     </article>

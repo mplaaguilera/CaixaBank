@@ -143,7 +143,6 @@ export default class SAC_ForzarResolucion extends LightningElement {
             this.modalForzarResolucion = false;
             this.spinnerLoading = true;
             
-            
     
             finalizarProcesoForzado({caseId: this.recordId, listaEscalados: this.escalados, listaConsultas: this.consultas, listaTareas: this.tareas, motivo: this.motivoCierre}).then(result => { 
                 
@@ -163,8 +162,8 @@ export default class SAC_ForzarResolucion extends LightningElement {
             })
             .catch(error => {
                 const evt = new ShowToastEvent({
-                    title: 'Error',
-                    message: 'Error al forzar el cierre',
+                    title: 'Error al forzar el cierre',
+                    message: error.body.pageErrors[0].message,
                     variant: 'error'
                 }); 
                 this.dispatchEvent(evt);

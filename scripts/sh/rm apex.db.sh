@@ -1,6 +1,6 @@
 #!/bin/bash
 
-filePath="/Users/marcpla/Documents/Feina/Projectes/CaixaBank/.sfdx/tools/254/apex.db"
+filePath="/Users/marcpla/Documents/Feina/Projectes/CaixaBank/.sfdx/tools/256/apex.db"
 
 if [ -f "$filePath" ]; then
     sudo rm "$filePath"

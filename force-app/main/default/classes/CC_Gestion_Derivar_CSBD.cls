@@ -1,22 +1,22 @@
 public with sharing class CC_Gestion_Derivar_CSBD {
     public static Map<String, Object> crearOportunidad(String recordId) {
         Map<String, Object> retorno = new Map<String, Object>();
-        Case caso = [SELECT id, OwnerId, ContactId, CC_Oportunidad_creada__c, 
+        Case caso = [SELECT id, OwnerId, ContactId, CC_Oportunidad_creada__c,
         CC_Numero_Documento__c, Account.CC_Numero_Documento__c, CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_Producto_Servicio__c,
         CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c
-        FROM Case 
-        WHERE Id = :recordId 
+        FROM Case
+        WHERE Id = :recordId
         LIMIT 1];
         CC_Lista_Valores__c listaValorOportunidadTarea = [SELECT Id, CC_Activa__c, CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE Name = 'Texto oportunidad tarea existente' LIMIT 1];
-        
+
         if(!String.isEmpty(recordId)) {
-            try {                            
-                Boolean oppExistentes = comprobarOportunidadExistente(recordId);          
+            try {
+                Boolean oppExistentes = comprobarOportunidadExistente(recordId);
                 Boolean oppTareasCitas = CC_Activity.identificarTareasCitasExistentes(caso, listaValorOportunidadTarea);   //US1156943 - Botón "Derivar" - No permitir crear oportunidad con citas y tareas en el caso
                 Map<String, Object> tareasRellamadas = identificarTareasRellamadasExistentes(caso); //US1076730 - Derivación CSBD - Rellamada cliente
                 Map<String, Object> oppSimilares = identificarOportunidadesSimilares(caso); //US1076730 - Derivación CSBD - Rellamada cliente
-                
-                if(!oppExistentes && !(Boolean)oppSimilares.get('oportunidadSiExiste') && !oppTareasCitas && !(Boolean)tareasRellamadas.get('tareasRellamadas')) {                                
+
+                if(!oppExistentes && !(Boolean)oppSimilares.get('oportunidadSiExiste') && !oppTareasCitas && !(Boolean)tareasRellamadas.get('tareasRellamadas')) {
                     retorno.put('validacionCrearOportunidad', true);
                 } else {
                     if (oppExistentes) {
@@ -31,30 +31,30 @@ public with sharing class CC_Gestion_Derivar_CSBD {
                     else if((Boolean)oppSimilares.get('oportunidadSiExiste')){
                         retorno = oppSimilares;
                     }
-                }              
+                }
             } catch (Exception e) {
                 throw new AuraHandledException('Error en el proceso de creacion de oportunidad ' + e.getMessage());
-            }       
+            }
         }
         return retorno;
     }
-    
+
     @AuraEnabled
     public static Map<String, Object> crearOportunidadCSBD(String recordId){
         Case caso = [
             SELECT Id, OwnerId, ContactId, CC_Oportunidad_creada__c
-            FROM Case 
-            WHERE Id = :recordId 
+            FROM Case
+            WHERE Id = :recordId
             LIMIT 1
         ];
         Map<String, Object> retorno = new Map<String, Object>();
-        Map<String, Object> retornoCSBD = CSBD_WS_AltaOportunidad.altaOportunidadMac(recordId);                    
+        Map<String, Object> retornoCSBD = CSBD_WS_AltaOportunidad.altaOportunidadMac(recordId);
         if(retornoCSBD.get('success') == true) {
             retorno.put('oppCreada', retornoCSBD.get('success'));
             Id recordTypeTareaCC = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
             caso.CC_Oportunidad_creada__c = true;
             update caso;
-            CC_Activity.crearActividadOportunidad(recordId, caso.OwnerId, caso.ContactId); 
+            CC_Activity.crearActividadOportunidad(recordId, caso.OwnerId, caso.ContactId);
         }
         return retorno;
     }
@@ -62,7 +62,7 @@ public with sharing class CC_Gestion_Derivar_CSBD {
     public static Boolean comprobarOportunidadExistente(String recordId) {
         try {
             List<Case> opCreada = [SELECT Id, CC_Oportunidad_creada__c, CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c FROM Case WHERE Id = :recordId LIMIT 1];
-            if(!opCreada.isEmpty() && (opCreada[0].CC_Oportunidad_creada__c || opCreada[0].CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c != null)) {            
+            if(!opCreada.isEmpty() && (opCreada[0].CC_Oportunidad_creada__c || opCreada[0].CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c != null)) {
                 return opCreada[0].CC_Oportunidad_creada__c;
             }
         } catch (Exception e) {
@@ -78,47 +78,47 @@ public with sharing class CC_Gestion_Derivar_CSBD {
         if(!String.isEmpty(casoIdString) && !String.isEmpty(casoOportunidadString)) {
             //Publicar el platform event para que la transacción salga por el usuario integración
             CC_DevolverCaso__e devolverCasoEvent = new CC_DevolverCaso__e();
-            devolverCasoEvent.CC_CasoId__c = casoIdString; 
+            devolverCasoEvent.CC_CasoId__c = casoIdString;
             devolverCasoEvent.CC_resolucion3N__c = casoOportunidadString;
-            Database.SaveResult sr = EventBus.publish(devolverCasoEvent);  
+            Database.SaveResult sr = EventBus.publish(devolverCasoEvent);
         } else {
             CC_CustomException.throwAuraException('Error en el proceso de devolución, no se recibió ningún id de caso');
         }
     }
-    
+
     public static void reabrirCasoCSBD(Map<String, String> respuesta) {
         List<Case> casosAbrir =  new List<Case>();
         String casoIdString = (String)respuesta.get('casoId');
         String casoOportunidadString = (String)respuesta.get('oportunidadId');
         List <Opportunity> oportunityList = [SELECT Id, CSBD_Motivo_Devolucion__c FROM Opportunity WHERE Id = :casoOportunidadString];
         for(Case casoTarea : [
-            SELECT Id, 
+            SELECT Id,
                 CC_Resolucion__c,
                 (
                     SELECT OwnerId
                     FROM Tasks
-                    WHERE Type = 'Oportunidad CSBD' 
+                    WHERE Type = 'Oportunidad CSBD'
                     ORDER BY CreatedDate DESC
                     LIMIT 1
                 )
-            FROM Case 
+            FROM Case
             WHERE Id = :casoIdString
         ]){
-            if(casoTarea.Tasks.size()> 0){      
+            if(casoTarea.Tasks.size()> 0){
                 casoTarea.CC_Resolucion__c = oportunityList[0].CSBD_Motivo_Devolucion__c;
                 casoTarea.OwnerId = casoTarea.Tasks[0].OwnerId;
                 casoTarea.Status = 'Activo';
                 casosAbrir.add(casoTarea);
-            }     
-        }     
-      
+            }
+        }
+
         if(casosAbrir.size() > 0 ) {
             update casosAbrir;
             Task tarea = [SELECT Id, Description, Status, OwnerId FROM TASK WHERE Id = :casosAbrir[0].Tasks[0].Id];
             tarea.Description = oportunityList[0].CSBD_Motivo_Devolucion__c;
             tarea.Status = 'Rechazada';
             update tarea;
-        }   
+        }
     }
 
     //llamado desde el trigger de Platform Event
@@ -137,7 +137,7 @@ public with sharing class CC_Gestion_Derivar_CSBD {
 
     public static Boolean comprobarOportunidadExistente(Case caso){
        return (
-            !caso.CC_Oportunidad_creada__c && 
+            !caso.CC_Oportunidad_creada__c &&
             caso.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c == null
         );
     }
@@ -149,21 +149,21 @@ public with sharing class CC_Gestion_Derivar_CSBD {
         try {
             // Verificar si ya existe una oportunidad creada para el caso actual
             if (caso.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c == null) {
-                List<Opportunity> oportunidadList = buscarOportunidadesExistentes(caso);    
+                List<Opportunity> oportunidadList = buscarOportunidadesExistentes(caso);
                 if (!oportunidadList.isEmpty()) {
                     Opportunity oportunidad = oportunidadList[0];
                     // Acceder a las propiedades de la oportunidad
                     // WHERE Id = :caso.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c LIMIT 1];
                     if (oportunidad.IsClosed == true && oportunidad.StageName == 'Formalizada') {
-                        CC_Lista_Valores__c listaValor = [SELECT Id, CC_Mensajes_Mostrar__c 
-                        FROM CC_Lista_Valores__c 
+                        CC_Lista_Valores__c listaValor = [SELECT Id, CC_Mensajes_Mostrar__c
+                        FROM CC_Lista_Valores__c
                         WHERE Name = 'Oportunidad formalizada'
                         LIMIT 1];
                         String mensajeParametrizable = '';
                         if (listaValor != null) {
                             mensajeParametrizable = listaValor.CC_Mensajes_Mostrar__c;
                         }
-                        String message = mensajeParametrizable + '\n\nOPORTUNIDAD ' + oportunidad.Name + ' FORMALIZADA:'  + '\n\nDESCRIPCIÓN: ' 
+                        String message = mensajeParametrizable + '\n\nOPORTUNIDAD ' + oportunidad.Name + ' FORMALIZADA:'  + '\n\nDESCRIPCIÓN: '
                         + oportunidad.Description + '\n\nFEEDBACK DEL CLIENTE: ' + oportunidad.CSBD_FeedbackCliente__c;
 
                         List<Task> tareasExistentes = [SELECT Id FROM Task WHERE WhatId = :caso.Id AND Type = 'Consulta oportunidad formalizada' LIMIT 1];
@@ -174,8 +174,8 @@ public with sharing class CC_Gestion_Derivar_CSBD {
                         respuesta.put('mensaje', message);
                         respuesta.put('tipo', 'Formalizada');
                     } else if (oportunidad.IsClosed == false) {
-                        CC_Lista_Valores__c listaValor2 = [SELECT Id, CC_Mensajes_Mostrar__c 
-                        FROM CC_Lista_Valores__c 
+                        CC_Lista_Valores__c listaValor2 = [SELECT Id, CC_Mensajes_Mostrar__c
+                        FROM CC_Lista_Valores__c
                         WHERE Name = 'Oportunidad en curso contexto'
                         LIMIT 1];
                         String mensajeParametrizable2 = '';
@@ -189,7 +189,7 @@ public with sharing class CC_Gestion_Derivar_CSBD {
                     }
                 } else {
                     respuesta.put('oportunidadSiExiste', false);
-                } 
+                }
             }
             if (respuesta.isEmpty()) {
                 respuesta.put('oportunidadSiExiste', false);
@@ -206,12 +206,12 @@ public with sharing class CC_Gestion_Derivar_CSBD {
             throw new AuraHandledException('El recordId no puede ser nulo');
         }
         //else
-        Case caso = [SELECT id, OwnerId, ContactId, CC_Oportunidad_creada__c, 
+        Case caso = [SELECT id, OwnerId, ContactId, CC_Oportunidad_creada__c,
             CC_Numero_Documento__c, Account.CC_Numero_Documento__c, CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_Producto_Servicio__c,
             CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c,
             CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__r.OwnerId
-            FROM Case 
-            WHERE Id = :recordId 
+            FROM Case
+            WHERE Id = :recordId
             LIMIT 1];
 
         List<Opportunity> oportunidadList = buscarOportunidadesExistentes(caso);
@@ -225,12 +225,12 @@ public with sharing class CC_Gestion_Derivar_CSBD {
             Id oportunidadId = oportunidadList[0].Id;
             if (oportunidadId != null) {
                 Task tareaOportunidad = CC_Activity.crearTareaRellamadaCSBD(
-                    oportunidad, 
+                    oportunidad,
                     caso,
                     description);
                 Task tareaCC = CC_Activity.crearTareaRellamadaCC(caso, description, 'Consulta oportunidad en curso');
-            } 
-        }    
+            }
+        }
     }
 
     public static Integer getOportunidadCreadaNDays() {
@@ -249,33 +249,33 @@ public with sharing class CC_Gestion_Derivar_CSBD {
         Map<String, Object> respuesta = new Map<String, Object>();
         respuesta.put('tareasRellamadas', false);
         List<Task> tareasRellamadas = [
-            SELECT Id  
-            FROM Task 
-            WHERE 
+            SELECT Id
+            FROM Task
+            WHERE
                 (WhatId = :caso.Id AND Type = 'Consulta oportunidad en curso') OR  //Tareas en Case
                 (AV_Case__c = :caso.Id AND Type = 'Rellamada CC') //Tareas en Opportunity
-        ];     
+        ];
         if (!tareasRellamadas.isEmpty()) {
             respuesta.put('tareasRellamadas', true);
-            CC_Lista_Valores__c listaValor = [SELECT Id, CC_Mensajes_Mostrar__c 
-                FROM CC_Lista_Valores__c 
+            CC_Lista_Valores__c listaValor = [SELECT Id, CC_Mensajes_Mostrar__c
+                FROM CC_Lista_Valores__c
                 WHERE Name = 'Oportunidad en curso'
                 LIMIT 1];
-            String mensajeParametrizable = '';              
+            String mensajeParametrizable = '';
             if (listaValor != null) {
                 mensajeParametrizable = listaValor.CC_Mensajes_Mostrar__c;
             }
             respuesta.put('mensaje', mensajeParametrizable);
-        }  
-        return respuesta; 
+        }
+        return respuesta;
     }
 
-    public static List<Opportunity> buscarOportunidadesExistentes(Case caso){ 
+    public static List<Opportunity> buscarOportunidadesExistentes(Case caso){
         Map<String, Object> bindParams = new Map<String, Object>{
             'dias' => (Integer)getOportunidadCreadaNDays(),
             'numeroDocumento' => caso.Account.CC_Numero_Documento__c,
             'tematica' => caso.CC_MCC_Tematica__c
-        };       
+        };
         String query = 'SELECT Id, OwnerId, CSBD_Contact__c, Name, StageName, IsClosed, Description, CSBD_FeedbackCliente__c ' +
             'FROM Opportunity ' +
             'WHERE CreatedDate = LAST_N_DAYS:' + bindParams.get('dias')  + //queryWithBinds does not support binding for LAST_N_DAYS
@@ -287,7 +287,7 @@ public with sharing class CC_Gestion_Derivar_CSBD {
             query += ' AND CSBD_CasoOrigen__r.CC_Producto_Servicio__c  =:productoServicio ';
             bindParams.put('productoServicio', caso.CC_Producto_Servicio__c);
         }
-        query += ' ORDER BY CreatedDate DESC LIMIT 1';      
+        query += ' ORDER BY CreatedDate DESC LIMIT 1';
         // Ejecutar la consulta utilizando Database.queryWithBinds con accessLevel
         List<Opportunity> results = Database.queryWithBinds(query, bindParams, AccessLevel.USER_MODE);
         return results;

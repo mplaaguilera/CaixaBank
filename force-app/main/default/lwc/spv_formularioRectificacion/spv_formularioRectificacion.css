@@ -1,0 +1,176 @@
+.subseccion {
+    margin-left: 20px;
+}
+
+.seccion {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.flecha {
+    color: rgb(116, 116, 116);
+    margin-left: 1px;
+}
+
+.cuerpo-subseccion {
+    margin-left: 20px;
+}
+
+.elemento-form {
+    padding-right: 25px;
+    position: relative;
+    margin-bottom: 5px;
+}
+
+.botonesEditar {
+    margin-top: 10px;
+}
+
+.contenedor {
+    display: flex;
+}
+
+.mi-boton {
+    margin-bottom: 10px;
+}
+
+/* Estilo para la barra gris debajo de cada campo */
+.campo-separador {
+    height: 1px;
+    background-color: #d8dde6;
+    margin-top: 2px;
+    width: 100%;
+}
+
+/* Contenedor para campo y su separador */
+.campo-container {
+    position: relative;
+    padding-bottom: 8px;
+}
+
+/* Posicionamiento del botón de editar */
+.boton-editar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+}
+
+/* Contenedor para campo con botón */
+.campo-con-boton {
+    position: relative;
+    padding-right: 30px; /* Espacio para el botón */
+}
+
+/* Estilo para los campos de información */
+.campo-info {
+    padding: 5px 0;
+    position: relative;
+}
+
+/* Botonera inferior fija */
+.footer-fixed {
+    position: fixed; /* Hace que el contenedor permanezca fijo en la ventana */
+    bottom: 0; /* Posiciona el contenedor en la parte inferior */
+    left: 0; /* Asegura que el contenedor esté alineado al inicio */
+    right: 0; /* Asegura que el contenedor ocupe todo el ancho */
+    background-color: #f3f2f2; /* Color de fondo similar al estándar de Salesforce */
+    border-top: 1px solid #d8dde6; /* Línea superior para separar visualmente los botones */
+    padding: 10px; /* Espaciado interno */
+    display: flex; /* Para alinear los botones */
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 5px; /* Espaciado entre los botones */
+    z-index: 100; /* Asegura que el contenedor esté por encima de otros elementos */
+}
+
+/* Espaciado para que el contenido no quede oculto por la botonera fija */
+.contenido-principal {
+    margin-bottom: 60px;
+}
+
+/* Estilos para elementos de formulario en modo edición */
+lightning-input-field {
+    margin-bottom: 8px;
+}
+
+/* Ocultar la línea gris en campos de edición */
+lightning-input-field + .campo-separador {
+    display: none;
+}
+
+.footer-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+/* REEMPLAZAR estas reglas de CSS */
+.boton-editar {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.campo-con-boton:hover .boton-editar {
+    opacity: 1;
+}
+
+/* POR ESTAS */
+.boton-editar {
+    opacity: 1; /* Siempre visible */
+    margin-left: 5px; /* Espaciado para separarlo del campo */
+}
+
+.campo-con-boton {
+    display: flex;
+    align-items: center;
+}
+.mensaje-error {
+    color: rgb(194, 57, 52);
+    font-size: 0.75rem;
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Corregir tamaño del input */
+.slds-input {
+    height: 32px;
+    max-height: 32px;
+}/* Estilos para campos obligatorios */
+.campo-requerido .slds-form-element__label:before {
+    content: "*";
+    color: rgb(194, 57, 52);
+    margin-right: 0.25rem;
+}
+
+.campo-requerido-vacio {
+    background-color: rgb(255, 245, 245);
+    border-left: 4px solid rgb(194, 57, 52);
+    padding-left: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.mensaje-obligatorio {
+    display: flex;
+    align-items: center;
+    margin-top: 0.25rem;
+    color: rgb(194, 57, 52);
+    font-size: 0.75rem;
+}
+
+.mensaje-obligatorio lightning-icon {
+    margin-right: 0.25rem;
+}
+
+/* Add or modify this CSS rule to provide space at the bottom of the form */
+lightning-record-edit-form {
+    padding-bottom: 80px; /* Add enough space to account for the footer height plus some extra */
+}
+
+/* This is an alternative approach - you can apply this class to the outermost div in your template */
+.form-container {
+    padding-bottom: 80px;
+}

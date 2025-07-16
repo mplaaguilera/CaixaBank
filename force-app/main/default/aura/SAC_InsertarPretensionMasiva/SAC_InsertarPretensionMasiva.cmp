@@ -2,6 +2,7 @@
 
     <aura:attribute name="caso" type="Case" />
     <aura:attribute name="tienePermisosEditar" type="Boolean" default="false" />
+    <aura:attribute name="tienePermisosEditarReclamacionCerrada" type="Boolean" default="false" />
     <aura:attribute name="isLoading" type="Boolean" default="false" />
     <aura:attribute name="modalPretensiones" type="Boolean" default="false" />
     <aura:attribute name="modalReemplazarPrincipal" type="Boolean" default="false" />
@@ -15,7 +16,7 @@
 
     <div class="slds-clearfix">
         <div class="slds-float_right">
-            <aura:if isTrue= "{!and(or(v.caso.Status=='SAC_001',v.caso.Status=='SAC_002'), v.tienePermisosEditar)}">
+            <aura:if isTrue= "{!or(and(or(v.caso.Status=='SAC_001',v.caso.Status=='SAC_002'), v.tienePermisosEditar),and(v.caso.Status=='Cerrado',v.tienePermisosEditarReclamacionCerrada))}">
                 <lightning:button variant="brand" label="Nueva pretensión" onclick="{!c.abrirModalPretensiones}"></lightning:button>
             <aura:set attribute="else">
                 <lightning:button variant="brand" label="Nueva pretensión" disabled="true" ></lightning:button>

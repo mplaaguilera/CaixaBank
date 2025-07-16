@@ -14,7 +14,7 @@
     <aura:attribute name="cuerpoCliente"  type="String"/>
     <aura:attribute name="casoRelacionado"  type="Case"/>
     <aura:attribute name="procedencia"  type="String" default="ConsultaDeReclamacion"/>
-    <aura:attribute name="usarComponente"  type="Boolean" default="true"/>
+    <aura:attribute name="usarComponente"  type="Boolean" default="false"/>
     <aura:attribute name="idsFicherosAdjuntosCliente" type="String[]" />
     <aura:attribute name="idsFicherosAdjuntosGrupo" type="String[]" />
     <aura:attribute name="ficherosAdjuntosGrupo" type="ContentVersion[]" />
@@ -33,12 +33,13 @@
     <aura:handler name="init" value="{!this}" action="{!c.inicio}" />
     <aura:handler event="force:refreshView" action="{! c.inicio}" />
 
-    <c:spv_GestionEmailsCmp usarComponente="{!v.usarComponente}"
-        procedencia="{!v.procedencia}" para="{!v.paraGrupo}" copia="{!v.copia}"
-        cuerpo="{!v.cuerpoGrupo}" asunto="{!v.asuntoGrupo}" caso="{!v.casoRelacionado}" consulta="{!v.consulta}"
-        ficherosAdjuntos="{!v.ficherosAdjuntos}"
-        ficherosBorrados="{!v.ficherosBorrados}"
-        idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" 
-        recordId="{!v.recordId}"/>
-
+    <aura:if isTrue="{!v.usarComponente}">
+        <c:spv_GestionEmailsCmp usarComponente="{!v.usarComponente}"
+            procedencia="{!v.procedencia}" para="{!v.paraGrupo}" copia="{!v.copia}"
+            cuerpo="{!v.cuerpoGrupo}" asunto="{!v.asuntoGrupo}" caso="{!v.casoRelacionado}" consulta="{!v.consulta}"
+            ficherosAdjuntos="{!v.ficherosAdjuntos}"
+            ficherosBorrados="{!v.ficherosBorrados}"
+            idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" 
+            recordId="{!v.recordId}"/>
+    </aura:if>
 </aura:component>

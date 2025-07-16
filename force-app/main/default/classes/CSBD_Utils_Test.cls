@@ -97,4 +97,21 @@ public class CSBD_Utils_Test {
             System.assertEquals('26', dec, 'El valor devuelto no es el esperado');
         }
     }
+
+    @isTest
+    private static void decToHex() {
+        System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+            Test.startTest();
+            String hex1 = CSBD_Utils.decToHex(26);
+            String hex2 = CSBD_Utils.decToHex(255);
+            String hex3 = CSBD_Utils.decToHex(0);
+            String hexNull = CSBD_Utils.decToHex(null);
+            Test.stopTest();
+
+            System.assertEquals('1A', hex1, 'El valor hexadecimal de 26 debe ser 1A');
+            System.assertEquals('FF', hex2, 'El valor hexadecimal de 255 debe ser FF');
+            System.assertEquals('0', hex3, 'El valor hexadecimal de 0 debe ser 0');
+            System.assertEquals(null, hexNull, 'El valor para null debe ser null');
+        }
+    }
 }

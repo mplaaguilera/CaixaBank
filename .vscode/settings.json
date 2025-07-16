@@ -10,7 +10,7 @@
 		"tab.activeForeground": "#ffffff",
 		"tab.activeBorder": "#006bc9",
 		"tab.activeModifiedBorder": "#f4a238",
-		"statusBar.background": "#158F8B",
+		"statusBar.background": null,
 		"activityBar.background": null
 	},
 	"eslint.useFlatConfig": false,
@@ -25,7 +25,37 @@
 	"chat.mcp.enabled": true,
 	"mcp": {
 		"inputs": [],
-		"servers": {}
+		"servers": {
+			"ibm-salesforce-mcp": {
+				"command": "node",
+				"args": [
+					"/Users/marcpla/Documents/Feina/Projectes/mcp/mcp_salesforce/index.js"
+				],
+				"env": {
+					"SF_MCP_AGENTFORCE_AGENT_ID": "0XxKN0000008OKp",
+					"WORKSPACE_FOLDER_PATHS": "/Users/marcpla/Documents/Feina/Projectes/mcp/mcp_salesforce"
+				},
+				"dev": {
+					"watch": "src/**/*.ts",
+					"debug": {
+						"type": "node"
+					}
+				}
+			},
+			"everything": {
+				"command": "npx",
+				"args": [
+					"-y",
+					"@modelcontextprotocol/server-everything"
+				],
+				"dev": {
+					"debug": {
+						"type": "node"
+					},
+					"watch": "src/**/*.ts"
+				}
+			}
+		}
 	},
 	"squarl.groups": [
 		{
@@ -82,17 +112,38 @@
 	"explorer.decorations.colors": false,
 	"explorer.fileNesting.enabled": true,
 	"actionButtons": {
+
 		"commands": [
 			{
-				"name": "$(diff) Diff",
-				"color": "currentColor",
+				"name": "$(compare-changes)",
 				"useVsCodeApi": true,
-				"command": "sf.diff"
+				"command": "sf.diff",
+				"color": "#d3d2c8"
 			},
 			{
-				"name": "$(symbol-method) Object Manager",
+				"name": "$(cloud-download)",
+				"useVsCodeApi": true,
+				"command": "sf.retrieve.current.source.file",
+				"color": "#e2e1d8"
+			},
+			{
+				"name": "$(symbol-method)",
 				"useVsCodeApi": false,
-				"command": "open https://caixabankcc--devservice.sandbox.my.salesforce-setup.com/lightning/setup/ObjectManager/home"
+				"command": "open https://caixabankcc--devservice.sandbox.my.salesforce-setup.com/lightning/setup/ObjectManager/home",
+				"color": "#94adc3"
+			},
+			{
+				"name": "$(console)",
+				"useVsCodeApi": false,
+				"command": "open https://caixabankcc--devservice.sandbox.my.salesforce.com/_ui/common/apex/debug/ApexCSIPage",
+				"color": "#94adc3"
+			},
+			{
+				"name": "$(test-view-icon)",
+                "useVsCodeApi": true,
+                "command": "workbench.action.tasks.runTask",
+                "args": ["npm: tail"],
+                "color": "#a0a0d0"
 			}
 		],
 		"defaultColor": "currentColor",
@@ -101,5 +152,13 @@
 	},
 	"conventionalCommits.scopes": [
 		"default"
-	]
+	],
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"chat.mcp.serverSampling": {
+		"CaixaBank/.vscode/mcp.json: ibm-salesforce-mcp": {
+			"allowedModels": [
+				"github.copilot-chat/claude-sonnet-4"
+			]
+		}
+	}
 }

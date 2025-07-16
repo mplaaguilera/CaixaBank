@@ -7,7 +7,7 @@
         var envioMail = component.get('v.checkMail');
         var idCase = component.get("v.recordId");
         var action = component.get("c.finalizarRedaccion");
-        action.setParams({ 'id': idCase, 'envioMail': envioMail });
+        action.setParams({ 'id': idCase, 'envioMail': envioMail, 'sinEnvio': envioMail});
         action.setCallback(this, function(response) {
             var state = response.getState();
             if (state === "SUCCESS") {

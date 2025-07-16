@@ -21,7 +21,8 @@
 
     <aura:if isTrue="{!and(v.hayContacto, v.hayDireccion)}">
 
-        <c:SAC_GeneracionCartas caseId="{!v.recordId}" nombreTitular="{!v.nombreTitular}" direccion="{!v.direccionEnvio}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoCliente}" procedencia="{!v.procedencia}"/>
+        <c:sac_GeneracionCartaPostal recordId="{!v.recordId}" nombreTitular="{!v.nombreTitular}" direccion="{!v.direccionEnvio}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoCliente}" procedencia="{!v.procedencia}"/>
+        <!-- <c:SAC_GeneracionCartas caseId="{!v.recordId}" nombreTitular="{!v.nombreTitular}" direccion="{!v.direccionEnvio}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoCliente}" procedencia="{!v.procedencia}"/> -->
         <aura:set attribute="else">
             <aura:if isTrue="{!!v.hayContacto}">
                 <strong>No hay ninguna persona de contacto asociada.</strong>

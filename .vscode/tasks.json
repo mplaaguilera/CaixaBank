@@ -1,0 +1,24 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "test",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"label": "npm: test",
+			"detail": "sf apex run -f scripts/apex/CSBD_RunTestSuite.apex"
+		},
+		{
+			"type": "npm",
+			"script": "tail",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			}
+		}
+	]
+}

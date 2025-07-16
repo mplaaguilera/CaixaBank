@@ -144,7 +144,7 @@
                     <span onkeypress="{!c.valorBusquedaTeclaPulsada}">
                         <lightning:input aura:id="valorBusqueda" type="search" name="valorBusqueda" label="Valor"
                             value="{!v.sBusqueda}" onchange="{!c.handleChange}" spellcheck="false"
-                            placeholder="Valor a buscar" />
+                            placeholder="Valor a buscar" autocomplete="off"/>
                     </span>
                 </div>
                 <!--Botón para iniciar búsqueda-->

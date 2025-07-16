@@ -26,6 +26,35 @@
         });
          $A.enqueueAction(action4);
          helper.fetchCVRespuesta(component);
+
+        var action2 = component.get("c.devolverCaso");
+         
+        action2.setParams({'id': idCase});
+        action2.setCallback(this, function(response) {
+        var state = response.getState();
+        if (state === "SUCCESS") {
+
+            component.set('v.caso', response.getReturnValue());
+            if(response.getReturnValue().RecordType.DeveloperName == 'SPV_Reclamacion') {
+                component.set('v.usarComponente', true);
+                component.set('v.carpetaRaiz', 'SPV_PlantillasRedaccion');
+                var action3 = component.get("c.getDocument");
+                action3.setParams({'idCaso': idCase});
+                action3.setCallback(this, function(response){
+                    var state = response.getState();
+                    if (state === "SUCCESS") {
+                        component.set('v.documentoResolucion', response.getReturnValue());
+                    }
+                });
+                $A.enqueueAction(action3);
+            } else {
+                component.set('v.carpetaRaiz', 'SAC_PlantillasRedaccion');
+
+            }
+        }
+        });
+
+        $A.enqueueAction(action2);
     }
     ,
 
@@ -81,7 +110,7 @@
                 action2.setParams({'idCaso' : idCase, 'idDoc': ids});
                 action2.setCallback(this, function(response) {
                     var state = response.getState();
-                    if (state === "SUCCESS") {                        
+                    if (state === "SUCCESS") {   
                         component.set('v.documentoResolucion', response.getReturnValue());
                     }
                     else{

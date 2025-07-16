@@ -1,37 +1,73 @@
-import { LightningElement, api, track } from 'lwc';
+import { LightningElement, api, track, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { getPicklistValues  } from 'lightning/uiObjectInfoApi';
 
+import getRecordTypes from '@salesforce/apex/SPV_Utils.obtenerRecordTypes';
 import comprobarExpDuplicado from '@salesforce/apex/SPV_LCMP_CrearCaso.comprobarExpDuplicado';
+
+import ENTIDADAFECTADA_FIELD from '@salesforce/schema/Case.SAC_Entidad_Afectada__c';
+
 
 export default class Spv_CrearCaso extends LightningElement {
 
     @api idRecordType;
+    @track rtReclamacion;
     @track spinnerLoading = false;
     @track expDuplicado = false;
     @track numExpediente = '';
     @track entAfectada = '';
+    @track valoresPicklistEntidad = [];
 
-    handleOnSubmit(event) {
-        this.spinnerLoading = true;
 
-        comprobarExpDuplicado({numeroExpediente: this.numExpediente, entidadAfectada: this.entAfectada}).then(result => {  
-            this.spinnerLoading = false;
+    @wire(getRecordTypes)
+    getRecordTypesResult(result){
+        if(result.data){
+            result.data.forEach(element => {
+                if(element.DeveloperName == 'SPV_Reclamacion'){
+                    this.rtReclamacion = element.Id;
+                }
+            });
+        }
+    }
 
-            if(result != null){
-                //Coincide con reclamaciones con el mismo expediente y entidad afectada, notificamos al usuario que ya existe una reclamación con estas características
-                this.expDuplicado = true;
-                this.lanzarToast("Advertencia!", 'Ya existe una reclamación dada de alta con el expediente y entidad afectada informados. Por favor revisela ' + result + '.', "warning");
-            }else{
-                //No coincide con ningun expediente/entidad afectada existente, luego crearemos la nueva reclamación
-                this.expDuplicado = false;
-                event.preventDefault();
-                this.spinnerLoading = true;
-            }
-        })
-        .catch(error => {
-            this.spinnerLoading = false;
-            this.lanzarToast("Error", 'Error al crear la reclamación', "error");
-        })
+    @wire(getPicklistValues, { recordTypeId: '$rtReclamacion', fieldApiName: ENTIDADAFECTADA_FIELD })
+    wiredPicklistMotivoDescarte({error, data}){
+        if(data){
+            this.valoresPicklistEntidad = data.values;
+        }
+    }
+
+    handleOnSubmit(event) { 
+        const camposValidados = [...this.template.querySelectorAll('lightning-combobox')]
+            .reduce((valido, campoAValidar) => {
+                campoAValidar.reportValidity();
+                return valido && campoAValidar.checkValidity();
+            }, true);
+ 
+        if(camposValidados){
+            this.spinnerLoading = true;
+            
+            comprobarExpDuplicado({numeroExpediente: this.numExpediente, entidadAfectada: this.entAfectada}).then(result => {  
+                this.spinnerLoading = false;
+                
+                if(result != null){
+                    //Coincide con reclamaciones con el mismo expediente y entidad afectada, notificamos al usuario que ya existe una reclamación con estas características
+                    this.expDuplicado = true;
+                    this.lanzarToast("Advertencia!", 'Ya existe una reclamación dada de alta con el expediente y entidad afectada informados. Por favor revisela ' + result + '.', "warning");
+                }else{
+                    //No coincide con ningun expediente/entidad afectada existente, luego crearemos la nueva reclamación
+                    this.expDuplicado = false;
+                    event.preventDefault();
+                    this.spinnerLoading = true;
+                }
+            })
+            .catch(error => {
+                this.spinnerLoading = false;
+                this.lanzarToast("Error", 'Error al crear la reclamación', "error");
+            })
+        } else {
+            event.preventDefault();
+        }
     }
 
     handleOnSuccess(event) {

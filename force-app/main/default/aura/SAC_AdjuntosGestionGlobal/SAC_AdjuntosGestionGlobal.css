@@ -184,3 +184,7 @@ border-right: 1px solid #e7e7e7;
     border-radius: 10px;
     background: rgba(0,0,0,0.4);
 }
+
+.THIS .btn-multiple-clasif{
+    text-align: right;
+}

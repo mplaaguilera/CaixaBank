@@ -320,7 +320,7 @@ export default class Spv_BusquedaCliente extends NavigationMixin(LightningElemen
                         variant: 'error '
                     }),);
             });
-            refreshView();
+            this.refreshView();
         }else{
             this.bError = true;
             this.sMensErr ='Debe ser propietario del registro para poder iniciar la identificación.';

@@ -330,5 +330,23 @@
             });
             toastEventWarning.fire();
         }
+    },
+
+    handleEventRichText : function(component, event, helper) {
+        //Recibo el evento desde el LWC y almaceno el nuevo mapa de tags de las imagenes
+        var message = event.getParam('data');
+        component.set("v.imageTagsMap", message);
+    },
+
+    handleEventFlagCambioPlantilla : function(component, event, helper) {
+        //Recibo el evento desde el LWC y almaceno el valor en el flag de cambio plantilla
+        var message = event.getParam('data');
+        component.set("v.flagCambioPlantillaPadre", message);
+    },
+
+    handleEventModificarImagen : function(component, event, helper) {
+        //Recibo el evento desde el LWC y almaceno el nuevo mapa de tags de las imagenes
+        var imagenes = event.getParam('imgMap');
+        component.set("v.imageTagsMap", imagenes);
     }
 })

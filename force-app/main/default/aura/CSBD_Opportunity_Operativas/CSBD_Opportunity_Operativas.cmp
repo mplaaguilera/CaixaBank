@@ -236,9 +236,9 @@
 						</aura:set>
 					</aura:if>
 
-					<aura:if isTrue="{!v.oportunidad.RecordType.DeveloperName == 'CSBD_MAC' || v.oportunidad.RecordType.DeveloperName == 'CSBD_CMN' || v.oportunidad.RecordType.DeveloperName == 'CSBD_CMB'}">
+					<!-- <aura:if isTrue="{!v.oportunidad.RecordType.DeveloperName == 'CSBD_MAC' || v.oportunidad.RecordType.DeveloperName == 'CSBD_CMN' || v.oportunidad.RecordType.DeveloperName == 'CSBD_CMB'}">
 						<lightning:button aura:id="autenticacionOtp" label="Autenticar" iconName="utility:unlock" onclick="{!c.abrirModalAutenticacionOtp}" disabled="{!!v.botonesActivos.botonAutenticarActivo}" />
-					</aura:if>
+					</aura:if> -->
 
 					<!--Otras operativas (panel flotante)-->
 					<div class="otrasOperativasContainer" onmouseenter="{!c.abrirOtrasOperativas}" onmouseleave="{!c.cerrarOtrasOperativas}">
@@ -253,6 +253,9 @@
 										<div class="slds-col">
 											<!-- <div class="tituloOtrasOperativas slds-text-title_caps slds-var-m-top_xxx-small slds-var-m-bottom_large slds-var-m-left_xx-small">Otras operativas</div> -->
 											<lightning:button aura:id="botonTomarPropiedad" label="Tomar propiedad" iconName="utility:change_owner" onclick="{!c.tomarPropiedad}" disabled="{!v.esPropietario}" variant="base" stretch="true" />
+											<hr />
+
+											<lightning:button aura:id="autenticacionOtp" label="Autenticación segura" iconName="utility:unlock" onclick="{!c.abrirModalAutenticacionOtp}" disabled="{!!v.botonesActivos.botonAutenticarActivo}" />
 											<hr />
 
 											<lightning:button aura:id="botonHistorialSolicitudes" label="Solicitudes anteriores" iconName="utility:info" onclick="{!c.solicitudesAnteriores}" disabled="{!!v.botonesActivos.botonHistorialSolicitudesActivo}" variant="base" stretch="true" />

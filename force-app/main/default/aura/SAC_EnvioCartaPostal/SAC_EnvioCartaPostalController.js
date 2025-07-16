@@ -23,7 +23,11 @@
                     component.set('v.codigoPostalEC', respuesta.codigoPostal);
                     component.set('v.provinciaEC', respuesta.provincia);
                     component.set('v.paisEC', respuesta.pais);
-                    component.set('v.cuerpoCliente', respuesta.cuerpo);
+                    
+                    let cuerpoExistente = component.get('v.cuerpoCliente');
+                    if(cuerpoExistente == undefined){
+                        component.set('v.cuerpoCliente', respuesta.cuerpo);                
+                    }
                 }
                 else{
                     let errors = response.getError();

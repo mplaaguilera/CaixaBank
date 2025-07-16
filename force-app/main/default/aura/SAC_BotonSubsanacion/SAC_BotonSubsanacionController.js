@@ -184,7 +184,7 @@
 
 				let para = component.get('v.para');
 				let copia = component.get('v.copia');
-				let cuerpo = component.get('v.cuerpo');
+				// let cuerpo = component.get('v.cuerpo');
 				let asunto = component.get('v.asunto');
 				let ficherosAdjuntos = component.get('v.ficherosAdjuntos');
 				let idsFicherosAdjuntos = [];
@@ -211,56 +211,68 @@
             			if (state === "SUCCESS") {
 							let emailsNoValidos = response.getReturnValue();
 
-							if(emailsNoValidos === ''){
-                    			//Todas las direcciones de email son validas (ninguna está activa en la blackList) luego enviamos el correo
-								component.set('v.isModalOpenSubsanacion', false);
-								
+							if(emailsNoValidos === ''){								
 								for(let i = 0; i < ficherosAdjuntos.length; i++){
 									idsFicherosAdjuntos.push(ficherosAdjuntos[i].Id);
 								}
 								idsFicherosAdjuntos = component.get('v.idsFicherosAdjuntos');
-						
-								var subsanar = component.get("c.subsanarCaso");
-								subsanar.setParams({'record': idCase, 'motivo': motivo, 'newStatus': estado, 'para':para, 'copia':copia, 'copiaOculta': component.get('v.copiaOculta'),'cuerpo':cuerpo, 'asunto':asunto, 'ficherosAdjuntos': JSON.stringify(idsFicherosAdjuntos)});
-								subsanar.setCallback(this, function(response) {
-									component.set('v.isLoading', false);
-									var state = response.getState();
-									if (state === "SUCCESS") {
-										component.set('v.alta', false);
-										component.set('v.analisis', false);
-						
-										var toastEvent = $A.get("e.force:showToast");
-										toastEvent.setParams({
-											"title": "Estado actualizado",
-											"message": 'Se ha actualizado el estado de la reclamación.',
-											"type": "success"
-										});
-										toastEvent.fire();
-										
-										$A.get('e.force:refreshView').fire();
-										
-									}else if(state === "ERROR"){ 
-										
-										var errors = response.getError();
-										if(errors){
-											if(errors[0] && errors[0].message){
-												const toastEvent = $A.get("e.force:showToast");
-												let toastParams = {
-													title: "Error",
-													message: errors[0].message, 
-													type: "error"
-												};
-												toastEvent.setParams(toastParams);
-												toastEvent.fire();
-											}
-											
-										}										
-										
-									}						
 
-								});
-						
-								$A.enqueueAction(subsanar);
+								helper.cargarTagsImgCuerpo(component);
+
+								if(component.get('v.todasImgConTag')){
+
+									component.set('v.isModalOpenSubsanacion', false);
+
+									var subsanar = component.get("c.subsanarCaso");
+									subsanar.setParams({'record': idCase, 'motivo': motivo, 'newStatus': estado, 'para':para, 'copia':copia, 'copiaOculta': component.get('v.copiaOculta'),'cuerpo': component.get('v.cuerpo'), 'asunto':asunto, 'ficherosAdjuntos': JSON.stringify(idsFicherosAdjuntos)});
+									subsanar.setCallback(this, function(response) {
+										component.set('v.isLoading', false);
+										var state = response.getState();
+										if (state === "SUCCESS") {
+											component.set('v.alta', false);
+											component.set('v.analisis', false);
+							
+											var toastEvent = $A.get("e.force:showToast");
+											toastEvent.setParams({
+												"title": "Estado actualizado",
+												"message": 'Se ha actualizado el estado de la reclamación.',
+												"type": "success"
+											});
+											toastEvent.fire();
+											
+											$A.get('e.force:refreshView').fire();
+											
+										}else if(state === "ERROR"){ 
+											var errors = response.getError();
+											if(errors){
+												if(errors[0] && errors[0].message){
+													const toastEvent = $A.get("e.force:showToast");
+													let toastParams = {
+														title: "Error",
+														message: errors[0].message, 
+														type: "error"
+													};
+													toastEvent.setParams(toastParams);
+													toastEvent.fire();
+												}
+											}										
+										}						
+									});
+							
+									$A.enqueueAction(subsanar);
+								}else{
+									component.set('v.todasImgConTag', true);
+									component.set('v.isLoading', false);
+
+									let toastParams = {
+										title: "Advertencia!",
+										message: 'Todas las imágenes enviadas deben tener una descripción informada. Revíselas con el botón "Modificar descripción imágenes"',  
+										type: "warning"
+									};
+									let toastEvent = $A.get("e.force:showToast");
+									toastEvent.setParams(toastParams);
+									toastEvent.fire();
+								}
 							}else{
 								//Alguna de las direcciones de email no son validas (alguna está activa en la blackList) luego notificamos esto al usuario
 								component.set('v.isLoading', false);
@@ -305,12 +317,24 @@
 						var toastEvent = $A.get("e.force:showToast");
 						toastEvent.setParams({
 							"title": "Estado actualizado",
-							"message": 'Se ha actualizado el estado de la reclamación.',
+							"message": 'Se ha actualizado el estado de la reclamación y se ha generado la tarea.',
 							"type": "success"
 						});
 						toastEvent.fire();
 						
 						$A.get('e.force:refreshView').fire();
+
+						let navService = component.find("navService");
+						var pageReference = {
+							type: 'standard__recordPage',
+							attributes: {
+								objectApiName: 'SAC_Accion__c',
+								actionName: 'view',
+								recordId: response.getReturnValue()
+							}
+						};
+						navService.navigate(pageReference);
+						
 					}else if(state === "ERROR"){
 						var error = response.getError();
 
@@ -361,7 +385,7 @@
 
 	},
 
-	openModalIdioma : function(component, event, helper){
+	/*openModalIdioma : function(component, event, helper){
 		component.set('v.isModalOpenIdioma', true);
 	},
 
@@ -400,5 +424,5 @@
 			});
 			toastEventWarning.fire();
 		}
-	}
+	}*/
 })

@@ -1,5 +1,5 @@
 import {LightningElement, api, wire, track} from 'lwc';
-import {getRecord, getFieldValue, getFieldDisplayValue} from 'lightning/uiRecordApi';
+import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
 import {NavigationMixin} from 'lightning/navigation';
 import LightningConfirm from 'lightning/confirm';
 import {errorApex} from 'c/csbd_lwcUtils';
@@ -14,9 +14,9 @@ import OPP_IDIOMA from '@salesforce/schema/Opportunity.CSBD_Idioma_Solicitud__c'
 import OPP_FECHA_AUT from '@salesforce/schema/Opportunity.CSBD_UltimaAutenticacionFecha__c';
 import OPP_NIVEL_AUT from '@salesforce/schema/Opportunity.CSBD_UltimaAutenticacionNivel__c';
 import OPP_ESTADO_AUT from '@salesforce/schema/Opportunity.CSBD_EstadoAutenticacion__c';
-import OPP_CASO_ORIGEN_ID from '@salesforce/schema/Opportunity.CSBD_CasoOrigen__c';
-import OPP_CASO_ORIGEN_CANAL_ENTRADA from '@salesforce/schema/Opportunity.CSBD_CasoOrigen__r.Origin';
-import OPP_CASO_ORIGEN_REPRESENTANTE from '@salesforce/schema/Opportunity.CSBD_CasoOrigen__r.CC_Representante__c';
+//import OPP_CASO_ORIGEN_ID from '@salesforce/schema/Opportunity.CSBD_CasoOrigen__c';
+//import OPP_CASO_ORIGEN_CANAL_ENTRADA from '@salesforce/schema/Opportunity.CSBD_CasoOrigen__r.Origin';
+//import OPP_CASO_ORIGEN_REPRESENTANTE from '@salesforce/schema/Opportunity.CSBD_CasoOrigen__r.CC_Representante__c';
 import OPP_ACCOUNT_ID from '@salesforce/schema/Opportunity.AccountId';
 import OPP_ACCOUNT_NAME from '@salesforce/schema/Opportunity.Account.Name';
 import OPP_ACCOUNT_EDAD from '@salesforce/schema/Opportunity.Account.AV_Age__c';
@@ -43,7 +43,7 @@ import eliminarAutenticacionesClienteApex from '@salesforce/apex/CSBD_Autenticac
 
 const OPPTY_FIELDS = [
 	OPP_IDENTIFICADOR, OPP_RT_DEVELOPERNAME, OPP_OWNER_ID, OPP_ESTADO, OPP_IDIOMA, OPP_ESTADO_AUT, OPP_FECHA_AUT, OPP_NIVEL_AUT, //OPP_INTENTOS_AUT,
-	OPP_CASO_ORIGEN_ID, OPP_CASO_ORIGEN_CANAL_ENTRADA, OPP_CASO_ORIGEN_REPRESENTANTE, //OPP_CASO_ORIGEN_OMITIR_PREGUNTAS,
+	//OPP_CASO_ORIGEN_ID, OPP_CASO_ORIGEN_CANAL_ENTRADA, OPP_CASO_ORIGEN_REPRESENTANTE, //OPP_CASO_ORIGEN_OMITIR_PREGUNTAS,
 	OPP_ACCOUNT_ID, OPP_ACCOUNT_NAME, OPP_ACCOUNT_EDAD, OPP_ACCOUNT_MENOR_EMANCIPADO, OPP_CONTACT_ID
 ];
 
@@ -62,7 +62,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 
 	oportunidad;
 
-	canalAutenticable = false;
+	//canalAutenticable = false;
 
 	datatableColumns = DATATABLE_COLUMNS;
 
@@ -92,9 +92,9 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 	get botonEmergenciaAttribs() {
 		if (this.componente.autEmergenciaHabilitada) {
 			return {class: 'botonEmergencia', iconName: 'utility:notification'};
-		} else {
-			return {class: 'botonEmergencia noDisponible', iconName: 'utility:notification_off'};
 		}
+		return {class: 'botonEmergencia noDisponible', iconName: 'utility:notification_off'};
+
 	}
 
 	@wire(getRecord, {recordId: '$recordId', fields: OPPTY_FIELDS})
@@ -132,8 +132,10 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 						toast('info', 'Autenticación de nivel 2 no disponible', `No constan datos suficientes para poder validar la identidad del cliente ${getFieldValue(this.oportunidad, OPP_ACCOUNT_NAME)}`);
 					} else if (resultado === 'CLIENTE BLOQUEADO') {
 						toast('error', 'Autenticación de nivel 2 no disponible', 'No se permite autenticar al cliente ya que se encuentra bloqueado de manera preventiva');
+					/*
 					} else if (resultado === 'SIN LLAMADAS') {
 						toast('info', 'Autenticación de nivel 2 no disponible', 'No hay ninguna llamada de teléfono en curso');
+					*/
 					} else if (resultado === 'OK') {
 						this.componente.spinner = true;
 						this.omitirOtpNivel2 = omitirOtp;
@@ -145,20 +147,26 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 				});
 
 			} else if (nivel === 'Emergencia') {
+				/*
 				if (this.canalAutenticable) {
 					this.abrirModalPreguntasEmergencia();
 				} else {
 					this.componente.spinner = false;
 					toast('info', 'Autenticación de emergencia no disponible', 'La autenticación segura de emergencia no está disponible para el canal ' + getFieldDisplayValue(this.oportunidad, OPP_CASO_ORIGEN_CANAL_ENTRADA));
 				}
+				xs*/
+				this.abrirModalPreguntasEmergencia();
 
 			} else if (nivel === 'Cliente Digital') {
+				/*
 				if (this.canalAutenticable) {
 					this.crearAutenticacion('Cliente Digital');
 				} else {
 					this.componente.spinner = false;
 					toast('info', 'Autenticación de cliente digital no disponible', 'La autenticación segura de cliente digital no está disponible para el canal ' + getFieldDisplayValue(this.oportunidad, OPP_CASO_ORIGEN_CANAL_ENTRADA));
 				}
+				*/
+				this.crearAutenticacion('Cliente Digital');
 			}
 		}
 	}
@@ -194,26 +202,28 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 						.catch(error => errorApex(this, error, 'Problema registrando el intento fallido de autenticación'));
 					} else {
 						//Respuestas nivel 2 OK
+						/*
 						if (!this.canalAutenticable) {
 							this.cerrarModalPreguntasNivel2();
 							this.componente.spinner = false;
 							toast('info', 'Autenticación de nivel 2 no disponible', 'La autenticación segura de nivel 2 con envío de OTP no está disponible para el canal ' + getFieldDisplayValue(this.oportunidad, OPP_CASO_ORIGEN_CANAL_ENTRADA));
 						} else {
-							try {
-								await this.n2crearRegistroAutenticacion(retornoValidacionRespuestas);
-								//if (!getFieldValue(this.oportunidad, OPP_CASO_ORIGEN_OMITIR_PREGUNTAS)) {
-								const callback = () => window.setTimeout(() => {
-									this.n2EnviarOtp();
-								}, 0);
-								this.modalMensajeAbrir(
-									'Las respuestas son correctas.', 'utility:success', 'modalMensajeIconSuccess',
-									false, 1400, callback
-								);
-								//}
-							} catch (error) {
-								errorApex(this, error, 'Problema registrando la autenticación');
-							}
+						*/
+						try {
+							await this.n2crearRegistroAutenticacion(retornoValidacionRespuestas);
+							//if (!getFieldValue(this.oportunidad, OPP_CASO_ORIGEN_OMITIR_PREGUNTAS)) {
+							const callback = () => window.setTimeout(() => {
+								this.n2EnviarOtp();
+							}, 0);
+							this.modalMensajeAbrir(
+								'Las respuestas son correctas.', 'utility:success', 'modalMensajeIconSuccess',
+								false, 1400, callback
+							);
+							//}
+						} catch (error) {
+							errorApex(this, error, 'Problema registrando la autenticación');
 						}
+						//}
 					}
 				}).catch(error => {
 					errorApex(this, error, 'Problema comprobando las respuestas');
@@ -331,16 +341,18 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			mostrarModal();
 
 			window.setTimeout(() => {
-				getDatosAsyncApex({canalEntradaCaso: getFieldDisplayValue(this.oportunidad, OPP_CASO_ORIGEN_CANAL_ENTRADA)})
-				.then(({autEmergenciaHabilitada, canalAutenticable}) => {
+				getDatosAsyncApex({})
+				//.then(({autEmergenciaHabilitada, canalAutenticable}) => {
+				.then(({autEmergenciaHabilitada}) => {
 					this.componente.autEmergenciaHabilitada = autEmergenciaHabilitada || this.componente.usuarioDesarrollador;
-					this.canalAutenticable = getFieldValue(this.oportunidad, OPP_RT_DEVELOPERNAME) !== 'CSBD_MAC' || canalAutenticable;
+					//this.canalAutenticable = getFieldValue(this.oportunidad, OPP_RT_DEVELOPERNAME) !== 'CSBD_MAC' || canalAutenticable;
 				});
 			}, 300);
 		}
 	}
 
 	async abrirModalValidacionesOk() {
+		/*
 		//Condiciones para iniciar la operativa que no requieren invocar método Apex
 		if (getFieldValue(this.oportunidad, OPP_RT_DEVELOPERNAME) === 'CSBD_MAC' && !getFieldValue(this.oportunidad, OPP_CASO_ORIGEN_ID)) {
 			this.modalMensajeCerrar();
@@ -352,20 +364,25 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			toast('error', 'Operativa de autenticación segura no disponible', 'El cliente es menor y el caso origen no tiene representante legal informado');
 			return false;
 		}
-
+		*/
 		//Condiciones para iniciar la operativa que requieren invocar método Apex
 		try {
-			const {llamadaEnCurso, clienteBloqueado, usuarioDesarrollador} = await getDatosApex({
+			//const {llamadaEnCurso, clienteBloqueado, usuarioDesarrollador} = await getDatosApex({
+			const {clienteBloqueado, usuarioDesarrollador} = await getDatosApex({
 				idOportunidad: this.recordId,
 				idCliente: getFieldValue(this.oportunidad, OPP_ACCOUNT_ID)
 			});
 			this.componente.usuarioDesarrollador = usuarioDesarrollador;
+			//this.componente.usuarioDesarrollador = false;
 
+			/*
 			if (!llamadaEnCurso) {
 				this.modalMensajeCerrar();
 				toast('info', 'Operativa de autenticación segura no disponible', 'No hay ninguna llamada de teléfono en curso');
 				return false;
 			}
+			*/
+
 			if (clienteBloqueado) {
 				this.modalMensajeCerrar();
 				toast('error', 'Operativa de autenticación segura no disponible', 'No se permite autenticar al cliente ya que se encuentra bloqueado de manera preventiva');
@@ -563,6 +580,12 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			});
 
 			await this.actualizarTablasAutenticaciones();
+
+			console.log('this.datatableData.datatableEnCurso');
+			console.log(this.autenticacionPendValidar);
+			console.log('retorno');
+			console.log(retorno);
+
 			this.autenticacionPendValidar = this.datatableData.datatableEnCurso.find(a => a.Id === retorno.id);
 			if (retorno.resultado !== 'OK') { //&& !getFieldValue(this.oportunidad, OPP_CASO_ORIGEN_OMITIR_PREGUNTAS)) {
 				this.abrirModalNuevoIntento();
@@ -609,7 +632,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		});
 		await this.actualizarTablasAutenticaciones();
 		this.refs.modalValidarOtp.classList.add('slds-fade-in-open');
-		window.setTimeout(() => this.refs.inputOtp1.focus(), 90);
+		window.setTimeout(() => this.refs.inputOtp1?.focus(), 90);
 	}
 
 	async cerrarModalValidarOtp(event, confirmar = true) {
@@ -827,12 +850,14 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		botonActualizar.classList.remove('rotar');
 	}
 
+	/*
 	clienteMenorSinRepresentante() {
 		return getFieldValue(this.oportunidad, OPP_ACCOUNT_EDAD)
 		&& getFieldValue(this.oportunidad, OPP_ACCOUNT_EDAD) < 18
 		&& !getFieldValue(this.oportunidad, OPP_ACCOUNT_MENOR_EMANCIPADO)
 		&& !getFieldValue(this.oportunidad, OPP_CASO_ORIGEN_REPRESENTANTE);
 	}
+	*/
 
 	async n2EnviarOtp() {
 		this.componente.spinner = false;
@@ -844,10 +869,17 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		this.modalMensajeAbrir('Solicitando envío del código de un solo uso al cliente...', 'utility:sms', null, true);
 		return nivel2EnviarSolicitudOtpApex({idAutenticacion: this.autenticacionPendValidar.Id})
 		.then(({CC_Estado__c: estadoAutenticacion, CC_Codigo_Error__c: codigoError, CC_Mensaje_Error__c: mensajeError}) => {
-			if (estadoAutenticacion !== 'Error') {
+			if (this.componente.simularRespuestas.enviarOtp === 'ok') {
+				this.autenticacionPendValidar = {'Id': '00Q000000000000', 'CC_Estado__c': 'OK'};
 				this.abrirModalValidarOtp();
+
+			} else if (estadoAutenticacion !== 'Error') {
+				this.abrirModalValidarOtp();
+
 			} else {
-				toast('error', 'Se ha recibido un error al solicitar el envío del código OTP', `${codigoError}: ${mensajeError}`);
+				const retornoError = codigoError + ': ' + mensajeError;
+				console.error(retornoError);
+				toast('error', 'Se ha recibido un error al solicitar el envío del código OTP', retornoError);
 				this.modalMensajeCerrar(() => this.abrirModal());
 			}
 		}).catch(error => {
@@ -971,9 +1003,9 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			return n2ValidarOtpMockOk(inputs);
 		} else if (this.componente.simularRespuestas.validarOtp === 'ko') {
 			return n2ValidarOtpMockKo(inputs);
-		} else {
-			return n2ValidarOtpApex(inputs);
 		}
+		return n2ValidarOtpApex(inputs);
+
 	}
 
 	eliminarAutenticacionesCliente() {

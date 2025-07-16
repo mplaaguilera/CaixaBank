@@ -13,17 +13,21 @@ import ESCALADO_OBJECT from '@salesforce/schema/SAC_Interaccion__c';
 //Campos reclamación
 import OWNERID_FIELD from '@salesforce/schema/Case.OwnerId';
 import IDFIELD from '@salesforce/schema/Case.Id';
-import FECHA_ENVIO_ORGANISMOS_FIELD from '@salesforce/schema/Case.SPV_FechaEnvioOrganismos__c';
-import FECHA_RESPUESTA_ORGANISMOS_FIELD from '@salesforce/schema/Case.SPV_FechaPteRespuestaOrganismo__c';
+//import FECHA_ENVIO_ORGANISMOS_FIELD from '@salesforce/schema/Case.SPV_FechaEnvioOrganismos__c';
+import FECHA_EXTENSION_CASE from '@salesforce/schema/Case.CBK_Case_Extension_Id__c';
+import FECHA_ENVIO_ORGANISMOS_FIELD from '@salesforce/schema/Case.CBK_Case_Extension_Id__r.SPV_FechaEnvioOrganismos__c';
+import FECHA_RESPUESTA_ORGANISMOS_FIELD from '@salesforce/schema/Case.CBK_Case_Extension_Id__r.SPV_FechaPteRespuestaOrganismo__c';
 import CASO_NEGOCIADO_FIELD from '@salesforce/schema/Case.SAC_CasoNegociado__c';
 import NEGOCIACION_FINALIZADA_FIELD from '@salesforce/schema/Case.SAC_NegociacionFinalizada__c';
 import RESULTADO_NEGOCIACION_FIELD from '@salesforce/schema/Case.SAC_ResultadoNegociacion__c';
-import NEGOCIACION_FINALIZADA_RECTIFICACION_FIELD from '@salesforce/schema/Case.SPV_NegociacionFinalizadaRectificacion__c';
-import RESULTADO_NEGOCIACION_RECTIFICACION_FIELD from '@salesforce/schema/Case.SPV_ResultadoNegociacionRectificacion__c';
-import FECHA_COMPLEMENTARIA_ENTIDAD_FIELD from '@salesforce/schema/Case.SPV_FechaComplementariaEntidad__c';
-import FECHA_COMPLEMENTARIA_ORGANISMO_FIELD from '@salesforce/schema/Case.SPV_FechaComplementariaOrganismo__c';
+import NEGOCIACION_FINALIZADA_RECTIFICACION_FIELD from '@salesforce/schema/Case.CBK_Case_Extension_Id__r.SPV_NegociacionFinalizadaRectificacion__c';
+import RESULTADO_NEGOCIACION_RECTIFICACION_FIELD from '@salesforce/schema/Case.CBK_Case_Extension_Id__r.SPV_ResultadoNegociacionRectificacion__c';
+import FECHA_COMPLEMENTARIA_ENTIDAD_FIELD from '@salesforce/schema/Case.CBK_Case_Extension_Id__r.SPV_FechaComplementariaEntidad__c';
+import FECHA_COMPLEMENTARIA_ORGANISMO_FIELD from '@salesforce/schema/Case.CBK_Case_Extension_Id__r.SPV_FechaComplementariaOrganismo__c';
 import CASO_RECTIFICADO_FIELD from '@salesforce/schema/Case.SPV_Rectificado__c';
 import SENTIDO_RESOLUCION_FIELD from '@salesforce/schema/Case.SAC_SentidoResolucion__c';
+import STATUS_FIELD from '@salesforce/schema/Case.Status';
+//import CONCLUSION_RESOLUCION_ORGANISMO_FIELD from '@salesforce/schema/Case.CBK_Case_Extension_Id__r.SPV_ConclusionResolucionSupervisorc__c';
 
 
 //Campos Escalado
@@ -31,15 +35,17 @@ import TIPO_ALLANAMIENTO_FIELD from '@salesforce/schema/SAC_Interaccion__c.SPV_T
 import TIPO_RESPUESTA_FIELD from '@salesforce/schema/SAC_Interaccion__c.SPV_TipoRespuesta__c';
 import ANALISIS_SEDE_ORGANISMOS_FIELD from '@salesforce/schema/SAC_Interaccion__c.SPV_AnalisisSedeOrganismo__c';
 
-
+//Campos Case Extensión
+import TIPO_RESULTADO_NEGOCIACION_RECTIFICACION_FIELD from '@salesforce/schema/CBK_Case_Extension__c.SPV_ResultadoNegociacionRectificacion__c';
 
 //LLamadas Apex
 import getEscaladosReclamacion from '@salesforce/apex/SPV_LCMP_CamposDesplegables.getEscaladosReclamacion';
-import getRecordTypes from '@salesforce/apex/SPV_LCMP_CamposDesplegables.obtenerRecordTypes';
+import getNegociacionesReclamacion from '@salesforce/apex/SPV_LCMP_CamposDesplegables.getNegociacionesReclamacion';
+import getRecordTypes from '@salesforce/apex/SPV_Utils.obtenerRecordTypes';
 
-const fields = [IDFIELD, OWNERID_FIELD, FECHA_ENVIO_ORGANISMOS_FIELD, FECHA_RESPUESTA_ORGANISMOS_FIELD, CASO_NEGOCIADO_FIELD, NEGOCIACION_FINALIZADA_FIELD, RESULTADO_NEGOCIACION_FIELD, 
+const fields = [IDFIELD, OWNERID_FIELD,STATUS_FIELD, FECHA_ENVIO_ORGANISMOS_FIELD, FECHA_RESPUESTA_ORGANISMOS_FIELD, CASO_NEGOCIADO_FIELD, NEGOCIACION_FINALIZADA_FIELD, RESULTADO_NEGOCIACION_FIELD, 
     NEGOCIACION_FINALIZADA_RECTIFICACION_FIELD, RESULTADO_NEGOCIACION_RECTIFICACION_FIELD, FECHA_COMPLEMENTARIA_ENTIDAD_FIELD, FECHA_COMPLEMENTARIA_ORGANISMO_FIELD, CASO_RECTIFICADO_FIELD,
-    SENTIDO_RESOLUCION_FIELD
+    SENTIDO_RESOLUCION_FIELD, FECHA_EXTENSION_CASE
 ];
 
 export default class Spv_camposDesplegables extends LightningElement {
@@ -48,6 +54,7 @@ export default class Spv_camposDesplegables extends LightningElement {
     @api objectApiName;
     @track rtReclamacion;
     @track rtEscalado;
+    @track rtReclamacionExt;
 
     @track fechaEnvioOrganismos;    //Fecha en la que la reclamación pasó al estado "Envío Organismos"
     @track fechaPteRespuestaOrganismos;     //Fecha en la que la reclamación pasó al estado "Pendiente Respuesta Organismos"
@@ -56,18 +63,22 @@ export default class Spv_camposDesplegables extends LightningElement {
     @track caso;
     @track idCaso;
     @track casoNegociado;
-    @track casoNegociadoEnRectificacion;        //Se muestra cuando hay resultados de la negociación. Se puede crear un campo nuevo que se marque a true cuando se negocie en status rectificado,
+    @track casoNegociadoEnRectificacion = false;        //Se muestra cuando hay resultados de la negociación posterior al informe supervisor.
+    @track casoNegociadoAntesRectificacion = false;        //Se muestra cuando hay resultados de la negociación previo al informe supervisor.
     @track casoRectificado;                     //Se muestra la sección de Rectificación solo si el caso ha sido rectificado
 
     @track valoresPicklistTipoAllanamiento = [];
     @track valoresPicklistTipoRespuesta = [];
     @track valoresPicklistAnalisisSedeOrganismos = [];
-    @track valoresPicklisResultadoNegociacion = [];
-    @track valoresPicklisResultadoNegociacionRectificacion = [];
 
     //Controlar desplegable seccion: Decisión Análisis
     @track toggleSeccionDecisionAnalisis = "slds-section slds-is-open";
     @track expandirDecisionAnalisis = true;
+
+    //Controlar desplegable: Decisión
+    @track toggleSeccionDecision = "slds-section slds-is-open";
+    @track expandirDecision = true;
+    @track mostrarDesplegableDecision = false;
 
     //Controlar subDesplegable: Alegaciones
     @track toggleSeccionAlegaciones = "slds-section slds-is-open";
@@ -109,12 +120,8 @@ export default class Spv_camposDesplegables extends LightningElement {
     @track toggleSeccionNegociaciones = "slds-section slds-is-open";
     @track expandirNegociaciones = true;
     @track mostrarNegociaciones;
-
-
-    //Controlar subdesplegable: negociación previa
-    @track toggleSeccionNegociacionPrevia = "slds-section slds-is-open";
-    @track expandirNegociacionePrevia = true;
-    @track valorResultadoNegociacionPreviaMostrar;
+    @track listNegociacionPreviaInforme = [];
+    @track listNegociacionPosteriorInforme = [];
 
     //Controlar subdesplegable: negociación posterior
     @track toggleSeccionNegociacionPosterior = "slds-section slds-is-open";
@@ -124,13 +131,16 @@ export default class Spv_camposDesplegables extends LightningElement {
     //Controlar desplegable: Resolución organismo
     @track toggleSeccionResolucionOrganismo = "slds-section slds-is-open";
     @track expandirResolucionOrganismo = true;
+    @track mostrarResolucionOrganismo = false;
     @track resolucionDesfavorableEntidad = false;
-
-
 
     //Controlar desplegable: Rectificación
     @track toggleSeccionRectificacion = "slds-section slds-is-open";
     @track expandirRectificacion = true;
+    @track mostrarRectificacion = false;
+    @track mostrarPrueba = false;
+    @track editarCampos = false; //Se pone a true cuando quiere que los campos se muestren en modo formulario
+
 
     @wire(getObjectInfo, {objectApiName: CASO_OBJECT})
     objectInfoCase;
@@ -142,31 +152,21 @@ export default class Spv_camposDesplegables extends LightningElement {
     @wire(getRecordTypes)
     getRecordTypesResult(result){
         if(result.data){
-            console.log('Datos recibidos ' + JSON.stringify(result.data));
+            
             result.data.forEach(element => {
                 if(element.DeveloperName == 'SPV_Reclamacion'){
                     this.rtReclamacion = element.Id;
                 }else{
-                    this.rtEscalado = element.Id;
+                    if(element.DeveloperName == 'SPV_ReclamacionCaseExt'){
+                        this.rtReclamacionExt = element.Id;
+                    }else{
+                        this.rtEscalado = element.Id;
+                    }
+                    
                 }
             });
         }
     }
-
-
-
-
-   /* obtenerValoresPicklist(){
-        getPicklistValues({recordTypeId: this.rtReclamacion, fieldApiName: RESULTADO_NEGOCIACION_FIELD})
-            .then(data=>{
-                this.valoresPicklisResultadoNegociacion = data.values;
-                this.obtenerLabelResultadoNegociacion();
-                console.log('pruebaa ' + this.valoresPicklisResultadoNegociacion);
-            });
-
-    }*/
-
-
 
     //Obtención de valores de picklist y su label correspondiente al valor del escalado a mostrar
     @wire(getPicklistValues, { recordTypeId: '$rtEscalado', fieldApiName: TIPO_ALLANAMIENTO_FIELD })
@@ -194,26 +194,6 @@ export default class Spv_camposDesplegables extends LightningElement {
         }
     }
 
-    @wire(getPicklistValues, { recordTypeId: '$rtReclamacion', fieldApiName: RESULTADO_NEGOCIACION_FIELD })
-    wiredPicklistResultadoNegociacion({error, data}){
-        if(data){
-            this.valoresPicklisResultadoNegociacion = data.values;
-            this.obtenerLabelResultadoNegociacion();
-        }
-    }
-
-    @wire(getPicklistValues, { recordTypeId: '$rtReclamacion', fieldApiName: RESULTADO_NEGOCIACION_RECTIFICACION_FIELD })
-    wiredPicklistResultadoNegociacioRectificacion({error, data}){
-        if(data){
-            this.valoresPicklisResultadoNegociacionRectificacion = data.values;
-            this.obtenerLabelResultadoNegociacionRectificacion();
-        }
-    }
-
-    
-
-
-
     //----------------
 
     @wire(getRecord, { recordId: '$recordId', fields })
@@ -223,42 +203,54 @@ export default class Spv_camposDesplegables extends LightningElement {
             this.idCaso = data.fields.Id.value;
             this.casoNegociado = data.fields.SAC_CasoNegociado__c.value;
 
+            this.mostrarPrueba = true;
+     
+            if(data.fields.CBK_Case_Extension_Id__c.value != null && data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaEnvioOrganismos__c.value != null){
+                this.fechaEnvioOrganismos = new Date(data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaEnvioOrganismos__c.value).toLocaleDateString();
+            }
+            if(data.fields.CBK_Case_Extension_Id__c.value != null && data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaPteRespuestaOrganismo__c.value != null){
+                this.fechaPteRespuestaOrganismos = new Date(data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaPteRespuestaOrganismo__c.value).toLocaleDateString();
+            }
+            if(data.fields.CBK_Case_Extension_Id__c.value != null &&  data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaComplementariaEntidad__c.value != null){
+                this.fechaComplementariaEntidad = new Date(data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaComplementariaEntidad__c.value).toLocaleDateString();
+            }
+            if(data.fields.CBK_Case_Extension_Id__c.value != null &&  data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaComplementariaOrganismo__c.value != null){
+                this.fechaComplementariaOrganismo = new Date(data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaComplementariaOrganismo__c.value).toLocaleDateString();
+            }
 
-            //Si algún campo relacionado con la negociación en rectificación está relleno, es que ha habido negociación en rectificación
-            //Si no sirve-> Se puede crear campo en Case y ponerlo a true si se negocia estando en estado de rectificación
-            if(data.fields.SPV_NegociacionFinalizadaRectificacion__c.value == true || (data.fields.SPV_ResultadoNegociacionRectificacion__c.value != null && data.fields.SPV_ResultadoNegociacionRectificacion__c.value != '')){
-                this.casoNegociadoEnRectificacion = true;
+            //Control de desplegables en función del estado
+            if(data.fields.Status.value == 'SAC_001'){
+                this.mostrarDesplegableDecision = false;
+            }else{
+                this.mostrarDesplegableDecision = true;
             }
-       
-            if(data.fields.SPV_FechaEnvioOrganismos__c.value != null){
-                this.fechaEnvioOrganismos = new Date(data.fields.SPV_FechaEnvioOrganismos__c.value).toLocaleDateString();
+
+            if(data.fields.Status.value == 'SPV_RecepcionResolucion' || data.fields.Status.value == 'Cerrado' || data.fields.Status.value == 'Descartado'){
+                this.mostrarResolucionOrganismo = true;
+            }else{
+                this.mostrarResolucionOrganismo = false;
             }
-            if(data.fields.SPV_FechaPteRespuestaOrganismo__c.value != null){
-                this.fechaPteRespuestaOrganismos = new Date(data.fields.SPV_FechaPteRespuestaOrganismo__c.value).toLocaleDateString();
-            }
-            if(data.fields.SPV_FechaComplementariaEntidad__c.value != null){
-                this.fechaComplementariaEntidad = new Date(data.fields.SPV_FechaComplementariaEntidad__c.value).toLocaleDateString();
-            }
-            if(data.fields.SPV_FechaComplementariaOrganismo__c.value != null){
+
+            /*if(data.fields.SPV_FechaComplementariaOrganismo__c.value != null){
                 this.fechaComplementariaOrganismo = new Date(data.fields.SPV_FechaComplementariaOrganismo__c.value).toLocaleDateString();
-            }
+            }*/
 
             //Solo se muestra la complementaria si hay info que mostrar
-            if(data.fields.SPV_FechaComplementariaEntidad__c.value != null || data.fields.SPV_FechaComplementariaOrganismo__c.value != null){
+            if(data.fields.CBK_Case_Extension_Id__c.value != null && (data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaComplementariaEntidad__c.value != null || data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaComplementariaOrganismo__c.value != null)){
                 this.mostrarComplementarias = true;
             }else{
                 this.mostrarComplementarias = false;
             }
 
             //Solo se muestra la sección de Negociación si alguna de las subsecciones tiene info que mostrar
-            if(this.casoNegociado == true || this.casoNegociadoEnRectificacion == true){
+            if(this.casoNegociado === true){
                 this.mostrarNegociaciones = true;
             }else{
                 this.mostrarNegociaciones = false;
             }
 
             //Solo se muestra la sección de Rectificación si el caso se ha rectificado
-            if(data.fields.SPV_Rectificado__c.value == true){
+            if(data.fields.SPV_Rectificado__c.value === true){
                 this.casoRectificado = true;
             }else{
                 this.casoRectificado = false;
@@ -272,17 +264,26 @@ export default class Spv_camposDesplegables extends LightningElement {
                 this.resolucionDesfavorableEntidad = false;
             }
 
-            //Obtener valores picklist a mostrar
-            if(this.casoNegociado == true){
-                this.obtenerLabelResultadoNegociacion();
+            if(this.casoNegociado === true){
+                getNegociacionesReclamacion({'casoId': this.recordId}).then(result=>{
+                    if(result){
+                        this.listNegociacionPreviaInforme = result.listNegociacionPreviaInforme;
+                        this.casoNegociadoAntesRectificacion = result.existeNegociacionPreviaInforme;
+                        this.listNegociacionPosteriorInforme = result.listNegociacionPosteriorInforme;
+                        this.casoNegociadoEnRectificacion = result.existeNegociacionPosteriorInforme;
+                    }
+                }).catch(error =>{
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: 'Error',
+                            message: JSON.stringify(error),
+                            variant: 'error'
+                        })
+                    );
+                });
             }
-            if(this.casoNegociadoEnRectificacion == true){
-                this.obtenerLabelResultadoNegociacionRectificacion();
-            }
-
         }
     }
-
 
     @wire(getEscaladosReclamacion, { casoId: '$recordId'})
     getEscaladosReclamacion(result){
@@ -404,35 +405,6 @@ export default class Spv_camposDesplegables extends LightningElement {
         }
     }
 
-    obtenerLabelAnalisisSedeOrganismosDesistimiento(){
-
-    }
-
-    obtenerLabelResultadoNegociacion(){
-
-        if(this.caso != null && Object.keys(this.caso) != 0 && this.valoresPicklisResultadoNegociacion.length > 0){
-            if(this.caso.fields.SAC_ResultadoNegociacion__c.value != null){
-                const valor = this.valoresPicklisResultadoNegociacion.find(element => element.value == this.caso.fields.SAC_ResultadoNegociacion__c.value);
-                this.valorResultadoNegociacionPreviaMostrar = valor ? valor.label : '';
-            }else{
-                this.valorResultadoNegociacionPreviaMostrar = '';
-            }
-        }
-
-    }
-
-    obtenerLabelResultadoNegociacionRectificacion(){
-
-        if(this.caso != null && Object.keys(this.caso) != 0 && this.valoresPicklisResultadoNegociacionRectificacion.length > 0){
-            if(this.caso.fields.SPV_ResultadoNegociacionRectificacion__c.value != null){
-                const valor = this.valoresPicklisResultadoNegociacionRectificacion.find(element => element.value == this.caso.fields.SPV_ResultadoNegociacionRectificacion__c.value);
-                this.valorResultadoNegociacionPosteriorRectificacionMostrar = valor ? valor.label : '';
-            }else{
-                this.valorResultadoNegociacionPosteriorRectificacionMostrar = '';
-            }
-        }
-    }
-
     //Controlar el abirir y cerrar desplegables
     handleExpandirDecisionAnalisis(){
         if(this.expandirDecisionAnalisis){
@@ -441,6 +413,16 @@ export default class Spv_camposDesplegables extends LightningElement {
         }else{
             this.expandirDecisionAnalisis = true;
             this.toggleSeccionDecisionAnalisis = "slds-section slds-is-open";
+        }
+    }
+
+    handleExpandirDecision(){
+        if(this.expandirDecision){
+            this.expandirDecision = false;
+            this.toggleSeccionDecision = "slds-section"; 
+        }else{
+            this.expandirDecision = true;
+            this.toggleSeccionDecision = "slds-section slds-is-open";
         }
     }
 
@@ -484,23 +466,23 @@ export default class Spv_camposDesplegables extends LightningElement {
         }
     }
 
-    handleExpandirNegociacionPrevia(){
-        if(this.expandirNegociacionePrevia){
-            this.expandirNegociacionePrevia = false;
-            this.toggleSeccionNegociacionPrevia = "slds-section"; 
-        }else{
-            this.expandirNegociacionePrevia = true;
-            this.toggleSeccionNegociacionPrevia = "slds-section slds-is-open";
+    handleExpandirNegociacionPrevia(event){
+        let buttonid = event.currentTarget.dataset.name;
+        let currentsection = this.template.querySelector('[data-id="' + buttonid + '"]');
+        if (currentsection.className.search('slds-is-open') == -1) {
+            currentsection.className = 'slds-section slds-is-open';
+        } else {
+            currentsection.className = 'slds-section';
         }
     }
 
-    handleExpandirNegociacionPosterior(){
-        if(this.expandirNegociacionePosterior){
-            this.expandirNegociacionePosterior = false;
-            this.toggleSeccionNegociacionPosterior = "slds-section"; 
-        }else{
-            this.expandirNegociacionePosterior = true;
-            this.toggleSeccionNegociacionPosterior = "slds-section slds-is-open";
+    handleExpandirNegociacionPosterior(event){
+        let buttonid = event.currentTarget.dataset.name;
+        let currentsection = this.template.querySelector('[data-id="' + buttonid + '"]');
+        if (currentsection.className.search('slds-is-open') == -1) {
+            currentsection.className = 'slds-section slds-is-open';
+        } else {
+            currentsection.className = 'slds-section';
         }
     }
 
@@ -540,5 +522,29 @@ export default class Spv_camposDesplegables extends LightningElement {
     handleSubmit(event){
         this.template.querySelectorAll('lightning-record-edit-form').forEach((form) => {form.submit()});
     }
+
+
+
+    //Controlar cuando se pulsa en el lapiz de editar
+
+    handleEditarCampos(event){
+        if(this.editarCampos == false){
+            this.editarCampos = true;
+        }else{
+            this.editarCampos = false;
+        } 
+    }
+
+    handleSuccessEditar(event){
+        const updatedRecord = event.detail.id;
+        const toast = new ShowToastEvent({
+            title: 'Exito',
+            message: 'Se han actualizado campos correctamente.',
+            variant: 'success'
+        });
+        this.dispatchEvent(toast);
+        this.editarCampos = false;  //Se cierran los campos de modo edición
+    }
+
 
 }

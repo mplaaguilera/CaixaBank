@@ -1,18 +1,20 @@
 ({
-	getActividadesTrasladoColaborador: function(component) {
-		let getActividadesTrasladoColaborador = component.get('c.actividadesTrasladoColaborador');
-		getActividadesTrasladoColaborador.setParam('recordId', component.get('v.recordId'));
-		getActividadesTrasladoColaborador.setCallback(this, response => {
-			if (response.getState() === 'SUCCESS') {
-				component.find('cambiarEstadoPendienteColaborador').set('v.disabled', !response.getReturnValue());
-			}
-		});
-		$A.enqueueAction(getActividadesTrasladoColaborador);
-	},
+	// getActividadesTrasladoColaborador: function(component) {
+	// 	let getActividadesTrasladoColaborador = component.get('c.actividadesTrasladoColaborador');
+	// 	getActividadesTrasladoColaborador.setParam('recordId', component.get('v.recordId'));
+	// 	getActividadesTrasladoColaborador.setCallback(this, response => {
+	// 		if (response.getState() === 'SUCCESS') {
+	// 			component.find('cambiarEstadoPendienteColaborador').set('v.disabled', !response.getReturnValue());
+	// 		}
+	// 	});
+	// 	$A.enqueueAction(getActividadesTrasladoColaborador);
+	// },
 
+	onInit : function(component, event, helper) {
+        helper.subscribeToEvent(component);
+    },
 
 	recordDataUpdated: function(component, event, helper) {
-
 		if (event.getParams().changeType === 'LOADED' || event.getParams().changeType === 'CHANGED') {
 			component.set('v.estadoInicial', component.get('v.caso.Status'));
 			component.set('v.opcionesMccCargadas', {canalesOperativos: false, tematicas: false, productos: false, motivos: false, causas: false, soluciones: false, campanas: false, erroresTf7: false});
@@ -47,6 +49,11 @@
 				component.find('selectItemCausa').set('v.value', component.get('v.caso.CC_MCC_Causa__c'));
 				component.set('v.comboboxesInformados.causa', true);
 			}
+			if(component.get('v.caso.RecordType.DeveloperName') === 'CC_Cliente'){
+				component.set('v.dynamicHidden', 'slds-hide');
+			} else {
+				component.set('v.dynamicHidden', '');
+			}
 			if (component.get('v.caso.CC_MCC_Solucion__c')) {
 				//if (!component.get('v.opcionesMccCargadas.soluciones')) {
 				component.set('v.opcionesSoluciones', [{value: component.get('v.caso.CC_MCC_Solucion__c'), label: component.get('v.caso.CC_MCC_Solucion__r.Name')}]);
@@ -72,7 +79,6 @@
 					let getCanalesOperativos = component.get('c.getCanalesOperativos');
 					getCanalesOperativos.setCallback(this, response => {
 						if (response.getState() === 'SUCCESS') {
-							z;
 							component.set('v.opcionesCanalOperativo', response.getReturnValue());
 							const labelCanalOperativo = component.get('v.opcionesCanalOperativo').find(opcion => opcion.value === component.get('v.caso.CC_Canal_Operativo__c')).label;
 							component.find('selectItemCanalOperativo').set('v.value', labelCanalOperativo);
@@ -100,17 +106,67 @@
 			}
 			//}
 			helper.esCasoPromoCaixa(component);
-			$A.enqueueAction(component.get('c.getActividadesTrasladoColaborador'));
+			if(component.get('v.caso.CC_Canal_Procedencia__c') && (component.get('v.caso.CC_Canal_Procedencia__c') === 'Emisiones PromoCaixa' || component.get('v.caso.CC_Canal_Procedencia__c').includes('CompraEstrella'))){
+                component.set('v.isFacilitea', true);
+            }else{
+				component.set('v.isFacilitea', false);
+			}
+			
+			if(component.get('v.caso.CC_MCC_Tematica__r.Name') && component.get('v.caso.CC_MCC_Tematica__r.Name').includes('Facilitea')){
+                component.set('v.isTematicaFacilitea', true);
+            }else{
+				component.set('v.isTematicaFacilitea', false);
+			}
+			// if(component.get('v.caso.RecordType.DeveloperName') !== 'CC_Cliente' ){
+			// 	$A.enqueueAction(component.get('c.getActividadesTrasladoColaborador'));
+			// }
+			
 			//Activa la casilla para cambiar el estado a Activo cuando el estado es pendiente cliente
 			//
-
 			if (!component.get('v.tieneActividad') && event.getParams().changeType === 'CHANGED' && !component.get('v.cerrarCaso')
 				&& !component.get('v.cierroCaso') && !component.get('v.voyACerrar')
 				&& component.get('v.caso.RecordType.DeveloperName') === 'CC_Cliente'
-				&& component.get('v.botonGuardarCerrar')) {
+				&& component.get('v.botonGuardarCerrar')
+				&& !component.get('v.ambitoCSBD')) {
 				$A.enqueueAction(component.get('c.comprobarAgrupacionSolucion'));
 			}
 
+			let tituloOnboarding = component.get("c.mensajeValidacionPreguntas");
+				tituloOnboarding.setParams({ "validacion": "TITULO_ONBOARDING" });
+				tituloOnboarding.setCallback(this, function (response) {
+					if (response.getState() === "SUCCESS") {
+						let tituloMensaje = response.getReturnValue();
+						component.set('v.tituloOnboarding',tituloMensaje.CC_Valor__c);
+					}
+				});
+				$A.enqueueAction(tituloOnboarding);
+
+				if (component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Onboarding' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Onboarding' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Desistir' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Desistir') {
+					let tituloDerivar = component.get("c.tituloDerivar");
+					if (component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Onboarding' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Onboarding') {
+						tituloDerivar.setParams({ "validacion": "Texto modal Onboarding" });
+					} else if (component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Desistir' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Desistir')  {
+						tituloDerivar.setParams({ "validacion": "Texto modal Desistir" });
+					}
+						tituloDerivar.setCallback(this, function (response) {
+							if (response.getState() === "SUCCESS") {
+								let tituloMensaje = response.getReturnValue();
+								component.set('v.tituloDerivar',tituloMensaje);
+							}
+						});
+						$A.enqueueAction(tituloDerivar);
+
+					let tituloYaDerivado = component.get("c.tituloYaDerivado");
+					tituloYaDerivado.setParams({});
+					tituloYaDerivado.setCallback(this, function (response) {
+						if (response.getState() === "SUCCESS") {
+							let titulo = response.getReturnValue();
+							component.set('v.tituloYaDerivado', titulo);
+						}
+					});
+					$A.enqueueAction(tituloYaDerivado);
+				}
+				
 		} else if (event.getParams().changeType === 'ERROR') {
 			console.error('force:recordData Error: ' + component.get('v.recordDataError'));
 			helper.mostrarToast('error', 'Problema recuperando los datos del caso', component.get('v.recordDataError'));
@@ -250,6 +306,31 @@
 		component.set('v.comboboxesInformados.solucion', false);
 		component.set('v.opcionesMccCargadas.causas', false);
 
+		// Ambito Onboarding/Desistir
+		let motivoId = component.find('selectItemMotivo').get('v.value');
+		if(motivoId !== null && motivoId !== undefined && motivoId !== ''){
+			let recuperarAmbitos = component.get('c.recuperarAmbitoMotivo');
+			recuperarAmbitos.setParams({
+				'recordId': motivoId
+			});
+			recuperarAmbitos.setCallback(this, response => {
+				if (response.getState() === 'SUCCESS') {
+					let respuesta = response.getReturnValue();
+					if (respuesta['Caixa'] === 'Onboarding' || respuesta['Caixa'] === 'Desistir' || respuesta['Imagin'] === 'Desistir' || respuesta['Imagin'] === 'Onboarding') {
+						if (component.get('v.caso.AccountId') != null) {
+							component.set('v.motivoOnboardingWS', true);
+							//$A.enqueueAction(component.get('c.llamadaWSOnboarding'));
+						} else {
+							//$A.enqueueAction(component.get('c.modalOnboardingAbrir'));
+							component.set('v.motivoOnboardingModal', true);
+						}
+					}
+				}
+			});
+			$A.enqueueAction(recuperarAmbitos);
+		}	
+		// End ambito motivo
+
 		helper.getOptionsCausas(component);
 	},
 
@@ -289,9 +370,82 @@
 		}
 	},
 
-	gestionaGuardarCerrar: function(component, event, helper) {
-		let agrupacionComprobacion = '';
+	gestionaGuardarCerrarPrevio: function(component, event, helper) {
 		component.set('v.cerrarCaso', event.getSource().getLocalId() === 'submitGuardarCerrar');
+		let esImagin = 	(
+			component.get('v.caso.Account.AV_IndicadoresClientes__c') != null && 
+			component.get('v.caso.Account.AV_IndicadoresClientes__c') != undefined  && 
+			component.get('v.caso.Account.AV_IndicadoresClientes__c').includes('28')
+		);
+		if (
+			( esImagin && component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Caso a Fraude' ) 
+			||
+			( !esImagin && component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Caso a Fraude' )
+		){
+			let action = component.get("c.validarActividadesFraude");
+			action.setParams({'recordId': component.get("v.recordId")});
+			action.setCallback(this, response => {
+				if (response.getState() === 'SUCCESS') {
+					if (response.getReturnValue()) {
+						component.set('v.isOpen', true);
+					} else {
+						component.set('v.isOpen', false);
+						$A.enqueueAction(component.get('c.gestionaGuardarCerrar'));
+					}
+				}
+			});
+			$A.enqueueAction(action);
+		} else if (component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Onboarding' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Onboarding' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Desistir' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Desistir') {
+			if (component.get('v.caso.CBK_Case_Extension_Id__r.CC_DerivadoBPO__c') === false) {
+				let action = component.get("c.comprobarCodigoOnboarding");
+				action.setParams({'codigo': component.get('v.caso.CBK_Case_Extension_Id__r.CC_CodigoONB__c')});
+				action.setCallback(this, response => {
+					if (response.getState() === 'SUCCESS') {
+						if (response.getReturnValue()) {
+							component.set('v.onboardingDesistir', true);
+						} else {
+							$A.enqueueAction(component.get('c.gestionaGuardarCerrar'));
+						}
+					}
+				});
+				$A.enqueueAction(action);
+			} else {
+				component.set('v.onboardingYaDerivado', true);
+			}
+		} else {
+			component.set('v.isOpen', false);
+			component.set('v.onboardingDesistir', false);
+			$A.enqueueAction(component.get('c.gestionaGuardarCerrar'));
+		}
+	},
+
+	handleNoDerivarFraude: function(component, event, helper){
+		component.set('v.isOpen', false);
+		component.set('v.cerrarCaso', true);
+		$A.enqueueAction(component.get('c.gestionaGuardarCerrar'));
+	},
+
+	handleNoDerivarFraudeCerrar: function(component, event, helper){
+		component.set('v.isOpen', false);
+	},
+
+
+	gestionaGuardarCerrar: function(component, event, helper) {
+		helper.inicioGuardar(component);
+		//copiar el detalle consulta en el campo detalles solucion para los RT de Clientes
+		if (
+			(
+				component.get('v.caso.CC_Detalles_Consulta__c') !== null  && 
+				component.get('v.caso.CC_Detalles_Consulta__c') !== '' &&
+				component.get('v.caso.CC_Detalles_Consulta__c') !== undefined
+			)			
+			&&
+			component.get('v.caso.RecordType.DeveloperName') === 'CC_Cliente'  
+		) {
+			component.set('v.caso.CC_Detalles_Solucion__c', component.get('v.caso.CC_Detalles_Consulta__c'));
+		}
+
+		let agrupacionComprobacion = '';
 		component.set('v.botonGuardarCerrar', true);
 		if (component.get('v.cerrarCaso')) {
 			component.set('v.cierroCaso', true);
@@ -308,7 +462,7 @@
 			}
 
 			if (!['Propuestas de mejora', 'Email - Revisar'].includes(component.get('v.caso.Origin'))) {
-				if (!component.find('CC_Tipo_Contacto__c').get('v.value')) {
+				if (component.find('CC_Tipo_Contacto__c') && !component.find('CC_Tipo_Contacto__c').get('v.value')) {
 					camposObligatoriosNoInformados.push('Tipo de contacto');
 				}
 				if (component.find('selectItemCanalOperativo') && !component.find('selectItemCanalOperativo').get('v.value')) {
@@ -326,10 +480,10 @@
 				if (!component.find('selectItemCausa').get('v.value')) {
 					camposObligatoriosNoInformados.push('Causa');
 				}
-				if (!component.find('selectItemCausa').get('v.value')) {
-					camposObligatoriosNoInformados.push('Solución');
-				}
-				if (!component.find('CC_Idioma__c').get('v.value')) {
+				// if (!component.find('selectItemCausa').get('v.value')) {
+				// 	camposObligatoriosNoInformados.push('Solución');
+				// }
+				if (component.find('CC_Idioma__c') && !component.find('CC_Idioma__c').get('v.value')) {
 					camposObligatoriosNoInformados.push('Idioma');
 				}
 			}
@@ -345,7 +499,7 @@
 			}
 
 			//
-			if (component.get('v.caso.CC_Canal_Procedencia__c') === 'Formulario Consultas Operativas') {
+			if (component.get('v.caso.CC_Canal_Procedencia__c') === 'Formulario Consultas Operativas' || component.get('v.caso.Origin') === 'Phone' || component.get('v.caso.Origin') === 'Chat') {
 				//Comprobar si hay tareas abiertas de reapertura automatica
 				let comprobarReaperturaValida = component.get('c.comprobarReaperturaValida');
 				comprobarReaperturaValida.setParams({
@@ -370,8 +524,6 @@
 								'valor': component.find('CC_Reapertura_Valida__c').get('v.value')
 							});
 							informarReaperturaValida.setCallback(this, response => {
-								if (response.getState() === 'SUCCESS') {
-								}
 							});
 							$A.enqueueAction(informarReaperturaValida);
 
@@ -383,6 +535,9 @@
 
 			if (camposObligatoriosNoInformados.length > 1) {
 				helper.mostrarToast('info', 'Campos obligatorios', 'Es necesario que informes Los siguientes campos antes de cerrar el caso:' + camposObligatoriosNoInformados.join('\n\u00a0\u00a0\u00a0\u00a0\u00a0·\u00a0\u00a0'));
+				helper.finGuardar(component);
+				component.set('v.cerrarCaso', false);
+				component.set('v.cierroCaso', false);
 				return;
 			}
 
@@ -400,24 +555,50 @@
 				}
 			}
 		}
+
 		let selectedMccMotivo = component.get('v.opcionesMotivos').find(motivo => motivo.value === component.find('selectItemMotivo').get('v.value'));
 		if (selectedMccMotivo != undefined) {
-
 			component.set('v.seleccionado', selectedMccMotivo.label);
 		}
 
+		let onboardingWS  = component.get('v.motivoOnboardingWS');
+		let onboardingModal = component.get('v.motivoOnboardingModal');
+		let esImagin = 	(
+			component.get('v.caso.Account.AV_IndicadoresClientes__c') != null && 
+			component.get('v.caso.Account.AV_IndicadoresClientes__c') != undefined  && 
+			component.get('v.caso.Account.AV_IndicadoresClientes__c').includes('28')
+		);
+		if (
+			( esImagin && component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Onboarding' ) 
+			||
+			( !esImagin && component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Onboarding' )
+		) {
+			onboardingWS = component.get('v.caso.AccountId') != null ? true : false;
+			onboardingModal = onboardingWS ? false : true;
+		}
 
-		helper.inicioGuardar(component);
+		// Llamada a Onboarding
+		if (!component.get('v.cerrarCaso')) {
+			if(onboardingWS){
+			$A.enqueueAction(component.get('c.llamadaWSOnboarding'));
+			} else if(onboardingModal){
+				$A.enqueueAction(component.get('c.modalOnboardingAbrir'));
+			}
+		}
+		// ---- Fin llamada a Onboarding ----
 
 		//if (!component.get('v.continuarGuardarCerrar') && caso.RecordType.DeveloperName === 'CC_Cliente' && (agrupacionComprobacion === 'Derivar a oficina' || agrupacionComprobacion === 'Derivar a oficina: Limitación protocolo')) {
 
 		//Validaciones en servidor
 		let selectItemCanalOperativo = component.find('selectItemCanalOperativo');
 		let validarGuardar = component.get('c.validarGuardarCerrar');
+		let nuevoCanalRespuesta = component.get('v.caso.Origin') !== 'Propuestas de mejora' ? 
+			component.find('modificarResp') !== undefined ? component.find('modificarResp').get('v.value') : null 
+			: null;
 		validarGuardar.setParams({
 			'recordId': component.get('v.recordId'),
 			'cerrar': component.get('v.cerrarCaso'),
-			'nuevoCanalRespuesta': component.get('v.caso.Origin') !== 'Propuestas de mejora' ? component.find('modificarResp').get('v.value') : null,
+			'nuevoCanalRespuesta': nuevoCanalRespuesta,
 			'nuevoCanalOperativo': selectItemCanalOperativo ? selectItemCanalOperativo.get('v.value') : null,
 			'nuevaTematica': component.find('selectItemTematica').get('v.value'),
 			'nuevoProducto': component.find('selectItemProducto').get('v.value'),
@@ -425,7 +606,7 @@
 			'agrupacionComprobacion': agrupacionComprobacion
 
 		});
-		let rec = component.get('v.seleccionado');
+		//let rec = component.get('v.seleccionado');
 		validarGuardar.setCallback(this, response => {
 			if (response.getState() === 'ERROR') {
 				//Se muestra un Toast de error y no se sigue adelante con el update de la recordEditForm
@@ -443,8 +624,16 @@
 				for (let key in responseValidarGuardar) {
 					if (key === 'tieneActividad') {
 						component.set('v.tieneActividad', responseValidarGuardar[key]);
+					}else if (key === 'ambitoCSBD') {
+						component.set('v.ambitoCSBD', responseValidarGuardar[key]);
+					} else if (key === 'cambiarStatusAuto') {
+						component.set('v.cambiarStatusAuto', responseValidarGuardar[key]);
+						if(component.get('v.cambiarStatusAuto') === true){
+						helper.recuperarMensajeToast(component, 'error', 'BLOQUEADO_ARGOS');
+						}
 					}
 				}
+				
 				helper.guardar(component, responseValidarGuardar);
 			}
 		});
@@ -455,7 +644,7 @@
 	recordEditFormOnLoad: function(component) {
 		component.set('v.recordEditFormLoaded', true);
 
-		if (component.find('estado').get('v.value') === 'Pendiente Cliente') {
+		if (component.find('estado').get('v.value') === 'Pendiente Cliente' && component.find('cambiarEstadoActivo')) {
 			component.find('cambiarEstadoActivo').set('v.disabled', false);
 		}
 
@@ -509,8 +698,6 @@
 		}
 
 
-
-
 		helper.finGuardar(component);
 
 		/*PENDiENTE CONFIRMACIÓN DEL CLIENTE PARA ACTIVAR ESTA PARTE
@@ -530,7 +717,7 @@
 		if (component.get('v.cerrarCaso')) {
 			helper.mostrarToast('success', 'Se cerró Caso', 'Se cerró correctamente el caso ' + component.get('v.caso.CaseNumber'));
 			component.set('v.cerrarCaso', false);
-		} else if (component.get('v.caso.CC_Canal_Procedencia__c') === 'Formulario Consultas Operativas' && component.get('v.noCerrarFCO')) {
+		} else if ((component.get('v.caso.CC_Canal_Procedencia__c') === 'Formulario Consultas Operativas' || component.get('v.caso.Origin') === 'Phone' || component.get('v.caso.Origin') === 'Chat') && component.get('v.noCerrarFCO')) {
 			helper.mostrarToast('error', 'Campo obligatorio', 'Es necesario que informes el campo Reapertura Válida');
 		} else {
 			helper.mostrarToast('success', 'Se actualizó Caso', 'Se actualizaron correctamente los datos del caso ' + component.get('v.caso.CaseNumber'));
@@ -591,7 +778,18 @@
 		$A.enqueueAction(cerrarCasoOrigen);
 	},
 
+	handleDerivarFraude: function(component, event, helper) {
+		let validado = helper.camposObligatoriosNoInformados(component);
+		if(validado){
+			component.set('v.cerrarCaso', false);
+			$A.enqueueAction(component.get('c.handleModalDerivar'));	
+		} else {
+			component.set('v.isOpen', false);
+		}
+	},
+
 	handleModalDerivar: function(component, event, helper) {
+		component.set('v.isOpen', false);
 		component.set('v.cierroCaso', false);
 		component.set('v.mostrarComponenteOperativaDerivar', true);
 		$A.util.removeClass(component.find('modalOperativaOficina'), 'slds-fade-in-open');
@@ -630,7 +828,7 @@
 		}
 	},
 
-	comprobarAgrupacionSolucion: function(component) {
+	comprobarAgrupacionSolucion: function(component, event, helper) {
 		/*const caso = component.get('v.caso');
 		let agrupacionComboBox = '';
 		let agrupacionComprobacion = '';
@@ -649,13 +847,25 @@
 			comprobarTareaOperativaOficina.setCallback(this, responseComprobarTareaOperativaOficina => {
 				if (responseComprobarTareaOperativaOficina.getState() === 'SUCCESS') {
 					if (!responseComprobarTareaOperativaOficina.getReturnValue()) {*/
-		component.set('v.mostrarAvisoOperativaOficina', true);
-		component.set('v.continuarGuardarCerrar', true);
-		component.set('v.botonGuardarCerrar', false);
-
-		$A.util.addClass(component.find('modalOperativaOficina'), 'slds-fade-in-open');
-		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
+			component.set('v.mostrarAvisoOperativaOficina', true);
+			component.set('v.continuarGuardarCerrar', true);
+			component.set('v.botonGuardarCerrar', false);
+			let esImagin = 	(
+				component.get('v.caso.Account.AV_IndicadoresClientes__c') != null && 
+				component.get('v.caso.Account.AV_IndicadoresClientes__c') != undefined  && 
+				component.get('v.caso.Account.AV_IndicadoresClientes__c').includes('28')
+			);
+		// if (
+		// 	( esImagin && component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Caso a Fraude' ) 
+		// 	 ||
+		// 	( !esImagin && component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Caso a Fraude' )
+		// ) {
+			helper.guardarCerrarAuxiliar(component);
+		// }
 		/*} else {
+			// Código a ejecutar si ambas condiciones son verdaderas
+						$A.util.addClass(component.find('modalOperativaOficina'), 'slds-fade-in-open');
+						$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 						helper.guardar(component, responseValidarGuardar);
 					}*/
 		//}
@@ -666,6 +876,43 @@
 	validacionesLinksTF: function(component, event, helper) {
 		let mccMotivoId = component.get('v.caso.CC_MCC_Motivo__c');
 		let tieneFicha = component.get('v.caso.CC_MCC_Motivo__r.CC_Tipo_Ficha_TF__c');
+		let caseOrigin  = component.get('v.caso.Origin');
+
+		let canalesEscritos = ['Chat', 'Email','Comentarios Stores', 'Fax']; 		
+
+		let autenticacionRequerida = true;
+		if (canalesEscritos.includes(caseOrigin)) {
+			autenticacionRequerida = false; //No se requiere autenticación para canales escritos
+		}
+
+		if (component.get('v.caso.CC_MCC_Motivo__r.CC_No_autenticar_TF__c')) {
+        autenticacionRequerida = false; //No se requiere autenticación si el campo No Autenticar TF está marcado
+		}
+
+		 if (!autenticacionRequerida) {
+        // Si no se requiere autenticación (es canal escrito o MCC tiene flag)
+        if (tieneFicha) {
+            let crearTarea = component.get('c.crearTareaTF9');
+            crearTarea.setParams({recordId: component.get('v.recordId'), motivo: component.get('v.caso.CC_MCC_Motivo__r.CC_Tipo_Ficha_TF__c')});
+            crearTarea.setCallback(this, response => {
+                if (response.getState() === 'SUCCESS') {
+                    let linkTF = response.getReturnValue();
+                    if (linkTF) {
+                        helper.recuperarMensajeToast(component, 'success', 'OK_TF');
+                        window.open(linkTF, '_blank');
+                    } else {
+                        helper.recuperarMensajeToast(component, 'error', 'KO_TF');
+                    }
+                } else if (response.getState() === 'ERROR') {
+                    helper.recuperarMensajeToast(component, 'error', 'ERROR_APEX_CREAR_TAREA'); // Nuevo mensaje de error para claridad
+                }
+            });
+            $A.enqueueAction(crearTarea);
+        } else {
+            helper.recuperarMensajeToast(component, 'info', 'NO_FICHA');
+        }
+
+		} else {
 
 		let comprobarAutenticacion = component.get('c.comprobarAutenticacion');
 		comprobarAutenticacion.setParams({recordId: component.get('v.recordId')});
@@ -713,7 +960,90 @@
 		});
 		$A.enqueueAction(comprobarAutenticacion);
 
+		}
+
+	},
+
+	//-------Metodos onboarding---------
+	modalOnboardingAbrir: function(component, event, helper) {
+		window.setTimeout($A.getCallback(() => {
+			$A.util.addClass(component.find('ModalBoxOnboarding'), 'slds-fade-in-open');
+			$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
+			component.find('ModalBoxOnboarding').focus();
+		}), 200);
+	},
+
+	modalOnboardingCerrar: function(component, event, helper) {
+		// component.set('v.valueInputDNI', null); // Cambiar por id?
+
+		let pillTarget = component.find('lookup-pill-queue');
+		$A.util.addClass(pillTarget, 'slds-hide');
+		$A.util.removeClass(pillTarget, 'slds-show');
+
+		let lookUpTarget = component.find('lookupFieldQueue');
+		$A.util.addClass(lookUpTarget, 'slds-show');
+		$A.util.removeClass(lookUpTarget, 'slds-hide');
+
+		$A.util.removeClass(component.find('ModalBoxOnboarding'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
+	},
+
+	modalOnboardingTeclaPulsada: function(component, event) {
+		if (event.keyCode === 27) { //ESC
+			$A.enqueueAction(component.get('c.modalOnboardingCerrar'));
+		}
+	},
+
+	validarDNIOnboarding: function(component, event) {
+		if (component.find('inputDNIOnboarding').get('v.value') == null || component.find('inputDNIOnboarding').get('v.value') == '') {
+			component.set('v.botonValidarOnboarding', true);
+		} else {
+			component.set('v.botonValidarOnboarding', false);
+		}
+	},
+
+	llamadaWSOnboarding: function(component, event, helper) {
+		component.set('v.botonValidarOnboarding', true);
+		let dni = component.find('inputDNIOnboarding').get('v.value');
+		let wsOnboarding = component.get('c.llamadaWSOnboardingApex');
+		wsOnboarding.setParams({
+			'recordId': component.get('v.recordId'),
+			'nif': dni
+		});
+		wsOnboarding.setCallback(this, response => {
+			if (response.getState() === 'SUCCESS') {
+				let respuesta = response.getReturnValue();
+				if (respuesta === 'El cliente no esta en proceso de Onboarding') {
+					helper.recuperarMensajeToast(component, 'warning', 'CLIENTE_NO_ONBOARDING');
+				} else if (respuesta === 'El cliente esta en proceso de Onboarding') {
+					helper.recuperarMensajeToast(component, 'success', 'CLIENTE_PROCESO_ONBOARDING');
+				}
+			}
+			$A.enqueueAction(component.get('c.modalOnboardingCerrar'));
+		});
+		$A.enqueueAction(wsOnboarding);
+		component.set('v.botonValidarOnboarding', false);
+	},
+
+	envioCorreoOnboarding: function(component, event, helper) {
+		component.set('v.onboardingDesistir', false);
+		let envioCorreo = component.get('c.envioCorreoOnboardingApex');
+		envioCorreo.setParams({'recordId': component.get('v.recordId')});
+		envioCorreo.setCallback(this, response => {
+			if (response.getState() === 'SUCCESS') {
+				$A.enqueueAction(component.get('c.gestionaGuardarCerrar'));
+			}
+		});
+		$A.enqueueAction(envioCorreo);
+	},
+
+	cerrarModalYaDerivado: function(component, event, helper) {
+		component.set('v.onboardingYaDerivado', false);
+		component.set('v.onboardingDesistir', false);
+		$A.enqueueAction(component.get('c.gestionaGuardarCerrar'));
 	}
+
+	//-------Fin Metodos onboarding---------
 
 	/*continuarGuardarCerrar: function(component) {
 		component.set('v.continuarGuardarCerrar', true);

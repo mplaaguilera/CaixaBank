@@ -107,21 +107,22 @@
             getExternalCases.setCallback(this, function(response){
                 let state = response.getState();
                 if (state === "SUCCESS") {
-                    let rowsATR = response.getReturnValue();
+                    let rowsATR = response.getReturnValue();                    
 
-                    for ( let i = 0; i < rowsATR.length; i++ ) {
-                        if (rowsATR[i].customerIds)
-                       {
-                            for ( let j = 0; j < rowsATR[i].customerIds.length; j++ ) {
-                                if (j!==0){
-                                    rowsATR[i].customers= rowsATR[i].customers+"  /  ";
+                    if(rowsATR){
+                        for ( let i = 0; i < rowsATR.length; i++ ) {
+                            if (rowsATR[i].customerIds){
+                                for ( let j = 0; j < rowsATR[i].customerIds.length; j++ ) {
+                                    if (j!==0){
+                                        rowsATR[i].customers= rowsATR[i].customers+"  /  ";
+                                    }
+                                    rowsATR[i].customers= rowsATR[i].customers+rowsATR[i].customerIds[j];
                                 }
-                                rowsATR[i].customers= rowsATR[i].customers+rowsATR[i].customerIds[j];
                             }
                         }
-                    }
-                    if(rowsATR[0].claimCode != null){
-                        component.set("v.atrList", rowsATR);
+                        if(rowsATR[0].claimCode != null){
+                            component.set("v.atrList", rowsATR);
+                        }
                     }
                 }
             });

@@ -28,6 +28,12 @@
     <!-- US670077 atributos para el desarrollo de adjuntar los archivos de la reclamacion a la derivacion automaticamente -->
     <aura:attribute name="adjuntosDerivar" type="Boolean"/>
 
+    <!-- Atributos para el desarrollo de añadir un tag a las imágenes insertadas -->
+    <aura:attribute name="imageTagsMap" type="Map" />
+    <aura:attribute name="flagCambioPlantillaPadre" type="Boolean" default="false"/>
+    <aura:attribute name="todasImgConTag" type="Boolean" default="true"/>
+
+
     <aura:registerEvent name="cmpEvent" type="c:SAC_ResolverConsultaEvt"/>
     <!--doInit-->
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
@@ -88,13 +94,18 @@
                     
                     <c:spv_RecuperarPlantillas recordId="{!v.caso.Id}" recordIdAux="{!v.consulta.Id}" subjectPlantilla="{!v.asunto}" cuerpoPlantilla="{!v.cuerpo}"/>
     
+                    <c:sac_ModificarTagImagenes name="sac_ModificarTagImagenes" cuerpo="{!v.cuerpo}" recordId="{!v.consulta.Id}" imageTagsMap ="{!v.imageTagsMap}" onevtmodimagen="{!c.handleEventModificarImagen}"/>
+                    
                     <!-- LMG - FIN - Boton plantillas -->
                     <div style="padding-top: 8px;">
-                    <!--    <lightning:inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="true" title="Cuerpo"> -->
-                            <!-- onchange='{!c.cambiaCuerpo}' -->
-                    <!--   </lightning:inputRichText>-->
-                    <c:SAC_inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="true" title="Cuerpo"/>
-
+                        <aura:if isTrue="{!and(v.consulta != '', v.consulta != null, v.consulta != undefined)}">
+                            <c:sac_inputRichTextLWC aura:id="sac_inputRichText1" name="sac_inputRichText" value="{!v.cuerpo}" recordId="{!v.consulta.Id}" label="Cuerpo" title="Cuerpo" labelVisible="true" imageTagsMap ="{!v.imageTagsMap}" onevtinforichtext="{!c.handleEventRichText}" onevtflagcambioplantilla="{!c.handleEventFlagCambioPlantilla}" flagCambioPlantilla="{!v.flagCambioPlantillaPadre}"/>
+                            <!-- <c:SAC_inputRichText value='{!v.cuerpo}' recordId="{!v.consulta.Id}" label="Cuerpo" labelVisible="true" title="Cuerpo"/> -->
+                            <aura:set attribute="else">
+                                <!-- <c:SAC_inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="true" title="Cuerpo"/> -->
+                                <c:sac_inputRichTextLWC aura:id="sac_inputRichText2" name="sac_inputRichText" value="{!v.cuerpo}" recordId="{!v.caso.Id}" label="Cuerpo" title="Cuerpo" labelVisible="true" imageTagsMap ="{!v.imageTagsMap}" onevtinforichtext="{!c.handleEventRichText}" onevtflagcambioplantilla="{!c.handleEventFlagCambioPlantilla}" flagCambioPlantilla="{!v.flagCambioPlantillaPadre}"/>
+                            </aura:set>
+                        </aura:if>
                     </div>
                 </div>
                 <div class="slds-grid">
@@ -103,49 +114,11 @@
                             <lightning:button variant="brand" label="Enviar" title="Enviar" onclick="{!c.muestraModal}" /> <!-- muestraModalValidar -->
                         </div>
                     </aura:if>
-                    <!-- OCS SE ELIMINA LA INSERCION DE ADJUNTOS
 
-                    <div class="slds-col slds-size_6-of-12 slds-float_left" style="padding: 8px;">
-                        <lightning:fileUpload label="Adjuntar archivos adicionales" name="fileUploader" multiple="true"
-                            fileFieldName="SAC_StringRedaccion_fileupload__c" fileFieldValue="{!v.stringRed}"
-                            accept="{!v.filetype}" recordId="{!v.caso.Id}"
-                            onuploadfinished="{!c.handleUploadFinished}" />
-                    </div>-->
-                    <!--<aura:if isTrue="{v.procedencia=='Redaccion'}">
-                    
-                </aura:if> -->
-
-                
                 </div>
-                <!-- OCS SE ELIMINA LA INSERCION DE ADJUNTOS
-                <div class="slds-grid">
-                    <div class="slds-col slds-size_12-of-12 slds-float_left" style="padding: 8px;">
-                        <h1 style="padding-top: 12px; font-size: 15px; padding-bottom: 8px"><b>Archivos Adjuntos:</b>
-                        </h1>
-                        <br />
-                        <aura:iteration items="{!v.ficherosAdjuntos}" var="item">
-                            <div class="slds-grid">
-                                <div class="slds-col">
-                                    <div>
-                                        <lightning:icon iconName="doctype:attachment" alternativeText="Adjunto"
-                                            title="Adjunto" size="small" />
-                                        <lightning:badge label="{!item.Title}" />    
-                                        <div class="slds-float_right">
-                                            <lightning:button variant="base" label="Borrar" title="Borrar"
-                                                onclick="{!c.borrarAdjunto}" name="{!item.Id}" />
-                                            <lightning:button variant="base" label="Visualizar" title="Visualizar"
-                                                onclick="{!c.previsualizarDoc}" name="{!item.ContentDocumentId}" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </aura:iteration>
-                    </div>
-                </div> -->
             </div>
         </div>
     </aura:if>
-
      <!-- Modal para informar de que hay elementos por validar-->
      <aura:if isTrue="{!and(v.procedencia=='SAC_003',v.modalValidar)}">
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"

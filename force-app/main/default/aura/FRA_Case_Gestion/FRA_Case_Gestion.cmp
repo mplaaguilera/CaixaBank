@@ -6,8 +6,6 @@
     <aura:attribute name="guardando" type="Boolean" default="false"/>
     <aura:attribute name="esPropietario" type="Boolean" default="false"/>
 
-												   
-
     <!--Opciones de los desplegables-->
     <aura:attribute name="opcionesCargadas" type="Map" default="{'tematicas': false, 'productos': false, 'motivos': false, 'causas': false, 'soluciones': false, 'campanasFMW': false}"/>
     <aura:attribute name="nivelSeleccionado" type="Map" default="{'tematica': false, 'producto': false, 'motivo': false, 'causa': false, 'solucion': false, 'campanaFMW': false}"/>

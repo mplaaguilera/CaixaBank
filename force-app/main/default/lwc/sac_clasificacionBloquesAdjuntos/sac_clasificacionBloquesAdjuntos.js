@@ -25,6 +25,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
     @api esRecAsociadaASPV;
     @api recordTypeRegistro;
     @api deleteLastCV;
+    @api permitirEdicion;
     @track recordTypeId;
     @track sacBloqueValues;
     @track modalClasificar = false;
@@ -33,7 +34,9 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
     @track opcionesBloquesFichero;
     @track opcionesBloquesSeleccionadas;
     @track esRespuesta;
+    @track mapFicheroBloque = [];
 
+    @api estaEnTramitacion;
     
     bloqueContieneElFichero;
     ContentDocumentId;
@@ -88,10 +91,23 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
                     const sacBloqueArray = this.fichero.SAC_Bloque__c.split(';');
                     // Verificar si el array contiene el valor de bloqueAcordeon
                     if (sacBloqueArray.includes(this.bloqueAcordeon)) {
-                        this.bloqueContieneElFichero = true;
-                        //Guardar los valores que contiene el campo en una lista
-                        this.opcionesBloquesFichero = sacBloqueArray;
-                        this.opcionesBloquesSeleccionadas = this.opcionesBloquesFichero;
+                        console.log('this.esUserGeneral -> ' + this.esUserGeneral);
+                        console.log('this.bloqueAcordeon -> ' + this.bloqueAcordeon);
+                        console.log('this.fichero.SAC_Enviado__c -> ' + this.fichero.SAC_Enviado__c);
+                        
+                        if(this.esUserGeneral || (!this.esUserGeneral && (this.bloqueAcordeon != 'SAC_Respuesta' || (this.bloqueAcordeon == 'SAC_Respuesta' && this.fichero.SAC_Enviado__c)))){
+                            this.bloqueContieneElFichero = true;
+                            //Guardar los valores que contiene el campo en una lista
+                            this.opcionesBloquesFichero = sacBloqueArray;
+                            this.opcionesBloquesSeleccionadas = this.opcionesBloquesFichero;
+                        }
+
+                        //LO NUEVO - ALEX
+                        if(this.esUserGeneral == false && this.estaEnTramitacion == true){
+                            this.bloqueContieneElFichero = false;
+                        }
+
+                        //---------------
                     } else {
                         this.bloqueContieneElFichero = false;
                     }
@@ -107,7 +123,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
         return this.mostrarOculto || this.fichero.SAC_Oculto__c === false;
     }
 
-    ficheroSeleccionado(event) {
+    ficheroSeleccionado(event) {       
         let id = event.currentTarget.id;
 
         // Comprueba si el id contiene un guion seguido de uno o más números
@@ -131,7 +147,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
 
     abrirModalClasificar(event) {
         this.modalClasificar = true;
-        this.selectedFichero = event.target.value;
+        this.selectedFichero = event.target.value;       
     }
 
     cerrarModalClasificar(event) {
@@ -224,9 +240,13 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
     cambiarClasificacionFichero() {
         this.disableButtons = true;
 
+        var idsFicheros = new Set();        
+        idsFicheros.add(this.selectedFichero.ContentDocumentId);        
+
         cambiarClasificacionApex({
-            idAdjunto: this.selectedFichero.Id,
-            listaValoresBloque: this.opcionesBloquesSeleccionadas
+            listIdAdjuntos: Array.from(idsFicheros),
+            listaValoresBloque: this.opcionesBloquesSeleccionadas,
+            caseId: this.recordId
         })
         .then(result => {
             this.showToast("Clasificación modificada", "Se ha modificado el bloque del fichero", "success");
@@ -269,7 +289,8 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
     mostrarOpciones(event) {
         // Lógica para mostrar las opciones cuando se hace clic en el primer input (onclick)
         recuperaTipoAdjuntosApex({
-            id: ''
+            id: '',
+            rtCaso: this.recordTypeRegistro
         })
         .then(result => {
             this.opcionesMaestroAdjuntos = result;
@@ -330,4 +351,20 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
         });
     }
 
+    handleClasifMultiple(event) {
+        
+        let idFicheroAct = event.target.value;
+        let bloqueAct = event.target.name;
+        let marcadoAct = event.target.checked;     
+
+        const interaccionClasifMultiple = new CustomEvent('clasifmultipleaction', {
+            detail: {
+                idFichero: idFicheroAct,
+                bloqueFichero: bloqueAct,
+                marcadoFichero: marcadoAct,
+                bloqueActual: this.bloqueAcordeon
+            }
+        });
+        this.dispatchEvent(interaccionClasifMultiple);
+    }
 }

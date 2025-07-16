@@ -10,22 +10,22 @@ import { updateRecord } from 'lightning/uiRecordApi';
 import comprobarPermisosVinculacion from '@salesforce/apex/SPV_LCMP_ReclamacionesVinculadas.comprobarPermisosVinculacion';
 
 import ACCOUNTID from '@salesforce/schema/Case.AccountId';
-import CASORELACIONADO from '@salesforce/schema/Case.CC_CasoRelacionado__c';
 
 
 const FIELDS = [
-    ACCOUNTID,
-    CASORELACIONADO
+    ACCOUNTID
 ];
 
 export default class Spv_AsociarReclamacion extends NavigationMixin(LightningElement) {
-    @track existenReclamaciones = false;
-    @track idCasoRelacionado = '';
-    @track listadoReclamaciones = [];
-    @track deshabilitarBotones = false;
     @api recordId;    
     @api caseId;
     @api isLoading = false;
+    @api tabNombre;
+    @track existenReclamaciones = false;
+    @track listadoReclamaciones = [];
+    @track deshabilitarBotones = false;
+    @track tituloInicial = 'Reclamaciones relacionadas';
+    @track esRegistroSAC;
 
     
     _wiredResult;
@@ -42,35 +42,43 @@ export default class Spv_AsociarReclamacion extends NavigationMixin(LightningEle
                         this.showToast('Error', 'No existe un cliente asociado a la reclamación.', 'error');
                     }
                 }
-                if (campo == 'CC_CasoRelacionado__c'){
-                    if (data.fields[campo].value != null){
-                        this.idCasoRelacionado = data.fields[campo].value;
-                    }
-                }
             }
 
             if(hayReclamante){
-                getReclamacionesMismoReclamante({ idCasoActual: this.recordId}).then(result => {
-                    if (result) {
+                getReclamacionesMismoReclamante({ idCasoActual: this.recordId, regProyecto: this.tabNombre}).then(result => {
+                    
+                    if (result) {                        
                         this.listadoReclamaciones = [];
                         this._wiredResult = result;
                         this.existenReclamaciones = true;
                         let reclamaciones = result;
-                        
 
-                        for (var miReclamacion in reclamaciones) {                
+                        for (var miReclamacion in reclamaciones) {  
                             let reclamacion = reclamaciones[miReclamacion];
                             reclamacion.isExpanded = false;
-                            reclamacion.toggleText = 'Ver más...';
+                            reclamacion.toggleText = 'Ver más...';                            
 
-                            if(reclamacion.reclamacionActual.Id === this.idCasoRelacionado){
+                            if(reclamacion.casoVinculadoActual){
                                 reclamacion.desactivarVincular = true;
                                 reclamacion.desactivarDesvincular = false;
                             }else{
                                 reclamacion.desactivarVincular = false;
                                 reclamacion.desactivarDesvincular = true;
                             }
-                            this.listadoReclamaciones.push(reclamacion);
+
+                            //Aqui vamos a intentar meter a cada pretension su N_Contrato                            
+                            var listPretensiones = reclamacion.listaPretensionesActual;
+                            var listacontratos = reclamacion.mapPretNumerosContratosActual;
+
+                            listPretensiones.forEach(pretension => {
+                                //Obtener los contratos relacionados al Id de la pretension desde listacontratos
+                                const contratos = listacontratos[pretension.Id] || [];
+
+                                // Agregar un nuevo campo 'Contratos' al objeto pretension
+                                pretension.contratosPret = contratos;
+                            });
+
+                            this.listadoReclamaciones.push(reclamacion);                            
                         } 
 
                         this.listadoReclamaciones.sort(function(r1,r2){ 
@@ -84,7 +92,7 @@ export default class Spv_AsociarReclamacion extends NavigationMixin(LightningEle
                         });
                     }
                 })
-                .catch(error => {
+                .catch(error => {                    
                     this.showToast('Error', error.body.message, 'error');
                 });
             }
@@ -102,7 +110,17 @@ export default class Spv_AsociarReclamacion extends NavigationMixin(LightningEle
         }
     };
 
+    connectedCallback(){           
+        if(this.tabNombre){
+            this.tituloInicial = 'Reclamaciones ' + this.tabNombre + ' relacionadas';
 
+            if(this.tabNombre === 'SAC'){
+                this.esRegistroSAC = true;
+            }else if(this.tabNombre === 'Supervisores'){
+                this.esRegistroSAC = false;
+            }
+        }
+    }
 
     navigateToCase(evt) {
 
@@ -163,11 +181,10 @@ export default class Spv_AsociarReclamacion extends NavigationMixin(LightningEle
             }
         }
 
-        desvincularReclamacion({ idCasoActual: this.recordId }).then(result => {
+        desvincularReclamacion({ idCasoVinculado: this.caseId, idCasoActual: this.recordId }).then(result => {
             this.showToast('Reclamacion desvinculada', 'La reclamación ha sido desvinculada correctamente.', 'success');
             this.isLoading = false; 
             this.listadoReclamaciones = [];
-            this.idCasoRelacionado = '';
             refreshApex(this._wiredResult);
             this.updateRecordView(this.recordId);
 

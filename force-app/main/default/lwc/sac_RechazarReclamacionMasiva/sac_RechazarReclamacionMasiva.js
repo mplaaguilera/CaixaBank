@@ -69,7 +69,7 @@ export default class sac_RechazarReclamacionMasiva extends LightningElement {
                                         });
                                         this.dispatchEvent(evt);
                                         window.history.back();  
-                                    } else {
+                                    } else {                                        
                                         const evt = new ShowToastEvent({
                                             title: 'Error',
                                             message: JSON.stringify(data),
@@ -80,10 +80,11 @@ export default class sac_RechazarReclamacionMasiva extends LightningElement {
                                     } 
                                 })
                                 .catch(error => {  
-                                    this.isLoading = false;   
+                                    this.isLoading = false;                                    
+                                      
                                     const evt = new ShowToastEvent({
                                         title: 'Error',
-                                        message: JSON.stringify(error),
+                                        message: JSON.stringify(error.body.pageErrors[0].message),
                                         variant: 'error'
                                     });
                                     this.dispatchEvent(evt); 

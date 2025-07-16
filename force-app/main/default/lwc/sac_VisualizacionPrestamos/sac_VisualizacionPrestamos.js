@@ -1,73 +1,39 @@
-import { LightningElement, api, wire, track } from 'lwc';
+import {LightningElement, api, wire} from 'lwc';
+
 import getPrestamosByAccountId from '@salesforce/apex/SAC_VisualizacionPrestamos.getPrestamosByAccountId';
 
+const TITULOS = {'SAC_Prestamo': 'Préstamos', 'SAC_Titular_Prestamo': 'Titular Préstamo', 'SAC_Titular_Cuenta': 'Titular Cuenta'};
+
 export default class prestamoList extends LightningElement {
-    @api recordId;
-    prestamosRT;
-    @track selectedPrestamoId;
-    showMessage = false;
+	@api recordId;
 
-    // Get related Préstamos
-    @wire(getPrestamosByAccountId, { recId: '$recordId' })
-    wiredprestamos({ error, data }) {
-        if (data) {
-            let hasValidation = false;
-            let spinnerLoading = true;
-            this.prestamosRT = Object.keys(data).map(recordTypeDevName => {
-                let tableTitle;
-                if (recordTypeDevName === 'SAC_Prestamo') {
-                    tableTitle = 'Préstamos';
-                } else if (recordTypeDevName === 'SAC_Titular_Prestamo') {
-                    tableTitle = 'Titular Préstamo';
-                } else if (recordTypeDevName === 'SAC_Titular_Cuenta') {
-                    tableTitle = 'Titular Cuenta';
-                }
+	prestamos;
 
-                // Check validation
-                const prestamos = data[recordTypeDevName].map(prestamo => {
-                    if (prestamo.validation) { 
-                        hasValidation = true;
-                    }
-                    return {
-                        ...prestamo,
-                    };
-                });
+	showErrorMessage = false;
 
-                return {
-                    tableTitle,
-                    prestamoRT: recordTypeDevName === 'SAC_Prestamo',
-                    titularPrestamoRT: recordTypeDevName === 'SAC_Titular_Prestamo',
-                    titularCuentaRT: recordTypeDevName === 'SAC_Titular_Cuenta',
-                    prestamos: prestamos
-                };
-            });
-            spinnerLoading = false;
-            this.showMessage = true;
-            // Event for validation
-            const event = new CustomEvent('validationcheck', {
-                detail: { hasValidation, spinnerLoading}
-             });
-            this.dispatchEvent(event);
-        } else if (error) {
-            this.prestamosRT = undefined;
-            this.showMessage = true;
-        }
-    }
+	@wire(getPrestamosByAccountId, {recId: '$recordId'})
+	wiredprestamos({error, data: prestamos}) {
+		if (prestamos) {
+			const self = this;
+			setTimeout(() => {
+				this.prestamos = Object.keys(prestamos).map(rt => ({
+					tableTitle: TITULOS[rt],
+					prestamoRT: rt === 'SAC_Prestamo',
+					titularPrestamoRT: rt === 'SAC_Titular_Prestamo',
+					titularCuentaRT: rt === 'SAC_Titular_Cuenta',
+					prestamos: prestamos[rt].map(p => ({...p, showDetails: false}))
+				}));
+				self.dispatchEvent(new CustomEvent('validationcheck', {
+					detail: {hasValidation: Object.values(prestamos).flat().some(p => p.validation)}}));
+			}, 0);
 
-    // Press "Desplegar" button
-    toggleDetailsprestamo(event) {   
-        const recId = event.currentTarget.dataset.id;
-        this.prestamosRT = this.prestamosRT.map((recordType) => {
-            return {
-                ...recordType,
-                prestamos: recordType.prestamos.map((prestamo) => {
-                    if (prestamo.prestamo.Id === recId) {
-                        return { ...prestamo, showDetails: !prestamo.showDetails };
-                    } else {
-                        return prestamo;
-                    }
-                })
-            };
-        });
-    }
+		} else if (error) {
+			this.prestamos = null;
+			this.showErrorMessage = true;
+		}
+	}
+
+	abrirCerrarDetalles({currentTarget: botonMostrarDetalles}) {
+		botonMostrarDetalles.closest('article.slds-card').classList.toggle('detallesVisibles');
+	}
 }

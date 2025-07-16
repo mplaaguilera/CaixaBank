@@ -64,7 +64,7 @@ export default class SAC_BuscadorTopic extends NavigationMixin(LightningElement)
             this.error = 'error';
         }else{
 
-            getResultados({nombre: this.enteredValue}).then(result => {
+            getResultados({nombre: this.enteredValue, idCaso: this.recordId}).then(result => {
                 this.objects = [];
                 this.error = '';
                 if(result.length === 0){
@@ -142,7 +142,7 @@ export default class SAC_BuscadorTopic extends NavigationMixin(LightningElement)
             let filteKeyValue = valorInput.value;
             this.enteredValue = filteKeyValue;
 
-            newTopic({topic : this.enteredValue}).then(result =>{ 
+            newTopic({topic : this.enteredValue, idCaso: this.recordId}).then(result =>{ 
                 if(result === true){
                     setTopicACase({idCaso: this.recordId, topic : this.enteredValue}).then(result =>{                    
                         this.objects = [];

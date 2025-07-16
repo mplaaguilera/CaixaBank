@@ -4,25 +4,15 @@
 	"version": "1.0.0",
 	"description": "Salesforce App",
 	"scripts": {
-		"lint": "eslint **/{aura,lwc}/**/*.js",
-		"lint:lwc": "eslint force-app/main/default/lwc",
-		"test": "npm run test:unit",
-		"test:unit": "sfdx-lwc-jest",
-		"test:unit:watch": "sfdx-lwc-jest --watch",
-		"test:unit:debug": "sfdx-lwc-jest --debug",
-		"test:unit:coverage": "sfdx-lwc-jest --coverage",
-		"prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
-		"prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
-		"postinstall": "husky install",
-		"precommit": "lint-staged",
+		"test": "sf apex run -f scripts/apex/CSBD_RunTestSuite.apex",
+		"tail": "sf apex tail log --debug-level ApexUserDebug --color",
 		"browser-tools": "concurrently -k -s first -n server,mcp -c blue,green \"npx @agentdeskai/browser-tools-server@latest\" \"wait-on http://localhost:PORT && npx @agentdeskai/browser-tools-mcp@1.2.0\""
 	},
 	"devDependencies": {
-		"@eslint/eslintrc": "^3.3.1",
+		"@babel/core": "^7.27.4",
+		"@babel/eslint-parser": "^7.27.5",
 		"@eslint/js": "^9.28.0",
-		"@locker/eslint-config-locker": "^0.21.10",
 		"@lwc/eslint-plugin-lwc": "^2.2.0",
-		"@prettier/plugin-xml": "^3.2.2",
 		"@salesforce/eslint-config-lwc": "^3.7.2",
 		"@salesforce/eslint-plugin-aura": "^2.1.0",
 		"@salesforce/eslint-plugin-lightning": "^1.0.0",
@@ -34,9 +24,7 @@
 		"globals": "^16.2.0",
 		"husky": "^8.0.3",
 		"lint-staged": "^15.1.0",
-		"prettier": "3.3.3",
-		"prettier-plugin-apex": "2.1.4",
-		"wait-on": "^7.2.0"
+		"prettier": "3.3.3"
 	},
 	"lint-staged": {
 		"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [
@@ -47,10 +35,7 @@
 		]
 	},
 	"dependencies": {
-		"-": "^0.0.1",
-		"clang-format": "^1.8.0",
-		"eslint-plugin-compat": "^6.0.1",
 		"eslint-plugin-marc": "file:../eslint-plugin-marc",
-		"generator-code": "^1.11.4"
+		"puppeteer": "^24.12.1"
 	}
 }

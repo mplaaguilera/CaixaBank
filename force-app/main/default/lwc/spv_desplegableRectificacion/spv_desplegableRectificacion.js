@@ -9,20 +9,20 @@ import ESCALADO_OBJECT from '@salesforce/schema/SAC_Interaccion__c';
 
 //LLamadas Apex
 import getEscaladosReclamacion from '@salesforce/apex/SPV_LCMP_CamposDesplegables.getEscaladosReclamacion';
-import getRecordTypes from '@salesforce/apex/SPV_LCMP_CamposDesplegables.obtenerRecordTypes';
+import getRecordTypes from '@salesforce/apex/SPV_Utils.obtenerRecordTypes';
 
 //Campos reclamación
 import OWNERID_FIELD from '@salesforce/schema/Case.OwnerId';
 import IDFIELD from '@salesforce/schema/Case.Id';
-import FECHA_ENVIO_ORGANISMOS_FIELD from '@salesforce/schema/Case.SPV_FechaEnvioOrganismos__c';
-import FECHA_RESPUESTA_ORGANISMOS_FIELD from '@salesforce/schema/Case.SPV_FechaPteRespuestaOrganismo__c';
+//import FECHA_ENVIO_ORGANISMOS_FIELD from '@salesforce/schema/Case.SPV_FechaEnvioOrganismos__c';
+import FECHA_EXTENSION_CASE from '@salesforce/schema/Case.CBK_Case_Extension_Id__c';
+import FECHA_ENVIO_ORGANISMOS_FIELD from '@salesforce/schema/Case.CBK_Case_Extension_Id__r.SPV_FechaEnvioOrganismos__c';
+import FECHA_RESPUESTA_ORGANISMOS_FIELD from '@salesforce/schema/Case.CBK_Case_Extension_Id__r.SPV_FechaPteRespuestaOrganismo__c';
 import CASO_NEGOCIADO_FIELD from '@salesforce/schema/Case.SAC_CasoNegociado__c';
 import NEGOCIACION_FINALIZADA_FIELD from '@salesforce/schema/Case.SAC_NegociacionFinalizada__c';
 import RESULTADO_NEGOCIACION_FIELD from '@salesforce/schema/Case.SAC_ResultadoNegociacion__c';
-import NEGOCIACION_FINALIZADA_RECTIFICACION_FIELD from '@salesforce/schema/Case.SPV_NegociacionFinalizadaRectificacion__c';
-import RESULTADO_NEGOCIACION_RECTIFICACION_FIELD from '@salesforce/schema/Case.SPV_ResultadoNegociacionRectificacion__c';
-import FECHA_COMPLEMENTARIA_ENTIDAD_FIELD from '@salesforce/schema/Case.SPV_FechaComplementariaEntidad__c';
-import FECHA_COMPLEMENTARIA_ORGANISMO_FIELD from '@salesforce/schema/Case.SPV_FechaComplementariaOrganismo__c';
+//import NEGOCIACION_FINALIZADA_RECTIFICACION_FIELD from '@salesforce/schema/Case.SPV_NegociacionFinalizadaRectificacion__c';
+//import RESULTADO_NEGOCIACION_RECTIFICACION_FIELD from '@salesforce/schema/Case.SPV_ResultadoNegociacionRectificacion__c';
 import CASO_RECTIFICADO_FIELD from '@salesforce/schema/Case.SPV_Rectificado__c';
 import SENTIDO_RESOLUCION_FIELD from '@salesforce/schema/Case.SAC_SentidoResolucion__c';
 
@@ -31,9 +31,9 @@ import TIPO_ALLANAMIENTO_FIELD from '@salesforce/schema/SAC_Interaccion__c.SPV_T
 import TIPO_RESPUESTA_FIELD from '@salesforce/schema/SAC_Interaccion__c.SPV_TipoRespuesta__c';
 import ANALISIS_SEDE_ORGANISMOS_FIELD from '@salesforce/schema/SAC_Interaccion__c.SPV_AnalisisSedeOrganismo__c';
 
-const fields = [IDFIELD, OWNERID_FIELD, FECHA_ENVIO_ORGANISMOS_FIELD, FECHA_RESPUESTA_ORGANISMOS_FIELD, CASO_NEGOCIADO_FIELD, NEGOCIACION_FINALIZADA_FIELD, RESULTADO_NEGOCIACION_FIELD, 
-    NEGOCIACION_FINALIZADA_RECTIFICACION_FIELD, RESULTADO_NEGOCIACION_RECTIFICACION_FIELD, FECHA_COMPLEMENTARIA_ENTIDAD_FIELD, FECHA_COMPLEMENTARIA_ORGANISMO_FIELD, CASO_RECTIFICADO_FIELD,
-    SENTIDO_RESOLUCION_FIELD
+const fields = [IDFIELD, OWNERID_FIELD, FECHA_RESPUESTA_ORGANISMOS_FIELD, CASO_NEGOCIADO_FIELD, NEGOCIACION_FINALIZADA_FIELD, RESULTADO_NEGOCIACION_FIELD, 
+     CASO_RECTIFICADO_FIELD,
+    SENTIDO_RESOLUCION_FIELD, FECHA_EXTENSION_CASE
 ];
 
 
@@ -72,7 +72,6 @@ export default class Spv_desplegableRectificacion extends LightningElement {
         @wire(getRecordTypes)
         getRecordTypesResult(result){
             if(result.data){
-                console.log('Datos recibidos ' + JSON.stringify(result.data));
                 result.data.forEach(element => {
                     if(element.DeveloperName == 'SPV_Reclamacion'){
                         this.rtReclamacion = element.Id;
@@ -89,13 +88,13 @@ export default class Spv_desplegableRectificacion extends LightningElement {
             if(data){
                 this.caso = data;
                 this.idCaso = data.fields.Id.value;
-
-           
-                if(data.fields.SPV_FechaEnvioOrganismos__c.value != null){
-                    this.fechaEnvioOrganismos = new Date(data.fields.SPV_FechaEnvioOrganismos__c.value).toLocaleDateString();
+             
+                //Descomentar lo de abajo cuando se tenga todo. Los campos que arriba se hacen import y están comentados, están en extension, habrá que poner que coja los que están en el extension
+                /*if(data.fields.CBK_Case_Extension_Id__c.value != null && data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaEnvioOrganismos__c.value != null){
+                    this.fechaEnvioOrganismos = new Date(data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaEnvioOrganismos__c.value).toLocaleDateString();
                 }
-                if(data.fields.SPV_FechaPteRespuestaOrganismo__c.value != null){
-                    this.fechaPteRespuestaOrganismos = new Date(data.fields.SPV_FechaPteRespuestaOrganismo__c.value).toLocaleDateString();
+                if(data.fields.CBK_Case_Extension_Id__c.value != null && data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaPteRespuestaOrganismo__c.value != null){
+                    this.fechaPteRespuestaOrganismos = new Date(data.fields.CBK_Case_Extension_Id__r.value.fields.SPV_FechaPteRespuestaOrganismo__c.value).toLocaleDateString();
                 }
 
                 //Solo se muestra la sección de Rectificación si el caso se ha rectificado
@@ -103,7 +102,7 @@ export default class Spv_desplegableRectificacion extends LightningElement {
                     this.casoRectificado = true;
                 }else{
                     this.casoRectificado = false;
-                }
+                }*/
     
             }
         }

@@ -10,6 +10,7 @@ import MAESTRODEVELOPERNAME_FIELD from "@salesforce/schema/SAC_Accion__c.SAC_Mae
 import ESTADO_FIELD from "@salesforce/schema/SAC_Accion__c.SAC_Estado__c";
 import OWNERRECID_FIELD from "@salesforce/schema/SAC_Accion__c.SAC_Reclamacion__r.OwnerId";
 import OWNERPRETID_FIELD from "@salesforce/schema/SAC_Accion__c.SAC_Reclamacion__r.SAC_PretensionPrincipal__r.OwnerId";
+import ANULACIONSOLICITADA__FIELD from "@salesforce/schema/SAC_Accion__c.SPV_CheckAnulacionSolicitada__c";
 //Métodos Apex
 import tomarPropiedadTareaApex from '@salesforce/apex/SPV_LCMP_TareaOperativas.tomarPropiedadTarea';
 import devolverTareaApex from '@salesforce/apex/SPV_LCMP_TareaOperativas.devolverTarea';
@@ -22,8 +23,11 @@ import finalizarTareaApex from '@salesforce/apex/SPV_LCMP_TareaOperativas.finali
 import enviarTareaGGHApex from '@salesforce/apex/SPV_LCMP_TareaOperativas.enviarTareaGGH';
 import finalizarTareaGGHApex from '@salesforce/apex/SPV_LCMP_TareaOperativas.finalizarTareaGGH';
 import notificarTareaResolutor from '@salesforce/apex/SPV_LCMP_TareaOperativas.notificarTareaResolutor';
+import solicitarAnulacion from '@salesforce/apex/SPV_LCMP_TareaOperativas.solicitarAnulacion';
+import cancelarSolicitud from '@salesforce/apex/SPV_LCMP_TareaOperativas.cancelarSolicitud';
+import aceptarSolicitudAnulacion from '@salesforce/apex/SPV_LCMP_TareaOperativas.aceptarSolicitudAnulacion';
 
-const tareaFields = [OWNERID_FIELD, MAESTRODEVELOPERNAME_FIELD, ESTADO_FIELD, OWNERRECID_FIELD, OWNERPRETID_FIELD];
+const tareaFields = [OWNERID_FIELD, MAESTRODEVELOPERNAME_FIELD, ESTADO_FIELD, OWNERRECID_FIELD, OWNERPRETID_FIELD, ANULACIONSOLICITADA__FIELD];
 
 export default class Spv_TareaOperativas extends LightningElement {
     @api recordId; //Id del registro en el que se encuentra el componente
@@ -32,17 +36,36 @@ export default class Spv_TareaOperativas extends LightningElement {
     mostrarModalDevolverGestorLetrado = false; //Mostrar el modal de devolver al gestor o al letrado
     mostrarModalFinalizar = false; //Mostrar el modal de finalizar
     mostrarModalProrrogar = false; //Mostrar el modal de prorrogar
+    mostrarModalSolicitarAnulacion = false; //Mostrar el modal de solicitar anulacion
     mostrarBotonesPrincipalesFinalizar = false; //Mostrar los botones descartar, finalizada incompleta y finalizada del modal finalizar tarea
     mostrarBotonesDescartar = false; //Mostrar los botones de descartar tarea del modal finalizar tarea
     mostrarBotonesFinalizadaIncompleta = false; //Mostrar los botones de finalizada incompleta del modal finalizar tarea
     mostrarBotonesFinalizada = false; //Mostrar los botones de finalizada del modal finalizar tarea
     mostrarComentarios = false; //Mostrar el input comentarios del modal finalizar tarea
+    motivoDevolverValue = ''; //Campo para indicar el value del motivo de devolver la tarea al gestor o al letrado
     motivoDevolver = ''; //Campo para indicar el motivo de devolver la tarea al gestor o al letrado
+    motivoOtros = ''; //Campo para indicar el motivo de devolver la tarea al gestor o al letrad
+    motivoSolicitud = ''; //Campo para indicar el motivo de la solicitud de anulacion
+    esSolicitada = false; //Campo para indicar si la tarea es solicitada para anulacion
     comentariosFinalizarTarea = ''; //Campo comentarios para cuando finalizamos la tarea
     fechaProrroga = ''; //Campo para indicar la fecha de prorroga introducida
     bloquearBotonEnviarGGH = false;
     mostrarModalNotificar = false;
     comentariosNotificar = '';
+    @track isOtros = false;
+
+
+    get optionsMotivo() {
+        return [
+            { label: 'Contrato erróneo', value: 'ContratoErroneo' },
+            { label: 'Cuenta Cancelada o errónea', value: 'CuentaCanceladaOErronea' },
+            { label: 'Importe abonado previo a la tarea (revisar el nombre)', value: 'ImporteAbonadoPrevio' },
+            { label: 'Instrucciones erróneas/incompletas', value: 'InstruccionesErroneasIncompletas' },
+            { label: 'Instrucciones no ejecutables', value: 'InstruccionesNoEjecutables' },
+            { label: 'Maestro tareas erróneo', value: 'MaestroTareasErroneo' },
+            { label: 'Otros + Observaciones Motivo Devolución tarea', value: 'Otros' }
+        ];
+    }
 
 
 
@@ -70,6 +93,11 @@ export default class Spv_TareaOperativas extends LightningElement {
         return getFieldValue(this.record.data, OWNERPRETID_FIELD);
     }
 
+    get anulacionSolicitada(){
+        this.esSolicitada = getFieldValue(this.record.data, ANULACIONSOLICITADA__FIELD);
+        return this.esSolicitada;
+    }
+
     //Getters visibilidad botones
     get disableBotonTomarPropiedad() {
         //Si el usuario es el mismo que ya tiene la tarea o el estado está en pendiente de enviar, finalizada, finalizada incompleta o descartada se debe deshabilitar
@@ -81,7 +109,7 @@ export default class Spv_TareaOperativas extends LightningElement {
     }
     get disableBotonDevolverTarea() {
         //Si el usuario es el mismo que el owner actual de la tarea y el estado es diferente a pendiente enviar, a devuelta, finalizada, finalizada incompleta y descartada debe estar activo
-        if (this.tareaOwnerId == this.userId && this.estadoTarea != 'SAC_PendienteEnviar' && this.estadoTarea != 'SAC_Devuelta' && this.estadoTarea != 'SAC_Finalizada' && this.estadoTarea != 'SAC_FinalizadaIncompleta' && this.estadoTarea != 'SAC_Descartada') {
+        if (this.tareaOwnerId == this.userId && this.estadoTarea != 'SAC_PendienteEnviar' && this.estadoTarea != 'SAC_Devuelta' && this.estadoTarea != 'SAC_Finalizada' && this.estadoTarea != 'SAC_FinalizadaIncompleta' && this.estadoTarea != 'SAC_Descartada' || this.estadoTarea != 'SPV_Anulada') {
             return false;
         } else {
             return true;
@@ -119,6 +147,16 @@ export default class Spv_TareaOperativas extends LightningElement {
             return true;
         }
     }
+
+    get disableBotonSolicitar() {
+        //Si el estado es SAC_PendienteAsignar y SAC_EnGestion se debe mostrar el botón
+        if (this.estadoTarea == 'SAC_PendienteAsignar' || this.estadoTarea == 'SAC_EnGestion' || this.esSolicitada == true) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     get mostrarBotoneraGGH() {
         //Si el maestro de acciones de la tarea tiene el SAC_DeveloperName__c como SPV_GGH, se debe mostrar la botonera de GGH. Si no, se mostrará la botonera normal
         if (this.maestroAccionesDeveloperName == 'SPV_GGH') {
@@ -137,7 +175,7 @@ export default class Spv_TareaOperativas extends LightningElement {
     }
     get disableBotonNotificar() {
         //Si el usuario en ejecución es el gestor o letrado, y la tarea no esta en ningulo de los estados detallados, el boton esta activo
-        if ((this.userId == this.reclamacionOwnerId || this.userId == this.pretensionOwnerId) && (this.estadoTarea != 'SAC_Devuelta' && this.estadoTarea != 'SAC_Finalizada' && this.estadoTarea != 'SAC_FinalizadaIncompleta' && this.estadoTarea != 'SAC_PendienteEnviar' && this.estadoTarea != 'SAC_StandBy' && this.estadoTarea != 'SAC_Descartada')) {
+        if ((this.userId == this.reclamacionOwnerId || this.userId == this.pretensionOwnerId) && (this.estadoTarea != 'SAC_Devuelta' && this.estadoTarea != 'SAC_Finalizada' && this.estadoTarea != 'SAC_FinalizadaIncompleta' && this.estadoTarea != 'SAC_PendienteEnviar' && this.estadoTarea != 'SAC_StandBy' && this.estadoTarea != 'SAC_Descartada' || this.estadoTarea != 'SPV_Anulada')) {
             return false;
         } else {
             return true;
@@ -191,15 +229,21 @@ export default class Spv_TareaOperativas extends LightningElement {
     //Botón devolver tarea al gestor o al letrado (llamada a apex)
     handleDevolverTareaGestorLetrado() {
         //Comprobar si el motivoDevolver está rellenado
-        if (this.motivoDevolver === '') {
+        if (this.motivoDevolverValue === 'Otros' && this.motivoOtros === '') {
             //Mensaje de error
-            this.lanzarToast('Atención', 'Por favor, indique el motivo de la devolución', 'warning');
+            this.lanzarToast('Atención', 'Por favor, indique las observaciones del motivo', 'warning');
             return; //Salir del método
+        } else if (this.motivoDevolverValue === 'Otros' && this.motivoOtros !== '') {
+            this.motivoDevolver = this.motivoOtros;
+        }else if(this.motivoDevolverValue === ''){
+             //Mensaje de error
+             this.lanzarToast('Atención', 'Por favor, indique el motivo de la devolución', 'warning');
+             return; //Salir del método
         }
         //Activar el spinner
         this.handleActivarSpinner();
         //LLamada a apex
-        devolverTareaGestorLetradoApex({ tareaId: this.recordId, motivoDevolucion: this.motivoDevolver })
+        devolverTareaGestorLetradoApex({ tareaId: this.recordId, motivoDevolucion: this.motivoDevolver, motivoOtros: this.motivoOtros })
             .then(result => {
                 //Mensaje de éxito
                 this.lanzarToast('Éxito', 'Se ha devuelto la tarea al gestor/letrado', 'success');
@@ -560,7 +604,12 @@ export default class Spv_TareaOperativas extends LightningElement {
 
     //Onchange del motivo de devolución
     changeMotivoDevolver(event) {
-        this.motivoDevolver = event.target.value;
+        this.motivoOtros = event.target.value;
+    }
+
+    changeMotivoSolicitud(event) {
+        this.motivoSolicitud = event.target.value;
+        
     }
 
     //Onchange del input de comentarios del modal de finalizar tarea
@@ -585,6 +634,15 @@ export default class Spv_TareaOperativas extends LightningElement {
         this.comentariosNotificar = event.target.value;
     }
 
+    handleChange(event) {
+        this.motivoDevolverValue = event.detail.value;
+        this.isOtros = this.motivoDevolverValue === 'Otros';
+
+        const selectedOption = this.optionsMotivo.find(opt => opt.value === this.motivoDevolverValue);
+        this.motivoDevolver = selectedOption ? selectedOption.label : '';
+
+    }
+
     handleNotificarTarea() {
         //Activar el spinner
         this.handleActivarSpinner();
@@ -606,5 +664,80 @@ export default class Spv_TareaOperativas extends LightningElement {
                 //Desactivar el spinner
                 this.handleDesactivarSpinner();
             });
+    }
+
+    handleAbrirModalSolicitarAnulacion() {
+        this.mostrarModalSolicitarAnulacion = true;
+    }
+
+    handleCerrarModalSolicitarAnulacion() {
+        this.mostrarModalSolicitarAnulacion = false;
+    }
+    handleSolicitarAnulacion() {
+        //Activar el spinner
+        this.handleActivarSpinner();
+        this.handleCerrarModalSolicitarAnulacion();
+        //LLamada a apex        
+        solicitarAnulacion({ tareaId: this.recordId, motivo: this.motivoSolicitud })
+        .then(result => {
+            //Mensaje de éxito
+            this.lanzarToast('Éxito', 'Se ha enviado la solicitud.', 'success');
+            //Cerrar modal finalizar
+            //Refrescar el componente
+            this.refrescarComponente();
+            //Desactivar el spinner
+            this.handleDesactivarSpinner();
+        })
+        .catch(error => {
+            //Mensaje de error
+            this.lanzarToast('Error', 'Error al solicitar la anulación de la tarea: ' + this.extractErrorMessage(error), 'error');
+            //Desactivar el spinner
+            this.handleDesactivarSpinner();
+        });
+        
+    }
+
+    handleCancelarSolicitud() {
+        //Activar el spinner
+        this.handleActivarSpinner();
+        //LLamada a apex        
+        cancelarSolicitud({ tareaId: this.recordId})
+        .then(result => {
+            //Mensaje de éxito
+            this.lanzarToast('Éxito', 'Se ha cancelado la solicitud.', 'success');
+            //Cerrar modal finalizar
+            //Refrescar el componente
+            this.refrescarComponente();
+            //Desactivar el spinner
+            this.handleDesactivarSpinner();
+        })
+        .catch(error => {
+            //Mensaje de error
+            this.lanzarToast('Error', 'Error al cancelar la solicitud de anulación de la tarea: ' + this.extractErrorMessage(error), 'error');
+            //Desactivar el spinner
+            this.handleDesactivarSpinner();
+        });
+    }
+
+    handleAceptarAnulacion() {
+        //Activar el spinner
+        this.handleActivarSpinner();
+        //LLamada a apex        
+        aceptarSolicitudAnulacion({ tareaId: this.recordId })
+        .then(result => {
+            //Mensaje de éxito
+            this.lanzarToast('Éxito', 'Se ha anulado la tarea.', 'success');
+            //Cerrar modal finalizar
+            //Refrescar el componente
+            this.refrescarComponente();
+            //Desactivar el spinner
+            this.handleDesactivarSpinner();
+        })
+        .catch(error => {
+            //Mensaje de error
+            this.lanzarToast('Error', 'Error al aceptar anulación de la tarea: ' + this.extractErrorMessage(error), 'error');
+            //Desactivar el spinner
+            this.handleDesactivarSpinner();
+        });
     }
 }

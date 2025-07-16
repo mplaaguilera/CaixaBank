@@ -1,6 +1,7 @@
 <aura:component controller="SAC_LCMP_GestionEmails"
 implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
     <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="consultaId" type="String" />
     <aura:attribute name="busqueda" type="String" default=""/>
     <aura:attribute name="selectedItem" type="String" />
     <aura:attribute name="ficherosAdjuntos" type="Object[]" />
@@ -32,6 +33,7 @@ implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable
     <aura:handler name="change" value="{!v.caseId}" action="{!c.Inicial}" />
 
     <aura:handler name="change" value="{!v.pills}" action="{!c.actualizaFicheros}" />
+    <aura:handler event="force:refreshView" action="{!c.Inicial}" />
 
     <aura:method name="refresh" action="{!c.Inicial}" access="PUBLIC">
     </aura:method>

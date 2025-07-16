@@ -28,7 +28,15 @@
     <!-- US670077 atributos para el desarrollo de adjuntar los archivos de la reclamacion a la derivacion automaticamente -->
     <aura:attribute name="adjuntosDerivar" type="Boolean"/>
 
+    <!-- Atributos para el desarrollo de añadir un tag a las imágenes insertadas -->
+    <aura:attribute name="imageTagsMap" type="Map" />
+    <aura:attribute name="flagCambioPlantillaPadre" type="Boolean" default="false"/>
+    <aura:attribute name="todasImgConTag" type="Boolean" default="true"/>
+
+
     <aura:registerEvent name="cmpEvent" type="c:SAC_ResolverConsultaEvt"/>
+    <!-- <aura:handler event="c:SAC_RichTextInputEvt" action="{!c.handleEventRichText}"/> -->
+
     <!--doInit-->
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
@@ -67,38 +75,48 @@
                 </aura:if>
                 <div>
                     <lightning:input name="para" value='{!v.para}' label="Para" maxlength="2400"
-                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaPara}' required="true">
+                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaPara}' required="true" autocomplete="off">
                     </lightning:input>
 
                     <lightning:input name="CC" value='{!v.copia}' label="CC" maxlength="2400"
-                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaCopia}'>
+                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaCopia}' autocomplete="off">
                     </lightning:input>
 
                     <lightning:input name="CCO" value='{!v.copiaOculta}' label="CCO" maxlength="2400"
-                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaCopiaOculta}'>
+                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaCopiaOculta}' autocomplete="off">
                     </lightning:input>
 
                     <lightning:input name="asunto" value='{!v.asunto}' label="Asunto" maxlength="2400"
-                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaAsunto}'>
+                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaAsunto}' autocomplete="off">
                     </lightning:input>
                     <!-- OCS Inicio prueba temporal archivos adjuntos -->
-                    <c:SAC_AdjuntosEmail aura:id="adjuntosComponent" idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" caseId="{!v.caso.Id}" seleccionarReclamacion="{!v.seleccionarReclamacion}" adjuntosDerivar="{!v.adjuntosDerivar}" derivarAQuien="{!v.derivarAQuien}" procedencia="{!v.procedencia}"/> 
+                    <aura:if isTrue="{!not(v.procedencia == 'ReenvioRedaccion')}">
+                        <c:SAC_AdjuntosEmail aura:id="adjuntosComponent" idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" caseId="{!v.caso.Id}" consultaId="{!v.consulta.Id}" seleccionarReclamacion="{!v.seleccionarReclamacion}" adjuntosDerivar="{!v.adjuntosDerivar}" derivarAQuien="{!v.derivarAQuien}" procedencia="{!v.procedencia}"/> 
+                    </aura:if>
                     <!-- OCS FIN prueba temporal archivos adjuntos -->
                     <!-- LMG - INI - Boton plantillas -->
                     
-                    <c:SAC_RecuperarPlantillas recordId="{!v.caso.Id}" recordIdAux="{!v.consulta.Id}" subjectPlantilla="{!v.asunto}" cuerpoPlantilla="{!v.cuerpo}"/>
+                    <c:SAC_RecuperarPlantillas recordId="{!v.caso.Id}" recordIdAux="{!v.consulta.Id}" subjectPlantilla="{!v.asunto}" cuerpoPlantilla="{!v.cuerpo}" flagCambioPlantilla="{!v.flagCambioPlantillaPadre}"/>
     
+                    <c:sac_ModificarTagImagenes name="sac_ModificarTagImagenes" cuerpo="{!v.cuerpo}" recordId="{!v.consulta.Id}" imageTagsMap ="{!v.imageTagsMap}" onevtmodimagen="{!c.handleEventModificarImagen}"/>
                     <!-- LMG - FIN - Boton plantillas -->
                     <div style="padding-top: 8px;">
                     <!--    <lightning:inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="true" title="Cuerpo"> -->
                             <!-- onchange='{!c.cambiaCuerpo}' -->
                     <!--   </lightning:inputRichText>-->
-                    <c:SAC_inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="true" title="Cuerpo"/>
 
+                        <aura:if isTrue="{!and(v.consulta != '', v.consulta != null, v.consulta != undefined)}">
+                            <c:sac_inputRichTextLWC aura:id="sac_inputRichText1" name="sac_inputRichText" value="{!v.cuerpo}" recordId="{!v.consulta.Id}" label="Cuerpo" title="Cuerpo" labelVisible="true" imageTagsMap ="{!v.imageTagsMap}" onevtinforichtext="{!c.handleEventRichText}" onevtflagcambioplantilla="{!c.handleEventFlagCambioPlantilla}" flagCambioPlantilla="{!v.flagCambioPlantillaPadre}"/>
+                            <!-- <c:SAC_inputRichText value='{!v.cuerpo}' recordId="{!v.consulta.Id}" label="Cuerpo" labelVisible="true" title="Cuerpo"/> -->
+                            <aura:set attribute="else">
+                                <!-- <c:SAC_inputRichText value='{!v.cuerpo}' recordId="{!v.caso.Id}" label="Cuerpo" labelVisible="true" title="Cuerpo"/> -->
+                                <c:sac_inputRichTextLWC aura:id="sac_inputRichText2" name="sac_inputRichText" value="{!v.cuerpo}" recordId="{!v.caso.Id}" label="Cuerpo" title="Cuerpo" labelVisible="true" imageTagsMap ="{!v.imageTagsMap}" onevtinforichtext="{!c.handleEventRichText}" onevtflagcambioplantilla="{!c.handleEventFlagCambioPlantilla}" flagCambioPlantilla="{!v.flagCambioPlantillaPadre}"/>
+                            </aura:set>
+                        </aura:if>
                     </div>
                 </div>
                 <div class="slds-grid">
-                    <aura:if isTrue="{!not(or(v.procedencia == 'derivar',v.procedencia == 'subsanacion'))}">
+                    <aura:if isTrue="{!not(or(v.procedencia == 'derivar' || v.procedencia == 'subsanacion' || v.procedencia == 'ReenvioRedaccion'))}">
                         <div class="slds-col slds-size_6-of-12 slds-float_right" style="padding: 8px;">
                             <lightning:button variant="brand" label="Enviar" title="Enviar" onclick="{!c.muestraModalValidar}" />
                         </div>
@@ -147,7 +165,7 @@
     </aura:if>
 
      <!-- Modal para informar de que hay elementos por validar-->
-     <aura:if isTrue="{!and(v.procedencia=='SAC_003',v.modalValidar)}">
+     <aura:if isTrue="{!and(or(v.procedencia=='SAC_003',v.procedencia=='Inadmision'),v.modalValidar)}">
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
             aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">

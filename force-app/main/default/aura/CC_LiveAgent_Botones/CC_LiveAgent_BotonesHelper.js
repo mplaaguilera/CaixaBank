@@ -121,7 +121,7 @@
 	getPicklistCategoria: function(cmp) {
 		let espacio = cmp.get('v.espacio');
 		let categoria = cmp.get('v.categoria');
-		let aplicacion = cmp.get('v.aplicacion');
+		let aplicacion = cmp.get('v.aplicacion');		
 
 		let action = cmp.get('c.recuperarCategorias');
 		action.setParams({

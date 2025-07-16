@@ -1,0 +1,99 @@
+.subseccion {
+    margin-left: 20px;
+}
+
+.seccion {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.flecha {
+    color: rgb(116, 116, 116);
+    margin-left: 1px;
+}
+
+.cuerpo-subseccion {
+    margin-left: 20px;
+}
+
+.elemento-form {
+    padding-right: 25px;
+    position: relative;
+    margin-bottom: 5px;
+}
+
+.botonesEditar {
+    margin-top: 10px;
+}
+
+.contenedor {
+    display: flex;
+}
+
+.mi-boton {
+    margin-bottom: 10px;
+}
+
+/* Estilo para la barra gris debajo de cada campo */
+.campo-separador {
+    height: 1px;
+    background-color: #d8dde6;
+    margin-top: 2px;
+    width: 100%;
+}
+
+/* Contenedor para campo y su separador */
+.campo-container {
+    position: relative;
+    padding-bottom: 8px;
+}
+
+/* Posicionamiento del botón de editar */
+.boton-editar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+}
+
+/* Contenedor para campo con botón */
+.campo-con-boton {
+    position: relative;
+    padding-right: 30px; /* Espacio para el botón */
+}
+
+/* Estilo para los campos de información */
+.campo-info {
+    padding: 5px 0;
+    position: relative;
+}
+
+/* Botonera inferior fija */
+.footer-fixed {
+    position: fixed; /* Hace que el contenedor permanezca fijo en la ventana */
+    bottom: 0; /* Posiciona el contenedor en la parte inferior */
+    left: 0; /* Asegura que el contenedor esté alineado al inicio */
+    right: 0; /* Asegura que el contenedor ocupe todo el ancho */
+    background-color: #f3f2f2; /* Color de fondo similar al estándar de Salesforce */
+    border-top: 1px solid #d8dde6; /* Línea superior para separar visualmente los botones */
+    padding: 10px; /* Espaciado interno */
+    display: flex; /* Para alinear los botones */
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 5px; /* Espaciado entre los botones */
+    z-index: 100; /* Asegura que el contenedor esté por encima de otros elementos */
+}
+
+/* Espaciado para que el contenido no quede oculto por la botonera fija */
+.contenido-principal {
+    margin-bottom: 60px;
+}
+
+/* Estilos para elementos de formulario en modo edición */
+lightning-input-field {
+    margin-bottom: 8px;
+}
+
+/* Ocultar la línea gris en campos de edición */
+lightning-input-field + .campo-separador {
+    display: none;
+}

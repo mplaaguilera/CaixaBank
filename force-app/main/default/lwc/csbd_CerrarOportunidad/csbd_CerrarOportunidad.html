@@ -1,23 +1,34 @@
 <template>
-    <section role="dialog" lwc:ref="modalCerrarOportunidad" class="slds-modal" tabindex="-1" aria-modal="true" onkeydown={modalTeclaPulsada}>
+    <section role="dialog" lwc:ref="modalCerrarOportunidad" class="slds-modal modalCerrarOportunidad" tabindex="-1" aria-modal="true" onkeydown={modalTeclaPulsada}>
         <div class="slds-modal__container">
             <header class="slds-modal__header">
                 <!-- sldsValidatorIgnoreNextLine -->
-                <button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar}>
+                <button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar} disabled={spinner}>
                     <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
                 </button>
                 <h2 class="slds-text-heading_medium slds-hyphenate">Cerrar oportunidad</h2>
                 <p class="slds-var-m-top_x-small">Finalizar la gestión de la oportunidad.</p>
             </header>
 
-            <div class="slds-modal__content slds-var-p-horizontal_xx-large slds-var-p-vertical_large">
+            <div class="slds-modal__content slds-var-p-horizontal_xx-large slds-var-p-vertical_large slds-is-relative">
+                <c-csbd_-spinner-kx lwc:if={spinner} size="large" variant="brand"></c-csbd_-spinner-kx>
+
                 <div lwc:if={mostrarNotificacion} style="padding-bottom: 16px; padding-left: 5px; padding-right: 5px; font-weight: 300;">
                     <c-cc-scoped-notification tema="Claro" icono="info" mensaje="La oportunidad no tiene contacto informado. Solo es posible rechazarla."></c-cc-scoped-notification>
                 </div>
 
-                <lightning-combobox lwc:ref="inputEtapa" class="inputEtapa slds-var-m-bottom_large" label="Etapa de ventas final" options={cerrarEtapas} required onchange={inputEtapaOnchange}></lightning-combobox>
-                <lightning-combobox lwc:ref="inputResolucion" class="inputResolucion slds-var-m-bottom_large" label="Resolución" options={cerrarResoluciones} required onchange={inputResolucionOnchange}></lightning-combobox>
-                <lightning-textarea lwc:if={mostrarMotivoRechazo} class="inputMotivoRechazo slds-var-m-bottom_large" label="Motivo de rechazo" required></lightning-textarea>
+                <div style="min-height: 74px;">
+                    <lightning-combobox lwc:ref="inputEtapa" class="inputEtapa" label="Etapa de ventas final" options={cerrarEtapas} required onchange={inputEtapaOnchange}></lightning-combobox>
+                </div>
+
+                <div style="min-height: 74px;">
+                    <lightning-combobox lwc:ref="inputResolucion" class="inputResolucion" label="Resolución" options={cerrarResoluciones} required onchange={inputResolucionOnchange}></lightning-combobox>
+                </div>
+
+                <div lwc:if={mostrarMotivoRechazo} style="min-height: 88px;">
+                    <lightning-textarea lwc:ref="inputMotivoRechazo" class="inputMotivoRechazo" label="Motivo de rechazo" required></lightning-textarea>
+                </div>
+
                 <template lwc:if={mostrarTipoBonificado}>
                     <lightning-input lwc:ref="inputTipoOfertado" class="inputTipoOfertado slds-var-m-bottom_large" type="number" formatter="percent-fixed" min="0" max="100" step="0.01" label="Tipo ofertado"></lightning-input>
                     <lightning-combobox lwc:ref="inputEntidadCompetencia" class="inputEntidadCompetencia slds-var-m-bottom_medium" label="Entidad de la competencia" options={entidadesCompetencia}></lightning-combobox>
@@ -25,8 +36,8 @@
             </div>
 
             <footer class="slds-modal__footer">
-                <lightning-button lwc:ref="botonAceptar" variant="brand" label="Cerrar oportunidad" icon-name="action:close" onclick={cerrarOportunidad} class="botonAceptar"></lightning-button>
-                <lightning-button label="Cancelar" onclick={modalCerrar} class="slds-var-m-left_small"></lightning-button>
+                <lightning-button lwc:ref="botonAceptar" variant="brand" label="Cerrar oportunidad" icon-name="action:close" onclick={cerrarOportunidad} class="botonAceptar" disabled={spinner}></lightning-button>
+                <lightning-button label="Cancelar" onclick={modalCerrar} class="slds-var-m-left_small" disabled={spinner}></lightning-button>
             </footer>
         </div>
     </section>

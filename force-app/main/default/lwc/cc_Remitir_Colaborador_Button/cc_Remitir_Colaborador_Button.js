@@ -17,10 +17,10 @@ export default class Cc_Responder_Cliente_Button extends LightningElement {
 
     connectedCallback() {
         // Intentar obtener el recordId de diferentes fuentes
-        this.currentRecordId = this.recordId ||
-            (this.pageRef?.attributes?.recordId) ||
-            (this.pageRef?.state?.recordId);
-
+        this.currentRecordId = this.recordId || 
+            (this.pageRef?.attributes?.recordId) || 
+            (this.pageRef?.state?.recordId);           
+   
     }
 
     renderedCallback() {
@@ -28,8 +28,8 @@ export default class Cc_Responder_Cliente_Button extends LightningElement {
         let datosAdicionales = '';
         let origen = 'remitirColaboradorButton';
         let destino = 'remitirColaboradorBotonera';
-
-        if (this.currentRecordId) {
+        
+        if (this.currentRecordId) {      
             // Publicar el mensaje
             this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
             // Cerrar el Quick Action
@@ -39,7 +39,7 @@ export default class Cc_Responder_Cliente_Button extends LightningElement {
         }
     }
 
-    publicarMensajeDerivarInteraccion(origenDerivacion, destinoDerivacion, datosAdicionales) {
+    publicarMensajeDerivarInteraccion(origenDerivacion, destinoDerivacion, datosAdicionales) {       
         if (this.messageContext) {
             const payload = {
                 recordId: this.currentRecordId,

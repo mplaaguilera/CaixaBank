@@ -1,8 +1,10 @@
 import { LightningElement, api, wire, track } from 'lwc';
 import reclamacionesVinculadas from '@salesforce/apex/SAC_LCMP_DesvincularReclamacion.reclamacionesVinculadas';
+import { RefreshEvent } from 'lightning/refresh';
 import consultasVinculadas from '@salesforce/apex/SAC_LCMP_DesvincularReclamacion.consultasVinculadas';
 import desvincularReclamacion from '@salesforce/apex/SAC_LCMP_DesvincularReclamacion.desvincularReclamacion';
 import desvincularConsulta from '@salesforce/apex/SAC_LCMP_DesvincularReclamacion.desvincularConsulta';
+import validarDesvincularComplementaria from '@salesforce/apex/SAC_LCMP_DesvincularReclamacion.validarDesvincularComplementaria';
 import { getRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from 'lightning/navigation';
@@ -100,27 +102,56 @@ export default class Sac_DesvincularReclamacion extends NavigationMixin(Lightnin
             }
         }
         evt.stopPropagation();
-        desvincularReclamacion({ caseId: this.caseId })
-            .then(result => {
-                this.mensajeDesvinculacion = result;
-                this.dispatchEvent(new ShowToastEvent({
-                    title: 'Reclamación desvinculada',
-                    message: this.mensajeDesvinculacion,
-                    variant: 'success'
-                }),);
-                this.spinnerLoading = false;
-                refreshApex(this._wiredResult);
-                this.updateRecordView(this.recordId);
-            })
-            .catch(error => {
-                
-                this.dispatchEvent(new ShowToastEvent({
-                    title: 'No se ha podido desvincular la reclamación',
-                    message: error.body.message,
+        validarDesvincularComplementaria({idCaso: this.caseId}).then(result =>{
+            if(result == true){
+                //Permite desvincular si no es una complementaria que ya ha sido resuelta
+                desvincularReclamacion({ caseId: this.caseId})
+                .then(result => {
+                    this.mensajeDesvinculacion = result;
+                    this.dispatchEvent(new ShowToastEvent({
+                        title: 'Reclamación desvinculada',
+                        message: this.mensajeDesvinculacion,
+                        variant: 'success'
+                    }),);
+                    this.spinnerLoading = false;
+                    refreshApex(this._wiredResult);
+                    this.updateRecordView(this.recordId);
+                })
+                .catch(error => {
+                    
+                    this.dispatchEvent(new ShowToastEvent({
+                        title: 'No se ha podido desvincular la reclamación',
+                        message: error.body.message,
+                        variant: 'error'
+                    }),);
+                    this.spinnerLoading = false;
+                });
+
+
+            }else{
+               this.spinnerLoading = false;
+               this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error al desvincular',
+                        message: 'No se puede desvincular una complementaria que ya ha sido resuelta',
+                        variant: 'error'
+                    })
+                );
+                this.dispatchEvent(new RefreshEvent());
+            }
+
+        })
+        .catch(error => {
+            this.spinnerLoading = false;
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Error',
+                    message: 'Error al desvincular',
                     variant: 'error'
-                }),);
-                this.spinnerLoading = false;
-            });
+                })
+            );
+        })
+
     }
 
     desvincularConsultas(evt){

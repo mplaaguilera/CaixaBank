@@ -254,6 +254,16 @@
                                                                                     aria-describedby="form-error-01"
                                                                                 />
                                                                             </div>
+                                                                            <template if:true={mostrarOficinas}>
+                                                                                <br/><br/>
+                                                                                <lightning-combobox
+                                                                                    label="La reclamación tiene varias oficinas afectadas, debe seleccionar aquella que quiera asociar a la consulta"
+                                                                                    value={selectOficina}
+                                                                                    placeholder="Seleccione la oficina deseada..."
+                                                                                    options={listOficinasMostrar}
+                                                                                    onchange={handleChangeOficina}
+                                                                                ></lightning-combobox>
+                                                                            </template>
                                                                         </div>
                                                                     </div>
                                                                 </div> 

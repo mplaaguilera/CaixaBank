@@ -1,53 +1,366 @@
 <template>
+    <template if:true={casoEnNegociacion}>
+        <div align="right" style="padding-top: 4px; padding-bottom: 8px;">
+            <lightning-button data-id="anadirPretensiones" label="Añadir pretensiones" onclick={onClickAnadirPretensiones} icon-name="utility:add"></lightning-button>
+        </div>
+    </template>
+
     <lightning-card>
         <template for:each={pretensiones} for:item="pretension">
-            <lightning-record-edit-form object-api-name="Case" key={pretension.Id} record-id={pretension.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
-                <lightning-messages>
-                </lightning-messages>
-                <div class="slds-form__item" role="listitem">
-                    <div class="slds-form-element slds-form-element_stacked slds-is-editing">
-                        <div class="slds-grid slds-wrap">
-                            <div class="slds-size_1-of-2">
-                                <lightning-output-field field-name="CaseNumber"> </lightning-output-field>
+            <div class="slds-section slds-is-open" key={pretension.Id}>
+                <h3 class="slds-section__title slds-theme_shade">
+                    <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Pretension {pretension.CaseNumber}</span>
+                </h3>
+                <div class="slds-section__content">
+                    <lightning-record-edit-form object-api-name="Case" record-id={pretension.Id} onsuccess={handleSuccessEditar}>
+                        <!-- CAMPOS EDITABLES -->
+                        <template if:true={editarCampos}>
+                            <div class="slds-grid slds-wrap" style="margin-left: 15px;margin-bottom: 20px;">
+                                <!-- Campo SPV_IdPretension__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-output-field field-name="SPV_IdPretension__c"></lightning-output-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo Subject -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-output-field field-name="Subject"></lightning-output-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo SAC_ResultadoNegociacion__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-input-field field-name="SAC_ResultadoNegociacion__c"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo CC_Importe_Reclamado__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-output-field field-name="CC_Importe_Reclamado__c"></lightning-output-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo SAC_DetalleResultadoNegociacion__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-input-field field-name="SAC_DetalleResultadoNegociacion__c"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo SAC_Importe_Resuelto__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-input-field field-name="SAC_Importe_Resuelto__c"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo SAC_Motivoresultadonegociacion__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-input-field field-name="SAC_Motivoresultadonegociacion__c"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo SAC_TipoInteresContrato__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-input-field field-name="SAC_TipoInteresContrato__c"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo SAC_Observaciones__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-input-field field-name="SAC_Observaciones__c"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo SAC_TipoInteresNegociado__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-input-field field-name="SAC_TipoInteresNegociado__c"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo SAC_NegociacionFinalizada__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-input-field field-name="SAC_NegociacionFinalizada__c"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="slds-size_1-of-1">
-                                <lightning-output-field field-name="Subject"> </lightning-output-field>
+                        </template>
+                        <!-- CAMPOS SIN EDITAR -->
+                        <template if:false={editarCampos}>
+                            <div class="slds-grid slds-wrap" style="margin-left: 15px;margin-bottom: 20px;">
+                                <!-- Campo SPV_IdPretension__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SPV_IdPretension__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo Subject -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="Subject"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo SAC_ResultadoNegociacion__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SAC_ResultadoNegociacion__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <template if:true={casoEnNegociacion}> 
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </template>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo CC_Importe_Reclamado__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="CC_Importe_Reclamado__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo SAC_DetalleResultadoNegociacion__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SAC_DetalleResultadoNegociacion__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <template if:true={casoEnNegociacion}> 
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </template>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo SAC_Importe_Resuelto__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SAC_Importe_Resuelto__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <template if:true={casoEnNegociacion}> 
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </template>                                            
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo SAC_Motivoresultadonegociacion__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SAC_Motivoresultadonegociacion__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <template if:true={casoEnNegociacion}> 
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </template>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo SAC_TipoInteresContrato__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SAC_TipoInteresContrato__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <template if:true={casoEnNegociacion}> 
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </template>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo SAC_Observaciones__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SAC_Observaciones__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <template if:true={casoEnNegociacion}> 
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </template>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo SAC_TipoInteresNegociado__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SAC_TipoInteresNegociado__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <template if:true={casoEnNegociacion}> 
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </template>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                                <!-- Campo SAC_NegociacionFinalizada__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="10" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SAC_NegociacionFinalizada__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <template if:true={casoEnNegociacion}> 
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </template>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
                             </div>
-                            <div class="slds-size_1-of-2">
-                                <lightning-input-field field-name="SAC_ResultadoNegociacion__c">
-                                </lightning-input-field>
-                                <lightning-input-field field-name="SAC_DetalleResultadoNegociacion__c">
-                                </lightning-input-field>
-                                <lightning-input-field field-name="SAC_Motivoresultadonegociacion__c">
-                                </lightning-input-field> 
-                                <lightning-input-field field-name="SAC_Observaciones__c" >
-                                </lightning-input-field>
-                                <lightning-input-field field-name="SAC_NegociacionFinalizada__c">
-                                </lightning-input-field>
-                            </div>
-                            <div class="slds-size_1-of-2">
-                                <lightning-input-field field-name="CC_Importe_Reclamado__c" disabled="true"> 
-                                </lightning-input-field>
-                                <lightning-input-field field-name="SAC_Importe_Resuelto__c">
-                                </lightning-input-field>
-                                <lightning-input-field field-name="SAC_TipoInteresContrato__c">
-                                </lightning-input-field>
-                                <lightning-input-field field-name="SAC_TipoInteresNegociado__c">
-                                </lightning-input-field>
-                                
-                            </div>
-                            <div class="slds-col slds-size_1-of-1">                            
-                                <lightning-button class="slds-float_right" variant="brand" type="submit" name="update"
-                                    label="Guardar">
-                                </lightning-button>
-                            </div>
-                            <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
-                        </div> 
-                    </div>
-                </div>               
-            </lightning-record-edit-form>
+                        </template>    
+                    </lightning-record-edit-form> 
+                    <!--Botón para eliminar pretensiones de la negociación en curso-->
+                    <template if:false={unicaPretension}> 
+                        <template if:true={casoEnNegociacion}> 
+                            <template if:false={editarCampos}>
+                                <div align="right" style="padding-top: 4px; padding-bottom: 8px;">
+                                    <lightning-button variant="brand" data-id={pretension.Id} label="Eliminar pretensión" onclick={onClickEliminarPretension} icon-name="utility:delete"></lightning-button>
+                                </div>
+                            </template>
+                        </template>
+                    </template>
+                </div>
+            </div>
+        </template>
+        <template if:true={editarCampos}>
+            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                <div class="slds-col slds-size_1-of-1" style="text-align: center;">   
+                    <lightning-button label="Cancelar" onclick={handleEditarCampos}></lightning-button>
+                    <lightning-button label="Guardar" class="slds-m-left_small" onclick={handleSubmit} variant="brand"></lightning-button>
+                </div>
+            </div>
         </template>
     </lightning-card>
+
+
+    <!--Modal de añadir pretensiones-->
+    <template if:true={modalAddPretension}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-1" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalAddPretension}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-1" class="slds-text-heading_medium slds-hyphenate">Seleccione las pretensiones en las que desee negociar</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <!-- spinner -->
+                    <template if:true={isLoading}>
+                        <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                    </template>
+                    <lightning-datatable
+                            key-field="id"
+                            data={pretensionesAdd}
+                            columns={columns}
+                            onrowselection={handleRowSelection}
+                    >
+                    </lightning-datatable>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModalAddPretension} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={negociarPretensiones} title="Ok" disabled={mostrarBotonSeleccionPretensiones}>Seleccionar Pretensiones</button> 
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+
+    <!--Modal de eliminar pretensiones-->
+    <template if:true={modalEliminarPretension}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalEliminarPretension}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="border"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-devolverLetrado" class="slds-text-heading_medium slds-hyphenate">Eliminar pretensión</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modalDevolverLetrado-content-id">
+                    <p>Se <b>eliminará</b> la pretensión de la negociación en curso.
+                    <br/>¿Deseas continuar con la operación?</p>   
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModalEliminarPretension} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={eliminarPretension} title="OK">Continuar</button> 
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
 
 
     <template if:true={spinnerLoading}>

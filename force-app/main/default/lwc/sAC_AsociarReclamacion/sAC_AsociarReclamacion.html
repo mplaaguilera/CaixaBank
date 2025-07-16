@@ -48,22 +48,57 @@
                       value={reclamacion.reclamacionActual.CreatedDate}></lightning-formatted-date-time>
                   </p>
                 </div>
+
+
                 <div class="slds-size_6-of-12">
                   Estado:
                   {reclamacion.reclamacionActual.Status}
                 </div>
+
+                
+                <div class="slds-size_12-of-12">
+                  <p>
+                    Naturaleza:
+                    {reclamacion.reclamacionActual.SAC_Naturaleza__c}
+                  </p>
+                </div>
+
               </div>
+
 
               <br />  
               <template if:true={esPropietario}>  
 
-                <lightning-button key={reclamacion.reclamacionActual.Id} id={reclamacion.reclamacionActual.Id} style= "padding: 4px"
-                  label="Desvincular" slot="actions" variant="brand" onclick={handleClickDesvincular} disabled={reclamacion.desactivarBotonDesvincular}>
-                </lightning-button>
+                <!--Si es una complementaria, no se puede desvincular si ya está resuelta-->
+                <template if:true={complementariaResuelta}>
+                    <lightning-button key={reclamacion.reclamacionActual.Id} id={reclamacion.reclamacionActual.Id} style= "padding: 4px"
+                      label="Desvincular" slot="actions" variant="brand" onclick={handleClickDesvincular} disabled="true">
+                    </lightning-button>
 
-                <lightning-button key={reclamacion.reclamacionActual.Id} id={reclamacion.reclamacionActual.Id} style= "padding: 4px"
-                  label="Vincular" slot="actions" variant="brand" onclick={handleClick} disabled={reclamacion.desactivarBotonVincular}>
-                </lightning-button>
+                    <lightning-button key={reclamacion.reclamacionActual.Id} id={reclamacion.reclamacionActual.Id} style= "padding: 4px"
+                      label="Vincular" slot="actions" variant="brand" onclick={handleClick} disabled="true">
+                    </lightning-button>
+                </template>
+                 <!--Si es una no complementaria o si sí lo es pero no está resuelta, sí se puede desvincular-->
+
+                <template if:false={complementariaResuelta}>
+
+                  
+          
+
+              
+                      <lightning-button key={reclamacion.reclamacionActual.Id} id={reclamacion.reclamacionActual.Id} style= "padding: 4px"
+                        label="Desvincular" slot="actions" variant="brand" onclick={handleClickDesvincular} disabled={reclamacion.desactivarBotonDesvincular}>
+                      </lightning-button>
+
+                      <lightning-button key={reclamacion.reclamacionActual.Id} id={reclamacion.reclamacionActual.Id} style= "padding: 4px"
+                        label="Vincular" slot="actions" variant="brand" onclick={handleClick} disabled={reclamacion.desactivarBotonVincular}>
+                      </lightning-button>
+              
+
+
+                </template>
+
 
               </template> 
               <template if:false={esPropietario}>  

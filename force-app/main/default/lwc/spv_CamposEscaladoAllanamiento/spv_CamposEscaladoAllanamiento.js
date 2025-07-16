@@ -14,8 +14,12 @@ export default class Spv_CamposEscaladoAllanamiento extends LightningElement {
     @api selectedOptionAnalisis = '';
     optionsAnalisis = [];
     optionsMotivo = [];
-    escaladoMotivo = '--Ninguno--';
-    escaladoAnalisis = '--Ninguno--';
+    placeholderEscaladoMotivo = '--Ninguno--';
+    placeholderEscaladoAnalisis = '--Ninguno--';
+    escaladoMotivo;
+    escaladoAnalisis;
+    @track editarCampos = false; //Se pone a true cuando quiere que los campos se muestren en modo formulario
+
 
     //Recuperar registro con los campos definidos en la constante caseFields
     @wire(getRecord, {recordId: "$recordId",fields: escaladoFields})
@@ -23,9 +27,11 @@ export default class Spv_CamposEscaladoAllanamiento extends LightningElement {
         if (data) {
             if(data.fields.SPV_MotivoAllanamiento__c.value) {
                 this.escaladoMotivo = data.fields.SPV_MotivoAllanamiento__c.value;
+                this.placeholderEscaladoMotivo = data.fields.SPV_MotivoAllanamiento__c.value;
             }
             if(data.fields.SPV_AnalisisAllanamiento__c.value) {
                 this.escaladoAnalisis = data.fields.SPV_AnalisisAllanamiento__c.value;
+                this.placeholderEscaladoAnalisis = data.fields.SPV_AnalisisAllanamiento__c.value;
             }
         } 
         else if (error) {
@@ -51,10 +57,12 @@ export default class Spv_CamposEscaladoAllanamiento extends LightningElement {
 
     handleOptionChangeMotivo(event) {
         this.selectedOptionMotivo = event.detail.value;
+        this.escaladoMotivo = event.detail.value;
         const fields = {};
         fields[ID_FIELD.fieldApiName] = this.recordId;
         fields[MOTIVOALLANAMIENTO_FIELD.fieldApiName] = event.detail.value;
         const recordInput = {fields};
+        this.editarCampos = false;
         updateRecord(recordInput)
         .then(() => this.mostrarToast('success', 'Se actualizó el caso', 'Se actualizó correctamente el motivo de allanamiento'))
         .catch(error => {
@@ -74,10 +82,12 @@ export default class Spv_CamposEscaladoAllanamiento extends LightningElement {
 
     handleOptionChangeAnalisis(event) {
         this.selectedOptionAnalisis = event.detail.value;
+        this.escaladoAnalisis = event.detail.value;
         const fields = {};
         fields[ID_FIELD.fieldApiName] = this.recordId;
         fields[ANALISISALLANAMIENTO_FIELD.fieldApiName] = event.detail.value;
         const recordInput = {fields};
+        this.editarCampos = false;
         updateRecord(recordInput)
         .then(() => this.mostrarToast('success', 'Se actualizó el caso', 'Se actualizó correctamente el análisis allanamiento/desistimiento'))
         .catch(error => {
@@ -99,4 +109,15 @@ export default class Spv_CamposEscaladoAllanamiento extends LightningElement {
 	mostrarToast(variant, title, message) {
 		this.dispatchEvent(new ShowToastEvent({variant: variant, title: title, message: message, mode: 'dismissable', duration: 4000}));
 	}
+
+
+    //Controlar cuando se pulsa en el lapiz de editar
+
+    handleEditarCampos(event){
+        if(this.editarCampos == false){
+            this.editarCampos = true;
+        }else{
+            this.editarCampos = false;
+        } 
+    }
 }

@@ -11,6 +11,7 @@
                             <th scope="col">Caso</th>
                             <th scope="col">Fecha recepción</th>
                             <th scope="col">Estado</th>
+                            <th scope="col">Naturaleza</th>
                             <th scope="col">Asunto</th>
                             <th scope="col">Propietario</th>
                             <th scope="col">Fecha resolución</th>
@@ -34,6 +35,7 @@
                                         </div>
                                     </td>
                                     <td class="custom-bg-color">{rec.EstadoReclamacion}</td>
+                                    <td class="custom-bg-color">{rec.NaturalezaReclamacion}</td>
                                     <td class="custom-bg-color">{rec.AsuntoReclamacion}</td>
                                     <td data-id={rec.idOwnerCaso} data-objeto="User" onclick={redirigirRegistro} class="custom-bg-color record-link">{rec.NombreOwnerCaso}</td>
                                     <td class="custom-bg-color">

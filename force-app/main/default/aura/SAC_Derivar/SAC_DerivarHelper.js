@@ -1,8 +1,4 @@
 ({
-    helperMethod : function() {
-
-    },
-
     doInitStartHelper : function(component) {
         $A.util.toggleClass(component.find('gruposCombobox'),'slds-is-open');
         var value = component.get('v.value');
@@ -120,15 +116,18 @@
         let para;
         let copia;
         let copiaOculta;
+        let pantalla = '';
 
         if(component.get("v.numeroPantalla") === 2){
             para = component.get("v.paraGrupo");
             copia = component.get("v.CC");
             copiaOculta =  component.get("v.CCO");
+            pantalla = 'cuerpoGrupo';
         }else if(component.get("v.numeroPantalla") === 4){
             para = component.get("v.paraCliente");
             copia = component.get("v.CCCliente");
             copiaOculta =  component.get("v.CCOCliente");
+            pantalla = 'cuerpoCliente';
         }
 
         var actionComprobarEmails = component.get("c.comprobarEmailsEnvio");
@@ -139,10 +138,33 @@
                 let emailsNoValidos = response.getReturnValue();
 
                 if(emailsNoValidos === ''){
-                    //Todas las direcciones de email son validas (ninguna está activa en la blackList) luego avanzamos a la siguiente pantalla
-                    var numeroPagina = component.get("v.numeroPantalla");
-                    numeroPagina = numeroPagina + 1;
-                    component.set("v.numeroPantalla", numeroPagina); 
+                    //Almacenamos los tag de las imágenes en la copia de seguridad para no perderlas
+                    var imageTagsMapPadre = component.get("v.imageTagsMapPadre");                   
+                    var imageTagsMapPadreCopia = component.get("v.imageTagsMapPadreCopia");                   
+   
+                    var mergedMap = this.mergeMaps(imageTagsMapPadre, imageTagsMapPadreCopia);
+                    component.set("v.imageTagsMapPadreCopia", mergedMap);                    
+
+                    //Verificar todas las imagenes tienen alt informado
+                    this.cargarTagsImgCuerpo(component, pantalla, false);  
+
+                    if(component.get('v.todasImgConTag')){
+                        //Todas las direcciones de email son validas (ninguna está activa en la blackList) luego avanzamos a la siguiente pantalla
+                        var numeroPagina = component.get("v.numeroPantalla");
+                        numeroPagina = numeroPagina + 1;
+                        component.set("v.numeroPantalla", numeroPagina); 
+                    }else{
+                        component.set('v.todasImgConTag', true);
+
+                        let toastParams = {
+                            title: "Advertencia!",
+                            message: 'Todas las imágenes enviadas deben tener una descripción informada. Revíselas con el botón "Modificar descripción imágenes"',  
+                            type: "warning"
+                        };
+                        let toastEvent = $A.get("e.force:showToast");
+                        toastEvent.setParams(toastParams);
+                        toastEvent.fire();
+                    }
                 }else{
                     //Alguna de las direcciones de email no son validas (alguna está activa en la blackList) luego notificamos esto al usuario
                     component.set('v.isLoading', false);
@@ -171,5 +193,79 @@
         })
 
         $A.enqueueAction(actionComprobarEmails);
+    },
+
+    cargarTagsImgCuerpo: function(component, tipoEnvio, comprobarTags){
+        //El rich text borra los atributos 'alt' de las etiquetas img, por lo que cada vez que se actualiza tenemos que recorrer el map de tag de imagenes
+        //y en caso de haber imagenes con tag, asignar el tag a cada una de estas
+
+        //Recupero el contenido del cuerpo y el mapa de tag de imagenes
+        var cuerpo;
+        var imageMap = component.get("v.imageTagsMapPadreCopia");       
+
+        if(tipoEnvio === 'cuerpoGrupo'){
+            var cuerpoG = component.get("v.cuerpoGrupo");
+            cuerpo = cuerpoG;
+        }else if(tipoEnvio === 'cuerpoCliente'){
+            var cuerpoC = component.get("v.cuerpoCliente");
+            cuerpo = cuerpoC;
+        }
+
+        //Encuentra todas las imagenes del cuerpo
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(cuerpo, 'text/html');
+        var images = Array.from(doc.querySelectorAll('img'));
+
+        //Recorro las imagenes, y si tiene una entrada en el mapa de tags, le añado el atributo 'alt'
+        images.forEach(function (image) {
+            
+            if(imageMap && imageMap.has(image.src)){
+                var alt = imageMap.get(image.src);
+
+                if (alt !== undefined && alt !== '') {
+                    image.setAttribute('alt', alt);
+                }else{
+                    component.set('v.todasImgConTag', false);
+                }
+            }else{                
+                const baseUrl = doc.baseURI; 
+
+                if(image.src !== baseUrl){
+                    component.set('v.todasImgConTag', false);
+                }
+            }
+        });       
+
+        if(!comprobarTags){
+            //Actualizo el valor del cuerpo con el contenido actualizado
+            var updatedContent = doc.body.innerHTML;
+
+            if(tipoEnvio === 'cuerpoGrupo'){
+                component.set("v.cuerpoGrupo", updatedContent);
+            }else if(tipoEnvio === 'cuerpoCliente'){
+                component.set("v.cuerpoCliente", updatedContent);
+            }
+        }
+    },
+
+    mergeMaps: function(map1, map2) {
+        
+        var mergedMap = new Map();
+
+        if(map2){
+            // Copia los valores del segundo mapa al mapa fusionado
+            map2.forEach(function(value, key) {                
+                mergedMap.set(key, value);
+            });
+        }
+        
+        if(map1){            
+            // Copia los valores del primer mapa al mapa fusionado
+            map1.forEach(function(value, key) {
+                mergedMap.set(key, value);
+            });
+        }
+                   
+        return mergedMap;
     }
 })

@@ -21,6 +21,23 @@
                 ficherosAdjuntosFiltradoCase.push(ficherosVisiblesCase[i]);
             }
         }
+
+        const esUserGeneral = component.get("v.esUserGeneral");
+
+        ficherosAdjuntosFiltradoCase.forEach(file => {
+            file.shouldEnterIf = (
+                esUserGeneral ||
+                (
+                    !esUserGeneral &&
+                    file.SAC_Bloque__c !== 'SAC_Tramitacion' &&
+                    (
+                        file.SAC_Bloque__c !== 'SAC_Respuesta' ||
+                        (file.SAC_Bloque__c === 'SAC_Respuesta' && file.SAC_Enviado__c)
+                    )
+                )
+            );
+        });
+
         component.set('v.ficherosAdjuntosCase',ficherosVisiblesCase);
         component.set('v.ficherosAdjuntosVisiblesCase', ficherosAdjuntosFiltradoCase);
 
@@ -181,11 +198,10 @@
     },
 
     mostrarOpcionesHelper : function( component, event, helper ) {
-
         let idRegistro = component.get('v.recordId');
-
+        let rtCaso = component.get('v.rtRegistro');
         var tiposAdjuntos = component.get('c.recuperaTipoAdjuntos');
-        tiposAdjuntos.setParams({'id':idRegistro});
+        tiposAdjuntos.setParams({'id':idRegistro, 'rtCaso':rtCaso});
         tiposAdjuntos.setCallback(this, function(response) {
         var state = response.getState();
         if(state === 'SUCCESS'){
@@ -240,6 +256,7 @@
         for(var key in resultBloques){
             fieldMap.push({value: key, label: resultBloques[key]});
         }
+
         component.set("v.bloquesAdjunto", fieldMap);
     
         var bloquesAdjunto = component.get("v.bloquesAdjunto");

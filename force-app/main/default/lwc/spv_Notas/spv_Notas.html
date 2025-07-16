@@ -1,0 +1,363 @@
+<template>
+    <template if:true={componenteCargado}>
+
+        <div class="slds-card slds-card_boundary">
+            <!--Cabecera de Notes-->
+            <div class="header-container slds-card_header slds-grid slds-p-around_small slds-align_absolute_center">
+                <lightning-icon icon-name="standard:note" size= "small" class="slds-m-right_small note-icon"></lightning-icon>
+                <h2 class="slds-text-heading_small slds-truncate notes-title slds-text-title_bold" title="Notes">Notes ({numNotas})</h2>
+                <div class="slds-col_bump-left">
+                    <lightning-button icon-name="utility:refresh" title="Refrescar" onclick={handleRecargarNotas} style="margin-right: 10px;"> </lightning-button>
+                    <lightning-button label="New" onclick={handleOnClickNewNote}></lightning-button>
+                </div>
+            </div>
+    
+            <!--Contenido de Notes-->
+            <template if:true={hayNotas}>
+                <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+                    <div  class="slds-grid slds-wrap slds-gutters_medium">
+                        
+    
+                            <!--Para los casos con el componente en la flexipage central-->
+                            <template if:false={componenteEnLateral}>
+                                <template for:each={notasPreview} for:item="nota">
+                                    <div key={nota.id} data-id={nota.id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 borde-item">
+                                        <article class="slds-card slds-m-vertical_small slds-p-bottom_medium note-item slds-border_bottom">
+                                            <div onclick={handleOnClickVerNota} class="subrayado-on-mouse-over" style="cursor: pointer;" data-id={nota.id}>
+                                                <h3 class="slds-text-heading_small slds-truncate titulo-nota-individual acortarTitulo" style="cursor: pointer;" data-id={nota.id} title={nota.title}>{nota.title}</h3>
+                                            </div>
+                                            <p class="slds-text-body_regular slds-m-top_x-small acortar" style="line-height: 1.2; margin-bottom:1px;">{nota.body}</p>
+                                            <div class="slds-text-color_weak slds-text-body_small slds-m-top_small div-user">
+                                                <p class="acortar" style="display: inline-block; margin-right: 5px; margin-bottom: 0; margin-top: 0; line-height: 1.1;">{nota.createdDate} by </p> 
+                                                    <lightning-button class="boton-user" style="margin: 0; padding: 0; line-height: 1;" variant="base" label={nota.createdByName} name={nota.createdById} data-target-id={nota.createdById} onclick={verUserClick}></lightning-button>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </template>
+                            </template>
+    
+                            <!--Para los casos con el componente en el lateral-->
+                            <template if:true={componenteEnLateral}>
+                                <template for:each={notasPreview} for:item="nota">
+                                    <div key={nota.id} data-id={nota.id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-1 borde-item">
+                                        <article class="slds-card slds-m-vertical_small slds-p-bottom_medium note-item slds-border_bottom">
+                                            <div onclick={handleOnClickVerNota} class="subrayado-on-mouse-over" style="cursor: pointer;" data-id={nota.id}>
+                                                <h3 class="slds-text-heading_small slds-truncate titulo-nota-individual acortarTitulo" style="cursor: pointer;" data-id={nota.id} title={nota.title}>{nota.title}</h3>
+                                            </div>
+                                            <p class="slds-text-body_regular slds-m-top_x-small acortar" style="line-height: 1.2; margin-bottom:1px;">{nota.body}</p>
+                                            <div class="slds-text-color_weak slds-text-body_small slds-m-top_small div-user">
+                                                <p class="acortar" style="display: inline-block; margin-right: 5px; margin-bottom: 0; margin-top: 0; line-height: 1.1;">{nota.createdDate} by </p> 
+                                                    <lightning-button class="boton-user" style="margin: 0; padding: 0; line-height: 1;" variant="base" label={nota.createdByName} name={nota.createdById} data-target-id={nota.createdById} onclick={verUserClick}></lightning-button>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </template>
+                            </template>
+    
+    
+                        
+                    </div>
+                </div>
+                <!--Footer de Notes-->
+                    <div if:true={hayNotas} class="slds-card_footer custom-footer" style="display: flex; justify-content: center; padding: 10px;">
+                        <lightning-button variant="base" label="View All" onclick={handleClickViewAll}></lightning-button>
+                    </div>
+            </template>
+        </div>
+    </template>
+
+
+
+
+
+    <!--Modal View All-->
+    <template if:true={mostrarModalViewAll}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-1" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalViewAll}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-1" class="slds-text-heading_medium slds-hyphenate">View All</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium slds-scrollable_x" id="modal-content-id-1">
+                    <lightning-datatable
+                            key-field="id"
+                            data={notasConIndice}
+                            columns={columns}
+                            onrowaction={handleRowActionTablaNotas}
+                            hide-checkbox-column="true"
+                            wrap-text-max-lines="1"
+                            resize-column-disabled="true"
+                    >
+                    </lightning-datatable>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+
+
+    <!--Modal View All-->
+    <template if:true={mostrarModalVerNota}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-1" aria-modal="true" aria-describedby="modal-content-id-1" class={claseAnimacion}>
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalVerNota}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-2" class="slds-text-heading_medium">Ver Nota</h3>
+                   
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+
+                    <h3 class="nombre-campo-nota">Título:</h3>
+                    <div class="div-titulo-nota">
+                        <lightning-formatted-rich-text class="contenido-nota-rich-text" value={tituloNotaSeleccionada}></lightning-formatted-rich-text>
+                    </div>
+
+                    <h3 class="nombre-campo-nota">Contenido:</h3>
+                    <div class="div-contenido-nota">
+                        <lightning-formatted-rich-text class="contenido-nota-rich-text" value={contenidoNota}></lightning-formatted-rich-text>
+                    </div>
+                </div>
+
+                <!--Footer de ver Nota, se mostrará un botón de eleminar solo para los system admin por si es encesario borrar-->
+                <footer class="slds-modal__footer">
+                    <button if:true={esSystemAdmin} class="slds-button slds-button_brand" title="Eliminar" onclick={handleOnClickEliminarNota}>Eliminar</button> 
+                </footer>
+
+                            
+            </div>
+        </section>
+        <div class="custom-backdrop"></div>
+    </template>
+
+
+    <!--Modal Nueva Nota-->
+    <template if:true={mostrarModalNuevaNota}>
+
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-1" aria-modal="true" aria-describedby="modal-content-id-1" class={claseAnimacion}>
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalNuevaNota}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-3" class="slds-text-heading_medium slds-hyphenate">Añadir Nueva Nota</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+   
+                    <div style="padding: 3px; margin-bottom: 10px;">
+                        <h3 class="nombre-campo-nota-add">Título:</h3>
+                        <lightning-input variant="label-hidden" placeholder="--Introduce el título de la nota--" required value={tituloAniadido} onchange={handleTituloOnChange}></lightning-input>
+                    </div>
+
+                    <div style="padding: 3px;">
+                        <h3 class="nombre-campo-nota">Contenido:</h3>
+                        <lightning-input-rich-text label="Contenido nota" value={contenidoAniadido} required="true" formats="bold, italic, underline, strike, list, indent, image" onchange={handleContenidoOnChange}></lightning-input-rich-text>
+                    </div>
+
+                    
+                </div>
+
+                 <!--Footer de Añadir Notas-->
+                 <!--<footer class="slds-modal__footer modal-footer">
+                    <div class="botones-izquierda">
+                        <button class="slds-button slds-button_neutral boton-share" title="Share" onclick={handleClickShare}>Share</button>
+                        <button class="slds-button slds-button_neutral boton-share" title="Add to record" onclick={handleClickAddRecord}>Add to record</button>
+                    </div>
+                    <div class="botones-derecha">
+                        <button class="slds-button slds-button_neutral" title="Cancelar" onclick={closeModalNuevaNota}>Cancelar</button>
+                        <button class="slds-button slds-button_brand" title="Añadir" onclick={handleOnClickAddNota} disabled={disableBotonAdd}>Añadir</button>
+                    </div>
+                </footer>-->
+
+                <!--Footer de Añadir Notas-->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" title="Cancelar" onclick={closeModalNuevaNota}>Cancelar</button>
+                    <button class="slds-button slds-button_brand" title="Añadir" onclick={handleOnClickAddNota} disabled={disableBotonAdd}>Añadir</button>
+                </footer>
+
+
+            </div>
+        </section>
+        <div class="custom-backdrop"></div>
+    </template>
+
+
+    <!--Modal Share-->
+    <!--<template if:true={mostrarModalShare}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-1" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+               
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalShare}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-share" class="slds-text-heading_medium">Share Note</h3>
+                    
+                </header>
+             
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-share">
+
+                   
+ 
+                     
+                        <div class="slds-col barra-busqueda">
+                                <lightning-input type="search" name="valorBusqueda" label="Usuario a buscar" value={inputValue}
+                                    onchange={handleValorBusquedaChange} onblur={handleOnBlurShare} onfocus={handleFocusInputShare} autocomplete="off" spellcheck="false" placeholder="Introduce el nombre del usuario...">
+                                </lightning-input>
+
+                                <template if:true={hayResultadosBusqueda}>
+                                    <ul class="sugerencias">
+                                        <template for:each={opcionesUsuario} for:item="opcion">
+                                            <li  data-id={opcion.key} key={opcion.key} onclick={handleClickSeleccionUsuario}>
+                                                <div class="div-sugerencia" style="display: flex;">
+                                                    <lightning-icon icon-name="standard:avatar" size="small" style="margin-right: 5px;"></lightning-icon>
+                                                    <span class="texto-sugerencia">{opcion.label}</span>
+                                        
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </template>
+                        </div>
+
+                        <div if:true={hayUserSelecionado}>
+                            <h3 class="nombre-campo-nota-add margen-sup">Usuarios seleccionados:</h3>
+                            <div class="selected-list">
+                                <template for:each={selectedUsers} for:item="user">
+                                    <div key={user.id} class="selected-item">
+                                        <lightning-icon icon-name="standard:avatar" size="small" style="margin-right: 5px;"></lightning-icon>
+                                        <span class="texto-sugerencia">{user.label}</span>
+                                        <lightning-button-icon class="boton-eliminar" icon-name="utility:close" onclick={handleClickEliminarUser} data-id={user.id}></lightning-button-icon>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <lightning-textarea class="mensaje-share" label="Mensaje" rows="5" value={mensajeEscrito} onchange={handleChangeMensajeEscrito} placeholder="Escribe un mensaje..."></lightning-textarea>
+                        </div>
+                </div>
+
+                
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand boton-share" title="Share" onclick={handleClickShare}>Confirmar</button>
+                </footer>
+
+                            
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template> -->
+
+
+      <!--Modal Add to record-->
+      <!--<template if:true={mostrarModalAddToRecord}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-1" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+    
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalAddRecord}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-addrecord" class="slds-text-heading_medium">Add to record</h3>
+                    
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-addrecord">
+
+                   
+                        <div class="slds-col barra-busqueda">
+                                <lightning-input type="search" name="valorBusquedaRegistro" label="Registro a buscar" value={inputValueRegistro}
+                                    onchange={handleValorBusquedaRegistroChange} onblur={handleOnBlurRegistro} onfocus={handleFocusInputRegistro} autocomplete="off" spellcheck="false" placeholder="Introduce el registro...">
+                                </lightning-input>
+
+                                <template if:true={hayResultadosBusquedaRegistros}>
+                                    <ul class="sugerencias">
+                                        <template for:each={opcionesAddRecord} for:item="opcion">
+                                            <li  data-id={opcion.key} key={opcion.key} onclick={handleClickSeleccionRegistro}>
+                                                <div class="div-sugerencia" style="display: flex;">
+                                                    <lightning-icon icon-name="standard:case" size="small" style="margin-right: 5px;"></lightning-icon>
+                                                    <span class="texto-sugerencia">{opcion.label}</span>
+                                        
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </template>
+                        </div>
+
+                        <div if:true={hayRegistroSelecionado}>
+                            <h3 class="nombre-campo-nota-add margen-sup">Registros seleccionados:</h3>
+                            <div class="selected-list">
+                                <template for:each={selectedRegistros} for:item="registro">
+                                    <div key={registro.id} class="selected-item">
+                                        <lightning-icon icon-name="standard:case" size="small" style="margin-right: 5px;"></lightning-icon>
+                                        <span class="texto-sugerencia">{registro.label}</span>
+                                        <lightning-button-icon class="boton-eliminar" icon-name="utility:close" onclick={handleClickEliminarRegistro} data-id={registro.id}></lightning-button-icon>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                </div>
+
+
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand boton-share" title="Share" onclick={handleClickAddRecordConfirm}>Confirmar</button>
+                </footer>
+      
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>-->
+
+
+
+    <template if:true={spinnerLoading}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                {mensajeSpinner}
+                            </span>
+                            <div class="exampleHolder">
+                                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

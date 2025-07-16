@@ -1,0 +1,73 @@
+.icon-style {
+    top: -29px;
+    left: 5px;
+    position: relative;
+}
+
+.backdrop-style {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    left: calc(-50vw + 50%) !important;
+    top: calc(-50vh + 50%) !important;
+}
+
+.icon-popin-style {
+    left: 95vw;
+    position: relative;
+}
+
+.full-area-style {
+    transition: all .5s ease-in-out!important;
+    transform: translateY(5px); 
+    position: relative;
+    z-index: 99;
+    width: 90vw;
+    left: 5vw;
+    top: calc(-50vh + 55%) !important;
+}
+
+/* 
+.full-area-style:last-child .slds-rich-text-area__content{
+    height: 90vw !important;
+	max-height: 85vh !important;
+} */
+/* 
+.slds-rich-text-editor__textarea:last-child .slds-rich-text-area__content{
+    height: 90vw;
+	max-height: 85vh;
+}
+
+.full-area-style:last-child .slds-rich-text-area__content{
+    height: 90vw;
+	max-height: 85vh;
+}
+
+.lightning-input-rich-text.full-area-style.slds-form-element{
+    
+} */
+
+/* class="slds-rich-text-area__content slds-grow slds-text-color-weak standin */
+/* 
+:host {
+    --sds-c-textarea-sizing-min-height: var(--rtf-size-min, 20%);
+    --sds-c-textarea-sizing-max-height: var(--rtf-size-max, 20%);
+
+} */
+
+/* .THIS {
+    --slds-c-textarea-sizing-min-height: 100%;       
+    --slds-c-textarea-sizing-max-height: 100%;    
+}
+
+.THIS .slds-rich-text-area__content {
+    height: 90vw !important;
+	max-height: 85vh !important;
+}
+
+.THIS .slds-rich-text-editor__textarea {
+    height: 90vw !important;
+	max-height: 85vh !important;
+} */

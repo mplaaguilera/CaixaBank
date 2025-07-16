@@ -39,8 +39,8 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
     private static String reclamanteText = 'reclamante';
     private static String cotitularText = 'cotitular';
     private static String encryption = 'XXXXX';
-    
-    /* @description: method that gets validations (in order) 
+
+    /* @description: method that gets validations (in order)
      * @param prestamo: prestamo record
      * @param fechaRecActual: fecha recepción reclamación
      * @param recId: id reclamación
@@ -73,7 +73,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
                     validation = antigReclamacion;
                 }
                 // Criteria "Prescripción" - Navarra
-                else if(prestamo.SAC_Fecha_cancelacion_real_prestamo__c != null && ((prestamo.SAC_Fecha_cancelacion_real_prestamo__c < navCancelation1 && prestamo.SAC_Fecha_cancelacion_real_prestamo__c.addYears(30) < fechaRecActual) || 
+                else if(prestamo.SAC_Fecha_cancelacion_real_prestamo__c != null && ((prestamo.SAC_Fecha_cancelacion_real_prestamo__c < navCancelation1 && prestamo.SAC_Fecha_cancelacion_real_prestamo__c.addYears(30) < fechaRecActual) ||
                         (prestamo.SAC_Fecha_cancelacion_real_prestamo__c >= navCancelation2 && prestamo.SAC_Fecha_cancelacion_real_prestamo__c <= navCancelation3 && fechaRecActual > navCancelation4) ||
                         (prestamo.SAC_Fecha_cancelacion_real_prestamo__c > navCancelation3 && prestamo.SAC_Fecha_cancelacion_real_prestamo__c.addYears(5) < fechaRecActual))){
                             validation = prescripcion;
@@ -82,16 +82,16 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
                 // Criteria "Antigüedad Reclamación" - Rest of Spain
                 if(fechaReciente != null && fechaReciente.addYears(5).addDays(82) < fechaRecActual){
                     validation = antigReclamacion;
-                }   
+                }
                 // Criteria "Prescripción" - Rest of Spain
                 else if(prestamo.SAC_Fecha_cancelacion_real_prestamo__c != null && prestamo.SAC_Fecha_cancelacion_real_prestamo__c.addYears(5).addDays(82) < fechaRecActual){
                     validation = prescripcion;
-                }                
+                }
             }
-        }	
+        }
         return validation;
     }
-    
+
     /* @description: method that gets MCC metadata
 	 */
     @AuraEnabled (cacheable=true)
@@ -99,12 +99,12 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         // Get specific MCCs
         return [SELECT Id, SAC_Tematica__c, SAC_ProductoServicio__c, SAC_Motivo__c, SAC_Detalle__c FROM SAC_MCC_Prestamos__mdt];
     }
-    
+
     /* @description: method that maps MCC metadata (SF)
 	 */
     @AuraEnabled (cacheable=true)
     public static Map<String, List<SAC_MCC_Prestamos__mdt>> getSFMetadataMCC(){
-		List<SAC_MCC_Prestamos__mdt> mccsToCheckList = getMetadataMCC();  
+		List<SAC_MCC_Prestamos__mdt> mccsToCheckList = getMetadataMCC();
         Map<String, List<SAC_MCC_Prestamos__mdt>> mccToCheckMapSF = new Map<String, List<SAC_MCC_Prestamos__mdt>>();
         for(SAC_MCC_Prestamos__mdt mccToCheck : mccsToCheckList){
             if(mccToCheckMapSF.containsKey(mccToCheck.SAC_Tematica__c)){
@@ -114,17 +114,17 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
             }else{
                 List<SAC_MCC_Prestamos__mdt> mccList = new List<SAC_MCC_Prestamos__mdt>();
                 mccList.add(mccToCheck);
-                mccToCheckMapSF.put(mccToCheck.SAC_Tematica__c, mccList); 
+                mccToCheckMapSF.put(mccToCheck.SAC_Tematica__c, mccList);
             }
         }
         return mccToCheckMapSF;
     }
-    
+
     /* @description: method that maps MCC metadata (SIEBEL)
 	 */
     @AuraEnabled (cacheable=true)
     public static Map<String, List<SAC_MCC_Prestamos__mdt>> getSBLMetadataMCC(){
-        List<SAC_MCC_Prestamos__mdt> mccsToCheckList = getMetadataMCC(); 
+        List<SAC_MCC_Prestamos__mdt> mccsToCheckList = getMetadataMCC();
         Map<String, List<SAC_MCC_Prestamos__mdt>> mccToCheckMapSBL = new Map<String, List<SAC_MCC_Prestamos__mdt>>();
         for(SAC_MCC_Prestamos__mdt mccToCheck : mccsToCheckList){
             if(mccToCheckMapSBL.containsKey(mccToCheck.SAC_ProductoServicio__c)){
@@ -134,13 +134,13 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
             }else{
                 List<SAC_MCC_Prestamos__mdt> mccList = new List<SAC_MCC_Prestamos__mdt>();
                 mccList.add(mccToCheck);
-                mccToCheckMapSBL.put(mccToCheck.SAC_ProductoServicio__c, mccList); 
+                mccToCheckMapSBL.put(mccToCheck.SAC_ProductoServicio__c, mccList);
             }
         }
         return mccToCheckMapSBL;
     }
 
-    /* @description: method that checks if "Inadmitir Reclamación" button must be visible 
+    /* @description: method that checks if "Inadmitir Reclamación" button must be visible
      * @param recId: id reclamación
 	 */
     @AuraEnabled
@@ -156,7 +156,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         return showButton;
     }
-    
+
     /* @description: method that gets préstamos to show in lookup
      * @param searchKeyWord: written word
      * @param ObjectName: SAC_Prestamo__c
@@ -181,9 +181,9 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         for(sObject obj: prestamosMCC) {returnList.add(obj);}
         return returnList;
     }
-    
-     
-	/* @description: method to create URL for Documento de Inadmisión 
+
+
+	/* @description: method to create URL for Documento de Inadmisión
 	 * @param caseId: Id de la reclamación
 	 * param prestamoId: Id del préstamo
 	 */
@@ -192,9 +192,9 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         String validation;
         Case reclamacion = devolverCaso(recId);
         // Get Préstamo records related to all reclamantes (only Prestamo RT)
-		SAC_Prestamo__c prestamo =  [SELECT Id, SAC_Codigo_Contrato_TF7__c, CreatedDate, SAC_Codigo_CNAE__c, SAC_Operacion_Empleado__c, SAC_Provincia_centro_gestor__c, SAC_Fecha_cancelacion_real_prestamo__c 
-                                               FROM SAC_Prestamo__c 
-                                               WHERE Id =: prestamoId LIMIT 1]; 
+		SAC_Prestamo__c prestamo =  [SELECT Id, SAC_Codigo_Contrato_TF7__c, CreatedDate, SAC_Codigo_CNAE__c, SAC_Operacion_Empleado__c, SAC_Provincia_centro_gestor__c, SAC_Fecha_cancelacion_real_prestamo__c
+                                               FROM SAC_Prestamo__c
+                                               WHERE Id =: prestamoId LIMIT 1];
         // Transform TF7 Code
         String transformedCode;
         if(prestamo.SAC_Codigo_Contrato_TF7__c != null && prestamo.SAC_Codigo_Contrato_TF7__c.length() == 19){
@@ -210,8 +210,8 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
 		validation = checkValidations(prestamo, Date.valueOf(reclamacion.SAC_FechaRecepcion__c), reclamacion.Id, reclamacion.AccountId);
         return validation;
     }
-    
-	/* @description: method that checks DocumentoEnvio "Inadmisión - Préstamo" 
+
+	/* @description: method that checks DocumentoEnvio "Inadmisión - Préstamo"
 	 * @param caseId: id reclamación
 	 */
      @AuraEnabled
@@ -220,12 +220,12 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
                                                     FROM SAC_DocumentoEnvio__c
                                                     WHERE SAC_Caso__c = :caseId
                                                     AND SAC_TipoDocumento__c =: tipoDocumento ORDER by createdDate desc LIMIT 1];
-        
-        
+
+
          return !docGuardado.isEmpty() ? true : false;
      }
-    
-	/* @description: method that creates DocumentoEnvio "Inadmisión - Préstamo" 
+
+	/* @description: method that creates DocumentoEnvio "Inadmisión - Préstamo"
 	 * @param caseId: id reclamación
 	 * @param idioma: idioma
 	 * @param motivoInadmisión: motivo inadmisión
@@ -262,7 +262,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         String docHTML = '';
         if(!etList.isEmpty()){
-            Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(etList[0].Id, null, caseId); 
+            Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(etList[0].Id, null, caseId);
             docHTML = renderStored.getHtmlBody();
         }
         SAC_DocumentoEnvio__c docEnvio = new SAC_DocumentoEnvio__c();
@@ -278,39 +278,39 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
             SAC_LCMP_GeneracionDocumento.generarDocumentoInadmision(caseId);
         }
     }
-    
-   /* @description: method that checks Documento de Inadmisión 
+
+   /* @description: method that checks Documento de Inadmisión
     * @param id: Id de la reclamación
     */
     @AuraEnabled
     public static Boolean compruebaPDFs(String id){
         return SAC_LCMP_RedaccionFinal.compruebaPDFs(id);
     }
-    
-   	/* @description: method that shows Documento de Inadmisión 
+
+   	/* @description: method that shows Documento de Inadmisión
 	 * @param caseId: Id de la reclamación
 	 */
      @AuraEnabled
      public static String visualizarDocumentoInadmision(Id caseId){
          String urlVF = 'https://';
          SAC_DocumentoEnvio__c docEnvio = [SELECT SAC_Caso__c, SAC_Documento__c, SAC_DocPDF__c, SAC_Version__c, Id
-                                           FROM SAC_DocumentoEnvio__c 
+                                           FROM SAC_DocumentoEnvio__c
                                            WHERE SAC_Caso__c =: caseId and SAC_Documento__c = null
                                            ORDER BY CreatedDate DESC LIMIT 1];
-        
+
          String vfHostname = DomainCreator.getVisualforceHostname(null);
          urlVF += vfHostname + '/apex/SAC_DocumentoRedaccionPDF?id=' + docEnvio.Id;
          return urlVF;
      }
-    
+
    	/* @description: method that checks if user has permission
 	 * @param reclamacion: reclamación
 	 */
-    @AuraEnabled 
+    @AuraEnabled
     public static Boolean recuperarPermiso(Case reclamacion){
         return SAC_LCMP_RedaccionFinal.recuperarPermiso(reclamacion);
     }
-    
+
    	/* @description: method that saves sentido, motivo and argumento
 	 * @param id: id reclamación
 	 * @param sentido: sentido reclamación
@@ -321,20 +321,20 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
     public static void guardarResolucionApex(String id, String sentido, String argumento, String motivoInad){
         SAC_LCMP_RedaccionFinal.guardarResolucionApex(id, sentido, argumento, motivoInad);
     }
-    
+
    	/* @description: method for inadmisión emails
 	 * @param idCaso: id reclamación
 	 * @param motivoInadmision: motivo inadmisión
  	 */
 	@AuraEnabled
     public static SAC_LCMP_RedaccionFinal.DatosEmailWrapper obtenerDatosEmailInadmision(String idCaso){
-        try { 
+        try {
                 Case caso = devolverCaso(idCaso);
                 Id idPlantilla;
             List<EmailTemplate> etList = new List<EmailTemplate>();
                 if(!Test.isRunningTest()){
                     idPlantilla = obtenerPlantillaInadmision(caso.CC_Idioma__c);
-                etList =[SELECT Id, Body, HtmlValue FROM EmailTemplate WHERE id =:idPlantilla LIMIT 1]; 
+                etList =[SELECT Id, Body, HtmlValue FROM EmailTemplate WHERE id =:idPlantilla LIMIT 1];
                 }else{
                 etList =[SELECT Id, Body, HtmlValue FROM EmailTemplate LIMIT 1];
                 }
@@ -345,132 +345,123 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
                 }
             if(!etList.isEmpty()){
                 String whoId = UserInfo.getUserId();
-                Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(etList[0].Id, whoId, idCaso);              
+                Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(etList[0].Id, whoId, idCaso);
                 if(String.isBlank(para)){
                     return new SAC_LCMP_RedaccionFinal.DatosEmailWrapper(caso.OS_Email__c, renderStored.getSubject(), renderStored.getHtmlBody(), '', caso, documentos);
                 }
                 else{
                     return new SAC_LCMP_RedaccionFinal.DatosEmailWrapper(para, renderStored.getSubject(), renderStored.getHtmlBody(), '', caso, documentos);
-                }   
+                }
             }else {
                 return new SAC_LCMP_RedaccionFinal.DatosEmailWrapper(para, '', '', '', caso, documentos);
-                }   
+                }
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
     }
-     
+
    	/* @description: method to get email templates for inadmisión (préstamos)
 	 * @param motivoInadmision: motivo inadmisión
 	 * @param idioma: idioma reclamación
 	 */
     public static Id obtenerPlantillaInadmision(String idioma){
         Id idPlantilla;
-        List<SAC_PlantillaRedaccion__c> plantillaList = [SELECT id, SAC_PlantillaCastellanoId__c, SAC_PlantillaCatalanId__c, SAC_PlantillaInglesId__c, SAC_PlantillaValencianoId__c, SAC_PlantillaEuskeraId__c, SAC_PlantillaGallegoId__c FROM SAC_PlantillaRedaccion__c WHERE  SAC_TipoPlantilla__c =: tipoPlantilla LIMIT 1];   
+        List<SAC_PlantillaRedaccion__c> plantillaList = [SELECT id, SAC_PlantillaCastellanoId__c, SAC_PlantillaCatalanId__c, SAC_PlantillaInglesId__c, SAC_PlantillaValencianoId__c, SAC_PlantillaEuskeraId__c, SAC_PlantillaGallegoId__c FROM SAC_PlantillaRedaccion__c WHERE  SAC_TipoPlantilla__c =: tipoPlantilla LIMIT 1];
         if(!plantillaList.isEmpty()){
             switch on idioma {
-                when 'es' {	 
+                when 'es' {
                     idPlantilla = plantillaList[0].SAC_PlantillaCastellanoId__c;
-                }	
-                when 'ca' {	 
+                }
+                when 'ca' {
                     idPlantilla = plantillaList[0].SAC_PlantillaCatalanId__c;
                 }
-                when 'en' {	
+                when 'en' {
                     idPlantilla = plantillaList[0].SAC_PlantillaInglesId__c;
                 }
-                when 'va' {	
+                when 'va' {
                     idPlantilla = plantillaList[0].SAC_PlantillaValencianoId__c;
                 }
-                when 'eu' {	
+                when 'eu' {
                     idPlantilla = plantillaList[0].SAC_PlantillaEuskeraId__c;
                 }
-                when 'ga' {	
+                when 'ga' {
                     idPlantilla = plantillaList[0].SAC_PlantillaGallegoId__c;
                 }
-                when else {	
+                when else {
                     idPlantilla = plantillaList[0].SAC_PlantillaCastellanoId__c;
                 }
             }
         }
         return idPlantilla;
     }
-    
+
    /* @description: method that gets CV
 	* @param recordId: id
 	*/
     @AuraEnabled
     public static List<ContentVersion> getCVRespuestas(Id recordId){
-        return SAC_LCMP_RedaccionFinal.getCVRespuestas(recordId); 
+        return SAC_LCMP_RedaccionFinal.getCVRespuestas(recordId);
     }
-    
-   /* @description: method that gets reclamantes
+
+    /* @description: method that gets reclamantes
 	* @param reclamacionId: reclamación id
 	*/
     @AuraEnabled (cacheable=true)
-    public static List<SAC_CaseReclamante__c> getReclamantes(Id reclamacionId){
-        List<SAC_CaseReclamante__c> reclamantes = [SELECT Id, SAC_Case__c, SAC_Account__c, SAC_Account__r.CC_NumPerso__c, SAC_Account__r.CC_Numero_Documento__c
-                                                   FROM SAC_CaseReclamante__c 
-                                                   WHERE SAC_Case__c =: reclamacionId];
-        return reclamantes;
+    public static List<SAC_CaseReclamante__c> getReclamantes(Id reclamacionId) {
+        return [SELECT SAC_Case__c, SAC_Account__c, SAC_Account__r.CC_NumPerso__c, SAC_Account__r.CC_Numero_Documento__c
+                FROM SAC_CaseReclamante__c WHERE SAC_Case__c = :reclamacionId];
     }
-    
-   /* @description: method that gets all prestamos (prestamo RT) for all reclamantes 
+
+   /* @description: method that gets all prestamos (prestamo RT) for all reclamantes
 	* @param reclamantesNumPerso: numperso reclamantes
 	*/
-    @AuraEnabled (cacheable=true)
+    @AuraEnabled(cacheable=true)
     public static List<SAC_Prestamo__c> getPrestamosbyReclamantes(List<String> reclamantesNumPerso){
-        // Get Préstamo/Titulares 
-        Set<Id> prestamosIds = new Set<Id>();
-        List<SAC_Prestamo_Titular__c> prestamoTitular = [SELECT Id, SAC_Prestamo__c, SAC_Titular__c, SAC_Titular__r.SAC_Id_persona_en_Origen__c 
-                                                         FROM SAC_Prestamo_Titular__c 
-                                                         WHERE SAC_Titular__r.SAC_Id_persona_en_Origen__c IN: reclamantesNumPerso];
-        for(SAC_Prestamo_Titular__c pt: prestamoTitular){
-            prestamosIds.add(pt.SAC_Prestamo__c);
-        }
-        List<SAC_Prestamo__c> prestamos = [SELECT Id, CreatedDate, SAC_Codigo_CNAE__c, SAC_Operacion_Empleado__c, SAC_Provincia_centro_gestor__c, 
-                                           SAC_Fecha_cancelacion_real_prestamo__c, Name, SAC_Codigo_Contrato_TF7__c
-                                           FROM SAC_Prestamo__c 
-                                           WHERE RecordType.DeveloperName =: prestamoRT 
-                                           AND Id IN: prestamosIds
-                                           ORDER BY RecordType.Name ASC];
-        return prestamos;
+        List<String> ids = SAC_Utils.listaCampo([SELECT SAC_Prestamo__c FROM SAC_Prestamo_Titular__c
+                                                WHERE SAC_Titular__r.SAC_Id_persona_en_Origen__c
+                                                IN :reclamantesNumPerso], 'SAC_Prestamo__c', true);
+
+        return [SELECT CreatedDate, SAC_Codigo_CNAE__c, SAC_Operacion_Empleado__c, SAC_Provincia_centro_gestor__c,
+                SAC_Fecha_cancelacion_real_prestamo__c, Name, SAC_Codigo_Contrato_TF7__c
+                FROM SAC_Prestamo__c WHERE RecordType.DeveloperName = :prestamoRT
+                AND Id IN: ids ORDER BY RecordType.Name ASC];
     }
-    
-   	/* @description: method that gets reclamación record 
+
+   	/* @description: method that gets reclamación record
 	 * param id: id reclamación
 	 */
     @AuraEnabled (cacheable=true)
     public static Case devolverCaso(String id){
-        Case reclamacion = [SELECT Id, CC_Canal_Respuesta__c, OS_Fecha_Resolucion__c, SAC_SentidoResolucion__c, SAC_MotivoSentidoResolucion__c, OwnerId, Status, 
-                                  SAC_FechaRecepcion__c, SAC_Entidad_Afectada__c, SAC_EntidadProductora__c, CC_Oficina_Afectada_Lookup__c, CC_Oficina_Afectada_Lookup__r.CC_Email__c, 
-                                  SAC_Naturaleza__c, SAC_MotivoDemora__c, SAC_ComentarioDemora__c, Origin, SAC_MotivoInadmision__c, CC_Idioma__c, Account.CC_NumPerso__c, 
-                                  SAC_DireccionPostalNotificacion__c, AccountId, Account.RecordTypeId, OS_Email__c, Account.CC_Email__c, SAC_DireccionPostal__c, RecordTypeId, 
-                                  SuppliedEmail, CaseNumber, Subject, SAC_OrigenConsulta__c, CC_No_Identificado__c, recordType.Name, SAC_Reclamacion__r.OS_Email__c, 
+        Case reclamacion = [SELECT Id, CC_Canal_Respuesta__c, OS_Fecha_Resolucion__c, SAC_SentidoResolucion__c, SAC_MotivoSentidoResolucion__c, OwnerId, Status,
+                                  SAC_FechaRecepcion__c, SAC_Entidad_Afectada__c, SAC_EntidadProductora__c, CC_Oficina_Afectada_Lookup__c, CC_Oficina_Afectada_Lookup__r.CC_Email__c,
+                                  SAC_Naturaleza__c, SAC_MotivoDemora__c, SAC_ComentarioDemora__c, Origin, SAC_MotivoInadmision__c, CC_Idioma__c, Account.CC_NumPerso__c,
+                                  SAC_DireccionPostalNotificacion__c, AccountId, Account.RecordTypeId, OS_Email__c, Account.CC_Email__c, SAC_DireccionPostal__c, RecordTypeId,
+                                  SuppliedEmail, CaseNumber, Subject, SAC_OrigenConsulta__c, CC_No_Identificado__c, recordType.Name, SAC_Reclamacion__r.OS_Email__c,
                                   CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name, SEG_Detalle__r.Name, SAC_Prestamo_seleccionado__c, SAC_TipoConsumidor__c
-                                  FROM Case 
+                                  FROM Case
                                   WHERE Id =: id LIMIT 1];
         return reclamacion;
     }
-    
-   	/* @description: method that gets préstamos 
-	 * param id: id reclamación 
+
+   	/* @description: method that gets préstamos
+	 * param id: id reclamación
 	 */
-    @AuraEnabled (cacheable=true)
-    public static Boolean checkPrestamos(String recId){
-        Boolean exist = false;
-        // Get reclamantes
-        List<String> reclamantesNumPerso = new List<String>();
-        for(SAC_CaseReclamante__c reclamante : getReclamantes(recId)){
-            if(reclamante.SAC_Account__c != null && reclamante.SAC_Account__r.CC_NumPerso__c != null){
-                reclamantesNumPerso.add(reclamante.SAC_Account__r.CC_NumPerso__c);
-            }
+    @AuraEnabled(cacheable=true)
+    public static Boolean checkPrestamos(String recId) {
+        List<String> numpersoReclamantes = SAC_Utils.listaCampo(
+            [SELECT SAC_Account__r.CC_NumPerso__c FROM SAC_CaseReclamante__c WHERE SAC_Case__c = :recId AND SAC_Account__r.CC_NumPerso__c != null],
+            'SAC_Account__r.CC_NumPerso__c'
+        );
+        if (numpersoReclamantes.isEmpty()) {
+            return false;
         }
-        // Get préstamos
-        List<SAC_Prestamo__c> prestamoList =  getPrestamosbyReclamantes(reclamantesNumPerso);
-        if(!prestamoList.isEmpty()){exist = true;}
-        return exist;
+
+        return ![SELECT Id FROM SAC_Prestamo_Titular__c
+                    WHERE SAC_Titular__r.SAC_Id_persona_en_Origen__c IN :numpersoReclamantes
+                    AND SAC_Prestamo__r.RecordType.DeveloperName = :prestamoRT
+                    AND SAC_Prestamo__c != null LIMIT 1].isEmpty();
     }
-    
+
    	/* @description: antecedente wrapper
 	 */
     public class antecedenteWrapper{
@@ -523,23 +514,23 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         @AuraEnabled
         public string detalle;
     }
-    
-    /* @description: method that gets numPerso from cotitulares 
+
+    /* @description: method that gets numPerso from cotitulares
 	 * param tf7Codigo: codigo tf7 préstamo
 	 */
     /*@AuraEnabled(cacheable=true)
     public static List<SAC_Prestamo_titular__c> getnumPersoCotitulares(String tf7Codigo) {
         return [SELECT Id, SAC_Titular__r.SAC_Id_persona_en_Origen__c FROM SAC_Prestamo_titular__c WHERE SAC_Prestamo__r.SAC_Codigo_Contrato_TF7__c =: tf7Codigo];
     }*/
-    
-    /* @description: method that gets numPerso from cotitulares 
+
+    /* @description: method that gets numPerso from cotitulares
 	 * param tf7Codigo: codigo tf7 préstamo
 	 */
     @AuraEnabled(cacheable=true)
     public static List<Account> getAccountbyNumPerso(List<String> numPersoCotitulares) {
         return [SELECT Id, CC_Numero_Documento__c FROM Account WHERE CC_NumPerso__c IN: numPersoCotitulares];
     }
-    
+
    	/* @description: method that gets Status (Case) picklist labels
 	 * param picklistValue: picklist api name
 	 */
@@ -553,8 +544,8 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         return null;
     }
-    
-    /* @description: method that gets DNIs from cotitulares 
+
+    /* @description: method that gets DNIs from cotitulares
 	 * param tf7Codigo: codigo tf7 préstamo
 	 * param recId: id reclamación
 	 */
@@ -572,7 +563,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         // Find co-titulares
         List<SAC_Prestamo__c> prestamoList =  getPrestamosbyReclamantes(reclamantesNumPerso);
         List<SAC_Prestamo_Titular__c> prestamoTitular = [SELECT Id, SAC_Titular__c,  SAC_Titular__r.SAC_Id_persona_en_Origen__c
-                                                         FROM SAC_Prestamo_Titular__c 
+                                                         FROM SAC_Prestamo_Titular__c
                                                          WHERE SAC_Prestamo__c IN: prestamoList
                                                          AND SAC_Titular__r.SAC_Id_persona_en_Origen__c NOT IN: reclamantesNumPerso];
         for(SAC_Prestamo_Titular__c pt: prestamoTitular){
@@ -590,7 +581,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         return rolNumDoc;
     }
-    
+
     /* @description: method that gets antecedentes from reclamantes and cotitulares
     * salesforce cases (reclamaciones)
     * param recId: id reclamación
@@ -629,7 +620,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         return rolAntecedenteWrapper;
     }
-    
+
     /* @description: method that gets antecedentes from reclamantes and cotitulares
     * reclamaciones históricas SAC and CBPO
     * param recId: id reclamación
@@ -685,7 +676,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         return rolAntecedenteWrapper;
     }
-    
+
    	/* @description: method that gets antecedentes from reclamantes and cotitulares
 	 * demandas judiciales contra la entidad
 	 * param recId: id reclamación
@@ -732,7 +723,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         return rolAntecedenteWrapper;
     }
-    
+
    	/* @description: method that gets antecedentes from reclamantes and cotitulares
 	 * demandas judiciales morosidad
 	 * param recId: id reclamación
@@ -778,7 +769,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         return rolAntecedenteWrapper;
     }
-    
+
    	/* @description: method that gets antecedentes from reclamantes and cotitulares
 	 * concursos
 	 * param recId: id reclamación
@@ -824,7 +815,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         return rolAntecedenteWrapper;
     }
-    
+
     /* @description: method that checks antecedentes (if they match MCCs)
      * @param atrResponses: antecedentes cotitulares
      * @param reclamacionesAnteriores: reclamaciones (SF) anteriores
@@ -841,7 +832,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
                     if(mcc.SAC_ProductoServicio__c == reclAnterior.CC_MCC_ProdServ__r.Name && mcc.SAC_Motivo__c == reclAnterior.CC_MCC_Motivo__r.Name
                        && mcc.SAC_Detalle__c == reclAnterior.SEG_Detalle__r.Name){
                            fechaAntecedente = Date.valueOf(reclAnterior.SAC_FechaRecepcion__c);
-                           break; 
+                           break;
                        }
                 }
             }
@@ -866,7 +857,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         }
         return fechaAntecedente;
     }
-    
+
     /* @description: method that gets all antecedentes from reclamantes and cotitulares
 	 * param recId: id reclamación
 	 */
@@ -899,24 +890,24 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
         Date fechaReciente = checkAllAntecedentes(allAntecedentes, reclamacionesAnteriores);
         return fechaReciente;
     }
-    
+
     /* @description: method that gets reclamaciones anteriores from reclamantes and cotitulares
      * @param numDocumentos: dnis reclamantes and cotitulares
 	 */
     private static List<Case> getReclamacionesAnteriores(List<String> numDocumentos, String recId){
         Set<String> reclamacionId = new Set<String>();
-        List<SAC_CaseReclamante__c > reclamanteList = [SELECT Id, SAC_Case__c 
-                                                       FROM SAC_CaseReclamante__c 
+        List<SAC_CaseReclamante__c > reclamanteList = [SELECT Id, SAC_Case__c
+                                                       FROM SAC_CaseReclamante__c
                                                        WHERE SAC_Account__r.CC_Numero_Documento__c IN: numDocumentos
                                                        AND SAC_Case__r.RecordTypeId =: RECTYPERECLAMACION
                                                        AND SAC_Case__c !=: recId];
         for(SAC_CaseReclamante__c reclamante: reclamanteList){
             reclamacionId.add(reclamante.SAC_Case__c);
         }
-        List<Case> reclamacionesAnteriores = [SELECT Id, RecordTypeId, SAC_FechaRecepcion__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, 
+        List<Case> reclamacionesAnteriores = [SELECT Id, RecordTypeId, SAC_FechaRecepcion__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name,
                                               CC_MCC_Motivo__r.Name, SEG_Detalle__r.Name, CaseNumber, Subject, Status, Account.CC_Numero_Documento__c,
                                               CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Motivo__c, SEG_Detalle__c
-                                              FROM Case 
+                                              FROM Case
                                               WHERE Id IN: reclamacionId
                                               ORDER BY SAC_FechaRecepcion__c DESC];
         return reclamacionesAnteriores;

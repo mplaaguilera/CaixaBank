@@ -24,25 +24,18 @@
 
 		$A.enqueueAction(getCaso);
 
-		/*var tienePermisos = component.get('c.tienePermisos');
+		var tienePermisos = component.get('c.tienePermisosReclamacionCerrada');
         tienePermisos.setParam('idCaso', component.get('v.recordId'));
 		tienePermisos.setCallback(this, function(response) {
         	var state = response.getState();
             if (state === "SUCCESS") {
-
 				if(response.getReturnValue()){
-
-					component.set('v.tienePermisosEditar', response.getReturnValue());
-
-				}else if(component.get('v.caso.OwnerId') == userId){
-
-					component.set('v.tienePermisosEditar', true);
+					component.set('v.tienePermisosEditarReclamacionCerrada', response.getReturnValue());
 				}
 			}
 		});
 
 		$A.enqueueAction(tienePermisos);
-*/
 	},
 
 	abrirModalPretensiones : function(component, event, helper){

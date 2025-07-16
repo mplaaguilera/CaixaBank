@@ -1,12 +1,12 @@
 public without sharing class SAC_Utils {
-    
+
     /*
     @description Método para recuperar los record types de un mapa de objetos.
     @param mapObjetos -> Mapa de objetos a obtener los recordTypes.
     @return Mapa con la configuración de de recordTypes obtenidos.
     */
     public static Map<String,Map<String,Schema.RecordTypeInfo>> getRecordTypesObjects(Set<String> setObjetos) {
-        
+
         Map<String,Map<String,Schema.RecordTypeInfo>> mapObjectRT = new Map<String,Map<String,Schema.RecordTypeInfo>>();
         for(String objeto : setObjetos){
             if (String.isNotBlank(objeto) && !mapObjectRT.containsKey(objeto)){
@@ -86,7 +86,7 @@ public without sharing class SAC_Utils {
 					when 'CC_Caracteristica__c' {
                         mapObjectRT.put(objeto,Schema.SObjectType.CC_Caracteristica__c.getRecordTypeInfosByDeveloperName());
                     }
-					when 'CBK_Case_Extension__c' { 
+					when 'CBK_Case_Extension__c' {
 						mapObjectRT.put(objeto,Schema.SObjectType.CBK_Case_Extension__c.getRecordTypeInfosByDeveloperName());
 					}
                     when else {
@@ -97,7 +97,7 @@ public without sharing class SAC_Utils {
         }
         return mapObjectRT;
     }
-    
+
     /**
     Wrapper para retornar datos de las reglas de clasificación
     */
@@ -107,7 +107,7 @@ public without sharing class SAC_Utils {
         public String motivoRechazo{get; set;}
 		public String motivoDescarte{get; set;}
     }
-    
+
 
     /*
     Recuperar configuración integración CUSTOM METADATO con Body petición.
@@ -148,7 +148,7 @@ public without sharing class SAC_Utils {
 
         return threadId;
     }
-    
+
     /**
     Método para insertar trazas
     */
@@ -159,7 +159,7 @@ public without sharing class SAC_Utils {
         	List<CC_TrazaInt__c> lstTrazas = (List<CC_TrazaInt__c>)Json.deserialize(jsonTrazas,List<CC_TrazaInt__c>.class);
 			SAC_DatabaseDML.insertListDML(lstTrazas, false);
         }
-        
+
     }
 
 	/**
@@ -172,7 +172,7 @@ public without sharing class SAC_Utils {
         	List<Case> lstCase = (List<Case>)Json.deserialize(jsonCase,List<Case>.class);
 			SAC_DatabaseDML.updateListDML(lstCase, false);
         }
-        
+
     }
 
 	/**
@@ -207,7 +207,7 @@ public without sharing class SAC_Utils {
         	List<SAC_Accion__c> lstAccion = (List<SAC_Accion__c>)Json.deserialize(jsonAccion,List<SAC_Accion__c>.class);
 			SAC_DatabaseDML.updateListDML(lstAccion, false);
         }
-        
+
     }
 
 	/**
@@ -219,7 +219,7 @@ public without sharing class SAC_Utils {
 
 	/** Métodos EmailService */
     /**
-    Método para determinar la clasificación rápida que se debe asignar al caso cuando entra por email 
+    Método para determinar la clasificación rápida que se debe asignar al caso cuando entra por email
     */
     public static WrapperReglaClasificacion determinarCR(String fromAddress, List<String> toAddresses, List<String> ccAddresses, String subject, String body, String recordTypeId)
 	{
@@ -260,8 +260,8 @@ public without sharing class SAC_Utils {
 		for (SEG_Multivalor__c obj :[SELECT id, SEG_Reglas_Clasificacion__c, SEG_TipodeValor__c, SEG_Valor__c, SEG_ReglaInactiva__c, SEG_Reglas_Clasificacion__r.OS_Logica_Multivalor__c,
                                     SEG_Reglas_Clasificacion__r.SEG_ClasificacionRapida__r.OS_EstadoCaso__c, SEG_Reglas_Clasificacion__r.SEG_ClasificacionRapida__r.SAC_MotivoRechazo__c,
 									SEG_Reglas_Clasificacion__r.SEG_ClasificacionRapida__r.SAC_MotivoDescarte__c
-                                    FROM SEG_Multivalor__c 
-                                    WHERE SEG_ReglaInactiva__c = false AND SEG_CRInactiva__c = false AND SEG_Reglas_Clasificacion__c <> '' AND SEG_Reglas_Clasificacion__r.CBK_Negocio__c = 'SAC' 
+                                    FROM SEG_Multivalor__c
+                                    WHERE SEG_ReglaInactiva__c = false AND SEG_CRInactiva__c = false AND SEG_Reglas_Clasificacion__c <> '' AND SEG_Reglas_Clasificacion__r.CBK_Negocio__c = 'SAC'
 									AND SEG_Reglas_Clasificacion__r.SEG_ClasificacionRapida__r.SAC_Target__c = :targetCR
                                     ORDER BY SEG_Reglas_Clasificacion__r.OS_OrdenEjecucion__c ASC])
 		{
@@ -269,7 +269,7 @@ public without sharing class SAC_Utils {
             WrapperReglaClasificacion wrapRC = new WrapperReglaClasificacion();
             wrapRC.id = obj.SEG_Reglas_Clasificacion__c;
             if (String.isNotBlank(obj.SEG_Reglas_Clasificacion__r.SEG_ClasificacionRapida__r.OS_EstadoCaso__c)) {
-                wrapRC.estado = obj.SEG_Reglas_Clasificacion__r.SEG_ClasificacionRapida__r.OS_EstadoCaso__c;    
+                wrapRC.estado = obj.SEG_Reglas_Clasificacion__r.SEG_ClasificacionRapida__r.OS_EstadoCaso__c;
             }
             if (String.isNotBlank(obj.SEG_Reglas_Clasificacion__r.SEG_ClasificacionRapida__r.SAC_MotivoRechazo__c)) {
                 wrapRC.motivoRechazo = obj.SEG_Reglas_Clasificacion__r.SEG_ClasificacionRapida__r.SAC_MotivoRechazo__c;
@@ -288,7 +288,7 @@ public without sharing class SAC_Utils {
                     mapaRCMVTotal.put(obj.SEG_Reglas_Clasificacion__c, listaMultivalores);
                 }
             }
-            
+
 			if (obj.SEG_TipodeValor__c == 'Remitente' && String.isNotBlank(obj.SEG_Valor__c))
 			{
 				reglasClasificacionIds.put(obj.SEG_Reglas_Clasificacion__c, obj.SEG_Reglas_Clasificacion__c);
@@ -456,7 +456,7 @@ public without sharing class SAC_Utils {
 			Map<String, SEG_Multivalor__c> listDestinatariosCCExcluir = new Map<String, SEG_Multivalor__c> ();
 
 			if (maplistOfMultivalorRemitentesIncluir.containsKey(target)){
-				listRemitentes = maplistOfMultivalorRemitentesIncluir.get(target);			
+				listRemitentes = maplistOfMultivalorRemitentesIncluir.get(target);
 			}
 			if (maplistOfMultivalorAsuntosIncluir.containsKey(target)){
 				listAsuntos = maplistOfMultivalorAsuntosIncluir.get(target);
@@ -471,7 +471,7 @@ public without sharing class SAC_Utils {
 				listDestinatariosCC = maplistOfMultivalorDestinatarioCCIncluir.get(target);
 			}
 			if (maplistOfMultivalorRemitentesExcluir.containsKey(target)){
-				listRemitentesExcluir = maplistOfMultivalorRemitentesExcluir.get(target);			
+				listRemitentesExcluir = maplistOfMultivalorRemitentesExcluir.get(target);
 			}
 			if (maplistOfMultivalorAsuntosExcluir.containsKey(target)){
 				listAsuntosExcluir = maplistOfMultivalorAsuntosExcluir.get(target);
@@ -500,7 +500,7 @@ public without sharing class SAC_Utils {
                     mapaRCMVEncontrados = rellenarMapaMVEncontrados(mapaRCMVEncontrados, listRemitentes.get(valor));
 					totalEncontrados++;
 				}
-				
+
 			}
 			for (String valor : listAsuntos.KeySet())
 			{
@@ -597,9 +597,9 @@ public without sharing class SAC_Utils {
 
         return wrapRCRetornar;
 	}
-    
+
     /**
-    Método para rellenar mapa con multivalores por cada regla de clasificación 
+    Método para rellenar mapa con multivalores por cada regla de clasificación
     */
     private static Map<Id, List<SEG_Multivalor__c>> rellenarMapaMVEncontrados(Map<Id, List<SEG_Multivalor__c>> mapaRCMVEncontrados, SEG_Multivalor__c multiValor) {
         //Rellenar mapa con los multivalores que se estan encontrando con key regla de clasificación padre
@@ -679,7 +679,7 @@ public without sharing class SAC_Utils {
 					direccionesToEmailStr = direccion;
 					variasDirecciones = true;
 				}else{
-					direccionesToEmailStr = direccionesToEmailStr + ';' + direccion; 
+					direccionesToEmailStr = direccionesToEmailStr + ';' + direccion;
 				}
 			}
 			casoNuevo.SAC_EmailTo__c = direccionesToEmailStr.left(250);
@@ -695,7 +695,7 @@ public without sharing class SAC_Utils {
 					direccionesCCEmailStr = direccion;
 					variasDirecciones = true;
 				}else{
-					direccionesCCEmailStr = direccionesCCEmailStr + ';' + direccion; 
+					direccionesCCEmailStr = direccionesCCEmailStr + ';' + direccion;
 				}
 			}
 			casoNuevo.SAC_EmailCC__c = direccionesCCEmailStr.left(250);
@@ -705,9 +705,9 @@ public without sharing class SAC_Utils {
             casoNuevo.Subject = subjectRecortado;
         }
 
-        if(email.htmlBody != null){ 
+        if(email.htmlBody != null){
             casoNuevo.Description = email.htmlBody.stripHtmlTags().left(32000);
-        }else if(email.plainTextBody != null){ 
+        }else if(email.plainTextBody != null){
             casoNuevo.Description = email.plainTextBody.left(32000);
         }
 
@@ -715,7 +715,7 @@ public without sharing class SAC_Utils {
         if (cola != null) {
             casoNuevo.OwnerId = cola.QueueId;
         }
-        
+
         return casoNuevo;
     }
 
@@ -726,7 +726,7 @@ public without sharing class SAC_Utils {
 
 		String fechaEmail = '';
         Datetime emailDate;
-       
+
 		// Recuperar la fecha en la que se envió el email
 		for(Messaging.InboundEmail.Header header : email.headers){
 			if (header.name == 'Date') {
@@ -735,7 +735,7 @@ public without sharing class SAC_Utils {
 		}
 
 		// Separar la cadena en sus componentes, formato que se recoge la fecha -> Ejemplo: Wed, 13 Sep 2023 08:43:40 +0000
-		List<String> parts = fechaEmail.split(' ');  
+		List<String> parts = fechaEmail.split(' ');
 
 		if (parts.size() >= 5) {
 			// Mapear el mes a su equivalente numérico
@@ -743,10 +743,10 @@ public without sharing class SAC_Utils {
 				'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06',
 				'Jul' => '07', 'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12'
 			};
-		
+
 			// Explicación -> parts[1] = dia, parts[2] mes, parts[3] año, parts[4] hora(global), timeParts[0] hora, timeParts[1] minutos, timeParts[2] segundo
 			String[] timeParts = parts[4].split(':');
-		
+
 			// Convertir la fecha en un objeto Datetime
 			try {
 				emailDate = Datetime.newInstanceGmt(Integer.valueOf(parts[3]), Integer.valueOf(monthMap.get(parts[2])), Integer.valueOf(parts[1]), Integer.valueOf(timeParts[0]), Integer.valueOf(timeParts[1]), Integer.valueOf(timeParts[2]));
@@ -820,8 +820,8 @@ public without sharing class SAC_Utils {
 					filteredEmails.add(email);
 				}
 			}
-		}		
-		
+		}
+
 		//Devolver la lista de correos electrónicos válidos
 		return filteredEmails;
     }
@@ -864,8 +864,8 @@ public without sharing class SAC_Utils {
 					listaSEMFiltrada.add(email);
 				}
 			}
-		}	
-		
+		}
+
 		//Devolver la lista de correos electrónicos válidos
 		return listaSEMFiltrada;
     }
@@ -890,7 +890,7 @@ public without sharing class SAC_Utils {
 		String cuerpoEmailParseado = emailBody;
 		try{
 			if (String.isNotBlank(emailBody)) {
-				// Pattern patronURLs = Pattern.compile('<img src=\\"https:\\/\\/caixabankcc([a-zA-Z0-9-=?&;%]|\\.|\\\\|:|\\/)+\\">');		
+				// Pattern patronURLs = Pattern.compile('<img src=\\"https:\\/\\/caixabankcc([a-zA-Z0-9-=?&;%]|\\.|\\\\|:|\\/)+\\">');
 				Pattern patronURLs = Pattern.compile('<img src=\\"https:\\/\\/caixabankcc([a-zA-Z0-9-=?&;%]|\\.|\\\\|:|\\/)+\\" alt=\\"[^\\"]*\\"\\>');
 
 				// Pattern patronURLconDominio = Pattern.compile('<img src="(.{0,100})?\\/sfc\\/servlet\\.shepherd\\/version\\/download\\/068[A-Za-z0-9]{12,15}">');
@@ -903,7 +903,7 @@ public without sharing class SAC_Utils {
 				Pattern patronCV = Pattern.compile('\\/068[a-zA-Z0-9]+\\?');
 				Pattern patronCVDominio = Pattern.compile('\\/068[a-zA-Z0-9]+');
 				Pattern patronChatter = Pattern.compile('068[a-zA-Z0-9]{12}');
-				
+
 				//Preparar mapa de URLs de reemplazo.
 				Map<String,String> mapaReemplazoUrls = new Map<String,String>();
 				Set<String> setContentVersions = new Set<String>();
@@ -938,7 +938,7 @@ public without sharing class SAC_Utils {
 
 					Map<String, Id> mapAssetDocument = new Map<String, Id>();
 					Map<String, String> mapAssetContentVer = new Map<String, String>();
-					
+
 					for(ContentVersion contentVersion : contestLimpios){
 						if(contentVersion.ContentDocumentId != null){
 							String developerNameFinal;
@@ -1022,7 +1022,7 @@ public without sharing class SAC_Utils {
 							Integer finAlt = urlPrivadaCorreo.indexOf('"', inicioAlt);
 							altURL = urlPrivadaCorreo.substring(inicioAlt, finAlt);
 						}
-						
+
 					}
 					if (!String.isBlank(ficheroURL) && mapaFilePublicURL.containsKey(ficheroURL)) {
 						nuevaURL = mapaFilePublicURL.get(ficheroURL);
@@ -1095,9 +1095,9 @@ public without sharing class SAC_Utils {
 				//Parsear la url privada para encontrar el Identificador del fichero.
 				Matcher matcherCV = patronCV.matcher(urlImagen);
 
-				if (matcherCV.find()) {							
+				if (matcherCV.find()) {
 					String fileId = matcherCV.group();
-					
+
 					if(tipo == 'url'){
 						fileId = fileId.substring(1,fileId.length()-1);
 					}else if(tipo == 'dominio'){
@@ -1105,11 +1105,41 @@ public without sharing class SAC_Utils {
 					}else if(tipo == 'chatter'){
 						fileId = fileId.substring(0,fileId.length());
 					}
-					
+
 					mapaReemplazoUrls.put(urlImagen, fileId);
 					setContentVersions.add(fileId);
 				}
 			}
 		}
 	}
+
+	public static List<String> listaCampo(List<SObject> registros, String campo, Boolean quitarDuplicados) {
+        /* Marc Pla, 19/8/2020: Dada una lista de SObject, retorna una lista con los valores del campo indicado.
+            Ejemplo:
+                List<String> nombresCuentas = listaCampo([SELECT Status, Account.Name FROM Case LIMIT 3], 'Account.Name', false);
+                retorna ['JOAN MERCADER OBIOLS', 'PERE CRUZ', 'RAMON MESSEGUER'] */
+
+        List<String> retorno = new List<String>();
+        if (registros != null) {
+            for (SObject registro : registros) {
+                String valor;
+                Map<String, Object> mapaCamposActual = registro.getPopulatedFieldsAsMap();
+                for (String campoJoin : campo.split('\\.')) {
+                    if (campo.containsNone('.') || campoJoin == campo.substringAfterLast('.')) {
+                        valor = String.valueOf(mapaCamposActual.get(campoJoin));
+                    } else { //Lookup
+                        if (mapaCamposActual.get(campoJoin) != null) {
+                            mapaCamposActual = ((SObject)mapaCamposActual.get(campoJoin)).getPopulatedFieldsAsMap();
+                        }
+                    }
+                }
+                retorno.add(valor);
+            }
+        }
+        return quitarDuplicados ? new List<String>(new Set<String>(retorno)) : retorno;
+    }
+
+    public static List<String> listaCampo(List<SObject> lista, String campo) {
+        return listaCampo(lista, campo, false);
+    }
 }

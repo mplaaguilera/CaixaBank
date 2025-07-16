@@ -277,9 +277,9 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 			CBK_Log.error(e);
 		}
 		try {
-			if (solicitud.tipoSolicitud != 'prestamoPJ') {
+			// if (solicitud.tipoSolicitud != 'prestamoPJ') {
 				CSBD_Denegacion_Automatica_Oportunidades.denegacionAutomaticaOportunidades(ids);
-			}
+			// }
 		} catch (Exception e) {
 			CBK_Log.error(e);
 		}

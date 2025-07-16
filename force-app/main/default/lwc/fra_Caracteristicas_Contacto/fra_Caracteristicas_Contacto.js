@@ -1,6 +1,7 @@
 import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { RefreshEvent } from 'lightning/refresh';
+import LightningConfirm from 'lightning/confirm';
 import { refreshApex } from '@salesforce/apex';
 import getCaracteristicas from '@salesforce/apex/FRA_Caracteristicas_Controller.conseguirCaracteristicaContactoCaso';
 import getCaracteristicasFRADeContacto from '@salesforce/apex/FRA_Caracteristicas_Controller.conseguirCaracteristicasFRADeContacto';
@@ -60,15 +61,24 @@ export default class Fra_Caracteristicas_Contacto extends LightningElement {
         }
     }
 
-    // Llamada al método Apex para asociar la característica
+        // Llamada al método Apex para asociar la característica
     asociarCaracteristica(idCaracteristica) {
-        asociarCaracteristicaAContacto({ idCaso: this.recordId, idCaracteristica })
-            .then(() => {
-                // Disparar el RefreshEvent para recargar datos en la página
-                refreshApex(this.ccaracteristics);
-                this.dispatchEvent(new RefreshEvent());
-            })
-            .catch(error => {
-            });
+        LightningConfirm.open({
+            message: '¿Estás seguro de asociar esta característica al Contacto?',
+            label: 'Confirmar Asociación',
+            theme: 'warning'
+        }).then((userConfirmed) => {
+            if (userConfirmed) {
+                asociarCaracteristicaAContacto({ idCaso: this.recordId, idCaracteristica })
+                    .then(() => {
+                        // Disparar el RefreshEvent para recargar datos en la página
+                        refreshApex(this.ccaracteristics);
+                        this.dispatchEvent(new RefreshEvent());
+                    })
+                    .catch(error => {
+                    });
+            }
+        }).catch((error) => {
+        });
     }
 }

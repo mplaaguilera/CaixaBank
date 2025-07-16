@@ -35,18 +35,16 @@ public with sharing class CSBD_Llamada_GC {
 		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 		insert llamada;
 
-		Opportunity oportunidad = CSBD_WS_GetGestorRoutingLlamada.calcularOportunidad(inputLlamada.ani);
-		if (oportunidad != null) { //Se reutiliza la oportunidad existente
-			oportunidad = [SELECT CSBD_Empresa_Proveedora__c, CSBD_Familia_Producto__c, CSBD_Producto__c,
-							CSBD_Telefono_Solicitud__c, CSBD_Now_Codigo_Producto__c, CSBD_Canal__c, CSBD_Now_Origen__c,
-							CSBD_Estado__c, AccountId, CSBD_Contact__c, CSBD_Idioma_Solicitud__c, OwnerId,
-							CSBD_Turno_Contacto__c, CSBD_Identificador__c FROM Opportunity WHERE Id = :oportunidad.Id];
-			if (oportunidad.OwnerId != UserInfo.getUserId()) {
-				oportunidad.OwnerId = UserInfo.getUserId();
-				update oportunidad;
-			}
+		Boolean crearNuevaOportunidad = true;
+		Opportunity oportunidad;
 
-		} else {
+		CSBD_LlamadaSettings__c llamadaSettings = CSBD_LlamadaSettings__c.getOrgDefaults();
+		Boolean crearSiempreOportunidad = llamadaSettings?.CSBD_EntranteCrearSiempreOportunidad__c ?? false;
+		if (!crearSiempreOportunidad) {
+			crearNuevaOportunidad = false;
+		}
+
+		if (crearNuevaOportunidad) {
 			// Se crea una nueva oportunidad
 			oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Llamada_Servicio', new Map<String, Object>{
 				'CSBD_Empresa_Proveedora__c' => servicioGenesys.CSBD_Empresa_Proveedora__c,
@@ -63,7 +61,20 @@ public with sharing class CSBD_Llamada_GC {
 				'OwnerId' => UserInfo.getUserId(),
 				'CSBD_Turno_Contacto__c' => llamada.CC_Fecha_Inicio__c.hour() < 15 ? 'Mañana': 'Tarde'
 			});
+		} else {
+			oportunidad = CSBD_WS_GetGestorRoutingLlamada.calcularOportunidad(inputLlamada.ani);
+			if (oportunidad != null) { //Se reutiliza la oportunidad existente
+				oportunidad = [SELECT CSBD_Empresa_Proveedora__c, CSBD_Familia_Producto__c, CSBD_Producto__c,
+								CSBD_Telefono_Solicitud__c, CSBD_Now_Codigo_Producto__c, CSBD_Canal__c, CSBD_Now_Origen__c,
+								CSBD_Estado__c, AccountId, CSBD_Contact__c, CSBD_Idioma_Solicitud__c, OwnerId,
+								CSBD_Turno_Contacto__c, CSBD_Identificador__c FROM Opportunity WHERE Id = :oportunidad.Id];
+				if (oportunidad.OwnerId != UserInfo.getUserId()) {
+					oportunidad.OwnerId = UserInfo.getUserId();
+					update oportunidad;
+				}
+			}
 		}
+
 		Id idTask = crearActividad(llamada, oportunidad.Id, 'Llamada entrante', servicioGenesys.Name);
 
 		return new Map<String, Object>{
@@ -227,11 +238,10 @@ public with sharing class CSBD_Llamada_GC {
 		};
 	}
 
+
 	private static Opportunity informarSla(CC_Llamada__c llamada, Opportunity oportunidad) {
 		//Primera actividad de llamada saliente, por lo que hay que calcular el campo CSBD_SLA_Primera_Respuesta__c de la oportunidad vinculada.
-		//if ([SELECT RecordTypeId, CC_Llamada_Id__c FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'].size() == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
-		if ([SELECT COUNT() FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'] == 1
-		&& oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
+		if ([SELECT RecordTypeId, CC_Llamada_Id__c FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'].size() == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
 			// Guardo la fecha de creación de la Oportunidad
 			Datetime tiempoOrigen;
 			Datetime tiempoFinal = System.now();
@@ -287,6 +297,76 @@ public with sharing class CSBD_Llamada_GC {
 		}
 		return oportunidad;
 	}
+
+	/*
+	public static Opportunity informarSla(CC_Llamada__c llamada, Opportunity oportunidad) {
+		//Primera actividad de llamada saliente, por lo que hay que calcular el campo CSBD_SLA_Primera_Respuesta__c de la oportunidad vinculada.
+		//if ([SELECT RecordTypeId, CC_Llamada_Id__c FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'].size() == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
+		if (([SELECT COUNT() FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'] == 1
+		&& oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null)
+		|| oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
+			// Guardo la fecha de creación de la Oportunidad
+			Datetime tiempoOrigen;
+			Datetime tiempoFinal = System.now();
+			List<BusinessHours> businessHoursList = new List<BusinessHours>();
+
+			//RecordType CMN, Préstamo, Hipotecas y PRO Automática
+			if (oportunidad.Recordtype.DeveloperName == 'CSBD_CMN' || oportunidad.Recordtype.DeveloperName == 'CSBD_Prestamo' || oportunidad.Recordtype.DeveloperName == 'CSBD_Hipoteca'
+			|| oportunidad.Recordtype.DeveloperName == 'CSBD_PROAutomatica' || oportunidad.Recordtype.DeveloperName == 'CSBD_MAC') {
+				if(oportunidad.Recordtype.DeveloperName == 'CSBD_Hipoteca' || oportunidad.Recordtype.DeveloperName == 'CSBD_PROAutomatica'){
+
+					List<CC_Lista_Valores__c> lovList = [SELECT Name, CC_Valor__c FROM CC_Lista_Valores__c
+															WHERE RecordType.DeveloperName = 'CC_Valor'
+															AND CC_Lista__r.Name = 'CSBD: Horarios comerciales por tipología SLA'
+															AND Name  =: oportunidad.Recordtype.DeveloperName
+															AND CC_Activa__c = TRUE limit 1];
+
+					if(!lovList.isEmpty()){
+						businessHoursList = [SELECT Id, Name FROM BusinessHours WHERE Name =:lovList[0].CC_Valor__c limit 1];
+						tiempoOrigen = BusinessHours.nextStartDate(businessHoursList[0].id, oportunidad.CreatedDate);
+					}
+
+				}else{
+					tiempoOrigen = oportunidad.CreatedDate;
+				}
+			}
+
+			//RecordType CMB
+			if (oportunidad.Recordtype.DeveloperName == 'CSBD_CMB') {
+				if(String.isNotBlank(oportunidad.CSBD_Horario_Contacto__c)) {
+					String rangoFinal = Datetime.now().format('yyyy-MM-dd') + ' ' + oportunidad.CSBD_Horario_Contacto__c.substring(7) + ':00';
+					tiempoOrigen = Datetime.valueOf(rangoFinal);
+
+					if(tiempoOrigen < oportunidad.CreatedDate){
+						tiempoOrigen = tiempoOrigen.addDays(1);
+					}
+				}
+				else{
+					tiempoOrigen = oportunidad.CreatedDate;
+				}
+			}
+
+			// Se calculan los SLAs
+			if(tiempoOrigen >= System.now()) {
+				oportunidad.CSBD_SLA_Primera_Respuesta__c = 0;
+				oportunidad.CSBD_PrimerContactoSLA__c = tiempoFinal;
+			}
+			if(tiempoOrigen < System.now()){
+				if(oportunidad.Recordtype.DeveloperName == 'CSBD_Hipoteca' || oportunidad.Recordtype.DeveloperName == 'CSBD_PROAutomatica') {
+
+					if(!businessHoursList.isEmpty()) {
+						oportunidad.CSBD_SLA_Primera_Respuesta__c = (Integer)(BusinessHours.diff(businessHoursList[0].id, tiempoOrigen, tiempoFinal))/(1000);
+					}
+				} else {
+					oportunidad.CSBD_SLA_Primera_Respuesta__c = (Integer)(tiempoFinal.getTime() - tiempoOrigen.getTime())/(1000);
+				}
+
+				oportunidad.CSBD_PrimerContactoSLA__c = tiempoFinal;
+			}
+		}
+		return oportunidad;
+	}
+	*/
 
 	private static void identificarPorNumPerso(CC_Llamada__c llamada, String numPerso) {
 		//Realizamos una búsqueda para informar el contacto y la cuenta

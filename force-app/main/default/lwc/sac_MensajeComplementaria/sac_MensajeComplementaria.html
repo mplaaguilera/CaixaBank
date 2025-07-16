@@ -1,0 +1,22 @@
+<template>
+    <template if:true={datosCargados}>
+        <template if:true={esComplementaria}>
+            <template if:true={tieneReclamacionVinculada}>
+                <div class="cartel_texto" style="background-color:#359cd5;" >
+                        <div class="slds-float_left">
+                            <span class = "color_texto">Esta es una complementaria vinculada a la reclamación: {reclamacionCaseNumber}</span>
+                        </div>
+                </div>
+            </template>
+
+            <template if:false={tieneReclamacionVinculada}>
+                <div class="cartel_texto" style="background-color:#359cd5;" >
+                    <div class="slds-float_left">
+                        <span class = "color_texto">Esta es una complementaria que aún no ha sido vinculada a una reclamación.</span>
+                    </div>
+                </div>
+            </template>
+
+        </template>
+    </template>
+</template>

@@ -80,6 +80,7 @@
     },
 
     muestraModalValidar : function(component, event, helper) {
+
         var action = component.get('c.getDocumentRedaccion');
         action.setParams({'id':component.get('v.caso.Id')});
         action.setCallback(this, function(response) {
@@ -334,5 +335,17 @@
             });
             toastEventWarning.fire();
         }
+    },
+
+    handleEventRichText : function(component, event, helper) {
+        //Recibo el evento desde el LWC y almaceno el nuevo mapa de tags de las imagenes
+        var message = event.getParam('data');
+        component.set("v.imageTagsMap", message);
+    },
+
+    handleEventModificarImagen : function(component, event, helper) {
+        //Recibo el evento desde el LWC y almaceno el nuevo mapa de tags de las imagenes
+        var imagenes = event.getParam('imgMap');
+        component.set("v.imageTagsMap", imagenes);
     }
 })

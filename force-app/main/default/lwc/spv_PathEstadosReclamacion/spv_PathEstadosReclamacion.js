@@ -11,12 +11,16 @@ import SUBESTADO_FIELD from "@salesforce/schema/Case.SEG_Subestado__c";
 import RECORDTYPEID_FIELD from "@salesforce/schema/Case.RecordTypeId";
 import RECORDTYPENAME_FIELD from "@salesforce/schema/Case.RecordType.DeveloperName";
 import ISCLOSED_FIELD from "@salesforce/schema/Case.IsClosed";
+import MOTIVOCOMPLEMENTARIA_FIELD from "@salesforce/schema/Case.SPV_MotivoComplementariaOrganismo__c";
+import RECTIFICADO_FIELD from "@salesforce/schema/Case.SPV_Rectificado__c";
+import FECHARECEPCIONRESOLUCION_FIELD from "@salesforce/schema/Case.SPV_FechaRecepcionResolucion__c";
+import ORGANISMO_FIELD from "@salesforce/schema/Case.SPV_Organismo__c";
 //Llamadas Apex
 import getPretensiones from '@salesforce/apex/SPV_LCMP_PathEstadosReclamacion.getPretensiones';
 import pasarFaseNegociacion from '@salesforce/apex/SPV_LCMP_PathEstadosReclamacion.pasarFaseNegociacion';
 import pasarFaseEnvioOrgRectificacion from '@salesforce/apex/SPV_LCMP_PathEstadosReclamacion.pasarFaseEnvioOrgRectificacion';
 
-const caseFields = [CASEID_FIELD, STATUS_FIELD, SUBESTADO_FIELD, RECORDTYPEID_FIELD, ISCLOSED_FIELD, RECORDTYPENAME_FIELD];
+const caseFields = [CASEID_FIELD, STATUS_FIELD, SUBESTADO_FIELD, RECORDTYPEID_FIELD, ISCLOSED_FIELD, RECORDTYPENAME_FIELD, MOTIVOCOMPLEMENTARIA_FIELD, RECTIFICADO_FIELD, FECHARECEPCIONRESOLUCION_FIELD, ORGANISMO_FIELD];
 
 const columns = [
     { label: 'Temática', fieldName: 'CC_MCC_Tematica' }, 
@@ -30,11 +34,12 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
     statusValues; //Almacenar los valores de la picklist status
 	subestadosData; //Almacenar la data de la picklist subestado
 	subestadosValues = []; //Almacenar los valores de la picklist subestado (solo los valores dependientes del status)
-    statusSeleccionado; //Indicar el status seleccionado
+    @track statusSeleccionado = 'SAC_001'; //Indicar el status seleccionado
     subestadoSeleccionado; //Indicar el subestado seleccionado
 	@track subestadoSeleccionadoOnLastClick = '';
 	isLoading = false;
 	@track status;
+	@track generarProgressIndicator = false;		//Variable con la que se controla que se genere el path de estados cuando todos los datos requeridos ya están calculados y no antes
 	@track subestado;
 	@track seleccionadoSubestado = false;
 	@track mostrarPasoEnvioOrgRecti = false;
@@ -47,7 +52,21 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
     mostrarBoton = true;
     lstSelectedRecords = [];
 
+	@track statusAlta = 'SAC_001';
+	@track statusAnalisisDecision = 'SPV_AnalisisDecision';
+    @track statusEnvio = 'SPV_Envio';
+    @track statusPendienteRespuestaOrganismo = 'SPV_PendienteRespuestaOrganismo';
+    @track statusAnalisisComplementariaOrganismo = 'SPV_AnalisisComplementariaOrganismo'
+    @track statusEnvioComplementaria = 'SPV_EnvioComplementaria';
+    @track statusRecepcionResolucion = 'SPV_RecepcionResolucion';
+    @track statusRectificacion = 'SPV_Rectificacion';
+    @track statusEnvioRectificacion = 'SPV_EnvioRectificacion';
+    @track statusResolucion = 'SAC_003';
+    @track statusDescartada = 'Descartado';
+    @track statusCerrar = 'Cerrado';
+	@track statusBaja = 'SAC_009';
 
+	@track organismoConsumo = 'SPV_Consumo';
     //Recuperar registro con los campos definidos en la constante caseFields
     @wire(getRecord, {
         recordId: "$recordId",
@@ -58,9 +77,10 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 	@wire(getRecord, { recordId: '$recordId', fields: caseFields })
     wiredGetRecord({error, data}) {
         if (data) {
+			this.generarProgressIndicator = false;
 			this.status = data.fields.Status.value;
-			this.subestado = data.fields.SEG_Subestado__c.value;
-			
+			//this.subestado = data.fields.SEG_Subestado__c.value;
+		 	//this.seleccionadoSubestado = false;
 			if(data.fields.RecordType.value.fields.DeveloperName.value == 'SPV_Pretension' && data.fields.Status.value == 'SAC_007') {
 				const botonActualizar = this.template.querySelector('.botonActualizar');
 				botonActualizar.disabled = true;
@@ -68,26 +88,226 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 		}
     }
 
-    @wire(getPicklistValues, { recordTypeId: '$record.data.recordTypeId', fieldApiName: STATUS_FIELD })
+	/*opcion1(){
+		if (this.caseStatus === this.statusAlta || this.caseStatus === this.statusAnalisisDecision || this.caseStatus === this.statusEnvio || this.caseStatus === this.statusPendienteRespuestaOrganismo || this.caseStatus === this.statusRecepcionResolucion || this.caseStatus === this.statusCerrar) {
+			return true;
+		}else{
+			return false;
+		}
+	}*/
+
+    @wire(getPicklistValues, { recordTypeId: '$record.data.recordTypeId', fieldApiName: STATUS_FIELD, fields: caseFields })
     valoresPicklistStatus({data}) {
         if (data) {
-            //Recuperar valores ordenandolos
+			this.generarProgressIndicator = false;
             this.statusValues = this.sortStatusValues(data.values);
-			// NO mostrar el estado negociación en la reclamación pero si en la pretensión
-			for (let i in this.statusValues) {
-				if(this.statusValues[i].label === 'Negociación' && this.recordTypeName === 'SPV_Reclamacion') {
-					this.statusValues.splice(i, 1);
+			if(this.caseOrganismo != this.organismoConsumo){
+				// Alta, Análisis, Envío, Pendiente Respuesta Organismo, Resolución y Cerrado
+				if (this.caseStatus === this.statusAlta || this.caseStatus === this.statusAnalisisDecision || this.caseStatus === this.statusEnvio || this.caseStatus === this.statusPendienteRespuestaOrganismo || this.caseStatus === this.statusRecepcionResolucion || this.caseStatus === this.statusCerrar) {
+					const estadosExcluidos = [
+						'SPV_AnalisisComplementariaOrganismo',
+						'SPV_EnvioComplementaria',
+						'SPV_Rectificacion',
+						'SPV_EnvioRectificacion',
+						'Rechazado',
+						'Descartado',
+						'SAC_009'
+					];
+					this.statusValues = this.statusValues.filter(status => 
+						!estadosExcluidos.includes(status.value)
+					);
+					
 				}
+				// Análisis Complementaria Organismo y Envío Complementaria
+				else if(this.caseStatus === this.statusAnalisisComplementariaOrganismo || this.caseStatus === this.statusEnvioComplementaria){
+					const estadosExcluidos = [
+						'Descartado',
+						'SPV_Rectificacion',
+						'SPV_EnvioRectificacion',
+						'SAC_009'
+					];
+					this.statusValues = this.statusValues.filter(status => 
+						!estadosExcluidos.includes(status.value)
+					);
+				}
+				// Rectificación y Envío Rectificación
+				else if(this.caseStatus === this.statusRectificacion || this.caseStatus === this.statusEnvioRectificacion){
+					const estadosExcluidos = [
+						'Descartado',
+						'SPV_AnalisisComplementariaOrganismo',
+						'SPV_EnvioComplementaria',
+						'Rechazado',
+						'SAC_009'
+					];
 
+					this.statusValues = this.statusValues.filter(status => 
+						!estadosExcluidos.includes(status.value)
+					);
+				}	
+				// Descartado
+				else if (this.caseStatus === this.statusDescartada) {
+					const estadosExcluidos = [
+						'SAC_002',
+						'SPV_AnalisisDecision',
+						'SPV_Envio',
+						'SPV_PendienteRespuestaOrganismo',
+						'SPV_AnalisisComplementariaOrganismo',
+						'SPV_EnvioComplementaria',
+						'SPV_RecepcionResolucion',
+						'SPV_Rectificacion',
+						'SPV_EnvioRectificacion',
+						'Rechazado',
+						'Cerrado',
+						'SAC_009'
+					];
+					this.statusValues = this.statusValues.filter(status => 
+						!estadosExcluidos.includes(status.value));
+					
+				}
+				// Baja
+				else if (this.caseStatus === this.statusBaja) {
+					const estadosExcluidos = [
+						'SAC_001',
+						'SAC_002',
+						'SPV_AnalisisDecision',
+						'SPV_Envio',
+						'SPV_PendienteRespuestaOrganismo',
+						'SPV_AnalisisComplementariaOrganismo',
+						'SPV_EnvioComplementaria',
+						'SPV_RecepcionResolucion',
+						'SPV_Rectificacion',
+						'SPV_EnvioRectificacion',
+						'Rechazado',
+						'Cerrado',
+						'Descartado'
+					];
+					this.statusValues = this.statusValues.filter(status => 
+						!estadosExcluidos.includes(status.value));
+					
+				}
+			}else{
+				// Alta, Análisis, Envío, Pendiente Respuesta Organismo, Resolución y Cerrado
+				if (this.caseStatus === this.statusAlta || this.caseStatus === this.statusAnalisisDecision || this.caseStatus === this.statusEnvio || this.caseStatus === this.statusCerrar) {
+					const estadosExcluidos = [
+						'SPV_PendienteRespuestaOrganismo',
+						'SPV_RecepcionResolucion',
+						'SPV_AnalisisComplementariaOrganismo',
+						'SPV_EnvioComplementaria',
+						'SPV_Rectificacion',
+						'SPV_EnvioRectificacion',
+						'Rechazado',
+						'Descartado',
+						'SAC_009'
+					];
+					this.statusValues = this.statusValues.filter(status => 
+						!estadosExcluidos.includes(status.value)
+					);
+					
+				}
+				// Análisis Complementaria Organismo y Envío Complementaria
+				else if(this.caseStatus === this.statusAnalisisComplementariaOrganismo || this.caseStatus === this.statusEnvioComplementaria){
+					const estadosExcluidos = [
+						'SPV_PendienteRespuestaOrganismo',
+						'SPV_RecepcionResolucion',
+						'SPV_Rectificacion',
+						'SPV_EnvioRectificacion',
+						'Descartado',
+						'SAC_009'
+					];
+					this.statusValues = this.statusValues.filter(status => 
+						!estadosExcluidos.includes(status.value)
+					);
+				}	
+				// Descartado
+				else if (this.caseStatus === this.statusDescartada) {
+					const estadosExcluidos = [
+						'SAC_002',
+						'SPV_AnalisisDecision',
+						'SPV_Envio',
+						'SPV_PendienteRespuestaOrganismo',
+						'SPV_AnalisisComplementariaOrganismo',
+						'SPV_EnvioComplementaria',
+						'SPV_RecepcionResolucion',
+						'SPV_Rectificacion',
+						'SPV_EnvioRectificacion',
+						'Rechazado',
+						'Cerrado',
+						'SAC_009'
+					];
+					this.statusValues = this.statusValues.filter(status => 
+						!estadosExcluidos.includes(status.value));
+				}
+				// Baja
+				else if (this.caseStatus === this.statusBaja) {
+					const estadosExcluidos = [
+						'SAC_001',
+						'SAC_002',
+						'SPV_AnalisisDecision',
+						'SPV_Envio',
+						'SPV_PendienteRespuestaOrganismo',
+						'SPV_AnalisisComplementariaOrganismo',
+						'SPV_EnvioComplementaria',
+						'SPV_RecepcionResolucion',
+						'SPV_Rectificacion',
+						'SPV_EnvioRectificacion',
+						'Rechazado',
+						'Cerrado',
+						'Descartado'
+					];
+					this.statusValues = this.statusValues.filter(status => 
+						!estadosExcluidos.includes(status.value));
+					
+				}
 			}
+			// Cerrado
+			/*else if (this.caseStatus === 'Cerrado') {
+				const estadosExcluidos = [
+					'Rechazado',
+				];
+
+				if (this.caseMotivoComplementaria === null) {
+					estadosExcluidos.push('SPV_AnalisisComplementariaOrganismo');
+					estadosExcluidos.push('SPV_EnvioComplementaria');
+				}
+				if (this.caseRectificado === false) {
+					estadosExcluidos.push('SPV_Rectificacion');
+					estadosExcluidos.push('SPV_EnvioRectificacion');
+				}
+				this.statusValues = this.statusValues.filter(status => 
+					!estadosExcluidos.includes(status.value));
+				
+			}*/
+
+			
+			//for (let i in this.statusValues) {
+			//	if(data.fieldApiName == 'SAC_001' || data.fieldApiName == 'SAC_002' || data.fieldApiName == 'SAC_Envio' || data.fieldApiName == 'SAC_PendienteRespuestaOrganismo'){
+			//		if(this.statusValues[i].label === 'SPV_AnalisisComplementariaOrganismo' || this.statusValues[i].label === 'SPV_EnvioComplementaria' || this.statusValues[i].label === 'SPV_RecepcionResolucion' || this.statusValues[i].label === 'SPV_Rectificacion' || this.statusValues[i].label === 'SPV_EnvioRectificacion' || this.statusValues[i].label === 'Descartado') {
+			//			this.statusValues.splice(i, 1);
+			//		}
+			//	}else if(data.fieldApiName == 'Descartado'){
+			//		if((this.statusValues[i].label === 'SPV_002' /*&& data.fields.SPV_EsAnalisis__c == false*/) || (this.statusValues[i].label === 'SPV_Envio' /*&& data.fields.SPV_EsEnvio__c == false*/) || (this.statusValues[i].label === 'SPV_PendienteRespuestaOrganismo' /*&& data.fields.SPV_EsPRO__c == false*/) || (this.statusValues[i].label === 'SPV_AnalisisComplementariaOrganismo' && data.fields.SPV_MotivoComplementariaOrganismo__c == null) || (this.statusValues[i].label === 'SPV_Rectificacion' && data.fields.SPV_Rectificado__c == null) || (this.statusValues[i].label === 'SPV_RecepcionResolucion' && data.fields.SPV_FechaRecepcionResolucion__c == null)) {
+			//			this.statusValues.splice(i, 1);
+			//		}
+			//	}else if(data.fieldApiName == 'Descartado'){
+			//
+			//	}else{
+			//
+			//	}
+				//if(this.statusValues[i].label === 'Negociación' && this.recordTypeName === 'SPV_Reclamacion') {
+					//this.statusValues.splice(i, 1);
+				//}
+
+			//}
 
             //Indicar el estado seleccionado
-            this.statusSeleccionado = this.caseStatus;
+			this.statusSeleccionado = this.caseStatus;
+			this.generarProgressIndicator = true;
+
         }
     }
 
 	//Recuperar los valores de la picklist subestado a través del recordtypeid del registro (recuperado con getrecord)
-    @wire(getPicklistValues, { recordTypeId: '$record.data.recordTypeId', fieldApiName: SUBESTADO_FIELD })
+    /*@wire(getPicklistValues, { recordTypeId: '$record.data.recordTypeId', fieldApiName: SUBESTADO_FIELD })
     valoresPicklistSubestado({data}) {
         if (data) {
             //Recuperar data de la picklist subestado
@@ -97,15 +317,18 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
             //Indicar el subestado seleccionado
             this.subestadoSeleccionado = this.caseSubestado;
         }
-    }
+    }*/
 
     //Getters de valores de campos
+	get caseOrganismo() {
+        return getFieldValue(this.record.data, ORGANISMO_FIELD);
+    }
     get caseStatus() {
         return getFieldValue(this.record.data, STATUS_FIELD);
     }
-	get caseSubestado() {
+	/*get caseSubestado() {
         return getFieldValue(this.record.data, SUBESTADO_FIELD);
-    }
+    }*/
 	get caseIsClosed() {
         return getFieldValue(this.record.data, ISCLOSED_FIELD);
     }
@@ -115,6 +338,15 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 
 	get esPretension() {
         return this.recordTypeName == 'SPV_Pretension' ? true : false;
+    }
+	get caseMotivoComplementaria() {
+        return getFieldValue(this.record.data, MOTIVOCOMPLEMENTARIA_FIELD);
+    }
+	get caseFechaRecepcionResolucion() {
+        return getFieldValue(this.record.data, FECHARECEPCIONRESOLUCION_FIELD);
+    }
+	get caseRectificado() {
+        return getFieldValue(this.record.data, RECTIFICADO_FIELD);
     }
 
 
@@ -129,33 +361,35 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
     sortStatusValues(statusValues) {
         //Estados ordenados
         let sortOrder = {
-            "SAC_001": 1, //Alta
-            "SAC_002": 2, //Analisis
-			"SAC_007": 3, //Negociación
-			"SPV_EnvioOrganismos": 4, //Envio Organismos
-			"SPV_PendienteRespuestaOrganismos": 5, //Pendiente respuesta Organismos
-			"SPV_Rectificacion": 6, //Rectificacion
-            "Cerrado": 7, //Cerrado
-			"Descartado": 8 //Descartado
+            "SAC_001": 0, //Alta
+            "SPV_AnalisisDecision": 1,
+			"SPV_Envio": 2,
+			"SPV_PendienteRespuestaOrganismo": 3,
+			"SPV_AnalisisComplementariaOrganismo": 4,
+			"SPV_EnvioComplementaria": 5,
+			"SPV_RecepcionResolucion": 6,
+			"SPV_Rectificacion": 7,
+			"SPV_EnvioRectificacion": 8,
+			"Descartado": 9,
+			"Cerrado": 10
         };
     
         //Ordenar los valores de la picklist con el orden definido en la variable sortOrder
         let sortedValues = Array.from(statusValues).sort((a, b) => {
             return sortOrder[a.value] - sortOrder[b.value];
         });
-    
         return sortedValues;
     }
 
 	//Método para filtrar los subestados y mostrar únicamente los subestados dependientes de cada status
-	filtrarSubestadoDependiente(estadoDelCaso) {
+	/*filtrarSubestadoDependiente(estadoDelCaso) {
         let key = this.subestadosData.controllerValues[estadoDelCaso];
         return this.subestadosData.values.filter(opt => opt.validFor.includes(key));
-    }
+    }*/
 
 	//Método para seleccionar el status y filtrar sus respectivos subestados
-	statusOnclick(event) {
-		this.desactivarBotonActualizar(event);
+	/**statusOnclick(event) {
+		//this.desactivarBotonActualizar(event);
 
 		//Ahora:
 		this.seleccionadoSubestado = false;
@@ -168,8 +402,8 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 			//Vaciar subestadoSeleccionadoOnLastClick para indicar que hay que seleccionar un sub estado
 			this.subestadoSeleccionadoOnLastClick = '';
 		}
-	}
-
+	}*/
+	/*
 	desactivarBotonActualizar(event) {
 		
 		// Solamente activar el botón de actualizar estado en la pretensión cuando se rechace
@@ -241,10 +475,10 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 			botonActualizar.disabled = true;
 		}
 		
-	}
+	}*/
 
 	//Método para seleccionar el subestado
-	subestadoOnclick(event) {
+	/*subestadoOnclick(event) {
 
 		//Antes (para los subestados como ciclo de vida):
 		//this.subestadoSeleccionado = event.target.value;
@@ -256,9 +490,9 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 		this.subestadoSeleccionadoOnLastClick = event.target.dataset.id;
 
 		this.desactivarBotonActualizarSubestado();
-	}
+	}*/
 
-	desactivarBotonActualizarSubestado(){
+	/*desactivarBotonActualizarSubestado(){
 
 		//Si esta en estado Rectificacion
 		if(this.recordTypeName === 'SPV_Reclamacion' && this.status === 'SPV_Rectificacion'){
@@ -283,9 +517,9 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 			}
 			
 		}
-	}
+	}*/
 
-	get subestadosYApecto(){
+	/*get subestadosYApecto(){
 
 		//Por el if entra cuando recarga la página, para ver si el subestado del caso es alguno de los que hay y hay que marcarlo
 		//O cuando al clickar sobre un estado, este es el actual de nuevo, asique debe mostrarse el subestado actual ya marcado
@@ -307,9 +541,9 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 		}
 
 
-	}
+	}*/
 
-
+	/*
 	botonActualizarOnclick() {
 		const botonActualizar = this.template.querySelector('.botonActualizar');
 
@@ -390,11 +624,13 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 					}
 		
 					//Mostrar el mensaje de error en el toast
+
+
 					this.mostrarToast('error', 'Error actualizando el caso', errorMessage);
 				}).finally(() => botonActualizar.disabled = false);
 			}	
 		}
-	}
+	}*/
 
 	pasoDeRectEnvioOrg(){
 		this.isLoading = true;

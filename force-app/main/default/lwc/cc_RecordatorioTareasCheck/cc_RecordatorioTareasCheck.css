@@ -1,0 +1,128 @@
+:host {
+    --slds-g-color-border-base-4: rgb(240, 131, 6);
+}
+
+.slds-pill_container {
+    position: relative;
+    margin: 0 auto;
+    border: none;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    justify-content: center;
+    width: fit-content;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* c-csbd_-pill {
+    cursor: pointer;
+} */
+
+c-csbd_-banner + c-csbd_-banner {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+div.botonCambiarVista {
+    position: absolute;
+    z-index: 1;
+    top: -7px;
+    right: -10px;
+    background-color: #fff3cd;
+    opacity: 0;
+    transition: opacity 90ms ease;
+}
+
+div.botonCambiarVista:hover {
+    opacity: 0.9;
+}
+
+article.cardBanners div.botonCambiarVista {
+    top: -9px;
+    right: -7px;
+    transform: rotate(270deg);
+}
+
+div.botonCambiarVista > lightning-button-icon {
+    --slds-c-button-shadow-focus: 0.5;
+    transform: rotate(270deg);
+    opacity: 0.8;
+}
+
+article.cardBanners, div.pillContainer {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 60ms linear, opacity 60ms ease-in-out;
+}
+
+article.cardBanners.oculto, div.pillContainer.oculto {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.pillPopover {
+    will-change: transform, opacity;
+    position: absolute;
+    z-index: 6000;
+    top: -47px;
+    left: 50%;
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    transition: visibility 150ms linear, opacity 150ms cubic-bezier(0, 0.3, 0.15, 1), transform 250ms cubic-bezier(0, 0.3, 0.15, 1);
+}
+
+.pillPopoverOculto {
+    visibility: hidden;
+    /* top: -38px; */
+    opacity: 0;
+    transform: translateX(-50%) translateY(0.5rem);
+}
+
+.pillPopover::before {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    content: '';
+    background-color: #fff3cd;;
+    left: 0;
+    bottom: -7px;
+    box-shadow: rgb(0 0 0 / 5%) 2px 2px 3px 0px;
+    transform: translateX(calc(var(--nubbin-offset, 0px) - 0.5rem)) rotate(45deg);
+    border: solid 1px var(--slds-g-color-border-base-4);
+    border-style: none solid solid none;
+    z-index: 0;
+}
+
+.pillPopover::after {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    content: '';
+    background-color: #fff3cd;;
+    left: 0;
+    bottom: -5px;
+    transform: translateX(calc(var(--nubbin-offset, 0px) - 0.5rem)) rotate(45deg);
+    z-index: 1;
+}
+
+.pillPopover .slds-popover__body {
+    padding: 0;
+}
+
+.pillPopover .slds-popover__body .slds-media__figure {
+    margin-right: 8px;
+}
+
+.pillContainerItem {
+    position: relative;
+    border-radius: 6px;
+}
+
+.pillContainerItem .slds-scoped-notification {
+    border: none;
+}
+
+.pillContainerItem .slds-scoped-notification .slds-scoped-notification__content {
+    padding: 0;
+}

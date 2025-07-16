@@ -622,6 +622,8 @@
 	},
 
 	abrirModalEscalar: function (component, event, helper) {
+		component.set('v.nombreBoton', event.getSource().get('v.label'));
+		console.log(component.get('v.nombreBoton'));
 		helper.getPicklistEspacios(component);
 		helper.getPicklistCategoria(component);
 
@@ -1138,9 +1140,16 @@
         $A.enqueueAction(component.get('c.cerrarModalReclasificar'));
     
 	},
+	
 
 	handleEspacioSeleccionado: function (component, event, helper) {
-		let actualOption = component.find('firstOptionEspacios').get('v.value');
+		let actualOption
+		if(component.get('v.nombreBoton') === 'Escalar'){
+		 actualOption= component.find('firstOptionEspaciosEscalar').get('v.value');
+		}else{
+			actualOption = component.find('firstOptionEspacios').get('v.value');
+		}
+		
 		component.set('v.espacio', actualOption);
 		component.set('v.selectedFirstOption', actualOption);
 
@@ -1162,6 +1171,7 @@
 	},
 
 	onCodeSelectFirstChangeEspacio: function (component, event, helper) {
+
 		let actualOption = component.find('firstOptionEspacio').get('v.value');
 		component.set('v.espacio', actualOption);
 		component.set('v.selectedFirstOption', actualOption);
@@ -1185,6 +1195,7 @@
 
 
 	handleCategoriaSeleccionada: function (cmp) {
+
 		let actualOption = cmp.find('firstOptionCategorias').get('v.value');
 		cmp.set('v.categoria', actualOption);
 		cmp.set('v.selectedFirstOption', actualOption);

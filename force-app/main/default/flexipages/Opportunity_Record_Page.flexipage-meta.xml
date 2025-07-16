@@ -113,22 +113,28 @@
         </itemInstances>
         <itemInstances>
             <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.CSBD_Empleado__c</fieldItem>
-                <identifier>RecordCSBD_Empleado_cField</identifier>
+                <fieldItem>Record.Account.AV_Empleado__c</fieldItem>
+                <identifier>RecordAccountAV_Empleado_cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>CSBD_MAC</rightValue>
+                    </criteria>
+                </visibilityRule>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
             <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.CSBD_ClienteConfidencial__c</fieldItem>
-                <identifier>RecordCSBD_ClienteConfidencial_cField</identifier>
+                <fieldItem>Record.Account.AV_Confidencial__c</fieldItem>
+                <identifier>RecordAccountAV_Confidencial_cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>CSBD_MAC</rightValue>
+                    </criteria>
+                </visibilityRule>
             </fieldInstance>
         </itemInstances>
         <itemInstances>

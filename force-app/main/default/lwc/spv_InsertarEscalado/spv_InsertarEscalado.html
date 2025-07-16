@@ -2,7 +2,7 @@
     <div class="slds-clearfix">
         <template if:false={existeEscalado}>
             <div class="slds-float_right">
-                <lightning-button variant="brand" label="Nuevo escalado" onclick={comprobarPropietario} disabled={isEstadoEscalado}></lightning-button>
+                <lightning-button variant="brand" label="Nuevo escalado" onclick={comprobarCamposInsertarEscalado} disabled={isEstadoEscalado}></lightning-button>
             </div>
         </template>
         <template if:true={existeEscalado}>
@@ -22,7 +22,7 @@
                     </div>
                     <div class="slds-col slds-size_4-of-12">
                         <div class="slds-float_right">
-                            <lightning-button variant="brand" label="Nuevo escalado" onclick={comprobarPropietario} disabled="true"></lightning-button>
+                            <lightning-button variant="brand" label="Nuevo escalado" onclick={comprobarCamposInsertarEscalado} disabled="true"></lightning-button>
                         </div>
                     </div>
                 </div>
@@ -48,16 +48,47 @@
                 </header>
                 <!-- Modal/Popup Box LWC body starts here -->
                 <div class="slds-modal__content slds-var-p-around_xx-large" id="modal-content-id-1">
-                    <lightning-input type="text" name="input" label="Título" placeholder="Título" required="true" onchange={handleTituloChange}></lightning-input>
-                    <lightning-input name="input" label="Motivo" placeholder="Motivo" read-only="true" value={motivoLabel}></lightning-input>
-                    <lightning-combobox name="Equipo" label="Equipo" 
+
+                    <lightning-combobox required="true" 
+                    name="Tipo escalado" 
+                    label = "Tipo escalado"
+                    value={selectedTipoEscalado} 
+                    placeholder="-Select-"
+                    options={getTipoEscaladoValues.data.values}
+                    onchange={handleOptionChangeTipoEscalado}>
+                    </lightning-combobox>
+
+                    <template if:true={mostrarObservacionesTipoEscalado}>
+                        <lightning-textarea style="margin-top: 5px;" name="inputObservacionesTipoEscalado" placeholder="Introduce las observaciones sobre el tipo de escalado..." max-length ="1000" label="Observaciones Tipo escalado" required="true" onchange={handleChangeObservTipoEscalado}></lightning-textarea>
+                    </template>
+
+                    <template if:true={mostrarPropuestaLetrado}>
+                        <lightning-textarea name="input" style="margin-top: 5px;" label="Propuesta Letrado" placeholder="Introduce la propuesta..." required="true" max-length ="255" onchange={handlePropuestaChange}></lightning-textarea>
+                    </template>
+
+                    <lightning-combobox required="true"
+                    style="margin-top: 5px;" 
+                    name="Motivo" 
+                    label = "Motivo"
+                    value={selectedMotivo} 
+                    placeholder="-Select-"
+                    options={getMotivoValues.data.values}
+                    onchange={handleOptionChangeMotivo}>
+                    </lightning-combobox>
+
+                    <template if:true={mostrarObservacionesMotivo}>
+                        <lightning-textarea name="inputObservacionesMotivoEscalado" style="margin-top: 5px;" placeholder="Introduce las observaciones sobre el motivo del escalado..." max-length ="1000" label="Observaciones Motivo escalado" required="true" onchange={handleChangeObservMotivoEscalado}></lightning-textarea>
+                    </template>
+                    
+                    <lightning-combobox name="Equipo" label="Grupo responsable escalado"
+                        style="margin-top: 5px;"
                         required="true"
                         value={valueEquipo}
                         options={options}
                         onchange={handleChangeEquipo} >
                     </lightning-combobox>
-                    <lightning-textarea name="input" label="Propuesta Letrado" placeholder="Introduce la propuesta..." required="true" onchange={handlePropuestaChange}></lightning-textarea>
-                    <lightning-textarea name="inputObservaciones" label="Observaciones" onchange={handleObservacionesChange}></lightning-textarea>
+
+
                 </div>
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
@@ -69,6 +100,36 @@
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 
+
+    <!--Modal de campos por rellenar para escalar-->
+    <template if:true={mostrarModalCamposPorRellenar}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-14" aria-modal="true" aria-describedby="modal-content-id-14" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalComprobarCampos}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="border"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-PasarEnvio" class="slds-text-heading_medium slds-hyphenate">Crear Escalado</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modalPasarEnvio-content-id">
+                        <p><lightning-formatted-text value={camposPendientesParaEscalar}></lightning-formatted-text></p>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand" onclick={closeModalComprobarCampos} title="Aceptar">Aceptar</button> 
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+        
     <!--Modal warning-->
     <template if:true={modalWarning}>
         <!-- Modal/Popup Box LWC starts here -->
@@ -100,8 +161,24 @@
 
     <!-- spinner -->
     <template if:true={spinnerLoading}>
-        <div class="slds-is-relative">
-            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
-        </div>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                Actualizando los datos... por favor espere.
+                            </span>
+                            <div class="exampleHolder">
+                                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
+
 </template>

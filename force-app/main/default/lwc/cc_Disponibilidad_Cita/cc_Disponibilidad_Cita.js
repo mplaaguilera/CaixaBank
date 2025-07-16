@@ -1,17 +1,35 @@
 import { LightningElement, track, api } from 'lwc';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 import disponibilidadCitasApex from '@salesforce/apex/CC_WS_Disponibilidad_Cita.obtenerFechasDisponiblidadGestorPool';
+import diasAdicionar from '@salesforce/apex/CC_Disponibilidad_Cita_Setting.getDaysDiff';
 
 export default class Cc_Disponibilidad_Cita extends LightningElement {
     @track opcionesDisponibles = [];
     @api numOficina;
     @api numPer;
     fechaDefault;
+    fechaMin;
     fechaSelecionada;
-    mostrarHoras = false;
+    mostrarHoras = false;    
+    isDisponibilidadDisable = false;
 
     connectedCallback() {
-        this.fechaDefault = new Date().toISOString().substring(0, 10);
+        //Inicializar con la fecha actual
+        this.fechaDefault = new Date().toISOString().substring(0, 10);   
+        this.fechaMin = this.fechaDefault;   
+      
+        //buscar cuantos dias es lo permitido en el setting
+        diasAdicionar()
+        .then(retorno => {     
+           let days = retorno.citaRapida ?? 0;
+           let fechaUpdated = this.addDays(new Date(), days);   
+           this.fechaDefault = fechaUpdated.toISOString().substring(0, 10);
+           this.fechaMin = this.fechaDefault;
+		})
+		.catch(error => {
+            console.error('Error al cargar el setting:', error);        
+		});
+       
     }
 
     disponibilidadCitas() {
@@ -29,7 +47,7 @@ export default class Cc_Disponibilidad_Cita extends LightningElement {
                 this.opcionesDisponibles = uniqueHoras.map(hora => ({ label: hora, value: hora }));
                 this.mostrarHoras = true;
             } else {
-                this.toast('error', 'Error', 'No se han encontrado franjas disponiblbes');
+                this.toast('error', 'Error', 'No se han encontrado franjas disponibles');
             }
 		})
 		.catch(error => {
@@ -62,4 +80,21 @@ export default class Cc_Disponibilidad_Cita extends LightningElement {
 			duration: 6000
 		}));
 	}
+
+    validarDisponibilidad(event){
+        this.inputValue = event.target.value;
+        // Validate the input field and update the button's disabled state
+        const isValid = event.target.checkValidity();
+        this.isDisponibilidadDisable = !isValid; // Di
+    }
+
+    addDays(date, days) {
+        let result = new Date(date); // Create a copy of the date
+        result.setDate(result.getDate() + days);
+        return result;
+    }
+    
+
+
+  
 }

@@ -12,6 +12,7 @@ import getProductosApex from '@salesforce/apex/CSBD_FamiliaProductoPicklistContr
 import getEmpresasApex from '@salesforce/apex/CSBD_FamiliaProductoPicklistController.getEmpresas';
 import getMotivosMacApex from '@salesforce/apex/CSBD_FamiliaProductoPicklistController.getMotivosMac';
 
+import OPP_ID from '@salesforce/schema/Opportunity.Id';
 import OPP_RT_NAME from '@salesforce/schema/Opportunity.RecordType.Name';
 import OPP_OWNER_ID from '@salesforce/schema/Opportunity.OwnerId';
 import OPP_FAMILIA_PROD from '@salesforce/schema/Opportunity.CSBD_Familia_Producto__c';
@@ -32,6 +33,8 @@ import OPP_NOW_ORIGEN_NOMBRE_CAMPAÑA from '@salesforce/schema/Opportunity.CSBD_
 import OPP_DELIMITADOR from '@salesforce/schema/Opportunity.CSBD_Delimitador__c';
 import OPP_GARANTIA from '@salesforce/schema/Opportunity.CSBD_Garantia__c';
 
+import CHAT_OPPORTUNITY_ID from '@salesforce/schema/LiveChatTranscript.CSBD_Oportunidad_Id__c';
+
 const OPP_FIELDS = [
 	OPP_RT_NAME, OPP_OWNER_ID,
 	OPP_EMPRESA, OPP_FAMILIA_PROD, OPP_PRODUCTO, OPP_MOTIVO_MAC,
@@ -43,6 +46,8 @@ const OPP_FIELDS = [
 ];
 
 export default class csbdFamiliaProductoPicklist extends LightningElement {
+	@api objectApiName;
+
 	@api recordId;
 
 	subscription;
@@ -50,6 +55,8 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 	boundHandleClick;
 
 	boundHandleWindowClick;
+
+	idOportunidad;
 
 	oportunidad;
 
@@ -116,8 +123,33 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 	@wire(MessageContext) messageContext;
 
 
-	@wire(getRecord, {recordId: '$recordId', fields: OPP_FIELDS})
+	get wiredRecordFields() {
+		if (this.objectApiName === 'LiveChatTranscript') {
+			return [CHAT_OPPORTUNITY_ID];
+		} else if (this.objectApiName === 'Opportunity') {
+			return [OPP_ID];
+		} else {
+			return [];
+		}
+	};
+
+	@wire(getRecord, {recordId: '$recordId', fields: '$wiredRecordFields'})
 	wiredRecord({error, data}) {
+		if (data) {
+			if (this.objectApiName === 'LiveChatTranscript') {
+				this.idOportunidad = getFieldValue(data, CHAT_OPPORTUNITY_ID);
+			} else if (this.objectApiName === 'Opportunity') {
+				this.idOportunidad = this.recordId;
+			} else {
+				return;
+			}
+		} else if (error) {
+			errorApex(this, error, 'Problema recuperando los datos del producto de la oportunidad');
+		}
+	}
+
+	@wire(getRecord, {recordId: '$idOportunidad', fields: OPP_FIELDS})
+	wiredOpportunity({error, data}) {
 		if (data) {
 			this.oportunidad = data;
 			if (this.editando) {
@@ -199,8 +231,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 			this.detallesOrigen = {...this.detallesOrigen};
 
 		} else if (error) {
-			console.error(error);
-			this.toast('error', 'Problema recuperando los datos del producto de la oportunidad', JSON.stringify(error));
+			errorApex(this, error, 'Problema recuperando los datos del producto de la oportunidad');
 		}
 	}
 
@@ -223,7 +254,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 	getEmpresas() {
 		const comboboxEmpresas = this.template.querySelector('.comboboxEmpresas');
-		comboboxEmpresas.spinnerActive = true;
+		// comboboxEmpresas.spinnerActive = true;
 		getEmpresasApex({nombreRecordType: getFieldValue(this.oportunidad, OPP_RT_NAME)})
 		.then(empresasProveedoras => {
 			let empresasProveedorasAux = empresasProveedoras.map(e => this.valueToOpcion(e.Name));
@@ -264,7 +295,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 	getFamiliasProducto() {
 		const comboboxFamilias = this.template.querySelector('.comboboxFamilias');
-		comboboxFamilias.spinnerActive = true;
+		// comboboxFamilias.spinnerActive = true;
 		getFamiliasApex({nombreRecordType: getFieldValue(this.oportunidad, OPP_RT_NAME), empresaProveedora: this.empresaProveedora.value})
 		.then(familiasProducto => {
 			let familiasProductoAux = familiasProducto.map(f => this.valueToOpcion(f.Name));
@@ -301,8 +332,8 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 	getProductos() {
 		const comboboxProductos = this.template.querySelector('.comboboxProductos');
-		comboboxProductos.spinnerActive = true;
-		getProductosApex({familia: this.familiaProducto.value, nombreRecordType: getFieldValue(this.oportunidad, OPP_RT_NAME)})
+		// comboboxProductos.spinnerActive = true;
+		getProductosApex({familia: this.familiaProducto.value, nombreRecordType: getFieldValue(this.oportunidad, OPP_RT_NAME), empresaProveedora: this.empresaProveedora.value})
 		.then(productos => {
 			let productosAux = productos.map(p => this.valueToOpcion(p.Name));
 			if (!productosAux.some(p => p.value === this.producto.value)) {
@@ -331,7 +362,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 
 	getMotivosMac() {
 		const comboboxMotivosMac = this.template.querySelector('.comboboxMotivosMac');
-		comboboxMotivosMac.spinnerActive = true;
+		// comboboxMotivosMac.spinnerActive = true;
 		getMotivosMacApex({producto: this.producto.value})
 		.then(motivosMac => {
 			let motivosMacAux = motivosMac.map(m => this.valueToOpcion(m.CC_Lista__r.Name));
@@ -461,7 +492,7 @@ export default class csbdFamiliaProductoPicklist extends LightningElement {
 		this.spinner = true;
 
 		const fields = {};
-		fields.Id = this.recordId;
+		fields.Id = this.idOportunidad;
 		fields[OPP_EMPRESA.fieldApiName] = this.opcionToValue(this.empresaProveedora);
 		fields[OPP_FAMILIA_PROD.fieldApiName] = this.opcionToValue(this.familiaProducto);
 		fields[OPP_PRODUCTO.fieldApiName] = this.opcionToValue(this.producto);

@@ -1,0 +1,32 @@
+<template>
+    <lightning-card title="Seleccionar Agrupador y Crear Caso" icon-name="standard:case">
+        <div class="slds-m-around_medium">
+            <lightning-combobox
+                label="Selecciona un Agrupador"
+                value={selectedAgrupador}
+                options={agrupadoresOptions}
+                placeholder="Seleccione una opción"
+                onchange={handleAgrupadorChange}
+                class="slds-m-bottom_medium">
+            </lightning-combobox>
+
+            <lightning-button 
+                label="Crear Caso"
+                variant="brand"
+                onclick={handleAsociarMasiva}
+                class="slds-m-top_medium">
+            </lightning-button>
+
+            <template if:true={caseId}>
+                <p class="slds-m-top_medium slds-text-color_success">
+                    Caso creado con éxito. ID: {caseId}
+                </p>
+            </template>
+
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Cargando..." size="small"></lightning-spinner>
+            </template>
+            
+        </div>
+    </lightning-card>
+</template>

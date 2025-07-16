@@ -5,6 +5,7 @@
         obtenerInformacion.setParams({'record': component.get('v.recordId')})
         obtenerInformacion.setCallback(this, function(response) {
 			let state = response.getState();
+            
             if (state === "SUCCESS") {
                 let respuesta = response.getReturnValue();
                 component.set('v.paraGrupo', respuesta.paraEmail);
@@ -14,9 +15,11 @@
                 component.set('v.casoRelacionado', respuesta.casoRelacionado);
                 component.set('v.noEsOficinas', respuesta.noEsOficinas);
                 component.set('v.consulta', respuesta.consulta);
+                component.set('v.usarComponente', true);                
             }
             else{
                 let errors = response.getError();
+
                 let toastParams = {
                     title: "Error",
                     message: errors[0].pageErrors[0].message, 

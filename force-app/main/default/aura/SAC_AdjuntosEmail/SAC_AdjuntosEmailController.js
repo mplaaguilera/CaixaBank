@@ -108,6 +108,31 @@
 
             $A.enqueueAction(action);
         }
+
+        //Si es desde una consulta externa, vincular los ficheros con la consulta
+        if(component.get('v.consultaId')){
+            
+            let fileId =  event.getSource().get("v.value");
+
+            var actionFile = component.get('c.checkAdjuntoConsulta');
+            actionFile.setParams({'consultaId': component.get('v.consultaId'), "fileId": fileId});
+            actionFile.setCallback(this, function(response) {
+                var state = response.getState();
+                if(state !== 'SUCCESS'){
+                    let toastParams = {
+                        title: "Error",
+                        message: "Error al adjuntar los archivos en la consulta", 
+                        type: "error"
+                    };
+            
+                    let toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams(toastParams);
+            
+                    toastEvent.fire();
+                }
+            });
+            $A.enqueueAction(actionFile);
+        }
     },
     desvincular: function(component, event, helper) {
         
@@ -118,6 +143,29 @@
             }
         }
         component.set('v.pills', pills);
+
+        if(component.get('v.consultaId')){
+
+            //Eliminar el ContentDocumentLink del adjunto con la consulta
+            var actionDelete = component.get('c.deleteFileConsulta');
+            actionDelete.setParams({'consultaId': component.get('v.consultaId'), 'fileId': event.getSource().get("v.value")});
+            actionDelete.setCallback(this, function(response) {
+                var state = response.getState();
+                if(state !== 'SUCCESS'){
+                    let toastParams = {
+                        title: "Error",
+                        message: "Error al desvincular el archivo de la consulta", 
+                        type: "error"
+                    };
+            
+                    let toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams(toastParams);
+            
+                    toastEvent.fire();
+                }
+            });
+            $A.enqueueAction(actionDelete);
+        }
     },
     eliminaTemporal: function(component, event, helper) {
         var pills = component.get('v.pills');
@@ -158,6 +206,28 @@
             $A.enqueueAction(action);
         }
         else{
+            if(component.get('v.consultaId')){
+
+                //Eliminar el ContentDocumentLink del adjunto con la consulta
+                var actionDelete = component.get('c.deleteFileConsulta');
+                actionDelete.setParams({'consultaId': component.get('v.consultaId'), 'fileId': items[item].id});
+                actionDelete.setCallback(this, function(response) {
+                    var state = response.getState();
+                    if(state !== 'SUCCESS'){
+                        let toastParams = {
+                            title: "Error",
+                            message: "Error al desvincular el archivo de la consulta", 
+                            type: "error"
+                        };
+                
+                        let toastEvent = $A.get("e.force:showToast");
+                        toastEvent.setParams(toastParams);
+                
+                        toastEvent.fire();
+                    }
+                });
+                $A.enqueueAction(actionDelete);
+            }
             items.splice(item, 1);
             component.set('v.pills', items);
         }
@@ -198,6 +268,31 @@
             }
         });
         $A.enqueueAction(action);
+        
+
+        if(component.get('v.consultaId')){
+            
+            let fileIds = uploadedFiles.map(file => file.documentId);
+
+            var action = component.get('c.linkFileToConsulta');
+            action.setParams({'consultaId': component.get('v.consultaId'), "fileIds": fileIds});
+            action.setCallback(this, function(response) {
+                var state = response.getState();
+                if(state !== 'SUCCESS'){
+                    let toastParams = {
+                        title: "Error",
+                        message: "Error al adjuntar los archivos en la consulta", 
+                        type: "error"
+                    };
+            
+                    let toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams(toastParams);
+            
+                    toastEvent.fire();
+                }
+            });
+            $A.enqueueAction(action);
+        }
     },
     myFunction: function(component, event, helper) {
         component.set('v.isOpen', !component.get('v.isOpen'));
@@ -211,6 +306,22 @@
         actionValidar.setCallback(this, function(response) {
             var state = response.getState();
                 if(state === 'SUCCESS'){
+                    let validatedItems = component.get('v.validateItems') || [];
+                    let nonValidatedItems = component.get('v.nonValidatedItems') || [];
+
+                    // Buscar el índice correcto usando ContentDocumentId
+                    let index = nonValidatedItems.findIndex(item => item.ContentDocumentId === idFichero);
+
+                    if (index !== -1) {
+                        let itemValidado = nonValidatedItems.splice(index, 1)[0]; // Sacar el item de la lista no validada
+                        validatedItems.push(itemValidado); // Agregarlo a la lista validada
+                    }
+
+                    // **IMPORTANTE:** Reasignar el array para que el framework detecte el cambio
+                    component.set('v.validateItems', [...validatedItems]);
+                    component.set('v.nonValidatedItems', [...nonValidatedItems]);
+
+        
                     let toastParams = {
                         title: "Fichero Validado",
                         message: "Se ha validado fichero con la reclamación", 
@@ -219,7 +330,6 @@
             
                     let toastEvent = $A.get("e.force:showToast");
                     toastEvent.setParams(toastParams);
-            
                     toastEvent.fire();
                     $A.get('e.force:refreshView').fire();
 

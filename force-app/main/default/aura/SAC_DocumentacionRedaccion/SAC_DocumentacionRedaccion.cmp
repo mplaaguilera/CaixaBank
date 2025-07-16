@@ -21,7 +21,8 @@
 
 
     <aura:attribute name="tieneDocGuardado" type="Boolean" default="false" />
-    <aura:attribute name="carpetaRaiz" type="String" default="SAC_PlantillasRedaccion" />
+    <!-- <aura:attribute name="carpetaRaiz" type="String" default="SAC_PlantillasRedaccion" /> -->
+    <aura:attribute name="carpetaRaiz" type="String"/>
 
     <aura:registerEvent name="appEvent" type="c:SAC_PertimiteEmailRedaccion"/>
 

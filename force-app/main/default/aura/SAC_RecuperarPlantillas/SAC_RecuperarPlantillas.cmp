@@ -16,6 +16,9 @@
     <aura:attribute name="idRaiz" type="String" />
     <aura:attribute name="puedeVolver" type="Boolean" default="true" />
 
+    <!-- Atributos para el desarrollo de añadir un tag a las imágenes insertadas -->
+    <aura:attribute name="flagCambioPlantilla" type="Boolean" default="false" />
+
 
 
     <!--Init-->

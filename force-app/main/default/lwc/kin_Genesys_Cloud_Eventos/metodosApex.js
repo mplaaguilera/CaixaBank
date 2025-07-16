@@ -133,6 +133,7 @@ export async function conversionApexInputs(nombreMetodoApex, message, interactio
 				idioma: message.data.attributes['Participant.idioma'] ?? '',
 				datos: message.data.attributes['Participant.datos'] ?? '',
 				connIdCognitivo: message.data.attributes['Participant.connIdCognitivo'] ?? '',
+				cognitivoId: message.data.attributes['Participant.CCO_CONVID'] ?? '',
 				casoId: message.data.attributes['Participant.casoId'] ?? '',
 				salesforceParentId: message.data.attributes['Participant.salesforceParentId'] ?? '',
 				llamadaId: message.data.attributes['Participant.llamadaId'] ?? '',
@@ -146,7 +147,8 @@ export async function conversionApexInputs(nombreMetodoApex, message, interactio
 				summary: message.data.attributes['Participant.summary'] ?? '',
 				assistantResponse: message.data.attributes['Participant.assistantResponse'] ?? '',
 				userQuery: message.data.attributes['Participant.userQuery'] ?? '',
-				telefonoUnico: message.data.attributes['Participant.telefonoUnico'] ?? ''
+				telefonoUnico: message.data.attributes['Participant.telefonoUnico'] ?? '',
+				vRUDoc: message.data.attributes['Participant.VRUDoc'] ?? ''
 			})
 		};
 

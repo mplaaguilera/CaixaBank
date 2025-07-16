@@ -29,6 +29,7 @@ export default class cc_Chat_History extends LightningElement {
 
 	@wire(getHistoryChatApex, {recordId: '$recordId', cognitivo: '$forzarCognitivo'})
 	wiredHistoryChat({error, data}) {
+		console.log('DPK Datos-->' + JSON.stringify(data));
 		if (data) {
 			this.historyChat = data.map((chat, index) => ({...chat, id: index}));
 			this.vacio = !this.historyChat.length;

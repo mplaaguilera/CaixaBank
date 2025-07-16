@@ -59,8 +59,6 @@
             </lightning-datatable>
         </template>
 
-
-
         <template if:true={error}>
           <div class="slds-theme_error slds-m-around_medium">
             <p>Error al cargar los datos: {error}</p>
@@ -68,7 +66,283 @@
         </template>
       </lightning-card>
     </div>
+    <template if:true={createProductModalOpen}>
+      <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            
+          <!-- Cabecera del modal -->
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" 
+              title="Cerrar" onclick={cerrarModalCreateProduct}>
+              <lightning-icon icon-name="utility:close" size="small" alternative-text="close" class="slds-button__icon slds-button__icon_large"></lightning-icon>
+              <span class="slds-assistive-text">Cerrar</span>
+            </button>
+            <h2 class="slds-text-heading_medium">Nuevo Registro</h2>
+          </header>
+          
+          <!-- Contenido del modal -->
+          <div class="slds-modal__content slds-p-around_medium">
+            <!-- Formulario de edición de registro -->
+            <lightning-record-edit-form 
+                object-api-name="SAC_ProductCase__c" 
+                onsuccess={handleSuccessCreateProduct} 
+                onerror={handleErrorCreateProduct}>
+                
+                <!-- Contenedor con la estructura de dos columnas -->
+                <div class="slds-grid slds-grid_vertical-align-start slds-wrap">
+                  <!-- Columna 1 -->
+                  <div class="slds-size_1-of-2 slds-p-right_medium">
+                    <!-- Campo para SAC_Pretension__c (solo lectura, tipo Output Field) -->
+                    <div class="slds-grid slds-grid_vertical-align-start slds-wrap">
+                      <div class="slds-size_1-of-2 slds-p-right_medium">
+                          <label class="slds-text-title slds-p-bottom_xx-small">Pretensión</label>
+                      <br><br>
+                          <div class="slds-text-body_regular slds-p-bottom_medium">
+                              {caseNumber}
+                          </div>
+                      </div>
+                  </div>
+                    <!-- Campo de tipo (Picklist) -->
+                    <lightning-input-field 
+                          field-name="SAC_Tipo__c"
+                          value={sacTipo}
+                          required="true"
+                          message-when-value-missing="El campo Tipo es obligatorio."
+                          onchange={handleInputChange}>
+                    </lightning-input-field>
+                      
+                    <!-- Campo de texto para SAC_Descripcion__c -->
+                    <lightning-input-field 
+                        field-name="SAC_Descripcion__c"
+                        value={sacDescripcion}
+                        required="true"
+                        message-when-value-missing="El campo Descripción es obligatorio."
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
 
+                    <!-- Campo de texto para N_Contrato__c -->
+                    <lightning-input-field 
+                        field-name="N_Contrato__c"
+                        value={nContrato}
+                        required="true"
+                        message-when-value-missing="El campo Número de Contrato es obligatorio."
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+    
+                    <!-- Campo de fecha para SAC_FechaApertura__c -->
+                    <lightning-input-field 
+                        field-name="SAC_FechaApertura__c"
+                        value={sacFechaApertura}
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+                  </div>
+    
+                  <!-- Columna 2 -->
+                  <div class="slds-size_1-of-2 slds-p-left_medium">
+
+                    <!-- Campo de porcentaje para SAC_TaeMaximoAplicado__c -->
+                    <lightning-input-field 
+                          field-name="SAC_TaeMaximoAplicado__c"
+                          value={sacTaeMaximo}
+                          onchange={handleInputChange}>
+                    </lightning-input-field>
+                    
+                    <!-- Campo de porcentaje para SAC_TaeInicialContrato__c -->
+                    <lightning-input-field 
+                          field-name="SAC_TaeInicialContrato__c"
+                          value={sacTaeInicial}
+                          onchange={handleInputChange}>
+                    </lightning-input-field>
+                      
+                    <!-- Campo de texto para SAC_Negociar__c -->
+                    <lightning-input-field 
+                        field-name="SAC_Negociar__c"
+                        value={sacNegociar}
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <!-- Campo de texto para SAC_DisponemosDeContrato__c -->
+                    <lightning-input-field 
+                        field-name="SAC_DisponemosDeContrato__c"
+                        value={sacDisponemosContrato}
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <!-- Campo de fecha para SAC_FechaCancelacion__c -->
+                    <lightning-input-field 
+                        field-name="SAC_FechaCancelacion__c"
+                        value={sacFechaCancelacion}
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <lightning-input-field 
+                        field-name="SAC_ProcedenciaContrato__c"
+                        value={sacProcedenciaContrato}
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <template if:true={mostrarCajaProcedencia}>
+                      <lightning-input-field 
+                        field-name="SAC_CajaProcedencia__c"
+                        value={sacCajaProcedencia}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                    </template>
+
+                  </div>
+                </div>
+    
+                <!-- Pie de modal -->
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancelar" style="margin-right: 5px" onclick={cerrarModalCreateProduct}></lightning-button>
+                    <lightning-button variant="brand" label="Guardar" onclick={handleGuardarCreateProduct}></lightning-button>
+                </footer>
+            </lightning-record-edit-form>
+          </div>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
+    <template if:true={editProductModalOpen}>
+      <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            
+          <!-- Cabecera del modal -->
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" 
+              title="Cerrar" onclick={cerrarModalEditProduct}>
+              <lightning-icon icon-name="utility:close" size="small" alternative-text="close" class="slds-button__icon slds-button__icon_large"></lightning-icon>
+              <span class="slds-assistive-text">Cerrar</span>
+            </button>
+            <h2 class="slds-text-heading_medium">Editar Registro</h2>
+          </header>
+          
+          <!-- Contenido del modal -->
+          <div class="slds-modal__content slds-p-around_medium">
+            <!-- Formulario de edición de registro -->
+            <lightning-record-edit-form 
+                object-api-name="SAC_ProductCase__c" 
+                record-id={productoSeleccionadoId} 
+                onsuccess={handleSuccessEdit} 
+                onerror={handleErrorEdit}>
+                
+                <!-- Contenedor con la estructura de dos columnas -->
+                <div class="slds-grid slds-grid_vertical-align-start slds-wrap">
+                  <!-- Columna 1 -->
+                  <div class="slds-size_1-of-2 slds-p-right_medium">
+                    <!-- Campo para SAC_Pretension__c (solo lectura, tipo Output Field) -->
+                    <div class="slds-grid slds-grid_vertical-align-start slds-wrap">
+                      <div class="slds-size_1-of-2 slds-p-right_medium">
+                          <label class="slds-text-title slds-p-bottom_xx-small">Pretensión</label>
+                      <br><br>
+                          <div class="slds-text-body_regular slds-p-bottom_medium">
+                              {caseNumber}
+                          </div>
+                      </div>
+                  </div>
+                    <!-- Campo de tipo (Picklist) -->
+                    <lightning-input-field 
+                          field-name="SAC_Tipo__c"
+                          value={sacTipo}
+                          required="true"
+                          message-when-value-missing="El campo Tipo es obligatorio."
+                          onchange={handleInputChange}>
+                    </lightning-input-field>
+                      
+                    <!-- Campo de texto para SAC_Descripcion__c -->
+                    <lightning-input-field 
+                        field-name="SAC_Descripcion__c"
+                        value={sacDescripcion}
+                        required="true"
+                        message-when-value-missing="El campo Descripción es obligatorio."
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <!-- Campo de texto para N_Contrato__c -->
+                    <lightning-input-field 
+                        field-name="N_Contrato__c"
+                        value={nContrato}
+                        required="true"
+                        message-when-value-missing="El campo Número de Contrato es obligatorio."
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+    
+                    <!-- Campo de fecha para SAC_FechaApertura__c -->
+                    <lightning-input-field 
+                        field-name="SAC_FechaApertura__c"
+                        value={sacFechaApertura}
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+                  </div>
+    
+                  <!-- Columna 2 -->
+                  <div class="slds-size_1-of-2 slds-p-left_medium">
+
+                    <!-- Campo de porcentaje para SAC_TaeMaximoAplicado__c -->
+                    <lightning-input-field 
+                          field-name="SAC_TaeMaximoAplicado__c"
+                          value={sacTaeMaximo}
+                          onchange={handleInputChange}>
+                    </lightning-input-field>
+                    
+                    <!-- Campo de porcentaje para SAC_TaeInicialContrato__c -->
+                    <lightning-input-field 
+                          field-name="SAC_TaeInicialContrato__c"
+                          value={sacTaeInicial}
+                          onchange={handleInputChange}>
+                    </lightning-input-field>
+                      
+                    <!-- Campo de texto para SAC_Negociar__c -->
+                    <lightning-input-field 
+                        field-name="SAC_Negociar__c"
+                        value={sacNegociar}
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <!-- Campo de texto para SAC_DisponemosDeContrato__c -->
+                    <lightning-input-field 
+                        field-name="SAC_DisponemosDeContrato__c"
+                        value={sacDisponemosContrato}
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <!-- Campo de fecha para SAC_FechaCancelacion__c -->
+                    <lightning-input-field 
+                        field-name="SAC_FechaCancelacion__c"
+                        value={sacFechaCancelacion}
+                        onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <lightning-input-field 
+                      field-name="SAC_ProcedenciaContrato__c"
+                      value={sacProcedenciaContrato}
+                      onchange={handleInputChange}>
+                    </lightning-input-field>
+                    
+                    <template if:true={mostrarCajaProcedencia}>
+                      <lightning-input-field 
+                        field-name="SAC_CajaProcedencia__c"
+                        value={sacCajaProcedencia}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                    </template>
+
+
+                  </div>
+                </div>
+    
+                <!-- Pie de modal -->
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancelar" style="margin-right: 5px" onclick={cerrarModalEditProduct}></lightning-button>
+                    <lightning-button variant="brand" label="Guardar" onclick={handleGuardarEditProduct}></lightning-button>
+                </footer>
+            </lightning-record-edit-form>
+          </div>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
 
     <template if:true={abrirModalListaProductos}>
       <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">

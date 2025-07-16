@@ -3,11 +3,13 @@ public with sharing class CBK_BorrarDatosSandbox implements Schedulable {
     public static void borrarDatosSandbox(Boolean notificarFin) {
         Boolean isSandBox = [SELECT IsSandbox FROM Organization].IsSandbox;
         if (isSandBox) { //Solo borra si NO es la Org de producción
+            borrarLogs();
             borrarTrazas();
             borrarOportunidades();
             borrarLlamadas();
             borrarChats();
             borrarCasosTareas();
+            borrarCasos();
             borrarOtros();
         } else {
             CBK_Log.debug('¡¡INVOCACIÓN A CBK_BorrarDatosSandbox.borrarDatosSandbox() EN PRODUCCIÓN!!');
@@ -23,13 +25,17 @@ public with sharing class CBK_BorrarDatosSandbox implements Schedulable {
     }
 
     @future @TestVisible
-    private static void borrarTrazas() {
-        //Conserva solo los 4000 registros más recientes dentro de los creados en los últimos 5 días
-        Database.delete([SELECT Id FROM CBK_Log__c WHERE LastModifiedDate < LAST_N_DAYS:4 LIMIT 9000], false);
-        Database.delete([SELECT Id FROM CBK_Log__c ORDER BY CreatedDate ASC LIMIT :Math.max(0, [SELECT COUNT() FROM CBK_Log__c] - 4000)], false);
+    private static void borrarLogs() {
+        Integer limitLogs = Math.max(Math.min([SELECT COUNT() FROM CBK_Log__c] - 4000, 0), 5000);
+        Database.delete([SELECT Id FROM CBK_Log__c WHERE LastModifiedDate < LAST_N_DAYS:4 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM CBK_Log__c ORDER BY CreatedDate ASC LIMIT :limitLogs], false);
+    }
 
-        Database.delete([SELECT Id FROM CC_TrazaInt__c WHERE LastModifiedDate < LAST_N_DAYS:4 LIMIT 9000], false);
-        Database.delete([SELECT Id FROM CC_TrazaInt__c ORDER BY CreatedDate ASC LIMIT :Math.max(0, [SELECT COUNT() FROM CC_TrazaInt__c] - 4000)], false);
+    @future @TestVisible
+    private static void borrarTrazas() {
+        Integer limitTrazas = Math.max(Math.min([SELECT COUNT() FROM CC_TrazaInt__c] - 4000, 0), 5000);
+        Database.delete([SELECT Id FROM CC_TrazaInt__c WHERE LastModifiedDate < LAST_N_DAYS:4 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM CC_TrazaInt__c ORDER BY CreatedDate ASC LIMIT :limitTrazas], false);
     }
 
     @future @TestVisible
@@ -50,11 +56,15 @@ public with sharing class CBK_BorrarDatosSandbox implements Schedulable {
 
     @future @TestVisible
     private static void borrarCasosTareas() {
-        Database.delete([SELECT Id FROM CC_Marca_Case__c WHERE CC_Case__c = NULL OR CC_Case__r.LastModifiedDate < LAST_N_DAYS:7], false);
-        Database.delete([SELECT Id FROM SAC_Marca_Case__c WHERE SAC_Case__c = NULL OR SAC_Case__r.LastModifiedDate < LAST_N_DAYS:7], false);
-        Database.delete([SELECT Id FROM SEG_Marcasdeuncaso__c WHERE SEG_Caso__c = NULL OR SEG_Caso__r.LastModifiedDate < LAST_N_DAYS:7], false);
-        Database.delete([SELECT Id FROM CBK_CaseHistory__c WHERE CBK_CaseId__c = NULL OR CBK_CaseId__r.LastModifiedDate < LAST_N_DAYS:7], false);
+        Database.delete([SELECT Id FROM CC_Marca_Case__c WHERE CC_Case__c = NULL OR CC_Case__r.LastModifiedDate < LAST_N_DAYS:7 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM SAC_Marca_Case__c WHERE SAC_Case__c = NULL OR SAC_Case__r.LastModifiedDate < LAST_N_DAYS:7 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM SEG_Marcasdeuncaso__c WHERE SEG_Caso__c = NULL OR SEG_Caso__r.LastModifiedDate < LAST_N_DAYS:7 LIMIT 4000], false);
+        Database.delete([SELECT Id FROM CBK_CaseHistory__c WHERE CBK_CaseId__c = NULL OR CBK_CaseId__r.LastModifiedDate < LAST_N_DAYS:7 LIMIT 4000], false);
         Database.delete([SELECT Id FROM Task WHERE WhatId = NULL OR LastModifiedDate < LAST_N_DAYS:7 ORDER BY LastModifiedDate ASC LIMIT 4000], false);
+    }
+
+    @future @TestVisible
+    private static void borrarCasos() {
         Database.delete([SELECT Id FROM CBK_Case_Extension__c WHERE LastModifiedDate < LAST_N_DAYS:7 AND Case_Id__r.LastModifiedDate < LAST_N_DAYS:7 ORDER BY LastModifiedDate ASC LIMIT 4000], false);
         Database.delete([SELECT Id FROM Case WHERE LastModifiedDate < LAST_N_DAYS:7 ORDER BY LastModifiedDate ASC LIMIT 4000], false);
     }

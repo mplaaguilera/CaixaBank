@@ -1,0 +1,35 @@
+<template>
+    <lightning-card title="Oportunidades CSBD" icon-name="standard:opportunity">
+        <template lwc:if={oportunidades}>
+            <div class="slds-m-around_medium">
+                <ul class="slds-list_dotted">
+                    <template for:each={oportunidades} for:item="oportunidad">
+                        <li key={oportunidad.Id} class="slds-var-m-bottom_medium">
+                            <div class="slds-media__body slds-is-relative" style="top: 1px;">
+                                <div class="slds-grid slds-grid_align-spread slds-timeline__trigger" style="padding-left: 0px;">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                        <span lwc:if={oportunidad.Name} title={oportunidad.Name}>
+                                            <a href="#" class="slds-text-link" onclick={navigate} data-record-id={oportunidad.oportunidadId}>{oportunidad.Name}</a>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="slds-var-m-top_x-small">
+                                    <span class="slds-text-color_weak slds-var-m-right_x-small">Fecha de apertura:</span>
+                                    <span style="font-style: italic;">{oportunidad.CreatedDate}</span>
+                                </div>
+                                <div class="slds-var-m-top_x-small">
+                                    <span class="slds-text-color_weak slds-var-m-right_x-small">Estado:</span>
+                                    <span style="font-style: italic;">{oportunidad.Estado}</span>
+                                </div>
+                                <div class="slds-var-m-top_x-small">
+                                    <span class="slds-text-color_weak slds-var-m-right_x-small">Propietario:</span>
+                                    <span style="font-style: italic;">{oportunidad.Propietario}</span>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </template>
+    </lightning-card>
+</template>

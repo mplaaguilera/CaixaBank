@@ -1,6 +1,7 @@
 import { LightningElement, api, wire} from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { RefreshEvent } from 'lightning/refresh';
+import LightningConfirm from 'lightning/confirm';
 import { refreshApex } from '@salesforce/apex';
 import getCaracteristicas from '@salesforce/apex/FRA_Caracteristicas_Controller.conseguirCaracteristicaCuenta'
 import getCaracteristicasFRADeCuenta from '@salesforce/apex/FRA_Caracteristicas_Controller.conseguirCaracteristicasFRADeCuenta';
@@ -55,14 +56,22 @@ export default class Fra_Caracteristicas_Cliente extends LightningElement  {
     }
 
     asociarCaracteristica(idCaracteristica) {
-        asociarCaracteristicaACuenta({ idCaso: this.recordId, idCaracteristica })
-            .then(() => {
-                refreshApex(this.ccaracteristics);
-                this.dispatchEvent(new RefreshEvent());
-            })
-            .catch(error => {
-            });
+        LightningConfirm.open({
+            message: '¿Estás seguro de asociar esta característica al Cliente?',
+            label: 'Confirmar Asociación',
+            theme: 'warning'
+        }).then((userConfirmed) => {
+            if (userConfirmed) {
+                asociarCaracteristicaACuenta({ idCaso: this.recordId, idCaracteristica })
+                    .then(() => {
+                        refreshApex(this.ccaracteristics);
+                        this.dispatchEvent(new RefreshEvent());
+                    })
+                    .catch(error => {
+                    });
+            }
+        }).catch((error) => {
+        });
     }
-    
-    
+        
 }

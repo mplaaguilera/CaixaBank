@@ -15,8 +15,8 @@ public with sharing class CC_WS_Envio_OTP {
 														CC_Case__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c,
 														CC_Case__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c
 														FROM CC_Comunicaciones__c WHERE Id IN :idAutenticaciones]; //AND RecordType.DeveloperName = 'CC_OTPSMS'];
-	
-		
+
+
 
 		CC_InterfaceSettings__mdt cfgIntegracion = CC_MetodosUtiles.getInterfazConfigBody('CC_Envio_OTP');
 		if (cfgIntegracion != null) {
@@ -65,6 +65,9 @@ public with sharing class CC_WS_Envio_OTP {
 						if ((cfgIntegracion.CC_TrazaSalida__c || Test.isRunningTest())) {
 							traza.CC_MensajeSalida__c = httpResponse.getBody();
 						}
+
+						System.debug('::: httpResponse.getBody()');
+						System.debug(httpResponse.getBody());
 
                         if (tipoObjeto == 'Case') {
                             Case caso = new Case(Id = recordId);

@@ -134,4 +134,22 @@ public with sharing class CSBD_Utils {
         }
         return String.valueOf(dec);
     }
+
+    public static String decToHex(Integer dec) {
+        if (dec == null) {
+            return null;
+        }
+        if (dec < 0) {
+            throw new IllegalArgumentException('El valor no puede ser negativo');
+        }
+        String hex = '';
+        Integer value = dec;
+        String digits = '0123456789ABCDEF';
+        do {
+            Integer remainder = Math.mod(value, 16);
+            hex = digits.substring(remainder, remainder + 1) + hex;
+            value = value / 16;
+        } while (value > 0);
+        return hex;
+    }
 }

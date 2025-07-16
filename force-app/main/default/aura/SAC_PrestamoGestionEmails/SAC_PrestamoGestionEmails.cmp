@@ -25,6 +25,10 @@
     <aura:attribute name="modalParaProrrogar" type="Boolean" default="false" />
     <aura:attribute name="checkConfirmacionValidacion" type="Boolean" default="false" />
 
+    <!-- Atributos para el desarrollo de añadir un tag a las imágenes insertadas -->
+    <aura:attribute name="imageTagsMap" type="Map" />
+    <aura:attribute name="todasImgConTag" type="Boolean" default="true"/>
+
     <!-- US670077 atributos para el desarrollo de adjuntar los archivos de la reclamacion a la derivacion automaticamente -->
     <aura:attribute name="adjuntosDerivar" type="Boolean"/>
     <aura:registerEvent name="cmpComponent" type="c:SAC_PrestamoShowComponent"/>
@@ -83,9 +87,12 @@
                     </lightning:input>
                     
                     <c:SAC_PrestamoAdjuntosEmail aura:id="adjuntosComponent" idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" caseId="{!v.caso.Id}" seleccionarReclamacion="{!v.seleccionarReclamacion}" adjuntosDerivar="{!v.adjuntosDerivar}" derivarAQuien="{!v.derivarAQuien}" procedencia="{!v.procedencia}"/>
+
+                    <c:sac_ModificarTagImagenes name="sac_ModificarTagImagenes" cuerpo="{!v.cuerpo}" recordId="{!v.caso.Id}" imageTagsMap ="{!v.imageTagsMap}" onevtmodimagen="{!c.handleEventModificarImagen}"/>
                     
                     <div style="padding-top: 8px;">
-                    <c:SAC_inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="true" title="Cuerpo"/>
+                        <!-- <c:SAC_inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="true" title="Cuerpo"/> -->
+                        <c:sac_inputRichTextLWC aura:id="sac_inputRichText1" name="sac_inputRichText" value="{!v.cuerpo}" recordId="{!v.caso.Id}" label="Cuerpo" title="Cuerpo" labelVisible="true" imageTagsMap ="{!v.imageTagsMap}" onevtinforichtext="{!c.handleEventRichText}"/>
                     </div>
                 </div>
                 <div class="slds-grid">

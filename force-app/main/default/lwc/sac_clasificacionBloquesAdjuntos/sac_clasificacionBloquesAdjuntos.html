@@ -6,15 +6,26 @@
             <!-- Aquí puedes añadir el contenido que quieras mostrar -->
             <template if:true={mostrarOcultoOrFileVisible}>
                 <!-- Inicio item archivo-->
-                <div class="slds-nav-vertical__item" style="padding: 2px;" onclick={ficheroSeleccionado} id={fichero.ContentDocumentId}>
+                <div class="slds-nav-vertical__item" style="padding: 2px;" id={fichero.ContentDocumentId}> <!-- onclick={ficheroSeleccionado} -->
                 <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-p-around_x-small">
                     <!--Boton clasificar-->
                     <div class="slds-col slds-size_1-of-12">
                         <template if:true={esRecAsociadaASPV}>
                             <lightning-button-icon icon-name="utility:sort" title="Clasificar" variant="bare" onclick={abrirModalClasificar} value={fichero} disabled="true"></lightning-button-icon>
+                            <!-- Checkbox clasificar múltiple-->
+                            <lightning-input disabled type="checkbox" onchange={handleClasifMultiple} value={fichero.Id} class="slds-float_right"></lightning-input> 
                         </template>
                         <template if:false={esRecAsociadaASPV}>
-                            <lightning-button-icon icon-name="utility:sort" title="Clasificar" variant="bare" onclick={abrirModalClasificar} value={fichero}></lightning-button-icon>
+                            <template if:true={permitirEdicion}>
+                                <lightning-button-icon icon-name="utility:sort" title="Clasificar" variant="bare" onclick={abrirModalClasificar} value={fichero}></lightning-button-icon>
+                                <!-- Checkbox clasificar múltiple-->
+                                <lightning-input type="checkbox" onchange={handleClasifMultiple} value={fichero.ContentDocumentId} name={fichero.SAC_Bloque__c} data-titulo={fichero.Title} class="slds-float_right"></lightning-input> 
+                            </template>
+                            <template if:false={permitirEdicion}>
+                                <lightning-button-icon icon-name="utility:sort" title="Clasificar" variant="bare" onclick={abrirModalClasificar} value={fichero} disabled="true"></lightning-button-icon>
+                                <!-- Checkbox clasificar múltiple-->
+                                <lightning-input disabled type="checkbox" onchange={handleClasifMultiple} value={fichero.Id} class="slds-float_right"></lightning-input> 
+                            </template>
                         </template>
                     </div>
                     <!--Fecha-->
@@ -46,18 +57,23 @@
                                     <lightning-input disabled data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value={nombreTipoAdjunto} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-5"></lightning-input>
                                 </template>
                                 <template if:false={esRecAsociadaASPV}>
-                                    <div class="slds-combobox_container">
-                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" data-id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
-                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                                                <template if:true={tieneTipoAdjunto}>
-                                                    <lightning-input data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value={nombreTipoAdjunto} onblur={handleBlur} onclick={mostrarOpciones} onkeyup={filtroBusqueda} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name={fichero.Id}></lightning-input>
-                                                </template>
-                                                <template if:false={tieneTipoAdjunto}>
-                                                    <lightning-input data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value="" onblur={handleBlur} onclick={mostrarOpciones} onkeyup={filtroBusqueda} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-3" name={fichero.Id}></lightning-input>
-                                                </template>
+                                    <template if:true={permitirEdicion}>
+                                        <div class="slds-combobox_container">
+                                            <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" data-id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                                    <template if:true={tieneTipoAdjunto}>
+                                                        <lightning-input data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value={nombreTipoAdjunto} onblur={handleBlur} onclick={mostrarOpciones} onkeyup={filtroBusqueda} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name={fichero.Id}></lightning-input>
+                                                    </template>
+                                                    <template if:false={tieneTipoAdjunto}>
+                                                        <lightning-input data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value="" onblur={handleBlur} onclick={mostrarOpciones} onkeyup={filtroBusqueda} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-3" name={fichero.Id}></lightning-input>
+                                                    </template>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </template>
+                                    <template if:false={permitirEdicion}>
+                                        <lightning-input disabled data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value={nombreTipoAdjunto} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id124"></lightning-input>
+                                    </template>
                                 </template>
                             </template>
                             <template if:false={esUserGeneral}>
@@ -88,22 +104,28 @@
                     </div>
                     <!--Fin parte de la clasificacion de grupos del fichero-->
                     <div class="slds-col slds-size_1-of-12">
-                    <template if:true={fichero.SAC_Oculto__c}>
-                        <lightning-button-icon icon-name="utility:hide" variant="bare" alternative-text="Oculto" title="Oculto" name={fichero.Title} value={fichero.Id} class="slds-float_right" disabled ></lightning-button-icon>
-                    </template>
-                    <template if:false={fichero.SAC_Oculto__c}>
-                        <lightning-button-icon icon-name="utility:preview" variant="bare" alternative-text="Visible" title="Visible" name={fichero.Title} value={fichero.Id} class="slds-float_right" disabled ></lightning-button-icon>
-                    </template>
+                        <lightning-button-icon icon-name="utility:search" variant="bare" alternative-text="Ver fichero" title="Ver fichero" id={fichero.ContentDocumentId} name={fichero.Title} value={fichero.ContentDocumentId} onclick={ficheroSeleccionado} class="slds-float_right"></lightning-button-icon>
+                        <template if:true={fichero.SAC_Oculto__c}>
+                            <lightning-button-icon icon-name="utility:hide" variant="bare" alternative-text="Oculto" title="Oculto" name={fichero.Title} value={fichero.Id} class="slds-float_right" disabled ></lightning-button-icon>
+                        </template>
+                        <template if:false={fichero.SAC_Oculto__c}>
+                            <lightning-button-icon icon-name="utility:preview" variant="bare" alternative-text="Visible" title="Visible" name={fichero.Title} value={fichero.Id} class="slds-float_right" disabled ></lightning-button-icon>
+                        </template>
                     </div>
                     <template if:true={esRespuesta}>
-                    <div class="slds-col slds-size_3-of-12">
-                        <template if:true={esRecAsociadaASPV}>
-                            <lightning-input disabled type="checkbox" label ="Validar" checked={fichero.SAC_ValidadoCV__c} onchange={handleChangeValidar} name={fichero.Title} value={fichero.Id}></lightning-input> 
-                        </template>
-                        <template if:false={esRecAsociadaASPV}>
-                            <lightning-input type="checkbox" label ="Validar" checked={fichero.SAC_ValidadoCV__c} onchange={handleChangeValidar} name={fichero.Title} value={fichero.Id}></lightning-input> 
-                        </template>
-                    </div>
+                        <div class="slds-col slds-size_3-of-12">
+                            <template if:true={esRecAsociadaASPV}>
+                                <lightning-input disabled type="checkbox" label ="Validar" checked={fichero.SAC_ValidadoCV__c} onchange={handleChangeValidar} name={fichero.Title} value={fichero.Id}></lightning-input> 
+                            </template>
+                            <template if:false={esRecAsociadaASPV}>
+                                <template if:true={permitirEdicion}>
+                                    <lightning-input type="checkbox" label ="Validar" checked={fichero.SAC_ValidadoCV__c} onchange={handleChangeValidar} name={fichero.Title} value={fichero.Id}></lightning-input> 
+                                </template>
+                                <template if:false={permitirEdicion}>
+                                    <lightning-input disabled type="checkbox" label ="Validar" checked={fichero.SAC_ValidadoCV__c} onchange={handleChangeValidar} name={fichero.Title} value={fichero.Id}></lightning-input> 
+                                </template>
+                            </template>
+                        </div>
                     </template>
                 </div>
                 </div>

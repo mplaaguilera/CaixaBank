@@ -149,14 +149,15 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
     @wire(recuperarReclamantes, { caseId: '$recordId' })
     caseReclamantes(result){
         this._wiredResult = result; 
-
+        
         if(this.recordType === 'SAC_Reclamacion'){
-            this.esReclamacion = true;
-        }
+            this.esReclamacion = true;            
+        }        
 
         if (result.data) {
             this.reclamantes = result.data.listReclamantes;
             this.caracteristicasClientes = result.data.listCaracteristicas;
+
             //Inicializar variables de control
             this.options = [];
             this.idReclamantePulsado = null;
@@ -165,18 +166,26 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
             this.reclamantePrincipal = [];
             this.reclamantesSecundarios = [];
             for(let i=0; i<this.reclamantes.length; i++){
-                if (this.reclamantes[i].SAC_ReclamantePrincipal__c) {
+
+                if(!this.recordType){
+                    if(this.reclamantes[i].SAC_Case__r.RecordType.DeveloperName === 'SAC_Reclamacion'){
+                        this.esReclamacion = true;
+                    }
+                }
+
+                if (this.reclamantes[i].SAC_ReclamantePrincipal__c) {     
+
                     let listCaract = [];
                     let caractElement = [];
-                    if(this.caracteristicasClientes != ''){
+                    if(this.caracteristicasClientes != ''){                        
                         this.mostrarCaractPrincipal = true;
                         this.caracteristicasClientes.forEach(element => {
-                            if(element.SAC_Cuenta__c === this.reclamantes[i].SAC_Account__c){
+                            if(element.SAC_Cuenta__c === this.reclamantes[i].SAC_Account__c){                                
                                 caractElement.push(element); 
                             }
                         });
-                        if(this.reclamantes[i].SAC_Account__r.AV_EAPGestor__c != null) {
-                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId != null) {
+                        if(this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {                            
+                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
                                 listCaract = Object.assign({caracteristicas : caractElement}, {OficinaDiferente : true}, this.reclamantes[i]);
                             } else {
                                 listCaract = Object.assign({caracteristicas : caractElement}, {OficinaDiferente : false}, this.reclamantes[i]);
@@ -187,8 +196,8 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                         this.reclamantePrincipal.push(listCaract);
                     }else{
                         let listaReclamantes = [];
-                        if(this.reclamantes[i].SAC_Account__r.AV_EAPGestor__c != null) {
-                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId != null) {
+                        if(this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
+                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
                                 listaReclamantes = Object.assign({OficinaDiferente : true}, this.reclamantes[i]);
                             } else {
                                 listaReclamantes = Object.assign({OficinaDiferente : false}, this.reclamantes[i]);
@@ -208,8 +217,8 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                                 caractElement.push(element); 
                             }
                         });
-                        if(this.reclamantes[i].SAC_Account__r.AV_EAPGestor__c != null) {
-                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId != null) {
+                        if(this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
+                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
                                 listCaract = Object.assign({caracteristicas : caractElement}, {OficinaDiferente : true}, this.reclamantes[i]);
                             } else {
                                 listCaract = Object.assign({caracteristicas : caractElement}, {OficinaDiferente : false}, this.reclamantes[i]);
@@ -220,8 +229,8 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                         this.reclamantesSecundarios.push(listCaract);
                     }else{
                         let listaReclamantes = [];
-                        if(this.reclamantes[i].SAC_Account__r.AV_EAPGestor__c != null) {
-                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_EAPGestor__r.AccountId != null) {
+                        if(this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
+                            if(this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c && this.reclamantes[i].SAC_Account__r.CC_OficinaGestoraId__c != null && this.reclamantes[i].SAC_Account__r.AV_OfficeManager__c != null) {
                                 listaReclamantes = Object.assign({OficinaDiferente : true}, this.reclamantes[i]);
                             } else {
                                 listaReclamantes = Object.assign({OficinaDiferente : false}, this.reclamantes[i]);
@@ -310,8 +319,8 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                 //Si el modal no se ha abierto y SI que vengo de la ventana de eliminar, elimino el reclamante principal poniendo un secundario como nuevo principal
                 this.eliminarCambiandoPrincipal();
             }                    
-        }else{            
-            comprobarMultiplesCasosCliente({ ownerId: this.ownerId, pretPrincipalownerId: this.pretPrincipalOwnerId, reclamanteId: this.idReclamantePulsado })
+        }else{      
+            comprobarMultiplesCasosCliente({ caseId: this.recordId, ownerId: this.ownerId, pretPrincipalownerId: this.pretPrincipalOwnerId, reclamanteId: this.idReclamantePulsado })
             .then(result => {
                 let existenCasosAbiertos = result;
                 if (existenCasosAbiertos) {

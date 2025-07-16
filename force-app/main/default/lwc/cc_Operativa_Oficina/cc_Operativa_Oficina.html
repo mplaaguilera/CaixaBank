@@ -1,28 +1,60 @@
 <template>
-    <section role="dialog" tabindex="-1" aria-modal="true" class="modal slds-modal" onkeydown={modalTeclaPulsada}>
-        <div class="slds-modal__container">
-            <!-- sldsValidatorIgnoreNextLine -->
-            <lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModal} class="slds-modal__close"></lightning-button-icon>
+    <!-- <div class={backdropClass}></div> -->
+       
+        <div class="modal contenido-principal">
+    
+                <!-- <lightning-quick-action-panel> -->
+                <!-- <section role="dialog" tabindex="-1" aria-modal="true" class="modal slds-modal" onkeydown={modalTeclaPulsada}> -->
+                <!-- <div class="modal" onkeydown={modalTeclaPulsada}> -->
+                <!-- <div class="slds-modal__container"> -->
+                <!-- sldsValidatorIgnoreNextLine -->
+                <!-- <lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModal} class="slds-modal__close"></lightning-button-icon> -->
             <div class="slds-modal__header">
                 <h1 class="slds-modal__title slds-hyphenate">Derivar</h1>
             </div>
             <div class="slds-modal__content slds-var-p-vertical_large slds-var-p-horizontal_xx-large" style="text-align: start;overflow: visible;">
                 <lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" style="position: absolute;"></lightning-spinner>
+
                 <div lwc:if={alertaTexto} style="text-align: center;">
                     <p>{alertaTexto}</p>
                     <p class="slds-var-m-top_medium">¿Quieres continuar con el proceso?</p>
                 </div>
-                <div lwc:elseif={ambitoFraude} style="text-align: center;">
-                    <template if:true={preguntaSenal}>
-                        <p>{preguntaSenal}</p>
-                    </template>
-                    <template if:true={mostrarModalPreguntaRealizarRemitido}>
-                        <div lwc:if={preguntaRealizarRemitido} style="text-align: center;">
-                            <p>{preguntaRealizarRemitido}</p>
-                        </div>
-                    </template>
+                <!--Migración Toast-->
+                <div lwc:elseif={mostrarModalToast} style="text-align: center;">
+                    <p style="white-space: pre-wrap;">{mensajeMostrarModalToast}</p>
                 </div>
-                <div lwc:elseif={grupoColaborador} style="text-align: center;">
+                <div lwc:elseif={mostrarModalToastUrl} style="text-align: center;">
+                    <p>{mensajeMostrarModalToastUrl}</p>
+                    <lightning-formatted-url value={urlOficina} label={numeroOficina} target="_self"></lightning-formatted-url>
+                </div>
+                <!--Migración Toast-->
+                <div lwc:elseif={ambitoFraude} style="text-align: center;">
+                    <div lwc:if={fraudeANivelDeMotivo}>
+                        <div lwc:if={motivoDevolucionTemaFraude}>
+                            <p>{motivoDevolucionTemaFraude}</p>
+                        </div>
+                        <div lwc:elseif={preguntaSenal}>
+                            <p>{preguntaSenal}</p>
+                        </div>
+                        <div lwc:elseif={mostrarModalPreguntaRealizarRemitido}>
+                            <div lwc:if={preguntaRealizarRemitido} style="text-align: center;">
+                                <p>{preguntaRealizarRemitido}</p>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div lwc:else>
+                        <div lwc:if={preguntaSenalAntigua}>
+                            <p>{preguntaSenalAntigua}</p>
+                        </div>
+                        <div lwc:elseif={mostrarModalPreguntaRealizarRemitido}>
+                            <div lwc:if={preguntaRealizarRemitido} style="text-align: center;">
+                                <p>{preguntaRealizarRemitido}</p>
+                            </div>
+                        </div>      
+                    </div>
+                </div>
+                <div lwc:elseif={mostrarModalTrasladarGrupoColaborador} style="text-align: center;">
                     <p>{preguntaGrupoColaborador}</p>
                 </div>
                 <template lwc:else>
@@ -35,16 +67,371 @@
                     <div lwc:elseif={textoOportunidadExistente} style="text-align: center;">
                         <p>{textoOportunidadExistente}</p>
                     </div>
-                    <div lwc:elseif={preguntaCSBDContratar} style="text-align: center;">
-                        <p>{preguntaCSBDContratar}</p>
-                        <br>
-                        <div>
-                            <lightning-button label="TF" icon-name="utility:trending" title="TF" onclick={linkTF}></lightning-button>
+                    <div lwc:elseif={preguntaTelefonoCSBD} style="text-align: center;">
+                        <p>{preguntaTelefonoCSBD}</p>
+                    </div>                 
+                     <div lwc:elseif={existeOppTareasCSBD} style="text-align: center;">
+                        <p>{textoOppTareasCSBD}</p>
+                    </div>
+                     
+                    <!--MGT-->
+                    <div lwc:elseif={existeOppFormalizada} style="text-align: center;">
+                        <lightning-formatted-text value={textoRellamadaCSBDFormalizada}></lightning-formatted-text>
+                        <!--<p>{textoRellamadaCSBDFormalizada}</p>-->
+                    </div>
+                    <div lwc:elseif={existeTareaRellamada} style="text-align: center;">
+                        <lightning-formatted-text value={textoTareaRellamada}></lightning-formatted-text>
+                        <!--<p>{textoRellamadaCSBDFormalizada}</p>-->
+                    </div>
+                    <div lwc:elseif={existeOppEnGestion} style="text-align: center;">
+                        <lightning-formatted-text value={textoRellamadaCSBDEnGestion}></lightning-formatted-text>
+                        <lightning-textarea required="true" label="Comentarios" value={comentarioTareaRellamada} onchange={actualizarComentario}></lightning-textarea>
+                    </div>
+                    <div lwc:elseif={mensajeDerivarAccionistas} style="text-align: center;">
+                        <p>{mensajeDerivarAccionistas}</p>
+                    </div>
+                    <!--MGT-->                    
+                    <!--PhisingSmishingMalware1-->
+                    <div lwc:elseif={PhisingSmishingMalware1} style="text-align: center;">
+                        <p>{PhisingSmishingMalware1}</p>
+                    </div>
+                    <div lwc:elseif={mostrarPregunta} style="text-align: center;">
+                        <p>{PhisingSmishingMalware6}</p>
+                    </div>
+                    <div lwc:elseif={mostrarPhisingSmishingMalware5} style="text-align: center;">
+                        <p>{PhisingSmishingMalware5}</p>
+                    </div>
+                    <div lwc:elseif={mostrarPhisingSmishingMalware4} style="text-align: center;">
+                        <p>{PhisingSmishingMalware4}</p>
+                    </div>
+                    <!--MGT-->
+                    
+                    <!--CashBack-->
+                    <div lwc:elseif={CashBack1}>
+                        <h2 class="slds-text-heading_medium">{CashBack1}</h2>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <lightning-input type="text" name="idCliente" value={detallesConsulta} onchange={handledetallesConsultaChange}></lightning-input>
+                            </div>
+                            <div>
+                                <label class="slds-form-element__label" for="idCliente"><abbr class="slds-required" title="required">*</abbr>Descripción de la reclamación <lightning-helptext class="textoInfo" content={CashBack5}></lightning-helptext></label>
+                            </div>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <lightning-input type="text" name="idCliente" value={idCliente} onchange={handleIdClienteChange}></lightning-input>
+                            </div>
+                            <div>
+                                <label class="slds-form-element__label" for="idCliente"><abbr class="slds-required" title="required">*</abbr>ID cliente <lightning-helptext class="textoInfo" content={CashBack2}></lightning-helptext></label>
+                            </div>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <lightning-input type="text" name="nombreComercio" value={nombreComercio} onchange={handleNombreComercioChange}></lightning-input>
+                            </div>
+                            <label class="slds-form-element__label" for="nombreComercio"><abbr class="slds-required" title="required">*</abbr>Nombre comercio <lightning-helptext class="textoInfo" content={CashBack3}></lightning-helptext></label>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <lightning-input type="date" name="fechaCompra" value={fechaCompra} onchange={handleFechaCompraChange}></lightning-input>
+                            </div>
+                            <label class="slds-form-element__label" for="fechaCompra"><abbr class="slds-required" title="required">*</abbr>Fecha de compra <lightning-helptext class="textoInfo" content={CashBack4}></lightning-helptext></label>
                         </div>
                     </div>
-                    <div lwc:elseif={preguntaCSBDContratar2} style="text-align: center;">
-                        <p>{preguntaCSBDContratar2}</p>
+                    <!--CashBack-->
+
+                    <!--Refinanciación Deudas-->
+                    <div lwc:elseif={RefinanciacionDeudas1} class="slds-box slds-p-around_medium">
+                        <div class="slds-form-element">
+                            <div>
+                                <label class="slds-form-element__label" for="idCliente">{RefinanciacionDeudas1}</label>
+                            </div>
+                            <div class="slds-form-element__control">
+                                <lightning-input type="text" name="idCliente" value={detallesConsulta} onchange={handledetallesConsultaChange}></lightning-input>
+                            </div>
+                        </div>
                     </div>
+                    <!--Refinanciación Deudas-->
+
+                    <div lwc:elseif={ambitoCSBD} style="text-align: center;">
+                        <div lwc:if={preguntaCSBDContratar} style="text-align: center;">
+                            <p>{preguntaCSBDContratar}</p>
+                            <br>
+                            <div>
+                                <lightning-button label="TF" icon-name="utility:trending" title="TF" onclick={linkTF}></lightning-button>
+                            </div>
+                        </div>
+                        <div lwc:elseif={preguntaCSBDContratar2} style="text-align: center;">
+                            <p>{preguntaCSBDContratar2}</p>
+                        </div>
+                        <div lwc:elseif={mostrarModalCSBDNoContratar} style="text-align: center;">
+                            <p>{textoMotivoCSBDNoContratar}</p>
+                        </div>
+                    
+                    </div>
+                    <div lwc:elseif={textoDocumentacionCertificado} style="text-align: center;">
+                        <p>{textoDocumentacionCertificado}</p>
+                    </div>
+                    <div lwc:elseif={preguntaInformacionRequeridaDocumentacion} style="text-align: center;">
+                        <p>{preguntaInformacionRequeridaDocumentacion}</p>
+                    </div>
+                    <div lwc:elseif={casoCreadoDocumentacion} style="text-align: center;">
+                        <p>{modalDocumentacionCasoCreado}</p>
+                    </div>
+                    <div lwc:elseif={preguntaInformacionCompletaDocumentacion} style="text-align: center;">
+                        <p>{preguntaInformacionCompletaDocumentacion}</p>
+                    </div>
+                    <div lwc:elseif={trasladarDocumentacion} style="text-align: center;">
+                        <p>{preguntaGrupoColaborador}</p>
+                    </div>
+                    <!--ARGOS-->
+                    <div lwc:elseif={operacionMFAArgos} style="text-align: center;">
+                        <p>{operacionMFAArgos}</p>
+                    </div>
+                    <div lwc:elseif={diarioMFAArgos} style="text-align: center;">
+                        <p>{diarioMFAArgos}</p>
+                    </div>
+                    <div lwc:elseif={preguntasArgosActivas} style="text-align: center;">
+                        <p>{cabeceraPreguntasMFAArgos}</p>
+                        <div style="text-align: left; padding: 20px;">
+                            <template for:each={preguntasArgos} for:item="pregunta">
+                                <lightning-radio-group 
+                                    key={pregunta}
+                                    class="radioGroup"
+                                    name={pregunta}
+                                    label={pregunta}
+                                    options={options}
+                                    type="button"
+                                    onchange={handleChange}>
+                                </lightning-radio-group>
+                            </template>
+                        </div>
+                    </div>
+                    <div lwc:elseif={preguntaConfirmacionArgosActiva}>
+                        <p><strong>{preguntaConfirmacionArgos}</strong></p>
+                        <div style="text-align: left; padding: 20px;">
+                            <template for:each={respuestasPreguntasArgos} for:item="item">
+                                <p style="margin-bottom: 10px;" key={item.key}><span>{item.key} -> <strong>{item.value}</strong></span></p>
+                            </template>
+                        </div>
+                    </div>
+                    <!--ARGOS-->
+
+                    <!--MECANISMO FIRMA CONTENT-->
+                    <div lwc:elseif={preguntaMecanismoFirma} style="text-align: center;">
+                        <p>{preguntaMecanismoFirma}</p>
+                    </div>
+                    <div lwc:elseif={preguntaMecanismoFirmaDatos} style="text-align: left;">
+                        <p style="white-space: pre-wrap;">{preguntaMecanismoFirmaDatos}</p>
+                        <template for:each={preguntaMecanismoFirmaDatosValores} for:item="pregunta">
+                            <lightning-radio-group 
+                                key={pregunta}
+                                class="radioGroup"
+                                name={pregunta}
+                                label={pregunta}
+                                options={options}
+                                type="button"
+                                onchange={handleChangeMF}>
+                            </lightning-radio-group>
+                        </template>
+                    </div>
+                    <div lwc:elseif={preguntaMecanismoFirmaIdentificador} style="text-align: center;">
+                        <p>{preguntaMecanismoFirmaIdentificador}</p>
+                    </div>
+                    <div lwc:elseif={preguntaMecanismoFirmaClienteAutenticado} style="text-align: center;">
+                        <p>{preguntaMecanismoFirmaClienteAutenticado}</p>
+                    </div>                    
+                    <!--MECANISMO FIRMA CONTENT-->
+
+
+                    <!--AMENAZAS EMPLEADOS-->
+                    <!-- <div lwc:elseif={mensajeSolicitudDatosAmenazasEmpleados}>
+                        <p>{mensajeSolicitudDatosAmenazasEmpleados}</p>
+                        <div class="slds-combobox_container">
+
+                            <template lwc:if={cambioOficina}>
+                                <div class="slds-form-element slds-var-p-bottom_medium slds-var-m-top_medium">
+                                    <div class="slds-form-element__control">
+                                        <template lwc:if={oficinaAmenazadaSeleccionada}>
+                                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Oficina destino</label>
+                                            <div class="slds-combobox_container slds-has-selection">
+                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                                        <span class="slds-icon_container slds-combobox__input-entity-icon slds-var-m-left_xx-small">
+                                                            <lightning-icon icon-name="standard:account" size="x-small"></lightning-icon>
+                                                        </span>
+                                                        <div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                            <span class="slds-truncate">{oficinaAmenazadaSeleccionada.Name}</span>
+                                                        </div>
+                                                        <span class="slds-input__icon slds-input__icon_right" style="pointer-events: initial; top: calc(50% - 1px);">
+                                                            <lightning-button-icon icon-name="utility:close" size="small" variant="bare" tooltip="Deseleccionar" onclick={lookupDeseleccionar}></lightning-button-icon>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template lwc:else>
+                                            <div class="slds-combobox_container">
+                                                <div class="lookupOficina slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                                    <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Oficina destino</label>
+                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                                        <lightning-input class="lookupOficinaInput" type="search" variant="label-hidden" value={lookupOficinaInputValue} placeholder="Buscar por ciudad o calle" autocomplete="off" onchange={lookupOficinaOnchange} onfocus={lookupOficinaAbrir} onblur={lookupOficinaCerrar}></lightning-input>
+                                                    </div>
+                                                    <div lwc:if={lookupOficinaResultados.length} class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                            <template for:each={lookupOficinaResultados} for:item="resultado">
+                                                                <li key={resultado.Id} role="presentation" class="slds-listbox__item" onclick={lookupOficinaAmenazadaSeleccionar} data-id={resultado.Id}>
+                                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                                        <span class="slds-media__figure slds-listbox__option-icon slds-is-relative" style="top: -2px;">
+                                                                            <lightning-icon icon-name="standard:account" size="x-small"></lightning-icon>
+                                                                        </span>
+                                                                        <span class="slds-media__body">
+                                                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity">{resultado.Name}</span>
+                                                                            <span class="slds-listbox__option-meta slds-listbox__option-meta_entity" style="font-weight: 300; padding-top: 1px;">{resultado.BillingCity} - {resultado.BillingStreet}</span>
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                            </template>
+                                                        </ul>
+                                                    </div>
+                                                    <template lwc:else>
+                                                        <div lwc:if={lookupOficinaInputValue} class="slds-dropdown slds-dropdown_length-with-icon-5 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                                <li role="presentation" class="slds-listbox__item">
+                                                                    <div aria-selected="true" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_term slds-has-focus" role="option" style="cursor: default;">
+                                                                        <span class="slds-media__body">
+                                                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity slds-text-color_weak">No hay resultados.</span>
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template lwc:if={cambioOficina}>
+                                <div class="slds-form-element slds-var-p-bottom_medium slds-var-m-top_medium">
+                                    <div class="slds-form-element__control">
+                                        <template lwc:if={empleadoAmenazadoSeleccionado}>
+                                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Empleado amenazado</label>
+                                            <div class="slds-combobox_container slds-has-selection">
+                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                                        <span class="slds-icon_container slds-combobox__input-entity-icon slds-var-m-left_xx-small">
+                                                            <lightning-icon icon-name="standard:contact" size="x-small"></lightning-icon>
+                                                        </span>
+                                                        <div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                            <span class="slds-truncate">{empleadoAmenazadoSeleccionado.Name}</span>
+                                                        </div>
+                                                        <span class="slds-input__icon slds-input__icon_right" style="pointer-events: initial; top: calc(50% - 1px);">
+                                                            <lightning-button-icon icon-name="utility:close" size="small" variant="bare" tooltip="Deseleccionar" onclick={lookupDeseleccionarEmpleadoAmenazado}></lightning-button-icon>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template lwc:else>
+                                            <div class="slds-combobox_container">
+                                                <div class="lookupEmpleado slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                                    <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Empleado amenazado</label>
+                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                                        <lightning-input class="lookupEmpleadoInput" type="search" variant="label-hidden" value={lookupEmpleadoInputValue} placeholder="Buscar por ciudad o calle" autocomplete="off" onchange={lookupEmpleadoOnchange} onfocus={lookupEmpleadoAbrir} onblur={lookupEmpleadoCerrar}></lightning-input>
+                                                    </div>
+                                                    <div lwc:if={lookupEmpleadoResultados.length} class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                            <template for:each={lookupEmpleadoResultados} for:item="resultado">
+                                                                <li key={resultado.Id} role="presentation" class="slds-listbox__item" onclick={lookupEmpleadoAmenazadoSeleccionar} data-id={resultado.Id}>
+                                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                                        <span class="slds-media__figure slds-listbox__option-icon slds-is-relative" style="top: -2px;">
+                                                                            <lightning-icon icon-name="standard:contact" size="x-small"></lightning-icon>
+                                                                        </span>
+                                                                        <span class="slds-media__body">
+                                                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity">{resultado.Name}</span>
+                                                                            <span class="slds-listbox__option-meta slds-listbox__option-meta_entity" style="font-weight: 300; padding-top: 1px;">{resultado.Name} - {resultado.CC_Matricula__c}</span>
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                            </template>
+                                                        </ul>
+                                                    </div>
+                                                    <template lwc:else>
+                                                        <div lwc:if={lookupEmpleadoInputValue} class="slds-dropdown slds-dropdown_length-with-icon-5 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                                <li role="presentation" class="slds-listbox__item">
+                                                                    <div aria-selected="true" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_term slds-has-focus" role="option" style="cursor: default;">
+                                                                        <span class="slds-media__body">
+                                                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity slds-text-color_weak">No hay resultados.</span>
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                            <div class="slds-form-element slds-var-p-bottom_medium slds-var-m-top_medium">
+                                <div class="slds-form-element__control">
+                                        <lightning-input class="motivoAmenazaInputValue" type="text" label="Motivo de la amenaza" value={motivoAmenazaInputValue} required="true"></lightning-input>
+                                        <lightning-input class="detalllesAmenazaInputValue" type="text" label="Detalles de la amenaza" value={detalllesAmenazaInputValue} required="true"></lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    <!--AMENAZAS EMPLEADOS-->
+
+                    <!--AMENAZAS SUICIDIOS -->
+                    <!-- <div lwc:elseif={mensajeSolicitudDatosAmenazasSuicidios}>
+                        <div class="slds-form-element slds-var-p-bottom_medium slds-var-m-top_medium">
+                            <div class="slds-form-element__control">
+                                    <lightning-input class="motivoAmenazaSuicidiosInputValue" type="text" label="Motivo" value={motivoAmenazaSuicidiosInputValue} required="true"></lightning-input>
+                            </div>
+                            <div class="slds-form-element">
+                                <lightning-input-address
+                                    class="direccionAmenazasSuicidiosInputValue"
+                                    address-label="Dirección"
+                                    street-label="Calle"
+                                    city-label="Ciudad"
+                                    country-label="País"
+                                    province-label="Provincia"
+                                    postal-code-label="Código postal"
+                                    onchange={amenazasSuicidios}
+                                    required="true"
+                                ></lightning-input-address>
+                            </div>
+                        </div>
+                    </div> -->
+                    <!--AMENAZAS SUICIDIOS -->                    
+                    
+                    <!--ONBOARDING / DESISTIR -->
+                    <div lwc:elseif={textoModalOnboarding} style="text-align: center;">
+                        <p>{textoModalOnboarding}</p>
+                    </div>
+                    <div lwc:elseif={textoModalDesistir} style="text-align: center;">
+                        <p>{textoModalDesistir}</p>
+                    </div>
+                    <div lwc:elseif={derivadoBPO} style="text-align: center;">
+                        <p>{derivadoBPO}</p>
+                    </div>
+                    <div lwc:elseif={textoModalOnboardingCodigos} style="text-align: center;">
+                        <p>{textoModalOnboardingCodigos}</p>
+                        <p><b>Empresa:</b> {empresaONB}</p>
+                        <p><b>Estado:</b> {estadoONB}</p>
+                        <p><b>Subestado:</b> {subestadoONB}</p>
+                        <p><b>Fecha estado:</b> {fechaEstadoONB}</p>
+                        <p><b>Motivo cierre:</b> {motivoCierreONB}</p>
+                        <p><b>Num SR:</b> {numSR}</p>
+                    </div>
+                    <!--ONBOARDING / DESISTIR -->
+
                     <!--<template if:true={mostrarModalPreguntaEnrollmentDatos}>
                         <div lwc:if={preguntaEnrollmentDatos} style="text-align: left;">
                             <lightning-formatted-text value={preguntaEnrollmentDatos} >   
@@ -66,6 +453,7 @@
                             <p>{preguntaSenal}</p>
                         </div>
                     </template>-->
+                    
                     <template lwc:elseif={mostrarModalCreacionTarea}>
                         <div lwc:if={cargandoGestor} class="slds-is-relative" style="height: 55px;" align="center">
                             <lightning-spinner variant="brand" style="position: absolute;"></lightning-spinner>
@@ -128,6 +516,9 @@
                                             </template>
                                             <template lwc:elseif={citaRapida}>
                                                 Oficina del gestor.
+                                            </template>
+                                            <template lwc:elseif={hubGestion}>
+                                                Hub Gestión.
                                             </template>
                                             <template lwc:else>
                                                 {nombreGestor}
@@ -336,7 +727,7 @@
                                         <div style="font-size: 14px;font-weight: 700;">Nuevo evento</div>
                                         <div class="slds-var-m-top_medium">
                                             <template lwc:if={citaRapida}>
-                                                <lightning-combobox class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" placeholder="Seleccione un tipo de cita" onchange={valorTipoCita} options={opcionesCita}></lightning-combobox>
+                                                <lightning-combobox class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" placeholder="Seleccione un tipo de cita" onchange={valorTipoCita} options={opcionesCitaRapida}></lightning-combobox>
                                             </template>
                                             <template lwc:elseif={imagin}>
                                                 <lightning-select class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" onchange={valorTipoCita} options={opcionesCitaDigital}></lightning-select>
@@ -353,23 +744,25 @@
                                             <lightning-input name="asuntoEvento" required="true" label="Asunto" maxlength="200"
                                             class="asuntoEvento slds-var-m-top_medium"></lightning-input>
                                             <template if:false={gestorBackupActivo}>
-                                                <div class="slds-var-m-top_xx-large" style="font-size:14px; font-weight:700;">
-                                                    Asignado a
-                                                </div>
-                                                <div style="margin-top:10px;">
-                                                    <span style="padding-right:10px;" class="slds-icon">
-                                                        <lightning-icon class="slds-var-m-right_small" icon-name="standard:user" size="x-small"></lightning-icon>
-                                                    </span>
-                                                    {nombreGestor}
-                                                </div>
-                                                <div style="margin-top:15px;">
-                                                    <template if:false={gestorAsignadoCoincide}>
-                                                        <span style="margin-right: 5px" class="slds-icon_container">
-                                                            <lightning-icon icon-name="utility:info_alt" size="x-small"></lightning-icon>
+                                                <template if:false={citaRapida}>
+                                                    <div class="slds-var-m-top_xx-large" style="font-size:14px; font-weight:700;">
+                                                        Asignado a
+                                                    </div>
+                                                    <div style="margin-top:10px;">
+                                                        <span style="padding-right:10px;" class="slds-icon">
+                                                            <lightning-icon class="slds-var-m-right_small" icon-name="standard:user" size="x-small"></lightning-icon>
                                                         </span>
-                                                        El gestor disponible no coincide con el asignado al cliente: {nombreGestorAsignado}.
-                                                    </template>
-                                                </div>
+                                                        {nombreGestor}
+                                                    </div>
+                                                    <div style="margin-top:15px;">
+                                                        <template if:false={gestorAsignadoCoincide}>
+                                                            <span style="margin-right: 5px" class="slds-icon_container">
+                                                                <lightning-icon icon-name="utility:info_alt" size="x-small"></lightning-icon>
+                                                            </span>
+                                                            El gestor disponible no coincide con el asignado al cliente: {nombreGestorAsignado}.
+                                                        </template>
+                                                    </div>
+                                                </template>
                                                 <div>
                                                     <div class="slds-var-m-top_xx-large" style="font-size:14px;font-weight:700; margin-bottom:10px;">
                                                         Fecha y hora
@@ -382,15 +775,20 @@
                                                             <lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Consultar disponibilidad" onclick={consultarFechasDisponibilidadGestor}></lightning-button>
                                                         </template>
                                                         <template if:true={disponibilidadConsultada}>
-                                                            <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+                                                            <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">                                                                                                             
                                                                 <div class="citaGestorFechaBackUpFalse slds-col slds-size_1-of-2">
-                                                                    <lightning-combobox label="Fecha" class="fechasDisponibilidad" placeholder="--Seleccione una fecha--" options={fechasDisponibilidad} onchange={consultarHorasDisponibilidadGestor}></lightning-combobox>
+                                                                    <lightning-combobox label="Fecha" class="fechasDisponibilidad" disabled={sinFechasDisponibles} placeholder="--Seleccione una fecha--" options={fechasDisponibilidad} onchange={consultarHorasDisponibilidadGestor}></lightning-combobox>
                                                                 </div>
                                                                 <div class="horasDisponibilidad1 slds-col slds-size_1-of-2">
-                                                                    <lightning-combobox label="Hora" placeholder="--Seleccione una hora--" options={horasDisponibilidad} onchange={guardarHorasDisponibilidad}></lightning-combobox>
-                                                                </div>
-                                                            </div>
+                                                                    <lightning-combobox label="Hora" disabled={sinFechasDisponibles} placeholder="--Seleccione una hora--" options={horasDisponibilidad} onchange={guardarHorasDisponibilidad}></lightning-combobox>
+                                                                </div>                                                                
+                                                            </div> 
                                                         </template>
+                                                        <template if:true={sinFechasDisponibles}>
+                                                            <div class="slds-form-element__help" style="color: #ea001e;">
+                                                                {mensajeSinDisponibilidadGestor}
+                                                            </div>
+                                                        </template>         
                                                     </template>
                                                 </div>
                                             </template>
@@ -399,33 +797,40 @@
                                                     <div class="slds-var-m-top_xx-large" style="font-size:14px;font-weight:700; margin-bottom:10px;">
                                                         Otros gestores
                                                     </div>
-                                                    <lightning-input name="checkbox" type="toggle" checked={gestorBackupActivo} onchange={mostrarGestorBackup} messagetoggleactive="Gestor backup" messagetoggleinactive="Gestor asignado" disabled="true"></lightning-input>
-                                                </div>                                                
-                                                <template if:true={gestorBackupActivoDos}>
-                                                    <template if:true={existeBackup}>
-                                                        <div class="slds-col slds-size_1-of-1" style="margin-top:15px; margin-bottom:10px;">
-                                                            <lightning-combobox label="Gestor backup" placeholder="--Seleccione un gestor--" options={gestoresBackup} onchange={resetDisponibilidadConsultada}></lightning-combobox>
-                                                            <div>
-                                                                <div style="font-size:14px;font-weight:700; margin-top:15px; margin-bottom:10px;">
-                                                                    Fecha y hora
-                                                                </div>
-                                                                <template if:false={disponibilidadConsultada}>
-                                                                    <lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Consultar disponibilidad" onclick={consultarFechasDisponibilidadBackup}></lightning-button>
-                                                                </template>
-                                                                <template if:true={disponibilidadConsultada}>
-                                                                    <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
-                                                                        <div class="horasDisponibilidad slds-col slds-size_1-of-2">
-                                                                            <lightning-combobox class="fechasDisponibilidad" label="Fecha" placeholder="--Seleccione una fecha--" options={fechasDisponibilidad} onchange={consultarHorasDisponibilidadBackup}></lightning-combobox>
-                                                                        </div>
-                                                                        <div class="horasDisponibilidad slds-col slds-size_1-of-2">
-                                                                            <lightning-combobox label="Hora" placeholder="--Seleccione una hora--" options={horasDisponibilidad}></lightning-combobox>
-                                                                        </div>
+                                                    <lightning-input name="checkbox" type="toggle" checked={gestorBackupActivo} onchange={mostrarGestorBackup} messagetoggleactive="Gestor backup" messagetoggleinactive="Gestor asignado" disabled={botonBackupDesactivado}></lightning-input>
+                                                </div>
+                                                <template if:true={gestorBackupActivo}>
+                                                    <template if:true={gestorBackupActivoDos}>
+                                                        <template if:true={existeBackup}>
+                                                            <div class="slds-col slds-size_1-of-1" style="margin-top:15px; margin-bottom:10px;">
+                                                                <lightning-combobox label="Gestor backup" placeholder="--Seleccione un gestor--" options={gestoresBackup} onchange={gestorBackupOnChange}></lightning-combobox>
+                                                                <div>
+                                                                    <div style="font-size:14px;font-weight:700; margin-top:15px; margin-bottom:10px;">
+                                                                        Fecha y hora
                                                                     </div>
-                                                                </template>
+                                                                    <template if:false={disponibilidadConsultada}>
+                                                                        <lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Consultar disponibilidad" onclick={consultarFechasDisponibilidadBackup} disabled={botonConsultarDisponibilidadDesactivado}></lightning-button>
+                                                                    </template>
+                                                                    <template if:true={disponibilidadConsultada}>
+                                                                        <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+                                                                            <div class="horasDisponibilidad slds-col slds-size_1-of-2">
+                                                                                <lightning-combobox class="fechasDisponibilidad" disabled={sinFechasDisponibles} label="Fecha" placeholder="--Seleccione una fecha--" options={fechasDisponibilidad} onchange={consultarHorasDisponibilidadBackup}></lightning-combobox>
+                                                                            </div>
+                                                                            <div class="horasDisponibilidad slds-col slds-size_1-of-2">
+                                                                                <lightning-combobox label="Hora" disabled={sinFechasDisponibles} placeholder="--Seleccione una hora--" options={horasDisponibilidad} onchange={setHorasDisponibilidadGestorBackup}></lightning-combobox>
+                                                                            </div>
+                                                                        </div>
+                                                                    </template>
+                                                                    <template if:true={sinFechasDisponibles}>
+                                                                        <div class="slds-form-element__help" style="color: #ea001e;">
+                                                                            {mensajeSinDisponibilidadGestor}
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        </template>
                                                     </template>
-                                                </template>
+                                                </template>                                              
                                                 <template if:false={existeBackup}>
                                                     <div style="margin-top:15px;">
                                                         <span style="margin-right: 5px; margin-left: 5px;" class="slds-icon_container">
@@ -445,7 +850,7 @@
                                             </div>
                                         </div>
                                 </template>
-                                <template lwc:else>
+                                <template lwc:elseif = {mostrarNoGestor}>
                                     <div style="margin: 10px">
                                         <span style="margin-right: 10px" class="slds-icon_container">
                                             <lightning-icon icon-name="utility:warning" variant="warning"
@@ -459,15 +864,33 @@
                         </template>
                     </template>
                     <!-- FIN CITA GESTOR-->
+                    <!-- DERIVAR SAC -->
+                     <div lwc:elseif={mostrarDerivarSAC} style="text-align: center;">
+                        <p>{mensajeDerivarAlSAC}</p>
+                    </div>
+                    <!-- FIN DERIVAR SAC -->
+                    <!-- DEVOLVER SAC -->
+                     <div lwc:elseif={mostrarDevolverSAC} style="text-align: center;">
+                        <p>{mensajeDevolverAlSAC}</p>
+                        <div style="text-align: left;">
+                            <lightning-textarea label="Introduce el motivo de la devolución a SAC" value={motivoSAC} onchange={handleMotivoSACChange} required></lightning-textarea>
+                        </div>
+                    </div>
+                    <!-- FIN DEVOLVER SAC -->
+                    <!-- ERROR CANAL PROCEDENCIA DERIVAR/DEVOLVER SAC -->
+                     <div lwc:elseif={mostrarCanalProcedenciaErroneo} style="text-align: center;">
+                        <p>{mensajeCanalProcedenciaErroneo}</p>
+                    </div>
+                    <!-- FIN ERROR CANAL PROCEDENCIA DERIVAR/DEVOLVER SAC -->
                     <div lwc:elseif={mostrarModalGestionGestorAsignado} style="text-align: center;">
-                        <p>¿La gestión a realizar es con el gestor del cliente?</p>
+                        <p>{textoOperativaDerivarGestor}</p>
                     </div>
                     <div lwc:elseif={mostrarModalGestionGestorGenerico} style="text-align: center;">
-                        <p>¿La gestión a realizar es con la oficina del cliente?</p>
+                       <p>{textoOperativaDerivarOficina}</p>
                     </div>
                     <template lwc:elseif={mostrarModalDNITestamentaria}>
                         <div style="text-align: center;">
-                            <lightning-input class="DNITestamentaria slds-align_absolute-center" label="Introduzca el documento de identidad del difunto" placeholder="Documento" value={DNITestamentaria} required="true"></lightning-input>
+                            <lightning-input class="DNITestamentaria slds-align_absolute-center" label={textoTestamentariaDocumentacion} placeholder="Documento" value={DNITestamentaria} required="true"></lightning-input>
                         </div>
                     </template>
                     <template lwc:elseif={mostrarFlowDerivar}>
@@ -480,21 +903,51 @@
                     <lightning-button label="Continuar" variant="brand" onclick={handleContinuarProceso}></lightning-button>
                     <lightning-button class="botonCancelar slds-var-m-left_small" label="Cancelar" onclick={cerrarModal}></lightning-button>
                 </div>
+                <!--Migración Toast-->
+                    
+                    <div lwc:elseif={mostrarModalToast} style="text-align: center;">
+                        <lightning-button label="Aceptar" variant="brand" onclick={cerrarModal}></lightning-button>
+                    </div>
+                    <div lwc:elseif={mostrarModalToastUrl} style="text-align: center;">
+                        <lightning-button label="Aceptar" variant="brand" onclick={cerrarModal}></lightning-button>
+                    </div>
+                    
+                    <!--Migración Toast-->
                 <div lwc:elseif={ambitoFraude} style="text-align: center;">
-                    <template if:false={mostrarModalPreguntaRealizarRemitido}>
-                        <template lwc:if={preguntaSenal}>
-                            <lightning-button label="Si" variant="brand" onclick={handlePreguntaSenalSi}></lightning-button>
-                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarPreguntaRealizarRemitido}></lightning-button>
+                    <div lwc:if={fraudeANivelDeMotivo}>
+                        <template if:false={mostrarModalPreguntaRealizarRemitido}>
+                            <template lwc:if={preguntaSenal}>
+                                <lightning-button label="Oficina" variant="brand" onclick={handleOficinaFraude}></lightning-button>
+                                <lightning-button label="Fraude" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarPreguntaRealizarRemitido}></lightning-button>
+                            </template>
+                            <template lwc:elseif={motivoDevolucionTemaFraude}>
+                                <lightning-button label="Si" variant="brand" onclick={motivoDevolucionTemaFraudeSi}></lightning-button>
+                                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={motivoDevolucionTemaFraudeNo}></lightning-button>
+                            </template>
                         </template>
-                    </template>
-                    <template if:true={mostrarModalPreguntaRealizarRemitido}>
-                        <template lwc:if={preguntaRealizarRemitido}>
-                            <lightning-button label="Si" variant="brand" onclick={handleRemitir}></lightning-button>
-                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarMensajeRemitir}></lightning-button>
+                        <template if:true={mostrarModalPreguntaRealizarRemitido}>
+                            <template lwc:if={preguntaRealizarRemitido}>
+                                <lightning-button label="Si" variant="brand" onclick={handleFraudeRemitir} disabled={pulsadoGenerarCasoFraude}></lightning-button>
+                                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarMensajeRemitir}></lightning-button>
+                            </template>
                         </template>
-                    </template>
+                    </div>
+                    <div lwc:else>
+                        <template if:false={mostrarModalPreguntaRealizarRemitido}>
+                            <template lwc:if={preguntaSenalAntigua}>
+                                <lightning-button label="Si" variant="brand" onclick={handlePreguntaSenalSi}></lightning-button>
+                                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarPreguntaRealizarRemitido}></lightning-button>
+                            </template>
+                        </template>
+                        <template if:true={mostrarModalPreguntaRealizarRemitido}>
+                            <template lwc:if={preguntaRealizarRemitido}>
+                                <lightning-button label="Si" variant="brand" onclick={handleRemitir}></lightning-button>
+                                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarMensajeRemitir}></lightning-button>
+                            </template>
+                        </template>          
+                    </div>
                 </div>    
-                <div lwc:elseif={grupoColaborador} style="text-align: center;">
+                <div lwc:elseif={mostrarModalTrasladarGrupoColaborador} style="text-align: center;">
                     <lightning-button label="Derivar" variant="brand" onclick={handleGrupoColaboradorDerivar}></lightning-button>
                     <lightning-button label="Trasladar" onclick={handleGrupoColaboradorTrasladar} class="botonCancelar slds-var-m-left_small"></lightning-button>
                 </div>
@@ -505,12 +958,13 @@
                             <lightning-button label="Cancelar" onclick={cerrarModal} class="slds-m-horizontal_small"></lightning-button>
                         </div>
                     </template>
-                    <template lwc:elseif={mostrarModalCreacionTarea}>
-                        <lightning-button label="Crear tarea" variant="brand"
-                        onclick={handleCrearTareaGestor}></lightning-button>
-                        <lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" style="position: absolute;"></lightning-spinner>
-                        <lightning-button class="slds-var-m-left_small" label="Cancelar"
-                        onclick={cerrarModal}></lightning-button>
+                    <template lwc:elseif={preguntaInformacionCompletaDocumentacion}>
+                        <lightning-button label="Si" variant="brand" onclick={preguntaInformacionCompletaDocumentacionSi}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaInformacionCompletaDocumentacionNo}></lightning-button>
+                    </template>
+                    <template lwc:elseif={trasladarDocumentacion}>
+                        <lightning-button label="Derivar" variant="brand" onclick={handleGrupoColaboradorDerivar}></lightning-button>
+                        <lightning-button label="Trasladar" onclick={handleGrupoColaboradorTrasladar} class="botonCancelar slds-var-m-left_small"></lightning-button>
                     </template>
                     <template lwc:elseif={preguntaCajeros}>
                         <lightning-button label="Si" variant="brand" onclick={preguntaCajerosSi}></lightning-button>
@@ -523,14 +977,184 @@
                     <template lwc:elseif={textoOportunidadExistente}>
                         <lightning-button label="Aceptar" variant="brand" onclick={cerrarModal}></lightning-button>
                     </template>
-                    <template lwc:elseif={preguntaCSBDContratar}>
-                        <lightning-button label="Si" variant="brand" onclick={preguntaCSBDContratarSi}></lightning-button>
-                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCSBDContratarNo}></lightning-button>
+                    <template lwc:elseif={mensajeDerivarAccionistas}>
+                        <lightning-button label="Si" variant="brand" onclick={handleRemitir}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleDerivarAccionistasNo} disabled={botonDesabilitado} ></lightning-button>
                     </template>
-                    <template lwc:elseif={preguntaCSBDContratar2}>
-                        <lightning-button label="Si" variant="brand" onclick={preguntaCSBDContratar2Si}></lightning-button>
-                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCSBDContratar2No}></lightning-button>
+                    <template lwc:elseif={preguntaTelefonoCSBD}>
+                        <lightning-button label="Si" variant="brand" onclick={handleTelefonoCorrecto}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleTelefonoIncorrecto} disabled={botonDesabilitado} ></lightning-button>
                     </template>
+                    <!--ARGOS-->
+                    <template lwc:elseif={operacionMFAArgos}>
+                        <lightning-button label="Seguridad" variant="brand" onclick={trasladoColaboradorArgos}></lightning-button>
+                        <lightning-button label="Oficina" class ='botonCancelar slds-var-m-left_small' variant="brand" onclick={preguntaMFAArgosOficina}></lightning-button>
+                    </template>
+                    <template lwc:elseif={diarioMFAArgos}>
+                        <lightning-button label="Seguridad" variant="brand" onclick={preguntaMFAArgosSeguridad}></lightning-button>
+                        <lightning-button label="Oficina" class ='botonCancelar slds-var-m-left_small' variant="brand" onclick={preguntaMFAArgosOficina}></lightning-button>
+                    </template>
+                    <template lwc:elseif={preguntasArgosActivas}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={handleSubmit}  disabled={preguntasCompletasArgos}></lightning-button>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' variant="brand" onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <template lwc:elseif={preguntaConfirmacionArgosActiva}>
+                        <lightning-button label="Continuar" variant="brand" onclick={trasladoColaboradorArgos}></lightning-button>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' variant="brand" onclick={returnPreguntasArgosActivas}></lightning-button>
+                    </template> 
+                    <!--ARGOS-->
+
+
+                    <!--MGT-->
+                    <template lwc:elseif={existeOppFormalizada}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={cerrarModal}></lightning-button>
+                    </template>  
+                    <template lwc:elseif={existeTareaRellamada}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={cerrarModal}></lightning-button>
+                    </template> 
+                    <template lwc:elseif={existeOppEnGestion}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={crearTareaRellamada} disabled={procesandoCreacionTarea}></lightning-button>
+                        <lightning-button label="Cancelar" class="botonCancelar slds-var-m-left_small" onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <!--MGT--> 
+                    <template lwc:elseif={ambitoCSBD}>
+                        <template lwc:if={preguntaCSBDContratar}>
+                            <lightning-button label="Si" variant="brand" onclick={preguntaCSBDContratarSi}></lightning-button>
+                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCSBDContratarNo}></lightning-button>
+                        </template>
+                        <template lwc:elseif={preguntaCSBDContratar2}>
+                            <lightning-button label="Si" variant="brand" onclick={preguntaCSBDContratar2Si}></lightning-button>
+                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCSBDContratar2No}></lightning-button>
+                        </template>
+                        <template lwc:elseif={mostrarModalCSBDNoContratar}>
+                            <lightning-button label="Aceptar" variant="brand" onclick={crearOportunidadApex}></lightning-button>
+                            <lightning-button label="Cancelar" class="botonCancelar slds-var-m-left_small" onclick={cerrarModal}></lightning-button>
+                        </template>
+                    </template>                   
+                    <template lwc:elseif={textoDocumentacionCertificado}>
+                        <lightning-button label="Si" variant="brand" onclick={preguntaDocumentacionCertificadoSi}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaDocumentacionCertificadoNo}></lightning-button>
+                    </template>
+                    <template lwc:elseif={preguntaInformacionRequeridaDocumentacion}>
+                        <lightning-button label="Si" variant="brand" onclick={preguntaInformacionRequeridaDocumentacionSi}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaInformacionRequeridaDocumentacionNo}></lightning-button>
+                    </template>
+                    <template lwc:elseif={casoCreadoDocumentacion}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={cerrarModal}></lightning-button>
+                    </template>
+
+                    <!-- MGT -->
+                   <template lwc:elseif={condicion1}>
+                        <lightning-button label="Si" variant="brand" onclick={handleSi}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleNo}></lightning-button>
+                    </template>
+                    <template lwc:elseif={condicion2}>
+                        <lightning-button label="Sí" variant="brand" onclick={handleSiPregunta}>
+                        </lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarMensajeRemitir}>
+                        </lightning-button>
+                    </template>
+                    <template lwc:elseif={condicion3}>
+                        <!--<lightning-button label="Aceptar" variant="brand" onclick={handleAceptar}></lightning-button>-->
+                    </template>
+                    <template lwc:elseif={mostrarPhisingSmishingMalware4}>
+                        <!-- <lightning-button label="Aceptar" variant="brand" onclick={handleAceptar}></lightning-button> -->
+                    </template> 
+
+                    <!-- CASHBACK FOOT -->
+                    <template lwc:elseif={CashBack1}>
+                        <lightning-button label="Trasladar" class="botonCancelar slds-var-m-horizontal_small" onclick={continuarCashBack}></lightning-button>
+                        <lightning-button label="Cancelar" variant="brand" onclick={cancelarCashBack}></lightning-button>
+                    </template>
+                    <!-- CASHBACK FOOT -->
+
+                    <!--Refinanciación Deudas-->
+                    <template lwc:elseif={RefinanciacionDeudas1}>
+                        <lightning-button label="Siguiente" class="botonCancelar slds-var-m-horizontal_small" onclick={handleCrearTareaGestor}></lightning-button>
+                        <lightning-button label="Cancelar" variant="brand" onclick={cancelarRefinanciacionDeudas}></lightning-button>
+                    </template>
+                    <!--Refinanciación Deudas-->
+
+                     <!--MECANISMO FIRMA FOOT-->
+                    <template lwc:elseif={preguntaMecanismoFirma}>
+                        <lightning-button label="Si" variant="brand" onclick={handleMFClienteEnElExtranjero}></lightning-button>
+                        <lightning-button label="No" class ='botonCancelar slds-var-m-left_small' variant="brand" onclick={handleMFClienteEnElPais}></lightning-button>
+                    </template>
+                    <template lwc:elseif={preguntaMecanismoFirmaDatos}>
+                        <lightning-button label="Confirmar datos" variant="brand" onclick={handleMFDatosConfirmar}></lightning-button>
+                    </template>  
+                    <template lwc:elseif={preguntaMecanismoFirmaIdentificador}>
+                        <lightning-button label="Si" variant="brand" onclick={handleMFIdentificadorBloqueado}></lightning-button>
+                        <lightning-button label="No" class ='botonCancelar slds-var-m-left_small' variant="brand" onclick={handleMFIdentificadorSinBloquear}></lightning-button>
+                    </template>  
+                    <template lwc:elseif={preguntaMecanismoFirmaClienteAutenticado}>
+                        <lightning-button label="Si" variant="brand" onclick={handleMFClienteIdentificado}></lightning-button>
+                        <lightning-button label="No" class ='botonCancelar slds-var-m-left_small' variant="brand" onclick={handleMFNull}></lightning-button>
+                    </template> 
+                    <!--MECANISMO FIRMA FOOT-->
+                    
+                    <!--MGT-->
+                    <template lwc:elseif={mostrarModalCreacionTarea}>
+                        <lightning-button label="Crear tarea" variant="brand"
+                        onclick={handleCrearTareaGestor}></lightning-button>
+                        <lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" style="position: absolute;"></lightning-spinner>
+                        <lightning-button class="slds-var-m-left_small" label="Cancelar"
+                        onclick={cerrarModal}></lightning-button>                        
+                    </template>
+
+                    <!-- AMENAZAS EMPLEADOS -->
+                    <!-- <template lwc:elseif={mensajeSolicitudDatosAmenazasEmpleados}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={parametrizacionDatos}></lightning-button>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' onclick={cerrarModal}></lightning-button>
+                    </template> -->
+                    <!-- AMENAZAS EMPLEADOS -->
+
+                    <!-- AMENAZAS SUICIDIOS -->
+                    <!-- <template lwc:elseif={mensajeSolicitudDatosAmenazasSuicidios}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={parametrizacionDatosAmenazasSuicidios}></lightning-button>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' onclick={cerrarModal}></lightning-button>
+                    </template> -->
+                    <!-- AMENAZAS SUICIDIOS -->
+
+                     <!--ONBOARDING / DESISTIR -->
+                    <template lwc:elseif={textoModalOnboarding}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={handleOnboarding}></lightning-button>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <template lwc:elseif={textoModalDesistir}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={handleOnboarding}></lightning-button>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <template lwc:elseif={derivadoBPO}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={cerrarModal}></lightning-button>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <template lwc:elseif={textoModalOnboardingCodigos}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={cerrarCasoOnboarding}></lightning-button>
+                    </template>
+                    <!--ONBOARDING / DESISTIR -->
+                   
+                    <!-- DERIVAR SAC -->
+                    <template lwc:elseif={mostrarDerivarSAC}>
+                        <lightning-button label="Derivar al SAC" variant="brand" onclick={handleDerivarSAC}></lightning-button>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <!-- FIN DERIVAR SAC -->
+
+                    <!-- DEVOLVER SAC -->
+                    <template lwc:elseif={mostrarDevolverSAC}>
+                        <lightning-button label="Devolver al SAC" variant="brand" onclick={handleDevolverSAC}></lightning-button>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <!-- FIN DEVOLVER SAC -->
+
+                    <!-- ERROR CANAL PROCEDENCIA DERIVAR/DEVOLVER SAC -->
+                    <template lwc:elseif={mostrarCanalProcedenciaErroneo}>
+                        <lightning-button label="Cancelar" class ='botonCancelar slds-var-m-left_small' onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <!-- FIN ERROR CANAL PROCEDENCIA DERIVAR/DEVOLVER SAC -->
+                    
+
                     <!--<template if:false={mostrarModalPreguntaEnrollmentDatos}>
                         <template lwc:if={preguntaEnrollment}>
                             <lightning-button label="Si" variant="brand" onclick={handleMostrarEnrollmentDatos}></lightning-button>
@@ -549,9 +1173,10 @@
                             <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarPreguntaRealizarRemitido}></lightning-button>
                         </template>
                     </template>-->
+                    
                     <template lwc:elseif={mostrarModalPreguntaRealizarRemitido}>
                         <template lwc:if={preguntaRealizarRemitido}>
-                            <lightning-button label="Si" variant="brand" onclick={handleRemitir}></lightning-button>
+                            <lightning-button label="Si mostrarModalPreguntaRealizarRemitido" variant="brand" onclick={handleRemitir}></lightning-button>
                             <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarMensajeRemitir}></lightning-button>
                         </template>
                     </template>
@@ -559,6 +1184,8 @@
                         <lightning-button label="Si" variant="brand" onclick={handleAbrirModalCita}></lightning-button>
                         <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleGestionGestorAsignadoNo}></lightning-button>
                     </template>
+                    
+
                     <template lwc:elseif={mostrarModalGestionGestorGenerico}>
                         <lightning-button label="Si" variant="brand" onclick={handleGestionGestorDistintoSi}></lightning-button>
                         <lightning-button label="No" onclick={handleGestionGestorDistintoNo} class="botonCancelar slds-var-m-left_small"></lightning-button>
@@ -572,13 +1199,24 @@
                                 <template if:false={mostrarTareaModalCitaGestor}>
                                     <lightning-button label="Agendar cita gestor" variant="brand" disabled={ocultarBotonCita} onclick={confirmarCitaGestor}></lightning-button>
                                 </template>
+
                                 <lightning-button label="Cancelar" onclick={cerrarModal} class="slds-var-m-left_small"></lightning-button>
                             </template>
                         </template>
                     </template>
+                    
                 </div>
             </div>
+           
+            <!-- </div> -->
+            <!-- </div> -->
+        
+            <!-- </section> -->
         </div>
-    </section>
-    <div class="backdrop slds-backdrop"></div>
+        
+
+
+    <!-- <div class="backdrop slds-backdrop_open"></div> -->
+    <!-- </lightning-quick-action-panel> -->
+    <!-- <div class="backdrop slds-backdrop"></div> -->
 </template>

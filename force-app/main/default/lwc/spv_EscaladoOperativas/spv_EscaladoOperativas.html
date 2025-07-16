@@ -10,13 +10,52 @@
             <lightning-button data-id="enviarEscalado" label="Enviar escalado" icon-name="utility:send" onclick={handleEnviarEscalado} disabled={disableBotonEnviar}></lightning-button>
         </div>
         <div class="slds-var-p-left_x-small">
-            <lightning-button data-id="responderEscalado" label="Responder escalado" icon-name="utility:answer" onclick={abrirModalResponder} disabled={disableBotonDevolverEscalado}></lightning-button>
+            <lightning-button data-id="responderEscalado" label="Responder escalado" icon-name="utility:answer" onclick={abrirModalResponder} disabled={disableBotonResponderEscalado}></lightning-button>
+        </div>
+        <div class="slds-var-p-left_x-small">
+            <lightning-button data-id="cancelarEscalado" label="Cancelar escalado" icon-name="utility:close" onclick={handleCancelarEscalado} disabled={disableBotonCancelarEscalado}></lightning-button>
+        </div>
+        <div class="slds-var-p-left_x-small">
+            <lightning-button data-id="botonVolverEscalar" label="Volver a escalar" icon-name="utility:arrowup" onclick={abrirModalVolverEscalar} disabled={disableBotonVolverAEscalar}></lightning-button>
         </div>
     </div>
+
+
+
 
     <!--Spinner-->
     <template if:true={mostrarSpinner}>
         <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+
+
+    <!--Modal de volver a escalar-->
+    <template if:true={mostrarModalVolverEscalar}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-14" aria-modal="true" aria-describedby="modal-content-id-14" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalVolverEscalar}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="border"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-PasarEnvio" class="slds-text-heading_medium slds-hyphenate">Volver a escalar</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modalPasarEnvio-content-id">
+                        <lightning-textarea style="margin-top: 5px;" name="inputPropuestaLetrado" placeholder="Introduce la propuesta..." max-length ="255" label="Propuesta letrado" onchange={handleChangePropuestaLetrado}></lightning-textarea>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={cerrarModalVolverEscalar} class="slds-var-p-right_small"></lightning-button>
+                    <button class="slds-button slds-button_brand" onclick={handleVolverEscalar} title="Aceptar">Aceptar</button> 
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 
     <!--Modal responder-->
@@ -32,11 +71,11 @@
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                     <!--Picklist tipo de respuesta-->
                     <lightning-combobox
-                        label="Tipo de respuesta"
-                        value={selectedValueTipoRespuesta}
-                        placeholder="Selecciona un tipo de respuesta"
-                        options={picklistTipoRespuestaValues}
-                        onchange={handleTipoRespuestaChange}>
+                        label="Conclusión escalado"
+                        value={selectedValueConclusion}
+                        placeholder="Selecciona la conclusión"
+                        options={picklistConclusionValues}
+                        onchange={handleConclusionChange}>
                     </lightning-combobox>
                     <!--Campo Comentarios-->
                     <template if:true={mostrarComentarios}>

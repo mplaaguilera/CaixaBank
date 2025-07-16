@@ -2,6 +2,10 @@
 	llamadaUpdated: function(component, event, helper) {
 		if (event.getParams().changeType === 'ERROR') {
 			helper.mostrarToast('error', 'Problema recuperando datos de la llamada', component.get('v.errorLds'));
+		}else{
+			var llamada = component.get("v.llamada");
+			// Verificar si el RecordType es "Empleado"
+			component.set("v.esHDTEmpleado", llamada.RecordType.DeveloperName === "HDT_Empleado");
 		}
 	},
 
@@ -69,5 +73,13 @@
 			//eslint-disable-next-line @lwc/lwc/no-async-operation
 			window.setTimeout($A.getCallback(() => component.find('botonCrearCaso').focus()), 0);
 		}
-	}
+	},
+
+	handleAsociarMasiva: function(component, event, helper) {
+        component.set("v.isModalOpen", true);
+    },
+
+    closeModal: function(component, event, helper) {
+        component.set("v.isModalOpen", false);
+    }
 });

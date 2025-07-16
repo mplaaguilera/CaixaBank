@@ -60,7 +60,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>createQuickActionName</name>
-                    <value>SDOC__NewContact</value>
+                    <value>NewContact</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>lookupFieldName</name>
@@ -337,7 +337,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>createQuickActionName</name>
-                    <value>SDOC__NewContact</value>
+                    <value>NewContact</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>lookupFieldName</name>
@@ -739,7 +739,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>createQuickActionName</name>
-                    <value>SDOC__NewContact</value>
+                    <value>NewContact</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>lookupFieldName</name>

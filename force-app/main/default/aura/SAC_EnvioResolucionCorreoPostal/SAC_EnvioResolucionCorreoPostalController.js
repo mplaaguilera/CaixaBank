@@ -1,6 +1,7 @@
 ({
     inicio : function(component, event, helper)
     {
+        helper.fetchOptions(component);
         let busquedaCarta = component.get("c.buscaCartaPrevia");
         let idCaso = component.get("v.recordId");
         let tipo = component.get("v.procedencia");
@@ -15,10 +16,10 @@
                 component.set('v.provincia', respuesta.provincia);
                 component.set('v.pais', respuesta.pais);
                 component.set('v.idCarta', respuesta.idCarta);
-                component.set('v.documentoRedaccion', respuesta.documentoRedaccion);
-                component.set("v.idDocumentoRedaccion", respuesta.documentoRedaccion.Id);
+                // component.set('v.documentoRedaccion', respuesta.documentoRedaccion);
+                component.set("v.idDocumentoRedaccion", respuesta.documentoRedaccion);
                 component.set("v.idVersion", respuesta.versionRedaccion.Id);
-                component.set("v.idDoc", respuesta.documentoRedaccion.Id);
+                component.set("v.idDoc", respuesta.documentoRedaccion);
 
                 let paises = respuesta.opcionesPais;
                 var options = component.get('v.options');
@@ -70,6 +71,7 @@
     },
 
     handleSuccess : function(component, event, helper) {
+        console.log("Emtra success");
         var record = event.getParam("response");
         var apiName = record.apiName;
         var myRecordId = record.id; // ID of updated or created record
@@ -83,12 +85,15 @@
     handleSubmit : function(component, event, helper) {
         event.preventDefault();
         const fields = event.getParam('fields');
+        console.log("Campos a guardar:", JSON.stringify(fields));
         fields.SAC_Direccion__c = component.get("v.direccion");
         fields.SAC_CP__c = component.get("v.codigoPostal");
         fields.SAC_Poblacion__c = component.get("v.poblacion");
         fields.SAC_Provincia__c = component.get("v.provincia");
         fields.SAC_Pais__c = component.get("v.paisSeleccionado");
-        component.find('recordEditForm').submit(fields);
+        console.log("Campos a guardar:", JSON.stringify(fields));
+
+        component.find('editForm').submit(fields);
     },
 
     guardarDatos : function(component, event, helper) {
@@ -127,11 +132,21 @@
 
     abrirModalValidarDoc :  function(component, event, helper){
         component.set('v.modalValidarDoc', true);
+        component.set('v.modalSeleccionarDocs', false);
     },    
 
     cerrarModalValidarDoc :  function(component, event, helper){
         component.set('v.modalValidarDoc', false);
     }, 
+
+    abrirModalSeleccionarDocs :  function(component, event, helper){
+        component.set('v.modalSeleccionarDocs', true);
+    },    
+
+    cerrarModalSeleccionarDocs :  function(component, event, helper){
+        component.set('v.modalSeleccionarDocs', false);
+    }, 
+
 
     validarDocumentacion :  function(component, event, helper){
         var checkmarcado = component.get("v.checkConfirmacionValidacion");
@@ -139,6 +154,7 @@
         if (checkmarcado) {
             component.set('v.modalValidarDoc', false);
             helper.finalizar(component, event);
+            component.find("editForm").submit();
         }else {
             var toastEventWarning = $A.get("e.force:showToast");
             toastEventWarning.setParams({
@@ -148,5 +164,5 @@
             });
             toastEventWarning.fire();
         }
-    } 
+    }
 })

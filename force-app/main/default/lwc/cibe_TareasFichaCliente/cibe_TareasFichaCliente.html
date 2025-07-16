@@ -28,21 +28,21 @@
                         onsort={handleSortData}
                         default-sort-direction={defaultSort}>
                 </lightning-datatable>
-            </div>
-            <div class="slds-text-align_right slds-m-top_x-small">
+            </div> </br>
+            <div class=" slds-text-align_right slds-m-top_xx-small">
                 <lightning-button-group>
                     <lightning-button-icon icon-name="utility:arrow_left" size="medium" onclick={first}></lightning-button-icon>
                     <lightning-button-icon icon-name="utility:left" size="medium" onclick={previous}></lightning-button-icon>
                     <lightning-button-icon icon-name="utility:right" size="medium" onclick={next}></lightning-button-icon>
                     <lightning-button-icon icon-name="utility:arrow_right" size="medium" onclick={last}></lightning-button-icon>
                 </lightning-button-group>
-                <div class="slds-m-top_xx-small">
+                <div class="slds-m-top_xxx-small">
                     ({getPageNumber} / {getTotalPageNumber})
                 </div>
             </div>
-            <template if:true={isShowSpinner}>
+            <template if:true={isShowSpinner}> 
                 <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
             </template>
         </div>
-    </div>
+    </div>    
 </template>

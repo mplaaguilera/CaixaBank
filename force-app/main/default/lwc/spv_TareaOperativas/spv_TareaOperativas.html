@@ -23,6 +23,21 @@
             <div class="slds-var-p-left_x-small">
                 <lightning-button data-id="finalizarTarea" label="Finalizar tarea" icon-name="utility:switch" onclick={handleAbrirModalFinalizarConBotonesPrincipales} disabled={disableBotonFinalizar}></lightning-button>
             </div>
+        </div> 
+        <div class="slds-align_absolute-center slds-var-m-top_medium">
+            <template if:false={anulacionSolicitada}>
+            <div class="slds-var-p-left_x-small">
+            <lightning-button data-id="SolicitarAnulacion" label="Solicitar Anulación" icon-name="utility:switch" onclick={handleAbrirModalSolicitarAnulacion} disabled={disableBotonSolicitar}></lightning-button>
+            </div>
+            </template>
+            <template if:true ={anulacionSolicitada}>
+                <div class="slds-var-p-left_x-small">
+                    <lightning-button data-id="cancelarSolicitud" label="Cancelar Solicitud" icon-name="utility:switch" onclick={handleCancelarSolicitud}></lightning-button>
+                </div>
+                <div class="slds-var-p-left_x-small">
+                    <lightning-button data-id="aceptarAnulacion" label="Aceptar Anulación" icon-name="utility:switch" onclick={handleAceptarAnulacion}></lightning-button>
+                </div>
+            </template>
         </div>
     </template>
 
@@ -54,7 +69,25 @@
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Devolver al gestor/letrado</h2>
                 </header>
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                    <lightning-textarea name="inputMotivo" value={motivoDevolver} onchange={changeMotivoDevolver} label="Indique el motivo de la devolución:" required></lightning-textarea>
+                    <lightning-combobox
+                    name="progress"
+                    label="Seleccione el motivo de la devolución"
+                    value={motivoDevolverValue}
+                    placeholder="Select Progress"
+                    options={optionsMotivo}
+                    onchange={handleChange}
+                    required
+                    ></lightning-combobox>
+                    <template if:true={isOtros}>
+                        <lightning-textarea
+                            name="inputMotivo"
+                            value={motivoOtros}
+                            onchange={changeMotivoDevolver}
+                            label="Indique el motivo de la devolución:"
+                            required>
+                        </lightning-textarea>
+                    </template>
+                    <!-- <lightning-textarea name="inputMotivo" value={motivoDevolver} onchange={changeMotivoDevolver} label="Indique el motivo de la devolución:" required></lightning-textarea> -->
                 </div>
                 <footer class="slds-modal__footer">
                     <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={handleCerrarModalDevolverGestorLetrado} class="slds-var-p-right_small"></lightning-button>
@@ -131,6 +164,34 @@
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 
+        <!--Modal solicitar Anulación -->
+        <template if:true={mostrarModalSolicitarAnulacion}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={handleCerrarModalSolicitarAnulacion}>
+                            <lightning-icon icon-name="utility:close" size="small" alternative-text="Cerrar"></lightning-icon>
+                        </button>
+                        <h2 id="modal-heading-05" class="slds-text-heading_medium slds-hyphenate">Solicitar Anulación</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-5">
+                            <lightning-textarea
+                                name="inputMotivoSolicitud"
+                                value={motivoSolicitud}
+                                onchange={changeMotivoSolicitud}
+                                label="Indique el motivo para solicitar la anulacion:"
+                                required>
+                            </lightning-textarea>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={handleCerrarModalSolicitarAnulacion} class="slds-var-p-right_small"></lightning-button>
+                        <lightning-button variant="brand" label="Solicitar" title="Solicitar" onclick={handleSolicitarAnulacion}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
     <!--Modal notificar tarea-->
     <template if:true={mostrarModalNotificar}>
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
@@ -152,4 +213,15 @@
         </section>
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
+
+    <template if:true={anulacionSolicitada}>
+        <article class="slds-card" style="margin-bottom: 5px; margin-top: 5px; background-color: darkorange; border: 2px black; border-radius: 8px;">
+            <div class="slds-card__header slds-grid slds-text-color_inverse ">
+                <div class="slds-float_left" style="padding-left: 10px;">
+                    <span>Anulación de la tarea pendiente por aceptar...</span>
+                </div>
+            </div>
+        </article>
+    </template>
+
 </template>

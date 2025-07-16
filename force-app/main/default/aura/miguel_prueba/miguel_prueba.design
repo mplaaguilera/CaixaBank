@@ -1,0 +1,9 @@
+<design:component label="Hello World_MGT">
+    <design:attribute name="subject" label="Subject" description="Name of the person you want to greet" />
+    <design:attribute name="greeting" label="Greeting" />
+    <design:attribute name="width" label="Width" default="100%" />
+
+    <design:attribute name="BúsquedaPorDNISinDuplicados" label="Búsqueda por DNI nueva (Sin duplicados)1" default="true"/>
+
+    <design:attribute name="busquedaPorDniSinDuplicados" label="Búsqueda por DNI nueva(Sin duplicados)2" default="false"/>
+</design:component>

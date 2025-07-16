@@ -1,30 +1,70 @@
 <template>
         <div class="slds-grid">
-                <div class="slds-col slds-size_1-of-2">
-                        <lightning-combobox
-                                id="comboMotivo"
-                                name="Motivo Allanamiento"
-                                label="Motivo de allanamiento"
-                                value={selectedOptionMotivo}
-                                placeholder={escaladoMotivo}
-                                options={optionsMotivo}
-                                onchange={handleOptionChangeMotivo} 
-                                style='margin-left: 7px; margin-right: 7px;'
-                                variant="label-inline">
-                        </lightning-combobox>
+                <div class="slds-col slds-size_1-of-2" style='padding-right: 14px; padding-left: 14px;'>
+                        <template if:true={editarCampos}>
+                                <lightning-combobox
+                                        id="comboMotivo"
+                                        name="Motivo Allanamiento"
+                                        label="Motivo de allanamiento"
+                                        value={selectedOptionMotivo}
+                                        placeholder={placeholderEscaladoMotivo}
+                                        options={optionsMotivo}
+                                        onchange={handleOptionChangeMotivo} 
+                                        variant="label-inline">
+                                </lightning-combobox>
+                        </template>
+                        <template if:false={editarCampos}>
+                                <lightning-layout-item class="slds-form-element_readonly" size="12" >
+                                        <lightning-layout>
+                                        <lightning-layout-item size="4" class="slds-border_bottom">
+                                                <div class="slds-form-element">
+                                                <span class="slds-form-element__label">Motivo de allanamiento</span>
+                                                </div>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="7" class="slds-border_bottom">
+                                                <div class="slds-form-element">
+                                                <span class="slds-form-element__static">{escaladoMotivo}</span>
+                                                </div>   
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                        </lightning-layout-item>
+                                        </lightning-layout>
+                                </lightning-layout-item>
+                        </template>        
                 </div>
-                <div class="slds-col slds-size_1-of-2">
-                        <lightning-combobox
-                                id="comboAnalisis"
-                                name="Analisis Allanamiento/Desistimientoo"
-                                label="Análisis Allanamiento/Desistimiento"
-                                value={selectedOptionAnalisis}
-                                placeholder={escaladoAnalisis}
-                                options={optionsAnalisis}
-                                onchange={handleOptionChangeAnalisis} 
-                                style='margin-right: 7px; margin-left: 7px;'
-                                variant="label-inline">
-                        </lightning-combobox>
+                <div class="slds-col slds-size_1-of-2" style='padding-right: 14px; padding-left: 14px;'>
+                        <template if:true={editarCampos}>
+                                <lightning-combobox
+                                        id="comboAnalisis"
+                                        name="Analisis Allanamiento/Desistimientoo"
+                                        label="Análisis Allanamiento/Desistimiento"
+                                        value={selectedOptionAnalisis}
+                                        placeholder={placeholderEscaladoAnalisis}
+                                        options={optionsAnalisis}
+                                        onchange={handleOptionChangeAnalisis} 
+                                        variant="label-inline">
+                                </lightning-combobox>
+                        </template>
+                        <template if:false={editarCampos}>
+                                <lightning-layout-item class="slds-form-element_readonly" size="12" >
+                                        <lightning-layout>
+                                        <lightning-layout-item size="4" class="slds-border_bottom">
+                                                <div class="slds-form-element">
+                                                <span class="slds-form-element__label">Análisis Allanamiento/Desistimiento</span>
+                                                </div>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="7" class="slds-border_bottom">
+                                                <div class="slds-form-element">
+                                                <span class="slds-form-element__static">{escaladoAnalisis}</span>
+                                                </div>   
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                        </lightning-layout-item>
+                                        </lightning-layout>
+                                </lightning-layout-item>
+                        </template>        
                 </div>
         </div>
 </template>

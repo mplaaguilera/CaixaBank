@@ -9,6 +9,7 @@ export default class Sac_TiempoNegociacion extends LightningElement {
     @api objectApiName;
 
     @track tiempoNegociacion;
+    @track tiempoFinNegociacion;
     @track negociacion;
     // @track fechaNegociacion;
     @track fechaFinal;
@@ -28,10 +29,11 @@ export default class Sac_TiempoNegociacion extends LightningElement {
         if(result.data){
             this.negociacion = result.data.fechaNegociacion;
             this.tiempoNegociacion = result.data.slaNegocio;
+            this.tiempoFinNegociacion = result.data.fechaFinNegociacion;
             
             //this.fechaNegociacion = new Date(this.negociacion);
-            this.fechaFin = new Date(this.negociacion);
-            this.fechaFin.setDate(this.fechaFin.getDate() + this.tiempoNegociacion);
+            this.fechaFin = new Date(this.tiempoFinNegociacion);
+            // this.fechaFin.setDate(this.tiempoFinNegociacion.getDate() + this.tiempoNegociacion);
             // Se indica la fecha de fin como las 23:59 del día de vencimiento por el cálculo de SLA con días completos US961684
             this.fechaFin.setHours(23, 59, 59, 0);
             //this.fechaAhora = new Date();

@@ -21,7 +21,7 @@ export default class csbdMacRelatedList extends NavigationMixin(LightningElement
 			typeAttributes: {year: '2-digit', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit'}},
 		{label: 'Oportunidad', fieldName: '_oportunidadUrl', type: 'url', initialWidth: 109, hideDefaultActions: true,
 			typeAttributes: {label: {fieldName: 'CSBD_Identificador__c'}}},
-		{label: 'Estado', fieldName: 'CSBD_Estado__c', initialWidth: 90, hideDefaultActions: true},
+		{label: 'Producto', fieldName: 'CSBD_Producto__c', initialWidth: 90, hideDefaultActions: true},
 		{label: 'Propietario', fieldName: '_ownerUrl', type: 'url', hideDefaultActions: true,
 			typeAttributes: {label: {fieldName: '_ownerName'}}},
 		{label: 'Vincular', type: 'button-icon', fixedWidth: 74, hideDefaultActions: true,
@@ -64,23 +64,22 @@ export default class csbdMacRelatedList extends NavigationMixin(LightningElement
 			message: `Se definirá la oportunidad seleccionada ${seleccionada.CSBD_Identificador__c} como padre de la actual. ¿Quieres continuar?`
 		})) {
 			this.spinner = true;
-			const oportunidadPadre = {
-				Id: this.recordId,
-				[OPP_PARENT_ID.fieldApiName]: seleccionada.Id
-			};
-			updateRecord({fields: oportunidadPadre})
+			updateRecord({fields: {Id: this.recordId, [OPP_PARENT_ID.fieldApiName]: seleccionada.Id}})
+			.then(() => {
+				crearTareaVinculacionApex({recordId: this.recordId, identificadorParent: seleccionada.CSBD_Identificador__c})
 				.then(() => {
-					crearTareaVinculacionApex({recordId: this.recordId, identificadorParent: seleccionada.CSBD_Identificador__c})
-					.catch(error => errorApex(this, error, 'Problema creando la tarea de la oporunidad'));
-
 					toast('success', 'Se vinculó la oportunidad', `Se vinculó correctamente la oportunidad con la ${seleccionada.CSBD_Identificador__c}`);
 					this[NavigationMixin.Navigate]({
 						type: 'standard__recordPage',
 						attributes: {recordId: seleccionada.Id, actionName: 'view'}
 					});
 					notifyRecordUpdateAvailable([{recordId: this.recordId}]);
-				}).catch(error => errorApex(this, error, 'Problema vinculando las oportunidades'))
+				}).catch(error => errorApex(this, error, 'Problema creando la tarea de la oporunidad'))
 				.finally(() => this.spinner = false);
+			}).catch(error => {
+				errorApex(this, error, 'Problema vinculando las oportunidades');
+				this.spinner = false;
+			});
 		}
 	}
 }

@@ -1,6 +1,6 @@
 <template>
     <br/>
-    <lightning-card title="Reclamaciones SAC relacionadas" icon-name="">
+    <lightning-card title={tituloInicial} icon-name="">
 
         <div class="slds-grid slds-wrap">
           <template if:true={existenReclamaciones}>
@@ -9,10 +9,18 @@
                 <!--INFORMACION RECLAMACION-->
                 <lightning-card title={reclamacion.reclamacionActual.CaseNumber} icon-name="standard:case" class="slds-card_boundary" variant="narrow" style="width: 100%">
                   <div class="slds-m-left_small slds-text-heading_small">
-                    <p>Asunto:
-                      <lightning-button style="padding-left:8px" variant="base" id={reclamacion.reclamacionActual.Id} label={reclamacion.reclamacionActual.Subject}
-                        onclick={navigateToCase} ></lightning-button>
-                    </p>
+                    <template if:true={esRegistroSAC}>
+                      <p>Asunto:
+                        <lightning-button style="padding-left:8px" variant="base" id={reclamacion.reclamacionActual.Id} label={reclamacion.reclamacionActual.Subject}
+                          onclick={navigateToCase} ></lightning-button>
+                      </p>
+                    </template>
+                    <template if:false={esRegistroSAC}>
+                      <p>Número Expediente:
+                        <lightning-button style="padding-left:8px" variant="base" id={reclamacion.reclamacionActual.Id} label={reclamacion.reclamacionActual.SPV_NumExpediente__c}
+                          onclick={navigateToCase} ></lightning-button>
+                      </p>
+                    </template>
                   </div>
                   <div class="slds-m-left_small  slds-grid slds-wrap slds-text-heading_small">
                     <div class="slds-size_6-of-12">
@@ -135,6 +143,27 @@
                                             &nbsp; 
                                           </dd>
                                         </template>
+                                        <!-- Representar los numeros de contrato de cada pretension -->
+                                        <dt class="slds-item_label slds-text-color_weak" title="Nº Contratos">
+                                          NºContratos:
+                                        </dt>
+                                        <div>
+                                          <br/>
+                                          <template if:true={pretension.contratosPret}>
+                                            <template for:each={pretension.contratosPret} for:item="contrato">
+                                              <div key={contrato} >
+                                                 <span class="slds-item_label slds-text-color_weak" title={contrato}>
+                                                  {contrato}
+                                                </span>
+                                              </div>
+                                            </template>
+                                          </template>
+                                          <template if:false={pretension.contratosPret}>
+                                            <dd class="slds-item_detail">
+                                              &nbsp; 
+                                            </dd>
+                                          </template>
+                                        </div>
                                       </dl>
                                     </div>
                                   </div>
@@ -148,7 +177,6 @@
                     </template>
                   </div>
                 </lightning-card>
-                <!-- <hr key={reclamacion.reclamacionActual.Id} /> -->
               </div>
             </template>
     

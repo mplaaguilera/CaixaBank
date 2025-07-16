@@ -65,7 +65,7 @@
                                                 <template for:each={product.lstContratos} for:item="contrato">
                                                     <tr key={contrato}>
                                                         <td class="column-cell">
-                                                            <lightning-button-icon data-id={contrato.id} data-description={contrato.description} data-product={product.nameProduct} icon-name="utility:link" alternative-text="Vincular contrato a la pretensión" class="slds-var-m-left_xxx-small" title="Vincular contrato a la pretensión" onclick={handleLink}></lightning-button-icon>
+                                                            <lightning-button-icon data-id={contrato.id} data-description={contrato.description} data-product={product.nameProduct} data-apertura={contrato.openDate} data-cancelacion={contrato.cancelDate} icon-name="utility:link" alternative-text="Vincular contrato a la pretensión" class="slds-var-m-left_xxx-small" title="Vincular contrato a la pretensión" onclick={handleLink}></lightning-button-icon>
                                                         </td>
                                                         <td class="column-cell">
                                                             {contrato.id}

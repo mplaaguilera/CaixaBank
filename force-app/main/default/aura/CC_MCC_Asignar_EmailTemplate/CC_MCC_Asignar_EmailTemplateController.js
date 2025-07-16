@@ -8,7 +8,6 @@
     //Comprobar si selecciona si es sdocs
     loadItemPlantillaOptions: function (component, event, helper) {
         var opts = [
-            { value: "SDOCS", label: "Plantillas S-Docs" },
             { value: "SALESFORCE", label: "Plantillas Salesforce " }
         ];
         component.set("v.optionsItemPlantilla", opts);
@@ -89,9 +88,5 @@
     },
     handleClickCancelar : function(component, event, helper) {
         $A.get("e.force:closeQuickAction").fire(); 
-    },
-    buscarPlantillaSDOC : function(component, event, helper) {
-        component.set("v.nombrePlantillaElegido", false);
-        helper.loadPlantillaSDOC(component,event,helper);    
-    },
+    }
 })

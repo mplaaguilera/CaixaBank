@@ -134,10 +134,9 @@
                                                 action6.setCallback(this, function(response) {
                                                     var state = response.getState();
                                                     if(state === "SUCCESS"){
-                                                        component.set('v.tieneContratos', response.getReturnValue());
-                                                        if(response.getReturnValue() === false){
+                                                        if(response.getReturnValue() === true){
                                                             component.set('v.tieneContratos', false);
-                                                            component.set('v.mensaje', 'La reclamación debe tener dado de alta al menos un contrato en alguna de sus pretensiones');
+                                                            component.set('v.mensaje', 'La reclamación debe tener dado de alta al menos un contrato en cada una de sus pretensiones');
                                                         }else{
                                                             component.set('v.tieneContratos', true);
                                                         }
@@ -166,7 +165,7 @@
                                                                 component.set('v.copia', wrapper.copia);
 
                                                                 component.set('v.caso', wrapper.caso);
-                                                                //component.set('v.ficherosAdjuntos', wrapper.adjuntos);
+                                                                component.set('v.ficherosAdjuntos', wrapper.adjuntos);
 
                                                         
                                                             }
@@ -232,7 +231,7 @@
                                                         component.set('v.copia', wrapper.copia);
 
                                                         component.set('v.caso', wrapper.caso);
-                                                        //component.set('v.ficherosAdjuntos', wrapper.adjuntos);
+                                                        component.set('v.ficherosAdjuntos', wrapper.adjuntos);
 
                                                         
                                                     }

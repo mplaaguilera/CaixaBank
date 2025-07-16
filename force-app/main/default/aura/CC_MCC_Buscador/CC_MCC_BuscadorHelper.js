@@ -37,5 +37,35 @@
 			'duration': 4000
 		});
 		toastEvent.fire();
-	}
+	},
+	
+	recargarKnowledge: function(component) {
+        console.log('Iniciando recarga de datos en CC_MCC_Buscador...');
+
+        // Ajusta este nombre según tu método Apex que recupera los resultados.
+        let action = component.get("c.obtenerResultadosKnowledge");
+
+        // Parámetros (si tu método Apex necesita alguno)
+        action.setParams({
+            recordId: component.get("v.recordId") // o el parámetro que uses
+        });
+
+        action.setCallback(this, response => {
+            let state = response.getState();
+            if (state === "SUCCESS") {
+                let resultados = response.getReturnValue();
+                console.log('Resultados recibidos:', resultados);
+
+                // Ajusta este nombre de atributo según cómo se llame en tu componente
+                component.set("v.resultadosKnowledge", resultados);
+            } else if (state === "ERROR") {
+                let errors = response.getError();
+                console.error('Error al recargar:', errors);
+            } else {
+                console.warn('⚠️ Estado inesperado:', state);
+            }
+        });
+
+        $A.enqueueAction(action);
+    }
 });

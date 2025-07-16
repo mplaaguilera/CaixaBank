@@ -1,0 +1,281 @@
+.header-container {
+    background-color: #f3f3f3;
+    border-bottom: 1px solid #d8dde6;
+    border-radius: 0.25rem 0.25rem 0 0;
+    align-items: center;
+}
+
+.custom-backdrop {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100vh;
+background-color: rgba(0, 0, 0, 0.4);
+z-index: 1040;
+}
+
+.animacion-in {
+	left: 0;
+	height: 100vh;
+	width: 100%;
+	padding: 30px 20px;
+	line-height: 1rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transform: translateY(-100%);
+    animation: slide-in .5s ease; 
+    animation-fill-mode: forwards;
+    z-index: 1050;
+}
+
+.animacion-out {
+	left: 0;
+	height: 100vh;
+	width: 100%;
+	padding: 30px 20px;
+	line-height: 1rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transform: translateY(-100%);
+    animation: slide-out 0.3s ease; 
+    animation-fill-mode: forwards;
+    z-index: 1050;
+}
+
+@keyframes slide-in {
+	0% {
+		transform: translateY(100%);
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+
+@keyframes slide-out {
+	0% {
+		transform: translateY(0);
+	}
+	100% {
+		transform: translateY(100%);
+	}
+}
+
+.note-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    align-items: center;
+}
+
+.notes-title {
+    /*font-size: 1.1rem;*/
+    line-height: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.note-item {
+    line-height: 1.0;
+    margin-bottom: 0;
+    background: white;
+    padding: 0;
+}
+
+.acortar {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.titulo-nota-individual {
+    font-size: 0.85rem;
+    color: #2087d8;
+}
+
+.acortar-titulo {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+}
+
+.subrayado-on-mouse-over {
+    cursor: pointer;
+}
+.subrayado-on-mouse-over :hover {
+    text-decoration: underline;
+}
+
+.columnaTitulo {
+    max-width: 250;
+    min-width: 250;
+    
+}
+
+.acortarTituloBoton {
+    white-space: nowrap;
+    line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 190;
+    display: inline-block;
+}
+
+
+
+
+.borde-item {
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.boton-user {
+    margin: 0;
+    color: #2087d8;
+    padding: 0;
+    line-height: 1.25;
+    display: inline-block;
+}
+
+.div-user {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+
+
+.custom-footer {
+    border-top: 1px solid #c9c9c9;
+    height: 40px;
+    align-items: center;
+}
+
+
+
+.nombre-campo-nota {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.campo-titulo-nota {
+    margin: 0;
+    overflow-wrap: break-word;
+    text-align: justify;
+}
+
+.div-titulo-nota {
+    margin-left: 10px;
+    padding-left: 5px;
+    margin-right: 10px;
+    padding-right: 5px;
+    margin-bottom: 5px;
+}
+
+.div-contenido-nota {
+    border: 1px solid #d8dde6;
+    margin-left: 10px;
+    padding-left: 5px;
+    margin-right: 10px;
+    padding-right: 5px;
+    margin-bottom: 5px;
+}
+
+.contenido-nota-rich-text {
+    margin: 0;
+}
+
+.nombre-campo-nota-add {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.sugerencias {
+    border: 1px solid #d8dde6;
+    max-height: 150px;
+    overflow-y: auto;
+    background: white;
+    position: absolute;
+    width: 80%;
+    z-index: 1000;   
+}
+
+.sugerencias li:hover {
+    background-color: #d8dde6;
+}
+
+.sugerencias li {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    cursor: pointer;
+    width: 100%;
+
+}
+
+.div-sugerencia {
+    align-items: center;
+    vertical-align: center;
+}
+
+.texto-sugerencia {
+    vertical-align: center;
+}
+
+.barra-busqueda {
+    align-content: center;
+}
+
+.margen-sup {
+    margin-top: 15px;
+}
+
+.selected-list {
+    margin-top: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #d8dde6;
+}
+
+.selected-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    margin-left: 5px;
+    border-bottom: 1px solid #d8dde6;
+}
+
+.boton-eliminar {
+    align-self: right;
+    margin-left: auto;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    z-index: 10;
+}
+
+.boton-share {
+    z-index: 10;
+    align-self: left;
+    margin-right: auto;
+
+}
+
+.mensaje-share {
+    margin-top: 10px;
+    height: 100px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

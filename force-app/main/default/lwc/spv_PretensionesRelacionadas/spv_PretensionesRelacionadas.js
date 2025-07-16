@@ -109,7 +109,7 @@ export default class SAC_LCMP_PretensionesRelacionadas extends NavigationMixin(L
 
     get comprobarStatus() {
         let estado = this.statusReclamacion;
-        if(estado != 'SAC_002' && estado != 'SAC_001'){
+        if(estado != 'SPV_AnalisisDecision' && estado != 'SAC_001'){
             return true;
         }else{
             return false;

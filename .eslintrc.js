@@ -1,9 +1,15 @@
-//File removed: /Users/marcpla/Documents/Feina/Projectes/CaixaBank/eslint.config.mjs
+const eslintPluginLwc = require('@lwc/eslint-plugin-lwc');
+const babelParser = require('@babel/eslint-parser');
 
-//New file created: .eslintrc.js
 module.exports = {
 	root: true,
-	extends: ['@salesforce/eslint-config-lwc'],
+	parser: '@babel/eslint-parser',
+	parserOptions: {
+		requireConfigFile: false,
+		babelOptions: {
+			presets: ['@babel/preset-env']
+		}
+	},
 	overrides: [
 		{
 			files: ['**/*.{js,mjs,cjs}'],
@@ -11,9 +17,6 @@ module.exports = {
 				browser: true,
 			},
 			rules: {
-				'@lwc/lwc/no-unexpected-wire-adapter-usages': 'off',
-				'@lwc/lwc/no-async-operation': 'off',
-				'@locker/locker/distorted-window-set-timeout': 'off',
 				'indent': ['warn', 'tab', {'SwitchCase': 1, 'MemberExpression': 'off'}],
 				'linebreak-style': ['error', 'unix'],
 				'quotes': ['error', 'single'],
@@ -93,15 +96,25 @@ module.exports = {
 				'no-return-await': 'off',
 				'no-unused-expressions': 'off',
 				'compat/compat': 'off',
-				'@lwc/lwc/no-async-await': 'off',
-				'@lwc/lwc/no-for-of': 'off',
-				'@salesforce/aura/ecma-intrinsics': 'off'
+
 			}
 		},
 		{
-			files: ['force-app/main/default/aura/**/*.js'],
-			plugins: ['@salesforce/eslint-plugin-aura'],
-			extends: ['plugin:@salesforce/aura/recommended']
+			files: ['force-app/main/default/**/*.js'],
+			plugins: ['@salesforce/eslint-plugin-aura', '@lwc/eslint-plugin-lwc'],
+			extends: ['plugin:@salesforce/aura/recommended', '@salesforce/eslint-config-lwc'],
+			rules: {
+				'@lwc/lwc/no-unexpected-wire-adapter-usages': 'off',
+				'@lwc/lwc/no-async-operation': 'off',
+				'@locker/locker/distorted-window-set-timeout': 'off',
+				'@lwc/lwc/no-async-await': 'off',
+				'@lwc/lwc/no-for-of': 'off',
+				'@salesforce/aura/ecma-intrinsics': 'off',
+				'no-return-assign': 'off',
+				'no-unused-expressions': 'off',
+				'no-return-await': 'warn',
+				'compat/compat': 'off'
+			}
 		}
 	]
 };

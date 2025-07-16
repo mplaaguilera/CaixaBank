@@ -15,7 +15,13 @@
 
                 <div class="slds-grid slds-var-m-bottom_x-large slds-grid_vertical-align-end">
                     <div class="slds-col slds-grow-none" style="flex: 0 1 220px; max-width: 220px;">
-                        <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Tipo de cita</label>
+                        <label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Tipo de cita                     
+                        </label>
+                        <lightning-helptext if:true={componente.mostrarIconoInfo} 
+                            icon-name="utility:info" 
+                            content="La oficina del gestor solo puede atender citas telefónicas">
+                        </lightning-helptext>
                         <lightning-radio-group lwc:ref="inputTipoCita" options={componente.tipoCitaOptions} value={tipoCitaSeleccionada} type="button" variant="label-hidden" required onchange={handleTipoCitaChange} disabled={botonesDisabled}></lightning-radio-group>
                     </div>
 

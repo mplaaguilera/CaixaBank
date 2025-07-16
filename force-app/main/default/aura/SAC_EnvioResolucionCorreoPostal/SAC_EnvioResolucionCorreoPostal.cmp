@@ -15,8 +15,9 @@
 
     <aura:attribute name="idCarta" type="id" default="" />
     <aura:attribute name="procedencia" type="String" default="redacción" />
+    <aura:attribute name="procedenciaAdj" type="String" />
 
-    <aura:attribute name="documentoRedaccion" type="ContentDocument" />
+    <!-- <aura:attribute name="documentoRedaccion" type="ContentDocument" /> -->
     <aura:attribute name="idDocumentoRedaccion" type="String" />
     <aura:attribute name="idVersion" type="String" />
 
@@ -32,7 +33,22 @@
     <aura:attribute name="idDoc" type="String[]" />
 
     <aura:attribute name="modalValidarDoc" type="Boolean" default="false" />
+    <aura:attribute name="modalSeleccionarDocs" type="Boolean" default="false" />
+
     <aura:attribute name="checkConfirmacionValidacion" type="Boolean" default="false" />
+
+    <aura:attribute name="seleccionarReclamacion" type="Boolean" default="false"/>
+
+    <aura:attribute name="idsFicherosAdjuntos" type="String[]" />
+
+    <aura:attribute name="optionsGruposTarea" type="List" default="[]" />
+    <aura:attribute name="filteredOptionsGruposTarea" type="List" default="[]" />
+    <aura:attribute name="selectedValue" type="String" default="" />
+    <aura:attribute name="equipoResponsableId" type="String" default="" />
+    <aura:attribute name="searchTerm" type="String" default="" />
+    <aura:attribute name="isDropdownOpen" type="Boolean" default="false" />
+    <aura:attribute name="recordId" type="Id" />
+
 
 
 
@@ -76,7 +92,7 @@
                 <lightning:fileCard fileId="{!v.idDocumentoRedaccion}" />
             </div>
             <div align='right' style="margin-top: 8px;">
-                <lightning:button variant="brand" label="Enviar" title="Enviar" onclick="{!c.abrirModalValidarDoc}" /> <!-- !c.finalizar-->
+                <lightning:button variant="brand" label="Enviar" title="Enviar" onclick="{!c.abrirModalSeleccionarDocs}" /> <!-- !c.finalizar-->
             </div>
         </div>
     </div>
@@ -139,6 +155,45 @@
         </section>
         <div class="slds-backdrop slds-backdrop_open"></div>
     </aura:if>
+
+    <aura:if isTrue="{!v.modalSeleccionarDocs}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                        onclick="{! c.cerrarModalSeleccionarDocs }"
+                                        alternativeText="Cerrar"
+                                        variant="bare-inverse"
+                                        class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Confirme la operación</h2>
+                </header>
+    
+                <div class="slds-modal__content slds-p-around_medium">
+                    <h2 class="slds-text-heading_medium slds-m-bottom_small">Seleccionar Adjuntos para la tarea: </h2>
+    
+                    <!-- Adjuntos -->
+                    <div class="slds-form-element">
+                        <p>Elementos Adjuntados: </p>
+                        <c:SAC_AdjuntosEmail aura:id="adjuntosComponent" 
+                                             idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" 
+                                             caseId="{!v.caso.Id}" 
+                                             consultaId="{!v.consulta.Id}" 
+                                             seleccionarReclamacion="{!v.seleccionarReclamacion}" 
+                                             adjuntosDerivar="{!v.adjuntosDerivar}" 
+                                             derivarAQuien="{!v.derivarAQuien}" 
+                                             procedencia="{!v.procedenciaAdj}"/>
+                    </div>
+                </div>
+    
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar" onclick="{! c.cerrarModalSeleccionarDocs }" />
+                    <lightning:button class="slds-button slds-button_brand" onclick="{! c.abrirModalValidarDoc }" title="Confirmar">Confirmar</lightning:button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
 
     <aura:if isTrue="{!v.modalValidarDoc}">
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">

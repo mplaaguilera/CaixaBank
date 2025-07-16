@@ -89,6 +89,7 @@ export default class Sac_GastosHipotecarios extends LightningElement {
             //Tasacion
             this.impTasacionReclamado = data.fields.SAC_ImpReclamadoTasacion__c.value;
             this.impTasacionResuelto = data.fields.SAC_ImpResueltoTasacion__c.value;
+            
             if(!this.lanzarWarning && data.fields.SAC_TasacionReclamado__c.value !== 'SAC_Yes' && (data.fields.SAC_TasacionReclamado__c.value === 'SAC_No' || (!(this.impTasacionReclamado > 0) && !(this.impTasacionResuelto > 0)))){
                 this.impTasacionBloqueado = true;
             }
@@ -106,7 +107,7 @@ export default class Sac_GastosHipotecarios extends LightningElement {
             var impResueltoGestoriaInicio = (this.impGestoriaResuelto == '' || this.impGestoriaResuelto == null) ? 0 : this.impGestoriaResuelto;
             var impResueltoRegistrosInicio = (this.impRegistroResuelto == '' || this.impRegistroResuelto == null) ? 0 : this.impRegistroResuelto;
             var impResueltoTasacionInicio = (this.impTasacionResuelto == '' || this.impTasacionResuelto == null) ? 0 : this.impTasacionResuelto;
-            this.sumatorioImpResueltosInicio = Number(impResueltoNotariaInicio) + Number(impResueltoGestoriaInicio) + Number(impResueltoRegistrosInicio) + Number(impResueltoTasacionInicio);
+            this.sumatorioImpResueltosInicio = Number((Number(impResueltoNotariaInicio) + Number(impResueltoGestoriaInicio) + Number(impResueltoRegistrosInicio) + Number(impResueltoTasacionInicio)).toFixed(2));
         } else if (error) {
             this.dispatchEvent(
             new ShowToastEvent({
@@ -134,17 +135,18 @@ export default class Sac_GastosHipotecarios extends LightningElement {
             const fields = event.detail.fields;
 
             //Damos valor a los campos de importe reclamado para actualizar el caso
-            fields.SAC_ImpReclamadoNotaria__c = (this.impNotariaReclamado == '') ? null : this.impNotariaReclamado;
-            fields.SAC_ImpReclamadoGestoria__c = (this.impGestoriaReclamado == '') ? null : this.impGestoriaReclamado;
-            fields.SAC_ImpReclamadoRegistros__c = (this.impRegistroReclamado == '') ? null : this.impRegistroReclamado;
-            fields.SAC_ImpReclamadoTasacion__c = (this.impTasacionReclamado == '') ? null : this.impTasacionReclamado;
-            fields.CC_Importe_Reclamado__c = Number(fields.SAC_ImpReclamadoNotaria__c) + Number(fields.SAC_ImpReclamadoGestoria__c) + Number(fields.SAC_ImpReclamadoRegistros__c) + Number(fields.SAC_ImpReclamadoTasacion__c);
+            fields.SAC_ImpReclamadoNotaria__c = (this.impNotariaReclamado === '') ? null : this.impNotariaReclamado;
+            fields.SAC_ImpReclamadoGestoria__c = (this.impGestoriaReclamado === '') ? null : this.impGestoriaReclamado;
+            fields.SAC_ImpReclamadoRegistros__c = (this.impRegistroReclamado === '') ? null : this.impRegistroReclamado;
+            fields.SAC_ImpReclamadoTasacion__c = (this.impTasacionReclamado === '') ? null : this.impTasacionReclamado;
+            fields.CC_Importe_Reclamado__c = Number((Number(fields.SAC_ImpReclamadoNotaria__c) + Number(fields.SAC_ImpReclamadoGestoria__c) + Number(fields.SAC_ImpReclamadoRegistros__c) + Number(fields.SAC_ImpReclamadoTasacion__c)).toFixed(2));
+            
 
             //Damos valor a los campos de importe resuelto para actualizar el caso
-            fields.SAC_ImpResueltoNotaria__c = (this.impNotariaResuelto == '') ? null : this.impNotariaResuelto;
-            fields.SAC_ImpResueltoGestoria__c = (this.impGestoriaResuelto == '') ? null : this.impGestoriaResuelto;
-            fields.SAC_ImpResueltoRegistros__c = (this.impRegistroResuelto == '') ? null : this.impRegistroResuelto;
-            fields.SAC_ImpResueltoTasacion__c = (this.impTasacionResuelto == '') ? null : this.impTasacionResuelto;
+            fields.SAC_ImpResueltoNotaria__c = (this.impNotariaResuelto === '') ? null : this.impNotariaResuelto;
+            fields.SAC_ImpResueltoGestoria__c = (this.impGestoriaResuelto === '') ? null : this.impGestoriaResuelto;
+            fields.SAC_ImpResueltoRegistros__c = (this.impRegistroResuelto === '') ? null : this.impRegistroResuelto;
+            fields.SAC_ImpResueltoTasacion__c = (this.impTasacionResuelto === '') ? null : this.impTasacionResuelto;
 
             
             //Si no es igual, significa que existen tareas de intereses legales, luego para el total de SAC_Importe_Resuelto__c debemos tener en cuenta esto
@@ -153,9 +155,9 @@ export default class Sac_GastosHipotecarios extends LightningElement {
                 var impInteresesLegales = this.impTotalResueltoInicial - this.sumatorioImpResueltosInicio;
 
                 //Al nuevo sumatorio de imp resueltos, le sumamos el impInteresesLegales, para obtener el SAC_Importe_Resuelto__c correcto
-                fields.SAC_Importe_Resuelto__c = Number(fields.SAC_ImpResueltoNotaria__c) + Number(fields.SAC_ImpResueltoGestoria__c) + Number(fields.SAC_ImpResueltoRegistros__c) + Number(fields.SAC_ImpResueltoTasacion__c) + Number(impInteresesLegales);
+                fields.SAC_Importe_Resuelto__c = Number((Number(fields.SAC_ImpResueltoNotaria__c) + Number(fields.SAC_ImpResueltoGestoria__c) + Number(fields.SAC_ImpResueltoRegistros__c) + Number(fields.SAC_ImpResueltoTasacion__c) + Number(impInteresesLegales)).toFixed(2));
             }else{
-                fields.SAC_Importe_Resuelto__c = Number(fields.SAC_ImpResueltoNotaria__c) + Number(fields.SAC_ImpResueltoGestoria__c) + Number(fields.SAC_ImpResueltoRegistros__c) + Number(fields.SAC_ImpResueltoTasacion__c);
+                fields.SAC_Importe_Resuelto__c = Number((Number(fields.SAC_ImpResueltoNotaria__c) + Number(fields.SAC_ImpResueltoGestoria__c) + Number(fields.SAC_ImpResueltoRegistros__c) + Number(fields.SAC_ImpResueltoTasacion__c)).toFixed(2));
             }
 
             let arrayImportes= [
@@ -163,8 +165,7 @@ export default class Sac_GastosHipotecarios extends LightningElement {
                         fields.SAC_ImpResueltoGestoria__c,
                         fields.SAC_ImpResueltoRegistros__c,
                         fields.SAC_ImpResueltoTasacion__c] //Number(fields.SAC_ImpResueltoInteresesLegales__c)
-
-            
+                        
             this.template.querySelector('lightning-record-edit-form').submit(fields);
 
             modificarImportesTarea({caseId: this.recordId, arrayImportes: arrayImportes}).then(result => {

@@ -1,6 +1,6 @@
 ({
     doInit : function(component, event, helper) {
-        //console.log('carga de datos');
+
         let getInfo = component.get("c.getInfoInit");
         let registro = component.get("v.recordId");
         getInfo.setParams({'recordId' : registro});
@@ -9,12 +9,7 @@
             if (state === "SUCCESS") {
                 let result = response.getReturnValue();
                 component.set('v.caso', result.caso);
-                // if(result.caso.CC_AcuseRecibo__c != '2'){
-                //     component.set('v.botonPulsado', false);
-                // }
-                // else{
-                //     component.set('v.botonPulsado', true);
-                // }
+
                 component.set("v.direccion", result.caso.SAC_DireccionContacto__c);
                 component.set("v.poblacion", result.caso.SAC_PoblacionContacto__c);
                 component.set("v.provincia", result.caso.SAC_ProvinciaContacto__c);
@@ -32,21 +27,29 @@
                 }
                 if((result.caso.OS_Email__c != '' && result.caso.OS_Email__c != undefined) || (result.caso.SuppliedEmail != '' && result.caso.SuppliedEmail != undefined)){
                     component.set('v.noTieneEmail', false);
+
+                    if(result.caso.OS_Email__c != '' && result.caso.OS_Email__c != undefined){
+                        component.set('v.correoCasoInformado', true);
+                        component.set('v.correoDelCaso', result.caso.OS_Email__c);
+                    }else{
+                        component.set('v.correoCasoInformado', false);
+                    }
+                    if(result.caso.SuppliedEmail != '' && result.caso.SuppliedEmail != undefined){
+                        component.set('v.webEmailInformado', true);
+                        component.set('v.webEmail', result.caso.SuppliedEmail);
+                    }else{
+                        component.set('v.webEmailInformado', false);
+                    }
                 }
                 else{
                     component.set('v.noTieneEmail', true);
                 }
-                //component.set('v.cuerpo', );
                 
                 if( component.get("v.pais") === 'España' || component.get("v.pais") === 'españa' || component.get("v.pais") === 'ESPAÑA' ){
                     component.set("v.paisSeleccionado", '011'); 
                 }
 
-
-                //component.set("v.statusOptions", result.opcionesPais.keys());
-
                 let paises = result.opcionesPais;
-                //var options = component.get('v.options');
                 var options = [];
                 
                 for (var miPais in paises) {
@@ -55,11 +58,6 @@
                 }       
                 
                 component.set('v.options', JSON.parse(JSON.stringify(options)));
-                //component.set('v.paisSeleccionado', 011);
-                // if(result.caso.Origin == 'SAC_Manual' || result.caso.Origin == 'SAC_CartaPostal'){
-                //     component.set('v.procedenciaManual', true);
-                // }
-                //alert(JSON.stringify(result + ' - ' + result.caso.SAC_RedaccionFinal__c));
             }
         });
         $A.enqueueAction(getInfo);
@@ -77,8 +75,9 @@
     },
 
     enviarAcuse : function(component, event, helper) {
+        
         let caso = component.get('v.caso');
-
+        
         // Si el acuse ya ha sido enviado, mostramos mensaje informativo
         if(caso.CC_AcuseRecibo__c == '2'){
             component.set("v.modalAcuseYaEnviado", true);
@@ -92,46 +91,15 @@
         component.set("v.envioAcusePulsado", true);
     },
 
-    enviarAcuseEmail : function(component, event, helper) {
-        component.set('v.isLoading', true);
-        component.set("v.envioAcusePulsado", false);
-        let caso = component.get('v.caso');
-
-        var envio = component.get("c.envioEmailManual");
-        envio.setParams({'casoApex': caso});
-        envio.setCallback(this, function(response) {
-            component.set('v.isLoading', false);
-            var state = response.getState();
-            
-            if (state === "SUCCESS") {
-                var toastEvent = $A.get("e.force:showToast");
-                toastEvent.setParams({
-                    "title": "Acuse enviado",
-                    "message": 'Se ha enviado la notificación al cliente.',
-                    "type": "success"
-                });
-                component.set('v.envioCartaPostal', false);
-                component.set('v.envioEmail', false);
-                component.set("v.envioAcusePulsado", false);
-                toastEvent.fire();                
-                $A.get('e.force:refreshView').fire();
-            }
-            else{
-                var error = response.getError();
-                let toastParams = {
-                    title: "Error",
-                    //message: "El email destino no es válido.", 
-                    message: error[0].message, 
-                    type: "error"
-                };
-
-                let toastEvent = $A.get("e.force:showToast");
-                toastEvent.setParams(toastParams);
-                toastEvent.fire();
-            }
-        });
-        $A.enqueueAction(envio);
-        //component.set('v.envioEmail', false);    
+    enviarAcuseEmail : function(component, event, helper) {   
+        
+        if(component.get('v.correoCasoInformado') && component.get('v.webEmailInformado')){
+            component.set('v.envioAcusePulsado', false);    
+            component.set('v.envioEmail', true);
+        }else{
+            component.set('v.envioEmail', false);
+            helper.envioAcuseEmailAuto(component, event);
+        }
     },
 
     enviarAcuseCarta : function(component, event, helper) {
@@ -160,8 +128,6 @@
         (paisCarta != '' && paisCarta !== undefined) &&
         (codigoPostalCarta != '' && codigoPostalCarta !== undefined)){
             component.set('v.envioAcusePulsado', false);
-            //component.find("editForm").submit();
-            //alert('click boton ' + component.get('v.botonPulsado'));
             let crearCarta = component.get("c.envioCartaPostal");
             let casoActual = component.get("v.caso");
             crearCarta.setParams({'caso' : casoActual, 'direccion' : direccionCarta, 'codigoPostal': codigoPostalCarta, 'poblacion': poblacionCarta, 'provincia' :provinciaCarta, 'pais': paisCarta});
@@ -261,8 +227,19 @@
     
     clickComboBox : function(component, event, helper) {
         component.set('v.isLoading', true);
-        //console.log('pincha en el combo');
         document.getElementById("divCombo").style.display="block";
 
+    },
+
+    enviarCorreoCaso: function(component, event, helper) {
+        component.set('v.viaEnvio', 'correoCaso');
+        component.set('v.envioEmail', false);    
+        helper.envioAcuseEmailAuto(component, event);
+    },
+
+    enviarWebEmail: function(component, event, helper) {
+        component.set('v.viaEnvio', 'webEmail');
+        component.set('v.envioEmail', false);    
+        helper.envioAcuseEmailAuto(component, event);
     }
 })

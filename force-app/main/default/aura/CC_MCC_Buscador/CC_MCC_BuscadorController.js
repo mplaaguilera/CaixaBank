@@ -301,6 +301,12 @@
 		helper.onValueSelect(component);
 	},
 
+	
+    handleRefresh: function(component, event, helper) {
+        console.log('Se recibió el evento de refresh en CC_MCC_Buscador');
+        helper.recargarKnowledge(component); 
+    },
+
 	guardar: function(component, event, helper) {
 		component.set('v.guardando', true);
 		//eslint-disable-next-line @lwc/lwc/no-async-operation
@@ -344,6 +350,7 @@
 				let eventoCops = $A.get('e.c:OS_Refresh_Case_Gestion');
 				eventoCops.setParams({'recordId': component.get('v.recordId')});
 				eventoCops.fire();
+
 				if (component.get('v.negocio') !== 'CC' || component.get('v.negocio') !== 'HDT') {
 					component.find('caseData').reloadRecord(true);
 				}
@@ -362,6 +369,9 @@
 			}
 			$A.util.removeClass(component.find('modalGuardando'), 'slds-fade-in-open');
 			$A.util.removeClass(component.find('backdropGuardando'), 'slds-backdrop_open');
+
+			//Forzar refresco de la vista para el componente standard Knowledge
+			$A.get('e.force:refreshView').fire();
 			//eslint-disable-next-line @lwc/lwc/no-async-operation
 			window.setTimeout($A.getCallback(() => component.set('v.guardando', false)), 300);
 		});

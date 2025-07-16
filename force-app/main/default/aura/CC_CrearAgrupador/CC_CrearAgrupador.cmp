@@ -11,6 +11,7 @@
     
     <!-- Permisos -->
     <aura:attribute name="bCrear" type="Boolean" default="false"/>
+    <aura:attribute name="bEstado" type="Boolean" default="false"/>
     <aura:attribute name="bAsociar" type="Boolean" default="false"/>
     
     <!-- Atributos -->

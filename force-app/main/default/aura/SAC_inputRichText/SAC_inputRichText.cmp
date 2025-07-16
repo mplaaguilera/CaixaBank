@@ -3,14 +3,14 @@
     <aura:attribute name="label" type="String" />
     <aura:attribute name="labelVisible" type="String" />
     <aura:attribute name="title" type="String" />
-
+    <aura:attribute name="recordId" type="String" />
     <aura:attribute name="isOpen" type="Boolean" default="false"/>
 
     
     <div>
     <aura:renderIf isTrue="{!!v.isOpen}">
 
-    <lightning:inputRichText value='{!v.value}' label="{!v.label}" labelVisible="{!v.labelVisible}" title="{!v.cuerpo}" />
+    <lightning:inputRichText value='{!v.value}' label="{!v.label}" labelVisible="{!v.labelVisible}" title="{!v.cuerpo}" shareWithEntityId="{!v.recordId}"/>
     <lightning:icon iconName="utility:new_window" alternativeText="Connected"  size="small" onclick="{!c.reescalado}" style="top: -29px;
                                                                                                                             left: 5px;
                                                                                                                             position: relative;"/>
@@ -25,7 +25,7 @@
                     left: calc(-50vw + 50%) !important;
                     top: calc(-50vh + 50%) !important;" class="slds-backdrop slds-backdrop_open">
         <lightning:icon iconName="utility:pop_in" alternativeText="Connected"  variant="inverse"  onclick="{!c.reescalado}" style="left: 95vw; position: relative;"/>
-            <lightning:inputRichText value='{!v.value}' title="{!v.cuerpo}" class="TextAreaFull"/>
+            <lightning:inputRichText value='{!v.value}' shareWithEntityId="{!v.recordId}" title="{!v.cuerpo}" class="TextAreaFull"/>
         </div>
     </aura:renderIf>
     </div>

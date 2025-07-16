@@ -62,6 +62,7 @@
     muestraModal : function(component, event, helper) {
         var para = component.get("v.para");        
         if(para != null){
+            component.set('v.modalValidar', false);
             component.set('v.muestraModal', true);
         }else{
             let toastParams = {
@@ -80,29 +81,33 @@
     },
 
     muestraModalValidar : function(component, event, helper) {
-        var action = component.get('c.getDocumentRedaccion');
-        action.setParams({'id':component.get('v.caso.Id')});
-        action.setCallback(this, function(response) {
-                var state = response.getState();
-                if(state === 'SUCCESS'){
-                    let nonValidatedItems = [];
-                    let returnValues = response.getReturnValue();
-                    if (Array.isArray(returnValues)) {
-                        returnValues.forEach(function(item) {
-                            if(item.SAC_ValidadoCV__c == false){
-                                nonValidatedItems.push(item);
-                            }
-                        });
+        let procedencia = component.get('v.procedencia');
+        if(procedencia == 'SAC_003' || procedencia == 'Inadmision') {
+            var action = component.get('c.getDocumentRedaccion');
+            action.setParams({'id':component.get('v.caso.Id')});
+            action.setCallback(this, function(response) {
+                    var state = response.getState();
+                    if(state === 'SUCCESS'){
+                        let nonValidatedItems = [];
+                        let returnValues = response.getReturnValue();
+                        if (Array.isArray(returnValues)) {
+                            returnValues.forEach(function(item) {
+                                if(item.SAC_ValidadoCV__c == false){
+                                    nonValidatedItems.push(item);
+                                }
+                            });
+                        }
+                        if(nonValidatedItems.length > 0 ){
+                            component.set('v.modalValidar', true);
+                        }else{
+                            component.set('v.muestraModal', true);
+                        }
                     }
-                    if(nonValidatedItems.length > 0 ){
-                        component.set('v.modalValidar', true);
-                    }else{
-                        component.set('v.muestraModal', true);
-                    }
-                }
-            });
-        $A.enqueueAction(action);
-    
+                });
+            $A.enqueueAction(action);
+        } else {
+            component.set('v.muestraModal', true);
+        }
     },
     
     ocultaModalValidar : function(component, event, helper) {
@@ -233,8 +238,8 @@
                     idsFicherosAdjuntos.splice(i, 1);
                     ficherosAdjuntos.splice(i, 1); 
                 }
-            
             }
+
             component.set('v.ficherosAdjuntos', ficherosAdjuntos);
             component.set('v.idsFicherosAdjuntos', idsFicherosAdjuntos);
 
@@ -334,5 +339,23 @@
             });
             toastEventWarning.fire();
         }
+    },
+
+    handleEventRichText : function(component, event, helper) {       
+        //Recibo el evento desde el LWC y almaceno el nuevo mapa de tags de las imagenes
+        var message = event.getParam('data');
+        component.set("v.imageTagsMap", message);
+    },
+
+    handleEventFlagCambioPlantilla : function(component, event, helper) {        
+        //Recibo el evento desde el LWC y almaceno el valor en el flag de cambio plantilla
+        var message = event.getParam('data');
+        component.set("v.flagCambioPlantillaPadre", message);
+    },
+
+    handleEventModificarImagen : function(component, event, helper) {
+        //Recibo el evento desde el LWC y almaceno el nuevo mapa de tags de las imagenes
+        var imagenes = event.getParam('imgMap');
+        component.set("v.imageTagsMap", imagenes);
     }
 })

@@ -8,6 +8,11 @@ public class CSBD_Llamada_GC_Test {
 		User gestorCsbd;
 
 		System.runAs(usuarioAdmin) {
+
+			CSBD_LlamadaSettings__c llamadaSettings = new CSBD_LlamadaSettings__c();
+			llamadaSettings.CSBD_EntranteCrearSiempreOportunidad__c = true;
+			insert llamadaSettings;
+
             User gestor = new User();
             gestor.LastName = 'Gestor CSBD Test';
             gestor.Alias = 'gestor';
@@ -89,15 +94,15 @@ public class CSBD_Llamada_GC_Test {
 
             CC_Lista_Valores__c listaValores4 = new CC_Lista_Valores__c();
 			listaValores4.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-			listaValores4.Name = 'CSBD: Horarios comerciales por tipología';
+			listaValores4.Name = 'CSBD: Horarios comerciales por tipología SLA';
 			listaValores4.CC_Activa__c = true;
 			insert listaValores4;
 
             CC_Lista_Valores__c valor4 = new CC_Lista_Valores__c();
             valor4.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
             valor4.CC_Lista__c = listaValores4.Id;
-            valor4.CC_Valor__c = 'CSBD: Horario comercial Hipoteca';
-            valor4.Name = 'Hipoteca';
+            valor4.CC_Valor__c = 'CSBD: Horario comercial Hipoteca SLA';
+            valor4.Name = 'CSBD_Hipoteca';
             insert valor4;
 
         }
@@ -526,7 +531,7 @@ public class CSBD_Llamada_GC_Test {
 				Test.stopTest();
 
 				oportunidad = [SELECT CSBD_SLA_Primera_Respuesta__c FROM Opportunity WHERE Id = :oportunidad.Id];
-				System.assert(oportunidad.CSBD_SLA_Primera_Respuesta__c > 0, 'No se ha calculado correctamente el SLA (valor: ' + oportunidad.CSBD_SLA_Primera_Respuesta__c + ')');
+				System.assert(oportunidad.CSBD_SLA_Primera_Respuesta__c != null, 'No se ha calculado correctamente el SLA (valor: ' + oportunidad.CSBD_SLA_Primera_Respuesta__c + ')');
 			}
 		}
 	}

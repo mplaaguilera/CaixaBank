@@ -6,12 +6,14 @@ private class CSBD_MacRelatedList_Apex_Test {
 		System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
 			CSBD_Opportunity.crearOportunidad('CSBD_MAC', new Map<String, Object>{
                 'CSBD_Now_Origen__c' => 'Asistencia Comercial Centralita',
-                'CSBD_Telefono_Solicitud__c' => '650123123'
+                'CSBD_Telefono_Solicitud__c' => '650123123',
+                'CSBD_Motivo_MAC__c' => 'motivo de prueba'
             });
 
 			CSBD_Opportunity.crearOportunidad('CSBD_MAC', new Map<String, Object>{
                 'CSBD_Now_Origen__c' => 'Otro origen',
-                'CSBD_Telefono_Solicitud__c' => '650123123'
+                'CSBD_Telefono_Solicitud__c' => '650123123',
+                'CSBD_Motivo_MAC__c' => 'motivo de prueba'
             });
 
 			Test.startTest();
@@ -27,12 +29,14 @@ private class CSBD_MacRelatedList_Apex_Test {
 		System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
 			Opportunity oppCentralita = CSBD_Opportunity.crearOportunidad('CSBD_MAC', new Map<String, Object>{
                 'CSBD_Now_Origen__c' => 'Asistencia Comercial Centralita',
-                'CSBD_Telefono_Solicitud__c' => '650123123'
+                'CSBD_Telefono_Solicitud__c' => '650123123',
+                'CSBD_Motivo_MAC__c' => 'motivo de prueba'
             });
 
 			Opportunity oppPadre = CSBD_Opportunity.crearOportunidad('CSBD_MAC', new Map<String, Object>{
                 'CSBD_Now_Origen__c' => 'Otro origen',
-                'CSBD_Telefono_Solicitud__c' => '650123123'
+                'CSBD_Telefono_Solicitud__c' => '650123123',
+                'CSBD_Motivo_MAC__c' => 'motivo de prueba'
             });
 
             String identificadorPadre = [SELECT CSBD_Identificador__c FROM Opportunity WHERE Id = :oppPadre.Id].CSBD_Identificador__c;

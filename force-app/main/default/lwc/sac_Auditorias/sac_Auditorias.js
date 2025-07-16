@@ -37,10 +37,6 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     @track searchInputGestor = '';
     @track searchInputLetrados = '';
     @track searchInputSoloPretPpal = '';
-    @track searchInputTematica = '';
-    @track searchInputProducto = '';
-    @track searchInputMotivo = '';
-    @track searchInputDetalle = '';
     @track searchInputGrupoResolver = '';
 
     //Flags para mostrar el selector de cada buscador
@@ -50,10 +46,6 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     @track modalOpcionesGestor = false;
     @track modalOpcionesLetrados = false;
     @track modalOpcionesSoloPretPpal = false;
-    @track modalOpcionesTematica = false;
-    @track modalOpcionesProducto = false;
-    @track modalOpcionesMotivo = false;
-    @track modalOpcionesDetalle = false;
     @track modalOpcionesGrupoResolver = false;
 
     //Variables para filtrar las búsquedas de cada buscador
@@ -61,10 +53,6 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     @track filteredResultsGrupoLet = [];
     @track filteredResultsGestor = [];
     @track filteredResultsLetrados = [];
-    @track filteredResultsTematica = [];
-    @track filteredResultsProducto = [];
-    @track filteredResultsMotivo = [];
-    @track filteredResultsDetalle = [];
     @track filteredResultsGrupoResolver = [];
 
     //Variables para guardar el id del registro seleccionado en cada buscador
@@ -75,15 +63,9 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     @track idSelectGrupoLetVarios = '';
     @track idSelectGestor = '';
     @track idSelectLetrado = '';
-    @track idMccSelectTematica = '';
-    @track idMccSelectProducto = '';
-    @track idMccSelectMotivo = '';
     @track idSelectGrupoResolver = '';
 
     //Flags para desactivar/activar buscadores/botones
-    @track disabledProducto = true;
-    @track disabledMotivo = true;
-    @track disabledDetalle = true;
     @track disabledGestor = true;
     @track disabledLetrados = true;
     @track disabledConfirmarAudit = true;
@@ -140,7 +122,38 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     @track sentidoResolucionValue;
     @track cadenaSentidoRes = '';
 
+    //Selector Temática
+    @track filteredResultsTematica = [];
+    @track searchInputTematica = '';
+    @track valuesMccTematica = [];
+    @track modalOpcionesTematica = false;
+    @track tematicaValue;
+    @track cadenaTematica = '';
+    @track disabledTematica = false;
 
+    //Selector Producto
+    @track filteredResultsProducto = [];
+    @track searchInputProducto = '';
+    @track valuesMccProducto = [];
+    @track modalOpcionesProducto = false;
+    @track cadenaProducto = '';
+    @track disabledProducto = false;
+
+    //Selector Motivo
+    @track filteredResultsMotivo = [];
+    @track searchInputMotivo = '';
+    @track valuesMccMotivo = [];
+    @track modalOpcionesMotivo = false;
+    @track cadenaMotivo = '';
+    @track disabledMotivo = false;
+
+    //Selector Detalle
+    @track filteredResultsDetalle = [];
+    @track searchInputDetalle = '';
+    @track valuesMccDetalle = [];
+    @track modalOpcionesDetalle = false;
+    @track cadenaDetalle = '';
+    @track disabledDetalle = false;
 
     get optionsTrueFalse() {
         return [
@@ -168,6 +181,12 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
 
     @wire(buscarResultados, { searchTerm: '$searchInput', tipoBusqueda: '$tipoBuscador', id: '$idSelect' })
     wiredSearchResults({ error, data }) {
+
+        console.log(this.valuesMccTematica.length);
+            console.log(this.valuesMccProducto.length);
+            console.log(this.valuesMccMotivo.length);
+            console.log(this.valuesMccDetalle.length);
+            console.log(JSON.stringify(this.valuesMccTematica));
 
         if (data == '' || data == undefined) {
 
@@ -225,16 +244,16 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
             if(this.tipoBuscador === 'buscadorLetrados'){
                 this.filteredResultsLetrados = data;
             }
-            if(this.tipoBuscador === 'buscadorTematica'){
+            if(this.tipoBuscador === 'buscadorTematica' && this.valuesMccTematica.length == 0){
                 this.filteredResultsTematica = data;
             }
-            if(this.tipoBuscador === 'buscadorProducto'){
+            if(this.tipoBuscador === 'buscadorProducto' && (this.valuesMccProducto.length == 0 || (this.valuesMccProducto.length > 0 && this.valuesMccTematica.length == 0))){
                 this.filteredResultsProducto = data;
             }
-            if(this.tipoBuscador === 'buscadorMotivo'){
+            if(this.tipoBuscador === 'buscadorMotivo' && (this.valuesMccMotivo.length == 0 || (this.valuesMccMotivo.length > 0 && this.valuesMccProducto.length == 0))){
                 this.filteredResultsMotivo = data;
             }
-            if(this.tipoBuscador === 'buscadorDetalle'){
+            if(this.tipoBuscador === 'buscadorDetalle' && (this.valuesMccDetalle.length == 0 || (this.valuesMccDetalle.length > 0 && this.valuesMccMotivo.length == 0))){
                 this.filteredResultsDetalle = data;
             }
             if(this.tipoBuscador === 'buscadorGrupoResolver'){
@@ -880,7 +899,7 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
                 }
             }
 
-            this.searchInputSentidoResolucion =  this.cadenaSentidoRes;
+            this.searchInputSentidoResolucion = this.cadenaSentidoRes;
             this.sentidoResolucionValue = this.resolucionValue;
             event.preventDefault();
         }
@@ -956,38 +975,17 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     blurTematica(){
         this.modalOpcionesTematica = false;
         this.estaAbierto = false;
-
-        if(this.opcionSeleccionada === false){
-            this.searchInput = '';
-            this.searchInputTematica = '';
-            this.idMccSelectTematica = '';
-
-            //Modifico la Temática -> Bloque los niveles inferiores, y vacio sus posibles valores
-            this.disabledProducto = true;
-            this.searchInputProducto = '';
-            this.idMccSelectProducto = '';
-            this.disabledMotivo = true;
-            this.searchInputMotivo = '';
-            this.idMccSelectMotivo = '';
-            this.disabledDetalle = true;
-            this.searchInputDetalle = '';
-            this.idMccSelectDetalle = '';
-        }
     }
 
     mostrarOpcTematica(event){
         this.searchInput = '';
         this.tipoBuscador = event.target.name;
-        this.opcionSeleccionada = false;
+        this.idSelect = '';
         this.mostrarListaReclamaciones = false;
 
         if(this.estaAbierto === false){
             this.estaAbierto = true;
-
-            setTimeout(() => {
-                this.searchInputTematica = '';
-                this.modalOpcionesTematica = true;
-            }, 150);
+            this.modalOpcionesTematica = true;
         }else{
             this.estaAbierto = false;
             this.modalOpcionesTematica = false;
@@ -995,81 +993,107 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     }
 
     selectTematica(event){
-        const selectedValue = event.currentTarget.dataset.value;
-        const resultName = event.currentTarget.dataset.name;
+        var selectedVal = event.currentTarget.dataset.value;
 
-        this.searchInput = '';
-        this.opcionSeleccionada = true;
-        this.searchInputTematica = resultName;
-        this.idMccSelectTematica = selectedValue;
-        this.disabledProducto = false;
+        if(selectedVal) {
+            var options = JSON.parse(JSON.stringify(this.filteredResultsTematica));
 
-        //Modifico la Temática -> Bloque los niveles inferiores, y vacio sus posibles valores
-        this.searchInputProducto = '';
-        this.disabledMotivo = true;
-        this.searchInputMotivo = '';
-        this.disabledDetalle = true;
-        this.searchInputDetalle = '';
+            for(var i = 0; i < options.length; i++) {
+                if(options[i].Id === selectedVal) {
+                    if(this.valuesMccTematica.includes(options[i].Id)) {
+                        this.valuesMccTematica.splice(this.valuesMccTematica.indexOf(options[i].Id), 1);
+                    } else {
+                        this.valuesMccTematica.push(options[i].Id);
+                    }
+                    options[i].selected = options[i].selected ? false : true;
+                }
+            }
 
-        this.modalOpcionesTematica = false;
-    }
+            this.filteredResultsTematica = options;
+            this.cadenaTematica = '';
+            this.temValue = '';
+            var count = 0;
 
-    filtrarOpcTematica(event){
-        this.tipoBuscador = event.target.name;
+            for(var i = 0; i < options.length; i++){
+                if(options[i].selected === true) {
+                    count++;
 
-        this.opcionSeleccionada = false;
-        this.searchInputTematica = event.target.value;
-        this.searchInput = this.searchInputTematica;
+                    if(count > 1){
+                        this.cadenaTematica = this.cadenaTematica + ', ' + options[i].Name;
+                    }else{
+                        this.cadenaTematica = options[i].Name;
+                        this.temValue = options[i].Id;
+                    }
+                }                
+            }
 
-        //Modifico la Temática -> Bloque los niveles inferiores, y vacio sus posibles valores
-        this.disabledProducto = true;
-        this.searchInputProducto = '';
-        this.disabledMotivo = true;
-        this.searchInputMotivo = '';
-        this.disabledDetalle = true;
-        this.searchInputDetalle = '';
+            //Se desactivan y blanquean el resto de niveles en el caso de que se seleccione más de 1 opción
+            if(count > 1){
+                this.disabledProducto = true;
+                this.searchInputProducto = '';
+                this.valuesMccProducto = [];
+                this.filteredResultsProducto = [];
+                this.cadenaProducto = '';
+                this.disabledMotivo = true;
+                this.searchInputMotivo = '';
+                this.valuesMccMotivo = [];
+                this.filteredResultsMotivo = [];
+                this.cadenaMotivo = '';
+                this.disabledDetalle = true;
+                this.searchInputDetalle = '';
+                this.valuesMccDetalle = [];
+                this.filteredResultsDetalle = [];
+                this.cadenaDetalle = '';
+            }
 
-        if(this.searchInput.length > 2){
-            this.message = '';
+            //En el caso de deseleccionar todas las opciones se blanquean todos los inputs de menor nivel
+            else if(count == 0){
+                this.searchInputProducto = '';
+                this.valuesMccProducto = [];
+                this.filteredResultsProducto = [];
+                this.cadenaProducto = '';
+                this.searchInputMotivo = '';
+                this.valuesMccMotivo = [];
+                this.filteredResultsMotivo = [];
+                this.cadenaMotivo = '';
+                this.searchInputDetalle = '';
+                this.valuesMccDetalle = [];
+                this.filteredResultsDetalle = [];
+                this.cadenaDetalle = '';
+            }
+
+            //En el caso de solo tener 1 opción seleccionada, se dejan activos
+            else{
+                this.disabledProducto = false;
+                this.disabledMotivo = false;
+                this.disabledDetalle = false;
+            }
+
+            this.searchInputTematica = this.cadenaTematica;
+            event.preventDefault();
         }
     }
-
 
     /* Bloque métodos Producto */
 
     blurProducto(){
         this.modalOpcionesProducto = false;
         this.estaAbierto = false;
-
-        if(this.opcionSeleccionada === false){
-            this.searchInput = '';
-            this.searchInputProducto = '';
-            this.idMccSelectProducto = '';
-
-            //Modifico el Producto -> Bloque los niveles inferiores, y vacio sus posibles valores
-            this.disabledMotivo = true;
-            this.searchInputMotivo = '';
-            this.idMccSelectMotivo = '';
-            this.disabledDetalle = true;
-            this.searchInputDetalle = '';
-            this.idMccSelectDetalle = '';
-        }
     }
 
     mostrarOpcProducto(event){
         this.searchInput = '';
-        this.idSelect = this.idMccSelectTematica;
         this.tipoBuscador = event.target.name;
-        this.opcionSeleccionada = false;
+        if(this.valuesMccTematica.length > 0){
+            this.idSelect = this.valuesMccTematica[0];
+        }else{
+            this.idSelect = '';
+        }
         this.mostrarListaReclamaciones = false;
 
         if(this.estaAbierto === false){
             this.estaAbierto = true;
-
-            setTimeout(() => {
-                this.searchInputProducto = '';
-                this.modalOpcionesProducto = true;
-            }, 150);
+            this.modalOpcionesProducto = true;
         }else{
             this.estaAbierto = false;
             this.modalOpcionesProducto = false;
@@ -1077,74 +1101,102 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     }
 
     selectProducto(event){
-        const selectedValue = event.currentTarget.dataset.value;
-        const resultName = event.currentTarget.dataset.name;
+        var selectedVal = event.currentTarget.dataset.value;
 
-        this.searchInput = '';
-        this.opcionSeleccionada = true;
-        this.searchInputProducto = resultName;
-        this.idMccSelectProducto = selectedValue;
-        this.disabledMotivo = false;
+        if(selectedVal) {
+            var options = JSON.parse(JSON.stringify(this.filteredResultsProducto));
 
-        //Modifico el Producto -> Bloque los niveles inferiores, y vacio sus posibles valores
-        this.searchInputMotivo = '';
-        this.disabledDetalle = true;
-        this.searchInputDetalle = '';
+            for(var i = 0; i < options.length; i++) {
+                if(options[i].Id === selectedVal) {
+                    if(this.valuesMccProducto.includes(options[i].Id)) {
+                        this.valuesMccProducto.splice(this.valuesMccProducto.indexOf(options[i].Id), 1);
+                    } else {
+                        this.valuesMccProducto.push(options[i].Id);
+                    }
+                    options[i].selected = options[i].selected ? false : true;
+                }
+            }
 
-        this.modalOpcionesProducto = false;
-    }
+            this.filteredResultsProducto = options;
+            this.cadenaProducto = '';
+            var count = 0;
 
-    filtrarOpcProducto(event){
-        this.tipoBuscador = event.target.name;
+            for(var i = 0; i < options.length; i++){
+                if(options[i].selected === true) {
+                    count++;
 
-        this.opcionSeleccionada = false;
-        this.searchInputProducto = event.target.value;
-        this.searchInput = this.searchInputProducto;
+                    if(count > 1){
+                        this.cadenaProducto = this.cadenaProducto + ', ' + options[i].Name;
+                    }else{
+                        this.cadenaProducto = options[i].Name;
+                    }
+                }
+            }
 
-        //Modifico el Producto -> Bloque los niveles inferiores, y vacio sus posibles valores
-        this.disabledMotivo = true;
-        this.searchInputMotivo = '';
-        this.disabledDetalle = true;
-        this.searchInputDetalle = '';
+            //Se desactivan y blanquean el resto de niveles en el caso de que se seleccione más de 1 opción
+            if(count > 1){
+                this.disabledTematica = true;
+                this.searchInputTematica = '';
+                this.valuesMccTematica = [];
+                this.filteredResultsTematica = [];
+                this.cadenaTematica = '';
+                this.disabledMotivo = true;
+                this.searchInputMotivo = '';
+                this.valuesMccMotivo = [];
+                this.filteredResultsMotivo = [];
+                this.cadenaMotivo = '';
+                this.disabledDetalle = true;
+                this.searchInputDetalle = '';
+                this.valuesMccDetalle = [];
+                this.filteredResultsDetalle = [];
+                this.cadenaDetalle = '';
+            }
 
-        if(this.searchInput.length > 2){
-            this.message = '';
+            //En el caso de deseleccionar todas las opciones se blanquean todos los inputs de menor nivel, y el mismo
+            else if(count == 0){
+
+                this.searchInputMotivo = '';
+                this.valuesMccMotivo = [];
+                this.filteredResultsMotivo = [];
+                this.cadenaMotivo = '';
+                this.searchInputDetalle = '';
+                this.valuesMccDetalle = [];
+                this.filteredResultsDetalle = [];
+                this.cadenaDetalle = '';
+            }
+
+            //En el caso de solo tener 1 opción seleccionada, se dejan activos
+            else{
+                this.disabledTematica = false;
+                this.disabledMotivo = false;
+                this.disabledDetalle = false;
+            }
+
+            this.searchInputProducto = this.cadenaProducto;
+            event.preventDefault();
         }
     }
-
 
     /* Bloque métodos Motivo */
 
     blurMotivo(){
         this.modalOpcionesMotivo = false;
         this.estaAbierto = false;
-
-        if(this.opcionSeleccionada === false){
-            this.searchInput = '';
-            this.searchInputMotivo = '';
-            this.idMccSelectMotivo = '';
-
-            //Modifico el Motivo -> Bloque los niveles inferiores, y vacio sus posibles valores
-            this.disabledDetalle = true;
-            this.searchInputDetalle = '';
-            this.idMccSelectDetalle= '';
-        }
     }
 
     mostrarOpcMotivo(event){
         this.searchInput = '';
-        this.idSelect = this.idMccSelectProducto;
         this.tipoBuscador = event.target.name;
-        this.opcionSeleccionada = false;
+        if(this.valuesMccProducto.length > 0){
+            this.idSelect = this.valuesMccProducto[0];
+        }else{
+            this.idSelect = '';
+        }
         this.mostrarListaReclamaciones = false;
 
         if(this.estaAbierto === false){
             this.estaAbierto = true;
-
-            setTimeout(() => {
-                this.searchInputMotivo = '';
-                this.modalOpcionesMotivo = true;
-            }, 150);
+            this.modalOpcionesMotivo = true;
         }else{
             this.estaAbierto = false;
             this.modalOpcionesMotivo = false;
@@ -1152,65 +1204,97 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     }
 
     selectMotivo(event){
-        const selectedValue = event.currentTarget.dataset.value;
-        const resultName = event.currentTarget.dataset.name;
+        var selectedVal = event.currentTarget.dataset.value;
 
-        this.searchInput = '';
-        this.opcionSeleccionada = true;
-        this.searchInputMotivo = resultName;
-        this.idMccSelectMotivo = selectedValue;
-        this.disabledDetalle = false;
+        if(selectedVal) {
+            var options = JSON.parse(JSON.stringify(this.filteredResultsMotivo));
 
-        //Modifico el Motivo -> Bloque los niveles inferiores, y vacio sus posibles valores
-        this.searchInputDetalle = '';
+            for(var i = 0; i < options.length; i++) {
+                if(options[i].Id === selectedVal) {
+                    if(this.valuesMccMotivo.includes(options[i].Id)) {
+                        this.valuesMccMotivo.splice(this.valuesMccMotivo.indexOf(options[i].Id), 1);
+                    } else {
+                        this.valuesMccMotivo.push(options[i].Id);
+                    }
+                    options[i].selected = options[i].selected ? false : true;
+                }
+            }
 
-        this.modalOpcionesMotivo = false;
-    }
+            this.filteredResultsMotivo = options;
+            this.cadenaMotivo = '';
+            var count = 0;
 
-    filtrarOpcMotivo(event){
-        this.tipoBuscador = event.target.name;
+            for(var i = 0; i < options.length; i++){
+                if(options[i].selected === true) {
+                    count++;
 
-        this.opcionSeleccionada = false;
-        this.searchInputMotivo = event.target.value;
-        this.searchInput = this.searchInputMotivo;
+                    if(count > 1){
+                        this.cadenaMotivo = this.cadenaMotivo + ', ' + options[i].Name;
+                    }else{
+                        this.cadenaMotivo = options[i].Name;
+                    }
+                }
+            }
 
-        //Modifico el Motivo -> Bloque los niveles inferiores, y vacio sus posibles valores
-        this.disabledDetalle = true;
-        this.searchInputDetalle = '';
+            //Se desactivan y blanquean el resto de niveles en el caso de que se seleccione más de 1 opción
+            if(count > 1){
+                this.disabledTematica = true;
+                this.searchInputTematica = '';
+                this.valuesMccTematica = [];
+                this.filteredResultsTematica = [];
+                this.cadenaTematica = '';
+                this.disabledProducto = true;
+                this.searchInputProducto = '';
+                this.valuesMccProducto = [];
+                this.filteredResultsProducto = [];
+                this.cadenaProducto = '';
+                this.disabledDetalle = true;
+                this.searchInputDetalle = '';
+                this.valuesMccDetalle = [];
+                this.filteredResultsDetalle = [];
+                this.cadenaDetalle = '';
+            }
 
-        if(this.searchInput.length > 2){
-            this.message = '';
+            //En el caso de deseleccionar todas las opciones se blanquean todos los inputs de menor nivel
+            else if(count == 0){
+                this.searchInputDetalle = '';
+                this.valuesMccDetalle = [];
+                this.filteredResultsDetalle = [];
+                this.cadenaDetalle = '';
+            }
+
+            //En el caso de solo tener 1 opción seleccionada, se dejan activos
+            else{
+                this.disabledTematica = false;
+                this.disabledProducto = false;
+                this.disabledDetalle = false;
+            }
+
+            this.searchInputMotivo = this.cadenaMotivo;
+            event.preventDefault();
         }
     }
-
 
     /* Bloque métodos Detalle */
 
     blurDetalle(){
         this.modalOpcionesDetalle = false;
         this.estaAbierto = false;
-
-        if(this.opcionSeleccionada === false){
-            this.searchInput = '';
-            this.searchInputDetalle = '';
-            this.idMccSelectDetalle= '';
-        }
     }
 
     mostrarOpcDetalle(event){
         this.searchInput = '';
-        this.idSelect = this.idMccSelectMotivo;
         this.tipoBuscador = event.target.name;
-        this.opcionSeleccionada = false;
+        if(this.valuesMccMotivo.length > 0){
+            this.idSelect = this.valuesMccMotivo[0];
+        }else{
+            this.idSelect = '';
+        }
         this.mostrarListaReclamaciones = false;
 
         if(this.estaAbierto === false){
             this.estaAbierto = true;
-
-            setTimeout(() => {
-                this.searchInputDetalle = '';
-                this.modalOpcionesDetalle = true;
-            }, 150);
+            this.modalOpcionesDetalle = true;
         }else{
             this.estaAbierto = false;
             this.modalOpcionesDetalle = false;
@@ -1218,29 +1302,68 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     }
 
     selectDetalle(event){
-        const selectedValue = event.currentTarget.dataset.value;
-        const resultName = event.currentTarget.dataset.name;
+        var selectedVal = event.currentTarget.dataset.value;
 
-        this.searchInput = '';
-        this.opcionSeleccionada = true;
-        this.searchInputDetalle = resultName;
-        this.idMccSelectDetalle = selectedValue;
+        if(selectedVal) {
+            var options = JSON.parse(JSON.stringify(this.filteredResultsDetalle));
 
-        this.modalOpcionesDetalle = false;
-    }
+            for(var i = 0; i < options.length; i++) {
+                if(options[i].Id === selectedVal) {
+                    if(this.valuesMccDetalle.includes(options[i].Id)) {
+                        this.valuesMccDetalle.splice(this.valuesMccDetalle.indexOf(options[i].Id), 1);
+                    } else {
+                        this.valuesMccDetalle.push(options[i].Id);
+                    }
+                    options[i].selected = options[i].selected ? false : true;
+                }
+            }
 
-    filtrarOpcDetalle(event){
-        this.tipoBuscador = event.target.name;
+            this.filteredResultsDetalle = options;
+            this.cadenaDetalle = '';
+            var count = 0;
 
-        this.opcionSeleccionada = false;
-        this.searchInputDetalle = event.target.value;
-        this.searchInput = this.searchInputDetalle;
+            for(var i = 0; i < options.length; i++){
+                if(options[i].selected === true) {
+                    count++;
 
-        if(this.searchInput.length > 2){
-            this.message = '';
+                    if(count > 1){
+                        this.cadenaDetalle = this.cadenaDetalle + ', ' + options[i].Name;
+                    }else{
+                        this.cadenaDetalle = options[i].Name;
+                    }
+                }
+            }
+
+            //Se desactivan y blanquean el resto de niveles en el caso de que se seleccione más de 1 opción
+            if(count > 1){
+                this.disabledTematica = true;
+                this.searchInputTematica = '';
+                this.valuesMccTematica = [];
+                this.filteredResultsTematica = [];
+                this.cadenaTematica = '';
+                this.disabledProducto = true;
+                this.searchInputProducto = '';
+                this.valuesMccProducto = [];
+                this.filteredResultsProducto = [];
+                this.cadenaProducto = '';
+                this.disabledMotivo = true;
+                this.searchInputMotivo = '';
+                this.valuesMccMotivo = [];
+                this.filteredResultsMotivo = [];
+                this.cadenaMotivo = '';
+            }
+
+            //En el caso de solo tener 1 opción seleccionada, se dejan activos
+            else{
+                this.disabledTematica = false;
+                this.disabledProducto = false;
+                this.disabledMotivo = false;
+            }
+
+            this.searchInputDetalle = this.cadenaDetalle;
+            event.preventDefault();
         }
     }
-
 
     /* Bloque métodos Grupo Responsable */
   
@@ -1367,7 +1490,7 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
             });
             this.dispatchEvent(evt);
         }else{
-            buscarReclamacionesAuditoria({ tipoAuditoria: this.searchInputTipoAudit, soloPretPpal: this.soloPretPpal, fechaDesde: this.fechaDesde, fechaHasta: this.fechaHasta, grupoProvId: this.idSelectGrupoProv, despachosId: this.idSelectGrupoLet, gestorId: this.idSelectGestor, letrado: this.searchInputLetrados, impAbonadoDesde: this.importeDesde, impAbonadoHasta: this.importeHasta, sentidoResolucion: this.valuesSentidoRes, tematicaId: this.idMccSelectTematica, productoId: this.idMccSelectProducto, motivoId: this.idMccSelectMotivo, detalleId: this.idMccSelectDetalle, numMaxReclamaciones: this.numRec }).then(result => {
+            buscarReclamacionesAuditoria({ tipoAuditoria: this.searchInputTipoAudit, soloPretPpal: this.soloPretPpal, fechaDesde: this.fechaDesde, fechaHasta: this.fechaHasta, grupoProvId: this.idSelectGrupoProv, despachosId: this.idSelectGrupoLet, gestorId: this.idSelectGestor, letrado: this.searchInputLetrados, impAbonadoDesde: this.importeDesde, impAbonadoHasta: this.importeHasta, sentidoResolucion: this.valuesSentidoRes, listIdsTematica: this.valuesMccTematica, listIdsProducto: this.valuesMccProducto, listIdsMotivo: this.valuesMccMotivo, listIdsDetalle: this.valuesMccDetalle, numMaxReclamaciones: this.numRec }).then(result => {
                 this.mostrarListaReclamaciones = true;
                 this.listaRecs = result;
 
@@ -1516,7 +1639,7 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
             }
         }
 
-        crearAuditorias({ nombreAuditoria: this.nombreAuditoria, tipoAuditoria:  this.tipoAuditValue, slaCalidad: this.slaCalidad, fechaDesde: this.fechaDesde, fechaHasta: this.fechaHasta, grupoProvId: this.idSelectGrupoProv, despachosId: this.idSelectGrupoLet, gestorId: this.idSelectGestor, letradoId: this.idSelectLetrado, impAbonadoDesde: this.importeDesde, impAbonadoHasta: this.importeHasta, sentidoResolucion: this.sentidoResolucionValue, tematicaId: this.idMccSelectTematica, productoId: this.idMccSelectProducto, motivoId: this.idMccSelectMotivo, detalleId: this.idMccSelectDetalle, grupoResolverId: this.idSelectGrupoResolver, listaCasos: this.selectedCons }).then(result => {
+        crearAuditorias({ nombreAuditoria: this.nombreAuditoria, tipoAuditoria:  this.tipoAuditValue, slaCalidad: this.slaCalidad, fechaDesde: this.fechaDesde, fechaHasta: this.fechaHasta, grupoProvId: this.idSelectGrupoProv, despachosId: this.idSelectGrupoLet, gestorId: this.idSelectGestor, letradoId: this.idSelectLetrado, impAbonadoDesde: this.importeDesde, impAbonadoHasta: this.importeHasta, sentidoResolucion: this.sentidoResolucionValue, listIdsTematica: this.cadenaTematica, listIdsProducto: this.cadenaProducto, listIdsMotivo: this.cadenaMotivo, listIdsDetalle: this.cadenaDetalle, listIdsTematicaLabel: this.searchInputTematica, listIdsProductoLabel: this.searchInputProducto, listIdsMotivoLabel: this.searchInputMotivo, listIdsDetalleLabel: this.searchInputDetalle, grupoResolverId: this.idSelectGrupoResolver, listaCasos: this.selectedCons }).then(result => {
             this.spinnerLoading = false;
             this.mostrarListaReclamaciones = false;
             const evt = new ShowToastEvent({

@@ -18,7 +18,7 @@
                </button>
                </h1>
                <div class="slds-section__content" id="expando-unique-id-datos">
-                   <lightning-record-view-form record-id={idAuditoria} object-api-name="SEG_Auditoria__c">
+                   <lightning-record-view-form record-id={idAuditoria} data-record-id={idAuditoria} object-api-name="SEG_Auditoria__c">
                        <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small">    
                            <div class="slds-col slds-size_1-of-1">
                                <lightning-output-field field-name="SAC_NombreAuditoria__c"> </lightning-output-field>
@@ -72,7 +72,7 @@
                <div class="slds-section__content" id="expando-unique-dictamen">
                    <!-- Seccion de los datos dictamen con la auditoría finalizada -->
                    <template lwc:if={auditoriaFinalizada}>
-                       <lightning-record-view-form record-id={idAuditoria} object-api-name="SEG_Auditoria__c">
+                       <lightning-record-view-form record-id={idAuditoria} data-record-id={idAuditoria} object-api-name="SEG_Auditoria__c">
                            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small">    
                                <div class="slds-col slds-size_3-of-12">
                                    <span><b>Bloque</b></span>
@@ -96,8 +96,20 @@
                                        <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
                                            <div lwc:else class="slds-col slds-size_1-of-12"></div> 
                                        <div class="slds-col slds-size_2-of-12">
-                                           <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id}>
-                                               <lightning-output-field field-name="SAC_Dictamen__c" variant="label-hidden"> </lightning-output-field>
+                                           <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id}>
+                                                <lightning-output-field field-name="SAC_Dictamen__c" variant="label-hidden"> </lightning-output-field>
+                                           </lightning-record-view-form>
+                                       </div>
+                                       <div lwc:if={punto.DictamenKO} class="slds-col slds-size_3-of-12" style="margin-top: 10px;"></div>
+                                        <div lwc:if={punto.DictamenKO} class="slds-col slds-size_9-of-12" style="margin-top: 10px;">
+                                            <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id}>
+                                                <lightning-output-field field-name="SAC_DetalleDictamen__c"> </lightning-output-field>
+                                           </lightning-record-view-form>
+                                        </div>
+                                        <div lwc:if={punto.DetalleDictamenOtros} class="slds-col slds-size_3-of-12"></div>
+                                        <div lwc:if={punto.DetalleDictamenOtros} class="slds-col slds-size_9-of-12">
+                                           <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id}>
+                                                <lightning-output-field field-name="SAC_Observaciones__c"> </lightning-output-field>
                                            </lightning-record-view-form>
                                        </div>
                                        <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
@@ -120,7 +132,7 @@
                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
                                
                                <!-- Funcionalidad para revisar la auditoria una vez completada -->
-                               <lightning-record-edit-form style="width:100%;" if:false={auditoriaReplicada} object-api-name="SEG_Auditoria__c" record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                               <lightning-record-edit-form style="width:100%;" if:false={auditoriaReplicada} object-api-name="SEG_Auditoria__c" data-record-id={idAuditoria} record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
                                    <div lwc:if={tienePermisosReplicar} class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xx-small"> 
                                        <div class="slds-col slds-size_3-of-12"></div>
                                        <div class="slds-col slds-size_2-of-12"><span>Réplica</span></div>
@@ -153,7 +165,7 @@
 
                    <!-- Seccion de los datos dictamen para auditores del grupo gestor o letrado -->
                    <template lwc:elseif={esGestorLetrado}>
-                        <lightning-record-edit-form object-api-name="SEG_Auditoria__c" record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                        <lightning-record-edit-form object-api-name="SEG_Auditoria__c" data-record-id={idAuditoria} record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
                             <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small"> 
                                 <div class="slds-col slds-size_3-of-12">
                                     <span><b>Bloque</b></span>
@@ -177,10 +189,22 @@
                                         <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
                                             <div lwc:else class="slds-col slds-size_1-of-12"></div> 
                                         <div class="slds-col slds-size_2-of-12">
-                                            <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                            <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
                                                 <lightning-input-field field-name="SAC_Dictamen__c" variant="label-hidden" disabled="true"> </lightning-input-field>
                                             </lightning-record-edit-form>
                                         </div>
+                                         <div lwc:if={punto.DictamenKO} class="slds-col slds-size_3-of-12" style="margin-top: 10px;"></div>
+                                        <div lwc:if={punto.DictamenKO} class="slds-col slds-size_9-of-12" style="margin-top: 10px;">
+                                            <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                                <lightning-input-field field-name="SAC_DetalleDictamen__c" disabled="true"> </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </div>
+                                        <div lwc:if={punto.DetalleDictamenOtros} class="slds-col slds-size_3-of-12"></div>
+                                        <div lwc:if={punto.DetalleDictamenOtros} class="slds-col slds-size_9-of-12">
+                                           <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                                <lightning-input-field field-name="SAC_Observaciones__c" disabled="true"> </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                       </div>
                                         <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
                                     </div>
                                 </template>
@@ -212,7 +236,7 @@
                    
                    <template lwc:elseif={tienePermisosEditar}>
                        <!-- Seccion de los datos dictamen con la auditoría SIN finalizar para gente con permisos-->
-                       <lightning-record-edit-form object-api-name="SEG_Auditoria__c" record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                       <lightning-record-edit-form object-api-name="SEG_Auditoria__c" data-record-id={idAuditoria} record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
                            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small"> 
                                <div class="slds-col slds-size_3-of-12">
                                    <span><b>Bloque</b></span>
@@ -236,8 +260,29 @@
                                        <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
                                            <div lwc:else class="slds-col slds-size_1-of-12"></div> 
                                        <div class="slds-col slds-size_2-of-12">
-                                           <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
-                                               <lightning-input-field field-name="SAC_Dictamen__c" variant="label-hidden"> </lightning-input-field>
+                                           <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                               <lightning-input-field field-name="SAC_Dictamen__c" variant="label-hidden" data-id={punto.Id} onchange={handleDictamenChange}> </lightning-input-field>
+                                               <lightning-input-field field-name="SAC_DetalleDictamen__c" class="slds-hide"> </lightning-input-field>
+                                           </lightning-record-edit-form>
+                                       </div>
+                                       
+                                        <div lwc:if={punto.DictamenKO} class="slds-col slds-size_3-of-12" style="margin-top: 10px;"></div>
+                                        <div lwc:if={punto.DictamenKO} class="slds-col slds-size_9-of-12" style="margin-top: 10px;">
+                                            <lightning-combobox
+                                            name="Detalle Dictamen"
+                                            label="Detalle Dictamen"
+                                            placeholder={punto.SAC_DetalleDictamen__c}
+                                            value={punto.SAC_PuntoDeControl__r.SAC_DetalleDictamen__c}
+                                            options={punto.OpcionesDetalle}
+                                            data-id={punto.Id}
+                                            onchange={handleOptionChangeDetalleDictamen} 
+                                            variant="label-inline">
+                                        </lightning-combobox> 
+                                        </div>
+                                        <div lwc:if={punto.DetalleDictamenOtros} class="slds-col slds-size_3-of-12"></div>
+                                        <div lwc:if={punto.DetalleDictamenOtros} class="slds-col slds-size_9-of-12">
+                                           <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                               <lightning-input-field field-name="SAC_Observaciones__c"> </lightning-input-field>
                                            </lightning-record-edit-form>
                                        </div>
                                        <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
@@ -291,7 +336,7 @@
                    </template>
                    <!-- Seccion de los datos dictamen con la auditoría SIN finalizar para gente sin permisos -->
                    <template lwc:else>
-                        <lightning-record-edit-form object-api-name="SEG_Auditoria__c" record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                        <lightning-record-edit-form object-api-name="SEG_Auditoria__c" data-record-id={idAuditoria} record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
                             <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small"> 
                                 <div class="slds-col slds-size_3-of-12">
                                     <span><b>Bloque</b></span>
@@ -315,10 +360,22 @@
                                         <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
                                             <div lwc:else class="slds-col slds-size_1-of-12"></div> 
                                         <div class="slds-col slds-size_2-of-12">
-                                            <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                            <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
                                                 <lightning-input-field field-name="SAC_Dictamen__c" variant="label-hidden" disabled="true"> </lightning-input-field>
                                             </lightning-record-edit-form>
                                         </div>
+                                         <div lwc:if={punto.DictamenKO} class="slds-col slds-size_3-of-12" style="margin-top: 10px;"></div>
+                                        <div lwc:if={punto.DictamenKO} class="slds-col slds-size_9-of-12" style="margin-top: 10px;">
+                                            <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                                <lightning-input-field field-name="SAC_DetalleDictamen__c" disabled="true"> </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </div>
+                                        <div lwc:if={punto.DetalleDictamenOtros} class="slds-col slds-size_3-of-12"></div>
+                                        <div lwc:if={punto.DetalleDictamenOtros} class="slds-col slds-size_9-of-12">
+                                           <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                                <lightning-input-field field-name="SAC_Observaciones__c" disabled="true"> </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                       </div>
                                         <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
                                     </div>
                                 </template>
@@ -363,7 +420,7 @@
                        <!-- Seccion de datos de la auditoría finalizada -->
                        <lightning-accordion allow-multiple-sections-open>
                            <lightning-accordion-section name="Datos de la auditoría finalizada" label="Datos de la auditoría finalizada">
-                               <lightning-record-view-form record-id={auditoria.Id} object-api-name="SEG_Auditoria__c">
+                               <lightning-record-view-form data-record-id={auditoria.Id} record-id={auditoria.Id} object-api-name="SEG_Auditoria__c">
                                    <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small">    
                                        <div class="slds-col slds-size_1-of-1">
                                            <lightning-output-field field-name="SAC_NombreAuditoria__c"> </lightning-output-field>
@@ -408,7 +465,7 @@
                        <lightning-accordion allow-multiple-sections-open>
                            <lightning-accordion-section name="Dictamen de la auditoría finalizada" label="Dictamen de la auditoría finalizada">
                                <!-- Seccion de los datos dictamen con la auditoría finalizada -->
-                               <lightning-record-view-form record-id={auditoria.Id} object-api-name="SEG_Auditoria__c">
+                               <lightning-record-view-form data-record-id={auditoria.Id} record-id={auditoria.Id} object-api-name="SEG_Auditoria__c">
                                    <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small">    
                                        <div class="slds-col slds-size_3-of-12">
                                            <span><b>Bloque</b></span>
@@ -432,10 +489,22 @@
                                                <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
                                                    <div lwc:else class="slds-col slds-size_1-of-12"></div> 
                                                <div class="slds-col slds-size_2-of-12">
-                                                   <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id}>
+                                                   <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id}>
                                                        <lightning-output-field field-name="SAC_Dictamen__c" variant="label-hidden"> </lightning-output-field>
                                                    </lightning-record-view-form>
                                                </div>
+                                                <div class="slds-col slds-size_3-of-12" style="margin-top: 10px;"></div>
+                                                <div class="slds-col slds-size_9-of-12" style="margin-top: 10px;">
+                                                    <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id}>
+                                                        <lightning-output-field field-name="SAC_DetalleDictamen__c"> </lightning-output-field>
+                                                </lightning-record-view-form>
+                                                </div>
+                                                <div class="slds-col slds-size_3-of-12"></div>
+                                                <div class="slds-col slds-size_9-of-12">
+                                                <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" data-record-id={punto.Id} record-id={punto.Id}>
+                                                        <lightning-output-field field-name="SAC_Observaciones__c"> </lightning-output-field>
+                                                </lightning-record-view-form>
+                                                </div>
                                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
                                            </div>
                                        </template>
@@ -456,7 +525,7 @@
                                        <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
 
                                        <!-- Funcionalidad para revisar la auditoria una vez completada -->
-                                        <lightning-record-edit-form style="width:100%;" if:false={auditoria.Replicada} object-api-name="SEG_Auditoria__c" record-id={auditoria.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                        <lightning-record-edit-form style="width:100%;" if:false={auditoria.Replicada} object-api-name="SEG_Auditoria__c" data-record-id={auditoria.Id} record-id={auditoria.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
                                             <div lwc:if={auditoria.PermisosReplicar} class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xx-small"> 
                                                 <div class="slds-col slds-size_3-of-12"></div>
                                                 <div class="slds-col slds-size_2-of-12"><span>Réplica</span></div>

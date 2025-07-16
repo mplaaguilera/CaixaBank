@@ -13,9 +13,10 @@ import validarPretensiones from '@salesforce/apex/SAC_LCMP_RecuperarPlantillas.v
 //Campos reclamación
 import IDIOMA_FIELD from '@salesforce/schema/Case.CC_Idioma__c';
 import RECORDTYPE_FIELD from '@salesforce/schema/Case.RecordTypeId';
+import ENTIDAD_AFECTADA_FIELD from '@salesforce/schema/Case.SAC_Entidad_Afectada__c';
 
 
-const fields = [IDIOMA_FIELD, RECORDTYPE_FIELD];
+const fields = [IDIOMA_FIELD, RECORDTYPE_FIELD, ENTIDAD_AFECTADA_FIELD];
 
 export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
     // Variable que se comunica con el lwc sAC_GeneracionDocumento
@@ -53,6 +54,7 @@ export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
     @track caso;
     @track idiomaReclamacion = '';
     @track recordTypeCaso;
+    @track entAfectada = '';
 
 
     //Se obtiene cuál es el idioma del caso
@@ -62,6 +64,7 @@ export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
             this.caso = data;
             this.idiomaReclamacion = data.fields.CC_Idioma__c.value;
             this.recordTypeCaso = data.fields.RecordTypeId.value;
+            this.entAfectada = data.fields.SAC_Entidad_Afectada__c.value;
         }
     }
 
@@ -256,7 +259,7 @@ export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
             this.dispatchEvent(new RefreshEvent());
 		}
 		else {
-            obtenerDatosTemplate({'idTemplate': this.idPlantilla, 'idObject': this.recordId, 'idioma': this.idiomaReclamacion, 'recordType' : this.recordTypeCaso}).then(result => {              
+            obtenerDatosTemplate({'idTemplate': this.idPlantilla, 'idObject': this.recordId, 'idioma': this.idiomaReclamacion, 'recordType' : this.recordTypeCaso, 'entidadAfectada' : this.entAfectada}).then(result => {              
                 if(result){
                     this.cuerpoPlantilla = result.cuerpo;
                     this.headerPlantilla = result.header;

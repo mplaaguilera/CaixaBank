@@ -42,8 +42,10 @@
 
                                 <aura:if isTrue="{!v.readonly}">
                                     <lightning:outputField fieldName="SAC_PlantillaReclamante__c" />
+                                    <lightning:outputField fieldName="SAC_PlantillaReclamanteCartaPostal__c" />
                                     <aura:set attribute="else">
                                         <lightning:inputField fieldName="SAC_PlantillaReclamante__c" />
+                                        <lightning:inputField fieldName="SAC_PlantillaReclamanteCartaPostal__c" />
                                     </aura:set>
                                 </aura:if>
                             </lightning:recordEditForm>

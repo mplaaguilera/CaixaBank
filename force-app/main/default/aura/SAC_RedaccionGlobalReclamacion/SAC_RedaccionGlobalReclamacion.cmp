@@ -65,7 +65,6 @@
             </div>
         </div>
     </aura:if>
-
     <aura:if
         isTrue="{!or(v.caso.Status == 'Cerrado', v.caso.Status == 'SAC_004') &amp;&amp; v.metodoEnvio == 'SAC_CartaPostal' &amp;&amp; v.comunicacionCliente == true}">
         <div class="slds-align_absolute-center" style="height:5rem">
@@ -103,7 +102,7 @@
                                     <c:SAC_GestionEmails ficherosAdjuntos="{!v.ficherosAdjuntos}" para="{!v.para}" copiaOculta="{!v.CCO}" asunto="{!v.asunto}" cuerpo="{!v.cuerpo}" caso="{!v.caso}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" seleccionarReclamacion="true" />
                                 </aura:if>
                                 <aura:if isTrue="{!and(v.metodoEnvio == 'SAC_CartaPostal' &amp;&amp; v.usarComponente &amp;&amp; !v.checkMail)}">
-                                    <c:SAC_EnvioResolucionCorreoPostal recordId="{!v.recordId}" />
+                                    <c:SAC_EnvioResolucionCorreoPostal recordId="{!v.recordId}" procedenciaAdj="{!v.procedencia}" caso="{!v.caso}" seleccionarReclamacion="true"/>
                                 </aura:if>
                             </aura:if>                       
                         

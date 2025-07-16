@@ -21,7 +21,7 @@
             component.set('v.idiomaInformado', true);
           }
         }
-
+        
         var getUser = component.get("c.recuperarUser");
         getUser.setParams({
           casoActual: casoActual,

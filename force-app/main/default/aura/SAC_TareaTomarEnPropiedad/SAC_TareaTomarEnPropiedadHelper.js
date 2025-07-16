@@ -24,7 +24,18 @@
                 });
                 toastEvent.fire(); 
                 $A.get('e.force:refreshView').fire(); 
-          
+            }else{
+                component.set('v.isLoading', false); 
+
+                var errors = response.getError();
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    "title": "Error",
+                    "message": errors[0].message,
+                    "type": "error"
+                });
+                toastEvent.fire(); 
+                $A.get('e.force:refreshView').fire(); 
             }
         }
     ),
@@ -69,6 +80,19 @@
                     });
                     toastEvent.fire(); 
                     $A.get('e.force:refreshView').fire();                 
+                }
+                else{
+                    component.set('v.isLoading', false); 
+    
+                    var errors = response.getError();
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        "title": "Error",
+                        "message": errors[0].message,
+                        "type": "error"
+                    });
+                    toastEvent.fire(); 
+                    $A.get('e.force:refreshView').fire(); 
                 }
             })
     

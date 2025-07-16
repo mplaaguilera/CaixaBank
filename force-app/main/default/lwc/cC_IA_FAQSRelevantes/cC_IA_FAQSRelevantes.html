@@ -1,0 +1,22 @@
+<template>
+  <template if:true={isLoadingOpp}>
+    <div class="sincasos">
+    <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </div>
+  </template>
+  <template if:false={sinDatos}>
+      <div class="slds-grid">
+        <template for:each={relevantes} for:item="caso">
+          <div class="slds-col slds-size_2-of-6 tarjeta slds-card slds-card_boundary" key={caso.id}>
+            <header class="slds-popover__header">
+              <div class="onclick"><h2 class="slds-text-heading_small" onclick={handleOpenTab} data-url={caso.id}>{caso.titulo}</h2></div>
+            </header>
+            <div class="slds-scrollable_x slds-p-left_x-small slds-p-bottom_xx-small">
+              <b class="slds-p-right_x-small">Punto clave:</b>{caso.Fragmento}<br>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+    <template if:true={sinDatos}><div class="sincasos"><h2><b>No se han encontrado Artículos Relacionados</b></h2></div></template>
+</template>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>sire_lwc_Comunicaciones</componentName>
+                <identifier>c_sire_lwc_Comunicaciones</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>sire_lwc_HomeGestorFlujo</componentName>
+                <identifier>c_sire_lwc_HomeGestorFlujo</identifier>
+                <visibilityRule>
+                    <booleanFilter>(1 AND 2) OR 3</booleanFilter>
+                    <criteria>
+                        <leftValue>{!$User.AV_Funcion__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Gestor</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!$User.AV_tipoGestor__c}</leftValue>
+                        <operator>NE</operator>
+                        <rightValue>Tec. Ges. Act.</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!$User.AV_tipoGestor__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Dir. Banca Emp.</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>dashboardId</name>
+                    <value>SIRE_Inicio_FLUJO</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>enableNotifications</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>enableSubscriptions</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>height</name>
+                    <value>1850</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>hideOnError</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>openLinksInNewWindow</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>openLocation</name>
+                    <value>HIDE</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>showHeader</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>showSharing</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>showTitle</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentName>wave:waveDashboard</componentName>
+                <identifier>wave_waveDashboard</identifier>
+                <visibilityRule>
+                    <booleanFilter>(1 OR 2) AND 3</booleanFilter>
+                    <criteria>
+                        <leftValue>{!$User.AV_Funcion__c}</leftValue>
+                        <operator>NE</operator>
+                        <rightValue>Gestor</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!$User.AV_tipoGestor__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Tec. Ges. Act.</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!$User.AV_tipoGestor__c}</leftValue>
+                        <operator>NE</operator>
+                        <rightValue>Dir. Banca Emp.</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <name>main</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <masterLabel>Inicio FLUJO</masterLabel>
+    <template>
+        <name>flexipage:defaultAppHomeTemplate</name>
+    </template>
+    <type>AppPage</type>
+</FlexiPage>

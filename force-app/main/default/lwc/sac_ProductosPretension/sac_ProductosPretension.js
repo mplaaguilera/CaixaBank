@@ -4,7 +4,12 @@ import { NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { deleteRecord } from 'lightning/uiRecordApi';
-import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
+//import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
+import createProductCase from '@salesforce/apex/SAC_LCMP_ProductosPretension.createProductCase';
+import editProductCase from '@salesforce/apex/SAC_LCMP_ProductosPretension.editProductCase';
+import eliminarProducto from '@salesforce/apex/SAC_LCMP_ProductosPretension.eliminarProducto';
+import { getRecord } from 'lightning/uiRecordApi';
+const FIELDS = ['Case.CaseNumber', 'Case.Status'];
 
 const actions = [
     { label: 'Editar', name: 'prod_editar', iconName: 'utility:edit' },
@@ -26,7 +31,11 @@ const columnsReclamacionExpandida = [
     { label: 'Tae máximo aplicado', fieldName: 'SAC_TaeMaximoAplicado__c', type: 'number', sortable: true, cellAttributes: { iconName: 'utility:percent', iconPosition: 'right' }, typeAttributes: { minimumFractionDigits: 2, maximumFractionDigits: 2 } },
     { label: 'Tae inicial contrato', fieldName: 'SAC_TaeInicialContrato__c', type: 'number', sortable: true, cellAttributes: { iconName: 'utility:percent', iconPosition: 'right' }, typeAttributes: { minimumFractionDigits: 2, maximumFractionDigits: 2 } },
     { label: 'Negociar', fieldName: 'SAC_Negociar__c', type: 'text', sortable: true },
-    { label: 'Disponemos de contrato', fieldName: 'SAC_DisponemosDeContrato__c', type: 'text', sortable: true }
+    { label: 'Disponemos de contrato', fieldName: 'SAC_DisponemosDeContrato__c', type: 'text', sortable: true },
+    { label: 'Fecha Apertura', fieldName: 'SAC_FechaApertura__c', type: 'text', sortable: true },
+    { label: 'Fecha Cancelación', fieldName: 'SAC_FechaCancelacion__c', type: 'text', sortable: true },
+    { label: 'Procedencia del contrato', fieldName: 'SAC_ProcedenciaContrato__c', type: 'text', sortable: true},
+    { label: 'Caja de procedencia', fieldName: 'SAC_CajaProcedencia__c', type: 'text', sortable: true}
 ];
 
 const columnsPretension = [
@@ -47,6 +56,10 @@ const columnsPretensionExpandida = [
     { label: 'Tae inicial contrato', fieldName: 'SAC_TaeInicialContrato__c', type: 'number', sortable: true, cellAttributes: { iconName: 'utility:percent', iconPosition: 'right' }, typeAttributes: { minimumFractionDigits: 2, maximumFractionDigits: 2 } },
     { label: 'Negociar', fieldName: 'SAC_Negociar__c', type: 'text', sortable: true },
     { label: 'Disponemos de contrato', fieldName: 'SAC_DisponemosDeContrato__c', type: 'text', sortable: true },
+    { label: 'Fecha Apertura', fieldName: 'SAC_FechaApertura__c', type: 'text', sortable: true },
+    { label: 'Fecha Cancelación', fieldName: 'SAC_FechaCancelacion__c', type: 'text', sortable: true },
+    { label: 'Procedencia del contrato', fieldName: 'SAC_ProcedenciaContrato__c', type: 'text', sortable: true},
+    { label: 'Caja de procedencia', fieldName: 'SAC_CajaProcedencia__c', type: 'text', sortable: true},
     {
         type: 'action',
         typeAttributes: { rowActions: actions }
@@ -70,7 +83,37 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
     @track abrirModalListaProductos = false;
     @api spinnerLoading = false;
 
-    productosAbiertos = false
+    productosAbiertos = false;
+    createProductModalOpen = false;
+    editProductModalOpen = false;
+    
+    sacDescripcion; 
+    sacFechaApertura;
+    sacFechaCancelacion;
+    nContrato;
+    sacTipo;
+    sacTaeInicial;
+    sacTaeMaximo;
+    sacNegociar;
+    sacDisponemosContrato;
+    sacProcedenciaContrato;
+    sacCajaProcedencia; //Campo solo visible si la procedencia del contrato es Banca Cívica
+    @track caseNumber;
+    @track mostrarCajaProcedencia = false;
+
+    @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
+    case;
+
+    getCaseNumber() {
+        if (this.case.data) {
+            this.caseNumber = this.case.data.fields.CaseNumber.value;
+        }
+    }
+
+    renderedCallback() {
+        this.getCaseNumber();
+    }
+    
     @wire(getProductosPretensiones, { recordId: '$recordId' })
     wiredProdPretensiones(result) {
         this.wiredProdPretensiones = result;
@@ -80,11 +123,11 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
             this.listaProductos = result.data.listaProductos;
             this.error = undefined;
 
-            if(this.tipoCaso == 'SAC_Reclamacion'){
+            if(this.tipoCaso == 'SAC_Reclamacion' || this.tipoCaso === 'SPV_Reclamacion'){
                 this.mostrarReclamacion = true;
                 this.mostrarPretension = false;
                 this.tituloTabla = 'Productos de pretensiones (' +  this.listaProductos.length + ')';
-            }else if(this.tipoCaso == 'SAC_Pretension'){
+            }else if(this.tipoCaso == 'SAC_Pretension' || this.tipoCaso === 'SPV_Pretension'){
                 this.mostrarReclamacion = false;
                 this.mostrarPretension = true;
                 this.tituloTabla = 'Productos de la pretensión (' +  this.listaProductos.length + ')';
@@ -95,7 +138,7 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
             this.tipoCaso = undefined;
         }
     }
-
+    
     handleRefreshClick() {
         this.spinnerLoading = !this.spinnerLoading;
         
@@ -212,6 +255,14 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
             sortedBy = 'SAC_Negociar__c';
         }else if(this.sortedBy === 'SAC_DisponemosDeContrato__c'){
             sortedBy = 'SAC_DisponemosDeContrato__c';
+        }else if(this.sortedBy === 'SAC_FechaApertura__c'){
+            sortedBy = 'SAC_FechaApertura__c';
+        }else if(this.sortedBy === 'SAC_FechaCancelacion__c'){
+            sortedBy = 'SAC_FechaCancelacion__c';
+        }else if(this.sortedBy === 'SAC_ProcedenciaContrato__c'){
+            sortedBy = 'SAC_ProcedenciaContrato__c';
+        }else if(this.sortedBy === 'SAC_CajaProcedencia__c'){
+            sortedBy = 'SAC_CajaProcedencia__c';
         }
 
         sortedData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
@@ -226,7 +277,11 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
                 SAC_TaeMaximoAplicado__c: this.roundNumber(prod.SAC_TaeMaximoAplicado__c),
                 SAC_TaeInicialContrato__c: this.roundNumber(prod.SAC_TaeInicialContrato__c),
                 SAC_Negociar__c: prod.SAC_Negociar__c,
-                SAC_DisponemosDeContrato__c: prod.SAC_DisponemosDeContrato__c
+                SAC_DisponemosDeContrato__c: prod.SAC_DisponemosDeContrato__c,
+                SAC_FechaApertura__c: prod.SAC_FechaApertura__c,
+                SAC_FechaCancelacion__c: prod.SAC_FechaApertura__c,
+                SAC_ProcedenciaContrato__c: prod.SAC_ProcedenciaContrato__c,
+                SAC_CajaProcedencia__c: prod.SAC_CajaProcedencia__c
             };
         });
     }
@@ -237,23 +292,181 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
     }
 
     handleNewProduct() {
+        this.createProductModalOpen = true;
+    }
 
-        const recordId = this.recordId;
+    // Cerrar modal crear producto
+    cerrarModalCreateProduct() {
+        this.createProductModalOpen = false;
+    }
 
-        const defaultValues = encodeDefaultFieldValues({
-            SAC_Pretension__c: recordId
-        });
+    // Cerrar modal editar producto
+    cerrarModalEditProduct() {
 
-        this[NavigationMixin.Navigate]({
-            type: 'standard__objectPage',
-            attributes: {    
-                objectApiName: 'SAC_ProductCase__c',
-                actionName: 'new'
-            },
-            state: {
-                defaultFieldValues: defaultValues
+        this.vaciarDatos();
+        this.editProductModalOpen = false;
+    }
+
+    // Manejar cambios en los campos
+    handleInputChange(event) {
+        const field = event.target.fieldName;
+        if (field === 'SAC_Pretension__c') {
+            this.sacPretension = event.target.value;
+        } else if (field === 'SAC_Descripcion__c') {
+            this.sacDescripcion = event.target.value;
+        } else if (field === 'SAC_FechaApertura__c') {
+            this.sacFechaApertura = event.target.value;
+        } else if (field === 'SAC_FechaCancelacion__c') {
+            this.sacFechaCancelacion = event.target.value;
+        } else if (field === 'N_Contrato__c') { 
+            this.nContrato = event.target.value;
+        } else if (field === 'SAC_Tipo__c') {
+            this.sacTipo = event.target.value;
+            if(this.sacTipo == 'Contrato no aplica'){
+                this.nContrato = '000';
+            }else if(this.sacTipo == 'Contrato no localizado'){
+                this.nContrato = '999';
             }
-        });
+        } else if (field === 'SAC_TaeInicialContrato__c') { 
+            this.sacTaeInicial = event.target.value;
+        } else if (field === 'SAC_TaeMaximoAplicado__c') { 
+            this.sacTaeMaximo = event.target.value;
+        } else if (field === 'SAC_Negociar__c') { 
+            this.sacNegociar = event.target.value;
+        } else if (field === 'SAC_DisponemosDeContrato__c') { 
+            this.sacDisponemosContrato = event.target.value;
+        }else if (field === 'SAC_ProcedenciaContrato__c'){
+            this.sacProcedenciaContrato = event.target.value;
+            if(this.sacProcedenciaContrato === 'Banca Cívica'){
+                this.mostrarCajaProcedencia = true;
+            }else{
+                this.sacCajaProcedencia = null;
+                this.mostrarCajaProcedencia = false;
+            }
+        }else if (field === 'SAC_CajaProcedencia__c'){
+            this.sacCajaProcedencia = event.target.value;
+        }
+    }
+
+    // Manejar éxito al guardar el registro
+    handleSuccessCreateProduct(event) {
+        const recordId = event.detail.id;
+        
+        this.cerrarModalCreateProduct();
+    }
+
+    // Manejar error al guardar el registro
+    handleErrorCreateProduct(event) {
+        this.showToast('Error', event.detail.message, 'error');
+    }
+
+    handleGuardarCreateProduct() {
+        // Llamada a Apex para crear el registro
+        if(this.sacDescripcion == '' || this.sacDescripcion == null || this.sacTipo == '' || this.sacTipo == null || this.nContrato == '' || this.nContrato == null){
+            if((this.sacDescripcion == '' || this.sacDescripcion == null) && (this.sacTipo == '' || this.sacTipo == null) && (this.nContrato == '' || this.nContrato == null)){
+                this.showToast('Error', 'Es necesario informar todos los campos obligatorios antes de guardar.', 'error');
+            }else if(this.sacDescripcion == '' || this.sacDescripcion == null){
+                this.showToast('Error', 'Es obligatorio informar el campo Descripción antes de guardar.', 'error');
+            }else if(this.sacTipo == '' || this.sacTipo == null){
+                this.showToast('Error', 'Es obligatorio informar el campo Tipo antes de guardar.', 'error');
+            }else{
+                this.showToast('Error', 'Es obligatorio informar el Nº de contrato antes de guardar.', 'error');
+            }
+        }else{
+            this.spinnerLoading = true;
+            createProductCase({ 
+                descripcion: this.sacDescripcion,
+                contrato: this.nContrato,
+                tipo: this.sacTipo,
+                fechaApertura: this.sacFechaApertura,
+                fechaCancelacion: this.sacFechaCancelacion,
+                pretensionId: this.recordId,
+                taeInicial: this.sacTaeInicial,
+                taeMaximo: this.sacTaeMaximo,
+                negociar: this.sacNegociar,
+                disponemosContrato: this.sacDisponemosContrato,
+                procedenciaContrato: this.sacProcedenciaContrato,
+                cajaProcedencia: this.sacCajaProcedencia
+            })
+            .then(result => {
+                this.showToast('Éxito', 'Se ha creado el producto correctamente', 'success');
+                this.spinnerLoading = false;
+                this.vaciarDatos();
+                this.cerrarModalCreateProduct();  // Cerrar el modal al guardar correctamente
+            })
+            .catch(error => {
+                this.spinnerLoading = false;
+                this.showToast('Error', error.body.message, 'error');
+            });
+        }
+    }
+
+    vaciarDatos(){
+        this.sacPretension = null;
+        this.sacDescripcion = null;
+        this.sacFechaApertura = null;
+        this.sacFechaCancelacion = null;
+        this.nContrato = null;
+        this.sacTipo = null;
+        this.sacTaeInicial = null;
+        this.sacTaeMaximo = null;
+        this.sacNegociar = null;
+        this.sacDisponemosContrato = null;
+        this.sacProcedenciaContrato = null;
+        this.sacCajaProcedencia = null;
+        this.mostrarCajaProcedencia = false;
+    }
+
+    // Manejar éxito al guardar el registro
+    handleSuccessEditProduct(event) {
+        const recordId = event.detail.id;
+        this.cerrarModalEditProduct();
+    }
+
+    // Manejar error al guardar el registro
+    handleErrorEditProduct(event) {
+        this.showToast('Error', event.detail.message, 'error');
+    }
+
+    handleGuardarEditProduct() {
+        // Llamada a Apex para crear el registro
+        if(this.sacDescripcion == '' || this.sacDescripcion == null || this.sacTipo == '' || this.sacTipo == null || this.nContrato == '' || this.nContrato == null){
+            if((this.sacDescripcion == '' || this.sacDescripcion == null) && (this.sacTipo == '' || this.sacTipo == null) && (this.nContrato == '' || this.nContrato == null)){
+                this.showToast('Error', 'Es necesario informar todos los campos obligatorios antes de guardar.', 'error');
+            }else if(this.sacDescripcion == '' || this.sacDescripcion == null){
+                this.showToast('Error', 'Es obligatorio informar el campo Descripción antes de guardar.', 'error');
+            }else if(this.sacTipo == '' || this.sacTipo == null){
+                this.showToast('Error', 'Es obligatorio informar el campo Tipo antes de guardar.', 'error');
+            }else{
+                this.showToast('Error', 'Es obligatorio informar el Nº de contrato antes de guardar.', 'error');
+            }
+        }else{
+            this.spinnerLoading = true;
+            editProductCase({ 
+                productId: this.productoSeleccionadoId,
+                descripcion: this.sacDescripcion,
+                contrato: this.nContrato,
+                tipo: this.sacTipo,
+                fechaApertura: this.sacFechaApertura,
+                fechaCancelacion: this.sacFechaCancelacion,
+                pretensionId: this.recordId,
+                taeInicial: this.sacTaeInicial,
+                taeMaximo: this.sacTaeMaximo,
+                negociar: this.sacNegociar,
+                disponemosContrato: this.sacDisponemosContrato,
+                procedenciaContrato: this.sacProcedenciaContrato,
+                cajaProcedencia : this.sacCajaProcedencia
+            })
+            .then(result => {
+                this.showToast('Éxito', 'Se ha editado el producto correctamente', 'success');
+                this.spinnerLoading = false;
+                this.cerrarModalEditProduct();  // Cerrar el modal al guardar correctamente
+            })
+            .catch(error => {
+                this.spinnerLoading = false;
+                this.showToast('Error', error.body.message, 'error');
+            });
+        }
     }
 
     handleButtonClick(event) {
@@ -267,15 +480,30 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
                 this.abrirModalListaProductos = false
             }
 
-        }else if (action === 'prod_editar') {            
-            this[NavigationMixin.Navigate]({
-                type: 'standard__recordPage',
-                attributes: {    
-                    recordId: this.productoSeleccionadoId,
-                    objectApiName: 'SAC_ProductCase__c',
-                    actionName: 'edit'
-                }
-            });
+        }else if (action === 'prod_editar') {  
+            const producto = event.detail.row;
+        
+        // Asignar los valores actuales del registro a las variables
+            this.sacPretension = producto.SAC_Pretension__c;
+            this.sacDescripcion = producto.SAC_Descripcion__c;
+            this.sacFechaApertura = producto.SAC_FechaApertura__c;
+            this.sacFechaCancelacion = producto.SAC_FechaCancelacion__c;
+            this.nContrato = producto.N_Contrato__c;
+            this.sacTipo = producto.SAC_Tipo__c;
+            this.sacTaeInicial = producto.SAC_TaeInicialContrato__c;
+            this.sacTaeMaximo = producto.SAC_TaeMaximoAplicado__c;
+            this.sacNegociar = producto.SAC_Negociar__c;
+            this.sacDisponemosContrato = producto.SAC_DisponemosDeContrato__c;
+            this.sacProcedenciaContrato = producto.SAC_ProcedenciaContrato__c;
+            this.sacCajaProcedencia = producto.SAC_CajaProcedencia__c;
+            if(this.sacProcedenciaContrato === 'Banca Cívica'){
+                this.mostrarCajaProcedencia = true;
+            }else{
+                this.mostrarCajaProcedencia = false;
+            }
+
+            this.editProductModalOpen = true;
+            this.abrirModalListaProductos = false;
         }
     }
 
@@ -286,25 +514,27 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
         if(this.productosAbiertos == true){
             this.abrirModalListaProductos = true
         }
-        
     }
 
     confirmarEliminar() {
-        deleteRecord(this.productoSeleccionadoId)
+        this.spinnerLoading = true;
+        eliminarProducto({idProducto: this.productoSeleccionadoId})
         .then(() => {
             this.showToast('Producto eliminado', 'Se ha eliminado el producto de pretensión correctamente', 'success');
+            this.spinnerLoading = false;
             return refreshApex(this.wiredProdPretensiones);
         })
         .catch(error => {
+            this.spinnerLoading = false;
             this.showToast('Error', 'Error al eliminar el producto de pretensión seleccionado', 'error');
-        }); 
+        });
 
         this.mostrarEliminar = false;
+
         //Al cerrar el modal de eliminar, en caso de que ya estuviera abierto el modal de los productos, se vuelve a mostrar
         if(this.productosAbiertos == true){
-                this.abrirModalListaProductos = true
-            }
-
+            this.abrirModalListaProductos = true
+        }
     }
 
     showToast(title, message, variant) {
@@ -315,5 +545,4 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
         });
         this.dispatchEvent(event);
     }
-
 }

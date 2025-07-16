@@ -1,0 +1,21 @@
+<template>
+    <section role="dialog" tabindex="-1" aria-modal="true" class="modal slds-modal" onkeydown={modalTeclaPulsada}>
+        <div class="slds-modal__container">
+            <lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModal} class="slds-modal__close"></lightning-button-icon>
+            <c-cc_-operativa_-oficina 
+                record-id={recordId} 
+                oportunidad-creada-api={oportunidadCreadaAPI}
+                derivar-b={derivar} 
+                otp-derivar={otpDerivar}
+                onmodalcerrado={handleModalOficinaCerrado}
+                onrealizartrasladocolaborador={realizarTrasladoDesdeDerivar}
+                onrealizarremitido={abrirModalTrasladarColaborador}
+                onsolicitarinfo={abrirModalSolicitarInfo}
+                onrefrescartab={refreshTab}
+                ondesactivarspinner={desactivarSpinnerDerivar}
+                onabrirmodal={abrirModal}>
+            </c-cc_-operativa_-oficina>
+        </div>
+        <div class="backdrop slds-backdrop_open"></div>
+    </section>
+</template>

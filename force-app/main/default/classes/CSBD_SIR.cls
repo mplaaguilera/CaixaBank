@@ -31,7 +31,7 @@ public with sharing class CSBD_SIR {
         }
     }
 
-    /* Finalmente no es necesario invocar este servicio de SIR
+    /* Finalmente no es necesario invocar el servicio de SIR
     public static Map<String, Integer> sirConsultaScorings(String numperso) {
         CC_InterfaceSettings__mdt parametrosInterfaz = obtenerParametrosIntegracion('CSBD_SIR_ConsultaScorings');
         if (parametrosInterfaz == null) {

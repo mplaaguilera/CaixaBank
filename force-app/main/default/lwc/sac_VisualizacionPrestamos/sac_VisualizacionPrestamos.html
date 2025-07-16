@@ -1,337 +1,367 @@
 <template>
-    <!-- Préstamo records -->
-    <lightning-card style="margin-bottom: 40px;">
-       <template if:true={prestamosRT}>
-          <template for:each={prestamosRT} for:item="prestamos">
-             <lightning-card key={prestamos.recordTypeDevName} title={prestamos.tableTitle}>
-                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
-                   <thead>
-                      <tr>
-                         <template if:true={prestamos.prestamoRT}>
-                            <th scope="col">Préstamo</th>
-                            <th scope="col">Nº Contrato</th>
-                            <th scope="col">Fecha Const.</th>
-                            <th scope="col">Fecha Cancel.</th>
-                            <th scope="col">Activo</th>
-                            <th scope="col">Finalidad</th>
-                            <th scope="col">Provincia</th>
-                            <th scope="col">Resolución express</th>
-                            <th scope="col"></th>
-                         </template>
-                         <template if:true={prestamos.titularPrestamoRT}>
-                            <th scope="col">Préstamo</th>
-                            <th scope="col">Titular</th>
-                            <th scope="col">Tipo persona</th>
-                            <th scope="col">Relación</th>
-                            <th scope="col">Tipo doc.</th>
-                            <th scope="col">NIF</th>
-                            <th scope="col">Empleado</th>
-                            <th scope="col">Provincia</th>
-                            <th scope="col"></th>
-                         </template>
-                         <template if:true={prestamos.titularCuentaRT}>
-                            <th scope="col">Préstamo</th>
-                            <th scope="col">Titular</th>
-                            <th scope="col">Tipo persona</th>
-                            <th scope="col">Relación</th>
-                            <th scope="col">Tipo doc.</th>
-                            <th scope="col">NIF</th>
-                            <th scope="col">Empleado</th>
-                            <th scope="col">Provincia</th>
-                            <th scope="col"></th>
-                         </template>
-                      </tr>
-                   </thead>
-                   <tbody>
-                      <template for:each={prestamos.prestamos} for:item="prestamo">
-                         <tr key={prestamo.prestamo.Id}>
-                            <template if:true={prestamos.prestamoRT}>
-                               <td>
-                                  <a href={prestamo.url} target="_blank">{prestamo.prestamo.Name}</a>
-                               </td>
-                               <td>{prestamo.prestamo.SAC_Codigo_Contrato__c}</td>
-                               <td>
-                                  <lightning-formatted-date-time 
-                                     value={prestamo.prestamo.SAC_Fecha_constitucion_prestamo__c} 
-                                     year="numeric" 
-                                     month="numeric" 
-                                     day="numeric">
-                                  </lightning-formatted-date-time>
-                               </td>
-                               <td>
-                                 <lightning-formatted-date-time 
-                                    value={prestamo.prestamo.SAC_Fecha_cancelacion_real_prestamo__c} 
-                                    year="numeric" 
-                                    month="numeric" 
-                                    day="numeric">
-                                 </lightning-formatted-date-time>
-                              </td>
-                               <td>{prestamo.prestamoActivo}</td>
-                               <td>{prestamo.prestamo.SAC_Finalidad_Prestamo__c}</td>
-                               <td>{prestamo.prestamo.SAC_Provincia_centro_gestor__c}</td>
-                               <td>{prestamo.validation}</td>
-                               <td>
-                                  <lightning-button 
-                                     label="Desplegar" 
-                                     onclick={toggleDetailsprestamo}
-                                     data-id={prestamo.prestamo.Id}
-                                     variant="brand">
-                                  </lightning-button>
-                               </td>
-                            </template>
-                            <template if:true={prestamos.titularPrestamoRT}>
-                               <td>
-                                  <a href={prestamo.url} target="_blank">{prestamo.prestamo.Name}</a>
-                               </td>
-                               <td>{prestamo.prestamo.SAC_Nombre_titular__c}</td>
-                               <td>{prestamo.prestamo.SAC_Tipo_persona__c}</td>
-                               <td>{prestamo.prestamo.SAC_Tipo_relacion__c}</td>
-                               <td>{prestamo.prestamo.SAC_Tipo_documento_titular__c}</td>
-                               <td>{prestamo.prestamo.SAC_NIF_titular__c}</td>
-                               <td>{prestamo.empleado}</td>
-                               <td>{prestamo.prestamo.SAC_Provincia_titular__c}</td>
-                               <td>
-                                  <lightning-button 
-                                     label="Desplegar" 
-                                     onclick={toggleDetailsprestamo}
-                                     data-id={prestamo.prestamo.Id}
-                                     variant="brand">
-                                  </lightning-button>
-                               </td>
-                            </template>
-                            <template if:true={prestamos.titularCuentaRT}>
-                               <td>
-                                  <a href={prestamo.url} target="_blank">{prestamo.prestamo.Name}</a>
-                               </td>
-                               <td>{prestamo.prestamo.SAC_Nombre_titular__c}</td>
-                               <td>{prestamo.prestamo.SAC_Tipo_persona__c}</td>
-                               <td>{prestamo.prestamo.SAC_Tipo_relacion__c}</td>
-                               <td>{prestamo.prestamo.SAC_Tipo_documento_titular__c}</td>
-                               <td>{prestamo.prestamo.SAC_NIF_titular__c}</td>
-                               <td>{prestamo.empleado}</td>
-                               <td>{prestamo.prestamo.SAC_Provincia_titular__c}</td>
-                               <td>
-                                  <lightning-button 
-                                     label="Desplegar" 
-                                     onclick={toggleDetailsprestamo}
-                                     data-id={prestamo.prestamo.Id}
-                                     variant="brand">
-                                  </lightning-button>
-                               </td>
-                            </template>
-                         </tr>
-                         <!-- Show details -->
-                         <template if:true={prestamo.showDetails}>
-                            <template if:true={prestamos.prestamoRT}>
-                               <tr key={prestamo.prestamo.Id}>
-                                  <td colspan="9">
-                                     <table class="no-horizontal-borders">
-                                        <tr>
-                                           <!-- Column 1 -->
-                                           <td style="vertical-align: top; padding-right: 20px;">
-                                              <p class="field-title">Id de la Cuenta actual</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Id_cuenta_actual__c}</p>
-                                              <p class="field-title">Cuenta actual activa</p>
-                                              <p class="field-value underlined">{prestamo.cuentaActualActiva}</p>
-                                              <p class="field-title">Id de la Cuenta TF7</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Id_cuenta_TF7__c}</p>
-                                              <p class="field-title">Fecha constitución préstamo</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Fecha_constitucion_prestamo__c}</p>
-                                              <p class="field-title">Fecha última subrogación</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Fecha_ultima_subrogacion__c}</p>
-                                              <p class="field-title">Fecha cancelación real del préstamo</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Fecha_cancelacion_real_prestamo__c}</p>
-                                              <p class="field-title">Último mes Datapool</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Ultimo_mes_Datapool__c}</p>
-                                              <p class="field-title">Código del centro gestor</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_centro_gestor__c}</p>
-                                              <p class="field-title">Población del centro gestor</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Poblacion_centro_gestor__c}</p>
-                                              <p class="field-title">Código Contrato Origen</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Contrato_Origen__c}</p>
-                                              <p class="field-title">Código Contrato TF7</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Contrato_TF7__c}</p>
-                                              <p class="field-title">Código Finalidad préstamo</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Finalidad_Prestamo__c}</p>
-                                              <p class="field-title">Finalidad préstamo consumidor</p>
-                                              <p class="field-value underlined">{prestamo.finalidadConsumidor}</p>
-                                              <p class="field-title">Código Entidad Origen Migración</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Entidad_Origen_Migracion__c}</p>
-                                              <p class="field-title">Código Línea Crédito</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Linea_Credito__c}</p>
-                                              <p class="field-title">Código Tipo de Garantía</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_Garantia__c}</p>
-                                              <p class="field-title">Código Garantía Principal</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Garantia_Principal__c}</p>
-                                              <p class="field-title">Código Vigencia Préstamo</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Vigencia_Prestamo__c}</p>
-                                              <p class="field-title">Código CNAE</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_CNAE__c}</p>
-                                           </td>
-                                           <!-- Column 2 -->
-                                           <td style="vertical-align: top; padding-right: 20px;">
-                                              <p class="field-title">Id de la Cuenta inicial</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Id_cuenta_inicial__c}</p>
-                                              <p class="field-title">Cuenta inicial activa</p>
-                                              <p class="field-value underlined">{prestamo.cuentaInicialActiva}</p>
-                                              <p class="field-title">Entidad migrada</p>
-                                              <p class="field-value underlined">{prestamo.entidadMigrada}</p>
-                                              <p class="field-title">Préstamo activo</p>
-                                              <p class="field-value underlined">{prestamo.prestamoActivo}</p>
-                                              <p class="field-title">Operación Empleado</p>
-                                              <p class="field-value underlined">{prestamo.operacionEmpleado}</p>
-                                              <p class="field-title">Importe capital concedido</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Importe_capital_concedido__c}</p>
-                                              <p class="field-title">Código empresa gestora</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_empresa_gestora__c}</p>
-                                              <p class="field-title">Centro gestor</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Centro_gestor__c}</p>
-                                              <p class="field-title">Provincia del centro gestor</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Provincia_centro_gestor__c}</p>
-                                              <p class="field-title">Código Contrato</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Contrato__c}</p>
-                                              <p class="field-title"></br></p>
-                                              <p class="field-value underlinedTransparent"></br></p>
-                                              <p class="field-title">Finalidad Préstamo</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Finalidad_Prestamo__c}</p>
-                                              <p class="field-title">Codigo Tipo convenio</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_Convenio__c}</p>
-                                              <p class="field-title">Entidad Origen Migración</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Entidad_Origen_Migracion__c}</p>
-                                              <p class="field-title">Línea Crédito</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Linea_Credito__c}</p>
-                                              <p class="field-title">Tipo Garantía</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_Garantia__c}</p>
-                                              <p class="field-title">Garantía Principal</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Garantia_Principal__c}</p>
-                                              <p class="field-title">Vigencia Préstamo</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Vigencia_Prestamo__c}</p>
-                                              <p class="field-title">CNAE</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_CNAE__c}</p>
-                                           </td>
-                                        </tr>
-                                     </table>
-                                  </td>
-                               </tr>
-                            </template>
-                            <template if:true={prestamos.titularPrestamoRT}>
-                               <tr key={prestamo.prestamo.Id}>
-                                  <td colspan="9">
-                                     <table class="no-horizontal-borders">
-                                        <tr>
-                                         <!-- Column 1 -->
-                                           <td style="vertical-align: top; padding-right: 20px;">
-                                              <p class="field-title">Nombre del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Nombre_titular__c}</p>
-                                              <p class="field-title">Código Tipo relación</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_relacion__c}</p>
-                                              <p class="field-title">Baja persona</p>
-                                              <p class="field-value underlined">{prestamo.bajaPersona}</p>
-                                              <p class="field-title">Defunción</p>
-                                              <p class="field-value underlined">{prestamo.defuncion}</p>
-                                              <p class="field-title">Código Tipo documento titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_documento_titular__c}</p>
-                                              <p class="field-title">NIF del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_NIF_titular__c}</p>
-                                              <p class="field-title">Localidad titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Localidad_titular__c}</p>
-                                              <p class="field-title">Código Provincia del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Provincia_titular__c}</p>
-                                              <p class="field-title">Código País del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Pais_titular__c}</p>
-                                           </td>
-                                           <!-- Column 2 -->
-                                           <td style="vertical-align: top; padding-right: 20px;">
-                                              <p class="field-title">Tipo persona</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_persona__c}</p>
-                                              <p class="field-title">Tipo relación</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_relacion__c}</p>
-                                              <p class="field-title">Empleado</p>
-                                              <p class="field-value underlined">{prestamo.empleado}</p>
-                                              <p class="field-title">Señales de bloqueo/embargo</p>
-                                              <p class="field-value underlined">{prestamo.senalBloqueoEmbargo}</p>
-                                              <p class="field-title">Tipo documento titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_documento_titular__c}</p>
-                                              <p class="field-title">Id persona en Origen</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Id_persona_en_Origen__c}</p>
-                                              <p class="field-title">Id de la cuenta actual</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Contrato__c}</p>
-                                              <p class="field-title">Provincia del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Provincia_titular__c}</p>
-                                              <p class="field-title">País del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Pais_titular__c}</p>
-                                           </td>
-                                        </tr>
-                                     </table>
-                                  </td>
-                               </tr>
-                            </template>
-                            <template if:true={prestamos.titularCuentaRT}>
-                               <tr key={prestamo.prestamo.Id}>
-                                  <td colspan="9">
-                                     <table class="no-horizontal-borders">
-                                        <tr>
-                                           <!-- Column 1 -->
-                                           <td style="vertical-align: top; padding-right: 20px;">
-                                              <p class="field-title">Nombre del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Nombre_titular__c}</p>
-                                              <p class="field-title">Código Tipo relación</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_relacion__c}</p>
-                                              <p class="field-title">Baja persona</p>
-                                              <p class="field-value underlined">{prestamo.bajaPersona}</p>
-                                              <p class="field-title">Defunción</p>
-                                              <p class="field-value underlined">{prestamo.defuncion}</p>
-                                              <p class="field-title">Código Tipo documento titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_documento_titular__c}</p>
-                                              <p class="field-title">NIF del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_NIF_titular__c}</p>
-                                              <p class="field-title">Localidad titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Localidad_titular__c}</p>
-                                              <p class="field-title">Código Provincia del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Provincia_titular__c}</p>
-                                              <p class="field-title">Código País del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Pais_titular__c}</p>
-                                           </td>
-                                           <!-- Column 2 -->
-                                           <td style="vertical-align: top; padding-right: 20px;">
-                                              <p class="field-title">Tipo persona</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_persona__c}</p>
-                                              <p class="field-title">Tipo relación</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_relacion__c}</p>
-                                              <p class="field-title">Empleado</p>
-                                              <p class="field-value underlined">{prestamo.empleado}</p>
-                                              <p class="field-title">Señales de bloqueo/embargo</p>
-                                              <p class="field-value underlined">{prestamo.senalBloqueoEmbargo}</p>
-                                              <p class="field-title">Tipo documento titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_documento_titular__c}</p>
-                                              <p class="field-title">Id persona en Origen</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Id_persona_en_Origen__c}</p>
-                                              <p class="field-title">Id de la cuenta actual</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Id_cuenta_actual__c}</p>
-                                              <p class="field-title">Provincia del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Provincia_titular__c}</p>
-                                              <p class="field-title">País del titular</p>
-                                              <p class="field-value underlined">{prestamo.prestamo.SAC_Pais_titular__c}</p>
-                                           </td>
-                                        </tr>
-                                     </table>
-                                  </td>
-                               </tr>
-                            </template>
-                         </template>
-                      </template>
-                   </tbody>
-                </table>
-             </lightning-card>
-          </template>
-       </template>
-    </lightning-card>
-    <!-- No Préstamo records -->
-    <lightning-card style="margin-bottom: 40px;">
-      <template if:true={showMessage}>
-         <template if:false={prestamosRT}>
-            <p>No hay préstamos asociados con esta cuenta.</p>
-         </template>
-       </template>
-    </lightning-card>
- </template>
+	<!-- Préstamo records -->
+	<lightning-card style="margin-bottom: 40px;">
+
+		<template lwc:if={prestamos} for:each={prestamos} for:item="prestamos">
+
+			<article key={prestamos.recordTypeDevName} class="slds-card">
+
+				<div class="slds-card__header" style="margin-bottom: 10px;">
+					<header class="slds-media slds-media_center">
+						<div class="slds-media__figure slds-var-m-left_x-small">
+							<lightning-icon icon-name="custom:custom62" size="x-small"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<h2 class="slds-card__header-title" style="font-weight: 600;">{prestamos.tableTitle}</h2>
+						</div>
+					</header>
+				</div>
+
+				<div class="slds-card__body slds-card__body_inner">
+					<div style="border: 1px solid #c9c9c9; border-radius: 5px; overflow: hidden; margin: 0 6px 0 5px; box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 2px 0px !important;">
+						<table class="slds-table slds-table_bordered slds-no-row-hover" style="border-top: none; border-bottom: none;">
+							<thead>
+								<tr style="height: 2.02rem;">
+									<template lwc:if={prestamos.prestamoRT}>
+										<th scope="col" style="width: 40px;"></th>
+										<th scope="col" title="Préstamo" style="width: 116px;">Préstamo</th>
+										<th scope="col" title="Nº Contrato">Nº Contrato</th>
+										<th scope="col" title="Fecha Const.">Fecha Const.</th>
+										<th scope="col" title="Fecha Cancel.">Fecha Cancel.</th>
+										<th scope="col" title="Activo">Activo</th>
+										<th scope="col" title="Finalidad">Finalidad</th>
+										<th scope="col" title="Provincia">Provincia</th>
+										<th scope="col" title="Resolución express">Resolución express</th>
+									</template>
+
+									<template lwc:if={prestamos.titularPrestamoRT}>
+										<th scope="col" style="width: 40px;"></th>
+										<th scope="col" title="Préstamo" style="width: 116px;">Préstamo</th>
+										<th scope="col" title="Titular" >Titular</th>
+										<th scope="col" title="Tipo persona" >Tipo persona</th>
+										<th scope="col" title="Relación" >Relación</th>
+										<th scope="col" title="Tipo doc." >Tipo doc.</th>
+										<th scope="col" title="NIF" >NIF</th>
+										<th scope="col" title="Empleado" >Empleado</th>
+										<th scope="col" title="Provincia" >Provincia</th>
+									</template>
+
+									<template lwc:if={prestamos.titularCuentaRT}>
+										<th scope="col" style="width: 40px;"></th>
+										<th scope="col" title="Préstamo" style="width: 116px;">Préstamo</th>
+										<th scope="col" title="Titular">Titular</th>
+										<th scope="col" title="Tipo persona">Tipo persona</th>
+										<th scope="col" title="Relación">Relación</th>
+										<th scope="col" title="Tipo doc.">Tipo doc.</th>
+										<th scope="col" title="NIF">NIF</th>
+										<th scope="col" title="Empleado">Empleado</th>
+										<th scope="col" title="Provincia">Provincia</th>
+									</template>
+								</tr>
+							</thead>
+							<tbody style="overflow-x: auto;">
+								<template for:each={prestamos.prestamos} for:item="prestamo">
+									<tr key={prestamo.prestamo.Id} style="height: 2.04rem;">
+										<template lwc:if={prestamos.prestamoRT}>
+											<td style="text-align: center; background-color: #f6fafe; border-right: 1px solid #dddddd;">
+												<div class="divToggle">
+													<!-- sldsValidatorIgnoreNextLine -->
+													<lightning-button-icon class="slds-align_absolute-center"
+														icon-name="utility:chevronright"
+														tooltip="Mostrar/ocultar detalles"
+														variant="bare"
+														onclick={abrirCerrarDetalles}
+														data-id={prestamo.prestamo.Id}>
+													</lightning-button-icon>
+												</div>
+											</td>
+											<td>
+												<a href={prestamo.url} target="_blank">{prestamo.prestamo.Name}</a>
+											</td>
+											<td>{prestamo.prestamo.SAC_Codigo_Contrato__c}</td>
+											<td>
+												<lightning-formatted-date-time
+													value={prestamo.prestamo.SAC_Fecha_constitucion_prestamo__c}
+													year="numeric"
+													month="numeric"
+													day="numeric">
+												</lightning-formatted-date-time>
+											</td>
+											<td>
+												<lightning-formatted-date-time
+													value={prestamo.prestamo.SAC_Fecha_cancelacion_real_prestamo__c}
+													year="numeric"
+													month="numeric"
+													day="numeric">
+												</lightning-formatted-date-time>
+											</td>
+											<td>{prestamo.prestamoActivo}</td>
+											<td>{prestamo.prestamo.SAC_Finalidad_Prestamo__c}</td>
+											<td>{prestamo.prestamo.SAC_Provincia_centro_gestor__c}</td>
+											<td>{prestamo.validation}</td>
+										</template>
+										<template lwc:if={prestamos.titularPrestamoRT}>
+											<td style="text-align: center; background-color: #f6fafe; border-right: 1px solid #dddddd;">
+												<div class="divToggle">
+													<!-- sldsValidatorIgnoreNextLine -->
+													<lightning-button-icon class="slds-align_absolute-center"
+														icon-name="utility:chevronright"
+														tooltip="Mostrar/ocultar detalles"
+														variant="bare"
+														onclick={abrirCerrarDetalles}
+														data-id={prestamo.prestamo.Id}>
+													</lightning-button-icon>
+												</div>
+											</td>
+											<td>
+												<a href={prestamo.url} target="_blank">{prestamo.prestamo.Name}</a>
+											</td>
+											<td>{prestamo.prestamo.SAC_Nombre_titular__c}</td>
+											<td>{prestamo.prestamo.SAC_Tipo_persona__c}</td>
+											<td>{prestamo.prestamo.SAC_Tipo_relacion__c}</td>
+											<td>{prestamo.prestamo.SAC_Tipo_documento_titular__c}</td>
+											<td>{prestamo.prestamo.SAC_NIF_titular__c}</td>
+											<td>{prestamo.empleado}</td>
+											<td>{prestamo.prestamo.SAC_Provincia_titular__c}</td>
+										</template>
+										<template lwc:if={prestamos.titularCuentaRT}>
+											<td style="text-align: center; background-color: #f6fafe; border-right: 1px solid #dddddd;">
+												<div class="divToggle">
+													<!-- sldsValidatorIgnoreNextLine -->
+													<lightning-button-icon class="slds-align_absolute-center"
+														icon-name="utility:chevronright"
+														tooltip="Mostrar/ocultar detalles"
+														variant="bare"
+														onclick={abrirCerrarDetalles}
+														data-id={prestamo.prestamo.Id}>
+													</lightning-button-icon>
+												</div>
+											</td>
+											<td>
+												<a href={prestamo.url} target="_blank">{prestamo.prestamo.Name}</a>
+											</td>
+											<td>{prestamo.prestamo.SAC_Nombre_titular__c}</td>
+											<td>{prestamo.prestamo.SAC_Tipo_persona__c}</td>
+											<td>{prestamo.prestamo.SAC_Tipo_relacion__c}</td>
+											<td>{prestamo.prestamo.SAC_Tipo_documento_titular__c}</td>
+											<td>{prestamo.prestamo.SAC_NIF_titular__c}</td>
+											<td>{prestamo.empleado}</td>
+											<td>{prestamo.prestamo.SAC_Provincia_titular__c}</td>
+										</template>
+									</tr>
+
+									<!-- Show details -->
+									<tr lwc:if={prestamos.prestamoRT} key={prestamo.prestamo.Id}>
+										<td class="tdDetalles" colspan="9">
+											<div class="divFormDetalles" data-id={prestamo.prestamo.Id}>
+
+												<table class="no-horizontal-borders slds-var-m-top_medium">
+													<tr>
+														<!-- Column 1 -->
+														<td style="vertical-align: top; padding-right: 20px;">
+															<p class="field-title">Id de la Cuenta actual</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Id_cuenta_actual__c}</p>
+															<p class="field-title">Cuenta actual activa</p>
+															<p class="field-value underlined">{prestamo.cuentaActualActiva}</p>
+															<p class="field-title">Id de la Cuenta TF7</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Id_cuenta_TF7__c}</p>
+															<p class="field-title">Fecha constitución préstamo</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Fecha_constitucion_prestamo__c}</p>
+															<p class="field-title">Fecha última subrogación</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Fecha_ultima_subrogacion__c}</p>
+															<p class="field-title">Fecha cancelación real del préstamo</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Fecha_cancelacion_real_prestamo__c}</p>
+															<p class="field-title">Último mes Datapool</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Ultimo_mes_Datapool__c}</p>
+															<p class="field-title">Código del centro gestor</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_centro_gestor__c}</p>
+															<p class="field-title">Población del centro gestor</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Poblacion_centro_gestor__c}</p>
+															<p class="field-title">Código Contrato Origen</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Contrato_Origen__c}</p>
+															<p class="field-title">Código Contrato TF7</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Contrato_TF7__c}</p>
+															<p class="field-title">Código Finalidad préstamo</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Finalidad_Prestamo__c}</p>
+															<p class="field-title">Finalidad préstamo consumidor</p>
+															<p class="field-value underlined">{prestamo.finalidadConsumidor}</p>
+															<p class="field-title">Código Entidad Origen Migración</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Entidad_Origen_Migracion__c}</p>
+															<p class="field-title">Código Línea Crédito</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Linea_Credito__c}</p>
+															<p class="field-title">Código Tipo de Garantía</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_Garantia__c}</p>
+															<p class="field-title">Código Garantía Principal</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Garantia_Principal__c}</p>
+															<p class="field-title">Código Vigencia Préstamo</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Vigencia_Prestamo__c}</p>
+															<p class="field-title">Código CNAE</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_CNAE__c}</p>
+														</td>
+														<!-- Column 2 -->
+														<td style="vertical-align: top; padding-right: 20px;">
+															<p class="field-title">Id de la Cuenta inicial</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Id_cuenta_inicial__c}</p>
+															<p class="field-title">Cuenta inicial activa</p>
+															<p class="field-value underlined">{prestamo.cuentaInicialActiva}</p>
+															<p class="field-title">Entidad migrada</p>
+															<p class="field-value underlined">{prestamo.entidadMigrada}</p>
+															<p class="field-title">Préstamo activo</p>
+															<p class="field-value underlined">{prestamo.prestamoActivo}</p>
+															<p class="field-title">Operación Empleado</p>
+															<p class="field-value underlined">{prestamo.operacionEmpleado}</p>
+															<p class="field-title">Importe capital concedido</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Importe_capital_concedido__c}</p>
+															<p class="field-title">Código empresa gestora</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_empresa_gestora__c}</p>
+															<p class="field-title">Centro gestor</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Centro_gestor__c}</p>
+															<p class="field-title">Provincia del centro gestor</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Provincia_centro_gestor__c}</p>
+															<p class="field-title">Código Contrato</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Contrato__c}</p>
+															<p class="field-title"></br></p>
+															<p class="field-value underlinedTransparent"></br></p>
+															<p class="field-title">Finalidad Préstamo</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Finalidad_Prestamo__c}</p>
+															<p class="field-title">Codigo Tipo convenio</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_Convenio__c}</p>
+															<p class="field-title">Entidad Origen Migración</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Entidad_Origen_Migracion__c}</p>
+															<p class="field-title">Línea Crédito</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Linea_Credito__c}</p>
+															<p class="field-title">Tipo Garantía</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_Garantia__c}</p>
+															<p class="field-title">Garantía Principal</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Garantia_Principal__c}</p>
+															<p class="field-title">Vigencia Préstamo</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Vigencia_Prestamo__c}</p>
+															<p class="field-title">CNAE</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_CNAE__c}</p>
+														</td>
+													</tr>
+												</table>
+											</div>
+										</td>
+									</tr>
+
+									<tr lwc:if={prestamos.titularPrestamoRT} key={prestamo.prestamo.Id}>
+										<td class="tdDetalles" colspan="9">
+											<div class="divFormDetalles" data-id={prestamo.prestamo.Id}>
+												<table class="no-horizontal-borders slds-var-m-top_medium">
+													<tr>
+														<!-- Column 1 -->
+														<td style="vertical-align: top; padding-right: 20px;">
+															<p class="field-title">Nombre del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Nombre_titular__c}</p>
+															<p class="field-title">Código Tipo relación</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_relacion__c}</p>
+															<p class="field-title">Baja persona</p>
+															<p class="field-value underlined">{prestamo.bajaPersona}</p>
+															<p class="field-title">Defunción</p>
+															<p class="field-value underlined">{prestamo.defuncion}</p>
+															<p class="field-title">Código Tipo documento titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_documento_titular__c}</p>
+															<p class="field-title">NIF del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_NIF_titular__c}</p>
+															<p class="field-title">Localidad titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Localidad_titular__c}</p>
+															<p class="field-title">Código Provincia del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Provincia_titular__c}</p>
+															<p class="field-title">Código País del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Pais_titular__c}</p>
+														</td>
+														<!-- Column 2 -->
+														<td style="vertical-align: top; padding-right: 20px;">
+															<p class="field-title">Tipo persona</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_persona__c}</p>
+															<p class="field-title">Tipo relación</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_relacion__c}</p>
+															<p class="field-title">Empleado</p>
+															<p class="field-value underlined">{prestamo.empleado}</p>
+															<p class="field-title">Señales de bloqueo/embargo</p>
+															<p class="field-value underlined">{prestamo.senalBloqueoEmbargo}</p>
+															<p class="field-title">Tipo documento titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_documento_titular__c}</p>
+															<p class="field-title">Id persona en Origen</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Id_persona_en_Origen__c}</p>
+															<p class="field-title">Id de la cuenta actual</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Contrato__c}</p>
+															<p class="field-title">Provincia del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Provincia_titular__c}</p>
+															<p class="field-title">País del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Pais_titular__c}</p>
+														</td>
+													</tr>
+												</table>
+											</div>
+										</td>
+									</tr>
+
+									<tr lwc:if={prestamos.titularCuentaRT} key={prestamo.prestamo.Id}>
+										<td class="tdDetalles" colspan="9">
+											<div class="divFormDetalles" data-id={prestamo.prestamo.Id}>
+												<table class="no-horizontal-borders slds-var-m-top_medium">
+													<tr>
+														<!-- Column 1 -->
+														<td style="vertical-align: top; padding-right: 20px;">
+															<p class="field-title">Nombre del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Nombre_titular__c}</p>
+															<p class="field-title">Código Tipo relación</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_relacion__c}</p>
+															<p class="field-title">Baja persona</p>
+															<p class="field-value underlined">{prestamo.bajaPersona}</p>
+															<p class="field-title">Defunción</p>
+															<p class="field-value underlined">{prestamo.defuncion}</p>
+															<p class="field-title">Código Tipo documento titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Tipo_documento_titular__c}</p>
+															<p class="field-title">NIF del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_NIF_titular__c}</p>
+															<p class="field-title">Localidad titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Localidad_titular__c}</p>
+															<p class="field-title">Código Provincia del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Provincia_titular__c}</p>
+															<p class="field-title">Código País del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Codigo_Pais_titular__c}</p>
+														</td>
+														<!-- Column 2 -->
+														<td style="vertical-align: top; padding-right: 20px;">
+															<p class="field-title">Tipo persona</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_persona__c}</p>
+															<p class="field-title">Tipo relación</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_relacion__c}</p>
+															<p class="field-title">Empleado</p>
+															<p class="field-value underlined">{prestamo.empleado}</p>
+															<p class="field-title">Señales de bloqueo/embargo</p>
+															<p class="field-value underlined">{prestamo.senalBloqueoEmbargo}</p>
+															<p class="field-title">Tipo documento titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Tipo_documento_titular__c}</p>
+															<p class="field-title">Id persona en Origen</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Id_persona_en_Origen__c}</p>
+															<p class="field-title">Id de la cuenta actual</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Id_cuenta_actual__c}</p>
+															<p class="field-title">Provincia del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Provincia_titular__c}</p>
+															<p class="field-title">País del titular</p>
+															<p class="field-value underlined">{prestamo.prestamo.SAC_Pais_titular__c}</p>
+														</td>
+													</tr>
+												</table>
+											</div>
+										</td>
+									</tr>
+								</template>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</article>
+
+		</template>
+	</lightning-card>
+
+	<!-- Error message -->
+	<lightning-card lwc:if={showErrorMessage} class="slds-text-color_error" style="margin-bottom: 40px;">
+		<p>Se ha producido un problema al recuperar el listado de préstamos.</p>
+	</lightning-card>
+</template>

@@ -1,7 +1,8 @@
 /*eslint-disable dot-notation */
 import {LightningElement, api, wire} from 'lwc';
-import {getRecord, getFieldValue, updateRecord} from 'lightning/uiRecordApi';
+import {getRecord, getFieldValue, updateRecord, getRecordNotifyChange} from 'lightning/uiRecordApi';
 import getRegistroRelacionado from '@salesforce/apex/CSBD_EnlacesOperativasController.getRegistroRelacionado';
+import informarSLA from '@salesforce/apex/CSBD_EnlacesOperativasController.informarSLA';
 
 import OPP_ACCOUNT_ID from '@salesforce/schema/Opportunity.AccountId';
 import OPP_ACCOUNT_NUMPERSO from '@salesforce/schema/Opportunity.Account.CC_NumPerso__c';
@@ -86,7 +87,7 @@ export default class csbdEnalacesOperativas extends LightningElement {
 	wiredRecord({error, data}) {
     	if (data) {
 			this.oportunidad = data;
-			let links = [];
+            let links = [];
 			URL_ENLACES.forEach((enlace, id) => {
 				const url = this.substituirParametros(enlace.url);
 				if (!url.includes('@@@')) {
@@ -106,8 +107,8 @@ export default class csbdEnalacesOperativas extends LightningElement {
 			this.linksImpares = links.filter((_, index) => index % 2 !== 0);
     	} else if (error) {
     		console.error(error);
-    	}
-	}
+        }
+    }
 
     substituirParametros(url) {
     	return url
@@ -133,28 +134,23 @@ export default class csbdEnalacesOperativas extends LightningElement {
     }
 
     abrirEnlace(event) {
-    	//Abrir enlace en nueva ventana
-    	let url = event.currentTarget.dataset.url;
-    	window.open(url, '_blank', 'width=' + window.screen.availWidth, 'height=' + window.screen.availHeight);
+        // Abrir enlace en nueva ventana
+        let url = event.currentTarget.dataset.url;
+        window.open(url, '_blank', 'width=' + window.screen.availWidth, 'height=' + window.screen.availHeight);
 
-    	//En caso de acceder al enlace de OpenDesk, en Hipotecas o préstamos, se guarda la fecha en un campo de la oportunidad y se calcula el SLA
-    	let label = event.currentTarget.dataset.label;
-    	const recordType = getFieldValue(this.oportunidad, OPP_RECORDTYPE_DEVNAME);
-    	const primerSlaString = getFieldValue(this.oportunidad, OPP_PRIMERA_RESPUESTA_SLA);
+        // En caso de acceder al enlace de OpenDesk, en Hipotecas o préstamos, se calcula el SLA en Apex
+        let label = event.currentTarget.dataset.label;
+        const recordType = getFieldValue(this.oportunidad, OPP_RECORDTYPE_DEVNAME);
+        const primerSlaString = getFieldValue(this.oportunidad, OPP_PRIMERA_RESPUESTA_SLA);
 
-    	if (label === 'Opendesk' && !primerSlaString && (recordType === 'CSBD_Prestamo' || recordType === 'CSBD_Hipoteca')) {
-    		const creacionOppString = getFieldValue(this.oportunidad, OPP_CREATED_DATE);
-    		const tiempoActualString = new Date().toISOString();
+        if (label === 'Opendesk' && !primerSlaString && (recordType === 'CSBD_Prestamo' || recordType === 'CSBD_Hipoteca')) {
 
-    		const tiempoActual = new Date(tiempoActualString);
-    		const creacionOpp = new Date(creacionOppString);
-    		const tiempoTranscurrido = tiempoActual - creacionOpp;
-
-    		const fields = {};
-    		fields[OPP_ID.fieldApiName] = this.recordIdCalculado;
-    		fields[OPP_PRIMER_SLA.fieldApiName] = tiempoActual.toISOString();
-    		fields[OPP_PRIMERA_RESPUESTA_SLA.fieldApiName] = Math.round(tiempoTranscurrido / 60000);
-    		updateRecord({fields}).catch(error => console.error(error));
-    	}
+			informarSLA({ oportunidadId: this.recordIdCalculado })
+                .then(() => {
+                    // Aquí refresca el registro para ver los cambios en pantalla
+					getRecordNotifyChange([{recordId: this.recordIdCalculado}]);
+                })
+                .catch(error => console.error(error));
+        }
     }
 }

@@ -205,18 +205,13 @@
 			let recordAux = component.get('v.recordIdAux');
 			var obtenerCuerpo = component.get('c.obtenerTemplateBody');
 			obtenerCuerpo.setParams({'idTemplate': idPlantilla, 'idObject': record,  'idObjectAux': recordAux});
-
-			console.log("idPlantilla: " + idPlantilla);
-			console.log("record: " + record);
-			console.log("recordAux: " + recordAux);
-
-
 			obtenerCuerpo.setCallback(this, function(response){
 
-				if(response.getState() === "SUCCESS"){
+				if(response.getState() === "SUCCESS"){					
+					component.set('v.flagCambioPlantilla', true);
+
 					var contenidoPlantilla = response.getReturnValue();
 					component.set('v.cuerpoPlantilla', contenidoPlantilla);
-					console.log("contenidoSubject ") ;
 
 					var obtenerSubject = component.get('c.obtenerTemplateSubject');
 					obtenerSubject.setParams({'idTemplate': idPlantilla, 'idObject': record,  'idObjectAux': recordAux});
@@ -224,7 +219,7 @@
 						if(response.getState() === "SUCCESS"){
 							var contenidoSubject = response.getReturnValue();
 							component.set('v.subjectPlantilla', contenidoSubject);
-							console.log("contenidoSubject " + contenidoSubject);
+							// component.set('v.flagCambioPlantilla', true);
 
 							let toastParams = {
 								title: "Cambio aplicado",

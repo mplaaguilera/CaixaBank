@@ -80,7 +80,7 @@
                     <aura:if isTrue="{!v.sObjectName != 'Opportunity'}">
                         <lightning:button label="No se identifica" onclick="{!c.handleActualizarIdentificacion}" disabled="{! v.identificacionPrevia || v.llamadaFinalizada}" />
                         <aura:set attribute="else">
-                            <lightning:button class="divNoSeIdentificaButton" label="No se identifica" iconName="{!v.oportunidad.CSBD_No_Identificado__c ? 'utility:successs' : ''}" variant="base" onclick="{!c.handleActualizarIdentificacionCliente}" />
+                            <lightning:button class="divNoSeIdentificaButton" label="No se identifica" iconName="{!v.oportunidad.CSBD_No_Identificado__c ? 'utility:success' : ''}" variant="base" onclick="{!c.handleActualizarIdentificacionCliente}" />
                         </aura:set>
                     </aura:if>
 

@@ -10,7 +10,7 @@
     <aura:attribute name="openModalSubsanacion" type="Boolean" />
     <aura:attribute name="isModalOpenSubsanacion" type="Boolean" />
     <aura:attribute name="openModalIdioma" type="Boolean" />
-    <aura:attribute name="isModalOpenIdioma" type="Boolean" />
+    <!--<aura:attribute name="isModalOpenIdioma" type="Boolean" />-->
     <aura:attribute name="isLoading" type="Boolean" />
     <aura:attribute name="values" type="List" />
     <aura:attribute name="motivoSeleccionado" type="String" />
@@ -32,6 +32,12 @@
     <aura:attribute name="copiaOculta" type="String" />
     <aura:attribute name="acuseReciboEnviado" type="Boolean" default="false" />
     <aura:attribute name="idiomaInformado" type="Boolean" default="false" />
+
+    <!-- Atributos para el desarrollo de añadir un tag a las imágenes insertadas -->
+    <aura:attribute name="imageTagsMapPadre" type="Map" />
+    <aura:attribute name="todasImgConTag" type="Boolean" default="true"/>
+    
+    <lightning:navigation aura:id="navService"/>
 
 
     <aura:attribute name="metodoEnvio" type="String" />
@@ -91,7 +97,7 @@
                     <!--Modal de Subsanación-->
                     <aura:if isTrue="{!v.isModalOpenSubsanacion}">
                         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
-                            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
                             <lightning:spinner aura:id="mySpinner" alternativeText="Processing.." title="Processing.."
                                 variant="brand" size="large" class="slds-hide" />
                             <div class="slds-modal__container">
@@ -123,10 +129,10 @@
                                             cuerpo="{!v.cuerpo}" asunto="{!v.asunto}" caso="{!v.caso}"
                                             ficherosAdjuntos="{!v.ficherosAdjuntos}"
                                             ficherosBorrados="{!v.ficherosBorrados}"
-                                            idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" />
+                                            idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" imageTagsMap="{!v.imageTagsMapPadre}"/>
                                     </aura:if>
                                     <aura:if isTrue="{!v.metodoEnvio == 'SAC_CartaPostal'}">
-                                        <c:SAC_EnvioCartaPostal recordId="{!v.recordId}" procedencia="subsanación" />
+                                        <c:SAC_EnvioCartaPostal recordId="{!v.recordId}" procedencia="subsanación" cuerpoCliente="{!v.cuerpo}"/>
                                     </aura:if>
                                 </div>
                                 <!-- Modal/Popup Box LWC footer starts here -->
@@ -143,13 +149,13 @@
 
 
                     <!--Modal de Modal de aviso revisar idioma-->
+                    <!--
                     <aura:if isTrue="{!v.isModalOpenIdioma}">
                         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
                             aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
                             <lightning:spinner aura:id="mySpinner" alternativeText="Processing.." title="Processing.."
                                 variant="brand" size="large" class="slds-hide" />
                             <div class="slds-modal__container">
-                                <!-- Modal/Popup Box LWC header here -->
                                 <header class="slds-modal__header">
                                     <lightning:buttonIcon iconName="utility:close"
                                             onclick="{! c.closeModalIdioma }"
@@ -158,12 +164,11 @@
                                             class="slds-modal__close"/>
                                     <h2 id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">Revisión del idioma de la reclamación</h2>
                                 </header>
-                                <!-- Modal/Popup Box LWC body starts here -->
                                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-4">
                                     <p>Para <b>asegurar la correcta finalización del alta </b> , recuerde realizar las siguientes validaciones:</p><br/>
                                     <p>&ensp;&ensp;1. El campo <b>IDIOMA </b>de la pestaña <b>Detalles</b> se corresponde con el idioma del escrito del reclamante.</p>
                                     <aura:if isTrue="{!v.acuseReciboEnviado}">
-                                        <p>&ensp;&ensp;2. Se ha enviado el acuse de recibo en el idioma del escrito del reclamante.</p> <!-- , de forma manual, -->
+                                        <p>&ensp;&ensp;2. Se ha enviado el acuse de recibo en el idioma del escrito del reclamante.</p> 
                                     </aura:if>
                                     <br/>
                                     <lightning:input type="checkbox" label="Confirmo que he realizado las validaciones" value="{!v.checkConfirmacionValidacion}" checked="{!v.checkConfirmacionValidacion}" />
@@ -177,7 +182,6 @@
                                     </aura:if>   
                                     <p><b>¿Está seguro que quiere ejecutar la operación y ha realizado las comprobaciones anteriores?</b></p>                               
                                 </div>
-                                <!-- Modal/Popup Box LWC footer starts here -->
                                 <footer class="slds-modal__footer">
                                     <button class="slds-button slds-button_neutral" onclick="{!c.closeModalIdioma}"
                                         title="Cancel">Cancelar</button>
@@ -187,7 +191,7 @@
                             </div>
                         </section>
                         <div class="slds-backdrop slds-backdrop_open"></div>
-                    </aura:if>
+                    </aura:if>-->
 
 
                 </div>

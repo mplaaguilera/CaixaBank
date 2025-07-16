@@ -1,10 +1,435 @@
 <template>
-    <!--DESPLEGABLE DECISIÓN ANALISIS-->
+<!--Desplegable Negociación-->
+<template if:true={mostrarNegociaciones}>
+    <div class={toggleSeccionNegociaciones}>
+        <h1 class="slds-section__title">
+            <button aria-controls="expando-unique-id-negociacion" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirNegociaciones}>
+            <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+            </svg>
+            <span class="slds-truncate" title="Section Title"> Datos Negociación</span>
+            </button>
+        </h1>
+    </div>   
+</template>
+
+   <template if:true={expandirNegociaciones}>
+        <!--Subdesplegable Negociación Previa a Informe Supervisor-->
+        <template if:true={casoNegociadoAntesRectificacion}>
+            <!--Bucle para recorrer las negociaciones previas a Informe Supervisor-->
+            <template for:each={listNegociacionPreviaInforme} for:item="informe">
+                <div data-id={informe.Id} class="slds-section slds-is-open" key={informe.Id}>
+                    <h1 class="slds-section__title subseccion">
+                        <button data-name={informe.Id} aria-controls="expando-unique-id-NegociacionPrevia" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirNegociacionPrevia}>
+                        <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                            <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                        </svg>
+                        <span class="slds-truncate color" title="Section Title"> Negociación Previa a Informe Supervisor</span>
+                        </button>
+                    </h1>
+                    <div class="slds-section__content cuerpo-subseccion" id={informe.Id}>              <!--Contenido subdesplegable-->
+                        <lightning-record-edit-form object-api-name="SPV_Formulario__c" record-id={informe.Id} onsuccess={handleSuccessEditar}>
+                            <!-- CAMPOS EDITABLES -->
+                            <template if:true={editarCampos}>
+                                <div class="slds-grid slds-wrap" style="margin-left: 15px;margin-bottom: 20px;">
+                                    <!-- Campo SPV_NegociacionEnCurso__c -->
+                                    <div class="slds-col slds-size_1-of-1 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-output-field field-name="SPV_NegociacionEnCurso__c"></lightning-output-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_ResultadoNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-input-field field-name="SPV_ResultadoNegociacion__c"></lightning-input-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_FechaInicioNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-output-field field-name="SPV_FechaInicioNegociacion__c"></lightning-output-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_MotivoRechazoNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-input-field field-name="SPV_MotivoRechazoNegociacion__c"></lightning-input-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_FechaFinNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-output-field field-name="SPV_FechaFinNegociacion__c"></lightning-output-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_ResumenNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-1 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-output-field field-name="SPV_ResumenNegociacion__c"></lightning-output-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <!-- CAMPOS SIN EDITAR -->
+                            <template if:false={editarCampos}>
+                                <div class="slds-grid slds-wrap" style="margin-left: 15px;margin-bottom: 20px;">
+                                    <!-- Campo SPV_NegociacionEnCurso__c -->
+                                    <div class="slds-col slds-size_1-of-1 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_NegociacionEnCurso__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_ResultadoNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_ResultadoNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_FechaInicioNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_FechaInicioNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_MotivoRechazoNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_MotivoRechazoNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_FechaFinNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_FechaFinNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_ResumenNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-1 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_ResumenNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                </div>
+                            </template>    
+                        </lightning-record-edit-form> 
+                    </div>
+                </div>  <!--Fin subDesplegable Negociación Previa-->
+            </template>
+        </template>
+
+        <!--Subdesplegable Negociación Posterior a Informe Supervisor-->
+        <template if:true={casoNegociadoEnRectificacion}>
+            <!--Bucle para recorrer las negociaciones Posteriores a Informe Supervisor-->
+            <template for:each={listNegociacionPosteriorInforme} for:item="informe">       
+                <div data-id={informe.Id} class="slds-section slds-is-open" key={informe.Id}>
+                    <h1 class="slds-section__title subseccion">
+                        <button data-name={informe.Id} aria-controls="expando-unique-id-NegociacionPosterior" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirNegociacionPosterior}>
+                        <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                            <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                        </svg>
+                        <span class="slds-truncate color" title="Section Title"> Negociación Posterior a Informe Supervisor</span>
+                        </button>
+                    </h1>
+                    <div class="slds-section__content cuerpo-subseccion" id={informe.Id}>              <!--Contenido subdesplegable-->
+                        <lightning-record-edit-form object-api-name="SPV_Formulario__c" record-id={informe.Id} onsuccess={handleSuccessEditar}>
+                            <!-- CAMPOS EDITABLES -->
+                            <template if:true={editarCampos}>
+                                <div class="slds-grid slds-wrap" style="margin-left: 15px;margin-bottom: 20px;">
+                                    <!-- Campo SPV_NegociacionEnCurso__c -->
+                                    <div class="slds-col slds-size_1-of-1 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-output-field field-name="SPV_NegociacionEnCurso__c"></lightning-output-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_ResultadoNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-input-field field-name="SPV_ResultadoNegociacion__c"></lightning-input-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_FechaInicioNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-output-field field-name="SPV_FechaInicioNegociacion__c"></lightning-output-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_MotivoRechazoNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-input-field field-name="SPV_MotivoRechazoNegociacion__c"></lightning-input-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_FechaFinNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-output-field field-name="SPV_FechaFinNegociacion__c"></lightning-output-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Campo SPV_ResumenNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-1 elemento-form">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning-output-field field-name="SPV_ResumenNegociacion__c"></lightning-output-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <!-- CAMPOS SIN EDITAR -->
+                            <template if:false={editarCampos}>
+                                <div class="slds-grid slds-wrap" style="margin-left: 15px;margin-bottom: 20px;">
+                                    <!-- Campo SPV_NegociacionEnCurso__c -->
+                                    <div class="slds-col slds-size_1-of-1 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_NegociacionEnCurso__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_ResultadoNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_ResultadoNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_FechaInicioNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_FechaInicioNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_MotivoRechazoNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_MotivoRechazoNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_FechaFinNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-2 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_FechaFinNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                    <!-- Campo SPV_ResumenNegociacion__c -->
+                                    <div class="slds-col slds-size_1-of-1 elemento-form">
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_ResumenNegociacion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </div>
+                                </div>
+                            </template>    
+                        </lightning-record-edit-form> 
+                    </div>
+                </div>  <!--Fin subDesplegable Negociación Posterior-->
+            </template>
+        </template>
+        <template if:true={editarCampos}>
+            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                <div class="slds-col slds-size_1-of-1" style="text-align: center;">   
+                    <lightning-button label="Cancelar" onclick={handleEditarCampos}></lightning-button>
+                    <lightning-button label="Guardar" class="slds-m-left_small" onclick={handleSubmit} variant="brand"></lightning-button>
+                </div>
+            </div>
+        </template>
+
+    </template>                 <!--Fin desplegable de Negociaciones-->
+
+
+<!--Desplegable Decisión-->
+<template if:true={mostrarDesplegableDecision}>
+    <div class={toggleSeccionDecision}>
+        <h1 class="slds-section__title">
+            <button aria-controls="expando-unique-id-Rectificacion" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirDecision}>
+            <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+            </svg>
+            <span class="slds-truncate" title="Section Title"> Análisis y Decisión</span>
+            </button>
+        </h1>
+        <div class="slds-section__content cuerpo-seccion" id="expando-unique-id-contenidoDecision">              
+
+        </div>
+    </div>    
+</template> <!--Fin desplegable Decisión-->
+
+
+
+
+<!--Desplegable complementarias-->
+<template if:true={mostrarComplementarias}>
+    <div class={toggleSeccionComplementarias}>
+        <h1 class="slds-section__title">
+            <button aria-controls="expando-unique-id-complementarias" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirComplementarias}>
+            <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+            </svg>
+            <span class="slds-truncate" title="Section Title"> Complementarias</span>
+            </button>
+        </h1>
+        <div class="slds-section__content cuerpo-seccion" id="expando-unique-id-contenidoComplementarias">              <!--Contenido subdesplegable-->
+
+            <div class="slds-grid slds-wrap">
+                
+                <div class="slds-col slds-size_1-of-2 elemento-form">
+
+                    <div class="slds-form-element slds-form-element_readonly">
+                        <span class="slds-form-element__label">Fecha apertura complementarias entidad</span>
+                        <div class="slds-form-element__control">
+                            <lightning-formatted-text value={fechaComplementariaEntidad}></lightning-formatted-text>
+                        </div>
+                    </div>
+
+                    <div class="slds-form-element slds-form-element_readonly">
+                        <span class="slds-form-element__label">Fecha envío organismo</span>
+                        <div class="slds-form-element__control">
+                           <lightning-formatted-text value={fechaPteRespuestaOrganismos}></lightning-formatted-text>
+                           
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="slds-col slds-size_1-of-2 elemento-form">
+
+                    <div class="slds-form-element slds-form-element_readonly">
+                        <span class="slds-form-element__label">Fecha apertura complementarias organismo</span>
+                        <div class="slds-form-element__control">
+                            <lightning-formatted-text value={fechaComplementariaOrganismo}></lightning-formatted-text>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>    
+</template> <!--Fin desplegable complementarias-->
+
+
+
+<!--Desplegable Rectificación-->
+<template if:true={casoRectificado}>
+    <div class={toggleSeccionRectificacion}>
+        <h1 class="slds-section__title">
+            <button aria-controls="expando-unique-id-Rectificacion" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirRectificacion}>
+            <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+            </svg>
+            <span class="slds-truncate" title="Section Title"> Rectificacion</span>
+            </button>
+        </h1>
+        <div class="slds-section__content cuerpo-seccion" id="expando-unique-id-contenidoRectificacion">              
+
+        </div>
+    </div>    
+</template> <!--Fin desplegable Rectificación-->
+
+
+   
+   <!--DESPLEGABLE DECISIÓN ANALISIS
     <template if:true={mostrarDecisionAnalisis}>
         <div class={toggleSeccionDecisionAnalisis}>
             <h1 class="slds-section__title">
-                <button aria-controls="expando-unique-id-analisis" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirDecisionAnalisis}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                <button aria-controls="expando-unique-id-analisis" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirDecisionAnalisis}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
                     <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
                 </svg>
                 <span class="slds-truncate" title="Section Title"> Decisión Análisis</span>
@@ -13,21 +438,21 @@
         </div>      
     </template>
 
-    <!--Subdesplegables de decisión análisis-->
+    Subdesplegables de decisión análisis
     <template if:true={expandirDecisionAnalisis}>
 
-        <!--SubDesplegable de Alegaciones-->
+        SubDesplegable de Alegaciones
         <template if:true={cargarAlegacion}>
         <div class={toggleSeccionAlegaciones}>
             <h1 class="slds-section__title subseccion">
-                <button aria-controls="expando-unique-id-alegaciones" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirAlegaciones}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                <button aria-controls="expando-unique-id-alegaciones" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirAlegaciones}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
                     <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
                 </svg>
                 <span class="slds-truncate color" title="Section Title"> Datos Alegación</span>
                 </button>
             </h1>
-            <div class="slds-section__content cuerpo-subseccion" id="expando-unique-id-contenidoAlegaciones">              <!--Contenido subdesplegable-->
+            <div class="slds-section__content cuerpo-subseccion" id="expando-unique-id-contenidoAlegaciones">            
                 <lightning-record-view-form object-api-name="SAC_Interaccion__c" record-id={escaladoAlegacion.Id}>
                     <div class="slds-grid slds-wrap">
                         <div class="slds-col slds-size_1-of-2 elemento-form">
@@ -99,22 +524,22 @@
                     </div>
                 </lightning-record-view-form>
             </div>
-        </div>  <!--Fin subDesplegable Alegaciones-->
+        </div>  Fin subDesplegable Alegaciones
     </template>
 
-    <!--SubDesplegable de Allanamientos-->
+    SubDesplegable de Allanamientos
         
     <template if:true={cargarAllanamiento}>
         <div class={toggleSeccionAllanamiento}>
             <h1 class="slds-section__title subseccion">
-                <button aria-controls="expando-unique-id-allanamientos" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirAllanamientos}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                <button aria-controls="expando-unique-id-allanamientos" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirAllanamientos}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
                     <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
                 </svg>
                 <span class="slds-truncate color" title="Section Title"> Datos Allanamiento</span>
                 </button>
             </h1>
-            <div class="slds-section__content cuerpo-subseccion" id="expando-unique-id-contenidoAllanamientos">              <!--Contenido subdesplegable-->
+            <div class="slds-section__content cuerpo-subseccion" id="expando-unique-id-contenidoAllanamientos">              Contenido subdesplegable
                 <lightning-record-view-form object-api-name="SAC_Interaccion__c" record-id={escaladoAllanamiento.Id}>
                     <div class="slds-grid slds-wrap">
 
@@ -219,21 +644,21 @@
                 </lightning-record-view-form>
             </div>
         </div>  
-    </template>     <!--Fin subDesplegable Allanamiento-->
+    </template>     Fin subDesplegable Allanamiento
 
 
-    <!--SubDesplegable de Desistimientos-->
+    SubDesplegable de Desistimientos
     <template if:true={cargarDesistimientos}>
         <div class={toggleSeccionDesistimientos}>
             <h1 class="slds-section__title subseccion">
-                <button aria-controls="expando-unique-id-desistimientos" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirDesistimientos}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                <button aria-controls="expando-unique-id-desistimientos" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirDesistimientos}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
                     <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
                 </svg>
                 <span class="slds-truncate color" title="Section Title"> Datos Desistimiento</span>
                 </button>
             </h1>
-            <div class="slds-section__content cuerpo-subseccion" id="expando-unique-id-contenidoDesistimientos">              <!--Contenido subdesplegable-->
+            <div class="slds-section__content cuerpo-subseccion" id="expando-unique-id-contenidoDesistimientos">              Contenido subdesplegable
                 <lightning-record-view-form object-api-name="SAC_Interaccion__c" record-id={escaladoDesistimiento.Id}>
                     <div class="slds-grid slds-wrap">
                         <div class="slds-col slds-size_1-of-2 elemento-form">
@@ -247,240 +672,9 @@
                     </div>
                 </lightning-record-view-form>
             </div>
-        </div>  <!--Fin subDesplegable Desistimientos-->
+        </div>  Fin subDesplegable Desistimientos
     </template>
 
        
- </template> <!--FIN Desplegables de decisión análisis-->
-
-<!--Desplegable complementarias-->
-<template if:true={mostrarComplementarias}>
-    <div class={toggleSeccionComplementarias}>
-        <h1 class="slds-section__title">
-            <button aria-controls="expando-unique-id-complementarias" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirComplementarias}>
-            <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-            </svg>
-            <span class="slds-truncate" title="Section Title"> Complementarias</span>
-            </button>
-        </h1>
-        <div class="slds-section__content cuerpo-seccion" id="expando-unique-id-contenidoComplementarias">              <!--Contenido subdesplegable-->
-
-            <div class="slds-grid slds-wrap">
-                
-                <div class="slds-col slds-size_1-of-2 elemento-form">
-
-                    <div class="slds-form-element slds-form-element_readonly">
-                        <span class="slds-form-element__label">Fecha apertura complementarias entidad</span>
-                        <div class="slds-form-element__control">
-                            <lightning-formatted-text value={fechaComplementariaEntidad}></lightning-formatted-text>
-                        </div>
-                    </div>
-
-                    <div class="slds-form-element slds-form-element_readonly">
-                        <span class="slds-form-element__label">Fecha envío organismo</span>
-                        <div class="slds-form-element__control">
-                            <lightning-formatted-text value={fechaPteRespuestaOrganismos}></lightning-formatted-text>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="slds-col slds-size_1-of-2 elemento-form">
-
-                    <div class="slds-form-element slds-form-element_readonly">
-                        <span class="slds-form-element__label">Fecha apertura complementarias organismo</span>
-                        <div class="slds-form-element__control">
-                            <lightning-formatted-text value={fechaComplementariaOrganismo}></lightning-formatted-text>
-                        </div>
-                    </div>
-
-                </div>
-
-
-            </div>
-
-        </div>
-    </div>    
-</template> <!--Fin desplegable complementarias-->
-
-<!--Desplegable Negociación-->
-<template if:true={mostrarNegociaciones}>
-    <div class={toggleSeccionNegociaciones}>
-        <h1 class="slds-section__title">
-            <button aria-controls="expando-unique-id-negociacion" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirNegociaciones}>
-            <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-            </svg>
-            <span class="slds-truncate" title="Section Title"> Datos Negociación</span>
-            </button>
-        </h1>
-    </div>   
-</template>
-
-   <template if:true={expandirNegociaciones}>
-        <!--Subdesplegable Negociación Previa a Informe Supervisor-->
-        <template if:true={casoNegociado}>
-            <div class={toggleSeccionNegociacionPrevia}>
-                <h1 class="slds-section__title subseccion">
-                    <button aria-controls="expando-unique-id-NegociacionPrevia" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirNegociacionPrevia}>
-                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-                    </svg>
-                    <span class="slds-truncate color" title="Section Title"> Negociación Previa a Informe Supervisor</span>
-                    </button>
-                </h1>
-                <div class="slds-section__content cuerpo-subseccion" id="expando-unique-id-NegociacionPrevia">              <!--Contenido subdesplegable-->
-                    
-                        <div class="slds-grid slds-wrap">
-                            <div class="slds-col slds-size_1-of-2 elemento-form">
-
-                                <div class="slds-form-element slds-form-element_readonly">
-                                    <div class="contenedor">
-                                        <span class="slds-form-element__label">Negociación finalizada</span>
-                                        <div class="slds-form-element__control">
-                                            <lightning-input type="checkbox" checked={caso.fields.SAC_NegociacionFinalizada__c.value} disabled></lightning-input>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            
-                            <div class="slds-col slds-size_1-of-2 elemento-form">
-
-                                <div class="slds-form-element slds-form-element_readonly">
-                                    <span class="slds-form-element__label">Resultado de negociación</span>
-                                    <div class="slds-form-element__control">
-                                        <lightning-formatted-text value={valorResultadoNegociacionPreviaMostrar}></lightning-formatted-text>
-                                        
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                
-                </div>
-            </div>  <!--Fin subDesplegable Negociación Previa-->
-        </template>
-
-        <!--Subdesplegable Negociación Posterior a Informe Supervisor-->
-        <template if:true={casoNegociadoEnRectificacion}>
-            <div class={toggleSeccionNegociacionPosterior}>
-                <h1 class="slds-section__title subseccion">
-                    <button aria-controls="expando-unique-id-NegociacionPosterior" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirNegociacionPosterior}>
-                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-                    </svg>
-                    <span class="slds-truncate color" title="Section Title"> Negociación Posterior a Informe Supervisor</span>
-                    </button>
-                </h1>
-                <div class="slds-section__content cuerpo-subseccion" id="expando-unique-id-NegociacionPosterior">              <!--Contenido subdesplegable-->
-                    
-                        <div class="slds-grid slds-wrap">
-                            <div class="slds-col slds-size_1-of-2 elemento-form">
-
-                                <div class="slds-form-element slds-form-element_readonly">
-                                    <div class="contenedor">
-                                        <span class="slds-form-element__label">Negociación en rectificación finalizada</span>
-                                        <div class="slds-form-element__control">
-                                            <lightning-input type="checkbox" checked={valorResultadoNegociacionPosteriorRectificacionMostrar} disabled></lightning-input>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            
-                            <div class="slds-col slds-size_1-of-2 elemento-form">
-
-                                <div class="slds-form-element slds-form-element_readonly">
-                                    <span class="slds-form-element__label">Resultado de negociación en rectificación</span>
-                                    <div class="slds-form-element__control">
-                                        <lightning-formatted-text value={caso.fields.SPV_ResultadoNegociacionRectificacion__c.value}></lightning-formatted-text>
-                                        
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                
-                </div>
-            </div>  <!--Fin subDesplegable Negociación Posterior-->
-        </template>
-
-    </template>                 <!--Fin desplegable de Negociaciones-->
-
-
-    <!--Desplegable Resolución Organismo-->
-   <!-- <div class={toggleSeccionResolucionOrganismo}>
-        <h1 class="slds-section__title">
-            <button aria-controls="expando-unique-id-ResolucionOrganismo" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirResolucionOrganismo}>
-            <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-            </svg>
-            <span class="slds-truncate" title="Section Title"> Resolución Organismo</span>
-            </button>
-        </h1>
-        <div class="slds-section__content cuerpo-seccion" id="expando-unique-id-contenidoResolucionOrganismo">             
-            <lightning-record-edit-form object-api-name="Case" key={recordId} record-id={recordId} onsuccess={handleSuccess} onsubmit={handleSubmit}>
-                <div class="slds-grid slds-wrap">
-                    <div class="slds-col slds-size_1-of-2 elemento-form">
-                        <lightning-input-field field-name="SAC_SentidoResolucion__c">
-                        </lightning-input-field>
-
-
-                        <template if:true={resolucionDesfavorableEntidad}>
-                            <lightning-input-field field-name="SPV_TipoDesfavorable__c">
-                            </lightning-input-field>
-                        </template>
-
-                    </div>
-
-                    
-
-                    <div class="slds-col slds-size_1-of-2 elemento-form">
-                        <div class="linea-inferior">
-                             <lightning-output-field field-name="SPV_FechaRecepcionResolucion__c" class="elemento-form"> </lightning-output-field>
-                        </div>
-
-                        <template if:true={resolucionDesfavorableEntidad}>
-                            <lightning-input-field field-name="SPV_FechaVencimientoRectificacion__c">
-                            </lightning-input-field>
-                        </template>
-
-                    </div>
-
-                
-
-
-
-                <div class="slds-col slds-size_1-of-1 mi-boton">                            
-                    <lightning-button class="slds-float_right" variant="brand" type="submit" name="update"
-                        label="Guardar">
-                    </lightning-button>
-                </div>
-            </div>
-            </lightning-record-edit-form>
-        </div>
-    </div>    -->
-
-
-    <!--Desplegable Rectificación-->
-   <!-- <template if:true={casoRectificado}>
-        <div class={toggleSeccionRectificacion}>
-            <h1 class="slds-section__title">
-                <button aria-controls="expando-unique-id-Rectificacion" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirRectificacion}>
-                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-                </svg>
-                <span class="slds-truncate" title="Section Title"> Rectificacion</span>
-                </button>
-            </h1>
-            <div class="slds-section__content cuerpo-seccion" id="expando-unique-id-contenidoRectificacion">              
-
-            </div>
-        </div>    
-    </template> -->
-
+ </template> FIN Desplegables de decisión análisis-->
 </template>

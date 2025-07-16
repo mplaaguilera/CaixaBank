@@ -10,7 +10,6 @@ alwaysApply: false
 
 ### **General Guidelines both for generating code and reviewing code**
 - Ensure code is clear, maintainable, and scalable.
-- Naming must be in Spanish.
 - Use camelCase for variables and PascalCase for classes.
 - Indentation should be with tabs.
 - Write the least amount of code while ensuring readability and maintainability.

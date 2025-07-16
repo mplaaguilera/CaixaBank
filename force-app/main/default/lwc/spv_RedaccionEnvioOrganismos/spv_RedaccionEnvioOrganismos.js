@@ -1,17 +1,18 @@
 import { LightningElement, api, wire, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { refreshApex } from '@salesforce/apex';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import USER_ID from '@salesforce/user/Id';
 import CASO_OBJECT from '@salesforce/schema/Case'; 
 import ORGANISMO_FIELD from '@salesforce/schema/Case.SPV_Organismo__c';
 import OWNERID_FIELD from '@salesforce/schema/Case.OwnerId';
-import STATUS_FIELD from '@salesforce/schema/Case.Status';
-import SUBSTATUS_FIELD from '@salesforce/schema/Case.SEG_Subestado__c';
 import { RefreshEvent } from 'lightning/refresh';
 import enviarDocOrganismos from '@salesforce/apex/SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos';
+import getDocumentosValidados from '@salesforce/apex/SPV_LCMP_RedaccionEnvioOrganismos.getDocumentosValidados';
+import comprobarPermisosUsuario from '@salesforce/apex/SPV_LCMP_RedaccionEnvioOrganismos.comprobarPermisosUsuario';
 
-const fields = [ORGANISMO_FIELD, OWNERID_FIELD, STATUS_FIELD, SUBSTATUS_FIELD];
+const fields = [ORGANISMO_FIELD, OWNERID_FIELD];
 
 
 export default class Spv_RedaccionEnvioOrganismos extends LightningElement {
@@ -23,20 +24,41 @@ export default class Spv_RedaccionEnvioOrganismos extends LightningElement {
     @track mostrarOrganismo = false;
     @track organismoCaso;
     @track desactivarBotonEnviar;
-    @track status;
-    @track subestado;
+
+    @track documentosSeleccionados = [];
+    @track documentos;
+    @track hayDocs = false;
+    @track wiredDocumentos;
+    // @track wiredPermisosUser;
 
     @wire(getObjectInfo, {objectApiName: CASO_OBJECT})
     objectInfo;
 
     @wire(getRecord, {recordId: '$recordId', fields})
-    casoActual({ data, error }) {
-        if(data){
+    wiredCasoActual(result) {
+        if(result.data){
             this.userId = USER_ID;
-            this.desactivarBotonEnviar = (data.fields?.OwnerId?.value == this.userId) ? false : true;
-            this.organismoCaso = data.fields.SPV_Organismo__c.value;
-            this.status = data.fields.Status.value;  
-            this.subestado = data.fields.SEG_Subestado__c.value;
+            this.organismoCaso = result.data.fields.SPV_Organismo__c.value;          
+        }
+    }
+
+    @wire(getDocumentosValidados, {caseId: '$recordId'})
+    wiredDocumentos(result){
+        this.wiredDocumentos = result;
+        
+        if(result.data){
+
+            this.documentos = result.data;
+            if(this.documentos != null){
+                this.hayDocs = true;
+            }
+        }
+    }
+
+    @wire(comprobarPermisosUsuario, {caseId: '$recordId', usuarioActualId: USER_ID})
+    wiredPermisosUser(result){        
+        if(result){
+            this.desactivarBotonEnviar = !result.data;           
         }
     }
     
@@ -46,16 +68,25 @@ export default class Spv_RedaccionEnvioOrganismos extends LightningElement {
 
     handleEnviarOrganismos(event){
 		this.isCheckedEnviarOrganismos = event.target.checked;
-        if(this.isCheckedEnviarOrganismos == true) {
+
+        if(this.isCheckedEnviarOrganismos) {
             this.mostrarOrganismo = true;
-        } 
-        if(this.isCheckedEnviarOrganismos == false) {
+        }else{
             this.mostrarOrganismo = false;
         }
 	}
 
     enviarOrganismo(){
-        if(this.isCheckedEnviarOrganismos == true && this.organismoCaso == null) {
+        
+        if(this.documentosSeleccionados == null || this.documentosSeleccionados == undefined || this.documentosSeleccionados == '' ){
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Seleccionar documentos',
+                    message: 'Debe seleccionar al menos un documento para enviar.',
+                    variant: 'warning'
+                })
+            );
+        }else if(this.isCheckedEnviarOrganismos == true && this.organismoCaso == null) {
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Seleccionar un valor',
@@ -63,9 +94,10 @@ export default class Spv_RedaccionEnvioOrganismos extends LightningElement {
                     variant: 'warning'
                 })
             );
-        } else {
+        }
+        else {
             this.isLoading = true;
-            enviarDocOrganismos({'caseId': this.recordId, 'enviarReclamante': this.isCheckedEnviarReclamante, 'enviarOrganismos': this.isCheckedEnviarOrganismos, 'organismo': this.organismoCaso, 'estado': this.status, 'subestado': this.subestado}).then(()=>{
+            enviarDocOrganismos({'caseId': this.recordId, 'enviarReclamante': this.isCheckedEnviarReclamante, 'enviarOrganismos': this.isCheckedEnviarOrganismos, 'organismo': this.organismoCaso, 'listaSeleccionados': this.documentosSeleccionados}).then(()=>{
                 this.isLoading = false;
                 this.refreshView();
                 this.dispatchEvent(
@@ -85,6 +117,41 @@ export default class Spv_RedaccionEnvioOrganismos extends LightningElement {
                     }),);
             });
         }
+    }
+
+    get documentosPorColumnas() {        
+        if(this.documentos != '' && this.documentos != undefined){
+            let sortedData = [...this.documentos];
+            const sortDirection = this.sortedDirection;
+
+       
+            return sortedData.map(doc => {
+                const options = { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' };
+                const formattedDate = new Intl.DateTimeFormat('es-ES', options).format(new Date(doc.CreatedDate));
+                return {
+                    idDoc: doc.Id,
+                    titulo: doc.Title,
+                    formattedCreateDate: formattedDate,
+                    tipoDoc: doc.SAC_TipoAdjunto__r ? doc.SAC_TipoAdjunto__r.Name : 'N/A'
+                };
+            });
+        } 
+        return [];
+    }
+
+    handleCheckboxChange(event) {
+
+        const docId = event.target.dataset.id;
+        if (event.target.checked) {
+          this.documentosSeleccionados.push(docId);
+          
+        } else {
+            this.documentosSeleccionados = this.documentosSeleccionados.filter(id => id !== docId); // Filtrar para eliminar
+        }
+      }
+
+      handleRefreshClick() {
+        return refreshApex(this.wiredDocumentos);
     }
 
     refreshView() {

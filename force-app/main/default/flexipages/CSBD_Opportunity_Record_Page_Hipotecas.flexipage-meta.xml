@@ -172,14 +172,14 @@
                 <visibilityRule>
                     <booleanFilter>1 OR 2</booleanFilter>
                     <criteria>
-                        <leftValue>{!Record.RecordType.Name}</leftValue>
+                        <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
                         <operator>EQUAL</operator>
-                        <rightValue>Hipoteca</rightValue>
+                        <rightValue>CSBD_Hipoteca</rightValue>
                     </criteria>
                     <criteria>
-                        <leftValue>{!Record.RecordType.Name}</leftValue>
+                        <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
                         <operator>EQUAL</operator>
-                        <rightValue>Préstamo</rightValue>
+                        <rightValue>CSBD_Prestamo</rightValue>
                     </criteria>
                 </visibilityRule>
             </fieldInstance>
@@ -357,6 +357,10 @@
         </itemInstances>
         <itemInstances>
             <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>conditionalFormatRuleset</name>
+                    <value>CSBD_CSBD_Urgencia_c</value>
+                </fieldInstanceProperties>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
                     <value>none</value>
@@ -1283,6 +1287,16 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_SituacionVivienda__c</fieldItem>
+                <identifier>RecordCSBD_SituacionVivienda_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
                 <fieldItem>Record.CSBD_Pais__c</fieldItem>
                 <identifier>RecordCSBD_Pais_cField</identifier>
             </fieldInstance>
@@ -1315,16 +1329,6 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.CSBD_Municipio__c</fieldItem>
                 <identifier>RecordCSBD_Municipio_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.CSBD_CodigoPostal__c</fieldItem>
-                <identifier>RecordCSBD_CodigoPostal_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-521e20e0-289f-4f81-9722-72ec161188b0</name>
@@ -1389,6 +1393,16 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.CSBD_PuertaVivienda__c</fieldItem>
                 <identifier>RecordCSBD_PuertaVivienda_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_CodigoPostal__c</fieldItem>
+                <identifier>RecordCSBD_CodigoPostal_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-e7e0d2ee-3870-4fc4-ba89-6fecda23260a</name>
@@ -1465,8 +1479,48 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.CSBD_PeriodoFijo__c</fieldItem>
-                <identifier>RecordCSBD_PeriodoFijo_cField</identifier>
+                <fieldItem>Record.CSBD_Gastos_iniciales_sim__c</fieldItem>
+                <identifier>RecordCSBD_Gastos_iniciales_sim_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_Tasa_Fija_sim__c</fieldItem>
+                <identifier>RecordCSBD_Tasa_Fija_sim_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_Cuota_mensual_porcentaje__c</fieldItem>
+                <identifier>RecordCSBD_Cuota_mensual_porcentaje_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_Porcentaje_max_hipoteca_sim__c</fieldItem>
+                <identifier>RecordCSBD_Porcentaje_max_hipoteca_sim_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_IndiceReferencia__c</fieldItem>
+                <identifier>RecordCSBD_IndiceReferencia_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-cef2921f-4428-4890-84f6-547418f7ab54</name>
@@ -1499,8 +1553,38 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.CSBD_IndiceReferencia__c</fieldItem>
-                <identifier>RecordCSBD_IndiceReferencia_cField</identifier>
+                <fieldItem>Record.CSBD_TIN_bonificado__c</fieldItem>
+                <identifier>RecordCSBD_TIN_bonificado_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_TAE_bonificado__c</fieldItem>
+                <identifier>RecordCSBD_TAE_bonificado_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_Aportacion_inicial_sim__c</fieldItem>
+                <identifier>RecordCSBD_Aportacion_inicial_sim_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_Porcentaje_descuento__c</fieldItem>
+                <identifier>RecordCSBD_Porcentaje_descuento_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -1511,6 +1595,26 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.CSBD_CuotaMensualHipoteca__c</fieldItem>
                 <identifier>RecordCSBD_CuotaMensualHipoteca_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_Importe_max_hipoteca_sim__c</fieldItem>
+                <identifier>RecordCSBD_Importe_max_hipoteca_sim_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_PeriodoFijo__c</fieldItem>
+                <identifier>RecordCSBD_PeriodoFijo_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-7fde746a-abe6-4dc7-9c1e-6fa933d5ce08</name>
@@ -2041,7 +2145,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>title</name>
-                    <value>Medios de pago</value>
+                    <value>Pago</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>flexipage_tab7</identifier>
@@ -2114,56 +2218,14 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentInstanceProperties>
-                    <name>icono</name>
-                    <value>groups</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>mensaje</name>
-                    <value>La propiedad de esta oportunidad se gestiona manualmente.</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>tema</name>
-                    <value>Claro</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>texture</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentName>ccScopedNotification</componentName>
-                <identifier>ccScopedNotification</identifier>
-                <visibilityRule>
-                    <criteria>
-                        <leftValue>{!Record.CSBD_Alta_omnichannel__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>false</rightValue>
-                    </criteria>
-                </visibilityRule>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>csbd_AlertaTelefonia</componentName>
-                <identifier>c_csbd_AlertaTelefonia</identifier>
-                <visibilityRule>
-                    <booleanFilter>1 OR 2</booleanFilter>
-                    <criteria>
-                        <leftValue>{!Record.CSBD_Producto_MIFID__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>true</rightValue>
-                    </criteria>
-                    <criteria>
-                        <leftValue>{!Record.CSBD_TipoBonificado__c}</leftValue>
-                        <operator>NE</operator>
-                        <rightValue>0</rightValue>
-                    </criteria>
-                </visibilityRule>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
                 <componentName>CSBD_Opportunity_Operativas</componentName>
                 <identifier>CSBD_Opportunity_Operativas</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>csbd_ListaBanners</componentName>
+                <identifier>c_csbd_ListaBanners</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -2183,6 +2245,93 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentInstanceProperties>
+                    <name>planAmpli</name>
+                    <value>CSBD_AmpliacionResumen</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>planArg</name>
+                    <value>CSBD_CondicionesYpromos</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>planOpo</name>
+                    <value>CSBD_ResumenOportunidad</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>planProd</name>
+                    <value>CSBD_ResumenProducto</value>
+                </componentInstanceProperties>
+                <componentName>csbd_resumenesAgrupados</componentName>
+                <identifier>c_csbd_resumenesAgrupados</identifier>
+                <visibilityRule>
+                    <booleanFilter>2 AND (3 OR (4 AND 5)) AND 1</booleanFilter>
+                    <criteria>
+                        <leftValue>{!$Permission.CustomPermission.CSBD_UsuarioPromptsIA}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_CumpleCondicionesPrompts__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.IsClosed}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>false</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.IsClosed}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_HaUsadoIA__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>csbd_ChatGPT</componentName>
+                <identifier>c_csbd_ChatGPT</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5))</booleanFilter>
+                    <criteria>
+                        <leftValue>{!$Permission.CustomPermission.CSBD_UsuarioPromptsIA}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_CumpleCondicionesPrompts__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.IsClosed}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>false</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.IsClosed}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_HaUsadoIA__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>campoBusqueda</name>
+                </componentInstanceProperties>
                 <componentName>csbd_EnlacesOperativas</componentName>
                 <identifier>c_csbd_EnlacesOperativas</identifier>
             </componentInstance>
@@ -2313,6 +2462,25 @@
                 </componentInstanceProperties>
                 <componentName>console:relatedRecord</componentName>
                 <identifier>console_relatedRecord3</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>csbd_AlertaTelefonia</componentName>
+                <identifier>c_csbd_AlertaTelefonia</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 OR 2</booleanFilter>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_Producto_MIFID__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_TipoBonificado__c}</leftValue>
+                        <operator>NE</operator>
+                        <rightValue>0</rightValue>
+                    </criteria>
+                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <mode>Replace</mode>

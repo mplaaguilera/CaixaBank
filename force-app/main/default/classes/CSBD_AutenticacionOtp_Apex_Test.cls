@@ -233,10 +233,9 @@ public class CSBD_AutenticacionOtp_Apex_Test {
             Opportunity oportunidad = [SELECT AccountId FROM Opportunity WHERE CSBD_Titulo__c = 'Oportunidad Test'];
             Test.startTest();
             Map<String, Boolean> datos = CSBD_AutenticacionOtp_Apex.getDatos(oportunidad.Id, oportunidad.AccountId);
-            Map<String, Boolean> datosAsync = CSBD_AutenticacionOtp_Apex.getDatosAsync('Teléfono');
+            Map<String, Boolean> datosAsync = CSBD_AutenticacionOtp_Apex.getDatosAsync();
             Test.stopTest();
 
-            System.assertEquals(true, datos.get('llamadaEnCurso'), 'Atributo "llamadaEnCurso" retornado incorrecto');
             System.assertEquals(false, datos.get('clienteBloqueado'), 'Atributo "clienteBloqueado" retornado incorrecto');
         }
     }
@@ -451,6 +450,7 @@ public class CSBD_AutenticacionOtp_Apex_Test {
         }
     }
 
+    /*
     @isTest
     private static void canalAutenticableTest() {
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
@@ -471,6 +471,7 @@ public class CSBD_AutenticacionOtp_Apex_Test {
             Test.stopTest();
         }
     }
+    */
 
     @isTest
     private static void comprobarDatosNivel2Test() {

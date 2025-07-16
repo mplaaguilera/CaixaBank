@@ -43,7 +43,7 @@ export default class Spv_DocsEnviadosOrganismos extends LightningElement {
         }
     }
 
-    handleRefreshClick() {
+    handleRefreshClick() {       
         return refreshApex(this.wiredgetDocsEnviadosOrg);
     }
 

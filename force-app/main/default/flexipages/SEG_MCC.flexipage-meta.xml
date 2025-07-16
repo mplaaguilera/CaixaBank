@@ -86,7 +86,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>createQuickActionName</name>
-                    <value>SDOC__NewContact</value>
+                    <value>NewContact</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>lookupFieldName</name>
@@ -210,6 +210,16 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.SEG_Centro_Identificado__c</fieldItem>
                 <identifier>RecordSEG_Centro_Identificado__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SEG_Id_Related_Mail__c</fieldItem>
+                <identifier>RecordSEG_Id_Related_Mail__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-c7a2e51c-0c0d-4926-b72c-60c7afae6e21</name>
@@ -896,6 +906,16 @@
                 <identifier>RecordSEG_SROrigen_cField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CC_CasoRelacionado__c</fieldItem>
+                <identifier>RecordCC_CasoRelacionado_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-8f8c166c-2b7e-467b-88a3-93e8f552eb9d</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -918,6 +938,16 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.SEG_SRAuditoria__c</fieldItem>
                 <identifier>RecordSEG_SRAuditoria_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SEG_Id_Related_Mail__c</fieldItem>
+                <identifier>RecordSEG_Id_Related_Mail_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-115e9fc1-62db-410f-8e72-eb0427b58a54</name>
@@ -962,6 +992,16 @@
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SEG_N_operaciones_BO__c</fieldItem>
+                <identifier>RecordSEG_N_operaciones_BO_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <itemInstances>
             <fieldInstance>
                 <fieldInstanceProperties>
@@ -1543,6 +1583,31 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>decorate</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>richTextValue</name>
+                    <value>&lt;h6&gt;&lt;span style=&quot;color: rgb(250, 132, 36);&quot;&gt;Relación en curso: El caso se está relacionando automáticamente con el caso de COPS.&lt;/span&gt;&lt;/h6&gt;</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:richText</componentName>
+                <identifier>flexipage_richText</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 AND 2</booleanFilter>
+                    <criteria>
+                        <leftValue>{!Record.SEG_Id_Related_Mail__c}</leftValue>
+                        <operator>NE</operator>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CC_CasoRelacionado__r.SEG_Id_Related_Mail__c}</leftValue>
+                        <operator>EQUAL</operator>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
                     <name>columns</name>
                     <value>Facet-a01d5e70-04f2-4050-bbac-07bda1b06f58</value>
                 </componentInstanceProperties>
@@ -1714,6 +1779,12 @@
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>seg_Buscador_SOE</componentName>
+                <identifier>c_seg_Buscador_SOE</identifier>
+            </componentInstance>
+        </itemInstances>
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
@@ -1940,7 +2011,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>createQuickActionName</name>
-                    <value>SDOC__NewContact</value>
+                    <value>NewContact</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>lookupFieldName</name>
@@ -2740,6 +2811,16 @@
                 <identifier>RecordSEG_SROrigen_cField2</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CC_CasoRelacionado__c</fieldItem>
+                <identifier>RecordCC_CasoRelacionado_cField2</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-713e7923-43b4-4fe0-ac7f-222538e23722</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -2762,6 +2843,16 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.SEG_SRAuditoria__c</fieldItem>
                 <identifier>RecordSEG_SRAuditoria_cField2</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SEG_Id_Related_Mail__c</fieldItem>
+                <identifier>RecordSEG_Id_Related_Mail_cField2</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-f85a9d99-71e9-406e-bc7c-2b1c712ebc20</name>
@@ -2806,6 +2897,16 @@
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SEG_N_operaciones_BO__c</fieldItem>
+                <identifier>RecordSEG_N_operaciones_BO_cField2</identifier>
+            </fieldInstance>
+        </itemInstances>
         <itemInstances>
             <fieldInstance>
                 <fieldInstanceProperties>
@@ -3387,6 +3488,31 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>decorate</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>richTextValue</name>
+                    <value>&lt;h6&gt;&lt;span style=&quot;color: rgb(250, 132, 36);&quot;&gt;Relación en curso: El caso se está relacionando automáticamente con el caso de COPS.&lt;/span&gt;&lt;/h6&gt;</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:richText</componentName>
+                <identifier>flexipage_richText2</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 AND 2</booleanFilter>
+                    <criteria>
+                        <leftValue>{!Record.SEG_Id_Related_Mail__c}</leftValue>
+                        <operator>NE</operator>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CC_CasoRelacionado__r.SEG_Id_Related_Mail__c}</leftValue>
+                        <operator>EQUAL</operator>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
                     <name>columns</name>
                     <value>Facet-0be9b242-7a35-4288-9dfb-12973ea88506</value>
                 </componentInstanceProperties>
@@ -3815,7 +3941,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>createQuickActionName</name>
-                    <value>SDOC__NewContact</value>
+                    <value>NewContact</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>lookupFieldName</name>

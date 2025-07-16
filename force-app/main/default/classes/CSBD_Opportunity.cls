@@ -18,6 +18,7 @@ public inherited sharing class CSBD_Opportunity {
 			oportunidades.add(oportunidad);
 		}
 		insert oportunidades;
+
 		return oportunidades;
 	}
 
@@ -156,7 +157,7 @@ public inherited sharing class CSBD_Opportunity {
 		List<Opportunity> oportunidades = [SELECT RecordType.DeveloperName, CSBD_Estado__c, CSBD_Identificador__c,
 											CSBD_Alta_omnichannel__c, CSBD_Empresa_Proveedora__c, CSBD_Resolucion__c,
 											CSBD_Contact__c, CSBD_DeliveryInternalName__c, CSBD_CampaignId__c, CSBD_JourneyActionId__c,
-											CSBD_MessageProfileId__c, CSBD_Now_NUMPERSO__c, CSBD_Motivo_MAC__c FROM Opportunity WHERE Id IN :idOportunidades];
+											CSBD_MessageProfileId__c, CSBD_Now_NUMPERSO__c, CSBD_Motivo_MAC__c, Description FROM Opportunity WHERE Id IN :idOportunidades];
 		return cerrarOportunidad(oportunidades, nombreEtapaVentas, resolucion, campos);
 	}
 
@@ -233,9 +234,11 @@ public inherited sharing class CSBD_Opportunity {
 		//Creación de tareas
 		List<Task> tareasInsert = new List<Task>();
 		for (Opportunity oportunidad : oportunidades) {
-			tareasInsert.add(CSBD_Activity.crearActividadReturn(
-				new Task(), oportunidad.Id, oportunidad.CSBD_Estado__c, 'Completed', oportunidad.CSBD_Estado__c, null, null
-			));
+			Task tarea = CSBD_Activity.crearActividadReturn(new Task(), oportunidad.Id, oportunidad.CSBD_Estado__c, 'Completed', oportunidad.CSBD_Estado__c, null, null);
+			if(campos != null && String.isNotBlank(oportunidad.Description)){
+				tarea.Description = oportunidad.Description;
+			}
+			tareasInsert.add(tarea);
 		}
 		insert tareasInsert;
 
@@ -753,5 +756,28 @@ public inherited sharing class CSBD_Opportunity {
 		}
 
 		return oportunidadesCrearTitular;
+	}
+
+	/**
+	 * Actualitza l'owner d'una oportunitat de forma òptima (sense select previ)
+	 */
+	public static void actualizarOwner(Id idOportunitat, Id nouOwnerId) {
+		update new Opportunity(Id = idOportunitat, OwnerId = nouOwnerId);
+	}
+
+	// Versión optimizada para rendimiento
+	public static Opportunity crearOportunidad2(String recordTypeDeveloperName, Map<String, Object> campos) {
+		Id idRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(recordTypeDeveloperName).getRecordTypeId();
+		Opportunity oportunidad = new Opportunity();
+		oportunidad.RecordTypeId = idRecordType;
+		oportunidad.Name = 'temp'; // Se sobreescribe en el trigger AI
+		oportunidad.CSBD_Estado__c = String.isNotBlank((String) campos.get('CSBD_Estado__c')) ? (String) campos.get('CSBD_Estado__c') : 'Nueva';
+		oportunidad.StageName = String.isNotBlank((String) campos.get('StageName')) ? (String) campos.get('StageName') : 'Solicitud';
+		oportunidad.CloseDate = System.today().addDays(diasFechaCierre(idRecordType));
+		for (String campo : campos.keySet()) {
+			oportunidad.put(campo, campos.get(campo));
+		}
+		insert oportunidad;
+		return oportunidad;
 	}
 }

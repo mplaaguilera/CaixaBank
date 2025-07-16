@@ -3,6 +3,8 @@
 	<article class="slds-card">
 		<div class="slds-card__body slds-card__body_inner slds-var-p-horizontal_small slds-var-m-bottom_x-small">
             <!-- Indicador de estados -->
+            
+        <template if:true={generarProgressIndicator}>
 			<lightning-progress-indicator current-step={statusSeleccionado} type="path">
                 <template for:each={statusValues} for:item="statusValue">
                     <lightning-progress-step
@@ -10,17 +12,28 @@
                         label={statusValue.label}
                         value={statusValue.value}
                         onclick={statusOnclick}
-                        data-etapa-value={statusValue.value}
                     ></lightning-progress-step>
                 </template>
 			</lightning-progress-indicator>
-			<div class="slds-grid slds-grid_align-spread slds-gutters_direct-small slds-var-m-top_medium">
+        </template>
+
+            <!--<template if:true={opcion1}>
+                <lightning-progress-indicator current-step={statusSeleccionado} type="path">
+                    <lightning-progress-step key={statusAlta} label="Alta" value="SAC_001" onclick={statusOnclick}></lightning-progress-step>
+                    <lightning-progress-step key={as} label="Análisis y Decisión" value="SPV_AnalisisDecision" onclick={statusOnclick}></lightning-progress-step>
+                    <lightning-progress-step key={asd} label="Envío" value="SPV_Envio" onclick={statusOnclick}></lightning-progress-step>
+                    <lightning-progress-step key={sd} label="Pendiente respuesta Organismo" value="SPV_PendienteRespuestaOrganismo" onclick={statusOnclick}></lightning-progress-step>
+                    <lightning-progress-step key={asd} label="Recepción Resolución" value="SPV_RecepcionResolucion" onclick={statusOnclick}></lightning-progress-step>
+                    <lightning-progress-step key={asd} label="Cerrado" value="Cerrado" onclick={statusOnclick}></lightning-progress-step>
+                </lightning-progress-indicator>
+            </template>-->
+
+			<!--<div class="slds-grid slds-grid_align-spread slds-gutters_direct-small slds-var-m-top_medium">
 				<div class="slds-col" style="width: 100%; overflow-x: auto;">
 					<div style="display: inline-block; overflow-x: auto;">
 						<div class="divSubetapas">
                             <template if:false={esPretension}>
-                                <!-- Indicador subestados -->
-                                <!--<lightning-progress-indicator current-step={subestadoSeleccionado} type="path">
+                                <lightning-progress-indicator current-step={subestadoSeleccionado} type="path">
                                     <template for:each={subestadosValues} for:item="subestado">
                                         <lightning-progress-step
                                             key={subestado.value}
@@ -30,7 +43,7 @@
                                             onclick={subestadoOnclick}>
                                         </lightning-progress-step>
                                     </template>
-                                </lightning-progress-indicator>-->
+                                </lightning-progress-indicator>
 
                                 <div class="contenedor">
                                     <template for:each={subestadosYApecto} for:item="subestado">
@@ -44,7 +57,6 @@
 						</div>
 					</div>
 				</div>
-				<!-- Botón actualizar estado -->
 				<div class="slds-col slds-grow-none slds-shrink-none" >
 					<lightning-button
 						class="botonActualizar"
@@ -55,7 +67,7 @@
                         disabled={esPretension}>
 					</lightning-button>
 				</div>
-			</div>
+			</div>-->
 		</div>
 	</article>
 

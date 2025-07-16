@@ -20,6 +20,7 @@ export default class SAC_GeneracionDocumento extends LightningElement {
     @track llamadaSelector = false;
     @track guardado = false;
     @track spinnerLoading = false;
+    @track reenvio = false;
    
     @api recordId;  
     @api cuerpo;
@@ -124,7 +125,7 @@ export default class SAC_GeneracionDocumento extends LightningElement {
 
     generarDoc(){
         this.spinnerLoading = true;
-        generarDocumentoRedaccion({'id': this.idRedaccion }).then(result => {
+        generarDocumentoRedaccion({'id': this.idRedaccion,  'reenvio': this.reenvio  }).then(result => {
                 this.mostrarEdicion = false;
                 this.botonGenerar = true;
                 let dataToSend = true;

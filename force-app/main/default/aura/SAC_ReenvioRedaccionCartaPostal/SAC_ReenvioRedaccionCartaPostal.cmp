@@ -3,8 +3,25 @@
 
     <aura:attribute name="recordId" type="String" />    
     <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="archivoSubido" type="Boolean" default="false" />
     <aura:attribute name="confirmarOperacion" type="Boolean" default="false" />
-    <lightning:button variant="brand" label="Reenviar redacción" title="Enviar" onclick="{!c.abrirConfirmarOperacion}" />
+    <aura:attribute name="direccion" type="String" />
+    <aura:attribute name="codigoPostal" type="String" />
+    <aura:attribute name="poblacion" type="String" />
+    <aura:attribute name="provincia" type="String" />
+    <aura:attribute name="pais" type="String" />
+    <aura:attribute name="options" type="String[]" />
+    <aura:attribute name="paisSeleccionado" type="String" />
+    <aura:attribute name="editarReenvio" type="Boolean" default="false" />
+    <lightning:navigation aura:id="navService"/>
+
+
+    <aura:attribute name="procedenciaAdj" type="String" default="SAC_003" />
+    <aura:attribute name="idsFicherosAdjuntos" type="String[]" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <lightning:button variant="brand" label="Reenviar redacción" title="Enviar" onclick="{!c.abrirEditarReenvio}" />
 
     <aura:if isTrue="{!v.isLoading}">
         <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
@@ -26,6 +43,65 @@
         </section>
         <div class="slds-backdrop slds-backdrop_open"></div>
     </aura:if>
+
+    <aura:if isTrue="{!v.editarReenvio}">
+         <!-- Modal/Popup Box starts here-->
+         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                        onclick="{! c.cerrarEditarReenvio }"
+                                        alternativeText="close"
+                                        variant="bare-inverse"
+                                        class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reenviar redacción</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                   <h1 style= "padding-bottom: 8px"> Si lo deseas, puedes editar la carta o la dirección para el renvío, si no quieres puedes pulsar en continuar igualmente. </h1>
+                    
+                    <c:sAC_GeneracionDocumento aura:id="lwcGenDoc" recordId="{!v.recordId}" reenvio="true" onsenddata="{!c.receiveLWCDataDocumento}" style="padding-top: 12px"/>
+
+                      <!-- Adjuntos -->
+                      <div class="slds-form-element">
+                        <p>Elementos Adjuntados: </p>
+                        <c:SAC_AdjuntosEmail aura:id="adjuntosComponent" 
+                                             idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" 
+                                             caseId="{!v.recordId}" 
+                                             seleccionarReclamacion= "true" 
+                                             procedencia="{!v.procedenciaAdj}"/>
+                        </div>
+
+                    <div class="c-container" style="padding-top: 12px">
+                        <div class="slds-box">
+                            <h1 style="padding-top: 12px; font-size: 15px; padding-bottom: 8px"><b>Dirección carta postal:</b></h1>
+                            <div>
+                                <lightning:input name="input1" label="Dirección" required="true" value="{!v.direccion}"  onchange='{!c.cambiaDireccion}'/>
+                                <lightning:input name="input2" label="Código postal" required="true" value="{!v.codigoPostal}"  onchange='{!c.cambiaCP}'/>
+                                <lightning:input name="input3" label="Población" required="true" value="{!v.poblacion}"  onchange='{!c.cambiaPoblacion}'/>
+                                <lightning:input name="input4" label="Provincia" required="true" value="{!v.provincia}"  onchange='{!c.cambiaProvincia}'/>
+                                
+                                <lightning:combobox aura:id="selectorPais" name="status" label="País"
+                                    placeholder="--Seleccione un país--"
+                                    value="{!v.pais}"
+                                    onchange="{!c.cambioPais}"
+                                    options="{!v.options}"/>
+            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarEditarReenvio }" title="Cancelar">Cancelar</lightning:button>
+                    <lightning:button class="slds-button slds-button_brand" onclick="{! c.abrirConfirmarOperacion }" title="OK">Continuar</lightning:button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>  
 
     <aura:if isTrue="{!v.confirmarOperacion}">
             <!-- Modal/Popup Box starts here-->

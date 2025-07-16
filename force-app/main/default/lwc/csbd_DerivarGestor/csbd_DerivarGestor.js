@@ -4,6 +4,8 @@ import {errorApex, publicarEvento, toast, transitionThenCallback} from 'c/csbd_l
 
 import crearOportunidadGestor from '@salesforce/apex/CSBD_Opportunity_Operativas_Controller.crearTareaGestor';
 import cerrarOportunidad from '@salesforce/apex/CSBD_Opportunity_Operativas_Controller.cerrarOportunidad';
+import generarResumenCierre from '@salesforce/apex/CSBD_EinsteinUtils.generarResumenCierre';
+
 
 import OPP_GESTOR_NAME from '@salesforce/schema/Opportunity.Account.AV_EAPGestor__r.Name';
 import OPP_PRODUCTO_PF from '@salesforce/schema/Opportunity.AV_PF__c';
@@ -48,11 +50,23 @@ export default class csbdDerivarGestor extends LightningElement {
 		if (!this.oportunidad) {
 			return; //Si el getRecord no ha acabado, el modal se abrirá cuando acabe
 		}
-
+		this.resumenCierre = false;
 		if (!getFieldValue(this.oportunidad, OPP_PRODUCTO_PF)) {
 			toast('info', 'Operativa no disponible', 'La oportunidad no se puede derivar a un gestor porque no tiene producto PF');
 		} else {
-			this.refs.inputComentarios.value = getFieldValue(this.oportunidad, OPP_DESCRIPTION);
+			generarResumenCierre({
+				opId: this.recordId
+			}).then(response => {  
+				if(response && response != ''){
+					this.refs.inputComentarios.value = response;
+					this.resumenCierre = true;
+				}
+			}).catch(error => {
+				errorApex(this, error, 'Error al actualizar descripción de la oportunidad');
+			});
+			if(!this.resumenCierre){
+				this.refs.inputComentarios.value = getFieldValue(this.oportunidad, OPP_DESCRIPTION);
+			}
 
 			this.refs.backdropModal.classList.add('slds-backdrop_open');
 			transitionThenCallback(modalDerivarGestor, 'slds-fade-in-open', () => {
@@ -94,7 +108,10 @@ export default class csbdDerivarGestor extends LightningElement {
 			comentarios: comentariosTarea
 		}).then(() => {
 			toast('success', 'Oportunidad para el gestor creada con éxito', 'Puedes ver la nueva oportunidad en la ficha del cliente');
-			cerrarOportunidad({recordId: this.recordId, nombreEtapaVentas: 'Perdida', resolucion: 'Traslado a oficina'}).then(() => {
+			const campos = {
+				'Description': this.refs.inputComentarios.value
+			};
+			cerrarOportunidad({recordId: this.recordId, nombreEtapaVentas: 'Perdida', resolucion: 'Traslado a oficina', campos}).then(() => {
 				notifyRecordUpdateAvailable([{recordId: this.recordId}]);
 				toast('info', `Oportunidad ${getFieldValue(this.oportunidad, OPP_IDENTIFICADOR)} cerrada con éxito`, 'La oportunidad se cerró como Perdida');
 				this.modalCerrar();

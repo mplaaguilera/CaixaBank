@@ -4,6 +4,7 @@ import { RefreshEvent } from 'lightning/refresh';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import getPretensiones from '@salesforce/apex/SAC_LCMP_RedaccionFinal.getPretensiones';
 import finalizarRedaccionNegociacion from '@salesforce/apex/SAC_LCMP_RedaccionFinal.finalizarRedaccionNegociacion';
+import validarResolucionComplementaria from '@salesforce/apex/SAC_LCMP_RedaccionFinal.validarResolucionComplementaria';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import CASO_OBJECT from '@salesforce/schema/Case';
 
@@ -27,16 +28,23 @@ export default class SAC_ResolverNegociarRedaccion extends LightningElement {
 
     @track isModalOpenPretensiones = false;
 
+
+
     existenDatos;
     numPretensiones;
     antecedentesRevisados;
     reclamanteConforme
     estado;
+    sentidoResolucion;
+    naturaleza;
+    tieneCasoVinculado = false;
 
     pretensiones = [];
     columns = columns;
     mostrarBoton = true;
     lstSelectedRecords = [];
+    sePuedeResolver = false;
+
 
     @wire (getObjectInfo, {objectApiName: CASO_OBJECT})
     objectInfo;
@@ -112,18 +120,46 @@ export default class SAC_ResolverNegociarRedaccion extends LightningElement {
                 this.isModalOpenPretensiones = true;    
             } else {
                 this.isLoading = true;
-                // Llamada a la función para negociar la unipretension
-                finalizarRedaccionNegociacion({idCaso: this.recordId, envioMail: this.checkMail, pretensionesNegociacion: this.pretensiones}).then(result =>{
-                    this.isLoading = false;
-                    this.dispatchEvent(
-                        new ShowToastEvent({
-                            title: 'Estado actualizado',
-                            message: 'Se ha resuelto la reclamación y pasado a la fase de negociación',
-                            variant: 'success'
+                validarResolucionComplementaria({idCaso: this.recordId}).then(result =>{
+                    if(result == true){
+                        this.isLoading = true;
+                        // Llamada a la función para negociar la unipretension
+                        finalizarRedaccionNegociacion({idCaso: this.recordId, envioMail: this.checkMail, pretensionesNegociacion: this.pretensiones, sinEnvio: this.checkMail}).then(result =>{
+                            this.isLoading = false;
+                            this.dispatchEvent(
+                                new ShowToastEvent({
+                                    title: 'Estado actualizado',
+                                    message: 'Se ha resuelto la reclamación y pasado a la fase de negociación',
+                                    variant: 'success'
+                                })
+                            );
+                            
+                            this.dispatchEvent(new RefreshEvent());
                         })
-                    );
-                    
-                    this.dispatchEvent(new RefreshEvent());
+                        .catch(error => {
+                            this.isLoading = false;
+                            this.errorMsg = error;
+                
+                            this.dispatchEvent(
+                                new ShowToastEvent({
+                                    title: 'Fallo al actualizar',
+                                    message: error.body.message,
+                                    variant: 'error'
+                                })
+                            );
+                        }) 
+                    }else{
+                        this.isLoading = false;
+                        this.dispatchEvent(
+                            new ShowToastEvent({
+                                title: 'Error al resolver',
+                                message: 'No es posible resolver sin una reclamación vinculada.',
+                                variant: 'error'
+                            })
+                        );
+                        this.dispatchEvent(new RefreshEvent());
+                    }
+
                 })
                 .catch(error => {
                     this.isLoading = false;
@@ -137,6 +173,11 @@ export default class SAC_ResolverNegociarRedaccion extends LightningElement {
                         })
                     );
                 }) 
+
+
+
+
+                
             }
         }
     }
@@ -153,22 +194,52 @@ export default class SAC_ResolverNegociarRedaccion extends LightningElement {
 
     resolverPretensiones() {
         this.isLoading = true;
-        finalizarRedaccionNegociacion({idCaso: this.recordId, envioMail: this.checkMail, pretensionesNegociacion: this.lstSelectedRecords}).then(result =>{
-            this.isLoading = false;
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Estado actualizado',
-                    message: 'Se ha resuelto la reclamación y pasado a la fase de negociación',
-                    variant: 'success'
+        validarResolucionComplementaria({idCaso: this.recordId}).then(result =>{
+            if(result == true){
+                this.isLoading = true;
+
+                finalizarRedaccionNegociacion({idCaso: this.recordId, envioMail: this.checkMail, pretensionesNegociacion: this.lstSelectedRecords, sinEnvio: this.checkMail}).then(result =>{
+                    this.isLoading = false;
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: 'Estado actualizado',
+                            message: 'Se ha resuelto la reclamación y pasado a la fase de negociación',
+                            variant: 'success'
+                        })
+                    );
+                    
+                    this.dispatchEvent(new RefreshEvent());
+                    this.isModalOpenPretensiones = false;
                 })
-            );
-            
-            this.dispatchEvent(new RefreshEvent());
-            this.isModalOpenPretensiones = false;
+                .catch(error => {
+                    this.isLoading = false;
+                    this.isModalOpenPretensiones = false;
+                    this.errorMsg = error;
+        
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: 'Fallo al actualizar',
+                            message: error.body.message,
+                            variant: 'error'
+                        })
+                    );
+                }) 
+
+            }else{
+                this.isLoading = false;
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error al resolver',
+                        message: 'No es posible resolver sin una reclamación vinculada.',
+                        variant: 'error'
+                    })
+                );
+                this.dispatchEvent(new RefreshEvent());
+            }
+
         })
         .catch(error => {
             this.isLoading = false;
-            this.isModalOpenPretensiones = false;
             this.errorMsg = error;
 
             this.dispatchEvent(
@@ -179,6 +250,14 @@ export default class SAC_ResolverNegociarRedaccion extends LightningElement {
                 })
             );
         }) 
+
+
+
+
+
+
+
+
     }
 
     closeModalPretensiones(){

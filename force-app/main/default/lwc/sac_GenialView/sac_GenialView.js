@@ -70,7 +70,6 @@ import ESPRINCIPAL from '@salesforce/schema/Case.SAC_EsPrincipal__c';
 import EMAILRECLAMANTE from '@salesforce/schema/Case.OS_Email__c';
 
 import RESNIF from '@salesforce/schema/SAC_Genial_Resultado__c.SAC_SuppliedNIF__c';
-
 import mensajeIAResponsable from '@salesforce/label/c.SAC_MensajeIAResponsable';
 
 const FIELDSCASE = [CASEID,CASERT,ESTADO,ACCOUNTNAME,ACCOUNTNIF,USARDATOS,TIPODEREPRESENTANTE,TIPODEDOCUMENTO,NUMERODELDOCUMENTO,NOMBRECOMPLETO,TELEFONODECONTACTOREP,CORREOELECTRONICOREP,DESPACHOREPRESENTANTE,DIRECCIONREP,CODIGOPOSTALREP,POBLACIONREP,PROVINCIAREP,PAISREP,DIRECCIONPOSTALREP,PODERREP,IMPORTETIPO,IMPORTERECLAMADO,FECHARECEPCION,NATURALEZA,IDIOMA,OFICINAAFECTADA,MCCTEMATICA,MCCMOTIVO,MCCPRODSERV,SEGDETALLE,ESPRINCIPAL,EMAILRECLAMANTE,MCCRESUMEN,CANAL];
@@ -214,6 +213,7 @@ export default class Sac_GenialView extends LightningElement {
     }
 
     //obtener si en el objeto resultado, hay nif necesario para mostrar el boton que vincula el reclamante a la reclamación
+    //también el tipo de reclamante para mostrar o no la información del reclamante
     @wire(getRecord, {recordId: '$idResultadoGenial', fields : FIELDSRESULTADO})
     getResulRecord({error, data}){
         if(data) {

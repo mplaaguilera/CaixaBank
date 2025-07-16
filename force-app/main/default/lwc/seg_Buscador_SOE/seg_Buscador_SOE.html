@@ -1,0 +1,70 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-card__body slds-card__body_inner" align="left">
+            <lightning-button label="Buscar SOE" icon-name="utility:search" onclick={modalBuscarSOEAbrir} disabled={isNotOwner}></lightning-button>
+            <lightning-button label="Limpiar SOE" icon-name="utility:delete" onclick={limpiarDatosSOE} style="margin-left: 2px" disabled={isNotOwner}></lightning-button>
+        </div>
+    </article>
+
+    <section id='section' role="dialog" tabindex="-1" aria-modal="true" class="modalBuscarSOE slds-modal slds-modal_small" onkeydown={modalboxEnviarCorreoTeclaPulsada}>
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={modalBuscarSOECerrar} variant="border-filled" class="slds-modal__close"></lightning-button-icon>
+                <!--Título-->
+                <h2 class="slds-text-heading_medium slds-hyphenate">Buscar SOE</h2>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_x-large slds-text-align_center">
+                    <div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-end slds-align_absolute-center">
+                        <div if:true={mostarSpinner}>
+                            <div class="spinner mostrarSpinner">
+                                <lightning-spinner alternative-text="Cargando resultados"></lightning-spinner>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters">                            
+                                <div class="slds-col">
+                                    <lightning-input data-id="numeroSOE" label="Número SOE" type="search" maxlength = 5></lightning-input>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input data-id="nombreAcreditada" label="Nombre acreditada" type="search"></lightning-input>
+                                </div>                           
+                                <div class="slds-col">
+                                    <lightning-input data-id="nif" label="NIF" type="search"></lightning-input>
+                                </div>                       
+                    </div>
+                </div>
+                <!--Contenido del buscador-->
+                <div class="slds-hide slds-var-m-top_xx-large mostrarResultadosSOE">
+                    <lightning-datatable
+                        key-field="Id"
+                        columns={datatableColumnas}
+                        data={datatableData}
+                        max-row-selection="1"
+                        column-widths-mode="auto"
+                        onrowselection={habilitarSel}>
+                    </lightning-datatable>
+                </div>
+            </div>
+
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <div class="slds-hide mostrarErrorCampos">
+                    <p style="color:red; text-align:left; margin-right:70px">Debe informarse, al menos, uno de los siguientes campos: "Número SOE" o "Nombre acreditada" o "NIF".</p>
+                </div>
+                <div class="slds-hide mostrarErrorResultados">
+                    <p style="color:red; text-align:left; margin-right:70px">No se han encontrado resultados.</p>
+                </div>
+                <div class="slds-hide mostrarErrorLetras">
+                    <p style="color:red; text-align:left; margin-right:70px">No es posible indicar valores en SOE que no sean números.</p>
+                </div>
+                <lightning-button variant="brand" label="Buscar" title="Buscador SOE" icon-name="utility:search" class="slds-m-left_x-small botonBuscadorSOE" onclick={modalBuscarResultadosSOE}></lightning-button>
+                <lightning-button variant="brand" label="Seleccionar" icon-name="action:email" onclick={modalResultadosSOE} disabled={botonEnviarCorreoGenerarBorradorDisabled} class="slds-var-m-left_x-small botonSeleccionSOE"></lightning-button>
+                <lightning-button class="slds-var-m-left_x-small slds-float_right" label="Cancelar" onclick={modalBuscarSOECerrar}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+    <div class="slds-backdrop"></div>
+</template>

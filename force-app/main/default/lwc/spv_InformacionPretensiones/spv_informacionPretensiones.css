@@ -1,0 +1,14 @@
+.tabla-pretensiones {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-pretensiones table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.tabla-pretensiones th,
+.tabla-pretensiones td {
+    word-wrap: break-word;
+}

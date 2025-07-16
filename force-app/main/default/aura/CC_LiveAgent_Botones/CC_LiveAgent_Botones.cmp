@@ -23,6 +23,7 @@
     	{'label': 'Català', 'value': 'ca'},
 		]" />
     <aura:attribute name="radioValue" type="String" />
+    <aura:attribute name="nombreBoton" type="String" />
     <aura:attribute name="transferAPP" type="Boolean" default="false" />
     <aura:attribute name="chatCerrado" type="Boolean" default="false" />
     <aura:attribute name="valor" type="Boolean" default="" required="false" />
@@ -52,6 +53,11 @@
     <aura:attribute name="picklistFirstOptionsEspacio" type="Object[]" />
     <aura:attribute name="picklistFirstOptionsCategoria" type="Object[]" />
     <aura:attribute name="optionFirstLabel" type="String" />
+    <aura:attribute name="firstOptionEspacios" type="String" />
+    <aura:attribute name="firstOptionEspaciosEscalar" type="String" />
+    <aura:attribute name="selectedFirstOption" type="String" />
+    <aura:attribute name="picklistFirstOptionEspacio" type="String" />
+
 
     <aura:handler name="init" value="{!this}" action="{!c.inicializar}" />
     <aura:handler event="lightning:conversationChatEnded" action="{!c.onCloseWork}" />
@@ -291,17 +297,20 @@
                 <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalEscalar}"
                     alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
                 <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Escalar</h2>
-                <p class="slds-m-top_x-small">Seleccione una categoría para escalar</p>
+                <!-- <p class="slds-m-top_x-small">Seleccione una categoría para escalar</p> -->
+                <p class="slds-m-top_x-small">Seleccione un espacio y una categoría</p>
+
             </header>
             <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                 <!-- Selección de espacio -->
                 <lightning:layoutItem size="12" padding="around-small">
-                    <ui:inputSelect disabled="true" multiple="false" label="Espacio" aura:id="firstOptionEspacio">
+                    <ui:inputSelect disabled="false" multiple="false" label="Espacio"
+                                    change="{!c.handleEspacioSeleccionado}" aura:id="firstOptionEspaciosEscalar" value="{!v.espacio}">
                         <aura:iteration items="{!v.picklistFirstOptionsEspacio}" var="picklistFirstOptionEspacio">
                             <ui:inputSelectOption text="{!picklistFirstOptionEspacio.picklistValue}"
-                                label="{!picklistFirstOptionEspacio.picklistLabel}"
-                                value="{!picklistFirstOptionEspacio.bSel}"
-                                class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" />
+                                                  label="{!picklistFirstOptionEspacio.picklistLabel}"
+                                                  value="{!picklistFirstOptionEspacio.bSel}"
+                                                  class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" />
                         </aura:iteration>
                     </ui:inputSelect>
                 </lightning:layoutItem>

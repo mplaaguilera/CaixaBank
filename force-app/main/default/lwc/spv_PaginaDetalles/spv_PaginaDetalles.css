@@ -1,0 +1,52 @@
+.subseccion {
+    margin-left: 20px;
+}
+
+.seccion {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.flecha {
+    color: rgb(116, 116, 116);
+    margin-left: 1px;
+}
+
+.cuerpo-subseccion {
+    margin-left: 20px;
+}
+
+.cuerpo-seccion {
+    /* margin-left: 20px; */
+}
+
+.elemento-form {
+    padding-right: 25px;
+    
+}
+
+.botonesEditar {
+    margin-top: 10px;
+}
+
+.contenedor {
+    display: flex;
+}
+
+.mi-boton {
+    margin-bottom: 10px;
+}
+
+.botonera-inferior {
+    position: fixed; /* Hace que el contenedor permanezca fijo en la ventana */
+    bottom: 0; /* Posiciona el contenedor en la parte inferior */
+    left: 0; /* Asegura que el contenedor esté alineado al inicio */
+    right: 0; /* Asegura que el contenedor ocupe todo el ancho */
+    background-color: #f3f2f2; /* Color de fondo similar al estándar de Salesforce */
+    border-top: 1px solid #d8dde6; /* Línea superior para separar visualmente los botones */
+    padding: 10px; /* Espaciado interno */
+    display: flex; /* Para alinear los botones */
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 5px; /* Espaciado entre los botones */
+    z-index: 100; /* Asegura que el contenedor esté por encima de otros elementos */
+}

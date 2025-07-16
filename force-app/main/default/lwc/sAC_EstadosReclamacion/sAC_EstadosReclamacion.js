@@ -14,6 +14,7 @@ import vieneAlta from '@salesforce/apex/SAC_LCMP_UpdateStatus.vieneDeAlta';
 import esPropietario from '@salesforce/apex/SAC_LCMP_UpdateStatus.esPropietario';
 import reclamacionConPretension from '@salesforce/apex/SAC_LCMP_UpdateStatus.reclamacionConPretension';
 import insertarComentario from '@salesforce/apex/SAC_LCMP_UpdateStatus.insertarComentario';
+import comprobarConsumidorReclamacion from '@salesforce/apex/SAC_LCMP_UpdateStatus.comprobarConsumidorReclamacion';
 //import insertCommentRechazo from '@salesforce/apex/SAC_LCMP_UpdateStatus.insertCommentRechazo';
 import tienePretensiones from '@salesforce/apex/SAC_LCMP_UpdateStatus.tienePretensiones';
 import prorroga from '@salesforce/apex/SAC_LCMP_UpdateStatus.prorroga';
@@ -36,6 +37,7 @@ import ANTECEDENTESREVISADOSNEGOCIACION_FIELD from '@salesforce/schema/Case.SAC_
 import RECLAMANTECONFORMENEGOCIACION_FIELD from '@salesforce/schema/Case.SAC_Reclamacion__r.SAC_ReclamanteConformeNegociacion__c';
 import STATUSRECLAMACION_FIELD from '@salesforce/schema/Case.SAC_Reclamacion__r.Status';
 import FASTTRACK_FIELD from '@salesforce/schema/Case.SAC_FastTrack__c';
+import checkImportesGGHPretensiones from '@salesforce/apex/SAC_LCMP_UpdateStatus.checkImportesGGHPretensiones';
 
 const fields = [
     'Case.Status',
@@ -89,11 +91,12 @@ export default class SAC_EstadosReclamacion extends LightningElement {
     @track listaMarcasFT = [];
     @track marcaSeleccionada;
     @track avisoInfoCualitativa = false;
-    @track avisoIdioma = false;
+    //@track avisoIdioma = false;
     @track checkConfirmacionValidacion = false;
     @track variableAuxiliarBoton;
     isLoadingFT = false;
- 
+    @track reclamacionPadre;
+
     //@track plantillaProrroga;
     @track existenDatos;
     @track caseNumber;
@@ -122,6 +125,7 @@ export default class SAC_EstadosReclamacion extends LightningElement {
             this.fechaResolucion = this.existenDatos.fields.OS_Fecha_Resolucion__c.value; 
             this.idioma = this.existenDatos.fields.CC_Idioma__c.value; 
             this.estado;
+            this.reclamacionPadre = this.existenDatos.fields.SAC_Reclamacion__c.value; 
 
             if(this.existenDatos.fields.CC_AcuseRecibo__c.value === '2'){
                 this.acuseReciboEnviado = true;
@@ -473,35 +477,105 @@ export default class SAC_EstadosReclamacion extends LightningElement {
             );
             
         } else {
-            updateRecordStatus({ record: this.recordId, newStatus: this.estado }).then(result => {
-                this.isLoading = false;
-                this.dispatchEvent(
-    
-                    new ShowToastEvent({
-                        title: 'Estado actualizado',
-                        message: this.mensaje,
-                        variant: 'success'
-                    })
-                );
+            
+            //Si la pretensión se va a pasar a Resolución, habrá que comprobar si todas las pretensiones van a estar en resolución, y en ese caso, ver si la reclamación 
+            //está con el campo consumidor relleno
+            if(this.estado === 'SAC_003'){
+                comprobarConsumidorReclamacion({ idReclamacionPadre: this.reclamacionPadre, idPretensionActual: this.recordId}).then(result => {
+                    if (result === false){   //False si no está informado el campo consumidor y todas las pretensiones pasarían a Resolución
+                        this.isLoading = false;
+                        this.dispatchEvent(
+                            new ShowToastEvent({
+                                title: 'Fallo al actualizar',
+                                message: 'Debe informar el campo Consumidor en la reclamación antes de pasar a estado de Resolución.',
+                                variant: 'error'
+                            })
+                        );
+                    }else{
+                        updateRecordStatus({ record: this.recordId, newStatus: this.estado }).then(result => {
+                            this.isLoading = false;
+                            this.dispatchEvent(
                 
-				this.dispatchEvent(new RefreshEvent());
-    
-            })
-            .catch(error => {
-                this.isLoading = false;
-                this.errorMsg = error;
-                if (this.avisoInfoCualitativa) {
-                    this.avisoInfoCualitativa = false;
-                }
-    
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Fallo al actualizar',
-                        message: error.body.message,
-                        variant: 'error'
-                    })
-                );
-            })    
+                                new ShowToastEvent({
+                                    title: 'Estado actualizado',
+                                    message: this.mensaje,
+                                    variant: 'success'
+                                })
+                            );
+                            
+                            this.dispatchEvent(new RefreshEvent());
+                
+                        })
+                        .catch(error => {
+                            this.isLoading = false;
+                            this.errorMsg = error;
+                            if (this.avisoInfoCualitativa) {
+                                this.avisoInfoCualitativa = false;
+                            }
+                
+                            this.dispatchEvent(
+                                new ShowToastEvent({
+                                    title: 'Fallo al actualizar',
+                                    message: error.body.message,
+                                    variant: 'error'
+                                })
+                            );
+                        })  
+                    }
+        
+                })
+                .catch(error => {
+                    this.isLoading = false;
+                    this.errorMsg = error;
+                    if (this.avisoInfoCualitativa) {
+                        this.avisoInfoCualitativa = false;
+                    }
+        
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: 'Fallo al actualizar',
+                            message: error.body.message,
+                            variant: 'error'
+                        })
+                    );
+                })  
+            }else{
+            
+                updateRecordStatus({ record: this.recordId, newStatus: this.estado }).then(result => {
+                    this.isLoading = false;
+                    this.dispatchEvent(
+        
+                        new ShowToastEvent({
+                            title: 'Estado actualizado',
+                            message: this.mensaje,
+                            variant: 'success'
+                        })
+                    );
+                    
+                    this.dispatchEvent(new RefreshEvent());
+        
+                })
+                .catch(error => {
+                    this.isLoading = false;
+                    this.errorMsg = error;
+                    if (this.avisoInfoCualitativa) {
+                        this.avisoInfoCualitativa = false;
+                    }
+        
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: 'Fallo al actualizar',
+                            message: error.body.message,
+                            variant: 'error'
+                        })
+                    );
+                })  
+            }
+
+
+
+     
+  
         }      
     }
 
@@ -555,31 +629,67 @@ export default class SAC_EstadosReclamacion extends LightningElement {
             this.isLoading = true;
             this.estado = 'SAC_009';
             this.estadoActual = this.existenDatos.fields.Status.value;
-            updateRecordStatus({ record: this.recordId, newStatus: this.estado }).then(result => {
-            this.isLoading = false;
-            this.dispatchEvent(
+
+
+            //Si todas las pretensiones están en resolución (o están de baja) menos esta que se va a dar de baja, entonces solo se actualiza si el campo consumidor está informado
+            comprobarConsumidorReclamacion({ idReclamacionPadre: this.reclamacionPadre, idPretensionActual: this.recordId}).then(result => {
+                if (result === false){   //False si no está informado el campo consumidor y todas las pretensiones pasarían a Resolución
+                    this.isLoading = false;
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: 'Fallo al actualizar',
+                            message: 'Debe informar el campo Consumidor en la reclamación antes de pasar a estado de Resolución.',
+                            variant: 'error'
+                        })
+                    );
+                }else{      //Si se recibe true, es o porque el campo consumidor está informado, o porque no todas las pretensiones están en resolución, asique se puede actualizar esta pret. sin problemas
+                    updateRecordStatus({ record: this.recordId, newStatus: this.estado }).then(result => {
+                        this.isLoading = false;
+                        this.dispatchEvent(
+                
+                        new ShowToastEvent({
+                            title: 'Estado actualizado',
+                            message: this.mensaje,
+                            variant: 'success'
+                        })
+                        );
+                    
+                        this.dispatchEvent(new RefreshEvent());
+                
+                    })
+                        .catch(error => {
+                        this.isLoading = false;
+                        this.errorMsg = error;
+                
+                        this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: 'Fallo al actualizar',
+                            message: error.body.message,
+                            variant: 'error'
+                        }));
+                    })
+
+
+                }
     
-            new ShowToastEvent({
-                title: 'Estado actualizado',
-                message: this.mensaje,
-                variant: 'success'
             })
-            );
-        
-            this.dispatchEvent(new RefreshEvent());
-    
-        })
             .catch(error => {
-            this.isLoading = false;
-            this.errorMsg = error;
+                this.isLoading = false;
+                this.errorMsg = error;
+                if (this.avisoInfoCualitativa) {
+                    this.avisoInfoCualitativa = false;
+                }
     
-            this.dispatchEvent(
-            new ShowToastEvent({
-                title: 'Fallo al actualizar',
-                message: error.body.message,
-                variant: 'error'
-            }));
-        })
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Fallo al actualizar',
+                        message: error.body.message,
+                        variant: 'error'
+                    })
+                );
+            })  
+            
+
             
         }
 
@@ -1241,7 +1351,24 @@ export default class SAC_EstadosReclamacion extends LightningElement {
     }
 
     openModalInadmision() {
-        this.isModalOpenInadmision = true; 
+        checkImportesGGHPretensiones({ record: this.recordId })
+        .then(() => {
+                this.isModalOpenInadmision = true;
+        })
+        .catch(error => {
+            if(error.body.message != null) {
+                this.errorMsg = error.body.message;
+            } else {
+                this.errorMsg = error.body.pageErrors[0].message;
+            }
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Fallo al actualizar',
+                    message: this.errorMsg,
+                    variant: 'error'
+                })
+            );
+        })
     }
     closeModalInadmision() {
         this.isModalOpenInadmision = false;
@@ -1387,7 +1514,34 @@ export default class SAC_EstadosReclamacion extends LightningElement {
         this.avisoInfoCualitativa = false;
     }
 
-    mostrarAvisoIdioma(evt) {
+    clickAnalisisInadmision(evt) {
+        var variableAuxiliarCodigoboton = evt.currentTarget.id;
+        for (var i = 0; i < variableAuxiliarCodigoboton.length - 1; i++) {
+            if (variableAuxiliarCodigoboton.charAt(i) == '-') {
+                this.variableAuxiliarBoton = variableAuxiliarCodigoboton.substring(0, i);
+            }
+        }
+        this.comprobarIdioma();
+    }
+
+    comprobarIdioma() {
+        if(this.idioma == null) {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Advertencia',
+                    message: 'Debe completar el idioma de la reclamación',
+                    variant: 'warning'
+                }));
+        } else {
+                if(this.variableAuxiliarBoton == 'SAC_002') {
+                    this.clickReclamacion();
+                } else if(this.variableAuxiliarBoton =='Inadmisión') {
+                    this.openModalInadmision();
+                }
+            }
+    }
+   /*
+   mostrarAvisoIdioma(evt) {
         var variableAuxiliarCodigoboton = evt.currentTarget.id;
         for (var i = 0; i < variableAuxiliarCodigoboton.length - 1; i++) {
             if (variableAuxiliarCodigoboton.charAt(i) == '-') {
@@ -1404,7 +1558,6 @@ export default class SAC_EstadosReclamacion extends LightningElement {
     handleChangeIdioma(event) {
         this.checkConfirmacionValidacion = event.target.checked;
     }
-
     aceptarAvisoIdioma() {
         if(this.idioma == null) {
             this.dispatchEvent(
@@ -1431,5 +1584,5 @@ export default class SAC_EstadosReclamacion extends LightningElement {
             }
         }
     }
-
+    */
 }

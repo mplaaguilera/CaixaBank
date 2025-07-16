@@ -1,0 +1,45 @@
+.titulo-despegable {
+    padding-left: 13px;
+}
+
+.cuerpo-seccion {
+    margin-left: 20px;
+    padding-top: 20px !important;
+}
+
+.elemento-form {
+    padding-right: 25px;    
+}
+
+.slds-form-element__control {
+    display: flex;
+    align-items: center;
+}
+
+.lightning-input .slds-checkbox_faux {
+    margin-left: auto;
+}
+
+.selector {
+    margin-left: 4px;
+}
+
+.textoInfo {
+    margin-left: 4px;
+}
+
+.labelControl {
+    font-size: 12px;
+    display: inline-block;
+    padding-top: 5px;
+}
+
+.botonera-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btnCancelar {
+    margin-right: 5px;
+}

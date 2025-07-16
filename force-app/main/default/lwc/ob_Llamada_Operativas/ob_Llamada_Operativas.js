@@ -23,8 +23,6 @@ import OB_RESULTADO_CIERRE_FIELD from '@salesforce/schema/CC_Llamada__c.OB_Resul
 import OB_MOTIVO_RECHAZO_FIELD from '@salesforce/schema/CC_Llamada__c.OB_Motivo_Rechazo__c';
 import OB_FECHA_ULTIMA_VALIDACION_FIELD from '@salesforce/schema/CC_Llamada__c.OB_Fecha_Ultima_Validacion__c';
 import CBK_TICKET_OCP_FIELD from '@salesforce/schema/CC_Llamada__c.CBK_Ticket_OCP__c';
-import KIN_GENESYS_CLOUD_FIELD from '@salesforce/schema/CC_Llamada__c.KIN_Genesys_Cloud__c';
-import KIN_GENESYS_CLOUD_URL_GRABACION_FIELD from '@salesforce/schema/CC_Llamada__c.KIN_Genesys_Cloud_URL_Grabacion__c';
 
 //eslint-disable-next-line camelcase, new-cap
 export default class Ob_Llamada_Operativas extends NavigationMixin(LightningElement) {
@@ -88,9 +86,7 @@ export default class Ob_Llamada_Operativas extends NavigationMixin(LightningElem
 			OB_ESTADO_FIELD,
 			OB_RESULTADO_CIERRE_FIELD,
 			CBK_TICKET_OCP_FIELD,
-			OB_MARCA_ENVIO_GDD_FIELD,
-			KIN_GENESYS_CLOUD_FIELD,
-			KIN_GENESYS_CLOUD_URL_GRABACION_FIELD
+			OB_MARCA_ENVIO_GDD_FIELD
 		]
 	})
 	wiredRecord(result) {
@@ -107,41 +103,31 @@ export default class Ob_Llamada_Operativas extends NavigationMixin(LightningElem
 			this.llamadaOutboundRtId = this.campoLlamada(RECORDTYPE_ID_FIELD);
 			this.esPropietario = this.campoLlamada(OWNER_ID_FIELD) === currentUserId;
 			this.estadoError = this.campoLlamada(OB_ESTADO_FIELD) === 'OB_Error';
-			if (!this.estadoError && (this.campoLlamada(CBK_TICKET_OCP_FIELD) || this.campoLlamada(KIN_GENESYS_CLOUD_URL_GRABACION_FIELD))) {
+			if (!this.estadoError && this.campoLlamada(CBK_TICKET_OCP_FIELD)) {
 				//eslint-disable-next-line @lwc/lwc/no-async-operation
 				window.setTimeout(() => {
 					datosUrlGrabacion({'idLlamada': this.recordId})
 						.then(response => {
 							let reproductorAudio = this.buscarControl('.reproductorAudio');
 
-							//Verificar si es una URL de Genesys Cloud
-							if (response.genesysCloudUrl) {
-								//Si es Genesys Cloud, crear source con la URL directa
-								let source = document.createElement('source');
-								source.className = 'reproductorAudioSource';
-								source.type = 'audio/mpeg';
-								source.src = response.genesysCloudUrl;
-								source.onerror = this.reproductorAudioSourceError.bind(this);
-								reproductorAudio.appendChild(source);
-								reproductorAudio.load();
-							} else {
-								//Si es OCP, seguir con el flujo tradicional
-								let validacion = 'idDoc:' + response.tiquet + ';appId:' + response.appid + ';username:' + response.username + ';timestamp:' + response.timestamp;
-								//eslint-disable-next-line no-undef
-								let crypt = new JSEncrypt();
-								crypt.setPublicKey(response.publicKey);
-								let crypted = crypt.encrypt(validacion);
-								let auth = response.appid + ':' + response.username + ':' + response.canal;
-								let url = response.baseUrl + '/?auth=' + encodeURIComponent(btoa(auth)) + '&validacion=' + encodeURIComponent(crypted);
+							let validacion = 'idDoc:' + response.tiquet + ';appId:' + response.appid + ';username:' + response.username + ';timestamp:' + response.timestamp;
+							//eslint-disable-next-line no-undef
+							let crypt = new JSEncrypt();
+							crypt.setPublicKey(response.publicKey);
+							let crypted = crypt.encrypt(validacion);
+							let auth = response.appid + ':' + response.username + ':' + response.canal;
+							let url = response.baseUrl + '/?auth=' + encodeURIComponent(btoa(auth)) + '&validacion=' + encodeURIComponent(crypted);
 
-								let source = document.createElement('source');
-								source.className = 'reproductorAudioSource';
-								source.type = 'audio/mpeg';
-								source.src = url;
-								source.onerror = this.reproductorAudioSourceError.bind(this);
-								reproductorAudio.appendChild(source);
-								reproductorAudio.load();
-							}
+							//url = 'https://file-examples.com/storage/febc474733629f43d9f078c/2017/11/file_example_MP3_700KB.mp3';
+
+							let source = document.createElement('source');
+							source.className = 'reproductorAudioSource';
+							source.type = 'audio/mpeg';
+							source.src = url;
+							source.onerror = this.reproductorAudioSourceError.bind(this);
+							reproductorAudio.appendChild(source);
+
+							reproductorAudio.load();
 						}).catch(error => {
 							console.error(JSON.stringify(error));
 							this.mostrarToast('error', 'Error al obtener enlace a la grabación', error.body.message);

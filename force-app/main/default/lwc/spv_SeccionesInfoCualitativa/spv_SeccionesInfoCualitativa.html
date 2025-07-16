@@ -1,0 +1,110 @@
+<template>
+    <template if:true={esPretension}>
+
+
+        <div class={toggleInfoCualitativa}>
+            <h1 class="slds-section__title subseccion">
+                <button aria-controls="expando-unique-id-allanamientos" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandirInfoCualitativa}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate color" title="Section Title"> Información cualitativa</span>
+                </button>
+            </h1>
+        </div>  
+
+        <template if:true={expandirInfoCualitativa}>
+            <div class="cuerpo-seccion">
+                <lightning-card icon-name="standard:topic2" title="Información Cualitativa" variant="narrow" class="slds-border_bottom">
+                    <div style="padding-left: 20px; padding: right 20px;">
+                        <template if:true={mapaSecciones}>
+                            <div class="slds-grid slds-wrap">
+                                <template for:each={mapaSecciones} for:item="mapaKey">
+                                    <div key={mapaKey.key} class="slds-col slds-size_4-of-12">
+                                        <details open>
+                                            <summary class="slds-button slds-section__title-action">                            
+                                                <h3 class="slds-section__title">                                
+                                                    {mapaKey.key}                                
+                                                </h3></summary>
+                                            <template if:true={mapaKey.value}>
+                                                <div class="objeto">
+                                                <template for:each={mapaKey.value} for:item="object">  
+                                                        <lightning-input type="checkbox" 
+                                                        key={object.name} 
+                                                        label={object.name} 
+                                                        value={object.name}
+                                                        checked={object.selecionado} 
+                                                        disabled={desabilitado}
+                                                        onchange={handleChange}> </lightning-input>
+                                                </template>
+                                                </div> 
+                                            </template>                            
+                                        </details><br>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>  
+                        <template if:false={ocultarBoton}>
+                            <lightning-button variant="brand"                 
+                            label="Guardar" 
+                            title="Primary action" 
+                            onclick={handleClick} 
+                            disabled={desabilitado}
+                            ></lightning-button>                
+                        </template>  
+                        <template if:true={spinnerLoading}>
+                            <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+                                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                            </section>
+                        </template>        
+                    </div>       
+                </lightning-card>    
+            </div>
+        </template>
+
+
+    </template>
+
+    <template if:false={esPretension}>
+        <!--Así se mostrará el componente en las reclamaciones-->
+        <lightning-card icon-name="standard:topic2" title="Información Cualitativa" variant="narrow" class="slds-border_bottom">
+            <div style="padding-left: 20px; padding: right 20px;">
+                <template if:true={mapaSecciones}>
+                    <div class="slds-grid slds-wrap">
+                        <template for:each={mapaSecciones} for:item="mapaKey">
+                            <div key={mapaKey.key} class="slds-col slds-size_4-of-12">
+                                <details open>
+                                    <summary class="slds-button slds-section__title-action">                            
+                                        <h3 class="slds-section__title">                                
+                                            {mapaKey.key}                                
+                                        </h3></summary>
+                                    <template if:true={mapaKey.value}>
+                                        <div class="objeto">
+                                        <template for:each={mapaKey.value} for:item="object">  
+                                                <lightning-input type="checkbox" 
+                                                key={object.name} 
+                                                label={object.name} 
+                                                value={object.name}
+                                                checked={object.selecionado} 
+                                                disabled={desabilitado}
+                                                onchange={handleChange}> </lightning-input>
+                                        </template>
+                                        </div> 
+                                    </template>                            
+                                </details><br>
+                            </div>
+                        </template>
+                    </div>
+                </template>  
+                <template if:false={ocultarBoton}>
+                    <lightning-button variant="brand"                 
+                    label="Guardar" 
+                    title="Primary action" 
+                    onclick={handleClick} 
+                    disabled={desabilitado}
+                    ></lightning-button>                
+                </template>         
+            </div>       
+        </lightning-card>    
+    </template>
+</template>

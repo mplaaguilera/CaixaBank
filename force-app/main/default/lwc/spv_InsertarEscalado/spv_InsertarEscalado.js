@@ -10,7 +10,10 @@ import insertarEscalado from '@salesforce/apex/SPV_LCMP_InsertarEscalado.inserta
 import esPropietario from '@salesforce/apex/SPV_LCMP_InsertarEscalado.esPropietario';
 import hayEscaladosAbiertos from '@salesforce/apex/SPV_LCMP_InsertarEscalado.hayEscaladosAbiertos';
 import recogerGruposParaEscalados from '@salesforce/apex/SPV_LCMP_InsertarEscalado.recogerGruposParaEscalados';
+import getRecordTypes from '@salesforce/apex/SPV_Utils.obtenerRecordTypes';
+import comprobarCamposEscalar from '@salesforce/apex/SPV_LCMP_InsertarEscalado.comprobarCamposEscalar';
 import MOTIVO_ESCALADO from '@salesforce/schema/SAC_Interaccion__c.SAC_MotivoEscalado__c';
+import TIPO_ESCALADO from '@salesforce/schema/SAC_Interaccion__c.SPV_TipoEscalado__c';
 
 const FIELDS = ['Case.OwnerId', 'Case.Status', 'Case.RecordType.DeveloperName', 'Case.SEG_Subestado__c'];
 
@@ -21,28 +24,58 @@ export default class Spv_InsertarEscalado extends NavigationMixin(LightningEleme
     @track isModalAdjuntos = false;
     @track modalWarning = false;
     @track isEstadoEscalado = false;
-    @track propuesta;
+    @track propuestaLetrado;
     @track titulo;
-    @track observaciones;
     @track motivo;
-    @track motivoLabel;
     @track propietario;
     @track hayEscaladoAbierto = false;
     @track existeEscaladoReclamacion = false;
     @track valueEquipo = 'Asesoría Jurídica'; 
     @track options = []
 
+    @track camposPendientesParaEscalar = '';
+    @track mostrarModalCamposPorRellenar = false;
+
+    @track rtEscaladosSPV;
+
+    @track selectedTipoEscalado = '';
+    @track mostrarObservacionesTipoEscalado = false;
+    @track observacionesTipoEscalado = '';
+
+    @track selectedMotivo = '';
+    @track mostrarObservacionesMotivo = false;
+    @track observacionesMotivoEscalado = '';
+
+    @track mostrarPropuestaLetrado = false;
+
     @wire(getObjectInfo, {objectApiName: CASO_OBJECT})
     objectInfo;
 
-    @wire(getPicklistValues, { recordTypeId: '012000000000000AAA', fieldApiName: MOTIVO_ESCALADO })
+
+    //Se obtienen el RecordType de escalados de SPV
+    @wire(getRecordTypes)
+    getRecordTypesResult(result){
+        if(result.data){
+            
+            result.data.forEach(element => {
+                if(element.DeveloperName == 'SPV_Escalado'){
+                    this.rtEscaladosSPV = element.Id;
+                }
+            });
+        }
+    }
+
+    @wire(getPicklistValues, { recordTypeId: '$rtEscaladosSPV', fieldApiName: MOTIVO_ESCALADO })
     getMotivoValues;
+
+    @wire(getPicklistValues, { recordTypeId: '$rtEscaladosSPV', fieldApiName: TIPO_ESCALADO})
+    getTipoEscaladoValues;
 
     @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
     wiredGetRecord({data, error}){
         if(data){
             this.status = data.fields.SEG_Subestado__c.value;
-            if(this.status == 'Allanamiento') {
+            /*if(this.status == 'Allanamiento') {
                 this.motivo = 'SPV_Allanamiento';
                 this.motivoLabel = 'Allanamiento';
             } else if(this.status == 'Alegaciones') {
@@ -51,15 +84,15 @@ export default class Spv_InsertarEscalado extends NavigationMixin(LightningEleme
             } else {
                 this.motivo = 'SAC_OtrosMotivosEsc';
                 this.motivoLabel = 'Otros';
-            }
-            if(data.fields.Status.value == 'SAC_002') {
+            }*/
+            if(data.fields.Status.value == 'SPV_AnalisisDecision') {
                 this.isEstadoEscalado = false;
             } else {
                 this.isEstadoEscalado = true;
             }
         }
     }
-
+    
     @wire(recogerGruposParaEscalados, {idCase: '$recordId'})
     gruposParaEscalar(result) {
         if (result.data) { 
@@ -124,50 +157,113 @@ export default class Spv_InsertarEscalado extends NavigationMixin(LightningEleme
         this.spinnerLoading = false;
     }
 
+    cerrarModalInsertarEscalado() {
+        this.modalInsertarEscalado = false;
+        this.selectedTipoEscalado = '';
+        this.observacionesTipoEscalado ='';
+        this.mostrarObservacionesTipoEscalado = false;
+        this.selectedMotivo = '';
+        this.observacionesMotivoEscalado = '';
+        this.mostrarObservacionesMotivo = false;
+        this.mostrarPropuestaLetrado = false;
+        this.propuestaLetrado = '';
+        this.valueEquipo = '';
+    }
+
+    handleOptionChangeTipoEscalado(event){
+        this.selectedTipoEscalado = event.target.value;
+        if(this.selectedTipoEscalado == 'SPV_Otros'){
+            this.mostrarObservacionesTipoEscalado = true;
+            this.mostrarPropuestaLetrado = true;
+        }else{
+            this.mostrarObservacionesTipoEscalado = false;
+            this.mostrarPropuestaLetrado = false;
+        }
+    }
+
+    handleChangeObservTipoEscalado(event){
+        this.observacionesTipoEscalado = event.target.value;
+    }
+
+    handleOptionChangeMotivo(event){
+        this.selectedMotivo = event.target.value;
+        if(this.selectedMotivo == 'SAC_OtrosMotivosEsc'){
+            this.mostrarObservacionesMotivo = true;
+        }else{
+            this.mostrarObservacionesMotivo = false;
+        }
+    }
+
+    handleChangeObservMotivoEscalado(event){
+        this.observacionesMotivoEscalado = event.target.value;
+    }
+
     abrirModalWarning() {
         this.spinnerLoading = true;
         this.modalWarning = true;
         this.spinnerLoading = false;
     }
-
-    cerrarModalInsertarEscalado() {
-        this.modalInsertarEscalado = false;
-    }
-
     cerrarModalWarning() {
         this.modalWarning = false;
     }
 
     handlePropuestaChange(event) {
-        this.propuesta = event.target.value;
+        this.propuestaLetrado = event.target.value;
     }
 
     handleTituloChange(event) {
         this.titulo = event.target.value;
     }
 
-    handleObservacionesChange(event) {
-        this.observaciones = event.target.value;
-    }
-
     handleChangeEquipo(event) { 
         this.valueEquipo = event.detail.value; 
     }
 
+
+    comprobarCamposInsertarEscalado(){
+        this.spinnerLoading = true;
+        comprobarCamposEscalar({'caseId': this.recordId})
+        .then(data=>{
+            this.camposPendientesParaEscalar = data;
+            if(this.camposPendientesParaEscalar) {
+                this.spinnerLoading = false;
+                this.mostrarModalCamposPorRellenar = true;
+            }else{
+                this.comprobarPropietario();
+            }
+        })
+        .catch(error => {
+            this.spinnerLoading = false;
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Error',
+                    message: error.body.message,
+                    variant: 'error'
+                })
+            ); 
+        }); 
+    }
+
+    closeModalComprobarCampos(){
+        this.mostrarModalCamposPorRellenar = false;
+        this.camposPendientesParaEscalar = '';
+    }
+
+
     insertarEscalado() {
         this.spinnerLoading = true;
-        if ((this.titulo == null || this.titulo == '') || (this.propuesta == null || this.propuesta == '')) {
+        if ((this.selectedTipoEscalado == '' || this.selectedTipoEscalado == null) || (this.selectedTipoEscalado == 'SPV_Otros' && ((this.observacionesTipoEscalado == '' || this.observacionesTipoEscalado == null) || (this.propuestaLetrado == '' || this.propuestaLetrado == null))) || (this.valueEquipo == '' || this.valueEquipo == null) || (this.selectedMotivo == '' || this.selectedMotivo == null) || (this.selectedMotivo == 'SAC_OtrosMotivosEsc' && (this.observacionesMotivoEscalado == '' || this.observacionesMotivoEscalado == null))     ) {
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Precaución',
-                    message: 'Recuerde completar el título y la propuesta.',
+                    message: 'Recuerde completar todos los campos marcados como obligatorios para crear el escalado.',
                     variant: 'warning'
                 })
             ); 
             this.dispatchEvent(new RefreshEvent());
             this.spinnerLoading = false;
         } else {
-            insertarEscalado({caseId: this.recordId, propuesta: this.propuesta, titulo: this.titulo, motivo: this.motivo, observaciones: this.observaciones, equipoId: this.valueEquipo}).then(result => {
+            insertarEscalado({caseId: this.recordId, tipoEscalado: this.selectedTipoEscalado, observacionesTipoEscalado: this.observacionesTipoEscalado, propuestaLetrado: this.propuestaLetrado, equipoId: this.valueEquipo, motivoEscalado: this.selectedMotivo, observacionesMotivoEscalado: this.observacionesMotivoEscalado}).then(result => {
                 this.spinnerLoading = false;
                 let idNuevoEscalado = result;
                 this.dispatchEvent(

@@ -140,9 +140,11 @@
     }
 
     ,anteriorPantalla : function(component, event, helper) {
+
         component.set("v.cerrar", 0);
         component.set("v.mostrarGrupos", false);
-        var numeroPagina = component.get("v.numeroPantalla");
+        var numeroPagina = component.get("v.numeroPantalla");       
+        
         var enviaMailCliente = component.get('v.confirmEmailCliente');
         if (numeroPagina === 5) {
             if (enviaMailCliente === true) {
@@ -154,6 +156,15 @@
             numeroPagina = numeroPagina - 1;    
         }
         component.set("v.numeroPantalla", numeroPagina);
+
+        let pantalla = '';
+        if(numeroPagina === 2){
+            pantalla = 'cuerpoGrupo';
+        }else if(numeroPagina === 4){
+            pantalla = 'cuerpoCliente';
+        }
+
+        helper.cargarTagsImgCuerpo(component, pantalla, false); 
     }
 
     ,negarEmailReclamante : function(component, event, helper) {
@@ -230,19 +241,64 @@
         
         var paraCliente = component.get("v.paraCliente");
         let canalRespuesta = component.get("v.metodoEnvio");
-        if ((paraCliente == null || paraCliente == '') && canalRespuesta == 'Email') {
-            let toastParams = {
-            title: "Precaución",
-            message: "Recuerde completar la dirección de correo", 
-            type: "warning"
-            };
-            let toastEvent = $A.get("e.force:showToast");
-            toastEvent.setParams(toastParams);
-            toastEvent.fire();
-        } else {
-            //US723742 - Raúl Santos - 05/03/2024 - Añadir lógica envio emails blackList. Comprueba si los emails son correctos. Si son correctos continua el proceso, sino muestra mensaje informativo
-            helper.comprobarEmails(component, event);
-        }
+        var hayCarta = false;
+
+        if(canalRespuesta == 'SAC_CartaPostal'){
+            var validarDocDerivacion = component.get('c.validarDocDerivacionCliente');
+            validarDocDerivacion.setParams({'caseId': component.get("v.recordId")});
+            validarDocDerivacion.setCallback(this, function(response) {
+                var state = response.getState();
+
+                if (state === "SUCCESS") {
+                    hayCarta = response.getReturnValue();
+
+                    if(!hayCarta){
+                        let toastParams = {
+                            title: "Precaución",
+                            message: "Debe generar una carta antes de continuar", 
+                            type: "warning"
+                        };
+                        let toastEvent = $A.get("e.force:showToast");
+                        toastEvent.setParams(toastParams);
+                        toastEvent.fire();
+                    }else{
+                        // helper.comprobarEmails(component, event);
+                        var numeroPagina = component.get("v.numeroPantalla");
+                        numeroPagina = numeroPagina + 1;
+                        component.set("v.numeroPantalla", numeroPagina);
+                    }
+                }
+                else{
+                    var errors = response.getError();
+                    let toastParams = {
+                        title: "Error",
+                        message: errors[0].pageErrors[0].message, 
+                        type: "error"
+                    };
+                    let toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams(toastParams);
+                    toastEvent.fire();
+                }
+            })
+            $A.enqueueAction(validarDocDerivacion);
+        }        
+
+        if(canalRespuesta == 'Email') {
+
+            if(paraCliente == null || paraCliente == ''){
+                let toastParams = {
+                    title: "Precaución",
+                    message: "Recuerde completar la dirección de correo", 
+                    type: "warning"
+                };
+                let toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams(toastParams);
+                toastEvent.fire();
+            }else{
+                //US723742 - Raúl Santos - 05/03/2024 - Añadir lógica envio emails blackList. Comprueba si los emails son correctos. Si son correctos continua el proceso, sino muestra mensaje informativo
+                helper.comprobarEmails(component, event);
+            }
+        } 
     }
 
     ,handleBlur : function( component, event, helper ){
@@ -365,6 +421,8 @@
             derivarA = component.get('v.nombreGrupoSeleccionado');
         }
 
+        helper.cargarTagsImgCuerpo(component, 'cuerpoGrupo', false);        
+
         var envioCliente = component.get("v.confirmEmailCliente");
         var actionfinalizarDerivacion = component.get('c.finalizarDerivacion');
         actionfinalizarDerivacion.setParams({'caseId': component.get("v.recordId"),'para': component.get("v.paraGrupo"),'copia': component.get("v.CC"), 'copiaOculta': component.get("v.CCO"),'cuerpo': component.get("v.cuerpoGrupo"),'asunto': component.get("v.asuntoGrupo"), 'idsAdjuntos' : JSON.stringify(idsFicherosAdjuntosGrupoFinal), 'grupoSeleccionado' : derivarA});
@@ -374,6 +432,9 @@
                 //Si se ha decidido mandar email al cliente, se hace la llamada al método que lo envía
                 let canalRespuesta = component.get("v.metodoEnvio");
                 if (envioCliente === true && canalRespuesta === 'Email') {
+
+                    helper.cargarTagsImgCuerpo(component, 'cuerpoCliente', false);
+
                     var actionEmailCliente = component.get('c.enviarEmailCliente');
                     actionEmailCliente.setParams({'caseId': component.get("v.recordId"),'paraCliente': component.get("v.paraCliente"),'copiaCliente': component.get("v.CCCliente"), 'copiaClienteOculta': component.get("v.CCOCliente"), 'cuerpoCliente': component.get("v.cuerpoCliente"),'asuntoCliente': component.get("v.asuntoCliente"), 'idsAdjuntos' : JSON.stringify(idsFicherosAdjuntosClienteFinal)});
                     actionEmailCliente.setCallback(this, function(response) {
@@ -394,6 +455,7 @@
                         }
                         else{
                             var errors = response.getError();
+
                             let toastParams = {
                                 title: "Error",
                                 message: errors[0].pageErrors[0].message, 
@@ -405,9 +467,55 @@
                         }
                     })
                     $A.enqueueAction(actionEmailCliente);
-                } else {
-                    //Mostrar toast de éxito
-                    let toastParams = {
+                } else if (envioCliente === true && canalRespuesta === 'SAC_CartaPostal'){
+                    var actionCartaCliente = component.get("c.crearCartaPostalCV");
+                    actionCartaCliente.setParams({'caseId': component.get("v.recordId")});
+                    actionCartaCliente.setCallback(this, function(response) {
+                        var state = response.getState();                        
+
+                        if (state === "SUCCESS") {
+                            //Mostrar toast de éxito
+                            let toastParams = {
+                                title: "Éxito",
+                                message: 'Se ha realizado la derivación con éxito', 
+                                type: "success"
+                            };
+                            let toastEvent = $A.get("e.force:showToast");
+                            toastEvent.setParams(toastParams);
+                            toastEvent.fire();
+                            component.set("v.isLoading", false);
+                            component.set('v.derivar', false);
+                            $A.get('e.force:refreshView').fire();
+
+                            let navService = component.find("navService");
+                            var pageReference = {
+                                type: 'standard__recordPage',
+                                attributes: {
+                                    objectApiName: 'SAC_Accion__c',
+                                    actionName: 'view',
+                                    recordId: response.getReturnValue()
+                                }
+                            };
+                            navService.navigate(pageReference);
+                        }
+                        else{
+                            var errors = response.getError();
+
+
+                            let toastParams = {
+                                title: "Error",
+                                message: errors[0].pageErrors[0].message, 
+                                type: "error"
+                            };
+                            let toastEvent = $A.get("e.force:showToast");
+                            toastEvent.setParams(toastParams);
+                            toastEvent.fire();
+                        }
+                    })
+                    $A.enqueueAction(actionCartaCliente);
+                } else{
+                     //Mostrar toast de éxito
+                     let toastParams = {
                         title: "Éxito",
                         message: 'Se ha realizado la derivación con éxito', 
                         type: "success"
@@ -418,12 +526,21 @@
                     component.set("v.isLoading", false);
                     component.set('v.derivar', false);
                     $A.get('e.force:refreshView').fire();
+
                 }
             } else {
                 var errors = response.getError();
+
+                let mensageError;
+                if(errors[0].message) {
+                    mensageError = errors[0].message;
+                } else if(errors[0].pageErrors[0].message) {
+                    mensageError = errors[0].pageErrors[0].message;
+                }
+
                 let toastParams = {
                     title: "Error",
-                    message: errors[0].message, 
+                    message: mensageError, 
                     type: "error"
                 };
                 let toastEvent = $A.get("e.force:showToast");

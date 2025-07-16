@@ -90,21 +90,21 @@ export default class ccControlServei extends LightningElement {
 	async enviarComunicacion() {
 
 		this.spinner = true;
-		let plantilla;
-		gestionarImagenes({cuerpoMail: this.cuerpo})
-		.then(result => {
-			this.cuerpo = result;
-			this.toast('success', 'Imágenes parseadas con éxito');
-			this.cerrarQuickAction();
-		}).catch(error => {
-			console.error(error);
-			this.spinner = false;
-			this.toast('error', 'Problema preparando imágenes parseadas con éxito', error);
-		});
+		// let plantilla;
+		// gestionarImagenes({cuerpoMail: this.cuerpo})
+		// .then(result => {
+		// 	this.cuerpo = result;
+		// 	//this.toast('success', 'Imágenes parseadas con éxito');
+		// 	this.cerrarQuickAction();
+		// }).catch(error => {
+		// 	console.error(error);
+		// 	this.spinner = false;
+		// 	//console.toast('error', 'Problema preparando imágenes parseadas con éxito', error);
+		// });
 
-		plantilla = this.cuerpo;
+		// plantilla = this.cuerpo;
 		
-		enviarComunicacionApex({plantilla: plantilla, casos: this.datatableSelectedRows})
+		enviarComunicacionApex({plantilla: this.cuerpo, casos: this.datatableSelectedRows})
 		.then(() => {
 			this.toast('success', 'Comunicaciones enviadas con éxito');
 			this.cerrarQuickAction();

@@ -1,0 +1,21 @@
+.sincasos {
+    text-align: center;
+    padding: 1rem;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #4a4a4a;
+}
+
+.tarjeta {
+    border-radius: 20px;
+    border-width: 3px;
+    margin-right: 2px;
+    margin-top: 0%;
+    }
+
+.onclick {
+    color:#3274B2;
+    cursor:pointer;
+    }
+    
+.onclick:hover {text-decoration:underline}

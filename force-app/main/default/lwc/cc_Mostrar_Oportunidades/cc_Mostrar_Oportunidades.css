@@ -1,0 +1,8 @@
+.slds-media .slds-timeline__trigger {
+    border-radius: 6px;
+    transition: background-color 120ms ease;
+}
+
+.slds-media .slds-timeline__trigger:hover {
+    background-color: #94949410;
+}

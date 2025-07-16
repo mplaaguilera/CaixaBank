@@ -2,65 +2,154 @@
     <div class="slds-col" style="padding-top: 4px; padding-bottom: 8px;"  align="center">
 
         <template if:true={esPretension}>
-            <lightning-button style="padding-right: 5px" data-id="pretPpal" label="Pretensión Principal" onclick={setPretPpal} icon-name="utility:check" disabled ={esPretPpal}></lightning-button>
-        </template>
 
-        <lightning-button style="padding-right: 5px" data-id="tomarPropiedad" label="Tomar propiedad" onclick={tomarPropiedad} icon-name="utility:change_owner" disabled ={esPropietario}></lightning-button>
+            <template if:false={esBaja}>
+                <template if:true={mostrarTomarPropiedad}>
+                    <lightning-button style="padding-right: 5px" data-id="tomarPropiedad" label="Tomar propiedad" onclick={onClickTomarPropiedad} icon-name="utility:change_owner" disabled ={esPropietario}></lightning-button>
+                </template>
 
-        <template if:true={habilitarDevolver}>
-            <lightning-button style="padding-right: 5px" data-id="devolverCaso" label="Devolver caso" onclick={devolverCasoBoton} icon-name="utility:skip" disabled ={noEsPropietario}></lightning-button>
-        </template>
-        <template if:false={habilitarDevolver}>
-            <lightning-button style="padding-right: 5px" data-id="devolverCaso" label="Devolver caso" onclick={devolverCasoBoton} icon-name="utility:skip" disabled ="true"></lightning-button>
-        </template>
+                <template if:true={mostrarDevolverCaso}>
+                    <lightning-button style="padding-right: 5px" data-id="devolverPret" label="Devolver pretensiones" onclick={onClickDevolverCaso} icon-name="utility:skip" disabled ={noEsPropietario}></lightning-button>
+                </template>
 
-        <template if:true={esReclamacion}>
-            <lightning-button style="padding-right: 5px" data-id="reasignarLetrado" label="Reasignar letrado" onclick={abrirReasignarLetrado} icon-name="utility:change_request" disabled ={mostrarReasignar}></lightning-button>
-        </template>
-
-        <template if:true={habilitarVolverAnalisis}>
-            <lightning-button style="padding-right: 5px" data-id="volverAnalisis" label="Volver a análisis" onclick={volverAnalisisBoton} icon-name="utility:back"></lightning-button>
-        </template>
-
-        <template if:true={mostrarBotonComplementariaEntidad}>
-            <lightning-button style="padding-right: 5px" data-id="activarComplementariaEntidad"  label={botonLabel} onclick={activarComplementariaEntidadBoton} icon-name="utility:attach"></lightning-button>
-        </template>
-
-        <template if:true={esReclamacion}>
-            <template if:true={mostrarBotonComplementariaOrganismo}>
-                <lightning-button style="padding-right: 5px" data-id="activarComplementariaOrganismo" label="Activar complementaria organismo" onclick={abrirModalComplOrganismo} icon-name="utility:share_file"></lightning-button>
+                <!-- Pretensión principal se muestra siempre -->
+                <lightning-button style="padding-right: 5px" data-id="pretPpal" label="Pretensión Principal" onclick={setPretPpal} icon-name="utility:check" disabled ={deshabilitarPretPrincipal}></lightning-button>
+                
+                <!-- Baja se muestra siempre -->
+                <lightning-button style="padding-right: 5px" data-id="bajaPret" label="Baja" onclick={onClickBaja} icon-name="utility:cancel_file_request" disabled ={deshabilitarBaja}></lightning-button>
+            </template>
+            <template if:true={esBaja}>
+                <lightning-button style="padding-left:5px" data-id="dehacerBaja" label="Deshacer Baja" icon-name="utility:arrow_left" onclick={deshacerBajaPretension} disabled ={noEsPropietario}></lightning-button>
             </template>
         </template>
 
-        <template if:true={esReclamacion}>
-            <lightning-button style="padding-right: 5px" data-id="descartarReclamacion" label="Descartar" onclick={onClickAbrirModalDescartar} icon-name="utility:cancel_file_request" disabled ={deshabilitarBotonDescartar}></lightning-button>
+        <template if:false={esPretension}>
+            <template if:true={mostrarDevolverAlta}>
+                <lightning-button style="padding-right: 5px" data-id="devolverAlta" label="Devolución a Alta" onclick={onClickAbrirModalDevolverAlta} icon-name="utility:arrow_left" disabled={noEsGestorLetrado}></lightning-button>
+            </template>
+
+            <template if:true={mostrarReasignarLetrado}>
+                <lightning-button style="padding-right: 5px" data-id="reasignarLetrado" label="Reasignar Letrado" onclick={onClickReasignarLetrado} icon-name="utility:change_request" disabled={noEsGestor}></lightning-button>
+            </template>
+
+            <template if:true={mostrarTomarPropiedad}>
+                <lightning-button style="padding-right: 5px" data-id="tomarPropiedad" label="Tomar propiedad" onclick={onClickTomarPropiedad} icon-name="utility:change_owner" disabled ={esPropietario}></lightning-button>
+            </template>
+
+            <template if:true={mostrarDevolverCaso}>
+                <lightning-button style="padding-right: 5px" data-id="devolverCaso" label="Devolver caso" onclick={onClickDevolverCaso} icon-name="utility:skip" disabled={noEsPropietario}></lightning-button>
+            </template>
+
+            <template if:true={mostrarDerivar}>
+                <lightning-button style="padding-right: 5px" data-id="derivar" label="Derivar" onclick={onClickDerivar} icon-name="utility:forward" disabled={noEsGestor}></lightning-button>
+            </template>
+
+            <template if:true={mostrarConvertir}>
+                <lightning-button style="padding-right: 5px" data-id="convertirReclamacion" label="Convertir Reclamación" onclick={onClickConvertir} icon-name="utility:refresh" disabled={noEsGestor}></lightning-button>
+            </template>
+
+            <template if:true={mostrarAnalisis}>
+                <lightning-button style="padding-right: 5px" data-id="esAlta" label="Análisis y Decisión" onclick={onClickAnalisis} icon-name="utility:search" disabled={noEsGestor}></lightning-button>
+            </template>
+
+            <template if:true={mostrarDesactivarComplementariaOrganismo}>
+                <lightning-button style="padding-right: 5px" data-id="desactivarComplementaria" label="Desactivar Complementaria Organismo" onclick={onClickDesactivarComplementariaOrganismo} disabled={noEsGestor} icon-name="utility:task"></lightning-button>
+            </template>
+
+            <template if:true={mostrarEnvioComplementaria}>
+                <lightning-button style="padding-right: 5px" data-id="revisionComplementaria" label="Envío Complementaria" onclick={onClickEnvioComplementaria} disabled={noEsLetrado} icon-name="utility:email"></lightning-button>
+            </template>
+
+            <template if:true={mostrarEnvioRectificacion}>
+                <lightning-button style="padding-right: 5px" data-id="envioRectificacion" label="Envío Rectificacion" onclick={onClickEnvioRectificacion} disabled={noEsLetrado} icon-name="utility:email"></lightning-button>
+            </template>
+
+            <template if:true={mostrarComplementariaEntidad}>
+                <lightning-button style="padding-right: 5px" data-id="activarComplementariaEntidad"  label={botonLabelEntidad} onclick={onClickActivarComplementariaEntidad} icon-name="utility:attach" disabled={noEsLetrado}></lightning-button>
+            </template>
+
+            <template if:true={mostrarComplementariaOrganismo}>
+                <lightning-button style="padding-right: 5px" data-id="activarComplementariaOrganismo" label="Activar Complementaria Organismo" onclick={onClickComplementariaOrganismo} icon-name="utility:share_file" disabled={noEsGestor}></lightning-button>
+            </template>
+
+            <template if:true={mostrarNegociacion}>
+                <lightning-button style="padding-right: 5px" data-id="negociacionReclamacion" label="Activar Negociación" onclick={onClickNegociacion} disabled={noPuedeNegociar} icon-name="utility:groups"></lightning-button>
+            </template>
+
+            <template if:true={mostrarFinalizarNegociacion}>
+                <lightning-button style="padding-right: 5px" data-id="finalizarNegociacionReclamacion" label="Finalizar negociación" onclick={onClickFinalizarNegociacion} disabled={noPuedeNegociar} icon-name="utility:groups"></lightning-button>
+            </template>
+
+            <template if:true={mostrarDevolverLetrado}>
+                <lightning-button style="padding-right: 5px" data-id="devolverLetrado" label="Devolver a letrado" onclick={onClickDevolverALetrado} icon-name="utility:arrow_right" disabled={noEsGestor}></lightning-button>
+            </template>
+
+            <template if:true={mostrarRecepcionResolucion}>
+                <lightning-button style="padding-right: 5px" data-id="recepcionResolucion" label="Recepción Resolución" onclick={onClickRecepcionResolucion} disabled={noEsGestor} icon-name="utility:task"></lightning-button>
+            </template>
+
+            <!--<template if:true={mostrarResolucion}>
+                <lightning-button style="padding-right: 5px" data-id="resolucionReclamacion" label="Resolución" onclick={onClickResolucion} disabled={noEsPropietario} icon-name="utility:task"></lightning-button>
+            </template>-->
+
+            <template if:true={mostrarDescartar}>
+                <lightning-button style="padding-right: 5px" data-id="descartarReclamacion" label="Descartar" onclick={onClickAbrirModalDescartar} icon-name="utility:cancel_file_request" disabled ={noEsGestor}></lightning-button>
+            </template>
+
+        <!-- <template if:true={habilitarVolverAnalisis}>
+                <lightning-button style="padding-right: 5px" data-id="volverAnalisis" label="Volver a análisis" onclick={volverAnalisisBoton} icon-name="utility:back"></lightning-button>
+            </template> -->
+
+            <template if:true={mostrarPendienteRespOrganismo}>
+                <lightning-button style="padding-right: 5px" data-id="irAPendienteRespOrganismo"  label="Pendiente Respuesta Organismo" onclick={onClickPendienteRespOrganismo} icon-name="utility:clock" disabled={noEsGestor}></lightning-button>
+            </template>
+
+            <template if:true={mostrarRectificacion}>
+                <lightning-button style="padding-right: 5px" data-id="irARectificacion"  label="Rectificación" onclick={onClickActivarRectificacion} icon-name="utility:highlight" disabled={noEsGestor}></lightning-button>
+            </template>
+
+            <template if:true={mostrarProrroga}>
+                <lightning-button style="padding-right: 5px" data-id="prorrogarReclamacion" label="Prórroga" onclick={onclickAbrirModalProrroga} icon-name="utility:real_time" disabled={noEsLetrado}></lightning-button>
+            </template>
+            <template if:true={mostrarAnularProrroga}>
+                <lightning-button style="padding-right: 5px" data-id="anularProrrogarReclamacion" label="Anular Prórroga" onclick={onclickAbrirModalAnularProrroga} icon-name="utility:clear" disabled={noEsLetrado}></lightning-button>
+            </template>
+
+            <template if:true={mostrarEnvio}>
+                <lightning-button style="padding-right: 5px" data-id="revisionEnvio" label="Envío" onclick={onclickComprobarCamposEnvio} icon-name="utility:email" disabled={noEsLetrado}></lightning-button>
+            </template>
+
+            <template if:true={mostrarCerrar}>
+                <lightning-button style="padding-right: 5px" data-id="cerrarReclamacion" label="Cerrar" onclick={onClickCerrar} icon-name="utility:email" disabled={noEsGestor}></lightning-button>
+            </template>
+
+            <template if:true={mostrarReapertura}>
+                <lightning-button style="padding-right: 5px" data-id="reabrirReclamacion" label="Reapertura" onclick={onClickAbrirModalReapertura} icon-name="utility:replay" disabled={noEsGestor}></lightning-button>
+            </template>
+
+        <!-- <template if:true={mostrarDesactivarComplementariaEntidad}>
+                <lightning-button style="padding-right: 5px" data-id="desactivarComplementaria" label="Desactivar Complementaria Entidad" onclick={onClickDesactivarComplementariaOrganismo} disabled={noEsPropietario} icon-name="utility:task"></lightning-button>
+            </template>-->
+
+            <!--<template if:true={mostrarEnvioOrganismo}>
+                <lightning-button style="padding-right: 5px" data-id="envioOrganismoReclamacion" label="Envío Organismo" onclick={onClickEnvioOrganismo} disabled={noEsPropietario} icon-name="utility:email"></lightning-button>
+            </template>-->
         </template>
-
-        <template if:true={mostrarBotonRectificacion}>
-            <lightning-button style="padding-right: 5px" data-id="irARectificacion"  label="Rectificación" onclick={activarRectificacionBoton} icon-name="utility:highlight"></lightning-button>
-        </template>
-
-        <template if:true={mostrarBotonProrroga}>
-            <lightning-button style="padding-right: 5px" data-id="prorrogarReclamacion" label="Prorrogar" onclick={onClickProrrogar} icon-name="utility:real_time"></lightning-button>
-        </template>
-
-     
-
-        <template if:true={mostrarBotonReapertura}>
-            <lightning-button style="padding-right: 5px" data-id="reabrirReclamacion" label="Reapertura" onclick={onClickAbrirModalReapertura} icon-name="utility:replay"></lightning-button>
-        </template>
-
-        <!--Solo se mostrará el botón para devolver a alta en caso de una reclamación en estado de análisis-->
-        <template if:true={mostrarDevolverAlta}>
-            <lightning-button style="padding-right: 5px" data-id="devolverAlta" label="Devolución a Alta" onclick={onClickAbrirModalDevolverAlta} icon-name="utility:arrow_left"></lightning-button>
-        </template>
-
     </div>
 
     <template if:true={modalDevolver}>
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
             aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="border"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                </header>
                 <div align="left" class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                     <div class="slds-form-element__control">
                         <div align="center">
@@ -70,13 +159,15 @@
                             </span>
                         </div>
                         <br>
+                        <!--
                         <lightning-combobox name="motivosDevolver" label="Motivos" placeholder="Buscar motivos..."
                             value={selectedMotivo} options={getMotivo.data.values} required onchange={handleChangeMotivo}>
                         </lightning-combobox>
+                        -->
                         <br>
-                        <lightning-textarea name="observacion" label="Escribe el motivo por el que devuelves el caso"
-                            placeholder="Observaciones..." value={observacion} onchange={handleChangeObs}
-                            style="height: 130px; resize: none;">
+                        <lightning-textarea name="observacion" label="Escribe por qué devuelves el caso"
+                            placeholder="Observaciones..." max-heigh="10px" value={observacion} required onchange={handleChangeObs}
+                            style="height: 130px; resize: horizontal;">
                         </lightning-textarea>
                         <br>
                     </div>
@@ -109,7 +200,7 @@
                 <!-- Modal/Popup Box LWC body starts here -->
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
                     <!-- <lightning-textarea  data-my-id="textoParaChatter" label="Introduzca el motivo" minlength="5" required="true" value=""></lightning-textarea> -->
-                    <lightning-textarea name="observacionAnalisis" label="Escribe el motivo para volver a análisis:" placeholder="Motivo..." value={observaciones} onchange={handleChangeVolvAnalisis} style="height: 130px; resize: none;" required> </lightning-textarea>
+
                 </div>
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
@@ -121,6 +212,63 @@
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 
+
+        <!--Modal de devolver a letrado-->
+        <template if:true={mostrarModalDevolverLetrado}> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box LWC header here -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalDevolverLetrado}>
+                            <lightning-icon icon-name="utility:close"
+                                alternative-text="close"
+                                variant="border"
+                                size="small" ></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h3 id="modal-heading-devolverLetrado" class="slds-text-heading_medium slds-hyphenate">Devolver a letrado</h3>
+                    </header>
+                    <!-- Modal/Popup Box LWC body starts here -->
+                    <div class="slds-modal__content slds-p-around_medium" id="modalDevolverLetrado-content-id">
+                        <p>Se devolverá la reclamación al <b>Letrado.</b>
+                        <br/><br/></p> 
+                        
+                        <div if:true={mostrarMotivoDevolucionEnvio}>
+                            <lightning-combobox id="comboMotivoEnvio1" label="Seleccione el motivo por el cual desea  devolver a letrado:" name="Motivo Envio"
+                            value={valueMotivoDevolucionALetrado} placeholder="--Select--" options={valoresPicklistMotivoDevoEnvio} onchange={handleChangeMotivoDevolucionALetrado} required>
+                            </lightning-combobox>
+                        </div>
+                        <div if:true={mostrarMotivoDevolucionEnvioComplementaria}>
+                            <lightning-combobox id="comboMotivoEnvio2" label="Seleccione el motivo por el cual desea  devolver a letrado:" name="Motivo Envio"
+                            value={valueMotivoDevolucionALetrado} placeholder="--Select--" options={valoresPicklistMotivoDevoEnvioComplementaria} onchange={handleChangeMotivoDevolucionALetrado} required>
+                            </lightning-combobox>
+                        </div>
+                        
+                        <div if:true={mostrarMotivoDevolucionEnvioRectificacion}>
+                            <lightning-combobox id="comboMotivoEnvio3" label="Seleccione el motivo por el cual desea  devolver a letrado:" name="Motivo Envio"
+                            value={valueMotivoDevolucionALetrado} placeholder="--Select--" options={valoresPicklistMotivoDevoEnvioRectificacion} onchange={handleChangeMotivoDevolucionALetrado} required>
+                            </lightning-combobox>
+                        </div>
+
+                        <template if:true={mostrarObservacionesDevolverLetrado}>
+                                <lightning-textarea name="motivoDevolverLetrado" required="true" label="Añada observaciones por las que desea devolver a letrado." placeholder="Observaciones..." value={observacionesDevolverLetrado} onchange={handleChangeObservacionesDevolverLetrado}></lightning-textarea>
+                        </template>
+
+                    </div>
+
+
+
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={closeModalDevolverLetrado} title="Cancel">Cancelar</button>
+                        <button class="slds-button slds-button_brand" onclick={confirmarDevolverLetrado} title="OK">Confirmar</button> 
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        
 
     <!--Modal Descartar reclamación-->
     <template if:true={abrirModalDescartar}>
@@ -136,17 +284,101 @@
                 </header>
 
                 <!--Cuerpo del modal-->
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-4">
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-4">
                     <lightning-combobox id="comboMotivoDescarte" label="Seleccione el motivo por el cual desea descartar el caso:" name="Motivo descarte"
-                    value={selectedMotivoDescarte} placeholder="-Select-" options={getMotivoRechazo.data.values} onchange={handleChangeMotivoDescartar} required>
+                    value={selectedMotivoDescarte} placeholder="--Select--" options={valoresPicklistDescartarOrdenados} onchange={handleChangeMotivoDescartar} required>
                     </lightning-combobox>
-                <br/>
                 </div>
+
+                <template if:true={mostrarObservacionesDescartar}>
+                    <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-10-descartar">
+                        <lightning-textarea name="motivoDescartar" required="true" label="Añada observaciones por las que descarta la reclamación." placeholder="Observaciones..." value={observacionesDescartar} onchange={handleChangeObservacionesDescartar}></lightning-textarea>
+                    </div>
+                </template>
 
                 <!--Footer del modal-->
                 <footer class="slds-modal__footer">
                     <button class="slds-button slds-button_neutral" onclick={cerrarModalDescartar} title="Cancel">Cancelar</button>
                     <button class="slds-button slds-button_brand"  title="OK" onclick={descartarReclamacion}>Confirmar</button> 
+                </footer>
+
+            </div>
+
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+
+
+    <!--Modal prórroga-->
+    <template if:true={mostrarModalProrroga}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-04" aria-modal="true" aria-describedby="modal-content-id-4" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!--Header del modal-->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalProrroga}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="border" size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-04-Prorroga" class="slds-text-heading_medium slds-hyphenate">Se va a realizar la prórroga del caso</h3>
+                </header>
+
+                <!--Cuerpo del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-4-Prorroga">
+                    <lightning-combobox id="comboMotivoProrroga" label="Seleccione el motivo por el cual desea prorrogar el caso:" name="Motivo prorroga"
+                    value={valueMotivoProrroga} placeholder="--Select--" options={valoresPicklistMotivoProrroga} onchange={handleChangeMotivoProrroga} required>
+                    </lightning-combobox>
+                </div>
+
+                <template if:true={mostrarObservacionesProrroga}>
+                    <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-10-descartar-Prorroga">
+                        <lightning-textarea name="motivoProrrogar" required="true" label="Añada observaciones por las que realiza la prórroga de la reclamación." placeholder="Observaciones..." value={observacionesProrroga} onchange={handleChangeObservacionesProrroga}></lightning-textarea>
+                    </div>
+                </template>
+
+                <!--Footer del modal-->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={cerrarModalProrroga} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_brand"  title="OK" onclick={onClickProrrogar}>Confirmar</button> 
+                </footer>
+
+            </div>
+
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
+
+    <!--Modal Anular Prórroga-->
+    <template if:true={mostrarModalAnularProrroga}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-04" aria-modal="true" aria-describedby="modal-content-id-4" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!--Header del modal-->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalAnularProrroga}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="border" size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-04-AnularProrroga" class="slds-text-heading_medium slds-hyphenate">Se va a anular la prórroga del caso</h3>
+                </header>
+
+                <!--Cuerpo del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-4-AnularProrroga">
+                    <lightning-combobox id="comboMotivoAnularProrroga" label="Seleccione el motivo por el cual desea anular la prórroga:" name="Motivo anular prorroga"
+                    value={valueMotivoAnularProrroga} placeholder="--Select--" options={valoresPicklistMotivoAnularProrroga} onchange={handleChangeMotivoAnularProrroga} required>
+                    </lightning-combobox>
+                </div>
+
+                <template if:true={mostrarObservacionesAnularProrroga}>
+                    <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-10-descartar-AnularProrroga">
+                        <lightning-textarea name="motivoAnularProrroga" required="true" label="Añada observaciones por las que se anula la prórroga." placeholder="Observaciones..." value={observacionesAnularProrroga} onchange={handleChangeObservacionesAnularProrroga}></lightning-textarea>
+                    </div>
+                </template>
+
+                <!--Footer del modal-->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={cerrarModalAnularProrroga} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_brand"  title="OK" onclick={onClickAnularProrroga}>Confirmar</button> 
                 </footer>
 
             </div>
@@ -170,13 +402,34 @@
                     </button>
                     <h3 id="modalAlta-heading" class="slds-text-heading_medium slds-hyphenate">Devolver a Alta</h3>
                 </header>      
+
                 <!-- Modal/Popup Box LWC body starts here -->
-                <div class="slds-modal__content slds-p-around_medium" id="modalAlta-content-id">
+                <div class="slds-modal__content slds-p-around_medium" id="modalAlta-content-id-alta">
                     <p>La reclamación se devolverá al estado de <b>Alta.</b>
-                    <br/>¿Desea continuar con la operación?</p>   
-                   
-                    
+                    <br/></p>   
                 </div>
+
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-9-alta">
+                        <lightning-combobox
+                            name="motivoDevolucionAlta"
+                            label="Seleccione el motivo de devolución."
+                            value={valueMotivoDevolucionAlta}
+                            placeholder="--Select--"
+                            options={valoresPickListDevolucionAlta}
+                            onchange={handleChangeMotivoDevolucionAlta}
+                            required="true">
+                        </lightning-combobox>
+                  
+                </div>
+                <template if:true={mostrarObservacionesDevolucionAlta}>
+                    <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-10-alta">
+                        <lightning-textarea name="motivoDevolucionAlta" required="true" label="Añada observaciones por las que devuelve a alta la reclamación." placeholder="Observaciones..." value={observacionesDevolucionAlta} onchange={handleChangeObservacionesDevolucionAlta}></lightning-textarea>
+                    </div>
+                </template>
+
+
+
+
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
                     <div class = "contenedor-botones">
@@ -214,10 +467,11 @@
                         placeholder="-Select-"
                         options={optionsGruposLet}
                         onchange={handleOptionChangeGrupoLet}
+                        required="true"
                       >
                     </lightning-combobox>
                     <br/>
-                    <lightning-textarea  data-my-id="textoParaChatter" label="Escriba el motivo de la reasignación." placeholder="Motivo..." value={inputMotivoReasignar} onchange={onChangeMotivoReasignar}>></lightning-textarea>
+                    <lightning-textarea  data-my-id="textoParaChatter" required="true" label="Escriba el motivo de la reasignación." placeholder="Motivo..." value={inputMotivoReasignar} onchange={onChangeMotivoReasignar}>></lightning-textarea>
                 </div>
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
@@ -230,7 +484,7 @@
     </template>
 
     <!-- Modal de Reapertura -->
-    <template if:true={modalReapertura}> 
+    <template if:true={modalReaperturaNoConsumo}> 
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">
                 <!-- Modal/Popup Box LWC header here -->
@@ -245,53 +499,70 @@
                     <h3 id="modal-heading-09" class="slds-text-heading_medium slds-hyphenate">Reapertura de la reclamación</h3>
                 </header>
                 <!-- Modal/Popup Box LWC body starts here -->
-                <div class="slds-modal__content slds-p-around_medium centrar-elementos" id="modal-content-id-9">
-                    <p>Va a proceder a reabrir la reclamación, ¿que acción desea realizar?</p><br/>
-                    <div class="contenedor-botones">
-                        <button data-id="complementariaOrganismo" class="slds-button slds-button_brand" onclick={abrirModalConfirmacion} title="Complementaria por organismo">Complementaria por organismo</button> 
-                        <button data-id="rectificacion" class="slds-button slds-button_brand" onclick={abrirModalConfirmacion} title="Rectificación" disabled={getDisabledRectificacion}>Rectificación</button> 
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-9">
+                    <!-- <div class="slds-combobox_container"> -->
+                        <lightning-combobox
+                            name="motivoReapertura"
+                            label="Va a proceder a reabrir la reclamación, seleccione el motivo de reapertura."
+                            value={valueMotivoReapertura}
+                            placeholder="Seleccione un motivo de reapertura"
+                            options={valoresPicklisMotivoReapertura}
+                            onchange={handleChangeMotivoReapertura}
+                            required="true">
+                        </lightning-combobox>
+                    <!-- </div>  -->
+                </div>
+                <template if:true={mostrarObservacionesReapertura}>
+                    <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-10">
+                        <lightning-textarea name="motivoReapertura" required="true" label="Añade observaciones por las que reabre la reclamación." placeholder="Observaciones..." value={motivoReapertura} onchange={handleChangeMotivoReap}></lightning-textarea>
                     </div>
-                </div>
+                </template>
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
-                    <button class="slds-button slds-button_neutral" onclick={closeModalReapertura} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_neutral" onclick={closeModalReapertura} title="Cancelar">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={confirmarReapertura} title="Confirmar">Confirmar</button>
                 </footer>
             </div>
         </section>
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 
-    <template if:true={modalConfirmarReapertura}>
-        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <!-- Modal/Popup Box LWC body starts here -->
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-10">
-                    <template if:true={reaperturaComplementariaOrganismo}>
-                        <p>La reclamación pasará a estado "Complementaria por organismo" y se iniciará el SLA de dicho estado.<b> ¿Está seguro que desea realizar esta acción?</b></p>
-                    </template>
-                    <template if:true={reaperturaRectificacion}>
-                        <p>La reclamación pasará a estado "Rectificación" y se iniciará el SLA de dicho estado..<b> ¿Está seguro que desea realizar esta acción?</b></p>
-                    </template>
-                    <br/>
-                    <lightning-textarea name="motivoReapertura" label="Escribe el motivo de reapertura." placeholder="Motivo de reapertura..." value={motivoReapertura} onchange={handleChangeMotivoReap} required></lightning-textarea>
-                </div>
-                <!-- Modal/Popup Box LWC footer starts here -->
-                <footer class="slds-modal__footer">
-                    <button class="slds-button slds-button_neutral" onclick={closeModalConfReapertura} title="Cancel">Cancelar</button>
-                    <button class="slds-button slds-button_brand" onclick={confirmarReapertura} title="OK">Confirmar</button>
-                </footer>
-            </div>
-        </section>
-        <div class="slds-backdrop slds-backdrop_open"></div>
-    </template>
-
-    <!--Modal adjuntar archivos-->
-    <template if:true={modalProrroga}>
-        <!-- Modal/Popup Box LWC starts here -->
-        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+    <template if:true={modalReaperturaConsumo}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-9" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">
                 <!-- Modal/Popup Box LWC header here -->
                 <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalReapertura}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="border"
+                            size="small" ></lightning-icon>
+                    </button>
+                    <h3 id="modalReabrirConsumo-headingReabrir" class="slds-text-heading_medium slds-hyphenate">Reapertura de la reclamación</h3>
+                </header>  
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-11">
+                    <br> </br>
+                    <h1 class="slds-text-align_center">¿Quiere volver a <b>Envío</b> o <b>Análisis Complementaria Organismo?</b></h1>
+                    <br> </br>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <div class = "contenedor-botones">
+                        <lightning-button style="padding-right: 5px" data-id="envioReaperturaConsumo" label="Envío" onclick={onClickEnvio} icon-name="utility:email"></lightning-button>
+                        <lightning-button style="padding-right: 5px" data-id="acoReaperturaConsumo" label="Análisis Complementaria Organsismo" onclick={onClickComplementariaOrganismo} icon-name="utility:share_file"></lightning-button>
+                    </div>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    <!--Modal adjuntar archivos-->
+    <!-- <template if:true={modalProrroga}> -->
+        <!-- Modal/Popup Box LWC starts here -->
+        <!-- <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container"> -->
+                <!-- Modal/Popup Box LWC header here -->
+                <!-- <header class="slds-modal__header">
                     <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalProrroga}>
                         <lightning-icon icon-name="utility:close"
                             alternative-text="close"
@@ -300,9 +571,9 @@
                         <span class="slds-assistive-text">Close</span>
                     </button>
                     <h2 id="modal-heading-11" class="slds-text-heading_medium slds-hyphenate">Prorrogar reclamación: Adjuntar documento de prórroga</h2>
-                </header>
+                </header> -->
                 <!-- Modal/Popup Box LWC body starts here -->
-                <div class="slds-modal__content slds-var-p-around_xx-large" id="modal-content-id-11">
+                <!-- <div class="slds-modal__content slds-var-p-around_xx-large" id="modal-content-id-11">
                     <lightning-file-upload
                         label="Adjuntar archivos"
                         name="uploadFile"
@@ -310,16 +581,16 @@
                         record-id={recordId}    
                         onuploadfinished={handleUploadFinished} multiple>
                     </lightning-file-upload>
-                </div>
+                </div> -->
                 <!-- Modal/Popup Box LWC footer starts here -->
-                <footer class="slds-modal__footer">
+                <!-- <footer class="slds-modal__footer">
                     <button class="slds-button slds-button_neutral" onclick={closeModalProrroga} title="Cancel">Cancelar</button>
                     <button class="slds-button slds-button_brand" onclick={prorrogarReclamacion} title="Prorrogar">Prorrogar</button>
                 </footer>
             </div>
         </section>
         <div class="slds-backdrop slds-backdrop_open"></div>
-    </template>
+    </template> -->
 
     <template if:true={modalCompleOrganismo}>
         <!-- Modal/Popup Box LWC starts here -->
@@ -343,12 +614,21 @@
                         id="comboMotivoCompl"
                         label="Seleccione el motivo por el que se realiza la complementaria."
                         name="Motivo Complementaria Organismo"
-                        value={valueComplOrganismo} 
+                        value={valueComplOrganismo}
+                        required="true"
                         placeholder="-Select-"
                         options={getMotivoComplOrganismo.data.values}
                         onchange={handleOptionChangeComplOrganismo}
                       >
                     </lightning-combobox>
+                    <br/>
+                    <template if:true={mostrarObservacionesComplementariaOrganismo}>
+                            <lightning-textarea name="motivoComplementariaOrg" required="true" label="Añade observaciones por las que se realiza la complementaria" placeholder="Observaciones..." value={observacionesMotivoComplementariasOrganismo} onchange={handleChangeObservComplementariaOrganismo}></lightning-textarea>
+                    </template>
+
+                    <template if:false={tinePlazoRegOrgCompletado}>
+                        <lightning-input label="Introduce la fecha de vencimiento de SLA" min={diaActual} placeholder="-Introduce una fecha-" value={fechaVencimientoPlazoRegCompOrganismo} type="date" required="true" onchange={handleChangeFechaVencimientoPlazoRegCompOrganismo}></lightning-input>
+                    </template>
                 </div>
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
@@ -360,7 +640,107 @@
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 
+    <!--Modal de activar negociacion-->
+    <template if:true={modalNegociacion}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-13" aria-modal="true" aria-describedby="modal-content-id-13" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalNegociacion}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-13" class="slds-text-heading_medium slds-hyphenate">Seleccione las pretensiones en las que desee negociar</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-13">
+                    <lightning-datatable
+                            key-field="id"
+                            data={pretensiones}
+                            columns={columns}
+                            onrowselection ={handleRowSelection}
+                    >
+                    </lightning-datatable>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModalNegociacion} title="Cancelar">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={negociarPretensiones} title="Seleccionar Pretensiones" disabled={mostrarBotonSeleccionPretensiones}>Seleccionar Pretensiones</button> 
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
 
+    <!--Modal de finalizar negociacion-->
+    <template if:true={modalFinalizarNegociacion}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-14" aria-modal="true" aria-describedby="modal-content-id-14" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalFinalizarNegociacion}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="border"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-finalizarNegociacion" class="slds-text-heading_medium slds-hyphenate">Finalizar negociación</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modalFinalizarNegociacion-content-id">
+                    <template if:true={hayCamposPendientesNegociacion}> 
+                        <p>Para finalizar la negociación de la reclamación es necesario informar los siguientes campos obligatorios:
+                            <br/><lightning-formatted-text value={camposPendientesNegociacion} ></lightning-formatted-text></p>
+                    </template>
+                    <template if:false={hayCamposPendientesNegociacion}> 
+                        <p>Se <b>finalizará</b> la negociación en curso de la reclamación.
+                        <br/>¿Deseas continuar con la operación?</p>   
+                    </template>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModalFinalizarNegociacion} title="Cancelar">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={finalizarNegociacion} title="Continuar" disabled={hayCamposPendientesNegociacion}>Continuar</button> 
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--Modal de negociacion en curso-->
+    <template if:true={modalNegociacionActiva}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-15" aria-modal="true" aria-describedby="modal-content-id-15" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalNegociacionEnCurso}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="border"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-negociacionEnCurso" class="slds-text-heading_medium slds-hyphenate">Negociación en curso</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modalNegociacionEnCurso-content-id">
+                    <p><b>¡Atención!</b> la reclamación tiene una negociación en curso.
+                    <br/>¿Deseas continuar con la operación?</p>   
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModalNegociacionEnCurso} title="Cancelar">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={onClickFinalizarNegociacion} title="FinalizarNegocacion">Finalizar negociación activa</button> 
+                    <button class="slds-button slds-button_brand" onclick={continuarCambioEstado} title="Continuar">Continuar sin finalizar</button> 
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
 
     <template if:true={isLoading}>
         <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
@@ -388,7 +768,7 @@
             border-color:rgb(11, 11, 11)" >
                 <div class="slds-card__header slds-grid slds-text-color_inverse ">
                     <div class="slds-float_left">
-                        <span>Estas en una complementaria por entidad</span>
+                        <span>Está en una complementaria por entidad</span>
                     </div>
                 </div>
             </article>
@@ -403,7 +783,114 @@
                 </div>
             </div>
         </article>
-</template>
+    </template>
+
+    <template if:true={negociacionEnCurso}>
+        <article class="slds-card" style="margin-bottom: 5px; background-color:darkorange; border-radius: 8px;
+        border-color:rgb(11, 11, 11)" >
+            <div class="slds-card__header slds-grid slds-text-color_inverse ">
+                <div class="slds-float_left">
+                    <span>{mensajeNegociacion}</span>
+                </div>
+            </div>
+        </article>
+    </template>
+
+    <template if:true={hayTareasPtes}>
+        <article class="slds-card" style="margin-bottom: 5px; background-color:darkorange; border-radius: 8px;
+        border-color:rgb(11, 11, 11)" >
+            <div class="slds-card__header slds-grid slds-text-color_inverse ">
+                <div class="slds-float_left">
+                    <span>{mensajeTareasPtes}</span>
+                </div>
+            </div>
+        </article>
+    </template>
 
 
+        <!--Modal de campos por rellenar en el paso a estado de Envío-->
+        <template if:true={mostrarModalPasoEstadoEnvio}> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-14" aria-modal="true" aria-describedby="modal-content-id-14" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box LWC header here -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalCamposPasarEnvio}>
+                            <lightning-icon icon-name="utility:close"
+                                alternative-text="close"
+                                variant="border"
+                                size="small" ></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h3 id="modal-heading-PasarEnvio" class="slds-text-heading_medium slds-hyphenate">Pasar a estado de Envío</h3>
+                    </header>
+                    <!-- Modal/Popup Box LWC body starts here -->
+                    <div class="slds-modal__content slds-p-around_medium" id="modalPasarEnvio-content-id">
+                        <p><lightning-formatted-text value={camposPendientesParaEnvio} ></lightning-formatted-text></p>
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" onclick={closeModalCamposPasarEnvio} title="Aceptar">Aceptar</button> 
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+
+    <!--Modal de Convertir Reclamación -->
+    <template if:true={convertir}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalConvertir}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="border"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modalConvertir-headingConvertir" class="slds-text-heading_medium slds-hyphenate">Convertir Reclamación</h3>
+                </header>  
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-6">
+                    <br> </br>
+                    <h1 class="slds-text-align_center">¿Quiere convertir la reclamación a una Consulta COPS, una Reclamación SAC o una Consulta SPV?</h1>
+                    <br> </br>
+                    <h1 class="slds-text-align_center"><strong>¡Atención!</strong> Las pretensiones de la reclamación se darán de baja.</h1>
+                    <br> </br>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <div class = "contenedor-botones">
+                        <lightning-button style="padding-right: 5px" data-id="convertirCOPS" label="Consulta COPS" onclick={convertirAConsultaCOPS} icon-name="utility:change_owner"></lightning-button>
+                        <lightning-button style="padding-right: 5px" data-id="convertirSAC" label="Reclamación SAC" onclick={convertirAReclamacionSAC} icon-name="utility:change_owner"></lightning-button>
+                        <lightning-button style="padding-right: 5px" data-id="convertirSPV" label="Consulta SPV" onclick={convertirAConsultaSPV} icon-name="utility:change_owner"></lightning-button>
+                    </div>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    <!-- Modal Derivar -->
+    <!--<template if:true={modalDerivar}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                    aria-describedby="modal-content-id-1"
+                    class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close"
+                                            onclick={cerrarDerivar}
+                                            alternative-text="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close">
+                    </lightning-button-icon>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Derivar</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-133">
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>-->
+    
 </template>

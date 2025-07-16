@@ -1,5 +1,6 @@
 import { LightningElement, api, wire, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { refreshApex } from '@salesforce/apex';
 import recuperarReclamantes from '@salesforce/apex/SAC_LCMP_Reclamantes.recuperarReclamantes';
 
 

@@ -1,4 +1,18 @@
 ({
+	subscribeToEvent : function(component) {
+        // var empApi = component.find("empApi");
+        // var channel = "/event/CC_Refresh_MCC__e";
+
+        // empApi.subscribe(channel, -1, function(message) {
+        //     this.handleEvent(component, message);
+        // }.bind(this));
+    },
+
+    handleEvent : function(component, message) {
+        // var newMsg = message.data.payload.Case_Id__c;
+		// $A.get('e.force:refreshView').fire();
+    },
+	
 	getOptionsCanalesOperativos: function(component) {
 		let getCanalesOperativos = component.get('c.getCanalesOperativos');
 		getCanalesOperativos.setCallback(this, response => {
@@ -181,9 +195,14 @@
 		component.set('v.tematicaAnterior', responseValidarGuardar.tematicaAnteriorName);
 		component.set('v.productoAnterior', responseValidarGuardar.productoAnteriorName);
 		component.set('v.motivoAnterior', responseValidarGuardar.motivoAnteriorName);
+		
+
 		if (component.get('v.caso.RecordType.DeveloperName') === 'CC_Cliente') {
 			component.find('derivar').set('v.value', false);		
 			component.find('canalOperativoSeleccionadoOculto').set('v.value', component.find('selectItemCanalOperativo').get('v.value'));
+			if(component.get('v.cambiarStatusAuto')){
+				// component.find('statusAutoOculto').set('v.value', 'DENIED');
+			}
 		}
 		
 		let idTematica = component.find('selectItemTematica').get('v.value');
@@ -196,32 +215,29 @@
 		component.find('motivoSeleccionadoOculto').set('v.value', idMotivo ? idMotivo : null);
 		component.find('causaSeleccionadaOculto').set('v.value', idCausa ? idCausa : null);
 		component.find('solucionSeleccionadaOculto').set('v.value', idSolucion ? idSolucion : null);
-		component.find('campanaSeleccionadaOculto').set('v.value', component.find('selectItemCampana').get('v.value'));
+		if(component.find('campanaSeleccionadaOculto') && component.find('selectItemCampana')){
+			component.find('campanaSeleccionadaOculto').set('v.value', component.find('selectItemCampana').get('v.value'));
+		}
 		if (component.get('v.caso.RecordType.DeveloperName') === 'CC_Empleado'
 		| component.get('v.caso.RecordType.DeveloperName') === 'CC_CSI_Bankia') {
 			component.find('errorTerminalSeleccionadoOculto').set('v.value', component.find('selectItemErroresTF7').get('v.value'));
 		}
 		
-		if (component.get('v.cerrarCaso') && component.get('v.tieneActividad') /*&& (component.get('v.caso.RecordType.DeveloperName') === 'CC_Cliente' )*/)  {
-			/*component.find('tematicaInternaSeleccionadaOculto').set('v.value', idTematica ? component.get('v.opcionesTematicas').find(t => t.value === idTematica).label : null);
-			component.find('productoInternoSeleccionadaOculto').set('v.value', idProducto ? component.get('v.opcionesProductos').find(p => p.value === idProducto).label : null);
-			component.find('motivoInternoSeleccionadaOculto').set('v.value', idMotivo ? component.get('v.opcionesMotivos').find(m => m.value === idMotivo).label : null);
-			component.find('causaInternaSeleccionadaOculto').set('v.value', idCausa ? component.get('v.opcionesCausas').find(c => c.value === idCausa).label : null);
-			component.find('solucionInternaSeleccionadaOculto').set('v.value', idSolucion ? component.get('v.opcionesSoluciones').find(s => s.value === idSolucion).label : null);
-			let today = new Date();
-			component.find('cerradoOperativa').set('v.value', today.toISOString());
-			component.find('estado').set('v.value', 'Cerrado');*/
+		if (component.get('v.cerrarCaso') && (component.get('v.tieneActividad') || component.get('v.ambitoCSBD'))){
 			this.guardarCerrarAuxiliar(component);
 		} else if (component.get('v.cambiarEstadoPendienteColaborador')) {
 			component.find('estado').set('v.value', 'Pendiente Colaborador');
-		}else if (!component.get('v.tieneActividad') && component.get('v.cerrarCaso') && (component.get('v.caso.RecordType.DeveloperName') === 'CC_Cliente' )) {
+		}else if (!component.get('v.tieneActividad') && component.get('v.cerrarCaso') && (component.get('v.caso.RecordType.DeveloperName') === 'CC_Cliente' && !component.get('v.ambitoCSBD'))) {
 			$A.enqueueAction(component.get('c.comprobarAgrupacionSolucion'));
 		} else {
 			component.find('estado').set('v.value', component.get('v.estadoInicial'));
 		}
-		if(!component.get('v.cerrarCaso')) {
+		if(!component.get('v.cerrarCaso') && component.find('recordEditForm')) {
 			component.find('recordEditForm').submit();
 		}
+		// if(!component.get('v.cerrarCaso') && component.find('recordEditForm2')) {
+		// 	component.find('recordEditForm2').submit();
+		// }
 	},
 	
 	guardarCerrarAuxiliar: function(component) {
@@ -235,7 +251,9 @@
 		component.find('motivoSeleccionadoOculto').set('v.value', idMotivo ? idMotivo : null);
 		component.find('causaSeleccionadaOculto').set('v.value', idCausa ? idCausa : null);
 		component.find('solucionSeleccionadaOculto').set('v.value', idSolucion ? idSolucion : null);
-		component.find('campanaSeleccionadaOculto').set('v.value', component.find('selectItemCampana').get('v.value'));
+		if(component.find('campanaSeleccionadaOculto') && component.find('selectItemCampana')){
+			component.find('campanaSeleccionadaOculto').set('v.value', component.find('selectItemCampana').get('v.value'));
+		}
         if (component.get('v.caso.RecordType.DeveloperName') === 'CC_Empleado'
 		| component.get('v.caso.RecordType.DeveloperName') === 'CC_CSI_Bankia') {
 			component.find('errorTerminalSeleccionadoOculto').set('v.value', component.find('selectItemErroresTF7').get('v.value'));
@@ -250,7 +268,12 @@
             component.find('cerradoOperativa').set('v.value', today.toISOString());
             component.find('estado').set('v.value', 'Cerrado');
         }
-		component.find('recordEditForm').submit();
+		if(component.find('recordEditForm')){
+			component.find('recordEditForm').submit();
+		}
+		// if(component.find('recordEditForm2')){
+		// 	component.find('recordEditForm2').submit();
+		// }
 	},
 
 	recuperarMensajeToast : function (component, tipo, validacion) {
@@ -264,5 +287,61 @@
                 }
             });
             $A.enqueueAction(recuperarMensajeToast);
+    },
+
+	camposObligatoriosNoInformados: function(component){
+		let camposObligatoriosNoInformados = ['\n'];
+		if (!['Twitter', 'Propuestas de mejora', 'Chat', 'Comentarios Stores'].includes(component.get('v.caso.Origin'))
+		&& !['Buzón Fondos', 'Buzón Carteras'].includes(component.get('v.caso.CC_Canal_Procedencia__c'))
+		&& !component.find('CC_Detalles_Consulta__c').get('v.value')) {
+			camposObligatoriosNoInformados.push('Detalles consulta');
+		}
+
+		if (!['Propuestas de mejora', 'Email - Revisar'].includes(component.get('v.caso.Origin'))) {
+			if (component.find('CC_Tipo_Contacto__c') && !component.find('CC_Tipo_Contacto__c').get('v.value')) {
+				camposObligatoriosNoInformados.push('Tipo de contacto');
+			}
+			if (component.find('selectItemCanalOperativo') && !component.find('selectItemCanalOperativo').get('v.value')) {
+				camposObligatoriosNoInformados.push('Canal operativo');
+			}
+			if (!component.find('selectItemTematica').get('v.value')) {
+				camposObligatoriosNoInformados.push('Temática');
+			}
+			if (!component.find('selectItemProducto').get('v.value')) {
+				camposObligatoriosNoInformados.push('Producto/Servicio');
+			}
+			if (!component.find('selectItemMotivo').get('v.value')) {
+				camposObligatoriosNoInformados.push('Motivo');
+			}
+			if (!component.find('selectItemCausa').get('v.value')) {
+				camposObligatoriosNoInformados.push('Causa');
+			}
+			// if (!component.find('selectItemCausa').get('v.value')) {
+			// 	camposObligatoriosNoInformados.push('Solución');
+			// }
+			if (component.find('CC_Idioma__c') && !component.find('CC_Idioma__c').get('v.value')) {
+				camposObligatoriosNoInformados.push('Idioma');
+			}
+		}
+
+		if (component.get('v.caso.Origin') !== 'Twitter' && component.get('v.caso.Origin') !== 'Comentarios Stores'
+		&& component.get('v.caso.Canal_del_Empleado__c') !== 'Hidden'
+		&& !component.get('v.caso.CC_No_Identificado__c') && !component.get('v.caso.ContactId')) {
+			camposObligatoriosNoInformados.push('Cuenta y contacto');
+		}
+
+		if (!component.get('v.caso.CC_Canal_Procedencia__c')) {
+			camposObligatoriosNoInformados.push('Canal de procedencia');
+		}
+		
+		if (camposObligatoriosNoInformados.length > 1) {
+			this.mostrarToast('info', 'Campos obligatorios', 'Es necesario que informes Los siguientes campos antes de cerrar el caso:' + camposObligatoriosNoInformados.join('\n\u00a0\u00a0\u00a0\u00a0\u00a0·\u00a0\u00a0'));
+			this.finGuardar(component);
+			component.set('v.cerrarCaso', false);
+			component.set('v.cierroCaso', false);
+			return false;
+		} else {
+			return true;
+		}
     }
 });

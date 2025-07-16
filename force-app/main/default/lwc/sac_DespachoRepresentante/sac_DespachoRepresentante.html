@@ -1,0 +1,119 @@
+<template>
+    <template if:true={datosCargados}>
+        <div class="slds-section slds-is-open campo-despacho-clase" style="margin-top: 0; padding-top: 0" id="despachoEditable">
+            <div class="slds-section__content cuerpo-seccion" id="idSeccion">      
+            
+            <lightning-record-edit-form object-api-name="CBK_Case_Extension__c" key={recordId} record-id={caso.fields.CBK_Case_Extension_Id__c.value} onsuccess={handleSuccessEditar}>
+
+
+                    <!--Muestra el campo con el lápiz al lado, cuando no está en modo de edición-->
+                    <template if:false={editandoCampo}>
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <!--Solo mostrar el lápiz cuando se permite editar-->
+                                    <template if:true={sePuedeEditarDespacho}>
+                                        <lightning-layout>
+                                            <lightning-layout-item size="11" class="slds-border_bottom">
+                                                <div class="slds-form-element">
+                                                    <span class="slds-form-element__label">Despacho representante</span>
+                                                </div>
+                                                <template  if:false={despachoVacio}>
+                                                    <lightning-output-field  field-name="SAC_DespachoRepresentante__c" variant="label-hidden"></lightning-output-field>
+                                                </template>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </template>
+                                    <!--No se muestra el lápiz cuando no se puede editar-->
+                                    <template if:false={sePuedeEditarDespacho}>
+                                        <lightning-layout>
+                                            <lightning-layout-item size="12" class="slds-border_bottom">
+                                                <div class="slds-form-element">
+                                                    <span class="slds-form-element__label">Despacho representante</span>
+                                                </div>
+                                                <template  if:false={despachoVacio}>
+                                                    <lightning-output-field  field-name="SAC_DespachoRepresentante__c" variant="label-hidden"></lightning-output-field>
+                                                </template>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </template>
+
+                                </lightning-layout-item>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!--Cuando se pulas en editar, se muestra el campo modo combobox para elegir el valor que se desee-->
+                    <template if:true={editandoCampo}>
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+
+                                <!--Se pone un placeholder u otro en función de si ya había un valor seleccionado o no-->
+                                <template if:true={despachoVacio}>
+                                    <lightning-combobox
+                                        id="comboDespacho"
+                                        name="despachorepresentante"
+                                        label="Despacho representante"
+                                        value={selectedOptionMotivo}
+                                        placeholder=" - Select -"
+                                        options={picklistDespachoValues}
+                                        onchange={handleChangeDespacho} 
+                                        variant="label-inline">
+                                    </lightning-combobox>
+                                </template>
+
+                                <template if:false={despachoVacio}>
+                                    <lightning-combobox
+                                        id="comboDespacho2"
+                                        name="despachorepresentante"
+                                        label="Despacho representante"
+                                        value={selectedOptionMotivo}
+                                        placeholder={despachoActual}
+                                        options={picklistDespachoValues}
+                                        onchange={handleChangeDespacho} 
+                                        variant="label-inline">
+                                    </lightning-combobox>
+                                </template>
+
+
+                               <!-- <footer class="slds-modal__footer">
+                                    <lightning-button variant="neutral" label="Volver" title="Cancelar" onclick={handleCancelar} class="slds-var-p-right_small"></lightning-button>
+                                    <lightning-button variant="brand" label="Guardar" title="Guardar" onclick={handleGuardar}></lightning-button>
+                                </footer>-->
+
+                            </div>
+                        </div>
+                        <template if:true={spinnerLoading}>
+                            <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+                                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                            </section>
+                        </template> 
+                        
+                        <footer class="slds-modal__footer slds-align_absolute-center">
+                            <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={handleEditarCampos} class="slds-var-p-right_small"></lightning-button>
+                            <lightning-button variant="brand" label="Guardar" title="Guardar" onclick={handleGuardarDespacho}></lightning-button>
+                        </footer>
+
+                    </template>
+
+
+                </lightning-record-edit-form>
+
+            </div>
+        </div>  
+
+
+     <template if:true={mostrarCaracteristicas}>
+        <p style="color:red; font-size:12px;"><b>Atención: este despacho tiene firmados acuerdos de prelitigio con la entidad, deberás revisar si esta reclamación se corresponde con algún acuerdo.</b></p>
+        <template for:each={listaCaracteristicas} for:item="elemento">
+            <div class="slds-grid slds-wrap" key={recordId} > 
+                <p style="color:red; font-size:12px; margin-left: 30px; padding-top: 4px;"><b>-{elemento.CC_Caracteristica__r.Name}: {elemento.CC_Caracteristica__r.CC_Descripcion__c}</b></p>
+            </div>
+        </template>
+    </template>
+
+    </template>
+</template>

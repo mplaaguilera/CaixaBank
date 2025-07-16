@@ -1447,7 +1447,9 @@
 	},
 
 	modalAORCerrar: function(component) {
-		component.set('v.spinner', false);
+		component.set('v.loadingCreandoCaso', false);
+		component.set('v.botonPulsado', false);
+
 		$A.util.removeClass(component.find('backdrop'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalAOR'), 'slds-fade-in-open');
 		if (component.get('v.caso.SEG_Identificador_AOR__c')) {
@@ -2044,12 +2046,9 @@
 
 	enviarAOR: function(component) {
 		//Spinner
-		component.set('v.spinner', true);
-		if (component.get('v.caso.SEG_Identificador_AOR__c')) {
-			component.find('modalAORBotonIniciarRitm').set('v.disabled', true);
-		} else {
-			component.find('modalAORBotonIniciar').set('v.disabled', true);
-		}
+		component.set('v.loadingCreandoCaso', true);
+		// Control del botón pulsado
+		component.set('v.botonPulsado', true);
 
 		let listaFiche = component.get('v.currentSelectedRowsAnexos');
 		let tipoAOR1 = component.get('v.selectedValueN1');
@@ -2076,16 +2075,37 @@
 				'consultaAORaura': tipoconsulta, 'comentario': comentarioAOR, 'adjuntos': listaFiche, 'ritm': ritm
 			});
 			envioAOR.setCallback(this, response => {
+				component.set('v.botonPulsado', false);
+
 				if (response.getState() === 'SUCCESS') {
 					$A.enqueueAction(component.get('c.modalAORCerrar'));
 				} else {
+					helper.mostrarToast('error', 'Error en respuesta', 'No se ha podido completar la petición');					
 					$A.enqueueAction(component.get('c.modalAORCerrar'));
 				}
-				component.find('modalAORBotonIniciar').set('v.disabled', false);
-				component.find('modalAORBotonIniciarRitm').set('v.disabled', false);
-				component.find('tablaanexosAOR').set('v.currentSelectedRowsAnexos', []);
-				component.find('tipologiaN1').set('v.value', 'Seleccione un valor...');
-				component.find('tipologiaN2').set('v.value', 'Seleccione un valor...');
+
+				if(component.find('modalAORBotonIniciar') != null){
+					component.find('modalAORBotonIniciar').set('v.disabled', false);
+				}
+				
+				if(component.find('modalAORBotonIniciarRitm') != null){
+					component.find('modalAORBotonIniciarRitm').set('v.disabled', false);
+				}
+				
+				component.set('v.currentSelectedRowsAnexos', []);
+
+				if (component.find('tipologiaN1') != null) {
+					component.find('tipologiaN1').set('v.value', 'Seleccione un valor...');
+				}
+
+				if (component.find('tipologiaN2') != null) {
+					component.find('tipologiaN2').set('v.value', 'Seleccione un valor...');
+				}
+
+				if (component.find('tipologiaN2') != null) {
+
+				}
+
 				component.set('v.spinner', false);
 
 			});

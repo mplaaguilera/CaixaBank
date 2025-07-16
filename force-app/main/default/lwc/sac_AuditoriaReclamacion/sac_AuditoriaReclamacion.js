@@ -13,6 +13,8 @@ import replicarAuditoriaReclamacion from '@salesforce/apex/SAC_LCMP_AuditoriasCo
 import reabrirAuditoriaReclamacion from '@salesforce/apex/SAC_LCMP_AuditoriasController.crearAuditoriaReclamacion';
 import comprobarEnvioEmail from '@salesforce/apex/SAC_LCMP_AuditoriasController.comprobarEnvioEmail';
 import enviarEmailsAuditores from '@salesforce/apex/SAC_LCMP_AuditoriasController.enviarEmailsAuditores';
+import updateRecordsPuntos from '@salesforce/apex/SAC_LCMP_AuditoriasController.updateRecordsPuntos';
+
 
 import AUDITORIA_OBJECT from '@salesforce/schema/SEG_Auditoria__c';
 import AUDITORIACASO from '@salesforce/schema/Case.SEG_SRAuditoria__c';
@@ -36,6 +38,8 @@ export default class Sac_AuditoriaReclamacion extends NavigationMixin(LightningE
     @track estadoAuditoria;
     @track auditoriaRealizada;
     @track auditoriaReplicada = false;
+    @track opcionesDetalleDictamen;
+    @track listaOpcionesDetalleDictamen;
     @track objetoCase = {};
     @track nombreAuditoriaPadre = '';
     @track idAuditoriaPadre;
@@ -63,6 +67,9 @@ export default class Sac_AuditoriaReclamacion extends NavigationMixin(LightningE
     @track hayAuditoriasFinalizadas = false;
     @track esGestorLetrado = false;
     auditoriaResult;
+    placeholderDetalleDictamen = '--Ninguno--';
+    @track selectedOptionDetalleDictamen = '';
+
 
     @track datosAuditoria = "slds-section slds-is-open";
     @track bExpanseDatosAuditoria = true;
@@ -129,7 +136,9 @@ export default class Sac_AuditoriaReclamacion extends NavigationMixin(LightningE
             this.tienePermisosEditar = result.data.tienePermisosEditar;
             this.idAuditoriaPadre = result.data.auditoria.SAC_AuditoriaGeneral__c;
             this.nombreAuditoriaPadre = result.data.auditoria.SAC_AuditoriaGeneral__r.SAC_NombreAuditoria__c;
+            this.opcionesDetalleDictamen = result.data.listaOpcionesDetalleDictamen;
             
+
             this.listaAuditoria = this.listaAuditoria.map((item) => 
                 Object.assign({}, item, {Replicada: false, PermisosReplicar: false, PuntosControl:[]})
             )
@@ -163,7 +172,23 @@ export default class Sac_AuditoriaReclamacion extends NavigationMixin(LightningE
                 this.permitirReabrir = result.data.permitirReabrir;
             }
             
-            this.puntosControl = result.data.lstPuntos;
+            // Agregar la lógica para procesar puntosControl y agregar DictamenKO y opcionesdetalle
+            this.puntosControl = result.data.lstPuntos.map((punto) => {
+                // Filtrar las coincidencias de opcionesDetalleDictamen basadas en SAC_PuntoDeControl__c
+                const opcionesDetalle = this.opcionesDetalleDictamen
+                    .filter((opcion) => opcion.CC_Maestro_Temas__c === punto.SAC_PuntoDeControl__c || !opcion.CC_Maestro_Temas__c)
+                    .map((opcion) => ({
+                        label: opcion.Name, 
+                        value: opcion.Name 
+                    }));
+
+                return {
+                    ...punto, // Copiar todas las propiedades existentes
+                    DictamenKO: punto.SAC_Dictamen__c === 'SAC_KO', // Evaluar y agregar DictamenKO
+                    DetalleDictamenOtros: punto.SAC_DetalleDictamen__c === 'Otros', // Evaluar y agregar DetalleDictamenOtros
+                    OpcionesDetalle: opcionesDetalle // Agregar la lista de nombres que coinciden
+                };
+            });
 
             if(this.estadoAuditoria === 'SAC_Completada') {
                 this.auditoriaFinalizada = true;
@@ -198,9 +223,63 @@ export default class Sac_AuditoriaReclamacion extends NavigationMixin(LightningE
 
     // Botones para guardar y finalizar la edición de la auditoría de la reclamación
     handleSubmit(event) {
-        this.spinnerGuardar = true;
+        event.preventDefault(); 
+        
+        const recordsMap = new Map(); 
 
-        this.template.querySelectorAll('lightning-record-edit-form').forEach((form) => {form.submit()});
+        // Recorrer todos los lightning-record-edit-form en el componente
+        this.template.querySelectorAll('lightning-record-edit-form').forEach((form) => {
+            const recordId = form.dataset.recordId; // Extraer el recordId del atributo data-record-id
+
+            // Si el recordId ya existe en el Map, usamos el objeto existente; si no, creamos uno nuevo
+            let record = recordsMap.get(recordId) || { Id: recordId };
+
+            const inputs = form.querySelectorAll('lightning-input-field');
+            inputs.forEach((input) => {
+                record[input.fieldName] = input.value; 
+            });
+
+           // Buscar el valor de SAC_DetalleDictamen__c en puntosControl por recordId
+            const punto = this.puntosControl.find((p) => p.Id === recordId);
+            
+            if (punto) {
+                // Si el valor está dentro de SAC_PuntoDeControl__r, extraerlo y asignarlo al nivel superior del registro
+                const detalleDictamen = punto.SAC_DetalleDictamen__c;
+                
+                if (detalleDictamen) {
+                    record['SAC_DetalleDictamen__c'] = detalleDictamen;
+                }
+            }
+
+            // Guardar el objeto record en el Map
+            recordsMap.set(recordId, record);
+        });
+        // Convertir el Map en una lista de objetos
+        const recordsToUpdate = Array.from(recordsMap.values());
+        // Llamar al método Apex para actualizar los registros
+        this.spinnerGuardar = true;
+        updateRecordsPuntos({'recordsToUpdate': recordsToUpdate})
+            .then(() => {
+                this.spinnerGuardar = false;
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Éxito',
+                        message: 'Se ha actualizado la auditoría correctamente.',
+                        variant: 'success'
+                    })
+                );
+                this.dispatchEvent(new RefreshEvent());
+            })
+            .catch((error) => {
+                this.spinnerGuardar = false;
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error',
+                        message: 'Error al actualizar  la auditoría .',
+                        variant: 'error'
+                    })
+                );
+            });
     }
 
     handleSuccess(event) {
@@ -448,6 +527,42 @@ export default class Sac_AuditoriaReclamacion extends NavigationMixin(LightningE
                 objectApiName: 'SEG_Auditoria__c',
                 actionName: 'view'
             }
+        });
+    }
+
+    handleDictamenChange(event) {
+        const puntoId = event.target.dataset.id; // Obtener el ID del punto
+        const selectedValue = event.detail.value; // Obtener el valor seleccionado
+
+        // Actualizar el valor en la lista de puntosControl
+        this.puntosControl = this.puntosControl.map(punto => {
+            if (punto.Id === puntoId) {
+                // Actualizar directamente la propiedad DictamenKO
+                return {
+                    ...punto,
+                    DictamenKO: selectedValue === 'SAC_KO',
+                    DetalleDictamenOtros: selectedValue === 'Otros',
+                };
+            }
+            return punto;
+        });
+    }
+
+    handleOptionChangeDetalleDictamen(event) {
+        const puntoId = event.target.dataset.id; // Obtener el ID del punto
+        const selectedValue = event.detail.value; // Obtener el valor seleccionado
+
+        // Actualizar el valor en la lista de puntosControl
+        this.puntosControl = this.puntosControl.map(punto => {
+            if (punto.Id === puntoId) {
+                // Actualizar directamente la propiedad SAC_DetalleDictamen__c
+                return {
+                    ...punto,
+                    SAC_DetalleDictamen__c: selectedValue,
+                    DetalleDictamenOtros: selectedValue === 'Otros'
+                };
+            }
+            return punto;
         });
     }
 }

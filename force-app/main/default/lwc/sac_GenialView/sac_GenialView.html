@@ -52,119 +52,163 @@
                             <p>Debes comprobar que el contenido propuesto es correcto y corresponde con lo indicado por el reclamante en el caso y las pretensiones.</p>
                         </h1>
                     </div>                     -->
-                    <div class={toggleIconReclamante}>
-                        <h1 class="slds-section__title">
-                          <button aria-controls="expando-unique-id-reclamante" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableReclamante}>
-                            <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
-                              <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
-                            </svg>
-                            <span class="slds-truncate" title="Section Title"> Datos del Reclamante</span>
-                          </button>
-                        </h1>
-                       <div class="slds-section__content" id="expando-unique-id-reclamante">
-                            <lightning-record-view-form
-                                record-id={idResultadoGenial}
-                                object-api-name="SAC_Genial_Resultado__c"
-                            >
-                                <!-- el boton solo lo mostramos en caso de que aún no tenga un reclamante principal asociado -->
-                                <template if:true={mostrarBoton}>
-                                    <lightning-button label="Asignar Reclamante/s" title="Asignar Reclamante/s sugeridos por IA a la reclamación" onclick={asignarReclamantes} class="slds-m-right_x-small"></lightning-button>
-                                </template>
-                                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_AccountId__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.SAC_AccountId__c}>
-                                            <lightning-icon icon-name={iconosCampos.SAC_AccountId__c} alternative-text="IconAccountId" size="xx-small" title="IconAccountId"></lightning-icon>
-                                        </template>
-                                    </div>
-                                    <!-- <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_UsarDatos__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.SAC_UsarDatos__c}> 
-                                            <lightning-icon icon-name={iconosCampos.SAC_UsarDatos__c} alternative-text="IconUsarDatos" size="xx-small" title="IconUsarDatos"></lightning-icon>
-                                        </template>
-                                    </div> -->
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_Email__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.SAC_Email__c}>
-                                            <lightning-icon icon-name={iconosCampos.SAC_Email__c} alternative-text="IconAccountId" size="xx-small" title="IconEmail"></lightning-icon>
-                                        </template>
-                                    </div>
-                                    <template if:true={settingsCanal.data.SAC_BotonReclamante__c}>
+                    <!-- Inicio Reclamante -->
+                        <div class={toggleIconReclamante}>
+                            <h1 class="slds-section__title">
+                            <button aria-controls="expando-unique-id-reclamante" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableReclamante}>
+                                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                                </svg>
+                                <span class="slds-truncate" title="Section Title"> Datos del Reclamante</span>
+                            </button>
+                            </h1>
+                        <div class="slds-section__content" id="expando-unique-id-reclamante">
+                                <lightning-record-view-form
+                                    record-id={idResultadoGenial}
+                                    object-api-name="SAC_Genial_Resultado__c"
+                                >
+                                    <!-- el boton solo lo mostramos en caso de que aún no tenga un reclamante principal asociado -->
+                                    <template if:true={mostrarBoton}>
+                                        <lightning-button label="Asignar Reclamante/s" title="Asignar Reclamante/s sugeridos por IA a la reclamación" onclick={asignarReclamantes} class="slds-m-right_x-small"></lightning-button>
+                                    </template>
+                                    <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
                                         <div class="slds-col slds-size_5-of-12">
-                                            <lightning-output-field field-name="SAC_SuppliedNIF__c"> </lightning-output-field>
-                                        </div> 
+                                            <lightning-output-field field-name="SAC_AccountId__c"> </lightning-output-field>
+                                        </div>
                                         <div class="slds-col slds-size_1-of-12">
-                                            <template lwc:if={iconosCampos.SAC_SuppliedNIF__c}>
-                                                <lightning-icon icon-name={iconosCampos.SAC_SuppliedNIF__c} alternative-text="IconAccountNif" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                            <template lwc:if={iconosCampos.SAC_AccountId__c}>
+                                                <lightning-icon icon-name={iconosCampos.SAC_AccountId__c} alternative-text="IconAccountId" size="xx-small" title="IconAccountId"></lightning-icon>
                                             </template>
                                         </div>
-                                    </template>
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_Telefono_Contacto__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.Informativo}>
-                                            <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Teléfono" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                        <!-- <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_UsarDatos__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.SAC_UsarDatos__c}> 
+                                                <lightning-icon icon-name={iconosCampos.SAC_UsarDatos__c} alternative-text="IconUsarDatos" size="xx-small" title="IconUsarDatos"></lightning-icon>
+                                            </template>
+                                        </div> -->
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_Telefono_Contacto__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.Informativo}>
+                                                <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Teléfono" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                            </template>
+                                        </div>
+                                        <template if:true={settingsCanal.data.SAC_BotonReclamante__c}>
+                                            <div class="slds-col slds-size_5-of-12">
+                                                <lightning-output-field field-name="SAC_SuppliedNIF__c"> </lightning-output-field>
+                                            </div> 
+                                            <div class="slds-col slds-size_1-of-12">
+                                                <template lwc:if={iconosCampos.SAC_SuppliedNIF__c}>
+                                                    <lightning-icon icon-name={iconosCampos.SAC_SuppliedNIF__c} alternative-text="IconAccountNif" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                                </template>
+                                            </div>
+                                            <div class="slds-col slds-size_5-of-12">
+                                                <lightning-output-field field-name="SAC_UmbralNIF__c"> </lightning-output-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-12">
+                                                <lightning-icon icon-name={iconoInformativo} alternative-text="Umbral NIF" size="xx-small" title="Umbral NIF"></lightning-icon>
+                                            </div>
                                         </template>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_NombreContacto__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.Informativo}>
+                                                <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Nombre" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                            </template>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_UmbralNombre__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <lightning-icon icon-name={iconoInformativo} alternative-text="Umbral Nombre" size="xx-small" title="Umbral Nombre"></lightning-icon>
+                                        </div>
+                                        <div class="slds-col slds-size_6-of-12">
+                                        </br>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_UmbralApellido__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <lightning-icon icon-name={iconoInformativo} alternative-text="Umbral Apellido" size="xx-small" title="Umbral Nombre"></lightning-icon>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_Email__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.SAC_Email__c}>
+                                                <lightning-icon icon-name={iconosCampos.SAC_Email__c} alternative-text="IconAccountId" size="xx-small" title="IconEmail"></lightning-icon>
+                                            </template>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_UmbralEmail__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <lightning-icon icon-name={iconoInformativo} alternative-text="Umbral Email" size="xx-small" title="Umbral Email"></lightning-icon>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_DireccionContacto__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.Informativo}>
+                                                <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Dirección" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                            </template>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_CodigoPostalContacto__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.Informativo}>
+                                                <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="CP" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                            </template>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_PoblacionContacto__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.Informativo}>
+                                                <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Población" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                            </template>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_ProvinciaContacto__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.Informativo}>
+                                                <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Provincia" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                            </template>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_PaisContacto__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.Informativo}>
+                                                <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="País" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                            </template>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            </br>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_DocumentoURLFormula__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <lightning-icon icon-name={iconoInformativo} alternative-text="IconDocumentoURLSec" size="xx-small" title="IconDocumentoURLSec"></lightning-icon>
+                                        </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_PaginaDocumento__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <lightning-icon icon-name={iconoInformativo} alternative-text="IconPaginaDocumentoSec" size="xx-small" title="IconPaginaDocumentoSec"></lightning-icon>
+                                        </div>
                                     </div>
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_DireccionContacto__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.Informativo}>
-                                            <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Dirección" size="xx-small" title="IconAccountNif"></lightning-icon>
-                                        </template>
-                                    </div>
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_CodigoPostalContacto__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.Informativo}>
-                                            <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="CP" size="xx-small" title="IconAccountNif"></lightning-icon>
-                                        </template>
-                                    </div>
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_PoblacionContacto__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.Informativo}>
-                                            <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Población" size="xx-small" title="IconAccountNif"></lightning-icon>
-                                        </template>
-                                    </div>
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_ProvinciaContacto__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.Informativo}>
-                                            <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Provincia" size="xx-small" title="IconAccountNif"></lightning-icon>
-                                        </template>
-                                    </div>
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_PaisContacto__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.Informativo}>
-                                            <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="País" size="xx-small" title="IconAccountNif"></lightning-icon>
-                                        </template>
-                                    </div>
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_NombreContacto__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.Informativo}>
-                                            <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Nombre" size="xx-small" title="IconAccountNif"></lightning-icon>
-                                        </template>
-                                    </div>
-                                </div>
-                            </lightning-record-view-form>
+                                </lightning-record-view-form>
+                            </div>
                         </div>
-                    </div>
+                    <!-- Fin Reclamante -->
                     <template lwc:if={hayReclamantesSec}>
                         <div class={toggleReclamantesSec}>
                             <h1 class="slds-section__title">
@@ -191,10 +235,10 @@
                                                         <lightning-icon icon-name={iconoInformativo} alternative-text="IconAccountIdSec" size="xx-small" title="IconAccountIdSec"></lightning-icon>
                                                     </div>
                                                     <div class="slds-col slds-size_5-of-12">
-                                                        <lightning-output-field field-name="SAC_Email__c"> </lightning-output-field>
+                                                        <lightning-output-field field-name="SAC_Telefono_Contacto__c"> </lightning-output-field>
                                                     </div>
                                                     <div class="slds-col slds-size_1-of-12">
-                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="IconEmailSec" size="xx-small" title="IconEmailSec"></lightning-icon>
+                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="IconTelefono_ContactoSec" size="xx-small" title="IconTelefono_ContactoSec"></lightning-icon>
                                                     </div>
                                                     <template if:true={settingsCanal.data.SAC_BotonReclamante__c}>
                                                         <div class="slds-col slds-size_5-of-12">
@@ -203,12 +247,47 @@
                                                         <div class="slds-col slds-size_1-of-12">
                                                             <lightning-icon icon-name={iconoInformativo} alternative-text="IconSuppliedNIFSec" size="xx-small" title="IconSuppliedNIFtSec"></lightning-icon>
                                                         </div>
+                                                        <div class="slds-col slds-size_5-of-12">
+                                                            <lightning-output-field field-name="SAC_UmbralNIF__c"> </lightning-output-field>
+                                                        </div>
+                                                        <div class="slds-col slds-size_1-of-12">
+                                                            <lightning-icon icon-name={iconoInformativo} alternative-text="Umbral NIF" size="xx-small" title="Umbral NIF"></lightning-icon>
+                                                        </div>
                                                     </template>
                                                     <div class="slds-col slds-size_5-of-12">
-                                                        <lightning-output-field field-name="SAC_Telefono_Contacto__c"> </lightning-output-field>
+                                                        <lightning-output-field field-name="SAC_NombreContacto__c"> </lightning-output-field>
                                                     </div>
                                                     <div class="slds-col slds-size_1-of-12">
-                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="IconTelefono_ContactoSec" size="xx-small" title="IconTelefono_ContactoSec"></lightning-icon>
+                                                        <template lwc:if={iconosCampos.Informativo}>
+                                                            <lightning-icon icon-name={iconosCampos.Informativo} alternative-text="Nombre" size="xx-small" title="IconAccountNif"></lightning-icon>
+                                                        </template>
+                                                    </div>
+                                                    <div class="slds-col slds-size_5-of-12">
+                                                        <lightning-output-field field-name="SAC_UmbralNombre__c"> </lightning-output-field>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-12">
+                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="Umbral Nombre" size="xx-small" title="Umbral Nombre"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-col slds-size_6-of-12">
+                                                    </br>
+                                                    </div>
+                                                    <div class="slds-col slds-size_5-of-12">
+                                                        <lightning-output-field field-name="SAC_UmbralApellido__c"> </lightning-output-field>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-12">
+                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="Umbral Apellido" size="xx-small" title="Umbral Nombre"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-col slds-size_5-of-12">
+                                                        <lightning-output-field field-name="SAC_Email__c"> </lightning-output-field>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-12">
+                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="IconEmailSec" size="xx-small" title="IconEmailSec"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-col slds-size_5-of-12">
+                                                        <lightning-output-field field-name="SAC_UmbralEmail__c"> </lightning-output-field>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-12">
+                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="Umbral Email" size="xx-small" title="Umbral Email"></lightning-icon>
                                                     </div>
                                                     <div class="slds-col slds-size_5-of-12">
                                                         <lightning-output-field field-name="SAC_DireccionContacto__c"> </lightning-output-field>
@@ -241,10 +320,16 @@
                                                         <lightning-icon icon-name={iconoInformativo} alternative-text="IconPaisContactoSec" size="xx-small" title="IconPaisContactoSec"></lightning-icon>
                                                     </div>
                                                     <div class="slds-col slds-size_5-of-12">
-                                                        <lightning-output-field field-name="SAC_NombreContacto__c"> </lightning-output-field>
+                                                        <lightning-output-field field-name="SAC_DocumentoURLFormula__c"> </lightning-output-field>
                                                     </div>
                                                     <div class="slds-col slds-size_1-of-12">
-                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="IconNombreContactoSec" size="xx-small" title="IconNombreContactoSec"></lightning-icon>
+                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="IconDocumentoURLSec" size="xx-small" title="IconDocumentoURLSec"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-col slds-size_5-of-12">
+                                                        <lightning-output-field field-name="SAC_PaginaDocumento__c"> </lightning-output-field>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-12">
+                                                        <lightning-icon icon-name={iconoInformativo} alternative-text="IconPaginaDocumentoSec" size="xx-small" title="IconPaginaDocumentoSec"></lightning-icon>
                                                     </div>
                                                 </div>
                                             </lightning-record-view-form>
@@ -307,14 +392,14 @@
                                         </template>
                                     </div>
                                     <template if:true={settingsCanal.data.SAC_BotonReclamante__c}>
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_NumeroDelDocumento__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.SAC_NumeroDelDocumento__c}>
-                                            <lightning-icon icon-name={iconosCampos.SAC_NumeroDelDocumento__c} alternative-text="IconNumeroDocumento" size="xx-small" title="IconNumeroDocumento"></lightning-icon>
-                                        </template>
-                                    </div>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_NumeroDelDocumento__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.SAC_NumeroDelDocumento__c}>
+                                                <lightning-icon icon-name={iconosCampos.SAC_NumeroDelDocumento__c} alternative-text="IconNumeroDocumento" size="xx-small" title="IconNumeroDocumento"></lightning-icon>
+                                            </template>
+                                        </div>
                                     </template>
                                     <div class="slds-col slds-size_5-of-12">
                                         <lightning-output-field field-name="SAC_PoblacionRepresentante__c"> </lightning-output-field>
@@ -324,15 +409,16 @@
                                             <lightning-icon icon-name={iconosCampos.SAC_PoblacionRepresentante__c} alternative-text="IconPoblacionRep" size="xx-small" title="IconPoblacionRep"></lightning-icon>
                                         </template>
                                     </div>
-                
-                                    <div class="slds-col slds-size_5-of-12">
-                                        <lightning-output-field field-name="SAC_NombreRepresentante__c"> </lightning-output-field>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-12">
-                                        <template lwc:if={iconosCampos.SAC_NombreRepresentante__c}> 
-                                            <lightning-icon icon-name={iconosCampos.SAC_NombreRepresentante__c} alternative-text="IconNombreCompleto" size="xx-small" title="IconNombreCompleto"></lightning-icon>
-                                        </template>
-                                    </div>
+                                    <template if:true={settingsCanal.data.SAC_BotonReclamante__c}>
+                                        <div class="slds-col slds-size_5-of-12">
+                                            <lightning-output-field field-name="SAC_NombreRepresentante__c"> </lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12">
+                                            <template lwc:if={iconosCampos.SAC_NombreRepresentante__c}> 
+                                                <lightning-icon icon-name={iconosCampos.SAC_NombreRepresentante__c} alternative-text="IconNombreCompleto" size="xx-small" title="IconNombreCompleto"></lightning-icon>
+                                            </template>
+                                        </div>
+                                    </template>
                                     <div class="slds-col slds-size_5-of-12">
                                         <lightning-output-field field-name="SAC_ProvinciaRepresentante__c"> </lightning-output-field>
                                     </div>
@@ -414,7 +500,7 @@
                             record-id={idResultadoGenial}
                             object-api-name="SAC_Genial_Resultado__c"
                         >
-                                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap">
                                     <div class="slds-col slds-size_5-of-12">
                                         <lightning-output-field field-name="SAC_Importe_Tipo__c"> </lightning-output-field>
                                     </div>
@@ -587,13 +673,25 @@
                                                     <lightning-output-field field-name="SAC_MCC_Tematica__c"> </lightning-output-field>
                                                 </div>
                                                 <div class="slds-col slds-size_1-of-2">
+                                                    <lightning-output-field field-name="SAC_UmbralTematica__c"> </lightning-output-field>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2">
                                                     <lightning-output-field field-name="SAC_MCC_ProdServ__c"> </lightning-output-field>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2">
+                                                    <lightning-output-field field-name="SAC_UmbralProdServ__c"> </lightning-output-field>
                                                 </div>
                                                 <div class="slds-col slds-size_1-of-2">
                                                     <lightning-output-field field-name="SAC_MCC_Motivo__c"> </lightning-output-field>
                                                 </div>
                                                 <div class="slds-col slds-size_1-of-2">
+                                                    <lightning-output-field field-name="SAC_UmbralMotivo__c"> </lightning-output-field>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2">
                                                     <lightning-output-field field-name="SAC_Detalle__c"> </lightning-output-field>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2">
+                                                    <lightning-output-field field-name="SAC_UmbralDetalle__c"> </lightning-output-field>
                                                 </div>
                                                 <div class="slds-col slds-size_1-of-1">
                                                     <lightning-output-field field-name="SAC_Resumen__c"> </lightning-output-field>

@@ -1,3 +1,4 @@
+/*eslint-disable @lwc/lwc/no-async-await, no-extra-parens */
 import {LightningElement, wire, track} from 'lwc';
 import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
 import {MessageContext, publish, subscribe, unsubscribe} from 'lightning/messageService';
@@ -118,7 +119,7 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 		//await this.logEvento(message, nombreMetodoApex);
 		await this.logHistorial( //Se registra el evento recibido en el historial
 			'evento', null, JSON.stringify(message, null, 3), {category: message.category, type: message.type},
-			nombreMetodoApex ? {name: nombreMetodoApex, inbound: null} : null
+			(nombreMetodoApex ? {name: nombreMetodoApex, inbound: null} : null)
 		);
 		if (nombreMetodoApex) {
 			try {
@@ -147,9 +148,12 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 
 	async identificarTrigger(message) {
 	//eslint-disable-next-line @salesforce/aura/ecma-intrinsics, @lwc/lwc/no-for-of
-		for (const [nombreMetodoApexTrigger, condicionesTrigger] of Object.entries(METODOS_APEX_TRIGGERS)) {
-			if (this.cumpleCondicionesTrigger(message, condicionesTrigger)) {
-				return nombreMetodoApexTrigger;
+		for (const nombreMetodoApexTrigger in METODOS_APEX_TRIGGERS) {
+			if (Object.prototype.hasOwnProperty.call(METODOS_APEX_TRIGGERS, nombreMetodoApexTrigger)) {
+				const condicionesTrigger = METODOS_APEX_TRIGGERS[nombreMetodoApexTrigger];
+				if (this.cumpleCondicionesTrigger(message, condicionesTrigger)) {
+					return nombreMetodoApexTrigger;
+				}
 			}
 		}
 		return null;
@@ -194,7 +198,7 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 
 	//eslint-disable-next-line @lwc/lwc/no-async-await
 	async invocarMetodoApex(nombreMetodoApex, metodoApexInput) {
-		const timestampInicioApex = performance.now();
+		const timestampInicioApex = Date.now();
 		await this.cambiarTipoBanner('pendienteApex');
 		await this.logHistorial('Invocación Apex', 'Apex "' + nombreMetodoApex + '"\n', formatearApexInput(metodoApexInput));
 
@@ -202,7 +206,7 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 		const metodoApex = this.metodosApex.find(mA => mA.nombre === nombreMetodoApex).metodoApex;
 		try {
 			const retornoApex = await metodoApex(metodoApexInput);
-			const duracion = Math.round((performance.now() - timestampInicioApex) / 100) / 10;
+			const duracion = Math.round((Date.now() - timestampInicioApex) / 100) / 10;
 			await this.logHistorial(
 				'Respuesta Apex', 'Respuesta Apex "' + nombreMetodoApex + '" (' + duracion + 's)',
 				retornoApex ? JSON.stringify(retornoApex, null, 3) : '',
@@ -250,7 +254,7 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 		} catch (error) {
 			errorApex(error, 'Error Apex "' + nombreMetodoApex + '"');
 			const logMensajeErrorTexto = (error.body?.exceptionType ? error.body.exceptionType + ': ' : '') + error.body.message + '.\n\nHilo de ejecución:\n' + error.body.stackTrace;
-			this.logHistorial('error', 'Error Apex "' + nombreMetodoApex + '" (' + Math.round((performance.now() - timestampInicioApex) / 100) / 10 + 's)', logMensajeErrorTexto);
+			this.logHistorial('error', 'Error Apex "' + nombreMetodoApex + '" (' + Math.round((Date.now() - timestampInicioApex) / 100) / 10 + 's)', logMensajeErrorTexto);
 		} finally {
 			this.cambiarTipoBanner('online');
 		}

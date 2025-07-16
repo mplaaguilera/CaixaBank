@@ -3,12 +3,17 @@ public with sharing class CC_WS_Autenticacion {
 	public class DefaultException extends Exception {}
 
 	public static String CC_WS_Envio_Autenticacion(Id autenticacionId, Id recordId) {
+		return CC_WS_Envio_Autenticacion(autenticacionId, recordId, 'ClienteDigital');
+	}
+
+	public static String CC_WS_Envio_Autenticacion(Id autenticacionId, Id recordId, String tipoAutenticacion) {
+		System.debug('::: tipoAutenticacion: ' + tipoAutenticacion);
 		String resultado = 'OK';
 
 		if (String.isNotBlank(autenticacionId) && String.isNotBlank(recordId)) {
 			String tipoObjeto = recordId.getSObjectType().getDescribe().getName();
 
-			Map<String, Object> retorno = getDatos(recordId, autenticacionId);
+			Map<String, Object> retorno = getDatos(recordId, autenticacionId, tipoAutenticacion);
 			Map<String, Object> datos = (Map<String, Object>)retorno.get('datos');
 			Case caso = (Case)retorno.get('caso');
 			Opportunity oportunidad = (Opportunity)retorno.get('oportunidad');
@@ -20,7 +25,9 @@ public with sharing class CC_WS_Autenticacion {
 			body += '"expirationTime": "' + String.valueOf(fechaCaducidad.time()).substring(0, 5) + '",';
 			body += '"customerInternalId": "' + CC_MetodosUtiles.encriptarSHA('SHA-512', String.valueOf(datos.get('numperso'))).toLowerCase() + '",';
 			body += '"personType": "' + String.valueOf(datos.get('tipoPersona')) + '", "appName": "' + String.valueOf(datos.get('app')) + '",';
-			body += '"visualizationData": {"tickets": [{"datum": "' + String.valueOf(datos.get('telefono')) + '","ticketvalue": "' + String.valueOf(datos.get('ticketvalue')) + '"}]},';
+			if (tipoAutenticacion == 'ClienteDigital') {
+				body += '"visualizationData": {"tickets": [{"datum": "' + String.valueOf(datos.get('telefono')) + '","ticketvalue": "' + String.valueOf(datos.get('ticketvalue')) + '"}]},';
+			}
 			body += '"customerId" : "' + String.valueOf(datos.get('documento')) + '"}';
 
 			CC_TrazaInt__c traza = new CC_TrazaInt__c();
@@ -46,8 +53,10 @@ public with sharing class CC_WS_Autenticacion {
 				traza.CC_FechaFin__c = Datetime.now();
 				traza.CC_MensajeSalida__c = response.getBody();
 
+				System.debug('::: response.getBody(): ' + response.getBody());
+
 				if (response.getStatusCode() != 200) { //KO
-					
+
 					if (tipoObjeto == 'Case') {
 						resultado = 'KO';
 						caso.CC_Status_Autorizacion__c = 'ERROR';
@@ -103,7 +112,7 @@ public with sharing class CC_WS_Autenticacion {
 		return resultado;
 	}
 
-	private static Map<String, Object> getDatos(Id recordId, Id autenticacionId) {
+	private static Map<String, Object> getDatos(Id recordId, Id autenticacionId, String tipoAutenticacion) {
 		Map<String, Object> datos;
 		Case caso;
 		Opportunity oportunidad;
@@ -119,12 +128,12 @@ public with sharing class CC_WS_Autenticacion {
 
     	// Usar el método CC_OTP.recuperarNumperso para obtener el numperso
     	String numper = CC_OTP.recuperarNumperso(caso);
-		
+
 			datos = new Map<String, Object>{
 				'accountRecordType' => caso.Account?.RecordType.DeveloperName,
 				'accountDoc' => caso.Account?.CC_Numero_Documento__c,
 				// 'accountNumperso' => !String.isEmpty(caso.Account?.AV_NumPerso__c) ? caso.Account?.AV_NumPerso__c : caso.Account?.CC_NumPerso__c,
-				'accountNumperso' => numper, 
+				'accountNumperso' => numper,
 				// 'contactNumperso' => !String.isEmpty(caso.Contact?.CIBE_NumPerso__c) ? caso.Contact?.CIBE_NumPerso__c : !String.isEmpty(caso.Contact?.AV_NumPerso__c) ? caso.Contact?.AV_NumPerso__c : caso.Contact?.CC_NumPerso__c,
 				'contactNumperso' => numper,
                 'contactRecordType' => caso.Contact?.RecordType.DeveloperName,
@@ -137,11 +146,11 @@ public with sharing class CC_WS_Autenticacion {
 				'casoId' => caso.Id,
 				'casoUso' => caso.CC_MCC_Motivo__c,
 				'app' => 'CBCCSF',
-				'segmento'=> caso.Account?.AV_Segmento__c				
+				'segmento'=> caso.Account?.AV_Segmento__c
 			};
 
 		} else if (tipoObjeto == 'Opportunity') {
-			oportunidad = [SELECT Id, Account.RecordType.DeveloperName, Account.CC_NumPerso__c, Account.CC_Numero_Documento__c, 
+			oportunidad = [SELECT Id, Account.RecordType.DeveloperName, Account.CC_NumPerso__c, Account.CC_Numero_Documento__c,
 							CSBD_Contact__r.CC_NumPerso__c, CSBD_Contact__r.CC_Numero_Documento__c, CSBD_Contact__r.RecordType.DeveloperName,
 							CSBD_CasoOrigen__r.CC_Representante__r.RecordType.DeveloperName,
 							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
@@ -154,7 +163,7 @@ public with sharing class CC_WS_Autenticacion {
 				'accountNumperso' => oportunidad.Account?.CC_NumPerso__c,
 				'contactNumperso' => oportunidad.Account?.CC_NumPerso__c,
 				'contactDoc' => oportunidad.CSBD_Contact__r?.CC_Numero_Documento__c,
-				'contactRecordType' => oportunidad.CSBD_Contact__r.RecordType.DeveloperName, 
+				'contactRecordType' => oportunidad.CSBD_Contact__r.RecordType.DeveloperName,
 				'representanteRecordType' => oportunidad?.CSBD_CasoOrigen__r.CC_Representante__r?.RecordType.DeveloperName,
 				'representanteNumperso' => oportunidad.CSBD_CasoOrigen__r?.CC_Representante__r?.CC_Representante__r?.CC_NumPerso__c,
 				'representanteDocumento' => oportunidad.CSBD_CasoOrigen__r?.CC_Representante__r?.CC_Representante__r?.CC_Numero_Documento__c,
@@ -163,16 +172,18 @@ public with sharing class CC_WS_Autenticacion {
 				'casoId' => oportunidad.Id,
 				'casoUso' => '',
 				'app' => 'CSBD',
-				'segmento'=> ''	
+				'segmento'=> ''
 			};
 		}
 
 		//operationKey y ticketvalue
-		CC_Settings__c configuracion = [SELECT CC_Configuracion_1__c, CC_Configuracion_2__c, CC_Configuracion_3__c, CC_Configuracion_4__c
+		CC_Settings__c configuracion = [SELECT CC_Configuracion_1__c, CC_Configuracion_2__c, CC_Configuracion_3__c, CC_Configuracion_4__c, CC_Configuracion_6__c
 										FROM CC_Settings__c WHERE Name = 'CC_Integracion_ClienteDigital' LIMIT 1];
 		String operationKey;
 		String ticketvalue;
-		if ([SELECT CC_Tipo_Llamada__c FROM CC_Comunicaciones__c WHERE Id = :autenticacionId]?.CC_Tipo_Llamada__c == 'Saliente') {
+		if (tipoAutenticacion == 'Nivel2') {
+			datos.put('operationKey', configuracion.CC_Configuracion_6__c);
+		} else if ([SELECT CC_Tipo_Llamada__c FROM CC_Comunicaciones__c WHERE Id = :autenticacionId]?.CC_Tipo_Llamada__c == 'Saliente') {
 			datos.put('operationKey', configuracion.CC_Configuracion_2__c);
 			datos.put('ticketvalue', configuracion.CC_Configuracion_4__c);
 		} else { //Entrante
@@ -253,7 +264,7 @@ public with sharing class CC_WS_Autenticacion {
 
 			HttpResponse responseConsulta = CBK_HttpServiceIntegration.callHttpService(request, idAutenticacion, 'CC_Autenticacion_Robusta_Estado');
 			responseConsulta.setStatusCode(200);//DPK comentar
-			String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"REJECTED"}';
+			String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"APPROVED"}';
 			responseConsulta.setBody(body);//DPK comentar
 
 			if (tipoObjeto == 'Case') {
@@ -326,7 +337,7 @@ public with sharing class CC_WS_Autenticacion {
 		return new Map<String, Map<String, String>>{
 			'PENDING' => new Map<String, String>{'CC_Estado__c' => 'Pendiente', 'CC_Detalle__c' => 'La autorización está pendiente (pendiente cliente)'},
 			'INPROGRESS' => new Map<String, String>{'CC_Estado__c'=>'En progreso', 'CC_Detalle__c'=>'La autorización está en progreso (pendiente cliente)'},
-			'REJECTED' => new Map<String, String>{'CC_Estado__c'=>'Rechazado', 'CC_Detalle__c'=>'La autorización ha sido rechazada por el cliente (se permite 1 intento más)'},
+			'REJECTED' => new Map<String, String>{'CC_Estado__c'=>'Rechazado', 'CC_Detalle__c'=>'La autorización ha sido rechazada por el cliente'},
 			'EXPIRED' => new Map<String, String>{'CC_Estado__c'=>'Expirado', 'CC_Detalle__c'=>'La autorización ha expirado (se permite un nuevo intento)'},
 			'ERROR' => new Map<String, String>{'CC_Estado__c'=>'Error', 'CC_Detalle__c'=>'La autorización ha sufrido un error en el proceso (se permite un nuevo intento)'},
 			'APPROVED' => new Map<String, String>{'CC_Estado__c'=>'Aprobado', 'CC_Detalle__c'=>'La autorización ha sido aprobada por el cliente'},

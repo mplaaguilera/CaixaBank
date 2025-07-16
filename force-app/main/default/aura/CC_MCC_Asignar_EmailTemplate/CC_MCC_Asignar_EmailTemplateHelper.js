@@ -181,22 +181,5 @@
 			type: 'success'
 		});
 		toastEvent.fire();
-	},
-	//Cargar plantillas S-DOC
-	loadPlantillaSDOC: function(component, event, helper) {
-		let action = component.get('c.buscarPlantillasSDOC');
-		action.setParams({'formato': component.get('v.tipoplantillaFormato'), 'idioma': component.get('v.tipoplantillaLenguaje')});
-		action.setCallback(this, response => {
-			if (response.getState() === 'SUCCESS') {
-				let datos = response.getReturnValue();
-				let options = [];
-				datos.forEach(element => {
-					options.push({value: element.Id, label: element.Name});
-
-				});
-				component.set('v.opcionesNombrePlantilla', options);
-			}
-		});
-		$A.enqueueAction(action);
 	}
 });
