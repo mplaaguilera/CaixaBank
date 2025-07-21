@@ -547,10 +547,11 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 		} else if (clienteBloqueado(recordId, oportunidad.AccountId)) {
 			resultado = 'CLIENTE BLOQUEADO';
 
+		/*
 		} else if ([SELECT Id FROM Task WHERE RecordType.DeveloperName = 'CSBD_Task' AND WhatId = :recordId
 					AND CreatedDate = TODAY AND Status = 'Open' LIMIT 1].isEmpty() && !tienePermisoAutenticacion()) {
 			resultado = 'SIN LLAMADAS';
-
+		*/
 		} else {
 			/*
 			if (oportunidad.CSBD_CasoOrigen__r.CC_Representante__c != null) {

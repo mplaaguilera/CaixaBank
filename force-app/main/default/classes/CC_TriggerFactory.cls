@@ -46,7 +46,7 @@ public with sharing class CC_TriggerFactory {
         if (originalTypeName.contains('__')){
             originalTypeName = originalTypeName.substring(0, originalTypeName.lastIndexOf('__'));
         }
-        //Se elimina el doble _ del Namespace   
+        //Se elimina el doble _ del Namespace
         originalTypeName=originalTypeName.replace('__','_');
 
         if (originalTypeName.toUpperCase().startsWith('CC_')) {
@@ -54,8 +54,38 @@ public with sharing class CC_TriggerFactory {
         }
 
         String sNameCfgTrigger = 'CC_Trigger_' + originalTypeName;
-		System.debug('sNameCfgTrigger: ' + sNameCfgTrigger);
-        return [SELECT CC_Trigger_Activo__c, CBK_Custom_TRDisp_Name__c FROM CC_Trigger_Settings__mdt WHERE DeveloperName = :sNameCfgTrigger];
+
+        //Se buscan los TriggerSettings tanto del objeto a procesar como el general para comprobar si hace falta hacer bypass
+        Boolean bBypass = false;
+        CC_Trigger_Settings__mdt oTriggerSettingNoGlobal;
+        List<CC_Trigger_Settings__mdt> listTriggerSettings = [SELECT DeveloperName, CC_Trigger_Activo__c, CBK_Custom_TRDisp_Name__c,
+                                                              CBK_Bypass__c, CBK_BypassPermissionsList__c, CBK_ExecutionPermissionsList__c, CBK_PermissionOrder__c, CBK_PermissionPriority__c
+                                                              FROM CC_Trigger_Settings__mdt
+                                                              WHERE (DeveloperName = :sNameCfgTrigger OR DeveloperName = 'GlobalTriggerSettings')];
+        if(!listTriggerSettings.isEmpty()){
+            for(CC_Trigger_Settings__mdt oTriggerSetting : listTriggerSettings){
+                //Se extrae el que no es 'GlobalTriggerSettings' para validarlo siempre al final
+                if(oTriggerSetting.DeveloperName != 'GlobalTriggerSettings'){
+                    oTriggerSettingNoGlobal = oTriggerSetting;
+                }
+
+                //Se comprueba si en el 'GlobalTriggerSettings' se debe hacer bypass o no, y se quita de la lista
+                else{
+                    bBypass = checkBypass(oTriggerSetting);
+                }
+            }
+        }
+
+        //En el caso de no haber encontrado bypass en 'GlobalTriggerSettings', se mira si se debe hacer bypass según el TriggerSettings específico del Trigger
+        if(!bBypass){
+            bBypass = checkBypass(oTriggerSettingNoGlobal);
+        }
+
+        if(bBypass){
+            return new List<CC_Trigger_Settings__mdt>();
+        }else{
+            return new List<CC_Trigger_Settings__mdt>{oTriggerSettingNoGlobal};
+        }
     }
 
     //Ejecución del dispatcher, pasando
@@ -97,5 +127,64 @@ public with sharing class CC_TriggerFactory {
         }
         //Función de Housekeeping
         dispatcher.andFinally();
+    }
+
+    //Función para comprobar si se debe hacer bypass o no dependiendo de los valores informados en un TriggerSetting
+    public static Boolean checkBypass(CC_Trigger_Settings__mdt oTriggerSetting){
+        //Boolean para guardar el valor de las validaciones
+        Boolean bBypass = false;
+
+        //Se comprueba si tiene el bypass activo
+        if(oTriggerSetting != null && oTriggerSetting.CBK_Bypass__c){
+            //Se inicializa el Boolean como true en el caso de que esté activo el Bypass
+            bBypass = true;
+
+            //Se comprueba qué debe comprobarse último, en el caso de tener los dos informados
+            //En el caso de ser 'Bypass', se comprueba primero 'Execution' y después 'Bypass'
+            if(oTriggerSetting != null && oTriggerSetting.CBK_PermissionPriority__c == 'Bypass'){
+                //Se comprueba si tiene alguno de los Custom Permissions informados en ExecutionPermissions
+                //En el caso de encontrar una coincidencia en ExecutionPermissions, se informa que no debe hacerse bypass
+                if(String.isNotBlank(oTriggerSetting.CBK_ExecutionPermissionsList__c) && checkPermissionInBypassExecution(oTriggerSetting.CBK_ExecutionPermissionsList__c)){
+                    bBypass = false;
+                }
+
+                //Se comprueba si tiene alguno de los Custom Permissions informados en BypassPermissions
+                //En el caso de NO encontrar una coincidencia en BypassPermissions, se informa que no debe hacerse bypass
+                if(String.isNotBlank(oTriggerSetting.CBK_BypassPermissionsList__c) && !checkPermissionInBypassExecution(oTriggerSetting.CBK_BypassPermissionsList__c)){
+                    bBypass = false;
+                }
+            }
+
+            //En el caso de ser 'Execution' o no tener preferencia informada, se comprueba primero 'Bypass' y después 'Execution'
+            else{
+                //Se comprueba si tiene alguno de los Custom Permissions informados en BypassPermissions
+                //En el caso de NO encontrar una coincidencia en BypassPermissions, se informa que no debe hacerse bypass
+                if(String.isNotBlank(oTriggerSetting.CBK_BypassPermissionsList__c) && !checkPermissionInBypassExecution(oTriggerSetting.CBK_BypassPermissionsList__c)){
+                    bBypass = false;
+                }
+
+                //Se comprueba si tiene alguno de los Custom Permissions informados en ExecutionPermissions
+                //En el caso de encontrar una coincidencia en ExecutionPermissions, se informa que no debe hacerse bypass
+                if(String.isNotBlank(oTriggerSetting.CBK_ExecutionPermissionsList__c) && checkPermissionInBypassExecution(oTriggerSetting.CBK_ExecutionPermissionsList__c)){
+                    bBypass = false;
+                }
+            }
+      }
+
+        //Retorno
+        return bBypass;
+    }
+
+    //Función para comprobar si el usuario tiene un Permission en concreto en una lista de Permissions separada por ';'
+    private static Boolean checkPermissionInBypassExecution(String sPermissions){
+        //En el caso de encontrar una coincidencia, se devuelve true
+        //En el caso de tener ninguno de los CustomPermissions informados, se devuelve false
+        for(String sCustomPermission : sPermissions.split(';')){
+            if(FeatureManagement.checkPermission(sCustomPermission)){
+                return true;
+            }
+        }
+
+        return false;
     }
 }

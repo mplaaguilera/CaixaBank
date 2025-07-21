@@ -13,7 +13,7 @@ public with sharing class CC_Opportunity_AU_TRHan extends CC_TriggerHandlerBase 
             actualizarPropietarioOportunidadesHijas(listNewObj, mapOldObj);
             cerrarOportunidadesHijas(listNewObj, mapOldObj);
             sincronizarAccountHijas(listNewObj, mapOldObj);
-            
+
             if (!CSBD_Bypass_Trigger.isBypassed('CC_Opportunity_AU_TRHan')) {
                 crearActividadesIdentificarCliente(listNewObj, mapOldObj);
             }
@@ -25,13 +25,10 @@ public with sharing class CC_Opportunity_AU_TRHan extends CC_TriggerHandlerBase 
             if (!CSBD_Bypass_Trigger.isBypassed('CC_Opportunity_AU_TRHan_Omnichannel')) {
                 //No se crea cuando actualiza omnichannel, creamos una desde CSBD_Opportunity.actualizarPropietarioOportunidadOmnichannel()
                 crearActividadesReasignacion(listNewObj, mapOldObj);
-                System.debug('listNewObj --> ' + listNewObj);
-                System.debug('mapOldObj --> ' + mapOldObj);
                 desactivarGestorOportunidadCambioPropietarioManual(listNewObj, mapOldObj);
             }
         }
     }
-
     private static void desactivarGestorOportunidadCambioPropietarioManual(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
         Set<Id> oportunidadesIds = new Set<Id>();
         for (Opportunity oportunidad: listNewObj) {
@@ -212,7 +209,7 @@ public with sharing class CC_Opportunity_AU_TRHan extends CC_TriggerHandlerBase 
     private static void crearActividadesIdentificarCliente(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
         List<Opportunity> oportunidades = new List<Opportunity>();
         for (Opportunity newOportunidad : listNewObj) {
-            if (newOportunidad.CSBD_Contact__c != mapOldObj.get(newOportunidad.Id).CSBD_Contact__c 
+            if (newOportunidad.CSBD_Contact__c != mapOldObj.get(newOportunidad.Id).CSBD_Contact__c
                 && newOportunidad.CSBD_Contact__c != null) {
 
                 oportunidades.add(newOportunidad);

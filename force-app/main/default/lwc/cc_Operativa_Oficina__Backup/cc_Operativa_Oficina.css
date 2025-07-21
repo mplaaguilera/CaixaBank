@@ -1,0 +1,40 @@
+lightning-button, lightning-combobox {
+	--slds-g-color-border-base-4: rgb(201, 201, 201);
+    --slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}
+
+lightning-input {
+    --slds-c-input-color-border: rgb(201, 201, 201);
+}
+
+lightning-textarea {
+    --slds-c-textarea-color-border: rgb(201, 201, 201);
+}
+
+div.slds-dropdown {
+    border-color: rgb(201, 201, 201);
+}
+
+.radioGroup {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid rgb(201, 201, 201);
+    border-radius: 5px;
+    background-color: #f9f9f9;
+
+}
+
+.slds-radio label {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.slds-form-element[data-field="country"] {
+    display: none;
+}
+
+.oculto {
+    display: none !important;
+}

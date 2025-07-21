@@ -13,8 +13,7 @@ deploy-options.json
 .git/
 .husky/
 .DS_Store
-
-
+tmp/
 # LWC VSCode autocomplete
 **/lwc/jsconfig.json
 
@@ -53,3 +52,4 @@ $RECYCLE.BIN/
 
 # Sarif files
 *.sarif
+.pmdCache

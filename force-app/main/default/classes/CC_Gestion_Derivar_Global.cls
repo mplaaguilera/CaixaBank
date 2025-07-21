@@ -2,6 +2,7 @@ public with sharing class CC_Gestion_Derivar_Global {
     public static Case obtenerCaso(Id recordId) {
         return [ 
             SELECT 
+                Origin,
                 AssetId, 
                 OwnerId,
                 ContactId,             
@@ -15,6 +16,16 @@ public with sharing class CC_Gestion_Derivar_Global {
                 CC_Resolucion__c, 
                 CC_DevolucionCSBD__c, 
                 SAC_EnvioParcial__c,
+                CC_Canal_Procedencia__c,
+                CC_En_Segundo_Nivel__c,
+                CC_En_Tercer_Nivel__c,
+                ParentId,
+                Subject,
+                CC_Idioma__c,
+                Description,
+                AccountId,
+                CreatedDate,
+                RecordTypeId,
                 //MOTIVO
                 CC_MCC_Motivo__c, 
                 CC_MCC_Motivo__r.CC_Alerta_Caixa__c,
@@ -60,6 +71,7 @@ public with sharing class CC_Gestion_Derivar_Global {
                 Contact.CIBE_NumPerso__c,
                 Contact.AV_NumPerso__c,
                 Contact.CC_NumPerso__c,
+                Contact.AccountId,
                 //REPRESENTANTE
                 CC_Representante__c,
                 CC_Representante__r.CC_Representante__c,
@@ -76,6 +88,8 @@ public with sharing class CC_Gestion_Derivar_Global {
                 CBK_Case_Extension_Id__r.CC_MotivoCierreONB__c,
                 CBK_Case_Extension_Id__r.CC_SubestadoONB__c,
                 CBK_Case_Extension_Id__r.CC_NumSR__c,
+                CBK_Case_Extension_Id__r.CC_CodigoONB__c,
+                CBK_Case_Extension_Id__r.CC_DerivadoBPO__c,
                 CBK_Case_Extension_Id__r.CC_MecanismoFirma__c,
                 //CASO RELACIONADO
                 CC_CasoRelacionado__r.RecordTypeId
@@ -100,9 +114,26 @@ public with sharing class CC_Gestion_Derivar_Global {
 
         if(caso?.Account?.AV_IndicadoresClientes__c != null && caso?.Account?.AV_IndicadoresClientes__c?.contains('28')) {
             imagin = true;
-            ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c;        
+            ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c;
         } else {
-            ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;        
+            ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;
+        }
+
+        if(caso.Account.AV_Confidencial__c && !caso.CC_En_Segundo_Nivel__c && !caso.CC_En_Tercer_Nivel__c){
+            retorno.put('3NClienteConfidencial', CC_Settings__c.getValues('CC_3NClienteConfidencial').CC_Activa__c);
+        }
+
+        CC_Settings__c listaMotivosNoTrasladar =  CC_Settings__c.getValues('CC_OcultarModalTrasladarAmbitos');
+        String jsonString = JSON.serialize(listaMotivosNoTrasladar);
+        Map<String, Object> comoMapa = (Map<String, Object>) JSON.deserializeUntyped(jsonString);
+        for(String campo : comoMapa.keySet()){
+            if(comoMapa.get(campo) == ambitoMotivo) {
+                retorno.put('ocultarModalTrasladar', true);
+                break;
+            }
+        }
+        if(retorno.get('ocultarModalTrasladar') == null){
+            retorno.put('ocultarModalTrasladar', false);
         }
 
         if(otpDerivar == true) {
@@ -123,6 +154,8 @@ public with sharing class CC_Gestion_Derivar_Global {
         //devolucion desde CSBD a CC
         if(caso.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c != null && caso.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__r.CSBD_Resolucion__c == 'Devolución a contact') {
             ambitoMotivo = null;
+            ambitoCSBD = false;
+            ambitoVentas = true;
         }
 
         if(ambitoMotivo == '' || ambitoMotivo == null) {
@@ -134,9 +167,7 @@ public with sharing class CC_Gestion_Derivar_Global {
         }
 
         if(ambitoMotivo == 'Ventas' || ambitoMotivo == 'Oficina') {
-            if(!imagin) {
                  ambitoVentas = true; 
-            }           
         }
 
         if(ambitoMotivo == 'Hub Imagin' || ambitoMotivo == 'Argos Xpays' || ambitoMotivo == 'Argos General') {
@@ -144,7 +175,7 @@ public with sharing class CC_Gestion_Derivar_Global {
         } 
 
         if(ambitoMotivo == 'Oficina física') {
-            if(!caso.Account.CC_EsIntouch__c && !imagin) {
+            if(!caso.Account.CC_EsIntouch__c) {
                 ambitoVentas = true;
             }             
         }
@@ -155,18 +186,21 @@ public with sharing class CC_Gestion_Derivar_Global {
 
         if(ambitoMotivo == 'Documentación') {
             preguntaTrasladarDocumentacion = false;
-            if(caso.CC_DevolucionCSBD__c && !caso.CBK_Case_Extension_Id__r.CC_Documentacion__c) {
-                ambitoVentas = true;
-            } else {
-                if(!imagin && textosMap.get('Documentacion certificado caixa') != 'CSBD' && !caso.CBK_Case_Extension_Id__r.CC_Documentacion__c) {  
-                    ambitoVentas = true;                  
+            if(caso.Origin == 'Phone'){
+                if(caso.CC_DevolucionCSBD__c && !caso.CBK_Case_Extension_Id__r.CC_Documentacion__c) {
+                    ambitoVentas = true;
+                } else {
+                    if(textosMap.get('Documentacion certificado caixa') != 'CSBD' && !caso.CBK_Case_Extension_Id__r.CC_Documentacion__c) {  
+                        ambitoVentas = true;                 
+                    } 
                 } 
+            }else{
+                ambitoVentas = true;
             }
         }
         
         if(caso.CC_MCC_Solucion__r.CC_AmbitoTareas__c == 'Fraude' && otpDerivar == null) {
             ambitoFraude = true;
-            ambitoVentas = true;
         } 
         if(ambitoMotivo == 'Bizum Fraude'){
             ambitoFraude = true;
@@ -322,10 +356,41 @@ public with sharing class CC_Gestion_Derivar_Global {
         retorno.put('textoTestamentariaDocumentacion', textosMap.get('Texto testamentaria documentacion'));
     }
 
+    //Accionistas
+    public static void rellenarDatosAmbitoAccionistas(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
+        retorno.put('mensajeDerivarAccionistas', textosMap.get('Mensaje derivar accionistas'));
+        if(!caso.Account.AV_Cliente__c){
+            rellenarDatosNoCliente(retorno, textosMap);
+        } else {
+            retorno.put('ambitoVentas', true);
+        }
+    }
+    //Accionistas
+
     public static void rellenarDatosNoCliente(Map<String, Object> retorno, Map<String, Object> textosMap){
         retorno.put('toastNoCliente', textosMap.get('Mensaje derivar no clientes'));
         retorno.put('cambioOficina', true);
         retorno.put('mostrarModalCreacionTarea', true);
+    }
+
+    public static void rellenarDatosClienteConfidencial(Map<String, Object> retorno, Map<String, Object> textosMap, Case caso, String gestorGenericoName, CC_Settings__c consultarGestorPool){
+        if(retorno.get('3NClienteConfidencial') == true){
+            retorno.put('toastTrasladar3N', textosMap.get('Toast traslado 3N confidencial'));
+        } else if (retorno.get('3NClienteConfidencial') == false) {
+            if(caso.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c != null && caso.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__r.CSBD_Resolucion__c == 'Devolución a contact') {
+                retorno.put('ambitoMotivo', null);
+                retorno.put('ambitoCSBD', false);
+                retorno.put('ambitoVentas', true);
+                rellenarDatosAmbitoVentas(caso, retorno, gestorGenericoName, consultarGestorPool, textosMap);
+            } else {
+            retorno.put('ambitoCSBD', true);
+            retorno.put('oportunidadCreada', caso.CC_Oportunidad_Creada__c);
+            retorno.put('toastCSBDNoContratar', textosMap.get('Toast CSBD No Contratar cliente confidencial'));
+            retorno.put('textoOportunidadExistente', textosMap.get('Texto Oportunidad Existente'));
+            retorno.put('textoMotivoCSBDNoContratar', textosMap.get('Texto motivo CSBD No Contratar cliente confidencial'));
+            retorno.put('CSBDConfidencial', true);
+        }
+    }
     }
 
     public static void rellenarDatosHubImagin(Map<String, Object> retorno, Map<String, Object> textosMap){
@@ -342,7 +407,7 @@ public with sharing class CC_Gestion_Derivar_Global {
 
     public static void rellenarDatosDocumentacion(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
         Boolean imagin = (Boolean) retorno.get('imagin');
-        if(caso.CC_DevolucionCSBD__c) { // Este campo ahora indica el flag de documentación
+        if(caso.CC_DevolucionCSBD__c || caso.Origin != 'Phone') { // Este campo ahora indica el flag de documentación
             retorno.put('preguntaInformacionCompletaDocumentacion', textosMap.get('Pregunta información completa documentación'));                     
         } else {
             if (caso.CBK_Case_Extension_Id__r.CC_Documentacion__c) {
@@ -353,18 +418,19 @@ public with sharing class CC_Gestion_Derivar_Global {
                 retorno.put('documentacionDecisionCaixa', textosMap.get('Documentacion certificado caixa'));
                 retorno.put('toastDocumentacionCasoCreado', textosMap.get('Toast documentación caso creado'));
                 retorno.put('modalDocumentacionCasoCreado', textosMap.get('Modal documentación caso creado'));
-            retorno.put('preguntaInformacionRequeridaDocumentacion', textosMap.get('Pregunta información requerida documentación'));
-            if(!imagin) {
-                if(textosMap.get('Documentacion certificado caixa') == 'CSBD') {     
-                    retorno.put('oportunidadCreada', caso.CC_Oportunidad_creada__c);
-                    // retorno.put('toastCSBDNoContratar', textosMap.get('Toast CSBD No Contratar'));
-                    retorno.put('textoOportunidadExistente', textosMap.get('Texto Oportunidad Existente'));
+                retorno.put('preguntaInformacionRequeridaDocumentacion', textosMap.get('Pregunta información requerida documentación'));
+                if(!imagin) {
+                    if(textosMap.get('Documentacion certificado caixa') == 'CSBD') {     
+                        retorno.put('oportunidadCreada', caso.CC_Oportunidad_creada__c);
+                        retorno.put('toastCSBDNoContratar', textosMap.get('Toast CSBD No Contratar'));
+                        retorno.put('textoOportunidadExistente', textosMap.get('Texto Oportunidad Existente'));
+                        retorno.put('textoMotivoCSBDNoContratar', textosMap.get('Texto motivo CSBD No Contratar'));
+                    }
+                } else {
+                    retorno.put('hubGestion', true);
                 }
-            } else {
-                retorno.put('hubGestion', true);
             }
         }
-    }
     }
     public static void rellenarDatosAmbitoCSBD(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
         Boolean ambitoVentas = (Boolean) retorno.get('ambitoVentas');
@@ -372,9 +438,18 @@ public with sharing class CC_Gestion_Derivar_Global {
         Boolean ambitoCSBD = (Boolean) retorno.get('ambitoCSBD');
         Boolean imagin = (Boolean) retorno.get('imagin');
         if(caso.Account.AV_OficinaPrincipal__r.Parent.CC_Derivacion_CSBD__c) {
-            String numPerso = CC_OTP.recuperarNumperso(caso);
-            String clienteDigital = CC_WS_Autenticacion_SAU.ccWsEnvioAutenticacion(imagin, numPerso, false);
+            String numPerso = CC_OTP.recuperarNumperso(caso);          
+            Map<String, String> retornoAutenticacionSAU = CC_WS_Autenticacion_SAU.ccWsEnvioAutenticacion(imagin, numPerso,false, caso);//MBO
+            String clienteDigital = retornoAutenticacionSAU.get('resultado');
+            retorno.put('reqAutenticacionSAU', retornoAutenticacionSAU.get('allReq'));
+            retorno.put('resAutenticacionSAU', retornoAutenticacionSAU.get('allRes'));
+            retorno.put('nombreTraza', retornoAutenticacionSAU.get('nombreTraza'));
+            retorno.put('autenticacionSAU', true);
             if(clienteDigital == 'exist_contract' && caso.Account.CC_Tipo_Persona__c == 'F') {
+                if(caso.CC_OTP_Nivel__c != null && caso.CC_Status_Autorizacion__c != 'APPROVED' && caso.CC_OTP_Valido__c == false) {
+                    ambitoCSBD = false;
+                    ambitoVentas = true;
+                } else {
                 Boolean telefonoCSBD = CC_MetodosUtiles.getCustomSetting('CC_TelefonoActivoCSBD').CC_Configuracion_1__c == 'true' ? true : false;
                 String preguntaTelefonoCSBD = textosMap.get('Pregunta Telefono CSBD').toString();
                 if(telefonoCSBD) {
@@ -382,9 +457,6 @@ public with sharing class CC_Gestion_Derivar_Global {
                     retorno.put('preguntaTelefonoCSBD', preguntaTelefonoCSBD);
                     retorno.put('preguntaTelefonoCSBDNoEncontrado', textosMap.get('Pregunta Telefono CSBD No Encontrado'));
                 }
-                if(caso.CC_OTP_Nivel__c != null && caso.CC_Status_Autorizacion__c != 'APPROVED' && caso.CC_OTP_Valido__c == false) {
-                    ambitoVentas = true;
-                } else {
                     if(ambitoMotivo == 'CSBD 3N') {
                         retorno.put('toastTrasladar3N', textosMap.get('Toast trasladar 3N'));
                     } else if(ambitoMotivo == 'CSBD No Contratar') {
@@ -419,7 +491,8 @@ public with sharing class CC_Gestion_Derivar_Global {
         Boolean ambitoCSBD = (Boolean) retorno.get('ambitoCSBD');
         Boolean imagin = (Boolean) retorno.get('imagin');
         if(
-            !imagin || 
+            ambitoMotivo == 'Ventas' ||
+			ambitoMotivo == 'Oficina física' ||
             ambitoMotivo == 'CSBD Contratar' ||
             ambitoMotivo == 'CSBD 3N' ||
             ambitoMotivo == 'CSBD No Contratar' ||  
@@ -428,8 +501,10 @@ public with sharing class CC_Gestion_Derivar_Global {
             ambitoMotivo == 'Argos General' ||
             ambitoMotivo == 'Argos Xpays' ||
             ambitoMotivo == 'Mecanismo de firma' ||
-            (ambitoMotivo == 'Oficina' && !imagin) || 
-            (imagin && (ambitoMotivo == '' || ambitoMotivo == null || ambitoCSBD))
+            ambitoMotivo == 'Onboarding' ||
+            (ambitoMotivo == 'Accionistas' && caso.Account.AV_Cliente__c) ||
+            (ambitoMotivo == 'Oficina') || 
+            ((ambitoMotivo == '' || ambitoMotivo == null || ambitoCSBD))
         ) {
             if(Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c)) {
                 if(caso.Account.AV_EAPGestor__c != null && caso.Account.AV_EAPGestor__r.AV_Pool__c) {
@@ -485,21 +560,49 @@ public with sharing class CC_Gestion_Derivar_Global {
         retorno.put('preguntaRealizarRemitido', textosMap.get('Pregunta realizar remitido'));
         retorno.put('toastTrasladarDesdeDerivar', textosMap.get('Toast trasladar desde guardar'));
         retorno.put('toastRemitirDesdeDerivar', textosMap.get('Toast remitir desde guardar'));
+        retorno.put('mensajeSinDisponibilidadGestor', textosMap.get('Mensaje sin disponibilidad gestor'));
     }   
 
-    public static void rellenarDatosOnboarding(Case caso, Map<String, Object> retorno){
-        retorno.put('ambitoOnboarding', true);
-        retorno.put('casoAutenticado', caso.CC_Status_Autorizacion__c == 'APPROVED');
-        retorno.put('empresaONB', caso.CBK_Case_Extension_Id__r.CC_EmpresaONB__c);
-        retorno.put('estadoONB', caso.CBK_Case_Extension_Id__r.CC_EstadoONB__c);
-        retorno.put('fechaEstadoONB', caso.CBK_Case_Extension_Id__r.CC_FechaEstadoONB__c);
-        retorno.put('motivoCierreONB', caso.CBK_Case_Extension_Id__r.CC_MotivoCierreONB__c);
-        retorno.put('subestadoONB', caso.CBK_Case_Extension_Id__r.CC_SubestadoONB__c);
-        retorno.put('numSR', caso.CBK_Case_Extension_Id__r.CC_NumSR__c);
+    public static void rellenarDatosOnboarding(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
+        String ambitoMotivo = (String) retorno.get('ambitoMotivo');
+        if (caso.CC_Status_Autorizacion__c == 'APPROVED') {
+            if (caso.CBK_Case_Extension_Id__r.CC_EmpresaONB__c == null && caso.CBK_Case_Extension_Id__r.CC_EstadoONB__c == null && caso.CBK_Case_Extension_Id__r.CC_FechaEstadoONB__c == null && caso.CBK_Case_Extension_Id__r.CC_MotivoCierreONB__c == null && caso.CBK_Case_Extension_Id__r.CC_SubestadoONB__c == null && caso.CBK_Case_Extension_Id__r.CC_NumSR__c == null) {
+                retorno.put('ambitoVentas', true);
+            } else {
+                
+                //Textos
+        if (caso.CBK_Case_Extension_Id__r.CC_DerivadoBPO__c) {
+            retorno.put('derivadoBPO', textosMap.get('Texto modal Onboarding ya derivado'));
+        } else {
+            String settingCodigos = CC_Settings__c.getValues('CC_CodigosOnboarding')?.CC_Configuracion_2__c;
+            List<String> codigos = settingCodigos.split(';');
+                    if (ambitoMotivo == 'Onboarding') {
+                        if (codigos.contains(caso.CBK_Case_Extension_Id__r.CC_CodigoONB__c)) {
+                retorno.put('textoModalOnboarding', textosMap.get('Texto modal Onboarding'));
+                        } else {
+                            // Campos a mostrar en el modal de Onboarding
+                            retorno.put('empresaONB', caso.CBK_Case_Extension_Id__r.CC_EmpresaONB__c);
+                            retorno.put('estadoONB', caso.CBK_Case_Extension_Id__r.CC_EstadoONB__c);
+                            retorno.put('subestadoONB', caso.CBK_Case_Extension_Id__r.CC_SubestadoONB__c);
+                            retorno.put('fechaEstadoONB', caso.CBK_Case_Extension_Id__r.CC_FechaEstadoONB__c);
+                            retorno.put('motivoCierreONB', caso.CBK_Case_Extension_Id__r.CC_MotivoCierreONB__c);
+                            retorno.put('numSR', caso.CBK_Case_Extension_Id__r.CC_NumSR__c);
+
+                            retorno.put('textoModalOnboardingCodigos', textosMap.get('Texto modal Onboarding respuesta codigos'));
+                        }
+            } else if (ambitoMotivo == 'Desistir') {
+                retorno.put('textoModalOnboarding', textosMap.get('Texto modal Desistir'));
+            }
+            retorno.put('textoCorreoEnviado', textosMap.get('Texto modal correo enviado'));
+        }
+            }
+        } else {
+            retorno.put('ambitoVentas', true);
+        }
     }
 
     public static Boolean casoFraudeRechazado(Case caso){
-        List<Task> tareaFraude = [SELECT Id, Subject FROM Task WHERE WhatId = :caso.Id AND Type = 'Fraude' AND Status = 'Rechazada' LIMIT 1];
+        List<Task> tareaFraude = [SELECT Id, Subject FROM Task WHERE WhatId = :caso.Id AND Type = 'Caso Rechazado en Fraude' LIMIT 1];
         return !tareaFraude.isEmpty();
     }
 
@@ -523,6 +626,7 @@ public with sharing class CC_Gestion_Derivar_Global {
         CC_Settings__c configuracion = CC_Settings__c.getValues('CC_GruposColaboradoresFraude');
         retorno.put('cyberfraude', configuracion.CC_Configuracion_3__c);
         retorno.put('cybersoc', configuracion.CC_Configuracion_4__c);
+        //retorno.put('preguntaIdBancaDigital', textosMap.get('Pregunta Identificador Banca Digital'));
     }
 
     @AuraEnabled
@@ -556,7 +660,14 @@ public with sharing class CC_Gestion_Derivar_Global {
     }
     //MGT
     public static void rellenarDatosMecanismoFirma(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
-        if(!caso.CBK_Case_Extension_Id__r.CC_MecanismoFirma__c){
+        //Obtener el custom setting con los circuitos
+		CC_Settings__c configuracion = CC_Settings__c.getValues('CC_MecanismoFirmaCircuitos');
+		String circuitoExtranjero = configuracion.CC_Configuracion_1__c;
+		String circuitoCodigoFirma = configuracion.CC_Configuracion_2__c;
+
+        Boolean mecanismoFirma = [SELECT CBK_Case_Extension_Id__r.CC_MecanismoFirma__c FROM Case WHERE Id = :caso.Id LIMIT 1].CBK_Case_Extension_Id__r.CC_MecanismoFirma__c; 
+
+        if(!mecanismoFirma){
             // Obtener el string original de textosMap
             String mecanismoFirmaDatosValores = textosMap.get('Pregunta mecanismo firma datos preguntas').toString();
             
@@ -571,12 +682,12 @@ public with sharing class CC_Gestion_Derivar_Global {
             retorno.put('toastMecanismoFirmaArgosCorrecto', textosMap.get('Toast  mecanismo firma argos correcto'));
             retorno.put('toastMecanismoFirmaDatosIncompletos', textosMap.get('Toast mecanismo firma datos incompletos'));
             retorno.put('toastMecanismoFirmaCasoCreado', textosMap.get('Toast mecanismo firma caso creado'));
+            retorno.put('ambitoVentas', true);
 
         }else{
             //Obtener el custom setting con los circuitos
-            CC_Settings__c configuracion = CC_Settings__c.getValues('CC_MecanismoFirmaCircuitos');
-            retorno.put('circuitoExtranjero', configuracion.CC_Configuracion_1__c);
-            retorno.put('circuitoCodigoFirma', configuracion.CC_Configuracion_2__c);
+            retorno.put('circuitoExtranjero', circuitoExtranjero);
+            retorno.put('circuitoCodigoFirma', circuitoCodigoFirma);
 
             CC_Settings__c configuracion2 = CC_Settings__c.getValues('CC_GruposColaboradoresMecanismoFirma');
             retorno.put('cybersocMF', configuracion2.CC_Configuracion_1__c);
@@ -585,4 +696,136 @@ public with sharing class CC_Gestion_Derivar_Global {
             retorno.put('toastMecanismoFirmaAsuntoEnvioCodigo', textosMap.get('Toast mecanismo firma asunto envio codigo'));
         }
     }
+    
+    public static void rellenarDatosOficinaSinTarea(Map<String, Object> retorno, Map<String, Object> textosMap){
+        retorno.put('mensajeOficinaSinTarea', textosMap.get('Mensaje oficina sin tarea'));
+        //retorno.put('mostrarModalToast', true);
+    }
+
+    // //Amenazas
+    // public static void rellenarDatosAmenazasSuicidios(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
+    //     retorno.put('mensajeSolicitudDatosAmenazasSuicidios', textosMap.get('Mensaje solicitud datos amenazas suicidios'));
+    //     retorno.put('emailSuccess', textosMap.get('Mensaje email enviado OK'));
+    //     retorno.put('nombrePlantilla', textosMap.get('Nombre Plantilla Amenazas Suicidios'));
+    //     retorno.put('grupoCol', CC_Settings__c.getValues('CC_GruposColaboradoresParamDerivar').CC_Configuracion_2__c);
+    //     retorno.put('nameOWA', textosMap.get('OWA activa amenazas'));
+    // }
+    // public static void rellenarDatosAmenazasEmpleados(Map<String, Object> retorno, Map<String, Object> textosMap){
+    //     retorno.put('mensajeSolicitudDatosAmenazasEmpleados', textosMap.get('Mensaje solicitud datos amenazas empleados'));
+    //     retorno.put('cambioOficina', true);
+    //     retorno.put('nombrePlantilla', textosMap.get('Nombre Plantilla Amenazas Empleados'));
+    //     retorno.put('emailSuccess', textosMap.get('Mensaje email enviado OK'));
+    //     retorno.put('grupoCol', CC_Settings__c.getValues('CC_GruposColaboradoresParamDerivar').CC_Configuracion_1__c);
+    //     retorno.put('nameOWA', textosMap.get('OWA activa amenazas'));
+    // }
+    // //Amenazas
+
+    public static void rellenarDatosSAC(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap) {
+        Boolean mostrarDerivarSAC = false;
+        Boolean mostrarDevolverSAC = false;
+        Boolean mostrarCanalProcedenciaErroneo = false;
+        Boolean customSettingDerivarActivo = false;
+        Boolean customSettingDevolverActivo = false;
+
+        //Recorrer Custom Settings para comprobar si esta habilitada la opcion de derivar y devolver al SAC
+        for (CC_DevolverDerivarSAC__c opcion : CC_DevolverDerivarSAC__c.getAll().values()) {
+            if (opcion.Name == 'CC_Derivar') {
+                customSettingDerivarActivo = opcion.CC_Activo__c;
+            } else if (opcion.Name == 'CC_Devolver') {
+                customSettingDevolverActivo = opcion.CC_Activo__c;
+            }
+        }
+
+        if (caso.CC_Canal_Procedencia__c == 'Formulario web' && customSettingDerivarActivo) {
+            //Si canal de procedencia es "Formulario web" se deriva el caso al SAC
+            retorno.put('mensajeDerivarAlSAC', textosMap.get('Derivar al SAC'));
+            retorno.put('mensajeDerivarAlSACSuccess', textosMap.get('Derivar al SAC success'));
+            mostrarDerivarSAC = true;
+        } else if (caso.CC_Canal_Procedencia__c == 'Atención al Cliente' && caso.Origin == 'Email' && customSettingDevolverActivo && caso.ParentId != null && CC_Revincular_Caso_Controller.getParentIdRecordTypeDeveloperName(caso) == 'SAC_Reclamacion') {
+            //Si canal de procedencia es "Atención al cliente" y el canal de entrada es "Email" se debe devolver el caso al SAC
+            retorno.put('mensajeDevolverAlSAC', textosMap.get('Devolver al SAC'));
+            retorno.put('mensajeDevolverAlSACSuccess', textosMap.get('Devolver al SAC success'));
+            mostrarDevolverSAC = true;
+        } else {
+            retorno.put('mensajeCanalProcedenciaErroneo', textosMap.get('Derivar al SAC canal procedencia erroneo'));
+            mostrarCanalProcedenciaErroneo = true;
+        }
+
+        retorno.put('mostrarDerivarSAC', mostrarDerivarSAC);
+        retorno.put('mostrarDevolverSAC', mostrarDevolverSAC);
+        retorno.put('mostrarCanalProcedenciaErroneo', mostrarCanalProcedenciaErroneo);
+    }
+
+
+    //Comunidades de vecinos
+    @AuraEnabled
+    public static void rellenarDatosComunidadesVecinos(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap) {
+        retorno.put('mensajeMostrarModalToast', textosMap.get('Toast comunidades vecinos'));
+        retorno.put('mostrarModalToast', true);
+    }
+
+    /*
+    // Colectivos vulnerables
+    @AuraEnabled
+    public static void rellenarDatosColectivosVulnerables(Map<String, Object> retorno, Map<String, Object> textosMap) {
+        retorno.put('mensajeColectivosVulnerables', textosMap.get('Texto para oficina gestora'));
+        retorno.put('mostrarModalToast', true);
+    }*/
+    
+    public static void rellenarDatosCashBack(Map<String, Object> retorno, Map<String, Object> textosMap){
+        retorno.put('CashBack1', textosMap.get('CashBack 1'));
+        retorno.put('CashBack2', textosMap.get('CashBack descripción ID Cliente'));
+        retorno.put('CashBack3', textosMap.get('CashBack descripción Nombre comercio'));
+        retorno.put('CashBack4', textosMap.get('CashBack descripción Fecha de compra'));
+        retorno.put('CashBack5', textosMap.get('CashBack Descripción de la reclamación'));
+    }
+
+    public static void rellenarDatosRefinanciacionDeudas(Map<String, Object> retorno, Map<String, Object> textosMap){
+        retorno.put('RefinanciacionDeudas1', textosMap.get('Pregunta números de contrato'));
+        retorno.put('RefinanciacionDeudas2', textosMap.get('Texto tarea AV Pool = False'));
+        retorno.put('RefinanciacionDeudas3', textosMap.get('Texto tarea AV Pool = True'));
+        retorno.put('RefinanciacionDeudas4', textosMap.get('Final Operativa'));
+    }
+
+    /*
+    @AuraEnabled
+    public static Boolean recuperarArgos(String recordId) {
+        Boolean restricted = recuperarArgosRestricted(recordId);
+        Boolean denied = recuperarArgosDenied(recordId);
+        Boolean argos = denied || restricted;
+        
+        return argos;
+    }
+
+    @AuraEnabled
+    public static Boolean recuperarArgosRestricted(String recordId){
+        List<CBK_Case_Extension__c> extensiones = [SELECT Id, CC_Risk_Restricted__c FROM CBK_Case_Extension__c WHERE Case_Id__c = :recordId LIMIT 1];
+        Boolean restricted = false;
+
+        if (!extensiones.isEmpty()) {
+            restricted = extensiones[0].CC_Risk_Restricted__c;
+        }
+        
+        return restricted;
+    }
+
+    @AuraEnabled
+    public static Boolean recuperarArgosDenied(String recordId){
+        List<CBK_Case_Extension__c> extensiones = [SELECT Id, CC_Risk_Denied__c FROM CBK_Case_Extension__c WHERE Case_Id__c = :recordId LIMIT 1];
+        Boolean denied = false;
+
+        if (!extensiones.isEmpty()) {
+            denied = extensiones[0].CC_Risk_Denied__c;
+        }
+        
+        return denied;
+    }
+
+    @AuraEnabled
+    public static void actualizarDetallesSolucionArgos(Id recordId, String detallesSolucion) {
+        Case caso = [SELECT Id FROM Case WHERE Id = :recordId LIMIT 1];
+        caso.CC_Detalles_Solucion__c = detallesSolucion;
+        update caso;
+    }*/
+
 }

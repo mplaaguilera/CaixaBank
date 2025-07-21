@@ -5,7 +5,7 @@
 	"description": "Salesforce App",
 	"scripts": {
 		"test": "sf apex run -f scripts/apex/CSBD_RunTestSuite.apex",
-		"tail": "sf apex tail log --debug-level ApexUserDebug --color",
+		"tail": "node ./scripts/js/sf-tail-debug.js",
 		"browser-tools": "concurrently -k -s first -n server,mcp -c blue,green \"npx @agentdeskai/browser-tools-server@latest\" \"wait-on http://localhost:PORT && npx @agentdeskai/browser-tools-mcp@1.2.0\"",
 		"precommit": "echo 'No precommit script defined'"
 	},
@@ -25,7 +25,8 @@
 		"globals": "^16.2.0",
 		"husky": "^8.0.3",
 		"lint-staged": "^15.1.0",
-		"prettier": "3.3.3"
+		"prettier": "2.0.0",
+		"prettier-plugin-apex": "^1.0.0"
 	},
 	"lint-staged": {
 		"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [

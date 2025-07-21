@@ -1,5 +1,0 @@
----
-alwaysApply: true
----
-First, use the tool todo_tool to create a todo list of the tasks you are about to do.
-Then, use the tools of the ibm-salesforce_mcp to accomplish the tasks in the todo list.

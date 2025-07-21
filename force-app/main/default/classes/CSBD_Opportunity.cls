@@ -158,8 +158,12 @@ public inherited sharing class CSBD_Opportunity {
 											CSBD_Alta_omnichannel__c, CSBD_Empresa_Proveedora__c, CSBD_Resolucion__c,
 											CSBD_Contact__c, CSBD_DeliveryInternalName__c, CSBD_CampaignId__c, CSBD_JourneyActionId__c,
 											CSBD_MessageProfileId__c, CSBD_Now_NUMPERSO__c, CSBD_Motivo_MAC__c, Description FROM Opportunity WHERE Id IN :idOportunidades];
+
+		System.debug('oportunidades.size(): ' + oportunidades.size());
+
 		return cerrarOportunidad(oportunidades, nombreEtapaVentas, resolucion, campos);
 	}
+
 
 	public static List<Opportunity> cerrarOportunidad(List<Opportunity> oportunidades, String nombreEtapaVentas, String resolucion) {
 		return cerrarOportunidad(oportunidades, nombreEtapaVentas, resolucion, null);

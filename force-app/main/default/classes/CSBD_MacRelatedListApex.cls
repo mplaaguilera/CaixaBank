@@ -7,9 +7,10 @@ public with sharing class CSBD_MacRelatedListApex {
         }
 
         return [SELECT OwnerId, Owner.Name, CSBD_Identificador__c, CSBD_Producto__c, CreatedDate
-                FROM Opportunity WHERE IsClosed = FALSE //AND RecordType.DeveloperName = 'CSBD_MAC'
+                FROM Opportunity WHERE IsClosed = FALSE AND RecordType.DeveloperName LIKE 'CSBD_%'
                 AND CSBD_Telefono_Solicitud_Normalizado__c = :CSBD_Utils.normalizarNumeroTelefono(telefono)
                 AND CSBD_Now_Origen__c != 'Asistencia Comercial Centralita'
+                AND LastModifiedDate  = LAST_N_DAYS:21
                 ORDER BY CreatedDate DESC LIMIT 14];
     }
 

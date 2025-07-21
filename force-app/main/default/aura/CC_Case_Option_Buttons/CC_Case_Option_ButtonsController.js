@@ -714,7 +714,6 @@
 	},
 
 	prepararCuerpoEmail: function(component, event, helper) {
-		console.log('Preparar cuerpo email');
 		let listPara = [];
 		let listCC = [];
 		let contador = 0; //Utilizado para limitar el numero de copias en traslados y remitidos
@@ -729,9 +728,7 @@
 		const segundaOficinaName = segundaOficina ? segundaOficina.Name : null;
 		const segundaOficinaEmail = segundaOficina ? segundaOficina.CC_Email__c : null;
 		if (component.get('v.idBoton') === 'tab1') {
-			console.log('Preparar cuerpo email desde Trasladar Colaborador');
 			if (oficinaGestoraSeleccionada && oficinaSeleccionada) {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador con oficina gestora y seleccionada');
 				//OficinaGestora del cliente
 				let buscarEmpleadoOfi = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleadoOfi.setParams({
@@ -813,7 +810,6 @@
 				});
 				$A.enqueueAction(buscarEmpleadoOfi);
 			} else if (oficinaSeleccionada && !oficinaGestoraSeleccionada) {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador con oficina seleccionada');
 				//Otra oficina
 				let buscarEmpleadoOfi = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleadoOfi.setParams({
@@ -900,7 +896,6 @@
 
 				$A.enqueueAction(buscarEmpleadoOfi);
 			} else if (empleadoSeleccionado && empleadoGestorSeleccionado) {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador con empleado gestor y seleccionado');
 				let buscarEmpleOfi = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleOfi.setParams({
 					'idOficina': component.get('v.oficinaGestor'),
@@ -1003,7 +998,6 @@
 				});
 				$A.enqueueAction(buscarEmpleOfi);
 			} else if (empleadoSeleccionado && !empleadoGestorSeleccionado) {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador con empleado seleccionado');
 				let buscarEmpleado = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleado.setParams({
 					'idOficina': component.get('v.selectedRecord').Id,
@@ -1089,7 +1083,6 @@
 				});
 				$A.enqueueAction(buscarEmpleado);
 			} else {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador sin empleado ni oficina');
 				let buscarColaborador = component.get('c.buscarColaborador');
 				buscarColaborador.setParams({'idGrupoColaborador': component.get('v.grupoSeleccionadoValue')});
 				buscarColaborador.setCallback(this, responseBuscarColaborador => {
@@ -1108,30 +1101,23 @@
 								listCC.pop();
 							}
 							while (listPara.length) {
-								console.log('listPara1: ' + listPara);
 								listPara.pop();
-								console.log('listPara2: ' + listPara);
 							}
 						} else if (listCC[0] === undefined) {
 							while (listCC.length) {
 								listCC.pop();
 							}
 						} else if (listPara[0] === undefined) {
-							console.log('listPara3: ' + listPara);
 							while (listPara.length) {
 								listPara.pop();
 							}
-							console.log('listPara4: ' + listPara);
 						}
 
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-							console.log('Preparar cuerpo email desde Trasladar Colaborador con tipo registro CC_Cliente');
-							console.log('listPara: ' + JSON.stringify(listPara));
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', component.get('v.grupoSeleccionadoName'), 'Traslado Colaborador');
 
 						}else{
-							console.log('Preparar cuerpo email desde Trasladar Colaborador con tipo registro diferente a CC_Cliente');
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -1155,7 +1141,6 @@
 
 					}
 				});
-				console.log('ListParaFinal '+listPara);
 				$A.enqueueAction(buscarColaborador);
 			}
 		} else if (component.get('v.idBoton') === 'tab2') {
@@ -1532,11 +1517,8 @@
 
 						//Preparar borrador de correo con la plantilla seleccionada
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-							console.log('v.tipoRegistro == CC_Cliente');
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoSeleccionadoName, 'Remitir Colaborador');
-
 						}else{
-							conseole.log('Case.Email_Colaborador');
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -1564,7 +1546,6 @@
 	},
 
 	trasladarColaborador: function(component, event) {
-		console.log('Trasladar Colaborador');
 		let buttonClicked = event.getSource().getLocalId();
 		component.set('v.idBoton', buttonClicked);
 		let plantilla = '';
@@ -1580,7 +1561,6 @@
 					let oficina = responseOficinaAccount.getReturnValue();
 					component.set('v.oficinaAccount', oficina);
 					if (oficinaSeleccionada && (oficinaGestoraSeleccionada || !oficinaGestoraSeleccionada)) {
-						console.log('Preparar cuerpo email desde Trasladar Colaborador con oficina seleccionada');
 						if (!component.get('v.oficinaAccount')) {
 							let toastEvent = $A.get('e.force:showToast');
 							toastEvent.setParams({title: 'Oficina no permitida', message: 'No se puede realizar la operativa con esta oficina.', type: 'error', mode: 'dismissable', duration: '4000'});
@@ -1615,7 +1595,6 @@
 							$A.enqueueAction(actualizarCaso);
 						}
 					} else if (!oficinaSeleccionada) {
-						console.log('Preparar cuerpo email desde Trasladar Colaborador sin oficina seleccionada');
 						if (component.get('v.uncheckedPlantilla')) {
 							plantilla = component.get('v.selectedRecordPlantilla.Id');
 							nombrePlantilla = component.get('v.selectedRecordPlantilla.Name');
@@ -2381,16 +2360,12 @@
 			if(event) {
 				myData = event.getParam('data') || {};
 			}
-			//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			if(myData && myData.responderClienteDerivar != null) {
 				component.set('v.tipoOperativa', 'responderClienteDerivar');
-				//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			} else {
 				component.set('v.tipoOperativa', 'responder');
 			}
-			//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			helper.loadCarpetasIdioma(component, event, helper);
-			//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			if (component.get('v.tipoRegistro') === 'CC_Cliente' && canalRespuesta === 'Carta' && component.get('v.psSdocs')) {
 				$A.util.addClass(component.find('ModalboxPrevioResponderCliente'), 'slds-fade-in-open');
 			} else {
@@ -2588,7 +2563,6 @@
 
 	seleccionarPlantilla: function(component, event) {
 		component.set('v.plantillaEstaSeleccionada', true);
-		//console.log('LOG seleccionar plantilla ' + Date.now());
 		let tipoOperativa = component.get('v.tipoOperativa');
 
 		let plantillaId = event.getParam('value');

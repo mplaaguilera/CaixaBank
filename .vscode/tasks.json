@@ -18,6 +18,12 @@
 			"group": {
 				"kind": "test",
 				"isDefault": true
+			},
+			"presentation": {
+				"showReuseMessage": false,
+				"close": false,
+				"panel": "new",
+				"focus": true
 			}
 		}
 	]

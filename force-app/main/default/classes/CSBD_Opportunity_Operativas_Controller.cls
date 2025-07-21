@@ -5,8 +5,8 @@ public with sharing class CSBD_Opportunity_Operativas_Controller {
 		return new Map<String, Boolean>{
 			'esResponsable' => FeatureManagement.checkPermission('CSBD_Responsable'),
 			'esAdministrador' => ![SELECT Id FROM GroupMember
-									WHERE UserOrGroupId = :UserInfo.getUserId() AND Group.Name = 'CSBD Administrador'
-									LIMIT 1].isEmpty()
+								WHERE UserOrGroupId = :UserInfo.getUserId() AND Group.Name = 'CSBD Administrador'
+								LIMIT 1].isEmpty()
 		};
 	}
 
@@ -392,3 +392,16 @@ public with sharing class CSBD_Opportunity_Operativas_Controller {
 		}
 	}
 }
+// USER_DEBUG indentation behavior: Ensure root method is pushed/popped on stack for indentation
+// In the hypothetical log parser, after printing the root method for |CODE_UNIT_STARTED|, push rootMethod on methodStack
+// When handling |CODE_UNIT_FINISHED|, pop the root method from methodStack
+
+// Example (to be included in the log parser, not in this Apex class):
+// if (line.includes('|CODE_UNIT_STARTED|') ...) {
+//   print(rootMethod);
+//   // Push root method onto stack so debug messages indent correctly
+//   methodStack.push(rootMethod);
+// }
+// if (line.includes('|CODE_UNIT_FINISHED|') ...) {
+//   methodStack.pop();
+// }

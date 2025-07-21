@@ -158,7 +158,13 @@
 		"CaixaBank/.vscode/mcp.json: ibm-salesforce-mcp": {
 			"allowedModels": [
 				"github.copilot-chat/claude-sonnet-4"
-			]
+			],
+			"allowedDuringChat": true
 		}
-	}
+	},
+	"github.copilot.chat.reviewSelection.instructions": [],
+	"github.copilot.chat.codeGeneration.useInstructionFiles": false,
+	"github.copilot.chat.commitMessageGeneration.instructions": [
+
+	]
 }
