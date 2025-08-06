@@ -445,6 +445,36 @@
                 <identifier>RecordCSBD_FeedbackCliente_cField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_Feedback1_Motivo__c</fieldItem>
+                <identifier>RecordCSBD_Feedback1_Motivo_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_FeedBack2_Debido__c</fieldItem>
+                <identifier>RecordCSBD_FeedBack2_Debido_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.CSBD_FeedBack3_MasInformacion__c</fieldItem>
+                <identifier>RecordCSBD_FeedBack3_MasInformacion_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-b63e76b5-21e1-4181-bce8-70c363e4200b</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -725,6 +755,45 @@
                 </componentInstanceProperties>
                 <componentName>force:relatedListQuickLinksContainer</componentName>
                 <identifier>force_relatedListQuickLinksContainer</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>csbd_resumenOppAgentforce</componentName>
+                <identifier>c_csbd_resumenOppAgentforce</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5)) AND 6</booleanFilter>
+                    <criteria>
+                        <leftValue>{!$Permission.CustomPermission.CSBD_UsuarioPromptsIA}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_CumpleCondicionesPrompts__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.IsClosed}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>false</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.IsClosed}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_HaUsadoIA__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!$Permission.StandardPermission.EinsteinCopilotUser}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -1213,7 +1282,7 @@
                 <componentName>csbd_AlertaTelefonia</componentName>
                 <identifier>c_csbd_AlertaTelefonia</identifier>
                 <visibilityRule>
-                    <booleanFilter>1 OR 2</booleanFilter>
+                    <booleanFilter>1 OR 2 OR 3</booleanFilter>
                     <criteria>
                         <leftValue>{!Record.CSBD_Producto_MIFID__c}</leftValue>
                         <operator>EQUAL</operator>
@@ -1223,6 +1292,11 @@
                         <leftValue>{!Record.CSBD_TipoBonificado__c}</leftValue>
                         <operator>NE</operator>
                         <rightValue>0</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_Canal__c}</leftValue>
+                        <operator>CONTAINS</operator>
+                        <rightValue>portal</rightValue>
                     </criteria>
                 </visibilityRule>
             </componentInstance>
@@ -1269,7 +1343,7 @@
                 <componentName>csbd_resumenesAgrupados</componentName>
                 <identifier>c_csbd_resumenesAgrupados</identifier>
                 <visibilityRule>
-                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5))</booleanFilter>
+                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5)) AND 6</booleanFilter>
                     <criteria>
                         <leftValue>{!$Permission.CustomPermission.CSBD_UsuarioPromptsIA}</leftValue>
                         <operator>EQUAL</operator>
@@ -1294,6 +1368,11 @@
                         <leftValue>{!Record.CSBD_HaUsadoIA__c}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!$Permission.StandardPermission.EinsteinCopilotUser}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>false</rightValue>
                     </criteria>
                 </visibilityRule>
             </componentInstance>
@@ -1303,7 +1382,7 @@
                 <componentName>csbd_ChatGPT</componentName>
                 <identifier>c_csbd_ChatGPT</identifier>
                 <visibilityRule>
-                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5))</booleanFilter>
+                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5)) AND 6</booleanFilter>
                     <criteria>
                         <leftValue>{!$Permission.CustomPermission.CSBD_UsuarioPromptsIA}</leftValue>
                         <operator>EQUAL</operator>
@@ -1328,6 +1407,11 @@
                         <leftValue>{!Record.CSBD_HaUsadoIA__c}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!$Permission.StandardPermission.EinsteinCopilotUser}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>false</rightValue>
                     </criteria>
                 </visibilityRule>
             </componentInstance>

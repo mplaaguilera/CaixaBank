@@ -35,6 +35,25 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
 
             
         }
+        System.runAs(usuarioGeneral) {
+        List<SAC_PlantillaRedaccion__c> listaPlantillas = new List<SAC_PlantillaRedaccion__c>();
+        SAC_PlantillaRedaccion__c plantilla1 = new SAC_PlantillaRedaccion__c();
+        plantilla1.Name = 'plantilla1';
+        plantilla1.SAC_TipoPlantilla__c = 'SAC_Inadmision';
+        listaPlantillas.add(plantilla1);
+
+        SAC_PlantillaRedaccion__c plantilla2 = new SAC_PlantillaRedaccion__c();
+        plantilla2.Name = 'plantilla2';
+        plantilla2.SAC_TipoPlantilla__c = 'SAC_Inadmision';
+        listaPlantillas.add(plantilla2);
+
+        SAC_PlantillaRedaccion__c plantilla3 = new SAC_PlantillaRedaccion__c();
+        plantilla3.Name = 'plantilla3';
+        plantilla3.SAC_TipoPlantilla__c = 'SAC_Inadmision';
+        listaPlantillas.add(plantilla3);
+        SAC_DatabaseDML.insertListDML(listaPlantillas, true);
+        //Database.insert(listaPlantillas); 
+        }
         //Account
         Account cuentaOficina = SAC_TestDataFactory.crearCuentasOficina(1)[0];
         cuentaOficina.CC_Email__c = 'test@test.com'; 
@@ -478,23 +497,7 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         SAC_DatabaseDML.insertListDML(listaParametrizaciones, false);
         //Database.insert(listaParametrizaciones);
 
-        List<SAC_PlantillaRedaccion__c> listaPlantillas = new List<SAC_PlantillaRedaccion__c>();
-        SAC_PlantillaRedaccion__c plantilla1 = new SAC_PlantillaRedaccion__c();
-        plantilla1.Name = 'plantilla1';
-        plantilla1.SAC_TipoPlantilla__c = 'SAC_Inadmision';
-        listaPlantillas.add(plantilla1);
 
-        SAC_PlantillaRedaccion__c plantilla2 = new SAC_PlantillaRedaccion__c();
-        plantilla2.Name = 'plantilla2';
-        plantilla2.SAC_TipoPlantilla__c = 'SAC_Inadmision';
-        listaPlantillas.add(plantilla2);
-
-        SAC_PlantillaRedaccion__c plantilla3 = new SAC_PlantillaRedaccion__c();
-        plantilla3.Name = 'plantilla3';
-        plantilla3.SAC_TipoPlantilla__c = 'SAC_Inadmision';
-        listaPlantillas.add(plantilla3);
-        SAC_DatabaseDML.insertListDML(listaPlantillas, false);
-        //Database.insert(listaPlantillas); 
 
         List<SAC_MaestroTemas__c> listaMaestro = new List<SAC_MaestroTemas__c>();
         SAC_MaestroTemas__c maestroT = new SAC_MaestroTemas__c(Name = 'SACMotivoDemoraTest', RecordTypeId = recTypeMotivoDemora);

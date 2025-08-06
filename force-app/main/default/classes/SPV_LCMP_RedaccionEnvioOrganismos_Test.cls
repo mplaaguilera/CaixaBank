@@ -44,11 +44,6 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
         cuenta.CC_Tipo_Centro__c = 'DT';
         SPV_DatabaseDML.insertDML(cuenta, true);
 
-        
-
-        Group supervisores = [SELECT id FROM Group WHERE DeveloperName = 'SPV_PendienteAsignar'];
-
-
         //grupo colaborador
         List<CC_Grupo_Colaborador__c> listaGrupos = SPV_TestDataFactory.crearGrupoColaborador('GrupoDeTareas',1);
         listaGrupos[0].Name = 'grupo de tareas';
@@ -68,6 +63,7 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
         List<Case> listaReclamaciones = new List<Case>();
         Case caso = new Case();
         caso.Subject = 'ReclamacionTest';
+        caso.SAC_Prorrogado__c = true;
         caso.Status = 'SPV_AnalisisDecision';
         caso.SEG_Grupo__c = grupoColaborador.id;
         caso.AccountId = cuenta.Id;
@@ -86,40 +82,29 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
 
         SPV_DatabaseDML.insertDML(maestroTema, true);
 
-        //Content Version
-        // Blob body = blob.valueOf('Unit.Test');
-        // ContentVersion cv = new ContentVersion(
-        //     Title= 'Documento test', 
-        //     PathOnClient ='SampleTitle.pdf',
-        //     VersionData = body,
-        //     FirstPublishLocationId = caso.Id,
-        //     SAC_TipoAdjunto__c = maestroTema.id
-        // );
-        // Database.insert(cv);
-
         System.runAs(usuarioGeneral){
-        //ContentVersion
-        ContentVersion cv = SPV_TestDataFactory.crearContentVersion(caso);
-        cv.SAC_TipoAdjunto__c = maestroTema.id;
-        cv.SAC_Bloque__c = 'SAC_Respuesta';
-        cv.SAC_ValidadoCV__c = true;
-        List<ContentVersion> listaCV = new List<ContentVersion>();
-        listaCV.add(cv);
-        SPV_DatabaseDML.insertListDML(listaCV, true);
+
+            //ContentVersion
+            ContentVersion cv = SPV_TestDataFactory.crearContentVersion(caso);
+            cv.SAC_TipoAdjunto__c = maestroTema.id;
+            cv.SAC_Bloque__c = 'SAC_Respuesta';
+            cv.SAC_ValidadoCV__c = true;
+            List<ContentVersion> listaCV = new List<ContentVersion>();
+            listaCV.add(cv);
+            SPV_DatabaseDML.insertListDML(listaCV, true);
         }
 
-        SAC_MaestroAccionesReclamacion__c maestro = SPV_TestDataFactory.crearMaestroAcciones(1,listaGrupos[0].Id)[0];
-        maestro.SAC_DeveloperName__c ='SPV_TareaEnvioReclamante';
-        SPV_DatabaseDML.insertDML(maestro, true);
+        List<SAC_MaestroAccionesReclamacion__c> listmaestro = SPV_TestDataFactory.crearMaestroAcciones(8,listaGrupos[0].Id);
+        listmaestro[0].SAC_DeveloperName__c = 'SPV_CertificadaReclamante';
+        listmaestro[1].SAC_DeveloperName__c = 'SPV_EnvioOrgRectificacion';
+        listmaestro[2].SAC_DeveloperName__c = 'SPV_EnvioOrgCompOrg';
+        listmaestro[3].SAC_DeveloperName__c = 'SPV_RevisionProrroga';
+        listmaestro[4].SAC_DeveloperName__c = 'SPV_RevisionCompEntidad';
+        listmaestro[5].SAC_DeveloperName__c = 'SPV_EnvioAllanamiento';
+        // listmaestro[6].SAC_DeveloperName__c = 'SPV_EnvioAlegaciones';
+        // listmaestro[7].SAC_DeveloperName__c = 'SPV_EnvioDesistimiento';
 
-
-        SAC_MaestroAccionesReclamacion__c maestro2 = SPV_TestDataFactory.crearMaestroAcciones(1,listaGrupos[0].Id)[0];
-        maestro2.SAC_DeveloperName__c ='SPV_TareaEnvioOrganismo';
-        SPV_DatabaseDML.insertDML(maestro2, true);
-
-        SAC_MaestroAccionesReclamacion__c maestro3 = SPV_TestDataFactory.crearMaestroAcciones(1,listaGrupos[0].Id)[0];
-        maestro3.SAC_DeveloperName__c ='SPV_TareaRevisionOrganismo';
-        SPV_DatabaseDML.insertDML(maestro3, true);
+        SPV_DatabaseDML.insertListDML(listmaestro, true);
     }
 
 
@@ -127,17 +112,16 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
     static void enviarDocOrganismosTest() {
 
         Test.startTest();
-        User usuario = [SELECT Id, SAC_GruposPerteneciente__c FROM User WHERE Username = 'userageneral@test.com.testdata' AND IsActive = true LIMIT 1];
+        User usuario = [SELECT Id, SAC_GruposPerteneciente__c FROM User WHERE Username = 'useraadmin@test.com.testdata' AND IsActive = true LIMIT 1];
         Case caso = [SELECT id, Status, SEG_Subestado__c FROM Case WHERE subject = 'ReclamacionTest' limit 1];
 
         System.runAs(usuario) {
             List<ContentVersion> seleccionados = [SELECT id FROM ContentVersion];
-            System.debug('CGR seleccionados ' + seleccionados);
             List<String> idSeleccionados = new List<String>();
             for(ContentVersion cv: seleccionados){
                 idSeleccionados.add(cv.id);
             }
-            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_BDE', caso.Status, idSeleccionados);
+            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_BDE', idSeleccionados);
         }
 
         List<SAC_Accion__c> listTarea = [SELECT id FROM SAC_Accion__c WHERE SAC_Reclamacion__c = :caso.Id LIMIT 1];
@@ -156,7 +140,7 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
 
         System.runAs(usuario) {
 
-            caso.Status = 'SPV_Envio';
+            caso.Status = 'SPV_EnvioRectificacion';
             SPV_DatabaseDML.updateDML(caso, true);
 
             List<ContentVersion> seleccionados = [SELECT id FROM ContentVersion];
@@ -165,7 +149,49 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos_Test {
             for(ContentVersion cv: seleccionados){
                 idSeleccionados.add(cv.id);
             }
-            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, true, true, 'SPV_CNMV', caso.Status, idSeleccionados);
+            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, false, true, 'SPV_CNMV', idSeleccionados);
+
+            caso.Status = 'SPV_EnvioComplementaria';
+            SPV_DatabaseDML.updateDML(caso, true);
+            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, false, true, 'SPV_CNMV', idSeleccionados);
+        }
+
+        List<SAC_Accion__c> listTarea = [SELECT id FROM SAC_Accion__c WHERE SAC_Reclamacion__c = :caso.Id LIMIT 1];
+
+        Test.stopTest();
+        system.assertEquals(false, listTarea.isEmpty(), 'No se ha podido enviar la documentacion');
+    }
+
+    @isTest
+    static void enviarDocOrganismosTest3() {
+
+        Test.startTest();
+        User usuario = [SELECT Id, SAC_GruposPerteneciente__c FROM User WHERE Username = 'userageneral@test.com.testdata' AND IsActive = true LIMIT 1];
+        Case caso = [SELECT id, Status FROM Case WHERE subject = 'ReclamacionTest' LIMIT 1];
+
+        SPV_Formulario__c formulario = new SPV_Formulario__c();
+        formulario.RecordTypeId =  Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SPV_FormularioAnalisisDecision').getRecordTypeId();
+        formulario.SPV_Caso__c = caso.Id;
+        formulario.SPV_DecisionFinal__c = 'SPV_004';
+        SPV_DatabaseDML.insertDML(formulario, true);
+
+        System.runAs(usuario) {
+
+            caso.Status = 'PendienteRespuestaOrganismo';
+            caso.SPV_Complementaria_Entidad__c = true;
+            SPV_DatabaseDML.updateDML(caso, true);
+
+            List<ContentVersion> seleccionados = [SELECT id FROM ContentVersion];
+            List<String> idSeleccionados = new List<String>();
+
+            for(ContentVersion cv: seleccionados){
+                idSeleccionados.add(cv.id);
+            }
+            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, false, true, 'SPV_CNMV', idSeleccionados);
+
+            caso.Status = 'SPV_Envio';
+            SPV_DatabaseDML.updateDML(caso, true);
+            SPV_LCMP_RedaccionEnvioOrganismos.enviarDocOrganismos(caso.id, false, true, 'SPV_CNMV', idSeleccionados);
         }
 
         List<SAC_Accion__c> listTarea = [SELECT id FROM SAC_Accion__c WHERE SAC_Reclamacion__c = :caso.Id LIMIT 1];

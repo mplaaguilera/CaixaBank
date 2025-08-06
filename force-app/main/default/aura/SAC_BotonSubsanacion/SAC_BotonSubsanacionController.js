@@ -37,6 +37,9 @@
 						if(caso.SEG_Detalle__r.SAC_AcompanyaLlamada__c){
 							component.set('v.necesitaGestionLlamada', true);
 						}
+						if(caso.CC_Idioma__c != undefined && caso.SAC_Reclamacion__r.CC_Idioma__c != undefined){
+							component.set('v.idiomaInformado', true);
+						}
 					}
 					else if(caso.RecordType.Name == 'Reclamacion'){
 						component.set('v.metodoEnvio', caso.CC_Canal_Respuesta__c);
@@ -115,9 +118,20 @@
 	},
 
 	openModalSubsanacion : function(component, event, helper){
-
-		component.set('v.isModalOpenSubsanacion', true);
-		helper.setFicherosBorrados(component, event);
+		var idioma = component.get('v.idiomaInformado');
+		if(idioma == false){
+		let toastParams = {
+								title: "Advertencia",
+								message: "Debe completar el idioma de la reclamación y de la pretensión", 
+								type: "warning"
+							};
+							let toastEvent = $A.get("e.force:showToast");
+							toastEvent.setParams(toastParams);
+							toastEvent.fire();
+						}else{
+							component.set('v.isModalOpenSubsanacion', true);
+							helper.setFicherosBorrados(component, event);
+						}
 	},
 
 	closeModalSubsanacion : function(component, event, helper){
@@ -126,7 +140,16 @@
 	},
 
 	clickReclamacion : function(component, event, helper){
-
+		if(component.get('v.idiomaInformado') == false){
+		let toastParams = {
+								title: "Advertencia",
+								message: "Debe completar el idioma de la reclamación", 
+								type: "warning"
+							};
+							let toastEvent = $A.get("e.force:showToast");
+							toastEvent.setParams(toastParams);
+							toastEvent.fire();
+						}else{
 		var idCase = component.get("v.recordId");
 		let tieneCanalRespuesta = component.get("v.metodoEnvio");
 		if(tieneCanalRespuesta == 'Email' || tieneCanalRespuesta == 'SAC_CartaPostal'){
@@ -167,7 +190,7 @@
 			mensaje.fire();
 			$A.get('e.force:refreshView').fire();
 		}
-		
+	}
 
 	},
 
@@ -383,7 +406,7 @@
 
 		helper.recuperarPlantilla(component, event, helper);
 
-	},
+	}
 
 	/*openModalIdioma : function(component, event, helper){
 		component.set('v.isModalOpenIdioma', true);

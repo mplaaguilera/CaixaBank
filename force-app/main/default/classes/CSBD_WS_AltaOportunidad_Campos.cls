@@ -525,8 +525,12 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				campos.put('AccountId', solicitud.accountId);
 				campos.put('CSBD_Contact__c', solicitud.contactId);
 				campos.put('CSBD_Parent_Id__c', [SELECT Id FROM Opportunity WHERE CSBD_CasoOrigen__c = :solicitud.casoOrigen ORDER BY CreatedDate DESC LIMIT 1]?.Id);
-				campos.put('CSBD_Motivo_MAC__c', [SELECT CC_MCC_Motivo__r.Name FROM Case WHERE Id = :solicitud.casoOrigen LIMIT 1]?.CC_MCC_Motivo__r?.Name);
+				campos.put('CSBD_Motivo_MAC__c', solicitud.motivo);
 				informarEmpresaFamiliaProducto(solicitud?.nombreProducto, campos);
+				
+				if(solicitud.indicadoresCliente != null && solicitud.indicadoresCliente.contains('28')) {
+					campos.put('CSBD_Empresa_Proveedora__c', 'imaginBank');
+				}
 			}
 
 			when 'macCentralita' {
@@ -763,7 +767,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				//Identificación contra BD (también cuando identificación ALF sin resultados)
 				contactos = [SELECT AccountId FROM Contact
 								WHERE (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_ClientePA')
-								AND CC_NumPerso__c = :numperso2TitDecimal];
+								AND (AV_NumPerso__c = :numperso2TitDecimal OR CC_NumPerso__c = :numperso2TitDecimal)];
 				if (contactos.size() == 1) {
 					campos.put('CSBD_Contact_2__c', contactos[0].Id);
 				}
@@ -778,17 +782,12 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 		Map<String, String> tipoIdentificacion = tipoIdentificacionCliente(solicitud);
 		if (!String.isEmpty(tipoIdentificacion.get('tipoBusqueda'))) {
 			List<Account> empresas = new List<Account>();
-			System.debug('tipoIdentificacion: ' + tipoIdentificacion);
 
 			String tipoBusqueda = tipoIdentificacion.get('tipoBusqueda');
 			String valorBusqueda = tipoIdentificacion.get('valorBusqueda');
-
-			System.debug('tipoBusqueda: ' + tipoBusqueda);
-			System.debug('valorBusqueda: ' + valorBusqueda);
-
 			if (tipoBusqueda == 'NP') {
 				empresas = [SELECT AV_IndicadoresClientes__c FROM Account WHERE RecordType.DeveloperName = 'CC_Cliente'
-							AND AV_NumPerso__c = :valorBusqueda LIMIT 2];
+							AND CC_NumPerso__c = :valorBusqueda LIMIT 2];
 			} else if (tipoBusqueda == 'DOC') {
 				empresas = [SELECT AV_IndicadoresClientes__c FROM Account WHERE RecordType.DeveloperName = 'CC_Cliente'
 							AND CC_Numero_Documento__c = :valorBusqueda LIMIT 2];

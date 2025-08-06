@@ -59,7 +59,7 @@ public class CSBD_FamiliaProductoPicklist_Test {
     public static void getProductosTest() {
         System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
             Test.startTest();
-            List<CC_Lista_Valores__c> productos = CSBD_FamiliaProductoPicklistController.getProductos('Familia prueba');
+            List<CC_Lista_Valores__c> productos = CSBD_FamiliaProductoPicklistController.getProductos('Familia prueba', 'Consumo', 'CaixaBank');
             Test.stopTest();
 
             System.assertEquals(CC_MetodosUtiles.listaCampo(productos, 'Name').contains('Producto prueba'), true, 'Producto no encontrado');

@@ -3,9 +3,15 @@
     <!-- Atributos -->
     <aura:attribute name="recordId" type="Id"/>
     <aura:attribute name="columnasOTPCliente" type="List"/>
-    <aura:attribute name="columnasOTPHistoricoCliente" type="List"/>
+    <!--<aura:attribute name="columnasOTPHistoricoCliente" type="List"/>-->
     <aura:attribute name="otpCliente" type="Object"/>
-    <aura:attribute name="historicoOtpCliente" type="Object"/>
+
+    <aura:attribute name="autenticacionesRecientes" type="Object" />
+    <aura:attribute name="historicoAutenticacionesAntiguas" type="Object" />
+    <aura:attribute name="columnasAutenticacionesRecientes" type="List" />
+    <aura:attribute name="columnasHistoricoAutenticacionesAntiguas" type="List" />
+
+    <!--<aura:attribute name="historicoOtpCliente" type="Object"/>-->
     <aura:attribute name="pendienteEnvio" type="Boolean" default="false"/>
     <aura:attribute name="pendienteValidar" type="Boolean" default="false"/>
     <aura:attribute name="preguntasBasicas" type="Object"/>
@@ -103,6 +109,8 @@
     <aura:attribute name="otpDerivar" type="Boolean" default="true" />
     <aura:attribute name="menorDe65" type="Boolean" default="false" />
     <aura:attribute name="mccVacio" type="Boolean" default="true" />
+    <aura:attribute name="nivelDosAUTTerceros" type="Boolean" default="false" />
+    <aura:attribute name="settingIntegracionNivelDos" type="Boolean" default="false" />
 
     <aura:attribute name="listaCuentas" type="String" />
     <aura:attribute name="listaTarjetas" type="String" />
@@ -225,6 +233,38 @@
         </article>
     </div>
 
+     <div class="slds-m-bottom_large" style="margin-top: 1rem;">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Autenticaciones recientes">
+                            <lightning:icon iconName="utility:password" size="small"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate">Autenticaciones recientes</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <aura:if isTrue="{!v.autenticacionesRecientes.length > 0}">
+                <lightning:datatable data="{! v.autenticacionesRecientes }"
+                                     columns="{! v.columnasAutenticacionesRecientes}"
+                                     keyField="recordId"
+                                     hideCheckboxColumn="true"
+                                     minColumnWidth="150"/>
+            </aura:if>
+
+            <aura:if isTrue="{!!v.autenticacionesRecientes.length > 0}">
+
+                Sin autenticaciones recientes en las últimas 24 horas.
+            
+            </aura:if>
+        </article>
+    </div>
+
     <div class="slds-m-bottom_large" style="margin-top: 1rem;">
         <article class="slds-card">
             <div class="slds-card__header slds-grid">
@@ -241,16 +281,14 @@
                     </div>
                 </header>
             </div>
-            <aura:if isTrue="{!v.historicoOtpCliente.length > 0}">
+            <aura:if isTrue="{!v.historicoAutenticacionesAntiguas.length > 0}">
                     <!-- <div style="position: relative; height: 300px; border: 1px solid rgba(201, 201, 201); border-radius: 4px;"> -->
 
-                        <lightning:datatable data="{! v.historicoOtpCliente }" columns="{! v.columnasOTPHistoricoCliente}" keyField="Id" hideCheckboxColumn="true" minColumnWidth="150"/>
+                        <lightning:datatable data="{! v.historicoAutenticacionesAntiguas }" columns="{! v.columnasHistoricoAutenticacionesAntiguas}" keyField="Id" hideCheckboxColumn="true" minColumnWidth="150"/>
                     <!-- </div> -->
 
             </aura:if>
-
-
-            <aura:if isTrue="{!!v.historicoOtpCliente.length > 0}">
+            <aura:if isTrue="{!!v.historicoAutenticacionesAntiguas.length > 0}">
                 Sin autenticaciones seguras anteriores.
             </aura:if>
         </article>

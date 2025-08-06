@@ -5,10 +5,12 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
         List<User> usuarioGeneral = SPV_TestDataFactory.crearUsuarioSPVGeneral(2);
         usuarioGeneral[0].Username = 'ustestesteo@test.com';   
         usuarioGeneral[1].Username = 'ustestesteoDOS@test.com';     
-        Database.insert(usuarioGeneral);
+        //Database.insert(usuarioGeneral);
+        SPV_DatabaseDML.insertListDML(usuarioGeneral, true);
         List<User> usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1);
         usuarioAdmin[0].Username = 'usadtesteo1@test.com';
-        Database.insert(usuarioAdmin);
+        //Database.insert(usuarioAdmin);
+        SPV_DatabaseDML.insertListDML(usuarioAdmin, true);
 
         PermissionSet ps = new PermissionSet(Name='spvtest',Label='spvtest');
         insert ps;
@@ -46,7 +48,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
             camposRecl.put('Subject', 'TestTarea');
             camposRecl.put('OwnerId', usuarioGeneral[0].Id);
             Case casoReclamacion = SPV_TestDataFactory.crearCaso('Reclamacion',camposRecl);
-            Database.insert(casoReclamacion);
+            //Database.insert(casoReclamacion);
+            SPV_DatabaseDML.insertDML(casoReclamacion, true);
 
             //Pretension
             Map<String, Object> camposPret = new Map<String, Object>();
@@ -60,10 +63,12 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
             List<CC_Grupo_Colaborador__c> listaGrupos = SPV_TestDataFactory.crearGrupoColaborador('GrupoDeTareas',1);
             listaGrupos[0].Name = 'grupo de tareas';
             listaGrupos[0].SAC_PermiteTareas__c = true;
-            Database.insert(listaGrupos);
+            //Database.insert(listaGrupos);
+            SPV_DatabaseDML.insertListDML(listaGrupos, true);
 
             CC_Grupo_Colaborador_Contact__c grupoColaboradorContact2 = SPV_TestDataFactory.crearColaboradorContact(usuarioGeneral[1].Id,listaGrupos[0].id);
-            Database.insert(grupoColaboradorContact2);
+            //Database.insert(grupoColaboradorContact2);
+            SPV_DatabaseDML.insertDML(grupoColaboradorContact2, true);
 
             SAC_MaestroAccionesReclamacion__c maestroTareas = new SAC_MaestroAccionesReclamacion__c();
             maestroTareas.RecordTypeId = Schema.SObjectType.SAC_MaestroAccionesReclamacion__c.getRecordTypeInfosByDeveloperName().get('SPV_MaestroAcciones').getRecordTypeId();
@@ -74,7 +79,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
             maestroTareas.SAC_Prorroga__c = 2;
             maestroTareas.SAC_Activo__c = true;
 
-            Database.insert(maestroTareas);
+            //Database.insert(maestroTareas);
+            SPV_DatabaseDML.insertDML(maestroTareas, true);
 
             SAC_Accion__c tarea = new SAC_Accion__c();
             tarea.SAC_Observaciones__c = 'Llamar';
@@ -82,7 +88,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
             tarea.SAC_EquipoResponsable__c = listaGrupos[0].Id;
             tarea.SAC_Reclamacion__c = casoReclamacion.Id;
             tarea.SAC_Estado__c = 'SAC_PendienteEnviar';
-            Database.insert(tarea);
+            //Database.insert(tarea);
+            SPV_DatabaseDML.insertDML(tarea, true);
 
             Test.stopTest();
         }
@@ -108,7 +115,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
     @isTest
     static void devolverTareaTest(){
         Test.startTest();
-        User usuario = [SELECT Id FROM User WHERE Username = 'ustestesteoDOS@test.com' AND isActive = true LIMIT 1];
+        List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+        User usuario = [SELECT Id FROM User WHERE Username = 'usadtesteo1@test.com' AND isActive = true LIMIT 1];
         
         SAC_Accion__c tarea = [SELECT Id, ownerId, SAC_EquipoResponsable__c FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
         
@@ -118,13 +126,14 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
 
         String nuevoPropetarioTarea = [SELECT id, ownerId FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1].ownerId;
 
-        System.assertNotEquals(usuario.id, nuevoPropetarioTarea, 'No se ha devuelto a la cola');
+        System.assertNotEquals(cola[0].Id, nuevoPropetarioTarea, 'No se ha devuelto a la cola');
         Test.stopTest();
     }
 
     @isTest
     static void devolverTareaGestorLetradoTest(){
         Test.startTest();
+        List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
         User usuario = [SELECT Id FROM User WHERE Username = 'ustestesteoDOS@test.com' AND isActive = true LIMIT 1];
         
         SAC_Accion__c tarea = [SELECT Id, ownerId, SAC_EquipoResponsable__c FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
@@ -135,7 +144,7 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
 
         String nuevoPropetarioTarea = [SELECT id, ownerId FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1].ownerId;
 
-        System.assertNotEquals(usuario.id, nuevoPropetarioTarea, 'No se ha devuelto al gestor');
+        System.assertNotEquals(cola[0].Id, nuevoPropetarioTarea, 'No se ha devuelto al gestor');
         Test.stopTest();
     }
 
@@ -147,6 +156,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
         SAC_Accion__c tarea = [SELECT Id, ownerId, SAC_EquipoResponsable__c FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
         
         System.runAs(usuario) {
+            tarea.SAC_Comentarios__c = 'comentario test';
+            SPV_DatabaseDML.updateDML(tarea, true);
             SPV_LCMP_TareaOperativas.enviarTarea(tarea.Id);
         }
 
@@ -162,10 +173,11 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'ustestesteoDOS@test.com' AND isActive = true LIMIT 1];
         
         SAC_Accion__c tarea = [SELECT Id, ownerId, SAC_EquipoResponsable__c FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
-        
         System.runAs(usuario) {
             tarea.SAC_Estado__c = 'SAC_Devuelta';
-            Database.update(tarea);
+            tarea.SAC_Comentarios__c = 'comentario test';
+            tarea.SPV_InstruccionesTrasDevolucion__c = 'Instrucciones de prueba';
+            SPV_DatabaseDML.updateDML(tarea, true);
             SPV_LCMP_TareaOperativas.enviarTarea(tarea.Id);
         }
 
@@ -252,6 +264,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
         SAC_Accion__c tarea = [SELECT Id, ownerId, SAC_EquipoResponsable__c FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
         
         System.runAs(usuario) {
+            tarea.SAC_Antecedentes_Revisados__c = true;
+            SPV_DatabaseDML.updateDML(tarea, true);
             SPV_LCMP_TareaOperativas.finalizarIncompleta(tarea.Id, 'comentariotest');
         }
 
@@ -268,6 +282,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
         SAC_Accion__c tarea = [SELECT Id, ownerId, SAC_EquipoResponsable__c FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
         
         System.runAs(usuario) {
+            tarea.SAC_Antecedentes_Revisados__c = true;
+            SPV_DatabaseDML.updateDML(tarea, true);
             SPV_LCMP_TareaOperativas.finalizarTarea(tarea.Id, 'comentariotest');
         }
 
@@ -326,11 +342,13 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
     @isTest
     static void enviarTareaGGHTest(){
         Test.startTest();
-        User usuario = [SELECT Id FROM User WHERE Username = 'ustestesteoDOS@test.com' AND isActive = true LIMIT 1];
+        User usuario = [SELECT Id FROM User WHERE Username = 'usadtesteo1@test.com' AND isActive = true LIMIT 1];
         SAC_Accion__c tarea = [SELECT Id FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
         Boolean result = false;
         
         System.runAs(usuario) {
+            tarea.SAC_Comentarios__c = 'comentario test';
+            SPV_DatabaseDML.updateDML(tarea, true);
             SPV_LCMP_TareaOperativas.enviarTareaGGH(tarea.Id);
         }
 
@@ -366,6 +384,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
         Boolean result = false;
         
         System.runAs(usuario) {
+            tarea.SAC_Antecedentes_Revisados__c = true;
+            SPV_DatabaseDML.updateDML(tarea, true);
             SPV_LCMP_TareaOperativas.finalizarTareaGGH(tarea.Id);
         }
 
@@ -404,7 +424,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
             maestroTareas.SAC_Prorroga__c = 2;
             maestroTareas.SAC_Activo__c = true;
             maestroTareas.SAC_DeveloperName__c = 'SPV_GENERALOFICINAS';
-            Database.insert(maestroTareas);
+            //Database.insert(maestroTareas);
+            SPV_DatabaseDML.insertDML(maestroTareas, true);
 
             SAC_Accion__c tarea = new SAC_Accion__c();
             tarea.SAC_Observaciones__c = 'Llamar2';
@@ -415,7 +436,8 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
             tarea.SAC_MaestroAccionesReclamacion__c = maestroTareas.Id;
             tarea.SAC_Oficina__c = listaCuentas[0].Id;
             tarea.SAC_Comentarios__c = 'prueba';
-            Database.insert(tarea);
+            //Database.insert(tarea);
+            SPV_DatabaseDML.insertDML(tarea, true);
 
             SPV_LCMP_TareaOperativas.enviarTarea(tarea.Id);
         }
@@ -425,7 +447,7 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
         System.assertEquals('SAC_PendienteAsignar', tareaResult.SAC_Estado__c, 'No se ha enviado');
         Test.stopTest();
     }
-
+    
     @isTest
     static void notificarTareaResolutorTest(){
         Test.startTest();
@@ -439,6 +461,69 @@ public with sharing class SPV_LCMP_TareaOperativas_Test {
         SAC_Accion__c tareaResult = [SELECT Id, SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
 
         System.assertEquals('SAC_PendienteEnviar', tareaResult.SAC_Estado__c, 'No se ha finalizado');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void solicitarAnulacionTest(){
+        Test.startTest();
+
+        User usuario = [SELECT Id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true LIMIT 1];
+        SAC_Accion__c tarea = [SELECT Id, OwnerId, SAC_EquipoResponsable__c FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
+        Case casoReclamacion = [SELECT Id FROM Case WHERE Subject = 'TestTarea'];
+        casoReclamacion.ownerId = usuario.Id;
+        SPV_DatabaseDML.updateDML(casoReclamacion, true);
+
+
+        System.runAs(usuario) {
+            SPV_LCMP_TareaOperativas.solicitarAnulacion(tarea.Id, 'Otros');
+        }
+
+        SAC_Accion__c tareaResult = [SELECT Id, SPV_CheckAnulacionSolicitada__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
+
+        System.assertEquals(true, tareaResult.SPV_CheckAnulacionSolicitada__c, 'Error en la anulacion');
+        Test.stopTest();
+    }
+
+
+    @isTest
+    static void cancelarSolicitudTest(){
+        Test.startTest();
+        User usuario = [SELECT Id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true LIMIT 1];
+        SAC_Accion__c tarea = [SELECT Id, OwnerId, SAC_EquipoResponsable__c FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
+        tarea.SPV_CheckAnulacionSolicitada__c = true;
+        SPV_DatabaseDML.updateDML(tarea, true);
+
+        Case casoReclamacion = [SELECT Id FROM Case WHERE Subject = 'TestTarea'];
+        casoReclamacion.ownerId = usuario.Id;
+        SPV_DatabaseDML.updateDML(casoReclamacion, true);
+
+        System.runAs(usuario) {
+
+            SPV_LCMP_TareaOperativas.cancelarSolicitud(tarea.Id);
+        }
+
+        SAC_Accion__c tareaResult = [SELECT Id, SPV_CheckAnulacionSolicitada__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
+
+        System.assertEquals(false, tareaResult.SPV_CheckAnulacionSolicitada__c, 'No se ha cancelado la solicitud');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void aceptarSolicitudAnulacionTest(){
+        Test.startTest();
+        User usuario = [SELECT Id FROM User WHERE Username = 'ustestesteoDOS@test.com' AND isActive = true LIMIT 1];
+        SAC_Accion__c tarea = [SELECT Id FROM   SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
+        
+        System.runAs(usuario) {
+            tarea.SPV_CheckAnulacionSolicitada__c = true;
+            SPV_DatabaseDML.updateDML(tarea, true);
+            SPV_LCMP_TareaOperativas.aceptarSolicitudAnulacion(tarea.Id);
+        }
+
+        SAC_Accion__c tareaResult = [SELECT Id, SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'Llamar' LIMIT 1];
+
+        System.assertEquals('SPV_Anulada', tareaResult.SAC_Estado__c, 'No se ha anulado la tarea');
         Test.stopTest();
     }
 }

@@ -7,6 +7,8 @@ public with sharing class GRR_Case_BU_TRHan extends CC_TriggerHandlerBase {
         List<Case> casosGRR = GRR_CaseTriggerHelper.filtrarCasosGRR(listNewObj);
         if(!casosGRR.isEmpty()){
             GRR_CaseTriggerHelper.informarCamposOficina(casosGRR,mapOldObj);
+            GRR_CaseTriggerHelper.asignarDirecciones(casosGRR,mapOldObj);
+            GRR_CaseTriggerHelper.limpiarDireccionesSiCambiaContacto(casosGRR,mapOldObj);
         }    
     }
 }

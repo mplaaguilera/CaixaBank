@@ -4,6 +4,7 @@ public with sharing class SPV_LCMP_ResponderConsulta {
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
+    private static final Id RECTYPECONSULTA_TAREA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_ConsultaTarea').getRecordTypeId();
     
     /*********************************************************************************************
      * Proposito: Responder la consutkla y actualizar su estado
@@ -17,7 +18,7 @@ public with sharing class SPV_LCMP_ResponderConsulta {
     public static void responderConsulta(String consultaId, String respuesta, String motivo) {
 
         if(Schema.sObjectType.SAC_Interaccion__c.isAccessible()){
-            SAC_Interaccion__c consulta = [SELECT Id, Name, SAC_Reclamacion__c, SAC_GrupoColaborador__c, SAC_GrupoColaborador__r.SAC_DeveloperName__c FROM SAC_Interaccion__c WHERE RecordTypeId = :RECTYPECONSULTA AND Id = :consultaId ];
+            SAC_Interaccion__c consulta = [SELECT Id, Name, SAC_Reclamacion__c, SAC_GrupoColaborador__c, SAC_GrupoColaborador__r.SAC_DeveloperName__c FROM SAC_Interaccion__c WHERE RecordTypeId IN (:RECTYPECONSULTA, :RECTYPECONSULTA_TAREA) AND Id = :consultaId ];
 
             if(consulta.SAC_GrupoColaborador__r.SAC_DeveloperName__c == 'OFICINA'){
                 Datetime fechaActual = Datetime.now();
@@ -49,7 +50,7 @@ public with sharing class SPV_LCMP_ResponderConsulta {
     public static void guardarConsulta(String consultaId, String respuesta, String motivo) {
 
         if(Schema.sObjectType.SAC_Interaccion__c.isAccessible()){
-            SAC_Interaccion__c consulta = [SELECT Id, Name, SAC_Reclamacion__c,SAC_GrupoColaborador__r.SAC_DeveloperName__c FROM SAC_Interaccion__c WHERE RecordTypeId = :RECTYPECONSULTA AND Id = :consultaId ];
+            SAC_Interaccion__c consulta = [SELECT Id, Name, SAC_Reclamacion__c,SAC_GrupoColaborador__r.SAC_DeveloperName__c FROM SAC_Interaccion__c WHERE RecordTypeId IN (:RECTYPECONSULTA, :RECTYPECONSULTA_TAREA) AND Id = :consultaId ];
 
             if(consulta.SAC_GrupoColaborador__r.SAC_DeveloperName__c == 'OFICINA'){
                 Datetime fechaActual = Datetime.now();
@@ -80,7 +81,7 @@ public with sharing class SPV_LCMP_ResponderConsulta {
         String outputString = '';
 
         if(Schema.sObjectType.SAC_Interaccion__c.isAccessible()){
-            SAC_Interaccion__c consulta = [SELECT Id, SAC_Respuesta__c, SAC_GrupoColaborador__r.SAC_DeveloperName__c FROM SAC_Interaccion__c WHERE RecordTypeId = :RECTYPECONSULTA AND Id = :consultaId ];
+            SAC_Interaccion__c consulta = [SELECT Id, SAC_Respuesta__c, SAC_GrupoColaborador__r.SAC_DeveloperName__c FROM SAC_Interaccion__c WHERE RecordTypeId IN (:RECTYPECONSULTA, :RECTYPECONSULTA_TAREA) AND Id = :consultaId ];
 
             if(consulta.SAC_GrupoColaborador__r.SAC_DeveloperName__c == 'OFICINA' && consulta.SAC_Respuesta__c != null){
                 outputString = consulta.SAC_Respuesta__c.replace('<b>', '').replace('</b>', '').replace('<br>', '').replace('<br>', '');
@@ -100,7 +101,7 @@ public with sharing class SPV_LCMP_ResponderConsulta {
 
         if(Schema.sObjectType.SAC_Interaccion__c.isAccessible()){
 
-            SAC_Interaccion__c consulta = [SELECT id, SAC_Reclamacion__c, CreatedDate FROM SAC_Interaccion__C WHERE RecordTypeId = :RECTYPECONSULTA AND Id=: consultaId LIMIT 1];
+            SAC_Interaccion__c consulta = [SELECT id, SAC_Reclamacion__c, CreatedDate FROM SAC_Interaccion__C WHERE RecordTypeId IN (:RECTYPECONSULTA, :RECTYPECONSULTA_TAREA) AND Id=: consultaId LIMIT 1];
             
             List<ContentVersion> archivo = [SELECT id, CreatedDate, FirstPublishLocationId, Title, PathOnClient ,VersionData FROM ContentVersion WHERE FirstPublishLocationId =: consultaId ORDER BY CreatedDate DESC LIMIT :numFicheros];
             

@@ -417,7 +417,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
 	*/
     @AuraEnabled(cacheable=true)
     public static List<SAC_Prestamo__c> getPrestamosbyReclamantes(List<String> reclamantesNumPerso){
-        List<String> ids = SAC_Utils.listaCampo([SELECT SAC_Prestamo__c FROM SAC_Prestamo_Titular__c
+        List<Id> ids = SAC_Utils.listaCampo([SELECT SAC_Prestamo__c FROM SAC_Prestamo_Titular__c
                                                 WHERE SAC_Titular__r.SAC_Id_persona_en_Origen__c
                                                 IN :reclamantesNumPerso], 'SAC_Prestamo__c', true);
 

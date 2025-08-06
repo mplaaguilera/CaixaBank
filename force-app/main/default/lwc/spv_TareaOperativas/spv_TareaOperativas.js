@@ -26,8 +26,10 @@ import notificarTareaResolutor from '@salesforce/apex/SPV_LCMP_TareaOperativas.n
 import solicitarAnulacion from '@salesforce/apex/SPV_LCMP_TareaOperativas.solicitarAnulacion';
 import cancelarSolicitud from '@salesforce/apex/SPV_LCMP_TareaOperativas.cancelarSolicitud';
 import aceptarSolicitudAnulacion from '@salesforce/apex/SPV_LCMP_TareaOperativas.aceptarSolicitudAnulacion';
-
-const tareaFields = [OWNERID_FIELD, MAESTRODEVELOPERNAME_FIELD, ESTADO_FIELD, OWNERRECID_FIELD, OWNERPRETID_FIELD, ANULACIONSOLICITADA__FIELD];
+import SENTIDORESOLUCION_FIELD from "@salesforce/schema/SAC_Accion__c.SAC_Reclamacion__r.SAC_SentidoResolucion__c";
+import MAESTROTIPO_FIELD from "@salesforce/schema/SAC_Accion__c.SAC_MaestroAccionesReclamacion__r.SAC_tipo_formulario__c";
+import MAESTROCAMBIOESTADO_FIELD from "@salesforce/schema/SAC_Accion__c.SAC_MaestroAccionesReclamacion__r.SPV_EstadoAlFinalizar__c";
+const tareaFields = [OWNERID_FIELD, MAESTRODEVELOPERNAME_FIELD, ESTADO_FIELD, OWNERRECID_FIELD, OWNERPRETID_FIELD, ANULACIONSOLICITADA__FIELD, SENTIDORESOLUCION_FIELD, MAESTROTIPO_FIELD, MAESTROCAMBIOESTADO_FIELD];
 
 export default class Spv_TareaOperativas extends LightningElement {
     @api recordId; //Id del registro en el que se encuentra el componente
@@ -92,7 +94,15 @@ export default class Spv_TareaOperativas extends LightningElement {
     get pretensionOwnerId(){
         return getFieldValue(this.record.data, OWNERPRETID_FIELD);
     }
-
+    get sentidoResolucion(){
+        return getFieldValue(this.record.data, SENTIDORESOLUCION_FIELD);
+    }
+    get maestroTipo(){
+        return getFieldValue(this.record.data, MAESTROTIPO_FIELD);
+    }
+    get maestroCambioEstado(){
+        return getFieldValue(this.record.data, MAESTROCAMBIOESTADO_FIELD);
+    }
     get anulacionSolicitada(){
         this.esSolicitada = getFieldValue(this.record.data, ANULACIONSOLICITADA__FIELD);
         return this.esSolicitada;
@@ -370,6 +380,10 @@ export default class Spv_TareaOperativas extends LightningElement {
     handleFinalizarTarea() {
         //Comprobar si la longitud de los comentarios es superior a 255. De ser asi, muestra toast informativo y sale del metodo
         if(this.comprobarLongitudComentarios()) {
+            return;
+        }
+        if(this.sentidoResolucion == null && this.maestroTipo == 'Cambio de estado' && this.maestroCambioEstado == 'Cerrado'){
+            this.lanzarToast('Error', 'Es necesario informar el sentido de resolución de la reclamación', 'error');
             return;
         }
         //Activar el spinner

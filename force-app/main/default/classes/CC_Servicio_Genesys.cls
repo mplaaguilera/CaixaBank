@@ -41,7 +41,7 @@ public with sharing class CC_Servicio_Genesys {
         if (tipoRegistro == 'Case') {
             List<Case> casos = [SELECT CC_Canal_Procedencia__c, Recordtype.DeveloperName FROM Case WHERE Id = :registroId LIMIT 1];
 			String prefix = casos[0]?.Recordtype.DeveloperName.split('_')[0];
-			String servicioPorDefecto = (!String.isEmpty(prefix) && casos[0]?.Recordtype.DeveloperName == 'CC_Empleados') ? prefix + '_GenesysCloudOutboundDefaultEmpleados' : !String.isEmpty(prefix) ? (prefix + '_GenesysCloudOutboundDefault') : 'CC_GenesysCloudOutboundDefault';
+			String servicioPorDefecto = (!String.isEmpty(prefix) && casos[0]?.Recordtype.DeveloperName == 'CC_Empleado') ? prefix + '_GenesysCloudOutboundDefaultEmpleados' : !String.isEmpty(prefix) ? (prefix + '_GenesysCloudOutboundDefault') : 'CC_GenesysCloudOutboundDefault';
 
             List<CC_Servicio_Genesys__c> serviciosDefault = [SELECT KIN_Cola_Id_GC__c  FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :servicioPorDefecto LIMIT 1];
 			if (!serviciosDefault.isEmpty() && serviciosDefault[0].KIN_Cola_Id_GC__c != null) {

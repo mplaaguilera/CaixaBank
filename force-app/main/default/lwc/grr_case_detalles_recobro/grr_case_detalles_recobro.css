@@ -1,0 +1,12 @@
+.accordion-wrapper {
+    background-color: #f3f3f3; /* gris claro */
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.custom-shadow {
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  background-color: #f5f5f5; /* gris muy claro */
+  border-radius: 4px;
+  padding: 0.5rem; /* opcional, para que el contenido no esté pegado */
+}

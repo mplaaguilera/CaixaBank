@@ -4,10 +4,11 @@ import getActivityExtensionIdApex from '@salesforce/apex/CC_Formulario_Tarea_Con
 import TIPO_CITA from '@salesforce/schema/CBK_Activity_Extension__c.CC_Tipo_de_cita__c';
 import GRUPO_COLABORADOR from '@salesforce/schema/CBK_Activity_Extension__c.CC_Grupo_Colaborador_Name__c';
 import REAPERTURA_VALIDA from '@salesforce/schema/CBK_Activity_Extension__c.CC_Reapertura_Valida_Task__c';
+import GRABACION_UNBLU from '@salesforce/schema/CBK_Activity_Extension__c.CC_Grabacion_Unblu__c';
 
 export default class Cc_Formulario_Tarea extends LightningElement {
 
-	campos = [TIPO_CITA, GRUPO_COLABORADOR, REAPERTURA_VALIDA];
+	campos = [TIPO_CITA, GRUPO_COLABORADOR, REAPERTURA_VALIDA, GRABACION_UNBLU];
 
 	@api recordId;
 
@@ -18,6 +19,7 @@ export default class Cc_Formulario_Tarea extends LightningElement {
 		if (data) {
 			console.log(data);
 			this.activityExtensionId = data;
+		
 		} else if (error) {
 			console.error(error);
 		}

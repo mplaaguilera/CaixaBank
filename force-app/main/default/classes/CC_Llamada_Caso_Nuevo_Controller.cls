@@ -2,7 +2,7 @@ public with sharing class CC_Llamada_Caso_Nuevo_Controller {
 
     @AuraEnabled
     public static Case crearCasoLlamada(Id recordId, String asunto) {
-        CC_Llamada__c llamada = [SELECT RecordType.DeveloperName, CC_Representante__c, CC_Sentimiento__c,CC_Resumen_AI__c, CC_Respuesta_Asistente__c,  CC_Servicio_Genesys__c,
+        CC_Llamada__c llamada = [SELECT CC_Contacto__r.CC_Matricula__c,RecordType.DeveloperName, CC_Representante__c, CC_Sentimiento__c,CC_Resumen_AI__c, CC_Respuesta_Asistente__c,  CC_Servicio_Genesys__c,
                                     CC_Fecha_Inicio__c, CC_Fecha_Fin__c, CC_Idioma__c, CC_Asunto__c, CC_DNIS__c, CC_ANI__c, CC_No_Identificado__c, CC_Cuenta__c, CC_Contacto__c, CC_Tipo__c, CC_ConnId__c,
                                     CC_Cuenta__r.CC_OficinaGestoraId__c, CC_Cuenta__r.AV_OficinaPrincipal__c, CC_ConnId_Consulta__c, CC_Id_Cognitivo__c, CC_Canal_del_Empleado__c,
                                     CC_IdentCliente__c, CC_Status_Autorizacion__c, OS_Cola__c, CC_Case_Consulta__c, HDT_Desborde__c
@@ -90,7 +90,7 @@ public with sharing class CC_Llamada_Caso_Nuevo_Controller {
     @AuraEnabled
     public static Case crearCasoLlamadaMasiva(Id recordId, String agrupadorId) {
        
-        CC_Llamada__c llamada = [SELECT RecordType.DeveloperName, CC_Representante__c, CC_Sentimiento__c,CC_Resumen_AI__c, CC_Respuesta_Asistente__c,  CC_Servicio_Genesys__c,
+        CC_Llamada__c llamada = [SELECT CC_Contacto__r.CC_Matricula__c,RecordType.DeveloperName, CC_Representante__c, CC_Sentimiento__c,CC_Resumen_AI__c, CC_Respuesta_Asistente__c,  CC_Servicio_Genesys__c,
                                     CC_Fecha_Inicio__c, CC_Fecha_Fin__c, CC_Idioma__c, CC_Asunto__c, CC_DNIS__c, CC_ANI__c, CC_No_Identificado__c, CC_Cuenta__c, CC_Contacto__c, CC_Tipo__c, CC_ConnId__c,
                                     CC_Cuenta__r.CC_OficinaGestoraId__c, CC_Cuenta__r.AV_OficinaPrincipal__c, CC_ConnId_Consulta__c, CC_Id_Cognitivo__c, CC_Canal_del_Empleado__c,
                                     CC_IdentCliente__c, CC_Status_Autorizacion__c, OS_Cola__c, CC_Case_Consulta__c, HDT_Desborde__c

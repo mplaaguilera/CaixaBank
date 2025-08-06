@@ -50,10 +50,18 @@ public without sharing class SAC_LCMP_Derivar {
     @AuraEnabled
     public static List<CC_Grupo_Colaborador__c> buscarGrupos(){
         List<CC_Grupo_Colaborador__c> listagrupos = new List<CC_Grupo_Colaborador__c>();
+        
         if(!Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()){ throw new AuraHandledException( 'Fallo al recuperar los grupos.' ); }
-        listagrupos = [SELECT Id, Name, SAC_PlantillaReclamacion__c, SAC_PlantillaConsulta__c, SAC_PlantillaReclamante__c, SAC_DeveloperName__c FROM CC_Grupo_Colaborador__c WHERE RecordType.DeveloperName = 'SAC_GrupoProveedores'
+        Id profileId=userinfo.getProfileId();
+        String profileName=[Select Id,Name from Profile where Id=:profileId].Name;
+        if(profileName == 'SPV_General') {
+            listagrupos = [SELECT Id, Name, SAC_PlantillaReclamacion__c, SAC_PlantillaConsulta__c, SAC_PlantillaReclamante__c, SAC_DeveloperName__c FROM CC_Grupo_Colaborador__c WHERE RecordType.DeveloperName = 'SPV_GrupoGestor'
                         AND SAC_PermiteDerivacion__c = true ORDER BY Name ASC];
-
+        } else {
+            listagrupos = [SELECT Id, Name, SAC_PlantillaReclamacion__c, SAC_PlantillaConsulta__c, SAC_PlantillaReclamante__c, SAC_DeveloperName__c FROM CC_Grupo_Colaborador__c WHERE RecordType.DeveloperName = 'SAC_GrupoProveedores'
+                        AND SAC_PermiteDerivacion__c = true ORDER BY Name ASC];
+        }
+        
         return listagrupos;
     }
 
@@ -204,6 +212,12 @@ public without sharing class SAC_LCMP_Derivar {
                     listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaCatalanId__c];
                 } else if (caso.CC_Idioma__c == 'en') {//Inglés
                     listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaInglesId__c];
+                } else if (caso.CC_Idioma__c == 'eu') {//Euskera
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaEuskeraId__c];
+                } else if (caso.CC_Idioma__c == 'ga') {//Gallego
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaGallegoId__c];
+                } else if (caso.CC_Idioma__c == 'va') {//Valenciano
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaValencianoId__c];
                 } else {
                     listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamanteCartaPostal__r.SAC_PlantillaCastellanoId__c];
                 }
@@ -219,6 +233,12 @@ public without sharing class SAC_LCMP_Derivar {
                     listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaCatalanId__c];
                 } else if (caso.CC_Idioma__c == 'en') {//Inglés
                     listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaInglesId__c];
+                } else if (caso.CC_Idioma__c == 'eu') {//Euskera
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaEuskeraId__c];
+                } else if (caso.CC_Idioma__c == 'ga') {//Gallego
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaGallegoId__c];
+                } else if (caso.CC_Idioma__c == 'va') {//Valenciano
+                    listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaValencianoId__c];
                 } else {
                     listatemplate = [SELECT Id, Name, Subject, HtmlValue FROM EmailTemplate WHERE Id = :grupo.SAC_PlantillaReclamante__r.SAC_PlantillaCastellanoId__c];
                 }

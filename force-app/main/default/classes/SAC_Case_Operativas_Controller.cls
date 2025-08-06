@@ -39,7 +39,7 @@ public without sharing class SAC_Case_Operativas_Controller {
         String userId = UserInfo.getUserId();
         Case caseSR = new Case();
         if (Schema.sObjectType.Case.isAccessible()) {
-            caseSR = [SELECT id, Status, SEG_Grupo__c, SEG_Grupo__r.Name, OwnerId, AccountId, CaseNumber, Origin, RecordTypeId, SuppliedEmail, 
+            caseSR = [SELECT id, Status, SEG_Grupo__c, SEG_Grupo__r.Name, OwnerId, AccountId, CaseNumber, Origin, RecordTypeId, SuppliedEmail, ContactEmail,
             CC_MCC_Motivo__c,CC_MCC_ProdServ__c,CC_MCC_Tematica__c, RecordType.Name, CC_Idioma__c, Priority, SEG_Detalle__c, Subject, SAC_PretensionPrincipal__c,
             SAC_Reclamacion__r.SAC_PretensionPrincipal__c, SAC_Motivo__c, RecordType.DeveloperName, CC_Canal_Respuesta__c, CC_No_Identificado__c, SAC_OrigenConsulta__c,
             SAC_EsCliente__c, ContactId, OS_Email__c, SAC_NombreContacto__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_UsarDatos__c, SAC_PoblacionContacto__c, SAC_DireccionPostalNotificacion__c, CC_Importe_Reclamado__c, SAC_NPretensionesActivas__c,
@@ -61,7 +61,7 @@ public without sharing class SAC_Case_Operativas_Controller {
             SAC_PretensionPrincipal__r.SAC_NumeroDelDocumento__c, SAC_PretensionPrincipal__r.SAC_NombreRepresentante__c, SAC_PretensionPrincipal__r.SAC_DireccionPostal__c,
             SAC_PretensionPrincipal__r.SAC_EmailRepresentante__c, SAC_PretensionPrincipal__r.SAC_TelefonoRepresentante__c, SAC_PretensionPrincipal__r.SAC_Naturaleza__c, 
             SAC_PretensionPrincipal__r.SAC_CasoEspecial__c, SAC_PretensionPrincipal__r.SAC_CASE_esPSD2__c, SAC_PretensionPrincipal__r.SAC_Entidad_Afectada__c, SAC_PretensionPrincipal__r.SAC_EntidadProductora__c, 
-            SAC_MotivoReabrir__c, OS_Fecha_Resolucion__c, SAC_Letrado__c, SAC_GrupoLetrado__c
+            SAC_MotivoReabrir__c, OS_Fecha_Resolucion__c, SAC_Letrado__c, SAC_GrupoLetrado__c, SAC_GenialEstado__c
             FROM Case WHERE RecordType.DeveloperName LIKE 'SAC_%' AND Id = :caseId LIMIT 1];
         }
         
@@ -846,6 +846,7 @@ public without sharing class SAC_Case_Operativas_Controller {
             } else if(naturaleza == 'ConsultaCOPS') {
                 List<Group> cola = [SELECT Id FROM Group WHERE DeveloperName = 'SAC_PendienteAsignar' AND Type = 'Queue' LIMIT 1];
                 CC_Grupo_Colaborador__c grupoDXC =[SELECT Id FROM CC_Grupo_Colaborador__c WHERE SAC_DeveloperName__c ='DXC Zaragoza' LIMIT 1];
+                List<SAC_Genial_Resultado__c> genialReclamacion =[SELECT Id FROM SAC_Genial_Resultado__c WHERE SAC_Reclamacion__c = :caso.id LIMIT 1];
     
                 // Creación de la nueva consulta COPS convertida
                 Case consultaCOPS = new Case (
@@ -868,13 +869,19 @@ public without sharing class SAC_Case_Operativas_Controller {
                     SAC_CodigoPostalContacto__c = caso.SAC_CodigoPostalContacto__c,
                     SAC_PoblacionContacto__c = caso.SAC_PoblacionContacto__c,
                     SAC_PaisContacto__c = caso.SAC_PaisContacto__c,
-                    SAC_DireccionPostalNotificacion__c = caso.SAC_DireccionPostalNotificacion__c
+                    SAC_DireccionPostalNotificacion__c = caso.SAC_DireccionPostalNotificacion__c,
+                    SAC_GenialEstado__c = caso.SAC_GenialEstado__c
                 );
                                       
                 if (Schema.sObjectType.Case.isCreateable()){
                     SAC_DatabaseDML.insertDML(consultaCOPS, true);
                 } 
                 caso.CC_CasoRelacionado__c = consultaCOPS.id;
+                if(!genialReclamacion.isEmpty()) {
+                    SAC_Genial_Resultado__c genialResultado = genialReclamacion[0].clone(false, false, false, false);
+                    genialResultado.SAC_Reclamacion__c = consultaCOPS.Id;
+                    SAC_DatabaseDML.insertDML(genialResultado, true);
+                }
 
                 // Llamada al metodo para copiar los adjuntos en el nuevo caso creado;
                 copiarEmailsAdjuntos(caso.id, consultaCOPS.id);
@@ -1159,7 +1166,7 @@ public without sharing class SAC_Case_Operativas_Controller {
         //Reclamación que se está reabriendo
         Case casoReabrir = new Case();
         
-        //Comprobar si el estado es derivación o rechazado, si es así, asignar el estado que tenía anterior a la derivación o rechazado
+        //Comprobar si el estado es derivación, rechazado o cerrada sin resolver, si es así, asignar el estado que tenía anterior a la derivación, rechazado o cierre sin resolver
         if(casoEntrada.Status == 'SAC_008'){
 
             List<CaseHistory> historial = [SELECT id, NewValue,OldValue,CreatedDate FROM CaseHistory WHERE CaseId =: caseId ORDER BY CreatedDate ASC];
@@ -1180,6 +1187,21 @@ public without sharing class SAC_Case_Operativas_Controller {
 
             for(CaseHistory h : historial){
                 if(String.valueOf(h.NewValue) == 'Rechazado'){
+                    fechaCambio = h.CreatedDate;
+                    estadoAnterior = String.valueOf(h.OldValue);
+                }
+            }
+
+            casoReabrir.Status = estadoAnterior;
+            casoReabrir.SAC_StatusAuxiliar__c = estadoAnterior;
+            casoReabrir.SAC_MotivoRechazo__c = null;
+
+        }else if(casoEntrada.Status == 'SAC_014'){
+
+            List<CaseHistory> historial = [SELECT id, NewValue,OldValue,CreatedDate FROM CaseHistory WHERE CaseId =: caseId ORDER BY CreatedDate ASC];
+
+            for(CaseHistory h : historial){
+                if(String.valueOf(h.NewValue) == 'SAC_014'){
                     fechaCambio = h.CreatedDate;
                     estadoAnterior = String.valueOf(h.OldValue);
                 }
@@ -1235,8 +1257,8 @@ public without sharing class SAC_Case_Operativas_Controller {
             }   
 
         
-        }else if(casoEntrada.Status == 'Rechazado' || casoEntrada.Status == 'SAC_008'){ //Si la reclamación se reabre estando Rechazada o Derivada, las pretensiones que no estaban en baja se reabren con su estado anterior.
-
+        }else if(casoEntrada.Status == 'Rechazado' || casoEntrada.Status == 'SAC_008' || casoEntrada.Status == 'SAC_014'){ //Si la reclamación se reabre estando Rechazada o Derivada, las pretensiones que no estaban en baja se reabren con su estado anterior.
+                                                                                        //Si la reclamación estaba en estado Cerrada sin resolver, las pretensiones vuelven a su estado anterior (menos las que estan en baja)
             if(!Test.isRunningTest()){
             List<Case> listaPretensiones = [SELECT Id, SAC_SentidoResolucion__c, SAC_RedaccionFinal__c, Status FROM Case WHERE RecordType.DeveloperName = 'SAC_Pretension' AND SAC_Reclamacion__c = :caseId];
 
@@ -1260,7 +1282,7 @@ public without sharing class SAC_Case_Operativas_Controller {
                 for(Case pretension : listaPretensiones){
                     List<CaseHistory> hPretension = mapIdHistorial.get(pretension.id);
                     for(CaseHistory hP : hPretension){
-                        if(String.valueOf(hP.NewValue) == 'SAC_009' && hP.createdDate == fechaCambio){
+                        if((casoEntrada.Status != 'SAC_014' && String.valueOf(hP.NewValue) == 'SAC_009' && hP.createdDate == fechaCambio) || (casoEntrada.Status == 'SAC_014' && String.valueOf(hP.NewValue) == 'Cerrado')){
                             pretension.Status = String.valueOf(hP.OldValue);
                             pretension.SAC_StatusAuxiliar__c = String.valueOf(hP.OldValue);
                             //Añadido US501943 11/01/23. Se debe desmarcar el campo SAC_CasoNegociado__c para poder reabrir el SLA de un caso que habia sido negociado
@@ -2006,7 +2028,7 @@ public without sharing class SAC_Case_Operativas_Controller {
             Id idPlantilla = null;
             SAC_PlantillaRedaccion__c maestroPlantillas = new SAC_PlantillaRedaccion__c();
             if(casoAux.CC_Canal_Respuesta__c == 'Email' || casoAux.CC_Canal_Respuesta__c == 'SAC_CartaPostal'){
-                maestroPlantillas = [SELECT Id, SAC_PlantillaCatalanId__c, SAC_PlantillaCastellanoId__c, SAC_PlantillaInglesId__c, SAC_CanalRespuesta__c FROM SAC_PlantillaRedaccion__c WHERE RecordType.DeveloperName = 'SAC_Redaccion' AND SAC_TipoPlantilla__c =: 'SAC_Prorroga' AND SAC_CanalRespuesta__c IN: canalRespuesta];
+                maestroPlantillas = [SELECT Id, SAC_PlantillaCatalanId__c, SAC_PlantillaCastellanoId__c, SAC_PlantillaInglesId__c, SAC_PlantillaEuskeraId__c, SAC_PlantillaValencianoId__c, SAC_PlantillaGallegoId__c,  SAC_CanalRespuesta__c FROM SAC_PlantillaRedaccion__c WHERE RecordType.DeveloperName = 'SAC_Redaccion' AND SAC_TipoPlantilla__c =: 'SAC_Prorroga' AND SAC_CanalRespuesta__c IN: canalRespuesta];
             }
             
             if(maestroPlantillas.SAC_CanalRespuesta__c == 'Email'){
@@ -2017,7 +2039,13 @@ public without sharing class SAC_Case_Operativas_Controller {
                     idPlantilla = maestroPlantillas.SAC_PlantillaCatalanId__c;
                 } else if(casoAux.CC_Idioma__c == 'en'){
                     idPlantilla = maestroPlantillas.SAC_PlantillaInglesId__c;
-                } else {
+                } else if(casoAux.CC_Idioma__c == 'eu'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaEuskeraId__c;
+                } else if(casoAux.CC_Idioma__c == 'va'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaValencianoId__c;
+                } else if(casoAux.CC_Idioma__c == 'ga'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaGallegoId__c;
+                }else {
                     idPlantilla = maestroPlantillas.SAC_PlantillaCastellanoId__c;
                 }
 
@@ -2037,6 +2065,12 @@ public without sharing class SAC_Case_Operativas_Controller {
                     idPlantilla = maestroPlantillas.SAC_PlantillaCatalanId__c;
                 } else if(casoAux.CC_Idioma__c == 'en'){
                     idPlantilla = maestroPlantillas.SAC_PlantillaInglesId__c;
+                } else if(casoAux.CC_Idioma__c == 'eu'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaEuskeraId__c;
+                } else if(casoAux.CC_Idioma__c == 'va'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaValencianoId__c;
+                } else if(casoAux.CC_Idioma__c == 'ga'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaGallegoId__c;
                 } else {
                     idPlantilla = maestroPlantillas.SAC_PlantillaCastellanoId__c;
                 }
@@ -2117,7 +2151,7 @@ public without sharing class SAC_Case_Operativas_Controller {
             Id idPlantilla = null;
             SAC_PlantillaRedaccion__c maestroPlantillas = new SAC_PlantillaRedaccion__c();
             if(casoAux.CC_Canal_Respuesta__c == 'Email' || casoAux.CC_Canal_Respuesta__c == 'SAC_CartaPostal'){
-                maestroPlantillas = [SELECT Id, SAC_PlantillaCatalanId__c, SAC_PlantillaCastellanoId__c, SAC_PlantillaInglesId__c, SAC_CanalRespuesta__c FROM SAC_PlantillaRedaccion__c WHERE RecordType.DeveloperName = 'SAC_Redaccion' AND SAC_TipoPlantilla__c =: 'SAC_Prorroga' AND SAC_CanalRespuesta__c IN: canalRespuesta];
+                maestroPlantillas = [SELECT Id, SAC_PlantillaCatalanId__c, SAC_PlantillaCastellanoId__c, SAC_PlantillaInglesId__c, SAC_PlantillaEuskeraId__c, SAC_PlantillaValencianoId__c, SAC_PlantillaGallegoId__c, SAC_CanalRespuesta__c FROM SAC_PlantillaRedaccion__c WHERE RecordType.DeveloperName = 'SAC_Redaccion' AND SAC_TipoPlantilla__c =: 'SAC_Prorroga' AND SAC_CanalRespuesta__c IN: canalRespuesta];
             }
             
             if(maestroPlantillas.SAC_CanalRespuesta__c == 'Email'){
@@ -2128,6 +2162,12 @@ public without sharing class SAC_Case_Operativas_Controller {
                     idPlantilla = maestroPlantillas.SAC_PlantillaCatalanId__c;
                 } else if(casoAux.CC_Idioma__c == 'en'){
                     idPlantilla = maestroPlantillas.SAC_PlantillaInglesId__c;
+                } else if(casoAux.CC_Idioma__c == 'eu'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaEuskeraId__c;
+                } else if(casoAux.CC_Idioma__c == 'va'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaValencianoId__c;
+                } else if(casoAux.CC_Idioma__c == 'ga'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaGallegoId__c;
                 } else {
                     idPlantilla = maestroPlantillas.SAC_PlantillaCastellanoId__c;
                 }
@@ -2148,6 +2188,12 @@ public without sharing class SAC_Case_Operativas_Controller {
                     idPlantilla = maestroPlantillas.SAC_PlantillaCatalanId__c;
                 } else if(casoAux.CC_Idioma__c == 'en'){
                     idPlantilla = maestroPlantillas.SAC_PlantillaInglesId__c;
+                } else if(casoAux.CC_Idioma__c == 'eu'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaEuskeraId__c;
+                } else if(casoAux.CC_Idioma__c == 'va'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaValencianoId__c;
+                } else if(casoAux.CC_Idioma__c == 'ga'){
+                    idPlantilla = maestroPlantillas.SAC_PlantillaGallegoId__c;
                 } else {
                     idPlantilla = maestroPlantillas.SAC_PlantillaCastellanoId__c;
                 }

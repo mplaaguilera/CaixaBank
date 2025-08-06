@@ -19,7 +19,7 @@ public with sharing class SPV_LCMP_FormularioReclamaciones_Test {
             usuarioGeneral = SPV_TestDataFactory.crearUsuarioSPVGeneral(1)[0];
             Database.insert(usuarioGeneral);
 
-            PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SPV_Administrador'];
+            PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SPV_General'];
             PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
             permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
             permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
@@ -76,7 +76,7 @@ public with sharing class SPV_LCMP_FormularioReclamaciones_Test {
 
         //Crear formulario
         SPV_Formulario__c formulario = new SPV_Formulario__c();
-        formulario.RecordTypeId = Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SPV_Formulario').getRecordTypeId();
+        formulario.RecordTypeId = Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SPV_FormularioAnalisisDecision').getRecordTypeId();
         formulario.SPV_Caso__c = casoReclamacion.Id;
         formulario.SPV_LetradoRevisor__c = 'TestSPV';
         formulario.SPV_Importe__c = 1;
@@ -120,6 +120,7 @@ public with sharing class SPV_LCMP_FormularioReclamaciones_Test {
 
         System.runAs(usuario1){
             Test.startTest();
+            Id formularioId = SPV_LCMP_FormularioReclamaciones.crearNuevoFormularioReclamacion(reclamacion.Id);
             String resultado = SPV_LCMP_FormularioReclamaciones.getFormularioExistente(reclamacion.Id);
 
             Assert.areNotEqual(null, resultado, 'No se han recuperado el formulario');
@@ -132,11 +133,13 @@ public with sharing class SPV_LCMP_FormularioReclamaciones_Test {
 
         User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
         Case reclamacion = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec'];
+        List<Id> pretensionesIds = new List<Id>();
 
         System.runAs(usuario1){
             Test.startTest();
             List<Case> pretensiones = SPV_LCMP_FormularioReclamaciones.getPretensionesReclamacion(reclamacion.Id);
-
+            pretensionesIds.add(pretensiones[0].Id);
+			Map<Id, String> productos = SPV_LCMP_FormularioReclamaciones.getNumeroContratos(pretensionesIds);
             Assert.areNotEqual(null, pretensiones[0].id, 'No se han recuperado las pretensiones');
             Test.stopTest();
         }

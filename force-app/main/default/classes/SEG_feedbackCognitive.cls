@@ -39,7 +39,6 @@ public class SEG_feedbackCognitive implements Queueable, Database.AllowsCallouts
             CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
             requestWrp.body = jsonToCognitive;
             requestWrp.intSetting = intSetting;
-            requestWrp.method = 'PUT';
             requestWrp.mHeaders = mHeaders;
             requestWrp.mUriParams = null;
             requestWrp.mQueryParams = null;

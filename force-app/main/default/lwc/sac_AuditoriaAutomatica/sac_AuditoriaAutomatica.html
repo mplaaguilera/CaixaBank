@@ -497,176 +497,184 @@
                 </div>
                 <div class="separador-lateral"></div>
               </div>
-              <div class="slds-form__row">
-                <div class="separador-lateral"></div>
-                <div class="slds-form__item" role="listitem">
-                  <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
-                    <label class="slds-form-element__label" for="single-form-element-id-02">Temática</label>
-                    <div class="slds-form-element__control">
-                      <div class="slds-combobox_container">
-                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
-                          <!-- Buscador/Selector de temática -->
-                          <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                            <lightning-input disabled={disabled} name="buscadorTematica" class="inputBox" placeholder=" -- todos --" onblur={blurTematica} onclick={mostrarOpcTematica} onkeyup={filtrarOpcTematica} value={searchInputTematica} autocomplete="off" variant="label-hidden" id="combobox-id-4" ></lightning-input>
-                            <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
-                          </div>
-                          <!-- Mostrar opciones temática -->
-                          <template if:true={modalOpcionesTematica}>
-                            <div id="listbox-id-4" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
-                              <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
-                                <template if:false={message} >
-                                  <div  class="scroll-container">
-                                    <template for:each={filteredResultsTematica} for:item="option">
-                                      <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectTematica} class="slds-listbox__item eachItem">
-                                        <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
-                                      </li>
-                                    </template>
-                                    <div if:true={hayMasResultados} class="fixed-div">
-                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
-                                    </div>
-                                  </div>
-                                </template>
-                                <template if:true={message} >
-                                  <li class="slds-listbox__item">
-                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
-                                  </li>
-                                </template>
-                              </ul>
-                            </div>
-                          </template>
+              <!-- Sección Temática -->
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02">Temática</label>
+                  <div class="slds-form-element__control">
+    
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        
+                        <!-- Buscador/selector de tematica -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabledTematica} name="buscadorTematica" class="inputBox" placeholder="Seleccione la/s temática/s deseada/s..." onblur={blurTematica} onclick={mostrarOpcTematica} value={searchInputTematica} variant="label-hidden" id="combobox-id-4" readonly></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
                         </div>
+
+                        <!-- Mostrar opciones temática -->
+                        <template if:true={modalOpcionesTematica}>
+                          <div id="listbox-id-4" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message}>
+                                <div class="scroll-container">
+                                  <template for:each={filteredResultsTematica} for:item="option">
+                                    <li key={option.Id} data-value={option.Id} data-name={option.Name} onmousedown={selectTematica} class="slds-listbox__item eachItem">
+                                      <template if:true={option.selected}>
+                                        <lightning-icon icon-name="utility:check" size="x-small" alternative-text="icon" ></lightning-icon>
+                                      </template>
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                </div>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+
                       </div>
                     </div>
+                            
                   </div>
                 </div>
-                <div class="separador-central"></div>
-                <div class="slds-form__item" role="listitem">
-                  <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
-                    <label class="slds-form-element__label" for="single-form-element-id-03">Producto</label>
-                    <div class="slds-form-element__control">
-                      <div class="slds-combobox_container">
-                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
-                          <!-- Buscador/Selector de producto -->
-                          <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                            <lightning-input disabled={disabledProducto} name="buscadorProducto" class="inputBox" placeholder=" -- todos --" onblur={blurProducto} onclick={mostrarOpcProducto} onkeyup={filtrarOpcProducto} value={searchInputProducto} autocomplete="off" variant="label-hidden" id="combobox-id-5" ></lightning-input>
-                            <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
-                          </div>
-                          <!-- Mostrar opciones producto -->
-                          <template if:true={modalOpcionesProducto}>
-                            <div id="listbox-id-5" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
-                              <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
-                                <template if:false={message} >
-                                  <div  class="scroll-container">
-                                    <template for:each={filteredResultsProducto} for:item="option">
-                                      <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectProducto} class="slds-listbox__item eachItem">
-                                        <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
-                                      </li>
-                                    </template>
-                                    <div if:true={hayMasResultados} class="fixed-div">
-                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
-                                    </div>
-                                  </div>
-                                </template>
-                                <template if:true={message} >
-                                  <li class="slds-listbox__item">
-                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
-                                  </li>
-                                </template>
-                              </ul>
-                            </div>
-                          </template>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="separador-lateral"></div>
               </div>
-              <div class="slds-form__row">
-                <div class="separador-lateral"></div>
-                <div class="slds-form__item" role="listitem">
-                  <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
-                    <label class="slds-form-element__label" for="single-form-element-id-02">Motivo</label>
-                    <div class="slds-form-element__control">
-                      <div class="slds-combobox_container">
-                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
-                          <!-- Buscador/Selector de motivo -->
-                          <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                            <lightning-input disabled={disabledMotivo} name="buscadorMotivo" class="inputBox" placeholder=" -- todos --" onblur={blurMotivo} onclick={mostrarOpcMotivo} onkeyup={filtrarOpcMotivo} value={searchInputMotivo} autocomplete="off" variant="label-hidden" id="combobox-id-6" ></lightning-input>
-                            <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
-                          </div>
-                          <!-- Mostrar opciones motivo -->
-                          <template if:true={modalOpcionesMotivo}>
-                            <div id="listbox-id-6" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
-                              <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
-                                <template if:false={message} >
-                                  <div  class="scroll-container">
-                                    <template for:each={filteredResultsMotivo} for:item="option">
-                                      <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectMotivo} class="slds-listbox__item eachItem">
-                                        <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
-                                      </li>
-                                    </template>
-                                    <div if:true={hayMasResultados} class="fixed-div">
-                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
-                                    </div>
-                                  </div>
-                                </template>
-                                <template if:true={message} >
-                                  <li class="slds-listbox__item">
-                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
-                                  </li>
-                                </template>
-                              </ul>
-                            </div>
-                          </template>
+
+              <!-- Sección Producto -->
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">Producto</label>
+                  <div class="slds-form-element__control">
+    
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        
+                        <!-- Buscador/selector de producto -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabledProducto} name="buscadorProducto" class="inputBox" placeholder="Seleccione lo/s producto/s deseado/s..." onblur={blurProducto} onclick={mostrarOpcProducto} value={searchInputProducto} variant="label-hidden" id="combobox-id-5" readonly></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
                         </div>
+
+                        <!-- Mostrar opciones producto -->
+                        <template if:true={modalOpcionesProducto}>
+                          <div id="listbox-id-5" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message}>
+                                <div class="scroll-container">
+                                  <template for:each={filteredResultsProducto} for:item="option">
+                                    <li key={option.Id} data-value={option.Id} data-name={option.Name} onmousedown={selectProducto} class="slds-listbox__item eachItem">
+                                      <template if:true={option.selected}>
+                                        <lightning-icon icon-name="utility:check" size="x-small" alternative-text="icon" ></lightning-icon>
+                                      </template>
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                </div>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+
                       </div>
                     </div>
-                  </div>
-                </div>
-                <div class="separador-central"></div>
-                <div class="slds-form__item" role="listitem">
-                  <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
-                    <label class="slds-form-element__label" for="single-form-element-id-03">Detalle</label>
-                    <div class="slds-form-element__control">
-                      <div class="slds-combobox_container">
-                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
-                          <!-- Buscador/Selector de detalle -->
-                          <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                            <lightning-input disabled={disabledDetalle} name="buscadorDetalle" class="inputBox" placeholder=" -- todos --" onblur={blurDetalle} onclick={mostrarOpcDetalle} onkeyup={filtrarOpcDetalle} value={searchInputDetalle} autocomplete="off" variant="label-hidden" id="combobox-id-7" ></lightning-input>
-                            <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
-                          </div>
-                          <!-- Mostrar opciones detalle -->
-                          <template if:true={modalOpcionesDetalle}>
-                            <div id="listbox-id-7" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
-                              <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
-                                <template if:false={message} >
-                                  <div  class="scroll-container">
-                                    <template for:each={filteredResultsDetalle} for:item="option">
-                                      <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectDetalle} class="slds-listbox__item eachItem">
-                                        <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
-                                      </li>
-                                    </template>
-                                    <div if:true={hayMasResultados} class="fixed-div">
-                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
-                                    </div>
-                                  </div>
-                                </template>
-                                <template if:true={message} >
-                                  <li class="slds-listbox__item">
-                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
-                                  </li>
-                                </template>
-                              </ul>
-                            </div>
-                          </template>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="separador-lateral"></div>
+
+                  </div>  
+                </div>    
               </div>
+              <div class="separador-lateral"></div>
+            </div>
+
+            <!-- Sección Motivo -->
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">Motivo</label>
+                  <div class="slds-form-element__control">
+    
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        
+                        <!-- Buscador/selector de motivo -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabledMotivo} name="buscadorMotivo" class="inputBox" placeholder="Seleccione lo/s motivo/s deseado/s..." onblur={blurMotivo} onclick={mostrarOpcMotivo} value={searchInputMotivo} variant="label-hidden" id="combobox-id-6" readonly></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+
+                        <!-- Mostrar opciones motivo -->
+                        <template if:true={modalOpcionesMotivo}>
+                          <div id="listbox-id-6" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message}>
+                                <div class="scroll-container">
+                                  <template for:each={filteredResultsMotivo} for:item="option">
+                                    <li key={option.Id} data-value={option.Id} data-name={option.Name} onmousedown={selectMotivo} class="slds-listbox__item eachItem">
+                                      <template if:true={option.selected}>
+                                        <lightning-icon icon-name="utility:check" size="x-small" alternative-text="icon" ></lightning-icon>
+                                      </template>
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                </div>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+
+                      </div>
+                    </div>
+
+                  </div>  
+                </div>    
+              </div>
+
+              <!-- Sección Detalle -->
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">Detalle</label>
+                  <div class="slds-form-element__control">
+    
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        
+                        <!-- Buscador/selector de detalle -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabledDetalle} name="buscadorDetalle" class="inputBox" placeholder="Seleccione lo/s detalle/s deseado/s..." onblur={blurDetalle} onclick={mostrarOpcDetalle} value={searchInputDetalle} variant="label-hidden" id="combobox-id-7" readonly></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+
+                        <!-- Mostrar opciones detalle -->
+                        <template if:true={modalOpcionesDetalle}>
+                          <div id="listbox-id-7" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message}>
+                                <div class="scroll-container">
+                                  <template for:each={filteredResultsDetalle} for:item="option">
+                                    <li key={option.Id} data-value={option.Id} data-name={option.Name} onmousedown={selectDetalle} class="slds-listbox__item eachItem">
+                                      <template if:true={option.selected}>
+                                        <lightning-icon icon-name="utility:check" size="x-small" alternative-text="icon" ></lightning-icon>
+                                      </template>
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                </div>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+
+                      </div>
+                    </div>
+
+                  </div>  
+                </div>    
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            
               <div class="slds-form__row">
                 <div class="separador-lateral"></div>
                 <div class="slds-form__item" role="listitem">

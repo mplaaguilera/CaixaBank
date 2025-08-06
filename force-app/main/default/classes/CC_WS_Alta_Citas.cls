@@ -11,7 +11,8 @@ public with sharing class CC_WS_Alta_Citas {
         }else if(!existenTareasCitas){
             try {
                 CC_Settings__c configuracion = CC_Settings__c.getValues('CC_Configuracion_Cita_Rapida');
-                Blob digest = Crypto.generateDigest('SHA-256', Blob.valueOf(numPer + 'asesorVentas1'));
+                //Blob digest = Crypto.generateDigest('SHA-256', Blob.valueOf(numPer + 'asesorVentas1'));//se quita por la US1169531
+                Blob digest = Crypto.generateDigest('SHA-512', Blob.valueOf(numPer));
                 String branchHashId = EncodingUtil.convertToHex(digest);
                 Map<String, String> requestHeaders = getRequestHeaders();
                 
@@ -24,7 +25,7 @@ public with sharing class CC_WS_Alta_Citas {
                 bodyRequest.put('device', configuracion.CC_Configuracion_6__c);
                 bodyRequest.put('slotStartTime', franjaSeleccionada.substring(0, 5));
                 bodyRequest.put('reservationType', configuracion.CC_Configuracion_2__c);
-                bodyRequest.put('customerInternalId', numPer);
+                //bodyRequest.put('customerInternalId', numPer); //se quita por la US1169531
                 bodyRequest.put('customerInternalHashId', branchHashId);
                 String jsonBody = JSON.serialize(bodyRequest);
 

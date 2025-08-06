@@ -80,7 +80,7 @@
 
                             <aura:if isTrue="{!v.alta}">
 
-                                <lightning:button label="Subsanación" iconname="" onclick="{!c.openModalIdioma}">
+                                <lightning:button label="Subsanación" iconname="" onclick="{!c.clickReclamacion}">
                                 </lightning:button>
 
                             </aura:if>

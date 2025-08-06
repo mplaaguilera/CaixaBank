@@ -845,6 +845,7 @@ public with sharing class HDT_CaseTriggerHelper {
         }
 
         if(!lstTareas.isEmpty()){
+            System.debug('lstTareas: ' + JSON.serializePretty(lstTareas));
             HDT_Activity.crearActividades(lstTareas);
         }
     }
@@ -1102,10 +1103,40 @@ public with sharing class HDT_CaseTriggerHelper {
     /*************************** */
 
     public static void envioCorreoAcuseRecibo(List<Case> casos,Map<Id, Case> mapOldObj) {
-         
+
+        // Obtener todos los ContactId de los casos en una sola consulta
+            Set<Id> contactIds = new Set<Id>();
+            for (Case caso : casos) {
+                if (caso.ContactId != null) {
+                    contactIds.add(caso.ContactId);
+                }
+            } 
+
+
+        // Verificamos si hay tareas de acuse de recibo para esos casos en una sola consulta
+             List<Task> tareasAcuse = new List<Task>(); 
+             if (!contactIds.isEmpty()) {
+                 tareasAcuse = [
+                     SELECT WhatId, WhoId 
+                     FROM Task 
+                     WHERE RecordType.DeveloperName = 'HDT_Task'
+                     AND Type = 'Acuse de recibo' 
+                     AND WhatId IN :casos 
+                     AND WhoId IN :contactIds
+                 ];
+ 
+             }
+
+            if (!tareasAcuse.isEmpty())  {
+                //Salimos del metodo porque ya existen tareas para estos contactos
+                return;
+             }
+            
+            
             Boolean cambioContacto = false;
             // Verificar si hay cambios en ContactId
             for (Case caso : casos) {
+               
                 Case oldCase = mapOldObj.get(caso.Id);
                 if (oldCase != null && oldCase.ContactId != caso.ContactId) {
                     cambioContacto = true;
@@ -1113,12 +1144,7 @@ public with sharing class HDT_CaseTriggerHelper {
                 }
             }
 
-            // Si NO hubo cambios en ContactId, salir de la función
-            if (!cambioContacto) {
-                return;
-            }
-
-
+            
             // Buscamos los valores por defecto
             List<CC_Lista_Valores__c> valorValidacion = [SELECT Name, CC_Valor__c,CC_Valor2__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT_Mensajes_Parametrizables_Empleados' AND Name = 'Acuse de recibo limite tiempo' LIMIT 1];
             List<Case> casosParaActualizar = new List<Case>();
@@ -1134,32 +1160,11 @@ public with sharing class HDT_CaseTriggerHelper {
             HDT_Parametros__c emailRespuesta = HDT_Parametros__c.getInstance('HDT_Email_Respuesta_Empleados_New');
             List<OrgWideEmailAddress> buzones = [SELECT Id FROM OrgWideEmailAddress WHERE Address IN (:emailrespuesta.HDT_Configuracion_1__c) ORDER BY Address LIMIT 10];
 
-            // Obtener todos los ContactId de los casos en una sola consulta
-            Set<Id> contactIds = new Set<Id>();
-            for (Case caso : casos) {
-                if (caso.ContactId != null) {
-                    contactIds.add(caso.ContactId);
-                }
-            } 
             
-             // Verificamos si hay tareas de acuse de recibo para esos casos en una sola consulta
-             List<Task> tareasAcuse = new List<Task>(); 
-             if (!contactIds.isEmpty()) {
-                 tareasAcuse = [
-                     SELECT WhatId, WhoId 
-                     FROM Task 
-                     WHERE RecordType.DeveloperName = 'HDT_Task'
-                     AND Type = 'Acuse de recibo' 
-                     AND WhatId IN :casos 
-                     AND WhoId IN :contactIds
-                 ];
- 
-             }
-
              List<Messaging.SingleEmailMessage> acuses = new List<Messaging.SingleEmailMessage>();
              if (!plantillas.isEmpty() && !buzones.isEmpty()){
                 for (Case caso : casos) {
-                    if (caso.ContactId == null || !hanPasadoLimiteHoras(caso,tiempoValidacion) || caso.Status != 'Activo' || caso.ContactId == mapOldObj.get(caso.Id).ContactId) {
+                    if (caso.ContactId == null || !hanPasadoLimiteHoras(caso,tiempoValidacion) || caso.Status != 'Activo' /*|| caso.ContactId == mapOldObj.get(caso.Id).ContactId*/) {
                         continue; // Salta este caso y pasa al siguiente
                     }
         
@@ -1276,7 +1281,7 @@ public with sharing class HDT_CaseTriggerHelper {
 
         for (Case caso : lstCasos) {
             // Verificar que el caso fue creado dentro del límite dinámico y cumple con las demás condiciones
-            if (caso.CreatedDate >= limiteMinutos  
+            if (caso.CreatedDate >= limiteMinutos && !caso.HDT_Desborde__c  //Usamos este campo para comprobar si viene de Masiva desde el botón de llamada o no.
                 && caso.CC_MCC_Tematica__c != null 
                 && caso.CC_MCC_ProdServ__c != null 
                 && caso.CC_MCC_Motivo__c != null 
@@ -1317,11 +1322,6 @@ public with sharing class HDT_CaseTriggerHelper {
         String umbralTiempoEnvioNuevo = (valores.isEmpty() || valores[0].CC_Valor__c == null) 
         ? '15'  // Valor por defecto si no se encuentra el registro o es null.
         : valores[0].CC_Valor__c;
-
-        /*
-         // Recogemos el tiempo para validar cuando enviar el nuevo email pasado 15 mins.
-       String umbralTiempoEnvioNuevo = [SELECT CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT - Aviso Comunicaciones Informativas' 
-       AND Name = 'Comunicación Informativa de Caso - Umbral Envio de Emails'].CC_Valor__c;*/
 
        //Convertimos a numero para operar. Por defecto son 3 casos.
        Integer umbralTiempoEnvio = Integer.valueOf(umbralTiempoEnvioNuevo);
@@ -1455,7 +1455,7 @@ public with sharing class HDT_CaseTriggerHelper {
         DateTime limiteMinutos = fechaHoraActual.addMinutes(-umbralPrimerAviso);
 
         Set<String> causasSet = new Set<String>();
-        for (Case c : [SELECT CC_Causa__c FROM Case WHERE Id IN :idsCasos]) {
+        for (Case c : [SELECT CC_Causa__c FROM Case WHERE Id IN :idsCasos AND RecordType.DeveloperName = 'HDT_Empleado' AND CreatedDate >= : limiteMinutos]) {
             if (c.CC_Causa__c != null) {
                 causasSet.add(c.CC_Causa__c);
             }
@@ -1496,17 +1496,7 @@ public with sharing class HDT_CaseTriggerHelper {
                     AND RecordType.DeveloperName = 'HDT_Empleado'
                     AND CC_Causa__c IN :causasSet // Aquí se añade el filtro por las causas obtenidas
             ];
-           /* //Recogemos los casos anteriores que no se haya enviado email
-            lstCasosConMismaCausa = [SELECT CC_MCC_ProdServ__r.Name,CC_MCC_Motivo__r.Name,CreatedDate,CC_Repetitivo__c,CaseNumber,CC_MCC_Tematica__r.Name,Status,ContactId,CC_MCC_Motivo__c,CC_MCC_ProdServ__c,CC_MCC_Tematica__c,CC_Causa__c,Id, CC_Comunicacion_Informativa__c, CC_Admin__c,CC_MCC_Causa__c,CC_MCC_Causa__r.Name,CC_Campana__c, CC_Campana__r.Name 
-            FROM Case 
-            WHERE   CreatedDate >= :limiteMinutos
-                    AND CC_MCC_Tematica__c != null 
-                    AND CC_MCC_Causa__c != null 
-                    AND CC_MCC_ProdServ__c != null 
-                    AND CC_MCC_Motivo__c != null 
-                    //AND Id NOT IN :idsCasos
-                    AND RecordType.DeveloperName = 'HDT_Empleado'];*/
-        
+           
                     }
  
         // Si esta vacio salimos
@@ -1856,10 +1846,6 @@ public with sharing class HDT_CaseTriggerHelper {
     public static void cierreCasoHDT2N(List<Case> lstCasos, Map<Id, Case> oldMap) {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
 
-        /*
-        // Asegúrate de cargar el RecordType en la consulta SOQL de los casos
-        List<Case> casosFiltrados = [SELECT CC_Notif_Cont_Inter__c,ContactId,CC_SuppliedURL__c,CC_MCC_Tematica__c,CaseNumber,CC_Matricula_Empleado__c,CC_Idioma__c,CC_Canal_Resolucion__c,Status,Origin,HDT_Resuelto_Primera_Llamada__c,Id, CC_Agrupador_Id__c, CC_Agrupador_Id__r.RecordType.DeveloperName 
-        FROM Case WHERE RecordTypeId =: rtEmpleado  AND Id IN :oldMap.keySet()];*/
         
         List<CC_Lista_Valores__c> listaCanalResolucion = [SELECT Name,CC_Valor__c, CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Valor__c = 'EDG' AND CC_Lista__r.Name = 'HDT - Envío de Encuesta 2N - Canales de resolución'];
         List<CC_Lista_Valores__c> listaCanalResolucion2 = [SELECT Name,CC_Valor__c, CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Valor__c = 'No EDG' AND CC_Lista__r.Name = 'HDT - Envío de Encuesta 2N - Canales de resolución'];
@@ -1975,6 +1961,7 @@ public with sharing class HDT_CaseTriggerHelper {
         }
     }
 
+    
     public static void generarEncuestaHDT2N(Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj) {
 
         // Recuperar los valores de la lista para canales de NO EDG
@@ -1990,15 +1977,6 @@ public with sharing class HDT_CaseTriggerHelper {
             valoresCanalResolucion.add(valor.Name);
         }
 
-        /*
-        // Recuperar los valores de la lista para canales de NO EDGS
-        List<String> valoresCanalResolucion = new List<String>();
-        for (CC_Lista_Valores__c valor : [
-            SELECT Name,CC_Valor__c, CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Valor__c = 'No EDG' AND CC_Lista__r.Name = 'HDT - Envío de Encuesta 2N - Canales de resolución'
-        ]) {
-            valoresCanalResolucion.add(valor.Name);
-        }*/
-
          // Recuperar los valores de la lista para canales de NO EDG
          Set<String> valoresCanalResolucionEDGs = new Set<String>();
 
@@ -2011,16 +1989,7 @@ public with sharing class HDT_CaseTriggerHelper {
          ]) {
             valoresCanalResolucionEDGs.add(valor.Name);
          }
-         /*
-
-        // Recuperar los valores de la lista para canales de NO EDGS
-        List<String> valoresCanalResolucionEDGs = new List<String>();
-        for (CC_Lista_Valores__c valor : [
-            SELECT Name,CC_Valor__c, CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Valor__c = 'EDG' AND CC_Lista__r.Name = 'HDT - Envío de Encuesta 2N - Canales de resolución'
-        ]) {
-            valoresCanalResolucionEDGs.add(valor.Name);
-        }*/
-
+        
         List<CC_Lista_Valores__c> listaCanalResolucion = [SELECT Name,CC_Activa__c,CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT - Envío de Encuesta 2N - Canales de resolución'];
         
 		Set<String> canalesResolucion = new Set<String>();
@@ -2107,21 +2076,7 @@ public with sharing class HDT_CaseTriggerHelper {
 
         }
 
-        /*
-        if (!lstCasosHDT.isEmpty()) {
-            for (Case casoFiltrado : lstCasosHDT) {
-                // Crear una copia para evitar modificar registros de solo lectura
-                Case casoEditable = new Case(Id = casoFiltrado.Id);
-    
-                // Buscar activos asociados a la cuenta
-                List<Asset> valorAsset = [SELECT Id FROM Asset WHERE AccountId = :casoFiltrado.AccountId LIMIT 1];
-                if (!valorAsset.isEmpty()) {
-                    casoEditable.AssetId = valorAsset[0].Id;
-                    casosParaActualizar.add(casoEditable);
-                }
-            }
-        }*/
-
+        
         if (!lstCasosHDT.isEmpty()) {
             // Obtener todas las AccountId de los casos en lstCasosHDT
             Set<Id> accountIds = new Set<Id>();
@@ -2133,8 +2088,19 @@ public with sharing class HDT_CaseTriggerHelper {
         
             // Hacer una única consulta para obtener los activos asociados a esas cuentas
             Map<Id, Asset> assetMap = new Map<Id, Asset>();
+            String estadoActivo = '';
+		    List<String> familias = new List<String>();
+            List<CC_Lista_Valores__c> valorActivos = [SELECT Name, CC_Valor__c,CC_Valor2__c,CSBD_Valor4__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT_Mensajes_Parametrizables_Empleados' AND Name = 'Tipo de Activos asociados a Cuenta desde llamada' LIMIT 1];
+            if (!valorActivos.isEmpty()) {
+                familias.add(valorActivos[0].CC_Valor__c);
+                familias.add(valorActivos[0].CC_Valor2__c);
+                estadoActivo = valorActivos[0].CSBD_Valor4__c;
+            }
+
             if (!accountIds.isEmpty()) {
-                for (Asset asset : [SELECT Id, AccountId FROM Asset WHERE AccountId IN :accountIds]) {
+                for (Asset asset : [SELECT Id, AccountId FROM Asset WHERE HDT_Estado_CI__c = :estadoActivo AND AccountId IN :accountIds AND CC_Familia_Activo__c IN :familias]) {
+                    //Filtramos por familias para que NO recoja sino esta en la lista de valores
+
                     assetMap.put(asset.AccountId, asset);
                 }
             }

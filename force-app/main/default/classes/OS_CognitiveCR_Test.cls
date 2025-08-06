@@ -24,15 +24,14 @@ Global class OS_CognitiveCR_Test implements HttpCalloutMock{
         contacto.LastName = 'Apellido';
         insert contacto;
 
-        Id tematicaId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
-        Id productoId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
-        Id motivoId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id tematicaId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id productoId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         id rt = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
-        
-        Id grupoColOsId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
-        
-        Id accountId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-        Id contactId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id grupoColOsId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+        Id accountId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        Id contactId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id mccProductoServicioRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+
         
         SEG_ClasificacionRapida__c classR = new SEG_ClasificacionRapida__c(
             Name = 'No procede'
@@ -46,7 +45,7 @@ Global class OS_CognitiveCR_Test implements HttpCalloutMock{
         tematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         tematica.CC_Fecha_Vigencia_Inicio__c = System.now();
         tematica.OS_Horario__C = horario[0].Id;
-        tematica.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        tematica.RecordTypeId = tematicaId;
         tematica.CC_Codigo_Externo__c = 'TEC-000001';
         tematica.OS_Departamento__c = 'UAC';
         insert tematica;
@@ -55,7 +54,7 @@ Global class OS_CognitiveCR_Test implements HttpCalloutMock{
         producto.Name = 'producto cops test';
         producto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         producto.CC_Fecha_Vigencia_Inicio__c = System.now();
-        producto.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        producto.RecordTypeId = mccProductoServicioRecordTypeId;
         producto.CC_Tematica__c = tematica.Id;
         producto.CC_Codigo_Externo__c = 'PRC-000001'; 
         insert producto;
@@ -64,7 +63,7 @@ Global class OS_CognitiveCR_Test implements HttpCalloutMock{
         motivo.Name = 'motivo cops test';
         motivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         motivo.CC_Fecha_Vigencia_Inicio__c = System.now();
-        motivo.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        motivo.RecordTypeId = productoId;
         motivo.CC_Tematica__c = tematica.Id;
         motivo.CC_Producto_Servicio__c = producto.Id;
         motivo.CC_Codigo_Externo__c = 'MOC-000001';

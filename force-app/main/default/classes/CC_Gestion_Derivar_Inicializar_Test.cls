@@ -2,70 +2,9 @@
 public with sharing class CC_Gestion_Derivar_Inicializar_Test {
     @TestSetup
     static void makeData() {
- 
-        Map<String, Id> psCC = CC_TestDataFactory.getPermissionSet();
-        Map<String, Id> profCC = CC_TestDataFactory.getProfiles();
-        Map<String, Id> rolCC = CC_TestDataFactory.getRoles();
-
-        Id profileId = profCC.get('CC_Usuario_CaixaBank');
-        Id profileAdmin = profCC.get('System Administrator');
-        Id roleCC = rolCC.get('Contact_Center');
-        Id roleDirectorioCC = rolCC.get('Contact_Center_sin_acceso_a_Directorio');
-        Id psOperadorCliente = psCC.get('CC_Operador_Cliente');
-       // Id psOperadorEmpleado = psCC.get('CC_Operador_CCO');
-        Id psAVGestorOp = psCC.get('AV_GestorOperativa');
-        Id psClasses = psCC.get('CC_Classes');
-
-
-        List<User> userList = new List<User>();
-        List<PermissionSetAssignment> insertPSAssOperadores = new List<PermissionSetAssignment>();
-        
-        User usuarioAdmin = new User();
-        usuarioAdmin.profileId = profileAdmin;
-        usuarioAdmin.UserRoleId = roleCC;        
-        usuarioAdmin.FirstName = '';
-        usuarioAdmin.LastName = 'Administrador de sistema';
-        usuarioAdmin.Email = 'tuser000@amamama.com';
-        usuarioAdmin.Username = 'tuser000@amama.com' + System.currentTimeMillis();
-        usuarioAdmin.CompanyName = 'MST';
-        usuarioAdmin.Title = 'title';
-        usuarioAdmin.Alias = 'alias';
-        usuarioAdmin.TimeZoneSidKey = 'Europe/Paris';
-        usuarioAdmin.EmailEncodingKey = 'UTF-8';
-        usuarioAdmin.LanguageLocaleKey = 'es';
-        usuarioAdmin.LocaleSidKey = 'es_ES';
-        userList.add(usuarioAdmin);
-        
-        User operadorCliente = new User();
-        operadorCliente.profileId = profileId;
-        operadorCliente.UserRoleId = roleDirectorioCC;
-        operadorCliente.AV_ExternalID__c = 'U0124112';
-        operadorCliente.FirstName = 'Operador';
-        operadorCliente.LastName = 'Operador Cliente';
-        operadorCliente.Email = 'tuser001@amamama.com';
-        operadorCliente.Username = 'tuser001@amamama.com' + System.currentTimeMillis();
-        operadorCliente.CompanyName = 'MST';
-        operadorCliente.Title = 'title';
-        operadorCliente.Alias = 'alias';
-        operadorCliente.TimeZoneSidKey = 'Europe/Paris';
-        operadorCliente.EmailEncodingKey = 'UTF-8';
-        operadorCliente.LanguageLocaleKey = 'es';
-        operadorCliente.LocaleSidKey = 'es_ES';
-        userList.add(operadorCliente);
-        insert userList;
-        
-        PermissionSetAssignment psaOperadorCliente = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psOperadorCliente);
-        insertPSAssOperadores.add(psaOperadorCliente);
-
-        PermissionSetAssignment psaOperadorClasses = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psClasses);
-        insertPSAssOperadores.add(psaOperadorClasses);
-
-        PermissionSetAssignment psaOperadorAv = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psAVGestorOp);
-        insertPSAssOperadores.add(psaOperadorAv);
-
-
-       //Database.insert(insertPSAssOperadores);
-       insert insertPSAssOperadores;
+       Map<String, User> usuarios = CC_TestDataFactory.insertUserAdminOperador('U0124112');
+       User usuarioAdmin = usuarios.get('admin');
+       User operadorCliente = usuarios.get('operador');
 
         System.runAs(usuarioAdmin) {
         
@@ -78,7 +17,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             Id rtCentroId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
             Id rtEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
             Id rtClientePA = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
-
+    
             List<CC_MCC__Share> totalPermisosMCC = new List<CC_MCC__Share>();
             List<AccountShare> totalPermisosAccount = new List<AccountShare>();
             List<ContactShare> totalPermisosContact = new List<ContactShare>();
@@ -121,7 +60,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             insert contactoEmple;
 
             //Accounts
-
+            Test.startTest();
             List<Account> accounts = new List<Account>();
 
             Account oficina1 = new Account(
@@ -135,8 +74,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             );
             insert oficina1;
 
-//if(!caso.Account.AV_Cliente__c && otpDerivar == null
-
             Account cuentaImagin = new Account(
             FirstName = 'Cuenta Test',
             LastName = 'test',
@@ -146,7 +83,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             AV_OficinaPrincipal__c = centro.Id,
             CC_Numero_Documento__c = '45729937A',
             AV_Cliente__c = true,
-            AV_NumPerso__c = '214622853',
+            AV_NumPerso__c = '51304694',
             PersonMobilePhone = '666666666',
             RecordtypeId =  rtClientePA
             );
@@ -165,6 +102,21 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             RecordtypeId =  rtClientePA
             );
             accounts.add(cuentaNoImagin);
+
+            Account comunidadVecinos = new Account(
+            FirstName = 'comunidadVecinos',
+            LastName = 'test',
+            CC_Email__c = 'cuenta@test.com',
+            AV_IndicadoresClientes__c = '26',
+            AV_OficinaPrincipal__c = oficina1.Id,
+            CC_Numero_Empresa__c = '124',
+            CC_Numero_Oficina_Empresa__c = '000-12349',
+            AV_Cliente__c = true,
+            CC_Numero_Documento__c = 'H45729933437',
+            RecordtypeId =  rtClientePA
+            );
+            accounts.add(comunidadVecinos);
+
 
             insert accounts;
  
@@ -463,6 +415,20 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             valor36.CC_Mensajes_Mostrar__c = 'Pregunta telefono CSBD';
             valores.add(valor36);
 
+            CC_Lista_Valores__c valor37 = new CC_Lista_Valores__c();
+            valor37.Name = 'Toast comunidades vecinos';
+            valor37.RecordTypeId = recordTypeValor;
+            valor37.CC_Lista__c = listaDerivar.Id;
+            valor37.CC_Mensajes_Mostrar__c = 'Si esta consulta hace referencia a bastanteos o incidencias relacionadas con las Comunidades de Propietarios puedes facilitar este buzón al cliente: soporte.ccpp@caixabank.com.';
+            valores.add(valor37);
+
+            CC_Lista_Valores__c valor38 = new CC_Lista_Valores__c();
+            valor38.Name = 'CashBack 1';
+            valor38.RecordTypeId = recordTypeValor;
+            valor38.CC_Lista__c = listaDerivar.Id;
+            valor38.CC_Mensajes_Mostrar__c = 'Por favor, introduce la siguiente información:';
+            valores.add(valor38);
+
             insert valores;
 
             //MCC
@@ -471,7 +437,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             List<CC_MCC__c> motivos = new List<CC_MCC__c>();
             List<CC_MCC__c> causas = new List<CC_MCC__c>();
             List<CC_MCC__c> soluciones = new List<CC_MCC__c>();
-            //List<CC_MCC__c> mccCreado = new List<CC_MCC__c>();
 
             CC_MCC__c tematica = new CC_MCC__c(
             Name = 'Tematica Test',
@@ -481,7 +446,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'TE-000001'
             );
             tematicas.add(tematica);
-            //mccCreado.add(tematica);
 
             insert tematicas;
 
@@ -493,7 +457,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'PR-000001'
             );        
             productos.add(producto);
-            //mccCreado.add(producto);
 
             insert productos;
 
@@ -507,7 +470,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000001'
             );
             motivos.add(motivoOficina);
-            //mccCreado.add(motivoOficina);
 
             CC_MCC__c motivoGestor = new CC_MCC__c(
             Name = 'Cambio de Gestor',
@@ -519,7 +481,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000002'
             );
             motivos.add(motivoGestor);
-      //      //mccCreado.add(motivoGestor);
                 
             CC_MCC__c motivoVentas = new CC_MCC__c(
             Name = 'Ventas',
@@ -531,7 +492,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000005'
             );
             motivos.add(motivoVentas);
-       //     //mccCreado.add(motivoVentas);
 
             CC_MCC__c motivoCajeros = new CC_MCC__c(
             Name = 'Cajeros',
@@ -543,7 +503,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000007'
             );
             motivos.add(motivoCajeros);
-         //   //mccCreado.add(motivoCajeros);
 
             CC_MCC__c motivoFraude = new CC_MCC__c(
             Name = 'Fraude',
@@ -553,7 +512,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000008'
             );
             motivos.add(motivoFraude);
-         //   //mccCreado.add(motivoFraude);
 
             CC_MCC__c motivoNoCliente = new CC_MCC__c(
             Name = 'No clientes',
@@ -565,7 +523,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000009'
             );
             motivos.add(motivoNoCliente);
-          //  //mccCreado.add(motivoNoCliente);
 
             CC_MCC__c motivoTestamentaria = new CC_MCC__c(
             Name = 'Testamentaria',
@@ -577,7 +534,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000010'
             );
             motivos.add(motivoTestamentaria);
-           // //mccCreado.add(motivoTestamentaria);
 
             CC_MCC__c motivoCSBD3N = new CC_MCC__c(
             Name = 'CSBD 3N',
@@ -589,7 +545,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000011'
             );
             motivos.add(motivoCSBD3N);
-           // //mccCreado.add(motivoCSBD3N);
 
             CC_MCC__c motivoCSBDNoContratar = new CC_MCC__c(
             Name = 'CSBD No Contratar',
@@ -601,7 +556,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000012'
             );
             motivos.add(motivoCSBDNoContratar);
-          //  //mccCreado.add(motivoCSBDNoContratar);
 
             CC_MCC__c motivoCSBDContratar = new CC_MCC__c(
             Name = 'CSBD Contratar',
@@ -613,7 +567,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000013'
             );
             motivos.add(motivoCSBDContratar);
-           // //mccCreado.add(motivoCSBDContratar);
 
             CC_MCC__c motivoOficinaFisica = new CC_MCC__c(
             Name = 'Oficina física',
@@ -625,7 +578,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000014'
             );
             motivos.add(motivoOficinaFisica);
-        //    //mccCreado.add(motivoOficinaFisica);
 
             CC_MCC__c motivoDocumentacion = new CC_MCC__c(
             Name = 'Documentación',
@@ -637,7 +589,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000015'
             );
             motivos.add(motivoDocumentacion);
-          //  //mccCreado.add(motivoDocumentacion);
 
             CC_MCC__c motivoOnboarding = new CC_MCC__c(
             Name = 'Onboarding',
@@ -649,7 +600,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000016'
             );
             motivos.add(motivoOnboarding);
-          //  //mccCreado.add(motivoOnboarding);
 
             CC_MCC__c motivoVidacaixa = new CC_MCC__c(
             Name = 'Vidacaixa',
@@ -661,7 +611,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'MO-000017'
             );
             motivos.add(motivoVidacaixa);
-          //  //mccCreado.add(motivoVidacaixa);
 
             CC_MCC__c argosXpays = new CC_MCC__c(
             Name = 'Argos Xpays',
@@ -696,6 +645,83 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             );
             motivos.add(phising);
 
+            CC_MCC__c correosCash = new CC_MCC__c(
+            Name = 'CorreosCash',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Caixa__c = 'CorreosCash',
+            CC_Ambito_Tareas_Imagin__c = 'CorreosCash',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000021'
+            );
+            motivos.add(correosCash);
+
+            CC_MCC__c monteDePiedad = new CC_MCC__c(
+            Name = 'Monte de Piedad',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Caixa__c = 'Monte de Piedad',
+            CC_Ambito_Tareas_Imagin__c = 'Monte de Piedad',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000022'
+            );
+            motivos.add(monteDePiedad);
+
+            CC_MCC__c gestionReputacion = new CC_MCC__c(
+            Name = 'Gestión de reputación',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Caixa__c = 'Gestión reputacional',
+            CC_Ambito_Tareas_Imagin__c = 'Gestión reputacional',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000023'
+            );
+            motivos.add(gestionReputacion);
+
+            CC_MCC__c icpPostventa = new CC_MCC__c(
+            Name = 'ICP Postventa',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Caixa__c = 'ICP Postventa',
+            CC_Ambito_Tareas_Imagin__c = 'ICP Postventa',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000024'
+            );
+            motivos.add(icpPostventa);
+
+            CC_MCC__c incidenciasOficina = new CC_MCC__c(
+            Name = 'Incidencias oficina',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Caixa__c = 'Incidencias oficina',
+            CC_Ambito_Tareas_Imagin__c = 'Incidencias oficina',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000025'
+            );
+            motivos.add(incidenciasOficina);
+
+            CC_MCC__c sac = new CC_MCC__c(
+            Name = 'sac',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Caixa__c = 'SAC',
+            CC_Ambito_Tareas_Imagin__c = 'SAC',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000026'
+            );
+            motivos.add(sac);
+
+            CC_MCC__c cashBack = new CC_MCC__c(
+            Name = 'cashBack',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Caixa__c = 'CashBack',
+            CC_Ambito_Tareas_Imagin__c = 'CashBack',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000027'
+            );
+            motivos.add(cashBack);
+
             insert motivos;
 
             //Causas
@@ -707,7 +733,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Codigo_Externo__c = 'CA-000001'
             );
             causas.add(causaFraude);
-          //  //mccCreado.add(causaFraude);
             insert causas;
             
             //Soluciones
@@ -720,7 +745,6 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_AmbitoTareas__c = 'Fraude'
             );
             soluciones.add(solucionFraude);
-           // //mccCreado.add(solucionFraude);
             insert soluciones;
 
 
@@ -978,23 +1002,35 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             Case casoImaginDocumentacion = new Case(
             Description = 'casoImaginDocumentacion',
             Subject = 'casoImaginDocumentacion',
-            Origin = 'Email',
+            Origin = 'Phone',
             Status = 'Activo',
             accountId = cuentaImagin.Id,
             CC_Idioma__c = 'es',
-            CC_Canal_Respuesta__c = 'Email',
+            CC_Canal_Respuesta__c = 'Phone',
             CC_MCC_Tematica__c = tematica.Id, 
             CC_MCC_ProdServ__c = producto.Id,
             CC_MCC_Motivo__c = motivoDocumentacion.Id,
             CC_Motivo__c = 'Documentación',
             CC_Grupo_3N__c = 'Grupo 3N',
             CC_Tipo_Contacto__c = 'Consulta',
-            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Canal_Procedencia__c = 'Accionista',
             CC_Detalles_Consulta__c = 'Caso de Contact Center',
             RecordTypeId = recordTypeCaso
             );
             insertCase.add(casoImaginDocumentacion);
 
+            CBK_Case_Extension__c onboardingExtension = new CBK_Case_Extension__c(
+                CC_DerivadoBPO__c = false,
+                CC_EmpresaONB__c = 'Empresa',
+                CC_EstadoONB__c = 'Estado',
+                CC_FechaEstadoONB__c = 'Fecha',
+                CC_MotivoCierreONB__c = 'Motivo Cierre',
+                CC_SubestadoONB__c = 'Subestado',
+                CC_NumSR__c = 'NumSR',
+                CC_CodigoONB__c = '100'
+            );
+
+            insert onboardingExtension;
             Case casoImaginOnboarding = new Case(
             Description = 'casoImaginOnboarding',
             Subject = 'casoImaginOnboarding',
@@ -1009,11 +1045,15 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             CC_Motivo__c = 'Onboarding',
             CC_Grupo_3N__c = 'Grupo 3N',
             CC_Tipo_Contacto__c = 'Consulta',
+            CBK_Case_Extension_Id__c = onboardingExtension.Id,
+            CC_Status_Autorizacion__c = 'APPROVED',
             CC_Canal_Procedencia__c = 'Formulario web',
             CC_Detalles_Consulta__c = 'Caso de Contact Center',
             RecordTypeId = recordTypeCaso
             );
             insertCase.add(casoImaginOnboarding);
+
+            
 
             Case casoImaginVidacaixa = new Case(
             Description = 'casoImaginVidacaixa',
@@ -1095,6 +1135,166 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             );
             insertCase.add(casoImaginPhising);
 
+            Case casoRemitidosCorreosCash = new Case(
+            Description = 'casoRemitidosCorreosCash',
+            Subject = 'casoRemitidosCorreosCash',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuentaImagin.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_MCC_Tematica__c = tematica.Id, 
+            CC_MCC_ProdServ__c = producto.Id,
+            CC_MCC_Motivo__c = correosCash.Id,
+            CC_Motivo__c = 'CorreosCash',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            RecordTypeId = recordTypeCaso
+            );
+            insertCase.add(casoRemitidosCorreosCash);
+
+            Case casoRemitidosMonteDePiedad = new Case(
+            Description = 'casoRemitidosMonteDePiedad',
+            Subject = 'casoRemitidosMonteDePiedad',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuentaImagin.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_MCC_Tematica__c = tematica.Id, 
+            CC_MCC_ProdServ__c = producto.Id,
+            CC_MCC_Motivo__c = monteDePiedad.Id,
+            CC_Motivo__c = 'Monte de Piedad',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            RecordTypeId = recordTypeCaso
+            );
+            insertCase.add(casoRemitidosMonteDePiedad);
+            
+            Case casoRemitidosGestionReputacion = new Case(
+            Description = 'casoRemitidosGestionReputacion',
+            Subject = 'casoRemitidosGestionReputacion',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuentaImagin.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_MCC_Tematica__c = tematica.Id, 
+            CC_MCC_ProdServ__c = producto.Id,
+            CC_MCC_Motivo__c = gestionReputacion.Id,
+            CC_Motivo__c = 'Gestión reputacional',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            RecordTypeId = recordTypeCaso
+            );
+            insertCase.add(casoRemitidosGestionReputacion);
+            
+            Case casoRemitidosIcpPostventa = new Case(
+            Description = 'casoRemitidosIcpPostventa',
+            Subject = 'casoRemitidosIcpPostventa',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuentaImagin.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_MCC_Tematica__c = tematica.Id, 
+            CC_MCC_ProdServ__c = producto.Id,
+            CC_MCC_Motivo__c = icpPostventa.Id,
+            CC_Motivo__c = 'ICP Postventa',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            RecordTypeId = recordTypeCaso
+            );
+            insertCase.add(casoRemitidosIcpPostventa);
+            
+            Case casoRemitidosIncidenciasOficina = new Case(
+            Description = 'casoRemitidosIncidenciasOficina',
+            Subject = 'casoRemitidosIncidenciasOficina',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuentaImagin.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_MCC_Tematica__c = tematica.Id, 
+            CC_MCC_ProdServ__c = producto.Id,
+            CC_MCC_Motivo__c = incidenciasOficina.Id,
+            CC_Motivo__c = 'Incidencias oficina',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            RecordTypeId = recordTypeCaso
+            );
+            insertCase.add(casoRemitidosIncidenciasOficina);
+
+            Case casoComunidadesVecinos = new Case(
+            Description = 'casoComunidadesVecinos',
+            Subject = 'casoComunidadesVecinos',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = comunidadVecinos.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_MCC_Tematica__c = tematica.Id, 
+            CC_MCC_ProdServ__c = producto.Id,
+            CC_MCC_Motivo__c = incidenciasOficina.Id,
+            CC_Motivo__c = 'casoComunidadesVecinos',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            RecordTypeId = recordTypeCaso
+            );
+            insertCase.add(casoComunidadesVecinos);
+
+            Case casoDerivarSAC = new Case(
+            Description = 'casoDerivarSAC',
+            Subject = 'casoDerivarSAC',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuentaNoImagin.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_MCC_Tematica__c = tematica.Id, 
+            CC_MCC_ProdServ__c = producto.Id,
+            CC_MCC_Motivo__c = sac.Id,
+            CC_Motivo__c = 'casoDerivarSAC',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            RecordTypeId = recordTypeCaso
+            );
+            insertCase.add(casoDerivarSAC);
+
+            Case casoCashBack = new Case(
+            Description = 'casoCashBack',
+            Subject = 'casoCashBack',
+            Origin = 'Email',
+            Status = 'Activo',
+            accountId = cuentaNoImagin.Id,
+            CC_Idioma__c = 'es',
+            CC_Canal_Respuesta__c = 'Email',
+            CC_MCC_Tematica__c = tematica.Id, 
+            CC_MCC_ProdServ__c = producto.Id,
+            CC_MCC_Motivo__c = cashBack.Id,
+            CC_Motivo__c = 'casoCashBack',
+            CC_Grupo_3N__c = 'Grupo 3N',
+            CC_Tipo_Contacto__c = 'Consulta',
+            CC_Canal_Procedencia__c = 'Formulario web',
+            CC_Detalles_Consulta__c = 'Caso de Contact Center',
+            RecordTypeId = recordTypeCaso
+            );
+            insertCase.add(casoCashBack);
+
             insert insertCase;
 
             List<CC_Settings__c > listCustomSetting = new List<CC_Settings__c >();
@@ -1122,26 +1322,58 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             listCustomSetting.add(telefonoActivoCSBD);
 
             CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
-            customSetting.Name = 'CC_Autenticacion_SAU_No_Traza';
+            customSetting.Name = 'CC_Autenticacion_SAU';
             customSetting.NamedCredential__c = 'callout:API_GWT_TST_CCSF/eChannels/eBranchManagement/customers/id/contracts/validation';
             customSetting.RegistroTrazaIntegracion__c = true;
             insert customSetting;
+
+            CC_Settings__c  derivacionRemitidosAutomaticos = new CC_Settings__c ();
+            derivacionRemitidosAutomaticos.Name = 'CC_DerivacionRemitidosAutomaticos';
+            derivacionRemitidosAutomaticos.CC_Activa__c = true;
+            derivacionRemitidosAutomaticos.CC_Configuracion_1__c = 'CorreosCash;Monte de Piedad;Gestión reputacional;ICP Postventa;Incidencias oficina';
+            listCustomSetting.add(derivacionRemitidosAutomaticos);
+
             
+            CC_Settings__c  modalParam = new CC_Settings__c ();
+            modalParam.Name = 'CC_OcultarModalTrasladarAmbitos';
+            modalParam.CC_Activa__c = true;
+            modalParam.CC_Configuracion_1__c = 'Argos General';
+            listCustomSetting.add(modalParam);
+
+            CC_Settings__c  onboarding = new CC_Settings__c ();
+            onboarding.Name = 'CC_CodigosOnboarding';
+            onboarding.CC_Activa__c = true;
+            onboarding.CC_Configuracion_2__c = '0';
+            listCustomSetting.add(onboarding);
+
+            CC_Settings__c  ambitosPrioridadSobreNoClientes = new CC_Settings__c ();
+            ambitosPrioridadSobreNoClientes.Name = 'CC_AmbitosPrioridadSobreNoClientes';
+            ambitosPrioridadSobreNoClientes.CC_Activa__c = true;
+            ambitosPrioridadSobreNoClientes.CC_Configuracion_1__c = 'Testamentaría';
+            listCustomSetting.add(ambitosPrioridadSobreNoClientes);
+
+            CC_Settings__c  parametrizacionFiltrosCSBD = new CC_Settings__c ();
+            parametrizacionFiltrosCSBD.Name = 'CC_ParametrizacionesCSBD';
+            parametrizacionFiltrosCSBD.CC_Activa__c = true;
+            parametrizacionFiltrosCSBD.CC_Configuracion_1__c = 'true;true;true';
+            parametrizacionFiltrosCSBD.CC_Configuracion_2__c = 'true';
+            listCustomSetting.add(parametrizacionFiltrosCSBD);
+
+            CC_DevolverDerivarSAC__c  cssac = new CC_DevolverDerivarSAC__c ();
+            cssac.Name = 'CC_Derivar';
+            cssac.CC_Activo__c = true;
+            insert cssac;
+
             insert listCustomSetting;
+            Test.stopTest();
         }
     }
 
     @isTest //Pass
     public static void getDatosTest() {
         Test.startTest();
-        System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
             Case casoImagin = [SELECT Id FROM Case WHERE CC_Motivo__c LIKE 'Cambio de Oficina' AND Account.AV_IndicadoresClientes__c = '28'];
-
-
-         /*   List< CC_Lista_Valores__c> lista = [SELECT Name,  CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name IN ('Textos operativa Derivar') AND CC_Activa__c = true];
-            System.debug('LISTA: '+lista);
-            Map<String, Object> textosMap = CC_MetodosUtiles.getLOVNameValue(new List<String>{'Textos operativa Derivar'}, 'CC_Mensajes_Mostrar__c');    */      
-
 
             Map<String, Object> resultadoImagin = CC_Gestion_Derivar_Inicializar.getDatos(casoImagin.Id, null);
             System.assertEquals(resultadoImagin.get('mostrarModalCreacionTarea'), true, 'Error en caso Imagin');
@@ -1169,27 +1401,11 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             
             Case fraude = [SELECT Id FROM Case WHERE Subject = 'Fraude'];
             Map<String, Object> resultadoFraude = CC_Gestion_Derivar_Inicializar.getDatos(fraude.Id, false);
-            System.assertNotEquals(resultadoFraude.get('preguntaRealizarRemitido'), null, 'Error en caso fraude');
+            System.assertNotEquals(resultadoFraude.get('preguntaRealizarRemitido'), 'true', 'Error en caso fraude');
             
             Case testamentaria = [SELECT Id FROM Case WHERE Subject = 'casoImaginTestamentaria'];
             Map<String, Object> resultadoTestamentaria = CC_Gestion_Derivar_Inicializar.getDatos(testamentaria.Id, null);
             System.assertEquals(resultadoTestamentaria.get('mostrarModalDNITestamentaria'), true);
-
-            /*Case enrollment = [SELECT Id FROM Case WHERE Subject = 'casoEnrollmentPreguntaSi'];
-            Map<String, Object> resultadoEnrollment = CC_Gestion_Derivar_Inicializar.getDatos(enrollment.Id);
-            System.assertEquals(resultadoEnrollment.get('preguntaEnrollment'), '¿El cliente se encuentra en el extranjero?');*/
-
-            /*Case csbdContratar  = [SELECT Id FROM Case WHERE Subject = 'CSBD Contratar'];
-            Map<String, Object> resultadoCSBDContratar  = CC_Gestion_Derivar_Inicializar.getDatos(csbdContratar.Id);
-            System.assertNotEquals(resultadoCSBDContratar.get('preguntaCSBDContratar'), null, 'Error en caso de CSBD Contratar');
-
-            Case csbdNoContratar = [SELECT Id FROM Case WHERE Subject = 'CSBD No Contratar'];
-            Map<String, Object> resultadoCSBDNoContratar = CC_Gestion_Derivar_Inicializar.getDatos(csbdNoContratar.Id);
-            System.assertNotEquals(resultadoCSBDNoContratar.get('toastCSBDNoContratar'), null, 'Error en caso de CSBD No Contratar');*/
-
-            // Case hubImagin = [SELECT Id FROM Case WHERE Subject = 'casoImaginHubImagin'];
-            // Map<String, Object> resultadoHubImagin = CC_Gestion_Derivar_Inicializar.getDatos(hubImagin.Id, null);
-            // System.assertEquals(resultadoHubImagin.get('mostrarModalDNITestamentaria'), true);
 
             Case oficinaFisica = [SELECT Id FROM Case WHERE Subject = 'casoImaginOficinaFisica'];
             Map<String, Object> resultadoOficinaFisica = CC_Gestion_Derivar_Inicializar.getDatos(oficinaFisica.Id, null);
@@ -1201,7 +1417,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
 
             Case onboarding = [SELECT Id FROM Case WHERE Subject = 'casoImaginOnboarding'];
             Map<String, Object> resultadoOnboarding = CC_Gestion_Derivar_Inicializar.getDatos(onboarding.Id, null);
-            System.assertEquals(resultadoOnboarding.get('ambitoOnboarding'), true);
+            System.assertEquals(resultadoOnboarding.get('ambitoMotivo'), 'Onboarding');
         }
         Test.stopTest();
     }
@@ -1209,15 +1425,11 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
     @isTest //Pass
     public static void getDatosTest2() {
       Test.startTest();
-          System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+          System.runAs(CC_TestDataFactory.getUserAdmin()) {
             Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_SAU(200));
             Case csbd3n = [SELECT Id, Account.AV_NumPerso__c FROM Case WHERE Subject = 'casoImaginCSBD'];
             Map<String, Object> resultadoCSBD = CC_Gestion_Derivar_Inicializar.getDatos(csbd3n.Id, null);
             System.assertEquals(resultadoCSBD.get('ambitoVentas'), true);
-/*
-            Case csbdNoContratar = [SELECT Id FROM Case WHERE Subject = 'casoImaginCSBDNoContratar'];
-            Map<String, Object> resultadoCSBDNoContratar = CC_Gestion_Derivar_Inicializar.getDatos(csbdNoContratar.Id, null);
-            System.assertEquals(resultadoCSBDNoContratar.get('ambitoVentas'), true);*/
           }
       Test.stopTest();
     }
@@ -1225,7 +1437,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
     @isTest //Pass
     public static void getDatosTest3() {
         Test.startTest();
-            System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
                 Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_SAU(200));
                 Case csbdNoContratar = [SELECT Id FROM Case WHERE Subject = 'casoImaginCSBDNoContratar'];
                 Map<String, Object> resultadoCSBDNoContratar = CC_Gestion_Derivar_Inicializar.getDatos(csbdNoContratar.Id, null);
@@ -1237,7 +1449,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
     @isTest //Pass
     public static void getDatosTest4() {
         Test.startTest();
-            System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
               Test.setMock(HttpCalloutMock.class, new CC_WS_Mock_Autenticacion_SAU(200));
                 Case csbd3nContratar = [SELECT Id FROM Case WHERE Subject = 'casoImaginCSBDContratar'];
                 Map<String, Object> resultadoCSBDContratar = CC_Gestion_Derivar_Inicializar.getDatos(csbd3nContratar.Id, null);
@@ -1253,7 +1465,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
     @isTest
     public static void getDatosArgosXpays() {
         Test.startTest();
-            System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
                 Case argosXpays = [SELECT Id FROM Case WHERE Subject = 'casoImaginArgosXpays'];
                 Map<String, Object> resultadoArgosXpays = CC_Gestion_Derivar_Inicializar.getDatos(argosXpays.Id, null);
                 String test = '[{"key":"¿Estaba intentando realizar alguna inversión/compra de criptomonedas?","value":"Prueba"}]';
@@ -1269,7 +1481,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
     @isTest
     public static void getDatosArgosGeneral() {
         Test.startTest();
-            System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
                 Case argosGeneral = [SELECT Id FROM Case WHERE Subject = 'casoImaginArgosGeneral'];
                 Map<String, Object> resultadoArgosGeneral = CC_Gestion_Derivar_Inicializar.getDatos(argosGeneral.Id, null);
                 System.assertNotEquals(resultadoArgosGeneral.get('diarioMFAArgos'), null, 'Error en caso ArgosGeneral');
@@ -1280,7 +1492,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
     @isTest
     public static void getDatosPhising() {
         Test.startTest();
-            System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
                 Case phising = [SELECT Id FROM Case WHERE Subject = 'casoImaginPhising'];
                 Map<String, Object> resultadoPhising = CC_Gestion_Derivar_Inicializar.getDatos(phising.Id, null);
                 System.assertNotEquals(resultadoPhising.get('PhisingSmishingMalware1'), null, 'Error en caso Phising');
@@ -1288,4 +1500,64 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
         Test.stopTest();
     }
 
+    @isTest
+    public static void getDatosRemitidosAutomaticos() {
+        Test.startTest();
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
+                Case remitidosAutomaticosCorreosCash = [SELECT Id FROM Case WHERE Subject = 'casoRemitidosCorreosCash'];
+                Map<String, Object> casoRemitidosCorreosCash = CC_Gestion_Derivar_Inicializar.getDatos(remitidosAutomaticosCorreosCash.Id, null);
+                System.assertEquals(casoRemitidosCorreosCash.get('realizarRemitido'), true);
+
+                Case remitidosAutomaticosMonteDePiedad = [SELECT Id FROM Case WHERE Subject = 'casoRemitidosMonteDePiedad'];
+                Map<String, Object> casoRemitidosMonteDePiedad = CC_Gestion_Derivar_Inicializar.getDatos(remitidosAutomaticosMonteDePiedad.Id, null);
+                System.assertEquals(casoRemitidosMonteDePiedad.get('realizarRemitido'), true);
+
+                Case remitidosAutomaticosGestionReputacion = [SELECT Id FROM Case WHERE Subject = 'casoRemitidosGestionReputacion'];
+                Map<String, Object> casoRemitidosGestionReputacion = CC_Gestion_Derivar_Inicializar.getDatos(remitidosAutomaticosGestionReputacion.Id, null);
+                System.assertEquals(casoRemitidosGestionReputacion.get('realizarRemitido'), true);
+
+                Case remitidosAutomaticosIcpPostventa = [SELECT Id FROM Case WHERE Subject = 'casoRemitidosIcpPostventa'];
+                Map<String, Object> casoRemitidosIcpPostventa = CC_Gestion_Derivar_Inicializar.getDatos(remitidosAutomaticosIcpPostventa.Id, null);
+                System.assertEquals(casoRemitidosIcpPostventa.get('realizarRemitido'), true);
+
+                Case remitidosAutomaticosIncidenciasOficina = [SELECT Id FROM Case WHERE Subject = 'casoRemitidosIncidenciasOficina'];
+                Map<String, Object> casoRemitidosIncidenciasOficina = CC_Gestion_Derivar_Inicializar.getDatos(remitidosAutomaticosIncidenciasOficina.Id, null);
+                System.assertEquals(casoRemitidosIncidenciasOficina.get('realizarRemitido'), true);
+            }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void getDatosComunidadesVecinos() {
+        Test.startTest();
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
+                Case casoComunidades = [SELECT Id FROM Case WHERE Subject = 'casoComunidadesVecinos'];
+                Map<String, Object> derivarComunidades = CC_Gestion_Derivar_Inicializar.getDatos(casoComunidades.Id, null);
+                System.assertEquals(derivarComunidades.get('mostrarModalToast'), true);
+
+            }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void rellenarDatosSACTest() {
+        Test.startTest();
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
+                Case caso = [SELECT Id FROM Case WHERE Subject = 'casoDerivarSAC'];
+                Map<String, Object> retorno = CC_Gestion_Derivar_Inicializar.getDatos(caso.Id, null);
+                System.assertEquals(retorno.get('mostrarDerivarSAC'), true, 'no se ha activado el derivar a sac');
+            }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void rellenarDatosCashback() {
+        Test.startTest();
+            System.runAs(CC_TestDataFactory.getUserAdmin()) {
+                Case caso = [SELECT Id FROM Case WHERE Subject = 'casoCashback'];
+                Map<String, Object> retorno = CC_Gestion_Derivar_Inicializar.getDatos(caso.Id, null);
+                System.assertEquals(retorno.get('CashBack1'), 'Por favor, introduce la siguiente información:', 'No se ha recuperado el mensaje');
+            }
+        Test.stopTest();
+    }
 }

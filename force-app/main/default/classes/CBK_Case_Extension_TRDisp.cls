@@ -23,7 +23,7 @@ public with sharing class CBK_Case_Extension_TRDisp extends CC_TriggerDispatcher
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
     }
     */
-    public virtual override void beforeUpdate(CC_TriggerParameters tp) {
+    /*public virtual override void beforeUpdate(CC_TriggerParameters tp) {
         if (!isBeforeUpdateProcessing) {           
             isBeforeUpdateProcessing = true;
             for (String handlerClassName : getAssociatedHandlers(objectApiName, 'beforeUpdate')) {
@@ -34,7 +34,7 @@ public with sharing class CBK_Case_Extension_TRDisp extends CC_TriggerDispatcher
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
     }
-    
+    */
     /*
     public virtual override void beforeDelete(CC_TriggerParameters tp) {
         
@@ -61,7 +61,7 @@ public with sharing class CBK_Case_Extension_TRDisp extends CC_TriggerDispatcher
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterInsert);
     }*/
-    
+    /*
     public virtual override void afterUpdate(CC_TriggerParameters tp) {
         if (!isAfterUpdateProcessing) {           
             isAfterUpdateProcessing = true;
@@ -73,7 +73,7 @@ public with sharing class CBK_Case_Extension_TRDisp extends CC_TriggerDispatcher
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterUpdate);
     }
-    
+    */
     /*
     public virtual override void afterDelete(CC_TriggerParameters tp) {
         

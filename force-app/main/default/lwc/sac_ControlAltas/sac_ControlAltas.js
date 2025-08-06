@@ -37,7 +37,7 @@ export default class Sac_ControlAltas extends NavigationMixin(LightningElement) 
         if(data){
             this.estadoCaso = data.fields.Status.value;
 
-            if(this.estadoCaso === 'SAC_001'){
+            if(this.estadoCaso === 'SAC_001' || this.estadoCaso === 'SAC_006'){
                 this.disabledEditar = false;
             }else{
                 this.disabledEditar = true;

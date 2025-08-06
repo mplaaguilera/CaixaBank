@@ -1157,4 +1157,25 @@ public with sharing class SAC_Interaccion_Test {
 
         Assert.areEqual(true, respuesta, 'No se ha podido comprobar la validación de escalados.');
     }
+
+    @istest
+    static void validarUpdateCamposTest(){
+        User usuario = [SELECT id FROM User WHERE Username = 'ustestesteo@test.com' AND isActive = true Limit 1];
+        SAC_Interaccion__c escalado = [SELECT Id FROM SAC_Interaccion__c WHERE  SAC_Titulo__c = 'propuesta test' LIMIT 1];
+
+        PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
+        PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
+        permiSetAssi.AssigneeId = usuario.Id;
+        permiSetAssi.PermissionSetId = permiSet.Id;
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
+
+        Test.startTest();
+        System.runAs(usuario) {
+            escalado.SAC_Titulo__c = 'test modificar titulo SAC';
+            SAC_DatabaseDML.updateDML(escalado, true);
+        }
+        Test.stopTest();
+
+        Assert.areNotEqual(null, 'Mensaje', 'No se ha podido actualizar el escalado.');
+    }
 }

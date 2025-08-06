@@ -91,6 +91,7 @@ public with sharing class CC_Int_AltaCitaGestor {
                     } else {
                         mensaje = configuracionToast.CC_Configuracion_14__c.replace('XX:XX', horaIni);
                         mensaje = mensaje.replace('XX', fecContacto);
+                        mensaje = mensaje.replace('YY', nombreGestor);
                     }
                     resultadoAltaCitaGestor.put('mensaje', mensaje);
                     resultadoAltaCitaGestor.put('cuenta', caso[0].Account.AV_OficinaPrincipal__c);

@@ -18,9 +18,10 @@ public with sharing class CSBD_Desistimiento {
                     if (String.isNotBlank(nombrePlantillaCorreo)) {
                         Messaging.SendEmailResult resultadoEnvioCorreo = CSBD_MetodosComunes.enviarCorreo(
                             desistimiento.Id, 
-                            desistimiento.CSBD_Empresa_Proveedora__c == 'imaginBank' ? 'CSBD - ImaginBank' : 'CSBD - CaixaBank', 
+                            desistimiento.CSBD_Empresa_Proveedora__c, 
                             nombrePlantillaCorreo,
-                            new List<String>{desistimiento.CSBD_Email_Solicitud__c}
+                            new List<String>{desistimiento.CSBD_Email_Solicitud__c},
+                            true //para buscar buzon por empresa proveedora
                         );
                         if (resultadoEnvioCorreo == null || !resultadoEnvioCorreo.isSuccess()) {
                             CSBD_Activity.crearActividad(desistimiento.Id,

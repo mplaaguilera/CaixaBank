@@ -446,12 +446,6 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>spv_CaseOperativas</componentName>
-                <identifier>c_spv_CaseOperativas</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
                 <componentName>spv_GeneracionDocumento</componentName>
                 <identifier>c_spv_GeneracionDocumento</identifier>
             </componentInstance>
@@ -540,8 +534,8 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>force:detailPanel</componentName>
-                <identifier>force_detailPanel</identifier>
+                <componentName>SAC_EnvioEmailConsulta</componentName>
+                <identifier>c_SAC_EnvioEmailConsulta</identifier>
             </componentInstance>
         </itemInstances>
         <name>Facet-afdbd748-6f56-44d6-b1a6-98ac43bcf9cf</name>
@@ -556,7 +550,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>title</name>
-                    <value>Standard.Tab.detail</value>
+                    <value>Email</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>flexipage_tab19</identifier>
@@ -569,11 +563,95 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>context</name>
+                    <value>RECORD</value>
+                </componentInstanceProperties>
+                <componentName>forceChatter:exposedFeed</componentName>
+                <identifier>forceChatter_exposedFeed2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-a3813236-7ee7-4e13-a798-0bb075841df0</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>showLegacyActivityComposer</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentName>runtime_sales_activities:activityPanel</componentName>
+                <identifier>runtime_sales_activities_activityPanel</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-7780c493-8064-42db-ba29-72dac90f26f9</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-a3813236-7ee7-4e13-a798-0bb075841df0</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Histórico de comunicaciones</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>name</name>
+                    <value>accordionSection1</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:accordionSection</componentName>
+                <identifier>flexipage_accordionSection2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-7780c493-8064-42db-ba29-72dac90f26f9</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Histórico de actividades</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>name</name>
+                    <value>accordionSection--oud8lzf5ack</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:accordionSection</componentName>
+                <identifier>flexipage_accordionSection5</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-57a7bc27-29aa-48f5-b717-d8cb47395a4d</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>SAC_ComunicacionesReclamante</componentName>
+                <identifier>c_SAC_ComunicacionesReclamante</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
                     <name>tabs</name>
                     <value>Facet-feb35449-f59b-4aa4-9b7f-b8c3ca5f58ed</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:tabset</componentName>
                 <identifier>flexipage_tabset3</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>accordionSections</name>
+                    <value>Facet-57a7bc27-29aa-48f5-b717-d8cb47395a4d</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:accordion</componentName>
+                <identifier>flexipage_accordion3</identifier>
             </componentInstance>
         </itemInstances>
         <name>Facet-68f27557-db9b-42a1-8c83-67c10786ce27</name>
@@ -1340,12 +1418,6 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tabset</componentName>
                 <identifier>flexipage_tabset</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>spv_AutoasignacionesCmp</componentName>
-                <identifier>c_spv_AutoasignacionesCmp</identifier>
             </componentInstance>
         </itemInstances>
         <name>main</name>

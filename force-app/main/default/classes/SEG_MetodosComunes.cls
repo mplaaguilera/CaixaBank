@@ -1799,18 +1799,12 @@ static public Map<Id, List<ContentVersion>> getAttachmentsFromObject(Set<Id> set
 	public static CC_TrazaInt__c inicioTraza (String interfaz, String origen, String identificador, String mensajeEntrada)
 	{
 		CC_TrazaInt__c trazaInt;
-
-		CC_InterfaceSettings__mdt configTrazas = CC_MetodosUtiles.getInterfazConfig (interfaz);
-		if (configTrazas != null && configTrazas.CC_TrazaActiva__c || Test.isRunningTest())
-		{
-			trazaInt = new CC_TrazaInt__c();
-			trazaInt.CC_FechaInicio__c = System.now();
-			trazaInt.Name = interfaz;
-			trazaInt.CC_IdOrigen__c = origen.left(20);
-			trazaInt.CC_Identificador__c = identificador;
-			trazaInt.CC_MensajeEntrada__c = mensajeEntrada;
-		}
-
+		trazaInt = new CC_TrazaInt__c();
+		trazaInt.CC_FechaInicio__c = System.now();
+		trazaInt.Name = interfaz;
+		trazaInt.CC_IdOrigen__c = origen.left(20);
+		trazaInt.CC_Identificador__c = identificador;
+		trazaInt.CC_MensajeEntrada__c = mensajeEntrada;
 		return trazaInt;
 	}
 

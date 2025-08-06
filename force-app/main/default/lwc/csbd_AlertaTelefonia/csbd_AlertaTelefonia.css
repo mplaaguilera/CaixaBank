@@ -29,6 +29,10 @@ section.popupAlerta.tipoBonificado div.slds-modal__header {
     background-color: #66a0e2;
 }
 
+section.popupAlerta.identificarClientePortal div.slds-modal__header {
+    background-color: #c4c4c4;
+}
+
 section.popupAlerta div.slds-modal__content {
     font-size: 13.5px;
 }
@@ -45,6 +49,10 @@ section.popupAlerta.productoMifid div.slds-modal__content lightning-icon {
 
 section.popupAlerta.tipoBonificado div.slds-modal__content lightning-icon {
     --slds-c-icon-color-foreground-default: #66a0e2;
+}
+
+section.popupAlerta.identificarClientePortal div.slds-modal__content lightning-icon {
+    --slds-c-icon-color-foreground-default: #c4c4c4;
 }
 
 section.popupAlerta div.slds-modal__footer {

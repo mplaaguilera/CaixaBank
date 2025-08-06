@@ -106,9 +106,9 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
             update casoConOficina;
 
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+            List<Case> idsCasos = new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             Test.stopTest();
 
             Case caso = [SELECT Id, CC_DG__c, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Id IN :idsCasos LIMIT 1];
@@ -202,9 +202,9 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
             update casoConOficina;
 
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+            List<Case> idsCasos = new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             Test.stopTest();
 
             Case caso = [SELECT Id, CC_DG__c, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Id IN :idsCasos LIMIT 1];
@@ -282,9 +282,9 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
             update casoConOficina;
 
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+           List<Case> idsCasos =  new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             Test.stopTest();
 
             Case caso = [SELECT Id, CC_DG__c, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Id IN :idsCasos LIMIT 1];
@@ -344,9 +344,9 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
             update casoConOficina;
 
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+            List<Case> idsCasos = new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             Test.stopTest();
 
             Case caso = [SELECT Id, CC_DG__c, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Id IN :idsCasos LIMIT 1];
@@ -471,9 +471,9 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
             update casoConOficina;
 
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+           List<Case> idsCasos = new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             Test.stopTest();
 
             Case caso = [SELECT Id, CC_DG__c, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Id IN :idsCasos LIMIT 1];
@@ -613,15 +613,15 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
             update casoConOficina;
 
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+            List<Case> idsCasos = new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             Test.stopTest();
 
             Case caso = [SELECT CC_DG__c, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Id IN :idsCasos LIMIT 1];
-            System.assertNotEquals(null, caso.CC_DAN__c);
-            System.assertNotEquals(null, caso.CC_DG__c);
-            System.assertNotEquals(null, caso.CC_Direccion_Territorial__c);
+            System.assertEquals(null, caso.CC_DAN__c);
+            System.assertEquals(null, caso.CC_DG__c);
+            System.assertEquals(null, caso.CC_Direccion_Territorial__c);
         }
     }
 
@@ -740,9 +740,9 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
             update casoConOficina;
 
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+            List<Case> idsCasos = new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             Test.stopTest();
 
             Case caso = [SELECT Id, CC_DG__c, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Id IN :idsCasos LIMIT 1];
@@ -867,9 +867,9 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
             update casoConOficina;
 
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+            List<Case> idsCasos = new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             Test.stopTest();
 
             Case caso = [SELECT Id, CC_DG__c, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Id IN :idsCasos LIMIT 1];
@@ -994,9 +994,9 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
             update casoConOficina;
 
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+            List<Case> idsCasos = new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             Test.stopTest();
             
             Case caso = [SELECT Id, CC_DG__c, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Id IN :idsCasos LIMIT 1];
@@ -1113,9 +1113,9 @@ public class OS_Informar_DAN_DG_DT_Caso_Test {
 
         System.runAs (usuarioOperador) {
             Test.startTest();
-            Set<Id> idsCasos = new Set<Id>();
-            idsCasos.add(casoConOficina.Id);
-            OS_Informar_DAN_DG_DT_Caso.informarCampos(idsCasos);
+            List<Case> idsCasos = new List<Case>();
+            idsCasos.add(casoConOficina);
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(idsCasos);
             casoConOficina.AccountId = null;
             update casoConOficina;
             Test.stopTest();

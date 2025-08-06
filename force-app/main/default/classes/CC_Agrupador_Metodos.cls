@@ -10,7 +10,8 @@ public class CC_Agrupador_Metodos {
         public String canal {get;set;}
         public String idioma {get;set;}
         public String cuerpo {get;set;}
-
+        public String plantillaId {get;set;}
+      
         public String carpeta {get;set;}
         public String nombrePlantilla {get;set;}
     }
@@ -130,7 +131,7 @@ public class CC_Agrupador_Metodos {
         
         // Recogemos los cuerpos de los emails que nos faltan
         if (folderList.size() > 0 && templateList.size() > 0) {
-            List<EmailTemplate> emailTemplateList = [SELECT HtmlValue, Folder.DeveloperName, Name FROM EmailTemplate WHERE Folder.DeveloperName IN :folderList AND Name IN :templateList WITH SECURITY_ENFORCED];
+            List<EmailTemplate> emailTemplateList = [SELECT HtmlValue, Folder.DeveloperName, Name, Id FROM EmailTemplate WHERE Folder.DeveloperName IN :folderList AND Name IN :templateList WITH SECURITY_ENFORCED];
             for (Id idAgrupador : plantillasRequeridas.keySet()) {
                 for (PlantillaRequerida plantillaRequerida : plantillasRequeridas.get(idAgrupador)) {
                     if (plantillaRequerida.canal != 'Email'){
@@ -140,6 +141,8 @@ public class CC_Agrupador_Metodos {
                     for (EmailTemplate template : emailTemplateList) {
                         Folder carpeta = template.Folder;
                         if (carpeta.DeveloperName == plantillaRequerida.carpeta && template.Name == plantillaRequerida.nombrePlantilla) {
+                            //Id template.Id
+                            plantillaRequerida.plantillaId = template.Id;
                             plantillaRequerida.cuerpo = template.HtmlValue;
                             break;
                         }
@@ -158,7 +161,8 @@ public class CC_Agrupador_Metodos {
                     CC_Idioma__c = plantillaRequerida.idioma,
                     CC_Tipo_Cliente__c = plantillaRequerida.tipoCliente,
                     CC_Revisada__c = false,
-                    CC_CuerpoNotificacion__c = plantillaRequerida.cuerpo
+                    CC_CuerpoNotificacion__c = plantillaRequerida.cuerpo,
+                    CC_PlantillaId__c = plantillaRequerida.plantillaId
                 ));
             }
         }

@@ -521,10 +521,10 @@
                             <p>Se va a finalizar el alta y pasar el caso al siguiente estado.<br/></p>
                             <aura:set attribute="else">
                                 <p>Se va a finalizar el alta, se procederá al envío del acuse de recibo y se pasará el caso al siguiente estado.<br/>
-                                </p>
+                                </p> 
                             </aura:set>
-                        </aura:if>
-                        <p><b>¿Está seguro que quiere ejecutar la operación y ha realizado las comprobaciones anteriores?</b></p>
+                        </aura:if>   
+                        <p><b>¿Está seguro que quiere ejecutar la operación y ha realizado las comprobaciones anteriores?</b></p>                               
                     </div>
                     <!-- Modal/Popup Box LWC footer starts here -->
                     <footer class="slds-modal__footer">

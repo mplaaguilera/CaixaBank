@@ -52,13 +52,14 @@ public with sharing class CSBD_BatchAnonimarOportunidades implements Database.Ba
             camposAnonimizar.add('CSBD_ContactoTitular1__c');
             camposAnonimizar.add('CSBD_ContactoTitular2__c');
             camposAnonimizar.add('CSBD_MenorEdad__c');
+            camposAnonimizar.add('CSBD_Contact__r.AV_NumPerso__c');
 
             camposQuery = camposAnonimizar.isEmpty() ? '' : ', ' + String.join(camposAnonimizar, ', ');
             camposContact = camposAnonimizarContact.isEmpty() ? '' : ', ' + String.join(camposAnonimizarContact, ', ');
         }
 
         String query = 'SELECT Id ' + camposQuery + ' FROM Opportunity WHERE CSBD_Fecha_vencimiento_alta__c <= ' + startTimeFormat + 
-        ' AND CSBD_Contact__r.AV_NumPerso__c = null AND CSBD_Anonimizada__c = false AND CSBD_Estado__c = ' + '\''+ estado + '\'' +
+        ' AND CSBD_Anonimizada__c = false AND CSBD_Estado__c = ' + '\''+ estado + '\'' +
         ' AND RecordTypeId IN (' + recordTypeIdsStr + ')';
 
         /*  QUERY DINAMICA POR CUSTOM SETTING ELIMINADA POR SEGURIDAD A QUE NO SE INTRODUZCAN CORRECTAMENTE LOS VALORES
@@ -109,39 +110,41 @@ public with sharing class CSBD_BatchAnonimarOportunidades implements Database.Ba
 
             for (Opportunity opp : scope) {
                 // Realiza la lógica de actualización o procesamiento aquí
-                for(CSBD_ParametrosAnonimizar__c campo : parametrosMapa.get('Opportunity')){
-                    if (opp.get(campo.CSBD_Campo__c) != null) { 
-                        opp.put(campo.CSBD_Campo__c, getValorAnonimizado(campo.CSBD_Campo__c));
-                    }
-                }
-
-                if(titulares != null && (titulares?.containsKey(opp.CSBD_ContactoTitular1__c) || titulares?.containsKey(opp.CSBD_ContactoTitular2__c) || titulares?.containsKey(opp.CSBD_MenorEdad__c))){
-                    for(CSBD_ParametrosAnonimizar__c campo : parametrosMapa.get('Contact')){
-                        Contact titular1 = titulares.get(opp.CSBD_ContactoTitular1__c);
-                        if(titular1?.get(campo.CSBD_Campo__c) != null){
-                            titular1.put(campo.CSBD_Campo__c, getValorAnonimizado(campo.CSBD_Campo__c));
-                            if(!contactos.contains(titular1)){
-                                contactos.add(titular1);
-                            }
-                        }
-
-                        Contact titular2 = titulares.get(opp.CSBD_ContactoTitular2__c);
-                        if(titular2?.get(campo.CSBD_Campo__c) != null){
-                            titular2.put(campo.CSBD_Campo__c, getValorAnonimizado(campo.CSBD_Campo__c));
-                            if(!contactos.contains(titular2)){
-                                contactos.add(titular2);
-                            }
-                        }
-
-                        Contact menorEdad = titulares.get(opp.CSBD_MenorEdad__c);
-                        if(menorEdad?.get(campo.CSBD_Campo__c) != null){
-                            menorEdad.put(campo.CSBD_Campo__c, getValorAnonimizado(campo.CSBD_Campo__c));
-                            if(!contactos.contains(menorEdad)){
-                                contactos.add(menorEdad);
-                            }
+                if(opp.CSBD_Contact__r.AV_NumPerso__c == null){
+                    for(CSBD_ParametrosAnonimizar__c campo : parametrosMapa.get('Opportunity')){
+                        if (opp.get(campo.CSBD_Campo__c) != null) { 
+                            opp.put(campo.CSBD_Campo__c, getValorAnonimizado(campo.CSBD_Campo__c));
                         }
                     }
-                }
+    
+                    if(titulares != null && (titulares?.containsKey(opp.CSBD_ContactoTitular1__c) || titulares?.containsKey(opp.CSBD_ContactoTitular2__c) || titulares?.containsKey(opp.CSBD_MenorEdad__c))){
+                        for(CSBD_ParametrosAnonimizar__c campo : parametrosMapa.get('Contact')){
+                            Contact titular1 = titulares.get(opp.CSBD_ContactoTitular1__c);
+                            if(titular1?.get(campo.CSBD_Campo__c) != null){
+                                titular1.put(campo.CSBD_Campo__c, getValorAnonimizado(campo.CSBD_Campo__c));
+                                if(!contactos.contains(titular1)){
+                                    contactos.add(titular1);
+                                }
+                            }
+    
+                            Contact titular2 = titulares.get(opp.CSBD_ContactoTitular2__c);
+                            if(titular2?.get(campo.CSBD_Campo__c) != null){
+                                titular2.put(campo.CSBD_Campo__c, getValorAnonimizado(campo.CSBD_Campo__c));
+                                if(!contactos.contains(titular2)){
+                                    contactos.add(titular2);
+                                }
+                            }
+    
+                            Contact menorEdad = titulares.get(opp.CSBD_MenorEdad__c);
+                            if(menorEdad?.get(campo.CSBD_Campo__c) != null){
+                                menorEdad.put(campo.CSBD_Campo__c, getValorAnonimizado(campo.CSBD_Campo__c));
+                                if(!contactos.contains(menorEdad)){
+                                    contactos.add(menorEdad);
+                                }
+                            }
+                        }
+                    }
+                }               
 
                 opp.CSBD_Anonimizada__c = true;
             }

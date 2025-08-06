@@ -30,13 +30,9 @@ public with sharing class HDT_Llamada_GC {
 			CC_No_Identificado__c = false,
 			CC_Fecha_Inicio__c = System.now(),
 			CC_Fecha_Fin__c = null,
-			//CC_Cuenta__c = null,
-			//CC_Contacto__c = null,
 			CC_Id_Cognitivo__c = inputLlamada.cognitivoId,
 			CC_IdentCliente__c = '0',  //Sin datos ALF
-			//CC_Campana_Genesys__c = (inputLlamada.nombreCampana == null ? null: inputLlamada.nombreCampana)
 			CC_Campana_Genesys__c = inputLlamada.nombreCampana,
-			//CC_Status_Autorizacion__c = inputLlamada.statusAuto,
 			CC_Perfil__c = inputLlamada.perfil,
 			KIN_Genesys_Cloud_URL_Grabacion__c = inputLlamada.urlGrabacion
 			);
@@ -74,7 +70,7 @@ public with sharing class HDT_Llamada_GC {
 		}
 
 		llamada.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'HDT_Empleado');
-		identificarPorTelefono(llamada, inputLlamada.ani);
+		identificarPorTelefono(llamada, inputLlamada.ani,  servicioGenesys.CC_Canal_Procedencia__c);
 		if (String.isEmpty(inputLlamada.casoId) && !String.isEmpty(llamada.CC_Id_Cognitivo__c)) {
 			//Buscamos el caso correspondiente al Id de cognitivo. Si no lo encuentra, lo crea con la información de la llamada y el chat obtenido de cognitivo
 			caso = CC_WS_Recupera_LogConversacion.CC_WS_Recupera_Conversacion(llamada);
@@ -187,35 +183,11 @@ public with sharing class HDT_Llamada_GC {
 
 			crearActividadSaliente(llamada, inputLlamada.casoId, 'Llamada saliente', null);
 			
-			/*
-			List<String> recordTypesSla = new List<String>{'HDT_Empleado'};
-			
-			
-			if (recordTypesSla.contains(caso.Recordtype.DeveloperName)) {
-				Case casoSLA = informarSla(llamada, caso);
-				actualizarCaso.add(casoSLA);
-			}
-			*/
-
-			/*
-			List<Case> actualizarCaso = new List<Case>();
-
-			if(!caso.IsClosed){
-				Case oppContador = contadorLlamadasSalientes(llamada, caso);
-				if(!actualizarCaso.contains(oppContador)){
-					actualizarCaso.add(oppContador);
-				}
-			}
-			update actualizarCaso;*/
-          
 			Integer numeroIntentos = [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id AND Type = 'Llamada saliente'];
 			caso.CC_OTP_Intentos__c = numeroIntentos;
 			update caso;
 
 			return new Map<String, Object>{'className' => 'HDT_Llamada_GC', 'llamada' => llamada};
-		
-
-
 		
 	}
 
@@ -258,35 +230,7 @@ public with sharing class HDT_Llamada_GC {
 		return new Map<String, Object>{'className' => 'HDT_Llamada_GC', 'llamada' => consulta, 'caso' => caso};
 	}
 
-	/*
-	public static Map<String, Object> registrarConsultaExterna(CC_Llamada_Input inputConsulta) {
-		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
-		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
-													FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :inputConsulta.servicio LIMIT 1];
-		String agente = inputConsulta?.usuario;
-		if (String.isBlank(agente)) {
-			agente = [SELECT EmployeeNumber FROM User WHERE Id = :UserInfo.getUserId()].EmployeeNumber;
-		}
-		CC_Llamada__c consultaExterna = new CC_Llamada__c(
-			KIN_Genesys_Cloud__c = true,
-			KIN_Consulta__c = true,
-			RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'HDT_Empleado'),
-			CC_Tipo__c = 'Entrante',
-			CC_Agente__c = agente,
-			CC_ConnId__c = null,
-			CC_ConnId_Consulta__c = inputConsulta.connId,
-			CC_ANI__c = inputConsulta.ani,
-			CC_DNIS__c = inputConsulta.dnis,
-			CC_Servicio_Genesys__c = servicioGenesys.Id,
-			CC_Idioma__c = codigoIdioma(inputConsulta.idioma),
-			CC_Fecha_Inicio__c = System.now(),
-			CC_IdentCliente__c = '0' // Sin datos ALF
-		);
-		insert consultaExterna;
-		return new Map<String, Object>{'className' => 'HDT_Llamada_GC', 'llamada' => consultaExterna};
-	}
-	*/
-
+	
 	public static Id registrarConsultaNoAtendida(CC_Llamada_Input inputLlamada, CC_Llamada_Input inputConsulta) {
 		if (String.isNotBlank(inputConsulta.servicio)) {
 			CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
@@ -302,37 +246,6 @@ public with sharing class HDT_Llamada_GC {
 		}
 	}
 
-	/*
-	public static void registrarEncuesta(CC_Llamada_Input inputLlamada) {
-		String llamadaId = buscarLlamada(inputLlamada, false);
-		if (!String.isBlank(llamadaId)) {
-			CC_Llamada__c llamada = [SELECT CC_Servicio_Genesys__r.CC_Encuesta__r.Name, CC_Tipo__c FROM CC_Llamada__c WHERE Id = :llamadaId];
-			llamada.CC_Encuesta__c = llamada.CC_Servicio_Genesys__r.CC_Encuesta__c;
-
-			//Recuperamos el nombre de la encuesta para la tarea
-			String nombreEncuesta = llamada.CC_Servicio_Genesys__r.CC_Encuesta__r.Name;
-
-			if (llamada.CC_Encuesta__c == null && llamada.CC_Tipo__c == 'Saliente') {
-				List<AggregateResult> casoIds = [SELECT WhatId FROM Task WHERE CC_Llamada_Id__c = :llamadaId GROUP BY WhatId];
-				if (!casoIds.isEmpty()) {
-					Id casoId = String.valueOf(casoIds[0].get('WhatId'));
-					if (casoId != null) {
-						CC_Servicio_Genesys__c servicioGen = CC_Servicio_Genesys.obtenerServicioEncuestaDesdeCaso(casoId);
-						if (servicioGen != null) {
-							//Relacionamos la llamada con la encuesta
-							llamada.CC_Encuesta__c = servicioGen.CC_Encuesta__c;
-							//Recuperamos el nombre de la encuesta para la tarea
-							nombreEncuesta = servicioGen.CC_Encuesta__r.Name;
-						}
-					}
-				}
-			}
-			update llamada;
-
-			crearActividadCasos(llamadaId, 'Encuesta', nombreEncuesta, 'Encuesta enviada');
-		}
-	}
-	*/
 
 	private static String buscarLlamada(CC_Llamada_Input jsonLlamada, Boolean esConsulta) {
 		String resultado = jsonLlamada.llamadaId;
@@ -360,15 +273,7 @@ public with sharing class HDT_Llamada_GC {
 	}
 
 	public static Map<String, Object> finalizarLlamada(CC_Llamada_Input inputLlamada, String tipoCierre) {
-		/*
-		Versión anterior de Abril
-
-		String llamadaId = buscarLlamada(inputLlamada, false);
-		if (String.isNotBlank(llamadaId)) {
-			finalizarLlamadaActividades(new CC_Llamada__c(Id = llamadaId), 'Llamada%', tipoCierre != '' ? tipoCierre : 'Llamada finalizada');
-		}
-		return new Map<String, Object>{'className' => 'HDT_Llamada_GC', 'llamada' => llamadaId};*/
-
+		
 		Map<String, Object> response = new Map<String, Object>();
 
 		// Validar si inputLlamada es nulo o si llamadaId es nulo o vacío
@@ -403,11 +308,11 @@ public with sharing class HDT_Llamada_GC {
 
 	}
 
-	private static void finalizarActividades(CC_Llamada__c llamada, String tipoActividad, String tipoCierre) {
+	public static void finalizarActividades(CC_Llamada__c llamada, String tipoActividad, String tipoCierre) {
 		finalizarActividades(new List<CC_Llamada__c>{llamada}, tipoActividad, tipoCierre);
 	}
 
-	private static void finalizarActividades(List<CC_Llamada__c> llamadas, String tipoActividad, String tipoCierre) {
+	public static void finalizarActividades(List<CC_Llamada__c> llamadas, String tipoActividad, String tipoCierre) {
 		Set<Id> llamadaIds = new Set<Id>();
 		//Map<Id, Integer> oppDuracionMapa = new Map<Id, Integer>();
 
@@ -419,21 +324,10 @@ public with sharing class HDT_Llamada_GC {
 					actividad.CC_Fecha_Fin__c = System.now();
 					actividad.CC_Tipo_Cierre__c = obtenerTipoCierre(tipoCierre);
 					actividad.Status = 'Completed';
-
-					//Integer duracionMinutos = (Integer)((System.now().getTime() - actividad.CC_Fecha_Inicio__c.getTime()) / (1000 * 60));
-					//oppDuracionMapa.put(actividad.WhatId, duracionMinutos);
 				}
 				update actividades;
 			}
 		}
-
-        //SLA
-		/*<Opportunity> oportunidadesSla = [SELECT CSBD_SLA_TGT__c FROM Opportunity WHERE OwnerId = :UserInfo.getUserId()
-												AND IsClosed = FALSE AND Id IN :oppDuracionMapa.keySet() AND CSBD_SLA_TMO__c = NULL];
-		for (Opportunity oppSla : oportunidadesSla) {
-			oppSla.CSBD_SLA_TGT__c = (oppSla.CSBD_SLA_TGT__c ?? 0) + oppDuracionMapa.get(oppSla.Id);
-		}
-		update oportunidadesSla;*/
 
 	}
 
@@ -473,20 +367,6 @@ public with sharing class HDT_Llamada_GC {
 								FROM Case WHERE Id = :inputLlamada.casoId];
 
 		return new Map<String, Object>{'className' => 'HDT_Llamada_GC', 'llamada' => llamada, 'caso' => caso};
-
-
-		/*
-		Opportunity oportunidad = [SELECT CreatedDate, Name, CSBD_Idioma_Solicitud__c,  CSBD_Horario_Contacto__c, CSBD_Proveedor__c,
-									CSBD_SLA_Primera_Respuesta__c, RecordType.DeveloperName, CSBD_PrimerContactoSLA__c
-									FROM Opportunity WHERE Id = :inputLlamada.casoId];
-		
-		return new Map<String, Object>{
-			'className' => 'CSBD_Llamada_GC',
-			'llamada' => llamada,
-			'idioma' => formatoIdiomaGenesys(oportunidad.CSBD_Idioma_Solicitud__c),
-			'proveedor' => oportunidad?.CSBD_Proveedor__c == null ? '' : oportunidad.CSBD_Proveedor__c,
-			'numLlamadasAnteriores' => llamadasAnteriores.size()
-		};*/
 
 	}
 
@@ -584,18 +464,15 @@ public with sharing class HDT_Llamada_GC {
 			estadoActivo = valorActivos[0].CSBD_Valor4__c;
 		}
 
-		// Buscamos los activos que tiene asociada la cuenta
-        List<Asset> valorAsset = [SELECT Id,Name,CC_Familia_Activo__c,HDT_Estado_CI__c 
+		// Buscamos los activos que tiene asociado el contacto
+        List<Asset> valorAssetContacto = [SELECT Id,Name,CC_Familia_Activo__c,HDT_Estado_CI__c 
 								  FROM Asset 
-								  WHERE HDT_Estado_CI__c = :estadoActivo AND AccountId = :llamada.CC_Cuenta__c AND CC_Familia_Activo__c IN :familias
+								  WHERE HDT_Estado_CI__c = :estadoActivo AND HDT_Asignado_a__c  = :llamada.CC_Contacto__r.CC_Matricula__c AND CC_Familia_Activo__c IN :familias AND CC_Inactivo__c = false
 								  LIMIT 1];
-		if (!valorAsset.isEmpty())  {
-			for (Asset valor2 : valorAsset) {
-				miasset = valor2.Id;
-			}
+
+		if (!valorAssetContacto.isEmpty())  {		
+				miasset = valorAssetContacto[0].Id;
 		}
-
-
 
 		String 	miAsunto = '';
 		String detallesConsulta = '';
@@ -617,15 +494,12 @@ public with sharing class HDT_Llamada_GC {
 		FROM CC_Agrupador__c WHERE Id = :agrupadorId LIMIT 1];
 		
 		if (!valorAgrupador.isEmpty())  {
-			for (CC_Agrupador__c valor1 : valorAgrupador) {
-				miAsunto = miAsunto + ' ' + valor1.CC_Titulo__c;
-				descripcionMasiva = valor1.CC_Descripcion__c;
-				tematica = valor1.CC_Tematica_Id__c;
-				producto = valor1.CC_Producto_Servicio__c;
-				motivo = valor1.CC_Motivo__c;
-				causa = valor1.CC_Causa__c;
-
-			}
+				miAsunto = miAsunto + ' ' + valorAgrupador[0].CC_Titulo__c;
+				descripcionMasiva = valorAgrupador[0].CC_Descripcion__c;
+				tematica = valorAgrupador[0].CC_Tematica_Id__c;
+				producto = valorAgrupador[0].CC_Producto_Servicio__c;
+				motivo = valorAgrupador[0].CC_Motivo__c;
+				causa = valorAgrupador[0].CC_Causa__c;
 		}
 
 		Case caso = new Case(
@@ -647,7 +521,8 @@ public with sharing class HDT_Llamada_GC {
 			ContactId = llamada.CC_Contacto__c,
 			CC_IdentCliente__c = llamada.CC_IdentCliente__c,
 			CC_Id_Cognitivo__c = llamada.CC_Id_Cognitivo__c,
-			CC_Status_Autorizacion__c = llamada.CC_Status_Autorizacion__c
+			CC_Status_Autorizacion__c = llamada.CC_Status_Autorizacion__c,
+			HDT_Desborde__c = true		// Usamos este campo para recoger que el caso viene desde el botón de Masiva para omitir el envio de notificación.
 			);
 			
 		List<String> valoresPermitidos = new List<String>();
@@ -660,12 +535,6 @@ public with sharing class HDT_Llamada_GC {
 			caso.Canal_del_Empleado__c = null;
 		}
 
-
-		if (llamada.HDT_Desborde__c) {
-			llamada.HDT_Desborde_Gestionado__c = true;
-			caso.HDT_Desborde__c = true;
-			update llamada;
-		}
 		insert caso;
 
 		
@@ -687,6 +556,13 @@ public with sharing class HDT_Llamada_GC {
 
 
 	/*Fin -  Nuevo para IOP Abril 25*/
+	public static void crearVincularCasoDesborde(CC_Llamada__c llamada) {
+		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Canal_Procedencia__c, CC_Canal_de_Entrada__c, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
+													FROM CC_Servicio_Genesys__c WHERE Id = :llamada.CC_Servicio_Genesys__c];
+		Case caso = crearCaso(llamada, servicioGenesys);
+		vincularCaso(caso, llamada, servicioGenesys);
+		//return [SELECT CaseNumber, Status, Owner.Name, CreatedDate, Subject,RecordType.DeveloperName FROM Case WHERE Id = :caso.Id];
+	}
 
 	public static Case crearVincularCaso(CC_Llamada__c llamada) {
 		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Canal_Procedencia__c, CC_Canal_de_Entrada__c, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
@@ -699,7 +575,14 @@ public with sharing class HDT_Llamada_GC {
 	public static Case crearCaso(CC_Llamada__c llamada, CC_Servicio_Genesys__c servicioGenesys) {
 		//Buscamos si tiene asset asociados la cuenta
 		List<CC_Lista_Valores__c> valorActivos = [SELECT Name, CC_Valor__c,CC_Valor2__c,CSBD_Valor4__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT_Mensajes_Parametrizables_Empleados' AND Name = 'Tipo de Activos asociados a Cuenta desde llamada' LIMIT 1];
+		List<CC_Lista_Valores__c> valorActivos2 = [SELECT Name, CC_Valor__c,CC_Valor2__c,CSBD_Valor4__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT_Mensajes_Parametrizables_Empleados' AND Name = 'Mensaje para las llamadas de desborde al crear el caso' LIMIT 1];
     
+		String mensajeDesborde = '';
+
+		if (!valorActivos2.isEmpty()) {
+			mensajeDesborde = valorActivos2[0].CC_Valor__c;
+		}
+
 		String estadoActivo = '';
 		Id miasset;
 		List<String> familias = new List<String>();
@@ -710,17 +593,15 @@ public with sharing class HDT_Llamada_GC {
 			estadoActivo = valorActivos[0].CSBD_Valor4__c;
 		}
 
-		// Buscamos los activos que tiene asociada la cuenta
-        List<Asset> valorAsset = [SELECT Id,Name,CC_Familia_Activo__c,HDT_Estado_CI__c 
+		// Buscamos los activos que tiene asociado el contacto
+        List<Asset> valorAssetContacto = [SELECT Id,Name,CC_Familia_Activo__c,HDT_Estado_CI__c 
 								  FROM Asset 
-								  WHERE HDT_Estado_CI__c = :estadoActivo AND AccountId = :llamada.CC_Cuenta__c AND CC_Familia_Activo__c IN :familias
+								  WHERE HDT_Estado_CI__c = :estadoActivo AND HDT_Asignado_a__c  = :llamada.CC_Contacto__r.CC_Matricula__c AND CC_Familia_Activo__c IN :familias AND CC_Inactivo__c = false
 								  LIMIT 1];
-		if (!valorAsset.isEmpty())  {
-			for (Asset valor2 : valorAsset) {
-				miasset = valor2.Id;
-			}
-		}
 
+		if (!valorAssetContacto.isEmpty())  {		
+				miasset = valorAssetContacto[0].Id;
+		}
 
 		Case caso = new Case(
 			RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'HDT_Empleado'),
@@ -751,10 +632,23 @@ public with sharing class HDT_Llamada_GC {
 		}
 
 
+		//Moficaciones para la US : US1133185 : Creación de caso en la API de agente de desborde 
+		// Obtener el Id de la cola por nombre
+		Group cola = [
+			SELECT Id 
+			FROM Group 
+			WHERE Name = 'Agente de desborde HDT' AND Type = 'Queue' 
+			LIMIT 1
+		];
+
 		if (llamada.HDT_Desborde__c) {
-			llamada.HDT_Desborde_Gestionado__c = true;
+			caso.CC_Tipo_Contacto__c = 'Incidencia';
+			caso.Origin = 'Agente de desborde';
+			caso.Subject = mensajeDesborde;
+			caso.OwnerId = cola.Id; // Asignar la cola como propietario
+			//llamada.HDT_Desborde_Gestionado__c = true;
 			caso.HDT_Desborde__c = true;
-			update llamada;
+			//update llamada;
 		}
 
 		insert caso;
@@ -783,20 +677,47 @@ public with sharing class HDT_Llamada_GC {
 		crearActividadFuture(llamada.Id, caso.Id, tipoActividad, asunto, tipoCierre, llamada.CC_Fecha_Inicio__c, llamada.CC_Fecha_Fin__c);
 	}
 
-	private static CC_Canal_Com__c buscarEmpleadoPorTelefono(String telefono) {
+	private static CC_Canal_Com__c buscarEmpleadoPorTelefono(String canalProcedencia, String telefono) {
+		List<String> lstEDGMatriculas = new List<String>();
+		String matriculaPorCanalProcedencia = '';
+		for(CC_Lista_Valores__c listaValor : [SELECT Name, CC_Valor__c FROM CC_Lista_Valores__c WHERE RecordType.DeveloperName = 'CC_Valor' AND CC_Lista__r.Name = 'HDT - Matricula por Canal de Procedencia']){
+			if(canalProcedencia != null && canalProcedencia != '' && listaValor.Name == canalProcedencia) {
+				matriculaPorCanalProcedencia = listaValor.CC_Valor__c;
+			}
+			if(listaValor.Name.contains('EDG')) {
+				lstEDGMatriculas.add(listaValor.CC_Valor__c);	
+			}
+		}
 		telefono = telefono.replace('+34', '');
-		List<CC_Canal_Com__c> listCanales = [SELECT CC_ContactoId__c, CC_ContactoId__r.AccountId FROM CC_Canal_Com__c WHERE CC_Telefono__c = :telefono
-												AND CC_ContactoId__r.RecordType.DeveloperName = 'CC_Empleado' AND RecordType.DeveloperName = 'CC_Telefono' LIMIT 2];
-		if (listCanales.size() == 1) {
-			return listCanales[0];
+		List<CC_Canal_Com__c> listCanales = [SELECT CC_ContactoId__c, CC_ContactoId__r.AccountId, CC_ContactoId__r.CC_Matricula__c FROM CC_Canal_Com__c 
+												WHERE CC_Telefono__c = :telefono AND CC_ContactoId__r.RecordType.DeveloperName = 'CC_Empleado' 
+												AND RecordType.DeveloperName = 'CC_Telefono' AND CC_ContactoId__r.CC_Inactivo__c = false];
+		CC_Canal_Com__c empleadoEDG = null;
+		CC_Canal_Com__c empleadoMatriculaCorrecta = null;
+		for(CC_Canal_Com__c canalComunicacion : listCanales){
+			String matricula = canalComunicacion.CC_ContactoId__r.CC_Matricula__c;
+			if(matricula != null && matricula != '' && matricula.length() >= 3){
+				String matriculaPrefix = matricula.left(3);
+				if(matriculaPorCanalProcedencia != null && matriculaPorCanalProcedencia != '' && matriculaPorCanalProcedencia == matriculaPrefix && empleadoMatriculaCorrecta == null){
+					empleadoMatriculaCorrecta = canalComunicacion;
+				}
+				if(!lstEDGMatriculas.isEmpty() && lstEDGMatriculas.contains(matriculaPrefix) && empleadoEDG == null){
+					empleadoEDG = canalComunicacion;
+				}
+			}
+		}
+		if(empleadoMatriculaCorrecta!=null){
+			return empleadoMatriculaCorrecta;
+		}else if(empleadoEDG != null){
+			return empleadoEDG;
 		}
 		return null;
 	}
 
 	@TestVisible
-	private static void identificarPorTelefono(CC_Llamada__c llamada, String telefono) {
+	private static void identificarPorTelefono(CC_Llamada__c llamada, String telefono, String canalProcedencia) {
 		if (!String.isEmpty(telefono)) {
-			CC_Canal_Com__c canalComunicacion = buscarEmpleadoPorTelefono(telefono);
+			CC_Canal_Com__c canalComunicacion = buscarEmpleadoPorTelefono(canalProcedencia,telefono);
 			if (canalComunicacion != null) {
 				llamada.CC_Cuenta__c = canalComunicacion.CC_ContactoId__r.AccountId;
 				llamada.CC_Contacto__c = canalComunicacion.CC_ContactoId__c;
@@ -861,10 +782,12 @@ public with sharing class HDT_Llamada_GC {
 		}
 	}
 
+	@testvisible
 	private static void finalizarLlamadaActividades(CC_Llamada__c llamada, String tipoActividad, String tipoCierre) {
 		finalizarLlamadasActividades(new List<CC_Llamada__c>{llamada}, tipoActividad, tipoCierre);
 	}
 
+	@testvisible
 	private static void finalizarLlamadas(List<CC_Llamada__c> llamadas, String tipoCierre) {
 		for (CC_Llamada__c llamada : llamadas) {
 			llamada.CC_Fecha_Fin__c = System.now();
@@ -873,6 +796,7 @@ public with sharing class HDT_Llamada_GC {
 		update llamadas;
 	}
 
+	@testvisible
 	private static void finalizarLlamadasActividades(List<CC_Llamada__c> llamadas, String tipoActividad, String tipoCierre) {
 		if (!llamadas.isEmpty()) {
 			finalizarLlamadas(llamadas, tipoCierre);
@@ -921,17 +845,6 @@ public with sharing class HDT_Llamada_GC {
 		crearActividad(llamadaId, casoId, tipoActividad, asunto, tipoCierre, fechaInicio, fechaFin);
 	}
 
-	@future
-	private static void crearActividadCasos(Id llamadaId, String tipoActividad, String detalle, String tipoCierre) {
-		List<Task> actividades = new List<Task>();
-		for (AggregateResult resultado : [SELECT WhatId FROM Task WHERE CC_Llamada_Id__c = :llamadaId GROUP BY WhatId]) {
-			Id casoId = String.valueOf(resultado.get('WhatId'));
-			Task actividad = crearObjetoActividad(llamadaId, casoId, tipoActividad, detalle, tipoCierre, System.now(), System.now());
-			actividades.add(actividad);
-		}
-		insert actividades;
-	}
-
 	private static Id crearActividadEmpleado(Id llamadaId, Id casoId, String empleadoId, String empleadoTelefono, String tipoCierre, String tipoActividad) {
 		Task actividad = new Task(
 			ActivityDate = System.today(),
@@ -977,6 +890,7 @@ public with sharing class HDT_Llamada_GC {
 		return 'Inglés'.equals(idioma) ? 'en' : ('Catalán'.equals(idioma) ? 'ca' : 'es');
 	}
 
+	@testvisible
 	private static Case actualizarCaso(Id casoId, Id propietarioId) {
 		Case caso = new Case(Id = casoId);
 		caso.OwnerId = propietarioId;
@@ -984,6 +898,7 @@ public with sharing class HDT_Llamada_GC {
 		return caso;
 	}
 
+	@testvisible
 	private static Case actualizarCaso(Id casoId, Id propietarioId, String canalResolucion) {
 		Case caso = new Case(Id = casoId);
 		caso.CC_Canal_Resolucion__c = canalResolucion;
@@ -1034,68 +949,10 @@ public with sharing class HDT_Llamada_GC {
 		return actividad.Id;
 	}
 
+	@TestVisible
 	private static Case contadorLlamadasSalientes(CC_Llamada__c llamada, Case micaso){
 		micaso.CC_OTP_Intentos__c = [SELECT COUNT() FROM Task WHERE WhatId = :micaso.Id AND Type = 'Llamada saliente'];
 		return micaso;
 	}
-
-	/*
-	private static Case informarSla(CC_Llamada__c llamada, Case oportunidad) {
-		//Primera actividad de llamada saliente, por lo que hay que calcular el campo CSBD_SLA_Primera_Respuesta__c de la oportunidad vinculada.
-		if ([SELECT RecordTypeId, CC_Llamada_Id__c FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'].size() == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
-			// Guardo la fecha de creación de la Oportunidad
-			Datetime tiempoOrigen;
-			Datetime tiempoFinal = System.now();
-
-			/* ----------------------- RecordType CMN, Préstamo, Hipotecas y PRO Automática----------------------- 
-			if (oportunidad.Recordtype.DeveloperName == 'HDT_Empleado'){
-
-					List<CC_Lista_Valores__c> lovList = [SELECT Name, CC_Valor__c FROM CC_Lista_Valores__c
-															WHERE RecordType.DeveloperName = 'CC_Valor'
-															AND CC_Lista__r.Name = 'CSBD: Horarios comerciales por tipología'
-															AND Name  =: oportunidad.Recordtype.Name
-															AND CC_Activa__c = TRUE limit 1];
-
-					if(!lovList.isEmpty()){
-
-						List<BusinessHours> businessHoursList = [SELECT Id, Name FROM BusinessHours WHERE Name =:lovList[0].CC_Valor__c limit 1];
-
-						tiempoOrigen = BusinessHours.nextStartDate(businessHoursList[0].id, oportunidad.CreatedDate);
-
-						}
-
-				}else{
-					tiempoOrigen = oportunidad.CreatedDate;
-				}
-			}
-
-			/* ----------------------- RecordType CMB -----------------------
-			if (oportunidad.Recordtype.DeveloperName == 'CSBD_CMB') {
-				if(String.isNotBlank(oportunidad.CSBD_Horario_Contacto__c)) {
-					String rangoFinal = Datetime.now().format('yyyy-MM-dd') + ' ' + oportunidad.CSBD_Horario_Contacto__c.substring(7) + ':00';
-					tiempoOrigen = Datetime.valueOf(rangoFinal);
-
-					if(tiempoOrigen < oportunidad.CreatedDate){
-						tiempoOrigen = tiempoOrigen.addDays(1);
-					}
-				}
-				else{
-					tiempoOrigen = oportunidad.CreatedDate;
-				}
-			}
-
-			// Se calculan los SLAs
-			if(tiempoOrigen >= System.now()) {
-				oportunidad.CSBD_SLA_Primera_Respuesta__c = 0;
-				oportunidad.CSBD_PrimerContactoSLA__c = tiempoFinal;
-			}
-			if(tiempoOrigen < System.now()){
-				oportunidad.CSBD_SLA_Primera_Respuesta__c = (Integer)(tiempoFinal.getTime() - tiempoOrigen.getTime())/(1000 * 60);
-				oportunidad.CSBD_PrimerContactoSLA__c = tiempoFinal;
-			}
-		}
-		return oportunidad;
-	}*/
-
 
 }

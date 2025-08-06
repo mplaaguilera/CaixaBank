@@ -13,6 +13,7 @@ public without sharing class SAC_LCMP_GestionEmails {
     final static Id RECORDTYPEESCALADON3 = mapRTsObjects.get('SAC_Interaccion__c').get('SAC_EscaladoNV3').getRecordTypeId();
     final static Id RECORDTYPEMAESTROTAREA = mapRTsObjects.get('SAC_Accion__c').get('SAC_MaestroDeTareas').getRecordTypeId();
     final static Id RECORDTYPEOTRASTAEAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_OtrasTareas').getRecordTypeId();
+    final static Id RECTYPERECLAMACIONSPV = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
 
 
     /**
@@ -82,7 +83,7 @@ public without sharing class SAC_LCMP_GestionEmails {
     public static void comunicarResolucion(Case casoActual){
         List<String> body = new List<String>();
         Id idPlantillaAviso = null;
-        List<SAC_PlantillaRedaccion__c> lstPlantillas = [SELECT Id, SAC_PlantillaCatalanId__c, SAC_PlantillaCastellanoId__c, SAC_PlantillaInglesId__c FROM SAC_PlantillaRedaccion__c WHERE SAC_TipoPlantilla__c = 'SAC_AvisoResolucion'];
+        List<SAC_PlantillaRedaccion__c> lstPlantillas = [SELECT Id, SAC_PlantillaCatalanId__c, SAC_PlantillaCastellanoId__c, SAC_PlantillaInglesId__c, SAC_PlantillaEuskeraId__c, SAC_PlantillaValencianoId__c, SAC_PlantillaGallegoId__c FROM SAC_PlantillaRedaccion__c WHERE SAC_TipoPlantilla__c = 'SAC_AvisoResolucion'];
 
         if(lstPlantillas != null && !lstPlantillas.isEmpty()){
             for(SAC_PlantillaRedaccion__c plantilla : lstPlantillas){
@@ -92,7 +93,13 @@ public without sharing class SAC_LCMP_GestionEmails {
                     idPlantillaAviso = plantilla.SAC_PlantillaCatalanId__c;
                 } else if(casoActual.CC_Idioma__c == 'en'){
                     idPlantillaAviso = plantilla.SAC_PlantillaInglesId__c;
-                } else {
+                } else if(casoActual.CC_Idioma__c == 'eu'){
+                    idPlantillaAviso = plantilla.SAC_PlantillaEuskeraId__c;
+                } else if(casoActual.CC_Idioma__c == 'va'){
+                    idPlantillaAviso = plantilla.SAC_PlantillaValencianoId__c;
+                } else if(casoActual.CC_Idioma__c == 'ga'){
+                    idPlantillaAviso = plantilla.SAC_PlantillaGallegoId__c;
+                }else {
                     idPlantillaAviso = plantilla.SAC_PlantillaCastellanoId__c;
                 }   
             }
@@ -118,6 +125,14 @@ public without sharing class SAC_LCMP_GestionEmails {
     */ 
     @AuraEnabled
     public static void enviarEmail(Id id, String para, String copia, String copiaOculta, String cuerpo, String asunto, String idAdjuntos, String tipoEnvio){
+        System.System.debug('Kevin id: ' + id);
+        System.System.debug('Kevin para: ' + para);
+        System.System.debug('Kevin copia: ' + copia);
+        System.System.debug('Kevin copiaoculta: ' + copiaOculta);
+        System.System.debug('Kevin cuerpo: ' + cuerpo);
+        System.System.debug('Kevin asunto: ' + asunto);
+        System.System.debug('Kevin idadjuntos ' + idAdjuntos);
+        System.System.debug('Kevin tipoEnvio ' + tipoEnvio);
         Schema.SObjectType expectedCase = Schema.Case.getSObjectType();
         Schema.SObjectType expectedInteraccion = Schema.SAC_Interaccion__c.getSObjectType();
         Schema.SObjectType expectedAccion = Schema.SAC_Accion__c.getSObjectType();
@@ -128,12 +143,44 @@ public without sharing class SAC_LCMP_GestionEmails {
         Set<Id> fileId = new Set<Id>();
         List<Id> lstIdCV = new List<Id>();
         Case caso = new Case();
+        SAC_CaseReclamante__c reclamantePrincipal = new SAC_CaseReclamante__c();
+        CBK_Case_Extension__c caseExtension  = new CBK_Case_Extension__c();
         SAC_Interaccion__c interaccion = new SAC_Interaccion__c();
         SAC_Accion__c accion = new SAC_Accion__c();
         Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
+        Boolean actualizarReclamante = false;
 
         if(tipoObjeto == expectedCase){
-            caso = [SELECT Id, CaseNumber, CC_SuppliedID__c, RecordTypeId, Status, SAC_M2P__c, SAC_Reclamacion__r.SAC_M2P__c FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPECONSULTA, :RECTYPECONSULTASAC, :RECTYPEPRETENSION) AND Id =: id  LIMIT 1];
+            caso = [SELECT Id, CaseNumber, CC_SuppliedID__c, RecordTypeId, Status, SAC_M2P__c, SAC_Reclamacion__r.SAC_M2P__c, CC_Idioma__c, CC_Oficina__c, ContactId, AccountId FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPECONSULTA, :RECTYPECONSULTASAC, :RECTYPEPRETENSION, :RECTYPERECLAMACIONSPV) AND Id =: id  LIMIT 1];
+
+            if(caso.RecordTypeId == RECTYPERECLAMACIONSPV){
+                
+
+                caseExtension = [SELECT Id, SPV_ReclamantePrincipalEmail__c
+                                            FROM CBK_Case_Extension__c  
+                                            WHERE Case_Id__c  = :id
+                                            LIMIT 1];
+
+                if(caseExtension.SPV_ReclamantePrincipalEmail__c){
+                    reclamantePrincipal = [SELECT Id, SAC_Contact__c,SAC_Account__c, SAC_Account__r.CC_Idioma__pc, SAC_ReclamantePrincipal__c, SAC_Account__r.AV_OfficeManager__c
+                                            FROM SAC_CaseReclamante__c 
+                                            WHERE SAC_ReclamantePrincipal__c = true AND SAC_Case__c = :id 
+                                            LIMIT 1];
+
+                    caso.CC_Idioma__c = reclamantePrincipal.SAC_Account__r.CC_Idioma__pc;
+                    caso.CC_Oficina__c = reclamantePrincipal.SAC_Account__r.AV_OfficeManager__c;         
+                    caso.AccountId = reclamantePrincipal.SAC_Account__c;
+                    caso.ContactId = reclamantePrincipal.SAC_Contact__c;
+
+                    caseExtension.SPV_ReclamantePrincipalEmail__c = false;
+
+                    actualizarReclamante = true;
+
+
+                }
+            }          
+
+
         }else if(tipoObjeto == expectedInteraccion){
             interaccion = [SELECT Id, SAC_IndexedThreadId__c, SAC_Oficina__c, SAC_Reclamacion__c, SAC_GrupoColaborador__c, SAC_DNI__c, SAC_Reclamante__c, SAC_Respuesta__c, RecordTypeId, SAC_GrupoColaborador__r.SAC_Externo__c, SAC_Reclamacion__r.SAC_M2P__c
                                 FROM SAC_Interaccion__c WHERE RecordTypeId IN (:RECORDTYPECONSULTA, :RECORDTYPEESCALADON2, :RECORDTYPEESCALADON3) AND Id =: id LIMIT 1];
@@ -160,7 +207,7 @@ public without sharing class SAC_LCMP_GestionEmails {
             }*/
 
             if(!idsAdjuntosFinal.isEmpty()){
-                lstCV = [SELECT Id, ContentDocumentId, VersionData FROM ContentVersion WHERE ContentDocumentId IN: idsAdjuntosFinal AND SAC_BloqueoTotalVisibilidad__c = false];  
+                lstCV = [SELECT Id, ContentDocumentId, VersionData, SAC_Enviado__c FROM ContentVersion WHERE ContentDocumentId IN: idsAdjuntosFinal AND SAC_BloqueoTotalVisibilidad__c = false];  
             }
        
             if(!lstCV.isEmpty()){
@@ -243,7 +290,9 @@ public without sharing class SAC_LCMP_GestionEmails {
 
         try{
             Messaging.SendEmailResult[] results = Messaging.sendEmail(messages);
+            
             List<ContentDocumentLink> lstContentDocument = new List<ContentDocumentLink>();
+            List<ContentVersion> listCvAct = new List<ContentVersion>();
             Date fechaActual = Date.today();
             List<EmailMessage> lstEmailMessage = [SELECT id FROM EmailMessage WHERE parentId = :caso.Id AND Subject = :asunto AND Incoming = false ORDER BY createdDate DESC LIMIT 1];
             if(!lstEmailMessage.isEmpty()){
@@ -257,12 +306,27 @@ public without sharing class SAC_LCMP_GestionEmails {
                             contentLink.ContentDocumentId = contentVersion.ContentDocumentId;
                             lstContentDocument.add(contentLink);
                             
+                            if(!contentVersion.SAC_Enviado__c){
+                                listCvAct.add(new ContentVersion(Id=contentVersion.Id,SAC_Enviado__c=true));
+                            }
                         }
                     }
 
                     if(!lstContentDocument.isEmpty()){
                         SAC_DatabaseDML.insertListDML(lstContentDocument, true);
                     }
+                }else{
+                    if(!lstCV.isEmpty()){
+                        for(ContentVersion contentVersion : lstCV){                            
+                            if(!contentVersion.SAC_Enviado__c){
+                                listCvAct.add(new ContentVersion(Id=contentVersion.Id,SAC_Enviado__c=true));
+                            }
+                        }
+                    }
+                }
+
+                if(!listCvAct.isEmpty()){
+                    SAC_DatabaseDML.updateListDML(listCvAct, true);
                 }
 
                 //Si el EmailMessage es de la redaccion final de una reclamación, actualizamos el campo SAC_EnvioRedaccion__c del EmailMessage
@@ -271,6 +335,15 @@ public without sharing class SAC_LCMP_GestionEmails {
                     emailRecuperado.SAC_IDAdjuntos__c = idAdjuntos;
                     SAC_DatabaseDML.updateDML(emailRecuperado, true);
                 }
+
+                if(actualizarReclamante){
+
+                    SAC_DatabaseDML.updateDML(caso, true);
+
+                    SAC_DatabaseDML.updateDML(caseExtension, true);
+                }
+
+
             }     
             
         }catch (Exception e){

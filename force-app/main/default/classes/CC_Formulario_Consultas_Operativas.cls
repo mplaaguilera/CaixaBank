@@ -21,7 +21,7 @@ public with sharing class CC_Formulario_Consultas_Operativas implements Messagin
                 (RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task')) LIMIT 1];
                 if (!tareaOrigen.isEmpty()) {
                     if (tareaOrigen[0].Type == 'Traslado Colaborador') {
-                        //Respuesta entrante de grupo colaborador
+                      //Respuesta entrante de grupo colaborador
                         CC_Metodos_EmailServices.respuestaTrasladoColaborador(email, tareaOrigen[0].WhatId, body, emailDestino);
                     } else if (tareaOrigen[0].Type == 'Solicitud Información') {
                         //Respuesta entrante de solicitud de información de cliente

@@ -27,6 +27,35 @@ public with sharing class SEG_trasladoColaboradorWS{
         public String cuerpoTraslado {get;set;}
         public List<Id> ficherosSeleccionados {get;set;}
 
+        
+
+        /*  Jaime:
+            Operación 06: Expediente electrónico Persona
+        */
+        public String cifOrdenante {get;set;} //Jaime: Operación 06: Obligatorio, validar NIF
+        public String nombreTitular {get;set;} //tambien presente en operacion 01
+        public String contacto {get;set;} //tambien presente en operacion 01
+        public String telefono {get;set;} //tambien presente en operacion 01
+        public String numPer {get;set;} //obligatorio
+        public String prestamoICO {get;set;} //tambien presente en operacion 01
+
+        /*  Jaime:
+            Operación 01: Expediente electrónico
+         */
+        public String tipoOperacion {get;set;} //select con 2 posibles valores
+        public String numExpediente {get;set;}
+        public String cifNif {get;set;}
+        public String cifNif2 {get;set;}
+        public String nombreTitular2 {get;set;}
+        public String cifNif3 {get;set;}
+        public String nombreTitular3 {get;set;}
+        public String cifNif4 {get;set;}
+        public String nombreTitular4 {get;set;}
+        public String cifNif5 {get;set;}
+        public String nombreTitular5 {get;set;}
+        public String idEER {get;set;}
+
+
         public SEG_DataTrasladoColaborador()
         {
             // Inicalizamos la lista de ficheros.
@@ -65,11 +94,38 @@ public with sharing class SEG_trasladoColaboradorWS{
         public String paqueteriaId {get;set;}
         public String tipoCargo {get;set;}
         public String fechaCargo {get;set;}
-        public String cifOrdenante {get;set;}
+
+        public String cifOrdenante {get;set;} //Jaime: Operación 06: Obligatorio, validar NIF
         public String pagoAgrupado {get;set;}
         public String concepto {get;set;}
         public String documentos {get;set;}
         public String comunidadAutonoma {get;set;}
+
+        /*  Jaime:
+            Operación 06: Expediente electrónico Persona
+        */
+        public String nombreTitular {get;set;}
+        public String contacto {get;set;} //tambien presente en operacion 01
+        public String telefono {get;set;} //tambien presente en operacion 01
+        public String numPer {get;set;} //obligatorio
+        public String prestamoICO {get;set;} //tambien presente en operacion 01
+
+        /*  Jaime:
+            Operación 01: Expediente electrónico
+         */
+        public String tipoOperacion {get;set;} //select con 2 posibles valores
+        public String numExpediente {get;set;}
+        public String cifNif {get;set;}
+        public String cifNif2 {get;set;}
+        public String nombreTitular2 {get;set;}
+        public String cifNif3 {get;set;}
+        public String nombreTitular3 {get;set;}
+        public String cifNif4 {get;set;}
+        public String nombreTitular4 {get;set;}
+        public String cifNif5 {get;set;}
+        public String nombreTitular5 {get;set;}
+        public String idEER {get;set;}
+
 
         // Estructura adicional
         public String zona {get;set;}
@@ -114,6 +170,29 @@ public with sharing class SEG_trasladoColaboradorWS{
         public String errorCode {get;set;}
         public String message {get;set;}
     }
+
+    /**
+     * @description Estructura del response de la respuesta de Valija 2.0.
+     */
+    public class SEG_ResponseValija_2 {
+        public String briefcaseId {get;set;}
+    }
+
+    /**
+     * @description Campos del JSON recibido en briefcaseId en Valija 2.0.
+     */
+    public class BriefCaseIdJSON{
+        public String actor;
+        public String aud;
+        public String sub;
+        public String iss;
+        public String principalName;
+        public Integer exp;
+        public Integer iat;
+        public String value; //Equivalente al id recibido en valijaOld 1.0
+        public String jti;
+	}
+
 
     public class SEG_Credenciales
     {
@@ -239,9 +318,52 @@ public with sharing class SEG_trasladoColaboradorWS{
             // Crear un post de chatter informando del inicio del proceso de traslado a WS.
             try
             {
-                String descripcionChatter = 'Se inicia el traslado al grupo colaborador <' + grupoTrasladoId + '> asociado a ' + datosTraslado.tipoColaborador;
+                String descripcionChatter = '';
+                String operativa = '';
+
+                if (datosTraslado.operacionFinalValija == '01') {
+                    operativa = '01';
+
+                    descripcionChatter = '<ul>'
+                        + '<li>Se inicia el traslado a Valija del caso <b>' + datosTraslado.caseId.escapeHtml4() + '</b> asociado a ' + datosTraslado.tipoColaborador.escapeHtml4() + '</li>'
+                        + '<li><b>Tipo de Operación: </b>' + datosTraslado.tipoOperacion.escapeHtml4() + '</li>' 
+                        + '<li><b>Número de Expediente: </b>' + datosTraslado.numExpediente.escapeHtml4() + '</li>'
+                        + '<li><b>CIF/NIF: </b>' + datosTraslado.cifNif.escapeHtml4() + '</li>' 
+                        + '<li><b>Nombre Titular: </b>' + datosTraslado.nombreTitular.escapeHtml4() + '</li>' 
+                        + '<li><b>CIF/NIF 2: </b>' + datosTraslado.cifNif2.escapeHtml4() + '</li>' 
+                        + '<li><b>Nombre titular 2: </b>' + datosTraslado.nombreTitular2.escapeHtml4() + '</li>' 
+                        + '<li><b>CIF/NIF 3: </b>' + datosTraslado.cifNif3.escapeHtml4() + '</li>' 
+                        + '<li><b>Nombre titular 3: </b>' + datosTraslado.nombreTitular3.escapeHtml4() + '</li>' 
+                        + '<li><b>CIF/NIF 4: </b>' + datosTraslado.cifNif4.escapeHtml4() + '</li>' 
+                        + '<li><b>Nombre titular 4: </b>' + datosTraslado.nombreTitular4.escapeHtml4() + '</li>' 
+                        + '<li><b>CIF/NIF 5: </b>' + datosTraslado.cifNif5.escapeHtml4() + '</li>' 
+                        + '<li><b>Nombre titular 5: </b>' + datosTraslado.nombreTitular5.escapeHtml4() + '</li>' 
+                        + '<li><b>Contacto: </b>' + datosTraslado.contacto.escapeHtml4() + '</li>' 
+                        + '<li><b>Teléfono: </b>' + datosTraslado.telefono.escapeHtml4() + '</li>' 
+                        + '<li><b>Préstamo ICO: </b>' + datosTraslado.prestamoICO.escapeHtml4() + '</li>' 
+                        + '<li><b>ID_EER: </b>' + datosTraslado.idEER.escapeHtml4() + '</li>'
+                        + '</ul>';
+                } else if (datosTraslado.operacionFinalValija == '06') {
+                    operativa = '06';
+
+                    descripcionChatter = '<ul>'
+                        + '<li>Se inicia el traslado del caso <b>' + datosTraslado.caseId.escapeHtml4() + '</b> asociado a ' + datosTraslado.tipoColaborador.escapeHtml4() + ' </li>' 
+                        + '<li><b>CIF Ordenante: </b>' + datosTraslado.cifOrdenante.escapeHtml4() + '</li>' 
+                        + '<li><b>Nombre Titular: </b>' + datosTraslado.nombreTitular.escapeHtml4() + '</li>' 
+                        + '<li><b>Contacto: </b>' + datosTraslado.contacto.escapeHtml4() + '</li>' 
+                        + '<li><b>Teléfono: </b>' + datosTraslado.telefono.escapeHtml4() + '</li>' 
+                        + '<li><b>Préstamo ICO: </b>' + datosTraslado.prestamoICO.escapeHtml4() + '</li>'
+                        + '</ul>';
+                } else {
+                    operativa = 'Autoasignar caso (Valija - WS)';
+
+                    descripcionChatter = 'Se inicia el traslado a Valija al grupo colaborador <' + grupoTrasladoId + '> del caso '  + datosTraslado.caseId + 'asociado a ' + datosTraslado.tipoColaborador;
+    
+                }
+
+                //Jaime OLD: descripcionChatter = 'Se inicia el traslado al grupo colaborador <' + grupoTrasladoId + '> asociado a ' + datosTraslado.tipoColaborador;
                 descripcionChatter = (retorno.get('codigo') != '0') ? descripcionChatter + '. ERROR (' + retorno.get('codigo') + '): ' + retorno.get('detalle') : descripcionChatter;
-                SEG_Case_Operativas_Controller.postOnChatter(datosTraslado.caseId, descripcionChatter, 'Autoasignar caso (Valija - WS)', null);
+                SEG_Case_Operativas_Controller.postOnChatter(datosTraslado.caseId, descripcionChatter, operativa, null);
             }catch (Exception e){
                 // Registramos el error.
                 CBK_Log.error(e);
@@ -382,7 +504,10 @@ public with sharing class SEG_trasladoColaboradorWS{
             if (retornoTraslado.status == 'OK')
             {
                 Map<String,String> estadoUpdate = actualizarCasoDerivadoValija(datosTraslado, datosCalculadosTraslado, retornoTraslado.referenciaValija);
-                if (estadoUpdate.get('codigo') != '0'){retornoTraslado.status = 'NOK'; retornoTraslado.codigo = '0003'; retornoTraslado.detalle = estadoUpdate.get('detalle');
+                if (estadoUpdate.get('codigo') != '0'){
+                    retornoTraslado.status = 'NOK'; 
+                    retornoTraslado.codigo = '0003'; 
+                    retornoTraslado.detalle = estadoUpdate.get('detalle');
                 }
             }
         }
@@ -410,12 +535,42 @@ public with sharing class SEG_trasladoColaboradorWS{
                                 Account.SEG_Oficina_Gestora_Segmentos__r.CC_Numero_Oficina__c, SEG_Numero_centro__c, SEG_Numero_de_centro__c,
                                 CaseNumber, ContactId, Contact.Email, OS_Referencia_Valija__c, SEG_TipoCargo__c, SEG_CIFOrdenanteValija__c,
                                 SEG_PagoAgrupado__c, SEG_ConceptoValija__c, SEG_DocumentosValija__c, SEG_ComunidadAutonoma__c, SEG_FechaCargo__c,
-                                SEG_Zona__c, SEG_Organizacion__c, SEG_Observaciones__c, Account.CC_Numero_Documento__c
+                                SEG_Zona__c, SEG_Organizacion__c, SEG_Observaciones__c, Account.CC_Numero_Documento__c, Account.AV_NumPerso__c 
                                 FROM Case
                                 WHERE Id = :datosTraslado.caseId];
         if (!listadoCaso.isEmpty())
         {
             Case datosCaso = listadoCaso[0];
+
+            /* Jaime: datos de operaciones 01 y 06 */
+            datosRetorno.nombreTitular = (String.isNotBlank(datosTraslado.nombreTitular))?datosTraslado.nombreTitular:'';
+            datosRetorno.contacto = (String.isNotBlank(datosTraslado.contacto))?datosTraslado.contacto:'';
+            datosRetorno.telefono = (String.isNotBlank(datosTraslado.telefono))?datosTraslado.telefono:'';
+
+            datosRetorno.numPer = (String.isNotBlank(datosCaso.Account?.AV_NumPerso__c))?datosCaso.Account?.AV_NumPerso__c:'';
+            /* datosRetorno.numPer = (String.isNotBlank(datosTraslado.numPer))?datosTraslado.numPer:''; */
+            datosRetorno.prestamoICO = (String.isNotBlank(datosTraslado.prestamoICO))?datosTraslado.prestamoICO:'';
+
+            if (datosTraslado.operacionFinalValija == '06') {
+                datosRetorno.cifOrdenante = (String.isNotBlank(datosTraslado.cifOrdenante))?datosTraslado.cifOrdenante:'';
+            }else{
+                datosRetorno.cifOrdenante = (String.isNotBlank(datosCaso.SEG_CIFOrdenanteValija__c))?datosCaso.SEG_CIFOrdenanteValija__c:'';
+            }
+
+            datosRetorno.tipoOperacion = (String.isNotBlank(datosTraslado.tipoOperacion))?datosTraslado.tipoOperacion:'';//select con 2 posibles valores
+            datosRetorno.numExpediente = (String.isNotBlank(datosTraslado.numExpediente))?datosTraslado.numExpediente:'';
+            datosRetorno.cifNif = (String.isNotBlank(datosTraslado.cifNif))?datosTraslado.cifNif:'';
+            datosRetorno.cifNif2 = (String.isNotBlank(datosTraslado.cifNif2))?datosTraslado.cifNif2:'';
+            datosRetorno.nombreTitular2 = (String.isNotBlank(datosTraslado.nombreTitular2))?datosTraslado.nombreTitular2:'';
+            datosRetorno.cifNif3 = (String.isNotBlank(datosTraslado.cifNif3))?datosTraslado.cifNif3:'';
+            datosRetorno.nombreTitular3 = (String.isNotBlank(datosTraslado.nombreTitular3))?datosTraslado.nombreTitular3:'';
+            datosRetorno.cifNif4 = (String.isNotBlank(datosTraslado.cifNif4))?datosTraslado.cifNif4:'';
+            datosRetorno.nombreTitular4 = (String.isNotBlank(datosTraslado.nombreTitular4))?datosTraslado.nombreTitular4:'';
+            datosRetorno.cifNif5 = (String.isNotBlank(datosTraslado.cifNif5))?datosTraslado.cifNif5:'';
+            datosRetorno.nombreTitular5 = (String.isNotBlank(datosTraslado.nombreTitular5))?datosTraslado.nombreTitular5:'';
+            datosRetorno.idEER = (String.isNotBlank(datosTraslado.idEER))?datosTraslado.idEER:'';
+
+
 
             datosRetorno.sucursalCredencial = (String.isNotBlank(datosCaso.SEG_Numero_centro__c))?datosCaso.SEG_Numero_centro__c:'';
             datosRetorno.caseId = datosCaso.Id;
@@ -427,7 +582,6 @@ public with sharing class SEG_trasladoColaboradorWS{
             datosRetorno.fechaCargo = (datosCaso.SEG_FechaCargo__c != null)?String.valueOf(datosCaso.SEG_FechaCargo__c):'';
             // A petición de negocio, solo se envía el CIF Ordenante que ha llegado desde paquetería o que ha puesto explícito el usuario.
             // FIX. datosRetorno.cifOrdenante = (String.isNotBlank(datosCaso.SEG_CIFOrdenanteValija__c))?datosCaso.SEG_CIFOrdenanteValija__c:((String.isNotBlank(datosCaso.Account?.CC_Numero_Documento__c))?datosCaso.Account?.CC_Numero_Documento__c:'');
-            datosRetorno.cifOrdenante = (String.isNotBlank(datosCaso.SEG_CIFOrdenanteValija__c))?datosCaso.SEG_CIFOrdenanteValija__c:'';
             datosRetorno.pagoAgrupado = (String.isNotBlank(datosCaso.SEG_PagoAgrupado__c))?datosCaso.SEG_PagoAgrupado__c:'';
             datosRetorno.concepto = (String.isNotBlank(datosCaso.SEG_ConceptoValija__c))?datosCaso.SEG_ConceptoValija__c:'';
             datosRetorno.documentos = (datosCaso.SEG_DocumentosValija__c != null)?String.valueOf(datosCaso.SEG_DocumentosValija__c):'0';
@@ -485,7 +639,6 @@ public with sharing class SEG_trasladoColaboradorWS{
                         listadoFicherosWS.add(newFile);
                     }
                 }
-
             }else{
                 // Recuperar todos los ficheros anexos del caso. Se recuperará los html creados y el posible fichero dummy.txt. Para gestionar los traslados automáticos sin intervención del usuario.
                 for (ContentDocumentLink linkFile : [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.LatestPublishedVersionId, 
@@ -538,6 +691,7 @@ public with sharing class SEG_trasladoColaboradorWS{
         CC_TrazaInt__c trazaWS = new CC_TrazaInt__c();
         trazaWS.Name = 'SEG_Int_Valija';
         trazaWS.CC_FechaInicio__c = datetime.now();
+        
 
         Boolean bError = false;
         String jsonRequest = '';
@@ -555,9 +709,12 @@ public with sharing class SEG_trasladoColaboradorWS{
 
         try{
 
+            
             //Generar el mensaje de request a Valija.
             if (flujoValija != null && flujoValija.SEG_Activo__c) {
                 jsonRequest = generarJSONValija(informacionTraslado);
+                
+                trazaWS.CC_MensajeEntrada__c = JSON.serialize(jsonRequest);
 
                 datosRetorno.mensajeEnviado = jsonRequest;
 
@@ -592,25 +749,35 @@ public with sharing class SEG_trasladoColaboradorWS{
                 String detalleWS = '';
                 Integer httpCodeWS = 200;
                 String codigoWS = '0000';
-                SEG_ResponseValija datosRespuestaWS;
+                SEG_ResponseValija_2 datosRespuestaWS;
                 String valijaIdSaliente = '';
+                Boolean finOK = true;
 
-                if (response.getStatusCode() != 200 && response.getStatusCode() != 201) {
+                try{ if (response.getStatusCode() != 200 && response.getStatusCode() != 201) {
                     // Error respuesta.
-                    statusWS = 'NOK';codigoWS = '0004';httpCodeWS = response.getStatusCode();
+                    statusWS = 'NOK';
+                    codigoWS = '0004';
+                    httpCodeWS = response.getStatusCode();
                     detalleWS = 'Error en la integración con el servicio REST Valija (Callout - enviarTrasladoValija). ' + response.getStatus() + ' (' + response.getStatusCode() + ')';
                 }else{
                     // Respuesta OK. Convertir JSON.
-                    datosRespuestaWS = (SEG_ResponseValija)JSON.deserialize(jsonResponse, SEG_trasladoColaboradorWS.SEG_ResponseValija.class);
-                    statusWS = (datosRespuestaWS.ok == false) ? 'NOK' : statusWS;
-                    codigoWS = (datosRespuestaWS.ok == false) ? datosRespuestaWS.errorCode : statusWS;
-                    detalleWS = 'Error en la integración con el servicio REST Valija (Respuesta NOK - enviarTrasladoValija). ' + datosRespuestaWS.message + ' (' + datosRespuestaWS.errorCode + ')';
-
+                    datosRespuestaWS = (SEG_ResponseValija_2)JSON.deserialize(jsonResponse, SEG_trasladoColaboradorWS.SEG_ResponseValija_2.class);
+                    // Ya no aplica en Valija 2.0 statusWS = (datosRespuestaWS.ok == false) ? 'NOK' : statusWS;
+                    // Ya no aplica en Valija 2.0 codigoWS = (datosRespuestaWS.ok == false) ? datosRespuestaWS.errorCode : statusWS;
+                    detalleWS = 'Conexión correcta de la integración con el servicio REST Valija (Respuesta OK - enviarTrasladoValija).';
                     // FIX. Tratar la indisponibilidad / asíncromismo de Valija.
-                    valijaIdSaliente = (datosRespuestaWS.ok == false) ? '' : datosRespuestaWS.id;  valijaIdSaliente = (valijaIdSaliente == 'UNKNOWN') ? 'UNKNOWN' + Datetime.now().getTime() : valijaIdSaliente;
-                } try{
-                    Boolean finOK = (statusWS == 'OK') ? true : false; trazaWS = SEG_MetodosComunes.finTrazaNoInsert(trazaWS, jsonResponse, finOK, codigoWS, detalleWS);
-                }catch(Exception e){CBK_Log.error(e);}
+
+                        List<String> datosSplit = datosRespuestaWS.briefcaseId.split('\\.');
+                        BriefCaseIdJSON datosBriefCase = (BriefCaseIdJSON) JSON.deserialize(EncodingUtil.base64Decode(datosSplit[1]).toString(), BriefCaseIdJSON.class);
+
+                        valijaIdSaliente = (valijaIdSaliente == 'UNKNOWN') ? 'UNKNOWN' + CBK_UtilsDate.nowDT().getTime() : datosBriefCase.value;
+                } 
+                        finOK = (statusWS == 'OK') ? true : false; 
+                }catch(Exception e){
+                    CBK_Log.error(e);
+                    trazaWS.CC_DetalleError__c = e.getMessage();
+                }
+                trazaWS = SEG_MetodosComunes.finTrazaNoInsert(trazaWS, jsonResponse, finOK, codigoWS, detalleWS);
 
                 // Preparar retorno método.
                 datosRetorno.status = statusWS;
@@ -630,7 +797,7 @@ public with sharing class SEG_trasladoColaboradorWS{
                 Map<String,string> mHeaders =  new  Map<String,string>();
                 mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
 
-                HttpRequest request = CBK_HttpServiceIntegration.getRequest(jsonRequest, intSetting, 'PUT', mHeaders);
+                HttpRequest request = CBK_HttpServiceIntegration.getRequest(jsonRequest, intSetting, 'POST', mHeaders);
 
                 HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, intSetting, intSetting);
 
@@ -699,6 +866,29 @@ public with sharing class SEG_trasladoColaboradorWS{
 
             // Cualquier otro proceso no tratado arriba, no enviará datos en la estructura metadata.
             switch on informacionTraslado.procesoValija {
+
+                /*  Jaime
+                    Operación 01: Expediente Riesgo (SIA)
+                */
+                when '01'{
+                    metadata.put('TIPO_OPERACION',informacionTraslado.tipoOperacion);
+                    metadata.put('NUM_EXPEDIENTE',informacionTraslado.numExpediente);
+                    metadata.put('CIF_NIF',informacionTraslado.cifNif);
+                    metadata.put('NOMBRE_TITULAR',informacionTraslado.nombreTitular);
+                    metadata.put('CIF_NIF_2',informacionTraslado.cifNif2);
+                    metadata.put('NOMBRE_TITULAR2',informacionTraslado.nombreTitular2);
+                    metadata.put('CIF_NIF_3',informacionTraslado.cifNif3);
+                    metadata.put('NOMBRE_TITULAR3',informacionTraslado.nombreTitular3);
+                    metadata.put('CIF_NIF_4',informacionTraslado.cifNif4);
+                    metadata.put('NOMBRE_TITULAR4',informacionTraslado.nombreTitular4);
+                    metadata.put('CIF_NIF_5',informacionTraslado.cifNif5);
+                    metadata.put('NOMBRE_TITULAR5',informacionTraslado.nombreTitular5);
+                    metadata.put('CONTACTO',informacionTraslado.contacto);
+                    metadata.put('TELEFONO',informacionTraslado.telefono);
+                    metadata.put('PRESTAMO_ICO', informacionTraslado.prestamoICO);
+                    metadata.put('ID_EER',informacionTraslado.idEER);
+                }
+
                 when '02' {
                     metadata.put('TIPO_CARGO',informacionTraslado.tipoCargo);
                     metadata.put('FECHA_CARGO',informacionTraslado.fechaCargo);
@@ -709,6 +899,20 @@ public with sharing class SEG_trasladoColaboradorWS{
                     metadata.put('SF_ID_CASO',informacionTraslado.caseId);
                     metadata.put('SF_NOTAS',informacionTraslado.notas);
                 }
+
+                /*  Jaime
+                    Operación 06: Expediente Persona
+                */
+                when '06' {
+                    metadata.put('CIF_NIF',informacionTraslado.cifOrdenante);
+                    metadata.put('NOMBRE_TITULAR',informacionTraslado.nombreTitular);
+                    metadata.put('CONTACTO',informacionTraslado.contacto);
+                    metadata.put('TELEFONO',informacionTraslado.telefono);
+                    metadata.put('NUMPER',informacionTraslado.numPer);
+                    metadata.put('PRESTAMO_ICO', informacionTraslado.prestamoICO);
+                }
+
+                /* Impuestos AEAT */
                 when '08' {
                     metadata.put('TIPO_CARGO',informacionTraslado.tipoCargo);
                     metadata.put('FECHA_CARGO',informacionTraslado.fechaCargo);
@@ -718,6 +922,8 @@ public with sharing class SEG_trasladoColaboradorWS{
                     metadata.put('SF_MAIL_CLIENT',informacionTraslado.email);
                     metadata.put('SF_ID_CASO',informacionTraslado.caseId);
                 }
+
+                /* Impuestos municipales */
                 when '09' {
                     metadata.put('TIPO_CARGO',informacionTraslado.tipoCargo);
                     metadata.put('FECHA_CARGO',informacionTraslado.fechaCargo);
@@ -727,6 +933,8 @@ public with sharing class SEG_trasladoColaboradorWS{
                     metadata.put('SF_MAIL_CLIENT',informacionTraslado.email);
                     metadata.put('SF_ID_CASO',informacionTraslado.caseId);
                 }
+
+                /* Impuestos recibos no domiciliados (RIN) */
                 when '47' {
                     metadata.put('TIPO_CARGO',informacionTraslado.tipoCargo);
                     metadata.put('FECHA_CARGO',informacionTraslado.fechaCargo);
@@ -736,6 +944,8 @@ public with sharing class SEG_trasladoColaboradorWS{
                     metadata.put('SF_MAIL_CLIENT',informacionTraslado.email);
                     metadata.put('SF_ID_CASO',informacionTraslado.caseId);
                 }
+
+                /* Impuestos comunidades autónomas */
                 when '64' {
                     metadata.put('SF_IDENTIFICADOR_VALIJA',informacionTraslado.paqueteriaId);
                     metadata.put('SF_NOTAS',informacionTraslado.notas);
@@ -762,7 +972,12 @@ public with sharing class SEG_trasladoColaboradorWS{
             SEG_RequestValija requestValija = new SEG_RequestValija();
             requestValija.action = 'NEW';
             requestValija.originId = 'SALESFORCE';
-            requestValija.operationId = '08';
+
+            
+            requestValija.operationId = informacionTraslado.procesoValija;
+            /* Jaime: OLD: SIEMPRE SE DA POR HECHO QUE ES OPERACION 08
+            requestValija.operationId = '08'; */
+
             requestValija.branchId = informacionTraslado.sucursalCredencial; //Confirmar con negocio/valija
             requestValija.sourceApp = 'SEGMENTOS_SF';
             requestValija.Metadatas = metadatasList;

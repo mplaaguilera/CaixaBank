@@ -260,7 +260,6 @@ public with sharing class SPV_CaseOperativas_Controller_Test {
     static void devolverALetradoTest(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useraadmin@test.com.testdata' AND IsActive = true LIMIT 1];
         Case reclamacion = [SELECT Id, Status FROM Case WHERE subject = 'ReclamacionTest4' limit 1];
-        Case pretension = [SELECT Id, OwnerId, SEG_Grupo__c FROM Case WHERE SuppliedCompany = 'pruebaPretension3' limit 1];
 
         Test.startTest();
 
@@ -268,8 +267,22 @@ public with sharing class SPV_CaseOperativas_Controller_Test {
             SPV_CaseOperativas_Controller.devolverALetrado(reclamacion.Id, 'SPV_010', 'Observaciones');
         }
 
-        Case reclamacionResult = [SELECT Id, OwnerId FROM Case WHERE subject = 'ReclamacionTest4' limit 1];
-        Assert.areEqual(reclamacionResult.OwnerId, pretension.OwnerId, 'No se ha devuelto la reclamación al letrado.');
+        Case reclamacionResult = [SELECT Id, Status FROM Case WHERE subject = 'ReclamacionTest4' limit 1];
+        Assert.areEqual(reclamacionResult.Status, 'SPV_AnalisisDecision', 'No se ha devuelto la reclamación al letrado.');
+    }
+
+    @isTest
+    static void comprobarSLAPlazoRegCompOrgCompletadoTest(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'useraadmin@test.com.testdata' AND IsActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE subject = 'ReclamacionTest4' limit 1];
+        Boolean result;
+        Test.startTest();
+
+        System.runAs(usuario){
+            result = SPV_CaseOperativas_Controller.comprobarSLAPlazoRegCompOrgCompletado(reclamacion.Id);
+        }
+
+        Assert.areEqual(result, false, 'No se ha comprobado correctamente el SLA.');
     }
 
     @isTest
@@ -487,6 +500,38 @@ public with sharing class SPV_CaseOperativas_Controller_Test {
     }
 
     @isTest
+    static void comprobarCamposPasarEnvioTest(){
+        Test.startTest();
+        User usuario = [SELECT Id FROM User WHERE Username = 'useraadmin@test.com.testdata' AND IsActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id FROM Case Where Subject = 'ReclamacionTest'];
+        Case pretension = [SELECT id, Status, SAC_EsPrincipal__c, CBK_Case_Extension_Id__c FROM Case WHERE SuppliedCompany = 'pruebaPretension' LIMIT 1];
+        Case pretension2 = [SELECT id, Status, SAC_EsPrincipal__c, CBK_Case_Extension_Id__c FROM Case WHERE SuppliedCompany = 'pruebaPretension2' LIMIT 1];
+
+        CBK_Case_Extension__c caseExtension1 = new CBK_Case_Extension__c();
+        caseExtension1.Id = pretension.CBK_Case_Extension_Id__c;
+        caseExtension1.SPV_DecisionPretensionLetrado__c = 'Allanamiento';
+
+        CBK_Case_Extension__c caseExtension2 = new CBK_Case_Extension__c();
+        caseExtension2.Id = pretension2.CBK_Case_Extension_Id__c;
+        caseExtension2.SPV_DecisionPretensionLetrado__c = 'Desistimiento';
+
+        List<CBK_Case_Extension__c> listaCaseExtension = new List<CBK_Case_Extension__c>();
+        listaCaseExtension.add(caseExtension1);
+        listaCaseExtension.add(caseExtension2);
+
+        String resultado = '';
+
+        System.runAs(usuario){
+            SPV_DatabaseDML.updateListDML(listaCaseExtension, true);
+
+            resultado = SPV_CaseOperativas_Controller.comprobarCamposPasarEnvio(reclamacion.Id);
+        }
+
+        Assert.areEqual(false, String.isBlank(resultado), 'No se han realizado las comprobaciones correctamente.');
+        Test.stopTest();
+    }
+
+    @isTest
     static void recuperarGruposLetradoTest() {
 
         List<CC_Grupo_Colaborador__c> listGruposLet = new List<CC_Grupo_Colaborador__c>();
@@ -594,7 +639,7 @@ public with sharing class SPV_CaseOperativas_Controller_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'useraadmin@test.com.testdata' AND IsActive = true LIMIT 1];
 
         System.runAs(usuario) {
-            SPV_CaseOperativas_Controller.activarComplementariaOrganismo(caso.Id, 'SPV_Otros', 'Observaciones');
+            SPV_CaseOperativas_Controller.activarComplementariaOrganismo(caso.Id, 'SPV_Otros', 'Observaciones', CBK_UtilsDate.todayDT());
         }
         Test.stopTest();
 
@@ -707,5 +752,68 @@ public with sharing class SPV_CaseOperativas_Controller_Test {
         Test.stopTest();
 
         Assert.areEqual('SPV_Envio' , casoEstadoCambiado.Status, 'Error al cambiar el estado de la reclamacion');
+    }
+
+    @isTest
+    static void comprobarTareasPtesTest() {
+        User usuario = [SELECT Id FROM User WHERE Username = 'useraadmin@test.com.testdata' AND IsActive = true LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE subject = 'ReclamacionTest' LIMIT 1];
+
+        Boolean tieneTareas = false;
+
+        Test.startTest();
+            System.runAs(usuario) {
+                tieneTareas = SPV_CaseOperativas_Controller.comprobarTareasPtes(caso.Id);
+            }
+        Test.stopTest();
+
+        Assert.areEqual(false, tieneTareas, 'Error al comprobar las tareas pendientes de la reclamación');
+    }
+    
+     @isTest
+    static void convertirReclamacionSAC(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'useraadmin@test.com.testdata' AND IsActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE subject = 'ReclamacionTest4' limit 1];
+
+        Test.startTest();
+
+        System.runAs(usuario){
+            SPV_CaseOperativas_Controller.convertirReclamacion(reclamacion.Id, 'ReclamacionSAC');
+        }
+
+        Case reclamacionResult = [SELECT Id, RecordType.DeveloperName FROM Case WHERE subject = 'ReclamacionTest4' limit 1];
+        Assert.areEqual(reclamacionResult.RecordType.DeveloperName, 'SAC_Reclamacion', 'No se ha convertido correctamente.');
+    }
+    
+     @isTest
+    static void convertirConsultaSPV(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'useraadmin@test.com.testdata' AND IsActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE subject = 'ReclamacionTest4' limit 1];
+
+        Test.startTest();
+
+        System.runAs(usuario){
+            SPV_CaseOperativas_Controller.convertirReclamacion(reclamacion.Id, 'ConsultaSPV');
+        }
+
+        Case reclamacionResult = [SELECT Id, RecordType.DeveloperName FROM Case WHERE subject = 'ReclamacionTest4' limit 1];
+        Assert.areEqual(reclamacionResult.RecordType.DeveloperName, 'SAC_ConsultaSAC', 'No se ha convertido correctamente.');
+    }
+    
+     @isTest
+    static void convertirConsultaCOPS(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'useraadmin@test.com.testdata' AND IsActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE subject = 'ReclamacionTest4' limit 1];
+		Case pretension = [SELECT Id, OwnerId, SEG_Grupo__c FROM Case WHERE SuppliedCompany = 'pruebaPretension3' limit 1];
+        Test.startTest();
+
+        System.runAs(usuario){
+            SPV_CaseOperativas_Controller.convertirReclamacion(reclamacion.Id, 'ConsultaCOPS');
+            SPV_CaseOperativas_Controller.esPrincipal(pretension.Id);
+        }
+
+        Case pretensionResult = [SELECT Id, Status FROM Case WHERE SuppliedCompany = 'pruebaPretension3' limit 1];
+
+        Assert.areEqual(pretensionResult.Status, 'SAC_009', 'No se ha dado de baja.');
     }
 }

@@ -124,7 +124,7 @@ export default class Spv_PaginaDetalles extends LightningElement {
     @track toggleSeccionResolucionOrganismo = "slds-section slds-is-open";
     @track expandirResolucionOrganismo = true;
     @track mostrarResolucionOrganismo = false;
-
+    @track mostrarResolucionOrganismoConsumo = false;
     //Controlar desplegable: Rectificación
     @track toggleSeccionRectificacion = "slds-section slds-is-open";
     @track expandirRectificacion = true;
@@ -173,12 +173,16 @@ export default class Spv_PaginaDetalles extends LightningElement {
 
             this.mostrarPrueba = true;
 
-            if(data.fields.Status.value == 'SPV_RecepcionResolucion' || data.fields.Status.value == 'Cerrado' || data.fields.Status.value == 'Descartado'){
+            if(data.fields.SPV_Organismo__c.value != 'SPV_Consumo' && (data.fields.Status.value == 'SPV_RecepcionResolucion' || data.fields.Status.value == 'SPV_AnalisisComplementariaOrganismo' || data.fields.Status.value == 'SPV_EnvioComplementaria' || data.fields.Status.value == 'SPV_Rectificacion' || data.fields.Status.value == 'SPV_EnvioRectificacion' || data.fields.Status.value == 'Cerrado' || data.fields.Status.value == 'Descartado')){
                 this.mostrarResolucionOrganismo = true;
             }else{
                 this.mostrarResolucionOrganismo = false;
             }
-
+            if(data.fields.SPV_Organismo__c.value == 'SPV_Consumo' && (data.fields.Status.value == 'SPV_Envio' || data.fields.Status.value == 'SPV_AnalisisComplementariaOrganismo' || data.fields.Status.value == 'SPV_EnvioComplementaria' || data.fields.Status.value == 'Cerrado' || data.fields.Status.value == 'Descartado')){
+                this.mostrarResolucionOrganismoConsumo = true;
+            }else{
+                this.mostrarResolucionOrganismoConsumo = false;
+            }
             if(data.fields.Status.value != 'SAC_001'){
                 this.mostrarAnalisisDecision = true;
             }else{

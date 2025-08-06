@@ -59,6 +59,13 @@ public with sharing class CC_Control_Servei_Controller_Test {
         
         System.runAs(usuarioAdmin) {
             String sRecordType = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Agrupador__c', 'CC_Incidencia');
+
+            //Custom Setting
+            CC_Agrupacion_Casos__c customSetting = new CC_Agrupacion_Casos__c();
+            customSetting.CC_Grupos_Casos__c = 1;
+            customSetting.Name = 'Agrupador Casos';
+            insert customSetting;
+        
             List<CC_Agrupador__c> listaAgrup = new  List<CC_Agrupador__c>();
             CC_Agrupador__c agrupadorAbierto = new CC_Agrupador__c();
             agrupadorAbierto.RecordTypeId = sRecordType;
@@ -212,38 +219,40 @@ public with sharing class CC_Control_Servei_Controller_Test {
         User usuario = [SELECT Id FROM User Where LastName = 'Operador Empleado' LIMIT 1];
 
         System.runAs(usuario) {
-
-            ContentVersion docsV = new contentVersion();
-            docsV.title='/test.jpeg';
-            docsV.PathOnClient ='/test.jpeg';
-            docsV.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body');
-           insert docsV;
-
-            ContentVersion docsV2 = new ContentVersion();
-            docsV2.title='/testDos.jpeg';
-            docsV2.PathOnClient ='/testDos.jpeg';
-            docsV2.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body Dos');
-           insert docsV2;
-    
-            String randomUuid = UUID.randomUUID().toString().remove('-').left(18);
-            String developerNameFinal = 'CC_' + docsV2.id + randomUuid;
-            
-            ContentAsset assetId = new ContentAsset();
-            assetId.DeveloperName = developerNameFinal;
-            assetId.IsVisibleByExternalUsers = true;
-            assetId.MasterLabel = developerNameFinal;
-            insert assetId;
-
-            List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = : docsV2.Id];
-    
-            ContentDocument cntDocument2 = new ContentDocument();
-            cntDocument2.Id = documents[0].Id;
-            update cntDocument2;
-
-            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '" alt="test1"></p><p>';
-        
             Test.startTest();
+                List<ContentVersion> cvList = new  List<ContentVersion>();
+                ContentVersion docsV = new contentVersion();
+                docsV.title='/test.jpeg';
+                docsV.PathOnClient ='/test.jpeg';
+                docsV.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body');
+                cvList.add(docsV);
+
+                ContentVersion docsV2 = new ContentVersion();
+                docsV2.title='/testDos.jpeg';
+                docsV2.PathOnClient ='/testDos.jpeg';
+                docsV2.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body Dos');
+                cvList.add(docsV2);
+                insert cvList;
+                //insert docsV2;
+        
+                String randomUuid = UUID.randomUUID().toString().remove('-').left(18);
+                String developerNameFinal = 'CC_' + docsV2.id + randomUuid;
+                
+                ContentAsset assetId = new ContentAsset();
+                assetId.DeveloperName = developerNameFinal;
+                assetId.IsVisibleByExternalUsers = true;
+                assetId.MasterLabel = developerNameFinal;
+                insert assetId;
+
+                List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = : docsV2.Id];
+        
+                ContentDocument cntDocument2 = new ContentDocument();
+                cntDocument2.Id = documents[0].Id;
+                update cntDocument2;
+
+                String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '" alt="test1"></p><p>';  
                 String htmlResult = CC_Control_Servei_Controller.gestionarImagenesInlineRedactarMail(emailBody);
+
             Test.stopTest();
 
             Assert.areNotEqual(emailBody, htmlResult, 'Error al parsear la imagen del email body');
@@ -256,37 +265,37 @@ public with sharing class CC_Control_Servei_Controller_Test {
         User usuario = [SELECT Id FROM User Where LastName = 'Operador Empleado' LIMIT 1];
 
         System.runAs(usuario) {
-
-            ContentVersion docsV = new contentVersion();
-            docsV.title='/test.jpeg';
-            docsV.PathOnClient ='/test.jpeg';
-            docsV.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body');
-           insert docsV;
-
-            ContentVersion docsV2 = new ContentVersion();
-            docsV2.title='/testDos.jpeg';
-            docsV2.PathOnClient ='/testDos.jpeg';
-            docsV2.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body Dos');
-          insert docsV2;
-    
-            String randomUuid = UUID.randomUUID().toString().remove('-').left(18);
-            String developerNameFinal = 'CC_' + docsV2.id + randomUuid;
-            
-            ContentAsset assetId = new ContentAsset();
-            assetId.DeveloperName = developerNameFinal;
-            assetId.IsVisibleByExternalUsers = true;
-            assetId.MasterLabel = developerNameFinal;
-            insert assetId;
-
-            List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = : docsV2.Id];
-    
-            ContentDocument cntDocument2 = new ContentDocument();
-            cntDocument2.Id = documents[0].Id;
-            cntDocument2.ContentAssetId = assetId.Id;
-          update cntDocument2;
-            String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '" alt="test2"></p><p>';
-        
             Test.startTest();
+                ContentVersion docsV = new contentVersion();
+                docsV.title='/test.jpeg';
+                docsV.PathOnClient ='/test.jpeg';
+                docsV.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body');
+                insert docsV;
+
+                ContentVersion docsV2 = new ContentVersion();
+                docsV2.title='/testDos.jpeg';
+                docsV2.PathOnClient ='/testDos.jpeg';
+                docsV2.versiondata=EncodingUtil.base64Decode('Unit Test Attachment Body Dos');
+                insert docsV2;
+        
+                String randomUuid = UUID.randomUUID().toString().remove('-').left(18);
+                String developerNameFinal = 'CC_' + docsV2.id + randomUuid;
+                
+                ContentAsset assetId = new ContentAsset();
+                assetId.DeveloperName = developerNameFinal;
+                assetId.IsVisibleByExternalUsers = true;
+                assetId.MasterLabel = developerNameFinal;
+                insert assetId;
+
+                List<ContentDocument> documents = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = : docsV2.Id];
+        
+                ContentDocument cntDocument2 = new ContentDocument();
+                cntDocument2.Id = documents[0].Id;
+                cntDocument2.ContentAssetId = assetId.Id;
+                update cntDocument2;
+                String emailBody = '</p><p><img src="https://caixabankcc.lightning.force.com/sfc/servlet.shepherd/version/download/'+ docsV2.Id + '" alt="test2"></p><p>';
+        
+           
                 String htmlResult = CC_Control_Servei_Controller.gestionarImagenesInlineRedactarMail(emailBody);
             Test.stopTest();
 

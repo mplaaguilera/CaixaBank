@@ -153,6 +153,21 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         camposRecl8.put('SAC_TipoConsumidor__c', 'Si');
         Case casoReclamacion8 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl8);
         
+        //RECLAMACION 8
+        Map<String, Object> camposRecl9 = new Map<String, Object>();
+        camposRecl9.put('Subject', 'TestRec9');
+        camposRecl9.put('Origin', 'Otros');
+        camposRecl9.put('Status', 'SAC_006');
+        camposRecl9.put('SAC_StatusAuxiliar__c', 'SAC_001');
+        camposRecl9.put('SAC_DetenidoDesde__c', CBK_UtilsDate.nowSYS());
+        camposRecl9.put('AccountId', cuenta.Id);
+        camposRecl9.put('SAC_ProrrogaCounter__c', 1);
+        camposRecl9.put('SuppliedEmail', 't.t@t.t');
+        camposRecl9.put('SAC_TipoConsumidor__c', 'Si');
+        
+        Case casoReclamacion9 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl9);
+
+
         List<Case> casosReclamacion = new List<Case>();
         casosReclamacion.add(casoReclamacion2);
         casosReclamacion.add(casoReclamacion3);
@@ -160,6 +175,7 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         casosReclamacion.add(casoReclamacion6);
         casosReclamacion.add(casoReclamacion7);
         casosReclamacion.add(casoReclamacion8);
+        casosReclamacion.add(casoReclamacion9);
         SAC_DatabaseDML.insertListDML(casosReclamacion, false); 
         //Database.insert(casosReclamacion);
         Test.stopTest();
@@ -256,6 +272,20 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         camposPret8.put('SAC_Reclamacion__c', casoReclamacion8.Id);
         camposPret8.put('AccountId', cuenta.Id);
         camposPret8.put('SEG_Detalle__c', mccGGH.Id);
+
+        //PRETENSION 9
+        Map<String, Object> camposPret9 = new Map<String, Object>();
+        camposPret9.put('Subject', 'TestPret9');
+        camposPret9.put('SuppliedCompany', 'TestPret9');
+        camposPret9.put('Origin', 'Otros');
+        camposPret9.put('Status', 'SAC_006');
+        camposPret9.put('SAC_StatusAuxiliar__c', 'SAC_001');
+        camposPret9.put('SAC_DetenidoDesde__c', CBK_UtilsDate.nowSYS());
+        camposPret9.put('SAC_Reclamacion__c', casoReclamacion9.Id);
+        camposPret9.put('AccountId', cuenta.Id);
+        camposPret9.put('SEG_Detalle__c', mcc.Id);
+        
+        Case pretension9 = SAC_TestDataFactory.crearCaso('Pretension', camposPret9);
         //camposPret8.put('SAC_TasacionReclamado__c', 'SAC_No');
         //camposPret8.put('SAC_RegistrosReclamado__c', 'SAC_No');
         //camposPret8.put('SAC_NotariaReclamado__c', 'SAC_No');
@@ -270,7 +300,8 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         casosPretension.add(pretension6);
         casosPretension.add(pretension7);
         casosPretension.add(pretension8);
-        
+        casosPretension.add(pretension9);
+
         SAC_DatabaseDML.insertListDML(casosPretension, false); 
         //Database.insert(casosPretension);
         
@@ -445,7 +476,90 @@ public with sharing class SAC_LCMP_UpdateStatus_Test2 {
         }       
         Test.stopTest();  
     }
+
+    @isTest
+    static void updateRecordStatusInadmision3(){
+        Test.startTest();
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec9'];
+        Case pretension = [SELECT Id, Status FROM Case WHERE Subject = 'TestPret9'];
+
+        System.runAs(usuario){
+            //pretension.Status = 'SAC_006';
+            pretension.CC_Canal_Respuesta__c = 'SAC_CartaPostal';
+            pretension.SAC_DireccionContacto__c = 'test1';
+            pretension.SAC_CodigoPostalContacto__c = '123';
+            pretension.SAC_PoblacionContacto__c = 'test2';
+            pretension.SAC_ProvinciaContacto__c = 'test3';
+            pretension.SAC_PaisContacto__c = 'españa';
+            SAC_DatabaseDML.updateDML(pretension, false);
+            reclamacion.SAC_DetenidoHasta__c = CBK_UtilsDate.nowSYS();
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+
+
+            SAC_LCMP_UpdateStatus.updateRecordStatusInadmision(pretension.Id,'SAC_005');
+        }
+
+        Case pretensionResult = [SELECT Id, Status FROM Case WHERE Subject = 'TestPret9'];
+        Assert.areEqual(pretensionResult.Status, 'SAC_003', 'No se ha actualizado la pretensión.');
+        Test.stopTest();
+    }
     
+    @isTest
+    static void updateRecordStatusInadmisionDesdeReclamacion(){
+        Test.startTest();
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec9'];
+        Case pretension = [SELECT Id, Status FROM Case WHERE Subject = 'TestPret9'];
+
+        System.runAs(usuario){
+            //pretension.Status = 'SAC_006';
+            pretension.CC_Canal_Respuesta__c = 'SAC_CartaPostal';
+            pretension.SAC_DireccionContacto__c = 'test1';
+            pretension.SAC_CodigoPostalContacto__c = '123';
+            pretension.SAC_PoblacionContacto__c = 'test2';
+            pretension.SAC_ProvinciaContacto__c = 'test3';
+            pretension.SAC_PaisContacto__c = 'españa';
+            SAC_DatabaseDML.updateDML(pretension, false);
+            reclamacion.SAC_DetenidoHasta__c = CBK_UtilsDate.nowSYS();
+            SAC_DatabaseDML.updateDML(reclamacion, false);
+
+
+            SAC_LCMP_UpdateStatus.updateRecordStatusInadmision(reclamacion.Id,'SAC_005');
+        }
+
+        Case reclamacionResult = [SELECT Id, Status FROM Case WHERE Subject = 'TestPret9'];
+        Assert.areEqual(reclamacionResult.Status, 'SAC_003', 'No se ha actualizado la pretensión.');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void updateRecordStatusInadmision4(){
+        Test.startTest();
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec2'];
+        Case pretension = [SELECT Id, Status FROM Case WHERE Subject = 'TestPret2'];
+
+        System.runAs(usuario){
+            pretension.CC_Canal_Respuesta__c = 'SAC_CartaPostal';
+            pretension.SAC_DireccionContacto__c = 'test1';
+            pretension.SAC_CodigoPostalContacto__c = '123';
+            pretension.SAC_PoblacionContacto__c = 'test2';
+            pretension.SAC_ProvinciaContacto__c = 'test3';
+            pretension.SAC_PaisContacto__c = 'españa';
+            SAC_DatabaseDML.updateDML(pretension, false);
+
+
+            SAC_LCMP_UpdateStatus.updateRecordStatusInadmision(pretension.Id,'SAC_005');
+        }
+
+        Case pretensionResult = [SELECT Id, Status FROM Case WHERE Subject = 'TestPret2'];
+        Assert.areEqual(pretensionResult.Status, 'SAC_003', 'No se ha actualizado la pretensión.');
+        Test.stopTest();
+
+        
+    }
+
     @isTest
     static void updateRecordStatusRechazadoTest(){
         Test.startTest();

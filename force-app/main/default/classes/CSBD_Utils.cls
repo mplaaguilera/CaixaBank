@@ -152,4 +152,10 @@ public with sharing class CSBD_Utils {
         } while (value > 0);
         return hex;
     }
+
+    @AuraEnabled(cacheable=true)
+    public static Boolean usuarioDesarrollador(Id idUsuario) {
+        idUsuario = idUsuario ?? UserInfo.getUserId();
+        return ![SELECT Id FROM GroupMember WHERE Group.DeveloperName = 'CSBD_Desarrollo' AND UserOrGroupId = :idUsuario LIMIT 1].isEmpty();
+    }
 }

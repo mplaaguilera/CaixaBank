@@ -135,6 +135,40 @@
                         value={sacFechaApertura}
                         onchange={handleInputChange}>
                     </lightning-input-field>
+
+                    <!-- Campo Contrato a Remediar para SAC_ContratoRemediar__c -->
+                    <lightning-input-field
+                      type="checkbox"
+                      field-name="SAC_ContratoRemediar__c"
+                      value={sacContratoRemediar}
+                      label="Contrato a Remediar"
+                      onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <!-- Campos condicionales para SAC_ContratoRemediar__c -->
+                    <template if:true={mostrarCamposAdicionales}>
+                      <lightning-input-field 
+                        field-name="SAC_Oficina__c"
+                        value={sacOficina}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                      <lightning-input-field
+                        field-name="SAC_Modalidad__c"
+                        value={sacModalidad}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                      <lightning-input-field 
+                        field-name="SAC_Contrato__c"
+                        value={sacContrato}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                      <lightning-input-field 
+                        field-name="SAC_DigitoControl__c"
+                        value={sacDigitoControl}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                    </template>
+                  
                   </div>
     
                   <!-- Columna 2 -->
@@ -274,6 +308,40 @@
                         value={sacFechaApertura}
                         onchange={handleInputChange}>
                     </lightning-input-field>
+
+
+                    <!-- Campo Contrato a Remediar para SAC_ContratoRemediar__c -->
+                    <lightning-input-field
+                      type="checkbox"
+                      field-name="SAC_ContratoRemediar__c"
+                      value={sacContratoRemediar}
+                      label="Contrato a Remediar"
+                      onchange={handleInputChange}>
+                    </lightning-input-field>
+
+                    <!-- Campos condicionales para SAC_ContratoRemediar__c -->
+                    <template if:true={mostrarCamposAdicionales}>
+                      <lightning-input-field 
+                        field-name="SAC_Oficina__c"
+                        value={sacOficina}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                      <lightning-input-field
+                        field-name="SAC_Modalidad__c"
+                        value={sacModalidad}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                      <lightning-input-field 
+                        field-name="SAC_Contrato__c"
+                        value={sacContrato}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                      <lightning-input-field 
+                        field-name="SAC_DigitoControl__c"
+                        value={sacDigitoControl}
+                        onchange={handleInputChange}>
+                      </lightning-input-field>
+                    </template>
                   </div>
     
                   <!-- Columna 2 -->

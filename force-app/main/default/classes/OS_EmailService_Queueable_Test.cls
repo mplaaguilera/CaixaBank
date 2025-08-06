@@ -38,7 +38,7 @@ public class OS_EmailService_Queueable_Test {
 		tematica.Name = 'tematica cops test';
         tematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         tematica.CC_Fecha_Vigencia_Inicio__c = System.now();
-        tematica.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        tematica.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         tematica.CC_Codigo_Externo__c = 'TEC-000001';
         tematica.OS_Departamento__c = 'UAC';
         tematica.OS_Horario__C= businessHoursId;
@@ -48,7 +48,7 @@ public class OS_EmailService_Queueable_Test {
         producto.Name = 'producto cops test';
         producto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         producto.CC_Fecha_Vigencia_Inicio__c = System.now();
-        producto.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        producto.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         producto.CC_Tematica__c = tematica.Id;
         producto.CC_Codigo_Externo__c = 'PRC-000001'; 
         insert producto;
@@ -57,7 +57,7 @@ public class OS_EmailService_Queueable_Test {
         motivo.Name = 'motivo cops test';
         motivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         motivo.CC_Fecha_Vigencia_Inicio__c = System.now();
-        motivo.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        motivo.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         motivo.CC_Tematica__c = tematica.Id;
         motivo.CC_Producto_Servicio__c = producto.Id;
         motivo.CC_Codigo_Externo__c = 'MOC-000001';
@@ -83,7 +83,9 @@ public class OS_EmailService_Queueable_Test {
 
     @isTest static void testEmailServiceQueueable() {
         User usuarioAdmin = OS_Usuarios.usuarioAdmin();
+
         
+        System.runAs(usuarioAdmin){
         // Preparar los datos para el envío del correo electrónico
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso OS_EmailService_Test'];
         caso.OwnerId = usuarioAdmin.Id;
@@ -97,7 +99,7 @@ public class OS_EmailService_Queueable_Test {
         tareaSolicitudInfo.Type = 'Solicitud Información';
         tareaSolicitudInfo.Subject = 'Solicitud Información';
         tareaSolicitudInfo.Status = 'Completed';
-        tareaSolicitudInfo.CC_Referencia_Correo_Saliente__c = 'refSolicitudInfo';
+        tareaSolicitudInfo.CC_Referencia_Correo_Saliente__c = '199409247102802500KN000001SQZpYAO';
         tareaSolicitudInfo.OwnerId = usuarioAdmin.Id;
         insert tareaSolicitudInfo;
 
@@ -111,7 +113,7 @@ public class OS_EmailService_Queueable_Test {
         envelope.toAddress = [SELECT OS_Email__c FROM OS_Correo__mdt WHERE DeveloperName LIKE '%Holabank%' LIMIT 1].OS_Email__c;
         correo.subject = 'asunto';
         correo.fromAddress = 'correo@prueba.com';
-        correo.plainTextBody = 'hola\n#@refSolicitudInfo#\nadios';
+        correo.plainTextBody = 'hola\n#@199409247102802500KN000001SQZpYAO#\nadios';
         correo.htmlBody = 'email test prueba';
         
         
@@ -132,12 +134,13 @@ public class OS_EmailService_Queueable_Test {
 
         // Enviar el correo electrónico mediante el Queueable
         Test.startTest();
-        System.runAs(usuarioAdmin){
-            System.enqueueJob(queueableEmail);
-        }
         
-        Test.stopTest();
+            System.enqueueJob(queueableEmail);
+            Test.stopTest();
+            List <EmailMessage> testEmailMessage = [SELECT ParentId FROM EmailMessage];
 
-        System.assertEquals(1, [SELECT Count() FROM EmailMessage WHERE ParentId = :caso.Id]);
+            System.assertEquals(1, [SELECT Count() FROM EmailMessage WHERE ParentId = :caso.Id]);
+            //Invoca invocations = Limits.getEmailInvocations();
+        }
     }
 }

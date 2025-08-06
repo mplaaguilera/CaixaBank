@@ -15,8 +15,8 @@ public with sharing class CC_WS_Envio_OTP {
 														CC_Case__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c,
 														CC_Case__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c
 														FROM CC_Comunicaciones__c WHERE Id IN :idAutenticaciones]; //AND RecordType.DeveloperName = 'CC_OTPSMS'];
-
-
+	
+		
 
 		CC_InterfaceSettings__mdt cfgIntegracion = CC_MetodosUtiles.getInterfazConfigBody('CC_Envio_OTP');
 		if (cfgIntegracion != null) {
@@ -56,18 +56,16 @@ public with sharing class CC_WS_Envio_OTP {
 						HttpResponse httpResponse = new Http().send(getRequest(cfgIntegracion, requestBody));
 						traza.CC_FechaFin__c = Datetime.now();
 
-						// httpResponse.setStatusCode(200);//DPK comentar
+						//httpResponse.setStatusCode(200);//DPK comentar
 						// httpResponse.setBody('{"ticket":"20240828123912408   00000007BCCOTP01","KeyBlock":{"publicClusterKey":"","publicIndexKey":""},"PhoneBlock":{"prefix":34,"phoneNumber":0,"phoneNumberO":"*****0346"}}');//DPK comentar
 						// Parse the JSON httpResponse
 
 						Boolean responseOk = httpResponse.getStatusCode() == 200;
+
                         traza.CC_FinOK__c = responseOk;
 						if ((cfgIntegracion.CC_TrazaSalida__c || Test.isRunningTest())) {
 							traza.CC_MensajeSalida__c = httpResponse.getBody();
 						}
-
-						System.debug('::: httpResponse.getBody()');
-						System.debug(httpResponse.getBody());
 
                         if (tipoObjeto == 'Case') {
                             Case caso = new Case(Id = recordId);

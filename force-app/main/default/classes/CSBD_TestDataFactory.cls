@@ -97,8 +97,28 @@ public with sharing class CSBD_TestDataFactory {
         Group grp = [SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Administrador' LIMIT 1];
         insert new GroupMember(GroupId = grp.Id, UserOrGroupId = admin.Id);
 
+        Set<String> permisosAsignados = new Set<String>{
+            'CSBD_CDP_Integracion',
+            'CSBD_WS_AltaOportunidad',
+            'CSBD_ByPass_VR',
+            'CSBD_WS_ConsultaOTP',
+            'CSBD_API_ONLY',
+            'CSBD_PS_Clientes_DatosSensibles',
+            'CSBD_Chat',
+            'CSBD_API_ONLY_CDP',
+            'CSBD_Chat_Admin',
+            'CSBD_Desarrollo',
+            'CSBD_API_ONLY_Infobip',
+            'CSBD_API_Punto_Servicio',
+            'CSBD_PS_Responsable',
+            'CSBD_PS_Gestor',
+            'CSBD_Formulario_Intouch',
+            'CSBD_PS_Administrador',
+            'CSBD_PS_Hipotecas'
+        };
+
         List<PermissionSetAssignment> nuevosPermisos = new List<PermissionSetAssignment>();
-        for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name LIKE 'CSBD%' AND Type != 'Group' AND License.Name != 'Salesforce Integration']) {
+        for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name IN :permisosAsignados AND Type != 'Group' AND License.Name != 'Salesforce Integration']) {
             PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
             nuevoPermiso.PermissionSetId = ps.Id;
             nuevoPermiso.AssigneeId = admin.Id;
@@ -125,15 +145,42 @@ public with sharing class CSBD_TestDataFactory {
         usuario.LanguageLocaleKey = 'es';
         usuario.LocaleSidKey = 'es_ES';
         // usuario.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'CSBD Genérico'].Id;
-        usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'CBK_Connected_Apps_Integration' LIMIT 1].Id;
+        usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'API Only' LIMIT 1].Id;
         usuario.TimeZoneSidKey = 'Europe/Madrid';
         usuario.UserName = 'usuario_int_test_' + UserInfo.getOrganizationId() + '_' + System.currentTimeMillis() + '@test.com';
         insert usuario;
 
-        PermissionSetAssignment psa = new PermissionSetAssignment();
-        psa.PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'CSBD_API_ONLY' LIMIT 1].Id;
-        psa.AssigneeId = usuario.Id;
-        insert psa;
+        Group grp = [SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Administrador' LIMIT 1];
+        insert new GroupMember(GroupId = grp.Id, UserOrGroupId = usuario.Id);
+
+        Set<String> permisosAsignados = new Set<String>{
+            'CSBD_CDP_Integracion',
+            'CSBD_WS_AltaOportunidad',
+            'CSBD_ByPassVR',
+            'CSBD_WS_ConsultaOTP',
+            'CSBD_API_ONLY',
+            'CSBD_PS_Clientes_DatosSensibles',
+            'CSBD_Chat',
+            'CSBD_API_ONLY_CDP',
+            'CSBD_Chat_Admin',
+            'CSBD_Desarrollo',
+            'CSBD_API_ONLY_Infobip',
+            'CSBD_API_Punto_Servicio',
+            'CSBD_PS_Responsable',
+            'CSBD_PS_Gestor',
+            'CSBD_Formulario_Intouch',
+            'CSBD_PS_Administrador',
+            'CSBD_PS_Hipotecas'
+        };
+
+        List<PermissionSetAssignment> nuevosPermisos = new List<PermissionSetAssignment>();
+        for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name IN :permisosAsignados AND Type != 'Group']) {
+            PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
+            nuevoPermiso.PermissionSetId = ps.Id;
+            nuevoPermiso.AssigneeId = usuario.Id;
+            nuevosPermisos.add(nuevoPermiso);
+        }
+        insert nuevosPermisos;
 
         return usuario;
     }
@@ -174,6 +221,7 @@ public with sharing class CSBD_TestDataFactory {
     }
 
     public static List<Account> crearCuenta(List<Map<String, Object>> camposCuentas) {
+        //Este método sirve para crear las cuentas de test
         List<Account> cuentas = new List<Account>();
         for (Map<String, Object> camposCuenta : camposCuentas) {
             Account cuenta = new Account();
@@ -356,5 +404,9 @@ public with sharing class CSBD_TestDataFactory {
 
     public static Map<String, SObject> crearEmpleadoOficina() {
         return crearEmpleadoOficina('00001', new Map<String, Object>());
+    }
+
+    public static User getUsuarioAdministrador() {
+        return [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' LIMIT 1];
     }
 }

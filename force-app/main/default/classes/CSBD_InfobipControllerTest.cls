@@ -2,33 +2,35 @@
 public class CSBD_InfobipControllerTest {
 
     @testSetup
-    static void setupData() {
-        // Insert necessary setup data here
-        CSBD_Infobip_Setting__c settings = new CSBD_Infobip_Setting__c(
-            CSBD_Envio_Automatico_Activo__c = true,
-            CSBD_Delay_Update__c = 1,
-            CSBD_Tipo_Tarea__c = 'Envio Mensaje RCS'
-        );
-        insert settings;
+    static void setupData() {        
 
-        User usuarioAdministrador = CSBD_Usuarios.usuarioAdministrador();
+        User usuarioAdministrador = CSBD_TestDataFactory.usuarioAdministrador();
+        System.runAs(usuarioAdministrador) {
+            // Insert necessary setup data here
+            CSBD_Infobip_Setting__c settings = new CSBD_Infobip_Setting__c(
+                CSBD_Envio_Automatico_Activo__c = true,
+                CSBD_Delay_Update__c = 1,
+                CSBD_Tipo_Tarea__c = 'Envio Mensaje RCS'
+            );
+            insert settings;
 
-        Map<String, SObject> cuentaContacto = CSBD_TestDataFactory.crearCuentaContacto('12345678Z');
-        Account cuenta = (Account)cuentaContacto.get('cuenta');
-        Opportunity opportunity = CSBD_Opportunity_Test.crearOportunidadPrestamo(cuenta);
+            Map<String, SObject> cuentaContacto = CSBD_TestDataFactory.crearCuentaContacto('12345678Z');
+            Account cuenta = (Account)cuentaContacto.get('cuenta');
+            Opportunity opportunity = CSBD_Opportunity_Test.crearOportunidadPrestamo(cuenta);
 
-        //create Task
-        Task tarea = new Task();
-        tarea.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CSBD_Task');
-        tarea.WhatId = opportunity.Id;
-        tarea.Type = 'Envio Mensaje RCS';
-        tarea.Status = 'Open';
-        tarea.Subject = 'Envio Mensaje RCS';
-        tarea.Description = 'Test';
-        tarea.AV_ExternalID__c = '123456';
-        tarea.CSBD_Evento_Estado__c = 'RCS Enviado';
-        tarea.ActivityDate = System.today();
-        insert tarea;
+            //create Task
+            Task tarea = new Task();
+            tarea.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CSBD_Task');
+            tarea.WhatId = opportunity.Id;
+            tarea.Type = 'Envio Mensaje RCS';
+            tarea.Status = 'Open';
+            tarea.Subject = 'Envio Mensaje RCS';
+            tarea.Description = 'Test';
+            tarea.AV_ExternalID__c = '123456';
+            tarea.CSBD_Evento_Estado__c = 'RCS Enviado';
+            tarea.ActivityDate = System.today();
+            insert tarea;
+        }
        
     }
 

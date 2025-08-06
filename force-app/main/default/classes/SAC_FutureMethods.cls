@@ -626,7 +626,8 @@ public without sharing class SAC_FutureMethods {
                 VersionData = body,
                 FirstPublishLocationId = caso.Id,
                 SAC_StringRedaccion_fileupload__c = 'carta postal acuse recibo',
-                SAC_Bloque__c = 'SAC_Tramitacion'
+                SAC_Bloque__c = 'SAC_Tramitacion',
+                SAC_Enviado__c = true
             );
             SAC_DatabaseDML.insertDML(cv, true);
         

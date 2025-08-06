@@ -24,14 +24,12 @@ public with sharing class HDT_EmailService_Utils {
      * @param body  texto
      * @param emailDestino  buzón de caixabank
 	 */
-    public static EmailMessage gestionAdjuntos(Messaging.InboundEmail email, Case caso, String emailDestino) {
+    public static void gestionAdjuntos(Messaging.InboundEmail email, Case caso, String emailDestino) {
 
         String htmlBody = '';
         if (String.isNotBlank(email.htmlBody)) {
             htmlBody = email.htmlBody.left(32000);
         }
-
-        EmailMessage crearEmailMessage = new EmailMessage();
 
         //Adjuntos del email se convierten en Files asociados al caso
         List<Id> listaContentVersionIdEmail = new List<Id>();
@@ -56,7 +54,7 @@ public with sharing class HDT_EmailService_Utils {
         if(!lstContentVersion.isEmpty()){
             if (!Schema.sObjectType.ContentVersion.fields.Title.isCreateable()) {
                 
-                return crearEmailMessage;
+                return;
             }
             Database.insert(lstContentVersion);
 
@@ -78,7 +76,7 @@ public with sharing class HDT_EmailService_Utils {
         if (!lstConentDocument.isEmpty()){
             if (!Schema.sObjectType.ContentDocumentLink.fields.LinkedEntityId.isCreateable()) {
                 
-                return crearEmailMessage;
+                return;
             }
             Database.insert(lstConentDocument);
         }
@@ -165,8 +163,6 @@ public with sharing class HDT_EmailService_Utils {
             listaContentDocumentLink.add(cdLink);
         }
         insert listaContentDocumentLink;
-
-        return emailMessage;
     }
 
 
@@ -252,7 +248,7 @@ public with sharing class HDT_EmailService_Utils {
     public static EmailMessage respuestaTrasladoColaborador(Messaging.InboundEmail email, Id whatIdTarea, String emailDestino) {
         Case caso = [SELECT Status, ContactId, IsClosed FROM Case WHERE Id = :whatIdTarea WITH SECURITY_ENFORCED];
 
-        EmailMessage crearEmailMessage = gestionAdjuntos(email, caso, emailDestino);
+        gestionAdjuntos(email, caso, emailDestino);
 
         caso.CC_Fecha_Ultima_Interaccion__c = System.now();
         caso.CC_Ultima_Interaccion__c = 'Respuesta de colaborador';
@@ -277,6 +273,8 @@ public with sharing class HDT_EmailService_Utils {
             nuevoHtmlBody = (String)mapaGestionAdjuntos.get('nuevoHtmlBody');
             Set<Id> listaContentVersionId = (Set<Id>)mapaGestionAdjuntos.get('listaContentVersionId');
             
+            //Creamos el mail entrante y lo asociamos al caso
+            EmailMessage crearEmailMessage = HDT_EmailService.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
             //Crear content document link
             crearContentDocumentLink(listaContentVersionId, crearEmailMessage, caso);   
             
@@ -333,7 +331,7 @@ public with sharing class HDT_EmailService_Utils {
         nuevoHtmlBody = (String)mapaGestionAdjuntos.get('nuevoHtmlBody');
         Set<Id> listaContentVersionId = (Set<Id>)mapaGestionAdjuntos.get('listaContentVersionId');
         //Creamos el mail entrante y lo asociamos al caso
-        EmailMessage crearEmailMessage = HDT_EmailMessage.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
+        EmailMessage crearEmailMessage = HDT_EmailService.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
         //Crear content document link
         crearContentDocumentLink(listaContentVersionId, crearEmailMessage, caso);
         //gestionAdjuntos(email, caso, emailDestino);
@@ -378,26 +376,25 @@ public with sharing class HDT_EmailService_Utils {
 
         //Gestión adjuntos
         //AM_Email_GestionAdjuntos.gestionAdjuntos(email, caso, myPlainText, emailDestino);
-        EmailMessage crearEmailMessage = gestionAdjuntos(email, caso, emailDestino);
+        gestionAdjuntos(email, caso, emailDestino);
 
         //Cierre de la actividad de envío del traslado a grupo colaborador
         HDT_Activity.finalizarActividadCaso(whatIdTarea, 'Solicitud Información', null, null);
 
-        // desde aqui es nuevo
         String nuevoHtmlBody = email.htmlBody;
         if (!String.isBlank(nuevoHtmlBody) && nuevoHtmlBody.length() > 131072) {
             nuevoHtmlBody = nuevoHtmlBody.left(131072);
         }
-        
+
         //Gestion adjuntos
         Map<String, Object> mapaGestionAdjuntos = gestionAdjuntosNew(email, caso, emailDestino);
         nuevoHtmlBody = (String)mapaGestionAdjuntos.get('nuevoHtmlBody');
         Set<Id> listaContentVersionId = (Set<Id>)mapaGestionAdjuntos.get('listaContentVersionId');
-            
+        //Creamos el mail entrante y lo asociamos al caso
+        EmailMessage crearEmailMessage = HDT_EmailService.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
         //Crear content document link
         crearContentDocumentLink(listaContentVersionId, crearEmailMessage, caso);
         return crearEmailMessage;
-        
 
     }
 
@@ -430,7 +427,7 @@ public with sharing class HDT_EmailService_Utils {
         Set<Id> listaContentVersionId = (Set<Id>)mapaGestionAdjuntos.get('listaContentVersionId');
 
         //Creamos el mail entrante y lo asociamos al caso
-        EmailMessage crearEmailMessage = HDT_EmailMessage.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
+        EmailMessage crearEmailMessage = HDT_EmailService.crearEmailMessage(email, emailDestino, caso.Id, caso.ContactId, nuevoHtmlBody);     
         //Crear content document link
         crearContentDocumentLink(listaContentVersionId, crearEmailMessage, caso);   
 
@@ -483,6 +480,26 @@ public with sharing class HDT_EmailService_Utils {
 
         List<Messaging.SingleEmailMessage> allmsg = new List<Messaging.SingleEmailMessage>();
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+
+        /*
+        if(remitentesId.size() == 2){
+            if(casoRecibido.CC_Idioma__c == 'ca'){
+                mail.setTemplateId(plantillas[0].Id);
+                mail.setOrgWideEmailAddressId(remitentesId[0].Id);
+            }else{
+                mail.setTemplateId(plantillas[1].Id);
+                mail.setOrgWideEmailAddressId(remitentesId[1].Id);
+            }
+        }else{
+            if(casoRecibido.CC_Idioma__c == 'ca'){
+                mail.setTemplateId(plantillas[0].Id);
+                mail.setOrgWideEmailAddressId(remitentesId[0].Id);
+            }else{
+                mail.setTemplateId(plantillas[1].Id);
+                mail.setOrgWideEmailAddressId(remitentesId[0].Id);
+            }
+        }*/
+
     
         if(remitentesId.size() == 3){ // Si hay al menos 3 remitentes
             if(casoRecibido.CC_Idioma__c == 'ca'){

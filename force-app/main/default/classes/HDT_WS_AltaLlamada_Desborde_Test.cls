@@ -86,7 +86,7 @@ private class HDT_WS_AltaLlamada_Desborde_Test {
         svc.CBK_Negocio__c = 'HDT';
         svc.CC_VDN__c = '4444444';
         svc.CC_Tipo__C = 'Servicio';
-        svc.CC_Canal_Procedencia__c = 'Servicios Centrales';
+        svc.CC_Canal_Procedencia__c = 'Incidencias Técnicas';
         svc.CC_Prefijo__c = '0';
         svc.CC_Tipo_Cliente__c = 'Empleado';
         insert svc;

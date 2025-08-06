@@ -51,12 +51,12 @@ public with sharing class OS_Encuesta {
                 }
 
                 //Se descartan los casos de los contactos descartados
-                for (Integer i = casos.size() - 1; i >= 0; i--) {
-                    if (!idContactos.contains(casos[i].ContactId)) {
-                        casos.remove(i);
+                for (Case caso : casos) {
+                    if (!idContactos.contains(caso.ContactId)) {
+                        casos.remove(casos.indexOf(caso));
                     }
                 }
-                
+
                 if (!casos.isEmpty()) {
                     //Crear SurveyInvitation
                     List<SurveyInvitation> surveyInvitations = new List<SurveyInvitation>();
@@ -81,30 +81,32 @@ public with sharing class OS_Encuesta {
                     Set<Id> listaIdInvitaciones = new Set<Id> ();                
                     //Crear SurveySubject
                     List<SurveySubject> surveySubjects = new List<SurveySubject>();
-                    for (Integer i = 0; i < casos.size(); i++) {
+
+                    for (Case caso : casos) {
                         SurveySubject surveySubject = new SurveySubject();
-                        surveySubject.SubjectId = casos[i].Id;         
-                        surveySubject.ParentId = surveyInvitations[i].Id;
-                        surveySubject.Name = 'Encuesta para el caso ' + casos[i].CaseNumber;
+                        surveySubject.SubjectId = caso.Id;         
+                        surveySubject.ParentId = surveyInvitations[casos.indexOf(caso)].Id;
+                        surveySubject.Name = 'Encuesta para el caso ' + caso.CaseNumber;
                         surveySubjects.add(surveySubject);
-                        listaIdInvitaciones.add(surveyInvitations[i].Id);
+                        listaIdInvitaciones.add(surveyInvitations[casos.indexOf(caso)].Id);
                     }
+
                     insert surveySubjects;
-                
+
                     // Obtener todas las SurveyInvitation
-                    List<SurveyInvitation>  listSurveyInvitation = [SELECT Id, InvitationLink FROM SurveyInvitation WHERE Id IN :listaIdInvitaciones];			             
+                    Map<Id, SurveyInvitation> mapCaseSurvey = new Map<Id, SurveyInvitation>();
+                    List<SurveyInvitation>  listSurveyInvitation = [SELECT Id, InvitationLink, CBK_Caso__c FROM SurveyInvitation WHERE Id IN :listaIdInvitaciones];	
+                    for (SurveyInvitation survey : listSurveyInvitation) {
+                        mapCaseSurvey.put(survey.CBK_Caso__c, survey);
+                    }		             
                     
-                    //Actualizar URL de la encuesta en el caso
-                    for (Integer i = 0; i < casos.size(); i++) {
-                        String surveyInvitationLink;
-                        for(Integer x = 0; x <listSurveyInvitation.size(); x++){
-                            if(surveyInvitations[i].Id == listSurveyInvitation[x].Id){
-                                surveyInvitationLink = listSurveyInvitation[x].InvitationLink;
-                            }
+                    for (Case caso : casos) {
+                        if (mapCaseSurvey.containsKey(caso.Id)) {
+                            caso.CC_URL_Encuesta_3N__c = mapCaseSurvey.get(caso.Id).InvitationLink;
                         }
-                        casos[i].CC_Admin__c = true;
-                        casos[i].CC_URL_Encuesta_3N__c = surveyInvitationLink;
+                        caso.CC_Admin__c = true;
                     }
+
                     update casos;
                     
                     List<OS_Canal_Procedencia__mdt> listmdtProcedencia = [SELECT Label, OS_OWA__c FROM OS_Canal_Procedencia__mdt];                

@@ -19,6 +19,7 @@ export default class Cc_Operativa_Oficina_Clientes extends LightningElement {
         });
         this.dispatchEvent(customEvent);
     }
+    
     realizarTrasladoDesdeDerivar(event) {
         // Reemitir el evento hacia el componente Aura
         const customEvent = new CustomEvent('realizartrasladocolaborador', {

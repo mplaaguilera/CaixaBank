@@ -5,7 +5,7 @@ public with sharing class OS_Task_BD_TRHan_Test {
     public static void borrar_task_error_text() {
         System.runAs(HDT_TestDataFactory.usuarioPruebasHdt()) {
             Task tarea = new Task();
-            tarea.RecordTypeId=Schema.getGlobalDescribe().get('Task').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Task').getRecordTypeId();
+            tarea.RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('OS_Task').getRecordTypeId();
             tarea.type = 'Automática';
             tarea.Status = 'Completado';
             tarea.Priority = 'Normal';

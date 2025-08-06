@@ -152,6 +152,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         List<Case> listaPretCambioResumenManual = new List<Case>();
         List<Case> listaRecCambioNaturaleza = new List<Case>();
         List<Case> listaActualizarDatosContacto = new List<Case>();
+        List<Case> listaModRecCerradas = new List<Case>();
         Set<Id> idsComprobarDespachoRepresentante = new Set<Id>();
         List<Case> listaComprobarDespachoRepresentante = new List<Case>();
         Set<Id> idsCambiaVinculacion = new Set<Id>();
@@ -286,11 +287,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     listaOwnersCambiados.add(caso);
                     idesReclaGlobal.add(caso.SAC_Reclamacion__c);
                 }
-                System.debug('Entra en el if de pretensiones');
-                System.debug('mapOldObj.get(caso.Id).Status ' + mapOldObj.get(caso.Id).Status);
-                System.debug('caso.Status ' + caso.Status);
                 if(mapOldObj.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SAC_009'){
-                    System.debug('Entra en if listaPretensionControlarMilestone ');
                     listaPretensionControlarMilestone.add(caso);
                 }
                  if (mapOldObj.containsKey(caso.Id) && (mapOldObj.get(caso.Id).SAC_Entidad_Afectada__c != caso.SAC_Entidad_Afectada__c || mapOldObj.get(caso.Id).SAC_EntidadProductora__c != caso.SAC_EntidadProductora__c)) {
@@ -351,6 +348,11 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 if(mapOldObj.containsKey(caso.Id) && caso.SAC_ValidacionMCC__c != mapOldObj.get(caso.Id).SAC_ValidacionMCC__c){
                     listaValidacionPretension.add(caso);
                     idesReclaGlobal.add(caso.SAC_Reclamacion__c);
+                }
+
+                // Si el caso está cerrado y ha sido modificado
+                if (mapOldObj.containsKey(caso.Id) && caso.Status == mapOldObj.get(caso.Id).Status && caso.Status == 'Cerrado') {
+                    listaModRecCerradas.add(caso);
                 }
 
                 listaPretensiones.add(caso);
@@ -430,9 +432,10 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 if (mapOldObj.containsKey(caso.Id) && caso.OwnerId != mapOldObj.get(caso.Id).OwnerId) { //Si cambia el Owner de la reclamación
                     //mapaReclamacionOwnerCambiado.put(caso.Id, caso); US458927 Se elimina la alerta notificarCambioOwner
                     idesReclaGlobal.add(caso.Id);
-                    listaIdsCambioOwnerReclamacion.add(caso.Id);
                     if(String.valueOf(caso.OwnerId).startsWith('005')){
                         listaOwnersCambiados.add(caso);
+                        listaIdsCambioOwnerReclamacion.add(caso.Id);
+                        
                     }
                     //ver si el cambio pertenece a alguien que no sea una de las colas de SAC cuando el estado es de alta US866223
                     if(caso.Status == 'SAC_001' && caso.OwnerId != cola.id && caso.OwnerId != colaSupervisores.id && caso.OwnerId != colaIA.id){
@@ -478,28 +481,31 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     (caso.Status == 'SAC_001' || caso.Status == 'SAC_002' || caso.Status == 'SAC_003'|| caso.Status == 'SAC_004'|| caso.Status == 'SAC_007')) {
                     listaVueltaDeSubsanacion.add(caso.Id); 
                 }
-                if(mapOldObj.get(caso.Id).OS_Fecha_Resolucion__c != caso.OS_Fecha_Resolucion__c){
+                if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).OS_Fecha_Resolucion__c != caso.OS_Fecha_Resolucion__c){
                     idesReclaGlobal.add(caso.Id);
                     listaRecPreFechaResolucion.add(caso);
                 } 
-                if((mapOldObj.get(caso.Id).Status == 'SAC_008') && /*Vuelta de  Negociacion*/
-                   (caso.Status == 'SAC_001' || caso.Status == 'SAC_002' || caso.Status == 'SAC_003'|| caso.Status == 'SAC_004'|| caso.Status == 'SAC_007')){    
+                if(mapOldObj.containsKey(caso.Id) && ((mapOldObj.get(caso.Id).Status == 'SAC_008') && /*Vuelta de  Negociacion*/
+                   (caso.Status == 'SAC_001' || caso.Status == 'SAC_002' || caso.Status == 'SAC_003'|| caso.Status == 'SAC_004'|| caso.Status == 'SAC_007'))){    
                    listaVueltaDeDerivacion.add(caso);
                 }
-                if((mapOldObj.get(caso.Id).Status == 'Rechazado'  || mapOldObj.get(caso.Id).Status == 'Cerrado' || mapOldObj.get(caso.Id).Status == 'SAC_014') && /*Reabrir reclamacion*/
-                   (caso.Status == 'SAC_001' || caso.Status == 'SAC_002' || caso.Status == 'SAC_003'|| caso.Status == 'SAC_004'|| caso.Status == 'SAC_007')){    
+                if(mapOldObj.containsKey(caso.Id) && ((mapOldObj.get(caso.Id).Status == 'Rechazado'  || mapOldObj.get(caso.Id).Status == 'Cerrado' || mapOldObj.get(caso.Id).Status == 'SAC_014') && /*Reabrir reclamacion*/
+                   (caso.Status == 'SAC_001' || caso.Status == 'SAC_002' || caso.Status == 'SAC_003'|| caso.Status == 'SAC_004'|| caso.Status == 'SAC_007'))){    
                    listaReabrirReclamacion.add(caso);
                 }    
-                if(mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SAC_014'){
+                if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SAC_014'){
                     listaRecPreFechaResolucion.add(caso);
                 }
-                if((mapOldObj != null && caso.OS_Email__c != mapOldObj.get(caso.Id).OS_Email__c) || 
+                if(mapOldObj.containsKey(caso.Id) && ((mapOldObj != null && caso.OS_Email__c != mapOldObj.get(caso.Id).OS_Email__c) || 
                 (mapOldObj != null && caso.CC_Telefono_Contacto__c != mapOldObj.get(caso.Id).CC_Telefono_Contacto__c) ||
-                (mapOldObj != null && caso.SAC_DireccionPostalNotificacion__c != mapOldObj.get(caso.Id).SAC_DireccionPostalNotificacion__c)){
+                (mapOldObj != null && caso.SAC_DireccionPostalNotificacion__c != mapOldObj.get(caso.Id).SAC_DireccionPostalNotificacion__c))){
                 listaActualizarDatosContacto.add(caso);
                 idesReclaGlobal.add(caso.Id);  
                 }
 
+                if (mapOldObj.containsKey(caso.Id) && caso.Status == mapOldObj.get(caso.Id).Status && caso.Status == 'Cerrado') {
+                    listaModRecCerradas.add(caso);
+                }
 
                 listaReclamaciones.add(caso);
                 listaCasos.add(caso);
@@ -588,7 +594,11 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 if (!reclIds.isEmpty()) {
                     SAC_CaseActualizarEstado.actualizarEstadoReclamacion(listaCasosSelect, reclIds, mapaDatosCasosActualizar);}    
               
-                if (!reclIdsSentidoResolucion.isEmpty()) {SAC_CaseActualizarResolucion.actualizarResolucionReclamacion(listaCasosSelect, reclIdsSentidoResolucion, mapaDatosCasosActualizar);} 
+                if (!reclIdsSentidoResolucion.isEmpty()) {
+                    SAC_CaseActualizarResolucion.actualizarResolucionReclamacion(listaCasosSelect, reclIdsSentidoResolucion, mapaDatosCasosActualizar);
+                    //Con las pretensiones llamamos a la clase SAC_CaseCalcularImporte le pasamos las pretensiones y que calcule el importe de Reclamación Padre cuando damos de baja o deshacemos la baja
+                    SAC_CaseCalcularImporte.calcular(listaCasosSelect, reclIdsSentidoResolucion, mapaDatosCasosActualizar);
+                } 
                 
                 if (!listaPretCambioArgumentario.isEmpty()) {SAC_Reclamacion.actualizarArgumentarioResolucion(listaCasosSelect, listaPretCambioArgumentario, mapaDatosCasosActualizar);} 
 
@@ -615,7 +625,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     // si se da de baja o se deshace la baja el resumen de la reclamación se tiene que actualizar con lo que ocurra en esta pretension
                     SAC_Reclamacion.actualizarResumenManual(listaCasosSelect, listaRecalcularPreActivas, mapaDatosCasosActualizar); 
                     SAC_Reclamacion.validarResumenManual(listaCasosSelect, listaRecalcularPreActivas, mapaDatosCasosActualizar); 
-
                 }
 
                 if (!listaPretOwnerCola.isEmpty()) {SAC_Pretension.cambioLetrado(listaPretOwnerCola, mapaDatosCasosActualizar, cola);}
@@ -794,6 +803,9 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 }
                 if(!setChangeGrupoLetrado.isEmpty()) {
                     SAC_FutureMethods.eliminarPermisosOwnerLetrado(setChangeGrupoLetrado, mapOldObj);
+                }
+                if(!listaModRecCerradas.isEmpty()){  
+                    SAC_Reclamacion.crearCaseHistoryReclamacionCerrada(mapOldObj, listNewObj);
                 }
             }          
             if(!listaOwnersCambiados.isEmpty()){

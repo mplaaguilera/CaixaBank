@@ -42,7 +42,7 @@ public with sharing class CC_WS_Casos_HDT_Test {
 
         insert userList;
 
-        System.runAs(usuario1){
+        System.runAs(usuario1){   
             Id idRtServicioGenesys = Schema.SObjectType.CC_Servicio_Genesys__c.getRecordTypeInfosByDeveloperName().get('CC_Servicio').getRecordTypeId();
 
             CC_Servicio_Genesys__c s1 = new CC_Servicio_Genesys__c();
@@ -112,17 +112,17 @@ public with sharing class CC_WS_Casos_HDT_Test {
             c1.CC_NumPerso__c = '123456';
             c1.CC_Tipo_Cliente__c = 'Empleado';
             c1.Status = 'Activo';
-            c1.Origin = 'Phone';
+            c1.Origin = 'Chat';
             c1.CC_Numero_Documento__c = '60236005V';
-            c1.CC_Tipo_Contacto__c = 'Petición de servicio';
-            c1.CC_Canal_Procedencia__c = 'EDG-BANKIA MEDIACIÓN';
+            c1.CC_Tipo_Contacto__c = 'Consulta';
+            c1.CC_Canal_Procedencia__c = 'EDG-BUILDING CENTER';
             c1.CC_Id_Cognitivo__c = 'HDD_666555666';
             c1.CC_Oficina_Afectada_Lookup__c = cuenta.Id;
             c1.CC_MCC_Motivo__c = mccMotivo.Id;
             c1.CC_MCC_ProdServ__c = mccProducto.Id;
             c1.CC_MCC_Tematica__c = mccTematica.Id;
             insert c1;
-            
+
             Task oTask = new Task();
             oTask.WhatId = c1.Id;
             oTask.CC_Chat_Cognitivo_Id__c = 'HDD_666555666';
@@ -167,10 +167,10 @@ public with sharing class CC_WS_Casos_HDT_Test {
             c2.CC_NumPerso__c = '123456';
             c2.CC_Tipo_Cliente__c = 'Empleado';
             c2.Status = 'Activo';
-            c2.Origin = 'Phone';
+            c2.Origin = 'Chat';
             c2.CC_Numero_Documento__c = '60236005V';
-            c2.CC_Tipo_Contacto__c = 'Petición de servicio';
-            c2.CC_Canal_Procedencia__c = 'EDG-BANKIA MEDIACIÓN';
+            c2.CC_Tipo_Contacto__c = 'Consulta';
+            c2.CC_Canal_Procedencia__c = 'EDG-BUILDING CENTER';
             c2.CC_Id_Cognitivo__c = 'HDD_666555666';
             c2.CC_Oficina_Afectada_Lookup__c = cuenta.Id;
             c2.CC_MCC_Motivo__c = mccMotivo.Id;
@@ -179,17 +179,39 @@ public with sharing class CC_WS_Casos_HDT_Test {
             c2.CC_Agrupador_Id__c = oAgr.Id;
             insert c2;
             
-
-
             /*
             String jsonLlamada = obtenerJsonLlamada(s1.CC_Codigo__c, '', '', contacto.Account.CC_NumPerso__c);
             CC_OpenCTI.registrarLlamadaEntrante(jsonLlamada);*/
 
-
         }
         
-
     }
+
+    @isTest
+    public static void ccWSCasosHDTSinTiempoEntrada() {
+
+        CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input oDataIn = new CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input();
+        oDataIn.fechaInicio = null;
+        
+        String jsonMsg=JSON.serialize(oDataIn);
+        
+        User us = [SELECT Id FROM User WHERE Email ='tuser001@amamama.com' LIMIT 1];
+        RestRequest req = new RestRequest(); 
+        RestResponse res = new RestResponse();
+        req.requestURI = '/services/apexrest/CC_Casos_HDT';  //Request URL
+        req.httpMethod = 'POST';//HTTP Request Type
+        req.requestBody = Blob.valueof(jsonMsg);
+        RestContext.request = req;
+        RestContext.response= res;
+
+        Test.startTest();
+        System.runAs ( us ) {
+            CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output oUtput = CC_WS_Casos_HDT.searchDetailCase(oDataIn);
+            System.assertNotEquals(null, oUtput);
+        }
+        Test.stopTest();
+    }
+
     @isTest
     public static void ccWSCasosHDTVacio() {
 
@@ -215,6 +237,107 @@ public with sharing class CC_WS_Casos_HDT_Test {
         Test.stopTest();
     }
  
+     @isTest
+    public static void ccWScasosHDTconFechas() {
+        
+        //List<CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input> oEntrada = new List<CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input>();
+        CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input oDataIn = new CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input();
+        oDataIn.fechaInicio = Datetime.newInstance(2025, 7, 23, 0, 0, 0); // Fecha válida
+        oDataIn.fechaFin = Datetime.newInstance(2025, 7, 23, 0, 0, 0); // Fecha válida
+
+        
+        User us = [SELECT Id FROM User WHERE Email ='tuser001@amamama.com' LIMIT 1];
+        Case caso= [SELECT id, CC_Canal_Procedencia__c, Origin FROM Case WHERE Status ='Activo' LIMIT 1];
+        //caso.CC_Canal_Procedencia__c = 'SmartPhones';
+        //caso.Origin = 'Phone';
+        //update caso;
+        
+        String jsonMsg=JSON.serialize(oDataIn);
+        
+        RestRequest req = new RestRequest(); 
+        RestResponse res = new RestResponse();
+        req.requestURI = '/services/apexrest/CC_Casos_HDT';  //Request URL
+        req.httpMethod = 'POST';//HTTP Request Type
+        req.requestBody = Blob.valueof(jsonMsg);
+        RestContext.request = req;
+        RestContext.response= res;
+
+        Test.startTest();
+        System.runAs ( us ) {
+            CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output oUtput = CC_WS_Casos_HDT.searchDetailCase(oDataIn);
+            System.assertNotEquals(null, oUtput);
+        }
+        Test.stopTest();
+    }
+
+     @isTest
+    public static void ccWScasosHDTFechaInicioMayor() {
+        
+        //List<CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input> oEntrada = new List<CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input>();
+        CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input oDataIn = new CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input();
+        oDataIn.fechaInicio = Datetime.newInstance(2025, 7, 25, 0, 0, 0); // Fecha válida
+        oDataIn.fechaFin = Datetime.newInstance(2025, 7, 23, 0, 0, 0); // Fecha válida
+
+        
+        User us = [SELECT Id FROM User WHERE Email ='tuser001@amamama.com' LIMIT 1];
+        Case caso= [SELECT id, CC_Canal_Procedencia__c, Origin FROM Case WHERE Status ='Activo' LIMIT 1];
+        //caso.CC_Canal_Procedencia__c = 'SmartPhones';
+        //caso.Origin = 'Phone';
+        //update caso;
+        
+        String jsonMsg=JSON.serialize(oDataIn);
+        
+        RestRequest req = new RestRequest(); 
+        RestResponse res = new RestResponse();
+        req.requestURI = '/services/apexrest/CC_Casos_HDT';  //Request URL
+        req.httpMethod = 'POST';//HTTP Request Type
+        req.requestBody = Blob.valueof(jsonMsg);
+        RestContext.request = req;
+        RestContext.response= res;
+
+        Test.startTest();
+        System.runAs ( us ) {
+            CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output oUtput = CC_WS_Casos_HDT.searchDetailCase(oDataIn);
+            System.assertNotEquals(null, oUtput);
+        }
+        Test.stopTest();
+    }
+
+     @isTest
+    public static void ccWScasosHDTUmbralMayor() {
+        
+        //List<CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input> oEntrada = new List<CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input>();
+        CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input oDataIn = new CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input();
+        oDataIn.fechaInicio = Datetime.newInstance(2025, 7, 00, 0, 0, 0); // Fecha válida
+        oDataIn.fechaFin = Datetime.newInstance(2025, 7, 23, 0, 0, 0); // Fecha válida
+
+        
+        User us = [SELECT Id FROM User WHERE Email ='tuser001@amamama.com' LIMIT 1];
+        Case caso= [SELECT id, CC_Canal_Procedencia__c, Origin FROM Case WHERE Status ='Activo' LIMIT 1];
+        //caso.CC_Canal_Procedencia__c = 'SmartPhones';
+        //caso.Origin = 'Phone';
+        //update caso;
+        
+        String jsonMsg=JSON.serialize(oDataIn);
+        
+        RestRequest req = new RestRequest(); 
+        RestResponse res = new RestResponse();
+        req.requestURI = '/services/apexrest/CC_Casos_HDT';  //Request URL
+        req.httpMethod = 'POST';//HTTP Request Type
+        req.requestBody = Blob.valueof(jsonMsg);
+        RestContext.request = req;
+        RestContext.response= res;
+
+        Test.startTest();
+        System.runAs ( us ) {
+            CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output oUtput = CC_WS_Casos_HDT.searchDetailCase(oDataIn);
+            System.assertNotEquals(null, oUtput);
+        }
+        Test.stopTest();
+    }
+
+
+
     @isTest
     public static void ccWScasosHDT2() {
         

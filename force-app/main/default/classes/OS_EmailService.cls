@@ -177,7 +177,9 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
                 //Si el owner es un usuario, validamos que esté activo
                 if(String.valueOf(casoOrigen[0].OwnerId).startsWith('005')) {
                     Boolean usuarioActivo = OS_Metodos_EmailServices.usuarioActivo(casoOrigen[0]);
-                    if (usuarioActivo == false){OS_Metodos_EmailServices.asignarColaUsuarioInactivo(casoOrigen[0], colaEntrante, colasTotalesCOPS);}
+                    if (usuarioActivo == false){
+                        casoOrigen[0] = OS_Metodos_EmailServices.asignarColaUsuarioInactivo(casoOrigen[0], colaEntrante, colasTotalesCOPS);
+                    }
                 }
                 if (tareaOrigen[0].Type == 'Traslado Colaborador') {
                     //Respuesta entrante de grupo colaborador

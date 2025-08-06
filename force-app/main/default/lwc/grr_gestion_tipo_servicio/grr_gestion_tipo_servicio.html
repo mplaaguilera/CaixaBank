@@ -1,0 +1,63 @@
+<template>    
+    <template if:true={showForm}>
+        <lightning-card title="Crear Nueva Gestión" icon-name="utility:service_contract">
+            <lightning-record-edit-form
+                object-api-name="GRR_Gestion__c"
+                record-type-id={recordTypeId}
+                onsuccess={handleSuccess}
+                onerror={handleError}
+                onsubmit={handleSubmit}
+            > 
+            
+                <lightning-input-field field-name="GRR_Numero_Contrato__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Fecha_Antiguedad_Deuda__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Importe_Deuda_Vencida__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Tipo_Producto__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Tipo_Garantia_Asociada__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_SMOR__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Numero_Recibos_Pendientes__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Deuda_Total__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Importe_Proximo_Recibo__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Fecha_Proximo_Recibo__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Capital_Concedido__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Fecha_Cancelacion_Previsto__c"></lightning-input-field>
+                
+                <div class="slds-grid slds-grid_align-center slds-m-top_medium">
+                    <lightning-button variant="neutral" label="Cancelar" onclick={handleCancel}></lightning-button>
+                    <lightning-button class="slds-m-left_small" variant="brand" type="submit" label="Guardar Gestión"></lightning-button>
+                </div>
+            </lightning-record-edit-form>
+         </lightning-card>
+    </template>
+   
+
+        <template if:false={showForm}>
+            <lightning-card title={tituloGestiones} icon-name="utility:service_report">
+                <template if:true={gestiones}>
+                    <template for:each={gestionesConLinks} for:item="gestion">
+                        <div key={gestion.Id} class="slds-p-around_x-small slds-border_bottom slds-grid slds-align-start">
+                            <div class="slds-m-right_small">
+                                <lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+                            </div>
+                            <div>
+                                <p><strong>Contrato : </strong> 
+                                    <a
+                                        href={gestion.link}
+                                        target="_blank"
+                                        class="slds-text-link"
+                                    >
+                                        {gestion.GRR_Numero_Contrato__c}
+                                    </a>
+                                </p>
+                                <p><strong>Antigüedad : </strong> {gestion.GRR_Fecha_Antiguedad_Deuda__c}</p>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <div class="slds-grid slds-grid_align-center slds-m-top_medium">
+                    <lightning-button variant="brand" class="sld-m-around_small" label="Crear Nueva Gestión" onclick={handleShowForm}></lightning-button>
+                </div>
+            </lightning-card>
+        </template>
+    
+</template>

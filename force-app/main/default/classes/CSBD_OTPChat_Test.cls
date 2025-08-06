@@ -10,6 +10,7 @@ public class CSBD_OTPChat_Test {
         cliente.FirstName = 'OLGA';
         cliente.LastName = 'ROBLES GEA';
         cliente.CC_NumPerso__c = '16849239';
+        cliente.AV_NumPerso__c = '16849239';
         insert cliente;
 
         AccountShare acshare = new AccountShare();
@@ -52,10 +53,10 @@ public class CSBD_OTPChat_Test {
     @isTest
     private static void testConsultaOTPOK() {
         System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
-            Account cliente = [SELECT PersonContactId, CC_NumPerso__c FROM Account WHERE CC_NumPerso__c = '16849239' LIMIT 1];
+            Account cliente = [SELECT PersonContactId, AV_NumPerso__c FROM Account WHERE AV_NumPerso__c = '16849239' LIMIT 1];
 
-            Contact contacto = [SELECT CC_NumPerso__c FROM Contact WHERE Id = :cliente.PersonContactId];
-            contacto.CC_NumPerso__c = '16849239';
+            Contact contacto = [SELECT AV_NumPerso__c FROM Contact WHERE Id = :cliente.PersonContactId];
+            contacto.AV_NumPerso__c = '16849239';
             update contacto;
 
             String jsonConsulta = '{"consultaWrapper": {"NUMPERSO": "01011957","IDIOMA": "es","CANAL": "Web","EMAILCLIENTE": "ramame69@hotmail.com","TELEFONOCLIENTE": "prueba2.txt","NOMBRESOLICITANTE": "RAQUEL","APELLIDO1": "Martos","APELLIDO2": "Medina","NIFSOLICITANTE": "46636883J","NOMBREPRODUCTO": "Prestamo Online","HORARIOCONTACTO": "08-10h"}}';

@@ -191,6 +191,7 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         casoReclamacion.Subject = 'TestRec';
         casoReclamacion.Origin = 'Backoffice';
         casoReclamacion.Status = 'SAC_001';
+        casoReclamacion.CC_Idioma__c = 'fr';
         casoReclamacion.SAC_StatusAuxiliar__c = casoReclamacion.Status;
         casoReclamacion.AccountId = cuenta.Id;
         casoReclamacion.OwnerId = usuarioGeneral.Id;
@@ -271,6 +272,7 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         casoReclamacion7.Subject = 'Caso PSD2 Email';
         casoReclamacion7.Origin = 'Backoffice';
         casoReclamacion7.Status = 'Alta';
+        casoReclamacion7.CC_Idioma__c = 'fr';
         casoReclamacion7.SAC_StatusAuxiliar__c = casoReclamacion7.Status;
         casoReclamacion7.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
         casoReclamacion7.OwnerId = usuarioGeneral.Id;
@@ -282,6 +284,7 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         casoReclamacion8.Subject = 'Caso PSD2 Postal';
         casoReclamacion8.Origin = 'Backoffice';
         casoReclamacion8.Status = 'Alta';
+        casoReclamacion8.CC_Idioma__c = 'fr';
         casoReclamacion8.SAC_StatusAuxiliar__c = casoReclamacion8.Status;
         casoReclamacion8.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
         casoReclamacion8.OwnerId = usuarioGeneral.Id;
@@ -298,11 +301,23 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
         casoReclamacion9.Subject = 'Caso PSD2';
         casoReclamacion9.Origin = 'Backoffice';
         casoReclamacion9.Status = 'Alta';
+        casoReclamacion9.CC_Idioma__c = 'fr';
         casoReclamacion9.SAC_StatusAuxiliar__c = casoReclamacion9.Status;
         casoReclamacion9.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
         casoReclamacion9.OwnerId = usuarioGeneral.Id;
         casoReclamacion9.CC_Canal_Respuesta__c = 'Phone';
         listaReclamaciones.add(casoReclamacion9);
+
+        //RECLAMACION 10
+        Case casoReclamacion10 = new Case();
+        casoReclamacion10.Subject = 'TestRec6';
+        casoReclamacion10.Origin = 'Backoffice';
+        casoReclamacion10.Status = 'SAC_014';
+        casoReclamacion10.SAC_StatusAuxiliar__c = casoReclamacion10.Status;
+        casoReclamacion10.AccountId = cuenta.Id;
+        casoReclamacion10.OwnerId = usuarioGeneral.Id;
+        casoReclamacion10.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
+        listaReclamaciones.add(casoReclamacion10);
 
 
         //CONSULTA 1
@@ -1208,6 +1223,42 @@ public with sharing class SAC_Case_Operativas_Controller_Test {
             SAC_Case_Operativas_Controller.reabrirReclamacion(reclamacion.Id, motivo);
             
             System.assertNotEquals(pretensionOld.Status, pretension.Status, 'No se ha actualizado el estado de la pretensión.');
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    static void reabrirReclamacionTest3() {
+        Test.startTest();
+        User usuario = [SELECT id, name FROM user WHERE alias = 'alias' and isActive = true and Username = 'usergeneral11111@test.com' limit 1];
+        
+        PermissionSet ps = [SELECT id FROM PermissionSet WHERE  PermissionSet.Label ='SAC_General'];
+        PermissionSetAssignment psa = new PermissionSetAssignment (PermissionSetId = ps.id, AssigneeId = usuario.id);
+        SAC_DatabaseDML.insertDML(psa, false);
+        
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec6'];
+
+        system.runAs(usuario) {
+            Case pretension = new Case();
+            pretension.SuppliedCompany = 'prueba2';
+            pretension.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
+            pretension.Status = 'SAC_001';
+            pretension.SAC_StatusAuxiliar__c = 'SAC_001';
+            pretension.SAC_Reclamacion__c = reclamacion.id;
+            SAC_DatabaseDML.insertDML(pretension, false);
+
+            Case pretensionOld = [SELECT Id, Status, SAC_StatusAuxiliar__c, RecordTypeId, SAC_Reclamacion__c
+                                  FROM Case WHERE SuppliedCompany = 'prueba2'];
+
+            pretension.Status = 'SAC_009';
+            pretension.SAC_StatusAuxiliar__c = pretension.Status;
+            SAC_DatabaseDML.updateDML(pretension, false);
+        
+            String motivo = 'test';
+            
+            SAC_Case_Operativas_Controller.reabrirReclamacion(reclamacion.Id, motivo);
+            
+            Assert.areNotEqual(pretensionOld.Status, pretension.Status, 'No se ha actualizado el estado de la pretensión.');
         }
         Test.stopTest();
     }

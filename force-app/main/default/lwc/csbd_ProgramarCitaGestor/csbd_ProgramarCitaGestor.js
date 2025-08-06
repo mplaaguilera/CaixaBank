@@ -112,6 +112,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 
 	async connectedCallback() {
 		this.componente.usuarioDesarrollador = await usuarioDesarrollador(currentUserId);
+		alert(this.componente.usuarioDesarrollador);
 	}
 
 	async obtenerDisponibilidad(tipoCitaDefault) {
@@ -138,7 +139,7 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 						coincide: result.matricula?.toUpperCase() == oppMatriculaGestor?.toUpperCase()
 					};
 
-					this.gestorAve.label = this.gestorAve.fullName || this.gestorAve.matricula;			
+					this.gestorAve.label = this.gestorAve.fullName || this.gestorAve.matricula;
 
 				} else {
 					this.gestorLegoOficina = result.oficina;
@@ -247,10 +248,10 @@ export default class csbdProgramarCitaGestor extends LightningElement {
 	}
 
 	actualizarOficinasNoPresencialesAVE() {
-		if (!this.gestorPool && 
-			this.oficinasNoPresencialesAve && 
+		if (!this.gestorPool &&
+			this.oficinasNoPresencialesAve &&
 			this.slotSeleccionado &&
-			this.oficinasNoPresencialesAve.includes(this.slotSeleccionado.oficina				
+			this.oficinasNoPresencialesAve.includes(this.slotSeleccionado.oficina
 		)) {
 			const tipoCitaTelefonica = this.componente.tipoCitaOptions.find(option => option.value === '43');
 			if (tipoCitaTelefonica) {

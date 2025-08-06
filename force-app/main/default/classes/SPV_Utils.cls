@@ -46,12 +46,12 @@ public with sharing class SPV_Utils {
                     when 'CBK_Case_Extension__c' {
                         mapObjectRT.put(objeto,Schema.SObjectType.CBK_Case_Extension__c .getRecordTypeInfosByDeveloperName());
                     }
-                    //Añadido
                     when 'Account' {
                         mapObjectRT.put(objeto, Schema.SobjectType.Account.getRecordTypeInfosByDeveloperName());
                     }
-
-
+					when 'CBK_CaseToCaseRelationship__c' {
+                        mapObjectRT.put(objeto, Schema.SobjectType.CBK_CaseToCaseRelationship__c.getRecordTypeInfosByDeveloperName());
+                    }
                 }
             }
         }
@@ -377,4 +377,89 @@ public with sharing class SPV_Utils {
 			}
 		}
 	}
+
+	/**
+	 * @description Método que inserta o elimina el permission set pasado como parámetro
+	 */
+	public static void procesarPermisionSet(Boolean esInsertar, String userId, String psName) {
+
+		if(esInsertar){
+			List<PermissionSetAssignment> listPermisosUser = [SELECT PermissionSetId, AssigneeId, PermissionSet.Name FROM PermissionSetAssignment WHERE AssigneeId = :userId AND PermissionSet.Name = :psName LIMIT 1];
+
+			if(listPermisosUser.isEmpty()){
+				//Asignamos al usuario el PS SPV_SystemAdmin para poder saltarse las validaciones
+				PermissionSet psSaltarValidaciones = [SELECT id FROM PermissionSet WHERE PermissionSet.Name = :psName LIMIT 1];
+
+				PermissionSetAssignment assigmentSaltoValidacion = new PermissionSetAssignment (PermissionSetId = psSaltarValidaciones.id, AssigneeId = userId); 
+				SPV_DatabaseDML.insertDML(assigmentSaltoValidacion, true);
+			}
+        }else{
+            //Quitamos al usuario el PS SPV_SystemAdmin
+            List<PermissionSetAssignment> listPermisosUser = [SELECT PermissionSetId, AssigneeId, PermissionSet.Name FROM PermissionSetAssignment WHERE AssigneeId = :userId AND PermissionSet.Name = :psName LIMIT 1];
+
+			if(!listPermisosUser.isEmpty()){
+				SPV_DatabaseDML.deleteListDML(listPermisosUser, true);
+			}
+        }
+	}	
+
+	/***********************************************************************************************
+     * Proposito: Comprobar si el usuario tiene el CustomPermission byPass para saltarse las
+     * validaciones de campos
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR           DATE         Description
+     * 1.0             US1208220      Álex Polo       15/04/2025      Creación 
+     ***********************************************************************************************/
+    public static Boolean comprobarTieneBypass(){
+
+        Boolean tieneByPass = false;
+
+        //Se obtienen los Ps que el usuario tiene asignados para ver si alguno de ellos tiene el CustomPermission ByPass
+        Set<Id> psAsignados = new Map<Id, PermissionSet>([
+            SELECT Id FROM PermissionSet
+            WHERE Id IN (
+                SELECT PermissionSetId
+                FROM PermissionSetAssignment
+                WHERE AssigneeId = :UserInfo.getUserId()
+            )
+        ]).keySet();
+
+        if(!psAsignados.isEmpty()){
+            List<CustomPermission> customPermisos = [
+                SELECT DeveloperName FROM CustomPermission
+                WHERE Id IN (
+                    SELECT SetupEntityId
+                    FROM SetupEntityAccess
+                    WHERE SetupEntityType = 'CustomPermission'
+                    AND ParentId IN :psAsignados
+                ) AND DeveloperName = 'SPV_BypassValidationRules'
+            ];
+    
+            if (!customPermisos.isEmpty()) {
+                tieneByPass = true;
+            }
+        }
+        return tieneByPass;
+    }
+
+
+	/***********************************************************************************************
+     * Proposito: Calcular el tiempo que hay entre la fecha y la medianoche
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR            DATE         Description
+     * 1.0             			    Sergio Martín      09/05/2025      Creación 
+     ***********************************************************************************************/
+	public static Integer minutosHastaMedianoche(DateTime fecha) {
+        // Calcula la fecha de medianoche del día actual
+        DateTime medianoche = DateTime.newInstance(fecha.year(), fecha.month(), fecha.day(), 23, 59, 59);
+        // Calcula la diferencia en minutos entre la fecha dada y medianoche
+        Long diferenciaMinutos = (medianoche.getTime() - fecha.getTime()) / (1000 * 60);
+        // Convierte la diferencia en minutos a un valor absoluto
+        diferenciaMinutos = Math.abs(diferenciaMinutos);
+        return Integer.valueOf(diferenciaMinutos);
+    }
 }

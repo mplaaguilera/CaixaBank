@@ -1,18 +1,4 @@
 ({
-	subscribeToEvent : function(component) {
-        // var empApi = component.find("empApi");
-        // var channel = "/event/CC_Refresh_MCC__e";
-
-        // empApi.subscribe(channel, -1, function(message) {
-        //     this.handleEvent(component, message);
-        // }.bind(this));
-    },
-
-    handleEvent : function(component, message) {
-        // var newMsg = message.data.payload.Case_Id__c;
-		// $A.get('e.force:refreshView').fire();
-    },
-	
 	getOptionsCanalesOperativos: function(component) {
 		let getCanalesOperativos = component.get('c.getCanalesOperativos');
 		getCanalesOperativos.setCallback(this, response => {
@@ -162,9 +148,9 @@
 		let canalEntrada = component.get('v.caso.Origin');
 		let canalProcedencia = component.get('v.caso.CC_Canal_Procedencia__c');
 		if (canalEntrada === 'Email' && (canalProcedencia === 'Soporte Clientes CompraEstrella' || canalProcedencia === 'Soporte Empleados CompraEstrella')
-		|| canalEntrada === 'Phone' && (canalProcedencia === 'Marketing' || canalProcedencia === 'Postventa CompraEstrella')
+		|| canalEntrada === 'Phone' && (canalProcedencia === 'Alfabético y Comercial' || canalProcedencia === 'Postventa CompraEstrella')
 		|| canalEntrada === 'Backoffice' && canalProcedencia === 'Emisiones PromoCaixa'
-		|| canalEntrada === 'Chat' && canalProcedencia === 'Marketing'
+		|| canalEntrada === 'Chat' && canalProcedencia === 'Alfabético y Comercial'
 		|| component.get('v.caso.CC_Grupo_3N__c') === '3N de PromoCaixa Interno') {
 			component.set('v.casoPromoCaixa', true);
 		}
@@ -235,9 +221,6 @@
 		if(!component.get('v.cerrarCaso') && component.find('recordEditForm')) {
 			component.find('recordEditForm').submit();
 		}
-		// if(!component.get('v.cerrarCaso') && component.find('recordEditForm2')) {
-		// 	component.find('recordEditForm2').submit();
-		// }
 	},
 	
 	guardarCerrarAuxiliar: function(component) {
@@ -271,9 +254,6 @@
 		if(component.find('recordEditForm')){
 			component.find('recordEditForm').submit();
 		}
-		// if(component.find('recordEditForm2')){
-		// 	component.find('recordEditForm2').submit();
-		// }
 	},
 
 	recuperarMensajeToast : function (component, tipo, validacion) {
@@ -290,6 +270,7 @@
     },
 
 	camposObligatoriosNoInformados: function(component){
+		let retorno;
 		let camposObligatoriosNoInformados = ['\n'];
 		if (!['Twitter', 'Propuestas de mejora', 'Chat', 'Comentarios Stores'].includes(component.get('v.caso.Origin'))
 		&& !['Buzón Fondos', 'Buzón Carteras'].includes(component.get('v.caso.CC_Canal_Procedencia__c'))
@@ -339,9 +320,11 @@
 			this.finGuardar(component);
 			component.set('v.cerrarCaso', false);
 			component.set('v.cierroCaso', false);
-			return false;
+			retorno = false;
 		} else {
-			return true;
+			retorno = true;
 		}
+
+		return retorno;
     }
 });

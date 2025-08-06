@@ -294,17 +294,58 @@ public with sharing class SPV_LCMP_Reclamantes {
         return listaEmailMessage;
     }
 
-    /*****************************************************************
-    * Proposito: Actualiza el campo SAC_ReclamantesConDatosNoAlf__c del caso si es necesario después de eliminar o informar datos no ALF en el reclamante.
-    * 
-    * Historial
-    * -------
-    * VERSION        USER_STORY       AUTHOR         DATE         Description
-    * 1.0             US826290      Carlos Gomez   02/06/24        Creación
-    *****************************************************************/
+    /*
+    * @description: informará datos no alfabetizados asociados a un reclamante
+    * @author: Raúl Santos
+    * @date: 25/04/25
+    */
+    @AuraEnabled
+    public static void informarDatosNoAlf(String idReclamacion, String idReclamante, String emailNoAlf, String tlfNoAlf, String direccionNoAlf) {
+
+        List<SAC_CaseReclamante__c> listRecDatosNoAlf = [SELECT Id, SAC_TieneDatosNoAlf__c, SAC_Case__c FROM SAC_CaseReclamante__c WHERE SAC_Case__c = :idReclamacion];
+
+        if(!listRecDatosNoAlf.isEmpty()){
+
+            SAC_CaseReclamante__c reclamanteAct = new SAC_CaseReclamante__c();
+            Boolean otrosRecNoAlf = false;
+
+            for(SAC_CaseReclamante__c reclamante : listRecDatosNoAlf){
+                if(reclamante.Id == idReclamante){
+                    reclamanteAct = reclamante;
+                }else if(reclamante.SAC_TieneDatosNoAlf__c == true){
+                    otrosRecNoAlf = true;
+                }
+            }
+
+            if(reclamanteAct != null){
+                reclamanteAct.SAC_EmailNoAlf__c = emailNoalf;
+                reclamanteAct.SAC_TelefonoNoAlf__c = tlfNoAlf;
+                reclamanteAct.SAC_DireccionNoAlf__c = direccionNoAlf;
+        
+                if(emailNoAlf != '' || tlfNoAlf != '' || direccionNoAlf != ''){
+                    reclamanteAct.SAC_TieneDatosNoAlf__c = true;
+                }else{
+                    reclamanteAct.SAC_TieneDatosNoAlf__c = false;
+                }
+        
+                SPV_DatabaseDML.updateDML(reclamanteAct, true);
+        
+                //Si es el único reclamante con datos no ALF, debemos actualizar el campo de la reclamación
+                if(otrosRecNoAlf == false){
+                    actualizarRecNoAlf(reclamanteAct);
+                }        
+            }
+        }
+    }
+
+    /*
+    * @description: Actualiza el campo SAC_ReclamantesConDatosNoAlf__c del caso si es necesario después de eliminar o informar datos no ALF en el reclamante.
+    * @author: Raúl Santos
+    * @date: 25/04/25
+    */
     public static void actualizarRecNoAlf(SAC_CaseReclamante__c reclamante) {
 
-        Case caso = [SELECT Id, SAC_ReclamantesConDatosNoAlf__c FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION) AND Id = :reclamante.SAC_Case__c LIMIT 1];
+        Case caso = [SELECT Id, SAC_ReclamantesConDatosNoAlf__c FROM Case WHERE RecordTypeId = :RECTYPERECLAMACION AND Id = :reclamante.SAC_Case__c LIMIT 1];
 
         //Actualizo el caso para ponerle el check.
         if(reclamante.SAC_TieneDatosNoAlf__c == true){

@@ -174,7 +174,12 @@ public with sharing class SAC_CaseReclamanteHandler {
 				}
                 reclamante.SAC_Edad__c = mapaAccounts.get(reclamante.SAC_Account__c).CC_Edad__pc;
                 reclamante.SAC_FechaDeNacimiento__c = mapaAccounts.get(reclamante.SAC_Account__c).CC_FechaNac__pc;
-                reclamante.SAC_DireccionPostal__c = mapaAccounts.get(reclamante.SAC_Account__c).BillingStreet;
+
+				reclamante.SAC_DireccionPostal__c = mapaAccounts.get(reclamante.SAC_Account__c).BillingStreet;
+				if(reclamante.SAC_DireccionPostal__c != null && reclamante.SAC_DireccionPostal__c.length() > 60){
+					reclamante.SAC_DireccionPostal__c = reclamante.SAC_DireccionPostal__c.substring(0, 60);
+				}
+
                 reclamante.SAC_Segmento__c = mapaAccounts.get(reclamante.SAC_Account__c).CC_Segmento__c;
                 reclamante.SAC_Subsegmento__c = mapaAccounts.get(reclamante.SAC_Account__c).CC_SubSegmento__c;
 				reclamante.SAC_PoblacionContacto__c = mapaAccounts.get(reclamante.SAC_Account__c).BillingCity;

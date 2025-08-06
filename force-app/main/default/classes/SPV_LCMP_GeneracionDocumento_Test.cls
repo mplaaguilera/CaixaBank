@@ -92,27 +92,27 @@ public with sharing class SPV_LCMP_GeneracionDocumento_Test {
         
         System.runAs(usuario){
             Test.startTest();
-            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id);
+            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id, 'Documento de prueba');
 
             reclamacion.CC_Idioma__c = 'ca';
             SPV_DatabaseDML.updateDML(reclamacion, true);
-            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id);
+            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id, 'Documento de prueba');
 
             reclamacion.CC_Idioma__c = 'en';
             SPV_DatabaseDML.updateDML(reclamacion, true);
-            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id);
+            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id, 'Documento de prueba');
 
             reclamacion.CC_Idioma__c = 'va';
             SPV_DatabaseDML.updateDML(reclamacion, true);
-            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id);
+            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id, 'Documento de prueba');
 
             reclamacion.CC_Idioma__c = 'ga';
             SPV_DatabaseDML.updateDML(reclamacion, true);
-            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id);
+            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id, 'Documento de prueba');
 
             reclamacion.CC_Idioma__c = 'eu';
             SPV_DatabaseDML.updateDML(reclamacion, true);
-            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id);
+            SPV_LCMP_GeneracionDocumento.generarDocumento(documentoEnvio.Id, 'Documento de prueba');
             Test.stopTest();
             documentoEnvio2 = [SELECT Id, SAC_URL__c  FROM SAC_DocumentoEnvio__c WHERE Name = 'TestDocumentoEnvio' LIMIT 1];
         }
@@ -134,5 +134,23 @@ public with sharing class SPV_LCMP_GeneracionDocumento_Test {
         }
 
         Assert.areNotEqual(documentoEnvio2.Id, null, 'El método que genera el comprueba el documento de envio ha fallado.');
+    }
+
+    @isTest
+    static void informacionCasoTest() {
+        // Obtener el usuario y el documento creado en TestSetup
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        SAC_DocumentoEnvio__c documento = [SELECT Id FROM SAC_DocumentoEnvio__c WHERE Name = 'TestDocumentoEnvio' LIMIT 1];
+        Case caso = [SELECT Id, CaseNumber, CC_Idioma__c FROM Case WHERE Subject = 'TestRecCrearRec1' LIMIT 1];
+
+        System.runAs(usuario) {
+            Test.startTest();
+            Map<String, Object> resultado = SPV_LCMP_GeneracionDocumento.informacionCaso(documento.Id);
+            Test.stopTest();
+
+            System.assertNotEquals(null, resultado, 'El Map devuelto no debe ser null');
+            System.assertEquals(caso.CaseNumber, (String) resultado.get('numeroCaso'), 'El número de caso no coincide');
+            System.assertEquals(caso.CC_Idioma__c, (String) resultado.get('idioma'), 'El idioma no coincide');
+        }
     }
 }

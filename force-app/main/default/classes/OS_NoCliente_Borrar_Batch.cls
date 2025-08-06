@@ -3,7 +3,7 @@ public class OS_NoCliente_Borrar_Batch implements Database.Batchable<SObject>, D
     
     public Database.QueryLocator start(Database.BatchableContext bc) {
         
-        Id rtId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id rtId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Datetime fechaNoCliente = Datetime.now();
         
         List<OS_NoCliente_Borrar__mdt> lstNoCliente = new List<OS_NoCliente_Borrar__mdt>([SELECT OS_NumeroDias__c FROM OS_NoCliente_Borrar__mdt WHERE DeveloperName = 'OS_Dias']);

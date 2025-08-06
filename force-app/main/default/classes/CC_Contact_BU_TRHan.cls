@@ -6,6 +6,9 @@ public with sharing class CC_Contact_BU_TRHan extends CC_TriggerHandlerBase {
 
 	private void process(Map<Id, Contact> mapOldObj, Map<Id, Contact> mapNewObj, List<Contact> listNewObj) {
 
+		
+
+
 		//CSBD
 		Id idRecordTypeTitularHipoteca = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
 		Map<Id, Contact> mapNewTitularesCsbd = new Map<Id, Contact>();
@@ -46,6 +49,9 @@ public with sharing class CC_Contact_BU_TRHan extends CC_TriggerHandlerBase {
 				}
 			}
 		}
+
+		//CONFIDENCIALES
+		vaciarContactoConfidencial(listNewObj);
 	}
 
 	private static void evitarDuplicadosCOPS(List<Contact> newContacts, Map<Id, Contact> mapIdContacts, Map<Id, Contact> mapOldObj) {
@@ -96,6 +102,36 @@ public with sharing class CC_Contact_BU_TRHan extends CC_TriggerHandlerBase {
 			if (!oportunidades.isEmpty()) {
 				CSBD_Hipoteca.informarCampoPrioridad(oportunidades, titularesCambioPrioridad);
 				update oportunidades;
+			}
+		}
+	}
+
+	private void vaciarContactoConfidencial(List<Contact> contactos) {
+
+		for (Contact contacto : contactos) {
+			if (contacto.CC_Confidencial__c == true) {
+				contacto.Birthdate = null;
+				contacto.CC_CuentaFacebook__c = '';
+				contacto.CC_CuentaTwitter__c = '';
+				contacto.CC_EmpleadoGestorId__c = null;
+				contacto.CC_FechaNac__c = null;
+				contacto.CC_Identificador_CBKNow__c = '';
+				contacto.CC_Idioma__c = null;
+				contacto.CC_OficinaGestoraId__c = null;
+				contacto.CC_Segmento__c = '';
+				contacto.CC_Sexo__c = null;
+				contacto.Email = '';
+				contacto.FirstName = '';
+				contacto.LastName = 'CONFIDENCIAL';
+				contacto.MailingCity = null;
+				contacto.MailingCountry = null;
+				contacto.MailingPostalCode = null;
+				contacto.MailingState = null;
+				contacto.MailingStreet = null;
+				contacto.MobilePhone = '';
+				contacto.Phone = '';
+				contacto.Salutation = null;
+
 			}
 		}
 	}

@@ -25,6 +25,15 @@ public with sharing class CC_OTP {
         public String nivel {get;set;}
     }
 
+    public class HistoricoOTPResponse {
+        @AuraEnabled public List<OTPWrapper> autenticacionesRecientes;
+        @AuraEnabled public List<OTPWrapper> historicoAutenticaciones;
+
+        public HistoricoOTPResponse() {
+            autenticacionesRecientes = new List<OTPWrapper>();
+            historicoAutenticaciones = new List<OTPWrapper>();
+        }
+    }
 
     @AuraEnabled
     public static Map<String,Object> existeBloqueoNuevo(Id recordId) {
@@ -33,7 +42,7 @@ public with sharing class CC_OTP {
         List<Task> comprobarLlamadas = comprobarSiHayLlamada(recordId);
         Boolean tienePSAutenticacion = getPSAutenticacion();
         Boolean mccVacio = true;
-        List<Case> casos = [SELECT CC_Status_Autorizacion__c, CC_OTP_Intentos__c, AccountId, ContactId, CC_Idioma__c, OwnerId, CC_Tipo_Cliente__c, CC_Representante__c, Account.AV_Age__c, Account.AV_Segmento__c, Account.CC_MenorEmancipado__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c, CC_MCC_Motivo__r.CC_ImpedirNivel2__c, CC_MCC_Motivo__r.CC_ImpedirClienteDigital__c, CC_Oportunidad_Creada__c, CC_Representante__r.CC_Representante__r.AV_Age__c, Account.RecordType.DeveloperName, Contact.RecordType.DeveloperName, Contact.CC_Edad__c, CC_MCC_Motivo__c, CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Causa__c FROM Case WHERE Id =:recordId LIMIT 1];
+        List<Case> casos = [SELECT CC_Status_Autorizacion__c, CC_OTP_Intentos__c, AccountId, ContactId, CC_Idioma__c, OwnerId, CC_Tipo_Cliente__c, CC_Representante__c, Account.AV_Age__c, Account.AV_Segmento__c, Account.CC_MenorEmancipado__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c, CC_MCC_Motivo__r.CC_ImpedirNivel2__c, CC_MCC_Motivo__r.CC_ImpedirClienteDigital__c, CC_MCC_Motivo__r.CC_Nivel2_AUT_Terceros__c, CC_Oportunidad_Creada__c, CC_Representante__r.CC_Representante__r.AV_Age__c, Account.RecordType.DeveloperName, Contact.RecordType.DeveloperName, Contact.CC_Edad__c, CC_MCC_Motivo__c, CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Causa__c FROM Case WHERE Id =:recordId LIMIT 1];
         String comprobarIntento;
         if(!casos.isEmpty()){
             comprobarIntento = comprobarIntentos(recordId, casos[0].AccountId);
@@ -53,10 +62,10 @@ public with sharing class CC_OTP {
             tieneLlamadas = false;
         }
 
-            if(!casos.isEmpty()){
+        if(!casos.isEmpty()) {
+            // Datos caso
             oRes.put('Llamadas', tieneLlamadas);
             oRes.put('mccVacio', mccVacio);
-            oRes.put('Cliente Bloqueado', comprobarIntentos);
             oRes.put('Idioma', casos.get(0).CC_Idioma__c);
             oRes.put('AccountId', casos.get(0).AccountId);
             oRes.put('ContactId', casos.get(0).ContactId);
@@ -64,41 +73,45 @@ public with sharing class CC_OTP {
             oRes.put('EstadoAut', casos.get(0).CC_Status_Autorizacion__c);
             oRes.put('OwnerId', casos.get(0).OwnerId);
             oRes.put('TipoCliente', casos.get(0).CC_Tipo_Cliente__c);
-            oRes.put('ClienteMenor', (casos.get(0).Account.AV_Age__c  < 18 && casos.get(0).Account.AV_Age__c != null && !casos.get(0).Account.CC_MenorEmancipado__c));
-            oRes.put('Representante', (casos.get(0).CC_Representante__c != null));
             oRes.put('ImpedirNivelDos', casos.get(0).CC_MCC_Motivo__r.CC_ImpedirNivel2__c);
             oRes.put('ImpedirClienteDigital', casos.get(0).CC_MCC_Motivo__r.CC_ImpedirClienteDigital__c);
+            oRes.put('NivelDosAUTTerceros', casos.get(0).CC_MCC_Motivo__r.CC_Nivel2_AUT_Terceros__c);
             oRes.put('OportunidadCreada', casos.get(0).CC_Oportunidad_Creada__c);
-            oRes.put('EdadCliente', (casos.get(0).Account.RecordType.DeveloperName == 'CC_Cliente' && casos.get(0).Account.AV_Segmento__c == 'RPF') ? casos.get(0).Contact.CC_Edad__c : casos.get(0).Account.AV_Age__c);
-            // oRes.put('EdadCliente', casos.get(0).Account.AV_Age__c);
             oRes.put('AmbitoMotivoCaixa', casos.get(0).CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c);
             oRes.put('AmbitoMotivoImagin', casos.get(0).CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c);
-                if(casos.get(0).CC_Status_Autorizacion__c != null && casos.get(0).CC_Status_Autorizacion__c != '' && casos.get(0).CC_Status_Autorizacion__c != 'ERROR' && casos.get(0).CC_Status_Autorizacion__c != 'UNAUTHORIZED' && casos.get(0).CC_Status_Autorizacion__c != 'TIMEOUT' && casos.get(0).CC_Status_Autorizacion__c != 'ABORTED'&& casos.get(0).CC_Status_Autorizacion__c != 'EXPIRED' && casos.get(0).CC_Status_Autorizacion__c != 'NOT_IDENTIFIED' && casos.get(0).CC_Status_Autorizacion__c != 'IS_MINOR'&& casos.get(0).CC_Status_Autorizacion__c != 'IS_A_COMPANY'&& casos.get(0).CC_Status_Autorizacion__c != 'NOTIFICATIONS_OFF' && casos.get(0).CC_Status_Autorizacion__c != 'SIN ESTADO'){
-                    resultado = true;
-                    //PERMITIR lanzar autenticación (sólo 1 vez más)
-                    if(casos.get(0).CC_Status_Autorizacion__c == 'REJECTED' && (casos.get(0).CC_OTP_Intentos__c == null ||  casos.get(0).CC_OTP_Intentos__c == 0)){
-                        resultado = false;
-                    }
+            if(casos.get(0).CC_Status_Autorizacion__c != null && casos.get(0).CC_Status_Autorizacion__c != '' && casos.get(0).CC_Status_Autorizacion__c != 'ERROR' && casos.get(0).CC_Status_Autorizacion__c != 'UNAUTHORIZED' && casos.get(0).CC_Status_Autorizacion__c != 'TIMEOUT' && casos.get(0).CC_Status_Autorizacion__c != 'ABORTED'&& casos.get(0).CC_Status_Autorizacion__c != 'EXPIRED' && casos.get(0).CC_Status_Autorizacion__c != 'NOT_IDENTIFIED' && casos.get(0).CC_Status_Autorizacion__c != 'IS_MINOR'&& casos.get(0).CC_Status_Autorizacion__c != 'IS_A_COMPANY'&& casos.get(0).CC_Status_Autorizacion__c != 'NOTIFICATIONS_OFF' && casos.get(0).CC_Status_Autorizacion__c != 'SIN ESTADO') {
+                resultado = true;
+                //PERMITIR lanzar autenticación (sólo 1 vez más)
+                if(casos.get(0).CC_Status_Autorizacion__c == 'REJECTED' && (casos.get(0).CC_OTP_Intentos__c == null ||  casos.get(0).CC_OTP_Intentos__c == 0)){
+                    resultado = false;
                 }
+            }
+
+            // Datos cliente
+            oRes.put('Cliente Bloqueado', comprobarIntentos);
+            oRes.put('ClienteMenor', (casos.get(0).Account.AV_Age__c  < 18 && casos.get(0).Account.AV_Age__c != null && !casos.get(0).Account.CC_MenorEmancipado__c));
+            oRes.put('Representante', (casos.get(0).CC_Representante__c != null));
+            oRes.put('EdadCliente', (casos.get(0).Account.RecordType.DeveloperName == 'CC_Cliente' && casos.get(0).Account.AV_Segmento__c == 'RPF') ? casos.get(0).Contact.CC_Edad__c : casos.get(0).Account.AV_Age__c);
+            //Comprobar la edad del cliente, representante o apoderado
+            if (casos.get(0).CC_Representante__c != null) {
+                if (casos.get(0).CC_Representante__r?.CC_Representante__r?.AV_Age__c != null) {
+                    oRes.put('EdadCliente', casos.get(0).CC_Representante__r?.CC_Representante__r?.AV_Age__c);
+                }
+            //Cuenta fisica
+            } else if (casos.get(0).Account.RecordType.DeveloperName != 'CC_Cliente' && casos.get(0).Contact.RecordType.DeveloperName != 'CIBE_Apoderado') {
+                if (casos.get(0).Account.AV_Age__c != null) {
+                    oRes.put('EdadCliente', casos.get(0).Account.AV_Age__c);
+                }
+            }
         }
+        // Configuraciones
+        oRes.put('SettingIntegracionNivelDos', (CC_Settings__c.getValues('CC_Nivel2_AUT_Terceros')?.CC_Activa__c ? CC_Settings__c.getValues('CC_Nivel2_AUT_Terceros')?.CC_Activa__c : false));
         oRes.put('MostrarBotonEmergencia', (CC_Settings__c.getValues('CC_VisibilidadBotonEmergenciaAut')?.CC_Activa__c ? CC_Settings__c.getValues('CC_VisibilidadBotonEmergenciaAut')?.CC_Activa__c : false));
         oRes.put('circuitoAutenticacion', (CC_Settings__c.getValues('CC_CircuitoAutenticacion')?.CC_Activa__c ? CC_Settings__c.getValues('CC_CircuitoAutenticacion')?.CC_Activa__c : false));
         oRes.put('menorDe65', (CC_Settings__c.getValues('CC_PreguntaMenores65')?.CC_Activa__c ? CC_Settings__c.getValues('CC_PreguntaMenores65').CC_Activa__c : false)); //corregir
         //US1173279 - Autenticación - Rango edades clientes senior parametrizable
-        if(CC_Settings__c.getValues('CC_EdadAutenticacion')?.CC_Activa__c && CC_Settings__c.getValues('CC_EdadAutenticacion')?.CC_Configuracion_1__c  != null){
+        if(CC_Settings__c.getValues('CC_EdadAutenticacion')?.CC_Activa__c && CC_Settings__c.getValues('CC_EdadAutenticacion')?.CC_Configuracion_1__c  != null) {
             oRes.put('edadLimite', Integer.valueOf(CC_Settings__c.getValues('CC_EdadAutenticacion').CC_Configuracion_1__c));
-        }
-
-        //Comprobar la edad del cliente, representante o apoderado
-        if (casos.get(0).CC_Representante__c != null) {
-            if (casos.get(0).CC_Representante__r?.CC_Representante__r?.AV_Age__c != null) {
-                oRes.put('EdadCliente', casos.get(0).CC_Representante__r?.CC_Representante__r?.AV_Age__c);
-            }
-        //Cuenta fisica
-        } else if (casos.get(0).Account.RecordType.DeveloperName != 'CC_Cliente' && casos.get(0).Contact.RecordType.DeveloperName != 'CIBE_Apoderado') {
-            if (casos.get(0).Account.AV_Age__c != null) {
-                oRes.put('EdadCliente', casos.get(0).Account.AV_Age__c);
-            }
         }
 
         oRes.put('Resultado', resultado);
@@ -106,13 +119,99 @@ public with sharing class CC_OTP {
     }
 
     @AuraEnabled
+    public static HistoricoOTPResponse obtenerHistoricoOTPClienteDividido(Id recordId, String idCliente) {
+        HistoricoOTPResponse response = new HistoricoOTPResponse();
+
+        if (idCliente != null) {
+            
+            CC_Settings__c valoresCS = CC_Settings__c.getValues('CC_Autenticacion_Bloqueos');
+            Integer horasRecientes = Integer.valueOf(valoresCS.CC_Configuracion_2__c);
+            Datetime fechaLimiteRecientes = DateTime.now().addHours(-horasRecientes);
+
+            Id recordTypeIdOTP = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Comunicaciones__c', 'CC_OTPSMS');
+
+                // --- CONSULTA PARA AUTENTICACIONES RECIENTES ---
+            List<CC_Comunicaciones__c> recientesList = [
+                SELECT Id, CC_Estado__c, CC_Fecha_Envio__c, CC_Fecha_Validacion__c, CC_Intentos_Validacion_OTP__c,
+                    CC_Codigo_OTPSMS__c, CC_Resultado_Validacion__c, CC_Mensaje_Error__c, CC_Case__c,
+                    CC_Case__r.CaseNumber, CC_Nivel__c
+                FROM CC_Comunicaciones__c
+                WHERE CC_Cliente__c = :idCliente AND RecordTypeId = :recordTypeIdOTP
+                AND CC_Fecha_Envio__c >= :fechaLimiteRecientes // Filtra solo los recientes
+                AND (CC_Nivel__c = 'Nivel 2' OR CC_Nivel__c = 'Cliente Digital')
+                ORDER BY CreatedDate DESC
+            ];
+
+              // --- CONSULTA OPTIMIZADA PARA EL HISTÓRICO ---
+            List<CC_Comunicaciones__c> historicoList = [
+                SELECT Id, CC_Estado__c, CC_Fecha_Envio__c, CC_Fecha_Validacion__c, CC_Intentos_Validacion_OTP__c,
+                    CC_Codigo_OTPSMS__c, CC_Resultado_Validacion__c, CC_Mensaje_Error__c, CC_Case__c,
+                    CC_Case__r.CaseNumber, CC_Nivel__c
+                FROM CC_Comunicaciones__c
+                WHERE CC_Cliente__c = :idCliente
+                AND RecordTypeId = :recordTypeIdOTP
+                AND CC_Fecha_Envio__c < :fechaLimiteRecientes // Filtra solo los antiguos
+                AND (CC_Nivel__c = 'Nivel 2' OR CC_Nivel__c = 'Cliente Digital')
+                ORDER BY CreatedDate DESC
+                LIMIT 5 
+            ];
+
+
+           // Mapear autenticaciones recientes
+        for (CC_Comunicaciones__c otp : recientesList) {
+            OTPWrapper otpWrapper = new OTPWrapper();
+            otpWrapper.recordId = otp.Id; 
+            otpWrapper.nivel = otp.CC_Nivel__c;
+            otpWrapper.numeroCaso = otp.CC_Case__r.CaseNumber;
+            otpWrapper.estado = otp.CC_Estado__c;
+            otpWrapper.fechaEnvio = otp.CC_Fecha_Envio__c;
+            otpWrapper.fechaValidacion = otp.CC_Fecha_Validacion__c;
+            otpWrapper.intentosValidacion = otp.CC_Intentos_Validacion_OTP__c;
+            otpWrapper.codigoOTP = otp.CC_Codigo_OTPSMS__c;
+            otpWrapper.resultado = otp.CC_Resultado_Validacion__c;
+            otpWrapper.codigoError = otp.CC_Mensaje_Error__c;
+            if (otp.CC_Nivel__c == 'Nivel 2'){
+                otpWrapper.nombreBoton = otp.CC_Estado__c == 'Pdte. Envío' ? 'Enviar' : 'Validar';
+            }else{
+                otpWrapper.nombreBoton = 'Cancelar';
+            }
+            response.autenticacionesRecientes.add(otpWrapper);
+        }
+
+
+        // Mapear histórico de autenticaciones (el bucle es más simple ahora)
+        for (CC_Comunicaciones__c otp : historicoList) {
+            OTPWrapper otpWrapper = new OTPWrapper();
+            otpWrapper.recordId = otp.Id;
+            otpWrapper.nivel = otp.CC_Nivel__c;
+            otpWrapper.numeroCaso = otp.CC_Case__r.CaseNumber;
+            otpWrapper.estado = otp.CC_Estado__c;
+            otpWrapper.fechaEnvio = otp.CC_Fecha_Envio__c;
+            otpWrapper.fechaValidacion = otp.CC_Fecha_Validacion__c;
+            otpWrapper.intentosValidacion = otp.CC_Intentos_Validacion_OTP__c;
+            otpWrapper.codigoOTP = otp.CC_Codigo_OTPSMS__c;
+            otpWrapper.resultado = otp.CC_Resultado_Validacion__c;
+            otpWrapper.codigoError = otp.CC_Mensaje_Error__c;
+            if (otp.CC_Nivel__c == 'Nivel 2'){
+                otpWrapper.nombreBoton = otp.CC_Estado__c == 'Pdte. Envío' ? 'Enviar' : 'Validar';
+            }else{
+                otpWrapper.nombreBoton = 'Cancelar';
+            }
+            response.historicoAutenticaciones.add(otpWrapper);
+        }
+
+        }
+        return response;
+    }
+
+    /*@AuraEnabled
     public static List<OTPWrapper> obtenerHistoricoOTPCliente(Id recordId, String idCliente) {
 
         List<OTPWrapper> otpWrapperList = new List<OTPWrapper>();
         if (idCliente != null) {
 
             Id recordTypeIdOTP = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Comunicaciones__c', 'CC_OTPSMS');
-                        List<CC_Comunicaciones__c> otpsList = [SELECT Id, CC_Estado__c, CC_Fecha_Envio__c, CC_Fecha_Validacion__c, CC_Intentos_Validacion_OTP__c, CC_Codigo_OTPSMS__c, CC_Resultado_Validacion__c, CC_Mensaje_Error__c, CC_Case__c, CC_Case__r.CaseNumber, CC_Nivel__c FROM CC_Comunicaciones__c WHERE CC_Cliente__c = :idCliente AND RecordTypeId = :recordTypeIdOTP ORDER BY CreatedDate DESC LIMIT 10];
+                        List<CC_Comunicaciones__c> otpsList = [SELECT Id, CC_Estado__c, CC_Fecha_Envio__c, CC_Fecha_Validacion__c, CC_Intentos_Validacion_OTP__c, CC_Codigo_OTPSMS__c, CC_Resultado_Validacion__c, CC_Mensaje_Error__c, CC_Case__c, CC_Case__r.CaseNumber, CC_Nivel__c FROM CC_Comunicaciones__c WHERE CC_Cliente__c = :idCliente AND RecordTypeId = :recordTypeIdOTP ORDER BY CreatedDate DESC LIMIT 5];
             for (CC_Comunicaciones__c otp : otpsList) {
                 OTPWrapper otpWrapper = new OTPWrapper();
                 otpWrapper.nivel = otp.CC_Nivel__c;
@@ -134,6 +233,7 @@ public with sharing class CC_OTP {
         }
         return otpWrapperList;
     }
+        */
 
     @AuraEnabled
     public static List<OTPWrapper> obtenerOTPCliente(Id recordId, String idCliente) {
@@ -169,7 +269,7 @@ public with sharing class CC_OTP {
     }
     //SMS
     @AuraEnabled
-    public static void enviarRegistro (Id recordId){
+    public static void enviarRegistro(Id recordId) {
         Set<Id> idsOTP = new Set<Id>();
         if (String.valueOf(Id.valueOf(recordId)?.getSObjectType()) == 'Case'){
         	Id otp = getOTP(recordId, 'Nivel 2', 'Pdte. Envío');
@@ -252,7 +352,6 @@ public with sharing class CC_OTP {
                 respuesta.put('Pregunta2', preguntasAnteriores.get('Pregunta 2'));
             }
         }
-
     	return respuesta;
     }
 
@@ -282,20 +381,19 @@ public with sharing class CC_OTP {
             tarjetasList =!String.isEmpty(numPerso) ? CC_WS_Recuperar_Tarjetas.recuperarTarjetasPorCliente(numPerso) : new List<String>();
             CBK_HttpServiceIntegration.registroTrazaIntegracion();
         }
-
         if(String.isEmpty(numPerso) && !onboarding){
             preguntas.put('error','SIN DATOS');
             return preguntas;
         	}else if (!representanteJuridico && !juridicoRPF && caso.Account.AV_Age__c == null && caso.Account.PersonMobilePhone == null) {
             preguntas.put('error','SIN DATOS');
             return preguntas;
-            } else if (!juridicoRPF && caso.Account.AV_Age__c == null) {
-                preguntaForzada = 'telefono';
+            } else if (representanteJuridico && !juridicoRPF && caso.Account.AV_Age__c == null) {
+                preguntaForzada = 'teléfono';
             } else if (!juridicoRPF && caso.Account.PersonMobilePhone == null) {
                 preguntaForzada = 'edad';
             }
 
-         if(!cuentasList.isEmpty() && !tarjetasList.isEmpty()){
+        if(!cuentasList.isEmpty() && !tarjetasList.isEmpty()){
             preguntaForzadaApi = 'ambas';
             preguntas.put('listaCuentas', JSON.serialize(cuentasList));
             preguntas.put('listaTarjetas', JSON.serialize(tarjetasList));
@@ -319,20 +417,8 @@ public with sharing class CC_OTP {
         List<Integer> pesoCumulativo1 = calcularPesoCumulativo(pesoPreguntas1);
         List<Integer> pesoCumulativo2 = calcularPesoCumulativo(pesoPreguntas2);
 
-        String pregunta1 = buscarPregunta(lstPreguntas1, pesoCumulativo1);
-        String pregunta2 = buscarPregunta(lstPreguntas2, pesoCumulativo2);
-
-        // for (CC_Lista_Valores__c listaPregunta : listaPreguntas) {
-        //     Integer cantidad = listaPregunta.CC_Orden__c != null ? Integer.valueOf(listaPregunta.CC_Orden__c) : 1;
-
-        //     for (Integer i = 0; i < cantidad; i++) {
-        //         if (listaPregunta.CC_Servicio__c == 'Pregunta 1') {
-        //             preguntas1.put(listaPregunta.CC_Valor__c + '_' + i, listaPregunta.CC_Mensajes_Mostrar__c);
-        //         } else if (listaPregunta.CC_Servicio__c == 'Pregunta 2') {
-        //             preguntas2.put(listaPregunta.CC_Valor__c + '_' + i, listaPregunta.CC_Mensajes_Mostrar__c);
-        //         }
-        //     }
-        // }
+        String pregunta1 = buscarPregunta('Pregunta1', lstPreguntas1, pesoCumulativo1, preguntaForzada, preguntaForzadaApi);
+        String pregunta2 = buscarPregunta('Pregunta2', lstPreguntas2, pesoCumulativo2, preguntaForzada, preguntaForzadaApi);
 
         for (CC_Lista_Valores__c pregunta : listaPreguntas) {
             if (pregunta.CC_Valor__c == pregunta1) {
@@ -341,7 +427,6 @@ public with sharing class CC_OTP {
                 preguntas2.put(pregunta.CC_Valor__c, pregunta.CC_Mensajes_Mostrar__c);
             }
         }
-
         asignarPregunta(preguntas, 'Pregunta1', preguntas1, caso, preguntaForzada, preguntaForzadaApi);
         asignarPregunta(preguntas, 'Pregunta2', preguntas2, caso, preguntaForzada, preguntaForzadaApi);
 
@@ -371,13 +456,23 @@ public with sharing class CC_OTP {
         return pesoCumulativo;
     }
 
-    public static String buscarPregunta(List<String> lstPreguntas, List<Integer> pesoCumulativo) {
-        Integer indexAleatorio = Integer.valueOf(Math.random() * (!pesoCumulativo.isEmpty() ? pesoCumulativo[pesoCumulativo.size() - 1] : 1));
+    public static String buscarPregunta(String bloquePregunta, List<String> lstPreguntas, List<Integer> pesoCumulativo, String preguntaForzada, String preguntaForzadaApi) {
         String pregunta = '';
-        for (Integer i = 0; i < lstPreguntas.size(); i++) {
-            if (pesoCumulativo[i] >= indexAleatorio) {
-                pregunta = lstPreguntas[i];
-                break;
+        if (bloquePregunta == 'Pregunta1' && preguntaForzada != null) {
+            for (Integer i = 0; i < lstPreguntas.size(); i++) {
+                if (lstPreguntas[i].toLowerCase().contains(preguntaForzada)) {
+                    pregunta = lstPreguntas[i];
+                    break;
+                }
+            }
+            
+        } else {
+            Integer indexAleatorio = Integer.valueOf(Math.random() * (!pesoCumulativo.isEmpty() ? pesoCumulativo[pesoCumulativo.size() - 1] : 1));
+            for (Integer i = 0; i < lstPreguntas.size(); i++) {
+                if (pesoCumulativo[i] >= indexAleatorio) {
+                    pregunta = lstPreguntas[i];
+                    break;
+                }
             }
         }
         return pregunta;
@@ -539,30 +634,30 @@ public with sharing class CC_OTP {
                     return tlf == telefonoLlamada || caso.CC_Representante__r?.CC_Representante__r?.PersonMobilePhone == telefonoLlamada;
                 } else if (caso.Account.RecordType.DeveloperName == 'CC_Cliente' && caso.Contact.RecordType.DeveloperName == 'CIBE_Apoderado') {
                     return caso.Contact.CIBE_Telefono1__c == telefonoLlamada;
-                }else if (caso.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c == true) {
+                } else if (caso.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c == true) {
                     return true;
-                }else{
+                } else {
                     String tlf = caso.Account.PersonMobilePhone;
                     if (tlf != null && tlf.startsWith('+34 ')) {
                         tlf = tlf.replace(' ', '').right(9);
                     }
                     return tlf == telefonoLlamada || caso.Account.PersonMobilePhone == telefonoLlamada;
                 }
-            }else {
+            } else {
                 if (caso.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c == true) {
-                  return true;
+                    return true;
                 }else{
                     return false;
                 }
             }
-        }else if (tienePSAutenticacion){
+        } else if (tienePSAutenticacion) {
             if (caso.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c == true) {
                 return true;
-              }else{
-                  return false;
+            } else {
+                return false;
             }
         }
-            return false;
+        return false;
     }
 
     private static Boolean validarEdad(Case caso, String respuesta) {
@@ -707,7 +802,7 @@ public with sharing class CC_OTP {
 
     //Se utiliza para emergencia
     @AuraEnabled
-    public static String gestionesSegunNivel (String casoId, Boolean valido, String nivel){
+    public static String gestionesSegunNivel(String casoId, Boolean valido, String nivel) {
         String resultado;
         String resultadoValidacion = '';
 
@@ -745,9 +840,9 @@ public with sharing class CC_OTP {
 
             //Recuperamos los metadata de notificaciones OTP
             if (procedencia == 'ImaginBank'){
-                            mdts = [SELECT Id, CC_Idioma__c, CC_Cuerpo__c, CC_EtiRemitente__c, CC_Remitente__c, CC_Plantilla__c, CC_PlantillaBase__c, CC_Carpeta__c, CC_Proceso__c, CC_TaskOrigenProc__c, CC_TiposTareaCaso__c, CC_CaseOrigenProc__c, CC_EntidadOrigen__c, CC_EstadoTarea__c FROM CC_ConfigNotifCliente__mdt WHERE CC_Proceso__c = 'Notificacion OTP Imagin OK' AND CC_Canal__c = 'Email' AND CC_Idioma__c = :idioma AND CC_Activa__c = true LIMIT 1];
+                mdts = [SELECT Id, CC_Idioma__c, CC_Cuerpo__c, CC_EtiRemitente__c, CC_Remitente__c, CC_Plantilla__c, CC_PlantillaBase__c, CC_Carpeta__c, CC_Proceso__c, CC_TaskOrigenProc__c, CC_TiposTareaCaso__c, CC_CaseOrigenProc__c, CC_EntidadOrigen__c, CC_EstadoTarea__c FROM CC_ConfigNotifCliente__mdt WHERE CC_Proceso__c = 'Notificacion OTP Imagin OK' AND CC_Canal__c = 'Email' AND CC_Idioma__c = :idioma AND CC_Activa__c = true LIMIT 1];
             } else {
-                            mdts = [SELECT Id, CC_Idioma__c, CC_Cuerpo__c, CC_EtiRemitente__c, CC_Remitente__c, CC_Plantilla__c, CC_PlantillaBase__c, CC_Carpeta__c, CC_Proceso__c, CC_TaskOrigenProc__c, CC_TiposTareaCaso__c, CC_CaseOrigenProc__c, CC_EntidadOrigen__c, CC_EstadoTarea__c FROM CC_ConfigNotifCliente__mdt WHERE CC_Proceso__c = 'Notificacion OTP OK' AND CC_Canal__c = 'Email' AND CC_Idioma__c = :idioma AND CC_Activa__c = true LIMIT 1];
+                mdts = [SELECT Id, CC_Idioma__c, CC_Cuerpo__c, CC_EtiRemitente__c, CC_Remitente__c, CC_Plantilla__c, CC_PlantillaBase__c, CC_Carpeta__c, CC_Proceso__c, CC_TaskOrigenProc__c, CC_TiposTareaCaso__c, CC_CaseOrigenProc__c, CC_EntidadOrigen__c, CC_EstadoTarea__c FROM CC_ConfigNotifCliente__mdt WHERE CC_Proceso__c = 'Notificacion OTP OK' AND CC_Canal__c = 'Email' AND CC_Idioma__c = :idioma AND CC_Activa__c = true LIMIT 1];
             }
 
             if(!mdts.isEmpty()){
@@ -830,15 +925,14 @@ public with sharing class CC_OTP {
         }
         return resultado;
     }
-//Desglce de métodos
+
+    //Desglce de métodos
     public static List<Task> comprobarSiHayLlamada(Id casoId){
        return [SELECT Id, CC_Llamada_Id__r.CC_Tipo__c, CC_Llamada_Id__r.CC_DNIS__c FROM Task WHERE WhatId = :casoId AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task') AND CreatedDate = TODAY AND (Status = 'Open' OR Type = 'Llamada transferida' OR Type = 'Consulta') AND CC_Llamada_Id__c != null ORDER BY  CreatedDate DESC LIMIT 1];
-
     }
 
-    private static String completarPerfilAgente(){
+    private static String completarPerfilAgente() {
         String perfil;
-
         String profile = [Select Name from Profile where Id=:UserInfo.getProfileId()].Name;
         CC_Settings__c configuracion = CC_Settings__c.getValues('CC_PerfilesAutentication');
         if(configuracion != null) {
@@ -854,7 +948,6 @@ public with sharing class CC_OTP {
         }
         return perfil;
     }
-
 
     private static CC_Comunicaciones__c crearComunicacionBasica(String casoId, String nivel, String estado, String idCliente, List<Task> tareas, Id recordTypeIdOTP){
         CC_Comunicaciones__c otp = new CC_Comunicaciones__c();
@@ -872,10 +965,8 @@ public with sharing class CC_OTP {
             }
         }
         //insert otp;
-
         return otp;
     }
-
 
     @AuraEnabled
     public static String clienteDigital(String casoId, String idCliente, String ownerId){
@@ -905,8 +996,6 @@ public with sharing class CC_OTP {
         }
         return resultado;
     }
-
-
 
     @AuraEnabled
     public static Map<String,String> segundoNivel(String casoId, Boolean valido, String nivel, String pregunta1, String pregunta2, String respuesta1, String respuesta2, String validacion1, String validacion2, Boolean enviarSMS, Boolean enviarPreguntas, Boolean cancelada) {
@@ -1112,8 +1201,12 @@ public with sharing class CC_OTP {
     }
 
     @AuraEnabled
-    public static String enviarAutorizacion(Id recordId, Id casoId){
-       return CC_WS_Autenticacion.CC_WS_Envio_Autenticacion(recordId, casoId);
+    public static String enviarAutorizacion(Id recordId, Id casoId, String tipoAutenticacion) {
+        System.debug('::: dentro enviarAutorizacion');
+        System.debug('::: recordId: ' + recordId);
+        System.debug('::: casoId: ' + casoId);
+        System.debug('::: recortipoAutenticaciondId: ' + tipoAutenticacion);
+       return CC_WS_Autenticacion.CC_WS_Envio_Autenticacion(recordId, casoId, tipoAutenticacion);
     }
 
     @AuraEnabled

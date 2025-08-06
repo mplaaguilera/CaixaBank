@@ -1,0 +1,76 @@
+<template>
+        <!--Desplegable Subsanacion-->
+    <template if:true={mostrarSubsanaciones}>
+        <div class={toggleSeccionPrincipal}>
+            <h1 class="slds-section__title">
+                <button  aria-controls="expando-unique-id-seccion-principal" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirSeccionPrincipal}>
+                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                    </svg>
+                    <span class="slds-truncate" title="Section Title">Información Subsanaciones</span>
+                </button>
+            </h1>
+        <div >          
+        <template if:true={expandirSeccionPrincipal}>
+            <!--Bucle para recorrer los campos de las subsanaciones realizadas -->
+        <template for:each={listSubsanacionesWithClass} for:item="subsanacion">
+            <div data-id={subsanacion.Id} class={subsanacion.sectionClass} key={subsanacion.Id}>
+                <h1 class="slds-section__title subseccion">
+                    <button data-name={subsanacion.Id} aria-controls="expando-unique-id-subsanacion" aria-expanded={subsanacion.isOpen} class="slds-button slds-section__title-action seccion" onclick={handleExpandirSubsanacion}>
+                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                    </svg>
+                    <span class="slds-truncate" title="Section Title"> Subsanacion {subsanacion.Name}</span>
+                    </button>
+                </h1>
+                <template if:true={subsanacion.isOpen}>
+                <div class="slds-section__content" key={subsanacion.Id}> 
+                    <lightning-record-view-form object-api-name="SPV_Formulario__c" data-record-id={subsanacion.Id} record-id={subsanacion.Id}>
+                        <div class="slds-grid slds-wrap" style="margin-left: 15px;margin-bottom: 20px;">
+                            <!-- Campo SAC_Subsanador__c -->
+                            <div class="slds-col slds-size_1-of-1 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_Subsanador__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                            <!-- Campo SAC_FechaSubsanacion__c -->
+                            <div class="slds-col slds-size_1-of-1 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_FechaSubsanacion__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                            <!-- Campo SAC_GrupoSubsanador -->
+                            <div class="slds-col slds-size_1-of-1 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_GrupoSubsanador__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                        </div>
+                    </lightning-record-view-form> 
+                </div>
+                </template>
+            </div>
+    </template>   
+    </template>
+    </div>  
+    </div>              
+    <!--Fin desplegable Subsanacion-->
+</template>

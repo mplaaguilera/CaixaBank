@@ -18,6 +18,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
     private static final Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('Case').get('SAC_Consulta').getRecordTypeId();
     private static final Id RECTYPECONSULTASAC = mapRTsObjects.get('Case').get('SAC_ConsultaSAC').getRecordTypeId();
+    private static final Id RECTYPERECLAMACIONSPV = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
     private static final Id RECTYPEESCALADONV2 = mapRTsObjects.get('SAC_Interaccion__c').get('SAC_Escalado').getRecordTypeId();
     private static final Id RECTYPEESCALADONV3 = mapRTsObjects.get('SAC_Interaccion__c').get('SAC_EscaladoNV3').getRecordTypeId();
     private static final Id RECTYPETMETAREA = mapRTsObjects.get('SAC_TMECaso__c').get('SAC_TMETarea').getRecordTypeId();
@@ -410,9 +411,9 @@ public without sharing class SAC_LCMP_RedaccionFinal {
         
         try { 
             List<String> body = new List<String>();
-            Case caso = [SELECT Id, SAC_DireccionPostalNotificacion__c, AccountId, Account.RecordTypeId, OS_Email__c, Origin, CC_Canal_Respuesta__c, 
+            Case caso = [SELECT Id, SAC_DireccionPostalNotificacion__c, AccountId, Account.RecordTypeId, OS_Email__c, Origin, CC_Canal_Respuesta__c, ContactEmail,
                         Account.CC_Email__c, SAC_DireccionPostal__c, RecordTypeId, SuppliedEmail, SAC_MotivoInadmision__c, CaseNumber, Subject, Status, 
-                        OwnerId, CC_Idioma__c, SAC_OrigenConsulta__c, CC_No_Identificado__c, recordType.Name, SAC_Reclamacion__r.OS_Email__c
+                        OwnerId, CC_Idioma__c, SAC_OrigenConsulta__c, CC_No_Identificado__c, recordType.Name, recordType.DeveloperName, SAC_Reclamacion__r.OS_Email__c
                         FROM Case WHERE id =: idCaso LIMIT 1];
             EmailTemplate et = null;
 
@@ -425,12 +426,10 @@ public without sharing class SAC_LCMP_RedaccionFinal {
             }else  if(caso.RecordTypeId == RECTYPECONSULTA && soloEmail == false){
                 et=[SELECT Id, Body, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'SAC_Consultas_COPS']; 
                 
-            }else {
-                et=[SELECT Id, Body, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'SAC_PlantillaSAC']; 
-                
-                
-                
-
+            }
+            else {
+                et=[SELECT Id, Body, HtmlValue FROM EmailTemplate WHERE DeveloperName = 'SAC_PlantillaSAC'];       
+            
             }             
              
             ContentDocument[] documentos = null;
@@ -459,6 +458,27 @@ public without sharing class SAC_LCMP_RedaccionFinal {
                     return new DatosEmailWrapper(para, renderStored.getSubject(), renderStored.getHtmlBody(), '', caso, documentos);
 
                 }
+            }else if(caso.RecordTypeId == RECTYPERECLAMACIONSPV){ //////
+                if(soloEmail){
+                    System.debug('entro al solo emaul??');
+                    System.debug('entro al solo emaul??' + caso.OS_Email__c);
+                    System.debug('entro al solo emaul??' + renderStored.getSubject());
+                    System.debug('entro al solo emaul??' + renderStored.getHtmlBody());
+                    System.debug('entro al solo emaul??' + caso);
+                    System.debug('entro al solo emaul??' + documentos );
+                    return new DatosEmailWrapper(caso.OS_Email__c, renderStored.getSubject(), renderStored.getHtmlBody(), '', caso, documentos);
+
+                }
+                if(String.isBlank(para)){
+                    System.debug('entro apara ??');
+                    return new DatosEmailWrapper(caso.OS_Email__c, renderStored.getSubject(), renderStored.getHtmlBody(), '', caso, documentos);
+
+                }
+                else{
+                    System.debug('entro ??');
+                    return new DatosEmailWrapper(para, renderStored.getSubject(), renderStored.getHtmlBody(), '', caso, documentos);
+
+                }
             }else if(caso.RecordTypeId == RECTYPECONSULTA){
                 if(soloEmail){
                     return new DatosEmailWrapper(caso.SuppliedEmail, renderStored.getSubject(), renderStored.getHtmlBody(), '', caso, documentos);
@@ -469,8 +489,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
 
                 }
                 else{
-                    return new DatosEmailWrapper(para, renderStored.getSubject(), renderStored.getHtmlBody(), '', caso, documentos);
-
+                    return new DatosEmailWrapper(caso.SuppliedEmail, renderStored.getSubject(), renderStored.getHtmlBody(), '', caso, documentos);
                 }
             }else{
                 if(soloEmail){
@@ -488,6 +507,62 @@ public without sharing class SAC_LCMP_RedaccionFinal {
             }
             
         } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+
+    @AuraEnabled
+    public static List<SAC_CaseReclamante__c> recuperarReclamantes (String idCaso){
+        try{
+
+            List<SAC_CaseReclamante__c> listaReclamantes = [SELECT Id, SAC_Account__c, SAC_Case__c, SAC_Account__r.Name, SAC_ReclamantePrincipal__c, SAC_Pretension__c, SAC_Empleado__c,
+                                                            SAC_Account__r.AV_EAPGestor__c, SAC_Account__r.CC_OficinaGestoraId__c, SAC_Account__r.AV_OfficeManager__c,
+                                                            SAC_TelefonoNoAlf__c, SAC_EmailNoAlf__c, SAC_DireccionNoAlf__c, SAC_TieneDatosNoAlf__c, SAC_Case__r.RecordTypeId, SAC_Case__r.RecordType.DeveloperName
+                                                            FROM SAC_CaseReclamante__c 
+                                                            WHERE SAC_Case__c = :idCaso];
+
+
+            return listaReclamantes;
+
+        }catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+    @AuraEnabled
+    public static void cambiarContactoReclamante (String reclamanteId, String idCaso){
+        try{
+
+            SAC_CaseReclamante__c reclamante = [SELECT Id, SAC_Contact__c,SAC_Account__c, SAC_Account__r.CC_Idioma__pc, SAC_ReclamantePrincipal__c, SAC_Account__r.AV_OfficeManager__c
+                                                            FROM SAC_CaseReclamante__c 
+                                                            WHERE Id = :reclamanteId AND SAC_Case__c = :idCaso 
+                                                            LIMIT 1];
+
+            CBK_Case_Extension__c caseExtension = [SELECT Id, SPV_ReclamantePrincipalEmail__c
+                                                            FROM CBK_Case_Extension__c  
+                                                            WHERE Case_Id__c  = :idCaso
+                                                            LIMIT 1];
+
+            Case casoActual = new Case();
+            casoActual.CC_Idioma__c = reclamante.SAC_Account__r.CC_Idioma__pc;
+            casoActual.CC_Oficina__c = reclamante.SAC_Account__r.AV_OfficeManager__c;           
+            casoActual.Id = idCaso;
+            casoActual.AccountId = reclamante.SAC_Account__c;
+            casoActual.ContactId = reclamante.SAC_Contact__c;
+
+
+            SAC_DatabaseDML.updateDML(casoActual, false);
+
+            if(reclamante.SAC_ReclamantePrincipal__c && caseExtension.SPV_ReclamantePrincipalEmail__c){
+                caseExtension.SPV_ReclamantePrincipalEmail__c = false;
+            }else if(!reclamante.SAC_ReclamantePrincipal__c){
+                caseExtension.SPV_ReclamantePrincipalEmail__c = true;
+            }
+
+            SAC_DatabaseDML.updateDML(caseExtension, false);
+
+        }catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
     }
@@ -671,14 +746,16 @@ public without sharing class SAC_LCMP_RedaccionFinal {
      * 1.0            US518130         Raúl Santos    25/01/2023   Creación
     *****************************************************************/
     @AuraEnabled
-    public static Boolean comprobrarRecordType(String idCaso){
+    public static String comprobrarRecordType(String idCaso){
 
         Case caso = [SELECT Id, RecordTypeId FROM Case WHERE id =: idCaso LIMIT 1]; 
 
         if(caso.RecordTypeId == RECTYPERECLAMACION || caso.RecordTypeId == RECTYPEPRETENSION){ 
-            return true; 
+            return 'SAC'; 
+        }else if(caso.RecordTypeId == RECTYPERECLAMACIONSPV){
+            return 'SPV';
         }else{
-            return false;
+            return 'OTRO';
         } 
     }
 

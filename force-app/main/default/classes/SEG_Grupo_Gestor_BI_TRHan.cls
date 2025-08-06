@@ -10,8 +10,8 @@ public with sharing class SEG_Grupo_Gestor_BI_TRHan extends CC_TriggerHandlerBas
 
     public static void grupoGestor(List<SEG_Gestor_Grupo__c> listNewObj) {
         for (SEG_Gestor_Grupo__c grupoGestor : listNewObj) {
-            if(!String.isBlank(grupoGestor.SEG_GrupoOperativa__c)){
-                grupoGestor.SEG_IDGestor__c = grupoGestor.SEG_GrupoOperativa__c;
+            if(!String.isBlank(grupoGestor.SEG_EmpleadoGestor__c)){
+                grupoGestor.SEG_IDGestor__c = String.valueOf(grupoGestor.SEG_EmpleadoGestor__c).left(15);
             }
         }
     }

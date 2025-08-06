@@ -238,67 +238,6 @@ public with sharing class CSBD_Llamada_GC {
 		};
 	}
 
-
-	private static Opportunity informarSla(CC_Llamada__c llamada, Opportunity oportunidad) {
-		//Primera actividad de llamada saliente, por lo que hay que calcular el campo CSBD_SLA_Primera_Respuesta__c de la oportunidad vinculada.
-		if ([SELECT RecordTypeId, CC_Llamada_Id__c FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'].size() == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
-			// Guardo la fecha de creación de la Oportunidad
-			Datetime tiempoOrigen;
-			Datetime tiempoFinal = System.now();
-
-			/* ----------------------- RecordType CMN, Préstamo, Hipotecas y PRO Automática----------------------- */
-			if (oportunidad.Recordtype.DeveloperName == 'CSBD_CMN' || oportunidad.Recordtype.DeveloperName == 'CSBD_Prestamo' || oportunidad.Recordtype.DeveloperName == 'CSBD_Hipoteca'
-			|| oportunidad.Recordtype.DeveloperName == 'CSBD_PROAutomatica' || oportunidad.Recordtype.DeveloperName == 'CSBD_MAC') {
-				if((oportunidad.Recordtype.DeveloperName == 'CSBD_Hipoteca' || oportunidad.Recordtype.DeveloperName == 'CSBD_PROAutomatica') && oportunidad.CSBD_HorarioComercial__c == 'NO'){
-
-					List<CC_Lista_Valores__c> lovList = [SELECT Name, CC_Valor__c FROM CC_Lista_Valores__c
-															WHERE RecordType.DeveloperName = 'CC_Valor'
-															AND CC_Lista__r.Name = 'CSBD: Horarios comerciales por tipología'
-															AND Name  =: oportunidad.Recordtype.Name
-															AND CC_Activa__c = TRUE limit 1];
-
-					if(!lovList.isEmpty()){
-
-						List<BusinessHours> businessHoursList = [SELECT Id, Name FROM BusinessHours WHERE Name =:lovList[0].CC_Valor__c limit 1];
-
-						tiempoOrigen = BusinessHours.nextStartDate(businessHoursList[0].id, oportunidad.CreatedDate);
-
-						}
-
-				}else{
-					tiempoOrigen = oportunidad.CreatedDate;
-				}
-			}
-
-			/* ----------------------- RecordType CMB -----------------------*/
-			if (oportunidad.Recordtype.DeveloperName == 'CSBD_CMB') {
-				if(String.isNotBlank(oportunidad.CSBD_Horario_Contacto__c)) {
-					String rangoFinal = Datetime.now().format('yyyy-MM-dd') + ' ' + oportunidad.CSBD_Horario_Contacto__c.substring(7) + ':00';
-					tiempoOrigen = Datetime.valueOf(rangoFinal);
-
-					if(tiempoOrigen < oportunidad.CreatedDate){
-						tiempoOrigen = tiempoOrigen.addDays(1);
-					}
-				}
-				else{
-					tiempoOrigen = oportunidad.CreatedDate;
-				}
-			}
-
-			// Se calculan los SLAs
-			if(tiempoOrigen >= System.now()) {
-				oportunidad.CSBD_SLA_Primera_Respuesta__c = 0;
-				oportunidad.CSBD_PrimerContactoSLA__c = tiempoFinal;
-			}
-			if(tiempoOrigen < System.now()){
-				oportunidad.CSBD_SLA_Primera_Respuesta__c = (Integer)(tiempoFinal.getTime() - tiempoOrigen.getTime())/(1000);
-				oportunidad.CSBD_PrimerContactoSLA__c = tiempoFinal;
-			}
-		}
-		return oportunidad;
-	}
-
-	/*
 	public static Opportunity informarSla(CC_Llamada__c llamada, Opportunity oportunidad) {
 		//Primera actividad de llamada saliente, por lo que hay que calcular el campo CSBD_SLA_Primera_Respuesta__c de la oportunidad vinculada.
 		//if ([SELECT RecordTypeId, CC_Llamada_Id__c FROM Task WHERE WhatId = :oportunidad.Id AND Type = 'Llamada saliente'].size() == 1 && oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
@@ -307,10 +246,10 @@ public with sharing class CSBD_Llamada_GC {
 		|| oportunidad.CSBD_PrimerContactoSLA__c == null && oportunidad.CSBD_SLA_Primera_Respuesta__c == null) {
 			// Guardo la fecha de creación de la Oportunidad
 			Datetime tiempoOrigen;
-			Datetime tiempoFinal = System.now();
+			Datetime tiempoFinal = CBK_UtilsDate.nowSYS();
 			List<BusinessHours> businessHoursList = new List<BusinessHours>();
 
-			//RecordType CMN, Préstamo, Hipotecas y PRO Automática
+			/* ----------------------- RecordType CMN, Préstamo, Hipotecas y PRO Automática----------------------- */
 			if (oportunidad.Recordtype.DeveloperName == 'CSBD_CMN' || oportunidad.Recordtype.DeveloperName == 'CSBD_Prestamo' || oportunidad.Recordtype.DeveloperName == 'CSBD_Hipoteca'
 			|| oportunidad.Recordtype.DeveloperName == 'CSBD_PROAutomatica' || oportunidad.Recordtype.DeveloperName == 'CSBD_MAC') {
 				if(oportunidad.Recordtype.DeveloperName == 'CSBD_Hipoteca' || oportunidad.Recordtype.DeveloperName == 'CSBD_PROAutomatica'){
@@ -322,7 +261,8 @@ public with sharing class CSBD_Llamada_GC {
 															AND CC_Activa__c = TRUE limit 1];
 
 					if(!lovList.isEmpty()){
-						businessHoursList = [SELECT Id, Name FROM BusinessHours WHERE Name =:lovList[0].CC_Valor__c limit 1];
+						businessHoursList = [SELECT Id, Name FROM BusinessHours WHERE Name =:lovList[0].CC_Valor__c  
+																				AND IsActive = True limit 1];
 						tiempoOrigen = BusinessHours.nextStartDate(businessHoursList[0].id, oportunidad.CreatedDate);
 					}
 
@@ -331,7 +271,7 @@ public with sharing class CSBD_Llamada_GC {
 				}
 			}
 
-			//RecordType CMB
+			/* ----------------------- RecordType CMB -----------------------*/
 			if (oportunidad.Recordtype.DeveloperName == 'CSBD_CMB') {
 				if(String.isNotBlank(oportunidad.CSBD_Horario_Contacto__c)) {
 					String rangoFinal = Datetime.now().format('yyyy-MM-dd') + ' ' + oportunidad.CSBD_Horario_Contacto__c.substring(7) + ':00';
@@ -366,7 +306,6 @@ public with sharing class CSBD_Llamada_GC {
 		}
 		return oportunidad;
 	}
-	*/
 
 	private static void identificarPorNumPerso(CC_Llamada__c llamada, String numPerso) {
 		//Realizamos una búsqueda para informar el contacto y la cuenta
@@ -402,7 +341,7 @@ public with sharing class CSBD_Llamada_GC {
 				}
 			} else {
 				//Identificación contra BD
-				List<Contact> contactos = [SELECT AccountId FROM Contact WHERE CC_NumPerso__c = :numPerso
+				List<Contact> contactos = [SELECT AccountId FROM Contact WHERE (AV_NumPerso__c = : numPerso OR CC_NumPerso__c = :numPerso)
 											AND (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_ClientePA') LIMIT 2];
 				if (contactos.size() == 1) {
 					llamada.CC_Cuenta__c = contactos[0].AccountId;

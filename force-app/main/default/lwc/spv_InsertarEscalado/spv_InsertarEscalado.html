@@ -2,7 +2,7 @@
     <div class="slds-clearfix">
         <template if:false={existeEscalado}>
             <div class="slds-float_right">
-                <lightning-button variant="brand" label="Nuevo escalado" onclick={comprobarCamposInsertarEscalado} disabled={isEstadoEscalado}></lightning-button>
+                <lightning-button variant="brand" label="Nuevo escalado" onclick={comprobarCamposInsertarEscalado} disabled={sinPermisoInsertar}></lightning-button>
             </div>
         </template>
         <template if:true={existeEscalado}>

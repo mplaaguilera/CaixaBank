@@ -24,7 +24,7 @@ export default class csbdChatOperativas extends LightningElement {
 
 	@api recordId;
 
-	usuarioDesarrollador = usuarioDesarrollador();
+	usuarioDesarrollador = false;
 
 	idOportunidad;
 
@@ -80,6 +80,10 @@ export default class csbdChatOperativas extends LightningElement {
 		} else if (error) {
 			errorApex(this, error, 'Error recuperando los datos de la oportunidad');
 		}
+	}
+
+	async connectedCallback() {
+		this.usuarioDesarrollador = await usuarioDesarrollador();
 	}
 
 	abrirModal({currentTarget: {dataset: {modal: nombreModal}}}) {

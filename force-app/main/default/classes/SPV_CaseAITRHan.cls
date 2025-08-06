@@ -31,6 +31,8 @@ public with sharing class SPV_CaseAITRHan extends CC_TriggerHandlerBase{
             if(!lstReclamaciones.isEmpty()){
                 //Si se cambia el account o el contact
                 SPV_CaseHelper.createReclamanteRecord(lstReclamaciones, null);
+                SPV_AsignarTMEs.insertarTMOconTPE(lstReclamaciones, null);
+
             }
 
             if(!lstPretensiones.isEmpty()){

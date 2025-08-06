@@ -128,10 +128,7 @@
             if (actualOption === clasificacionesMaximo[key].value) {
                 //Se setean los atributos
                 component.set("v.clasificacionMaximoSelectValue", clasificacionesMaximo[key].value);
-                component.set("v.clasificacionMaximoSelectName", clasificacionesMaximo[key].label);
-
-                //Se setea el valor visible del desplegable
-                component.find("clasificacionmaximo").set("v.value", clasificacionesMaximo[key].value);
+                component.set("v.clasificacionMaximoSelectName", clasificacionesMaximo[key].label);                
             }
         }
     },
@@ -145,9 +142,6 @@
                 //Se setean los atributos
                 component.set("v.grupoMaximoSelectValue", gruposMaximo[key].value);
                 component.set("v.grupoMaximoSelectName", gruposMaximo[key].label);
-
-                //Se setea el valor visible del desplegable
-                component.find("grupomaximo").set("v.value", gruposMaximo[key].value);
             }
         }
     },
@@ -160,10 +154,7 @@
             if (actualOption === opcionesCallCenter[key].value) {
                 //Se setean los atributos
                 component.set("v.opcionCallCenterSelectValue", opcionesCallCenter[key].value);
-                component.set("v.opcionCallCenterSelectName", opcionesCallCenter[key].label);
-
-                //Se setea el valor visible del desplegable
-                component.find("opcioncallcenter").set("v.value", opcionesCallCenter[key].value);
+                component.set("v.opcionCallCenterSelectName", opcionesCallCenter[key].label);               
             }
         }
     },
@@ -257,13 +248,7 @@
                 consultaQuery.setCallback(this, function(response){
                     if (response.getState() === "SUCCESS") {
                        let respuesta = response.getReturnValue();
-                       if (respuesta.length === 0) {
-                        component.set('v.Message', 'No hay resultados.');
-                    } else {
-                        component.set('v.Message', 'Resultado de la búsqueda...');
-                    }
-                    component.set('v.listaBuscadorClasificacion', respuesta);
-                       console.log("respuesta" + JSON.stringify(respuesta));
+                       component.set('v.listaBuscadorClasificacion', respuesta);                      
                     }
                 })
                 //Encolar la ejecucion del metodo apex
@@ -278,14 +263,8 @@
                 consultaQuery.setParams({"cadenaBusqueda" : currentText});
                 consultaQuery.setCallback(this, function(response){
                     if (response.getState() === "SUCCESS") {
-                       let respuesta = response.getReturnValue();
-                       if (respuesta.length === 0) {
-                        component.set('v.Message', 'No hay resultados.');
-                    } else {
-                        component.set('v.Message', 'Resultado de la búsqueda...');
-                    }
-                    component.set('v.listaBuscadorGrupo', respuesta);
-                       console.log("respuesta" + JSON.stringify(respuesta));
+                        let respuesta = response.getReturnValue();               
+                        component.set('v.listaBuscadorGrupo', respuesta);                       
                     }
                 })
 

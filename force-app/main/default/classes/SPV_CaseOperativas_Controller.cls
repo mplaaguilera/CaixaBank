@@ -12,6 +12,7 @@ public with sharing class SPV_CaseOperativas_Controller {
     private static final Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SPV_Pretension').getRecordTypeId();      //Pretensión SPV
     private static final Id RECORDTYPECONSULTA = mapRTsObjects.get('Case').get('SAC_Consulta').getRecordTypeId();		//Consulta COPS
     private static final Id RECORDTYPECONSULTASAC = mapRTsObjects.get('Case').get('SAC_ConsultaSAC').getRecordTypeId();		//Consulta SAC
+    private static final Id RECORDTYPERECLAMACIONSAC = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();		//Reclamación SAC
     
     //Rec Type de Maestro Temas
     private static final Id RECTYPETIPOADJUNTOS = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_TipoAdjuntos').getRecordTypeId();
@@ -88,6 +89,7 @@ public with sharing class SPV_CaseOperativas_Controller {
         Group colaSupervisores = [SELECT Id FROM Group WHERE DeveloperName = 'SPV_PendienteAsignar' AND Type = 'Queue' LIMIT 1];
         List<CC_Grupo_Colaborador_Contact__c> colabContact= new List<CC_Grupo_Colaborador_Contact__c>();
         Boolean lanzarError = true;
+        CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
 
         if(caseSR.OwnerId == colaSupervisores.id){
 
@@ -108,6 +110,7 @@ public with sharing class SPV_CaseOperativas_Controller {
             if(Test.isRunningTest() || !colabContact.isEmpty()){
                 caseSR.OwnerId = ownerId;
                 lanzarError = false;
+                
             }
         }
         else{
@@ -134,11 +137,22 @@ public with sharing class SPV_CaseOperativas_Controller {
             }
         }
             
+        /*if(!colabContact.isEmpty()){
+            if(caseSR.recordTypeId == RECTYPEPRETENSION){
+                    List <CBK_Case_Extension__c> listCaseExt = [SELECT Id FROM CBK_Case_Extension__c WHERE Case_Id__c = :caseSR.Id LIMIT 1];
+                    if(!listCaseExt.isEmpty()){
+                        caseExtension.Id = listCaseExt[0].Id;
+                        caseExtension.SPV_LetradoPropietario__c = ownerId;
+                    }
+            }
+        }*/
 
         if(lanzarError){throw new AuraHandledException('No tienes permisos para tomar en propiedad el Caso');
         }else{
             SPV_DatabaseDML.updateDML(caseSR, true); 
-
+            /*if(caseExtension.Id != null){
+                SPV_DatabaseDML.updateDML(caseExtension, true); 
+            }*/
             //Tras el update, llamar a las integraciones ERR
             
             //SPV_RecuperarDocumentosController.recuperarTicketERR(caseId);
@@ -255,9 +269,11 @@ public with sharing class SPV_CaseOperativas_Controller {
         String comentarioNuevo;
         CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
         List<Task> newTasks = new List<Task>();
-        Case caso = [SELECT OwnerId, recordTypeId, SAC_NumDevoluciones__c, CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SPV_ComentarioDevolucionCaso__c FROM Case WHERE RecordType.DeveloperName LIKE 'SPV_%' AND id = :caseId LIMIT 1];
+        Case caso = [SELECT OwnerId, recordTypeId, SAC_NumDevoluciones__c, SAC_Reclamacion__c, CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SPV_ComentarioDevolucionCaso__c FROM Case WHERE RecordType.DeveloperName LIKE 'SPV_%' AND id = :caseId LIMIT 1];
         List<Group> cola = [SELECT Id FROM Group WHERE DeveloperName = 'SPV_PendienteAsignar' AND Type = 'Queue' LIMIT 1];
         
+        List<Case> listaFamiliaCasos = new List<Case>();
+
         if(!cola.isEmpty()){
             caso.OwnerId = cola[0].id;
             caso.SAC_NumDevoluciones__c = caso.SAC_NumDevoluciones__c == null ? 0 : caso.SAC_NumDevoluciones__c + 1;
@@ -266,12 +282,17 @@ public with sharing class SPV_CaseOperativas_Controller {
             //En caso de que ya haya comentario, se añade el nuevo en una línea aparte indicando la fecha
             if(String.isBlank(caso.CBK_Case_Extension_Id__r.SPV_ComentarioDevolucionCaso__c)){
                 //comentarioNuevo = System.now() + ' : ' + comentario;
-                comentarioNuevo = System.now().format('dd-MM-yyyy') + ' : ' + comentario;
+                comentarioNuevo = CBK_UtilsDate.nowSYS().format('dd-MM-yyyy') + ' : ' + comentario;
             }else{
                 //comentarioNuevo = System.now() + ' : ' + comentario;0
-                comentarioNuevo = caso.CBK_Case_Extension_Id__r.SPV_ComentarioDevolucionCaso__c + '\n' + System.now().format('dd-MM-yyyy') + ' : ' + comentario;
+                comentarioNuevo = caso.CBK_Case_Extension_Id__r.SPV_ComentarioDevolucionCaso__c + '\n' + CBK_UtilsDate.nowSYS().format('dd-MM-yyyy') + ' : ' + comentario;
             }
             caseExtension.SPV_ComentarioDevolucionCaso__c = comentarioNuevo;
+
+            /*if(caso.recordTypeId == RECTYPEPRETENSION){
+                caseExtension.SPV_LetradoPropietario__c = null;
+            }*/
+
             newTasks.add(new Task(
                 WhatId = caseId,
                 Subject = comentarioNuevo,
@@ -301,20 +322,20 @@ public with sharing class SPV_CaseOperativas_Controller {
 
             //Si el estado es "Envío", se devuelve al letrado y se cambia el estado a "Análisis y Decisión"
             if(caso.Status == 'SPV_Envio'){
-                caso.SEG_Grupo__c = caso.SAC_PretensionPrincipal__r.SEG_Grupo__c;   //Se asigna el grupo de la pretensión a la reclamación, para que el letrado pueda ser su owner
-                caso.OwnerId = caso.SAC_PretensionPrincipal__r.OwnerId;
+                //caso.SEG_Grupo__c = caso.SAC_PretensionPrincipal__r.SEG_Grupo__c;   //Se asigna el grupo de la pretensión a la reclamación, para que el letrado pueda ser su owner
+                //caso.OwnerId = caso.SAC_PretensionPrincipal__r.OwnerId;
                 caso.Status = 'SPV_AnalisisDecision';
                 caseExtension.SPV_MotivoDevolucionEnvio__c = motivo;
                 listaCasosActualizar.add(caso);
             }else if(caso.Status == 'SPV_EnvioComplementaria'){         //Si el estado es "Envío complementaria", se devuelve al letrado y se cambia el estado a "Análisis Complementaria Organismo"
-                caso.SEG_Grupo__c = caso.SAC_PretensionPrincipal__r.SEG_Grupo__c;  
-                caso.OwnerId = caso.SAC_PretensionPrincipal__r.OwnerId;
+                //caso.SEG_Grupo__c = caso.SAC_PretensionPrincipal__r.SEG_Grupo__c;  
+                //caso.OwnerId = caso.SAC_PretensionPrincipal__r.OwnerId;
                 caso.Status = 'SPV_AnalisisComplementariaOrganismo';
                 caseExtension.SPV_MotivoDevolucionComplementaria__c = motivo;
                 listaCasosActualizar.add(caso);
             }else if(caso.Status == 'SPV_EnvioRectificacion'){         //Si el estado es "Envío Rectificación", se devuelve al letrado y se cambia el estado a "Rectificación"
-                caso.SEG_Grupo__c = caso.SAC_PretensionPrincipal__r.SEG_Grupo__c;  
-                caso.OwnerId = caso.SAC_PretensionPrincipal__r.OwnerId;
+                //caso.SEG_Grupo__c = caso.SAC_PretensionPrincipal__r.SEG_Grupo__c;  
+                //caso.OwnerId = caso.SAC_PretensionPrincipal__r.OwnerId;
                 caso.Status = 'SPV_Rectificacion';
                 caseExtension.SPV_MotivoDevolucionRectificacion__c = motivo;
                 listaCasosActualizar.add(caso);
@@ -402,7 +423,6 @@ public with sharing class SPV_CaseOperativas_Controller {
             }else{
                 caseExtension.SPV_ObservacionesDevolucionAlta__c = '';
             }
-
         }
         if(Schema.sObjectType.Case.isUpdateable()){
             SPV_DatabaseDML.updateDML(caseSR, true); 
@@ -505,7 +525,7 @@ public with sharing class SPV_CaseOperativas_Controller {
                 }
             }
 
-            reclamacion.SAC_FechaUltimaAsignacionLetrado__c = System.now();
+            reclamacion.SAC_FechaUltimaAsignacionLetrado__c = CBK_UtilsDate.nowSYS();
             //reclamacion.SAC_MotivoReasignacion__c = motivo;
             reclamacion.SAC_GrupoLetrado__c = idGrupo;
             reclamacion.SAC_Letrado__c = 'Pte. Asignar';
@@ -514,9 +534,9 @@ public with sharing class SPV_CaseOperativas_Controller {
             
             //En caso de que ya haya comentario, se añade el nuevo en una línea aparte indicando la fecha
             if(String.isBlank(reclamacion.SAC_MotivoReasignacion__c)){
-                reclamacion.SAC_MotivoReasignacion__c = System.now().format('dd-MM-yyyy') + ' : ' + motivo;
+                reclamacion.SAC_MotivoReasignacion__c = CBK_UtilsDate.nowSYS().format('dd-MM-yyyy') + ' : ' + motivo;
             }else{
-                reclamacion.SAC_MotivoReasignacion__c = reclamacion.SAC_MotivoReasignacion__c + '\n' + System.now().format('dd-MM-yyyy') + ' : ' + motivo;
+                reclamacion.SAC_MotivoReasignacion__c = reclamacion.SAC_MotivoReasignacion__c + '\n' + CBK_UtilsDate.nowSYS().format('dd-MM-yyyy') + ' : ' + motivo;
             }
 
             
@@ -542,13 +562,13 @@ public with sharing class SPV_CaseOperativas_Controller {
 
                 if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
                     CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
-                    caseExtension.SPV_FechaComplementariaEntidad__c  = System.now();
+                    caseExtension.SPV_FechaComplementariaEntidad__c  = CBK_UtilsDate.nowSYS();
                     SPV_DatabaseDML.insertDML(caseExtension, false);
                     caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
                 }else{          //Si ya lo tiene
                     CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
                     caseExtension.Id = caso.CBK_Case_Extension_Id__c;
-                    caseExtension.SPV_FechaComplementariaEntidad__c  = System.now();
+                    caseExtension.SPV_FechaComplementariaEntidad__c  = CBK_UtilsDate.nowSYS();
                     SPV_DatabaseDML.updateDML(caseExtension, false);
                 }
             } 
@@ -558,7 +578,7 @@ public with sharing class SPV_CaseOperativas_Controller {
             SPV_Formulario__c formComplementaria = new SPV_Formulario__c();
             formComplementaria.recordTypeId = RECTYPEFORMCOMPLEMENTARIA;
             formComplementaria.SPV_TipoComplementaria__c = 'SPV_Entidad';
-            formComplementaria.SPV_FechaAperturaEntidad__c = System.now();
+            formComplementaria.SPV_FechaAperturaEntidad__c = CBK_UtilsDate.nowSYS();
             formComplementaria.SPV_Caso__c = caso.Id;
             if(Schema.sObjectType.SPV_Formulario__c.isCreateable()){  
                 SPV_DatabaseDML.insertDML(formComplementaria, true); 
@@ -591,21 +611,21 @@ public with sharing class SPV_CaseOperativas_Controller {
             Case casoActual = recuperarCaso(idCaso); 
             CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
 
-            if(casoActual.SPV_Organismo__c == 'SPV_Consumo') {
-                for (SPV_ParametrizacionesProrroga__mdt parametrizacionesComunidades : [SELECT SPV_ComunidadAutonoma__c, SPV_DiasProrroga__c FROM SPV_ParametrizacionesProrroga__mdt]) {
-                    if(parametrizacionesComunidades.SPV_ComunidadAutonoma__c == casoActual.SPV_ComunidadAutonoma__c) {
-                        //Utilizado este campo para almacenar los días de prorroga
-                        casoActual.SPV_DiasProrroga__c = parametrizacionesComunidades.SPV_DiasProrroga__c;
-                    }
-                }
-            } else {
-                casoActual.SPV_DiasProrroga__c = 11;
-            }
+            // if(casoActual.SPV_Organismo__c == 'SPV_Consumo') {
+            //     for (SPV_ParametrizacionesProrroga__mdt parametrizacionesComunidades : [SELECT SPV_ComunidadAutonoma__c, SPV_DiasProrroga__c FROM SPV_ParametrizacionesProrroga__mdt]) {
+            //         if(parametrizacionesComunidades.SPV_ComunidadAutonoma__c == casoActual.SPV_ComunidadAutonoma__c) {
+            //             //Utilizado este campo para almacenar los días de prorroga
+            //             casoActual.SPV_DiasProrroga__c = parametrizacionesComunidades.SPV_DiasProrroga__c;
+            //         }
+            //     }
+            // } else {
+            //     casoActual.SPV_DiasProrroga__c = 11;
+            // }
 
             //Indica que hay una prorroga activa
             casoActual.SAC_ProrrogaCounter__c = 1;
             casoActual.SAC_Prorrogado__c = true;
-            casoActual.SAC_FechaProrroga__c = System.now();
+            casoActual.SAC_FechaProrroga__c = CBK_UtilsDate.nowSYS();
 
             caseExtension.Id = casoActual.CBK_Case_Extension_Id__c;
             caseExtension.SPV_MotivoProrroga__c = motivo;
@@ -637,6 +657,7 @@ public with sharing class SPV_CaseOperativas_Controller {
             casoActual.SAC_Prorrogado__c = false;
             caseExtension.Id = casoActual.CBK_Case_Extension_Id__c;
             caseExtension.SPV_MotivoAnulacionProrroga__c = motivo;
+            caseExtension.SPV_FechaAnulacionProrroga__c = CBK_UtilsDate.todayDT();
             if(motivo == 'SPV_003'){
                 caseExtension.SPV_ObservacionesAnulacionProrroga__c = observaciones;
             }else{
@@ -666,7 +687,7 @@ public with sharing class SPV_CaseOperativas_Controller {
             }
             casoActual.SAC_MotivoReabrir__c = observacionesMotivoReapertura;
             // casoActual.CC_Rechazar_Reabrir_Caso__c = true;
-            casoActual.CC_Fecha_Reapertura__c = System.now();
+            casoActual.CC_Fecha_Reapertura__c = CBK_UtilsDate.nowSYS();
 
             SPV_DatabaseDML.updateDML(casoActual, true);
 
@@ -779,7 +800,7 @@ public with sharing class SPV_CaseOperativas_Controller {
     }
 
     @AuraEnabled
-    public static void activarComplementariaOrganismo(String caseId, String motivoComplementaria, String observaciones){
+    public static void activarComplementariaOrganismo(String caseId, String motivoComplementaria, String observaciones, Date fechaVencimientoPlazoRegOrganismo){
 
         if (Schema.sObjectType.Case.isAccessible()) {
             Case casoActual = recuperarCaso(caseId);   
@@ -790,10 +811,13 @@ public with sharing class SPV_CaseOperativas_Controller {
             casoActual.SPV_MotivoComplementariaOrganismo__c = motivoComplementaria;
             //Añadido: Al activar la complementaria organismo, se rellena la fecha en su campo correspondiente
             //casoActual.SPV_FechaComplementariaOrganismo__c = System.now();
-
+            
             if(casoActual.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
                 CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
-                caseExtension.SPV_FechaComplementariaOrganismo__c  = System.now();
+                caseExtension.SPV_FechaComplementariaOrganismo__c  = CBK_UtilsDate.nowSYS();
+                if(fechaVencimientoPlazoRegOrganismo != null){
+                    caseExtension.SPV_FechaVencimientoPlazoRegOrganismo__c  = fechaVencimientoPlazoRegOrganismo;
+                }
                 if(motivoComplementaria == 'SPV_Otros'){
                     caseExtension.SPV_ObservacionesComplementariaOrganismo__c = observaciones;
                 }else{
@@ -804,7 +828,11 @@ public with sharing class SPV_CaseOperativas_Controller {
             }else{          //Si ya lo tiene
                 CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
                 caseExtension.Id = casoActual.CBK_Case_Extension_Id__c;
-                caseExtension.SPV_FechaComplementariaOrganismo__c  = System.now();
+                caseExtension.SPV_FechaComplementariaOrganismo__c  = CBK_UtilsDate.nowSYS();
+                if(fechaVencimientoPlazoRegOrganismo != null){
+                    caseExtension.SPV_FechaVencimientoPlazoRegOrganismo__c  = fechaVencimientoPlazoRegOrganismo;
+                }
+
                 if(motivoComplementaria == 'SPV_Otros'){
                     caseExtension.SPV_ObservacionesComplementariaOrganismo__c = observaciones;
                 }else{
@@ -819,7 +847,7 @@ public with sharing class SPV_CaseOperativas_Controller {
             SPV_Formulario__c formComplementaria = new SPV_Formulario__c();
             formComplementaria.recordTypeId = RECTYPEFORMCOMPLEMENTARIA;
             formComplementaria.SPV_TipoComplementaria__c = 'SPV_Organismo';
-            formComplementaria.SPV_FechaAperturaOrganismo__c = System.now();
+            formComplementaria.SPV_FechaAperturaOrganismo__c = CBK_UtilsDate.nowSYS();
             formComplementaria.SPV_Caso__c = casoActual.Id;
             if(Schema.sObjectType.SPV_Formulario__c.isCreateable()){  
                 SPV_DatabaseDML.insertDML(formComplementaria, true); 
@@ -950,7 +978,7 @@ public with sharing class SPV_CaseOperativas_Controller {
             formNegociacion.recordTypeId = RECTYPEFORMNEGOCIACION;
             formNegociacion.SPV_EstadoNegociacion__c = caseSR.Status;
             formNegociacion.SPV_NegociacionEnCurso__c = true;
-            formNegociacion.SPV_FechaInicioNegociacion__c = System.now();
+            formNegociacion.SPV_FechaInicioNegociacion__c = CBK_UtilsDate.nowSYS();
             formNegociacion.SPV_Caso__c = caseSR.Id;
             if(Schema.sObjectType.SPV_Formulario__c.isCreateable()){  
                 SPV_DatabaseDML.insertDML(formNegociacion, true); 
@@ -960,6 +988,21 @@ public with sharing class SPV_CaseOperativas_Controller {
         }
     }
 
+
+    @AuraEnabled
+    public static Boolean comprobarSLAPlazoRegCompOrgCompletado(Id casoId){
+        try {
+            //Solo cogerá el SLA si SÍ está completo
+            List<CaseMilestone> listaSLA = [SELECT caseid, startdate, IsCompleted, CompletionDate, MilestoneType.Name FROM CaseMilestone WHERE caseId = :casoId AND MilestoneType.Name = 'SLA Plazo Regulatorio Complementaria Organismo' AND CompletionDate != null];
+            if(!listaSLA.isEmpty()){
+                return true;        //Tiene el SLA completo
+            }else{
+                return false;       //No tiene el SLA completo
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
 
     /***************************************************************** 
      * Proposito: Recuperar las pretensiones del caso 
@@ -1015,7 +1058,7 @@ public with sharing class SPV_CaseOperativas_Controller {
                         formNegociacion.SPV_MotivoRechazoNegociacion__c = 'SPV_SolicitaVerificarPrimero';
                     }
                 }
-                formNegociacion.SPV_FechaFinNegociacion__c = System.now();
+                formNegociacion.SPV_FechaFinNegociacion__c = CBK_UtilsDate.nowSYS();
 
                 // Recorrer las pretensiones negociadas y recoger la información en el campo SPV_ResumenNegociacion__c
                 for (Case pretension : listaPretensiones) {
@@ -1099,67 +1142,316 @@ public with sharing class SPV_CaseOperativas_Controller {
         return camposSinRellenar;
     }
 
-
+    /*****************************************************************
+    * Proposito: Comprobar los campos obligatorios antes de permitir pasar de 
+    * Análisis y Decisión a Envío
+    * 
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0             US1208220      Álex Polo     14/04/25        Creación
+    *****************************************************************/
     @AuraEnabled
     public static String comprobarCamposPasarEnvio(Id caseId){
         String camposSinRellenar = '';
+        Integer numCampo = 1;
         Map<String, String> camposAniadidos = new Map<String, String>();    //Mapa para no añadir en la lista de campos pendientes 2 veces el mismo campo
+        String pretensionesAllanamiento = '';
+        String pretensionesDesistimiento = '';
+        String pretensionesNecesitanImporteAllanamiento = '';
+        String pretensionesNecesitanImporteDesistimiento = '';
 
-        List<Case> listaPretensiones = [SELECT Id, Status, SAC_Reclamacion__c, SAC_ResumenManual__c, CC_Importe_Reclamado__c, CBK_Case_Extension_Id__r.SPV_ValidacionResumen__c,
-                                         CBK_Case_Extension_Id__r.SPV_ResumenResolucionSAC__c, CBK_Case_Extension_Id__r.SPV_EmisionSAC__c, CBK_Case_Extension_Id__r.SPV_ResolucionRemitidaEnPlazo__c,
-                                         CBK_Case_Extension_Id__r.SPV_CongruenciaRespuestaSAC__c, CBK_Case_Extension_Id__r.SPV_CalidadRespuesta__c, CBK_Case_Extension_Id__r.SPV_ReclamacionMalFuncionamiento__c,
-                                         CBK_Case_Extension_Id__r.SPV_ActuacionCumpleBdE__c, CBK_Case_Extension_Id__r.SPV_DisponeDocumentacion__c, CBK_Case_Extension_Id__r.SPV_DocumentacionNecesaria__c
-                                        FROM Case WHERE RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c =: caseId AND Status <> 'SAC_009'];
-        for(Case pretension : listaPretensiones){
-            if((pretension.CBK_Case_Extension_Id__r.SPV_ValidacionResumen__c == null || pretension.CBK_Case_Extension_Id__r.SPV_ValidacionResumen__c == false) && !camposAniadidos.containsKey('SPV_ValidacionResumen__c')){
-                camposSinRellenar = camposSinRellenar + 'Validación Resumen ' + '\r\n';
-                camposAniadidos.put('SPV_ValidacionResumen__c', 'Añadido');
-            }
-            if(pretension.CC_Importe_Reclamado__c == null && !camposAniadidos.containsKey('CC_Importe_Reclamado__c')){
-                camposSinRellenar = camposSinRellenar + 'Importe Reclamado ' + '\r\n';
-                camposAniadidos.put('CC_Importe_Reclamado__c', 'Añadido');
-            }
-            if((pretension.CBK_Case_Extension_Id__r.SPV_ResumenResolucionSAC__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ResumenResolucionSAC__c)) && !camposAniadidos.containsKey('SPV_ResumenResolucionSAC__c')){
-                camposSinRellenar = camposSinRellenar + 'Resumen resolución SAC (argumentos) ' + '\r\n';
-                camposAniadidos.put('SPV_ResumenResolucionSAC__c', 'Añadido');
-            }
-            if((pretension.CBK_Case_Extension_Id__r.SPV_EmisionSAC__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_EmisionSAC__c)) && !camposAniadidos.containsKey('SPV_EmisionSAC__c')){
-                camposSinRellenar = camposSinRellenar + 'Emisión de respuesta del SAC ' + '\r\n';
-                camposAniadidos.put('SPV_EmisionSAC__c', 'Añadido');
-            }
-            if((pretension.CBK_Case_Extension_Id__r.SPV_ResolucionRemitidaEnPlazo__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ResolucionRemitidaEnPlazo__c)) && !camposAniadidos.containsKey('SPV_ResolucionRemitidaEnPlazo__c')){
-                camposSinRellenar = camposSinRellenar + 'Resolución remitida en plazo ' + '\r\n';
-                camposAniadidos.put('SPV_ResolucionRemitidaEnPlazo__c', 'Añadido');
-            }
-            if((pretension.CBK_Case_Extension_Id__r.SPV_CongruenciaRespuestaSAC__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_CongruenciaRespuestaSAC__c)) && !camposAniadidos.containsKey('SPV_CongruenciaRespuestaSAC__c')){
-                camposSinRellenar = camposSinRellenar + 'Congruencia de la respuesta del SAC ' + '\r\n';
-                camposAniadidos.put('SPV_CongruenciaRespuestaSAC__c', 'Añadido');
-            }
-            if((pretension.CBK_Case_Extension_Id__r.SPV_CalidadRespuesta__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_CalidadRespuesta__c)) && !camposAniadidos.containsKey('SPV_CalidadRespuesta__c')){
-                camposSinRellenar = camposSinRellenar + 'Calidad de la respuesta ' + '\r\n';
-                camposAniadidos.put('SPV_CalidadRespuesta__c', 'Añadido');
-            }
-            if((pretension.CBK_Case_Extension_Id__r.SPV_ReclamacionMalFuncionamiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ReclamacionMalFuncionamiento__c)) && !camposAniadidos.containsKey('SPV_ReclamacionMalFuncionamiento__c')){
-                camposSinRellenar = camposSinRellenar + 'Reclamación D.E.C mal funcionamiento ' + '\r\n';
-                camposAniadidos.put('SPV_ReclamacionMalFuncionamiento__c', 'Añadido');
-            }
-            if((pretension.CBK_Case_Extension_Id__r.SPV_ActuacionCumpleBdE__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ActuacionCumpleBdE__c)) && !camposAniadidos.containsKey('SPV_ActuacionCumpleBdE__c')){
-                camposSinRellenar = camposSinRellenar + 'La actuación SAC cumple criterios BdE ' + '\r\n';
-                camposAniadidos.put('SPV_ActuacionCumpleBdE__c', 'Añadido');
-            }
-            if((pretension.CBK_Case_Extension_Id__r.SPV_DisponeDocumentacion__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_DisponeDocumentacion__c)) && !camposAniadidos.containsKey('SPV_DisponeDocumentacion__c')){
-                camposSinRellenar = camposSinRellenar + 'Dispone de documentación ' + '\r\n';
-                camposAniadidos.put('SPV_DisponeDocumentacion__c', 'Añadido');
-            }
-            //Documentación Necesaria Solo obligatorio si el campo Dispone Documentación es NO:
-            if((pretension.CBK_Case_Extension_Id__r.SPV_DocumentacionNecesaria__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_DocumentacionNecesaria__c)) && pretension.CBK_Case_Extension_Id__r.SPV_DisponeDocumentacion__c == 'No' && !camposAniadidos.containsKey('SPV_DocumentacionNecesaria__c')){
-                camposSinRellenar = camposSinRellenar + 'Documentación Necesaria ' + '\r\n';
-                camposAniadidos.put('SPV_DocumentacionNecesaria__c', 'Añadido');
-            }
+        Boolean tieneByPass = SPV_Utils.comprobarTieneBypass();    //Para probar, si nuestro usuario tiene el customPermission byPass, no nos saltarán las validaciones
+
+        if(tieneByPass == false){
+            List<Case> listaPretensiones = [SELECT Id, Status, CaseNumber, SAC_Reclamacion__c, SAC_ResumenManual__c, CC_Importe_Reclamado__c, CBK_Case_Extension_Id__r.SPV_ValidacionResumen__c,
+                                    CBK_Case_Extension_Id__r.SPV_ResumenResolucionSAC__c, CBK_Case_Extension_Id__r.SPV_EmisionSAC__c, CBK_Case_Extension_Id__r.SPV_ResolucionRemitidaEnPlazo__c,
+                                    CBK_Case_Extension_Id__r.SPV_CongruenciaRespuestaSAC__c, CBK_Case_Extension_Id__r.SPV_CalidadRespuesta__c, CBK_Case_Extension_Id__r.SPV_ReclamacionMalFuncionamiento__c,
+                                    CBK_Case_Extension_Id__r.SPV_ActuacionCumpleBdE__c, CBK_Case_Extension_Id__r.SPV_DisponeDocumentacion__c, CBK_Case_Extension_Id__r.SPV_DocumentacionNecesaria__c, CBK_Case_Extension_Id__r.SPV_InformacionPrecontractual__c,
+                                    CBK_Case_Extension_Id__r.SPV_ComunicacionesCambiosCondiciones__c, CBK_Case_Extension_Id__r.SPV_ComunicacionesLEC__c, CBK_Case_Extension_Id__r.SPV_JustificantesOperaciones__c,
+                                    CBK_Case_Extension_Id__r.SPV_ComunicacionesOficinaCliente__c, CBK_Case_Extension_Id__r.SPV_AntecedentesCumplimientoResol__c, CBK_Case_Extension_Id__r.SPV_CumplimientoCondicionesPactadas__c,
+                                    CBK_Case_Extension_Id__r.SPV_InformeOficina__c, CBK_Case_Extension_Id__r.SPV_MencionarCriterioBdE__c, CBK_Case_Extension_Id__r.SPV_DecisionPretensionLetrado__c,
+                                CBK_Case_Extension_Id__r.SPV_Documentacion__c, CBK_Case_Extension_Id__r.SPV_TipoAllanamiento__c, CBK_Case_Extension_Id__r.SPV_MotivoAllanamiento__c, CBK_Case_Extension_Id__r.SPV_AnalisisAllanamiento__c,
+                                CBK_Case_Extension_Id__r.SPV_TipoActuacionAllanamiento__c, CBK_Case_Extension_Id__r.SPV_ImporteAllanamientoPropuesto__c, CBK_Case_Extension_Id__r.SPV_ImputableAllanamiento__c,
+                                CBK_Case_Extension_Id__r.SPV_InstruccionesEjecucionAllanamiento__c, CBK_Case_Extension_Id__r.SPV_AcreditacionEjecucionAllanamiento__c, CBK_Case_Extension_Id__r.SPV_NCuentaAbonoAllanamiento__c,
+                                CBK_Case_Extension_Id__r.SPV_MotivoDesistimiento__c, CBK_Case_Extension_Id__r.SPV_AnalisisDesistimiento__c, CBK_Case_Extension_Id__r.SPV_TipoActuacionDesistimiento__c,
+                                CBK_Case_Extension_Id__r.SPV_ImporteDesistimientoPropuesto__c, CBK_Case_Extension_Id__r.SPV_ImputableDesistimiento__c, CBK_Case_Extension_Id__r.SPV_InstruccionesEjecucionDesistimiento__c,
+                                CBK_Case_Extension_Id__r.SPV_AcreditacionEjecucionDesistimiento__c, CBK_Case_Extension_Id__r.SPV_NCuentaAbonoDesistimiento__c, SAC_CheckResumen__c
 
 
-        }
+                                FROM Case WHERE RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c =: caseId AND Status <> 'SAC_009'];
+
+            //Almacenar qué pretensiones son de Allanamiento o Desistimiento
+            for(Case pret : listaPretensiones){
+                if(pret.CBK_Case_Extension_Id__r.SPV_DecisionPretensionLetrado__c == 'Allanamiento'){
+                    if(String.isBlank(pretensionesAllanamiento)){
+                        pretensionesAllanamiento = pretensionesAllanamiento + ' ' + pret.CaseNumber;
+                    }else{
+                        pretensionesAllanamiento = pretensionesAllanamiento + ', ' + pret.CaseNumber;
+                    }
+                }else if(pret.CBK_Case_Extension_Id__r.SPV_DecisionPretensionLetrado__c == 'Desistimiento'){
+                    if(String.isBlank(pretensionesDesistimiento)){
+                        pretensionesDesistimiento = pretensionesDesistimiento + ' ' + pret.CaseNumber;
+                    }else{
+                        pretensionesDesistimiento = pretensionesDesistimiento + ', ' + pret.CaseNumber;
+                    }
+                }
+            }
+
+            for(Case pretension : listaPretensiones){
+                if((pretension.SAC_CheckResumen__c == null || pretension.SAC_CheckResumen__c == false) && !camposAniadidos.containsKey('SAC_CheckResumen__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Validación Resumen ' + '\r\n';
+                    camposAniadidos.put('SAC_CheckResumen__c', 'Añadido');
+                    numCampo++;
+                }
+                if(pretension.CC_Importe_Reclamado__c == null && !camposAniadidos.containsKey('CC_Importe_Reclamado__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Importe Reclamado ' + '\r\n';
+                    camposAniadidos.put('CC_Importe_Reclamado__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_ResumenResolucionSAC__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ResumenResolucionSAC__c)) && !camposAniadidos.containsKey('SPV_ResumenResolucionSAC__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Resumen resolución SAC (argumentos) ' + '\r\n';
+                    camposAniadidos.put('SPV_ResumenResolucionSAC__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_EmisionSAC__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_EmisionSAC__c)) && !camposAniadidos.containsKey('SPV_EmisionSAC__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Emisión de respuesta del SAC ' + '\r\n';
+                    camposAniadidos.put('SPV_EmisionSAC__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_ResolucionRemitidaEnPlazo__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ResolucionRemitidaEnPlazo__c)) && !camposAniadidos.containsKey('SPV_ResolucionRemitidaEnPlazo__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Resolución remitida en plazo ' + '\r\n';
+                    camposAniadidos.put('SPV_ResolucionRemitidaEnPlazo__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_CongruenciaRespuestaSAC__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_CongruenciaRespuestaSAC__c)) && !camposAniadidos.containsKey('SPV_CongruenciaRespuestaSAC__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Congruencia de la respuesta del SAC ' + '\r\n';
+                    camposAniadidos.put('SPV_CongruenciaRespuestaSAC__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_CalidadRespuesta__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_CalidadRespuesta__c)) && !camposAniadidos.containsKey('SPV_CalidadRespuesta__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Calidad de la respuesta ' + '\r\n';
+                    camposAniadidos.put('SPV_CalidadRespuesta__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_ReclamacionMalFuncionamiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ReclamacionMalFuncionamiento__c)) && !camposAniadidos.containsKey('SPV_ReclamacionMalFuncionamiento__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Reclamación D.E.C mal funcionamiento ' + '\r\n';
+                    camposAniadidos.put('SPV_ReclamacionMalFuncionamiento__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_ActuacionCumpleBdE__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ActuacionCumpleBdE__c)) && !camposAniadidos.containsKey('SPV_ActuacionCumpleBdE__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- La actuación SAC cumple criterios BdE ' + '\r\n';
+                    camposAniadidos.put('SPV_ActuacionCumpleBdE__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_DisponeDocumentacion__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_DisponeDocumentacion__c)) && !camposAniadidos.containsKey('SPV_DisponeDocumentacion__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Dispone de documentación ' + '\r\n';
+                    camposAniadidos.put('SPV_DisponeDocumentacion__c', 'Añadido');
+                    numCampo++;
+                }
+                //Documentación Necesaria Solo obligatorio si el campo Dispone Documentación es NO:
+                if((pretension.CBK_Case_Extension_Id__r.SPV_DocumentacionNecesaria__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_DocumentacionNecesaria__c)) && pretension.CBK_Case_Extension_Id__r.SPV_DisponeDocumentacion__c == 'No' && !camposAniadidos.containsKey('SPV_DocumentacionNecesaria__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Documentación Necesaria (Si el campo Dispone de documentación en la pretensión es "NO") ' + '\r\n';
+                    camposAniadidos.put('SPV_DocumentacionNecesaria__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_InformacionPrecontractual__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_InformacionPrecontractual__c)) && !camposAniadidos.containsKey('SPV_InformacionPrecontractual__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Información precontractual ' + '\r\n';
+                    camposAniadidos.put('SPV_InformacionPrecontractual__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_ComunicacionesCambiosCondiciones__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ComunicacionesCambiosCondiciones__c)) && !camposAniadidos.containsKey('SPV_ComunicacionesCambiosCondiciones__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Comunicaciones cambios de condiciones ' + '\r\n';
+                    camposAniadidos.put('SPV_ComunicacionesCambiosCondiciones__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_ComunicacionesLEC__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ComunicacionesLEC__c)) && !camposAniadidos.containsKey('SPV_ComunicacionesLEC__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Comunicaciones con liquidaciones, extractos, recibos ' + '\r\n';
+                    camposAniadidos.put('SPV_ComunicacionesLEC__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_JustificantesOperaciones__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_JustificantesOperaciones__c)) && !camposAniadidos.containsKey('SPV_JustificantesOperaciones__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Justificantes de operaciones ' + '\r\n';
+                    camposAniadidos.put('SPV_JustificantesOperaciones__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_ComunicacionesOficinaCliente__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ComunicacionesOficinaCliente__c)) && !camposAniadidos.containsKey('SPV_ComunicacionesOficinaCliente__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Comunicaciones entre oficina y cliente ' + '\r\n';
+                    camposAniadidos.put('SPV_ComunicacionesOficinaCliente__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_AntecedentesCumplimientoResol__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_AntecedentesCumplimientoResol__c)) && !camposAniadidos.containsKey('SPV_AntecedentesCumplimientoResol__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Antecedentes y cumplimiento de resoluciones ' + '\r\n';
+                    camposAniadidos.put('SPV_AntecedentesCumplimientoResol__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_CumplimientoCondicionesPactadas__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_CumplimientoCondicionesPactadas__c)) && !camposAniadidos.containsKey('SPV_CumplimientoCondicionesPactadas__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Cumplimiento condiciones pactadas ' + '\r\n';
+                    camposAniadidos.put('SPV_CumplimientoCondicionesPactadas__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_InformeOficina__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_InformeOficina__c)) && !camposAniadidos.containsKey('SPV_InformeOficina__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Informe de la oficina ' + '\r\n';
+                    camposAniadidos.put('SPV_InformeOficina__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_MencionarCriterioBdE__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_MencionarCriterioBdE__c)) && !camposAniadidos.containsKey('SPV_MencionarCriterioBdE__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Mencionar el criterio BdE ' + '\r\n';
+                    camposAniadidos.put('SPV_MencionarCriterioBdE__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_DecisionPretensionLetrado__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_DecisionPretensionLetrado__c)) && !camposAniadidos.containsKey('SPV_DecisionPretensionLetrado__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Decisión de pretensión Análisis Letrado ' + '\r\n';
+                    camposAniadidos.put('SPV_DecisionPretensionLetrado__c', 'Añadido');
+                    numCampo++;
+                }
+                if((pretension.CBK_Case_Extension_Id__r.SPV_Documentacion__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_Documentacion__c)) && !camposAniadidos.containsKey('SPV_Documentacion__c')){
+                    camposSinRellenar = camposSinRellenar + numCampo + '- Documentación ' + '\r\n';
+                    camposAniadidos.put('SPV_Documentacion__c', 'Añadido');
+                    numCampo++;
+                }
+            }
+
+            if(!String.isBlank(camposSinRellenar)){
+                camposSinRellenar = 'Para pasar a Envío, se deben informar los siguientes campos en todas las pretensiones que sea necesario: ' + '\r\n' + camposSinRellenar;
+            }
+
+            //Se añade en otro bucle for porque se necesita que se compruebe después de haber comprobado lo anterior para cada pretensión
+            for(Case pretension : listaPretensiones){
+                //Obligatorios solo si Decisión de pretensión letrado = Allanamiento
+                if(pretension.CBK_Case_Extension_Id__r.SPV_DecisionPretensionLetrado__c == 'Allanamiento'){
+
+                    if(!camposAniadidos.containsKey('MensajeAllanamiento') && (String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_TipoAllanamiento__c) || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_MotivoAllanamiento__c) || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_AnalisisAllanamiento__c) || 
+                    String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionAllanamiento__c) || (pretension.CBK_Case_Extension_Id__r.SPV_ImporteAllanamientoPropuesto__c == null && (pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionAllanamiento__c == 'SPV_Pago' || pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionAllanamiento__c == 'SPV_PagoTarea')) || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ImputableAllanamiento__c) ||
+                    String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_InstruccionesEjecucionAllanamiento__c) || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_AcreditacionEjecucionAllanamiento__c) || pretension.CBK_Case_Extension_Id__r.SPV_NCuentaAbonoAllanamiento__c == null)){
+                        camposAniadidos.put('MensajeAllanamiento', 'Añadido');
+                        camposSinRellenar = camposSinRellenar + '\r\n' + 'Para las pretensiones: ' + pretensionesAllanamiento +  ', es necesario informar los siguientes campos de allanamiento: ' + '\r\n';
+                    }
+
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_TipoAllanamiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_TipoAllanamiento__c)) && !camposAniadidos.containsKey('SPV_TipoAllanamiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Tipo Allanamiento ' + '\r\n';
+                        camposAniadidos.put('SPV_TipoAllanamiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_MotivoAllanamiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_MotivoAllanamiento__c)) && !camposAniadidos.containsKey('SPV_MotivoAllanamiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Motivo de Allanamiento ' + '\r\n';
+                        camposAniadidos.put('SPV_MotivoAllanamiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_AnalisisAllanamiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_AnalisisAllanamiento__c)) && !camposAniadidos.containsKey('SPV_AnalisisAllanamiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Análisis Allanamiento ' + '\r\n';
+                        camposAniadidos.put('SPV_AnalisisAllanamiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionAllanamiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionAllanamiento__c)) && !camposAniadidos.containsKey('SPV_TipoActuacionAllanamiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Tipo actuación ' + '\r\n';
+                        camposAniadidos.put('SPV_TipoActuacionAllanamiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    //Obligatorio si tipo actuación = Pago || Pago + Tarea
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_ImporteAllanamientoPropuesto__c == null) && (pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionAllanamiento__c == 'SPV_Pago' || pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionAllanamiento__c == 'SPV_PagoTarea') /*&& !camposAniadidos.containsKey('SPV_ImporteAllanamientoPropuesto__c')*/){
+                        //camposSinRellenar = camposSinRellenar + numCampo + '- Importe Allanamiento Propuesto ' + '\r\n';
+                        //camposAniadidos.put('SPV_ImporteAllanamientoPropuesto__c', 'Añadido');
+                        //numCampo++;
+                        if(String.isBlank(pretensionesNecesitanImporteAllanamiento)){
+                            pretensionesNecesitanImporteAllanamiento = pretensionesNecesitanImporteAllanamiento + ' ' + pretension.CaseNumber;
+                        }else{
+                            pretensionesNecesitanImporteAllanamiento = pretensionesNecesitanImporteAllanamiento + ', ' + pretension.CaseNumber;
+                        }
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_ImputableAllanamiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ImputableAllanamiento__c)) && !camposAniadidos.containsKey('SPV_ImputableAllanamiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Imputable Allanamiento ' + '\r\n';
+                        camposAniadidos.put('SPV_ImputableAllanamiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_InstruccionesEjecucionAllanamiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_InstruccionesEjecucionAllanamiento__c)) && !camposAniadidos.containsKey('SPV_InstruccionesEjecucionAllanamiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Instrucciones de ejecución ' + '\r\n';
+                        camposAniadidos.put('SPV_InstruccionesEjecucionAllanamiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_AcreditacionEjecucionAllanamiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_AcreditacionEjecucionAllanamiento__c)) && !camposAniadidos.containsKey('SPV_AcreditacionEjecucionAllanamiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Acreditación de la ejecución ' + '\r\n';
+                        camposAniadidos.put('SPV_AcreditacionEjecucionAllanamiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_NCuentaAbonoAllanamiento__c == null) && !camposAniadidos.containsKey('SPV_NCuentaAbonoAllanamiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Nº Cuenta abono allanamiento ' + '\r\n';
+                        camposAniadidos.put('SPV_NCuentaAbonoAllanamiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                }
+            }
+
+            if(!String.isBlank(pretensionesNecesitanImporteAllanamiento)){
+                camposSinRellenar = camposSinRellenar + numCampo + '- Se debe informar el Importe Allanamiento propuesto en las pretensiones: ' + pretensionesNecesitanImporteAllanamiento + '\r\n';
+                numCampo++;
+            }
         
+            for(Case pretension : listaPretensiones){
+                //Obligatorios solo si Decisión de pretensión letrado = Desistimiento
+                if(pretension.CBK_Case_Extension_Id__r.SPV_DecisionPretensionLetrado__c == 'Desistimiento'){
+
+                    if(!camposAniadidos.containsKey('MensajeDesistimiento') && (String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_MotivoDesistimiento__c) || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_AnalisisDesistimiento__c) || 
+                    String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionDesistimiento__c) || (pretension.CBK_Case_Extension_Id__r.SPV_ImporteDesistimientoPropuesto__c == null && (pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionDesistimiento__c == 'SPV_Pago' || pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionDesistimiento__c == 'SPV_PagoTarea')) || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ImputableDesistimiento__c) ||
+                    String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_InstruccionesEjecucionDesistimiento__c) || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_AcreditacionEjecucionDesistimiento__c) || pretension.CBK_Case_Extension_Id__r.SPV_NCuentaAbonoDesistimiento__c == null)){
+                        camposAniadidos.put('MensajeDesistimiento', 'Añadido');
+                        camposSinRellenar = camposSinRellenar + '\r\n' + 'Para las pretensiones: ' + pretensionesDesistimiento +  ', es necesario informar los siguientes campos de desistimiento: ' + '\r\n';
+                    }
+
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_MotivoDesistimiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_MotivoDesistimiento__c)) && !camposAniadidos.containsKey('SPV_MotivoDesistimiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Motivo de Desistimiento ' + '\r\n';
+                        camposAniadidos.put('SPV_MotivoDesistimiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_AnalisisDesistimiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_AnalisisDesistimiento__c)) && !camposAniadidos.containsKey('SPV_AnalisisDesistimiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Análisis Desistimiento ' + '\r\n';
+                        camposAniadidos.put('SPV_AnalisisDesistimiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionDesistimiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionDesistimiento__c)) && !camposAniadidos.containsKey('SPV_TipoActuacionDesistimiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Tipo actuación desistimiento ' + '\r\n';
+                        camposAniadidos.put('SPV_TipoActuacionDesistimiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    //Obligatorio si tipo actuación = Pago || Pago + Tarea
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_ImporteDesistimientoPropuesto__c == null) && (pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionDesistimiento__c == 'SPV_Pago' || pretension.CBK_Case_Extension_Id__r.SPV_TipoActuacionDesistimiento__c == 'SPV_PagoTarea') && !camposAniadidos.containsKey('SPV_ImporteDesistimientoPropuesto__c')){
+                        /*camposSinRellenar = camposSinRellenar + numCampo + '- Importe desistimiento propuesto ' + '\r\n';
+                        camposAniadidos.put('SPV_ImporteDesistimientoPropuesto__c', 'Añadido');
+                        numCampo++;*/
+                        if(String.isBlank(pretensionesNecesitanImporteDesistimiento)){
+                            pretensionesNecesitanImporteDesistimiento = pretensionesNecesitanImporteDesistimiento + ' ' + pretension.CaseNumber;
+                        }else{
+                            pretensionesNecesitanImporteDesistimiento = pretensionesNecesitanImporteDesistimiento + ', ' + pretension.CaseNumber;
+                        }
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_ImputableDesistimiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_ImputableDesistimiento__c)) && !camposAniadidos.containsKey('SPV_ImputableDesistimiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Imputable desistimiento ' + '\r\n';
+                        camposAniadidos.put('SPV_ImputableDesistimiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_InstruccionesEjecucionDesistimiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_InstruccionesEjecucionDesistimiento__c)) && !camposAniadidos.containsKey('SPV_InstruccionesEjecucionDesistimiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Instrucciones de ejecución desistimiento ' + '\r\n';
+                        camposAniadidos.put('SPV_InstruccionesEjecucionDesistimiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_AcreditacionEjecucionDesistimiento__c == '' || String.isBlank(pretension.CBK_Case_Extension_Id__r.SPV_AcreditacionEjecucionDesistimiento__c)) && !camposAniadidos.containsKey('SPV_AcreditacionEjecucionDesistimiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Acreditación de ejecución desistimiento ' + '\r\n';
+                        camposAniadidos.put('SPV_AcreditacionEjecucionDesistimiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                    if((pretension.CBK_Case_Extension_Id__r.SPV_NCuentaAbonoDesistimiento__c == null) && !camposAniadidos.containsKey('SPV_NCuentaAbonoDesistimiento__c')){
+                        camposSinRellenar = camposSinRellenar + numCampo + '- Nº Cuenta abono desistimiento ' + '\r\n';
+                        camposAniadidos.put('SPV_NCuentaAbonoDesistimiento__c', 'Añadido');
+                        numCampo++;
+                    }
+                }
+            }
+
+            if(!String.isBlank(pretensionesNecesitanImporteDesistimiento)){
+                camposSinRellenar = camposSinRellenar + numCampo + '- Se debe informar el Importe Desistimiento Propuesto en las pretensiones: ' + pretensionesNecesitanImporteDesistimiento + '\r\n';
+                numCampo++;
+            }
+        }
 
         return camposSinRellenar;
     }
@@ -1209,14 +1501,19 @@ public with sharing class SPV_CaseOperativas_Controller {
         Case caso = recuperarCaso(caseId);
         List<Case> listaCasosUpdatear = new List<Case>();
         
-        if(naturaleza == 'Consulta') {
-            caso.SAC_Naturaleza__c = 'SAC_005';
+        if(naturaleza == 'ConsultaSPV') {
+            //caso.SAC_Naturaleza__c = 'SAC_005';
             caso.SAC_Letrado__c = 'Pte. Asignar';
-            caso.RecordTypeId = RECORDTYPECONSULTASAC;
+            caso.RecordTypeId = RECORDTYPECONSULTASAC; //crear RT consulta SPV?
+        }else if(naturaleza == 'ReclamacionSAC'){
+            caso.SAC_Naturaleza__c = 'SAC_004';
+            caso.recordTypeId = RECORDTYPERECLAMACIONSAC;
+            caso.Status = 'SAC_001';
+            caso.SAC_StatusAuxiliar__c = 'SAC_001';
         }else if(naturaleza == 'ConsultaCOPS') {
             caso.Status = 'Descartado';
             caso.SAC_StatusAuxiliar__c = caso.Status;
-            caso.SAC_MotivoRechazo__c = 'Rechazada por conversión';
+            caso.SAC_MotivoDescarte__c  = 'SPV_AltaErronea';
             if(caso.recordTypeId == RECTYPERECLAMACION && caso.SAC_NPretensionesActivas__c != 0) {
                 List<Case> listaPretCasos = [SELECT id, recordTypeId, Status 
                                     FROM  Case 
@@ -1230,8 +1527,8 @@ public with sharing class SPV_CaseOperativas_Controller {
                 }
             }
             
-            List<Group> cola = [SELECT Id FROM Group WHERE DeveloperName = 'SAC_PendienteAsignar' AND Type = 'Queue' LIMIT 1];
-            CC_Grupo_Colaborador__c grupoDXC =[SELECT Id FROM CC_Grupo_Colaborador__c WHERE SAC_DeveloperName__c ='DXC Zaragoza' LIMIT 1];
+            List<Group> cola = [SELECT Id FROM Group WHERE DeveloperName = 'SPV_PendienteAsignar' AND Type = 'Queue' LIMIT 1];
+            //CC_Grupo_Colaborador__c grupoDXC =[SELECT Id FROM CC_Grupo_Colaborador__c WHERE SAC_DeveloperName__c ='DXC Zaragoza' LIMIT 1];
             
             // Creación de la nueva consulta COPS convertida
             Case consultaCOPS = new Case (
@@ -1244,7 +1541,7 @@ public with sharing class SPV_CaseOperativas_Controller {
                 Origin = caso.Origin,
                 SAC_Naturaleza__c = 'SAC_005',
                 CC_Idioma__c = caso.CC_Idioma__c,
-                SEG_Grupo__c = grupoDXC.id,
+                //SEG_Grupo__c = grupoDXC.id,
                 SuppliedEmail = caso.SuppliedEmail,
                 CC_CasoRelacionado__c = caso.id,
                 OwnerId = cola[0].id,

@@ -620,11 +620,13 @@ global with sharing class SEG_wsRoboticsCasosPost {
             // Crear el registro de operaciones CSO.
     
             if (datosEntrada.numeroOperacionesCSO != null && datosEntrada.numeroOperacionesCSO > 0 && String.isNotBlank(datosEntrada.usuarioCSOId) && (datosEntrada.mccTematica != null|| datosEntrada.mccProducto != null|| datosEntrada.mccMotivo != null|| datosEntrada.mccProducto != null)){
-                Map<String,String> resultadoMCC = SEG_wsRoboticsCasosComunes.validarDatosMCC (datosEntrada.mccTematica, datosEntrada.mccProducto, datosEntrada.mccMotivo, datosEntrada.mccDetalle);
-                String tematica = resultadoMCC.get('mccTematica') != '' ? resultadoMCC.get('mccTematica') : null;
-                String producto = resultadoMCC.get('mccProducto') != '' ? resultadoMCC.get('mccProducto') : null;
-                String motivo = resultadoMCC.get('mccMotivo') != '' ? resultadoMCC.get('mccMotivo') : null;
-                String detalle = resultadoMCC.get('mccDetalle') != '' ? resultadoMCC.get('mccDetalle') : null;
+
+                
+                Map<String, String> resultadosValidados = validarDatosEntradaPOST(datosEntrada);
+                String tematica = resultadosValidados.get('mccTematica') != '' ? resultadosValidados.get('mccTematica') : null;
+                String producto = resultadosValidados.get('mccProducto') != '' ? resultadosValidados.get('mccProducto') : null;
+                String motivo = resultadosValidados.get('mccMotivo') != '' ? resultadosValidados.get('mccMotivo') : null;
+                String detalle = resultadosValidados.get('mccDetalle') != '' ? resultadosValidados.get('mccDetalle') : null;
                 String mcc = null;
 
                 mcc = tematica != null ? tematica : mcc;
@@ -658,13 +660,15 @@ global with sharing class SEG_wsRoboticsCasosPost {
             );
             insert createTask;
 
+
+            List<Case> listCase = new List<Case>();
             // Lanzar acuse de recibo. Se lanza en este punto para que no se concatene posibles emails de traslado al cliente.
             Boolean lanzarAcuse = (datosEntrada.acuseRecibo == null)?false:((datosEntrada.acuseRecibo==1 && String.isNotBlank(datosValidados.get('direccionMail')))?true:false);
             if (lanzarAcuse || Test.isRunningTest())
             {
                 // Recuperar los datos necesarios para enviar el acuse de recibo.
                 try{
-                    List<Case> listCase = [SELECT CaseNumber, Description,SEG_Idioma__c,ContactId,Contact.CC_Idioma__c,Contact.Account.AV_Idioma__c, ContactEmail, SEG_Organizacion__c, SEG_Zona__c, 
+                   listCase = [SELECT CaseNumber, Description,SEG_Idioma__c,ContactId,Contact.CC_Idioma__c,Contact.Account.AV_Idioma__c, ContactEmail, SEG_Organizacion__c, SEG_Zona__c, 
                                             Account.SEG_No_enviar_Acuse_Recibo_Empresa__c, Contact.SEG_No_enviar_Acuse_Recibo__c, SEG_Estado_Contacto__c, CC_AcuseRecibo__c, SEG_NO_AR_Account__c,
                                             SEG_No_AR_Contact__c, SEG_Email_Buzon_Entrada__c, SEG_SemillaId__c FROM Case WHERE Id = :casoNuevo.Id];
 
@@ -674,6 +678,8 @@ global with sharing class SEG_wsRoboticsCasosPost {
                     CBK_Log.error(e);
                     SEG_Case_Operativas_Controller.postOnChatterObject (casoNuevo.Id, 'Error al enviar el acuse de recibo al cliente. Detalle: ' + e.getMessage() + ' (' + e.getStackTraceString() + ')', 'Macros Robotics - Error acuse', null, listadoFeeds);
                 }
+            } else {
+                listCase = [SELECT Id, CaseNumber, SEG_SemillaId__c FROM Case WHERE Id = :casoNuevo.Id];
             }
 
             // Lógica para cerrar el caso derivado de colaboradores externos.
@@ -727,13 +733,11 @@ global with sharing class SEG_wsRoboticsCasosPost {
                 insert listadoFeeds;
             }
 
-            // Recuperar datos del caso para devolver al servicio.
-            List<Case> listaCasos = [SELECT Id, CaseNumber, SEG_SemillaId__c FROM Case WHERE Id = :casoNuevo.Id];
+            // Datos del caso para devolver al servicio.
 
             resultadoCreacion.put('casoId', casoNuevo.Id);
-            resultadoCreacion.put('numeroCaso', listaCasos[0].CaseNumber);
-            resultadoCreacion.put('semilla', listaCasos[0].SEG_SemillaId__c);
-            
+            resultadoCreacion.put('numeroCaso', listCase[0].CaseNumber);
+            resultadoCreacion.put('semilla', listCase[0].SEG_SemillaId__c);
         } catch (Exception e) {
             sError = 'KO';
             sDescError = 'Error al crear el caso. Detalle: ' + e.getMessage();

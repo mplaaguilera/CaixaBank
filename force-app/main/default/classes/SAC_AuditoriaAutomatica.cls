@@ -4,6 +4,7 @@
  * Historial
  * VERSION        USER_STORY            AUTHOR                DATE        Description
  * 1.0             US791098           Raúl Santos           04/01/24       Creación
+ * 1.2            US1278233             Jose M. Fernández     20/06/2025  Modificado: cambiar queries/lógica para usar campos nuevos    
  * *******************************************************************************************/
 
 public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<sObject>{
@@ -22,7 +23,7 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
 
         //Recuperamos las auditorías automáticas que esten activas y que la fecha del momento en que se ejecuta este comprendida entre las fechas inicio y fin de las auditorías
         return Database.getQueryLocator([SELECT Id, SAC_NombreAuditoria__c, SAC_FechaCierre__c,	SAC_GrupoProveedor__c, 	SAC_GrupoLetrado__c, SAC_ImporteAbonadoDesde__c, 
-                                                SAC_ImporteAbonadoHasta__c, SAC_MCCTematica__c, SAC_MCCProducto__c, SAC_MCCMotivo__c, SAC_MCCDetalle__c, SAC_NumMaxReclamaciones__c, 
+                                                SAC_ImporteAbonadoHasta__c, SAC_MCCTematicaList__c, SAC_MCCProductoList__c, SAC_MCCMotivoList__c, SAC_MCCDetalleList__c, SAC_MCCTematicaListLabel__c, SAC_MCCProductoListLabel__c, SAC_MCCMotivoListLabel__c, SAC_MCCDetalleListLabel__c, SAC_NumMaxReclamaciones__c, 
                                                 SAC_GrupoResponsableResolver__c, SAC_SoloPretPpal__c, SAC_Tipo__c, SAC_SLACalidad__c, SAC_PeriocidadEjecucion__c, SAC_FechaUltimaEjecucion__c, SAC_SentidoResolucion__c
                                                 FROM SEG_Auditoria__c 
                                                 WHERE recordTypeId =: RECORDTYPEAUDITORIAAUTOMATICA 
@@ -57,8 +58,9 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
     
                 //Creación de un wrapper con los campos de la auditoría necesarios para la búsqueda de reclamaciones
                 FiltrosBusquedaReclamaciones filtroBusqueda = new FiltrosBusquedaReclamaciones(auditoriaAutomatica.SAC_Tipo__c, fechaDesde, fechaHasta, auditoriaAutomatica.SAC_GrupoProveedor__c, auditoriaAutomatica.SAC_GrupoLetrado__c, 
-                                                                            auditoriaAutomatica.SAC_ImporteAbonadoDesde__c, auditoriaAutomatica.SAC_ImporteAbonadoHasta__c, auditoriaAutomatica.SAC_MCCTematica__c, 
-                                                                            auditoriaAutomatica.SAC_MCCProducto__c, auditoriaAutomatica.SAC_MCCMotivo__c, auditoriaAutomatica.SAC_MCCDetalle__c, Integer.valueOf(auditoriaAutomatica.SAC_NumMaxReclamaciones__c), auditoriaAutomatica.SAC_SentidoResolucion__c);
+                                                                            auditoriaAutomatica.SAC_ImporteAbonadoDesde__c, auditoriaAutomatica.SAC_ImporteAbonadoHasta__c, (String.isNotBlank(auditoriaAutomatica.SAC_MCCTematicaList__c))? auditoriaAutomatica.SAC_MCCTematicaList__c.split(';') : null, 
+                                                                            (String.isNotBlank(auditoriaAutomatica.SAC_MCCProductoList__c))? auditoriaAutomatica.SAC_MCCProductoList__c.split(';') : null, (String.isNotBlank(auditoriaAutomatica.SAC_MCCMotivoList__c))? auditoriaAutomatica.SAC_MCCMotivoList__c.split(';') : null,
+                                                                            (String.isNotBlank(auditoriaAutomatica.SAC_MCCDetalleList__c))? auditoriaAutomatica.SAC_MCCDetalleList__c.split(';') : null, Integer.valueOf(auditoriaAutomatica.SAC_NumMaxReclamaciones__c), auditoriaAutomatica.SAC_SentidoResolucion__c);
     
                 //Recuperamos las reclamaciones que cumplan estos criterios
                 List<Case> listReclamaciones = buscarReclamaciones(filtroBusqueda, auditoriaAutomatica.SAC_SoloPretPpal__c);
@@ -73,14 +75,18 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
     
                     //Dependiendo si la fechaDesde/fechaHasta esta informada, completamos el wrapper con los campos para crear la auditoría de una forma u otra
                     if(fechaDesde != null && fechaHasta != null){
-                        detallesNuevaAuditoria = new SAC_LCMP_AuditoriasController.DetallesAuditoria(auditoriaAutomatica.SAC_Tipo__c, auditoriaAutomatica.SAC_SLACalidad__c, fechaDesde.date(), fechaHasta.date().addDays(-1), auditoriaAutomatica.SAC_GrupoProveedor__c, auditoriaAutomatica.SAC_GrupoLetrado__c, null, null, auditoriaAutomatica.SAC_ImporteAbonadoDesde__c, auditoriaAutomatica.SAC_ImporteAbonadoHasta__c, auditoriaAutomatica.SAC_MCCTematica__c, auditoriaAutomatica.SAC_MCCProducto__c, auditoriaAutomatica.SAC_MCCMotivo__c, auditoriaAutomatica.SAC_MCCDetalle__c, auditoriaAutomatica.SAC_GrupoResponsableResolver__c);
+                        detallesNuevaAuditoria = new SAC_LCMP_AuditoriasController.DetallesAuditoria(auditoriaAutomatica.SAC_Tipo__c, auditoriaAutomatica.SAC_SLACalidad__c, fechaDesde.date(), fechaHasta.date().addDays(-1), auditoriaAutomatica.SAC_GrupoProveedor__c, auditoriaAutomatica.SAC_GrupoLetrado__c, null, null, auditoriaAutomatica.SAC_ImporteAbonadoDesde__c, auditoriaAutomatica.SAC_ImporteAbonadoHasta__c, auditoriaAutomatica.SAC_MCCTematicaList__c, auditoriaAutomatica.SAC_MCCProductoList__c, auditoriaAutomatica.SAC_MCCMotivoList__c, auditoriaAutomatica.SAC_MCCDetalleList__c, auditoriaAutomatica.SAC_MCCTematicaListLabel__c, auditoriaAutomatica.SAC_MCCProductoListLabel__c, auditoriaAutomatica.SAC_MCCMotivoListLabel__c, auditoriaAutomatica.SAC_MCCDetalleListLabel__c, auditoriaAutomatica.SAC_GrupoResponsableResolver__c);
                     }else{
-                        detallesNuevaAuditoria = new SAC_LCMP_AuditoriasController.DetallesAuditoria(auditoriaAutomatica.SAC_Tipo__c, auditoriaAutomatica.SAC_SLACalidad__c, null, null, auditoriaAutomatica.SAC_GrupoProveedor__c, auditoriaAutomatica.SAC_GrupoLetrado__c, null, null, auditoriaAutomatica.SAC_ImporteAbonadoDesde__c, auditoriaAutomatica.SAC_ImporteAbonadoHasta__c, auditoriaAutomatica.SAC_MCCTematica__c, auditoriaAutomatica.SAC_MCCProducto__c, auditoriaAutomatica.SAC_MCCMotivo__c, auditoriaAutomatica.SAC_MCCDetalle__c, auditoriaAutomatica.SAC_GrupoResponsableResolver__c);
+                        detallesNuevaAuditoria = new SAC_LCMP_AuditoriasController.DetallesAuditoria(auditoriaAutomatica.SAC_Tipo__c, auditoriaAutomatica.SAC_SLACalidad__c, null, null, auditoriaAutomatica.SAC_GrupoProveedor__c, auditoriaAutomatica.SAC_GrupoLetrado__c, null, null, auditoriaAutomatica.SAC_ImporteAbonadoDesde__c, auditoriaAutomatica.SAC_ImporteAbonadoHasta__c, auditoriaAutomatica.SAC_MCCTematicaList__c, auditoriaAutomatica.SAC_MCCProductoList__c, auditoriaAutomatica.SAC_MCCMotivoList__c, auditoriaAutomatica.SAC_MCCDetalleList__c, auditoriaAutomatica.SAC_MCCTematicaListLabel__c, auditoriaAutomatica.SAC_MCCProductoListLabel__c, auditoriaAutomatica.SAC_MCCMotivoListLabel__c, auditoriaAutomatica.SAC_MCCDetalleListLabel__c, auditoriaAutomatica.SAC_GrupoResponsableResolver__c);
                     }
     
                     //Creamos la auditoria padre
                     SEG_Auditoria__c auditoriaPadre = SAC_LCMP_AuditoriasController.generarAuditoria(RECORDTYPEAUDITORIAGENERAL, detallesNuevaAuditoria);
-                    auditoriaPadre.SAC_NombreAuditoria__c = auditoriaAutomatica.SAC_NombreAuditoria__c;
+                    String sufijoNombre = '';
+                    if(auditoriaAutomatica.SAC_PeriocidadEjecucion__c != null){
+                        sufijoNombre = crearSufijoNombre(auditoriaAutomatica.SAC_PeriocidadEjecucion__c);
+                    }
+                    auditoriaPadre.SAC_NombreAuditoria__c = auditoriaAutomatica.SAC_NombreAuditoria__c + ' ' + sufijoNombre;
                     auditoriaPadre.SAC_TotalReclamacionesAuditadas__c = numAuditorias;
                     //US844784 - 24/04/2024 - Raúl Santos - Añadido el campo SAC_SentidoResolucion__c
                     auditoriaPadre.SAC_SentidoResolucion__c = auditoriaAutomatica.SAC_SentidoResolucion__c;
@@ -130,7 +136,27 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
     public void finish(Database.BatchableContext dbc){
         CBK_Log.debug('Auditoría automática ejecutada con éxito');
     }
-
+	/*********************************************************************************************
+     * Proposito: Añadir sufijo al nombre de la Auditoría según sea diaria, mensual o anual                              
+     * 
+     * Historial
+     * VERSION        USER_STORY            AUTHOR                DATE        Description
+     * 1.0            US1278177            Iria ANPC            24/06/25       Creación
+     * *******************************************************************************************/
+    public static String crearSufijoNombre(String periodicidad){
+        String sufijoNombre = '';
+        DateTime day = CBK_UtilsDate.nowDT();
+        Integer month = day.month();
+        Integer year = day.year();
+        
+        List<String> monthList = new List<String>{'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'};
+            if(periodicidad.contains('Diaria')){
+                sufijoNombre = day.format('dd/MM/yyyy');
+            }else if(periodicidad.contains('Mensual')){
+                sufijoNombre = monthList[month - 1] + ' ' + String.valueOf(year);
+            }
+        return sufijoNombre;
+    }
 
     /*********************************************************************************************
      * Proposito: Dependiendo de si la auditoría programada tiene el campo de solo pret principal de la reclamación o todas las pretensiones,
@@ -217,21 +243,21 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
 
             whereQ = whereQ + ' AND toLabel(SAC_SentidoResolucion__c) IN :sentidosResolucion';
         }
-        if(String.isNotBlank(filtroBusqueda.tematicaId)){
-            String tematicaId = filtroBusqueda.tematicaId; 
-            whereQ = whereQ + ' AND CC_MCC_Tematica__c =: tematicaId';
+        if(filtroBusqueda.listIdsTematica != null && !filtroBusqueda.listIdsTematica.isEmpty()){
+            List<String> listIdsTematica = filtroBusqueda.listIdsTematica;
+            whereQ = whereQ + ' AND CC_MCC_Tematica__c IN :listIdsTematica';
         }
-        if(String.isNotBlank(filtroBusqueda.productoId)){
-            String productoId = filtroBusqueda.productoId; 
-            whereQ = whereQ + ' AND CC_MCC_ProdServ__c =: productoId';
+        if(filtroBusqueda.listIdsProducto != null && !filtroBusqueda.listIdsProducto.isEmpty()){
+            List<String> listIdsProducto = filtroBusqueda.listIdsProducto;
+            whereQ = whereQ + ' AND CC_MCC_ProdServ__c IN :listIdsProducto';
         }
-        if(String.isNotBlank(filtroBusqueda.motivoId)){
-            String motivoId = filtroBusqueda.motivoId; 
-            whereQ = whereQ + ' AND CC_MCC_Motivo__c =: motivoId';
+        if(filtroBusqueda.listIdsMotivo != null && !filtroBusqueda.listIdsMotivo.isEmpty()){
+            List<String> listIdsMotivo = filtroBusqueda.listIdsMotivo;
+            whereQ = whereQ + ' AND CC_MCC_Motivo__c IN :listIdsMotivo';
         }
-        if(String.isNotBlank(filtroBusqueda.detalleId)){
-            String detalleId = filtroBusqueda.detalleId; 
-            whereQ = whereQ + ' AND SEG_Detalle__c =: detalleId';
+        if(filtroBusqueda.listIdsDetalle != null && !filtroBusqueda.listIdsDetalle.isEmpty()){
+            List<String> listIdsDetalle = filtroBusqueda.listIdsDetalle;
+            whereQ = whereQ + ' AND SEG_Detalle__c IN :listIdsDetalle';
         }
 
         if(String.isnotBlank(whereQ)){
@@ -259,7 +285,7 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
         List<Case> listReclamaciones = new List<Case>();
         List<String> estadosRec = new List<String>{'Cerrado','SAC_008'};
 
-        String selectQ = 'SELECT Id, SAC_Reclamacion__c FROM Case';
+        String selectQ = 'SELECT Id, SAC_Reclamacion__c, CC_MCC_ProdServ__c FROM Case';
         String whereQ = ' WHERE RecordTypeId =: RECORDTYPEPRETENSION AND SAC_Reclamacion__r.Status IN :estadosRec AND SAC_Reclamacion__r.SEG_SRAuditoria__c = false AND SAC_Reclamacion__r.ClosedDate != null';
     
         if(String.isnotBlank(filtroBusqueda.tipoAuditoriaStr) && !filtroBusqueda.tipoAuditoriaStr.contains('Todas')){ 
@@ -309,23 +335,23 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
 
             whereQ = whereQ + ' AND toLabel(SAC_Reclamacion__r.SAC_SentidoResolucion__c) IN :sentidosResolucion';
         }
-        if(String.isNotBlank(filtroBusqueda.tematicaId)){
-            String tematicaId = filtroBusqueda.tematicaId; 
-            whereQ = whereQ + ' AND CC_MCC_Tematica__c =: tematicaId';
+        if(filtroBusqueda.listIdsTematica != null && !filtroBusqueda.listIdsTematica.isEmpty()){
+            List<String> listIdsTematica = filtroBusqueda.listIdsTematica;
+            whereQ = whereQ + ' AND CC_MCC_Tematica__c IN :listIdsTematica';
         }
-        if(String.isNotBlank(filtroBusqueda.productoId)){
-            String productoId = filtroBusqueda.productoId; 
-            whereQ = whereQ + ' AND CC_MCC_ProdServ__c =: productoId';
+        if(filtroBusqueda.listIdsProducto != null && !filtroBusqueda.listIdsProducto.isEmpty()){
+            List<String> listIdsProducto = filtroBusqueda.listIdsProducto;
+            whereQ = whereQ + ' AND CC_MCC_ProdServ__c IN :listIdsProducto';
         }
-        if(String.isNotBlank(filtroBusqueda.motivoId)){
-            String motivoId = filtroBusqueda.motivoId; 
-            whereQ = whereQ + ' AND CC_MCC_Motivo__c =: motivoId';
+        if(filtroBusqueda.listIdsMotivo != null && !filtroBusqueda.listIdsMotivo.isEmpty()){
+            List<String> listIdsMotivo = filtroBusqueda.listIdsMotivo;
+            whereQ = whereQ + ' AND CC_MCC_Motivo__c IN :listIdsMotivo';
         }
-        if(String.isNotBlank(filtroBusqueda.detalleId)){
-            String detalleId = filtroBusqueda.detalleId; 
-            whereQ = whereQ + ' AND SEG_Detalle__c =: detalleId';
+        if(filtroBusqueda.listIdsDetalle != null && !filtroBusqueda.listIdsDetalle.isEmpty()){
+            List<String> listIdsDetalle = filtroBusqueda.listIdsDetalle;
+            whereQ = whereQ + ' AND SEG_Detalle__c IN :listIdsDetalle';
         }
-
+        
         if(String.isnotBlank(whereQ)){
             Set<Id> idsUnicos = new Set<Id>();
 
@@ -464,14 +490,14 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
             List<String> diasPeriocidad = partes[1].split(',');
 
             //Recuperamos el día actual de la semana en formato numérico donde: 1 es lunes... 7 es domingo
-            Integer diaActualNumero = Integer.valueOf(System.now().format('u'));               
+            Integer diaActualNumero = Integer.valueOf(System.now().format('u'));             
 
             //Recorremos los días de periocidad de la auditoría
             for(String diaPeriocidad : diasPeriocidad) {
                 String dia = diaPeriocidad.trim();
 
                 //Si el día de la periocidad está entre los permitidos AND (día de la periocidad -de la auditoria- es igual al día actual OR día de la periocidad -de la auditoria- es igual TODOS) AND auditoira.SAC_FechaUltimaEjecucion__c es diferente de HOY, si la expresión devuelve Sí, la auditoría programada se ejecutará
-                if(diasSemana.containsKey(dia) && (diasSemana.get(dia) == diaActualNumero || diasSemana.get(dia) == 8) && (Date.valueOf(auditoria.SAC_FechaUltimaEjecucion__c) != Date.today())) { 
+                if(diasSemana.containsKey(dia) && (diasSemana.get(dia) == diaActualNumero || diasSemana.get(dia) == 8) && ((auditoria.SAC_FechaUltimaEjecucion__c != null && Date.valueOf(auditoria.SAC_FechaUltimaEjecucion__c.addHours(2)) != CBK_UtilsDate.todayDT()) || auditoria.SAC_FechaUltimaEjecucion__c == null)) { 
                     ejecutarAuditoria = true;
                 }
             }
@@ -498,12 +524,12 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
             List<String> mesesPeriocidad = partes[1].split(',');
 
             //Recuperamos el mes actual en formato numérico donde: 1 es enero... 12 es diciembre
-            Integer mesActualNumero = Integer.valueOf(System.now().format('MM'));              
+            Integer mesActualNumero = Integer.valueOf(System.now().format('MM'));             
 
             //Si la fecha de ultima ejecucion viene informada, almacenamos el mes en el que se ejecuto por última vez
-            Integer mesUltimaEjecucion = -1;
+            Integer mesUltimaEjecucion = -1;  
             if(Date.valueOf(auditoria.SAC_FechaUltimaEjecucion__c) != null){
-                mesUltimaEjecucion = Date.valueOf(auditoria.SAC_FechaUltimaEjecucion__c).month();
+                mesUltimaEjecucion = Date.valueOf(auditoria.SAC_FechaUltimaEjecucion__c.addHours(2)).month();     
             }            
 
             //Recorremos los meses de periocidad de la auditoría
@@ -529,15 +555,16 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
         public Id despachosId{get; set;}
         public Decimal impAbonadoDesde {get; set;}
         public Decimal impAbonadoHasta {get; set;}
-        public Id tematicaId{get; set;}
-        public Id productoId {get; set;}
-        public Id motivoId {get; set;}
-        public Id detalleId{get; set;}
+        public List<String> listIdsTematica {get; set;}
+        public List<String> listIdsProducto {get; set;}
+        public List<String> listIdsMotivo {get; set;}
+        public List<String> listIdsDetalle {get; set;}
         public Integer numMaxReclamaciones {get; set;}
         public String sentidoResolucionStr{get; set;}
 
         public filtrosBusquedaReclamaciones(String tipoAuditoriaStrActual, DateTime fechaCierreDesdeActual, DateTime fechaCierreHastaActual, Id grupoProvIdActual, Id despachosIdActual, Decimal impAbonadoDesdeActual,
-        Decimal impAbonadoHastaActual, Id tematicaIdActual, Id productoIdActual, Id motivoIdActual, Id detalleIdActual, Integer numMaxReclamacionesActual, String sentidoResolucionStrActual)
+        Decimal impAbonadoHastaActual, List<String> listIdsTematicaActual, List<String> listIdsProductoActual, List<String> listIdsMotivoActual, List<String> listIdsDetalleActual,
+        Integer numMaxReclamacionesActual, String sentidoResolucionStrActual)
         {
             tipoAuditoriaStr = tipoAuditoriaStrActual;
             fechaCierreDesde = fechaCierreDesdeActual;
@@ -546,10 +573,10 @@ public with sharing class SAC_AuditoriaAutomatica implements Database.batchable<
             despachosId = despachosIdActual;
             impAbonadoDesde = impAbonadoDesdeActual;
             impAbonadoHasta = impAbonadoHastaActual;
-            tematicaId = tematicaIdActual;
-            productoId = productoIdActual;
-            motivoId = motivoIdActual;
-            detalleId = detalleIdActual;
+            listIdsTematica = listIdsTematicaActual;
+            listIdsProducto = listIdsProductoActual;
+            listIdsMotivo = listIdsMotivoActual;
+            listIdsDetalle = listIdsDetalleActual;
             numMaxReclamaciones = numMaxReclamacionesActual;
             sentidoResolucionStr = sentidoResolucionStrActual;
         }

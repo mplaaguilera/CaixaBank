@@ -1,6 +1,10 @@
 @isTest
 public class OS_EmailMessage_TRHan_Test {
 
+    public static Id accountCentroCaixabank = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+    public static Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+    public static Id caseOSClienteRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+
     @TestSetup
     static void makeData(){
         User usuarioOperador = OS_Usuarios.usuarioOperador();
@@ -38,7 +42,6 @@ public class OS_EmailMessage_TRHan_Test {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
         //CREACIÓN DE CASOS PARA LOS CORREOS
-        Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo Colaborador Temporal';
         grupoColab.OS_Negocio__c = 'COPS';
@@ -50,7 +53,7 @@ public class OS_EmailMessage_TRHan_Test {
         List<Case> casos = new List<Case>();
         Case caso = new Case();
         caso.Subject = 'Caso temporal';
-        caso.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso.RecordTypeId = caseOSClienteRecordTypeId;
         caso.CC_Referencia_Correo_Saliente__c = '#@1234567890#';
         caso.Origin = 'Email';
         caso.CC_Canal_Procedencia__c = 'Buzón Service Desk';
@@ -59,7 +62,7 @@ public class OS_EmailMessage_TRHan_Test {
         casos.add(caso);
         
         Case caso2 = new Case();
-        caso2.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso2.RecordTypeId = caseOSClienteRecordTypeId;
         caso2.Subject = 'Caso temporal';
         caso2.CC_Cola_Procedencia__c='OS_Buzon_International_Support';
         caso2.Status = 'Pendiente Colaborador';
@@ -70,7 +73,7 @@ public class OS_EmailMessage_TRHan_Test {
         casos.add(caso2);
         
         Case caso3 = new Case();
-        caso3.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso3.RecordTypeId = caseOSClienteRecordTypeId;
         caso3.Subject = 'Caso temporal';
         caso3.Origin = 'Email';
         caso3.CC_Canal_Procedencia__c = 'Buzón Service Desk';
@@ -223,7 +226,6 @@ public class OS_EmailMessage_TRHan_Test {
         lista.CC_Valor__c = '1';
         insert lista;
         
-        Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo Colaborador Temporal';
         grupoColab.RecordTypeId = recordTypeGrupoColaborador;
@@ -231,7 +233,7 @@ public class OS_EmailMessage_TRHan_Test {
         insert grupoColab;  
         
         Case caso = new Case();
-       	caso.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+       	caso.RecordTypeId = caseOSClienteRecordTypeId;
         caso.Subject = 'Caso temporal';
         caso.Origin = 'Email';
         caso.CC_Canal_Procedencia__c = 'Buzón Service Desk';
@@ -286,7 +288,7 @@ public class OS_EmailMessage_TRHan_Test {
     public static void responderClienteSaliente() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
 
         Case caso = new Case();
         caso.Subject = 'Caso temporal';
@@ -342,7 +344,7 @@ public class OS_EmailMessage_TRHan_Test {
     public static void respuestaCliente() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
 		
         List<Case> casos = new List<Case>();
         Case caso = new Case();
@@ -481,8 +483,8 @@ public class OS_EmailMessage_TRHan_Test {
     public static void validarDestinatariosCorreoTest() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeListaValores = Schema.getGlobalDescribe().get('CC_Lista_Valores__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-        Id recordTypeValor = Schema.getGlobalDescribe().get('CC_Lista_Valores__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
+        Id recordTypeListaValores = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
+        Id recordTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
 
         EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'OS%' LIMIT 1];
         String headerValueStr = headerValue.LocalPart +'@'+ headerValue.EmailDomainName;
@@ -516,7 +518,7 @@ public class OS_EmailMessage_TRHan_Test {
 
         Account cuenta = new Account();
         cuenta.Name = 'Cuenta02';
-        cuenta.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        cuenta.RecordTypeId = accountCentroCaixabank;
         insert cuenta;        
                         
         Contact contacto = new Contact();
@@ -531,7 +533,7 @@ public class OS_EmailMessage_TRHan_Test {
         caso.Subject = 'Caso temporal';
         caso.Status = 'Activo';
         caso.AccountId = cuenta.Id;
-        caso.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
 		caso.Origin = 'Email';
         caso.CC_Canal_Procedencia__c = 'Buzón Service Desk';
         caso.CC_Tipo_Contacto__c = 'Asesoramiento';        
@@ -612,7 +614,7 @@ public class OS_EmailMessage_TRHan_Test {
     public static void  respuestaSolInfo() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
 		
         List<Case> casos = new List<Case>();
         Case caso = new Case();

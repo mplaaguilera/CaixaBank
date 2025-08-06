@@ -1,9 +1,30 @@
 @isTest
 public with sharing class OS_Case_TRHan_Test {
-    
+    //devservice
+    public static Id mccProductoServicioRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+    public static Id mccMotivoRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+    public static Id caseOSClienteRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+    public static Id contactCCColaboradorRecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+    public static Id ccGrupoColaboradorGCRecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+    public static Id ccMCCTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+    public static Id contactCCClienteRecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+    public static Id recordTypeCuenta = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+    public static Id recordTypeIdCausa = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+    public static Id recordTypeGrupoTrabajo = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('OS_GrupoTrabajo').getRecordTypeId();
+    public static Id recordTypeIdSol = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+
+
     @TestSetup
     static void makeData(){
         User usuarioOperador = OS_Usuarios.usuarioOperador();
+        // Asignar Permission Set al usuario operador
+        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'CBK_BypassValidationRules' LIMIT 1];
+        PermissionSetAssignment psa = new PermissionSetAssignment(
+            AssigneeId = usuarioOperador.Id,
+            PermissionSetId = ps.Id
+        );
+        insert psa;
+
         User usuarioOperador2 = OS_Usuarios.usuarioOperador();
         usuarioOperador2.FirstName = 'OP222';
         usuarioOperador2.OS_Inicio_Vigencia_Agente_Backup__c = System.today().addDays(-1);
@@ -148,12 +169,11 @@ public with sharing class OS_Case_TRHan_Test {
         entitlement.SlaProcessId = entitlementProcess.Id;
         insert entitlement;
       
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Efectivo';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccTematica.RecordTypeId = recordTypeIdTematica;
+        mccTematica.RecordTypeId = ccMCCTematica;
         mccTematica.CC_Codigo_Externo__c = 'TEC-000001';
         mccTematica.OS_Buzon_Salida__c = 'Buzón CCI Holabank';
         mccTematica.OS_Departamento__c = 'UAFE';
@@ -162,23 +182,21 @@ public with sharing class OS_Case_TRHan_Test {
         mccTematica.OwnerId = usuarioOperador.Id;
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Producto COPS';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccProducto.RecordTypeId = recordTypeIdProducto;
+        mccProducto.RecordTypeId = mccProductoServicioRecordTypeId;
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PRC-000001';
         mccProducto.OwnerId = usuarioOperador.Id;
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Motivo COPS';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccMotivo.RecordTypeId = recordTypeIdMotivo;
+        mccMotivo.RecordTypeId = mccMotivoRecordTypeId;
         mccMotivo.CC_Tematica__c = mccTematica.Id;
         mccMotivo.CBK_Traslado_Remitido__c = 'Remitido';
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
@@ -186,7 +204,6 @@ public with sharing class OS_Case_TRHan_Test {
         mccMotivo.OwnerId = usuarioOperador.Id;
         insert mccMotivo;
 
-        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
        	CC_MCC__c mccCausa = new CC_MCC__c();
         mccCausa.Name = 'Causa COPS';
         mccCausa.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
@@ -220,7 +237,6 @@ public with sharing class OS_Case_TRHan_Test {
             caso.Description = 'Descripción';
             caso.CC_Detalles_Consulta__c = 'Detalles Consulta';
             caso.CC_Detalles_Solucion__c = 'Detalles Solución';
-            caso.Status = 'Activo';
             caso.Status = 'Cerrado';
             caso.CC_MCC_Motivo__c = mccMotivo.Id;
             caso.CC_MCC_Tematica__c = mccTematica.Id;
@@ -266,12 +282,11 @@ public with sharing class OS_Case_TRHan_Test {
         entitlement.SlaProcessId = entitlementProcess.Id;
         insert entitlement;
       
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Efectivo';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccTematica.RecordTypeId = recordTypeIdTematica;
+        mccTematica.RecordTypeId = ccMCCTematica;
         mccTematica.CC_Codigo_Externo__c = 'TEC-000001';
         mccTematica.OS_Buzon_Salida__c = 'Buzón CCI Holabank';
         mccTematica.OS_Horario__c = entitlementProcess.BusinessHoursId;
@@ -280,23 +295,21 @@ public with sharing class OS_Case_TRHan_Test {
         mccTematica.OwnerId = usuarioOperador.Id;
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Producto COPS';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccProducto.RecordTypeId = recordTypeIdProducto;
+        mccProducto.RecordTypeId = mccProductoServicioRecordTypeId;
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PRC-000001';
         mccProducto.OwnerId = usuarioOperador.Id;
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Motivo COPS';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccMotivo.RecordTypeId = recordTypeIdMotivo;
+        mccMotivo.RecordTypeId = mccMotivoRecordTypeId;
         mccMotivo.CC_Tematica__c = mccTematica.Id;
         mccMotivo.CBK_Traslado_Remitido__c = 'Remitido';
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
@@ -304,7 +317,6 @@ public with sharing class OS_Case_TRHan_Test {
         mccMotivo.OwnerId = usuarioOperador.Id;
         insert mccMotivo;
 
-        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
        	CC_MCC__c mccCausa = new CC_MCC__c();
         mccCausa.Name = 'Causa COPS';
         mccCausa.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
@@ -361,7 +373,6 @@ public with sharing class OS_Case_TRHan_Test {
     public static void informarCentroManipuladorBeforeInsert() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeGrupoTrabajo = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_GrupoTrabajo').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoTrabajo = new CC_Grupo_Colaborador__c();
         grupoTrabajo.Name = 'Grupo Trabajo';
         grupoTrabajo.RecordTypeId = recordTypeGrupoTrabajo;
@@ -439,7 +450,6 @@ public with sharing class OS_Case_TRHan_Test {
             insert testQueue;
         }
 
-        Id recordTypeGrupoTrabajo = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_GrupoTrabajo').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoTrabajo = new CC_Grupo_Colaborador__c();
         grupoTrabajo.Name = 'Grupo Trabajo';
         grupoTrabajo.RecordTypeId = recordTypeGrupoTrabajo;
@@ -499,7 +509,6 @@ public with sharing class OS_Case_TRHan_Test {
             QueuesObject testQueue = new QueueSObject(QueueID = testGroup.id, SObjectType = 'Case');
             insert testQueue;
         }
-        Id recordTypeGrupoTrabajo = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_GrupoTrabajo').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoTrabajo = new CC_Grupo_Colaborador__c();
         grupoTrabajo.Name = 'Grupo Trabajo';
         grupoTrabajo.RecordTypeId = recordTypeGrupoTrabajo;
@@ -606,6 +615,7 @@ public with sharing class OS_Case_TRHan_Test {
         contacto.Email = 'test@test.com';
         contacto.FirstName = 'Nombre';
         contacto.LastName = 'Apellido';
+
 
         System.runAs (usuarioOperador) {
             Test.startTest();
@@ -719,12 +729,11 @@ public with sharing class OS_Case_TRHan_Test {
             stdBHId = [SELECT Id FROM BusinessHours WHERE isActive = True LIMIT 1].Id;
         }
 
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Tematica COPS';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccTematica.RecordTypeId = recordTypeIdTematica;
+        mccTematica.RecordTypeId = ccMCCTematica;
         mccTematica.CC_Codigo_Externo__c = 'TEC-000001';
         mccTematica.OS_Horario__C= stdBHId;
         mccTematica.OS_Horas_SLA__c = '24' ;
@@ -732,23 +741,21 @@ public with sharing class OS_Case_TRHan_Test {
         mccTematica.OwnerId = usuarioOperador.Id;
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Producto COPS';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccProducto.RecordTypeId = recordTypeIdProducto;
+        mccProducto.RecordTypeId = mccProductoServicioRecordTypeId;
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PRC-000001';
         mccProducto.OwnerId = usuarioOperador.Id;
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Motivo COPS';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccMotivo.RecordTypeId = recordTypeIdMotivo;
+        mccMotivo.RecordTypeId = mccMotivoRecordTypeId;
         mccMotivo.CC_Tematica__c = mccTematica.Id;
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
         mccMotivo.CBK_Traslado_Remitido__c = 'Remitido';
@@ -756,7 +763,6 @@ public with sharing class OS_Case_TRHan_Test {
         mccMotivo.OwnerId = usuarioOperador.Id;
         insert mccMotivo;
 
-        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
        	CC_MCC__c mccCausa = new CC_MCC__c();
         mccCausa.Name = 'Causa COPS';
         mccCausa.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
@@ -768,7 +774,6 @@ public with sharing class OS_Case_TRHan_Test {
         mccCausa.OwnerId = usuarioOperador.Id;
         insert mccCausa;
         
-        Id recordTypeIdSol = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
        	CC_MCC__c mccSolucion = new CC_MCC__c();
         mccSolucion.Name = 'Solución COPS';
         mccSolucion.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
@@ -818,10 +823,9 @@ public with sharing class OS_Case_TRHan_Test {
         plantillaMotivo.CC_MCC__c = mccMotivo.Id;
         insert plantillaMotivo;
         
-        Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo Colab';
-        grupoColab.RecordTypeId = recordTypeGrupoColaborador;
+        grupoColab.RecordTypeId = ccGrupoColaboradorGCRecordTypeId;
         grupoColab.OS_Negocio__c = 'COPS';
         insert grupoColab;   
         
@@ -910,7 +914,7 @@ public with sharing class OS_Case_TRHan_Test {
         User usuarioOperador = [SELECT Id, FirstName, LastName FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
         Case caso = new Case();
-        caso.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso.RecordTypeId = caseOSClienteRecordTypeId;
         caso.Origin = 'Email';
         caso.CC_Canal_Procedencia__c = 'Buzón Comercio Exterior';
         caso.CC_Tipo_Contacto__c = 'Buzón de Calidad';
@@ -977,7 +981,6 @@ public with sharing class OS_Case_TRHan_Test {
             insert testQueue;
         }
 
-        Id recordTypeGrupoTrabajo = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_GrupoTrabajo').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoTrabajo = new CC_Grupo_Colaborador__c();
         grupoTrabajo.Name = 'Grupo Trabajo';
         grupoTrabajo.RecordTypeId = recordTypeGrupoTrabajo;
@@ -1138,7 +1141,6 @@ public with sharing class OS_Case_TRHan_Test {
     public static void actualizarTelefonoAccountCaso() {   
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeCuenta = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         Account cuenta = new Account();
         cuenta.RecordTypeId = recordTypeCuenta;
         cuenta.CC_Email__c = 'pruebasg@caixabank.com';
@@ -1154,10 +1156,9 @@ public with sharing class OS_Case_TRHan_Test {
         acshare.CaseAccessLevel = 'Edit';
         insert acshare;
         
-    	Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
-        caso.RecordTypeId = recordTypeCaso;
+        caso.RecordTypeId = caseOSClienteRecordTypeId;
         caso.Subject = 'Prueba telefono';
         caso.Status = 'Activo';
         caso.Origin = 'Email';

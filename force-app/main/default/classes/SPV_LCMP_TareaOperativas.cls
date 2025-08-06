@@ -53,7 +53,8 @@ public with sharing class SPV_LCMP_TareaOperativas {
                             SAC_ImpResueltoTasacion__c, SAC_NumeroContrato__c, SAC_NCuentaAbono__c, SAC_Comentarios__c, SAC_ImporteResuelto__c, SAC_ImporteAbonar__c,
                             SAC_MaestroAccionesReclamacion__r.SAC_tipo_formulario__c, SAC_ImpResueltoInteresesLegales__c, SAC_MaestroAccionesReclamacion__r.Name,
                             SAC_Oficina__r.CC_Email__c, SAC_IndexedThreadId__c, SAC_Antecedentes_Revisados__c, SAC_Reclamacion__r.SEG_Grupo__c, SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Grupo__c,
-                            SAC_Pretension__r.SEG_Grupo__c, SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c, SAC_EquipoResponsable__r.SAC_Email__c, SAC_EquipoResponsable__r.SAC_Email2__c, SAC_EquipoResponsable__r.SAC_Email3__c
+                            SAC_Pretension__r.SEG_Grupo__c, SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c, SAC_EquipoResponsable__r.SAC_Email__c, SAC_EquipoResponsable__r.SAC_Email2__c, SAC_EquipoResponsable__r.SAC_Email3__c, SPV_FechaReenvio__c, 
+                            SPV_FechaSolicitudAnulacion__c, SPV_MotivoAnulacion__c, SPV_CheckAnulacionSolicitada__c, SPV_FechaAnulacion__c
                     FROM SAC_Accion__c 
                     WHERE id = :tareaId LIMIT 1]; 
         return tarea; 
@@ -159,7 +160,7 @@ public with sharing class SPV_LCMP_TareaOperativas {
             if (usuarioPerteneceGrupoTarea(accion, idUsuario) || usuarioPerteneceGrupoCaso(accion, idUsuario) || perteneceCOPSAJ(idUsuario)) {
                 accion.OwnerId = usuarioActualId;
                 accion.SAC_Estado__c = 'SAC_EnGestion';
-                Database.update(accion);
+                SPV_DatabaseDML.updateDML(accion, true);
             } else {
                 mensajeError = 'No tienes permisos para tomar en propiedad la tarea';
                 throw new AuraHandledException(mensajeError);
@@ -183,7 +184,7 @@ public with sharing class SPV_LCMP_TareaOperativas {
             if(!cola.isEmpty() && (tarea.ownerId == idUsuario || perteneceCOPSAJ(idUsuario) || usuarioPerteneceGrupoTarea(tarea, idUsuario))){ 
                 tarea.OwnerId = cola[0].id;
                 tarea.SAC_Estado__c='SAC_PendienteAsignar';
-                Database.update(tarea);
+                SPV_DatabaseDML.updateDML(tarea, true);
 
                 SPV_HandlerWithoutSharingMethods.insertarAccionShare(tarea);
             }
@@ -216,23 +217,23 @@ public with sharing class SPV_LCMP_TareaOperativas {
 
         if (tarea.OwnerId == idUsuario || usuarioPerteneceGrupoCaso(tarea, idUsuario) || perteneceCOPSAJ(idUsuario) || esAdmin) {
             //Si el campo SAC_Pretension__c no está vacío, siginifca que hay que devolver la tarea al letrado de la pretensión.
-            if (String.isNotBlank(tarea.SAC_Pretension__c)) {
-                tarea.ownerId = tarea.SAC_Pretension__r.OwnerId;
-            } else {
-                tarea.ownerId = tarea.SAC_Reclamacion__r.OwnerId;
-            }
+            // if (String.isNotBlank(tarea.SAC_Pretension__c)) {
+            //     tarea.ownerId = tarea.SAC_Pretension__r.OwnerId;
+            // } else {
+            //     tarea.ownerId = tarea.SAC_Reclamacion__r.OwnerId;
+            // }
 
             //El estado de la tarea pasa a ser devuelta y se le añade el motivo de devolución
             tarea.SAC_Estado__c = 'SAC_Devuelta';
             //Si el motivo está en blanco, lo relleno con el nuevo valor
             if (String.isBlank(tarea.SAC_MotivoDevolucion__c)) {
-                tarea.SAC_MotivoDevolucion__c = System.now() + ' ' + motivoDevolucion;
+                tarea.SAC_MotivoDevolucion__c = CBK_UtilsDate.nowSYS().addHours(2) + ' ' + motivoDevolucion;
             } else { //De lo contrario, se concatena con el anterior valor
-                tarea.SAC_MotivoDevolucion__c = tarea.SAC_MotivoDevolucion__c + '\n' + System.now() + ' ' + motivoDevolucion;
+                tarea.SAC_MotivoDevolucion__c = tarea.SAC_MotivoDevolucion__c + '\n' + CBK_UtilsDate.nowSYS().addHours(2) + ' ' + motivoDevolucion;
             }
             
             try {
-                Database.update(tarea);
+                SPV_DatabaseDML.updateDML(tarea, true);
             } catch (Exception e) {throw new AuraHandledException(e.getMessage());}    
         } else {
             mensajeError = 'No tienes permisos para devolver la tarea';
@@ -271,8 +272,14 @@ public with sharing class SPV_LCMP_TareaOperativas {
 
         if (idUsuario == reclamacion.OwnerId || ids.contains(idUsuario) || idUsuario == tarea.OwnerId || usuarioPerteneceGrupoCaso(tarea, idUsuario) || perteneceCOPSAJ(idUsuario)) {
             //Envío de tarea
-            //Si el estado está en devuelta, hay que enviarla al owner que la devolvió (siempre que pertenezca al grupo resolutor ya que podrían haberlo cambiado)
+            //Si el estado está en devuelta, hay que enviarla al owner que la devolvió (siempre que pertenezca al grupo resolutor ya que podrían haberlo cambiado) y rellenamos el campor de reenvio de la tarea
             if (tarea.SAC_Estado__c == 'SAC_Devuelta') {
+                //Rellenar el campo de reenvio de la tarea
+                if (String.isBlank(tarea.SPV_FechaReenvio__c)) {
+                    tarea.SPV_FechaReenvio__c = ''+ CBK_UtilsDate.nowSYS().addHours(2);
+                } else { //De lo contrario, se concatena con el anterior valor
+                    tarea.SPV_FechaReenvio__c = tarea.SPV_FechaReenvio__c + '\n' + CBK_UtilsDate.nowSYS().addHours(2);
+                }
                 //Recuperar antiguos owners
                 List<SAC_Accion__History> listaAccionHistory = [SELECT id,OldValue, NewValue, Field, CreatedDate  FROM SAC_Accion__History WHERE ParentId = :tareaId AND Field = 'Owner' AND DataType = 'EntityId' ORDER BY CreatedDate desc];
                 //Si la query nos devuelve datos, la recorremos
@@ -304,7 +311,7 @@ public with sharing class SPV_LCMP_TareaOperativas {
                 tarea.OwnerId = pendiente.Id;
             }
 
-            Database.update(tarea);
+            SPV_DatabaseDML.updateDML(tarea, true);
 
             // Recuperar las tareas 'SPV_GENERALOFICINAS' para preparar el envio de correo electronico a la oficina
             if(tarea.SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c == 'SPV_GENERALOFICINAS'){
@@ -460,7 +467,7 @@ public with sharing class SPV_LCMP_TareaOperativas {
         if (perteneceCOPSAJ(idUsuario) || usuarioPerteneceGrupoTarea(tarea, idUsuario)) {
             Date fechaProrrogaDate = Date.valueOf(fechaProrroga);
             tarea.SAC_FechaVencimientoProrroga__c = fechaProrrogaDate;
-            Database.update(tarea);
+            SPV_DatabaseDML.updateDML(tarea, true);
         }else {
             mensajeError = 'No tienes permisos para prorrogar la tarea';
             throw new AuraHandledException(mensajeError);
@@ -496,13 +503,14 @@ public with sharing class SPV_LCMP_TareaOperativas {
         SAC_Accion__c tareaFinalizar = new SAC_Accion__c();
         tareaFinalizar.Id = tareaId;
         tareaFinalizar.SAC_Estado__c = estadoTarea;
+        tareaFinalizar.SPV_CheckAnulacionSolicitada__c = false;
         if (estadoTarea == 'SAC_Descartada' && String.isNotBlank(comentarios)) {
             tareaFinalizar.SAC_MotivoDescarte__c = comentarios;
         } else if (String.isNotBlank(comentarios)) {
             tareaFinalizar.SAC_Comentarios2__c = (String.isNotBlank(tarea.SAC_Comentarios2__c)) ? tarea.SAC_Comentarios2__c + comentarios : comentarios;
         }
 
-        Database.update(tareaFinalizar);
+        SPV_DatabaseDML.updateDML(tareaFinalizar, true);
     }
 
     /*
@@ -514,7 +522,7 @@ public with sharing class SPV_LCMP_TareaOperativas {
 
         SAC_Accion__C tarea = new SAC_Accion__C(Id = tareaId, SAC_Estado__c = 'SAC_PendienteAsignar');
         try {
-            Database.update(tarea);
+            SPV_DatabaseDML.updateDML(tarea, true);
         } catch (Exception e) { 
             String errorMsg = e.getMessage();
             String pureErrorMsg = errorMsg.substringAfter('_EXCEPTION,');
@@ -530,7 +538,7 @@ public with sharing class SPV_LCMP_TareaOperativas {
     @AuraEnabled
     public static void finalizarTareaGGH(Id tareaId){
         SAC_Accion__C tarea = new SAC_Accion__C(Id = tareaId, SAC_Estado__c = 'SAC_Finalizada');
-        Database.update(tarea);
+        SPV_DatabaseDML.updateDML(tarea, true);
     }
 
     @AuraEnabled
@@ -569,6 +577,112 @@ public with sharing class SPV_LCMP_TareaOperativas {
         //Si tenemos alertas que enviar, se llama al método que las envía
         if (!listaWrapperAlerta.isEmpty()) {
             SAC_Alertas.generarAlertas(listaWrapperAlerta);
+        }
+    }
+    /**************************************************************************
+     * Proposito: Solicitar la anulación de una tarea.
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            --------         Carlos Gómez   19/05/25      Creación 
+    **************************************************************************/
+    @AuraEnabled
+    public static void solicitarAnulacion(Id tareaId, String motivo){
+        //Recuperar tarea
+        SAC_Accion__c tarea = recuperarTarea(tareaId);
+        Id idUsuario = UserInfo.getUserId();
+
+        Case reclamacion = [SELECT id, OwnerId FROM Case WHERE id =: tarea.SAC_Reclamacion__c LIMIT 1];
+        List<Case> pretensiones = [SELECT OwnerId FROM Case WHERE SAC_Reclamacion__c =: reclamacion.Id];
+        Set<Id> ids = new Set<Id>();
+        List<SAC_WrapperAlerta> listaWrapperAlerta = new List<SAC_WrapperAlerta>();
+
+        for(Case pretension : pretensiones){
+            ids.add(pretension.OwnerId);
+        }
+
+        if (idUsuario == reclamacion.OwnerId || ids.contains(idUsuario) || usuarioPerteneceGrupoCaso(tarea, idUsuario) || perteneceCOPSAJ(idUsuario)) {
+            //Si el motivo está en blanco, lo relleno con el nuevo valor
+            tarea.SPV_CheckAnulacionSolicitada__c = true;
+            tarea.SPV_MotivoAnulacion__c = motivo;
+            tarea.SPV_FechaSolicitudAnulacion__c = CBK_UtilsDate.nowSYS();
+            SPV_DatabaseDML.updateDML(tarea, true);
+            //Preparar una alerta
+            SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(tarea.SAC_Reclamacion__c,
+                                                                'SPV_026',
+                                                                'Solicitud de anulación de la Tarea ' + tarea.Name + '. ' + motivo,
+                                                                tarea.OwnerId,
+                                                                '',
+                                                                tarea.Id,
+                                                                '');
+            wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + tarea.Id;
+            wrapAlerta.proyecto = 'SPV';
+            listaWrapperAlerta.add(wrapAlerta);
+            SAC_Alertas.generarAlertas(listaWrapperAlerta);
+
+        } else {
+            String mensajeError = 'No tienes permisos para solicitar la anulacion de la tarea';
+            throw new AuraHandledException(mensajeError);
+        }
+    }
+
+    /**************************************************************************
+     * Proposito: Cancelar la solicitud de anulación de una tarea.
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            --------         Carlos Gómez   19/05/25      Creación 
+    **************************************************************************/
+
+    @AuraEnabled
+    public static void cancelarSolicitud(Id tareaId){
+        //Recuperar tarea
+        SAC_Accion__c tarea = recuperarTarea(tareaId);
+        Id idUsuario = UserInfo.getUserId();
+
+        Case reclamacion = [SELECT id, OwnerId FROM Case WHERE id =: tarea.SAC_Reclamacion__c LIMIT 1];
+        List<Case> pretensiones = [SELECT OwnerId FROM Case WHERE SAC_Reclamacion__c =: reclamacion.Id];
+        Set<Id> ids = new Set<Id>();
+        for(Case pretension : pretensiones){
+            ids.add(pretension.OwnerId);
+        }
+
+        if (tarea.SPV_CheckAnulacionSolicitada__c == true && (idUsuario == reclamacion.OwnerId || ids.contains(idUsuario) ||  perteneceCOPSAJ(idUsuario) || usuarioPerteneceGrupoCaso(tarea, idUsuario))) {
+            tarea.SPV_CheckAnulacionSolicitada__c = false;
+            tarea.SPV_FechaSolicitudAnulacion__c = null;
+            tarea.SPV_MotivoAnulacion__c = '';
+            SPV_DatabaseDML.updateDML(tarea, true);
+        } else {
+            String mensajeError = 'No tienes permisos para cancelar la anulacion de la tarea';
+            throw new AuraHandledException(mensajeError);
+        }
+    }
+
+            /**************************************************************************
+     * Proposito: Aceptar la solicitud de anulación de una tarea.
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            --------         Carlos Gómez   19/05/25      Creación 
+    **************************************************************************/
+
+    @AuraEnabled
+    public static void aceptarSolicitudAnulacion(Id tareaId){
+        //Recuperar tarea
+        SAC_Accion__c tarea = recuperarTarea(tareaId);
+        Id idUsuario = UserInfo.getUserId();
+
+        if (tarea.SPV_CheckAnulacionSolicitada__c == true && (tarea.OwnerId == idUsuario)) {
+            tarea.SPV_CheckAnulacionSolicitada__c = false;
+            tarea.SPV_FechaAnulacion__c = CBK_UtilsDate.nowSYS();
+            tarea.SAC_Estado__c = 'SPV_Anulada';
+            SPV_DatabaseDML.updateDML(tarea, true);
+        } else {
+            String mensajeError = 'No tienes permisos para aceptar la anulación, tienes que ser el propietario de la tarea';
+            throw new AuraHandledException(mensajeError);
         }
     }
 }

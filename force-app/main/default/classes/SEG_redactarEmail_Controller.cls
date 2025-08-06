@@ -725,10 +725,14 @@ public with sharing class SEG_redactarEmail_Controller {
 						for (Database.SaveResult resInser : resultadoInsercion) {
 							if (!resInser.isSuccess()) {
 								for(Database.Error err : resInser.getErrors()){
-									CBK_log.debug('SEG_redactarEmail_Controller: Error en la inserción de ContentAsset: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+									//CBK_log.debug('SEG_redactarEmail_Controller: Error en la inserción de ContentAsset: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+								 	CBK_Log.addError(null, null, 'SEG_redactarEmail_Controller: Error en la inserción de ContentAsset: ' + err.getStatusCode() + err.getMessage(), null, null);
 								}
 							}
 						}
+
+						//Se insertan los CBK_Logs
+            			CBK_Log.insertDML();
 
 						List<ContentDocument> lstContentDocument = new List<ContentDocument>();
 
@@ -747,10 +751,14 @@ public with sharing class SEG_redactarEmail_Controller {
 							for (Database.SaveResult resUpdt : resultadoUpdate) {
 								if (!resUpdt.isSuccess()) {
 									for(Database.Error err : resUpdt.getErrors()){
-										CBK_log.debug('SEG_redactarEmail_Controller: Error en la actualización de ContentDocument: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+										// CBK_log.debug('SEG_redactarEmail_Controller: Error en la actualización de ContentDocument: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+										CBK_Log.addError(null, null, 'SEG_redactarEmail_Controller: Error en la actualización de ContentDocument: ' + err.getStatusCode() + err.getMessage(), null, null);
 									}
 								}
 							}
+
+						//Se insertan los CBK_Logs
+            			CBK_Log.insertDML();
 						}
 					}
 				}

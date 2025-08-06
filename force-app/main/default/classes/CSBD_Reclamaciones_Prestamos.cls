@@ -69,8 +69,7 @@ public with sharing class CSBD_Reclamaciones_Prestamos {
 
     private static void enviarCorreoReclamacion(Id idOportunidad, String empresaProveedora, String destinatario, String asunto, String nombrePlantilla) {
         //No realiza substituciones en el cuerpo del correo (si se usa setSubject no es posible)
-        if (String.isNotBlank(destinatario) && String.isNotBlank(asunto) && String.isNotBlank(nombrePlantilla)) {
-            String nombreBuzonSalida = empresaProveedora == 'imaginBank' ? 'CSBD - ImaginBank' : 'CSBD - CaixaBank';
+        if (String.isNotBlank(destinatario) && String.isNotBlank(asunto) && String.isNotBlank(nombrePlantilla)) {           
             String cuerpoPlantilla = '';
             if (Test.isRunningTest()) {
                 cuerpoPlantilla = [SELECT HtmlValue FROM EmailTemplate WHERE Name = :nombrePlantilla LIMIT 1].HtmlValue;
@@ -80,7 +79,7 @@ public with sharing class CSBD_Reclamaciones_Prestamos {
             }
             Messaging.SingleEmailMessage correo = new Messaging.SingleEmailMessage();
             correo.setWhatId(idOportunidad);
-            correo.setOrgWideEmailAddressId([SELECT Id FROM OrgWideEmailAddress WHERE DisplayName = :nombreBuzonSalida].Id);
+            correo.setOrgWideEmailAddressId(CSBD_MetodosComunes.obtenerIdBuzonSalida(empresaProveedora));
             correo.setToAddresses(new List<String>{destinatario});
             correo.setSubject(asunto);
             correo.setHtmlBody(cuerpoPlantilla);
@@ -89,8 +88,7 @@ public with sharing class CSBD_Reclamaciones_Prestamos {
     }
 
     private static void enviarCorreoCierre(Id idOportunidad, String empresaProveedora, String idContacto, String destinatario, String nombrePlantilla) {
-        if (String.isNotBlank(destinatario) && String.isNotBlank(nombrePlantilla)) {
-            String nombreBuzonSalida = empresaProveedora == 'imaginBank' ? 'CSBD - ImaginBank' : 'CSBD - CaixaBank';
+        if (String.isNotBlank(destinatario) && String.isNotBlank(nombrePlantilla)) {          
             Id idPlantilla;
             if (Test.isRunningTest()) {
                 idPlantilla = [SELECT Id FROM EmailTemplate WHERE Name = :nombrePlantilla LIMIT 1].Id;
@@ -99,7 +97,7 @@ public with sharing class CSBD_Reclamaciones_Prestamos {
             }
             Messaging.SingleEmailMessage correo = new Messaging.SingleEmailMessage();
             correo.setWhatId(idOportunidad);
-            correo.setOrgWideEmailAddressId([SELECT Id FROM OrgWideEmailAddress WHERE DisplayName = :nombreBuzonSalida].Id);
+            correo.setOrgWideEmailAddressId(CSBD_MetodosComunes.obtenerIdBuzonSalida(empresaProveedora));
             correo.setTargetObjectId(idContacto);
             correo.setTreatTargetObjectAsRecipient(false);
             correo.setToAddresses(new List<String>{destinatario});

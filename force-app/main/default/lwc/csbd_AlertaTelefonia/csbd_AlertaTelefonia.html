@@ -1,42 +1,42 @@
 <template>
 	<!--
 	<article lwc:if={alertas.tipoBonificado.mostrar} class="banner tipoBonificado slds-card slds-theme_alert-texture">
-        <div class="slds-card__body" style="margin: unset;">
-            <div class="slds-scoped-notification slds-media slds-media_center" role="status">
-                <div class="slds-media__figure">
-                    <span class="slds-icon_container">
-                        <lightning-icon icon-name="utility:database" size="x-small"></lightning-icon>
-                    </span>
-                </div>
-                <div class="slds-media__body">
-                    <p>
+		<div class="slds-card__body" style="margin: unset;">
+			<div class="slds-scoped-notification slds-media slds-media_center" role="status">
+				<div class="slds-media__figure">
+					<span class="slds-icon_container">
+						<lightning-icon icon-name="utility:database" size="x-small"></lightning-icon>
+					</span>
+				</div>
+				<div class="slds-media__body">
+					<p>
 						Se ha ofrecido previamente al cliente un interés bonificado del&nbsp;
 						<span style="font-weight: 500;">{datos.tipoBonificado}%</span>.
 					</p>
-                </div>
-            </div>
-        </div>
-    </article>
+				</div>
+			</div>
+		</div>
+	</article>
 
 	<article lwc:if={alertas.productoMifid.mostrar} class="banner productoMifid slds-card slds-theme_alert-texture">
-        <div class="slds-card__body" style="margin: unset;">
-            <div class="slds-scoped-notification slds-media slds-media_center" role="status">
-                <div class="slds-media__figure">
-                    <span class="slds-icon_container">
-                        <lightning-icon icon-name="utility:call" size="x-small"></lightning-icon>
-                    </span>
-                </div>
-                <div class="slds-media__body">
-                    <p>
+		<div class="slds-card__body" style="margin: unset;">
+			<div class="slds-scoped-notification slds-media slds-media_center" role="status">
+				<div class="slds-media__figure">
+					<span class="slds-icon_container">
+						<lightning-icon icon-name="utility:call" size="x-small"></lightning-icon>
+					</span>
+				</div>
+				<div class="slds-media__body">
+					<p>
 						Producto MiFID. Recuerda llamar mediante el widget de telefonía para que la conversación quede grabada.
 						<!-1- sldsValidatorIgnoreNextLine -1->
 						<lightning-click-to-dial value={datos.telefonoSolicitud} record-id={recordId} onclick={cerrarModal} class="slds-var-m-left_small" data-nombre-modal="productoMifid"></lightning-click-to-dial>
 
 					</p>
-                </div>
-            </div>
-        </div>
-    </article>
+				</div>
+			</div>
+		</div>
+	</article>
 	-->
 
 	<section lwc:if={alertas.productoMifid.mostrar} role="dialog" tabindex="0" aria-modal="true" class="slds-modal slds-modal_prompt productoMifid popupAlerta slds-hide" onclick={modalOnclick} onkeydown={modalTeclaPulsada} data-nombre-modal="productoMifid">
@@ -77,6 +77,27 @@
 			<div class="slds-modal__footer slds-theme_default">
 				<!-- sldsValidatorIgnoreNextLine -->
 				<button class="tipoBonificadoBotonCerrar botonCerrar slds-button slds-button_neutral slds-var-m-bottom_x-small" onclick={botonCerrarModalOnclick} disabled data-nombre-modal="tipoBonificado">Cerrar</button>
+			</div>
+		</div>
+	</section>
+
+	<section lwc:if={alertas.identificarClientePortal.mostrar} role="dialog" tabindex="0" aria-modal="true" class="slds-modal slds-modal_prompt identificarClientePortal popupAlerta slds-hide" onkeydown={modalTeclaPulsada} data-nombre-modal="identificarClientePortal">
+		<div class="slds-modal__container" onclick={modalContainerOnclick}>
+			<div class="slds-modal__header slds-theme_alert-texture">
+				<h1 class="slds-text-heading_medium">Identificar Cliente</h1>
+			</div>
+		<div class="slds-modal__content slds-var-p-bottom_xx-large slds-var-p-top_xx-large" style="padding-left: 24px; padding-right: 24px;">
+				<div class="slds-grid slds-grid_align-center slds-grid_vertical-align-center mensaje">
+					<lightning-icon icon-name="utility:info" size="x-small" class="slds-m-right_medium"></lightning-icon>
+					<div>
+						<b>Recuerda identificar correctamente al cliente.</b><br>
+						<span>Esta es una oportunidad de canal <b>Portal</b> y no se ha identificado al cliente.</span>
+					</div>
+				</div>
+			</div>
+			<div class="slds-modal__footer slds-theme_default">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<button class="identificarClientePortalBotonCerrar botonCerrar slds-button slds-button_neutral slds-var-m-bottom_x-small" onclick={botonCerrarModalOnclick} disabled data-nombre-modal="identificarClientePortal">Cerrar</button>
 			</div>
 		</div>
 	</section>

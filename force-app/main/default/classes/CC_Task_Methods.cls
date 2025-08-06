@@ -16,7 +16,7 @@ public class CC_Task_Methods {
                     
                     CC_Agrupador_Reclamacion__c agrupadorReclamacion = new CC_Agrupador_Reclamacion__c ();
                     agrupadorReclamacion.CC_Agrupador_Id__c = caso.CC_Agrupador_Id__c;
-                    agrupadorReclamacion.CC_Tipo_de_actividad__c = 'Reclamación';
+                    agrupadorReclamacion.CC_Tipo_de_actividad__c = 'RECLAMACION';
                     //agrupadorReclamacion.CC_Descripcion__c = caso.Subject;
                     //agrupadorReclamacion.CC_Contenido__c = caso.Comments;
                     listaAgrupadores.add(agrupadorReclamacion);         

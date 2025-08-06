@@ -156,7 +156,6 @@ export default class csbdCerrarOportunidad extends LightningElement {
 			}
 			this.seleccionarControl('inputResolucion', 20);
 		}).catch(error => errorApex(this, error, 'Error obteniendo la lista deresoluciones'));
-		//#endregion
 	}
 
 	inputResolucionOnchange() {

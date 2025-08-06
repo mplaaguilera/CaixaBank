@@ -63,7 +63,16 @@
                         var state = response.getState();
                             if(state === 'SUCCESS'){ 
                                 let ficherosAdjuntosCase = response.getReturnValue();
-                                console.log('LOS ADJUNTOS RECIBIDOS ' + ficherosAdjuntosCase);
+                            //Añadido - US1194593 - Álex
+                                ficherosAdjuntosCase.forEach(adjunto => {
+                                    if(adjunto.SAC_Bloque__c && adjunto.SAC_Bloque__c.includes('SAC_Tramitacion')){                                      
+                                        adjunto.estaEnTramitacion = true;                           
+                                    
+                                    }else{
+                                        adjunto.estaEnTramitacion = false;    
+                                    }
+                                });
+
                                 var selected = [];
                                 component.set('v.ficherosAdjuntosCase', ficherosAdjuntosCase);
                                 helper.actualizaSeleccionadosCase(component, event);
@@ -97,17 +106,17 @@
                         if(state === 'SUCCESS'){
                             
                             let ficherosAdjuntos = response.getReturnValue();
-                                                            console.log('LOS ADJUNTOS RECIBIDOS 2' + JSON.stringify(ficherosAdjuntos));
                             var selected = [];
 
-                            //AÑADIDO NUEVOOO - ÁLEX
-                            /*for(let i = 0; i < ficherosAdjuntos.length; i++){
-                                if(ficherosAdjuntos[i].SAC_Bloque__c.includes('SAC_Tramitacion')){
-                                 //console.log('esta en tramitacionnnnnn ');
-                                //ficherosAdjuntos[i].estaEnTramitacion = true;
+                            //Añadido - US1194593 - Álex
+                            ficherosAdjuntos.forEach(adjunto => {
+                                if(adjunto.SAC_Bloque__c && adjunto.SAC_Bloque__c.includes('SAC_Tramitacion')){                                          
+                                    adjunto.estaEnTramitacion = true;                        
+                                
+                                }else{
+                                    adjunto.estaEnTramitacion = false;     
                                 }
-                            }*/
-                            //------------------
+                            });
 
                             component.set('v.ficherosAdjuntos', ficherosAdjuntos);
 

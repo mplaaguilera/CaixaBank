@@ -1,0 +1,52 @@
+<template>
+    <lightning-card class="slds-card">
+        <!-- Accordion -->
+        <lightning-accordion
+            allow-multiple-sections-open="false"
+            active-section-name="sectionOnboarding"
+        >
+            <lightning-accordion-section name="sectionOnboarding" label="Detalles Recobro">
+                <div class="slds-m-top_medium">
+                    <lightning-record-edit-form
+                        record-id={caseExtensionId}
+                        object-api-name="CBK_Case_Extension__c"
+                        onsuccess={handleSuccess}
+                        onsubmit={handleSubmit}
+                        onerror={handleError}
+                    >
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <template for:each={campos} for:item="campo">
+                                <div key={campo.fieldApiName} class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                                    <template if:true={campo.isEditing}>
+                                        <lightning-input-field field-name={campo.fieldApiName}></lightning-input-field>
+                                    </template>
+                                    <template if:false={campo.isEditing}>
+                                        <div class="slds-form-element slds-grid slds-align_absolute-center slds-p-around_x-small slds-border_bottom">
+                                            <lightning-output-field field-name={campo.fieldApiName}></lightning-output-field>
+                                            <lightning-button-icon
+                                                icon-name="utility:edit"
+                                                variant="bare"
+                                                alternative-text="Editar"
+                                                title="Editar"
+                                                class="slds-m-left_x-small"
+                                                onclick={handleEditField}
+                                                data-field={campo.fieldApiName}
+                                            ></lightning-button-icon>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+
+                        <template if:true={hasEdits}>
+                            <div class="slds-m-top_medium">
+                                <lightning-button type="submit" variant="brand" label="Guardar" class="slds-m-right_small"></lightning-button>
+                                <lightning-button type="reset" label="Cancelar" onclick={handleCancel}></lightning-button>
+                            </div>
+                        </template>
+                    </lightning-record-edit-form>
+                </div>
+            </lightning-accordion-section>
+        </lightning-accordion>
+    </lightning-card>
+</template>

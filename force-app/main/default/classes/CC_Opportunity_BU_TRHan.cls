@@ -459,11 +459,55 @@ public with sharing class CC_Opportunity_BU_TRHan extends CC_TriggerHandlerBase 
 	}
 
 	private static void calcularTMO(List<Opportunity> listNewObj, Map<Id, Opportunity> mapOldObj) {
-		Map<Id, Opportunity> idOportunidad = new Map<Id, Opportunity>();
+		Map<Id, Schema.RecordTypeInfo> recordTypeInfos = Schema.SObjectType.Opportunity.getRecordTypeInfosById();
+		String rtDeveloperName;
+
+		List<Opportunity> oportunidadesTMO = new List<Opportunity>();
 		for (Opportunity oportunidad: listNewObj) {
 			if(!mapOldObj.get(oportunidad.Id).isClosed && oportunidad.isClosed && (oportunidad.CSBD_SLA_TMO__c == null || oportunidad.CSBD_SLA_TMO__c == 0) && oportunidad.CSBD_PrimerContactoSLA__c != null) {
 				oportunidad.CSBD_SLA_TMO__c = 0;
-				oportunidad.CSBD_SLA_TMO__c = (Integer)((System.now().getTime() - oportunidad.CSBD_PrimerContactoSLA__c.getTime()) / (1000));
+				rtDeveloperName = recordTypeInfos.get(oportunidad.RecordTypeId).getDeveloperName();
+
+                if(rtDeveloperName != 'CSBD_Hipoteca' && rtDeveloperName != 'CSBD_PROAutomatica'){
+
+					oportunidad.CSBD_SLA_TMO__c = (Integer)((CBK_UtilsDate.nowSYS()).getTime() - oportunidad.CSBD_PrimerContactoSLA__c.getTime()) / (1000);
+				}else {
+					oportunidadesTMO.add(oportunidad);
+				}
+			}
+		}
+
+		if(!oportunidadesTMO.isEmpty()){
+			List<CC_Lista_Valores__c> lovList = [SELECT Name, CC_Valor__c FROM CC_Lista_Valores__c
+															WHERE RecordType.DeveloperName = 'CC_Valor'
+															AND CC_Lista__r.Name = 'CSBD: Horarios comerciales por tipología SLA'
+															AND Name IN ('CSBD_Hipoteca', 'CSBD_PROAutomatica')
+															AND CC_Activa__c = TRUE];
+
+			if(!lovList.isEmpty()){
+				Map<String, String> mapaSLA = new Map<String, String>();
+				for(CC_Lista_Valores__c lov : lovList){
+					mapaSLA.put(lov.Name, lov.CC_Valor__c);
+				}
+
+				Map<String, Id> businessHoursMap = new Map<String, Id>();
+				List<BusinessHours> businessHoursList = [SELECT Id, Name FROM BusinessHours WHERE Name IN: mapaSLA.values()];
+				if(!businessHoursList.isEmpty()){
+					for(BusinessHours bh : businessHoursList){
+						businessHoursMap.put(bh.Name, bh.Id);
+					}
+				}
+				
+				//Calcular TMO para las oportunidades
+				for(Opportunity oportunidad : oportunidadesTMO){				
+					rtDeveloperName = recordTypeInfos.get(oportunidad.RecordTypeId).getDeveloperName();
+					
+					if(mapaSLA.containsKey(rtDeveloperName)){
+						if(businessHoursMap.containsKey(mapaSLA.get(rtDeveloperName))){
+							oportunidad.CSBD_SLA_TMO__c = (Integer)(BusinessHours.diff(businessHoursMap.get(mapaSLA.get(rtDeveloperName)), oportunidad.CSBD_PrimerContactoSLA__c, CBK_UtilsDate.nowSYS()))/(1000);
+						}
+					}
+				}
 			}
 		}
 	}

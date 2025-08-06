@@ -223,13 +223,20 @@
                         </div>
                         <!-- Espacio en blanco -->
                         <div class="slds-col slds-size_1-of-2 elemento-form"></div> 
-                        <!-- Campo SAC_GrupoLetrado__c -->
+                        <!-- Campo SEG_Grupo__c -->
                         <div class="slds-col slds-size_1-of-2 elemento-form">
-                            <div class="slds-form-element">
-                                <div class="slds-form-element__control">
-                                    <lightning-output-field field-name="SAC_GrupoLetrado__c"></lightning-output-field>
-                                </div>
-                            </div>
+                            <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                <lightning-layout>
+                                    <lightning-layout-item size="4" style="padding-left: 4px">
+                                        <label class="slds-form-element__label" for="form-element-01" style="color: rgb(68, 68, 68); display: block;">
+                                            Grupo Letrado
+                                        </label>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="8">
+                                        <lightning-output-field variant="label-hidden" field-name="SEG_Grupo__c"></lightning-output-field>
+                                    </lightning-layout-item>
+                                </lightning-layout>
+                            </lightning-layout-item>
                         </div>
                         <!-- Espacio en blanco -->
                         <div class="slds-col slds-size_1-of-2 elemento-form"></div>
@@ -383,18 +390,6 @@
                                 </lightning-layout>
                             </lightning-layout-item>
                         </div>
-                        <!-- <div class="slds-col slds-size_1-of-2 elemento-form">
-                            <lightning-layout-item class="slds-form-element_readonly" size="12">
-                                <lightning-layout>
-                                    <lightning-layout-item size="11" class="slds-border_bottom">
-                                        <lightning-output-field field-name="SAC_CheckResumen__c"></lightning-output-field>
-                                    </lightning-layout-item>
-                                    <lightning-layout-item size="1" class="slds-border_bottom">
-                                        <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
-                                    </lightning-layout-item>
-                                </lightning-layout>
-                            </lightning-layout-item>
-                        </div> -->
                         <!-- Espacio en blanco -->
                         <div class="slds-col slds-size_1-of-2 elemento-form"></div>
                         <!-- Campo Status -->
@@ -456,15 +451,19 @@
                         </div>
                         <!-- Espacio en blanco -->
                         <div class="slds-col slds-size_1-of-2 elemento-form"></div>
-                        <!-- Campo SAC_GrupoLetrado__c -->
+                        <!-- Campo SEG_Grupo__c -->
                         <div class="slds-col slds-size_1-of-2 elemento-form">
                             <lightning-layout-item class="slds-form-element_readonly" size="12">
                                 <lightning-layout>
-                                    <lightning-layout-item size="11" class="slds-border_bottom">
-                                        <lightning-output-field field-name="SAC_GrupoLetrado__c"></lightning-output-field>
+                                    <lightning-layout-item size="3" class="slds-border_bottom" style="padding-left: 4px">
+                                        <label class="slds-form-element__label" for="form-element-01" style="color: rgb(68, 68, 68); margin-bottom: 15px; display: block;">
+                                            Grupo Letrado
+                                        </label>
                                     </lightning-layout-item>
-                                    <lightning-layout-item size="1" class="slds-border_bottom">
+                                    <lightning-layout-item size="7" class="slds-border_bottom" style="padding-left: 35px">
+                                        <lightning-output-field variant="label-hidden" field-name="SEG_Grupo__c"></lightning-output-field>
                                     </lightning-layout-item>
+                                    <lightning-layout-item size="2" class="slds-border_bottom"></lightning-layout-item>
                                 </lightning-layout>
                             </lightning-layout-item>
                         </div>

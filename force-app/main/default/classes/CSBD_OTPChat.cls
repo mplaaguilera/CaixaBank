@@ -52,7 +52,7 @@ public with sharing class CSBD_OTPChat {
 
             String numPersoAux = CSBD_AppUtilities.formatearNumperso(numPerso);
             //Encontrar el cliente relacionado con el numPerso mandado desde NOW
-            List<Contact> lstContacto = [Select AccountId from Contact where CC_NumPerso__c = :numPersoAux];
+            List<Contact> lstContacto = [Select AccountId from Contact where (AV_NumPerso__c = :numPersoAux )];
             if(!lstContacto.isEmpty()){
                 
                 Contact contacto =  lstContacto.get(0);
@@ -81,7 +81,7 @@ public with sharing class CSBD_OTPChat {
                     RestContext.response.addHeader('Content-Type','application/json');
                     otpResponse.status = 'KO';
                     RestContext.response.statusCode = Integer.valueof(HTTP_STATUS_NOT_FOUND);
-                    otpResponse.errorOTP = 'No se encuentra el cliente relacionado al numperso: '+numPerso;
+                    otpResponse.errorOTP = 'No se encuentra el cliente.';
                     RestContext.response.responseBody       = Blob.valueOf(JSON.serialize(otpResponse));
     
                 }
@@ -89,7 +89,7 @@ public with sharing class CSBD_OTPChat {
                 RestContext.response.addHeader('Content-Type','application/json');
                 otpResponse.status = 'KO';
                 RestContext.response.statusCode = Integer.valueof(HTTP_STATUS_NOT_FOUND);
-                otpResponse.errorOTP = 'No se encuentra el contacto relacionado al numperso: '+numPerso;
+                otpResponse.errorOTP = 'No se encuentra el contacto.';
                 RestContext.response.responseBody       = Blob.valueOf(JSON.serialize(otpResponse));
 
             }
@@ -253,9 +253,12 @@ public with sharing class CSBD_OTPChat {
         otp.CBK_Codigo_OTP__c = keyOTP; 
         otp.CBK_Fecha_Codigo_OTP__c = DateTime.NOW().addHours(1);
         otp.CBK_Oportunidad__c = opportunityId;
-        Database.insert(otp);
+        //Database.insert(otp);
 
-        
+        List<CBK_OTP_Generado__c> otpGenerados = new List<CBK_OTP_Generado__c>();
+		otpGenerados.add(otp);
+
+		List<Database.SaveResult> resultadosActualizados = CBK_DMLUtility.insertRecords(otpGenerados, false);
 	}
 
     @TestVisible

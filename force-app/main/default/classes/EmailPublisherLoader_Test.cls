@@ -6,14 +6,14 @@ public with sharing class EmailPublisherLoader_Test {
         Exception failureDuringExecution = null;
 
         //Preparación de los datos
-        List<String> operativasCases = new List<String>{'Trasladar a colaborador','Remitir a colaborador','Solicitud de información','Responder a Clientes Formulario Web'};
+        List<String> operativasCases = new List<String>{'Trasladar a colaborador','Remitir a colaborador','Solicitud de información','Responder a cliente Formulario Web'};
         Map<String, Case> casesInsertMap = crearCasoPrueba(operativasCases);
         insert casesInsertMap.values();
         /*Case casoTrasladarColaborador = crearCasoPrueba('Trasladar a colaborador');
         Case casoRemitirColaborador = crearCasoPrueba('Remitir a colaborador');
         Case casoSolicitudInfo = crearCasoPrueba('Solicitud de información');
         Case casoResponderCliente = crearCasoPrueba('Responder a Clientes Formulario Web');*/
-        Case casoResponderClienteCOPS = crearCasoPruebaCOPS('Responder a Clientes Formulario Web');
+        Case casoResponderClienteCOPS = crearCasoPruebaCOPS('Responder a cliente Formulario Web');
 
         //Ejecución de las prueba
         Test.startTest();
@@ -321,7 +321,7 @@ public with sharing class EmailPublisherLoader_Test {
         idFolderCuerpo = [SELECT Id FROM Folder WHERE Name = :operativa AND ParentId = :idFolderCuerpo].Id;
         idFolderCuerpo = [SELECT Id FROM Folder WHERE Name = 'Castellano' AND ParentId = :idFolderCuerpo].Id;
 
-        if (operativa == 'Solicitud de información' || operativa == 'Responder a Clientes Formulario Web') {
+        if (operativa == 'Solicitud de información' || operativa == 'Responder a cliente Formulario Web') {
             idFolderCuerpo = [SELECT Id FROM Folder WHERE Name = 'Formal' AND ParentId = :idFolderCuerpo].Id;
         }
         

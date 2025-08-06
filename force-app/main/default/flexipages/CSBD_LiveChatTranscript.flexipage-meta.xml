@@ -31,16 +31,57 @@
         <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
+        <name>left</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>esResponseMasterHeader</name>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>stayOnCurrentRecord</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentName>runtime_service_predictions:einsteinSuggestionsCardContainer</componentName>
+                <identifier>runtime_service_predictions_einsteinSuggestionsCardContainer</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5))</booleanFilter>
+                    <criteria>
+                        <leftValue>{!$Permission.CustomPermission.CSBD_UsuarioPromptsIA}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_Oportunidad_Id__r.CSBD_CumpleCondicionesPrompts__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_Oportunidad_Id__r.IsClosed}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>false</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_Oportunidad_Id__r.IsClosed}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.CSBD_Oportunidad_Id__r.CSBD_HaUsadoIA__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
         <itemInstances>
             <componentInstance>
                 <componentName>csbd_ChatOperativas</componentName>
                 <identifier>c_csbd_ChatOperativas</identifier>
             </componentInstance>
         </itemInstances>
-        <name>left</name>
-        <type>Region</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
@@ -57,12 +98,6 @@
                 </componentInstanceProperties>
                 <componentName>console:relatedRecord</componentName>
                 <identifier>console_relatedRecord3</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>csbd_FamiliaProductoPicklist</componentName>
-                <identifier>c_csbd_FamiliaProductoPicklist</identifier>
             </componentInstance>
         </itemInstances>
         <name>leftCol1</name>
@@ -157,31 +192,10 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentInstanceProperties>
-                    <name>tabs</name>
-                    <value>Facet-3dc49732-82bb-430c-b0ca-85bf3592f88e</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tabset</componentName>
-                <identifier>flexipage_tabset1</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>leftCol2</name>
-        <type>Region</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>esResponseMasterHeader</name>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>stayOnCurrentRecord</name>
-                    <value>true</value>
-                </componentInstanceProperties>
-                <componentName>runtime_service_predictions:einsteinSuggestionsCardContainer</componentName>
-                <identifier>runtime_service_predictions_einsteinSuggestionsCardContainer</identifier>
+                <componentName>csbd_liveChatAyudasIAAgentforce</componentName>
+                <identifier>c_csbd_liveChatAyudasIAAgentforce</identifier>
                 <visibilityRule>
-                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5))</booleanFilter>
+                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5)) AND 6</booleanFilter>
                     <criteria>
                         <leftValue>{!$Permission.CustomPermission.CSBD_UsuarioPromptsIA}</leftValue>
                         <operator>EQUAL</operator>
@@ -207,9 +221,28 @@
                         <operator>EQUAL</operator>
                         <rightValue>true</rightValue>
                     </criteria>
+                    <criteria>
+                        <leftValue>{!$Permission.StandardPermission.EinsteinCopilotUser}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
                 </visibilityRule>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>tabs</name>
+                    <value>Facet-3dc49732-82bb-430c-b0ca-85bf3592f88e</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tabset</componentName>
+                <identifier>flexipage_tabset1</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>leftCol2</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
@@ -231,7 +264,7 @@
                 <componentName>csbd_liveChatAyudasIA</componentName>
                 <identifier>c_csbd_liveChatAyudasIA</identifier>
                 <visibilityRule>
-                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5))</booleanFilter>
+                    <booleanFilter>1 AND 2 AND (3 OR (4 AND 5)) AND 6</booleanFilter>
                     <criteria>
                         <leftValue>{!$Permission.CustomPermission.CSBD_UsuarioPromptsIA}</leftValue>
                         <operator>EQUAL</operator>
@@ -256,6 +289,11 @@
                         <leftValue>{!Record.CSBD_Oportunidad_Id__r.CSBD_HaUsadoIA__c}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>true</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!$Permission.StandardPermission.EinsteinCopilotUser}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>false</rightValue>
                     </criteria>
                 </visibilityRule>
             </componentInstance>

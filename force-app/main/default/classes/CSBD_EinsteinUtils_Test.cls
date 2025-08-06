@@ -23,13 +23,15 @@ public with sharing class CSBD_EinsteinUtils_Test {
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet1.Id;
-        Database.insert(permiSetAssi);
+        insert(permiSetAssi);
 
         System.runAs(usuarioGeneral){
 
             //opportunity con producto
             Map<String, Object> camposOppl = new Map<String, Object>();
             camposOppl.put('CSBD_Producto__c', 'MyBox Vida');
+            camposOppl.put('Description', 'descripcion');
+            camposOppl.put('CSBD_Notas_gestor__c', 'notas gestor'); 
             CSBD_Opportunity.crearOportunidad('CSBD_CMB', camposOppl); //la funcion ya hace el insert
 
             //opportunity sin producto
@@ -57,7 +59,7 @@ public with sharing class CSBD_EinsteinUtils_Test {
 */
     @isTest
     static void marcarCheckPromptNoCumple() {
-        List<Opportunity> opps = [SELECT Id, CSBD_Producto__c, RecordTypeId FROM Opportunity WHERE CSBD_Producto__c = null];
+        List<Opportunity> opps = [SELECT Id, CSBD_Producto__c, RecordTypeId, Description FROM Opportunity WHERE CSBD_Producto__c = null];
         
         User usuario = [SELECT id FROM User WHERE FirstName = 'GestorCSBD' AND isActive = true Limit 1];
 
@@ -102,12 +104,13 @@ public with sharing class CSBD_EinsteinUtils_Test {
     @isTest
     static void forzarException() {
         User usuario = [SELECT id FROM User WHERE FirstName = 'GestorCSBD' AND isActive = true Limit 1];
-        Opportunity oldOpp = [SELECT Id, CSBD_Producto__c, RecordTypeId, CSBD_GptResumenInicialRich__c, CSBD_CumpleCondicionesPrompts__c,  CSBD_HaUsadoIA__c, StageName FROM Opportunity WHERE CSBD_Producto__c = 'MyBox Vida'];
+        Opportunity oldOpp = [SELECT Id, CSBD_Producto__c, RecordTypeId, CSBD_GptResumenInicialRich__c, CSBD_CumpleCondicionesPrompts__c,  CSBD_HaUsadoIA__c, StageName, Description FROM Opportunity WHERE CSBD_Producto__c = 'MyBox Vida'];
         Opportunity newOpp = new Opportunity();
         
         newOpp.StageName = 'Perdida';
         newOpp.CSBD_GptResumenInicialRich__c = 'algo';
         newOpp.CSBD_CumpleCondicionesPrompts__c = true;
+        newOpp.Description = CSBD_EinsteinUtils.MENSAJEINICIAL;
         newOpp.id = oldOpp.id;
 
         Map<Id, Opportunity> mapOldObj = new Map<Id, Opportunity>();
@@ -121,6 +124,30 @@ public with sharing class CSBD_EinsteinUtils_Test {
             Test.startTest();
             try{
                 CSBD_EinsteinUtils.comprobarUsoPromptsYResumenCierre(listNewObj, mapOldObj);
+            }
+            catch(UnsupportedOperationException listExc){
+                exc = listExc;
+            }
+            Test.stopTest();
+        }
+        Boolean hayError = exc != null;
+        System.assertEquals(true, hayError,'El error no se ha capturado correctamente');
+    }
+
+    @isTest
+    static void generarResumenCierreException() {
+        User usuario = [SELECT id FROM User WHERE FirstName = 'GestorCSBD' AND isActive = true Limit 1];
+        Opportunity opp = [SELECT Id FROM Opportunity WHERE CSBD_Producto__c = 'MyBox Vida'];
+        Opportunity newOpp = new Opportunity();
+        newOpp.id = opp.id;
+        newOpp.CSBD_CumpleCondicionesPrompts__c = true;
+        update newOpp;
+
+        UnsupportedOperationException exc;
+        System.runAs(usuario){
+            Test.startTest();
+            try{
+                CSBD_EinsteinUtils.generarResumenCierre(newOpp.Id);
             }
             catch(UnsupportedOperationException listExc){
                 exc = listExc;

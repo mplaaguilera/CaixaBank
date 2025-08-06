@@ -9,7 +9,7 @@
 			if (responseComprobarRol.getState() === 'SUCCESS') {
 				let nombreRol = responseComprobarRol.getReturnValue().nombreRol;
 				component.set('v.nombreRol', nombreRol);
-				if (nombreRol !== 'SPV General' && nombreRol !== 'SAC General' && nombreRol !== 'SACH' && nombreRol !== 'Segmentos' && nombreRol !== 'Testamentarías' && nombreRol !== 'GRR' && nombreRol !== 'GRR Agente') {
+				if (nombreRol !== 'SPV General' && nombreRol !== 'SAC General' && nombreRol !== 'SACH' && nombreRol !== 'Segmentos' && nombreRol !== 'Testamentarías' && nombreRol !== 'GRR' && nombreRol !== 'GRR Agente' && nombreRol !== 'GRR Agente COPS') {
 					let obtenerVariablesCOPS = component.get('c.obtenerVariablesCOPS');
 					obtenerVariablesCOPS.setParams({"recordTypeId": recordTypeId, "recordId": recordId});
 					obtenerVariablesCOPS.setCallback(this, responseObtenerVariablesCOPS => {
@@ -62,6 +62,14 @@
 						component.set('v.spinner', false);
 						component.set('v.esCasoSPV', true);
 					}
+
+					//Nueva funcionalidad para los casos de GRR Agente COPS
+					if (nombreRol === 'GRR Agente COPS') {
+						component.set('v.esCasoGRRCOPS', true);
+						component.set('v.valorServicio', 'Servicio Recobro');
+						
+					}
+					
 				}
 				component.set('v.recordTypeId', recordTypeId);
 				component.set('v.mostrarRecordEditForm', true);

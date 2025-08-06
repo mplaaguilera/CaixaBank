@@ -161,6 +161,7 @@ public with sharing class SAC_Contratos_Controller {
         Case reclamacion = [Select Account.CC_NumPerso__c from Case where id = :idRegistro limit 1];
 
         if(reclamacion != null && reclamacion.Account.CC_NumPerso__c != null ){
+
             String numPerso = reclamacion.Account.CC_NumPerso__c;
             response.customerId = numPerso;
             responseIntegration = SAC_Contratos_Integration.getTicket(numPerso, profileName);
@@ -177,7 +178,9 @@ public with sharing class SAC_Contratos_Controller {
                 if(responseData.data != null && responseData.statusCode.equalsIgnoreCase('200')){
                     
                     List<SAC_Contratos_Integration.ClsProducts> lstProducts = responseData.data.Products;
+
                     for(SAC_Contratos_Integration.ClsProducts product : lstProducts){
+                        system.debug('***product '+product);
                         List<DetallesContratosProducto> lstContracts = new List<DetallesContratosProducto>();
                         CustomerProduct prod = new CustomerProduct();
                         if(product.productId != 0){
@@ -204,6 +207,7 @@ public with sharing class SAC_Contratos_Controller {
                                 lstContracts.add(detallesContrato);
                             }
                             prod.lstContratos = lstContracts;
+                            system.debug('***prod '+prod);
                             lstProductsMostrar.add(prod);    
                         }
                         
@@ -225,12 +229,10 @@ public with sharing class SAC_Contratos_Controller {
             lstTrazas.add(responseData.trazaContrato);
         }
         
-        if(!lstTrazas.isEmpty()){
-        
+        if(!lstTrazas.isEmpty()){        
             String jsonTrazas = JSON.serialize(lstTrazas);
             SAC_Utils.insertTrazas(jsonTrazas);
-        }
-        
+        }        
 
         return response;
     }
@@ -248,6 +250,7 @@ public with sharing class SAC_Contratos_Controller {
             response.statusCode = responseIntegration.statusCode;
             
             if(responseIntegration.statusCode.equalsIgnoreCase('200')){
+                system.debug('***response '+response);
                 //Integración devuelve un 200, extraemos los contratos
                 response.description = responseIntegration.data.description;
                 response.state = responseIntegration.data.state.value;
@@ -290,6 +293,14 @@ public with sharing class SAC_Contratos_Controller {
         producto.SAC_Tipo__c = tipo;
         producto.N_Contrato__c = numContrato;
         producto.SAC_Descripcion__c = descripcion;
+        producto.SAC_GeneradoAPI__C = true;
+
+        //Spliteo del numero de contrato para los 4 campos Oficine, Modalida, Contrato y Digito de Control
+        producto.SAC_Oficina__c = numContrato.substring(0, 4);
+        producto.SAC_Modalidad__c = numContrato.substring(4, 6);
+        producto.SAC_Contrato__c = numContrato.substring(6, 13);
+        producto.SAC_DigitoControl__c = numContrato.substring(13, 15);
+        
         if(fechaApertura != null && fechaApertura != '' && fechaApertura != '0'){
             producto.SAC_FechaApertura__c = Date.valueOf(fechaApertura);
         }

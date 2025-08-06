@@ -126,4 +126,28 @@ public class CC_Task_BI_TRHan_Test
             Test.stopTest();
         }
     }
+
+    @isTest
+    static void completarTaskTest()
+    {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+
+        System.runAs(supervisor)
+        {
+            Test.startTest();
+            Task tarea = new Task();
+            tarea.type = 'Actividad manual';
+            tarea.Priority = 'Normal';
+            tarea.Subject = 'Otros';
+            tarea.RecordTypeId = tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tareas.add(tarea);
+            insert tareas;
+
+            Task tareaAI = [SELECT Status from Task where Id =: tarea.Id];
+            
+            System.assertEquals('Completed', tareaAI.Status, 'No se ha completado la Task');
+            Test.stopTest();
+        }
+    }
 }

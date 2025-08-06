@@ -114,8 +114,8 @@ public with sharing class SAC_GenialQueueable_Test {
         '"direccion":"Camino Blanca, 1, 73º D","codPostal":"95543","poblacion":"El Longoria","provincia":"Málaga","pais":"España","direccionNoti":"calle falsa 123, 46410,'+
         ' Sueca, Valencia, España"},"reclamantes":[{"reclamantePrincipal":true,"reclamante":{"CC_Numero_Documento__c":"35825371L",'+
         '"PersonEmail":"bill.gates@hotmail.com.invalid","PersonMobilePhone":"731413628","BillingStreet":"Cádiz 64","BillingPostalCode":"7107","BillingCity":"Bérchules",'+
-        '"BillingState":"Granada","BillingCountry":"España","firstName":"Bill","lastName":"Gates"}},{"reclamantePrincipal":false,'+
-        '"reclamante":{"CC_Numero_Documento__c":"25071917P","firstName":"Paco","lastName":"Pelaes"}},'+
+        '"BillingState":"Granada","BillingCountry":"España","firstName":"Bill","lastName":"Gates"},"umbrales":[{"nivel": "nombre","valor": 0.1},{"nivel": "nif","valor": 0.2},{"nivel": "email","valor": 0.3}]}]}},{"reclamantePrincipal":false,'+
+        '"reclamante":{"CC_Numero_Documento__c":"25071917P","firstName":"Paco","lastName":"Pelaes"},"umbrales":[{"nivel": "nombre","valor": 0.1},{"nivel": "nif","valor": 0.2},{"nivel": "email","valor": 0.3}]}]}},'+
         '{"reclamantePrincipal":false,"reclamante":{"CC_Numero_Documento__c":"37548393L","firstName":"Confidencial","lastName":"Test"}}]}';
         request.requestUri ='/services/apexrest/ActualizacionCasoPretensiones';
         request.httpMethod = 'POST';
@@ -208,7 +208,7 @@ public with sharing class SAC_GenialQueueable_Test {
         Id recTypeDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
         user sacUser = [SELECT ID FROM USER WHERE Username = 'usertest0@test.com.testSetup'];
         List<CC_MCC__c> listaMCCs = new List<CC_MCC__c>();
-        DateTime inicioVigencia = System.now();
+        DateTime inicioVigencia = now();
         CC_MCC__c mccTematica1 = new CC_MCC__c(
             RecordTypeId = recTypeTematica,
             Name = 'Tematica',
@@ -397,7 +397,7 @@ public with sharing class SAC_GenialQueueable_Test {
         string textoRequest = '{"reclamacion":{"Id":"'+reclamacion.id+'"}, "contactoReclamacion":{"email":"contacto@mail.com.invalid","telefono":"661616161",'+
         '"direccion":"Camino Blanca, 1, 73º D","codPostal":"95543","poblacion":"El Longoria","provincia":"Málaga","pais":"España","direccionNoti":"calle falsa 123, 46410,'+
         ' Sueca, Valencia, España"},"reclamantes":[{"reclamantePrincipal":false,'+
-        '"reclamante":{"Id":"'+acc.id+'","CC_Numero_Documento__c":"25071917P","firstName":"Paco","lastName":"Pelaes"}}]}';
+        '"reclamante":{"Id":"'+acc.id+'","CC_Numero_Documento__c":"25071917P","firstName":"Paco","lastName":"Pelaes"},"umbrales":[{"nivel": "nombre","valor": 0.1},{"nivel": "nif","valor": 0.2},{"nivel": "email","valor": 0.3}]}]}';
         genialRequest = (SAC_Genial_WS.genialRequest)JSON.deserialize(textoRequest, SAC_Genial_WS.genialRequest.class);
 
         //es necesario saber el canal para acceder a SAC_GenialSettingsCanal__c
@@ -506,5 +506,8 @@ public with sharing class SAC_GenialQueueable_Test {
         test.stopTest();
 
         system.assertEquals(casoPretension.id, [SELECT SAC_PretensionPrincipal__c FROM Case WHERE Id = : reclamacion.id].SAC_PretensionPrincipal__c, 'la pretensión no se ha asociado a la reclamación como principal');
+    }
+    public static DateTime now() {
+        return System.now();
     }
 }

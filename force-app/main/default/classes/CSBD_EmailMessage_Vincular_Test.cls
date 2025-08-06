@@ -27,14 +27,33 @@ public class CSBD_EmailMessage_Vincular_Test {
             listaPreciosCsbd.Description = 'CSBD Price Book';
             listaPreciosCsbd.IsActive = true;
             insert new List<Pricebook2>{listaPreciosEstandar, listaPreciosCsbd};
+
+    
         }
     }
 
     @isTest
     private static void obtenerCorreosNoVinculados() {
+  
         System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
-            String direccionBuzonCaixaBank = [SELECT Address FROM OrgWideEmailAddress WHERE DisplayName = 'CSBD - CaixaBank'].Address;
-            String direccionBuzonImaginBank = [SELECT Address FROM OrgWideEmailAddress WHERE DisplayName = 'CSBD - ImaginBank'].Address;
+
+           // OrgWideEmailAddress owaCaixaBank = [SELECT Id, Address, DisplayName FROM OrgWideEmailAddress WHERE DisplayName LIKE 'Banca Digital%' LIMIT 1];
+            String direccionBuzonCaixaBank = 'solicitud.documentacion@bancadigital.caixabank.com';
+            String direccionBuzonImaginBank = 'solicitud.documentacion@bancadigital.imaginbank.com';
+            List<OrgWideEmailAddress> owaCSBD = [SELECT Id, Address, DisplayName FROM OrgWideEmailAddress WHERE DisplayName LIKE 'CSBD%' OR DisplayName LIKE 'Banca Digital%'];
+            for(OrgWideEmailAddress owa : owaCSBD){
+                if(owa.Address.contains('imaginbank')){
+                    direccionBuzonImaginBank = owa.Address;
+                }else{
+                    direccionBuzonCaixaBank = owa.Address;
+                }
+            }
+
+            CSBD_Remitente_Enviar_Correo__c config = new CSBD_Remitente_Enviar_Correo__c();
+            config.CSBD_Buzon_CaixaBank__c = direccionBuzonCaixaBank;
+            config.CSBD_Buzon_ImaginBank__c = direccionBuzonImaginBank;
+            config.CSBD_Buzon_Alta_digital_de_menores__c = direccionBuzonImaginBank;
+            insert config;
 
             EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'CSBD_%' LIMIT 1];
             String headerValueStr = headerValue.LocalPart + '@' + headerValue.EmailDomainName;

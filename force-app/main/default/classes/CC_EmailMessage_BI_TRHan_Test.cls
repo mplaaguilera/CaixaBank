@@ -1,68 +1,68 @@
 @isTest
-            public with sharing class CC_EmailMessage_BI_TRHan_Test {
-                
-                @TestSetup
-                static void makeData(){
-                    User usuarioAdmin = CC_TestDataFactory.insertUserAdmin();
-                    System.runAs(usuarioAdmin) {
+    public with sharing class CC_EmailMessage_BI_TRHan_Test {
+        
+        @TestSetup
+        static void makeData(){
+            User usuarioAdmin = CC_TestDataFactory.insertUserAdmin();
+            System.runAs(usuarioAdmin) {
 
-                        List<Account> cuentas = new List<Account>();
-                        Account cuenta = new Account();
-                        cuenta.Name = 'cuentaTest';
-                        cuenta.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-                        cuentas.add(cuenta);
-                        
-                        Account cuentaCentroCaixabank = new Account();
-                        cuentaCentroCaixabank.Name = 'cuentaTest';
-                        cuentaCentroCaixabank.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-                        cuentas.add(cuentaCentroCaixabank);
-                        insert cuentas;
-                        
-                        List<Contact> contactos = new List<Contact>();
-                        Contact contactoCliente = new Contact();
-                        contactoCliente.AccountId = cuenta.Id;
-                        contactoCliente.FirstName = 'test';
-                        contactoCliente.LastName = 'test';
-                        contactoCliente.Email = 'to@test.com';
-                        contactoCliente.RecordtypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-                        contactos.add(contactoCliente);
-                        
-                        
-                        Contact contactoEmpleado = new Contact();
-                        contactoEmpleado.AccountId = cuenta.Id;
-                        contactoEmpleado.FirstName = 'Contacto Empleado';
-                        contactoEmpleado.LastName = 'Contacto Empleado';
-                        contactoEmpleado.Email = 'to@test.com';
-                        contactoEmpleado.CC_Inactivo__c = true;
-                        contactoEmpleado.CC_Matricula__c = 'Invalid';
-                        contactoEmpleado.RecordtypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-                        contactos.add(contactoEmpleado);
-                        
-                        insert contactos;
-                        
-                        List<ContactShare> totalPermisosContact = new List<ContactShare>();
-                        for(Contact c : [SELECT Id FROM Contact]) {
-                            ContactShare contactShare = new ContactShare();
-                            contactShare.ContactId = c.Id;
-                            contactShare.UserOrGroupId = usuarioAdmin.Id;
-                            contactShare.ContactAccessLevel = 'Edit';
-                            totalPermisosContact.add(contactShare);
-                        }
-                        Database.insert(totalPermisosContact, false);
-                        
-                        List<AccountShare> totalPermisosAccount = new List<AccountShare>();
-                        for(Account a : [SELECT Id FROM Account]) {
-                            AccountShare acshare = new AccountShare();
-                            acshare.AccountId = a.Id;
-                            acshare.UserOrGroupId = usuarioAdmin.Id;
-                            acshare.AccountAccessLevel = 'Edit';
-                            acshare.OpportunityAccessLevel = 'Edit';
-                            acshare.CaseAccessLevel = 'Edit';
-                            totalPermisosAccount.add(acshare);
-                        }
-                        Database.insert(totalPermisosAccount, false);
-                    }
+                List<Account> cuentas = new List<Account>();
+                Account cuenta = new Account();
+                cuenta.Name = 'cuentaTest';
+                cuenta.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+                cuentas.add(cuenta);
+                
+                Account cuentaCentroCaixabank = new Account();
+                cuentaCentroCaixabank.Name = 'cuentaTest';
+                cuentaCentroCaixabank.RecordtypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+                cuentas.add(cuentaCentroCaixabank);
+                insert cuentas;
+                
+                List<Contact> contactos = new List<Contact>();
+                Contact contactoCliente = new Contact();
+                contactoCliente.AccountId = cuenta.Id;
+                contactoCliente.FirstName = 'test';
+                contactoCliente.LastName = 'test';
+                contactoCliente.Email = 'to@test.com';
+                contactoCliente.RecordtypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+                contactos.add(contactoCliente);
+                
+                
+                Contact contactoEmpleado = new Contact();
+                contactoEmpleado.AccountId = cuenta.Id;
+                contactoEmpleado.FirstName = 'Contacto Empleado';
+                contactoEmpleado.LastName = 'Contacto Empleado';
+                contactoEmpleado.Email = 'to@test.com';
+                contactoEmpleado.CC_Inactivo__c = true;
+                contactoEmpleado.CC_Matricula__c = 'Invalid';
+                contactoEmpleado.RecordtypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+                contactos.add(contactoEmpleado);
+                
+                insert contactos;
+                
+                List<ContactShare> totalPermisosContact = new List<ContactShare>();
+                for(Contact c : [SELECT Id FROM Contact]) {
+                    ContactShare contactShare = new ContactShare();
+                    contactShare.ContactId = c.Id;
+                    contactShare.UserOrGroupId = usuarioAdmin.Id;
+                    contactShare.ContactAccessLevel = 'Edit';
+                    totalPermisosContact.add(contactShare);
                 }
+                Database.insert(totalPermisosContact, false);
+                
+                List<AccountShare> totalPermisosAccount = new List<AccountShare>();
+                for(Account a : [SELECT Id FROM Account]) {
+                    AccountShare acshare = new AccountShare();
+                    acshare.AccountId = a.Id;
+                    acshare.UserOrGroupId = usuarioAdmin.Id;
+                    acshare.AccountAccessLevel = 'Edit';
+                    acshare.OpportunityAccessLevel = 'Edit';
+                    acshare.CaseAccessLevel = 'Edit';
+                    totalPermisosAccount.add(acshare);
+                }
+                Database.insert(totalPermisosAccount, false);
+            }
+        }
                 /**
                 @isTest
                 private static void test() {
@@ -394,6 +394,7 @@
             casoComprobarContactosToAddress.CC_Idioma__c = 'es';
             casoComprobarContactosToAddress.CC_Tipo_Contacto__c = 'Consulta';
             casoComprobarContactosToAddress.CC_Canal_Procedencia__c = 'Formulario web';
+            casoComprobarContactosToAddress.CC_Canal_Resolucion__c = 'Formulario web';
             casoComprobarContactosToAddress.CC_Detalles_Consulta__c = 'Caso Traslado a colaborador no contempla clientes en el toaddress';
             casoComprobarContactosToAddress.Status = 'Activo';
             casoComprobarContactosToAddress.AccountId = cuenta.Id;
@@ -439,7 +440,9 @@
     @isTest
     static void testEsAccionista() {
         User admin = CC_TestDataFactory.getUserAdmin();
+        
         System.runAs(admin) {
+            Test.startTest();
             Id rtCliente = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
             Account cuenta = [Select id from Account where Name = 'cuentaTest' and RecordtypeId = :rtCliente limit 1];
             Id rtContactoCliente = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
@@ -485,8 +488,8 @@
             correoAccionista.Subject = 'Correo Accionista';
             correoAccionista.HtmlBody = 'Test correo accionista';
            
-            Test.startTest();
-            try {	
+            
+           
                 System.debug('Intentando insertar correo con ToAddress: ' + correoAccionista.ToAddress);
                 insert correoAccionista;
                 System.debug('Correo insertado exitosamente con ID: ' + correoAccionista.Id);
@@ -499,12 +502,11 @@
                 System.debug('Correo después de inserción - ParentId: ' + correoVerificacion.ParentId);
                 System.debug('Correo después de inserción - Incoming: ' + correoVerificacion.Incoming);
                 
-            } catch (Exception e) {
+            
                 System.debug('Error al insertar el correo: ' + e.getMessage());
                 System.debug('Stack trace: ' + e.getStackTraceString());
-            }
-            Test.stopTest(); 
-
+            
+            
             // Verificar que el caso se actualizó correctamente
             Case casoActualizado = [SELECT Id, CC_Canal_Procedencia__c, CC_Tipo_Contacto__c, RecordTypeId 
                                    FROM Case 
@@ -518,13 +520,16 @@
                               'El canal de procedencia no se actualizó correctamente');
             System.assertEquals('Consulta', casoActualizado.CC_Tipo_Contacto__c, 
                               'El tipo de contacto no se actualizó correctamente');
+            Test.stopTest(); 
+
         }
-    }*/
-    /*
+    }
+    
     @isTest
     static void testMultiplesCorreos() {
         User admin = CC_TestDataFactory.getUserAdmin();
         System.runAs(admin) {
+            Test.startTest();
             String defaultFromAddressAttCliente = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE DeveloperName = 'CC_Atencion_Cliente_ESP'].CC_Direccion_Correo__c;
             
             Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
@@ -639,15 +644,18 @@
             correos.add(correoCatalan);
             
             
-            Test.startTest();
             insert correos;
-            Test.stopTest();
+
+            Case casoInglesActualizado = [SELECT Id, CC_Idioma__c FROM Case WHERE Id = :casoIngles.Id];
+            Case casoCastellanoActualizado = [SELECT Id, CC_Idioma__c FROM Case WHERE Id = :casoCastellano.Id];
+            Case casoCatalanActualizado = [SELECT Id, CC_Idioma__c FROM Case WHERE Id = :casoCatalan.Id];
+            
            
             
-            System.assertEquals('Inglés', casoIngles.CC_Idioma__c, 'El idioma del caso en inglés no es correcto');
-            System.assertEquals('Castellano', casoCastellano.CC_Idioma__c, 'El idioma del caso en español no es correcto');
-            System.assertEquals('Català', casoCatalan.CC_Idioma__c, 'El idioma del caso en catalán no es correcto');
-            
+            System.assertEquals('Inglés', casoInglesActualizado.CC_Idioma__c, 'El idioma del caso en inglés no es correcto');
+            System.assertEquals('Castellano', casoCastellanoActualizado.CC_Idioma__c, 'El idioma del caso en español no es correcto');
+            System.assertEquals('Català', casoCatalanActualizado.CC_Idioma__c, 'El idioma del caso en catalán no es correcto');
+            Test.stopTest();
         }
     }*/
 }

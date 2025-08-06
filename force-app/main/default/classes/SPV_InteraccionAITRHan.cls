@@ -4,6 +4,7 @@ public with sharing class SPV_InteraccionAITRHan extends CC_TriggerHandlerBase {
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
+    private static final Id RECTYPECONSULTA_TAREA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_ConsultaTarea').getRecordTypeId();
     private static final Id RECTYPEESCALADO = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Escalado').getRecordTypeId();
 
 
@@ -19,7 +20,7 @@ public with sharing class SPV_InteraccionAITRHan extends CC_TriggerHandlerBase {
         //Recorremos la lista de interacciones
         for (SAC_Interaccion__c interaccion : listNewObj) {
 
-           if(interaccion.RecordTypeId == RECTYPECONSULTA){
+           if(interaccion.RecordTypeId == RECTYPECONSULTA || interaccion.RecordTypeId == RECTYPECONSULTA_TAREA){
                 listaConsultas.add(interaccion);
             }
             if(interaccion.RecordTypeId == RECTYPEESCALADO){
@@ -34,7 +35,8 @@ public with sharing class SPV_InteraccionAITRHan extends CC_TriggerHandlerBase {
 
          if(!listaEscalados.isEmpty()){
             SPV_InteraccionHelper.lanzarAlertasInteraccion(listaEscalados, null);
-            SPV_InteraccionHelper.sumaSLAEscaladoAJ(listaEscalados);
+            SPV_InteraccionHelper.registrarCreacionEscaladoActividades(listaEscalados);
+            SPV_InteraccionHelper.crearFormularios(listaEscalados);
         }
     }
 }

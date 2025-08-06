@@ -839,24 +839,45 @@ public with sharing class CC_MetodosUtiles {
 
     public static Map<Id, String> generarURLsLimeSurvey(List<Case> listaCasos) {
         Map<Id, String> urlsEncuestas = new Map<Id, String>();
+        Id rtCaseEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
     
         if (listaCasos == null || listaCasos.isEmpty()) {
             return urlsEncuestas;
         }
 
         List<Task> tasks = [
-            SELECT Id, CC_Grupo_Colaborador_Id__r.Name, WhatId
+            SELECT Id, CC_Grupo_Colaborador_Id__r.Name, WhatId, Type, What.RecordTypeId, Status
             FROM Task
             WHERE WhatId IN :listaCasos
-            AND Type IN ('Traslado Tercer Nivel', 'Traslado colaborador')
+            AND Type IN ('Traslado Tercer Nivel', 'Traslado colaborador', 'Llamada transferida')
             ORDER BY WhatId, CreatedDate DESC
         ];
         Map<Id, String> caseToGroupMap = new Map<Id, String>();
         Set<Id> processedCaseIds = new Set<Id>();
+        Set<Id> casoConTrasladoColaborador = new Set<Id>();
+        Map<Id, List<Task>> mapCasoTasks = new Map<Id, List<Task>>();
         for (Task t : tasks) {
             if (!processedCaseIds.contains(t.WhatId)) {
-                caseToGroupMap.put(t.WhatId, t.CC_Grupo_Colaborador_Id__r.Name);
-                processedCaseIds.add(t.WhatId);
+                //Añadido controlar que si son llamadas transferidas, que solo sean las de tipo empleado US
+                if (t.Type != 'Llamada transferida') {
+                    caseToGroupMap.put(t.WhatId, t.CC_Grupo_Colaborador_Id__r.Name);
+                    processedCaseIds.add(t.WhatId);
+                } else if (String.isNotBlank(t.WhatId) && t.WhatId.getSObjectType().getDescribe().getName() == 'Case' && t.What.RecordTypeId == rtCaseEmpleado) {
+                    caseToGroupMap.put(t.WhatId, t.CC_Grupo_Colaborador_Id__r.Name);
+                    processedCaseIds.add(t.WhatId);
+                }
+                //Añadido controlar que si es una tarea de traslado colaborador, ese caso debe enviar una encuesta con el código de tercer nivel
+                if (t.Type == 'Traslado colaborador' && String.isNotBlank(t.WhatId) && t.WhatId.getSObjectType().getDescribe().getName() == 'Case' && t.What.RecordTypeId == rtCaseEmpleado) {
+                    casoConTrasladoColaborador.add(t.WhatId);
+                }
+            }
+            //Rellenar mapa con las task de cada caso
+            if (mapCasoTasks.containsKey(t.WhatId)) {
+                mapCasoTasks.get(t.WhatId).add(t);
+            } else {
+                List<Task> listaTasks = new List<Task>();
+                listaTasks.add(t);
+                mapCasoTasks.put(t.WhatId, listaTasks);
             }
         }
     
@@ -916,22 +937,44 @@ public with sharing class CC_MetodosUtiles {
     
             // Determinar identificador de encuesta
             String idEncuesta = idEncuestaGenerico;
-
-            if(caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas'){
-                idEncuesta = idFCO;
-            }else if (caso.CC_En_Tercer_Nivel__c) {
+                
+            if (caso.RecordtypeId == rtCaseEmpleado) {
+                if(caso.CC_En_Tercer_Nivel__c || casoConTrasladoColaborador.contains(caso.Id)){ //Añadido que si este caso es de empleados y tiene traslado colaborador, también debe mandar el codigo de encuesta 3N
                 idEncuesta = idEncuestaTercerNivel;
-            } else if ('Phone'.equals(caso.Origin)) {
-                idEncuesta = idEncuestaLlamada;
-            } else if ('Chat'.equals(caso.Origin)) {
-                idEncuesta = idEncuestaChat;
+                }else if (caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas') {
+                    idEncuesta = idFCO;
+                } else if ('Phone'.equals(caso.Origin)) {
+                    idEncuesta = idEncuestaLlamada;
+                } else if ('Chat'.equals(caso.Origin)) {
+                    idEncuesta = idEncuestaChat;
+                }
+            } else {
+                if(caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas'){
+                idEncuesta = idFCO;
+                }else if (caso.CC_En_Tercer_Nivel__c) {
+                    idEncuesta = idEncuestaTercerNivel;
+                } else if ('Phone'.equals(caso.Origin)) {
+                    idEncuesta = idEncuestaLlamada;
+                } else if ('Chat'.equals(caso.Origin)) {
+                    idEncuesta = idEncuestaChat;
+                }
             }
     
-            // Determinar identificador del espacio
-            String grupoTematica = (caseToGroupMap.containsKey(caso.Id) && !String.isEmpty(caseToGroupMap.get(caso.Id))) 
+            // Determinar grupo o temática
+            Boolean hayTrasladoColaborador = false;
+            if (mapCasoTasks.containsKey(caso.Id)) {
+                for (Task tarea : mapCasoTasks.get(caso.Id)) {
+                    if (tarea.Type == 'Traslado colaborador') {
+                        hayTrasladoColaborador = true;
+                    }
+                }    
+            }
+
+            String grupoTematica = (caseToGroupMap.containsKey(caso.Id) && !String.isEmpty(caseToGroupMap.get(caso.Id)) && (caso.CC_En_Tercer_Nivel__c || hayTrasladoColaborador)) 
             ? caseToGroupMap.get(caso.Id) 
             : caso.CC_Tematica__c;
 
+            // Determinar identificador del espacio
             String idEspacio = mapInfoChat.containsKey(caso.Id) 
                 ? mapInfoChat.get(caso.Id).replace(' ', '_') 
                 : caso.CC_Tematica__c.replace(' ', '_');
@@ -1000,7 +1043,148 @@ public with sharing class CC_MetodosUtiles {
     
         return idToNumPersoMap;
     }
-    
-    
-    
+
+    public static Map<String, String> inicializarCuerpoCorreo(EmailTemplate plantilla, Case caso) {
+
+        String textoCuerpo = '';
+        Map<String, String> datosPlantilla = new Map<String, String>();
+
+        if (plantilla.HtmlValue != null) {
+            textoCuerpo = plantilla.HtmlValue;
+            textoCuerpo = textoCuerpo.replaceAll('<html>','');
+            textoCuerpo = textoCuerpo.replaceAll('<body style="height: auto; min-height: auto;">','');
+            textoCuerpo = textoCuerpo.replaceAll('<body>','');
+            textoCuerpo = textoCuerpo.replaceAll('<head>','');
+            textoCuerpo = textoCuerpo.replaceAll('</body>','');
+            textoCuerpo = textoCuerpo.replaceAll('</head>','');
+            textoCuerpo = textoCuerpo.replaceAll('</html>','');
+            textoCuerpo = textoCuerpo.replaceAll('<title>','');
+            textoCuerpo = textoCuerpo.replaceAll('</title>','');
+            datosPlantilla = datosPlantilla(plantilla);
+
+        }
+        if (caso.CC_Referencia_Correo_Saliente__c == null || datosPlantilla.get('operativa') == null) {
+            throw new AuraHandledException('No se permiten enviar correos que no se originen de una operativa.');
+        }
+        //En función de la operativa recupera el histórico de correos para añadirlo al final del correo
+        String idioma = datosPlantilla.get('idioma');
+        String operativa = datosPlantilla.get('operativa');
+        String tratamiento = datosPlantilla.get('tratamiento');
+
+        String historicoCorreos = '';
+        try{
+            if (operativa == 'Responder a cliente') {
+                historicoCorreos = CC_Case.correoInicialCliente(caso.Id);
+            } else {
+                historicoCorreos = CC_Case.historicoCorreosCliente(caso.Id, false);
+            }
+        } catch(Exception e) {
+            throw new AuraHandledException('Error recopilando histórico de correos para el caso');
+        }
+
+        //Semilla multi idioma
+        List<CC_Texto_MultiIdioma__mdt> frasesSemilla = new List<CC_Texto_MultiIdioma__mdt>();
+        
+        if (operativa == 'Traslado Colaborador'){
+            frasesSemilla = [SELECT CC_Texto__c FROM CC_Texto_MultiIdioma__mdt WHERE CC_Nombre__c = 'CC_Semilla_Traslado_Colaborador_ESP' LIMIT 1];
+        } else if (operativa == 'Solicitud Información') {
+            String nombreMetadataSolInfo = idioma == 'en' ? 'CC_Semilla_Solicitud_Info' : 'CC_Semilla_Solicitud_Info_';
+            frasesSemilla = [SELECT CC_Texto__c FROM CC_Texto_MultiIdioma__mdt
+                            WHERE CC_Nombre__c = :(nombreMetadataSolInfo + tratamiento) AND CC_Idioma__c = :idioma LIMIT 1];
+        } else if (operativa == 'Responder Cliente') {
+            String nombreMetadataResponder = idioma == 'en' ? 'CC_Semilla_Responder' : 'CC_Semilla_Responder_';
+            frasesSemilla = [SELECT CC_Texto__c FROM CC_Texto_MultiIdioma__mdt
+                            WHERE CC_Nombre__c = :(nombreMetadataResponder + tratamiento) AND CC_Idioma__c = :idioma LIMIT 1];
+        }
+
+        textoCuerpo += '<br/><br/><font color="gray">';
+        if (!frasesSemilla.isEmpty()) {
+            textoCuerpo += frasesSemilla[0].CC_Texto__c + ' #@' + caso.CC_Referencia_Correo_Saliente__c + '#.';
+        } else if (frasesSemilla.isEmpty() && operativa != 'Traslado Colaborador' && operativa != 'Responder Cliente') {
+            textoCuerpo += 'Por favor, mantenga las siguientes referencias al responder a este correo electrónico: #@' + caso.CC_Referencia_Correo_Saliente__c + '#.';
+        } else if (frasesSemilla.isEmpty() && operativa == 'Responder Cliente') {
+            textoCuerpo += 'Por favor, no responder a este correo electrónico: #@' + caso.CC_Referencia_Correo_Saliente__c + '#.';
+        }
+        textoCuerpo += '</font>';
+
+        String textoTotal = textoCuerpo + historicoCorreos;
+
+        if (textoTotal.length() >= 131072) {
+            textoTotal = textoTotal.substring(0, 131072);
+        }
+        plantilla.HtmlValue = textoTotal;
+        return datosPlantilla;
+    }
+
+    private static Map<String, String> datosPlantilla(EmailTemplate plantilla) {
+        /* La operativa se puede deducir de la jerarquía de carpetas en la que se encuentra la plantilla. Ejemplo para operativas CC:
+
+        TIPO PLANTILLA              JERARQUÍA CARPETAS
+        Traslado a colaborador      Operativas > Trasladar a colaborador > Castellano > PLANTILLA
+        Remitir a colaborador       Operativas > Remitir a colaborador > Castellano
+        Solicitud de información    Operativas > Solicitud de información > Idioma (Castellano/Catalán/Inglés) > Tratamiento (Formal/Informal)
+        Responder a cliente         Operativas > Responder a cliente > Idioma (Castellano/Catalán/Inglés) > Tratamiento (Formal/Informal)
+        ---
+        * NOTA: Para idioma inglés no aplica subcarpeta de tratamiento.
+
+        Como en función de la operativa la carpeta que la define no siempre está a la misma distancia de
+        la plantilla, se concatenan en una cadena los nombres de las carpetas de los 3 últimos niveles de la
+        jerarquía y se busca en dicha cadena el nombre de la operativa. */
+
+        try {
+            Folder carpeta = [SELECT Name, ParentId FROM Folder WHERE Id = :plantilla.FolderId LIMIT 1];
+            String jerarquiaCarpetas = carpeta.Name;
+            
+            if(carpeta.ParentId != null){
+                carpeta = [SELECT Name, ParentId FROM Folder WHERE Id = :carpeta.ParentId LIMIT 1];
+                jerarquiaCarpetas = carpeta.Name + '-' + jerarquiaCarpetas;
+            }
+
+            if(carpeta.ParentId != null){
+                carpeta = [SELECT Name, ParentId FROM Folder WHERE Id = :carpeta.ParentId LIMIT 1];
+                jerarquiaCarpetas = carpeta.Name + '-' + jerarquiaCarpetas;
+            }
+
+            String operativa = null;
+            if (jerarquiaCarpetas.contains('Trasladar a colaborador')) {
+                operativa = 'Traslado Colaborador';
+            } else if (jerarquiaCarpetas.contains('Remitir a colaborador')) {
+                operativa = 'Remitir Colaborador';
+            } else if (jerarquiaCarpetas.contains('Solicitud de información')) {
+                operativa = 'Solicitud Información';
+            } else if (jerarquiaCarpetas.contains('Responder a cliente')) {
+                operativa = 'Responder Cliente';
+            } else if (jerarquiaCarpetas.contains('Enviar correo')) {
+                operativa = 'Enviar correo';
+            }
+
+
+            String idioma = null;
+            if (jerarquiaCarpetas.contains('Catalán')) {
+                idioma = 'ca';
+            } else if (jerarquiaCarpetas.contains('Inglés')) {
+                idioma = 'en';
+            } else {
+                idioma = 'es';
+            }
+
+            String tratamiento = null;
+            if (jerarquiaCarpetas.contains('Informal')) {
+                tratamiento = 'Tu';
+            } else if (jerarquiaCarpetas.contains('Genérico')) {
+                tratamiento = '';
+            } else {
+                tratamiento = 'Usted';
+            }
+
+            Map<String, String> retorno = new Map<String, String>();
+            retorno.put('operativa', operativa);
+            retorno.put('idioma', idioma);
+            retorno.put('tratamiento', tratamiento);
+            return retorno;
+        } catch (Exception e) {
+            throw new AuraHandledException('Error recuperando la jerarquía de carpetas para la plantilla "' + plantilla.DeveloperName + '"');
+        }
+    }
+   
 }

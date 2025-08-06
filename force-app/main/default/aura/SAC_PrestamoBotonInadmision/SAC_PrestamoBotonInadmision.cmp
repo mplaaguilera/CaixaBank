@@ -1,19 +1,16 @@
-<aura:component controller="SAC_LCMP_PrestamoGlobal" implements="force:hasRecordId,flexipage:availableForRecordHome">
-
+<aura:component controller="SAC_LCMP_PrestamoGlobal"
+                implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
     <aura:attribute name="recordId" type="String" />
     <aura:attribute name="showButton" type="Boolean" default="false"/>
     <aura:attribute name="cumpleCriterio" type="Boolean" default="false"/>
     <aura:attribute name="showComponent" type="Boolean" default="false"/>
-
     <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
     <aura:handler name="cmpComponent" event="c:SAC_PrestamoShowComponent" action="{!c.handleApplicationEvent}" />
 
     <aura:if isTrue="{!v.showButton}">
-        <lightning:button variant="brand" label="Inadmitir reclamación" onclick="{!c.openComponent}" />
+        <lightning:button class="slds-button slds-button_brand" label="Inadmitir Reclamación" onclick="{!c.openComponent}" />
     </aura:if>
-
     <aura:if isTrue="{!v.showComponent}">
         <c:SAC_PrestamoRedaccion recordId="{!v.recordId}"/>
     </aura:if>
-
 </aura:component>

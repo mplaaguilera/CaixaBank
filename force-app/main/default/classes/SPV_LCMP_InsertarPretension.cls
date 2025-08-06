@@ -31,7 +31,8 @@ public with sharing class SPV_LCMP_InsertarPretension {
 
         Case reclamacionActual = [SELECT Id,CC_Canal_Procedencia__c, SPV_VueltaAlta__c, ContactId, AccountId, SAC_TiempoSLARegulatorio__c, SAC_TiempoSLALetradoAlta__c, Origin, Status,
                                   SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_FechaRecepcion__c, SAC_PretensionPrincipal__r.OwnerId, OwnerId, SAC_CasoEspecial__c, CC_CasoRelacionado__c,
-                                  CC_CasoRelacionado__r.Status, CC_CasoRelacionado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_GrupoLetrado__c, SEG_Grupo__c
+                                  CC_CasoRelacionado__r.Status, CC_CasoRelacionado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_GrupoLetrado__c, SEG_Grupo__c, SPV_NumExpediente__c,
+                                  SPV_Organismo__c, SAC_FechaVencimientoSLA__c, SPV_ComunidadAutonoma__c, SAC_Entidad_Afectada__c
                                   FROM Case Where RecordType.DeveloperName LIKE 'SPV_%' AND Id =: idCase];  
 
                        
@@ -151,11 +152,16 @@ public with sharing class SPV_LCMP_InsertarPretension {
         nuevaPretension.CC_MCC_Motivo__c = motivo;
         nuevaPretension.CC_MCC_ProdServ__c = prodServ;
         nuevaPretension.CC_MCC_Tematica__c = tematica; 
-        nuevaPretension.SAC_Entidad_Afectada__c = mapaMcc.get(detalle).SAC_EntidadAfectada__c;
+        nuevaPretension.SAC_Entidad_Afectada__c = reclamacionActual.SAC_Entidad_Afectada__c;
         nuevaPretension.SAC_EntidadProductora__c = mapaMcc.get(detalle).SAC_EntidadProductora__c;
         nuevaPretension.SAC_CASE_esPSD2__c = mapaMcc.get(detalle).SAC_EsPsd2__c;
         nuevaPretension.CC_Codigo_Externo_Tematica__c = mapaMcc.get(detalle).CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__r.CC_Codigo_Externo__c;
         nuevaPretension.SAC_CasoEspecial__c = reclamacionActual.SAC_CasoEspecial__c;
+        nuevaPretension.SPV_NumExpediente__c = reclamacionActual.SPV_NumExpediente__c;
+        nuevaPretension.SPV_Organismo__c = reclamacionActual.SPV_Organismo__c;
+        nuevaPretension.SAC_FechaVencimientoSLA__c = reclamacionActual.SAC_FechaVencimientoSLA__c;
+        nuevaPretension.SPV_ComunidadAutonoma__c = reclamacionActual.SPV_ComunidadAutonoma__c;
+        nuevaPretension.SPV_Organismo__c = reclamacionActual.SPV_Organismo__c;
         
 
         //Añadido US963386
@@ -222,7 +228,8 @@ public with sharing class SPV_LCMP_InsertarPretension {
                                   SAC_TiempoSLALetradoAlta__c, Origin, Status, SPV_VueltaAlta__c,
                                   SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_PretensionPrincipal__r.OwnerId, OwnerId, SAC_CasoEspecial__c, 
                                   CC_CasoRelacionado__c, SAC_FechaRecepcion__c,
-                                  CC_CasoRelacionado__r.Status, CC_CasoRelacionado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c
+                                  CC_CasoRelacionado__r.Status, CC_CasoRelacionado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c, SPV_NumExpediente__c,
+                                  SPV_Organismo__c, SAC_FechaVencimientoSLA__c, SPV_ComunidadAutonoma__c, SAC_Entidad_Afectada__c
                                   FROM Case Where RecordType.DeveloperName LIKE 'SPV_%' AND Id =: idCase];
         
  

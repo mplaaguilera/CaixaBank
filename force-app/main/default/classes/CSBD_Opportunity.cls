@@ -158,12 +158,8 @@ public inherited sharing class CSBD_Opportunity {
 											CSBD_Alta_omnichannel__c, CSBD_Empresa_Proveedora__c, CSBD_Resolucion__c,
 											CSBD_Contact__c, CSBD_DeliveryInternalName__c, CSBD_CampaignId__c, CSBD_JourneyActionId__c,
 											CSBD_MessageProfileId__c, CSBD_Now_NUMPERSO__c, CSBD_Motivo_MAC__c, Description FROM Opportunity WHERE Id IN :idOportunidades];
-
-		System.debug('oportunidades.size(): ' + oportunidades.size());
-
 		return cerrarOportunidad(oportunidades, nombreEtapaVentas, resolucion, campos);
 	}
-
 
 	public static List<Opportunity> cerrarOportunidad(List<Opportunity> oportunidades, String nombreEtapaVentas, String resolucion) {
 		return cerrarOportunidad(oportunidades, nombreEtapaVentas, resolucion, null);
@@ -217,7 +213,7 @@ public inherited sharing class CSBD_Opportunity {
 				oportunidadesTraspasadas.add(oportunidad);
 			}
 		}
-		update oportunidades;
+		List<Database.SaveResult> resultadosActualizados = CBK_DMLUtility.updateRecords(oportunidades, false);
 
 		//Damos de baja en en GestorOportunidad (el trigger no se vuelve a ejecutar)
 		if (!idBajasGestorOportunidad.isEmpty()) {
@@ -467,7 +463,11 @@ public inherited sharing class CSBD_Opportunity {
 			}
 		}
 		insert nuevoEvento;
-		update oportunidad;
+		//update oportunidad;
+		List<Opportunity> oportunidades = new List<Opportunity>();
+		oportunidades.add(oportunidad);
+
+		List<Database.SaveResult> resultadosActualizados = CBK_DMLUtility.updateRecords(oportunidades, false);
 
 		//Cambio de PB a FW - Ejecución de citas pendientes: Inserto registros en CBK_SCH_PendingProcess__c para programar acciones
 		//Programar cita en CSBD_Fecha_Cita__c

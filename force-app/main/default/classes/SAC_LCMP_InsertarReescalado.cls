@@ -11,15 +11,40 @@
 *****************************************************************/
 public without sharing class SAC_LCMP_InsertarReescalado {
 
-    private static final Id RECTYPEESCALADONV2 = Schema.SObjectType.SAC_Interaccion__c.getRecordTypeInfosByDeveloperName().get('SAC_Escalado').getRecordTypeId();
-    private static final Id RECTYPEESCALADONV3 = Schema.SObjectType.SAC_Interaccion__c.getRecordTypeInfosByDeveloperName().get('SAC_EscaladoNV3').getRecordTypeId();
-    private static final Id RECTYPEGRUPOACCIONES = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SAC_GrupoResponsableAccion').getRecordTypeId();
+    private static Set<String> objetos = new Set<String>{'SAC_Interaccion__c','CC_Grupo_Colaborador__c'};
+    private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
+    
+    final static Id RECTYPEESCALADONV2 = mapRTsObjects.get('SAC_Interaccion__c').get('SAC_Escalado').getRecordTypeId();
+    final static Id RECTYPEESCALADONV3 = mapRTsObjects.get('SAC_Interaccion__c').get('SAC_EscaladoNV3').getRecordTypeId();
+    final static Id RECTYPEESCALADOSPV = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Escalado').getRecordTypeId();
+    final static Id RECTYPEREESCALADOSPV = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Reescalado').getRecordTypeId();
+    final static Id RECTYPEGRUPOACCIONES = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SAC_GrupoResponsableAccion').getRecordTypeId();
+    final static Id RECTYPEGRUPOTAREAS = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SPV_GrupoDeTareas').getRecordTypeId();
+
 
     //Wrapper para la funcion devolver escalado
     public class wrapEscalado{
         List<SAC_Interaccion__c> listaEscaladosActualizar = new List<SAC_Interaccion__c>();
         List<SAC_WrapperAlerta> listaWrapperAlerta = new List<SAC_WrapperAlerta>();
      }
+
+    @AuraEnabled
+    public static String insertReescalado(Id interaccionId, String porpuestaCops, String motivo, String observaciones) {
+        String idEscalado = '';
+        SAC_Interaccion__c escaladoNv2 = new SAC_Interaccion__c();
+        escaladoNv2 = [SELECT id, SAC_CasoEscalado__c, SAC_Estado__c, SAC_Propuesta__c, OwnerId, SAC_Titulo__c, SAC_CasoEscalado__r.SAC_Entidad_Afectada__c, SAC_EscaladoNV3__c, RecordTypeId
+                        FROM SAC_Interaccion__c 
+                        WHERE (RecordTypeId = :RECTYPEESCALADONV2 OR RecordTypeId = :RECTYPEESCALADOSPV)
+                        AND id = :interaccionId LIMIT 1];
+
+        if(escaladoNv2.RecordTypeId == RECTYPEESCALADOSPV) {
+            idEscalado = insertReescaladoSPV(interaccionId, porpuestaCops, motivo, observaciones, escaladoNv2);
+        } else {
+            idEscalado = insertReescaladoSAC(interaccionId, porpuestaCops, motivo, observaciones, escaladoNv2);
+        }
+
+        return idEscalado;
+    }
 
     /*****************************************************************
     * Proposito: Inserta una interacción con el record type SAC_EscaladoNV3 ligado al Escalado NV2 correspondiente
@@ -30,14 +55,7 @@ public without sharing class SAC_LCMP_InsertarReescalado {
     * 1.0            US219272         Carlos Solis   12/07/21     Creación
     *****************************************************************/
     @AuraEnabled
-    public static String insertReescalado(Id interaccionId, String porpuestaCops, String motivo, String observaciones) {
-        
-        SAC_Interaccion__c escaladoNv2 = new SAC_Interaccion__c();
-        escaladoNv2 = [SELECT id, SAC_CasoEscalado__c, SAC_Estado__c, SAC_Propuesta__c, OwnerId, SAC_Titulo__c, SAC_CasoEscalado__r.SAC_Entidad_Afectada__c, SAC_EscaladoNV3__c
-                        FROM SAC_Interaccion__c 
-                        WHERE RecordTypeId = :RECTYPEESCALADONV2
-                        AND id = :interaccionId LIMIT 1];
-        
+    public static String insertReescaladoSAC(Id interaccionId, String propuestaCops, String motivo, String observaciones, SAC_Interaccion__c escaladoNv2) {
         List<ContentDocumentLink> documentos = [SELECT id, ContentDocument.Owner.name, ContentDocumentId 
                                         FROM ContentDocumentLink WHERE  LinkedEntityId =: interaccionId];
 
@@ -73,7 +91,7 @@ public without sharing class SAC_LCMP_InsertarReescalado {
 
             //Si existe un escalado de nivel 3 que está en estado devuelto, se vuelve a poner en estado pendiente de respuesta y el de nivel 2 pasa a estado reescalado
             if (devuelto) {
-                reescalarDevuelto(escaladoNv2, porpuestaCops, motivo, observaciones);
+                reescalarDevuelto(escaladoNv2, propuestaCops, motivo, observaciones);
                 return escaladoNv2.SAC_EscaladoNV3__c;
             } else if (String.isNotBlank(error)) { //Si tenemos un error que enviar (ya reescalado o ya respondido) lo enviamos
                 throw new AuraHandledException(error);
@@ -101,7 +119,7 @@ public without sharing class SAC_LCMP_InsertarReescalado {
                 escaladoNv3.SAC_Propuesta__c = escaladoNv2.SAC_Propuesta__c;
                 escaladoNv3.SAC_EscaladoNV2__c = escaladoNv2.Id;
                 escaladoNv3.SAC_CasoEscalado__c = escaladoNv2.SAC_CasoEscalado__c;
-                escaladoNv3.SAC_PropuestaCOPS__c = porpuestaCops;
+                escaladoNv3.SAC_PropuestaCOPS__c = propuestaCops;
                 escaladoNv3.SAC_Titulo__c = escaladoNv2.SAC_Titulo__c;
                 escaladoNv3.SAC_MotivoEscalado__c = motivo;
                 escaladoNv3.SAC_Observaciones_Interaccion__c = observaciones;
@@ -114,7 +132,7 @@ public without sharing class SAC_LCMP_InsertarReescalado {
                 if (!cola.isEmpty()) {
                     escaladoNv3.OwnerId = cola[0].Id;
                 }
-    
+
                 SAC_DatabaseDML.insertDML(escaladoNv3, false);
                 //Database.insert(escaladoNv3);
     
@@ -138,6 +156,121 @@ public without sharing class SAC_LCMP_InsertarReescalado {
                     }
                 }
     
+                return escaladoNv3.id;
+            }
+        }
+        return '';
+    }
+
+
+    /*****************************************************************
+    * Proposito: Inserta una interacción con el record type SPV_Reescalado ligado al Escalado correspondiente
+    * 
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR          DATE         Description
+    * 1.0            US1277284      Sergio Martín   06/06/25        Creación
+    *****************************************************************/
+    @AuraEnabled
+    public static String insertReescaladoSPV(Id interaccionId, String propuestaCops, String motivo, String observaciones, SAC_Interaccion__c escaladoNv2) {
+        
+        List<ContentDocumentLink> documentos = [SELECT id, ContentDocument.Owner.name, ContentDocumentId 
+                                        FROM ContentDocumentLink WHERE  LinkedEntityId =: interaccionId];
+
+        List<CC_Grupo_Colaborador__c> listaGrupos = new List<CC_Grupo_Colaborador__c>();
+
+        if (escaladoNv2 != null) {
+            //Comprobar propietario
+            Id idUsuario = UserInfo.getUserId();
+            if (escaladoNv2.OwnerId != idUsuario) {throw new AuraHandledException('No eres el propietario del escalado');
+            }
+
+            //Comprobar si ya se ha reescalado o ya se ha respondido
+            List<SAC_Interaccion__c> listaEscalados = new List<SAC_Interaccion__c>();
+            listaEscalados = [SELECT id, SAC_CasoEscalado__c, SAC_Estado__c, SAC_Propuesta__c FROM SAC_Interaccion__c WHERE RecordTypeId = :RECTYPEREESCALADOSPV
+                            AND SAC_EscaladoNV2__c = :escaladoNv2.Id];
+
+            Boolean devuelto = false;
+            String error = '';
+            if (!listaEscalados.isEmpty()) {
+                for (SAC_Interaccion__c escaladoNV3 : listaEscalados) {
+                    if (escaladoNV3.SAC_Estado__c == 'SAC_Devuelto') {
+                        //Nuevo camino reescalado
+                        devuelto = true;
+                    } else if (escaladoNV3.SAC_Estado__c == 'SAC_Atendida') {
+                        //Error ya ha sido respondida
+                        error = 'La propuesta ya ha sido respondida!';
+                    } else {
+                        //Error ya ha sido reescalado
+                        error = 'Ya ha sido reescalado con anterioridad!';
+                    }
+                }
+            }
+
+            //Si existe un escalado de nivel 3 que está en estado devuelto, se vuelve a poner en estado pendiente de respuesta y el de nivel 2 pasa a estado reescalado
+            if (devuelto) {
+                reescalarDevueltoSPV(escaladoNv2, propuestaCops, motivo, observaciones);
+                return escaladoNv2.SAC_EscaladoNV3__c;
+            } else if (String.isNotBlank(error)) { //Si tenemos un error que enviar (ya reescalado o ya respondido) lo enviamos
+                throw new AuraHandledException(error);
+            } else { //Insertar el nuevo escalado de nivel 3
+                if(escaladoNv2.SAC_CasoEscalado__r.SAC_Entidad_Afectada__c == 'SAC_007'){
+                    listaGrupos = [SELECT Id, SAC_PermiteEscalado__c, SAC_Email__c, SAC_Email2__c, SAC_Email3__c 
+                                                                FROM CC_Grupo_Colaborador__c
+                                                                WHERE SAC_PermiteEscalado__c = true
+                                                                AND SAC_DeveloperName__c   = 'AJ_VCX'
+                                                                AND RecordTypeId = :RECTYPEGRUPOTAREAS];
+                }else{
+                    listaGrupos = [SELECT Id, SAC_PermiteEscalado__c, SAC_Email__c, SAC_Email2__c, SAC_Email3__c 
+                                                                FROM CC_Grupo_Colaborador__c
+                                                                WHERE 
+                                                                SAC_PermiteEscalado__c = true
+                                                                AND SAC_DeveloperName__c   = 'SPV_AJ'
+                                                                AND RecordTypeId = :RECTYPEGRUPOTAREAS];
+                }
+                List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+    
+                //Insert del escalado de nivel 3
+                SAC_Interaccion__c escaladoNv3 = new SAC_Interaccion__c();
+                escaladoNv3.RecordTypeId = RECTYPEREESCALADOSPV;
+                escaladoNv3.SAC_Estado__c = 'SAC_PendienteRespuesta';
+                escaladoNv3.SAC_Propuesta__c = escaladoNv2.SAC_Propuesta__c;
+                escaladoNv3.SAC_EscaladoNV2__c = escaladoNv2.Id;
+                escaladoNv3.SAC_CasoEscalado__c = escaladoNv2.SAC_CasoEscalado__c;
+                escaladoNv3.SAC_PropuestaCOPS__c = propuestaCops;
+                escaladoNv3.SAC_Titulo__c = escaladoNv2.SAC_Titulo__c;
+                escaladoNv3.SAC_MotivoEscalado__c = motivo;
+                escaladoNv3.SAC_Observaciones_Interaccion__c = observaciones;
+                if (!listaGrupos.isEmpty()) {
+                    escaladoNv3.SAC_GrupoColaborador__c = listaGrupos[0].Id;
+                    escaladoNv3.SAC_Email1__c = listaGrupos[0].SAC_Email__c;
+                    escaladoNv3.SAC_Email2__c = listaGrupos[0].SAC_Email2__c;
+                    escaladoNv3.SAC_Email3__c = listaGrupos[0].SAC_Email3__c;
+                }
+                if (!cola.isEmpty()) {
+                    escaladoNv3.OwnerId = cola[0].Id;
+                }
+                SAC_DatabaseDML.insertDML(escaladoNv3, false);
+    
+                List<SAC_CloneDocuments> listaDocumentos = new List<SAC_CloneDocuments>();
+                SAC_CloneDocuments documentosClonados = new SAC_CloneDocuments(interaccionId, escaladoNv3.Id);
+    
+                listaDocumentos.add(documentosClonados);
+                SAC_CloneDocuments.cloneDocuments(listaDocumentos);
+    
+                //Update del escalado de nivel 2
+                if (escaladoNv2.SAC_Estado__c == 'SAC_PendienteRespuesta') {
+                    escaladoNv2.SAC_Estado__c = 'SAC_Reescalada';
+                    escaladoNv2.SPV_SLAFinalizado__c = true;
+                    escaladoNv2.SAC_EscaladoNV3__c = escaladoNv3.Id;
+    
+                    try {
+                        SAC_DatabaseDML.updateDML(escaladoNv2, false);
+                        //Database.update(escaladoNv2);
+                    } catch (Exception e) {
+                        throw new AuraHandledException(e.getMessage());
+                    }
+                }
                 return escaladoNv3.id;
             }
         }
@@ -270,7 +403,6 @@ public without sharing class SAC_LCMP_InsertarReescalado {
                                         WHERE Id =: interaccionId LIMIT 1];
         
         User usuario = [SELECT SAC_GruposPerteneciente__c FROM User WHERE Id =: UserInfo.GetUserId() LIMIT 1];
-
         //Comprobamos los grupos a los que pertenece el usuario 
         // if(usuario.SAC_GruposPerteneciente__c != null){   
         if(String.isNotBlank(usuario.SAC_GruposPerteneciente__c)){
@@ -470,7 +602,6 @@ public without sharing class SAC_LCMP_InsertarReescalado {
     @AuraEnabled
     public static SAC_Interaccion__c getEscalado(Id interaccionId){
         //Recuperar escalado actual
-        // system.debug('SAC_LCMP_InsertarReescalado - SAC_Interaccion__c - interaccionId: ' + interaccionId);
         return [SELECT id, OwnerId, SAC_Conclusion__c, SAC_Respuesta__c, SAC_Estado__c, SAC_ImporteAutorizado__c, RecordTypeId, SAC_Titulo__c,
                                     Name, SAC_CasoEscalado__c, SAC_CasoEscalado__r.RecordTypeId, SAC_CasoEscalado__r.SAC_CasoEspecial__c, SAC_Reclamacion__c,
                                     SAC_EscaladoNV2__c, SAC_EscaladoNV2__r.OwnerId, SAC_EscaladoNV2__r.Name, SAC_EscaladoNV2__r.SAC_Titulo__c, 
@@ -566,7 +697,7 @@ public without sharing class SAC_LCMP_InsertarReescalado {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            US504007         CS             18/09/23     Creación
     *****************************************************************/
-    private static void reescalarDevuelto(SAC_Interaccion__c escaladoNv2, String porpuestaCops, String motivo, String observaciones) {
+    private static void reescalarDevuelto(SAC_Interaccion__c escaladoNv2, String propuestaCops, String motivo, String observaciones) {
         //Si existe un escalado de nivel 3 que está en estado devuelto, se vuelve a poner en estado pendiente de respuesta y el de nivel 2 pasa a estado reescalado
         List<SAC_Interaccion__c> listaInteraccionUpdatear = new List<SAC_Interaccion__c>();
         escaladoNv2.SAC_Estado__c = 'SAC_Reescalada';
@@ -576,12 +707,48 @@ public without sharing class SAC_LCMP_InsertarReescalado {
         escaladoNV3.Id = escaladoNv2.SAC_EscaladoNV3__c;
         escaladoNv3.SAC_Estado__c = 'SAC_PendienteRespuesta';
         escaladoNv3.SAC_Propuesta__c = escaladoNv2.SAC_Propuesta__c;
-        escaladoNv3.SAC_PropuestaCOPS__c = porpuestaCops;
+        escaladoNv3.SAC_PropuestaCOPS__c = propuestaCops;
         escaladoNv3.SAC_MotivoEscalado__c = motivo;
         escaladoNv3.SAC_Observaciones_Interaccion__c = observaciones;
         escaladoNv3.SAC_Conclusion__c = null;
 
         List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SAC_PendienteAsignar' LIMIT 1];
+        if (!cola.isEmpty()) {
+            escaladoNv3.OwnerId = cola[0].Id;
+        }
+        listaInteraccionUpdatear.add(escaladoNV3);
+
+        SAC_DatabaseDML.updateListDML(listaInteraccionUpdatear, true);
+        //Database.update(listaInteraccionUpdatear);
+    }
+
+
+    /*****************************************************************
+    * Proposito: Reescalar un escalado que ha sido devuelto. Esto sucede cuando ya existe
+    * un escalado nivel 3 y está en estado devuelto. El escalado nivel 2 vuelve a pasar a estado
+    * reescalado y el nivel 3 pasa de estado devuelto a estado pendiente respuesta.
+    * 
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0            US1277284      Sergio Martín   06/06/25        Creación
+    *****************************************************************/
+    private static void reescalarDevueltoSPV(SAC_Interaccion__c escaladoNv2, String propuestaCops, String motivo, String observaciones) {
+        //Si existe un escalado de nivel 3 que está en estado devuelto, se vuelve a poner en estado pendiente de respuesta y el de nivel 2 pasa a estado reescalado
+        List<SAC_Interaccion__c> listaInteraccionUpdatear = new List<SAC_Interaccion__c>();
+        escaladoNv2.SAC_Estado__c = 'SAC_Reescalada';
+        listaInteraccionUpdatear.add(escaladoNv2);
+
+        SAC_Interaccion__c escaladoNV3 = new SAC_Interaccion__c();
+        escaladoNV3.Id = escaladoNv2.SAC_EscaladoNV3__c;
+        escaladoNv3.SAC_Estado__c = 'SAC_PendienteRespuesta';
+        escaladoNv3.SAC_Propuesta__c = escaladoNv2.SAC_Propuesta__c;
+        escaladoNv3.SAC_PropuestaCOPS__c = propuestaCops;
+        escaladoNv3.SAC_MotivoEscalado__c = motivo;
+        escaladoNv3.SAC_Observaciones_Interaccion__c = observaciones;
+        escaladoNv3.SAC_Conclusion__c = null;
+
+        List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
         if (!cola.isEmpty()) {
             escaladoNv3.OwnerId = cola[0].Id;
         }

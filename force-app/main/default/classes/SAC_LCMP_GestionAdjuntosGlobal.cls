@@ -224,7 +224,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                     idsDocumentLink.add(recordCdL.ContentDocumentId);
                 }
     
-                List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, SAC_Oculto__c, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_Numero_Prestamo__c FROM ContentVersion WHERE ContentDocumentId IN: idsDocumentLink AND SAC_BloqueoTotalVisibilidad__c = false ORDER BY CreatedDate ASC];
+                List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, SAC_Oculto__c, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_Numero_Prestamo__c, SAC_Enviado__c FROM ContentVersion WHERE ContentDocumentId IN: idsDocumentLink AND SAC_BloqueoTotalVisibilidad__c = false ORDER BY CreatedDate ASC];
 
                 for(ContentVersion recordCv : cv){
                     contentOculto.put(recordCv.id, recordCv.SAC_Oculto__c);

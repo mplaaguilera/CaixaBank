@@ -10,6 +10,8 @@ public with sharing class CC_LiveChatTranscript_AI_TRHan extends CC_TriggerHandl
         Map<Id, Integer> mapeoArrays = new Map<Id, Integer>();
         List<ID> listadoChatsCreadosEmpleados = new List<ID>();
 
+        
+
         Id rtHdtId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('LiveChatTranscript', 'HDT_Empleados');
         Id rtEmpleadosId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('LiveChatTranscript', 'CC_Empleados');
         Id rtCSBD = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('LiveChatTranscript', 'CSBD_Gestor');
@@ -83,6 +85,8 @@ public with sharing class CC_LiveChatTranscript_AI_TRHan extends CC_TriggerHandl
             // Llamada asíncrona para actualizar el caso y crear tareas.
             CC_GestionEntradaChat.actualizarDatosChatAIFuture(listadoChatsCreadosEmpleados);
         }
+
+        identificarClientes(listNewObj);
 	}
 
 	//public override void inProgressEntry(CC_TriggerParameters tp) {
@@ -131,4 +135,27 @@ public with sharing class CC_LiveChatTranscript_AI_TRHan extends CC_TriggerHandl
         chats.clear();
         chats = null;
     }*/
+    private void identificarClientes(List<LiveChatTranscript> listNewObj) {
+        List<LiveChatTranscript> chatsParaIdentificar = new List<LiveChatTranscript>();
+        List<ID> idsChatsParaIdentificar = new List<ID>();
+        List<LiveChatTranscript> chatsParaIdentificarModificar = new List<LiveChatTranscript>();
+        for (LiveChatTranscript chatAgente : listNewObj) {
+            if (String.isNotBlank(chatAgente.ContactId) && String.isNotBlank(chatAgente.AccountId) && String.isNotBlank(chatAgente.CaseId) && chatAgente.Status == 'InProgress' && chatAgente.CC_Actualizar_ALF__c == true) {
+                chatsParaIdentificar.add(chatAgente);
+                idsChatsParaIdentificar.add(chatAgente.Id);
+            }
+        }
+
+        if (!idsChatsParaIdentificar.isEmpty()) {
+            //Invocamos el metodo de identificación de clientes
+            CC_IdentCliente_Future.identificarClientesChat(idsChatsParaIdentificar);
+            for (LiveChatTranscript chatAgente : chatsParaIdentificar) {
+                LiveChatTranscript chatAgenteModificar = new LiveChatTranscript();
+                chatAgenteModificar.Id = chatAgente.Id;
+                chatAgenteModificar.CC_Actualizar_ALF__c = false;
+                chatsParaIdentificarModificar.add(chatAgenteModificar);
+            }
+            update chatsParaIdentificarModificar;
+        }
+    }
 }

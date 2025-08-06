@@ -28,7 +28,7 @@ public with sharing class OS_Case_AI_TRHan extends CC_TriggerHandlerBase {
         if ((listNewObjCops.size() != 0)){
             crearActividadCierre(listNewObjCops);
             envioCorreoTrasladoRemitidoAutomatico(listNewObjCops);
-            gestionarDANDGDT(listNewObjCops);
+            //gestionarDANDGDT(listNewObjCops);
             completarMilestonesCasoManual(listNewObjCops); 
             //OS_CaseTriggerHelper.creacionCaso_AI(JSON.serialize(listNewObjCops)); 
             //OS_CaseTriggerHelper.filtroAcuseReciboValija_AI(listNewObjCops);
@@ -87,16 +87,6 @@ public with sharing class OS_Case_AI_TRHan extends CC_TriggerHandlerBase {
                 OS_Case.envioCorreoTrasladoRemitidoAutomatico(casosIds, MCCIds);
             }
         }
-    }
-
-    private void gestionarDANDGDT(List<Case> listNewObjCops){
-        Set<Id> casosInformarDANDGDT = new Set<Id>();
-        for(Case caso: listNewObjCops){
-            if(caso.AccountId != null){
-                casosInformarDANDGDT.add(caso.Id);
-            }
-        }
-        OS_Informar_DAN_DG_DT_Caso.informarCampos(casosInformarDANDGDT);
     }
 
     private void completarMilestonesCasoManual(List<Case> listNewObj) {

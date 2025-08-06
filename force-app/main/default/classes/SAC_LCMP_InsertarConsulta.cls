@@ -31,7 +31,6 @@ public with sharing class SAC_LCMP_InsertarConsulta {
     *********************************************************************************************/
     @AuraEnabled
     public static String insertarConsulta(String consultaId){
-
         SAC_Interaccion__c consulta = new SAC_Interaccion__c();
         consulta.RecordTypeId = RECTYPECONSULTA;
         consulta.SAC_Reclamacion__c = consultaId;

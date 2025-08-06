@@ -77,7 +77,30 @@ public class CC_Task_AU_TRHan_Test
             tareaReadOnly.WhatId = csReadOnly.Id;
             insert tareaReadOnly;
 
+            Case caso = new Case();
+            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            caso.CC_Idioma__c = 'es';
+            caso.Subject = 'Asunto';
+            caso.Description = 'Descripción';
+            caso.CC_Tipo_Contacto__c = 'Consulta';
+            caso.CC_Canal_Procedencia__c = 'Accionista';
+            caso.CC_Canal_Resolucion__c = 'Accionista';
+            caso.CC_Canal_Operativo__c = 'App CaixaBankPay';
+            caso.Origin = 'Email';
+            caso.Status = 'Inactivo ';
+            caso.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            caso.CC_Detalles_Solucion__c = 'Detalles Solución';
+            insert caso;
 
+            Task tareaNoTiempo = new Task();
+            tareaNoTiempo.type = 'Otros';
+            tareaNoTiempo.Status = 'Pendiente no localizado';
+            tareaNoTiempo.Priority = 'Normal';
+            tareaNoTiempo.Subject = 'Reclamación';
+            tareaNoTiempo.RecordTypeId = tareaNoTiempo.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tareaNoTiempo.WhatId = caso.Id;
+            
+            insert tareaNoTiempo;
         }
     }
 
@@ -182,6 +205,46 @@ public class CC_Task_AU_TRHan_Test
            // Test.startTest();
             System.assertEquals(tarea.type, tareaAI.OS_Tipo__c, 'No se ha copiado el Task Type');
             //Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void casoGestionTareasNoTiempoTest()
+    {
+        User administrador = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+        
+        System.runAs(administrador)
+        {
+            Test.startTest();
+
+
+
+            Case caso = [SELECT Id FROM Case WHERE Subject = 'Asunto' LIMIT 1];
+
+            Task tareaNoTiempo = [SELECT Id, Subject, Status, Type FROM Task WHERE Status = 'Pendiente no localizado' LIMIT 1];
+
+
+            tareaNoTiempo.Subject = 'Reclamación de cliente';
+            tareaNoTiempo.Status = 'Rechazada';
+            tareaNoTiempo.Type = 'Traslado Colaborador';
+            update tareaNoTiempo;
+            
+            System.debug('tareaNoTiempo: ' + tareaNoTiempo);
+
+            Task tareaNoTiempoUpdate = [SELECT Id, Subject, Status, Type, CC_Fecha_Fin__c FROM Task WHERE Id = :tareaNoTiempo.Id];
+
+            Case casoUpdate = [SELECT Id, CC_Fecha_Ultima_Reclamacion__c, CC_Numero_Reclamaciones_Cliente__c, Status FROM Case WHERE Id = :caso.Id];
+
+            System.assertEquals(tareaNoTiempoUpdate.Subject, 'Reclamación de cliente', 'No se ha actualizado el subject de la tarea');
+            System.assertEquals(tareaNoTiempoUpdate.Status, 'Rechazada', 'No se ha actualizado el status de la tarea');
+            System.assertEquals(tareaNoTiempoUpdate.Type, 'Traslado Colaborador', 'No se ha actualizado el type de la tarea');
+
+            System.assertEquals(true, tareaNoTiempoUpdate.CC_Fecha_Fin__c != null, 'No se ha actualizado la fecha de la última reclamación, sigue a Nulo');
+            System.assertEquals(true, casoUpdate.Status == 'Activo', 'No se ha actualizado el status del caso');
+
+
+            Test.stopTest();
         }
     }
 }

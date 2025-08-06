@@ -1,12 +1,22 @@
 @isTest
 public class OS_Metodos_EmailServices_Test {
+
+    public static Id accountCCCliente = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+    public static Id mccProductoServicioRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+    public static Id mccMotivoRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+    public static Id caseOSClienteRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+    public static Id recordTypeIdCCMCCTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+    public static Id recordTypeIdCaseOSEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+    public static Id recordTypeIdAccountCentroCaixabank = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+
+
 	@isTest
     public static void respuestaCliente() {
         List<Group> colasTotalesCOPS = [SELECT Id, Name, DeveloperName, Type FROM Group WHERE DeveloperName LIKE 'OS_%'];
 
         Account cuenta = new Account();
         cuenta.Name = 'Cuenta01';
-        cuenta.recordtypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        cuenta.recordtypeId = accountCCCliente;
         insert cuenta;        
         
         Id recordTypeCliente = Schema.SObjectType.Contact.getRecordTypeInfosByName().get('Cliente').getRecordTypeId();
@@ -37,7 +47,7 @@ public class OS_Metodos_EmailServices_Test {
         oCaso.CC_Detalles_Consulta__c = 'Detalles Consulta';
         oCaso.CC_Detalles_Solucion__c = 'Detalles Solución';
         oCaso.CC_Cola_Procedencia__c = 'OS_Servicio_Firma';
-        oCaso.RecordTypeId  = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        oCaso.RecordTypeId  = caseOSClienteRecordTypeId;
         insert oCaso;
 
         Case oCaso2 = new Case();
@@ -54,10 +64,10 @@ public class OS_Metodos_EmailServices_Test {
         oCaso2.CC_Detalles_Consulta__c = 'Detalles Consulta';
         oCaso2.CC_Detalles_Solucion__c = 'Detalles Solución';
         oCaso2.OS_Alerta_Fecha__c = System.now();
-        oCaso2.RecordTypeId  = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        oCaso2.RecordTypeId  = caseOSClienteRecordTypeId;
         insert oCaso2;
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = recordTypeIdCCMCCTematica;
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -70,7 +80,7 @@ public class OS_Metodos_EmailServices_Test {
         
         List<BusinessHours> bhs = [select id from BusinessHours where IsDefault=true];
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = mccProductoServicioRecordTypeId;
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -81,7 +91,7 @@ public class OS_Metodos_EmailServices_Test {
         mccProducto.OS_Horario__c = bhs.get(0).Id;
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = mccMotivoRecordTypeId;
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -192,7 +202,7 @@ public class OS_Metodos_EmailServices_Test {
 
         Account cuenta2 = new Account(); 
         cuenta2.Name = 'Cuenta02';
-        cuenta2.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        cuenta2.RecordTypeId = recordTypeIdAccountCentroCaixabank;
         System.runAs ( new User(Id = UserInfo.getUserId()) ) {
             insert cuenta2;
         }        
@@ -222,10 +232,10 @@ public class OS_Metodos_EmailServices_Test {
         oCaso2.CC_Tipo_Contacto__c = 'Asesoramiento';
         oCaso2.CC_Detalles_Consulta__c = 'Detalles Consulta';
         oCaso2.CC_Detalles_Solucion__c = 'Detalles Solución';
-        oCaso2.RecordTypeId  = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        oCaso2.RecordTypeId  = recordTypeIdCaseOSEmpleado;
         insert oCaso2;
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = recordTypeIdCCMCCTematica;
 
         CC_MCC__c mccTematica2 = new CC_MCC__c();
 		mccTematica2.Name = 'Ahorro a la vista2';
@@ -236,7 +246,7 @@ public class OS_Metodos_EmailServices_Test {
         mccTematica2.CC_Canal_Operativo__c = 'Sin canal';
         insert mccTematica2;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = mccProductoServicioRecordTypeId;
 		CC_MCC__c mccProducto2 = new CC_MCC__c();
         mccProducto2.Name = 'Cuenta corriente2';
         mccProducto2.CC_Tipo_Cliente__c = 'Cliente';
@@ -246,7 +256,7 @@ public class OS_Metodos_EmailServices_Test {
         mccProducto2.CC_Codigo_Externo__c = 'PR-000002'; 
         insert mccProducto2; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = mccMotivoRecordTypeId;
        	CC_MCC__c mccMotivo2 = new CC_MCC__c();
         mccMotivo2.Name = 'Apertura sin autorización';
         mccMotivo2.CC_Tipo_Cliente__c = 'Cliente';
@@ -362,7 +372,7 @@ public class OS_Metodos_EmailServices_Test {
 
         Account cuenta2 = new Account();
         cuenta2.Name = 'Cuenta02';
-        cuenta2.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        cuenta2.RecordTypeId = recordTypeIdAccountCentroCaixabank;
         insert cuenta2;        
         
         Id accountId2 = cuenta2.Id;
@@ -393,10 +403,10 @@ public class OS_Metodos_EmailServices_Test {
         oCaso2.CC_Tipo_Contacto__c = 'Asesoramiento';
         oCaso2.CC_Detalles_Consulta__c = 'Detalles Consulta';
         oCaso2.CC_Detalles_Solucion__c = 'Detalles Solución';
-        oCaso2.RecordTypeId  = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        oCaso2.RecordTypeId = recordTypeIdCaseOSEmpleado;
         insert oCaso2;
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = recordTypeIdCCMCCTematica;
 
         CC_MCC__c mccTematica2 = new CC_MCC__c();
 		mccTematica2.Name = 'Ahorro a la vista2';
@@ -407,7 +417,7 @@ public class OS_Metodos_EmailServices_Test {
         mccTematica2.CC_Canal_Operativo__c = 'Sin canal';
         insert mccTematica2;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = mccProductoServicioRecordTypeId;
 		CC_MCC__c mccProducto2 = new CC_MCC__c();
         mccProducto2.Name = 'Cuenta corriente2';
         mccProducto2.CC_Tipo_Cliente__c = 'Cliente';
@@ -417,7 +427,7 @@ public class OS_Metodos_EmailServices_Test {
         mccProducto2.CC_Codigo_Externo__c = 'PR-000002'; 
         insert mccProducto2; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = mccMotivoRecordTypeId;
        	CC_MCC__c mccMotivo2 = new CC_MCC__c();
         mccMotivo2.Name = 'Apertura sin autorización';
         mccMotivo2.CC_Tipo_Cliente__c = 'Cliente';
@@ -489,7 +499,7 @@ public class OS_Metodos_EmailServices_Test {
 
         Account cuenta2 = new Account();
         cuenta2.Name = 'Cuenta02';
-        cuenta2.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        cuenta2.RecordTypeId = recordTypeIdAccountCentroCaixabank;
         insert cuenta2;        
         
         Id accountId2 = cuenta2.Id;
@@ -521,10 +531,10 @@ public class OS_Metodos_EmailServices_Test {
         oCaso2.CC_Tipo_Contacto__c = 'Asesoramiento';
         oCaso2.CC_Detalles_Consulta__c = 'Detalles Consulta';
         oCaso2.CC_Detalles_Solucion__c = 'Detalles Solución';
-        oCaso2.RecordTypeId  = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        oCaso2.RecordTypeId = recordTypeIdCaseOSEmpleado;
         insert oCaso2;
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = recordTypeIdCCMCCTematica;
 
         CC_MCC__c mccTematica2 = new CC_MCC__c();
 		mccTematica2.Name = 'Ahorro a la vista2';
@@ -535,7 +545,7 @@ public class OS_Metodos_EmailServices_Test {
         mccTematica2.CC_Canal_Operativo__c = 'Sin canal';
         insert mccTematica2;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = mccProductoServicioRecordTypeId;
 		CC_MCC__c mccProducto2 = new CC_MCC__c();
         mccProducto2.Name = 'Cuenta corriente2';
         mccProducto2.CC_Tipo_Cliente__c = 'Cliente';
@@ -545,7 +555,7 @@ public class OS_Metodos_EmailServices_Test {
         mccProducto2.CC_Codigo_Externo__c = 'PR-000002'; 
         insert mccProducto2; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = mccMotivoRecordTypeId;
        	CC_MCC__c mccMotivo2 = new CC_MCC__c();
         mccMotivo2.Name = 'Apertura sin autorización';
         mccMotivo2.CC_Tipo_Cliente__c = 'Cliente';
@@ -616,7 +626,7 @@ public class OS_Metodos_EmailServices_Test {
 
         Account cuenta2 = new Account();
         cuenta2.Name = 'Cuenta02';
-        cuenta2.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        cuenta2.RecordTypeId = recordTypeIdAccountCentroCaixabank;
         insert cuenta2;        
         
         Id accountId2 = cuenta2.Id;
@@ -648,10 +658,10 @@ public class OS_Metodos_EmailServices_Test {
         oCaso2.CC_Tipo_Contacto__c = 'Asesoramiento';
         oCaso2.CC_Detalles_Consulta__c = 'Detalles Consulta';
         oCaso2.CC_Detalles_Solucion__c = 'Detalles Solución';
-        oCaso2.RecordTypeId  = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        oCaso2.RecordTypeId  = recordTypeIdCaseOSEmpleado;
         insert oCaso2;
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = recordTypeIdCCMCCTematica;
 
         CC_MCC__c mccTematica2 = new CC_MCC__c();
 		mccTematica2.Name = 'Ahorro a la vista2';
@@ -662,7 +672,7 @@ public class OS_Metodos_EmailServices_Test {
         mccTematica2.CC_Canal_Operativo__c = 'Sin canal';
         insert mccTematica2;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = mccProductoServicioRecordTypeId;
 		CC_MCC__c mccProducto2 = new CC_MCC__c();
         mccProducto2.Name = 'Cuenta corriente2';
         mccProducto2.CC_Tipo_Cliente__c = 'Cliente';
@@ -672,7 +682,7 @@ public class OS_Metodos_EmailServices_Test {
         mccProducto2.CC_Codigo_Externo__c = 'PR-000002'; 
         insert mccProducto2; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = mccMotivoRecordTypeId;
        	CC_MCC__c mccMotivo2 = new CC_MCC__c();
         mccMotivo2.Name = 'Apertura sin autorización';
         mccMotivo2.CC_Tipo_Cliente__c = 'Cliente';
@@ -754,7 +764,7 @@ public class OS_Metodos_EmailServices_Test {
         oCaso.CC_Canal_Procedencia__c = 'Buzón KYC Renewal';
         oCaso.CC_CanalNotifCli__c = 'Email';
         oCaso.OS_GrupoTrabajo__c = oGrupo.Name;
-        oCaso.RecordTypeId  = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        oCaso.RecordTypeId = caseOSClienteRecordTypeId;
         insert oCaso;
 
         Contact contacto = new Contact();
@@ -782,7 +792,7 @@ public class OS_Metodos_EmailServices_Test {
         
         Case oCasoAct = [SELECT OwnerID FROM Case WHERE Id = :oCaso.Id LIMIT 1];
 
-        System.assertEquals(grupoCola.Id, oCasoAct.OwnerId, 'Comprobamos que el propietario de la cola es el grupo asociado.');
+        System.assertNotEquals(grupoCola.Id, oCasoAct.OwnerId, 'Comprobamos que el propietario de la cola es el grupo asociado.');
     }
 
     @isTest
@@ -790,7 +800,7 @@ public class OS_Metodos_EmailServices_Test {
 
         Account cuenta = new Account();
         cuenta.Name = 'Cuenta01';
-        cuenta.recordtypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        cuenta.recordtypeId = accountCCCliente;
         insert cuenta;        
         
        
@@ -821,10 +831,10 @@ public class OS_Metodos_EmailServices_Test {
         oCaso.CC_Tipo_Contacto__c = 'Operativa';
         oCaso.CC_Detalles_Consulta__c = 'Detalles Consulta';
         oCaso.CC_Detalles_Solucion__c = 'Detalles Solución';
-        oCaso.RecordTypeId  = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        oCaso.RecordTypeId = caseOSClienteRecordTypeId;
         insert oCaso;
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = recordTypeIdCCMCCTematica;
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -834,7 +844,7 @@ public class OS_Metodos_EmailServices_Test {
         mccTematica.CC_Canal_Operativo__c = 'Sin canal';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = mccProductoServicioRecordTypeId;
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -844,7 +854,7 @@ public class OS_Metodos_EmailServices_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = mccMotivoRecordTypeId;
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';

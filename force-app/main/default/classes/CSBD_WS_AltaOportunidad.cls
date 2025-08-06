@@ -129,16 +129,16 @@ global with sharing class CSBD_WS_AltaOportunidad {
 					}
 
 					respuestaLog += 'Producto oportunidad: ' + producto + '. ';
-
+					
 					//Obtener los accountsIds pertenecientes a cada oportunidad mediante el método identificarCliente.
 					//Creación de un mapa relacionando el numsolicitud de la futura oportunidad con su accountId.
-
+					
 					Map<String, Object> datosCliente = new  Map<String, Object>();
 					if(String.isBlank(solicitud.indInTouch)){
 						datosCliente = CSBD_WS_AltaOportunidad_Campos.identificarCliente(solicitud, datosCliente, respuesta);
 					}
 
-					//Solo se comprueba la lógica de traspasar si indInTouch == 'S'
+					//Solo se comprueba la lógica de traspasar si indInTouch == 'S' 
 					if (solicitud.indInTouch == 'S' || (datosCliente.containsKey('AV_IndicadoresClientes__c') && datosCliente.get('AV_IndicadoresClientes__c').toString().contains('8'))) {
 
 						//¿Es empresa imagin?  -- el producto está dado de alta en la lista de valores -- no tenemos en cuenta indInTouch = S/N
@@ -318,7 +318,7 @@ global with sharing class CSBD_WS_AltaOportunidad {
     }
 
 	public static void altaOportunidadMacEvento(Id recordId) {
-		Case casoOrigen = [SELECT AccountId, ContactId, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name
+		Case casoOrigen = [SELECT AccountId, Account.AV_IndicadoresClientes__c, ContactId, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name
 							FROM Case WHERE Id = :recordId];
 
 		String claveProducto = '';
@@ -335,6 +335,8 @@ global with sharing class CSBD_WS_AltaOportunidad {
 		inputSolicitud.nombreProducto = claveProducto;
 		inputSolicitud.accountId = casoOrigen.AccountId;
 		inputSolicitud.contactId = casoOrigen.ContactId;
+		inputSolicitud.motivo = casoOrigen.CC_MCC_Motivo__r.Name;
+		inputSolicitud.indicadoresCliente = casoOrigen.Account.AV_IndicadoresClientes__c;
 
 		CSBD_WS_AltaOportunidad_Input input = new CSBD_WS_AltaOportunidad_Input();
 		input.solicitudes.add(inputSolicitud);

@@ -31,10 +31,26 @@ import getURCasoDestino from '@salesforce/apex/GRR_Case_Operativa.getURCasoDesti
 import crearTarea from '@salesforce/apex/GRR_Case_Operativa.crearTareaGestionadoMes'; 
 import perteneceServiciosCentrales from '@salesforce/apex/GRR_Case_Operativa.perteneceServiciosCentrales';
 import reabrirTareaTrasladoColaborador from '@salesforce/apex/GRR_Case_Operativa.reabrirTareaTrasladoColaborador';
+import getUserRoleName from '@salesforce/apex/GRR_CaseTriggerHelper.getUserRoleName';
+
+
 
 
 //eslint-disable-next-line camelcase, new-cap
 export default class grr_Case_Operativa extends NavigationMixin(LightningElement) {
+
+	userRole;
+    isRoleGestiones = false;
+
+	@wire(getUserRoleName)
+	wiredUserRole({ data }) {
+			if (data) {
+				this.userRole = data;
+				this.isRoleGestiones = data === 'GRR Agente COPS';
+			} 
+		}
+
+
 	@api recordId;
 
 	casoCargado = false;

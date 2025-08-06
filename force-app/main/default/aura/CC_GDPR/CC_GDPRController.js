@@ -90,6 +90,9 @@
 				}
 			}
 			
+			// Crear la tarea con el derecho ejercido
+			helper.crearTareaEnCaso(component, selectedRecordTypeName);
+			
 			//Cerrar el modal de Ejercer Derecho
 			let cerrarModalEjercerDerecho = component.get("c.cerrarModalEjercerDerecho");
 			$A.enqueueAction(cerrarModalEjercerDerecho);

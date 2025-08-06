@@ -13,7 +13,7 @@ public class OS_Programar_Alerta_Test {
 
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
-        caso.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         caso.Subject = 'Prueba Alerta';
         caso.Status = 'Pendiente Alerta';
         caso.Origin = 'Phone';
@@ -55,7 +55,7 @@ public class OS_Programar_Alerta_Test {
 
         Case caso2 = new Case();
         caso2.CC_Idioma__c = 'es';
-        caso2.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso2.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         caso2.Subject = 'Prueba Alerta';
         caso2.Status = 'Activo';
         caso2.Origin = 'Phone';

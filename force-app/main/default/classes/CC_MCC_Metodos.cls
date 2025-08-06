@@ -822,6 +822,9 @@ public without sharing class CC_MCC_Metodos {
 					}
 				}else if (mcc.RecordType.DeveloperName == 'CC_Motivo' && mcc.CC_Codigo_Externo__c == null){
 					if (mcc.CC_Tipo_Cliente__c == 'Cliente' || mcc.CC_Tipo_Cliente__c == 'Empleado' || mcc.CC_Tipo_Cliente__c == 'Cliente/Empleado' || mcc.CC_Tipo_Cliente__c == 'Prejubilado' || mcc.CC_Tipo_Cliente__c == 'Proveedor / Empleado') {
+						System.debug(':::numMotivoCC ' + numMotivoCC);
+						System.debug(':::codExternoMotivoCC ' + codExternoMotivoCC);
+						System.debug(':::mcc ' + mcc);
 						numMotivoCC = numMotivoCC+1;
 						codigoExternoMotivoCC = String.valueOf(numMotivoCC).leftPad(6, '0');
 						codigoExternoMotivoCC = codExternoMotivoCC[0] + '-' +codigoExternoMotivoCC;

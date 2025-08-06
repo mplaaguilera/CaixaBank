@@ -380,7 +380,7 @@ public with sharing class CC_GDPR {
 					throw errorRespuesta;
 				}
 			} catch (Exception e) {
-				// Error de comunicaciones...
+				// Error de comunicaciones
 				CBK_Log.error(e, 'CC_GDPR - altaSolicitudFuture - Error de comunicaciones');
 				descripcionError = 'Error de comunicaciones';
 				detalleError = e.getMessage();
@@ -417,5 +417,36 @@ public with sharing class CC_GDPR {
 	@InvocableMethod(label='Enviar solicitud de derecho a GDPR' description='Enviar solicitud de derecho a GDPR')
 	public static void altaSolicitud(List<Id> derechosId) {
 		altaSolicitudFuture(derechosId);
+	}
+
+	@AuraEnabled
+	public static void crearTareaGDPR(Id idCaso, String derechoEjercido) {
+		try {
+			// Obtener información del caso
+			Case caso = [SELECT Id, CaseNumber, Subject, Account.Name, Contact.Name 
+						 FROM Case 
+						 WHERE Id = :idCaso];
+			
+			// Crear nueva tarea
+			Task nuevaTarea = new Task();
+			nuevaTarea.WhatId = idCaso; // Asociar al caso
+			nuevaTarea.Subject = 'GDPR';
+			nuevaTarea.Type = 'GDPR';
+			nuevaTarea.Description = 'Se ha iniciado el proceso de ejercicio de derecho GDPR para el caso ' + caso.CaseNumber + 
+									'\nCliente: ' + (caso.Account.Name != null ? caso.Account.Name : 'N/A') +
+									'\nContacto: ' + (caso.Contact.Name != null ? caso.Contact.Name : 'N/A') +
+									'\nAsunto: ' + (caso.Subject != null ? caso.Subject : 'N/A') +
+									'\nDerecho ejercido: ' + derechoEjercido +
+									'\nFecha de creación: ' + Datetime.now().format('dd/MM/yyyy HH:mm:ss');
+			nuevaTarea.Status = 'Completed';
+			nuevaTarea.Priority = 'Normal';
+			nuevaTarea.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+			
+			insert nuevaTarea;
+			
+		} catch (Exception e) {
+			// Log del error pero no fallar la operación principal
+			CBK_Log.error(e, 'CC_GDPR - crearTareaGDPR - Error al crear tarea GDPR');
+		}
 	}
 }

@@ -11,6 +11,8 @@ public with sharing class SPV_LCMP_EscaladoOperativas_Test {
         Map<String, Object> camposObj = new Map<String, Object>();
         //Reclamacion
         Case recla = new Case();
+        //Pretensión
+        Case pret = new Case();
         //Grupo
         CC_Grupo_Colaborador__c grupo = new CC_Grupo_Colaborador__c();
 
@@ -31,6 +33,16 @@ public with sharing class SPV_LCMP_EscaladoOperativas_Test {
             camposObj.put('Subject', 'testrec1');
             recla = SPV_TestDataFactory.crearCaso('Reclamacion', camposObj);
             SPV_DatabaseDML.insertDML(recla, true);
+
+            //Pretensiones
+            camposObj.clear();
+            camposObj.put('Subject', 'testPret1');
+            pret = SPV_TestDataFactory.crearCaso('Pretension', camposObj);
+            SPV_DatabaseDML.insertDML(pret, true);
+
+            //Actualizar el campo pretensión principal de la reclamación
+            recla.SAC_PretensionPrincipal__c = pret.Id;
+            SPV_DatabaseDML.updateDML(recla, true);
         }
 
         system.runAs(listaUsersAdmin[0]) {
@@ -53,12 +65,24 @@ public with sharing class SPV_LCMP_EscaladoOperativas_Test {
             camposObj.put('SPV_TipoActuacion__c', 'SPV_Pago');
             camposObj.put('SPV_Importe__c', 1);
             camposObj.put('SPV_Imputable__c', 'SPV_Entidad');
+            camposObj.put('SPV_InstruccionesAJ__c', 'Test');
+            camposObj.put('SPV_DecisionFinal__c', 'Alegaciones');
+            camposObj.put('SPV_ImporteDecisionFinal__c', 12);
+            camposObj.put('SAC_Conclusion__c', 'SPV_Aceptado');
             SAC_Interaccion__c escalado = SPV_TestDataFactory.crearInteraccion('Escalado', camposObj);
             SPV_DatabaseDML.insertDML(escalado, true);
 
+            //Crear reescalado
+            SAC_Interaccion__c reescalado = new SAC_Interaccion__c();
+            reescalado.SAC_CasoEscalado__c = recla.Id;
+            reescalado.RecordTypeId = Schema.SObjectType.SAC_Interaccion__c.getRecordTypeInfosByDeveloperName().get('SPV_Reescalado').getRecordTypeId();
+            reescalado.SAC_GrupoColaborador__c = grupo.Id;
+            reescalado.SAC_Titulo__c = 'tesRescalado1';
+            SPV_DatabaseDML.insertDML(reescalado, true);
+            
             //Crear formulario
             SPV_Formulario__c formulario = new SPV_Formulario__c();
-            formulario.RecordTypeId = Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SPV_Formulario').getRecordTypeId();
+            formulario.RecordTypeId = Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SPV_FormularioAnalisisDecision').getRecordTypeId();
             formulario.SPV_Caso__c = recla.Id;
             formulario.SPV_LetradoRevisor__c = 'TestSPV';
             formulario.SPV_Importe__c = 1;
@@ -93,6 +117,47 @@ public with sharing class SPV_LCMP_EscaladoOperativas_Test {
             formulario.SPV_InformacionPrecontractual__c = 'TestSPV';
             SPV_DatabaseDML.insertDML(formulario, true);
         }
+    }
+
+
+    @isTest
+    static void cancelarEscaladoTest(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        SAC_Interaccion__c escalado = [SELECT Id, SAC_GrupoColaborador__c, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
+        Test.startTest();
+        System.runAs(usuario){
+            SPV_LCMP_EscaladoOperativas.cancelarEscalado(escalado.Id);
+        }
+        Test.stopTest();
+        SAC_Interaccion__c escaladoResult = [SELECT Id, OwnerId, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
+        System.assertEquals(escaladoResult.SAC_Estado__c, 'SAC_Cancelado', 'No se ha cancelado el escalado');
+    }
+
+    @isTest
+    static void obtenerEscaladoTest(){
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        SAC_Interaccion__c escalado = [SELECT Id, SAC_GrupoColaborador__c, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
+        SAC_Interaccion__c resultado = new SAC_Interaccion__c();
+        Test.startTest();
+        System.runAs(usuario){
+            resultado = SPV_LCMP_EscaladoOperativas.obtenerEscalado(escalado.Id);
+        }
+        Test.stopTest();
+        System.assertNotEquals(resultado, null, 'No se ha obtenido el escalado');
+    }
+
+    @isTest
+    static void volverAEscalarTest() {
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        SAC_Interaccion__c escalado = [SELECT Id, SAC_GrupoColaborador__c, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
+
+        Test.startTest();
+        System.runAs(usuario) {
+            SPV_LCMP_EscaladoOperativas.volverAEscalar(escalado.Id, 'propuesta letrado test');
+        }
+        SAC_Interaccion__c escResult = [SELECT Id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
+        Test.stopTest();
+        System.assertEquals('SAC_PendienteRespuesta', escResult.SAC_Estado__c, 'no se ha podido volver a escalar');
     }
 
     @isTest
@@ -186,6 +251,38 @@ public with sharing class SPV_LCMP_EscaladoOperativas_Test {
     }
 
     @isTest
+    static void responderEscaladoDevueltoTest() {
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        SAC_Interaccion__c escalado = [SELECT Id, SAC_GrupoColaborador__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'testrec1'];
+
+        Test.startTest();
+        System.runAs(usuario) {
+            SPV_LCMP_EscaladoOperativas.responderEscalado(escalado.Id, 'SAC_DevolverNivelAnterior', 'comentarios', 'SPV_Allanamiento', usuario.Id, caso.Id);
+        }
+        Test.stopTest();
+
+        SAC_Interaccion__c escaladoResult = [SELECT Id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
+        System.assertEquals('SAC_Devuelto', escaladoResult.SAC_Estado__c, 'No se ha podido responder el escalado');
+    }
+
+    @isTest
+    static void responderEscaladoDevueltoTest2() {
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        SAC_Interaccion__c escalado = [SELECT Id, SAC_GrupoColaborador__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'tesRescalado1' LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'testrec1'];
+
+        Test.startTest();
+        System.runAs(usuario) {
+            SPV_LCMP_EscaladoOperativas.responderEscalado(escalado.Id, 'SAC_DevolverNivelAnterior', 'comentarios', 'SPV_Allanamiento', usuario.Id, caso.Id);
+        }
+        Test.stopTest();
+
+        SAC_Interaccion__c escaladoResult = [SELECT Id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'tesRescalado1' LIMIT 1];
+        System.assertEquals('SAC_Devuelto', escaladoResult.SAC_Estado__c, 'No se ha podido responder el escalado');
+    }
+
+    @isTest
     static void responderEscaladoAceptadoTest() {
         User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
         SAC_Interaccion__c escalado = [SELECT Id, SAC_GrupoColaborador__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
@@ -198,7 +295,7 @@ public with sharing class SPV_LCMP_EscaladoOperativas_Test {
         Test.stopTest();
 
         SAC_Interaccion__c escaladoResult = [SELECT Id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
-        System.assertEquals('SAC_Resuelta', escaladoResult.SAC_Estado__c, 'No se ha podido responder el escalado');
+        System.assertEquals('SAC_Atendida', escaladoResult.SAC_Estado__c, 'No se ha podido responder el escalado');
     }
 
     @isTest
@@ -230,6 +327,6 @@ public with sharing class SPV_LCMP_EscaladoOperativas_Test {
         Test.stopTest();
 
         SAC_Interaccion__c escaladoResult = [SELECT Id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
-        System.assertEquals('SAC_Resuelta', escaladoResult.SAC_Estado__c, 'No se ha podido responder el escalado');
+        System.assertEquals('SAC_Atendida', escaladoResult.SAC_Estado__c, 'No se ha podido responder el escalado');
     }
 }

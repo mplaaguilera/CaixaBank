@@ -248,7 +248,7 @@ public with sharing class OS_Metodos_EmailServices {
         return usuarioActivo;
     }
 
-    public static void asignarColaUsuarioInactivo(Case caso, String colaEntrante, List<Group> colasTotalesCOPS) {
+    public static Case asignarColaUsuarioInactivo(Case caso, String colaEntrante, List<Group> colasTotalesCOPS) {
         if (!String.isBlank(caso.OS_GrupoTrabajo__c)){
             //Los nombres del grupo de trabajo pueden diferir: p. ej. Name = Comercio Exterior / OS_GrupoTrabajo__c = Buzón Comercio Exterior
             List <Group> grupoDeTrabajo = new List <Group>();
@@ -275,7 +275,7 @@ public with sharing class OS_Metodos_EmailServices {
         } else{
             caso.OwnerId = colaEntrante;
         }
-        update caso;
+        return caso;
     }
   
     public static Map<String, Object> gestionAdjuntos(Messaging.InboundEmail correo, Case caso, String nuevoHtmlBody) {

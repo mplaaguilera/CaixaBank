@@ -64,7 +64,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 	@isTest
 	private static void gestorOportunidadInsert() {
 		Account cuenta = crearCuentaContacto('53456777P');
-		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' AND Profile.Name = 'System Administrator' LIMIT 1];
+		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' LIMIT 1];
 		Map<String, Object> campos = new Map<String, Object>();
 		campos.put('Name', 'oportunidad de prueba');
 		campos.put('CSBD_Estado__c', 'Activa');
@@ -125,7 +125,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 	@isTest
 	private static void gestorOportunidadInsert2() {
 		Account cuenta = crearCuentaContacto('53456777P');
-		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' AND Profile.Name = 'System Administrator' LIMIT 1];
+		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' LIMIT 1];
 		Map<String, Object> campos = new Map<String, Object>();
 		campos.put('Name', 'oportunidad de prueba2');
 		campos.put('CSBD_Estado__c', 'Activa');
@@ -155,7 +155,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 	@isTest
 	private static void gestorOportunidadSincronizar() {
 		Account cuenta = crearCuentaContacto('53456777P');
-		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' AND Profile.Name = 'System Administrator' LIMIT 1];
+		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' LIMIT 1];
 		Map<String, Object> campos = new Map<String, Object>();
 		campos.put('Name', 'oportunidad de prueba3');
 		campos.put('CSBD_Estado__c', 'Activa');
@@ -188,7 +188,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 	@isTest
 	private static void gestorOportunidadDesactivar() {
 		Account cuenta = crearCuentaContacto('53456777P');
-		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' AND Profile.Name = 'System Administrator' LIMIT 1];
+		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' LIMIT 1];
 		Map<String, Object> campos = new Map<String, Object>();
 		campos.put('Name', 'oportunidad de prueba4');
 		campos.put('CSBD_Estado__c', 'Activa');
@@ -217,7 +217,7 @@ public class CSBD_GestorOportunidad_TRHan_Test {
 	@isTest
 	private static void gestorOportunidadActivar() {
 		Account cuenta = crearCuentaContacto('53456777P');
-		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' AND Profile.Name = 'System Administrator' LIMIT 1];
+		User userAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' LIMIT 1];
 
 		Map<String, Object> campos = new Map<String, Object>();
 		campos.put('Name', 'oportunidad de prueba4');

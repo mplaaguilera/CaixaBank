@@ -6,7 +6,9 @@ public with sharing class SPV_LCMP_PretensionesRelacionadas {
 
         @AuraEnabled(cacheable=true)
         public static List<Case> getPretensiones(Id recordId) {
-            List<Case> listaPrete = [SELECT Id, CaseNumber, Subject, toLabel(Status), CreatedDate, SAC_ValidacionMCC__c FROM Case WHERE RecordTypeId =: RECORDTYPEPRETENSION AND SAC_Reclamacion__c =: recordId]; 
+            List<Case> listaPrete = [SELECT Id, CaseNumber, Subject, toLabel(Status), CreatedDate, SAC_ValidacionMCC__c, CBK_Case_Extension_Id__r.SPV_DecisionPretensionLetrado__c, CBK_Case_Extension_Id__r.SPV_ObservacionesDecisionPretLetrado__c,   
+            CBK_Case_Extension_Id__r.SPV_DecisionFinal__c, CBK_Case_Extension_Id__r.SPV_ObservacionesDecisionFinal__c         
+                                    FROM Case WHERE RecordTypeId =: RECORDTYPEPRETENSION AND SAC_Reclamacion__c =: recordId]; 
             return listaPrete;
         }
 

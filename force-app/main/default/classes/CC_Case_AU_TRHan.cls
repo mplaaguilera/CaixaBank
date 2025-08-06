@@ -67,13 +67,138 @@ public without sharing class CC_Case_AU_TRHan extends CC_TriggerHandlerBase {
             CC_CaseTriggerHelper.asociaActivoAU(lstCasesCC, mapOldObj);
             CC_CaseTriggerHelper.informarDireccionTerritorialAU(lstCasesCC, mapOldObj);
             CC_CaseTriggerHelper.reaperturaNoValida(lstCasesCC, mapOldObj);
+            CC_CaseTriggerHelper.crearOportunidadCierreCaso(lstCasesCC, mapOldObj);
             //CC_CaseTriggerHelper.cierreCasoHDT1N(lstCasesCC, mapOldObj);
+        }
+
+        if(!casesCC.isEmpty()){
+            filtrarCasosAccountActualizada(casesCC, mapOldObj);
+            CC_CaseTriggerHelper.crearActividadCobrowsing(casesCC, mapOldObj);
         }
 
         //envioCorreoConsultasOperativasAsignarPropietario(mapOldObj, listNewObj, idsCAM);
         envioCorreoConsultasOperativasTrasladoAsignacionPropietario(mapOldObj, casesCC, idsCAM);
 
-    }    
+        //Revision de update de Marcas Caso al cerrar el caso
+        updateMarcaCasoCierreCaso(mapOldObj, mapNewObj, rtCliente);
+
+        //Revision de campo CC_Tiene_Caracteristicas_Detalle__c en Cuenta y Contacto asociado al Caso
+        revisarCaracteristicasDetalle(mapOldObj, mapNewObj, rtCliente);
+        
+    }
+
+    private void revisarCaracteristicasDetalle(Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj, Id rtCliente) {
+        Set<Id> idsContactos = new Set<Id>();
+        Set<Id> idsCuentas = new Set<Id>();
+         Map<Id,Contact> mapContactsToUpdateById = new Map<Id,Contact>();
+        Map<Id,Account> mapAccountsToUpdateById = new Map<Id,Account>();
+        for (Case caso : mapNewObj.values()) {
+            if(caso.RecordTypeId == rtCliente){
+                if (mapOldObj.get(caso.Id).ContactId != caso.ContactId) {
+                    if (caso.ContactId != null) {
+                        idsContactos.add(caso.ContactId);
+                    }
+                }
+                if (mapOldObj.get(caso.Id).AccountId != caso.AccountId) {
+                    if (caso.AccountId != null) {
+                        idsCuentas.add(caso.AccountId);
+                    }
+                }
+            }
+        }
+        if(!idsContactos.isEmpty() || !idsCuentas.isEmpty()){
+            List<CC_Caracteristica_Detalle__c> lstCaracteristicaDetalle = [SELECT Id, CC_Caracteristica__c, CC_Caracteristica__r.CC_Activo__c,
+                                                                            CC_Cliente__c, CC_Cliente__r.CC_Tiene_Caracteristica_Detalle__c, 
+                                                                            CC_Empleado__c, CC_Empleado__r.CC_Tiene_Caracteristica_Detalle__c,
+                                                                            CC_Cuenta__c, CC_Cuenta__r.CC_Tiene_Caracteristica_Detalle__c,
+                                                                            CC_Centro_CaixaBank__c , CC_Centro_CaixaBank__r.CC_Tiene_Caracteristica_Detalle__c
+                                                                        FROM CC_Caracteristica_Detalle__c 
+                                                                        WHERE CC_Caracteristica__r.CC_Activo__c = true 
+                                                                        AND (
+                                                                              CC_Cliente__c IN :idsContactos OR CC_Empleado__c IN :idsContactos OR 
+                                                                               CC_Cuenta__c IN :idsCuentas OR CC_Centro_CaixaBank__c IN :idsCuentas)
+                                                                        ];
+            for(CC_Caracteristica_Detalle__c detalle : lstCaracteristicaDetalle) {
+                //Control de que las nuevas cuentas o contactos tengan el campo CC_Tiene_Caracteristica_Detalle__c a true, sino los actualizo
+                if (detalle.CC_Cliente__c != null && !detalle.CC_Cliente__r.CC_Tiene_Caracteristica_Detalle__c) {
+                    Contact c = new Contact(Id = detalle.CC_Cliente__c);
+                    c.CC_Tiene_Caracteristica_Detalle__c = true;
+                    mapContactsToUpdateById.put(detalle.CC_Cliente__c,c);
+                }
+                if (detalle.CC_Empleado__c != null && !detalle.CC_Empleado__r.CC_Tiene_Caracteristica_Detalle__c) {
+                    Contact c = new Contact(Id = detalle.CC_Empleado__c);
+                    c.CC_Tiene_Caracteristica_Detalle__c = true;
+                    mapContactsToUpdateById.put(detalle.CC_Empleado__c,c);
+                }
+                if (detalle.CC_Cuenta__c != null && !detalle.CC_Cuenta__r.CC_Tiene_Caracteristica_Detalle__c) {
+                    Account a = new Account(Id = detalle.CC_Cuenta__c);
+                    a.CC_Tiene_Caracteristica_Detalle__c = true;
+                    mapAccountsToUpdateById.put(detalle.CC_Cuenta__c,a);
+                }
+                if (detalle.CC_Centro_CaixaBank__c != null && !detalle.CC_Centro_CaixaBank__r.CC_Tiene_Caracteristica_Detalle__c) {
+                    Account a = new Account(Id = detalle.CC_Centro_CaixaBank__c);
+                    a.CC_Tiene_Caracteristica_Detalle__c = true;
+                    mapAccountsToUpdateById.put(detalle.CC_Centro_CaixaBank__c,a);
+                }
+                if((detalle.CC_Cliente__c != null && idsContactos.contains(detalle.CC_Cliente__c)) || (detalle.CC_Empleado__c != null && idsContactos.contains(detalle.CC_Empleado__c))){
+                    idsContactos.remove(detalle.CC_Cliente__c);
+                }
+                if((detalle.CC_Cuenta__c != null && idsCuentas.contains(detalle.CC_Cuenta__c)) || (detalle.CC_Centro_CaixaBank__c != null && idsCuentas.contains(detalle.CC_Centro_CaixaBank__c))){
+                    idsCuentas.remove(detalle.CC_Cuenta__c);
+                }
+            }
+            //Revisamos si quedan contactos o cuentas en los sets
+            if(!idsContactos.isEmpty()) {
+                List<Contact> lstContacts = [SELECT Id, CC_Tiene_Caracteristica_Detalle__c FROM Contact WHERE Id IN :idsContactos];
+                for(Contact contact : lstContacts) {
+                    if(contact.CC_Tiene_Caracteristica_Detalle__c) {
+                        contact.CC_Tiene_Caracteristica_Detalle__c = false;
+                        mapContactsToUpdateById.put(contact.Id, contact);
+                    }
+                }
+            }
+            if(!idsCuentas.isEmpty()) {
+                List<Account> lstAccounts = [SELECT Id, CC_Tiene_Caracteristica_Detalle__c FROM Account WHERE Id IN :idsCuentas];
+                for(Account account : lstAccounts) {
+                    if(account.CC_Tiene_Caracteristica_Detalle__c) {
+                        account.CC_Tiene_Caracteristica_Detalle__c = false;
+                        mapAccountsToUpdateById.put(account.Id, account);
+                    }
+                }
+            }
+            // Actualizo los contactos y cuentas en caso de que haya alguna
+            if(!mapContactsToUpdateById.isEmpty()) {
+                update mapContactsToUpdateById.values();
+            }
+            if(!mapAccountsToUpdateById.isEmpty()) {
+                update mapAccountsToUpdateById.values();
+            }
+        }
+
+    }
+    
+    private void updateMarcaCasoCierreCaso(Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj, Id rtCliente){
+        List<SAC_Marca_Case__c> lstMarcasCaseCierre = new List<SAC_Marca_Case__c>();
+        List<Id> lstIdsCasosCerrados = new List<Id>();
+        for (Case caso : mapNewObj.values()) {
+            if (mapOldObj.get(caso.Id).Status != 'Cerrado' && caso.Status == 'Cerrado' && caso.RecordTypeId == rtCliente) {
+                lstIdsCasosCerrados.add(caso.Id);
+            }
+        }
+        if(!lstIdsCasosCerrados.isEmpty()){
+            lstMarcasCaseCierre = [SELECT Id, SAC_Case__c, CC_Motivo_del_Caso__c FROM SAC_Marca_Case__c WHERE SAC_Case__c IN :lstIdsCasosCerrados];
+            List<SAC_Marca_Case__c> lstMarcasCaseToUpdate = new List<SAC_Marca_Case__c>();
+            for (SAC_Marca_Case__c marcaCaso : lstMarcasCaseCierre) {
+                if(mapNewObj.containsKey(marcaCaso.SAC_Case__c) && marcaCaso.CC_Motivo_del_Caso__c == mapNewObj.get(marcaCaso.SAC_Case__c).CC_Motivo__c){
+                    marcaCaso.CC_Caso_Cerrado__c = true;
+                    lstMarcasCaseToUpdate.add(marcaCaso);
+                }
+            }
+            if(!lstMarcasCaseToUpdate.isEmpty()){
+                update lstMarcasCaseToUpdate;
+            }
+        }
+    }
 
     private void crearActividadCierreCAM(Map<Id, Case> mapOldObj, List<Case> listNewObj, List<Id> idsCAM) {
         List<Task> tareasCierre = new List<Task>();
@@ -400,6 +525,20 @@ public without sharing class CC_Case_AU_TRHan extends CC_TriggerHandlerBase {
             }
         }
         return idsCAM;
+    }
+
+    private static void filtrarCasosAccountActualizada(List<Case> lstCasos, Map<Id, Case> mapOldObj){
+        //Elimina los casos sin account
+        Map<Id,Case> casosUpdate = new Map<Id,Case>();
+        for(Case caso : lstCasos){
+            //Filtro por el primer update del account
+            if(caso.accountId != null &&  mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).ContactId == null && caso.Origin == 'Phone'){
+                casosUpdate.put(caso.Id,caso);
+            }
+        }
+        if(!casosUpdate.isEmpty()){
+            CC_CaseTriggerHelper.asignacionAccountTareaLlamada(casosUpdate);
+        }
     }
 
 }

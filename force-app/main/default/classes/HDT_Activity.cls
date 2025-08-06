@@ -76,7 +76,7 @@ public with sharing class HDT_Activity {
             for (Task tarea : tareas) {
                 tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'HDT_Task');
                 actividades.add(tarea);
-                system.debug(tarea.RecordtypeId);
+                system.debug('tarea: ' + JSON.serializePretty(tarea.RecordTypeId));
             }    
         }
  

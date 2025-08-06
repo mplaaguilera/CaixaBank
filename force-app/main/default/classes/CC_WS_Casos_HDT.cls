@@ -1,9 +1,13 @@
 @RestResource(urlMapping='/CC_Casos_HDT/*')
 global with sharing class CC_WS_Casos_HDT extends CBK_HttpServiceIntegration_Abstract{
+
 	/*  Clase para publicar un servicio Rest de consulta del detalle del Casos de una oficina.
         Clase para los parámetros de entrada. */ 
     global class CC_WS_Casos_HDT_Input {
         global String tiempo {get;set;}
+        global Datetime fechaInicio {get;set;} 
+        global Datetime fechaFin {get;set;}  
+        
     }
 
     /* Clase para el detalle del caso de salida. */
@@ -120,15 +124,44 @@ global class Miscasos {
     
     /* Método para validar los inputs obligatorios.*/
     private static String validarDatosEntrada (CC_WS_Casos_HDT.CC_WS_Casos_HDT_Input oDatos){
-        if (oDatos != null){
-            if (oDatos.tiempo == null){
-                return 'KO';
-            }else if (oDatos.tiempo.trim() == '') {
-                return 'KO';
-            }
+        if (oDatos == null) {
+            return 'KO';
         }
 
-        return 'OK';
+        List<CC_Lista_Valores__c> valueRangeMax = [SELECT CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT_Mensajes_Parametrizables_Empleados' AND Name = 'Rango Maximo Dias Consulta' LIMIT 1];
+
+        Integer rangeMax = 15;
+
+        if(!valueRangeMax.isEmpty()){
+           if (valueRangeMax[0].CC_Valor__c != null) 
+        
+            rangeMax = Integer.valueOf(valueRangeMax[0].CC_Valor__c);
+        }
+
+        
+        Boolean fechaInicioProvided = (oDatos.fechaInicio != null);
+        Boolean fechaFinProvided = (oDatos.fechaFin != null);
+
+        if (fechaInicioProvided && fechaFinProvided) {
+            if (oDatos.fechaFin < oDatos.fechaInicio) {
+                return 'KO_FECHAS_INVALIDAS'; 
+            }
+
+            Long difMillis = oDatos.fechaFin.getTime() - oDatos.fechaInicio.getTime();
+            Long difDays = difMillis / (1000 * 60 * 60 * 24);
+
+            if (difDays > rangeMax) {
+                return 'KO_RANGO_EXCEDIDO'; 
+            }
+            return 'OK'; 
+        } else if (fechaInicioProvided || fechaFinProvided) {
+            return 'KO_FECHAS_INCOMPLETAS';
+        } else {
+            if (oDatos.tiempo == null || oDatos.tiempo.trim() == '') {
+                return 'KO_TIEMPO_VACIO'; 
+            }
+            return 'OK'; 
+        }
     }
     
     /* Método para preparar la búsqueda de casos con los criterios de entrada. */
@@ -136,8 +169,27 @@ global class Miscasos {
         List<Case> oRes = new List<Case>();
          
         try {
+
+            if (oForm != null && oForm.fechaInicio != null && oForm.fechaFin != null) {
+
+                Datetime dtInicio = oForm.fechaInicio;
+                Datetime dtFin = oForm.fechaFin;
+
+                oRes = [SELECT Id,  OwnerId, OS_Propietario__c , Status , CaseNumber ,  CC_Matricula_Empleado__c , CC_Recipient_Name__c ,
+                                Subject, CreatedDate , CC_MCC_Tematica__c , CC_Producto_Servicio__c, CC_MCC_Motivo__c, CC_Detalles_Consulta__c, CC_Detalles_Solucion__c,
+                                ClosedDate, LastModifiedDate, Origin, CC_Agrupador_Identificador_Maximo__c, CC_Owner_Anterior__c, Language, CC_Agrupador_Id__c,
+                                CC_Direccion_Territorial__c, CC_Causa__c, Canal_del_Empleado__c, SEG_TipoCargo__c, CC_Oficina__c, HDT_Tipo_de_Cierre__c, 
+                                HDT_Resuelto_Primera_Llamada__c, CC_Canal_Resolucion__c, ContactEmail,Account.BillingState,CC_Notif_Cont_Inter__c,HDT_Tiempo_Resolucion__c,
+                                Account.BillingAddress,CreatedBy.EmployeeNumber,Owner.Name,Account.CC_Numero_Oficina_Empresa__c,Contact.CC_Matricula__c,CC_MCC_Tematica__r.Name,
+                                CC_MCC_ProdServ__r.Name,CC_MCC_Motivo__r.Name,CC_MCC_Causa__r.Name,CC_MCC_Solucion__r.Name,Account.Name,CC_Owner_Anterior__r.EmployeeNumber,CC_Idioma__c,
+                                CC_Recipient_BillingAddress__c,Contact.Email,CC_Telefono_Contacto__c,CC_Direccion_Territorial__r.Name,Contact.Name,CC_Owner_Anterior__r.Name
+
+                                FROM CASE WHERE (RecordType.DeveloperName ='HDT_Empleado')
+                                AND LastModifiedDate >= :dtInicio AND LastModifiedDate <= :dtFin];
+
+            }
             
-            if (oForm != null && oForm.tiempo != null){
+            else if (oForm != null && oForm.tiempo != null){
                 
                 datetime intervalo = datetime.now().addMinutes(-(integer.valueof(oForm.tiempo)));
                          oRes = [SELECT Id,  OwnerId, OS_Propietario__c , Status , CaseNumber ,  CC_Matricula_Empleado__c , CC_Recipient_Name__c ,
@@ -313,8 +365,44 @@ global class Miscasos {
                     if (sValido == 'OK'){
                         // Validados los datos realizamos las acciones necesarias
                         oMapForm.put(oDataIn.tiempo, oDataIn);
-                         req.requestBody =  Blob.valueOf(oDataIn.tiempo);
-                    }else{
+                        req.requestBody =  Blob.valueOf(oDataIn.tiempo);
+                         
+                    } else if(sValido == 'KO_FECHAS_INVALIDAS'){
+                    	// Error validación fechas.
+                        resultado = '{"Result":"KO","Description":"Fecha de fin anterior a fecha de inicio."}';
+                        req.requestBody =  Blob.valueOf('vino vacio');
+                        registrarTraza(req, res, dtStart, resultado, 413);
+                        
+                        CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output oAux = new CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output();
+                        oAux.resultado = '413';
+                        oAux.descripcion = 'Fecha de fin anterior a fecha de inicio.';
+                        oAux.datosCasos = null;
+                        oRes = oAux;
+                    } else if(sValido == 'KO_RANGO_EXCEDIDO'){
+                    	// Error validación rango.
+                        resultado = '{"Result":"KO","Description":"Rango de fechas excedido."}';
+                        req.requestBody =  Blob.valueOf('vino vacio');
+                        registrarTraza(req, res, dtStart, resultado, 414);
+                        
+                        CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output oAux = new CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output();
+                        oAux.resultado = '414';
+                        oAux.descripcion = 'El rango de fechas excede el máximo permitido de días.';
+                        oAux.datosCasos = null;
+                        oRes = oAux;
+                    
+                    } else if(sValido == 'KO_FECHAS_INCOMPLETAS'){
+                    	// Error validación rango.
+                        resultado = '{"Result":"KO","Description":"Alguna de las fechas no está informada correctamente."}';
+                        req.requestBody =  Blob.valueOf('vino vacio');
+                        registrarTraza(req, res, dtStart, resultado, 415);
+                        
+                        CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output oAux = new CC_WS_Casos_HDT.CC_WS_Casos_HDT_Output();
+                        oAux.resultado = '415';
+                        oAux.descripcion = 'Alguna de las fechas no está informada correctamente.';
+                        oAux.datosCasos = null;
+                        oRes = oAux;
+                    
+                    } else {
                     	// Error validación datos entrada.
                         resultado = '{"Result":"KO","Description":"Datos obligatorios no informados."}';
                          req.requestBody =  Blob.valueOf('vino vacio');

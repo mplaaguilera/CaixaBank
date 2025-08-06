@@ -76,12 +76,19 @@ public class CSBD_Reclamaciones_Prestamos_Test {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD'];
         Opportunity prestamo = [SELECT CSBD_Email_Solicitud__c FROM Opportunity WHERE CSBD_Titulo__c = 'prestamoTest'];
         System.runAs(usuarioGestor) {
+            OrgWideEmailAddress owa = [SELECT Id, Address, DisplayName FROM OrgWideEmailAddress WHERE DisplayName LIKE 'CSBD%' LIMIT 1];
+            CSBD_Remitente_Enviar_Correo__c config = new CSBD_Remitente_Enviar_Correo__c();
+            config.CSBD_Buzon_CaixaBank__c = owa.Address;
+            config.CSBD_Buzon_ImaginBank__c = owa.Address;
+            config.CSBD_Buzon_Alta_digital_de_menores__c = owa.Address;
+            insert config;
+
             EmailMessage correo = new EmailMessage();
             correo.CC_Aplicacion__c = 'CSBD';
             correo.RelatedToId = prestamo.Id;
             correo.CSBD_Oportunidad_Id__c = prestamo.Id;
             correo.Incoming = false;
-            correo.FromAddress = [SELECT Address FROM OrgWideEmailAddress WHERE DisplayName = 'CSBD - CaixaBank'].Address;
+            correo.FromAddress = owa.Address;
             correo.ToAddress = 'test@test.com';
             correo.Subject = 'asunto correo saliente';
             correo.HtmlBody = '#@refcorreo#';

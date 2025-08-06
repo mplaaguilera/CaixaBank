@@ -2,6 +2,12 @@ public class CC_Agrupador_Batch implements Database.Batchable<SObject>, Database
     List<Id> idAgrupadores;
     List<Id> tareasNotif;
     Boolean enviarNotificaciones = false;
+    Boolean isCliente = false; // Variable para controlar si hay casos de cliente
+
+    List<CC_Agrupador__c> listaAgrupadoresFallidos; // Lista de agrupadores fallidos para notificar por el platform event
+    Map<Id, List<Case>> casosCierreFallidoTotal; // Mapa de casos fallidos agrupados por agrupador para notificar por el platform event
+    
+
     //public CC_Agrupador_Batch (List<Id> idAgrupadores) { this.idAgrupadores = idAgrupadores; }
 
     public CC_Agrupador_Batch (List<Id> idAgrupadores, List<Id> tareasNotif, Boolean enviarNotificaciones) 
@@ -9,27 +15,39 @@ public class CC_Agrupador_Batch implements Database.Batchable<SObject>, Database
         this.idAgrupadores = idAgrupadores; 
         this.tareasNotif = tareasNotif; 
         this.enviarNotificaciones = enviarNotificaciones; 
+        this.casosCierreFallidoTotal = new Map<Id, List<Case>>();
+        this.listaAgrupadoresFallidos = new List<CC_Agrupador__c>();
     }
     
     public CC_Agrupador_Batch () 
     {
+        this.casosCierreFallidoTotal = new Map<Id, List<Case>>();
+        this.listaAgrupadoresFallidos = new List<CC_Agrupador__c>();
         CBK_log.debug('Comienzo batch Agrupador CC');
     }
 
     public Database.QueryLocator start(Database.BatchableContext bc) {
-        return Database.getQueryLocator([SELECT CC_Agrupador_Id__r.CC_Detalle_solucion__c,CC_Agrupador_Id__r.CC_Publica__c,CC_Detalles_Solucion__c,Status, CC_Agrupador_Id__c, CC_Idioma__c, RecordType.DeveloperName, RecordType.Name, CC_NotIncidencia__c FROM Case WHERE CC_Agrupador_Id__c IN :idAgrupadores AND Status != 'Cerrado' AND Status != 'Pendiente Revisión']); 
+        return Database.getQueryLocator([SELECT Id, CC_Agrupador_Id__r.CC_Detalle_solucion__c,CC_Agrupador_Id__r.CC_Publica__c,CC_Detalles_Solucion__c,Status, CC_Agrupador_Id__c, CC_Idioma__c, RecordType.DeveloperName, RecordType.Name, CC_NotIncidencia__c FROM Case WHERE CC_Agrupador_Id__c IN :idAgrupadores AND Status != 'Cerrado' AND Status != 'Pendiente Revisión']); 
     }
 
     public void execute(Database.BatchableContext bc, List<Case> records) {
+        // Inicializar variables si son null (por seguridad)
+        if (this.casosCierreFallidoTotal == null) {
+            this.casosCierreFallidoTotal = new Map<Id, List<Case>>();
+        }
+        if (this.listaAgrupadoresFallidos == null) {
+            this.listaAgrupadoresFallidos = new List<CC_Agrupador__c>();
+        }
+        
         // Obtenemos todas las plantillas de los agrupadores
-        Boolean isCliente = false;
         List<Id> idsCasos = new List<Id>();
         List<Id> idsAgrupadores = new List<Id>();
         List<Id> tareasNotificarFinal = new List<Id>();
+        List<Case> casosCierreFallido = new List<Case>(); // Lista de casos fallidos para actualizar en DML
 
         for (Case caso : records) {
-            if (caso.RecordType.DeveloperName == 'CC_Cliente' && isCliente == false){
-                isCliente = true;
+            if (caso.RecordType.DeveloperName == 'CC_Cliente' && (this.isCliente == false || this.isCliente == null)){
+                this.isCliente = true;
             }
             idsCasos.add(caso.Id);
             idsAgrupadores.add(caso.CC_Agrupador_Id__c);
@@ -74,7 +92,7 @@ public class CC_Agrupador_Batch implements Database.Batchable<SObject>, Database
         List<Task> tareasCerrar = new List<Task>();
         List<Id> tareasNotificar = new List<Id>();
         for (Task tarea : [SELECT Id FROM Task
-                            WHERE Agrupador__c IN :idAgrupadores AND Status != 'Completed' AND WhatId IN :idsCasos]) {
+                            WHERE Agrupador__c IN :this.idAgrupadores AND Status != 'Completed' AND WhatId IN :idsCasos]) {
 
             tarea.CC_Fecha_Fin__c = System.today();
             tarea.Status = 'Completed';
@@ -100,7 +118,6 @@ public class CC_Agrupador_Batch implements Database.Batchable<SObject>, Database
 
         //Gestión del resultado del cierre de los casos
         List<Task> tareasCrear = new List<Task>();
-        List<Case> casosCierreFallido = new List<Case>();
         Set<Id> idAgrupadoresFallidos = new Set<Id>();
 
         for (Integer i = 0; i < resultadosCierreCaso.size(); i++) {
@@ -127,6 +144,14 @@ public class CC_Agrupador_Batch implements Database.Batchable<SObject>, Database
 
                 //Se actualizan los casos con estado Pendiente Revisión
                 casosCerrar[i].Status = 'Pendiente Revisión';
+                
+                // Agregar al mapa agrupado por agrupador
+                Id agrupadorId = casosCerrar[i].CC_Agrupador_Id__c;
+                if (!this.casosCierreFallidoTotal.containsKey(agrupadorId)) {
+                    this.casosCierreFallidoTotal.put(agrupadorId, new List<Case>());
+                }
+                this.casosCierreFallidoTotal.get(agrupadorId).add(casosCerrar[i]);
+                
                 casosCierreFallido.add(casosCerrar[i]);
                 idAgrupadoresFallidos.add(casosCerrar[i].CC_Agrupador_Id__c);
             }
@@ -135,35 +160,15 @@ public class CC_Agrupador_Batch implements Database.Batchable<SObject>, Database
         CC_Activity.crearActividades(tareasCrear);
 
         //Si ha habido casos con cierre fallido se actualiza su estado y se muestra Toast
-        List<CC_Agrupador__c> listaAgrupadoresFallidos = [SELECT Name FROM CC_Agrupador__c WHERE Id = :idAgrupadoresFallidos];
+        List<CC_Agrupador__c> fallidosEnEsteBatch = new List<CC_Agrupador__c>();
+        if (!idAgrupadoresFallidos.isEmpty()) {
+            fallidosEnEsteBatch = [SELECT Name FROM CC_Agrupador__c WHERE Id = :idAgrupadoresFallidos];
+            this.listaAgrupadoresFallidos.addAll(fallidosEnEsteBatch);
+        }
+
+        
         if (!casosCierreFallido.isEmpty()) {
             update casosCierreFallido;
-
-            String mensajeError;
-            if (listaAgrupadoresFallidos.size() == 1) {
-                mensajeError = 'Cierre del agrupador ' + listaAgrupadoresFallidos[0].Name + ' finalizado. Hay ' + casosCierreFallido.size();
-            } else {
-                String nombresAgrupadores = listaAgrupadoresFallidos[0].Name;
-                for (Integer i = 1; i < listaAgrupadoresFallidos.size() - 1; ++i) {
-                    nombresAgrupadores += ', ' + listaAgrupadoresFallidos[i].Name;
-                }
-                nombresAgrupadores += ' y ' + listaAgrupadoresFallidos[listaAgrupadoresFallidos.size()-1].Name;
-
-                mensajeError = 'Cierre de los agrupadores ' + nombresAgrupadores + ' finalizado. En total hay ' + casosCierreFallido.size();
-            }
-
-            if (casosCierreFallido.size() == 1) { 
-                mensajeError += ' caso que no se ha podido cerrar y se debe revisar.';
-            } else {
-                mensajeError += ' casos que no se han podido cerrar y se deben revisar.';
-            }
-
-            if (isCliente)
-            {
-                CC_Aviso_Agrupador__e avisoMensaje = new CC_Aviso_Agrupador__e (Message__c = mensajeError, Type__c = 'warning');
-                Eventbus.publish(avisoMensaje);
-                //CC_Notificacion.publicarToastAviso(mensajeError);
-            }
         }
 
         // La razón por la que los emails ocurren al final es porque la clase NotifSegCaso está pensada
@@ -182,6 +187,53 @@ public class CC_Agrupador_Batch implements Database.Batchable<SObject>, Database
 
     public void finish(Database.BatchableContext bc) 
     {
+        if (this.casosCierreFallidoTotal != null && this.listaAgrupadoresFallidos != null) {
+        
+            if (!this.casosCierreFallidoTotal.isEmpty() && !this.listaAgrupadoresFallidos.isEmpty()) {
+                // Calcular el total de casos fallidos
+                Integer totalCasosFallidos = 0;
+                for (List<Case> casosAgrupador : this.casosCierreFallidoTotal.values()) {
+                    totalCasosFallidos += casosAgrupador.size();
+                }
+                // Eliminar duplicados de la lista de agrupadores fallidos para evitar que se repitan los mismos agrupadores en el mensaje de error
+                Set<CC_Agrupador__c> setAgrupadoresFallidos = new Set<CC_Agrupador__c>(this.listaAgrupadoresFallidos);
+                this.listaAgrupadoresFallidos = new List<CC_Agrupador__c>(setAgrupadoresFallidos);
+                
+                String mensajeError;
+                if (this.listaAgrupadoresFallidos.size() == 1) {
+                    mensajeError = 'Cierre del agrupador ' + this.listaAgrupadoresFallidos.iterator().next().Name + ' finalizado. Hay ' + totalCasosFallidos;
+                } else if (this.listaAgrupadoresFallidos.size() > 1) {
+                    String nombresAgrupadores = this.listaAgrupadoresFallidos[0].Name;
+                    // Construir la lista de nombres de agrupadores
+                    for (Integer i = 1; i < this.listaAgrupadoresFallidos.size(); ++i) {
+                        if (i == this.listaAgrupadoresFallidos.size() - 1) {
+                            // Último elemento
+                            nombresAgrupadores += ' y ' + this.listaAgrupadoresFallidos[i].Name;
+                        } else {
+                            // Elementos intermedios
+                            nombresAgrupadores += ', ' + this.listaAgrupadoresFallidos[i].Name;
+                        }
+                    }
+
+                    mensajeError = 'Cierre de los agrupadores ' + nombresAgrupadores + ' finalizado. En total hay ' + totalCasosFallidos;
+                } else {
+                    mensajeError = 'Cierre de agrupadores finalizado. En total hay ' + totalCasosFallidos;
+                }
+
+                if (totalCasosFallidos == 1) { 
+                    mensajeError += ' caso que no se ha podido cerrar y se debe revisar.';
+                } else {
+                    mensajeError += ' casos que no se han podido cerrar y se deben revisar.';
+                }
+
+                if (this.isCliente != null && this.isCliente)
+                {
+                    CC_Aviso_Agrupador__e avisoMensaje = new CC_Aviso_Agrupador__e (Message__c = mensajeError, Type__c = 'warning');
+                    Eventbus.publish(avisoMensaje);
+                    //CC_Notificacion.publicarToastAviso(mensajeError);
+                }
+            }
+        }
         CBK_log.debug('Fin batch Agrupador CC');        
     }
 }

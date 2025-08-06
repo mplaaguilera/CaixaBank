@@ -10,7 +10,7 @@ public class OS_Numero_Actividades_Test {
     static void sumarTask() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Case caso1 = new Case();
         caso1.CC_Idioma__c = 'es';
         caso1.RecordTypeId = recordTypeCaso;

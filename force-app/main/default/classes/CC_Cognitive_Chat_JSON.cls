@@ -239,6 +239,7 @@ public class CC_Cognitive_Chat_JSON {
         while (p.nextToken() != System.JSONToken.END_ARRAY) {
             res.add(new ConversationUnits(p));
         }
+        system.debug('DPK - RES -> ' + res);
         return res;
     }
 
@@ -366,6 +367,7 @@ public class CC_Cognitive_Chat_JSON {
         chat.Inicio2 = formateaDatetime(timestampToDatetime(startTime));
 
         List<CC_Cognitive_Chat_JSON.ConversationUnits> mensajes = new List<CC_Cognitive_Chat_JSON.ConversationUnits>();
+        system.debug('DPK size:' + conversationUnits.size());
         for (CC_Cognitive_Chat_JSON.ConversationUnits conversationUnit : conversationUnits) {
 
             if (conversationUnit.nickname != null) {

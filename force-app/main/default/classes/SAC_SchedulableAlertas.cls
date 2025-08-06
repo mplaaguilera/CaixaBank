@@ -173,6 +173,7 @@ public without sharing class SAC_SchedulableAlertas extends CBK_SCH_Queueable_Ab
                                             }
                                         } else {
                                             wrapAlerta.listaEmailsGrupo.add(string.valueOf(oDestinatario));
+                                    
                                         }
 
                                         //Añadido para los DT de 72

@@ -1,6 +1,6 @@
 @RestResource(urlMapping='/CC_Maximo/*')
 global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Abstract{
-
+	private static final List<String> ESTADOS_RESOLVED = new List<String>{'RESOLVED', 'RESOLV_REV_SOL', 'RESOLV_CHANGE', 'RESOLV_DOC'};
 
 	global class CC_WS_Maximo_Input {
 		global String TICKETID {get;set;}
@@ -22,6 +22,32 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 		global String TICKETID {get;set;}
 		global String sCodError {get;set;}
 		global String sDetalleError {get;set;}
+	}
+
+	/**
+	 * Función auxiliar para limpiar contenido HTML y obtener solo texto plano
+	 * @param htmlContent Contenido HTML a limpiar
+	 * @return Texto plano sin etiquetas HTML
+	 */
+	private static String limpiarHTML(String htmlContent) {
+		if (htmlContent == null || htmlContent.trim() == '') {
+			return null;
+		}
+		
+		// Primero unescape HTML entities
+		String contenidoLimpio = htmlContent.unescapeHtml4();
+		
+		// Eliminar etiquetas HTML usando regex
+		// Esta regex elimina todas las etiquetas HTML y sus atributos
+		contenidoLimpio = contenidoLimpio.replaceAll('<[^>]*>', '');
+		
+		// Eliminar espacios múltiples y saltos de línea excesivos
+		contenidoLimpio = contenidoLimpio.replaceAll('\\s+', ' ');
+		
+		// Eliminar espacios al inicio y final
+		contenidoLimpio = contenidoLimpio.trim();
+		
+		return contenidoLimpio;
 	}
 
 	private static String validarDatosEntrada (CC_WS_Maximo_Ret.CC_WS_Maximo_Input oDatos)
@@ -122,9 +148,9 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 							}
 							//MGT US1164720: Actualización del estado de los agrupadores de incidencias
 
-							if (inputMaximo.ESTADO == 'RESOLV_REV_SOL') {
+							if (ESTADOS_RESOLVED.contains(inputMaximo.ESTADO)) {
 								agrupador.CC_Estado__c = 'Pendiente Revision';
-								agrupador.CC_Detalle_Solucion__c = inputMaximo.FR2CODE_LONGDESCRIPTION;
+								agrupador.CC_Detalle_Solucion__c = inputMaximo.FR2CODE_LONGDESCRIPTION != null ? inputMaximo.FR2CODE_LONGDESCRIPTION.unescapeHtml4() : null;
 								agrupador.CC_Fecha_Resolucion__c = inputMaximo.ACTUALFINISH;
 
 								//Se realizan las actualizaciones de los casos
@@ -132,14 +158,14 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 								if (casosList != null) {
 									for (Case caso : casosList) {
 										idCasos.add(caso.Id);
-										caso.CC_Detalles_Solucion__c = inputMaximo.FR2CODE_LONGDESCRIPTION;
+										caso.CC_Detalles_Solucion__c = limpiarHTML(inputMaximo.FR2CODE_LONGDESCRIPTION);
 										casoUpdate.add(caso);
 									}
 								}
 
 							} else if (inputMaximo.ESTADO == 'ACCEPTED') {
 								agrupador.CC_Estado__c = 'Activo';
-								agrupador.CC_Detalle_Solucion__c = inputMaximo.FR2CODE_LONGDESCRIPTION;
+								//agrupador.CC_Detalle_Solucion__c = inputMaximo.FR2CODE_LONGDESCRIPTION != null ? inputMaximo.FR2CODE_LONGDESCRIPTION.unescapeHtml4() : null;
 								agrupador.CC_Fecha_Resolucion__c = null;
 								//Se realizan las actualizaciones del caso
 								List<Case> casosList = mapCases.get(agrupador.Id);

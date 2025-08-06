@@ -95,7 +95,10 @@ public with sharing class CC_MCC_Knowledge_AI_TRHan extends CC_TriggerHandlerBas
     
     public static Map <Id, Id> unPublishArticle(String recordId){
         Map<Id,Id> despublicadoIdVersion = new Map<Id,Id>();
-        String newArticleId = KbManagement.PublishingService.editOnlineArticle(recordId, true);
+        System.debug('DMV unPublishArticle recordId: ' + recordId); //KnowledgeArticleId - padre
+        System.debug('DMV access to parent ' + Schema.sObjectType.Knowledge__ka.isAccessible()); //Access to parent
+        String newArticleId = KbManagement.PublishingService.editOnlineArticle(recordId, true);  
+        System.debug('DMV unPublishArticle newArticleId: ' + newArticleId);   //Draft   
         despublicadoIdVersion.put(newArticleId, recordId);
         return despublicadoIdVersion;
      }
@@ -168,12 +171,15 @@ public with sharing class CC_MCC_Knowledge_AI_TRHan extends CC_TriggerHandlerBas
      }
 
     public static void publishArticle(String recordId){
+        System.debug('DMV publishArticle: ' + recordId); 
         KbManagement.PublishingService.publishArticle(recordId, true);
     }
 
     public static void actualizarMccs(Map<Id, Id> articuloNuevaVersion){
+        System.debug('DMV actualizarMccs: ' + JSON.serialize(articuloNuevaVersion.keySet()));
         List<CBK_MCC_Knowledge__c> objetosRelacion = new List<CBK_MCC_Knowledge__c>([SELECT Id, CBK_Knowledge__c, CBK_MCC__c FROM CBK_MCC_Knowledge__c WHERE CBK_Knowledge__c IN :articuloNuevaVersion.keySet()]);
         for (CBK_MCC_Knowledge__c objeto : objetosRelacion){
+            System.debug('DMV inside: ' + articuloNuevaVersion.get(objeto.CBK_Knowledge__c));
             objeto.CBK_Knowledge__c = articuloNuevaVersion.get(objeto.CBK_Knowledge__c);
         }
 

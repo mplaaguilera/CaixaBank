@@ -69,10 +69,21 @@ public with sharing class CSBD_MetodosComunes {
         return !oficinas.isEmpty() ? oficinas[0] : null;
     }
 
-    public static Messaging.SendEmailResult enviarCorreo(Id whatId, String nombreBuzonSalida, String nombrePlantilla, List<String> destinatarios) {
+    public static Messaging.SendEmailResult enviarCorreo(Id whatId, String nombreBuzonSalida, String nombrePlantilla, List<String> destinatarios, Boolean buscarPorEmpresa) {
         if (String.isBlank(nombreBuzonSalida) || String.isBlank(nombrePlantilla)) {
             return null;
         } else {
+            Id idBuzonSalida;
+            if (buscarPorEmpresa) {
+                //el nombreBuzonSalida es el nombre de la empresa proveedora
+                idBuzonSalida = obtenerIdBuzonSalida(nombreBuzonSalida);
+            } else {
+                //el nombreBuzonSalida es el nombre del buzon de salida
+                idBuzonSalida = [SELECT Id FROM OrgWideEmailAddress WHERE DisplayName = :nombreBuzonSalida].Id;
+            }
+            if (idBuzonSalida == null) {
+                return null;
+            }
             Messaging.SingleEmailMessage correo = new Messaging.SingleEmailMessage();
             correo.setToAddresses(destinatarios);
             correo.setTemplateId([SELECT Id FROM EmailTemplate WHERE Name = :nombrePlantilla LIMIT 1].Id);
@@ -88,10 +99,14 @@ public with sharing class CSBD_MetodosComunes {
             correo.setSaveAsActivity(true);
             correo.setTreatTargetObjectAsRecipient(false);
             correo.setWhatId(whatId);
-            correo.setOrgWideEmailAddressId([SELECT Id FROM OrgWideEmailAddress WHERE DisplayName = :nombreBuzonSalida].Id);
+            correo.setOrgWideEmailAddressId(idBuzonSalida);
             List<Messaging.SendEmailResult> resultadoEnvios = Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{correo});
             return resultadoEnvios[0];
         }
+    }
+
+    public static Messaging.SendEmailResult enviarCorreo(Id whatId, String nombreBuzonSalida, String nombrePlantilla, List<String> destinatarios) {
+        return enviarCorreo(whatId, nombreBuzonSalida, nombrePlantilla, destinatarios, false);
     }
 
     public static Messaging.SingleEmailMessage enviarCorreoReturnCorreo(Messaging.SingleEmailMessage correo, Id whatId, Id contactId, Id idBuzonSalida, String idPlantilla, List<String> destinatarios) {
@@ -174,4 +189,19 @@ public with sharing class CSBD_MetodosComunes {
 		}
         return esGestorPool;
 	}
+
+    public static Id obtenerIdBuzonSalida(String empresaProveedora) {
+        return obtenerIdBuzonSalida(empresaProveedora, null);
+    }
+
+    public static String obtenerIdBuzonSalida(String empresaProveedora, String familiaProducto) {
+        CSBD_Remitente_Enviar_Correo__c config = CSBD_Remitente_Enviar_Correo__c.getInstance();
+        if(config != null){
+            String address = 
+                familiaProducto != null && familiaProducto == 'Alta digital de menores' ? config.CSBD_Buzon_Alta_digital_de_menores__c : 
+                empresaProveedora == 'imaginBank' ? config.CSBD_Buzon_ImaginBank__c : config.CSBD_Buzon_CaixaBank__c;
+            return [SELECT Id FROM OrgWideEmailAddress WHERE Address = :address]?.Id;            
+        } 
+        return null;
+    }
 }

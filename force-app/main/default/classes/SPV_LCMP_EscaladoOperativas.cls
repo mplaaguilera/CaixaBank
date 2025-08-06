@@ -14,9 +14,14 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
 
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
-    private static final Id RECTYPEFORMULARIO = mapRTsObjects.get('SPV_Formulario__c').get('SPV_Formulario').getRecordTypeId();
+    private static final Id RECTYPEFORMULARIO = mapRTsObjects.get('SPV_Formulario__c').get('SPV_FormularioAnalisisDecision').getRecordTypeId();
     private static final Id RECTYPEESCALADO = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Escalado').getRecordTypeId();
+    private static final Id RECTYPEREESCALADO = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Reescalado').getRecordTypeId();
 
+    // Get the Id for our custom notification type
+    private static CustomNotificationType notificationType = [SELECT Id, DeveloperName 
+                                                                FROM CustomNotificationType 
+                                                                WHERE DeveloperName='SAC_EscaladoAtendido'];
     /*****************************************************************
      * Proposito: Tomar en propiedad el escalado. Solo puede tomarse en propiedad si
      * el usuario pertenece a el grupo del escalado.
@@ -72,7 +77,7 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
     public static void devolverEscaladoAlGrupo(String escaladoId) {
         try {
             //Asignar id de escalado
-            SAC_Interaccion__c escalado = [SELECT Id, SAC_CasoEscalado__c, Name, CreatedById FROM SAC_Interaccion__c WHERE RecordTypeId = :RECTYPEESCALADO AND Id = :escaladoId LIMIT 1];
+            SAC_Interaccion__c escalado = [SELECT Id, SAC_CasoEscalado__c, Name, CreatedById FROM SAC_Interaccion__c WHERE (RecordTypeId = :RECTYPEESCALADO OR RecordTypeId = :RECTYPEREESCALADO)AND Id = :escaladoId LIMIT 1];
 
             //Buscar la cola
             List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
@@ -147,7 +152,7 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
                                                                 FROM SPV_Formulario__c
                                                                 WHERE RecordTypeId = :RECTYPEFORMULARIO AND SPV_Caso__c = :casoId LIMIT 1];
             if (!listaFormulario.isEmpty()) {
-                mensajeError = validarFormulario(listaFormulario[0], mensajeError);
+                //mensajeError = validarFormulario(listaFormulario[0], mensajeError);
                 if (String.isNotBlank(mensajeError)) {
                     throw new AuraHandledException(mensajeError);
                 }
@@ -314,6 +319,68 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
         return fieldResult.getLabel();
     }
 
+
+    /*****************************************************************
+     * Proposito: Al pulsar cancelar escalado, se modifica su estado
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1277284       Álex Polo     18/06/2025      Creación
+    *****************************************************************/
+    @AuraEnabled
+    public static void cancelarEscalado(Id escaladoId){
+        try {
+            List<SAC_Interaccion__c> listaEscaladosUpdatear = new List<SAC_Interaccion__c>();
+            SAC_Interaccion__c interaccion = recuperarInteraccion(escaladoId);
+            interaccion.SAC_Estado__c = 'SAC_Cancelado';
+            listaEscaladosUpdatear.add(interaccion);
+
+            SAC_DatabaseDML.updateListDML(listaEscaladosUpdatear, true);
+
+            //Mandar una notificación de campanita al letrado de la pretensión.
+            List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+            String recipientId= '';
+            String targetId = escaladoId;
+            String titulo = 'Escalado cancelado.';
+            String contenidoMensaje = 'El escalado ' + interaccion.Name + ' ha sido cancelado.';
+            if (String.isNotBlank(interaccion.SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.OwnerId) && interaccion.SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.OwnerId != cola[0].Id) {
+                recipientId = interaccion.SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.OwnerId;
+            } else if (String.isNotBlank(interaccion.SAC_CasoEscalado__r.OwnerId) && interaccion.SAC_CasoEscalado__r.OwnerId != cola[0].Id) {
+                recipientId = interaccion.SAC_CasoEscalado__r.OwnerId;
+            }
+            if (String.isNotBlank(recipientId)) {
+                // Create a new custom notification
+                Messaging.CustomNotification notification = new Messaging.CustomNotification();
+                
+                // Set the contents for the notification
+                notification.setTitle(titulo);
+                notification.setBody(contenidoMensaje);
+
+                // Set the notification type and target
+                notification.setNotificationTypeId(notificationType.Id);
+                notification.setTargetId(targetId);
+
+                // Actually send the notification
+                Set<String> setRecipientId = new Set<String>();
+                setRecipientId.add(recipientId);
+
+                notification.send(setRecipientId);
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+    public static SAC_Interaccion__c recuperarInteraccion(Id interaccionId){
+        Id recTypeEscalado = Schema.SObjectType.SAC_Interaccion__c.getRecordTypeInfosByDeveloperName().get('SPV_Escalado').getRecordTypeId();
+        SAC_Interaccion__c interaccion = new SAC_Interaccion__c();
+        interaccion = [SELECT Id, OwnerId, SAC_GrupoColaborador__c, SAC_Estado__c, SAC_GrupoVolverEscalar__c, Name, SAC_CasoEscalado__r.OwnerId, SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.OwnerId
+                    FROM SAC_Interaccion__c
+                    WHERE (RecordTypeId = :recTypeEscalado OR RecordTypeId = :RECTYPEREESCALADO)
+                    AND Id = :interaccionId LIMIT 1];
+        return interaccion;
+    }
     /*****************************************************************
      * Proposito: Responde el escalado. Dependiendo del tipo de respuesta dado, modificamos el estado:
      * SPV_Aceptado: El estado pasa a resuelta.
@@ -328,7 +395,7 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
      * 1.0            US926239         CS             06/06/2024   Creación
     *****************************************************************/
     @AuraEnabled
-    public static void responderEscalado(String escaladoId, String tipoRespuesta, String comentarios, String motivoRechazo, String creadorEscaladoId, String casoId) {
+    public static void responderEscalado(String escaladoId, String conclusionEscalado, String comentarios, String motivoRechazo, String creadorEscaladoId, String casoId) {
         try {
             SAC_Interaccion__c escalado = new SAC_Interaccion__c();
             escalado.Id = escaladoId;
@@ -338,44 +405,54 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
             reclamacion.Id = casoId;
 
 
-
+            List<SAC_Interaccion__c> listaEscaladosActualizar = new List<SAC_Interaccion__c>();
             //Comprobar que campos hay que rellenar
-            if (tipoRespuesta == 'SPV_Aceptado') {
-                escalado.SPV_TipoRespuesta__c = tipoRespuesta;
+            if (conclusionEscalado == 'SPV_Aceptado') {
+                escalado.SAC_Conclusion__c = conclusionEscalado;
                 escalado.SPV_MotivoRechazo__c = null;
                 escalado.SAC_Respuesta__c = null;
 
                 //Cambiar el estado a respondido
-                escalado.SAC_Estado__c = 'SAC_Resuelta';
+                escalado.SAC_Estado__c = 'SAC_Atendida';
                 escalado.SAC_FechaRespuesta__c = System.now();                          //Añadido
+                listaEscaladosActualizar.add(escalado);
             }
-            else if (tipoRespuesta == 'SPV_AceptadoConModificaciones') {
-                escalado.SPV_TipoRespuesta__c = tipoRespuesta;
+            else if (conclusionEscalado == 'SPV_AceptadoConModificaciones') {
+                escalado.SAC_Conclusion__c = conclusionEscalado;
                 escalado.SAC_Respuesta__c = comentarios;
                 escalado.SPV_MotivoRechazo__c = null;
 
                 //Se devuelve el escalado al creador y se vuelve a poner en pendiente enviar
                 escalado.OwnerId = creadorEscaladoId;
                 escalado.SAC_Estado__c = 'SPV_PendienteEnviar';
+                listaEscaladosActualizar.add(escalado);
             }
-            else if (tipoRespuesta == 'SPV_Rechazado') {
-                escalado.SPV_TipoRespuesta__c = tipoRespuesta;
+            else if (conclusionEscalado == 'SPV_Rechazado') {
+                escalado.SAC_Conclusion__c = conclusionEscalado;
                 escalado.SPV_MotivoRechazo__c = motivoRechazo;
                 escalado.SAC_Respuesta__c = comentarios;
 
                 //Cambiar el estado a respondido
-                escalado.SAC_Estado__c = 'SAC_Resuelta';
+                escalado.SAC_Estado__c = 'SAC_Atendida';
                 escalado.SAC_FechaRespuesta__c = System.now();                          //Añadido
+                listaEscaladosActualizar.add(escalado);
+            }else if(conclusionEscalado == 'SAC_DevolverNivelAnterior'){
+                escalado.SAC_Conclusion__c = conclusionEscalado;
+                escalado.SAC_Estado__c = 'SAC_Devuelto';
+                listaEscaladosActualizar = devolverEscalado(escalado.Id, conclusionEscalado);
             }
-            
+
             if(Schema.sObjectType.SAC_Interaccion__c.isUpdateable()){   
                 // Database.update(escalado);
-                SPV_DatabaseDML.updateDML(escalado, true);
+                //SPV_DatabaseDML.updateDML(escalado, true);
+                if(!listaEscaladosActualizar.isEmpty()){
+                    SPV_DatabaseDML.updateListDML(listaEscaladosActualizar, true);
+                }
             
                 //Record type accion responder spv
                 Id recordTypeTareaResponder = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SPV_AccionResponderEsc').getRecordTypeId();
-                //Valores picklist SPV_TipoRespuesta__c
-                Schema.DescribeFieldResult fieldResult = SAC_Interaccion__c.SPV_TipoRespuesta__c.getDescribe();
+                //Valores picklist SAC_Conclusion__c
+                Schema.DescribeFieldResult fieldResult = SAC_Interaccion__c.SAC_Conclusion__c.getDescribe();
                 List<Schema.PicklistEntry> picklistEntries = fieldResult.getPicklistValues();
                 //Mapa de valores de API Name a label
                 Map<String, String> apiNameToLabelMap = new Map<String, String>();
@@ -397,19 +474,20 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
                 respuestaEsc.RecordTypeId = recordTypeTareaResponder;
                 respuestaEsc.SAC_Comentarios__c = escalado.SAC_Respuesta__c;
                 respuestaEsc.OwnerId =  UserInfo.GetUserId();
-                respuestaEsc.SPV_TipoRespuesta__c = apiNameToLabelMap.get(escalado.SPV_TipoRespuesta__c);
+                respuestaEsc.SPV_TipoRespuesta__c = apiNameToLabelMap.get(escalado.SAC_Conclusion__c);
                 respuestaEsc.SAC_RespuestaEscalado__c = escaladoId;
                 respuestaEsc.SAC_Estado__c = 'SAC_Finalizada';
                 // Database.insert(respuestaEsc);
                 SPV_DatabaseDML.insertDML(respuestaEsc, true);
-
                 // Rellenar el campo SPV_TipoRespuesta__c del formulario de la reclamación con la respuesta del escalado
                 List<SPV_Formulario__c> listaFormulario = [SELECT Id, SPV_TipoRespuesta__c FROM SPV_Formulario__c WHERE RecordTypeId = :RECTYPEFORMULARIO AND SPV_Caso__c = :casoId LIMIT 1];
-                listaFormulario[0].SPV_TipoRespuesta__c = apiNameToLabelMap.get(escalado.SPV_TipoRespuesta__c);
-                listaFormulario[0].SPV_MotivoRechazo__c = apiNameToLabelMap2.get(escalado.SPV_MotivoRechazo__c);
-                listaFormulario[0].SPV_ObservacionesAJ__c = escalado.SAC_Respuesta__c;
-                // Database.update(listaFormulario[0]);
-                SPV_DatabaseDML.updateDML(listaFormulario[0], true);
+                if(!listaFormulario.isEmpty()) {
+                    listaFormulario[0].SPV_TipoRespuesta__c = apiNameToLabelMap.get(escalado.SAC_Conclusion__c);
+                    listaFormulario[0].SPV_MotivoRechazo__c = apiNameToLabelMap2.get(escalado.SPV_MotivoRechazo__c);
+                    listaFormulario[0].SPV_ObservacionesAJ__c = escalado.SAC_Respuesta__c;
+                    // Database.update(listaFormulario[0]);
+                    SPV_DatabaseDML.updateDML(listaFormulario[0], true);
+                }
             }else{
                 throw new AuraHandledException('No tienes permisos para actualizar el escalado');
             }
@@ -417,4 +495,105 @@ public with sharing class SPV_LCMP_EscaladoOperativas {
             throw new AuraHandledException('Error: ' + e.getMessage());
         }
     }
+
+    /*****************************************************************
+     * Proposito: Si se ha respondido el escalado con "Devolver...", se modifica su Owner y Grupo
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1277284       Álex Polo     18/06/2025      Creación
+    *****************************************************************/
+    //Si es un re escalado -> Se devuelve al escalado principal, el re escalado pasa a devuelta y el escalado vuelve a abrirse
+    //Si es el escalado principal, se devuelve al letrado, grupo y owner de la pretensión
+    private static List<SAC_Interaccion__c> devolverEscalado(String escaladoId, String conclusion){
+        
+        List<SAC_Interaccion__c> listaEscaladosActualizar = new List<SAC_Interaccion__c>();
+        SAC_Interaccion__c escalado = [SELECT Id, SAC_Estado__c, RecordTypeId, SAC_GrupoVolverEscalar__c, OwnerId, SAC_GrupoColaborador__c, SAC_EscaladoNV2__c, SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.OwnerId, SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c FROM SAC_Interaccion__c WHERE Id = :escaladoId];
+        if (escalado.RecordTypeId == RECTYPEESCALADO) {
+        //Pasar escalado a devuelto y poner el owner y el grupo de la pretension y guardar el grupo que tenía en el campo SAC_GrupoVolverEscalar__c
+            escalado.SAC_Estado__c = 'SAC_Devuelto';
+            escalado.SAC_Conclusion__c = conclusion;
+            escalado.SAC_GrupoVolverEscalar__c = escalado.SAC_GrupoColaborador__c;
+            escalado.OwnerId = escalado.SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.OwnerId;
+            escalado.SAC_GrupoColaborador__c = escalado.SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c;
+            listaEscaladosActualizar.add(escalado);
+
+        }else if(escalado.RecordTypeId == RECTYPEREESCALADO){
+            //Si es el rescalado:
+
+            escalado.SAC_Estado__c = 'SAC_Devuelto';
+            escalado.SAC_GrupoVolverEscalar__c = escalado.SAC_GrupoColaborador__c;
+            listaEscaladosActualizar.add(escalado);
+
+            //Comprobar que tiene un escalado de nivel 2 (el que se ha reescalado), y si lo tiene, pasarlo a estado pendiente respuesta
+            if (String.isNotBlank(escalado.SAC_EscaladoNV2__c)) {
+                SAC_Interaccion__c escaladoNV2 = new SAC_Interaccion__c();
+                escaladoNV2.Id = escalado.SAC_EscaladoNV2__c;
+                escaladoNV2.SAC_Estado__c = 'SAC_PendienteRespuesta';
+                listaEscaladosActualizar.add(escaladoNV2);
+                
+            }else{
+                //Pasar escalado a devuelto y poner el owner y el grupo de la pretension
+                listaEscaladosActualizar[0].SAC_Conclusion__c = conclusion;
+                //escalado.SAC_ImporteAutorizado__c = importe;
+                listaEscaladosActualizar[0].SAC_GrupoVolverEscalar__c = listaEscaladosActualizar[0].SAC_GrupoColaborador__c;
+                listaEscaladosActualizar[0].SAC_Estado__c = 'SAC_Devuelto';
+                listaEscaladosActualizar[0].OwnerId = escalado.SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.OwnerId;
+                listaEscaladosActualizar[0].SAC_GrupoColaborador__c = escalado.SAC_CasoEscalado__r.SAC_PretensionPrincipal__r.SEG_Grupo__c;
+            }
+        }
+
+        return listaEscaladosActualizar;
+
+    }
+
+    /*****************************************************************
+     * Proposito: Obtener el RecordType DeveloperName del escalado y del
+     * grupo asociado
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1277284       Álex Polo     18/06/2025      Creación
+    *****************************************************************/
+    @AuraEnabled(Cacheable = true)
+    public static SAC_Interaccion__c obtenerEscalado(String escaladoId){
+        SAC_Interaccion__c escalado = [SELECT Id, RecordType.DeveloperName, SAC_GrupoColaborador__c, SAC_GrupoColaborador__r.RecordType.DeveloperName FROM SAC_Interaccion__c WHERE Id = :escaladoId];
+        return escalado;
+    }
+
+    /*****************************************************************
+     * Proposito: Botón volver a escalar. Está disponible para el letrado cuando se le ha devuelto el escalado
+    * nivel 2 y el estado del escalado es devuelto.
+    * Vuelve a poner el escalado con el grupo que tenia el escalado en el momento de devolverla.
+    * Pone como owner la cola pendiente de asignar. Pone el estado en pendiente respuesta.
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1277284       Álex Polo     18/06/2025      Creación
+    *****************************************************************/
+    @AuraEnabled
+    public static void volverAEscalar(Id interaccionId, String propuestaLet){
+        try {
+            List<Group> cola = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
+            SAC_Interaccion__c interaccion = recuperarInteraccion(interaccionId);
+
+            //Se devuelve al grupo que tenía el escalado y se vuelve a poner en estado pendiente de respuesta y owner la cola pendiente de respuesta.
+            interaccion.SAC_Estado__c = 'SAC_PendienteRespuesta';
+            interaccion.SAC_Propuesta__c = propuestaLet;
+            interaccion.SAC_GrupoColaborador__c = interaccion.SAC_GrupoVolverEscalar__c;
+            interaccion.SAC_Conclusion__c = null;
+
+            if (!cola.isEmpty()) {
+                interaccion.OwnerId = cola[0].Id;
+            }
+
+            SPV_DatabaseDML.updateDML(interaccion, false);
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
 }

@@ -129,6 +129,7 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     @track modalOpcionesTematica = false;
     @track tematicaValue;
     @track cadenaTematica = '';
+    @track cadenaTematicaIds = '';
     @track disabledTematica = false;
 
     //Selector Producto
@@ -137,6 +138,7 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     @track valuesMccProducto = [];
     @track modalOpcionesProducto = false;
     @track cadenaProducto = '';
+    @track cadenaProductoIds = '';
     @track disabledProducto = false;
 
     //Selector Motivo
@@ -145,6 +147,7 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     @track valuesMccMotivo = [];
     @track modalOpcionesMotivo = false;
     @track cadenaMotivo = '';
+    @track cadenaMotivoIds = '';
     @track disabledMotivo = false;
 
     //Selector Detalle
@@ -153,6 +156,7 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     @track valuesMccDetalle = [];
     @track modalOpcionesDetalle = false;
     @track cadenaDetalle = '';
+    @track cadenaDetalleIds = '';
     @track disabledDetalle = false;
 
     get optionsTrueFalse() {
@@ -181,13 +185,6 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
 
     @wire(buscarResultados, { searchTerm: '$searchInput', tipoBusqueda: '$tipoBuscador', id: '$idSelect' })
     wiredSearchResults({ error, data }) {
-
-        console.log(this.valuesMccTematica.length);
-            console.log(this.valuesMccProducto.length);
-            console.log(this.valuesMccMotivo.length);
-            console.log(this.valuesMccDetalle.length);
-            console.log(JSON.stringify(this.valuesMccTematica));
-
         if (data == '' || data == undefined) {
 
             if(this.tipoBuscador === 'buscadorGrupoProveedor'){
@@ -247,13 +244,13 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
             if(this.tipoBuscador === 'buscadorTematica' && this.valuesMccTematica.length == 0){
                 this.filteredResultsTematica = data;
             }
-            if(this.tipoBuscador === 'buscadorProducto' && (this.valuesMccProducto.length == 0 || (this.valuesMccProducto.length > 0 && this.valuesMccTematica.length == 0))){
+            if(this.tipoBuscador === 'buscadorProducto' && this.valuesMccProducto.length == 0){
                 this.filteredResultsProducto = data;
             }
-            if(this.tipoBuscador === 'buscadorMotivo' && (this.valuesMccMotivo.length == 0 || (this.valuesMccMotivo.length > 0 && this.valuesMccProducto.length == 0))){
+            if(this.tipoBuscador === 'buscadorMotivo' && this.valuesMccMotivo.length == 0){
                 this.filteredResultsMotivo = data;
             }
-            if(this.tipoBuscador === 'buscadorDetalle' && (this.valuesMccDetalle.length == 0 || (this.valuesMccDetalle.length > 0 && this.valuesMccMotivo.length == 0))){
+            if(this.tipoBuscador === 'buscadorDetalle' && this.valuesMccDetalle.length == 0){
                 this.filteredResultsDetalle = data;
             }
             if(this.tipoBuscador === 'buscadorGrupoResolver'){
@@ -1011,7 +1008,6 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
 
             this.filteredResultsTematica = options;
             this.cadenaTematica = '';
-            this.temValue = '';
             var count = 0;
 
             for(var i = 0; i < options.length; i++){
@@ -1020,9 +1016,10 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
 
                     if(count > 1){
                         this.cadenaTematica = this.cadenaTematica + ', ' + options[i].Name;
+                        this.cadenaTematicaIds = this.cadenaTematicaIds + ';' + options[i].Id.replace(',', ';');
                     }else{
                         this.cadenaTematica = options[i].Name;
-                        this.temValue = options[i].Id;
+                        this.cadenaTematicaIds = options[i].Id.replace(',', ';');
                     }
                 }                
             }
@@ -1034,16 +1031,19 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
                 this.valuesMccProducto = [];
                 this.filteredResultsProducto = [];
                 this.cadenaProducto = '';
+                this.cadenaProductoIds = '';
                 this.disabledMotivo = true;
                 this.searchInputMotivo = '';
                 this.valuesMccMotivo = [];
                 this.filteredResultsMotivo = [];
                 this.cadenaMotivo = '';
+                this.cadenaMotivoIds = '';
                 this.disabledDetalle = true;
                 this.searchInputDetalle = '';
                 this.valuesMccDetalle = [];
                 this.filteredResultsDetalle = [];
                 this.cadenaDetalle = '';
+                this.cadenaDetalleIds = '';
             }
 
             //En el caso de deseleccionar todas las opciones se blanquean todos los inputs de menor nivel
@@ -1052,14 +1052,17 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
                 this.valuesMccProducto = [];
                 this.filteredResultsProducto = [];
                 this.cadenaProducto = '';
+                this.cadenaProductoIds = '';
                 this.searchInputMotivo = '';
                 this.valuesMccMotivo = [];
                 this.filteredResultsMotivo = [];
                 this.cadenaMotivo = '';
+                this.cadenaMotivIds = '';
                 this.searchInputDetalle = '';
                 this.valuesMccDetalle = [];
                 this.filteredResultsDetalle = [];
                 this.cadenaDetalle = '';
+                this.cadenaDetalleIds = '';
             }
 
             //En el caso de solo tener 1 opción seleccionada, se dejan activos
@@ -1127,8 +1130,10 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
 
                     if(count > 1){
                         this.cadenaProducto = this.cadenaProducto + ', ' + options[i].Name;
+                        this.cadenaProductoIds = this.cadenaProductoIds + ';' + options[i].Id.replace(',', ';');
                     }else{
                         this.cadenaProducto = options[i].Name;
+                        this.cadenaProductoIds = options[i].Id.replace(',', ';');
                     }
                 }
             }
@@ -1140,16 +1145,19 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
                 this.valuesMccTematica = [];
                 this.filteredResultsTematica = [];
                 this.cadenaTematica = '';
+                this.cadenaTematicaIds = '';
                 this.disabledMotivo = true;
                 this.searchInputMotivo = '';
                 this.valuesMccMotivo = [];
                 this.filteredResultsMotivo = [];
                 this.cadenaMotivo = '';
+                this.cadenaMotivoIds = '';
                 this.disabledDetalle = true;
                 this.searchInputDetalle = '';
                 this.valuesMccDetalle = [];
                 this.filteredResultsDetalle = [];
                 this.cadenaDetalle = '';
+                this.cadenaDetalleIds = '';
             }
 
             //En el caso de deseleccionar todas las opciones se blanquean todos los inputs de menor nivel, y el mismo
@@ -1159,10 +1167,12 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
                 this.valuesMccMotivo = [];
                 this.filteredResultsMotivo = [];
                 this.cadenaMotivo = '';
+                this.cadenaMotivoIds = '';
                 this.searchInputDetalle = '';
                 this.valuesMccDetalle = [];
                 this.filteredResultsDetalle = [];
                 this.cadenaDetalle = '';
+                this.cadenaDetalleIds = '';
             }
 
             //En el caso de solo tener 1 opción seleccionada, se dejan activos
@@ -1230,8 +1240,10 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
 
                     if(count > 1){
                         this.cadenaMotivo = this.cadenaMotivo + ', ' + options[i].Name;
+                        this.cadenaMotivoIds = this.cadenaMotivoIds + ';' + options[i].Id.replace(',', ';');
                     }else{
                         this.cadenaMotivo = options[i].Name;
+                        this.cadenaMotivoIds = options[i].Id.replace(',', ';');
                     }
                 }
             }
@@ -1243,16 +1255,19 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
                 this.valuesMccTematica = [];
                 this.filteredResultsTematica = [];
                 this.cadenaTematica = '';
+                this.cadenaTematicaIds = '';
                 this.disabledProducto = true;
                 this.searchInputProducto = '';
                 this.valuesMccProducto = [];
                 this.filteredResultsProducto = [];
                 this.cadenaProducto = '';
+                this.cadenaProductoIds = '';
                 this.disabledDetalle = true;
                 this.searchInputDetalle = '';
                 this.valuesMccDetalle = [];
                 this.filteredResultsDetalle = [];
                 this.cadenaDetalle = '';
+                this.cadenaDetalleIds = '';
             }
 
             //En el caso de deseleccionar todas las opciones se blanquean todos los inputs de menor nivel
@@ -1261,6 +1276,7 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
                 this.valuesMccDetalle = [];
                 this.filteredResultsDetalle = [];
                 this.cadenaDetalle = '';
+                this.cadenaDetalleIds = '';
             }
 
             //En el caso de solo tener 1 opción seleccionada, se dejan activos
@@ -1328,8 +1344,10 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
 
                     if(count > 1){
                         this.cadenaDetalle = this.cadenaDetalle + ', ' + options[i].Name;
+                        this.cadenaDetalleIds = this.cadenaDetalleIds + ';' + options[i].Id.replace(',', ';');
                     }else{
                         this.cadenaDetalle = options[i].Name;
+                        this.cadenaDetalleIds = options[i].Id.replace(',', ';');
                     }
                 }
             }
@@ -1341,16 +1359,19 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
                 this.valuesMccTematica = [];
                 this.filteredResultsTematica = [];
                 this.cadenaTematica = '';
+                this.cadenaTematicaIds = '';
                 this.disabledProducto = true;
                 this.searchInputProducto = '';
                 this.valuesMccProducto = [];
                 this.filteredResultsProducto = [];
                 this.cadenaProducto = '';
+                this.cadenaProductoIds = '';
                 this.disabledMotivo = true;
                 this.searchInputMotivo = '';
                 this.valuesMccMotivo = [];
                 this.filteredResultsMotivo = [];
                 this.cadenaMotivo = '';
+                this.cadenaMotivoIds = '';
             }
 
             //En el caso de solo tener 1 opción seleccionada, se dejan activos
@@ -1425,7 +1446,6 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
     /* Otros métodos */
 
     botonGenerarAuditoria(){
-
         if(this.numRec <= 0 || this.numRec === undefined || this.searchInputTipoAudit === '' || this.searchInputTipoAudit === undefined || this.nombreAuditoria === '' || this.slaCalidad === '' || this.slaCalidad === undefined || this.nombreAuditoria === undefined ||  this.soloPretPpal === '' ||  this.soloPretPpal === undefined || (this.variosProv === true && (this.searchInputGrupoProveedor === '' || this.searchInputGrupoProveedor === undefined)) || (this.variosLet === true && (this.searchInputGrupoLetrado === '' || this.searchInputGrupoLetrado === undefined))){
             var contador = 0;
             this.mostrarListaReclamaciones = false;
@@ -1639,7 +1659,7 @@ export default class Sac_Auditorias extends NavigationMixin(LightningElement) {
             }
         }
 
-        crearAuditorias({ nombreAuditoria: this.nombreAuditoria, tipoAuditoria:  this.tipoAuditValue, slaCalidad: this.slaCalidad, fechaDesde: this.fechaDesde, fechaHasta: this.fechaHasta, grupoProvId: this.idSelectGrupoProv, despachosId: this.idSelectGrupoLet, gestorId: this.idSelectGestor, letradoId: this.idSelectLetrado, impAbonadoDesde: this.importeDesde, impAbonadoHasta: this.importeHasta, sentidoResolucion: this.sentidoResolucionValue, listIdsTematica: this.cadenaTematica, listIdsProducto: this.cadenaProducto, listIdsMotivo: this.cadenaMotivo, listIdsDetalle: this.cadenaDetalle, listIdsTematicaLabel: this.searchInputTematica, listIdsProductoLabel: this.searchInputProducto, listIdsMotivoLabel: this.searchInputMotivo, listIdsDetalleLabel: this.searchInputDetalle, grupoResolverId: this.idSelectGrupoResolver, listaCasos: this.selectedCons }).then(result => {
+        crearAuditorias({ nombreAuditoria: this.nombreAuditoria, tipoAuditoria:  this.tipoAuditValue, slaCalidad: this.slaCalidad, fechaDesde: this.fechaDesde, fechaHasta: this.fechaHasta, grupoProvId: this.idSelectGrupoProv, despachosId: this.idSelectGrupoLet, gestorId: this.idSelectGestor, letradoId: this.idSelectLetrado, impAbonadoDesde: this.importeDesde, impAbonadoHasta: this.importeHasta, sentidoResolucion: this.sentidoResolucionValue, tematicaId: this.cadenaTematicaIds, productoId: this.cadenaProductoIds, motivoId: this.cadenaMotivoIds, detalleId: this.cadenaDetalleIds, tematicaLabel: this.searchInputTematica, productoLabel: this.searchInputProducto, motivoLabel: this.searchInputMotivo, detalleLabel: this.searchInputDetalle, grupoResolverId: this.idSelectGrupoResolver, listaCasos: this.selectedCons }).then(result => {
             this.spinnerLoading = false;
             this.mostrarListaReclamaciones = false;
             const evt = new ShowToastEvent({

@@ -8,11 +8,9 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
 
     @TestSetup
     static void makeData(){
-        
+        Test.startTest();
         //defaultFromAddressAttCliente = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE DeveloperName = 'CC_Atencion_Cliente_ESP'].CC_Direccion_Correo__c;
         defaultFromAddressBuzonEmpleados = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE DeveloperName = 'CC_Buzon_Defecto_Empleados'].CC_Direccion_Correo__c;
-     
-        system.debug('El email es : ' + defaultFromAddressAttCliente + ' - ' + defaultFromAddressBuzonEmpleados );
 
     	List<String> developerNamesPlantillas = new List<String>{'CC_ConsultasOperativasCanalFormulario_Traslado_CAT','CC_ConsultasOperativasCanalFormulario_Traslado_CAS'};
 		List<EmailTemplate> plantillas = [SELECT Id, Name FROM EmailTemplate WHERE DeveloperName IN :developerNamesPlantillas];
@@ -77,6 +75,7 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         userList.add(usuario1);
         insert userList;
         System.runAs(usuario1){
+
             List<User> userList2 = new List<User>();
             User usuario = new User();
             usuario.ProfileId = profile2Id;
@@ -180,11 +179,36 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         horarioServiciosCentrales2.CC_Lista__c = horario.Id;
         valoresInsertar.add(horarioServiciosCentrales2);
 
+        CC_Lista_Valores__c horarioGenerico = new CC_Lista_Valores__c();
+        horarioGenerico.Name = 'Generico';
+        horarioGenerico.RecordTypeId = rtValor;
+        horarioGenerico.CC_Valor__c = '9:30';
+        horarioGenerico.CC_Valor2__c = '19';
+        horarioGenerico.CC_Valor_SFDC__c = 'L-J';
+        horarioGenerico.CC_Lista__c = horario.Id;
+        valoresInsertar.add(horarioGenerico);
+
+        CC_Lista_Valores__c horarioGenerico2 = new CC_Lista_Valores__c();
+        horarioGenerico2.Name = 'Generico';
+        horarioGenerico2.RecordTypeId = rtValor;
+        horarioGenerico2.CC_Valor__c = '9:30';
+        horarioGenerico2.CC_Valor2__c = '19';
+        horarioGenerico2.CC_Valor_SFDC__c = 'V';
+        horarioGenerico2.CC_Lista__c = horario.Id;
+        valoresInsertar.add(horarioGenerico2);
+
         CC_Lista_Valores__c valorPlazo = new CC_Lista_Valores__c();
         valorPlazo.Name = 'Plazo Genérico';
         valorPlazo.RecordTypeId = rtValor;
         valorPlazo.CC_Valor__c = '1';
         valoresInsertar.add(valorPlazo);
+
+        CC_Lista_Valores__c valorCSBD = new CC_Lista_Valores__c();
+        valorCSBD.Name = 'Texto oportunidad tarea existente';
+        valorCSBD.RecordTypeId = rtValor;
+        valorCSBD.CC_Mensajes_Mostrar__c = 'pruebatest';
+        valorCSBD.CC_Activa__c = true;
+        valoresInsertar.add(valorCSBD);
 
         insert valoresInsertar;
 
@@ -233,6 +257,32 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         mcc2.CC_Producto_Servicio__c = mcc1.Id;
         mcc2.CC_Codigo_Externo__c = 'MO-000001';
         insert mcc2;
+
+        //MCCs argos
+        CC_MCC__c mcc3 = new CC_MCC__c();
+        mcc3.RecordTypeId = recordTem;
+        mcc3.Name = 'App\'s';
+        mcc3.CC_Tipo_Cliente__c = 'Cliente';
+        mcc3.CC_Codigo_Externo__c = 'TE-000002';
+        mcc3.CC_Canal_Operativo__c = 'App BrokerNow';
+        insert mcc3;
+        CC_MCC__c mcc4 = new CC_MCC__c();
+        mcc4.RecordTypeId = recordProd;
+        mcc4.Name = 'APP CaixaBank';
+        mcc4.CC_Detalle__c = 'CaixaBank';
+        mcc4.CC_Tipo_Cliente__c = 'Cliente';
+        mcc4.CC_Tematica__c = mcc3.Id;
+        mcc4.CC_Codigo_Externo__c = 'PR-000002';
+        insert mcc4;
+        CC_MCC__c mcc5 = new CC_MCC__c();
+        mcc5.RecordTypeId = recordMot;
+        mcc5.Name = 'Valoración positiva';
+        mcc5.CC_Tipo_Cliente__c = 'Cliente';
+        mcc5.CC_Producto_Servicio__c = mcc4.Id;
+        mcc5.CC_Codigo_Externo__c = 'MO-000002';
+        mcc5.CC_Ambito_Tareas_Imagin__c = 'Argos General';
+        mcc5.CC_Ambito_Tareas_Caixa__c = 'Argos General';
+        insert mcc5;
         
         List<Case> casos = new List<Case>();
         Case caso = new Case();
@@ -263,8 +313,32 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         caso2.CC_Fecha_Traslado_Colaborador__c = Date.today().addDays(-7);
         casos.add(caso2);
 
-        insert casos;
+        Case caso3 = new Case();
+        caso3.AccountId = cuenta.Id;
+        caso3.ContactId = contacto.Id;
+        caso3.Subject = 'Caso Cliente 3';
+        caso3.Status = 'Activo';
+        caso3.Origin = 'Email';
+        caso3.CC_Tipo_Cliente__c = 'Cliente';
+        caso3.CC_Tipo_Contacto__c = 'Consulta';
+        caso3.CC_MCC_Tematica__c = mcc3.Id;
+        caso3.CC_MCC_ProdServ__c = mcc4.Id;
+        caso3.CC_MCC_Motivo__c = mcc5.Id;
+        caso3.CC_Canal_Procedencia__c = 'Formulario Consultas Operativas';
+        caso3.CC_Detalles_Consulta__c = 'Test';
+        caso3.CC_Detalles_Solucion__c = 'Test';
+        caso3.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+        casos.add(caso3);
 
+        CC_Settings__c configuracion = new CC_Settings__c(
+            Name = 'CC_RespuestaArgosPushSMS',
+            CC_Configuracion_1__c = 'CC_ConsultasOperativasCanalFormulario_Traslado_CAS',
+            CC_Configuracion_2__c = 'CC_ConsultasOperativasCanalFormulario_Traslado_CAT'
+        );
+        insert configuracion;
+
+        insert casos;
+        Test.stopTest();
     }    
     
     @isTest
@@ -289,6 +363,7 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         caso.Subject = 'Caso temporal';
         caso.CC_Referencia_Correo_Saliente__c = '#@1234567890#';
         insert caso;
+        
         
         Task actividadCorreo = new Task();
         actividadCorreo.Type = 'Traslado Colaborador';
@@ -338,8 +413,9 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
 
     @isTest
     public static void trasladoColaboradorEntrante() {
+        
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso temporal' LIMIT 1];
-        Test.startTest();
+
         Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo Colaborador Temporal';
@@ -381,7 +457,7 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         // insert actividadCorreo;
         tareas.add(actividadCorreo);
         insert tareas;
-
+		Test.startTest();
         //Setup header for the email
         List<EmailServicesAddress> emailServicesList= [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE FunctionId IN (SELECT Id FROM EmailServicesFunction WHERE FunctionName = 'CC_AC') LIMIT 1];
         String headerValueStr;
@@ -1405,10 +1481,11 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         correo.HtmlBody = String.join(cuerpo, '<br/>');
         
             insert correo;
-        Test.stopTest();
-        
         Case casoId = [SELECT Id FROM Case LIMIT 1];
         Integer cantidadDeEmails = [SELECT Count() FROM EmailMessage WHERE ParentId = :casoId.Id];
+        Test.stopTest();
+        
+
         System.AssertNotEquals(4, cantidadDeEmails);
         //System.AssertEquals(1, cantidadDeEmails.size());
     }
@@ -1416,7 +1493,6 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
     @isTest
     public static void trasladoColaboradorWivaiCorreoAutomaticoEsEmp() {
       
-        Test.startTest();
         Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo Colaborador Temporal';
@@ -1447,6 +1523,7 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         
         insert caso;
         
+        Test.startTest();
         Task actividadCorreo = new Task();
         actividadCorreo.Type = 'Traslado Colaborador';
         actividadCorreo.WhatId = caso.Id;
@@ -1556,7 +1633,6 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
     @isTest
     public static void trasladoColaboradorWivaiCorreoAutomaticoCaEmp() {
       
-        Test.startTest();
         Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo Colaborador Temporal';
@@ -1587,6 +1663,7 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         
         insert caso;
         
+        Test.startTest();
         Task actividadCorreo = new Task();
         actividadCorreo.Type = 'Traslado Colaborador';
         actividadCorreo.WhatId = caso.Id;
@@ -1625,7 +1702,6 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
     @isTest
     public static void trasladoColaboradorCorreoAutoFormularioConsultasOperativas() {
       
-        Test.startTest();
         Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo Colaborador Temporal';
@@ -1655,6 +1731,7 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
         caso.ContactId = contacto.Id;
         insert caso;
 
+        Test.startTest();
         Task actividadCorreo = new Task();
         actividadCorreo.Type = 'Traslado Colaborador';
         actividadCorreo.WhatId = caso.Id;
@@ -1837,6 +1914,208 @@ public with sharing class CC_EmailMessage_AI_TRHan_Test {
                 
                 CC_EmailMessage_AI_TRHan.comprobarDocumentacionDerivar(caso, correoOrigen);
                 System.assertEquals([SELECT OwnerId FROM Case WHERE CC_CasoRelacionado__c = :caso.Id].OwnerId, [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName  = 'CC_Inbound_Email_AC' LIMIT 1].Id, 'No se ha creado ningun caso');
+        }
+        Test.stopTest();
+    }
+
+
+    @isTest
+    public static void emailInbound() {
+        
+        System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            Test.startTest();
+            Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Cliente' LIMIT 1];
+            Task tarea = new Task();
+            tarea.Type = 'Actividad manual';
+            tarea.WhatId = caso.Id;
+            tarea.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            insert tarea;
+
+            //Setup header for the email
+            List<EmailServicesAddress> emailServicesList= [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE FunctionId IN (SELECT Id FROM EmailServicesFunction WHERE FunctionName = 'CC_AC') LIMIT 1];
+            String headerValueStr;
+            EmailServicesAddress headerValue= new EmailServicesAddress();
+            if (!EmailServicesList.isEmpty()) {
+                headerValue=emailServicesList[0];
+                headerValueStr = headervalue.LocalPart + '@' + headervalue.EmailDomainName;       
+            } else {
+                headerValueStr = 'Prueba@IBM';    
+            }
+            EmailMessage correo = new EmailMessage();
+            correo.Incoming = true;
+            correo.ParentId = caso.Id;
+            correo.RelatedToId = caso.Id;
+            correo.CC_Aplicacion__c = 'CC Clientes';
+            correo.ActivityId = tarea.Id;
+            correo.FromAddress = defaultFromAddressAttCliente;
+            correo.ToAddress = 'pruebaemailinbound@ibm.com';
+            correo.Headers = '[{"value": "' + headerValueStr + '","name": "X-SFDC-Original-RCPT"}]';
+            
+            List<String> cuerpoOrigen = new List<String>();
+            cuerpoOrigen.add('<html>');
+            cuerpoOrigen.add('Cuerpo del correo');
+            cuerpoOrigen.add('<font color="gray">PRUEBA</font>');
+            cuerpoOrigen.add('</html>');
+            correo.HtmlBody = String.join(cuerpoOrigen, '<br/>');
+
+            insert correo;
+
+            EmailMessage correoCreado = [SELECT Id, Incoming, CC_Aplicacion__c, HtmlBody FROM EmailMessage WHERE Id = :correo.Id];
+            System.assert(correoCreado.Id != null, 'No se ha creado el correo');
+            Task tareaActualizada  = [SELECT Id, Type FROM Task WHERE Id = :correo.ActivityId];
+            System.assertEquals('Correo no identificado', tareaActualizada.Type, 'El flow no se ha ejecutado o no se ha cambiado el tipo de tarea');
+
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void notificacionKnowledgeEntrante() {
+           
+        System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            Test.startTest(); 
+                Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Knowledge').getRecordTypeId();
+                Case caso = new Case();
+                caso.RecordTypeId = recordTypeCaso;
+                caso.Subject = 'Caso Knowledge';
+                caso.Status = CC_KnowledgeCaseHandler.CASE_STATUS_PENDIENTE_COLABORADOR;
+                caso.Origin = 'Email';  
+                caso.CC_Referencia_Correo_Saliente__c = '1234567890';
+                insert caso;
+                
+                Task tarea = CC_KnowledgeCaseHandler.crearTareaEnvioCorreo(caso.Id, true, '1234567890', 'Notificación de vencimiento enviada');
+                insert tarea;
+
+                //Setup header for the email
+                List<EmailServicesAddress> emailServicesList= [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE FunctionId IN (SELECT Id FROM EmailServicesFunction WHERE FunctionName = 'CC_AC') LIMIT 1];
+                String headerValueStr;
+                EmailServicesAddress headerValue= new EmailServicesAddress();
+                if (!EmailServicesList.isEmpty()) {
+                    headerValue=emailServicesList[0];
+                    headerValueStr = headervalue.LocalPart + '@' + headervalue.EmailDomainName;       
+                } else {
+                    headerValueStr = 'Prueba@IBM';    
+                }
+
+                EmailMessage correoOrigen = new EmailMessage();
+                correoOrigen.Subject = 'Prueba de envío de correo';
+                correoOrigen.ActivityId = tarea.Id;
+                correoOrigen.CC_Procedencia__c = 'Notificación de vencimiento';
+                correoOrigen.FromAddress = defaultFromAddressAttCliente;
+                correoOrigen.ToAddress = 'prueba@ibm.com';
+                correoOrigen.Incoming = true;
+                correoOrigen.ParentId = caso.Id;
+                correoOrigen.RelatedToId = caso.Id;
+                correoOrigen.Headers = '[{"value": "' + headerValueStr + '","name": "X-SFDC-Original-RCPT"}]';
+
+                List<String> cuerpoOrigen = new List<String>();
+                cuerpoOrigen.add('<html>');
+                cuerpoOrigen.add('Cuerpo del correo');
+                cuerpoOrigen.add('<font color="gray">Por favor mantenga la siguiente referencia al responder a este correo: #@1234567890#.</font>');
+                cuerpoOrigen.add('</html>');
+                correoOrigen.HtmlBody = String.join(cuerpoOrigen, '<br/>');
+                insert correoOrigen;     
+            Test.stopTest();
+
+            System.assertEquals(false, [SELECT Id FROM Case WHERE Status = :CC_KnowledgeCaseHandler.CASE_STATUS_ACTIVO AND Id = :caso.Id].isEmpty(), 
+                'No se ha actualizado el estado del caso');
+        }
+    }
+
+    @isTest
+    public static void automatizacionRespuestaArgosTest() {
+        
+        System.runAs(new User(Id = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Cliente 3' LIMIT 1];
+
+            Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+            CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
+            grupoColab.Name = 'Grupo Colaborador Temporal';
+            grupoColab.RecordTypeId = recordTypeGrupoColaborador;
+            grupoColab.CC_External__c = 'GC-00001';
+            insert grupoColab;       
+            
+            //Correo origen crear las dos task en una lista
+            List<Task> tareas = new List<Task>();
+            Task actividadCorreoOrigen = new Task();
+            actividadCorreoOrigen.Type = 'Traslado Colaborador';
+            actividadCorreoOrigen.WhatId = caso.Id;
+            actividadCorreoOrigen.CC_Referencia_Correo_Saliente__c = '1234567890';
+            actividadCorreoOrigen.RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId();
+            tareas.add(actividadCorreoOrigen);
+            
+            Task reasignacion = new Task();
+            reasignacion.Type = 'Reasignación';
+            reasignacion.WhatId = caso.Id;
+            reasignacion.Status = 'Completed';
+            reasignacion.Subject = 'Reasignación del caso a 3N de CaixaBank Now';
+            reasignacion.RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId();
+            tareas.add(reasignacion);
+
+            
+            Task actividadCorreo = new Task();
+            // insert actividadCorreo;
+            tareas.add(actividadCorreo);
+            insert tareas;
+            Test.startTest();
+            //Setup header for the email
+            List<EmailServicesAddress> emailServicesList= [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE FunctionId IN (SELECT Id FROM EmailServicesFunction WHERE FunctionName = 'CC_AC') LIMIT 1];
+            String headerValueStr;
+            EmailServicesAddress headerValue= new EmailServicesAddress();
+            if (!EmailServicesList.isEmpty()) {
+                headerValue=emailServicesList[0];
+                headerValueStr = headervalue.LocalPart + '@' + headervalue.EmailDomainName;       
+            } else {
+                headerValueStr = 'Prueba@IBM';    
+            }
+
+            List<EmailMessage> correos = new List<EmailMessage>();
+            EmailMessage correoOrigen = new EmailMessage();
+            correoOrigen.Subject = 'Prueba de envío de correo';
+            correoOrigen.ActivityId = actividadCorreoOrigen.Id;
+            correoOrigen.CC_Grupo_Colab__c = grupoColab.Name;
+            correoOrigen.CC_Procedencia__c = 'Traslado Colaborador';
+            correoOrigen.FromAddress = defaultFromAddressAttCliente;
+            correoOrigen.ToAddress = 'prueba@ibm.com';
+            correoOrigen.Incoming = false;
+            correoOrigen.ParentId = caso.Id;
+            correoOrigen.RelatedToId = caso.Id;
+
+            List<String> cuerpoOrigen = new List<String>();
+            cuerpoOrigen.add('<html>');
+            cuerpoOrigen.add('Cuerpo del correo');
+            cuerpoOrigen.add('<font color="gray">Por favor mantenga la siguiente referencia al responder a este correo: #@1234567890#.</font>');
+            cuerpoOrigen.add('</html>');
+            correoOrigen.HtmlBody = String.join(cuerpoOrigen, '<br/>');
+            //correos.add(correoOrigen);
+            insert correoOrigen;
+
+            EmailMessage correo = new EmailMessage();
+            correo.Status = '1';
+            correo.Subject = 'Prueba de envío de correo';
+            correo.ActivityId = actividadCorreo.Id;
+            correo.CC_Grupo_Colab__c = grupoColab.Name;
+            correo.CC_Procedencia__c = 'Traslado Colaborador';
+            correo.FromAddress = defaultFromAddressAttCliente;
+            correo.ToAddress = 'prueba@ibm.com';
+            correo.Incoming = true;
+            correo.ParentId = caso.Id;
+            correo.RelatedToId = caso.Id;
+            correo.Headers = '[{"value": "' + headerValueStr + '","name": "X-SFDC-Original-RCPT"}]';
+            correo.CC_Segunda_Oficina__c = 'Segunda oficina';
+
+            List<String> cuerpo = new List<String>();
+            cuerpo.add('<html>');
+            cuerpo.add('Cuerpo del correo');
+            cuerpo.add('<font color="gray"> #$%&CIERRE&%$# Por favor mantenga la siguiente referencia al responder a este correo: #@1234567890#.</font>');
+            cuerpo.add('</html>');
+            correo.HtmlBody = String.join(cuerpo, '<br/>');
+            correos.add(correo);
+            insert correos;
+
+            Case casoResult = [SELECT Id, Status, CC_Admin__c FROM Case WHERE Subject = 'Caso Cliente 3' LIMIT 1];
+            System.assertEquals('Cerrado', casoResult.Status, 'No se ha cerrado el caso');
+            System.assertEquals(false, casoResult.CC_Admin__c, 'No se ha quitado el check admin');
         }
         Test.stopTest();
     }

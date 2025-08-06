@@ -255,17 +255,19 @@ global with sharing class OS_WS_AltaCasoValija {
                 String numOficina = input.officeNum;
                 if (String.isNotBlank(numOficina)) {
                     numOficina = numOficina.length() == 4 ? '0'+numOficina : numOficina;
-                    List<Account> accounts = [SELECT Id FROM Account WHERE RecordTypeId IN :recordTypesCuentasEmpleado() AND CC_Numero_Oficina__c = :numOficina];
-                    if (accounts.size() == 1) {
+
+                    List<Account> accounts = [SELECT Id FROM Account WHERE RecordTypeId IN :recordTypesCuentasEmpleado() AND CC_Numero_Oficina__c = :numOficina LIMIT 1];
+                    if (!accounts.isEmpty()) {
                         caso.AccountId = accounts[0].Id;
                         caso.CC_Oficina__c = accounts[0].Id;
                         caso.CC_Oficina_Afectada_Lookup__c = accounts[0].Id;
-                    }
+                    } 
+
                 } else {
                     String numEmpleado = input.empNum;
                     if (String.isNotBlank(numEmpleado)) {
-                        List<Contact> empleados = [SELECT AccountId FROM Contact WHERE RecordTypeId IN :recordTypesContactosEmpleado() AND CC_Num_Empleado__c = :input.empNum];
-                        if (empleados.size() == 1) {
+                        List<Contact> empleados = [SELECT AccountId FROM Contact WHERE RecordTypeId IN :recordTypesContactosEmpleado() AND CC_Num_Empleado__c = :input.empNum LIMIT 1];
+                        if (!empleados.isEmpty()) {
                             caso.ContactId = empleados[0].Id;
                             caso.AccountId = empleados[0].AccountId;
                             caso.CC_Oficina__c = empleados[0].AccountId;

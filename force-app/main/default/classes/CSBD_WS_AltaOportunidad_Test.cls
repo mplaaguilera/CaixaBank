@@ -39,9 +39,10 @@ public class CSBD_WS_AltaOportunidad_Test  {
             cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
             cuenta.Name = 'Account Test';
             cuenta.CC_NumPerso__c = '214449821';
+            cuenta.AV_NumPerso__c = '214449821';
             cuenta.CC_TipoDocumento__c = 'NIF';
             cuenta.CC_Numero_Documento__c = '12312312K';
-            cuenta.AV_IndicadoresClientes__c = '11, 8';
+            cuenta.AV_IndicadoresClientes__c = '11;8;28';
             insert cuenta;
 
             Contact contacto = new Contact();
@@ -1650,6 +1651,23 @@ public class CSBD_WS_AltaOportunidad_Test  {
             System.assertNotEquals('', respuesta.opportunityId, 'No se ha creado la oportunidad.' + respuesta.detalleError);
             String sistemaOrigen = [SELECT CSBD_SistemaOrigen__c FROM Opportunity WHERE Id = :respuesta.opportunityId].CSBD_SistemaOrigen__c;
             System.assertEquals('WS', sistemaOrigen, 'El sistema origen debe ser WS (es ' + sistemaOrigen + ')');
+        }
+    }
+
+    @isTest
+    private static void altaOportunidadTestMacImagin() {
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+             Case casoCc = new Case();
+            casoCc.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            casoCc.accountId = [SELECT Id FROM Account WHERE AV_NumPerso__c = '214449821' LIMIT 1].Id;
+            insert casoCc;
+
+            Test.startTest();
+            CSBD_WS_AltaOportunidad.altaOportunidadMac(casoCc.Id);
+            Test.stopTest();
+
+            System.assertEquals(1, [SELECT Count() FROM Opportunity WHERE RecordType.DeveloperName = 'CSBD_MAC'
+                AND CSBD_CasoOrigen__c = :casoCc.Id LIMIT 2], 'Debería haberse creado una oportunidad de tipo MAC');
         }
     }
 }

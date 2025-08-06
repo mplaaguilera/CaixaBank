@@ -5,7 +5,7 @@ public with sharing class OS_Buzon_Salida_Test {
     public static void OS_BuzonSalidaTest() {
         User usuarioOperador = OS_Usuarios.usuarioOperador();
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
 
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';

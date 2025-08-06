@@ -17,7 +17,7 @@ public with sharing class CC_Task_Methods_Test {
         insert caso;
         
         Task tarea = new Task ();
-        tarea.Type = 'Reclamación';
+        tarea.Type = 'RECLAMACION';
         tarea.Subject = 'Prueba de Reclamacion';
         tarea.Status = 'Completado';
         tarea.Description = 'esto es una prueba de comentarios de la tarea';

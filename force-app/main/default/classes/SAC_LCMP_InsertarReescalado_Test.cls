@@ -25,28 +25,56 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         SAC_DatabaseDML.insertListDML(listaGrupos, false);
         //Database.insert(listaGrupos);
 
-        User usuario;
-        usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
-        usuario.Username = 'ustestesteo@test.com';
-        usuario.Email = 'emailtest@test.com';
-        usuario.LastName = 'Usuario Test';
-        usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'SAC_General'].Id;
-        usuario.Alias = 'alias';
-        usuario.TimeZoneSidKey = 'GMT';
-        usuario.LocaleSidKey = 'es_ES';
-        usuario.EmailEncodingKey = 'ISO-8859-1';
-        usuario.LanguageLocaleKey = 'en_US';
-        usuario.isActive = true;
-        usuario.SAC_GruposPerteneciente__c = listaGrupos[0].Id;  
-        SAC_DatabaseDML.insertDML(usuario, false);  
-        //Database.insert(usuario);
+        //Usuario Admin
+        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
-        
+        User usuario = new User();
+        List<User> listaUsers = new List<User>();
+        CC_Grupo_Colaborador__c grupoSPV = new CC_Grupo_Colaborador__c();
+        System.RunAs(usuarioAdmin) {
+            UserRole uRole = [SELECT Id FROM userRole WHERE DeveloperName = 'SAC_General'];
+
+            usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
+            usuario.Username = 'ustestesteo@test.com';
+            usuario.Email = 'emailtest@test.com';
+            usuario.LastName = 'Usuario Test';
+            usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'SAC_General'].Id;
+            usuario.Alias = 'alias';
+            usuario.TimeZoneSidKey = 'GMT';
+            usuario.LocaleSidKey = 'es_ES';
+            usuario.EmailEncodingKey = 'ISO-8859-1';
+            usuario.LanguageLocaleKey = 'en_US';
+            usuario.isActive = true;
+            usuario.UserRoleId = uRole.id;      
+            usuario.SAC_GruposPerteneciente__c = listaGrupos[0].Id;  
+            SAC_DatabaseDML.insertDML(usuario, false);  
+            //Database.insert(usuario);
+
+            grupoSPV.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SPV_GrupoDeTareas').getRecordTypeId();
+            grupoSPV.Name = 'grupotest';
+            grupoSPV.SAC_PermiteEscalado__c = true;
+            grupoSPV.OS_Negocio__c = 'SPV';
+            grupoSPV.SAC_DeveloperName__c = 'SPV_AJ';
+            SPV_DatabaseDML.insertDML(grupoSPV, true);
+
+            // CC_Grupo_Colaborador_Contact__c colabcontact = new CC_Grupo_Colaborador_Contact__c();
+            // colabcontact.CC_Usuario__c = listaUsers[0].Id;
+            // colabcontact.CC_Grupo_Colaborador__c = grupoSPV.Id;
+            // SPV_DatabaseDML.insertDML(colabcontact, true);
+
+            listaUsers = SPV_TestDataFactory.crearUsuarioSPVGeneral(1);
+            listaUsers[0].SAC_GruposPerteneciente__c = grupoSPV.Id;  
+            SPV_DatabaseDML.insertListDML(listaUsers, true);
+        }
+
         //Cuentas
         List<Account> listaCuentas = SAC_TestDataFactory.crearCuentas(1);
         listaCuentas[0].Name = 'Cuenta Test';
         SAC_DatabaseDML.insertListDML(listaCuentas, false);  
         //Database.insert(listaCuentas);
+
+        Test.startTest();
 
         List<Case> listaReclamaciones = new List<Case>();
         //RECLAMACION 1
@@ -134,6 +162,34 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         SAC_Interaccion__c escaladoNV3 = SAC_TestDataFactory.crearInteraccion('EscaladoNV3',camposEscNV3);
         SAC_DatabaseDML.insertDML(escaladoNV3, false); 
         //Database.insert(escaladoNV3);
+
+        Test.stopTest();
+
+        //Mapa campos
+        Map<String, Object> camposObj = new Map<String, Object>();
+        //Reclamacion
+        Case recla = new Case();
+        //Crear reclamacion
+        camposObj.put('Subject', 'testrec1');
+        recla = SPV_TestDataFactory.crearCaso('Reclamacion', camposObj);
+        SPV_DatabaseDML.insertDML(recla, true);
+
+        //Crear escalado
+        camposObj.clear();
+        camposObj.put('SAC_CasoEscalado__c', recla.Id);
+        camposObj.put('SAC_Titulo__c', 'testescalado1');
+        camposObj.put('SAC_GrupoColaborador__c', grupoSPV.Id);
+        camposObj.put('SPV_TipoAllanamiento__c', 'SPV_Parcial');
+        camposObj.put('SPV_MotivoAllanamiento__c', 'Test');
+        camposObj.put('SPV_AnalisisAllanamiento__c', 'Test');
+        camposObj.put('SPV_VerificacionesLetrado__c', 'Test');
+        camposObj.put('SAC_Propuesta__c', 'Test');
+        camposObj.put('SPV_TipoActuacion__c', 'SPV_Pago');
+        camposObj.put('SPV_Importe__c', 1);
+        camposObj.put('OwnerId',  listaUsers[0].Id);
+        camposObj.put('SPV_Imputable__c', 'SPV_Entidad');
+        SAC_Interaccion__c escaladoSPV = SPV_TestDataFactory.crearInteraccion('Escalado', camposObj);
+        SPV_DatabaseDML.insertDML(escaladoSPV, true);
 
         //Parametrizaciones Escalado 1
         Map<String, Object> camposParam = new Map<String, Object>();
@@ -349,11 +405,30 @@ public with sharing class SAC_LCMP_InsertarReescalado_Test {
         Test.startTest();
         System.runAs(usuario) {
             SAC_LCMP_InsertarReescalado.insertReescalado(escalado.Id, 'Propuesta COPS testdevolver', 'SAC_Importe', 'observacionesTesteo');
-            SAC_Interaccion__c escaladonv3 = [SELECT id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_EscaladoNV2__c = :escalado.Id AND SAC_PropuestaCOPS__c = 'Propuesta COPS testdevolver' LIMIT 1];    
+        }
+        SAC_Interaccion__c escaladonv3 = [SELECT id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_EscaladoNV2__c = :escalado.Id AND SAC_PropuestaCOPS__c = 'Propuesta COPS testdevolver' LIMIT 1];    
+        System.runAs(usuario) {
             SAC_LCMP_InsertarReescalado.responderEscalado(escaladonv3.Id, 'SAC_DevolverNivelAnterior', 'respuestatesteo');
             SAC_Interaccion__c escaladoResult = [SELECT id, SAC_Estado__c, SAC_EscaladoNV3__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'propuesta test' LIMIT 1];
             SAC_LCMP_InsertarReescalado.insertReescalado(escaladoResult.Id, 'Propuesta COPS testdevolver', 'SAC_Importe', 'observacionesTesteo');
+        }
+        Test.stopTest();
 
+        SAC_Interaccion__c escaladoResultFinal = [SELECT id, SAC_Estado__c FROM SAC_Interaccion__c WHERE SAC_EscaladoNV2__c = :escalado.Id AND SAC_PropuestaCOPS__c = 'Propuesta COPS testdevolver' LIMIT 1];
+        System.assertEquals('SAC_PendienteRespuesta', escaladoResultFinal.SAC_Estado__c, 'No se ha podido re escalar el escalado devuelto');
+    }
+
+
+    @isTest
+    static void reescalarDevueltoSPVTest() {
+        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        SAC_Interaccion__c escalado = [SELECT Id, SAC_GrupoColaborador__c FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'testescalado1' LIMIT 1];
+
+        Test.startTest();
+        System.runAs(usuario) {
+            SAC_LCMP_InsertarReescalado.insertReescalado(escalado.Id, 'Propuesta COPS testdevolver', 'SAC_Importe', 'observacionesTesteo');
+            SAC_Interaccion__c escaladonv3 = [SELECT id, SAC_Estado__c, SAC_GrupoColaborador__r.SAC_DeveloperName__c, SAC_GrupoColaborador__c FROM SAC_Interaccion__c WHERE SAC_EscaladoNV2__c = :escalado.Id AND SAC_PropuestaCOPS__c = 'Propuesta COPS testdevolver' LIMIT 1];    
+            SAC_LCMP_InsertarReescalado.responderEscalado(escaladonv3.Id, 'SAC_DevolverNivelAnterior', 'respuestatesteo');
         }
         Test.stopTest();
 

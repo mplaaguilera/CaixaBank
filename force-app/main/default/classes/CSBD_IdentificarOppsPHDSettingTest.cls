@@ -3,7 +3,7 @@ private class CSBD_IdentificarOppsPHDSettingTest {
     
     @TestSetup
     static void setupTestData() {
-        User usuarioAdministrador = CSBD_Usuarios.usuarioAdministrador();
+        User usuarioAdministrador = CSBD_TestDataFactory.usuarioAdministrador();
         System.runAs(usuarioAdministrador) {
             // Crear configuración personalizada
             CSBD_IdentificarOppsPHDSetting__c setting = new CSBD_IdentificarOppsPHDSetting__c();

@@ -19,7 +19,9 @@ public with sharing class SPV_LCMP_Autoasignaciones {
 
     private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
+    private static final Id RECTYPECONSULTA_TAREA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_ConsultaTarea').getRecordTypeId();
     private static final Id RECTYPEESCALADO = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Escalado').getRecordTypeId();
+    private static final Id RECTYPEREESCALADO = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Reescalado').getRecordTypeId();
     private static final Id RECTYPEOTRASTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SPV_Acciones').getRecordTypeId();
     private static final Id RECTYPEMAESTROTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SPV_MaestroDeTareas').getRecordTypeId();
     private static final Id RECTYPEGESTORES = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SPV_GrupoGestor').getRecordTypeId();
@@ -131,7 +133,7 @@ public with sharing class SPV_LCMP_Autoasignaciones {
     private static Boolean autoasignarInteraccion(String recordId, String usuarioActualId) {
 
         if(!Schema.sObjectType.SAC_Interaccion__c.isAccessible()){ throw new SPVException( 'No puede recuperar la interaccion' ); }
-        SAC_Interaccion__c interaccion = [SELECT Id, OwnerId, SAC_GrupoColaborador__c, SAC_Estado__c FROM SAC_Interaccion__c WHERE (RecordTypeId = :RECTYPEESCALADO OR RecordTypeId= :RECTYPECONSULTA) AND Id = :recordId LIMIT 1];
+        SAC_Interaccion__c interaccion = [SELECT Id, OwnerId, SAC_GrupoColaborador__c, SAC_Estado__c FROM SAC_Interaccion__c WHERE RecordTypeId IN (:RECTYPEESCALADO, :RECTYPECONSULTA, :RECTYPECONSULTA_TAREA, :RECTYPEREESCALADO) AND Id = :recordId LIMIT 1];
 
         if(!Schema.sObjectType.Group.isAccessible()){ throw new SPVException( 'No puede recuperar la cola' ); }
         Group colaPteAsignar = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];

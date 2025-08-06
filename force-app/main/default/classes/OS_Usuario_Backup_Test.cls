@@ -17,7 +17,7 @@ public class OS_Usuario_Backup_Test {
         List<Case> casos = new List<Case>();
         Case caso1 = new Case();
         caso1.CC_Idioma__c = 'es';
-        caso1.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso1.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         caso1.Subject = 'Prueba1';
         caso1.Status = 'Activo';
         caso1.Origin = 'Phone';
@@ -29,7 +29,7 @@ public class OS_Usuario_Backup_Test {
 
         Case caso2 = new Case();
         caso2.CC_Idioma__c = 'es';
-        caso2.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso2.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         caso2.Subject = 'Prueba2';
         caso2.Status = 'Activo';
         caso2.Origin = 'Phone';
@@ -41,7 +41,7 @@ public class OS_Usuario_Backup_Test {
 
         Case caso3 = new Case();
         caso3.CC_Idioma__c = 'es';
-        caso3.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        caso3.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
         caso3.Subject = 'Prueba3';
         caso3.Status = 'Activo';
         caso3.Origin = 'Phone';

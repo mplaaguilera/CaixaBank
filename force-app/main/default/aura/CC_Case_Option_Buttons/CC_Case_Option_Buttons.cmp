@@ -323,6 +323,10 @@
                     </aura:if>
                 </aura:if>
 
+                <aura:if isTrue="{!and(v.permisos.CC_Transferir_HDT, v.tipoRegistro == 'CC_Empleado')}"> <!--v.canalProcedencia == 'CCO'-->
+                <lightning:button aura:id="Transferir HDT" label="Transferir a HDT" iconName="utility:change_owner" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
                 <aura:if isTrue="{!and(v.canalProcedencia == 'Formulario Consultas Operativas', v.permisos.CC_Realizar_Transfer)}">
                     <lightning:button aura:id="transfer" label="Transferir a cola" iconName="utility:send" onclick="{!c.modalTransferAbrir}" />
                 </aura:if>
@@ -969,6 +973,25 @@
                 <footer class="slds-modal__footer">
                     <lightning:button class="slds-button slds-button_brand" variant="Brand" label="Escalar" onclick="{!c.trasladar2N}" disabled="{!v.deshabilitarEscalar}" />
                     <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.cerrarModalTrasladar2N}" />
+                </footer>
+            </div>
+        </section>
+
+        <!--Modal Trasferir HDT-->
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" aura:id="ModalboxTransferirHDT" onkeydown="{!c.modalTransferirHDTTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalTransferirHDT}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Transferir a HDT</h2>
+                    <p class="slds-var-m-top_x-small">A continuación va a transferir el caso a HDT.</p>
+                </header>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_brand" variant="Brand" label="Transferir" onclick="{!c.transferirHDT}" disabled="{!v.deshabilitarEscalar}" />
+                    <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.cerrarModalTransferirHDT}" />
                 </footer>
             </div>
         </section>

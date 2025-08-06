@@ -200,14 +200,14 @@ public with sharing class CC_Clasificacion_Casos_Controller {
     
     @AuraEnabled
     public static Map<String, Object> validarGuardar(Id recordId, String nuevoCanalRespuesta, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, Boolean tieneActividad) {
-        Case caso = [SELECT OwnerId, Origin, CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c,
-        CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name, Account.AV_IndicadoresClientes__c, 
-        CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c FROM Case WHERE Id = :recordId];      
-        return validarGuardar(caso, nuevoCanalRespuesta, nuevaTematica, nuevoProducto, nuevoMotivo, tieneActividad);
+        Case caso = [SELECT Id, OwnerId, Origin, CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c,
+        CC_MCC_ProdServ__r.Name, recordTypeId, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name, Account.AV_IndicadoresClientes__c, 
+        CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, recordType.DeveloperName FROM Case WHERE Id = :recordId]; 
+        return validarGuardar(caso, nuevoCanalRespuesta, nuevaTematica, nuevoProducto, nuevoMotivo, tieneActividad, false);
     }
 
     
-    public static Map<String, Object> validarGuardar(Case caso, String nuevoCanalRespuesta, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, Boolean tieneActividad) {
+    public static Map<String, Object> validarGuardar(Case caso, String nuevoCanalRespuesta, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, Boolean tieneActividad, Boolean cambiarStatusAuto) {
         
         Id profileId = UserInfo.getProfileId();
         String profileName;
@@ -238,6 +238,7 @@ public with sharing class CC_Clasificacion_Casos_Controller {
         }
         //verificar si es ambito CSBD
         String ambitoMotivo = '';
+        if (caso.RecordType.DeveloperName == 'CC_Cliente') {
         if(caso?.Account?.AV_IndicadoresClientes__c != null && caso?.Account?.AV_IndicadoresClientes__c?.contains('28')) {
             ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c;        
         } else {
@@ -251,25 +252,31 @@ public with sharing class CC_Clasificacion_Casos_Controller {
             resultado.put('ambitoCSBD', false);
         }
 
+    }   
+
         resultado.put('tieneActividad',tieneActividad);
+        resultado.put('cambiarStatusAuto', cambiarStatusAuto);
         return resultado;
     }
     
     @AuraEnabled
-    public static Map<String, Object> validarGuardarCerrar(Id recordId,boolean cerrar, String nuevoCanalRespuesta, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, String agrupacionComprobacion) {
-       
-        Case caso = [SELECT OwnerId, Origin, CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c, 
-                    CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name, 
-                    CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, 
-                    Account.AV_IndicadoresClientes__c, RecordType.DeveloperName, CC_MCC_Causa__c, 
-                    CC_MCC_Solucion__c, AccountId, ContactId, CC_Oportunidad_creada__c 
-                    FROM Case WHERE Id = :recordId];
-   
-        
-        CC_Settings__c configuracionFuncionalidad = CC_Settings__c.getValues('CC_OperativaOficinaGuardar');
+    public static Map<String, Object> validarGuardarCerrar(Id recordId,Boolean cerrar, String nuevoCanalRespuesta, Id nuevaTematica, Id nuevoProducto, Id nuevoMotivo, String agrupacionComprobacion) {
         Boolean tieneActividad = false;
+        Boolean cambiarStatusAuto = false;
+
+        Case caso = [SELECT Id, OwnerId, Origin, CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c, CC_Motivo_Derivacion__c, 
+                    CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_Motivo__c, CC_MCC_Motivo__r.Name, 
+                    CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, 
+                    Account.AV_IndicadoresClientes__c, RecordType.DeveloperName, CC_MCC_Causa__c, CC_Telefono_Contacto__c,
+                    CC_MCC_Solucion__c, AccountId, ContactId, CC_Oportunidad_creada__c,Account.RecordType.DeveloperName, Account.AV_Segmento__c, Account.AV_NumPerso__c, Account.CC_NumPerso__c, Account.CC_Numero_Documento__c,
+                    CC_Representante__r.CC_Representante__r.AV_IndicadoresClientes__c,  CC_Representante__r.CC_Representante__r.CC_NumPerso__c, CC_Representante__r.CC_Representante__r.CC_Numero_Documento__c, 
+                    CC_Representante__r.CC_Representante__r.AV_NumPerso__c, Contact.RecordType.DeveloperName, Contact.CIBE_NumPerso__c, Contact.AV_NumPerso__c, Contact.CC_NumPerso__c, Contact.CC_Numero_Documento__c, 
+                    CC_OTP_Nivel__c, CC_Status_Autorizacion__c, CC_Id_Cognitivo__c, ContactEmail
+                    FROM Case WHERE Id = :recordId];
+
+  
         if(cerrar) {
-            String errores = '';            
+               String errores = '';            
             if (caso.RecordType.DeveloperName.startsWith('CC')){
                 List<CC_MCC__c> tematica = [SELECT Id FROM CC_MCC__c WHERE Id = :nuevaTematica AND CC_Activo__c = true];
                 if(tematica.isEmpty()){
@@ -283,9 +290,11 @@ public with sharing class CC_Clasificacion_Casos_Controller {
                             List<CC_MCC__c> causa = [SELECT Id FROM CC_MCC__c WHERE Id = :caso.CC_MCC_Causa__c AND CC_Activo__c = true];
                             if(causa.isEmpty()){
                                 errores += ', Causa';
-                                List<CC_MCC__c> solucion = [SELECT Id FROM CC_MCC__c WHERE Id = :caso.CC_MCC_Solucion__c AND CC_Activo__c = true];
-                                if(solucion.isEmpty()){
-                                    errores += 'y Solución';
+                                if(caso.recordType.DeveloperName != 'CC_Cliente'){
+                                    List<CC_MCC__c> solucion = [SELECT Id FROM CC_MCC__c WHERE Id = :caso.CC_MCC_Solucion__c AND CC_Activo__c = true];
+                                    if(solucion.isEmpty()){
+                                        errores += 'y Solución';
+                                    }
                                 }
                             }
                         }
@@ -295,18 +304,73 @@ public with sharing class CC_Clasificacion_Casos_Controller {
                     throw new AuraHandledException('No se puede cerrar un caso sí los campos ' + errores + ' no estan vigentes'); 
                 }                
             }
+            if (caso.RecordType.DeveloperName == 'CC_Cliente') {
+                // MGT: Verificar si todas las tareas protocolarias están completadas
+                CC_Gestion_Checklist_Case.chequearChecklistAlGuardar(caso);         
+            }
         }
-
-        if (configuracionFuncionalidad.CC_Configuracion_1__c == 'true' && caso.AccountId != null && caso.ContactId != null && caso.RecordType.DeveloperName == 'CC_Cliente' && (agrupacionComprobacion == 'Derivar a oficina' || agrupacionComprobacion == 'Derivar a oficina: Limitación protocolo')) {
-            List<Task> tareas = [SELECT Id FROM Task WHERE AV_Case__c = :recordId AND Type IN ('Tarea gestor', 'Oportunidad CSBD')];
-            if(!tareas.isEmpty() || caso.CC_Oportunidad_creada__c) {
+                    
+        //NUEVO DPK ARGOS
+        if(caso.AccountId != null && caso.ContactId != null && caso.RecordType.DeveloperName == 'CC_Cliente') {
+            List<Task> tareas = [SELECT Id,CC_Detalles_Consulta__c, CC_Detalles_Solucion__c, Status, Type FROM Task WHERE (AV_Case__c = :recordId OR WhatId = :recordId) AND Type IN ('Tarea gestor', 'Oportunidad CSBD', 'Argos') ORDER BY CreatedDate DESC];
+            Boolean tieneActividadAux = false;
+            String keyAccCont,  keyTareaAccCont;
+            Boolean tieneTareaArgos = false;
+            Boolean retipificado = false;
+            
+            if(!tareas.isEmpty()) {
+                for(Task tarea : tareas) {
+                    if(tarea.Type == 'Oportunidad CSBD' && tarea.Status == 'Completed') {
+                        tieneActividadAux = true;
+                    }else if (tarea.Type == 'Argos'  && keyTareaAccCont == null) {
+                        keyTareaAccCont = tarea.CC_Detalles_Solucion__c;
+                        tieneTareaArgos = true;
+                    }
+                }
+            }
+                        
+            CC_Settings__c configuracionFuncionalidad = CC_Settings__c.getValues('CC_OperativaOficinaGuardar');
+            if (configuracionFuncionalidad.CC_Configuracion_1__c == 'true' && (agrupacionComprobacion == 'Derivar a oficina' || agrupacionComprobacion == 'Derivar a oficina: Limitación protocolo')) {
+                if(tieneActividadAux  || caso.CC_Oportunidad_creada__c) {
+                    tieneActividad = true;
+                }                    
+            } else {
                 tieneActividad = true;
-            }                    
+            }
+
+            if(nuevaTematica != null && nuevoProducto != null && nuevoMotivo != null && CC_Settings__c.getValues('CC_Parametrizacion_WS_Argos')?.CC_Activa__c){
+                retipificado = (caso.CC_MCC_Tematica__c != nuevaTematica || caso.CC_MCC_ProdServ__c != nuevoProducto || caso.CC_MCC_Motivo__c != nuevoMotivo) ? true : false;
+                keyAccCont = (caso.AccountId + ' - ' + caso.ContactId).left(255);
+                //valores para cuando se reclasifica el caso
+                Map<String, String> nuevosValores = new Map<String, String>{
+                'tematicaId' => String.valueOf(nuevaTematica),
+                'prodServId' => String.valueOf(nuevoProducto),
+                'motivoId' => String.valueOf(nuevoMotivo)
+                };
+
+                //invocar Argos start  
+                if((!cerrar  && !tieneTareaArgos) ||  //llamamos a guardar por primera vez y no hay una tarea
+                    (retipificado && !cerrar) ||                           //llamamos a guardar porque cambio el mcc   
+                    (keyAccCont != keyTareaAccCont && !cerrar) ||                   //llamamos a guardar porque cambio la ceunta/contacto
+                    ( !retipificado && keyAccCont == keyTareaAccCont && cerrar) //se le da al boton de guardar & cerrar y no cambio nada, solo se cierra
+                ){                 
+                    cambiarStatusAuto = CC_WS_Comunicaciones_Argos.process(caso, cerrar, false, nuevosValores);
+
+
+                } else if((!tieneTareaArgos && cerrar ) || //se le da al boton de guardar & cerrar no hay tareas de la llamada previa
+                ( retipificado && cerrar) ||                                    //se le da al boton de guardar & cerrar y cambio el mcc
+                (keyAccCont != keyTareaAccCont && cerrar)                               //se le da al boton de guardar & cerrar y cambio la ceunta/contacto
+                ){
+
+                    cambiarStatusAuto = CC_WS_Comunicaciones_Argos.process(caso, cerrar, true, nuevosValores); //multicall 
+                }                
+                //invocar Argos end
+            }
         } else {
             tieneActividad = true;
         }
-      
-        return validarGuardar(caso, nuevoCanalRespuesta, nuevaTematica, nuevoProducto, nuevoMotivo, tieneActividad);
+        
+        return validarGuardar(caso, nuevoCanalRespuesta, nuevaTematica, nuevoProducto, nuevoMotivo, tieneActividad, cambiarStatusAuto);
     }
     
     @AuraEnabled(cacheable=true)
@@ -521,14 +585,105 @@ public with sharing class CC_Clasificacion_Casos_Controller {
     }
 
     @AuraEnabled
+    public static String tituloDerivar(String validacion) {
+        String resultado = '';
+        if(!String.isEmpty(validacion)){
+            List<CC_Lista_Valores__c> valorValidaciones = [SELECT CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Textos operativa Derivar' AND Name = :validacion LIMIT 1];
+            if(!valorValidaciones.isEmpty()){
+                resultado = valorValidaciones[0].CC_Mensajes_Mostrar__c;
+            }
+        }
+        return resultado;
+    }
+
+    @AuraEnabled
     public static Map<String, String> recuperarAmbitoMotivo(String recordId) {
         Map<String, String> mapaAmbitos = new Map<String, String>();
         List<CC_MCC__c> motivos = [SELECT CC_Ambito_Tareas_Caixa__c, CC_Ambito_Tareas_Imagin__c FROM CC_MCC__c WHERE Id = :recordId LIMIT 1];
         if(!motivos.isEmpty()){
-            mapaAmbitos.put('Caixa', motivos[0].CC_Ambito_Tareas_Caixa__c);
-            mapaAmbitos.put('Imagin', motivos[0].CC_Ambito_Tareas_Imagin__c);
+             CC_MCC__c motivo = motivos[0];
+            if (motivo.CC_Ambito_Tareas_Caixa__c != null){
+            	mapaAmbitos.put('Caixa', motivo.CC_Ambito_Tareas_Caixa__c);
+            }
+            if (motivo.CC_Ambito_Tareas_Imagin__c != null){
+            	mapaAmbitos.put('Imagin', motivo.CC_Ambito_Tareas_Imagin__c);
+            }
         }
-         
         return mapaAmbitos;
     }
+
+    @AuraEnabled
+    public static void envioCorreoOnboardingApex(String recordId) {
+        CC_Gestion_Derivar_Onboarding.envioCorreoAutomatico(recordId);
+    }
+
+    @AuraEnabled
+    public static Boolean comprobarCodigoOnboarding(String codigo) {
+        String settingCodigos = CC_Settings__c.getValues('CC_CodigosOnboarding')?.CC_Configuracion_2__c;
+        List<String> codigos = settingCodigos.split(';');
+        return codigos.contains(codigo);
+    }
+
+    @AuraEnabled
+    public static String tituloYaDerivado() {
+        String titulo = '';
+        List<CC_Lista_Valores__c> valorValidaciones = [SELECT CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Textos operativa Derivar' AND Name = 'Texto modal Onboarding ya derivado' LIMIT 1];
+        if(!valorValidaciones.isEmpty()){
+            titulo = valorValidaciones[0].CC_Mensajes_Mostrar__c;
+        }
+		return titulo;
+    }
+
+    @AuraEnabled
+    public static List<String> getCanalesEscritos() {
+        List<String> canales = new List<String>();
+        List<CC_Lista_Valores__c> listaValores = [
+            SELECT CC_Valor__c
+            FROM CC_Lista_Valores__c
+            WHERE CC_Lista__r.Name = 'CC_CanalesEscritos'
+        ];
+
+        for (CC_Lista_Valores__c valor : listaValores) {
+            canales.add(valor.CC_Valor__c);
+        }
+        return canales;
+    }
+
+    //Mostrar modal guardar en Argos
+    @AuraEnabled
+    public static Boolean mostrarModalArgos(String recordId) {
+        try {
+            String config = CC_Settings__c.getValues('CC_AmbitosArgosGuardar').CC_Configuracion_1__c;
+            List<String> ambitos = config.split(';');
+            Boolean retorno=false;
+            Boolean argos = false;
+            Boolean restricted = false;
+            Boolean ambitoCorrecto = false;
+            Case caso = [SELECT Account.AV_IndicadoresClientes__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c FROM Case WHERE Id = :recordId ];
+            if( caso.Account != null && caso.CC_MCC_Motivo__r != null) {
+                Boolean esImagin = caso.Account.AV_IndicadoresClientes__c != null && caso.Account.AV_IndicadoresClientes__c.contains('28');
+                String ambitoActual = esImagin ? caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c : caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;
+                
+                if (!ambitos.contains(ambitoActual)) {
+                    ambitoCorrecto = false;
+                }else{
+                    ambitoCorrecto = true;
+                    argos = CC_Gestion_Derivar_Global.recuperarArgos(recordId);
+                }
+                retorno = argos && ambitoCorrecto;
+            }
+            return retorno;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    @AuraEnabled(cacheable=true)
+    public static String getMensajeOperativaDerivarArgos() {
+        Map<String, Object> textosMap = CC_MetodosUtiles.getLOVNameValue(new List<String>{'Textos operativa Derivar'}, 'CC_Mensajes_Mostrar__c');       
+
+        return textosMap.get('Argos true guardar').toString();
+    }
+    //Mostrar modal guardar en Argos
+
 }

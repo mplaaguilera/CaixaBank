@@ -147,24 +147,35 @@ public inherited sharing class CSBD_GestorOportunidad {
             '8' => '3', '9' => '3', '10' => '3', '11' => '3', '12' => '3', '13' => '3'
         };
 
-        gestorOportunidad.Name = oportunidad.Name + ' ' + (oportunidad.CSBD_Producto__c ?? '');
-        // if (oportunidad.CSBD_Producto__c != null) {
-        //     gestorOportunidad.Name += ' - ' + oportunidad.CSBD_Producto__c;
-        // }
-        gestorOportunidad.CSBD_Oportunidad__c = oportunidad.Id;
-        gestorOportunidad.CSBD_Empresa_proveedora__c = oportunidad.CSBD_Empresa_Proveedora__c;
-        gestorOportunidad.CSBD_Idioma__c = oportunidad.CSBD_Idioma_Solicitud__c;
-        gestorOportunidad.CSBD_Tipo_de_oportunidad__c = CC_MetodosUtiles.obtenerRecordTypes('Opportunity').get(oportunidad.RecordtypeId);
-        gestorOportunidad.CSBD_Turno_de_contacto__c = oportunidad.CSBD_Turno_Contacto__c;
+        gestorOportunidad.Name = oportunidad.Name;
+        if (oportunidad.CSBD_Producto__c != null) {
+            gestorOportunidad.Name += ' - ' + oportunidad.CSBD_Producto__c;
+        }
+        gestorOportunidad.CSBD_Oportunidad__c = oportunidad.Id;        
+        
+        gestorOportunidad.CSBD_Tipo_de_oportunidad__c = CC_MetodosUtiles.obtenerRecordTypes('Opportunity').get(oportunidad.RecordtypeId);        
 
         if (oportunidad.RecordType.Name == 'Hipoteca' || ((oportunidad.RecordType.Name == 'CMN' || oportunidad.RecordType.Name == 'CMB') && oportunidad.CSBD_Familia_Producto__c == 'Hipotecas')) {
             gestorOportunidad.CSBD_OC_Canal_Entrada__c = oportunidad.CSBD_OC_Canal_Entrada__c;
             gestorOportunidad.CSBD_OC_Prioridad__c = mapaTramoPrioridad.get(oportunidad.CSBD_OC_Prioridad__c);
         }
 
+        //Skill principal para enrutar.
         //INFORMAR PRODUCTO
         gestorOportunidad.CSBD_Familia_de_producto__c = calcularProductoGestorOportunidad(oportunidad.CSBD_Skill__c);
         //CALCULO HORARIO CONTACTO
+
+        //Verificar si la skill de producto está marcada como skill única. Si es así, no se añaden skills adicionales.        
+        CSBD_GestorOportunidadSkillHandler gestorOportunidadSkillHandler = CSBD_GestorOportunidadSkillHandler.getInstance();
+        Boolean skillUnica = gestorOportunidadSkillHandler.contieneValor(gestorOportunidad.CSBD_Familia_de_producto__c);
+
+        if (!skillUnica) {
+            //Grupo de skills adicionales. 
+            gestorOportunidad.CSBD_Empresa_proveedora__c = oportunidad.CSBD_Empresa_Proveedora__c;
+            gestorOportunidad.CSBD_Idioma__c = oportunidad.CSBD_Idioma_Solicitud__c;
+            gestorOportunidad.CSBD_Turno_de_contacto__c = oportunidad.CSBD_Turno_Contacto__c;
+        }
+
         //Horario de Contacto en formato Time
         if (oportunidad.CSBD_Horario_Contacto__c != null && oportunidad.CSBD_Horario_Contacto__c != '') {
             List<Time> horaInicioFin = calcularHoraInicioFinContactoGestorOportunidad(oportunidad.CSBD_Horario_Contacto__c);

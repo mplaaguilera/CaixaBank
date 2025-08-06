@@ -17,6 +17,7 @@ import obtenerValoracionResumen from '@salesforce/apex/SAC_GenialView_Controller
 import saveValoracionResumen from '@salesforce/apex/SAC_GenialView_Controller.guardarValorResumen';
 import asignarReclamantes from '@salesforce/apex/SAC_GenialView_Controller.asignarReclamantes';
 import getCustomSetting from '@salesforce/apex/SAC_GenialView_Controller.getCustomSettings';
+import getRecordTypes from '@salesforce/apex/SAC_Utils.obtenerRecordTypes';
 
 
 //import fields
@@ -90,6 +91,8 @@ export default class Sac_GenialView extends LightningElement {
     @track objetoCase = {};
 
     @track esReclamacion = false;
+    @track esConsulta = false;
+    @track esPretension = false;
 
     @track estadoEnviado = false;
     @track estadoRespondidoShadow = false;
@@ -110,6 +113,9 @@ export default class Sac_GenialView extends LightningElement {
     @track pretensionesIA = [];
 
     @track rtReclamacion = null;
+    @track rtConsultaSAC = null;
+    @track rtConsultaCOPS = null;
+    @track rtPretension = null;
 
     @track toggleReclamantesSec = "slds-section slds-is-open";
     @track bExpanseReclamantesSec = true;
@@ -193,10 +199,29 @@ export default class Sac_GenialView extends LightningElement {
     renderedCallback() {
         if (this.rtReclamacion != null && this.objetoCase.RecordTypeId == this.rtReclamacion){
             this.esReclamacion = true;
+            this.esConsulta = false;
+            this.esPretension = false;
             this.cargando = false;
         }
-        else { 
+        else if(this.rtConsultaCOPS != null && this.objetoCase.RecordTypeId == this.rtConsultaCOPS){ 
+            this.esConsulta = true;
             this.esReclamacion = false;
+            this.esPretension = false;
+            this.cargando = false;
+        } else if(this.rtConsultaSAC != null && this.objetoCase.RecordTypeId == this.rtConsultaSAC){
+            this.esConsulta = true;
+            this.esReclamacion = false;
+            this.esPretension = false;
+            this.cargando = false;
+        } else if(this.rtPretension != null && this.objetoCase.RecordTypeId == this.rtPretension){
+            this.esConsulta = false;
+            this.esReclamacion = false;
+            this.esPretension = true;
+            this.cargando = false;
+        }else {
+            this.esReclamacion = false;
+            this.esConsulta = false;
+            this.esPretension = false;
             this.cargando = false;
         }
     }
@@ -209,6 +234,22 @@ export default class Sac_GenialView extends LightningElement {
             this.rtReclamacion = data;
         } else if(error){
             console.error(error);
+        }
+    }
+
+    //Se obtienen los RecordType de consulta SAC y consulta COPS
+    @wire(getRecordTypes)
+    getRecordTypesResult(result){
+        if(result.data){
+            result.data.forEach(element => {
+                if(element.DeveloperName == 'SAC_Consulta'){
+                    this.rtConsultaCOPS = element.Id;
+                }else if(element.DeveloperName == 'SAC_ConsultaSAC'){
+                    this.rtConsultaSAC = element.Id;
+                } else if(element.DeveloperName == 'SAC_Pretension'){
+                    this.rtPretension = element.Id;
+                }
+            });
         }
     }
 
@@ -231,17 +272,11 @@ export default class Sac_GenialView extends LightningElement {
         if (data) {
             let objetoInterno = {};
             // let stringInterno = "{";
-            // console.log(JSON.stringify(data));
-            // console.log(JSON.stringify(data.fields));
             for (const campo in data.fields){
-                // console.log(JSON.stringify(campo));
-                // console.log(data.fields[campo].value);
                 //let obj = `${campo}: ${data.fields[campo].value}`;
                 if (Object.prototype.hasOwnProperty.call(data.fields, campo)) {
-                // console.log(JSON.stringify(objetoInterno));
 
                 // stringInterno = stringInterno + campo + ":" + data.fields[campo].value + ",";
-                // console.log(stringInterno);
 
                 // if (campo == 'RecordTypeId'){
                 //     if(data.fields[campo].value == RTRECLAMACION){  //this.rtReclamacion
@@ -343,7 +378,6 @@ export default class Sac_GenialView extends LightningElement {
                 this.hayReclamantesSec = false;
             }
         } else if(error){
-            //console.log(error);
             console.error(error);
         }
     }
@@ -371,7 +405,6 @@ export default class Sac_GenialView extends LightningElement {
 
     //obtener booleano si tiene ya un account vinculado
     existeReclamante() {
-        //console.log(this.template.querySelector("[data-id='accountPrincipal']").getDetails());
         if(JSON.stringify(this.objetoCase) !== "{}" && this.objetoCase["AccountId"] !== null)
         {
             return true;
@@ -381,7 +414,21 @@ export default class Sac_GenialView extends LightningElement {
 
     get mostrarBoton() {
         this.template.querySelector("lightning-output-field");
-        if(this.settingsCanal.data.SAC_BotonReclamante__c && !this.existeReclamante() && this.tieneDocumento){
+        if(this.settingsCanal.data.SAC_BotonReclamante__c && !this.existeReclamante() && this.tieneDocumento && !this.esConsulta){
+            return true;
+        }
+        return false;
+    }
+
+    get mostrarSeccionConsultaReclamacion() {        
+        if(this.esReclamacion || this.esConsulta){
+            return true;
+        }
+        return false;
+    }
+
+    get mostrarSeccionMCC() {        
+        if(this.esReclamacion || this.esPretension){
             return true;
         }
         return false;

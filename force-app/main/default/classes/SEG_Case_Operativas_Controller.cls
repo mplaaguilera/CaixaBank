@@ -15,7 +15,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 		@AuraEnabled
     	public boolean vRTSeguimiento{ get; set; }
 	}
-
 	@AuraEnabled
 	static public wrapperInit initComponentOp(String caseId){
         wrapperInit result = new wrapperInit();
@@ -32,18 +31,18 @@ public without sharing class SEG_Case_Operativas_Controller {
 		//Obtener informacion del caso
 		Case caso = [SELECT id, SEG_Organizacion__c, SEG_Zona__c, Contact.RecordType.DeveloperName, Status, SEG_Grupo__r.SEG_Organizacion__c, SEG_Grupo__r.SEG_Zona__c, OwnerId, RecordType.DeveloperName FROM Case WHERE id = :caseId LIMIT 1];
 
-		CBK_IntegrationSetting__c cmAOR = CBK_IntegrationSetting__c.getValues('SEG_Control_AOR');
-		if(cmAOR != null &&	cmAOR.CBK_IsInput__c || Test.isRunningTest()){
+		SEG_Settings__c cmAOR = SEG_Settings__c.getValues('SEG_Control_AOR');
+        
+		if(cmAOR != null &&	cmAOR.SEG_Activo__c || Test.isRunningTest()){
 			aorActivo = true;
 		}
 		result.vControlarAORActivo = aorActivo;
-
 
 		// List<PermissionSetAssignment> psUser = [SELECT PermissionSet.Name FROM PermissionSetAssignment WHERE AssigneeId = :UserInfo.getUserId()];
 		// Mejora con Custom Permission
 		if(FeatureManagement.checkPermission('SEG_SupervisorCustom')){
 				isSupervisor = true;
-			}
+		}
 
 		// controlar RTSeguimiento
 		if(caso.RecordType.DeveloperName == 'SEG_Seguimiento'){
@@ -182,7 +181,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 			}
 			*/
 			for (CC_Grupo_Colaborador__c gp : groups) {
-
 				mapGroups.put(gp.Id, gp);
 			}
 
@@ -1092,8 +1090,54 @@ public without sharing class SEG_Case_Operativas_Controller {
 			notaTipificada = 'Sin notas';
 		}
 
+		/* Escapar el contenido HTML para evitar problemas de inyección de código.
+		 Se realiza en operaciones distintas a 01  06, que ya está escapado 
+		*/
+		 switch on operativa {
+			when '01' {
+				operativa = 'Autoasignar caso (Valija - WS) - Operación 01: Expediente Riesgo (SIA)';
+			}
+			when '06' {
+				operativa = 'Autoasignar caso (Valija - WS) - Operación 06: Expediente Persona';
+			}
+			// Escapar el contenido HTML en el resto de operativas, al no saber si estan escapadas en origen
+			when else{
+				observaciones = observaciones.escapeHtml4();
+			}
+		}
+
+		//observaciones = observaciones.escapeHtml4();
+
+		if (String.isNotBlank(notaTipificada) && notaTipificada != 'Sin notas') {
+			String nombreNotaTipificada = [SELECT Name FROM SEG_NotasTipificadas__c WHERE Id = :notaTipificada].Name;
+			feed.Body = 'Comentarios publicados en ' + operativa + observaciones + ' Nota tipificada: <b>' + nombreNotaTipificada + '</b>';
+		} else {
+			feed.Body = 'Comentarios publicados en ' + operativa + observaciones + ' Nota tipificada: <b>' + notaTipificada + '</b>';
+		}
+		insert feed;
+	}
+
+	/* Jaime: OLD
+	@AuraEnabled
+	static public void postOnChatter(Id caseId, String observaciones, String operativa, String notaTipificada) {
+		if(String.isNotBlank(operativa) && String.isNotBlank(observaciones) )
+		{
+			createNotes(caseId, operativa, observaciones);
+		}
+
+		FeedItem feed = new FeedItem();
+		feed.ParentId = caseId;
+		feed.isRichText = true;
+		feed.Type = 'TextPost';
+		if (String.isBlank(observaciones)){
+			observaciones = 'Sin Comentarios';
+		}
+		if(String.isBlank(notaTipificada)){
+			notaTipificada = 'Sin notas';
+		}
+
 		// Escapar el contenido HTML.
-		observaciones = observaciones.escapeHtml4();
+		//observaciones = observaciones.escapeHtml4();
 
 		if (String.isNotBlank(notaTipificada) && notaTipificada != 'Sin notas') {
 			String nombreNotaTipificada = [SELECT Name FROM SEG_NotasTipificadas__c WHERE Id = :notaTipificada].Name;
@@ -1103,6 +1147,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 		}
 		insert feed;
 	}
+ 	*/
 
 	@AuraEnabled
 	static public void createNotes(Id caseId, String titulo, String texto) {
@@ -1338,7 +1383,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 		// Recuperar la información del caso necesaria para el proceso.
 		List<Case> listadoCasosData = [SELECT Id, SEG_Grupo__c, SEG_Centro_Identificado__c, SEG_Detalle__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Tematica__c, 
 							AccountId, SEG_Zona__c, SEG_Organizacion__c, OwnerId, Status, SEG_Subestado__c, Account.SEG_Oficina_Gestora_Segmentos__c,
-							Account.SEG_Oficina_Gestora_Segmentos__r.CC_Numero_Oficina__c, SEG_Grupo_colaborador_Externo__c, SEG_TipoProcesoValija__c, SEG_Numero_centro__c
+							Account.SEG_Oficina_Gestora_Segmentos__r.CC_Numero_Oficina__c, SEG_Grupo_colaborador_Externo__c, SEG_TipoProcesoValija__c, SEG_Numero_centro__c, Account.AV_NumPerso__c, Owner.Name
 							FROM Case WHERE id = :caseId LIMIT 1];
 		trazabilidadAsignacion += ' Los datos utilizados para el intento de asignación han sido: MCC Detalle - ' + listadoCasosData[0].SEG_Detalle__c + ' | MCC Motivo - ' + listadoCasosData[0].CC_MCC_Motivo__c + ' | MCC Producto - ' + listadoCasosData[0].CC_MCC_ProdServ__c + ' | MCC Temática - ' + listadoCasosData[0].CC_MCC_Tematica__c + ' | Cuenta - ' + listadoCasosData[0].AccountId + ' | Zona - '  + listadoCasosData[0].SEG_Zona__c + ' | Organización - ' + listadoCasosData[0].SEG_Organizacion__c + ' | Es buzón automático - ' + bAutomatico + ' | Id Caso - ' + listadoCasosData[0].Id;
         feed.Body =+ trazabilidadAsignacion;
@@ -1430,9 +1475,18 @@ public without sharing class SEG_Case_Operativas_Controller {
 						String grupoColaboradorAnteriorId = listadoCasosData[0].SEG_Grupo_colaborador_Externo__c;
 
 						// Preparamos los valores actuales del caso, para el proceso de traslado a WebService. Si hay error en la transferencia, se devuelve el caso a su grupo original.
+						/* Jaime:
+						   Datos de trasladoWS, independientemente de que sea un proceso trasladado a valija de forma automatica en iniciarTrasladoColaboradorWS(trasladoWS) o se necesite recoger más datos como en "Traslado iniciado manualmente por el agente" en el que llegamos a retorno.put('datosCalculadosTraslado', JSON.serialize(trasladoWS));
+						   Esta distincion se decide en if (bAutomatico && !entradaCasoPAK)
+						*/
 						SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador trasladoWS = new SEG_trasladoColaboradorWS.SEG_DataTrasladoColaborador();
 						trasladoWS.caseId = caseId;
 						trasladoWS.tipoColaborador = tipoColaboradorWS;
+
+						/* 	Jaime: 
+							Si es un traslado a Valija, se asigna el tipo de operación de la valija.
+							Si es un traslado a Paquetería, se asigna el tipo de operación de Paquetería.
+						*/
 						trasladoWS.operacionPaqueteria = listadoCasosData[0].SEG_TipoProcesoValija__c;
 						trasladoWS.operacionValijaMCC = retornoColaborador.get('operacionValija');
 
@@ -1545,6 +1599,42 @@ public without sharing class SEG_Case_Operativas_Controller {
 										return retorno;
 									}else{
 										retorno.put('requiereInfoAdicional','Y');
+
+										/* 
+											Jaime: al requerir información adicional, se envía el caso a 1 de los 3 modales posibles de Valija para que el usuario pueda completar los datos necesarios. 
+
+											Aqui podemos hacer la conexion con el frontend porJS:
+											trasladoWS.operacionPaqueteria
+											trasladoWS.operacionValijaMCC
+										*/
+										
+										if (trasladoWS.operacionValijaMCC == '01'){
+											//Modal de valija con datos de Operacion 01
+											retorno.put('operacionValijaMCC', '01');
+											retorno.put('nameOwnerCase', listadoCasosData[0].Owner.Name);
+										} else if (trasladoWS.operacionValijaMCC == '06') {
+											if(listadoCasosData[0].Account.AV_NumPerso__c == null || listadoCasosData[0].Account.AV_NumPerso__c == ''){
+
+												//Jaime: Si no tenemos el número de persona, no podemos asignar el caso a Valija.
+												retorno.put('errorProceso', 'Y');
+												retorno.put('errorGrupoAuto','10');
+												retorno.put('detalleError', 'No es posible asignar un caso de Operación Expediente Persona a Valija sin que la cuenta tenga Num. Persona informado');
+												errorAsignacion = true;
+
+												//Jaime: Crear un post de chatter informando del error al intentar asignar el caso a Valija.
+												feed.Body = feed.Body + 'No es posible asignar un caso de Operación Expediente Persona a Valija sin que la cuenta tenga Num. Persona informado';
+												insert feed;
+												return retorno;
+											}
+											retorno.put('operacionValijaMCC', '06');
+											retorno.put('nameOwnerCase', listadoCasosData[0].Owner.Name);
+											
+											//Modal de valija con datos de Operacion 06
+										} else{
+											retorno.put('operacionValijaMCC', trasladoWS.operacionValijaMCC);
+											//Modal de valija estandar
+										}
+
 										retorno.put('datosCalculadosTraslado', JSON.serialize(trasladoWS));
 										errorAsignacion = true;
 										feed.Body = feed.Body + 'Se requiere información adicional para el traslado: ' + JSON.serialize(trasladoWS);
@@ -1591,6 +1681,29 @@ public without sharing class SEG_Case_Operativas_Controller {
 		if(Limits.getDMLStatements() < Limits.getLimitDMLStatements()){
 			CBK_Log.debug(listadoCasosData[0].Id , trazabilidadAsignacion);
 		}
+		return retorno;
+	}
+
+	@AuraEnabled
+	public static Map<String,String> calcularTipoOperacionporNIF(String nif, Boolean esNIf1Boolean){
+		Map<String,String> retorno = new Map<String,String>();
+		retorno.put('tipoAccount', '');
+		retorno.put('nombreTitular', 'No encontrado');
+		// Lógica para calcular el tipo de operación según el NIF
+		List<Account> accounts = [SELECT RecordType.DeveloperName, Name FROM Account WHERE CC_Numero_Documento__c = :nif AND RecordType.DeveloperName IN ('CC_ClientePA', 'CC_Cliente') LIMIT 1];
+
+		if(!accounts.isEmpty()){
+			if(accounts[0].RecordType.DeveloperName == 'CC_Cliente'){
+				//es el nif de una empresa
+				retorno.put('nombreTitular', accounts[0].Name);
+				retorno.put('tipoAccount', '0-Empresa');
+			} else if(accounts[0].RecordType.DeveloperName == 'CC_ClientePA') { 
+				//es el nif de un particular
+				retorno.put('nombreTitular', accounts[0].Name);
+				retorno.put('tipoAccount', '1-Particular');
+			}
+		}
+	
 		return retorno;
 	}
 
@@ -1806,7 +1919,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 		List<Profile> profiles  = [SELECT Name FROM Profile WHERE Id = :UserInfo.getProfileId()];
 		if(!profiles.isEmpty()){
 			nombrePerfil = profiles[0].Name;
-}
+		}
 
 
 		Case caso = [SELECT SEG_Grupo__c, OwnerId, SEG_ClasificacionRapida__c, RecordType.DeveloperName FROM Case WHERE Id = :caseId];
@@ -2090,41 +2203,29 @@ public without sharing class SEG_Case_Operativas_Controller {
 						insert(listDocumentosInsert);
 					}
 
-					/* OLD. Quitamos esta gestión de marcas que no aplica a Segmentos.
-					List<SEG_Marca_de_un_cliente__c> marcasCliente = new List<SEG_Marca_de_un_cliente__c>([select id, SEG_Caracteristica__c,SEG_Cliente__c from SEG_Marca_de_un_cliente__c where SEG_Cliente__c=:casoOrigen.AccountId]);
-					List<CC_Marca_Case__c> listMarcasCaso = new list<CC_Marca_Case__c>();
-					for(Case casoAux : listCasosHijos)
-					{
-						for(SEG_Marca_de_un_cliente__c marca:marcasCliente)
-						{
-							if(casoAux.AccountId == marca.SEG_Cliente__c)
-							{
-								CC_Marca_Case__c marcaCaso = new CC_Marca_Case__c();
-								marcaCaso.CC_Case__c=casoAux.Id;
-								marcaCaso.CC_Marca__c=marca.SEG_Caracteristica__c;
-								listMarcasCaso.add(marcaCaso);
-							}
-						}
-					}
-					if(listMarcasCaso.size()>0)
-					{
-						insert(listMarcasCaso);
-					}
-					FIN OLD.*/
-
 					//VFR-20/01: El caso origen debe actualizarse con los siguientes valores:
 					List<SEG_ClasificacionRapida__c> lstCR = [SELECT id FROM SEG_ClasificacionRapida__c WHERE Name = 'Gestión en caso vinculado' AND CBK_Negocio__c = 'Segmentos' LIMIT 1];
-					List<CC_MCC__c> lstTem = [SELECT id FROM CC_MCC__c WHERE Name = 'Gestión en caso vinculado' AND RecordType.DeveloperName = 'CC_Tematica' AND CC_Tipo_Cliente__c = 'Segmentos' LIMIT 1];
-					List<CC_MCC__c> lstProd = [SELECT id FROM CC_MCC__c WHERE Name = 'Gestión en caso vinculado' AND RecordType.DeveloperName = 'CC_Producto_Servicio' AND CC_Tipo_Cliente__c = 'Segmentos' LIMIT 1];
-					List<CC_MCC__c> lstMotiv = [SELECT id FROM CC_MCC__c WHERE Name = 'Gestión en caso vinculado' AND RecordType.DeveloperName = 'CC_Motivo' AND CC_Tipo_Cliente__c = 'Segmentos' LIMIT 1];
-					casoOrigen.Status = 'Pendiente';
-					casoOrigen.SEG_Subestado__c = 'Casos vinculados pendientes';
-					casoOrigen.SEG_N_operaciones_del_caso__c = 1;
 
-					if(!lstCR.isEmpty()) {casoOrigen.SEG_ClasificacionRapida__c = lstCR[0].id;}
-					if(!lstTem.isEmpty()){casoOrigen.CC_MCC_Tematica__c = lstTem[0].id;}
-					if(!lstProd.isEmpty()){casoOrigen.CC_MCC_ProdServ__c = lstProd[0].id;}
-					if(!lstMotiv.isEmpty()){casoOrigen.CC_MCC_Motivo__c = lstMotiv[0].id;}
+					List<CC_MCC__c> lstMCC = [
+						SELECT Id, RecordType.DeveloperName
+						FROM CC_MCC__c
+						WHERE Name = 'Gestión en caso vinculado'
+						  AND CC_Tipo_Cliente__c = 'Segmentos'
+						  AND RecordType.DeveloperName IN ('CC_Tematica', 'CC_Producto_Servicio', 'CC_Motivo')
+					];
+					
+					if (!lstCR.isEmpty()){
+						casoOrigen.SEG_ClasificacionRapida__c = lstCR[0].Id;
+					}
+					
+
+					Id tematicaId, productoId, motivoId;
+					for (CC_MCC__c mcc : lstMCC) {
+						if (mcc.RecordType.DeveloperName == 'CC_Tematica') casoOrigen.CC_MCC_Tematica__c = mcc.Id;
+						else if (mcc.RecordType.DeveloperName == 'CC_Producto_Servicio') casoOrigen.CC_MCC_ProdServ__c = mcc.Id;
+						else if (mcc.RecordType.DeveloperName == 'CC_Motivo') casoOrigen.CC_MCC_Motivo__c = mcc.Id;
+					}
+					
 
 					update casoOrigen;
 				}
@@ -2169,80 +2270,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 
 				casoCreado.put('estado','KO');
 			}
-			/*//VFR 01/2022 - No se tiene que enviar AR cuando se crea un caso vinculado
-			//Envio plantilla genérica
-			if (listCasosHijos != null && !listCasosHijos.isEmpty())
-			{
-				List<Case> casoPlantilla = new List<Case>();
-				casoPlantilla.add(listCasosHijos[0]);
-
-				Map<Id, List<SEG_Plantilla__c>> plantillas = SEG_PlantillasHandler.determinarPlantillas(casoPlantilla, 'Acuse de recibo', null);
-
-				List<Contact> contacto = [SELECT id, Name, CC_Idioma__C, Email FROM Contact WHERE id = :listCasosHijos[0].ContactId LIMIT 1];
-				List<Account> cuenta = [SELECT id, SEG_EnviarAcuse__c, SEG_No_enviar_Acuse_Recibo_Empresa__c FROM Account WHERE id = :listCasosHijos[0].AccountId LIMIT 1];
-
-
-				String plantillaIdioma;
-				SEG_Plantilla__c plantillaCierre;
-				List<SEG_Plantilla__c> plantilla = new List<SEG_Plantilla__c>();
-
-				if(plantillas.size() == 1){
-
-					for(List<SEG_Plantilla__c> lP : plantillas.values()){
-						for(SEG_Plantilla__c p : lP){
-							plantilla.add(p);
-						}
-					}
-
-					plantillaCierre = plantilla[0];
-
-
-					if(!contacto.isEmpty())
-					{
-						if(contacto[0].CC_Idioma__c != null){
-
-							if(contacto[0].CC_Idioma__c =='ga'){
-								plantillaIdioma=plantillaCierre.SEG_PlantillaGalegoID__c;
-							}
-							else if(contacto[0].CC_Idioma__c =='ca'){
-								plantillaIdioma=plantillaCierre.SEG_PlantillaCatalanID__c;
-							}
-							else if(contacto[0].CC_Idioma__c =='en'){
-								plantillaIdioma=plantillaCierre.SEG_PlantillaInglesID__c;
-							}
-							else if(contacto[0].CC_Idioma__c =='eu'){
-								plantillaIdioma=plantillaCierre.SEG_PlantillaEuskeraID__c;
-							}
-							else {
-								plantillaIdioma=plantillaCierre.SEG_PlantillaCastellanoID__c;
-							}
-
-						}else{
-							plantillaIdioma=plantillaCierre.SEG_PlantillaCastellanoID__c;
-						}
-
-						// Envío del mail de acuse.
-						Map<String,String> envioAcuse= SEG_MetodosComunes.enviarCorreoAcuse(plantillaIdioma, listCasosHijos[0].Id, contacto[0]);
-
-						if (envioAcuse.get('error') != '0')
-						{
-							casoCreado.put('estado','email KO');
-							casoCreado.put('detalleError', envioAcuse.get('detalle'));
-
-							// Crear un post de chatter informando del error al intentar enviar el correo de acuse.
-							try
-							{
-								String errorChatter = 'No se ha podido crear el caso vinculado. Código error: ' + envioAcuse.get('error') + ' ' + envioAcuse.get('detalle');
-								postOnChatter(listCasosHijos[0].Id, errorChatter, 'Crear caso vinculado', '');
-							}catch (Exception e){
-								// Registramos el error.
-								CBK_Log.error(e);
-							}
-						}
-					}
-				}
-			}
-			*/
 			return casoCreado;
 		}
 	}
@@ -2300,19 +2327,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 				wrapperSet = (List<Id>)JSON.deserialize(listFiles, idTypeListId);
 			}
 
-			// Query sobre el historico del caso para recuperar los valores anteriores al cambio
-			/*List<CaseHistory> caseHistory = new List<CaseHistory>(
-				[SELECT CaseId, NewValue, OldValue, CreatedDate, Field
-				FROM CaseHistory WHERE CaseId =: casoID ORDER BY CreatedDate ASC]
-			);
-
-			for (CaseHistory chist : caseHistory) {
-				if (chist.Field == 'Status') {
-					statusOld = String.valueOf(chist.OldValue);
-				} else if (chist.Field == 'SEG_Subestado__c') {
-					substatusOld = String.valueOf(chist.OldValue);
-				}
-			}*/
 
 			//realizamos query sobre el caso Original
 			Case casoOrigen = new Case();
@@ -2404,25 +2418,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 					insert(listDocumentosInsert);
 				}
 
-				/* OLD. Quitamos esta gestión de marcas que no aplica a Segmentos.
-				List<SEG_Marca_de_un_cliente__c> marcasCliente = new List<SEG_Marca_de_un_cliente__c>(
-					[SELECT SEG_Caracteristica__c, SEG_Cliente__c
-					FROM SEG_Marca_de_un_cliente__c	WHERE SEG_Cliente__c = :casoOrigen.AccountId]
-				);
-				List<CC_Marca_Case__c> listMarcasCaso = new list<CC_Marca_Case__c>();
-				for (Case casoAux : listCasoReciclado) {
-					for (SEG_Marca_de_un_cliente__c marca:marcasCliente) {
-						if (casoAux.AccountId == marca.SEG_Cliente__c) {
-							CC_Marca_Case__c marcaCaso = new CC_Marca_Case__c();
-							marcaCaso.CC_Case__c = casoAux.Id;
-							marcaCaso.CC_Marca__c = marca.SEG_Caracteristica__c;
-							listMarcasCaso.add(marcaCaso);
-						}
-					}
-				}
-				insert(listMarcasCaso);
-				FIN OLD. */
-
 				//copiamos emails que ha generado el caso reciclado
 				List<EmailMessage> emailsListToRelate = new List<EmailMessage>();
 				List<EmailMessage> emailsListOriginalUpd = new List<EmailMessage>();
@@ -2438,38 +2433,38 @@ public without sharing class SEG_Case_Operativas_Controller {
 				update(emailsListOriginalUpd);
 			}
 
-			List<Case> csListNewRec = [SELECT Id,CaseNumber, Subject, Status,SEG_Subestado__c,ParentId,CC_Detalles_Consulta__c,SEG_ClasificacionRapida__c,SEG_Grupo__c,SEG_Grupo_Empresa__c,
+			List<Case> csListNewRec = [SELECT Id,CaseNumber, Subject, SEG_Grupo__r.Name, Status,SEG_Subestado__c,ParentId,CC_Detalles_Consulta__c,SEG_ClasificacionRapida__c,SEG_ClasificacionRapida__r.Name, SEG_Grupo__c,SEG_Grupo_Empresa__c,
 			SEG_Organizacion__c,SEG_Zona__c,SEG_Numero_de_centro__c,Contact.SEG_No_enviar_Acuse_Recibo__c,Account.SEG_No_enviar_Acuse_Recibo_Empresa__c,SEG_Idioma__c,
 			ContactId,CC_AcuseRecibo__c,ContactEmail,SEG_Estado_Contacto__c,SEG_No_AR_Account__c,SEG_No_AR_Contact__c,SEG_Resultado__c,SEG_N_case_y_subject__c,SEG_SemillaId__c
-			From Case where Id=:listCasoReciclado[0].Id];
+			FROM Case WHERE Id=:listCasoReciclado[0].Id];
 
 			for(Case casrecNew: csListNewRec){
 				casosIdLst.add(casrecNew.Id);
 				auxMapCase.put(casrecNew.Id,casrecNew);
 			}
 			if(listCasoReciclado.size()==1){
-				Case newCase = new Case();
-				newCase = [select id, SEG_ClasificacionRapida__c,SEG_ClasificacionRapida__r.Name,CaseNumber,SEG_Grupo__c,SEG_Grupo__r.Name from Case where id=:listCasoReciclado[0].Id];
-				if (newCase.CaseNumber != null){
-					casoCreado.add(newCase.CaseNumber);
+
+
+				if (csListNewRec[0].CaseNumber != null){
+					casoCreado.add(csListNewRec[0].CaseNumber);
 				}
 				else{
 					casoCreado.add('SIN NÚMERO CASO');
 				}
-				if (newCase.SEG_ClasificacionRapida__r.Name != null){
-					casoCreado.add(newCase.SEG_ClasificacionRapida__r.Name);
+				if (csListNewRec[0].SEG_ClasificacionRapida__r.Name != null){
+					casoCreado.add(csListNewRec[0].SEG_ClasificacionRapida__r.Name);
 				}
 				else{
 					casoCreado.add('SIN CR');
 				}
-				if (newCase.SEG_Grupo__r.Name != null){
-					casoCreado.add(newCase.SEG_Grupo__r.Name);
+				if (csListNewRec[0].SEG_Grupo__r.Name != null){
+					casoCreado.add(csListNewRec[0].SEG_Grupo__r.Name);
 				}
 				else{
 					casoCreado.add('SIN GRUPO');
 				}
-				if (newCase.id != null){
-					casoCreado.add(newCase.id);
+				if (csListNewRec[0].id != null){
+					casoCreado.add(csListNewRec[0].id);
 				}
 				else{
 					casoCreado.add('SIN ID CASO');
@@ -2719,17 +2714,15 @@ public without sharing class SEG_Case_Operativas_Controller {
             );
             return [SELECT CaseNumber, Subject FROM Case WHERE Id IN :idCasosRecientes];
         } else {
-Pattern patCasenum = Pattern.compile('^[0-9]{8}$');
+			Pattern patCasenum = Pattern.compile('^[0-9]{8}$');
 			Matcher matcherCasenum = patCasenum.matcher(cadenaBusqueda);
 			if (matcherCasenum.find()) {
-				String caseNum = cadenaBusqueda;
-			cadenaBusqueda = '%' + cadenaBusqueda + '%';
-			return [SELECT CaseNumber, Subject FROM Case
-					WHERE RecordType.DeveloperName IN ('SEG_Cliente', 'SEG_Seguimiento')
-					AND (CaseNumber = :caseNum OR Subject LIKE :cadenaBusqueda)
-					AND Id != :idCaso
-                    ORDER BY CreatedDate DESC LIMIT 5];
-} else {
+				return [SELECT CaseNumber, Subject FROM Case
+						WHERE RecordType.DeveloperName IN ('SEG_Cliente', 'SEG_Seguimiento')
+						AND CaseNumber = :cadenaBusqueda
+						AND Id != :idCaso
+						ORDER BY CreatedDate DESC LIMIT 5];
+			} else {
 				List<List<SObject>> busquedaCasos = [
 					FIND :cadenaBusqueda
 					IN ALL FIELDS
@@ -2877,27 +2870,30 @@ Pattern patCasenum = Pattern.compile('^[0-9]{8}$');
 		FROM Case WHERE id = :caseId];
 
 		Map<String,String> retorno = new Map<String,String>();
-        retorno.put('enviarcanal','N');
-        retorno.put('noexistemotivo', 'N');
 
+        retorno.put('noexistemotivo', 'N');
+		retorno.put('enviarcanal','N');
 		if(casoMotiv.CC_MCC_Motivo__c != null){
-			/*if (listaFicheros != null && !listaFicheros.isEmpty()){
+			/*OLD: if (listaFicheros != null && !listaFicheros.isEmpty()){
 
 			}*/
 
 			Case caso = new Case(Id = caseId);
-			SEG_BPO_WS.enviarCaso(caseId,'alta',notasCif,listaFicheros);
-			caso.SEG_Caso_sincronizado_en_BPO__c = true;
-			if(caseStatus){
-				caso.Status = 'Activo';
-				caso.SEG_Subestado__c = 'Gestión BPM';
-			}else{
-				caso.Status = 'Pendiente';
-				caso.SEG_Subestado__c = 'Gestión BPM';
+			String resultadoBPO = SEG_BPO_WS.enviarCaso(caseId,'alta',notasCif,listaFicheros);
+
+			if(!String.IsBlank(resultadoBPO) && resultadoBPO.equalsIgnoreCase('OK')){
+				caso.SEG_Caso_sincronizado_en_BPO__c = true;
+				if(caseStatus){
+					caso.Status = 'Activo';
+					caso.SEG_Subestado__c = 'Gestión BPM';
+				}else{
+					caso.Status = 'Pendiente';
+					caso.SEG_Subestado__c = 'Gestión BPM';
+				}
+				//OLD TODO: Falta acabar de definir en que estado se tiene que quedar pendiente
+				update caso;
+				retorno.put('enviarcanal','Y');
 			}
-			//TODO: Falta acabar de definir en que estado se tiene que quedar pendiente
-			update caso;
-			retorno.put('enviarcanal','Y');
 		}
 		else{
 			retorno.put('noexistemotivo', 'Y');
@@ -3198,7 +3194,7 @@ Pattern patCasenum = Pattern.compile('^[0-9]{8}$');
 			Database.update(listaCasosPadreUpdate);
 		}
 	}
-*/
+	*/
 
 	/* Clase para el botón AOR (Eric) */
 	private static final String BASE64CHARS = '' +

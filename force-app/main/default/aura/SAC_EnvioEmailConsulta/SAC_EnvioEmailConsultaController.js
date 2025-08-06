@@ -1,13 +1,13 @@
 ({
-    doInit : function(component, event, helper) {
+    doInit: function (component, event, helper) {
         //obtener info 
         var action = component.get('c.obtenerDatosEmail');
-        action.setParams({'idCaso': component.get("v.recordId"), 'soloEmail': true});
+        action.setParams({ 'idCaso': component.get("v.recordId"), 'soloEmail': true });
 
-        action.setCallback(this, function(response) {
-			var state = response.getState();
-            if (state === "SUCCESS") { 
-                var wrapper = response.getReturnValue(); 
+        action.setCallback(this, function (response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                var wrapper = response.getReturnValue();
 
                 component.set('v.para', wrapper.para);
                 component.set('v.asunto', wrapper.asunto);
@@ -19,19 +19,60 @@
                 var procedencia = 'Consulta';
                 component.set('v.procedencia', procedencia);
 
-                let RecoPret = component.get('c.comprobrarRecordType'); 
-                RecoPret.setParams({'idCaso': component.get("v.recordId")});
-                RecoPret.setCallback(this, function(response){
+                let RecoPret = component.get('c.comprobrarRecordType');
+                RecoPret.setParams({ 'idCaso': component.get("v.recordId") });
+                RecoPret.setCallback(this, function (response) {
                     let state = response.getState();
                     if (state === "SUCCESS") {
-                        let respuesta = response.getReturnValue(); 
-                        component.set('v.esReclamacionoPretension', respuesta);
+                        let respuesta = response.getReturnValue();
+
+
+                        if (respuesta === 'SAC') {
+                            component.set('v.esReclamacionoPretension', true);
+                        }
+
+                        if (respuesta === 'SPV') {
+                            //////////////////////////////////////////
+                            let action = component.get("c.recuperarReclamantes");
+                            action.setParams({ 'idCaso': component.get("v.recordId") });
+                            action.setCallback(this, function (responseApex) {
+                                let stateApex = responseApex.getState();
+                                if (stateApex === "SUCCESS") {
+                                    // Puedes hacer algo con el resultado si es necesario
+                                    let reclamantes = responseApex.getReturnValue();
+
+                                    // Mapear a formato para el combobox
+                                    let options = reclamantes.map(function (rec) {
+                                        return {
+                                            label: rec.SAC_Account__r.Name,  
+                                            value: rec.Id
+                                        };
+                                    });
+
+                                    component.set("v.reclamantesOptions", options);
+                                } else {
+                                    let errors = response.getError();
+                                    let toastParams = {
+                                        title: "Error",
+                                        message: errors[0].pageErrors[0].message,
+                                        type: "error"
+                                    };
+                                    let toastEvent = $A.get("e.force:showToast");
+                                    toastEvent.setParams(toastParams);
+                                    toastEvent.fire();
+                                }
+                            });
+
+                            $A.enqueueAction(action);
+
+                            component.set('v.esSupervisores', true);
+                        }
                     }
-                    else{
+                    else {
                         let errors = response.getError();
                         let toastParams = {
                             title: "Error",
-                            message: errors[0].pageErrors[0].message, 
+                            message: errors[0].pageErrors[0].message,
                             type: "error"
                         };
                         let toastEvent = $A.get("e.force:showToast");
@@ -41,11 +82,11 @@
                 })
                 $A.enqueueAction(RecoPret);
             }
-            else{
+            else {
                 var errors = response.getError();
                 let toastParams = {
                     title: "Error",
-                    message: errors[0].pageErrors[0].message, 
+                    message: errors[0].pageErrors[0].message,
                     type: "error"
                 };
                 let toastEvent = $A.get("e.force:showToast");
@@ -53,93 +94,103 @@
                 toastEvent.fire();
             }
         })
-        $A.enqueueAction(action);       
+        $A.enqueueAction(action);
     },
 
-    abrirModalGruposDerivacion : function(component, event, helper){ 
-		//component.set('v.isLoading', true);
+    abrirModalGruposDerivacion: function (component, event, helper) {
+        //component.set('v.isLoading', true);
         component.set('v.derivacionOconsulta', 'derivar');
         component.set('v.labelInformacion', 'Selecciona el grupo de derivación');
-		component.set('v.modalSeleccion', true);
+        component.set('v.modalSeleccion', true);
         helper.traerGrupos(component, event);
-	},
+    },
 
-    abrirModalGruposConsulta : function(component, event, helper){
-		//component.set('v.isLoading', true);
+    abrirModalGruposConsulta: function (component, event, helper) {
+        //component.set('v.isLoading', true);
         component.set('v.derivacionOconsulta', 'consulta');
         component.set('v.labelInformacion', 'Selecciona el grupo de consultas');
-		component.set('v.modalSeleccion', true);
+        component.set('v.modalSeleccion', true);
         helper.traerGrupos(component, event);
-	},
+    },
+
+    abrirModalEmailReclamante: function(component, event, helper) {
+        component.set('v.isLoading', true);
+        helper.cambiarContactoReclamante(component, event);
+        //component.set('v.modalReclamantes', true);
+    },
+
+    ocultaModalReclamantes : function(component, event, helper) {
+        component.set('v.modalReclamantes', false);
+    },
 
     cerrarModalSeleccion: function (component) {
         component.set('v.grupoAbuscar', '');
         component.set('v.grupoAbuscarId', '');
         //component.set('v.options', '');
-        component.set('v.mostrarGrupos', false);  
+        component.set('v.mostrarGrupos', false);
         component.set("v.modalSeleccion", false);
     },
 
-    handleBlur : function( component, event, helper ){
+    handleBlur: function (component, event, helper) {
         helper.handleBlurHelper(component, event);
     },
 
-    mostrarOpciones : function( component, event, helper ) {
+    mostrarOpciones: function (component, event, helper) {
         var disabled = component.get("v.disabled");
         component.set("v.mostrarGrupos", true);
 
-        if(!disabled /*&& component.get("v.cerrar") == 0*/) {
+        if (!disabled /*&& component.get("v.cerrar") == 0*/) {
             component.set("v.mensaje", '');
             component.set('v.grupoAbuscar', '');
             var options = component.get("v.options");
-            options.forEach( function(element,index) {
+            options.forEach(function (element, index) {
                 element.isVisible = true;
             });
             component.set("v.options", options);
-            if(!$A.util.isEmpty(component.get('v.options'))) {
-                $A.util.addClass(component.find('gruposCombobox'),'slds-is-open');
-            } 
+            if (!$A.util.isEmpty(component.get('v.options'))) {
+                $A.util.addClass(component.find('gruposCombobox'), 'slds-is-open');
+            }
         }
     },
 
-    filtroBusqueda : function( component, event, helper ) {
-        if( !$A.util.isEmpty(component.get('v.grupoAbuscar')) ) {
+    filtroBusqueda: function (component, event, helper) {
+        if (!$A.util.isEmpty(component.get('v.grupoAbuscar'))) {
             // Una vez borrado, poder volver a buscar escribiendo
-            if(component.get("v.mostrarGrupos") === false){
+            if (component.get("v.mostrarGrupos") === false) {
                 component.set("v.mostrarGrupos", true);
             }
             component.set("v.cadenaVacia", false);
             component.set("v.cerrar", 0);
             helper.filtroBusquedaHelper(component, event);
         } else {
-            if(component.get("v.cerrar") === 0 && component.get("v.cadenaVacia") === false){ 
+            if (component.get("v.cerrar") === 0 && component.get("v.cadenaVacia") === false) {
                 component.set("v.cerrar", 1);
                 var options = component.get("v.options");
-                options.forEach( function(element,index) {
+                options.forEach(function (element, index) {
                     element.isVisible = true;
                 });
                 component.set("v.options", options);
-                if(!$A.util.isEmpty(component.get('v.options'))) {
-                    $A.util.addClass(component.find('gruposCombobox'),'slds-is-open'); 
-                } 
-            }else{
+                if (!$A.util.isEmpty(component.get('v.options'))) {
+                    $A.util.addClass(component.find('gruposCombobox'), 'slds-is-open');
+                }
+            } else {
                 component.set("v.cerrar", 0);
                 component.set("v.mostrarGrupos", false);
                 //$A.util.removeClass(component.find('resultsDiv'),'slds-is-open');
                 component.set("v.value", '');
                 component.set("v.cadenaVacia", false);
             }
-        }           
+        }
     },
 
-    seleccionarGrupo : function( component, event, helper ) {
-        if(!$A.util.isEmpty(event.currentTarget.id)) {
+    seleccionarGrupo: function (component, event, helper) {
+        if (!$A.util.isEmpty(event.currentTarget.id)) {
             helper.seleccionarGrupoHelper(component, event);
         }
     },
 
     confirmarSeleccion: function (component, event, helper) {
-        component.set('v.isLoading', true); 
+        component.set('v.isLoading', true);
         component.set("v.modalSeleccion", false);
 
         helper.confirmarSeleccionHelper(component, event);

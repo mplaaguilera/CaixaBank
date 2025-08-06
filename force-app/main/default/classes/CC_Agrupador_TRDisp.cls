@@ -2,33 +2,102 @@ public with sharing class CC_Agrupador_TRDisp extends CC_TriggerDispatcherBase {
     
     private static Boolean isBeforeInsertProcessing = false;
     private static Boolean isBeforeUpdateProcessing = false;
+    private static Boolean isBeforeDeleteProcessing = false;
     private static Boolean isAfterInsertProcessing = false;
-    private static Boolean isAfterUpdateProcessing = false; 
-
+    private static Boolean isAfterUpdateProcessing = false;
+    private static Boolean isAfterDeleteProcessing = false;
+    private static Boolean isAfterUndeleteProcessing = false;
+	private static String objectApiName = 'CC_Agrupador__c';
+    
     public virtual override void beforeInsert(CC_TriggerParameters tp) {
-        if(!isBeforeInsertProcessing) {
+        
+        if (!isBeforeInsertProcessing) {           
             isBeforeInsertProcessing = true;
-            execute(new CC_Agrupador_BI_TRHan(), tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
+            for (String handlerClassName : getAssociatedHandlers(objectApiName, 'beforeInsert')) {
+                Type handlerClassType = Type.forName(handlerClassName);
+                execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
+            }
             isBeforeInsertProcessing = false;
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
     }
     
     public virtual override void beforeUpdate(CC_TriggerParameters tp) {
-        if(!isBeforeUpdateProcessing) {
+        
+        if (!isBeforeUpdateProcessing) {           
             isBeforeUpdateProcessing = true;
-            execute(new CC_Agrupador_BU_TRHan(), tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
+            for (String handlerClassName : getAssociatedHandlers(objectApiName, 'beforeUpdate')) {
+                Type handlerClassType = Type.forName(handlerClassName);
+                execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
+            }
             isBeforeUpdateProcessing = false;
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
     }
     
+/*    public virtual override void beforeDelete(CC_TriggerParameters tp) {
+        
+        if (!isBeforeDeleteProcessing) {           
+            isBeforeDeleteProcessing = true;
+            for (String handlerClassName : getAssociatedHandlers(objectApiName, 'beforeDelete')) {
+                Type handlerClassType = Type.forName(handlerClassName);
+                execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.beforeDelete);
+            }
+            isBeforeDeleteProcessing = false;
+        }
+        else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeDelete);
+    }*/
+    
     public virtual override void afterInsert(CC_TriggerParameters tp) {
-        if(!isAfterInsertProcessing) {
+        
+        if (!isAfterInsertProcessing) {           
             isAfterInsertProcessing = true;
-            execute(new CC_Agrupador_AI_TRHan(), tp, CC_TriggerParameters.TriggerEvent.afterInsert);
+            for (String handlerClassName : getAssociatedHandlers(objectApiName, 'afterInsert')) {
+                Type handlerClassType = Type.forName(handlerClassName);
+                execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterInsert);
+            }
             isAfterInsertProcessing = false;
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterInsert);
     }
+    
+    public virtual override void afterUpdate(CC_TriggerParameters tp) {
+        
+        if (!isAfterUpdateProcessing) {           
+            isAfterUpdateProcessing = true;
+            for (String handlerClassName : getAssociatedHandlers(objectApiName, 'afterUpdate')) {
+                Type handlerClassType = Type.forName(handlerClassName);
+                execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterUpdate);
+            }
+            isAfterUpdateProcessing = false;
+        }
+        else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterUpdate);
+    }
+/*    
+    public virtual override void afterDelete(CC_TriggerParameters tp) {
+        
+        if (!isAfterDeleteProcessing) {           
+            isAfterDeleteProcessing = true;
+            for (String handlerClassName : getAssociatedHandlers(objectApiName, 'afterDelete')) {
+                Type handlerClassType = Type.forName(handlerClassName);
+                execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterDelete);
+            }
+            isAfterDeleteProcessing = false;
+        }
+        else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterDelete);
+    }
+    
+    public virtual override void afterUndelete(CC_TriggerParameters tp) {
+        
+        if (!isAfterUndeleteProcessing) {           
+            isAfterUndeleteProcessing = true;
+            for (String handlerClassName : getAssociatedHandlers(objectApiName, 'afterUndelete')) {
+                Type handlerClassType = Type.forName(handlerClassName);
+                execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterUndelete);
+            }
+            isAfterUndeleteProcessing = false;
+        }
+        else execute(null, tp, CC_TriggerParameters.TriggerEvent.afterUndelete);
+    }*/
+    
 }

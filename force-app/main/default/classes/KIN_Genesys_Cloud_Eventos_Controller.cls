@@ -143,15 +143,19 @@ public with sharing class KIN_Genesys_Cloud_Eventos_Controller {
 	*/
 
 	@AuraEnabled
-	public static void completarConsulta(String servicio, String connIdConsulta, Id idNuevoOwner) {
+	public static Map<String, Object> completarConsulta(String servicio, String connIdConsulta, Id idNuevoOwner) {
 		String negocioServicioGenesys = negocioServicioGenesys(servicio);
+		Map<String, Object> retorno = new Map<String, Object>();
+		retorno.put('negocioServicio', negocioServicioGenesys);
 		if (negocioServicioGenesys == 'HDT') {
 			HDT_Llamada_GC.completarConsulta(connIdConsulta, idNuevoOwner);
+			return retorno;
 		} else if (negocioServicioGenesys == 'CC') {
-			CC_Llamada_GC.completarConsulta(connIdConsulta, idNuevoOwner);
+			retorno.putAll(CC_Llamada_GC.completarConsulta(connIdConsulta, idNuevoOwner));
+			return retorno;
 		} else {
 			throw new AuraHandledException('No es posible determinar la aplicación Salesforce correspondiente al servicio Genesys con código "' + servicio + '"');
-		}
+		}		
 	}
 
 	/*

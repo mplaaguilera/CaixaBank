@@ -37,12 +37,12 @@ public with sharing class OS_OpenCTI_Test {
         
         
         Account cuenta = new Account();
-        cuenta.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Buzon_Account').getRecordTypeId();
+        cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('OS_Buzon_Account').getRecordTypeId();
         cuenta.Name = 'CUENTA BUZON COPS';
         insert cuenta;
         
         Contact contacto = new Contact();
-		contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
+		contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
         contacto.Phone = '650399855';
         contacto.LastName = 'PRUEBAS BUZON COPS';
         contacto.AccountId = cuenta.Id;
@@ -72,7 +72,7 @@ public with sharing class OS_OpenCTI_Test {
     @isTest
     public static void registrarLlamadaSaliente() {
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
 
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
@@ -145,8 +145,7 @@ public with sharing class OS_OpenCTI_Test {
         OS_OpenCTI.finalizarLlamada(inputJson);
         Test.stopTest();
 
-        List<CC_Llamada__c> lstLlamada = [SELECT Id FROM CC_Llamada__c WHERE CC_DNIS__C = :entrada.dnis LIMIT 1];
-        system.assertEquals(0, lstLlamada.size(), 'Comprobamos no se crea la llamada.');
+        system.assertEquals(0, [SELECT COUNT() FROM CC_Llamada__c WHERE CC_DNIS__C = :entrada.dnis LIMIT 1], 'Comprobamos no se crea la llamada.');
 
     }
 
@@ -281,7 +280,6 @@ public with sharing class OS_OpenCTI_Test {
         OS_OpenCTI.transferirLlamada(inputJson);
         Test.stopTest();
 
-        List<CC_Llamada__c> lstLlamada = [SELECT Id FROM CC_Llamada__c WHERE CC_DNIS__C =:entrada.dnis];
-        system.assertEquals(0, lstLlamada.size(), 'Comprobamos no se crea la llamada.');
+        system.assertEquals(0, [SELECT COUNT() FROM CC_Llamada__c WHERE CC_DNIS__C =:entrada.dnis], 'Comprobamos no se crea la llamada.');
     }
 }

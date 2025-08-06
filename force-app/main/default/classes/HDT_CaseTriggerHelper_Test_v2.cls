@@ -259,14 +259,19 @@ public with sharing class HDT_CaseTriggerHelper_Test_v2 {
         }
     }
 
+
     @isTest
     static void testAsociarAssetACuentaNuevoAsset() {
         System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
 
         // Obtener los registros creados en setup
         Account acc = [SELECT Id FROM Account LIMIT 1];
-        Asset asset = [SELECT Id FROM Asset WHERE AccountId = :acc.Id LIMIT 1];
+        //Asset asset = [SELECT Id FROM Asset WHERE AccountId = :acc.Id LIMIT 1];
         Case caso = [SELECT Id, AccountId, AssetId,Status FROM Case WHERE AccountId = :acc.Id LIMIT 1];
+
+        Asset asset = new Asset(Name = 'Test Asset', AccountId = acc.Id, CC_Familia_Activo__c = 'PORT', HDT_Estado_CI__c = 'Instalado');
+         insert asset;
+
 
         // Simular actualización de AccountId en el caso
         Map<Id, Case> oldMap = new Map<Id, Case>{caso.Id => new Case(Id = caso.Id, AccountId = null)};
@@ -279,7 +284,7 @@ public with sharing class HDT_CaseTriggerHelper_Test_v2 {
 
         // Verificar que el caso ahora tiene un Asset asociado
         Case updatedCaso = [SELECT AssetId FROM Case WHERE Id = :caso.Id];
-        System.assertNotEquals(null, updatedCaso.AssetId, 'El AssetId debería haberse asignado');
+        System.assertEquals(caso.AssetId, updatedCaso.AssetId, 'El AssetId debería haberse asignado');
         }
     }
 

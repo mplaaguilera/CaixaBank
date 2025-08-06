@@ -48,12 +48,14 @@ public class SEG_ExcepcionesHandler {
 		Set<String> zonaFiltro = new Set<String>();
 		Set<String> organizacionFiltro = new Set<String>();
 		List<Case> lstCase = new List<Case>();
+
 		if (listadoCasos != null && !listadoCasos.isEmpty()) {
 			lstCase = [SELECT AccountId, SEG_Organizacion__c, SEG_Zona__c,
 			CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Motivo__c,
 			SEG_Detalle__c, SEG_Grupo__c, SEG_Numero_centro__c, 
 			SEG_Grupo_Empresa__c, SEG_ClasificacionRapida__c,
-			Account.SEG_Oficina_Gestora_Segmentos__c,Account.SEG_Empleado_gestor_Segmentos__c, SEG_Numero_de_centro__c
+			Account.SEG_Oficina_Gestora_Segmentos__c,Account.SEG_Empleado_gestor_Segmentos__c, SEG_Numero_de_centro__c,
+			Account.SEG_Prioridad_Carterizacion_Segmentos__c, Account.AV_EAPGestor__c
 			FROM Case WHERE Id in :listadoCasos];
 			for (case cs : lstCase) {
 				if (cs.SEG_Organizacion__c != null) {
@@ -66,10 +68,11 @@ public class SEG_ExcepcionesHandler {
 		}
 		List<SEG_Contratos__c> listadoContratosObj = new List<SEG_Contratos__c>();
 		if (listadoContratos != null && !listadoContratos.isEmpty()) {
+
 			listadoContratosObj = [SELECT Id, SEG_NombreCuenta__c, SEG_SR_Seguimiento__c, SEG_SR_Seguimiento__r.SEG_Organizacion__c, SEG_SR_Seguimiento__r.SEG_Zona__c,
 			 SEG_SR_Seguimiento__r.SEG_Grupo__c, SEG_SR_Seguimiento__r.SEG_Numero_centro__c,
-			SEG_SR_Seguimiento__r.SEG_Grupo_Empresa__c, SEG_SR_Seguimiento__r.SEG_ClasificacionRapida__c, 
-			SEG_NombreCuenta__r.SEG_Oficina_Gestora_Segmentos__c,SEG_NombreCuenta__r.SEG_Empleado_gestor_Segmentos__c, SEG_SR_Seguimiento__r.SEG_Numero_de_centro__c
+			SEG_SR_Seguimiento__r.SEG_Grupo_Empresa__c, SEG_SR_Seguimiento__r.SEG_ClasificacionRapida__c, SEG_NombreCuenta__r.AV_EAPGestor__c,
+			SEG_NombreCuenta__r.SEG_Oficina_Gestora_Segmentos__c,SEG_NombreCuenta__r.SEG_Empleado_gestor_Segmentos__c, SEG_NombreCuenta__r.SEG_Prioridad_Carterizacion_Segmentos__c, SEG_SR_Seguimiento__r.SEG_Numero_de_centro__c
 			FROM SEG_Contratos__c
 			WHERE Id IN :listadoContratos];
 
@@ -178,12 +181,20 @@ public class SEG_ExcepcionesHandler {
 					}
 				}
 
+				Id gestorActual;
+
+				if (cs?.Account?.SEG_Empleado_gestor_Segmentos__c != null && cs?.Account?.SEG_Prioridad_Carterizacion_Segmentos__c) {
+					gestorActual = cs?.Account?.SEG_Empleado_gestor_Segmentos__c;
+				} else if (cs?.Account?.AV_EAPGestor__c != null && !cs?.Account?.SEG_Prioridad_Carterizacion_Segmentos__c){
+					gestorActual = cs?.Account?.AV_EAPGestor__c;
+				}
+
 				filterExceptioByCentros(cs.SEG_Numero_de_centro__c, mapExcepcionesCaso);
 				filterExceptionByGrupos(cs.SEG_Grupo__c, mapExcepcionesCaso);
 				filterExceptionByGruposEmpresas(cs.SEG_Grupo_Empresa__c, mapExcepcionesCaso);
 				filterExceptionByEmpresa(cs.AccountId, mapExcepcionesCaso);
 				filterExceptionByCR(cs.SEG_ClasificacionRapida__c, mapExcepcionesCaso);
-				filterExceptionByGestor(cs.Account.SEG_Empleado_gestor_Segmentos__c, mapExcepcionesCaso);
+				filterExceptionByGestor(gestorActual, mapExcepcionesCaso);
 
 				lstExceptionAssignacion = new List<CaseExcepcion> ();
 				if (mapExcepcionesCaso.size() > 0) {
@@ -239,12 +250,21 @@ public class SEG_ExcepcionesHandler {
 						mapExcepcionesCaso.put(caseExc.excepcion.Id, caseExc);
 					}
 				}
+
+				Id gestorActual;
+
+				if (contrato?.SEG_NombreCuenta__r?.SEG_Empleado_gestor_Segmentos__c != null && contrato?.SEG_NombreCuenta__r?.SEG_Prioridad_Carterizacion_Segmentos__c) {
+					gestorActual = contrato?.SEG_NombreCuenta__r?.SEG_Empleado_gestor_Segmentos__c;
+				} else if (contrato?.SEG_NombreCuenta__r?.AV_EAPGestor__c != null && !contrato?.SEG_NombreCuenta__r?.SEG_Prioridad_Carterizacion_Segmentos__c){
+					gestorActual = contrato?.SEG_NombreCuenta__r?.AV_EAPGestor__c;
+				}
+
 				filterExceptioByCentros(contrato.SEG_SR_Seguimiento__r?.SEG_Numero_de_centro__c, mapExcepcionesCaso);
 				filterExceptionByGrupos(contrato.SEG_SR_Seguimiento__r?.SEG_Grupo__c, mapExcepcionesCaso);
 				filterExceptionByGruposEmpresas(contrato.SEG_SR_Seguimiento__r?.SEG_Grupo_Empresa__c, mapExcepcionesCaso);
 				filterExceptionByEmpresa(contrato.SEG_NombreCuenta__c, mapExcepcionesCaso);
 				filterExceptionByCR(contrato.SEG_SR_Seguimiento__r?.SEG_ClasificacionRapida__c, mapExcepcionesCaso);
-				filterExceptionByGestor(contrato.SEG_NombreCuenta__r?.SEG_Empleado_gestor_Segmentos__c, mapExcepcionesCaso);
+				filterExceptionByGestor(gestorActual, mapExcepcionesCaso);
 	
 				if (mapExcepcionesCaso.size() > 0) {
 					for (CaseExcepcion ex : mapExcepcionesCaso.values()) {

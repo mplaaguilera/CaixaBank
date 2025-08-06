@@ -1,5 +1,5 @@
 <aura:component controller="SEG_Case_Operativas_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome">
-
+    
     <aura:attribute name="iniciando" type="Integer" default="0"/>
     <aura:attribute name="caso" type="Case"/>
     <aura:attribute name="fullRecord" type="Case"/>
@@ -130,6 +130,10 @@
     <!-- Control botón Enviar en AOR para pulsado -->
     <aura:attribute name="botonPulsado" type="boolean" default="false"/>
 
+    <!-- Nombre del propietario del caso -->
+    <aura:attribute name="nameOwnerCase" type="string"/>
+    
+
 
     <!--Handlers-->
     <!--Init
@@ -150,6 +154,35 @@
     <aura:attribute name="notasManuales" type="String" default=""/>
     <aura:attribute name="datosTrasladoCalculados" type="String" default=""/>
     <aura:attribute name="datosImpuestosModificados" type="Boolean" default="false"/>
+
+
+    <!-- Jaime: nuevos campos operaciones 01 y 06 -->
+    <aura:attribute name="cifOrdenante" type="String" default=""/>
+    <aura:attribute name="tipoOperacion" type="String" default="sinOperacion"/>
+    <aura:attribute name="numExpediente" type="String" default=""/>
+    <aura:attribute name="cifNif" type="String" default=""/>
+    <aura:attribute name="nombreTitular" type="String" default=""/>
+    <aura:attribute name="cifNif2" type="String" default=""/>
+    <aura:attribute name="nombreTitular2" type="String" default=""/>
+    <aura:attribute name="cifNif3" type="String" default=""/>
+    <aura:attribute name="nombreTitular3" type="String" default=""/>
+    <aura:attribute name="cifNif4" type="String" default=""/>
+    <aura:attribute name="nombreTitular4" type="String" default=""/>
+    <aura:attribute name="cifNif5" type="String" default=""/>
+    <aura:attribute name="nombreTitular5" type="String" default=""/>
+    <aura:attribute name="idEER" type="String" default=""/>
+    
+    <aura:attribute name="contacto" type="String" default=""/>
+    <aura:attribute name="telefono" type="String" default=""/>
+    <aura:attribute name="prestamoICO" type="String" default="NO"/> 
+    <!--Jaime: <aura:attribute name="numPer" type="String" default=""/> -->
+
+    <!-- Control de operación actual para modal de Valija-->
+    <aura:attribute name="operacionValijaMCC" type="String" default=""/>
+
+    <!-- Jaime: Nombre de la operación de Valija -->
+    <aura:attribute name="operacionTitulo" type="String" default="Impuestos" />
+
 
     <!-- Control de datos para el modal de BPO -->
     <aura:attribute name="statusCasoBPO" type="Boolean" default="false"/>
@@ -806,56 +839,209 @@
         <aura:if isTrue="{!v.datosAdicionalesValija}">
             <section aura:id="modalValija" name="modalValija" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
                 <div class="slds-modal__container">
-                    <header class="slds-modal__header">
-                        <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalAutoasignarValijaCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
-                        <h2 class="slds-text-heading_medium slds-hyphenate">Autoasignar a Valija</h2>
-                        <p class="slds-var-m-top_x-small">Asignación automática a grupo.</p>
-                    </header>
+
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalAutoasignarValijaCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <aura:if isTrue="{!v.operacionValijaMCC != '01'}">
+                        <header class="slds-modal__header">
+                            <h2 class="slds-text-heading_medium slds-hyphenate">Autoasignar a Valija</h2>
+                            <p class="slds-var-m-top_x-small">Asignación automática a grupo.</p>
+                        </header>
+                    </aura:if>
+
                     <div class="slds-modal__content slds-var-p-around_xx-large">
                         <aura:if isTrue="{!v.loadingDatosAdicionales}">
-                        <div class="slds-spinner_container">
-                                <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
-                                    <span class="slds-assistive-text">Cargando datos...</span>
-                                    <div class="slds-spinner__dot-a"></div>
-                                    <div class="slds-spinner__dot-b"></div>
-                                </div>
+                            <div class="slds-spinner_container">
+                                    <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                                        <span class="slds-assistive-text">Cargando datos...</span>
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
                             </div>
                         </aura:if>
-                        <h2 class="slds-text-heading_medium slds-hyphenate">Información adicional para Valija...</h2>
+
+                        <aura:if isTrue="{!v.operacionValijaMCC == '01'}">
+                            <h2 class="slds-text-heading_medium slds-hyphenate">Información adicional para Expediente Riesgo (SIA)</h2>
+                            <!-- <aura:set attribute="else">
+                                <aura:if isTrue="{!v.operacionValijaMCC == '06'}">
+                                    <h2 class="slds-text-heading_medium slds-hyphenate">Información adicional para Expediente Persona</h2>
+                                    <aura:set attribute="else">
+                                        <h2 class="slds-text-heading_medium slds-hyphenate">Información adicional para Impuestos</h2>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set> -->
+                        </aura:if>
                         <br/>
+
                         <lightning:accordion>
-                            <lightning:accordionSection name="notasSection" label="Notas manuales traspaso">
-                                <div class="slds-modal__content slds-var-p-around_xx-large">
-                                    <lightning:textarea label="Escribe el motivo por el que realizas la autoasignación" type="text" aura:id="idObservacionValija" placeholder="Observaciones..." value="{!v.notasManuales}"
-                                    onchange="{!c.actualizarEnviarNotificacionCaracteresRestantes}"/>
-                                    <!--Indicador de caracteres restantes-->
-                                    <div aura:id="divEnviarNotificacionCaracteresRestantes" class="slds-float_right">
-                                        <lightning:formattedNumber label="Caracteres restantes" value="{!v.enviarNotificacionCaracteresRestantes}"/> caracteres restantes.
+
+                            <!-- Operación 01: Expediente Riesgo (SIA) -->
+                            <!-- 2 secciones, general + ficheros -->
+                            <aura:if isTrue="{!v.operacionValijaMCC == '01'}">
+                                <lightning:accordionSection name="operacion01Section" label="Datos de Expediente Riesgo (SIA)">
+                                    <div class="slds-modal__content slds-var-p-around_xx-large">
+                                        
+
+                                        <!-- Grid para Titulares y NIFs en dos columnas -->
+                                        <div class="slds-grid slds-wrap slds-gutters">
+
+                                            <!-- Izquierda -->
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning:select name="tipoOperacion" label="Tipo de Operación" value="{!v.tipoOperacion}" required="true" aura:id="tipoOperacion">
+                                                    <option value="sinOperacion">Introduzca el primer CIF/NIF</option>
+                                                    <option value="0-Empresa">0-Empresa</option>
+                                                    <option value="1-Particular">1-Particular</option>
+                                                </lightning:select>
+                                                <lightning:input label="CIF o NIF" value="{!v.cifNif}"  maxlength="9" required="true" onchange="{!c.limpiarEspacios}" onblur="{!c.validarCifNif}" data-esPrimerNIF="true" aura:id="nif1"/>
+                                                <lightning:input label="CIF o NIF 2" value="{!v.cifNif2}" maxlength="9" onchange="{!c.limpiarEspacios}" onblur="{!c.validarCifNif}" data-esPrimerNIF="false" aura:id="nif2"/>
+                                                <lightning:input label="CIF o NIF 3" value="{!v.cifNif3}" maxlength="9" onchange="{!c.limpiarEspacios}" onblur="{!c.validarCifNif}" data-esPrimerNIF="false" aura:id="nif3"/>
+                                                <lightning:input label="CIF o NIF 4" value="{!v.cifNif4}" maxlength="9" onchange="{!c.limpiarEspacios}" onblur="{!c.validarCifNif}" data-esPrimerNIF="false" aura:id="nif4"/>
+                                                <lightning:input label="CIF o NIF 5" value="{!v.cifNif5}" maxlength="9" onchange="{!c.limpiarEspacios}" onblur="{!c.validarCifNif}" data-esPrimerNIF="false" aura:id="nif5"/>
+                                                <lightning:input label="Persona contacto" value="{!v.nameOwnerCase}" aura:id="personaContactoOp01"/>
+                                                <lightning:select name="prestamoICO" label="Préstamo ICO" value="{!v.prestamoICO}" aura:id="prestamoIcoOp01">
+                                                    <option value="NO">NO</option>
+                                                    <option value="SI">SÍ</option>
+                                                </lightning:select>
+                                            </div>
+
+                                            <!-- Derecha -->
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning:input label="Num. Expediente (15 dígitos)" value="{!v.numExpediente}" required="true" maxlength="15" type="text" onchange="{!c.limpiarLetras}" onblur="{!c.validarYAsignarNumExpediente}" aura:id="numExpediente"/>
+                                                <lightning:input label="Nombre titular" value="{!v.nombreTitular}" aura:id="nombreTitular"/>
+                                                <lightning:input label="Nombre titular 2" value="{!v.nombreTitular2}" aura:id="nombreTitular2"/>
+                                                <lightning:input label="Nombre titular 3" value="{!v.nombreTitular3}" aura:id="nombreTitular3"/>
+                                                <lightning:input label="Nombre titular 4" value="{!v.nombreTitular4}" aura:id="nombreTitular4"/>
+                                                <lightning:input label="Nombre titular 5" value="{!v.nombreTitular5}" aura:id="nombreTitular5"/>
+                                                <lightning:input label="Teléfono" value="{!v.telefono}" aura:id="telefonoOp01" maxlength="20" type="tel" onblur="{!c.validarTelefono}"/>
+                                                <lightning:input label="ID_EER (Sólo dígitos sin decimales)" type="text" onchange="{!c.limpiarLetras}" value="{!v.idEER}" aura:id="idEER01"/>
+                                            </div>
+                                            
+                                        </div>
+                                        
                                     </div>
-                                </div>
-                            </lightning:accordionSection>
-                            <lightning:accordionSection name="impuestosSection" label="Datos de impuestos">
-                                <lightning:recordEditForm aura:id="formImpuestos" recordId="{!v.caseIdValija}" objectApiName="Case" onload="{!c.finCargaDatosImpuestos}" onsuccess="{!c.datosImpuestosActualizados}" onerror="{!c.errorDatosImpuestos}" onsubmit="{!c.inicioGuardadoDatosImpuestos}">
-                                    <!--<lightning:messages />-->
-                                    <lightning:inputField fieldName="SEG_ComunidadAutonoma__c" onchange="{!c.marcarDatosImpuestos}" />
-                                    <lightning:inputField fieldName="SEG_TipoCargo__c" onchange="{!c.marcarDatosImpuestos}" />
-                                    <lightning:inputField fieldName="SEG_FechaCargo__c" onchange="{!c.marcarDatosImpuestos}" />
-                                    <lightning:inputField fieldName="SEG_CIFOrdenanteValija__c" onchange="{!c.marcarDatosImpuestos}" />
-                                    <lightning:inputField fieldName="SEG_PagoAgrupado__c" onchange="{!c.marcarDatosImpuestos}" />
-                                    <lightning:inputField aura:id="caseOperations" fieldName="SEG_N_operaciones_del_caso__c" onchange="{!c.marcarDatosImpuestos}" />
-                                    <div class="slds-clearfix">
-                                        <div class="slds-float_right">
-                                            <lightning:button aura:id="botonGuardarDatosImpuestos" class="slds-var-m-top_small" variant="brand" type="submit" name="update" label="Actualizar caso" />
+                                </lightning:accordionSection>
+                            </aura:if>
+
+                            <!-- 3 secciones, general + nifs + ficheros -->
+                            <!-- <aura:if isTrue="{!v.operacionValijaMCC == '01'}">
+                                <lightning:accordionSection name="operacion01Section1.1" label="Datos de Expediente Persona">
+                                    <div class="slds-modal__content slds-var-p-around_xx-large">
+
+                                        <! Titulares y NIFs en dos columnas >
+                                        <div class="slds-grid slds-wrap slds-gutters">
+
+                                            <! Izquierda >
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning:input label="Contacto" value="{!v.nameOwnerCase}" />   
+                                                <lightning:input label="Tipo Operación" value="{!v.tipoOperacion}" />
+                                            </div>
+
+                                            <! Derecha >
+                                                <div class="slds-col slds-size_1-of-2">
+                                                <lightning:input label="Teléfono" value="{!v.telefono}" />
+                                                <lightning:input label="Num. Expediente" value="{!v.numExpediente}" />
+                                            </div>
+                                        </div>
+                                        
+                                        <! <lightning:input label="ID EER" value="{!v.idEER}" /> >
+
+                                        <lightning:select name="opcion" label="Préstamo ICO" value="{!v.prestamoICO}">
+                                            <option value=""> Selecciona </option>
+                                            <option value="SI">SÍ</option>
+                                            <option value="NO">NO</option>
+                                        </lightning:select>
+
+                                        <! <lightning:input type="checkbox" label="Préstamo ICO" checked="{!v.prestamoICO}" /> >
+                                    </div>
+                                </lightning:accordionSection>
+                                <lightning:accordionSection name="operacion01Section1.2" label="Datos de Titular y NIF/CIF">
+                                    <div class="slds-modal__content slds-var-p-around_xx-large">
+
+                                        <! Titulares y NIFs en dos columnas >
+                                        <div class="slds-grid slds-wrap slds-gutters">
+
+                                            <! Izquierda >
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning:input label="CIF/NIF 1" value="{!v.cifNif}" required="true"/>
+                                                <lightning:input label="CIF/NIF 2" value="{!v.cifNif2}" />
+                                                <lightning:input label="CIF/NIF 3" value="{!v.cifNif3}" />
+                                                <lightning:input label="CIF/NIF 4" value="{!v.cifNif4}" />
+                                                <lightning:input label="CIF/NIF 5" value="{!v.cifNif5}" />
+                                            </div>
+
+                                            <! Derecha >
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning:input label="Nombre Titular 1" value="{!v.nombreTitular}" />
+                                                <lightning:input label="Nombre Titular 2" value="{!v.nombreTitular2}" />
+                                                <lightning:input label="Nombre Titular 3" value="{!v.nombreTitular3}" />
+                                                <lightning:input label="Nombre Titular 4" value="{!v.nombreTitular4}" />
+                                                <lightning:input label="Nombre Titular 5" value="{!v.nombreTitular5}" />
+                                            </div>
                                         </div>
                                     </div>
-                                </lightning:recordEditForm>
-                            </lightning:accordionSection>
+                                </lightning:accordionSection>
+                            </aura:if> -->
+
+                            <!-- Operación 06: Expediente Persona -->
+                            <aura:if isTrue="{!v.operacionValijaMCC == '06'}">
+                                <lightning:accordionSection name="operacion06Section" label="Datos de Expediente Persona">
+                                    <div class="slds-modal__content slds-var-p-around_xx-large">
+
+                                        <lightning:input label="CIF o NIF" value="{!v.cifOrdenante}" maxlength="9" onchange="{!c.limpiarEspacios}" onblur="{!c.validarCifNif}" aura:id="nif6" data-esPrimerNIF="false" required="true"/>
+                                        <lightning:input label="Nombre Titular" value="{!v.nombreTitular}" aura:id="nombreTitularOp06"/>
+                                        <lightning:input label="Contacto" value="{!v.nameOwnerCase}" aura:id="personaContactoOp06"/>
+                                        <lightning:input label="Teléfono" value="{!v.telefono}" aura:id="telefonoOp06" maxlength="20" type="tel" onblur="{!c.validarTelefono}"/>
+                                        <!-- <lightning:input label="Num Per" value="{!v.numPer}" /> -->
+
+                                        <lightning:select name="opcion" label="Préstamo ICO" value="{!v.prestamoICO}" aura:id="prestamoIcoOp06">
+                                            <option value="NO">NO</option>
+                                            <option value="SI">SÍ</option>
+                                        </lightning:select>
+
+                                        <!-- <lightning:input type="checkbox" label="Préstamo ICO" checked="{!v.prestamoICO}" /> -->
+                                    </div>
+                                </lightning:accordionSection>
+                            </aura:if>
+
+                            <!-- Resto de operaciones: notas + impuestos -->
+                            <aura:if isTrue="{!and(v.operacionValijaMCC != '01', v.operacionValijaMCC != '06')}">
+
+                                <lightning:accordionSection name="notasSection" label="Notas manuales traspaso">
+                                    <div class="slds-modal__content slds-var-p-around_xx-large">
+                                        <lightning:textarea label="Escribe el motivo por el que realizas la autoasignación" type="text" aura:id="idObservacionValija" placeholder="Observaciones..." value="{!v.notasManuales}"
+                                        onchange="{!c.actualizarEnviarNotificacionCaracteresRestantes}"/>
+                                        <div aura:id="divEnviarNotificacionCaracteresRestantes" class="slds-float_right">
+                                            <lightning:formattedNumber label="Caracteres restantes" value="{!v.enviarNotificacionCaracteresRestantes}"/> caracteres restantes.
+                                        </div>
+                                    </div>
+                                </lightning:accordionSection>
+                            
+                                <lightning:accordionSection name="impuestosSection" label="Datos de impuestos">
+                                    <lightning:recordEditForm aura:id="formImpuestos" recordId="{!v.caseIdValija}" objectApiName="Case" onload="{!c.finCargaDatosImpuestos}" onsuccess="{!c.datosImpuestosActualizados}" onerror="{!c.errorDatosImpuestos}" onsubmit="{!c.inicioGuardadoDatosImpuestos}">
+                                        <!--<lightning:messages />-->
+                                        <lightning:inputField fieldName="SEG_ComunidadAutonoma__c" onchange="{!c.marcarDatosImpuestos}" />
+                                        <lightning:inputField fieldName="SEG_TipoCargo__c" onchange="{!c.marcarDatosImpuestos}" />
+                                        <lightning:inputField fieldName="SEG_FechaCargo__c" onchange="{!c.marcarDatosImpuestos}" />
+                                        <lightning:inputField fieldName="SEG_CIFOrdenanteValija__c" onchange="{!c.marcarDatosImpuestos}" />
+                                        <lightning:inputField fieldName="SEG_PagoAgrupado__c" onchange="{!c.marcarDatosImpuestos}" />
+                                        <lightning:inputField aura:id="caseOperations" fieldName="SEG_N_operaciones_del_caso__c" onchange="{!c.marcarDatosImpuestos}" />
+                                        <div class="slds-clearfix">
+                                            <div class="slds-float_right">
+                                                <lightning:button aura:id="botonGuardarDatosImpuestos" class="slds-var-m-top_small" variant="brand" type="submit" name="update" label="Actualizar caso" />
+                                            </div>
+                                        </div>
+                                    </lightning:recordEditForm>
+                                </lightning:accordionSection>
+
+                            </aura:if>
+
+                            <!-- Ficheros se muestra siempre -->
                             <lightning:accordionSection name="ficherosSection" label="Selección de ficheros">
                                 <span class="slds-form-element__label">Ficheros del caso</span>
                                 <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="height:10rem">
                                     <lightning:datatable columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" keyField="ContentDocumentId" selectedRows="{!v.currentSelectedRowsAnexos}" onrowselection="{!c.selectedRowsAnexos}"/>
                                 </div>
                             </lightning:accordionSection>
+
                         </lightning:accordion>
                     </div>
                     <footer class="slds-modal__footer">

@@ -1,13 +1,15 @@
 @isTest
 public with sharing class OS_CaseTriggerHelper_Test {
     
+    public static Id rtCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+    public static Id recordTypeOficina = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+
+
     @testSetup
     static void data(){
         User usuarioOperador = OS_Usuarios.usuarioOperador();
         usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
-        Id recordTypeOficina = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         Account oficinaGestora = new Account(RecordTypeId = recordTypeOficina, Name = 'Cuenta oficina gestora', CC_Tipo_Centro__c = 'OF',  CC_Email__c = 'test@test.com', CC_Numero_Oficina__c = '00001');
         insert oficinaGestora;
 
@@ -191,7 +193,6 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void testCcCaseModificarAccountPersonAccountBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
                 
         System.runAs (usuarioOperador) {
@@ -223,7 +224,6 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void testCcCaseModificarAccountPersonAccountBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
 
         Case caso = new Case();
@@ -263,7 +263,6 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void testCcCaseModificarAccountIdentificarClienteAlfBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE RecordType.DeveloperName = 'CC_ClientePA'];
             
         System.runAs (usuarioOperador) {
@@ -434,15 +433,13 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void testCc_Case_Modificar_AccountBlanqueoAccountBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCliente = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
-
         Account cuenta = [SELECT Id,PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
     
         Case caso = new Case();
         caso.Origin = 'Agenda de Riesgos';
         caso.CC_Canal_Procedencia__c = 'Buzón CCI Holabank';
         caso.CC_Tipo_Contacto__c = 'Otros';
-        caso.RecordTypeId = rtCliente;
+        caso.RecordTypeId = rtCaso;
         caso.CC_MailTelfNotif__c = 'mailnotif@mail.com';
         caso.CC_Numero_Documento__c = '45655665P';
         caso.CC_NumPerso__c = '12';
@@ -514,7 +511,6 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void seInformaCanalRespuestaBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         
         System.runAs (usuarioOperador) {
@@ -546,7 +542,6 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void seInformaCanalRespuestaBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
 
         Case caso = new Case();
@@ -587,7 +582,6 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void actualizarAgrupadorAU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
 
         System.runAs (usuarioOperador) {
@@ -619,7 +613,6 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void empleadoCuentaBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
         
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         Account cuenta = [SELECT Id, PersonContactId, CC_Numero_Oficina__c FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         Account cuenta3 = [SELECT Id, PersonContactId FROM Account WHERE Name = 'Parent Gerencia Comercial'];
 
@@ -662,7 +655,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void asociaActivoAU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA' AND LastName = 'asd' LIMIT 1];
         Account cuenta3 = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_Cliente' AND Name = 'cuenta1' LIMIT 1];
 
@@ -703,7 +696,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void tematicaInformadoBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         CC_MCC__c mccTematica = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Tematica' LIMIT 1];
         
@@ -747,7 +740,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void tematicaInformadoBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         CC_MCC__c mccTematica = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Tematica' LIMIT 1];
     
@@ -782,7 +775,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void productoInformadoBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         CC_MCC__c mccProducto = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Producto_Servicio' LIMIT 1];
         CC_MCC__c mccTematica = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Tematica' LIMIT 1];
@@ -828,7 +821,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void productoInformadoBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
         
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         CC_MCC__c mccProducto = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Producto_Servicio' LIMIT 1];
         CC_MCC__c mccTematica = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Tematica' LIMIT 1];
@@ -866,7 +859,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void motivoInformadoBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         CC_MCC__c mccMotivo = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Motivo' LIMIT 1];
         CC_MCC__c mccTematica = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Tematica' LIMIT 1];
@@ -913,7 +906,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void motivoInformadoBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         CC_MCC__c mccMotivo = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Motivo' LIMIT 1];
         CC_MCC__c mccProducto = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Producto_Servicio' LIMIT 1];
@@ -951,7 +944,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void causaInformadoBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         CC_MCC__c mccCausa = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Causa' LIMIT 1];
         
@@ -987,7 +980,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void causaInformadoBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE LastName = 'asd'];
         CC_MCC__c mccCausa = [SELECT Id,CC_Codigo_Externo__c,Name, RecordTypeId, CC_Motivo__c FROM CC_MCC__c WHERE recordType.developerName = 'CC_Causa' LIMIT 1];
         
@@ -1031,7 +1024,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void solucionInformadoBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName = 'CC_ClientePA'];
         CC_MCC__c mccSolucion = [SELECT Id,CC_Codigo_Externo__c,Name  FROM CC_MCC__c WHERE recordType.developerName = 'CC_Solucion' LIMIT 1];
                 
@@ -1065,7 +1058,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void solucionInformadoBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE LastName = 'asd'];
         CC_MCC__c mccSolucion = [SELECT Id,CC_Codigo_Externo__c,Name, RecordTypeId, CC_Motivo__c FROM CC_MCC__c WHERE recordType.developerName = 'CC_Solucion' LIMIT 1];
         CC_MCC__c mccCausa = [SELECT Id,CC_Codigo_Externo__c,Name, RecordTypeId, CC_Motivo__c FROM CC_MCC__c WHERE recordType.developerName = 'CC_Causa' LIMIT 1];
@@ -1110,7 +1103,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void actualizarColaProcedenciaBU() { 
         User usuarioAdmin = OS_Usuarios.usuarioAdmin();
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Group grupo = [SELECT Id, DeveloperName FROM Group WHERE Name = 'Queue_DXC'];
                     
         Case caso = new Case();
@@ -1148,7 +1141,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void informarOficinaAfectadaDetalleBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta3 = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName LIKE 'CC_%' LIMIT 1];
         
         AccountShare acshare = new AccountShare();
@@ -1190,7 +1183,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void informarOficinaAfectadaBI() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName LIKE 'CC_%' LIMIT 1];
 
         System.runAs (usuarioOperador) {
@@ -1223,7 +1216,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void informarOficinaAfectadaBU() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
         Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName  LIKE 'CC_%' LIMIT 1];
         Account cuenta3 = [SELECT Id, PersonContactId FROM Account WHERE recordType.developerName  LIKE 'CC_%' LIMIT 1];
         
@@ -1265,7 +1258,7 @@ public with sharing class OS_CaseTriggerHelper_Test {
     private static void informarCentroManipulador() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        
 
         CC_Grupo_Colaborador__c grupoColaborador = new CC_Grupo_Colaborador__c();
         grupoColaborador.Name = 'Grupo Trabajo Prueba';

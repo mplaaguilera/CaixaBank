@@ -5,7 +5,7 @@ public class OS_Cola_Backup_Test {
     static void cargaDeDatos(){
         User usuarioOperador = OS_Usuarios.usuarioOperador();
 
-        Group testGroup = new Group(Name='CCI Holabank', Type='Queue');
+        Group testGroup = new Group(Name='2N CCI Holabank', Type='Queue');
         insert testGroup;
     
         //Associating queue with group AND to the Case object
@@ -22,7 +22,7 @@ public class OS_Cola_Backup_Test {
 
         Case caso1 = new Case();
         caso1.CC_Idioma__c = 'es';
-        caso1.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso1.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         caso1.Subject = 'Prueba1';
         caso1.Status = 'Activo';
         caso1.Origin = 'Email'; 
@@ -34,7 +34,7 @@ public class OS_Cola_Backup_Test {
 
         Case caso2 = new Case();
         caso2.CC_Idioma__c = 'es';
-        caso2.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso2.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         caso2.Subject = 'Prueba2';
         caso2.Status = 'Activo';
         caso2.Origin = 'Email'; 
@@ -46,7 +46,7 @@ public class OS_Cola_Backup_Test {
 
         Case caso3 = new Case();
         caso3.CC_Idioma__c = 'es';
-        caso3.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso3.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         caso3.Subject = 'Prueba3';
         caso3.Status = 'Activo';
         caso3.Origin = 'Email'; 
@@ -66,11 +66,14 @@ public class OS_Cola_Backup_Test {
             OS_Cola_Backup.cambioPropietario(new List<Id>{usuarioOperador.Id});
             Test.stopTest();
             
-            List<Case> casosActual = [SELECT OwnerId, Owner.Name FROM Case WHERE Id IN :idDeCasos];
+            List<Case> casosActual = [SELECT OwnerId FROM Case WHERE Id IN :idDeCasos];
 
-            System.assertEquals('CCI Holabank', casosActual[0].Owner.Name);
-            System.assertEquals('CCI Holabank', casosActual[1].Owner.Name);
-            System.assertEquals('CCI Holabank', casosActual[2].Owner.Name);
+            User usuarioInfo = [SELECT OS_Cola_Backup__c FROM User WHERE Id =:usuarioOperador.Id AND OS_Cola_Backup__c != NULL AND OS_Inicio_Vigencia_Agente_Backup__c <= TODAY AND OS_Fin_Vigencia_Agente_Backup__c >= TODAY LIMIT 1];
+            Group grupo = [SELECT ID FROM Group WHERE Name =:usuarioInfo.OS_Cola_Backup__c AND Type ='Queue' LIMIT 1];
+
+            System.assertEquals(grupo.Id, casosActual[0].OwnerId, 'No se ha asignado correctamente el grupo al caso');
+            System.assertEquals(grupo.Id, casosActual[1].OwnerId, 'No se ha asignado correctamente el grupo al caso');
+            System.assertEquals(grupo.Id, casosActual[2].OwnerId, 'No se ha asignado correctamente el grupo al caso');
         }
     }
 }

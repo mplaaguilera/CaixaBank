@@ -6,7 +6,13 @@ public with sharing class CC_Account_AU_TRHan extends CC_TriggerHandlerBase {
     public override void mainEntry(CC_TriggerParameters tp) {
 		if(UserInfo.getProfileId() != null ){
         String perfilUtilizado = null;
-		perfilUtilizado = [SELECT Name FROM Profile WHERE Id = :UserInfo.getProfileId()].Name;
+
+		List<Profile> listaPerfilUtilizado = new List<Profile>();
+		listaPerfilUtilizado = [SELECT Name FROM Profile WHERE Id = :UserInfo.getProfileId()];
+		if (!listaPerfilUtilizado.isEmpty() && String.isNotBlank(listaPerfilUtilizado[0].Name)) {
+			perfilUtilizado = listaPerfilUtilizado[0].Name;
+		}
+
 		if(perfilUtilizado != 'SEG_Usuario_CaixaBank'){
 		process((List<Account>)tp.newList, (Map<Id,Account>)tp.oldMap) ;
 		}

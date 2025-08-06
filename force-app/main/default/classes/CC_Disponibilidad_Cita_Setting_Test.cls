@@ -4,69 +4,10 @@ private class CC_Disponibilidad_Cita_Setting_Test {
     static void makeData(){
     
         //crear usuarios
-        Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
-        Id profileAdmin = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
-        Id roleCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center'].Id;
-        Id roleDirectorioCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center_sin_acceso_a_Directorio'].Id;
-        PermissionSet psOperadorCliente = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_Cliente'];
-        PermissionSet psOperadorEmpleado = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO'];
-        PermissionSet psAVGestorOp = [SELECT Id FROM PermissionSet WHERE Name = 'AV_GestorOperativa'];
-        PermissionSet psClasses = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Classes'];
-        List<User> userList = new List<User>();
-        List<PermissionSetAssignment> insertPSAssOperadores = new List<PermissionSetAssignment>();
-        
-        User usuarioAdmin = new User();
-        usuarioAdmin.profileId = profileAdmin;
-        usuarioAdmin.UserRoleId = roleCC;        
-        usuarioAdmin.FirstName = '';
-        usuarioAdmin.LastName = 'Administrador de sistema';
-        usuarioAdmin.Email = 'tuser000@amamama.com';
-        usuarioAdmin.Username = 'tuser000@amama.com' + System.currentTimeMillis();
-        usuarioAdmin.CompanyName = 'MST';
-        usuarioAdmin.Title = 'title';
-        usuarioAdmin.Alias = 'alias';
-        usuarioAdmin.TimeZoneSidKey = 'Europe/Paris';
-        usuarioAdmin.EmailEncodingKey = 'UTF-8';
-        usuarioAdmin.LanguageLocaleKey = 'es';
-        usuarioAdmin.LocaleSidKey = 'es_ES';
-        userList.add(usuarioAdmin);
-        
-        User operadorCliente = new User();
-        operadorCliente.profileId = profileId;
-        operadorCliente.UserRoleId = roleDirectorioCC;
-        operadorCliente.AV_ExternalID__c = 'U0124112';
-        operadorCliente.FirstName = 'Operador';
-        operadorCliente.LastName = 'Operador Cliente';
-        operadorCliente.Email = 'tuser001@amamama.com';
-        operadorCliente.Username = 'tuser001@amamama.com' + System.currentTimeMillis();
-        operadorCliente.CompanyName = 'MST';
-        operadorCliente.Title = 'title';
-        operadorCliente.Alias = 'alias';
-        operadorCliente.TimeZoneSidKey = 'Europe/Paris';
-        operadorCliente.EmailEncodingKey = 'UTF-8';
-        operadorCliente.LanguageLocaleKey = 'es';
-        operadorCliente.LocaleSidKey = 'es_ES';
-        userList.add(operadorCliente);
-
-        insert userList;
-        
-        PermissionSetAssignment psaOperadorCliente = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psOperadorCliente.Id);
-        insertPSAssOperadores.add(psaOperadorCliente);
-
-        PermissionSetAssignment psaOperadorEmpleado = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psOperadorEmpleado.Id);
-        insertPSAssOperadores.add(psaOperadorEmpleado);
-
-        PermissionSetAssignment psaOperadorClasses = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psClasses.Id);
-        insertPSAssOperadores.add(psaOperadorClasses);
-
-        PermissionSetAssignment psaOperadorAV = new PermissionSetAssignment(AssigneeId = operadorCliente.Id, PermissionSetId = psAVGestorOp.Id);
-        insertPSAssOperadores.add(psaOperadorAV);
-
-        PermissionSetAssignment psaAdminAV = new PermissionSetAssignment(AssigneeId = usuarioAdmin.Id, PermissionSetId = psAVGestorOp.Id);
-        insertPSAssOperadores.add(psaAdminAV);
-
-        Database.insert(insertPSAssOperadores);
-
+        Map<String, User> usuarios = CC_TestDataFactory.insertUserAdminOperador('U0124112');
+        User usuarioAdmin = usuarios.get('admin');
+        User operadorCliente = usuarios.get('operador');
+     
         System.runAs(usuarioAdmin) {
             //create custom setting
             List<CC_Settings__c > listCustomSetting= new List<CC_Settings__c >();
@@ -98,7 +39,7 @@ private class CC_Disponibilidad_Cita_Setting_Test {
     @isTest 
     static void checkCitaDisponibilidadSett(){
         
-        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+        System.runAs(CC_TestDataFactory.getUserOperadorCliente()) {
             Map<String, Integer> dateDiff;
             Test.startTest();
                 dateDiff = CC_Disponibilidad_Cita_Setting.getDaysDiff();
@@ -114,7 +55,7 @@ private class CC_Disponibilidad_Cita_Setting_Test {
     @isTest 
     static void checkCitaRapidaOpcionesSett(){
         
-        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+        System.runAs(CC_TestDataFactory.getUserOperadorCliente()) {
             Map<String, String> citaRapidaOpciones;
             Test.startTest();
                 citaRapidaOpciones = CC_Disponibilidad_Cita_Setting.getOptionsCitaRapida();
@@ -130,7 +71,7 @@ private class CC_Disponibilidad_Cita_Setting_Test {
     @isTest 
     static void checkCitaDisponibilidadSettDefault(){
         
-        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
             CC_Settings__c  customSetting = [
                 SELECT CC_Configuracion_1__c, CC_Configuracion_2__c 
                 FROM CC_Settings__c 
@@ -144,7 +85,7 @@ private class CC_Disponibilidad_Cita_Setting_Test {
         }
 
         //run as operador
-        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+        System.runAs(CC_TestDataFactory.getUserOperadorCliente()) {
             Map<String, Integer> dateDiff;
             Test.startTest();
                 dateDiff = CC_Disponibilidad_Cita_Setting.getDaysDiff();

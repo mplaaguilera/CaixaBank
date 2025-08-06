@@ -27,7 +27,6 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
     * 1.0            US977960         Alexandre Perez        05/08/24     Creación     
     *****************************************************************/
     public static void envioReclamacion(list<DocumentsInfo> listaDocumentos, Id recordId){
-        system.debug('***');
         //separador necesario para el método multipart auque se ha pactado enviar documento a documento para minimizar posibles problemas con límites de salesforce,
 
         //String boundary = '----------------------------' + DateTime.now().getTime();
@@ -35,7 +34,6 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
         case reclamacion = [SELECT Id, description, subject, caseNumber FROM case 
                                 WHERE Id = : recordId
                                 WITH SECURITY_ENFORCED];
-		system.debug('***');
         RequestBody requestBody = new RequestBody();
         requestBody.claim.claimId = reclamacion.Id;
         //requestBody.claim.description = reclamacion.description;
@@ -45,11 +43,9 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
         //requestBody.claim.subject = reclamacion.subject;
         //lo pasamos como documentoS
         //requestBody.claim.subject = null;
-		system.debug('***');
         requestBody.attachedDocuments = listaDocumentos;
 
         string requestBodyJSON = JSON.serialize(requestBody);
-        system.debug('***');
         requestBodyJSON = requestBodyJSON.replace('attachedDocuments','AttachedDocuments');
         /*String cabecera =  boundary + crlf +
             'Content-Disposition: form-data; name="file"; filename="' + docu.title + '"' + crlf;
@@ -67,14 +63,9 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
        //Map<String,String> mHeaders2 = new Map<String,String>();
         reqWrapper.mHeaders = mHeaders;
         reqWrapper.body = requestBodyJSON;
-        system.debug('***requestBodyJSON '+requestBodyJSON);
         HttpRequest req =  CBK_HttpServiceIntegration.getRequest(reqWrapper);
-        system.debug('***requestBodyJSON '+requestBodyJSON);
         //req.setBodyAsBlob(bodyBlob);
         HttpResponse resp = CBK_HttpServiceIntegration.callHttpService(req, '', 'SAC_GenialOSEnviarRec');
-        system.debug('*** ' + resp.getStatusCode());
-        system.debug('*** ' + resp.getStatus());
-        system.debug('*** ' + resp.getBody());
         if(resp.getStatusCode() == 204){
             //codigo poner ok la reclamación y marcarla a finalizada
             reclamacion.SAC_GenialEstado__c = 'SAC_001';
@@ -137,10 +128,19 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
         String boundary = '----------------------------' + DateTime.now().getTime();
         String crlf = '\r\n';
         contentVersion docu = [SELECT Id, versionData, FileExtension, title, PathOnClient FROM contentVersion 
-                                WHERE ContentDocumentId = : doculink.ContentDocumentId and IsLatest = true
-                                WITH SECURITY_ENFORCED];
-
-        String pathOnClient = limpiarCaracteresEspeciales(docu.PathOnClient);
+                               WHERE ContentDocumentId = : doculink.ContentDocumentId and IsLatest = true
+                               WITH SECURITY_ENFORCED];
+        
+        String title = docu.Title;
+        if (title.contains('.')) {
+            Integer lastDotIndex = title.lastIndexOf('.');
+            // Si hay un punto en el título, cortamos la extensión
+            if (lastDotIndex != -1) {
+                title = title.substring(0, lastDotIndex); 
+            }
+        }
+        String cleanTitle = limpiarCaracteresEspeciales(title);
+        String pathOnClient =  cleanTitle + '.' + docu.FileExtension;      
         //convertimos la cabecera a binario y luego a hexadecimal para poder concatenarlo con el fichero                        
         /*blob cabecera =  blob.valueOf(boundary + crlf +
             'Content-Disposition: form-data; name="file"; filename="' + docu.title + '"' + crlf);*/
@@ -234,7 +234,6 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
 
     //public static ResponseOK envioBody(Id recordId){
     public static DocumentsInfo envioBody(Id recordId){
-        system.debug('***');
         //separador necesario para el método multipart auque se ha pactado enviar documento a documento para minimizar posibles problemas con límites de salesforce,
 
         String boundary = '----------------------------' + DateTime.now().getTime();
@@ -253,9 +252,7 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
         CBK_HttpServiceIntegration.RequestWapper reqWrapper =  new CBK_HttpServiceIntegration.RequestWapper();
         reqWrapper.intSetting = 'SAC_GenialOSEnviarDoc';
         reqWrapper.mHeaders = mHeaders;
-		system.debug('***reqWrapper '+reqWrapper);
         HttpRequest req =  CBK_HttpServiceIntegration.getRequest(reqWrapper);
-        system.debug('***');
        /*  req.setHeader('boundary', boundary);
         req.setHeader('Content-Disposition', 'form-data');
         req.setHeader('name', 'file');
@@ -266,7 +263,6 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
         //recuperar capacidad de la instancia
         bodyString = null;
         HttpResponse resp = CBK_HttpServiceIntegration.callHttpService(req, '', 'SAC_GenialOSEnviarDoc');
-		system.debug('***resp '+resp +  ' ' + resp.getStatusCode() + ' ' +resp.getBody());
         if(resp.getStatusCode() == 200){    
             //list<responseOK> rOK = (list<responseOK>)JSON.deserialize(resp.getBody(), list<responseOK>.class);
             responseOK rOK = (responseOK)JSON.deserialize(resp.getBody(), responseOK.class);
@@ -406,11 +402,15 @@ public with sharing class SAC_GenialOpenServicesIntegracion {
         input = input.replaceAll('<', ''); // Eliminar símbolo <
         input = input.replaceAll('>', ''); // Eliminar símbolo >
         input = input.replaceAll('\\^', ''); // Eliminar símbolo ^
-        //input = input.replaceAll('\\.', ''); // Eliminar símbolo .
+        input = input.replaceAll('\\.', ''); // Eliminar símbolo .
         input = input.replaceAll(',', ''); // Eliminar símbolo ,
         input = input.replaceAll(':', ''); // Eliminar símbolo :
         input = input.replaceAll(';', ''); // Eliminar símbolo ;
-        
+		
+		// Cortar el título, ya que la IA no admite títulos largos        
+        if (input.length() > 90) {
+            input = input.substring(0, 90);
+        }
         return input;
     }
 }

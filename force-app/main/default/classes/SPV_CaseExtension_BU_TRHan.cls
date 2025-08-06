@@ -19,12 +19,39 @@ public with sharing class SPV_CaseExtension_BU_TRHan extends CC_TriggerHandlerBa
     }
 
     private void process(List<CBK_Case_Extension__c> listNewObj, Map<Id, CBK_Case_Extension__c> mapNewObj, List<CBK_Case_Extension__c> listOldObj, Map<Id, CBK_Case_Extension__c> mapOldObj) {
-
+        //List en la que almacenar aquellas reclamaciones a las que se les debe mandar alertas sobre cambios en la fecha de prórroga
+        List<CBK_Case_Extension__c> listRecAlertasProrroga = new List<CBK_Case_Extension__c>();
+        
         //Llamar al método del helper para filtrar y obtener los casos
         List<CBK_Case_Extension__c> listaCaseExtSPV = SPV_CaseExtensionHelper.filtrarCasosSPV(listNewObj);
 
-        /*if(!listaCaseExtSPV.isEmpty()){
+        //Se recupera el grupo para utilizar como cola
+        Group cola;
+        List<Group> listaColas = [SELECT Id, DeveloperName, Name
+                                  FROM Group
+                                  WHERE Type = 'Queue'
+                                  AND DeveloperName = 'SPV_PendienteAsignar'];
+        if(!listaColas.isEmpty()){
+            for(Group grupoAux : listaColas) {
+                if(grupoAux.DeveloperName == 'SPV_PendienteAsignar'){
+                    cola = grupoAux;
+                }
+            }
+        }
 
-        }*/
+        //Se procesan las Case Extensions
+        if(!listaCaseExtSPV.isEmpty()){
+            for(CBK_Case_Extension__c oCaseExtension : listaCaseExtSPV){
+                //Se comprueba si se debe enviar alerta para esa reclamación por anulación de prórroga
+                if(mapOldObj.containsKey(oCaseExtension.Id) && mapOldObj.get(oCaseExtension.Id).SPV_FechaAnulacionProrroga__c != oCaseExtension.SPV_FechaAnulacionProrroga__c){
+                    listRecAlertasProrroga.add(oCaseExtension);
+                }
+            }
+
+            //En el caso de que se hayan encontrado reclamaciones a las que enviar sus Alertas sobre cambio de fecha de prórroga, se procesan
+            if(!listRecAlertasProrroga.isEmpty()){
+                SPV_CaseExtensionHelper.comprobarAlertasProrroga(listRecAlertasProrroga, cola);
+            }
+        }
     }
 }

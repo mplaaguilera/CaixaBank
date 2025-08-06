@@ -237,7 +237,19 @@ export default class kin_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 					estadoConsulta: 'consulta',
 					agenteDestinoId: USER_ID
 				};
+			} else if (nombreMetodoApex === 'completarConsulta') {
+				//Si el negocio es CC se pasa a Genesys el id de la llamada transferida
+				if (retornoApex !== null && 
+					retornoApex !== undefined && 
+					retornoApex.negocioServicio === 'CC' && 
+					retornoApex.llamadaId !== null && 
+					retornoApex.llamadaId !== undefined ) {
+					nuevosCustomAttributes = {
+						llamadaId: retornoApex.llamadaId
+					};
+				}
 			}
+		
 			if (nuevosCustomAttributes) {
 				await this.addCustomAttributes(nuevosCustomAttributes);
 			}

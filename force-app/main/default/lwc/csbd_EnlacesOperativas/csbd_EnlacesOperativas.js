@@ -5,7 +5,7 @@ import getRegistroRelacionado from '@salesforce/apex/CSBD_EnlacesOperativasContr
 import informarSLA from '@salesforce/apex/CSBD_EnlacesOperativasController.informarSLA';
 
 import OPP_ACCOUNT_ID from '@salesforce/schema/Opportunity.AccountId';
-import OPP_ACCOUNT_NUMPERSO from '@salesforce/schema/Opportunity.Account.CC_NumPerso__c';
+import OPP_CONTACT_NUMPERSO from '@salesforce/schema/Opportunity.CSBD_Contact__r.AV_NumPerso__c';
 import OPP_ACCOUNT_NUMDOC from '@salesforce/schema/Opportunity.Account.CC_Numero_Documento__c';
 import OPP_ACCOUNT_FIRSTNAME from '@salesforce/schema/Opportunity.Account.FirstName';
 import OPP_ACCOUNT_LASTNAME from '@salesforce/schema/Opportunity.Account.LastName';
@@ -20,7 +20,7 @@ import OPP_ANONIMIZADA from '@salesforce/schema/Opportunity.CSBD_Anonimizada__c'
 
 const OPP_FIELDS_GETRECORD = [
 	OPP_ACCOUNT_ID,
-	OPP_ACCOUNT_NUMPERSO,
+	OPP_CONTACT_NUMPERSO,
 	OPP_ACCOUNT_NUMDOC,
 	OPP_ACCOUNT_FIRSTNAME,
 	OPP_ACCOUNT_LASTNAME,
@@ -112,7 +112,7 @@ export default class csbdEnalacesOperativas extends LightningElement {
 
     substituirParametros(url) {
     	return url
-			.replace('@@@numperso@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_NUMPERSO) ?? '@@@ERROR@@@')
+			.replace('@@@numperso@@@', getFieldValue(this.oportunidad, OPP_CONTACT_NUMPERSO) ?? '@@@ERROR@@@')
 			.replace('@@@nif@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_NUMDOC) ?? '@@@ERROR@@@')
 			.replace('@@@firstName@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_FIRSTNAME) ?? '@@@ERROR@@@')
 			.replace('@@@lastName@@@', getFieldValue(this.oportunidad, OPP_ACCOUNT_LASTNAME) ?? '@@@ERROR@@@')

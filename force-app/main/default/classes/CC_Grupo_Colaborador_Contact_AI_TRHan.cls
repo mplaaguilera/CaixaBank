@@ -13,8 +13,10 @@ public without sharing class CC_Grupo_Colaborador_Contact_AI_TRHan extends CC_Tr
 		if (!System.isFuture() && !System.isBatch()){
         	crearQueue(idsGrupoColaboradorContact);
         }
+
+        updateGrupoColaboradorContact(idsGrupoColaboradorContact);
     }
-    
+
     @future(callout=true)
     public static void crearQueue(Set<Id> idsGrupoColaboradorContact) {
 
@@ -83,4 +85,41 @@ public without sharing class CC_Grupo_Colaborador_Contact_AI_TRHan extends CC_Tr
             }
         }
     }    
+
+    public static void updateGrupoColaboradorContact(Set<Id> idsGrupoColaboradorContact){
+
+        List<CC_Grupo_Colaborador_Contact__c> contactos = [
+            SELECT Id,
+                   CC_Usuario__c,
+                   CC_Grupo_Colaborador__r.OS_Negocio__c,
+                   CC_Grupo_Colaborador__r.RecordType.DeveloperName
+            FROM CC_Grupo_Colaborador_Contact__c
+            WHERE Id IN :idsGrupoColaboradorContact
+        ];
+
+        //List of user to add to the queue
+        List<Id> usersId = new List<Id>();
+
+        for (CC_Grupo_Colaborador_Contact__c contact : contactos) {
+            Boolean meetConditions = 
+                contact.CC_Usuario__c != null &&
+                contact.CC_Grupo_Colaborador__r != null &&
+                contact.CC_Grupo_Colaborador__r.OS_Negocio__c == 'CC' &&
+                contact.CC_Grupo_Colaborador__r.RecordType.DeveloperName != null &&
+                contact.CC_Grupo_Colaborador__r.RecordType.DeveloperName.contains('CC_');
+
+            if (meetConditions) {
+                usersId.add(contact.id);
+            } 
+           
+        }
+
+        if(!usersId.isEmpty()){
+
+            CC_Grupo_Colaborador_Contact_Anadir.anadirUsuario(usersId);
+
+        }
+           
+  }
+
 }

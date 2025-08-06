@@ -134,7 +134,7 @@
                 <componentName>cc_Formulario_Tarea</componentName>
                 <identifier>c_cc_Formulario_Tarea</identifier>
                 <visibilityRule>
-                    <booleanFilter>1 OR 2 OR 3</booleanFilter>
+                    <booleanFilter>1 OR 2 OR 3 OR 4</booleanFilter>
                     <criteria>
                         <leftValue>{!Record.Type}</leftValue>
                         <operator>EQUAL</operator>
@@ -149,6 +149,11 @@
                         <leftValue>{!Record.Type}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>Cita gestor</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.Type}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Cobrowsing</rightValue>
                     </criteria>
                 </visibilityRule>
             </componentInstance>

@@ -124,7 +124,7 @@ public with sharing class SAC_ParametrizacionSLATME_BU_Test {
         System.runAs(usuario){
             List<SAC_ParametrizacionSLATME__c> listaUpdate = new List<SAC_ParametrizacionSLATME__c>();
 
-            parametrizacion.SAC_Estados__c  = 'SAC_001;SAC_002;SAC_003;SAC_004;SAC_006;SAC_007';
+            parametrizacion.SAC_Estados__c  = 'SAC_001;SAC_002;SAC_003;SAC_004;SAC_006;SAC_007;SPV_ENVIO;SPV_ENVIOCOMPLEMENTARIA;SPV_RECEPCIONRESOLUCION;SPV_ANALISISCOMPLEMENTARIAORGANISMO;SPV_ANALISISDECISION;SPV_RECTIFICACION;SPV_ENVIORECTIFICACION';
             parametrizacion.SAC_CanalProcedencia__c = 'Junta Andalucia';
             listaUpdate.add(parametrizacion);
 

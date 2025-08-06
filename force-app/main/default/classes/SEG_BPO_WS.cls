@@ -5,7 +5,7 @@ public with sharing class SEG_BPO_WS {
 •	Respuesta alta/modificación de cliente (Código S03)
 
     */
-    public static void enviarCaso(String casoId,String tipoProceso,String notasCif, List<String> listaFicheros)
+    public static String enviarCaso(String casoId,String tipoProceso,String notasCif, List<String> listaFicheros)
     {
         /*SEG_cbpo038.consultav2 mensaje = new SEG_cbpo038.consultav2();
         mensaje.tipoProceso='S01';
@@ -20,6 +20,7 @@ public with sharing class SEG_BPO_WS {
         SEG_cbpo038.ConsultarRequestv2 consultaRequestV2 = new SEG_cbpo038.ConsultarRequestv2();
         consultaRequestV2.Consulta=mensaje;
         wsSBL.Recepcion(consultaRequestV2);  */
+        String resultadoBPO = '';
         CC_InterfaceSettings__mdt oConfig = CC_MetodosUtiles.getInterfazConfigBody ('SEG_CBPO_config');
         String certBPO = oConfig.CC_Certificado__c;
         List<Case> listCasos = new List<Case>();
@@ -165,15 +166,15 @@ public with sharing class SEG_BPO_WS {
                 String sDescError = '';
                 String sDetalleError = '';
                     
-                    // Generar traza.
-                    oTraza = new CC_TrazaInt__c();
-                    oTraza.Name = 'CBPO_Segmentos';
-                    oTraza.CC_FechaInicio__c = datetime.now();
+                // Generar traza.
+                oTraza = new CC_TrazaInt__c();
+                oTraza.Name = 'CBPO_Segmentos';
+                oTraza.CC_FechaInicio__c = datetime.now();
+                oTraza.CC_MensajeEntrada__c = String.valueOf(mensaje);
 
                 if (!Test.isRunningTest()){
                     try {
-                        string resultadoBPO = comunicacionws.Recepcion(receptor);
-                        oTraza.CC_MensajeEntrada__c = String.valueOf(mensaje);
+                        resultadoBPO = comunicacionws.Recepcion(receptor);
                         oTraza.CC_MensajeSalida__c = resultadoBPO;
                         oTraza.CC_FechaFin__c = datetime.now();
                         oTraza.CC_FinOK__c = true;
@@ -194,6 +195,8 @@ public with sharing class SEG_BPO_WS {
 
             }
         } 
+
+        return resultadoBPO;
     }
     @future(callout=true)
     public static void actualizarCaso(String casoId,String tipoProceso)

@@ -314,6 +314,7 @@ global with sharing class CSBD_WS_AltaOportunidad_Input {
         global String solucion {get;set;}
         global String detallesConsulta {get;set;}
         global String detallesSolucion {get;set;}
+        global String indicadoresCliente {get;set;}
 
         global String casoOrigen {get;set;}
         global String accountId {get;set;}

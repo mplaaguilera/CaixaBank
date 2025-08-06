@@ -111,6 +111,13 @@ VERSION  USER_STORY   AUTHOR        	 DATE        	 Description
 12.4    PPM100205278   Elisabeth R.      22/05/2024      Added fillSubState and blankSubState methods
 12.5    PPM100130465   Sandra Gómez      30/07/2024		 Change metohds updateCommentsHistory and byPassOpp to add parameter mapByPassOld
 12.6	PPM100265161   Sandra Gómez		 11/10/2024		 Change method updateGCF and byPassOpp to add filter DATAPIPELINES_ORIGENAPP
+12.7	FIX2711743	   Sandra Gómez		 04/12/2024		 Change method fillFieldsFrom to control null
+12.8	PPM100695616   Sandra Gómez		 16/01/2024		 Change methods validationsOpportunity and byPassOpp to add new origen AV_FlowChangeStage
+12.9	PPM101492955   Luis Fernández	 21/01/2025		 Modified updateCentro method to do not updateCenter if new owner is a pool user
+13.1	CDP MC		   Manuel Ramos	 	 16/02/2025		 New Method callCDPOppFeedback to send Feedback to Adobe when CDP originated Opp change stage.
+13.2	PPM101645696   Lucía Muñoz		 11/03/2025		 Update updateCentro method
+13.3	PPM101645696   Fernando Llorente 01/04/2025		 New method 'setOldEmployee' has been created to keep the old user in a opp in the case it changes
+13.4	IN1291650	   Sandra Gómez 	 24/06/2025		 Change method validatePF to no change externalId if RT CallMe
 ***********************************************************************************************************************/
 public with sharing class AV_OpportunityTriggerHelper {
 	private static final String SUFFIX_EXTERNALID     = 'Opp-';
@@ -1038,7 +1045,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 						if(closedStatusInitiativeRT.contains(opp.stageName) && opp.RecordType.DeveloperName == AV_AppConstants.OPPINICIATIVA_RT){
 							String oppVigente = string.valueOf(opp.AV_PF__c) + string.valueOf(opp.AccountId);
 							Opportunity opportunityNew = mapNew.get(oppVigente);
-							if(opportunityNew != null){
+							if(opportunityNew != null && !setRtCallMe.contains(opportunityNew.RecordTypeId)){
 								String stringSystemModStamp = string.valueOfGmt(opp.SystemModStamp);				
 								for(Opportunity existentOppo : accProdListOpp.get(oppVigente)){								
 									if(opp.AV_ExternalID__c != null && !opp.AV_ExternalID__c.contains(bigdot)){
@@ -1206,7 +1213,9 @@ public with sharing class AV_OpportunityTriggerHelper {
 	public static void fillFieldsFromOpp(List<Opportunity> listNews ){
 		Date createdFormatDate = system.today();
 		for(Opportunity opp: listNews){
-			opp.AV_FechaAlta__c = createdFormatDate;
+			if (opp.AV_FechaAlta__c == null) {
+				opp.AV_FechaAlta__c = createdFormatDate;
+			}
 		}
 	}
 	
@@ -1266,7 +1275,9 @@ public with sharing class AV_OpportunityTriggerHelper {
 					}
 					if(!isUpdate){
 						oppToProcess.AV_FechaAlta__c = dt;
-						oppToProcess.AV_EmpleadoAlta__c = idContactUser;
+						if(idContactUser != null){
+							oppToProcess.AV_EmpleadoAlta__c = idContactUser;
+						}
 						if(setRtIniciativa.contains(oppToProcess.RecordTypeId)) {
 							oppToProcess.AV_FechaModificacion__c = dt;   
 							if(!currentUserContact.isEmpty()){
@@ -1435,16 +1446,18 @@ public with sharing class AV_OpportunityTriggerHelper {
 		Set<Id> owners = new Set<Id>();
 		List<Opportunity> oppToProcess = new List<Opportunity>();
 		String offiNumber='';
+		Map<Id,User> relevantUsers = new Map<Id,User>( [SELECT Id,Profile.Name,Alias,AV_ExternalID__c FROM User WHERE  AV_ExternalId__c LIKE 'U01BPA%'  ]);//Invocamos al usuario para owners sin EAP
+		Set<Id> poolUsers = relevantUsers.keySet();
 		if(mapOldObj != null && !mapOldObj.isEmpty()){//Updating existint opp
 			for(Opportunity opp : listOpp){
-				if(opp.OwnerId != mapOldObj.get(opp.Id).OwnerId){
+				if(opp.OwnerId != mapOldObj.get(opp.Id).OwnerId && (poolUsers.isEmpty() || (!poolUsers.isEmpty() && !poolUsers.contains(opp.OwnerId))) ){
 					owners.add(opp.OwnerId);
 					oppToProcess.add(opp);        
 				}      
 			}
 		} else{
 			for(Opportunity opp : listOpp){
-				if(setRtIniciativa.contains(opp.RecordTypeId) || setRtAlerta.contains(opp.RecordTypeId)){
+				if((setRtIniciativa.contains(opp.RecordTypeId) || setRtAlerta.contains(opp.RecordTypeId)) && (poolUsers.isEmpty() || (!poolUsers.isEmpty() && !poolUsers.contains(opp.OwnerId)))){
 					owners.add(opp.OwnerId);
 					oppToProcess.add(opp);        
 				}      
@@ -1810,7 +1823,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 		Boolean hasByPassValidationRulesCbk = FeatureManagement.checkPermission('CBK_BypassValidationRules');
 		for(Opportunity o : listNew) {
 			if (mapOld != null) { //Update
-				if ((mapOld.get(o.Id).StageName != AV_AppConstants.OPP_STATUS_POTENCIAL && o.StageName != AV_AppConstants.OPP_STATUS_ENGESTION && o.AV_FechaProximoRecordatorio__c == mapOld.get(o.Id).AV_FechaProximoRecordatorio__c) && (!o.StageName.equalsIgnoreCase(mapOld.get(o.Id).StageName) && !AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.CLIENT_REPORT_ORIGENAPP.equals(o.AV_OrigenApp__c) && !AV_AppConstants.OPP_ORIGEN_BACK_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c))) {
+				if ((mapOld.get(o.Id).StageName != AV_AppConstants.OPP_STATUS_POTENCIAL && o.StageName != AV_AppConstants.OPP_STATUS_ENGESTION && o.AV_FechaProximoRecordatorio__c == mapOld.get(o.Id).AV_FechaProximoRecordatorio__c) && (!o.StageName.equalsIgnoreCase(mapOld.get(o.Id).StageName) && !AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.CLIENT_REPORT_ORIGENAPP.equals(o.AV_OrigenApp__c) && !AV_AppConstants.OPP_ORIGEN_BACK_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && !AV_AppConstants.FLOWCHANGESTAGE_ORIGENAPP.equals(o.AV_OrigenApp__c))) {
 					o.addError(Label.AV_ValidateOppToEditOppUseButt	);
 				}
 				if (o.CloseDate != o.AV_FechaProximoRecordatorio__c && o.CloseDate != mapOld.get(o.Id).CloseDate && (!AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.CLIENT_REPORT_ORIGENAPP.equals(o.AV_OrigenApp__c) && !AV_AppConstants.OPP_ORIGEN_BACK_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c))){
@@ -1879,6 +1892,9 @@ public with sharing class AV_OpportunityTriggerHelper {
 				}
 				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.DATAPIPELINES_ORIGENAPP){
 					o.AV_OrigenApp__c = AV_AppConstants.DATAPIPELINES_ORIGENAPP.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
+				}
+				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.FLOWCHANGESTAGE_ORIGENAPP){
+					o.AV_OrigenApp__c = AV_AppConstants.FLOWCHANGESTAGE_ORIGENAPP.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
 				}
 			} else {
 				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && (o.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_BACK_REPORT || o.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_SF_REPORT || o.AV_OrigenApp__c == AV_AppConstants.CLIENT_REPORT_ORIGENAPP || o.AV_OrigenApp__c == AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP)){
@@ -2022,5 +2038,57 @@ public with sharing class AV_OpportunityTriggerHelper {
 		}
 	}
 
+	/**
+	* @description     Callout or Batch to Adobe CDP with feedback about CDP Opportunities created or Stage changed
+	* @param  listNew  list of new Opportunities 
+	* @param  mapOld   map of old Opportunities 
+	**/
+	/*public static void callCDPOppFeedback(List<Opportunity> listNew, Map<Id, Opportunity> mapOld) {
+		List<Opportunity> feedbackOpps = new List<Opportunity>();
 
+		for (Opportunity o : listNew) {
+			if (setRtAlerta.contains(o.RecordTypeId) && o.EV_JourneyId__c != null && (mapOld == null || (mapOld != null && mapOld.get(o.Id).StageName != o.StageName))) {
+				feedbackOpps.add(o);
+			}
+		}
+		if (!feedbackOpps.isEmpty()) {
+			AsyncOptions options = new AsyncOptions();
+			options.DuplicateSignature = System.QueueableDuplicateSignature.Builder()
+                .addId(UserInfo.getUserId())
+				.addString(String.valueOf(Datetime.Now().getTime()))
+                .build();
+				try {
+					System.enqueueJob(new AV_CDPOpportunityFeedback_Queueable(feedbackOpps), options);
+				} catch (DuplicateMessageException ex) {
+					CBK_Log.error(ex);
+				}
+		}
+	}*/
+
+	public static void setOldEmployee(Map<Id, Opportunity> oldMap, List<Opportunity> newList){
+		
+		Set<Id> oldOwnerIds = new Set<Id>();
+		List<Opportunity> changeOpp = new List<Opportunity>();
+
+        for (Opportunity opp : newList) {
+            if (oldMap.get(opp.Id) != null && oldMap.get(opp.Id).OwnerId != opp.OwnerId) {
+                oldOwnerIds.add(oldMap.get(opp.Id).OwnerId);
+				changeOpp.add(opp);
+            }
+        }
+        Map<Id, String> oldUserExternalIds = new Map<Id, String>();
+        if (!oldOwnerIds.isEmpty()) {
+			List <User> listUser = [SELECT Id, AV_ExternalId__c FROM User WHERE Id IN :oldOwnerIds];
+			if(listUser != null && !listUser.isEmpty()){
+				for (User u : listUser) {
+					oldUserExternalIds.put(u.Id, u.AV_ExternalId__c);
+				}
+				for (Opportunity opp : changeOpp) {	
+					if (oldUserExternalIds.get(oldMap.get(opp.Id).OwnerId) != null) {
+						//opp.AV_OldEmployee__c = oldUserExternalIds.get(oldMap.get(opp.Id).OwnerId);
+					}	
+				}
+			}
+        }  
+	}
 }

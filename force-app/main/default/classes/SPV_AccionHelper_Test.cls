@@ -90,7 +90,6 @@ public with sharing class SPV_AccionHelper_Test {
             Database.insert(listaColaboradores);
         }
 
-        List<Case> listaReclamaciones = new List<Case>();
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
         camposRecl.put('Subject', 'TestRec');
@@ -183,7 +182,15 @@ public with sharing class SPV_AccionHelper_Test {
 
         System.runAs(usuarioAdmin){
             Database.insert(tareas);
-            }
+
+            //Maestro temas
+            SAC_MaestroTemas__c maestroTema = new SAC_MaestroTemas__c();
+            maestroTema.Name = 'Test SPV_EjecutorTarea';
+            maestroTema.RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SPV_EjecutorTarea').getRecordTypeId();
+            maestroTema.SAC_DeveloperName__c = 'SPV_EjecutorTarea_Maestro_Test';
+            maestroTema.SAC_Activo__c = true;
+            SPV_DatabaseDML.insertDML(maestroTema, true);
+        }
 
         Test.stopTest();
     }
@@ -236,6 +243,8 @@ public with sharing class SPV_AccionHelper_Test {
         Test.startTest();
 
         System.runAs(usuario) {
+            tarea.SAC_Antecedentes_Revisados__c = true;
+            tarea.SPV_DiferenciaImportes__c = 'test';
             tarea.SAC_Estado__c = 'SAC_Finalizada';
             Database.update(tarea);
         }
@@ -253,29 +262,14 @@ public with sharing class SPV_AccionHelper_Test {
         Test.startTest();
 
         System.runAs(usuario) {
+            tarea.SAC_Antecedentes_Revisados__c = true;
+            tarea.SPV_DiferenciaImportes__c = 'test';
             tarea.SAC_Estado__c = 'SAC_Finalizada';
             Database.update(tarea);
         }
 
         SAC_TMECaso__c tmeResult = [SELECT Id, SAC_FechaFin__c FROM SAC_TMECaso__c WHERE SAC_Accion__c = :tarea.Id LIMIT 1];
         Assert.areNotEqual(null, tmeResult.SAC_FechaFin__c, 'no se finalizado el tme');
-        Test.stopTest();
-    }
-
-    @isTest
-    static void comprobarTareasFinalizadasTest() {
-        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        SAC_Accion__c tarea = [SELECT Id, Name, OwnerId, SAC_EquipoResponsable__c,SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea1' LIMIT 1];
-       
-        Test.startTest();
-
-        System.runAs(usuario) {
-            tarea.SAC_Estado__c = 'SAC_Finalizada';
-            Database.update(tarea);
-        }
-
-        Case reclamacionResult = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec3' LIMIT 1];
-        Assert.areEqual('Cerrado', reclamacionResult.Status, 'no se ha cerrado la reclamación');
         Test.stopTest();
     }
 
@@ -339,7 +333,7 @@ public with sharing class SPV_AccionHelper_Test {
         Test.startTest();
 
         System.runAs(usuario) {
-            tarea.SAC_FechaVencimientoProrroga__c = Date.today().addDays(7);
+            tarea.SAC_FechaVencimientoProrroga__c = CBK_UtilsDate.todayDT().addDays(7);
             Database.update(tarea);
         }
 
@@ -352,12 +346,14 @@ public with sharing class SPV_AccionHelper_Test {
     static void cambioValorPicklistTerceroTest() {
         User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
         SAC_Accion__c tarea = [SELECT Id, SAC_FechaTentativa__c FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea1' LIMIT 1];
+        SAC_MaestroTemas__c maestro = [SELECT Id FROM SAC_MaestroTemas__c WHERE SAC_DeveloperName__c = 'SPV_EjecutorTarea_Maestro_Test' LIMIT 1];
 
         Test.startTest();
 
         System.runAs(usuario) {
             tarea.SAC_Tercero__c = 'Otros';
-            tarea.SAC_FechaTentativa__c = Date.today().addDays(2);
+            tarea.SPV_EjecucionPendienteDe__c = maestro.Id;
+            tarea.SAC_FechaTentativa__c = CBK_UtilsDate.todayDT().addDays(2);
             Database.update(tarea);
             tarea.SAC_Tercero__c = null;
             Database.update(tarea);
@@ -376,7 +372,7 @@ public with sharing class SPV_AccionHelper_Test {
         Test.startTest();
 
         System.runAs(usuario) {
-            tarea.SAC_FechaVencimientoProrroga__c = Date.today().addDays(7);
+            tarea.SAC_FechaVencimientoProrroga__c = CBK_UtilsDate.todayDT().addDays(7);
             Database.update(tarea);
         }
 
@@ -427,7 +423,6 @@ public with sharing class SPV_AccionHelper_Test {
     @isTest
     static void insertarAccionesReclamacionTest() {
         User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        SAC_Accion__c tarea = [SELECT Id FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea1' LIMIT 1];
         Case reclamacion = [SELECT Id, CC_Importe_Abonado__c, SAC_Importe_Resuelto__c FROM Case WHERE Subject = 'TestRec3' LIMIT 1];
         SAC_MaestroAccionesReclamacion__c mAccionesRec = [SELECT Id, SAC_Descripcion__c, SAC_EquipoResponsable__c, SAC_PlazoMaximo__c, SAC_Prorroga__c FROM SAC_MaestroAccionesReclamacion__c WHERE Name = 'NombreTareaTest0' LIMIT 1];
 
@@ -459,7 +454,6 @@ public with sharing class SPV_AccionHelper_Test {
     @isTest
     static void accionComprobarOwnerYStatusTest() {
         User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        SAC_Accion__c tarea = [SELECT Id FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea1' LIMIT 1];
         Case reclamacion = [SELECT Id, CC_Importe_Abonado__c, SAC_Importe_Resuelto__c FROM Case WHERE Subject = 'TestRec3' LIMIT 1];
         SAC_MaestroAccionesReclamacion__c mAccionesRec = [SELECT Id, SAC_Descripcion__c, SAC_EquipoResponsable__c, SAC_PlazoMaximo__c, SAC_Prorroga__c FROM SAC_MaestroAccionesReclamacion__c WHERE Name = 'NombreTareaTest0' LIMIT 1];
 
@@ -488,39 +482,8 @@ public with sharing class SPV_AccionHelper_Test {
     }
 
     @isTest
-    static void tareaReclamacionCerradaTest() {
-        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        SAC_Accion__c tarea = [SELECT Id FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea1' LIMIT 1];
-        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec3' LIMIT 1];
-        SAC_MaestroAccionesReclamacion__c mAccionesRec = [SELECT Id, SAC_Descripcion__c, SAC_EquipoResponsable__c, SAC_PlazoMaximo__c, SAC_Prorroga__c FROM SAC_MaestroAccionesReclamacion__c WHERE Name = 'NombreTareaTest0' LIMIT 1];
-
-        Test.startTest();
-
-        System.runAs(usuario) {
-            reclamacion.Status = 'Cerrado';
-            Database.update(reclamacion);
-
-            SAC_Accion__c tareaInsert = new SAC_Accion__c();
-            tareaInsert.SAC_Observaciones__c = 'tareaTest';
-            tareaInsert.SAC_PlazoMaximo__c = 10;
-            tareaInsert.SAC_Prorroga__c = 5;
-            tareaInsert.OwnerId = usuario.id;
-            tareaInsert.SAC_MaestroAccionesReclamacion__c = mAccionesRec.Id;
-            tareaInsert.SAC_Reclamacion__c = reclamacion.Id;
-            tareaInsert.RecordTypeId = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SPV_MaestroDeTareas').getRecordTypeId();
-            Database.insert(tareaInsert);
-
-        }
-
-        Case reclamacionResult = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec3' LIMIT 1];
-        Assert.areNotEqual(reclamacion.Status, reclamacionResult.Status, 'no se ha reabierto la reclamación');
-        Test.stopTest();
-    }
-
-    @isTest
     static void crearThreadIdTest() {
         User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        SAC_Accion__c tarea = [SELECT Id FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea1' LIMIT 1];
         Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec3' LIMIT 1];
         SAC_MaestroAccionesReclamacion__c mAccionesRec = [SELECT Id, SAC_Descripcion__c, SAC_EquipoResponsable__c, SAC_PlazoMaximo__c, SAC_Prorroga__c FROM SAC_MaestroAccionesReclamacion__c WHERE Name = 'NombreTareaTest0' LIMIT 1];
 
@@ -530,9 +493,6 @@ public with sharing class SPV_AccionHelper_Test {
             mAccionesRec.Name = 'GENERAL PARA OFICINAS';
             mAccionesRec.SAC_DeveloperName__c = 'SPV_GENERALOFICINAS';
             Database.update(mAccionesRec);
-
-            reclamacion.Status = 'Cerrado';
-            Database.update(reclamacion);
 
             SAC_Accion__c tareaInsert = new SAC_Accion__c();
             tareaInsert.SAC_Observaciones__c = 'tareaTest';
@@ -553,7 +513,6 @@ public with sharing class SPV_AccionHelper_Test {
     @isTest
     static void automatizarCasoAplicaTareaDelTest() {
         User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        SAC_Accion__c tarea = [SELECT Id FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea1' LIMIT 1];
         Case reclamacion = [SELECT Id, SAC_NoAplicaTareas__c FROM Case WHERE Subject = 'TestRec3' LIMIT 1];
         SAC_MaestroAccionesReclamacion__c mAccionesRec = [SELECT Id, SAC_Descripcion__c, SAC_EquipoResponsable__c, SAC_PlazoMaximo__c, SAC_Prorroga__c FROM SAC_MaestroAccionesReclamacion__c WHERE Name = 'NombreTareaTest0' LIMIT 1];
 
@@ -610,12 +569,40 @@ public with sharing class SPV_AccionHelper_Test {
         Test.startTest();
 
         System.runAs(usuario) {
+            tarea.SAC_Antecedentes_Revisados__c = true;
+            tarea.SPV_DiferenciaImportes__c = 'test';
             tarea.SAC_Estado__c = 'SAC_Finalizada';
             Database.update(tarea);
         }
 
         SAC_Accion__c tarearesult = [SELECT Id, SAC_Estado__c FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea3' LIMIT 1];
         Assert.areEqual(tarea.SAC_Estado__c, tarearesult.SAC_Estado__c, 'no se ha finalizado la tarea');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void comprobarTareaFinalizadaTest() {
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        SAC_Accion__c tarea = [SELECT Id, SAC_ProrrogaCounter__c FROM SAC_Accion__c WHERE SAC_Observaciones__c='tarea1' LIMIT 1];
+        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+        String estadoInicial = reclamacion.Status;
+
+        SAC_MaestroAccionesReclamacion__c mAccionesRec = [SELECT Id, SAC_Descripcion__c, SAC_EquipoResponsable__c, SAC_PlazoMaximo__c, SAC_Prorroga__c FROM SAC_MaestroAccionesReclamacion__c WHERE Name = 'NombreTareaTest0' LIMIT 1];
+        mAccionesRec.SAC_tipo_formulario__c = 'Cambio de estado';
+        mAccionesRec.SPV_EstadoAlFinalizar__c = 'Descartado';
+        SPV_DatabaseDML.updateDML(mAccionesRec, true);
+
+        Test.startTest();
+            System.runAs(usuario) {
+                tarea.SAC_MaestroAccionesReclamacion__c = mAccionesRec.Id;
+                tarea.SAC_Antecedentes_Revisados__c = true;
+                tarea.SPV_DiferenciaImportes__c = 'test';
+                tarea.SAC_Estado__c = 'SAC_Finalizada';
+                SPV_DatabaseDML.updateDML(tarea, true);
+            }
+
+            Case reclamacionF = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+            Assert.areEqual(estadoInicial, reclamacionF.Status, 'no se ha cambiado de estado la reclamacion');
         Test.stopTest();
     }
 }

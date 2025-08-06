@@ -115,27 +115,6 @@ public with sharing class CC_Push_SMS {
                     tarea.Subject = 'Envío de notificación al número ' + mensaje.destinatario;
                     tarea.Description = cuerpo;
                     tareasCasos.add(tarea);
-                } else if (mensaje.sObjectId.getSobjectType() == Schema.Opportunity.getSObjectType()) {
-                    //Tareas de oportunidades (CSBD): el RT de las tareas de CSBD es el mismo que para CC
-                    CSBD_Activity.crearActividad(
-                        mensaje.sObjectId,
-                        String.isNotBlank(mensaje.tipoTarea) ? mensaje.tipoTarea : 'Notificación - Salida',
-                        'Completed',
-                        String.isNotBlank(mensaje.asuntoTarea) ? mensaje.asuntoTarea : 'Envío de notificación al número ' + mensaje.destinatario,
-                        mensaje.texto
-                    );
-                } else if (mensaje.sObjectId.getSobjectType() == Schema.CC_Llamada__c.getSObjectType()) {
-                    prefijoRT = [SELECT RecordType.DeveloperName FROM CC_Llamada__c
-                                    WHERE Id = :mensaje.sObjectId].RecordType.DeveloperName.substringBefore('_');
-                    if (prefijoRT == 'OB') {
-                        //Llamada Outbound
-                        Map<String, Object> camposTarea = new Map<String, Object>();
-                        camposTarea.put('Type', 'Envío de SMS');
-                        camposTarea.put('Subject', 'Envío de SMS a ' + mensaje.destinatario);
-                        camposTarea.put('Description', cuerpo);
-                        camposTarea.put('Status', 'Completed');
-                        OB_Activity.crearActividad(mensaje.sObjectId, camposTarea);
-                    }
                 }
             }
         }

@@ -23,7 +23,7 @@ export default class Spv_InsertarEscalado extends NavigationMixin(LightningEleme
     @track modalInsertarEscalado = false;
     @track isModalAdjuntos = false;
     @track modalWarning = false;
-    @track isEstadoEscalado = false;
+    //@track isEstadoEscalado = false;
     @track propuestaLetrado;
     @track titulo;
     @track motivo;
@@ -32,6 +32,7 @@ export default class Spv_InsertarEscalado extends NavigationMixin(LightningEleme
     @track existeEscaladoReclamacion = false;
     @track valueEquipo = 'Asesoría Jurídica'; 
     @track options = []
+    @track sinPermisoInsertar = true;
 
     @track camposPendientesParaEscalar = '';
     @track mostrarModalCamposPorRellenar = false;
@@ -73,6 +74,12 @@ export default class Spv_InsertarEscalado extends NavigationMixin(LightningEleme
 
     @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
     wiredGetRecord({data, error}){
+        esPropietario({caseId: this.recordId}).then(result => {
+            this.propietario = result;
+            if(this.propietario){
+                this.sinPermisoInsertar = false;
+            }
+        })
         if(data){
             this.status = data.fields.SEG_Subestado__c.value;
             /*if(this.status == 'Allanamiento') {
@@ -85,11 +92,11 @@ export default class Spv_InsertarEscalado extends NavigationMixin(LightningEleme
                 this.motivo = 'SAC_OtrosMotivosEsc';
                 this.motivoLabel = 'Otros';
             }*/
-            if(data.fields.Status.value == 'SPV_AnalisisDecision') {
+            /*if(data.fields.Status.value == 'SPV_AnalisisDecision') {
                 this.isEstadoEscalado = false;
             } else {
                 this.isEstadoEscalado = true;
-            }
+            }*/
         }
     }
     

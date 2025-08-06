@@ -11,7 +11,6 @@ public with sharing class SPV_AccionAITRHan extends CC_TriggerHandlerBase {
 
         if(!listAccionesSPV.isEmpty()){
             SPV_AccionHelper.insertarPermisosAccion(listAccionesSPV);
-            //    SPV_AccionHelper.tareaReclamacionCerrada(listAccionesSPV);
             SPV_AccionHelper.automatizarCasoAplicaTarea(listAccionesSPV);
             SPV_AccionHelper.crearThreadId(listAccionesSPV);
             SPV_AccionHelper.insertarTMEs(listAccionesSPV);

@@ -35,7 +35,8 @@ import buscarGrupos3N from '@salesforce/apex/HDT_EmailSendController.buscarGrupo
 import devolver from '@salesforce/apex/HDT_EmailSendController.devolver';
 import vincularLlamada from '@salesforce/apex/HDT_EmailSendController.vincularLlamadaEnCurso';
 
-
+//import transferirCasoHDT 
+import transferCaseToHDT from '@salesforce/apex/CC_CaseTransfer.transferCaseToHDT';
 
 //Campos
 import CASE_ID from '@salesforce/schema/Case.Id';
@@ -265,6 +266,8 @@ export default class hdtCaseOptionButtons extends NavigationMixin(LightningEleme
 	resultadosGruposMostrar = false;
 
 	resultadosGrupos;
+
+	isProcessing = false;
 
 	//Se utiliza para recoger el buzon por defecto del Email de HDT
 	buzonEnviopordefecto;
@@ -1121,6 +1124,12 @@ export default class hdtCaseOptionButtons extends NavigationMixin(LightningEleme
 		}
 	}
 
+	modalTransferirCCOTeclaPulsada(event) {
+		if (event.keyCode === 27) {
+			this.cerrarModalTransferirCCO();
+		}
+	}
+
 	seleccionarGrupo(event) {
 		if (event.currentTarget.dataset.operativa === 'Trasladar') {
 			this.template.querySelector('.inputBuscarGrupos').value = event.currentTarget.dataset.name;
@@ -1327,6 +1336,17 @@ export default class hdtCaseOptionButtons extends NavigationMixin(LightningEleme
 									//Solicitar Informacion
 									this.abrirModalSolicitarInfo();
 								}
+							} else if (this.nombreBoton === 'Transferir CCO') {
+								//Llamada para transferir a CCO
+								//Obligatoriedad de campos al transferir a CCO
+								if (!this.AccountId || !this.ContactId && !this.noIdentificado ||
+									!this.canalProcedencia || !this.canalEntrada || !this.canalOperativo || !this.causa || !this.solucion) {
+									this.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Canal de entrada, Canal de procedencia, Idioma, Tipo de contacto, Canal operativo, Causa y Solución, Cuenta y Contacto');
+								} else {
+									//Transferir a CCO
+									this.abrirModalTransferirCCO();
+								}
+
 							} else if (this.nombreBoton === 'Responder Cliente Email' || this.nombreBoton === 'Responder Cliente SMS' || this.nombreBoton === 'Responder Cliente Twitter' || this.nombreBoton === 'Responder Cliente Apps') {
 								if (this.nombreBoton === 'Responder Cliente Email' && (!this.AccountId || !this.ContactId) && !this.noIdentificado) {
 									this.mostrarToast('error', 'Datos del Caso', 'Para poder realizar esta operativa, el caso debe estar vinculado a una cuenta y un contacto');
@@ -1942,6 +1962,81 @@ export default class hdtCaseOptionButtons extends NavigationMixin(LightningEleme
 				this.resultadosGrupoTercerNivel = grupos3N;
 			});
 	}
+
+	//Funciones referentes al Transferir a CCO
+	abrirModalTransferirCCO() {
+
+		this.template.querySelector('[data-id="ModalboxTransferirCCO"]').classList.add('slds-fade-in-open');
+		this.template.querySelector('[data-id="backdrop"]').classList.add('slds-backdrop_open');
+
+	}
+
+	cerrarModalTransferirCCO(){
+
+		const modalboxTransferir = this.template.querySelector('[data-id="ModalboxTransferirCCO"]');
+		if (modalboxTransferir) {
+			modalboxTransferir.classList.remove('slds-fade-in-open');
+		}
+
+		const modalbackdropTransferir = this.template.querySelector('[data-id="backdrop"]');
+		if (modalbackdropTransferir) {
+			modalbackdropTransferir.classList.remove('slds-backdrop_open');
+		}
+
+	}
+
+	transferirCCO() { 
+
+        if (this.isProcessing) {
+            return; 
+        }
+
+        if (!this.recordId) {
+            this.mostrarToast('error', 'Error de Validación', 'No se pudo obtener el ID del caso actual para transferir.');
+            return;
+        }
+
+        console.log('Iniciando transferencia HDT para caso:', this.recordId);
+        this.isProcessing = true; 
+
+        // Llama al método de Apex `transferCaseToHDT` con el ID del caso
+        transferCaseToHDT({ caseId: this.recordId })
+            .then(result => {
+                this.cerrarModalTransferirCCO(); 
+
+                if (result.isSuccess) {
+                    console.log('Transferencia a HDT exitosa:', result.message, 'Nuevo ID:', result.newCaseId);
+                    this.mostrarToast('success', 'Transferencia Exitosa', result.message);
+
+                    // Refresh the current record view
+                    this[NavigationMixin.Navigate]({
+                        type: 'standard__recordPage',
+                        attributes: {
+                            recordId: this.recordId,
+                            actionName: 'view'
+                        }
+                    }, true);
+
+                } else {
+                    console.error('Fallo en la transferencia a HDT:', result.message);
+                    this.mostrarToast('error', 'Error en Transferencia', result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error al llamar al método Apex transferCaseToHDT:', error);
+                let errorMessage = 'Ocurrió un error inesperado al transferir el caso a HDT.';
+                if (error.body && error.body.message) {
+                    errorMessage = error.body.message;
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                this.mostrarToast('error', 'Error del Servidor', errorMessage);
+            })
+            .finally(() => {
+                this.isProcessing = false; // Desactiva el spinner y habilita el botón
+                console.log('--- FIN DEL CALLBACK DE APEX (LWC) ---');
+            });
+    }
 
 	//Funciones referentes al Devolver a 1N
 	abrirModalDevolver1N() {

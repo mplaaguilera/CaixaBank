@@ -1,11 +1,12 @@
 @isTest
 public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
-    private static Set<String> objetos = new Set<String>{'Case'};
+    private static Set<String> objetos = new Set<String>{'Case','CBK_CaseToCaseRelationship__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPERECLAMACIONSPV = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
     private static final Id RECTYPEPRETENSIONSPV = mapRTsObjects.get('Case').get('SPV_Pretension').getRecordTypeId();
     private static final Id RECTYPERECLAMACIONSAC = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
+    private static final Id RECTYPECASORELACIONADOSPV = mapRTsObjects.get('CBK_CaseToCaseRelationship__c').get('SPV_CasoRelacionado').getRecordTypeId();
 
 
     @TestSetup
@@ -13,18 +14,18 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
 
         Test.startTest();
         User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(usuarioAdmin);
+        SPV_DatabaseDML.insertDML(usuarioAdmin, true);
 
         User usuarioGeneral;
         System.runAs(usuarioAdmin){
             usuarioGeneral = SPV_TestDataFactory.crearUsuarioSPVGeneral(1)[0];
-            Database.insert(usuarioGeneral);
+            SPV_DatabaseDML.insertDML(usuarioGeneral, true);
 
             PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SPV_Administrador'];
             PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
             permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
             permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
-            Database.insert(permiSetAssiAdmin);
+            SPV_DatabaseDML.insertDML(permiSetAssiAdmin, true);
         }
         Test.stopTest();
 
@@ -43,7 +44,7 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
         listaCuentas[1].billingStreet  = 'Calle Mayor 55';
         listaCuentas[1].BillingCountry = 'España';
         listaCuentas[1].CC_Numero_Documento__c = '12345678C';
-        Database.insert(listaCuentas);
+        SPV_DatabaseDML.insertListDML(listaCuentas, true);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -71,7 +72,7 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
         List<Case> reclamaciones = new List<Case>();
         reclamaciones.add(casoReclamacion);
         reclamaciones.add(casoReclamacion2);
-        Database.insert(reclamaciones);
+        SPV_DatabaseDML.insertListDML(reclamaciones, true);
 
         //Reclamacion
         Map<String, Object> camposRec3 = new Map<String, Object>();
@@ -81,10 +82,9 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
         camposRec3.put('SAC_TipoConsumidor__c', 'No');
         camposRec3.put('SAC_Naturaleza__c', 'SAC_004');
         camposRec3.put('OwnerId', usuarioGeneral.Id);
-        camposRec3.put('CC_CasoRelacionado__c', casoReclamacion2.Id);
 
         Case casoReclamacion3 = SPV_TestDataFactory.crearCaso('Reclamacion',camposRec3);
-        Database.insert(casoReclamacion3);
+        SPV_DatabaseDML.insertDML(casoReclamacion3, true);
 
 
         //Pretension
@@ -96,12 +96,52 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
         camposPret.put('OwnerId', usuarioGeneral.Id);
 
         Case casoPretension = SAC_TestDataFactory.crearCaso('Pretension',camposPret); //Pretension SAC
+
+        Map<String, Object> camposPret2 = new Map<String, Object>();
+        camposPret2.put('SuppliedCompany', 'testPret2');
+        camposPret2.put('Origin', 'Otros');
+        camposPret2.put('Status', 'SAC_001');
+        camposPret2.put('SAC_Reclamacion__c', casoReclamacion.Id);
+        camposPret2.put('OwnerId', usuarioGeneral.Id);
+
+        Case casoPretension2 = SPV_TestDataFactory.crearCaso('Pretension',camposPret2); //Pretension SPV
+
+        Map<String, Object> camposPret3 = new Map<String, Object>();
+        camposPret3.put('SuppliedCompany', 'testPret3');
+        camposPret3.put('Origin', 'Otros');
+        camposPret3.put('Status', 'SAC_001');
+        camposPret3.put('SAC_Reclamacion__c', casoReclamacion3.Id);
+        camposPret3.put('OwnerId', usuarioGeneral.Id);
+
+        Case casoPretension3 = SPV_TestDataFactory.crearCaso('Pretension',camposPret3); //Pretension SPV
         
         //Pretensiones
         List<Case> pretensiones = new List<Case>();
         pretensiones.add(casoPretension);
-        Database.insert(pretensiones);
+        pretensiones.add(casoPretension2);
+        pretensiones.add(casoPretension3);
+        SPV_DatabaseDML.insertListDML(pretensiones, true);
 
+        //Producto pretension
+        List<SAC_ProductCase__c> productos = new List<SAC_ProductCase__c>();
+        SAC_ProductCase__c producto  = new SAC_ProductCase__c();
+        producto.SAC_Pretension__c = casoPretension.Id;
+        producto.SAC_Descripcion__c = 'Descripcion test';
+        producto.N_Contrato__c = '111111';
+        productos.add(producto);
+        SAC_ProductCase__c producto2  = new SAC_ProductCase__c();
+        producto2.SAC_Pretension__c = casoPretension2.Id;
+        producto2.SAC_Descripcion__c = 'Descripcion test2';
+        producto2.N_Contrato__c = '222222';
+        productos.add(producto2);
+        SPV_DatabaseDML.insertListDML(productos, true);
+
+        //Caso vinculado
+        CBK_CaseToCaseRelationship__c casoVinculado = new CBK_CaseToCaseRelationship__c();
+        casoVinculado.SPV_CasoPadre__c = casoReclamacion3.Id;
+        casoVinculado.SPV_CasoVinculado__c = casoReclamacion.Id;
+        casoVinculado.RecordTypeId = RECTYPECASORELACIONADOSPV;
+        SPV_DatabaseDML.insertDML(casoVinculado, true);
 
         //Reclamante
         List<SAC_CaseReclamante__c> reclamantes = new List<SAC_CaseReclamante__c>();
@@ -124,7 +164,7 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
         reclamantes.add(reclamante1);
         reclamantes.add(reclamante2);
         reclamantes.add(reclamante3);
-        Database.insert(reclamantes);
+        SPV_DatabaseDML.insertListDML(reclamantes, true);
     }
 
     @isTest
@@ -137,7 +177,7 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
 
         System.runAs(usuario1){
             Test.startTest();
-            listResultado = SPV_LCMP_ReclamacionesVinculadas.getReclamacionesMismoReclamante(reclamacion.Id);
+            listResultado = SPV_LCMP_ReclamacionesVinculadas.getReclamacionesMismoReclamante(reclamacion.Id, 'SAC');
             Test.stopTest();
         }
 
@@ -154,65 +194,43 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
         System.runAs(usuario1){
             Test.startTest();
             SPV_LCMP_ReclamacionesVinculadas.vincularReclamacion(reclamacionSAC.Id, reclamacionSPV.Id);
+
+            List<CBK_CaseToCaseRelationship__c> listCasosVinculados = [SELECT Id FROM CBK_CaseToCaseRelationship__c WHERE SPV_CasoPadre__c =: reclamacionSPV.Id AND SPV_CasoVinculado__c = :reclamacionSAC.Id LIMIT 1];
+            Assert.areNotEqual(false, !listCasosVinculados.isEmpty(), 'No se ha vinculado la reclamacion correctamente');
             Test.stopTest();
         }
-
-        Case reclamacionSPV2 = [SELECT id, CC_CasoRelacionado__c FROM Case WHERE Subject = 'TestRec'];
-        Assert.areNotEqual(null, reclamacionSPV2.CC_CasoRelacionado__c, 'No se ha vinculado la reclamacion correctamente');
     }
 
     @isTest
     static void desvincularReclamacionTest(){
 
         User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        Case reclamacionSPV = [SELECT id, Ownerid, CC_CasoRelacionado__c FROM Case WHERE Subject = 'TestRec3'];
+        Case reclamacionSPV = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec3'];
+        Case reclamacionSPV2 = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec'];
 
         System.runAs(usuario1){
             Test.startTest();
-            SPV_LCMP_ReclamacionesVinculadas.desvincularReclamacion(reclamacionSPV.Id);
+            SPV_LCMP_ReclamacionesVinculadas.desvincularReclamacion(reclamacionSPV2.Id ,reclamacionSPV.Id);
+
+            List<CBK_CaseToCaseRelationship__c> listCasosVinculados = [SELECT Id FROM CBK_CaseToCaseRelationship__c WHERE SPV_CasoPadre__c =: reclamacionSPV.Id AND SPV_CasoVinculado__c = :reclamacionSPV2.Id LIMIT 1];
+            Assert.areEqual(true, listCasosVinculados.isEmpty(), 'No se ha vinculado la reclamacion correctamente');
             Test.stopTest();
         }
-
-        Case reclamacionSPV2 = [SELECT id, CC_CasoRelacionado__c FROM Case WHERE Subject = 'TestRec'];
-        Assert.areEqual(null, reclamacionSPV2.CC_CasoRelacionado__c, 'No se ha desvinculado la reclamacion correctamente');
     }
-
-    // @isTest
-    // static void comprobarPermisosVinculacionTest(){
-
-    //     User usuario2 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-
-    //     Case reclamacionSPV = [SELECT id, Ownerid, CC_CasoRelacionado__c FROM Case WHERE Subject = 'TestRec'];
-    //     Boolean permisos = false;
-
-    //     System.runAs(usuario2){
-    //         Test.startTest();
-    //         permisos = SPV_LCMP_ReclamacionesVinculadas.comprobarPermisosVinculacion(reclamacionSPV.Id);
-    //         Test.stopTest();
-    //     }
-
-    //     Case reclamacionSPV2 = [SELECT id, CC_CasoRelacionado__c FROM Case WHERE Subject = 'TestRec'];
-    //     Assert.areEqual(false, permisos, 'No se ha desvinculado la reclamacion correctamente');
-    // }
 
     @isTest
     static void comprobarPermisosVinculacionTest2(){
 
         User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
 
-        Case reclamacionSPV = [SELECT id, Ownerid, CC_CasoRelacionado__c FROM Case WHERE Subject = 'TestRec'];
+        Case reclamacionSPV = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec'];
         Boolean permisos = false;
-
-        List<Case> listaCasos = [SELECT Id, Status, OwnerId, RecordTypeId, SAC_Reclamacion__r.OwnerId, SAC_PretensionPrincipal__c FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACIONSPV 
-                                        AND Id = :reclamacionSPV.Id) OR (RecordTypeId = :RECTYPEPRETENSIONSPV AND SAC_Reclamacion__c = :reclamacionSPV.Id)];
 
         System.runAs(usuario1){
             Test.startTest();
             permisos = SPV_LCMP_ReclamacionesVinculadas.comprobarPermisosVinculacion(reclamacionSPV.Id);
             Test.stopTest();
         }
-
-        Case reclamacionSPV2 = [SELECT id, CC_CasoRelacionado__c FROM Case WHERE Subject = 'TestRec'];
         Assert.areEqual(false, permisos, 'No se ha desvinculado la reclamacion correctamente');
     }
 
@@ -220,12 +238,12 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
     static void getReclamacionVinculadaTest(){
 
         User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        Case reclamacion = [SELECT id, CC_CasoRelacionado__c FROM Case WHERE Subject = 'TestRec3'];
+        Case reclamacion = [SELECT id FROM Case WHERE Subject = 'TestRec'];
         List<SPV_LCMP_ReclamacionesVinculadas.ReclamacionWrapper> listResultado = new List<SPV_LCMP_ReclamacionesVinculadas.ReclamacionWrapper>();
 
         System.runAs(usuario1){
             Test.startTest();
-            listResultado = SPV_LCMP_ReclamacionesVinculadas.getReclamacionVinculada(reclamacion.CC_CasoRelacionado__c);
+            listResultado = SPV_LCMP_ReclamacionesVinculadas.getReclamacionesVinculadas(reclamacion.Id);
             Test.stopTest();
         }
 

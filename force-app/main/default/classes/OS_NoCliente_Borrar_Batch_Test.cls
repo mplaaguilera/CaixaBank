@@ -13,7 +13,7 @@ public class OS_NoCliente_Borrar_Batch_Test {
 		mccTematica.Name = 'MCC Tematica';
         mccTematica.CC_Tipo_Cliente__c = 'Empleado';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccTematica.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        mccTematica.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
 		insert mccTematica;
         
@@ -21,7 +21,7 @@ public class OS_NoCliente_Borrar_Batch_Test {
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Empleado';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccProducto.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        mccProducto.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PR-000001';
         insert mccProducto;
@@ -30,7 +30,7 @@ public class OS_NoCliente_Borrar_Batch_Test {
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Empleado';
         mccMotivo.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccMotivo.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        mccMotivo.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
         mccMotivo.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente desiste';
@@ -40,7 +40,7 @@ public class OS_NoCliente_Borrar_Batch_Test {
         mccCausa.Name = 'Causa 1';
         mccCausa.CC_Tipo_Cliente__c = 'Empleado';
         mccCausa.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccCausa.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        mccCausa.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
         mccCausa.CC_Motivo__c = mccMotivo.Id;
         mccCausa.CC_Codigo_Externo__c = 'CA-000001';
 		insert mccCausa;
@@ -49,13 +49,13 @@ public class OS_NoCliente_Borrar_Batch_Test {
         mccSolucion.Name = 'Solucion 1';
         mccSolucion.CC_Tipo_Cliente__c = 'Empleado';
         mccSolucion.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccSolucion.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+        mccSolucion.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
         mccSolucion.CC_Causa__c = mccCausa.Id;
         mccSolucion.CC_Codigo_Externo__c = 'SO-000001';
         mccSolucion.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente no localizado por FEDEX;Error KYC;Recibe por error la tarjeta de otro cliente';
 		insert mccSolucion;
         
-        Id recordTypeCasoCliente = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCasoCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         
         Case caso = new Case();
         caso.Subject='Caso no cliente';

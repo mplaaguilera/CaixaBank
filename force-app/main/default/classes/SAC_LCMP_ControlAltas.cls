@@ -139,7 +139,7 @@ public with sharing class SAC_LCMP_ControlAltas {
 
         Id idUsuarioAct = UserInfo.getUserId();
                     
-        if(estadoCaso == 'SAC_001' && ownerCaso == idUsuarioAct){
+        if((estadoCaso == 'SAC_001' || estadoCaso == 'SAC_006') && ownerCaso == idUsuarioAct){
             return false;
         }else{
             return true;

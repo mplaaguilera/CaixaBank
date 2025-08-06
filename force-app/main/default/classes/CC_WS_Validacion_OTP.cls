@@ -6,7 +6,7 @@ public with sharing class CC_WS_Validacion_OTP {
 
 		List<CC_Comunicaciones__c> autenticaciones = [SELECT CC_Case__c, CC_Case__r.Account.CC_NumPerso__c, //Name, CC_Case__r.CC_NumPerso__c
 														CSBD_Opportunity__c, CSBD_Opportunity__r.Account.CC_NumPerso__c,
-														CC_Ticket__c, CC_Codigo_OTPSMS__c, CC_Intentos_Validacion_OTP__c,
+														CC_Ticket__c, CC_Codigo_OTPSMS__c, CC_Intentos_Validacion_OTP__c,CC_Mensaje_Error__c,
 														CC_Resultado_Validacion__c, CC_Fecha_Validacion__c, CC_Codigo_Error__c, CC_Case__r.Account.RecordType.DeveloperName,
 														CC_Case__r.Account.AV_Segmento__c,
 														CC_Case__r.Account.AV_NumPerso__c,
@@ -58,8 +58,8 @@ public with sharing class CC_WS_Validacion_OTP {
 						HttpResponse httpResponse = new Http().send(getRequest(cfgIntegracion, requestBody));
 						traza.CC_FechaFin__c = Datetime.now();
 
-						// httpResponse.setStatusCode(200); //Comentar ////////////////////////////////////////////////////////
-
+						//httpResponse.setStatusCode(200); //Comentar ////////////////////////////////////////////////////////
+						httpResponse.setBody('{"ErrorData":{"errorCode":"00002","errorMessage":"Validación de otp nok"}}'); //Comentar ////////////////////////////////////////////////////////		
 						Boolean responseOk = httpResponse.getStatusCode() == 200;
 						traza.CC_FinOK__c = responseOk;
 						if ((cfgIntegracion.CC_TrazaSalida__c || Test.isRunningTest())) {
@@ -118,7 +118,7 @@ public with sharing class CC_WS_Validacion_OTP {
 	private static String getRequestBody(CC_InterfaceSettings__mdt cfgIntegracion, CC_Comunicaciones__c autenticacion, String numper, String codigoOtp) {
 		String requestBody = cfgIntegracion.CC_Body__c;
 		requestBody = requestBody.replace('##dateTime##', getTimestamp());
-		requestBody = requestBody.replace('##ticket##', autenticacion.CC_Ticket__c);
+		 requestBody = requestBody.replace('##ticket##', autenticacion.CC_Ticket__c);
 		//requestBody = requestBody.replace('##ticket##', '0BCC00000353000'); //Comentar ////////////////////////////////////////////////////////
 		requestBody = requestBody.replace('##otpEncrypt##', codigoOtp); //autenticacion.CC_Codigo_OTPSMS__c);
 		// requestBody = requestBody.replace('##personId##', numperso);

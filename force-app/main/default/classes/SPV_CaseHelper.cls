@@ -17,6 +17,7 @@ public with sharing class SPV_CaseHelper {
     private static final Id RECTYPEGRUPOTAREAS = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SPV_GrupoDeTareas').getRecordTypeId();
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
     private static final Id RECTYPECASEEXTENSION = mapRTsObjects.get('CBK_Case_Extension__c').get('SPV_ReclamacionCaseExt').getRecordTypeId();
+    private static final Id SACRECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
 
     //Obtener el record type de los no clientes
     private static final Id RECTYPENOCLIENTE = mapRTsObjects.get('Account').get('SAC_NoCliente_PA').getRecordTypeId();
@@ -30,7 +31,24 @@ public with sharing class SPV_CaseHelper {
     private static final String ORIGEN_BDE = 'SPV_BDE'; 
     private static final String GRUPOLET_FYRLEGAL = 'SPV_FYRLEGALLETRADO'; 
     private static final String GRUPOLET_INDRA = 'SPV_INDRALETRADO'; 
-
+    
+    static final Map<String, String> FIELD_LABELS = new Map<String, String>{
+        'SPV_NumExpediente__c' => 'N.º Expediente',
+            'SPV_Organismo__c' => 'Organismo',
+            'SAC_Prorrogado__c' => 'Prorrogado',
+            'SPV_FechaIniRegulador__c' => 'Fecha inicio regulador',
+            'SAC_FechaRecepcion__c' => 'Fecha de recepción',
+            'SAC_CasoRelacionado__c' => 'Caso relacionado',
+            'SAC_MotivoReasignacion__c' => 'Motivo reasignación',
+            'SAC_Entidad_Afectada__c' => 'Entidad afectada',
+            'SPV_MotivoComplementariaOrganismo__c' => 'Motivo complementaria organismo',
+            'SPV_FechaEnvioOrganismo__c' => 'Fecha envío organismo',
+            'SPV_FechaRecepcionResolucion__c' => 'Fecha recepción resolución',
+            'SAC_SentidoResolucion__c' => 'Sentido resolución',
+            'SAC_ResumenManual__c' => 'Resumen',
+            'Status' => 'Status',
+            'CC_Importe_Reclamado__c' => 'Importe reclamado'
+            };
 
 
     /*****************************************************************
@@ -417,7 +435,238 @@ public with sharing class SPV_CaseHelper {
 
      }
 
+	/************************************************************************************************************
+     * Proposito:  Al actualizar alguno de los campos de la reclamación, se deben registrar en actividades
+     *
+     *
+     *
+     * --------------------------Historial-----------------------------------------------------------------------
+     * VERSION              USER_STORY       AUTHOR               DATE               Description
+     * 1.0                                  Iria ANPC            02/05/2025               Creación
+     * *********************************************************************************************************/
+    /**
+	 * @description    Al actualizar alguno de los campos de la reclamación, se deben registrar en actividades
+	 * @param listaReclaSPV
+     * @param mapOldObj
+     * @param recordType
+	 */
+    public static void registrarCamposActividades(List<Case> casesSPV, Map<Id, Case> mapOldObj, String recordType){
+        List<FeedItem> feedItemToInsert = new List<FeedItem>();
+        for(Case recla : casesSPV){
+            //Si ha cambiado alguno de estos campos de la reclamación
+            if (mapOldObj.containsKey(recla.Id)) {
+                if(recordType == 'SPV_Reclamacion'){
+                    if (recla.SPV_NumExpediente__c != mapOldObj.get(recla.Id).SPV_NumExpediente__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SPV_NumExpediente__c', recla.SPV_NumExpediente__c);
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SPV_Organismo__c != mapOldObj.get(recla.Id).SPV_Organismo__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SPV_Organismo__c', recla.SPV_Organismo__c);
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SAC_Prorrogado__c != mapOldObj.get(recla.Id).SAC_Prorrogado__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SAC_Prorrogado__c', String.valueOf(recla.SAC_Prorrogado__c));
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SPV_FechaIniRegulador__c != mapOldObj.get(recla.Id).SPV_FechaIniRegulador__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SPV_FechaIniRegulador__c', String.valueOf(recla.SPV_FechaIniRegulador__c));
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SAC_FechaRecepcion__c != mapOldObj.get(recla.Id).SAC_FechaRecepcion__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SAC_FechaRecepcion__c', String.valueOf(recla.SAC_FechaRecepcion__c));
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SAC_CasoRelacionado__c != mapOldObj.get(recla.Id).SAC_CasoRelacionado__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SAC_CasoRelacionado__c', recla.SAC_CasoRelacionado__c);
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SAC_MotivoReasignacion__c != mapOldObj.get(recla.Id).SAC_MotivoReasignacion__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SAC_MotivoReasignacion__c', recla.SAC_MotivoReasignacion__c);
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SAC_Entidad_Afectada__c != mapOldObj.get(recla.Id).SAC_Entidad_Afectada__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SAC_Entidad_Afectada__c', recla.SAC_Entidad_Afectada__c);
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SPV_MotivoComplementariaOrganismo__c != mapOldObj.get(recla.Id).SPV_MotivoComplementariaOrganismo__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SPV_MotivoComplementariaOrganismo__c', recla.SPV_MotivoComplementariaOrganismo__c);
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SPV_FechaRecepcionResolucion__c != mapOldObj.get(recla.Id).SPV_FechaRecepcionResolucion__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SPV_FechaRecepcionResolucion__c', String.valueOf(recla.SPV_FechaRecepcionResolucion__c));
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SAC_SentidoResolucion__c != mapOldObj.get(recla.Id).SAC_SentidoResolucion__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SAC_SentidoResolucion__c', recla.SAC_SentidoResolucion__c);
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.SEG_Grupo__c != mapOldObj.get(recla.Id).SEG_Grupo__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SEG_Grupo__c', String.valueOf(recla.SEG_Grupo__c));
+                        feedItemToInsert.add(actividad);
+                    }
+                }else if(recordType == 'SPV_Pretension'){
+                    if (recla.SAC_ResumenManual__c != mapOldObj.get(recla.Id).SAC_ResumenManual__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'SAC_ResumenManual__c', recla.SAC_ResumenManual__c);
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.Status != mapOldObj.get(recla.Id).Status) {
+                        FeedItem actividad = crearActividades(recla.Id, 'Status', String.valueOf(recla.Status));
+                        feedItemToInsert.add(actividad);
+                    }
+                    if (recla.CC_Importe_Reclamado__c != mapOldObj.get(recla.Id).CC_Importe_Reclamado__c) {
+                        FeedItem actividad = crearActividades(recla.Id, 'CC_Importe_Reclamado__c', String.valueOf(recla.CC_Importe_Reclamado__c));
+                        feedItemToInsert.add(actividad);
+                    }
+                }
+            }
+        }
+        if(!feedItemToInsert.isEmpty()){
+            insert feedItemToInsert;
+        }
+     }
+    
+	/************************************************************************************************************
+     * Proposito:  Crear actividad relacionada con el caso
+     *
+     *
+     *
+     * --------------------------Historial-----------------------------------------------------------------------
+     * VERSION              USER_STORY       AUTHOR               DATE               Description
+     * 1.0                                  Iria ANPC            02/05/2025               Creación
+     * *********************************************************************************************************/
+    /**
+	 * @description    Crear actividad relacionada con el caso
+	 * @param caseId
+     * @param fieldName
+     * @param value
+	 */
+    public static FeedItem crearActividades(Id caseId, String fieldName, String value){
+        String fieldLabel = FIELD_LABELS.containsKey(fieldName) ? FIELD_LABELS.get(fieldName) : fieldName;
+		
+        // Obtener label si es un campo picklist
+        if (isPicklistField('Case', fieldName)) {
+            value = getPicklistLabel('Case', fieldName, value);
+        }
+        
+        FeedItem feed = new FeedItem();
+        feed.ParentId = caseId; 
+        feed.Body = fieldLabel + ': ' + value;
+        
+        return feed;
 
+     }
+    
+	/************************************************************************************************************
+     * Proposito:  Comprobar si el campo es tipo picklist
+     *
+     *
+     *
+     * --------------------------Historial-----------------------------------------------------------------------
+     * VERSION              USER_STORY       AUTHOR               DATE               Description
+     * 1.0                                  Iria ANPC            02/05/2025               Creación
+     * *********************************************************************************************************/
+    /**
+	 * @description    Comprobar si el campo es tipo picklist
+	 * @param sObjectName
+     * @param fieldName
+	 */
+    public static Boolean isPicklistField(String sObjectName, String fieldName) {
+        Schema.DescribeSObjectResult describe = Case.SObjectType.getDescribe();
+        Schema.SObjectField field = describe.fields.getMap().get(fieldName);
+        return field.getDescribe().getType() == Schema.DisplayType.Picklist;
+    }
+    
+    
+    /************************************************************************************************************
+     * Proposito:  Obtener label de un campo picklist
+     *
+     *
+     *
+     * --------------------------Historial-----------------------------------------------------------------------
+     * VERSION              USER_STORY       AUTHOR               DATE               Description
+     * 1.0                                  Iria ANPC            02/05/2025               Creación
+     * *********************************************************************************************************/
+    /**
+	 * @description    Obtener label de un campo picklist
+	 * @param sObjectName
+     * @param fieldName
+     * @param apiValue
+	 */
+    public static String getPicklistLabel(String sObjectName, String fieldName, String apiValue) {
+        Schema.DescribeSObjectResult describe = Case.SObjectType.getDescribe();
+        Schema.SObjectField field = describe.fields.getMap().get(fieldName);
+        List<Schema.PicklistEntry> values = field.getDescribe().getPicklistValues();
+        
+        for (Schema.PicklistEntry entry : values) {
+            if (entry.getValue() == apiValue) {
+                return entry.getLabel();
+            }
+        }
+        return apiValue;
+    }
+	    /************************************************************************************************************
+     * Proposito:  Al actualizar alguno de los campos de la reclamación, se deben actualizar de sus 
+     * pretensiones
+     *
+     *
+     *
+     * --------------------------Historial-----------------------------------------------------------------------
+     * VERSION              USER_STORY       AUTHOR               DATE               Description
+     * 1.0                                  Iria ANPC            02/05/2025               Creación
+     * *********************************************************************************************************/
+    /**
+	 * @description    Al actualizar alguno de los campos de la reclamación, se deben actualizar los de sus 
+     * pretensiones
+	 * @param listaReclaSPV
+     * @param mapOldObj
+     * @param mapaDatosCasosActualizar
+	 */
+    public static void actualizarCamposPretensiones(List<Case> listaReclaSPV, Map<Id, Case> mapOldObj, Map<Id,Case> mapaDatosCasosActualizar){
+
+        List<Case> listaPretensiones = new List<Case>();
+        Set<Id> idsReclamaciones = new Set<Id>();
+        Map<Id, Case> mapaReclamaciones = new Map<Id, Case>();
+        
+        for(Case recla : listaReclaSPV){
+            //Si ha cambiado alguno de estos campos de la reclamación, habrá que actualizar sus valores en las pretensiones
+            if(mapOldObj.containsKey(recla.Id) && (recla.SPV_ComunidadAutonoma__c != mapOldObj.get(recla.Id).SPV_ComunidadAutonoma__c || recla.SPV_NumExpediente__c != mapOldObj.get(recla.Id).SPV_NumExpediente__c || recla.SPV_Organismo__c != mapOldObj.get(recla.Id).SPV_Organismo__c || recla.SAC_FechaVencimientoSLA__c != mapOldObj.get(recla.Id).SAC_FechaVencimientoSLA__c || mapOldObj.get(recla.Id).SAC_Entidad_Afectada__c != mapOldObj.get(recla.Id).SAC_Entidad_Afectada__c)){
+                idsReclamaciones.add(recla.id);
+                if(!mapaReclamaciones.containsKey(recla.Id)){
+                    mapaReclamaciones.put(recla.Id, recla);
+                }
+            }
+        }
+
+        //Se obtienen las pretensiones de las reclamaciones que cumplen esas condiciones anteriores
+        if(!idsReclamaciones.isEmpty()){
+            listaPretensiones = [SELECT Id, SAC_Reclamacion__c, SPV_ComunidadAutonoma__c, SPV_NumExpediente__c, SPV_Organismo__c, SAC_FechaVencimientoSLA__c, SAC_Entidad_Afectada__c FROM Case WHERE SAC_Reclamacion__c IN :idsReclamaciones];
+        }
+
+        //Actualizar los datos de cada pretensión
+        if(!listaPretensiones.isEmpty()){
+            for(Case pretension : listaPretensiones){
+                //Se comprueba que su reclamación padre esté en el mapa de reclamaciones que haya cambiado algún dato a tratar
+                if(mapaReclamaciones.containsKey(pretension.SAC_Reclamacion__c)){
+                    if(!mapaDatosCasosActualizar.containsKey(pretension.Id)){
+                        pretension.SPV_ComunidadAutonoma__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SPV_ComunidadAutonoma__c;
+                        pretension.SPV_NumExpediente__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SPV_NumExpediente__c;
+                        pretension.SPV_Organismo__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SPV_Organismo__c;
+                        pretension.SAC_FechaVencimientoSLA__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SAC_FechaVencimientoSLA__c;
+                        pretension.SAC_Entidad_Afectada__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SAC_Entidad_Afectada__c;
+                        mapaDatosCasosActualizar.put(pretension.Id, pretension);
+                    }else{
+                        //Si la pretensión ya está en el mapa de datos a actualizar, se actualiza desde ahí
+                        mapaDatosCasosActualizar.get(pretension.Id).SPV_ComunidadAutonoma__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SPV_ComunidadAutonoma__c;
+                        mapaDatosCasosActualizar.get(pretension.Id).SPV_NumExpediente__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SPV_NumExpediente__c;
+                        mapaDatosCasosActualizar.get(pretension.Id).SPV_Organismo__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SPV_Organismo__c;
+                        mapaDatosCasosActualizar.get(pretension.Id).SAC_FechaVencimientoSLA__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SAC_FechaVencimientoSLA__c;
+                        mapaDatosCasosActualizar.get(pretension.Id).SAC_Entidad_Afectada__c = mapaReclamaciones.get(pretension.SAC_Reclamacion__c).SAC_Entidad_Afectada__c;
+                    }
+                }
+            }
+        }
+
+     }
     /************************************************************************************************************
      * Proposito:  Al asociar un AccountId (o actualizarlo) a una reclamación, se rellenan los campos DAN y
      * Dirección Territorial (DT)
@@ -1266,7 +1515,7 @@ public with sharing class SPV_CaseHelper {
         for(Case caso : listaReclamaciones){
             //Si el caso a añadortiene un caso relacionado, es porque viene de una copia y el campo fechaRecepcion ya está relleno
             if(String.isBlank(caso.SAC_CasoRelacionado__c)){
-                caso.SAC_FechaRecepcion__c = System.now();  
+                caso.SAC_FechaRecepcion__c = CBK_UtilsDate.nowSYS();  
             }
             //Y además asigne a cada caso nuevo de SPV, el owner a la cola Pte. Asignar
             caso.OwnerId = cola.id;
@@ -1720,7 +1969,6 @@ public with sharing class SPV_CaseHelper {
         Map<Id, Case> mapaReclamaciones = new Map<Id, Case>(listReclamaciones);
         List<Case> listPretensiones = new List<Case>();
         Case reclamacion = new Case();
-
         for (Case caso : listSelect) {
             Case reclamacionesCase = mapaReclamaciones.get(caso.Id);
             if (reclamacionesCase != null || mapaReclamaciones.get(caso.SAC_Reclamacion__c) != null) {
@@ -1732,10 +1980,11 @@ public with sharing class SPV_CaseHelper {
                 }
             }
         }
-        
+
+        // COMENTADO DESPUES DE BATERÏA DE PRUEBAS 09/07/25
         //Si ha vuelto de análisis a alta, el campo SPV_VueltaAlta valdrá true, y no hay que balancear
-        if(!listPretensiones.isEmpty() && reclamacion.SPV_VueltaAlta__c != true){
-        
+        //if(!listPretensiones.isEmpty() && reclamacion.SPV_VueltaAlta__c != true){
+        if(!listPretensiones.isEmpty()){
             if((reclamacion.SPV_Organismo__c == ORIGEN_CNMV || reclamacion.SPV_Organismo__c == ORIGEN_DGS || reclamacion.SPV_Organismo__c == ORIGEN_CONSUMO) && Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()){
                 //Si el origen de la reclamacion es CNMV o DGS se hace el balanceo al grupo FyR Legal
                 CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE RecordTypeId = :RECTYPEGRUPOLETRADO AND SAC_DeveloperName__c = :GRUPOLET_FYRLEGAL LIMIT 1];
@@ -1743,32 +1992,136 @@ public with sharing class SPV_CaseHelper {
 
             }else if(reclamacion.SPV_Organismo__c == ORIGEN_BDE){
                 //Si el origen de la reclamación es BDE, evaluamos otras condiciones 
-                //Si la reclamacion tiene antecedentes SAC con grupo letrado informado
-                if(reclamacion.CC_CasoRelacionado__c != null && reclamacion.CC_CasoRelacionado__r.SAC_GrupoLetrado__c != null){
-                    String grupoLetradoSAC = reclamacion.CC_CasoRelacionado__r.SAC_GrupoLetrado__r.Name;
-
-                    if(grupoLetradoSAC.toLowerCase().trim().contains('indra') && Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()){
-                        //Si los antecedentes son gestionados por el grupo letrado INDRA, se hace el balanceo a INDRA
-                        CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE RecordTypeId = :RECTYPEGRUPOLETRADO AND SAC_DeveloperName__c = :GRUPOLET_INDRA LIMIT 1];
-                        balancearPretensiones(listPretensiones, mapaDatosCasosActualizar, grupo.Id, cola);
-
-                    }else if((grupoLetradoSAC.toLowerCase().trim().contains('fyrlegal') || grupoLetradoSAC.toLowerCase().trim().contains('vilar')) && Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()){
-                        //Si los antecedenttes son gestionados por FYRLEGAL O VILAR, se hace el balanceo a FyR Legal
-                        CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE RecordTypeId = :RECTYPEGRUPOLETRADO AND SAC_DeveloperName__c = :GRUPOLET_FYRLEGAL LIMIT 1];
-                        balancearPretensiones(listPretensiones, mapaDatosCasosActualizar, grupo.Id, cola);
+                //Si la reclamación tiene marcas con grupos asociados, se evaluan estas marcas para ver a qué balancear
+                List<SAC_Marca_Case__c> marcasReclamacion = [SELECT Id, SAC_Marca__c, SAC_Marca__r.Name, SAC_Marca__r.SAC_OrdenPrelacion__c, SAC_Marca__r.SAC_GrupoLetrado__c  FROM SAC_Marca_Case__c WHERE SAC_Case__c =: reclamacion.Id AND SAC_Marca__r.SAC_OrdenPrelacion__c != null AND SAC_Marca__r.SAC_GrupoLetrado__c != null];
+                //listaPretensiones = [SELECT Id, SAC_Reclamacion__c, CBK_Case_Extension_Id__c FROM Case WHERE RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c = :reclamacion.Id];
+                if(!marcasReclamacion.isEmpty()){
+                    balanceoPorMarca(marcasReclamacion, listPretensiones, mapaDatosCasosActualizar, cola);
+                }else{      //Si la reclamación no tiene marcas con grupo, se evalúa a qué balancear siguiendo el segundo criterio
+                    //Si la reclamación tiene importe reclamado, es posible el balanceo por importe, si no, se evalúa el tercer criterio
+                    if(reclamacion.CC_Importe_Reclamado__c != 0 && reclamacion.CC_Importe_Reclamado__c != null){
+                        balanceoPorImporteMCC(reclamacion, listSelect, mapaDatosCasosActualizar, cola);
                     }else{
-                        //Si los antecedentes son gestionados por Ferrer o DXC, entro en balanceo por MCC
-                        balanceoPorMCC(reclamacion, listPretensiones, mapaDatosCasosActualizar, cola);
+                        //Si el Detalle es Especialidad, se balancea por MCC, si no, se evalúan antecedentes
+                        if(reclamacion.SAC_PretensionPrincipal__r.SEG_Detalle__r.SPV_Especialidad__c == true){
+                            balanceoPorMCC(reclamacion, listPretensiones, mapaDatosCasosActualizar, cola);
+                        }else{
+                            //Si la reclamacion tiene antecedentes SAC con grupo letrado informado
+                                balanceoPorAntecedente(reclamacion, listPretensiones, mapaDatosCasosActualizar, cola);
+
+                                /*String grupoLetradoSAC = reclamacion.CC_CasoRelacionado__r.SAC_GrupoLetrado__r.Name;
+                                if(grupoLetradoSAC.toLowerCase().trim().contains('indra') && Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()){
+                                    //Si los antecedentes son gestionados por el grupo letrado INDRA, se hace el balanceo a INDRA
+                                    CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE RecordTypeId = :RECTYPEGRUPOLETRADO AND SAC_DeveloperName__c = :GRUPOLET_INDRA LIMIT 1];
+                                    balancearPretensiones(listPretensiones, mapaDatosCasosActualizar, grupo.Id, cola);
+
+                                }else if((grupoLetradoSAC.toLowerCase().trim().contains('fyrlegal') || grupoLetradoSAC.toLowerCase().trim().contains('vilar')) && Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()){
+                                    //Si los antecedenttes son gestionados por FYRLEGAL O VILAR, se hace el balanceo a FyR Legal
+                                    CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE RecordTypeId = :RECTYPEGRUPOLETRADO AND SAC_DeveloperName__c = :GRUPOLET_FYRLEGAL LIMIT 1];
+                                    balancearPretensiones(listPretensiones, mapaDatosCasosActualizar, grupo.Id, cola);
+                                }else{
+                                    //Si los antecedentes son gestionados por Ferrer o DXC, entro en balanceo por MCC
+                                    balanceoPorMCC(reclamacion, listPretensiones, mapaDatosCasosActualizar, cola);
+                                }*/
+                            
+                        }
+
+
                     }
-                }else{
-                    //Entro en balanceo por MCC
-                    balanceoPorMCC(reclamacion, listPretensiones, mapaDatosCasosActualizar, cola);
+
                 }
+
+
+
             }else{
                 //Si no tiene organismo informado, hace el balanceo por MCC
                 balanceoPorMCC(reclamacion, listPretensiones, mapaDatosCasosActualizar, cola);
             }
         }
+    }
+
+
+    /*****************************************************************
+     * Proposito: Evalua y define el balanceo por marcas de la reclamación con organismo BDE.
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1279703      Álex Polo     21/07/25        Creación
+    ****************************************************************/ 
+    public static void balanceoPorMarca(List<SAC_Marca_Case__c> marcasReclamacion, List<Case> listaPretensiones, Map<Id, Case> mapaDatosCasosActualizar, Group cola){
+        if(marcasReclamacion.size() == 1){
+            balancearPretensiones(listaPretensiones, mapaDatosCasosActualizar, marcasReclamacion[0].SAC_Marca__r.SAC_GrupoLetrado__c, cola);    //Si solo hay una, se utiliza esa directamente
+        }else{
+            Decimal ordenAux = marcasReclamacion[0].SAC_Marca__r.SAC_OrdenPrelacion__c;
+            SAC_Marca_Case__c marcaBalanceo = marcasReclamacion[0];
+
+            for(SAC_Marca_Case__c marca : marcasReclamacion){
+                //Si alguna marca tiene un orden con más prioridad que la actual, se establecerá esa como Nueva marca para el balanceo
+                if(marca.SAC_Marca__r.SAC_OrdenPrelacion__c < ordenAux){
+                    ordenAux = marca.SAC_Marca__r.SAC_OrdenPrelacion__c;
+                    marcaBalanceo = marca;
+                }
+            }
+            balancearPretensiones(listaPretensiones, mapaDatosCasosActualizar, marcaBalanceo.SAC_Marca__r.SAC_GrupoLetrado__c, cola);
+        }
+    }
+
+    
+    /*****************************************************************
+     * Proposito: Evalua y define el balanceo por importe de la reclamación con organismo BDE.
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1279705      Álex Polo     22/07/25        Creación
+    ****************************************************************/ 
+    public static void balanceoPorImporteMCC(Case reclamacion, List<Case> listSelect, Map<Id, Case> mapaDatosCasosActualizar, Group cola){
+        Case pretPrincipal = new Case();
+        Id grupoCasoRelacionado = null;
+        Boolean balanceoPorImporte = false;
+        List<Case> listaPretensiones = new List<Case>();
+
+        for(Case caso : listSelect){
+            //Se obtiene la pretensión principal
+            if(caso.RecordTypeId == RECTYPEPRETENSION && caso.SAC_Reclamacion__c == reclamacion.Id){
+                listaPretensiones.add(caso);
+                if(caso.Id == reclamacion.SAC_PretensionPrincipal__c){
+                    pretPrincipal = caso;
+                }
+            }
+
+        }
+
+        //Se evaluan los importes del MCC
+        if(pretPrincipal.SEG_Detalle__r.SAC_ImporteDesdeMCC__c != null &&  pretPrincipal.SEG_Detalle__r.SAC_ImporteHastaMCC__c != null && pretPrincipal.SEG_Detalle__r.SAC_GrupoLetradoMCC__c != null && (pretPrincipal.SEG_Detalle__r.SAC_ImporteDesdeMCC__c <= reclamacion.CC_Importe_Reclamado__c && pretPrincipal.SEG_Detalle__r.SAC_ImporteHastaMCC__c >= reclamacion.CC_Importe_Reclamado__c)){
+            //Si el detalle tiene grupo letrado y además el importe reclamado de la reclamación está en el rango de importes del MCC Detalle:
+            grupoCasoRelacionado = pretPrincipal.SEG_Detalle__r.SAC_GrupoLetradoMCC__c;
+            balanceoPorImporte = true;
+        }else if(pretPrincipal.CC_MCC_Motivo__r.SAC_ImporteDesdeMCC__c != null &&  pretPrincipal.CC_MCC_Motivo__r.SAC_ImporteHastaMCC__c != null && pretPrincipal.CC_MCC_Motivo__r.SAC_GrupoLetradoMCC__c != null && (pretPrincipal.CC_MCC_Motivo__r.SAC_ImporteDesdeMCC__c <= reclamacion.CC_Importe_Reclamado__c && pretPrincipal.CC_MCC_Motivo__r.SAC_ImporteHastaMCC__c >= reclamacion.CC_Importe_Reclamado__c)){
+            //Si el detalle tiene grupo letrado y además el importe reclamado de la reclamación está en el rango de importes del MCC Motivo:
+            grupoCasoRelacionado = pretPrincipal.CC_MCC_Motivo__r.SAC_GrupoLetradoMCC__c;
+            balanceoPorImporte = true;
+        }else if(pretPrincipal.CC_MCC_ProdServ__r.SAC_ImporteDesdeMCC__c != null &&  pretPrincipal.CC_MCC_ProdServ__r.SAC_ImporteHastaMCC__c != null && pretPrincipal.CC_MCC_ProdServ__r.SAC_GrupoLetradoMCC__c != null && (pretPrincipal.CC_MCC_ProdServ__r.SAC_ImporteDesdeMCC__c <= reclamacion.CC_Importe_Reclamado__c && pretPrincipal.CC_MCC_ProdServ__r.SAC_ImporteHastaMCC__c >= reclamacion.CC_Importe_Reclamado__c)){
+            //Si el detalle tiene grupo letrado y además el importe reclamado de la reclamación está en el rango de importes del MCC Producto/Servicio:
+            grupoCasoRelacionado = pretPrincipal.CC_MCC_ProdServ__r.SAC_GrupoLetradoMCC__c;
+            balanceoPorImporte = true;
+        }else if(pretPrincipal.CC_MCC_Tematica__r.SAC_ImporteDesdeMCC__c != null &&  pretPrincipal.CC_MCC_Tematica__r.SAC_ImporteHastaMCC__c != null && pretPrincipal.CC_MCC_Tematica__r.SAC_GrupoLetradoMCC__c != null && (pretPrincipal.CC_MCC_Tematica__r.SAC_ImporteDesdeMCC__c <= reclamacion.CC_Importe_Reclamado__c && pretPrincipal.CC_MCC_Tematica__r.SAC_ImporteHastaMCC__c >= reclamacion.CC_Importe_Reclamado__c)){
+            //Si el detalle tiene grupo letrado y además el importe reclamado de la reclamación está en el rango de importes del MCC Temática:
+            grupoCasoRelacionado = pretPrincipal.CC_MCC_Tematica__r.SAC_GrupoLetradoMCC__c;
+            balanceoPorImporte = true;
+        }else{
+            //Si no se cumple ninguna de las condiciones para el balanceo por importe, se evalúa el siguiente criterio para el balanceo
+            balanceoPorImporte = false;
+            //AÑADIR LLAMADA A EVALUAR EL SIGUIENTE CRITERIO PARA EL BALANCEO
+            balanceoPorMCC(reclamacion, listaPretensiones, mapaDatosCasosActualizar, cola);
+        }
+
+        //Se realiza el balanceo por importe
+        if(balanceoPorImporte == true){
+            balancearPretensiones(listaPretensiones, mapaDatosCasosActualizar, grupoCasoRelacionado, cola);
+        }
+
     }
 
     /*****************************************************************
@@ -1780,6 +2133,7 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US909081      Raúl Santos    24/06/24        Creación
+     * 1.1             US1279713     Álex Polo      29/07/25        Se añade el parámetro llamadaDesdeAntecedentes, y se añade el campo SPV_Especialidad
     ****************************************************************/ 
     /**
      * @description    Evalua y define el balanceo por detalle del MCC.
@@ -1795,16 +2149,15 @@ public with sharing class SPV_CaseHelper {
 
         mccPretensionPrincipal = reclamacion.SAC_PretensionPrincipal__r.SEG_Detalle__c;
 
-        if (mccPretensionPrincipal != null && Schema.sObjectType.CC_MCC_Grupo_Colaborador__c.isAccessible()) {
+        //Se balancea por MCC si la especialidad == true, o en caso de ser false, si se intentó balancear por antecedentes pero no se pudo
+        if (mccPretensionPrincipal != null && Schema.sObjectType.CC_MCC_Grupo_Colaborador__c.isAccessible() /*&& (reclamacion.SAC_PretensionPrincipal__r.SEG_Detalle__r.SPV_Especialidad__c == true || (reclamacion.SAC_PretensionPrincipal__r.SEG_Detalle__r.SPV_Especialidad__c == false && llamadaDesdeAntecedentes == true))*/) {
             Id grupoAsociado = null;
-
             balanceoForzado = reclamacion.SAC_PretensionPrincipal__r.SEG_Detalle__r.SPV_BalanceoForzado__c;
 
             //obtenemos todos los grupos
             List<CC_MCC_Grupo_Colaborador__c> listMccGrupos = [SELECT CC_MCC__c, CC_Grupo_Colaborador__c, SAC_PorcentajeAsignacion__c, Name, SAC_MaximoDeCasosDiarios__c
                         FROM CC_MCC_Grupo_Colaborador__c 
                         WHERE CC_MCC__c = :mccPretensionPrincipal AND SPV_Tipo_Cliente__c = 'SPV'];
-
             if(!listMccGrupos.isEmpty()){
                 if(balanceoForzado == false){
                     //mapa de Grupo colaborador - numero de pretensiones
@@ -1812,7 +2165,6 @@ public with sharing class SPV_CaseHelper {
 
                     //mapa de id Grupo colaborador - grupo
                     Map<Id, CC_MCC_Grupo_Colaborador__c> mapIdGrupo = new Map<Id, CC_MCC_Grupo_Colaborador__c>();
-
                     //relleno las keys del mapa
                     for(CC_MCC_Grupo_Colaborador__c mccGrupo : listMccGrupos){
                         mapGrupoCasos.put(mccGrupo.CC_Grupo_Colaborador__c, 0);
@@ -1826,7 +2178,6 @@ public with sharing class SPV_CaseHelper {
                                 AND SAC_Reclamacion__r.SAC_PretensionPrincipal__r.SEG_Detalle__c = :mccPretensionPrincipal
                                 AND CC_Fecha_Traslado_Colaborador__c = TODAY
                                 GROUP BY SEG_Grupo__c];
-                    
 
                     //relleno los valores del mapa obteniendo registros del mapa con clave - 0 o clave - numero de pretensiones
                     for(AggregateResult caso : listaCasos){
@@ -1857,7 +2208,6 @@ public with sharing class SPV_CaseHelper {
                             //De lo contrario, calculo el porcentaje actual restando el valor de el maximo de casos diarios y con el valor del nuevo numTotalCasos
                             porcentajeActual = (mapGrupoCasos.get(grupoId) - mapIdGrupo.get(grupoId).SAC_MaximoDeCasosDiarios__c) * 100 / numTotalCasos;
                         }
-
                         //calculo de la desviacion para saber que grupo tiene la desviacion mas grande y asignar ese grupo a las pretensiones
                         if(mapIdGrupo.get(grupoId).SAC_PorcentajeAsignacion__c - porcentajeActual > desviacion && (todosLosGruposLLenos || mapIdGrupo.get(grupoId).SAC_MaximoDeCasosDiarios__c >= mapGrupoCasos.get(grupoId))){
                             desviacion = mapIdGrupo.get(grupoId).SAC_PorcentajeAsignacion__c - porcentajeActual;
@@ -1874,6 +2224,128 @@ public with sharing class SPV_CaseHelper {
             }
         }
     }
+
+
+    /*****************************************************************
+     * Proposito: Evalúa si se puede balancear por antecedentes. Se evalúa si el MCC detalle no es especialidad.
+     * En caso de que no sea letrado SPV o no haya antecedentes vinculados, se balancea por MCC.
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0            US1279713       Álex Polo      29/07/25      Creado
+    ****************************************************************/ 
+    private static void balanceoPorAntecedente(Case reclamacion, List<Case> listaPretensiones, Map<Id, Case> mapaDatosCasosActualizar, Group cola){
+
+        Set<Id> idsReclamacionesVinculadasRelationship = new Set<Id>();
+        Case reclamacionVinculadaABalancear = new Case();
+        Boolean pretensionPrincipalEncontradaEnAntecedentes = false;
+        Id grupoAsociado = null;
+        Map<Id, List<Case>> mapaReclaPretensiones = new Map<Id, List<Case>>();
+        Set<Id> idsReclamacionesVinculadas = new Set<Id>();
+        Boolean balancearPorMCC = false;
+        //Ver si la reclamación tiene casos SAC vinculados
+        List<CBK_CaseToCaseRelationship__c> listaRelatioshipCasosVinculados = [SELECT Id, SPV_CasoPadre__c, SPV_CasoVinculado__c FROM CBK_CaseToCaseRelationship__c WHERE SPV_CasoPadre__c = :reclamacion.Id];
+        if(!listaRelatioshipCasosVinculados.isEmpty()){
+            for(CBK_CaseToCaseRelationship__c caseToCase : listaRelatioshipCasosVinculados){
+                idsReclamacionesVinculadasRelationship.add(caseToCase.SPV_CasoVinculado__c);
+            }
+
+            if(!idsReclamacionesVinculadasRelationship.isEmpty()){
+                //Buscar los antecedentes SAC
+                List<Case> listaCasosVinculados = [SELECT Id, recordTypeId, CC_MCC_Tematica__c, CC_MCC_ProdServ__c, SEG_Detalle__c, SEG_Grupo__c, SAC_GrupoLetrado__c, CreatedDate, SAC_GrupoLetrado__r.RecordTypeId, CC_MCC_Motivo__c, SAC_FechaRecepcion__c, SAC_PretensionPrincipal__c, SAC_PretensionPrincipal__r.SEG_Grupo__c, SAC_PretensionPrincipal__r.SEG_Grupo__r.RecordTypeId FROM Case WHERE Id IN :idsReclamacionesVinculadasRelationship AND RecordTypeId = :SACRECTYPERECLAMACION];
+                if(!listaCasosVinculados.isEmpty()){
+                    
+                    for(Case recla : listaCasosVinculados){
+                        idsReclamacionesVinculadas.add(recla.Id);
+                    }
+
+                    List<Case> listaPretensionesReclamacionesSAC = [SELECT Id, CC_MCC_Tematica__c, CC_MCC_ProdServ__c, SEG_Detalle__c, CC_MCC_Motivo__c, SAC_Reclamacion__c FROM Case WHERE SAC_Reclamacion__c IN :idsReclamacionesVinculadas];
+
+                    //Crear un mapa con todas las pretensiones de los antecedentes SAC
+                    if(!listaPretensionesReclamacionesSAC.isEmpty()){
+                        for(Case pretension : listaPretensionesReclamacionesSAC){
+                            if(mapaReclaPretensiones.containsKey(pretension.SAC_Reclamacion__c)){
+                                mapaReclaPretensiones.get(pretension.SAC_Reclamacion__c).add(pretension);
+                            }else{
+                                List<Case> listAdd = new List<Case>();
+                                listAdd.add(pretension);
+                                mapaReclaPretensiones.put(pretension.SAC_Reclamacion__c, listAdd);
+                            }
+                        }
+
+                        //Recorrer cada pretensión para ver si se encuentra en alguna reclamación SAC, la pretensión de la reclamación SPV, si hay varias, se cogerá la reclamación SAC más reciente
+                        for(Case reclaVinculada : listaCasosVinculados){
+                            if(mapaReclaPretensiones.containskey(reclaVinculada.Id)){
+                                for(Case pretension : mapaReclaPretensiones.get(reclaVinculada.Id)){
+                                    if(reclamacion.SAC_PretensionPrincipal__r.SEG_Detalle__c == pretension.SEG_Detalle__c && reclamacion.SAC_PretensionPrincipal__r.CC_MCC_Motivo__c == pretension.CC_MCC_Motivo__c && reclamacion.SAC_PretensionPrincipal__r.CC_MCC_ProdServ__c == pretension.CC_MCC_ProdServ__c && reclamacion.SAC_PretensionPrincipal__r.CC_MCC_Tematica__c == pretension.CC_MCC_Tematica__c){
+                                        //Si ya se encontró una vinculada SAC con ese MCC, se compara cuál tiene la fecha más reciente, y se coge esa
+                                        if(pretensionPrincipalEncontradaEnAntecedentes == true){
+                                            if(reclaVinculada.SAC_FechaRecepcion__c > reclamacionVinculadaABalancear.SAC_FechaRecepcion__c && reclaVinculada.SAC_PretensionPrincipal__c != null && reclaVinculada.SAC_PretensionPrincipal__r.SEG_Grupo__c != null){    //Si la nueva que se está recorriendo es más actual, se coge esa
+                                                reclamacionVinculadaABalancear = reclaVinculada;
+                                            }
+                                        }else{
+                                            if(reclaVinculada.SAC_PretensionPrincipal__c != null && reclaVinculada.SAC_PretensionPrincipal__r.SEG_Grupo__c != null){
+                                                pretensionPrincipalEncontradaEnAntecedentes = true;
+                                                reclamacionVinculadaABalancear = reclaVinculada;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+                    //Recorrer las reclamaciones vinculadas para obtener aquella más reciente que tenga el MCC de la reclamación SPV padre
+                    /*for(Case reclaVinculada : listaCasosVinculados){
+                        if(reclamacion.SAC_PretensionPrincipal__r.SEG_Detalle__c == reclaVinculada.SEG_Detalle__c && reclamacion.SAC_PretensionPrincipal__r.CC_MCC_Motivo__c == reclaVinculada.CC_MCC_Motivo__c && reclamacion.SAC_PretensionPrincipal__r.CC_MCC_ProdServ__c == reclaVinculada.CC_MCC_ProdServ__c && reclamacion.SAC_PretensionPrincipal__r.CC_MCC_Tematica__c == reclaVinculada.CC_MCC_Tematica__c){
+                            //Si ya se encontró una vinculada SAC con ese MCC, se compara cuál tiene la fecha más reciente, y se coge esa
+                            if(pretensionPrincipalEncontradaEnAntecedentes == true){
+                                if(reclaVinculada.SAC_FechaRecepcion__c > reclamacionVinculadaABalancear.SAC_FechaRecepcion__c && reclaVinculada.SAC_PretensionPrincipal__c != null && reclaVinculada.SAC_PretensionPrincipal__r.SEG_Grupo__c != null){    //Si la nueva que se está recorriendo es más actual, se coge esa
+                                    reclamacionVinculadaABalancear = reclaVinculada;
+                                }
+                            }else{
+                                if(reclaVinculada.SAC_PretensionPrincipal__c != null && reclaVinculada.SAC_PretensionPrincipal__r.SEG_Grupo__c != null){
+                                    pretensionPrincipalEncontradaEnAntecedentes = true;
+                                    reclamacionVinculadaABalancear = reclaVinculada;
+                                }
+                            }
+                        }
+                    }*/
+
+
+                    //Si el letrado de esa reclamación SAC SÍ es letrado SPV, se asigna al mismo letrado, si no se cumple, se balancea por MCC
+                    if(reclamacionVinculadaABalancear != null && reclamacionVinculadaABalancear.SAC_PretensionPrincipal__r.SEG_Grupo__c != null && reclamacionVinculadaABalancear.SAC_PretensionPrincipal__r.SEG_Grupo__r.RecordTypeId == RECTYPEGRUPOLETRADO/*reclamacionVinculadaABalancear.SAC_GrupoLetrado__c != null && reclamacionVinculadaABalancear.SAC_GrupoLetrado__r.RecordTypeId == RECTYPEGRUPOLETRADO*/){
+                        //grupoAsociado = reclamacionVinculadaABalancear.SAC_GrupoLetrado__c;
+                        grupoAsociado = reclamacionVinculadaABalancear.SAC_PretensionPrincipal__r.SEG_Grupo__c;
+                        balancearPretensiones(listaPretensiones, mapaDatosCasosActualizar, grupoAsociado, cola);
+                    }else{
+                        //balanceoPorMCC(reclamacion, listaPretensiones, mapaDatosCasosActualizar, cola);
+                        balancearPorMCC = true;
+                    }
+
+
+                }else{      //Si no hay antecedentes SAC, se balancea por MCC
+                    //balanceoPorMCC(reclamacion, listaPretensiones, mapaDatosCasosActualizar, cola);
+                    balancearPorMCC = true;
+                }
+            }
+        }else{
+            //balanceoPorMCC(reclamacion, listaPretensiones, mapaDatosCasosActualizar, cola);
+            balancearPorMCC = true;
+        }
+
+
+        if(balancearPorMCC == true){
+            balanceoPorMCC(reclamacion, listaPretensiones, mapaDatosCasosActualizar, cola);
+        }
+
+    }
+
+
+
+
 
     /*****************************************************************
      * Proposito: ültimo paso del balanceo, tras el analisis previo aquí se asigna el grupo deseado a la pretension. También se informan los cambios en la reclamación padre
@@ -1896,11 +2368,11 @@ public with sharing class SPV_CaseHelper {
             
             if(mapaDatosCasosActualizar.containsKey(pretension.Id)){
                 mapaDatosCasosActualizar.get(pretension.Id).SEG_Grupo__c = grupoAsociado;
-                mapaDatosCasosActualizar.get(pretension.Id).CC_Fecha_Traslado_Colaborador__c = Datetime.now();
+                mapaDatosCasosActualizar.get(pretension.Id).CC_Fecha_Traslado_Colaborador__c = CBK_UtilsDate.nowDT();
             }
             else{
                 pretension.SEG_Grupo__c = grupoAsociado;
-                pretension.CC_Fecha_Traslado_Colaborador__c = Datetime.now();
+                pretension.CC_Fecha_Traslado_Colaborador__c = CBK_UtilsDate.nowDT();
                 mapaDatosCasosActualizar.put(pretension.Id, pretension);
             }
 
@@ -1933,7 +2405,7 @@ public with sharing class SPV_CaseHelper {
             //Se envia alerta el owner de las pretensiones y al grupo letrado
             SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(pretensiones[0].SAC_Reclamacion__C,
                                             'SPV_012',
-                                            'La reclamación ' + pretensiones[0].SAC_Reclamacion__r.CaseNumber + ' a pasado de Alta a análisis.',
+                                            'La reclamación ' + pretensiones[0].SAC_Reclamacion__r.CaseNumber + ' ha pasado de Alta a análisis.',
                                             cola.Id,
                                             '',
                                             '', 
@@ -2292,8 +2764,15 @@ public with sharing class SPV_CaseHelper {
         List<Case> listaEntradaAllanamiento = new List<Case>();
         List<Case> listaEntradaAlegaciones = new List<Case>();
         List<Case> listaEntradaDesistimiento = new List<Case>();
+        List<Case> listaEntraAnalisisDecision = new List<Case>();
         List<Case> listaEntraEnvioOrganismos = new List<Case>();
         List<Case> listaEntraPteRespuestaOrganismos = new List<Case>();
+        List<Case> listaEntraEnvio = new List<Case>();
+        List<Case> listaEntraEnvioComplementaria = new List<Case>();
+        List<Case> listaEntraEnvioRectificacion = new List<Case>();
+        List<Case> listaEntraCerradoEnvioRectificacion = new List<Case>();
+        List<Case> listaEntraCamposPretension = new List<Case>();
+        List<Case> listaEntraRecepcionResolucion = new List<Case>();
 
         for (case caso : listCasosSPV) { 
             //Si el caso pasa a subestado allanamiento y no habia estado nunca en subestado allanamiento (el check caso allanado no esta marcado)
@@ -2308,6 +2787,10 @@ public with sharing class SPV_CaseHelper {
             if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).SEG_Subestado__c != caso.SEG_Subestado__c && (caso.SEG_Subestado__c == 'Desistimiento' && !caso.SPV_CasoDesistido__c)) {
                 listaEntradaDesistimiento.add(caso);
             }
+            //Añadido: Al pasar a análisis y decisión, se rellena el campo de fecha correspondiente
+            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_AnalisisDecision'){
+                listaEntraAnalisisDecision.add(caso);
+            }
             //Añadido: Al pasar a envío organismos, se rellena el campo de fecha correspondiente
             if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_EnvioOrganismos'){
                 listaEntraEnvioOrganismos.add(caso);
@@ -2315,6 +2798,26 @@ public with sharing class SPV_CaseHelper {
             //Añadido: Al pasar a Pendiente respuesta organismos, se rellena el campo de fecha correspondiente
             if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_PendienteRespuestaOrganismo'){
                 listaEntraPteRespuestaOrganismos.add(caso);
+            }
+            //Añadido: Al pasar a Envío, se rellena el campo de fecha correspondiente
+            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_Envio'){
+                listaEntraEnvio.add(caso);
+            }
+            //Añadido: Al pasar a Envío Complementaria, se rellena el campo de fecha correspondiente
+            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_EnvioComplementaria'){
+                listaEntraEnvioComplementaria.add(caso);
+            }
+            //Añadido: Al pasar a Envío rectificación, se rellena el campo de fecha correspondiente
+            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_EnvioRectificacion'){
+                listaEntraEnvioRectificacion.add(caso);
+            }
+            //Añadido: Al pasar a Cerrado desde Envío rectificación, se rellena el campo de fecha correspondiente
+            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && mapOldObj.get(caso.Id).Status == 'SPV_EnvioRectificacion' && caso.Status == 'Cerrado'){
+                listaEntraCerradoEnvioRectificacion.add(caso);
+            }
+            //Añadido: Al pasar a Recepción Resolución, se rellena el campo de fecha correspondiente
+            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && mapOldObj.get(caso.Id).Status == 'SPV_PendienteRespuestaOrganismo' && caso.Status == 'SPV_RecepcionResolucion'){
+                listaEntraRecepcionResolucion.add(caso);
             }
         }
         if(!listaEntradaAllanamiento.isEmpty()) {
@@ -2326,6 +2829,9 @@ public with sharing class SPV_CaseHelper {
         if(!listaEntradaDesistimiento.isEmpty()) {
             rellenarCasoDesistido(listaEntradaDesistimiento);
         } 
+        if(!listaEntraAnalisisDecision.isEmpty()) {
+            rellenarFechaAnalisisDecision(listaEntraAnalisisDecision);
+        }
         //Añadido:
         if(!listaEntraEnvioOrganismos.isEmpty()) {
             rellenarFechaEnvioOrganismos(listaEntraEnvioOrganismos);
@@ -2333,9 +2839,53 @@ public with sharing class SPV_CaseHelper {
         if(!listaEntraPteRespuestaOrganismos.isEmpty()) {
             rellenarFechaPteRespuestaOrganismos(listaEntraPteRespuestaOrganismos);
         } 
+        //Añadido: 02052025
+        if(!listaEntraEnvio.isEmpty()) {
+            rellenarFechaRevisionEnvio(listaEntraEnvio);
+        } 
+        if(!listaEntraEnvioComplementaria.isEmpty()) {
+            rellenarFechaEnvioComplementaria(listaEntraEnvioComplementaria);
+        } 
+        if(!listaEntraEnvioRectificacion.isEmpty()) {
+            rellenarFechaRevisionEnvioRectificacion(listaEntraEnvioRectificacion);
+        } 
+        if(!listaEntraCerradoEnvioRectificacion.isEmpty()) {
+            rellenarFechaEnvioOrganismoRectificacion(listaEntraCerradoEnvioRectificacion);
+        }
+        if(!listaEntraRecepcionResolucion.isEmpty()){
+            rellenarFechaEntraRecepcionResolucion(listaEntraRecepcionResolucion);
+        }
     }
 
 
+    /***********************************************************************************************
+     * Proposito: Al pasar al estado "Analisis y Decision", se rellena la fecha en la que esto ocurre
+     * 
+     * Historial
+     * -------
+     * VERSION         USER_STORY       AUTHOR           DATE         Description
+     * 1.0             US1208699      Sergio Martín    12/05/25        Creación
+     ***********************************************************************************************/
+    /**
+     * @description  Al pasar al estado "Analisis y Decision", se rellena la fecha en la que esto ocurre
+     * @param listaAnalisisDecision
+     */
+    public static void rellenarFechaAnalisisDecision(List<Case> listaAnalisisDecision) {
+        for (Case caso : listaAnalisisDecision) {
+
+            if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaAnalisisDecision__c  = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = caso.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaAnalisisDecision__c  = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
+        }
+    }
 
     /***********************************************************************************************
      * Proposito: Al pasar al estado "Envío Organismos", se rellena la fecha en la que esto ocurre
@@ -2354,13 +2904,13 @@ public with sharing class SPV_CaseHelper {
 
             if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
                 CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
-                caseExtension.SPV_FechaEnvioOrganismos__c  = System.now();
+                caseExtension.SPV_FechaEnvioOrganismos__c  = CBK_UtilsDate.nowSYS();
                 SPV_DatabaseDML.insertDML(caseExtension, false);
                 caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
             }else{          //Si ya lo tiene
                 CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
                 caseExtension.Id = caso.CBK_Case_Extension_Id__c;
-                caseExtension.SPV_FechaEnvioOrganismos__c  = System.now();
+                caseExtension.SPV_FechaEnvioOrganismos__c  = CBK_UtilsDate.nowSYS();
                 SPV_DatabaseDML.updateDML(caseExtension, false);
             }
         }
@@ -2382,13 +2932,398 @@ public with sharing class SPV_CaseHelper {
         for (Case caso : listaCasoNegociacion) {
             if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
                 CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
-                caseExtension.SPV_FechaPteRespuestaOrganismo__c  = System.now();
+                caseExtension.SPV_FechaPteRespuestaOrganismo__c  = CBK_UtilsDate.nowSYS();
                 SPV_DatabaseDML.insertDML(caseExtension, false);
                 caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
             }else{          //Si ya lo tiene
                 CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
                 caseExtension.Id = caso.CBK_Case_Extension_Id__c;
-                caseExtension.SPV_FechaPteRespuestaOrganismo__c  = System.now();
+                caseExtension.SPV_FechaPteRespuestaOrganismo__c  = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
+        }
+    }
+
+        /***********************************************************************************************
+     * Proposito: Al pasar al estado "Envío", se rellena la fecha en la que esto ocurre
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1037919      Iria ANPC      02/05/25        Creación
+     ***********************************************************************************************/
+    /**
+     * @description  Al pasar al estado "Envío", se rellena la fecha en la que esto ocurre
+     * @param listaCasoNegociacion
+     */
+    public static void rellenarFechaRevisionEnvio(List<Case> listaCasoNegociacion) {
+        for (Case caso : listaCasoNegociacion) {
+            if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaRevisionEnvio__c = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = caso.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaRevisionEnvio__c = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
+        }
+    }
+
+    /***********************************************************************************************
+     * Proposito: Al pasar al estado "Recepción resolución", se rellena la fecha en la que esto ocurre
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1208706      Álex Polo    13/05/25        Creación
+     ***********************************************************************************************/
+    /**
+     * @description  Al pasar al estado "Recepción resolución", se rellena la fecha en la que esto ocurre
+     * @param listaCasos
+     */
+    public static void rellenarFechaEntraRecepcionResolucion(List<Case> listaCasos) {
+        for (Case caso : listaCasos) {
+            CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+            caseExtension.Id = caso.CBK_Case_Extension_Id__c;
+            caseExtension.SPV_FechaEntraRecepcionResolucion__c  = CBK_UtilsDate.nowSYS();
+            SPV_DatabaseDML.updateDML(caseExtension, false);
+        }
+    }
+    
+    /***********************************************************************************************
+     * Proposito: Completar o Reabrir los SLAs necesarios
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1208701        Álex        08/05/25        Creación
+     ***********************************************************************************************/
+    public static void completarOReabrirSLAs(List<Case> listaCasos, Map<Id, Case> mapOldCase) {
+
+        Map<Id, List<CaseMilestone>> mapaCaseMilestone = new Map<Id, List<CaseMilestone>>();
+        Set<Id> idsCasos = new Set<Id>();
+        List<CaseMilestone> listaCaseMilestone = new List<CaseMilestone>();
+        List<CaseMilestone> listaCaseMilestoneUpdatear = new List<CaseMilestone>();
+
+        for(Case caso : listaCasos){
+            idsCasos.add(caso.Id);
+        }
+        
+        //Obtener los Milestone de los casos que hayan entrado
+        if(!idsCasos.isEmpty()){
+            listaCaseMilestone = [SELECT caseid, startdate, IsCompleted, CompletionDate, MilestoneType.Name FROM CaseMilestone WHERE caseId IN :idsCasos];
+        }
+
+        if(!listaCasos.isEmpty()){
+            //Construir un mapa Id caso - Lista de sus Milestones
+            for (CaseMilestone caseMil : listaCaseMilestone) {
+                if (mapaCaseMilestone.get(caseMil.caseId) != null) {
+                    mapaCaseMilestone.get(caseMil.caseId).add(caseMil);
+                } else {
+                    List<CaseMilestone> listaCM = new List<CaseMilestone>();
+                    listaCM.add(caseMil);
+                    mapaCaseMilestone.put(caseMil.CaseId, listaCM);
+                }
+            }
+            listaCaseMilestoneUpdatear.addall(completarSLAs(listaCasos, mapaCaseMilestone, mapOldCase));
+            listaCaseMilestoneUpdatear.addall(reabrirSLAs(listaCasos, mapaCaseMilestone, mapOldCase));
+        }
+
+        if(!listaCaseMilestoneUpdatear.isEmpty()){
+            SPV_DatabaseDML.updateListDML(listaCaseMilestoneUpdatear, true);
+        }
+    }
+
+
+    /***********************************************************************************************
+     * Proposito: Completar los SLAs necesarios
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1208701        Álex        08/05/25        Creación
+     ***********************************************************************************************/
+    public static List<CaseMilestone> completarSLAs(List<Case> listaCasos, Map<Id, List<CaseMilestone>> mapaCaseMilestone, Map<Id, Case> mapOldCase) {
+      
+        List<CaseMilestone> listaCaseMilestoneUpdatear = new List<CaseMilestone>();
+
+        for (Case caso : listaCasos) {
+            //Completar SLA Envío Análisis y Decisión
+            if(mapOldCase.containsKey(caso.Id) && mapOldCase.get(caso.Id).SPV_Organismo__c != 'SPV_Consumo') {
+                if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && mapOldCase.get(caso.Id).Status == 'SPV_Envio' && caso.Status == 'SPV_PendienteRespuestaOrganismo'){
+                    for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                        if(cm.MilestoneType.Name == 'SLA Envío Análisis y Decisión'){
+                            cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                            listaCaseMilestoneUpdatear.add(cm);
+                        }
+                    }
+                }
+            }/*else{
+                if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && mapOldCase.get(caso.Id).Status == 'SPV_Envio' && caso.Status == 'Cerrado'){
+                    for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                        if(cm.MilestoneType.Name == 'SLA Envío Análisis y Decisión'){
+                            cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                            listaCaseMilestoneUpdatear.add(cm);
+                        }
+                    }
+                }
+            }*/
+            //Completar SLA Alta
+            if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && mapOldCase.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SPV_AnalisisDecision'){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Alta'){
+                        cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Completar SLA Recepción Resolución
+            if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && ((mapOldCase.get(caso.Id).Status == 'SPV_RecepcionResolucion' && caso.Status == 'SPV_Rectificacion'))){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Recepción Resolución'){
+                        cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Completar SLA Análisis y Decisión Letrado
+            if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && (mapOldCase.get(caso.Id).Status == 'SPV_AnalisisDecision' && caso.Status == 'SPV_Envio')){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Análisis y Decisión Letrado'){
+                        cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Completar SLA Plazo Regulatorio Análisis
+            if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && ((caso.SPV_Organismo__c != 'SPV_Consumo' && mapOldCase.get(caso.Id).Status == 'SPV_Envio' && caso.Status == 'SPV_PendienteRespuestaOrganismo'))){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Plazo Regulatorio Análisis'){
+                        cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+            //Completar SLA Rectificación letrado
+            if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && (caso.SPV_Organismo__c != 'SPV_Consumo' && mapOldCase.get(caso.Id).Status == 'SPV_Rectificacion' && caso.Status == 'SPV_EnvioRectificacion')){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Rectificación letrado'){
+                        cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Completar SLA Plazo Regulatorio Complementaria Organismo
+            if((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && ((caso.SPV_Organismo__c != 'SPV_Consumo' && mapOldCase.get(caso.Id).Status == 'SPV_EnvioComplementaria' && caso.Status == 'SPV_PendienteRespuestaOrganismo'))){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Plazo Regulatorio Complementaria Organismo'){
+                        cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Completar SLA Complementaria Organismo Letrado
+            if((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && (mapOldCase.get(caso.Id).Status == 'SPV_AnalisisComplementariaOrganismo' && caso.Status == 'SPV_EnvioComplementaria')){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Complementaria Organismo Letrado'){
+                        cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Completar SLA Envío Complementaria Organismo
+            if((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && (caso.SPV_Organismo__c != 'SPV_Consumo' && mapOldCase.get(caso.Id).Status == 'SPV_EnvioComplementaria' && caso.Status == 'SPV_PendienteRespuestaOrganismo')){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Envío Complementaria Organismo'){
+                        cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Detectar el cambio de estado a "Cerrado" o "Descartado"
+            if((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && caso.Status != mapOldCase.get(caso.Id).Status && (caso.Status == 'Cerrado' || caso.Status == 'Descartado')){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    cm.CompletionDate = CBK_UtilsDate.nowSYS();
+                    listaCaseMilestoneUpdatear.add(cm);
+                }
+            }
+        }
+
+        return listaCaseMilestoneUpdatear;
+
+    }
+
+
+    /***********************************************************************************************
+     * Proposito: Reabrir los SLAs necesarios
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1208701        Álex        08/05/25        Creación
+     ***********************************************************************************************/
+    public static List<CaseMilestone> reabrirSLAs(List<Case> listaCasos, Map<Id, List<CaseMilestone>> mapaCaseMilestone, Map<Id, Case> mapOldCase) {
+      
+        List<CaseMilestone> listaCaseMilestoneUpdatear = new List<CaseMilestone>();
+
+        for (Case caso : listaCasos) {
+            //Reabrir SLA Alta
+            if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && mapOldCase.get(caso.Id).Status == 'SPV_AnalisisDecision' && caso.Status == 'SAC_001'){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Alta'){
+                        cm.CompletionDate = null;
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Reabrir SLA Recepción Resolución
+            if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && ((mapOldCase.get(caso.Id).Status == 'SPV_Rectificacion' && caso.Status == 'SPV_RecepcionResolucion') || (mapOldCase.get(caso.Id).Status == 'Cerrado' && caso.Status == 'SPV_RecepcionResolucion'))){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Recepción Resolución'){
+                        cm.CompletionDate = null;
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Reabrir SLA Análisis y Decisión Letrado
+            if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && (mapOldCase.get(caso.Id).Status == 'SPV_Envio' && caso.Status == 'SPV_AnalisisDecision')){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Análisis y Decisión Letrado'){
+                        cm.CompletionDate = null;
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Reabrir SLA Rectificación letrado
+            if ((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && (caso.SPV_Organismo__c != 'SPV_Consumo' && mapOldCase.get(caso.Id).Status == 'SPV_EnvioRectificacion' && caso.Status == 'SPV_Rectificacion')){
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Rectificación letrado'){
+                        cm.CompletionDate = null;
+                        listaCaseMilestoneUpdatear.add(cm);
+                    }
+                }
+            }
+
+            //Completar SLA Complementaria Organismo Letrado
+            if((mapOldCase.containsKey(caso.Id) && mapaCaseMilestone.containsKey(caso.Id)) && (mapOldCase.get(caso.Id).Status == 'SPV_EnvioComplementaria' && caso.Status == 'SPV_AnalisisComplementariaOrganismo')){
+                Boolean tieneRegOrganismoCompleto = false;
+                CaseMilestone milestoneAReabrir = new CaseMilestone();
+                for(CaseMilestone cm : mapaCaseMilestone.get(caso.Id)){
+                    if(cm.MilestoneType.Name == 'SLA Plazo Regulatorio Complementaria Organismo' && cm.CompletionDate != null){
+                        tieneRegOrganismoCompleto = true;
+                    }
+                    if(cm.MilestoneType.Name == 'SLA Complementaria Organismo Letrado'){
+                        milestoneAReabrir = cm;
+                    }
+                }
+
+                //Solo se reabre en caso de que sea la primera complementaria organismo, es decir, si el SLA de plazo reg organismo no está completo
+                if(true){
+                    milestoneAReabrir.CompletionDate = null;
+                    listaCaseMilestoneUpdatear.add(milestoneAReabrir);
+                }
+                
+            }
+
+        }
+
+        return listaCaseMilestoneUpdatear;
+
+    }
+
+
+    /***********************************************************************************************
+     * Proposito: Al pasar al estado "Envío Complementaria", se rellena la fecha en la que esto ocurre
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1037919      Iria ANPC      02/05/25        Creación
+     ***********************************************************************************************/
+    /**
+     * @description  Al pasar al estado "Envío Complementaria", se rellena la fecha en la que esto ocurre
+     * @param listaCasoNegociacion
+     */
+    public static void rellenarFechaEnvioComplementaria(List<Case> listaCasoNegociacion) {
+        for (Case caso : listaCasoNegociacion) {
+            if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaEnvioComplementaria__c  = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = caso.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaEnvioComplementaria__c  = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
+        }
+    }
+    
+        /***********************************************************************************************
+     * Proposito: Al pasar al estado "Envío Rectificación", se rellena la fecha en la que esto ocurre
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1037919      Iria ANPC      02/05/25        Creación
+     ***********************************************************************************************/
+    /**
+     * @description  Al pasar al estado "Envío Rectificación", se rellena la fecha en la que esto ocurre
+     * @param listaCasoNegociacion
+     */
+    public static void rellenarFechaRevisionEnvioRectificacion(List<Case> listaCasoNegociacion) {
+        for (Case caso : listaCasoNegociacion) {
+            if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaRevisionEnvioRectificacion__c  = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = caso.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaRevisionEnvioRectificacion__c  = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.updateDML(caseExtension, false);
+            }
+        }
+    }
+    
+        /***********************************************************************************************
+     * Proposito: Al pasar al estado "Cerrado" desde "Envío Rectificación", se rellena la fecha en la que esto ocurre
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR         DATE         Description
+     * 1.0             US1037919      Iria ANPC      02/05/25        Creación
+     ***********************************************************************************************/
+    /**
+     * @description  Al pasar al estado "Cerrado" desde "Envío Rectificación", se rellena la fecha en la que esto ocurre
+     * @param listaCasoNegociacion
+     */
+    public static void rellenarFechaEnvioOrganismoRectificacion(List<Case> listaCasoNegociacion) {
+        for (Case caso : listaCasoNegociacion) {
+            if(caso.CBK_Case_Extension_Id__c == null){      //Si aún no tiene el extension
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.SPV_FechaEnvioOrganismoRectificacion__c  = CBK_UtilsDate.nowSYS();
+                SPV_DatabaseDML.insertDML(caseExtension, false);
+                caso.CBK_Case_Extension_Id__c = caseExtension.Id;   
+            }else{          //Si ya lo tiene
+                CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = caso.CBK_Case_Extension_Id__c;
+                caseExtension.SPV_FechaEnvioOrganismoRectificacion__c  = CBK_UtilsDate.nowSYS();
                 SPV_DatabaseDML.updateDML(caseExtension, false);
             }
         }
@@ -2611,9 +3546,13 @@ public with sharing class SPV_CaseHelper {
                 if(caso.SAC_FechaRecepcion__c == null || String.isBlank(String.valueOf(caso.SAC_FechaRecepcion__c))){
                     caso.addError('No se puede pasar al estado de Análisis y Decisión sin haber establecido la Fecha de recepción.');
                 }
-                if(caso.SAC_FechaVencimientoSLA__c == null || String.isBlank(String.valueOf(caso.SAC_FechaVencimientoSLA__c))){
+                /*if(caso.SAC_FechaVencimientoSLA__c == null || String.isBlank(String.valueOf(caso.SAC_FechaVencimientoSLA__c))){
                     caso.addError('No se puede pasar al estado de Análisis y Decisión sin haber establecido la Fecha de vencimiento.');
+                }*/
+                if(caso.SPV_Organismo__c == 'SPV_Consumo' && (caso.SAC_DiaVencimientoSLA__c == null || String.isBlank(String.valueOf(caso.SAC_DiaVencimientoSLA__c)))){
+                    caso.addError('No se puede pasar al estado de Análisis y Decisión sin haber establecido el Día de vencimiento.');
                 }
+
                 if(caso.SAC_Importe_Tipo__c == null || String.isBlank(caso.SAC_Importe_Tipo__c)){
                     caso.addError('No se puede pasar al estado de Análisis y Decisión sin haber establecido el tipo de importe.');
                 }else if(((caso.CC_Importe_Reclamado__c == 0 || caso.CC_Importe_Reclamado__c == null) && caso.SAC_Importe_Tipo__c == 'Importe reclamado') || caso.CC_Importe_Reclamado__c != 0 && caso.CC_Importe_Reclamado__c != null && (caso.SAC_Importe_Tipo__c == 'SIn cuantificar' || caso.SAC_Importe_Tipo__c == 'Sin importe')){
@@ -2769,94 +3708,99 @@ public with sharing class SPV_CaseHelper {
      * @param mapNewObj
      */
     public static void validarCamposEntraCerradoReclamacion(List<Case> listaCasos, Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj){
-        Set<Id> setIdsReclamaciones = new Set<Id>();
-        List<SAC_ImagenDocumento__c> listaOficinasAfectadas = new List<SAC_ImagenDocumento__c>();
-        List<CBK_Case_Extension__c> listaCaseExtension = new List<CBK_Case_Extension__c>();
-        Map<Id, CBK_Case_Extension__c> mapaCaseExtension = new Map<Id, CBK_Case_Extension__c>();
+        
+        Boolean tieneByPass = SPV_Utils.comprobarTieneBypass();  //si el usuario tiene el customPermission byPass, no nos saltarán las validaciones
 
-        for(Case caso : listaCasos){
-            setIdsReclamaciones.add(caso.Id);
-        }
+        if(!tieneByPass){
+            Set<Id> setIdsReclamaciones = new Set<Id>();
+            List<SAC_ImagenDocumento__c> listaOficinasAfectadas = new List<SAC_ImagenDocumento__c>();
+            List<CBK_Case_Extension__c> listaCaseExtension = new List<CBK_Case_Extension__c>();
+            Map<Id, CBK_Case_Extension__c> mapaCaseExtension = new Map<Id, CBK_Case_Extension__c>();
 
-        listaCaseExtension = [SELECT Id, Case_Id__c, SPV_Conclusion__c, SPV_ObservacionesMotivoDesfavorable__c, SPV_PropuestaLetrado__c FROM CBK_Case_Extension__c WHERE Case_Id__c IN :setIdsReclamaciones];
-        for(CBK_Case_Extension__c extension : listaCaseExtension){
-            if(!mapaCaseExtension.containsKey(extension.Id)){
-                mapaCaseExtension.put(extension.Id, extension);
+            for(Case caso : listaCasos){
+                setIdsReclamaciones.add(caso.Id);
             }
-        }
-        if(!setIdsReclamaciones.isEmpty()){
-            listaOficinasAfectadas = [SELECT Id, SAC_Caso__c FROM SAC_ImagenDocumento__c WHERE SAC_Caso__c IN :setIdsReclamaciones AND SPV_OficinaAfectada_Lookup__c != NULL];
-        }
-        //Se crea un mapa en el que se relaciona una reclamación con su oficina afectada (aunque tenga más de una), para controlar que tenga AL MENOS una oficina afectada
-        Map<Id, SAC_ImagenDocumento__c> mapaReclamacionOficinasAfectadas = new Map<Id, SAC_ImagenDocumento__c>();
-        if(!listaOficinasAfectadas.isEmpty()){
-            for(SAC_ImagenDocumento__c oficina : listaOficinasAfectadas){
-                if(!mapaReclamacionOficinasAfectadas.containsKey(oficina.SAC_Caso__c)){
-                    mapaReclamacionOficinasAfectadas.put(oficina.SAC_Caso__c, oficina);     //Con añadir la primera oficina es suficiente para las comprobaciones
+
+            listaCaseExtension = [SELECT Id, Case_Id__c, SPV_Conclusion__c, SPV_ObservacionesMotivoDesfavorable__c, SPV_PropuestaLetrado__c FROM CBK_Case_Extension__c WHERE Case_Id__c IN :setIdsReclamaciones];
+            for(CBK_Case_Extension__c extension : listaCaseExtension){
+                if(!mapaCaseExtension.containsKey(extension.Id)){
+                    mapaCaseExtension.put(extension.Id, extension);
                 }
             }
-        }
+            if(!setIdsReclamaciones.isEmpty()){
+                listaOficinasAfectadas = [SELECT Id, SAC_Caso__c FROM SAC_ImagenDocumento__c WHERE SAC_Caso__c IN :setIdsReclamaciones AND SPV_OficinaAfectada_Lookup__c != NULL];
+            }
+            //Se crea un mapa en el que se relaciona una reclamación con su oficina afectada (aunque tenga más de una), para controlar que tenga AL MENOS una oficina afectada
+            Map<Id, SAC_ImagenDocumento__c> mapaReclamacionOficinasAfectadas = new Map<Id, SAC_ImagenDocumento__c>();
+            if(!listaOficinasAfectadas.isEmpty()){
+                for(SAC_ImagenDocumento__c oficina : listaOficinasAfectadas){
+                    if(!mapaReclamacionOficinasAfectadas.containsKey(oficina.SAC_Caso__c)){
+                        mapaReclamacionOficinasAfectadas.put(oficina.SAC_Caso__c, oficina);     //Con añadir la primera oficina es suficiente para las comprobaciones
+                    }
+                }
+            }
 
-        for(Case caso : listaCasos){
-            List<String> valoresCampoMotivoDesfavorable = new List<String>();
-            if(caso.SAC_ValidacionOficinaAfectada__c == false){
-                caso.addError('Revise el campo Validación oficina afectada. No es posible cerrar la reclamación sin tener el campo informado.');
+            for(Case caso : listaCasos){
+                List<String> valoresCampoMotivoDesfavorable = new List<String>();
+                if(caso.SAC_ValidacionOficinaAfectada__c == false){
+                    caso.addError('Revise el campo Validación oficina afectada. No es posible cerrar la reclamación sin tener el campo informado.');
+                }
+                if(caso.SPV_NumExpediente__c == null || String.isBlank(caso.SPV_NumExpediente__c)){
+                    caso.addError('No se puede pasar al estado de Cerrado sin haber establecido el número de expediente de la reclamación.');
+                }
+                if(caso.SPV_Organismo__c == null || String.isBlank(caso.SPV_Organismo__c)){
+                    caso.addError('No se puede pasar al estado de Cerrado sin haber establecido el Organismo de la reclamación.');
+                }
+                if(caso.SPV_Organismo__c == 'SPV_Consumo' && (caso.SPV_ComunidadAutonoma__c == null || String.isBlank(caso.SPV_ComunidadAutonoma__c))){
+                    caso.addError('No se puede pasar al estado de Cerrado sin haber establecido la comunidad autónoma de la reclamación.');
+                }
+                if(caso.SPV_FechaIniRegulador__c == null || String.isBlank(String.valueOf(caso.SPV_FechaIniRegulador__c ))){
+                    caso.addError('No se puede pasar al estado de Cerrado sin tener informado el campo Fecha Inicio Regulador.');
+                }
+                if(caso.SAC_FechaRecepcion__c == null || String.isBlank(String.valueOf(caso.SAC_FechaRecepcion__c))){
+                    caso.addError('No se puede pasar al estado de Cerrado sin haber establecido la Fecha de recepción.');
+                }
+                /*if(caso.SAC_FechaVencimientoSLA__c == null || String.isBlank(String.valueOf(caso.SAC_FechaVencimientoSLA__c))){
+                    caso.addError('Revise el campo Fecha vencimiento. No es posible pasar a estado Cerrado sin tener el campo informado.');
+                }*/
+                if(caso.SAC_Importe_Tipo__c == null || String.isBlank(caso.SAC_Importe_Tipo__c)){
+                    caso.addError('No se puede pasar al estado de Cerrado sin haber establecido el tipo de importe.');
+                }else if(((caso.CC_Importe_Reclamado__c == 0 || caso.CC_Importe_Reclamado__c == null) && caso.SAC_Importe_Tipo__c == 'Importe reclamado') || caso.CC_Importe_Reclamado__c != 0 && caso.CC_Importe_Reclamado__c != null && (caso.SAC_Importe_Tipo__c == 'SIn cuantificar' || caso.SAC_Importe_Tipo__c == 'Sin importe')){
+                    caso.addError('El valor seleccionado para el campo Tipo importe no es correcto. Revise su valor o el valor del importe reclamado.');
+                }
+                if(caso.SAC_Entidad_Afectada__c == null || String.isBlank(caso.SAC_Entidad_Afectada__c)){
+                    caso.addError('No se puede pasar al estado de Cerrado sin haber informado la entidad afectada de la Reclamación.');
+                }
+                if(caso.SAC_EntidadProductora__c == null || String.isBlank(caso.SAC_EntidadProductora__c)){
+                    caso.addError('No se puede pasar al estado de Cerrado sin haber establecido el valor de Entidad productora.');
+                }
+                if(!mapaReclamacionOficinasAfectadas.containsKey(caso.Id)){
+                    caso.addError('No se puede pasar al estado de Cerrado sin haber establecido al menos una oficina afectada de la reclamación.');
+                }
+                if(caso.SPV_FechaRecepcionResolucion__c == null || String.isBlank(String.valueOf(caso.SPV_FechaRecepcionResolucion__c))){
+                    caso.addError('Revise el campo Fecha recepción resolución. No es posible pasar a estado Cerrado sin tener el campo informado.');
+                }
+                if(caso.SAC_SentidoResolucion__c == null || String.isBlank(caso.SAC_SentidoResolucion__c)){
+                    caso.addError('Revise el campo Sentido resolución. No es posible pasar a estado Cerrado sin tener el campo informado.');
+                }
+                //Si es desfavorable a la entidad, la conclusión es obligatoria:
+                /*if((caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadTotal' || caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadParcial') && (mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_Conclusion__c == null || String.isBlank(mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_Conclusion__c))){
+                    caso.addError('Revise el campo Conclusión. No es posible pasar a estado Cerrado sin tener el campo informado.');
+                }
+                if((caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadTotal' || caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadParcial') && (caso.SPV_TipoDesfavorable__c == null || String.isBlank(caso.SPV_TipoDesfavorable__c))){
+                    caso.addError('Revise el campo Motivo Desfavorable. No es posible pasar a estado Cerrado sin tener el campo informado.');
+                }
+                //Solo es encesario añadir observaciones al motivo desfavorable si el motivo desfavorable incluye "Otros":
+                if(caso.SPV_TipoDesfavorable__c != null){
+                    valoresCampoMotivoDesfavorable = caso.SPV_TipoDesfavorable__c.split(';');
+                }
+                if((caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadTotal' || caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadParcial') && valoresCampoMotivoDesfavorable.contains('SPV_TipoDesf_04') && (mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_ObservacionesMotivoDesfavorable__c == null || String.isBlank(mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_ObservacionesMotivoDesfavorable__c))){
+                    caso.addError('Es necesario añadir las Observaciones Motivo Desfavorable para poder pasar a estado Cerrado.');
+                }*/
+                /*if(mapaCaseExtension.containsKey(caso.CBK_Case_Extension_Id__c) && (mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_PropuestaLetrado__c == null || String.isBlank(mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_PropuestaLetrado__c))){
+                    caso.addError('Revise el campo Propuesta Letrado. No es posible pasar a estado Cerrado sin tener el campo informado.');
+                }*/
             }
-            if(caso.SPV_NumExpediente__c == null || String.isBlank(caso.SPV_NumExpediente__c)){
-                caso.addError('No se puede pasar al estado de Cerrado sin haber establecido el número de expediente de la reclamación.');
-            }
-            if(caso.SPV_Organismo__c == null || String.isBlank(caso.SPV_Organismo__c)){
-                caso.addError('No se puede pasar al estado de Cerrado sin haber establecido el Organismo de la reclamación.');
-            }
-            if(caso.SPV_Organismo__c == 'SPV_Consumo' && (caso.SPV_ComunidadAutonoma__c == null || String.isBlank(caso.SPV_ComunidadAutonoma__c))){
-                caso.addError('No se puede pasar al estado de Cerrado sin haber establecido la comunidad autónoma de la reclamación.');
-            }
-            if(caso.SPV_FechaIniRegulador__c == null || String.isBlank(String.valueOf(caso.SPV_FechaIniRegulador__c ))){
-                caso.addError('No se puede pasar al estado de Cerrado sin tener informado el campo Fecha Inicio Regulador.');
-            }
-            if(caso.SAC_FechaRecepcion__c == null || String.isBlank(String.valueOf(caso.SAC_FechaRecepcion__c))){
-                caso.addError('No se puede pasar al estado de Cerrado sin haber establecido la Fecha de recepción.');
-            }
-            if(caso.SAC_FechaVencimientoSLA__c == null || String.isBlank(String.valueOf(caso.SAC_FechaVencimientoSLA__c))){
-                caso.addError('Revise el campo Fecha vencimiento. No es posible pasar a estado Cerrado sin tener el campo informado.');
-            }
-            if(caso.SAC_Importe_Tipo__c == null || String.isBlank(caso.SAC_Importe_Tipo__c)){
-                caso.addError('No se puede pasar al estado de Cerrado sin haber establecido el tipo de importe.');
-            }else if(((caso.CC_Importe_Reclamado__c == 0 || caso.CC_Importe_Reclamado__c == null) && caso.SAC_Importe_Tipo__c == 'Importe reclamado') || caso.CC_Importe_Reclamado__c != 0 && caso.CC_Importe_Reclamado__c != null && (caso.SAC_Importe_Tipo__c == 'SIn cuantificar' || caso.SAC_Importe_Tipo__c == 'Sin importe')){
-                caso.addError('El valor seleccionado para el campo Tipo importe no es correcto. Revise su valor o el valor del importe reclamado.');
-            }
-            if(caso.SAC_Entidad_Afectada__c == null || String.isBlank(caso.SAC_Entidad_Afectada__c)){
-                caso.addError('No se puede pasar al estado de Cerrado sin haber informado la entidad afectada de la Reclamación.');
-            }
-            if(caso.SAC_EntidadProductora__c == null || String.isBlank(caso.SAC_EntidadProductora__c)){
-                  caso.addError('No se puede pasar al estado de Cerrado sin haber establecido el valor de Entidad productora.');
-            }
-            if(!mapaReclamacionOficinasAfectadas.containsKey(caso.Id)){
-                caso.addError('No se puede pasar al estado de Cerrado sin haber establecido al menos una oficina afectada de la reclamación.');
-            }
-            if(caso.SPV_FechaRecepcionResolucion__c == null || String.isBlank(String.valueOf(caso.SPV_FechaRecepcionResolucion__c))){
-                caso.addError('Revise el campo Fecha recepción resolución. No es posible pasar a estado Cerrado sin tener el campo informado.');
-            }
-            if(caso.SAC_SentidoResolucion__c == null || String.isBlank(caso.SAC_SentidoResolucion__c)){
-                caso.addError('Revise el campo Sentido resolución. No es posible pasar a estado Cerrado sin tener el campo informado.');
-            }
-            //Si es desfavorable a la entidad, la conclusión es obligatoria:
-            /*if((caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadTotal' || caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadParcial') && (mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_Conclusion__c == null || String.isBlank(mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_Conclusion__c))){
-                caso.addError('Revise el campo Conclusión. No es posible pasar a estado Cerrado sin tener el campo informado.');
-            }
-            if((caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadTotal' || caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadParcial') && (caso.SPV_TipoDesfavorable__c == null || String.isBlank(caso.SPV_TipoDesfavorable__c))){
-                caso.addError('Revise el campo Motivo Desfavorable. No es posible pasar a estado Cerrado sin tener el campo informado.');
-            }
-            //Solo es encesario añadir observaciones al motivo desfavorable si el motivo desfavorable incluye "Otros":
-            if(caso.SPV_TipoDesfavorable__c != null){
-                valoresCampoMotivoDesfavorable = caso.SPV_TipoDesfavorable__c.split(';');
-            }
-            if((caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadTotal' || caso.SAC_SentidoResolucion__c == 'SPV_DesfavorableEntidadParcial') && valoresCampoMotivoDesfavorable.contains('SPV_TipoDesf_04') && (mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_ObservacionesMotivoDesfavorable__c == null || String.isBlank(mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_ObservacionesMotivoDesfavorable__c))){
-                caso.addError('Es necesario añadir las Observaciones Motivo Desfavorable para poder pasar a estado Cerrado.');
-            }*/
-            /*if(mapaCaseExtension.containsKey(caso.CBK_Case_Extension_Id__c) && (mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_PropuestaLetrado__c == null || String.isBlank(mapaCaseExtension.get(caso.CBK_Case_Extension_Id__c).SPV_PropuestaLetrado__c))){
-                caso.addError('Revise el campo Propuesta Letrado. No es posible pasar a estado Cerrado sin tener el campo informado.');
-            }*/
         }
     }
 
@@ -2909,9 +3853,6 @@ public with sharing class SPV_CaseHelper {
 
                 }
             }
-
-
-
         }
     }
 
@@ -3142,7 +4083,6 @@ public with sharing class SPV_CaseHelper {
      * @param mapaDatosCasosActualizar
      */
     public static void cambioAltaAnalisisReclamacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar){
-
         Set<Id> idsReclaCambiarEstado = new Set<Id>();
         List<Id> listaIdsRec = new List<Id>();
         List<Case> listaBalanceoLetrado = new List<Case>();
@@ -3154,7 +4094,6 @@ public with sharing class SPV_CaseHelper {
                 if(mapOldObj.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SPV_AnalisisDecision'){
                     //Al pasar de "Alta" a "Análisis y Decisión" la reclamación, se hace el balanceo de letrado
                     listaBalanceoLetrado.add(caso);
-                    
                 }
                 listaIdsRec.add(caso.Id);
             }
@@ -3163,10 +4102,11 @@ public with sharing class SPV_CaseHelper {
         if(!idsReclaCambiarEstado.isEmpty() || !listaBalanceoLetrado.isEmpty()){
 
     
-            List<Case> listaFamilaRec = [SELECT Id, OwnerId, recordTypeId, SAC_Reclamacion__c, SAC_Reclamacion__r.OwnerId, SAC_Letrado__c, SPV_VueltaAlta__c, Origin, CC_CasoRelacionado__c, CC_CasoRelacionado__r.SAC_GrupoLetrado__c, CC_CasoRelacionado__r.SAC_GrupoLetrado__r.Name, SAC_PretensionPrincipal__c, SAC_PretensionPrincipal__r.SEG_Detalle__c,
-                                                SAC_PretensionPrincipal__r.SEG_Detalle__r.SPV_BalanceoForzado__c, SPV_Organismo__c, SAC_ResultadoNegociacion__c, Status, SAC_Reclamacion__r.Status, SAC_Reclamacion__r.SAC_PretensionPrincipal__c, SAC_Reclamacion__r.CaseNumber, SEG_Grupo__c, SEG_Grupo__r.SAC_Email__c
+            List<Case> listaFamilaRec = [SELECT Id, OwnerId, recordTypeId, SAC_Reclamacion__c, SAC_Reclamacion__r.OwnerId, SAC_Letrado__c, SPV_VueltaAlta__c, Origin, CC_CasoRelacionado__c, CC_Importe_Reclamado__c, CC_CasoRelacionado__r.SAC_GrupoLetrado__c, CC_CasoRelacionado__r.SAC_GrupoLetrado__r.Name, SAC_PretensionPrincipal__c, SAC_PretensionPrincipal__r.SEG_Detalle__c, SAC_PretensionPrincipal__r.CC_MCC_Motivo__c, SAC_PretensionPrincipal__r.CC_MCC_ProdServ__c, SAC_PretensionPrincipal__r.CC_MCC_Tematica__c,
+                                                SAC_PretensionPrincipal__r.SEG_Detalle__r.SPV_BalanceoForzado__c, SPV_Organismo__c, SAC_ResultadoNegociacion__c, Status, SAC_Reclamacion__r.Status, SAC_Reclamacion__r.SAC_PretensionPrincipal__c, SAC_Reclamacion__r.CaseNumber, SEG_Grupo__c, SEG_Grupo__r.SAC_Email__c, SEG_Detalle__r.SAC_ImporteDesdeMCC__c, SEG_Detalle__r.SAC_ImporteHastaMCC__c, SEG_Detalle__r.SAC_GrupoLetradoMCC__c, CC_MCC_Motivo__r.SAC_ImporteDesdeMCC__c, CC_MCC_Motivo__r.SAC_ImporteHastaMCC__c, CC_MCC_Motivo__r.SAC_GrupoLetradoMCC__c,
+                                                CC_MCC_ProdServ__r.SAC_ImporteDesdeMCC__c, CC_MCC_ProdServ__r.SAC_ImporteHastaMCC__c, CC_MCC_ProdServ__r.SAC_GrupoLetradoMCC__c, CC_MCC_Tematica__r.SAC_ImporteDesdeMCC__c, CC_MCC_Tematica__r.SAC_ImporteHastaMCC__c, CC_MCC_Tematica__r.SAC_GrupoLetradoMCC__c,
+                                                SAC_PretensionPrincipal__r.SEG_Detalle__r.SPV_Especialidad__c, SEG_Detalle__c, CC_MCC_ProdServ__c, CC_MCC_Motivo__c, CC_MCC_Tematica__c
                                                 FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION AND Id IN :listaIdsRec) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__C IN :listaIdsRec)];
-
             if(!idsReclaCambiarEstado.isEmpty()) {
                 //Actualizar el estado de las pretensiones 
                 actualizarEstadosPretension(idsReclaCambiarEstado, mapaDatosCasosActualizar, listaFamilaRec);
@@ -3236,7 +4176,6 @@ public with sharing class SPV_CaseHelper {
                 ////Para las reclamaciones que cambian de owner, se cambia el de sus hermanas
                 // SPV_Pretension.cambiarOwnersPretsHermanas(lstPretensiones, listaCasosSelect, mapaDatosCasosActualizar);
                 // SPV_Pretension.cambioLetrado(lstPretensiones, mapaDatosCasosActualizar, cola, colaSupervisores, colaPteAsignarSPV);
-                cambioSLAAsignacionLetrado(lstPretensiones, mapOldObj, colaPteAsignarSPV);
             }
         }
 
@@ -3527,9 +4466,8 @@ public with sharing class SPV_CaseHelper {
 
         for (Case caso : listaCasosSPV) {
             if (caso.RecordTypeId == RECTYPERECLAMACION){
-                if((mapOldObj.get(caso.Id).Status == 'SPV_EnvioOrganismos' && caso.Status == 'SPV_AnalisisDecision') || (mapOldObj.get(caso.Id).Status == 'SPV_AnalisisDecision' && caso.Status == 'SAC_001') || (mapOldObj.get(caso.Id).Status == 'SPV_AnalisisDecision' && caso.Status == 'SPV_EnvioOrganismos') ||
-                   (mapOldObj.get(caso.Id).Status == 'SPV_PendienteRespuestaOrganismo' && caso.Status == 'SPV_AnalisisDecision' && caso.SPV_Complementaria_Entidad__c == true) || (mapOldObj.get(caso.Id).Status == 'SPV_PendienteRespuestaOrganismo' && caso.Status == 'SPV_Rectificacion') ||
-                   (mapOldObj.get(caso.Id).Status == 'SPV_PendienteRespuestaOrganismo' && caso.Status == 'SPV_RecepcionResolucion') || (mapOldObj.get(caso.Id).Status == 'SPV_RecepcionResolucion' && caso.Status == 'Cerrado')
+                if((mapOldObj.get(caso.Id).Status == 'SPV_Envio' && caso.Status == 'SPV_AnalisisDecision') || (mapOldObj.get(caso.Id).Status == 'SPV_AnalisisDecision' && caso.Status == 'SAC_001') || (mapOldObj.get(caso.Id).Status == 'SPV_EnvioComplementaria' && caso.Status == 'SPV_AnalisisComplementariaOrganismo') ||
+                   (mapOldObj.get(caso.Id).Status == 'SPV_EnvioRectificacion' && caso.Status == 'SPV_Rectificacion')
                    ) {
                     setIdsReclamaciones.add(caso.Id);
                     hacerQuery = true;
@@ -3546,7 +4484,7 @@ public with sharing class SPV_CaseHelper {
 
         if (hacerQuery) {
             listaCasosSelect = [SELECT Id, RecordTypeId, SAC_Reclamacion__c, OwnerId, SEG_Grupo__r.SAC_Email__c, SAC_PretensionPrincipal__r.OwnerId, SAC_GrupoLetrado__r.SAC_Email__c, Owner.Email, SAC_PretensionPrincipal__r.Owner.Email,
-                                    SAC_PretensionPrincipal__r.SEG_Grupo__r.SAC_Email__c, CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c
+                                    SAC_PretensionPrincipal__r.SEG_Grupo__r.SAC_Email__c, CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c, SAC_PretensionPrincipal__r.SEG_Case_Owner__c, SAC_GrupoLetrado__c
                                 FROM Case
                                 WHERE (RecordTypeId = :RECTYPEPRETENSION OR RecordTypeId = :RECTYPERECLAMACION) AND (Id = :setIdsReclamaciones OR SAC_Reclamacion__c IN :setIdsReclamaciones)];
 
@@ -3574,108 +4512,136 @@ public with sharing class SPV_CaseHelper {
                 //Si es una reclamación
                 if (caso.RecordTypeId == RECTYPERECLAMACION) {
                     Case reclamacion = mapReclamaciones.get(caso.Id);
-
-                    //Status pasa de "Análisis y Decisión" a "Alta"
-                    if (mapOldObj.get(caso.Id).Status == 'SPV_AnalisisDecision' && caso.Status == 'SAC_001') {
-
-                        List<String> listaEmails = new List<String>();
-                        if(reclamacion.SEG_Grupo__r.SAC_Email__c != null) {
-                            listaEmails.add(reclamacion.SEG_Grupo__r.SAC_Email__c);
-                        }
-                        //Añadir el email del gestor
-                        listaEmails.add(reclamacion.Owner.Email);
-
-                        SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(caso.Id,
-                                                                'SPV_001',
-                                                                'Devolución letrado a gestor. ' + 
-                                                                'Se ha devuelto la reclamación ' + caso.CaseNumber + ' a estado de alta. Debe volver a revisar la reclamación.',
-                                                                caso.OwnerId,
-                                                                '',
-                                                                '',
-                                                                '');
-                                                                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
-                                                                wrapAlerta.listaEmailsGrupo = listaEmails;
-                                                                wrapAlerta.idGrupoColaborador = caso.SEG_Grupo__c;
-                                                                wrapAlerta.proyecto = 'SPV';
-                        //Añadirla a la lista para posteriormente llamar al método
-                        listaWrapperAlerta.add(wrapAlerta);
-                    }
-                    //Status pasa de "Análisis y Decisión" a "Envío organismo"
-                    else if (mapOldObj.get(caso.Id).Status == 'SPV_AnalisisDecision' && caso.Status == 'SPV_EnvioOrganismos') {
+                    //Si se devuelve de "Análisis y Decisión" a "Alta"
+                    if(mapOldObj.get(caso.Id).Status == 'SPV_AnalisisDecision' && caso.Status == 'SAC_001'){
+                        
+                        //Primero se determina a qué email se enviará la alerta
 
                         List<String> listaEmails = new List<String>();
-                        if(reclamacion.SEG_Grupo__r.SAC_Email__c != null) {
-                            listaEmails.add(reclamacion.SEG_Grupo__r.SAC_Email__c);
-                        }
-                        //Añadir el email del gestor
-                        listaEmails.add(reclamacion.Owner.Email);
 
+                        //Si está en Pte. Asignar, se envía email al grupo proveedor asignado a la reclamación
+                        if(caso.SEG_Case_Owner__c == 'Pte. Asignar (SPV)'){
+                            if(reclamacion.SEG_Grupo__r.SAC_Email__c != null) {
+                                listaEmails.add(reclamacion.SEG_Grupo__r.SAC_Email__c);
+                            }
+                        }else{      //Si no, añadir el email del gestor de altas propietario de la reclamación
+                            if(String.isNotBlank(reclamacion.Owner.Email)) {
+                                listaEmails.add(reclamacion.Owner.Email);
+                            }
+
+                        }
+
+                        //Se crea la alerta
                         SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(caso.Id,
-                                                                'SPV_002',
-                                                                'La reclamación ' + caso.CaseNumber + ' a pasado de análisis a Envío organismo.',
-                                                                caso.OwnerId,
-                                                                '',
-                                                                '',
-                                                                '');
-                                                                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
-                                                                wrapAlerta.listaEmailsGrupo = listaEmails;
-                                                                wrapAlerta.idGrupoColaborador = caso.SEG_Grupo__c;
-                                                                wrapAlerta.proyecto = 'SPV';
+                                        'SPV_001',
+                                        'Devolución a alta. ' + 
+                                        'Se ha devuelto la reclamación ' + caso.CaseNumber + ' a estado de alta. Debe volver a revisar la reclamación.',
+                                        caso.OwnerId,
+                                        '',
+                                        '',
+                                        '');
+                                        wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+                                        wrapAlerta.listaEmailsGrupo = listaEmails;
+                                        wrapAlerta.idGrupoColaborador = caso.SEG_Grupo__c;
+                                        wrapAlerta.proyecto = 'SPV';
                         //Añadirla a la lista para posteriormente llamar al método
                         listaWrapperAlerta.add(wrapAlerta);
-                    }
-                    //Status pasa de "Envío organismo" a "Análisis y Decisión"
-                    else if (mapOldObj.get(caso.Id).Status == 'SPV_EnvioOrganismos' && caso.Status == 'SPV_AnalisisDecision') {
 
+                    }else if(mapOldObj.get(caso.Id).Status == 'SPV_Envio' && caso.Status == 'SPV_AnalisisDecision'){     //Alerta al devolver la reclamación de Envío a Análisis y Decisión
+                        //Primero se establece a qué emails se mandará la alerta
                         List<String> listaEmails = new List<String>();
-                        if(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c != null) {
-                            listaEmails.add(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c);
+
+                        //Si el letrado está en Pte. Asignar, se envía email al grupo letrado asignado a las pretensiones
+                        if(reclamacion.SAC_PretensionPrincipal__r.SEG_Case_Owner__c == 'Pte. Asignar (SPV)'){
+                            if(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c != null) {
+                                listaEmails.add(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c);
+                            }
+                        }else{      //Si no, añadir el email del letrado propietario de la pretensión principal
+                            if(String.isNotBlank(reclamacion.SAC_PretensionPrincipal__r.Owner.Email)) {
+                                listaEmails.add(reclamacion.SAC_PretensionPrincipal__r.Owner.Email);
+                            }
                         }
-                        //Añadir el email del letrado
-                        listaEmails.add(reclamacion.SAC_PretensionPrincipal__r.Owner.Email);
-                    
-                        //Se envia alerta el owner de las pretensiones y al grupo letrado
+
+                        //Se crea la alerta
                         SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(caso.Id,
-                                                        'SPV_003',
-                                                        'La reclamación ' + caso.CaseNumber + ' a pasado de Envío organismo a análisis.',
-                                                        reclamacion.SAC_PretensionPrincipal__r.OwnerId,
-                                                        '',
-                                                        '', 
-                                                        '');
-                                                        wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
-                                                        wrapAlerta.listaEmailsGrupo = listaEmails;
-                                                        wrapAlerta.idGrupoColaborador = caso.SAC_GrupoLetrado__c;
-                                                        wrapAlerta.proyecto = 'SPV';
+                                        'SPV_003',
+                                        'Devolución a Análisis y Decisión. ' + 
+                                        'Se ha devuelto la reclamación ' + caso.CaseNumber + ' a estado de Análisis y Decisión.',
+                                        reclamacion.SAC_PretensionPrincipal__r.OwnerId,
+                                        '',
+                                        '',
+                                        '');
+                                        wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+                                        wrapAlerta.listaEmailsGrupo = listaEmails;
+                                        wrapAlerta.idGrupoColaborador = reclamacion.SAC_GrupoLetrado__c;
+                                        wrapAlerta.proyecto = 'SPV';
                         //Añadirla a la lista para posteriormente llamar al método
                         listaWrapperAlerta.add(wrapAlerta);
-                    }
-                    //Status pasa de "Pendiente respuesta organismos" a "Análisis y Decisión" y tenga la complementaria entidad activa
-                    else if (mapOldObj.get(caso.Id).Status == 'SPV_PendienteRespuestaOrganismo' && caso.Status == 'SPV_AnalisisDecision' && caso.SPV_Complementaria_Entidad__c == true) {
 
+                    }else if(mapOldObj.get(caso.Id).Status == 'SPV_EnvioComplementaria' && caso.Status == 'SPV_AnalisisComplementariaOrganismo'){            //Alerta al devolver la reclamación de Envío Complementaria a Análisis Complementaria Organismo
+                        //Primero se establece a qué emails se mandará la alerta
                         List<String> listaEmails = new List<String>();
-                        if(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c != null) {
-                            listaEmails.add(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c);
+                        //Si el letrado está en Pte. Asignar, se envía email al grupo letrado asignado a las pretensiones
+                        if(reclamacion.SAC_PretensionPrincipal__r.SEG_Case_Owner__c == 'Pte. Asignar (SPV)'){
+                            if(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c != null) {
+                                listaEmails.add(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c);
+                            }
+                        }else{      //Si no, añadir el email del letrado propietario de la pretensión principal
+                            if(String.isNotBlank(reclamacion.SAC_PretensionPrincipal__r.Owner.Email)) {
+                                listaEmails.add(reclamacion.SAC_PretensionPrincipal__r.Owner.Email);
+                            }
                         }
-                        //Añadir el email del letrado
-                        listaEmails.add(reclamacion.SAC_PretensionPrincipal__r.Owner.Email);
 
-                        //Se envia alerta el owner de las pretensiones y al grupo letrado
+                        //Se crea la alerta
                         SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(caso.Id,
-                                                        'SPV_011',
-                                                        'La reclamación ' + caso.CaseNumber + ' a pasado de Pendiente respuesta organismo a análisis.',
-                                                        reclamacion.SAC_PretensionPrincipal__r.OwnerId,
-                                                        '',
-                                                        '', 
-                                                        '');
-                                                        wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
-                                                        wrapAlerta.listaEmailsGrupo = listaEmails;
-                                                        wrapAlerta.idGrupoColaborador = caso.SAC_GrupoLetrado__c;
-                                                        wrapAlerta.proyecto = 'SPV';
+                                        'SPV_027',
+                                        'Devolución a Análisis Complementaria Organismo. ' + 
+                                        'Se ha devuelto la reclamación ' + caso.CaseNumber + ' a estado Análisis Complementaria Organismo.',
+                                        reclamacion.SAC_PretensionPrincipal__r.OwnerId,
+                                        '',
+                                        '',
+                                        '');
+                                        wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+                                        wrapAlerta.listaEmailsGrupo = listaEmails;
+                                        wrapAlerta.idGrupoColaborador = reclamacion.SAC_GrupoLetrado__c;
+                                        wrapAlerta.proyecto = 'SPV';
                         //Añadirla a la lista para posteriormente llamar al método
                         listaWrapperAlerta.add(wrapAlerta);
+
+                    }else if(mapOldObj.get(caso.Id).Status == 'SPV_EnvioRectificacion' && caso.Status == 'SPV_Rectificacion'){                              //Alerta al devolver la reclamación de Envío Rectificación a Rectificación                                  
+                        
+                        //Primero se establece a qué emails se mandará la alerta
+                        List<String> listaEmails = new List<String>();
+                        //Si el letrado está en Pte. Asignar, se envía email al grupo letrado asignado a las pretensiones
+                        if(reclamacion.SAC_PretensionPrincipal__r.SEG_Case_Owner__c == 'Pte. Asignar (SPV)'){
+                            if(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c != null) {
+                                listaEmails.add(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c);
+                            }
+                        }else{      //Si no, añadir el email del letrado propietario de la pretensión principal
+                            if(String.isNotBlank(reclamacion.SAC_PretensionPrincipal__r.Owner.Email)) {
+                                listaEmails.add(reclamacion.SAC_PretensionPrincipal__r.Owner.Email);
+                            }
+                        }
+
+                        //Se crea la alerta
+                        SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(caso.Id,
+                                        'SPV_028',
+                                        'Devolución a Rectificación. ' + 
+                                        'Se ha devuelto la reclamación ' + caso.CaseNumber + ' a estado de Rectificación.',
+                                        reclamacion.SAC_PretensionPrincipal__r.OwnerId,
+                                        '',
+                                        '',
+                                        '');
+                                        wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+                                        wrapAlerta.listaEmailsGrupo = listaEmails;
+                                        wrapAlerta.idGrupoColaborador = reclamacion.SAC_GrupoLetrado__c;
+                                        wrapAlerta.proyecto = 'SPV';
+                        //Añadirla a la lista para posteriormente llamar al método
+                        listaWrapperAlerta.add(wrapAlerta);
+
                     }
                     //Reasignación grupo letrado (grupo letrado diferente al que inicialmente se había asignado)
-                    else if (mapOldObj.get(caso.Id).SAC_GrupoLetrado__c != null && mapOldObj.get(caso.Id).SAC_GrupoLetrado__c != caso.SAC_GrupoLetrado__c) {
+                    /*else if (mapOldObj.get(caso.Id).SAC_GrupoLetrado__c != null && mapOldObj.get(caso.Id).SAC_GrupoLetrado__c != caso.SAC_GrupoLetrado__c) {
 
                         if(mapRecOldOwnerPret.containsKey(caso.Id)){
                             List<String> listaEmails = new List<String>();
@@ -3700,36 +4666,9 @@ public with sharing class SPV_CaseHelper {
                             //Añadirla a la lista para posteriormente llamar al método
                             listaWrapperAlerta.add(wrapAlerta);
                         }
-                    }
-                    //Status pasa de Pendiente respeusta organismo a Rectificacion
-                    else if (mapOldObj.get(caso.Id).Status == 'SPV_PendienteRespuestaOrganismo' && caso.Status == 'SPV_Rectificacion') {
-
-                        List<String> listaEmails = new List<String>();
-                        if(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c != null) {
-                            listaEmails.add(reclamacion.SAC_GrupoLetrado__r.SAC_Email__c);
-                        }
-                        //Añadir el email del letrado
-                        if(String.isNotBlank(reclamacion.SAC_PretensionPrincipal__r.Owner.Email)) {
-                            listaEmails.add(reclamacion.SAC_PretensionPrincipal__r.Owner.Email);
-                        }
-
-                        //Se envia alerta el owner de las pretensiones y al grupo letrado
-                        SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(caso.Id,
-                                                        'SPV_014',
-                                                        'La reclamación ' + caso.CaseNumber + ' ha pasado de Pendiente respuesta Organismo a Rectificación.',
-                                                        reclamacion.SAC_PretensionPrincipal__r.OwnerId,
-                                                        '',
-                                                        '', 
-                                                        '');
-                                                        wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
-                                                        wrapAlerta.listaEmailsGrupo = listaEmails;
-                                                        wrapAlerta.idGrupoColaborador = caso.SAC_GrupoLetrado__c;
-                                                        wrapAlerta.proyecto = 'SPV';
-                        //Añadirla a la lista para posteriormente llamar al método
-                        listaWrapperAlerta.add(wrapAlerta);
-                    }
+                    }*/
                     //Status pasa de Pendiente respuesta organismo a recepcion resolucion o de recepcion resolucion a cerrado con una NEGOCIACION EN CURSO
-                    else if ((mapOldObj.get(caso.Id).Status == 'SPV_PendienteRespuestaOrganismo' && caso.Status == 'SPV_RecepcionResolucion' && reclamacion.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c == true) || 
+                    /*else if ((mapOldObj.get(caso.Id).Status == 'SPV_PendienteRespuestaOrganismo' && caso.Status == 'SPV_RecepcionResolucion' && reclamacion.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c == true) || 
                             (mapOldObj.get(caso.Id).Status == 'SPV_RecepcionResolucion' && caso.Status == 'Cerrado' && reclamacion.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c == true)) {
                         
                         List<String> listaEmails = new List<String>();
@@ -3755,19 +4694,19 @@ public with sharing class SPV_CaseHelper {
                                                         wrapAlerta.proyecto = 'SPV';
                         //Añadirla a la lista para posteriormente llamar al método
                         listaWrapperAlerta.add(wrapAlerta);
-                    }
+                    }*/
                     //Si el subestado es 'Negociacion', lanzar schedulable  para dentro de 7 dias comprobar si sigue en negociación y mandar alerta
-                    else if (mapOldObj.get(caso.Id).SEG_Subestado__c != caso.SEG_Subestado__c && caso.SEG_Subestado__c == 'Negociacion') {
+                    /*else if (mapOldObj.get(caso.Id).SEG_Subestado__c != caso.SEG_Subestado__c && caso.SEG_Subestado__c == 'Negociacion') {
                         listCasosNegociacion.add(caso);
-                    }
+                    }*/
                 }
             }
         }
 
         //Si tenemos reclamaciones en subestado negociacion, debemos crear el pending process para la ejecucion de sus alertas
-        if (!listCasosNegociacion.isEmpty()) {
+        /*if (!listCasosNegociacion.isEmpty()) {
             scheduleAlertaNegociacion(listCasosNegociacion);
-        }
+        }*/
 
         //Si tenemos alertas que enviar, se llama al método que las envía
         if (!listaWrapperAlerta.isEmpty()) {
@@ -3787,7 +4726,7 @@ public with sharing class SPV_CaseHelper {
      * @description  Crea un registro de pendingProcess para lanzar una clase schedulable al cabo de 7 dias.
      * @param listNewRecPret
      */
-    public static void scheduleAlertaNegociacion(List<Case> listNewRecPret) {
+    /*public static void scheduleAlertaNegociacion(List<Case> listNewRecPret) {
         List<CBK_SCH_PendingProcess__c> listaPendingProcess = new List<CBK_SCH_PendingProcess__c>();
 
         for (Case caso : listNewRecPret) {
@@ -3801,7 +4740,7 @@ public with sharing class SPV_CaseHelper {
         if (!listaPendingProcess.isEmpty()) {
             SPV_DatabaseDML.insertListDML(listaPendingProcess, true);
         }
-    }
+    }*/
 
     /*****************************************************************
     * Proposito: Informar el MCC y las entidades de la pretension principal en la reclamación
@@ -3874,7 +4813,7 @@ public with sharing class SPV_CaseHelper {
         Set<Id> idsUsuarios= new Set<Id>();                             //Set de ids donde se almacenan los nuevos owner
         Map<Id, Id> mapaReclamacionNuevoOwnwer = new Map<Id, Id>();     //Mapa id padre - id nuevo owner pretensiones
         List<Case> listaPretensionesCambiaOwnerInicial = new List<Case>();  //Lista donde se almacenan las pretensiones que han cambiado de owner (las que vienen del trigger)
-
+        //Group colaPteAsignar = [SELECT Id, DeveloperName, Name FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SPV_PendienteAsignar' LIMIT 1];
 
         for(Case pretension : listaPretensiones){
             if(mapOldObj.containsKey(pretension.Id) && mapOldObj.get(pretension.Id).OwnerId != pretension.OwnerId){         //Si la pretensión ha cambiado de owner
@@ -3890,10 +4829,11 @@ public with sharing class SPV_CaseHelper {
 
         //Se obtienen todas las pretensiones hermanas de las pretensiones cuyo owner haya cambiado
         if(!idsReclamacionesPadre.isEmpty()){
-            listaPretensionesCambiaOwner = [SELECT Id, OwnerId, SAC_Reclamacion__c FROM Case WHERE SAC_Reclamacion__c IN :idsReclamacionesPadre];
+            listaPretensionesCambiaOwner = [SELECT Id, OwnerId, SAC_Reclamacion__c, CBK_Case_Extension_Id__c FROM Case WHERE SAC_Reclamacion__c IN :idsReclamacionesPadre];
         }
         
 
+        List<CBK_Case_Extension__c> listaCaseExtensionActualizar = new List<CBK_Case_Extension__c>();
         //Se añaden al mapaCasosActualizar las pretensiones hermanas con el nuevo owner cambiado
         if(!listaPretensionesCambiaOwner.isEmpty()){
             for(Case pretension : listaPretensionesCambiaOwner){
@@ -3905,7 +4845,22 @@ public with sharing class SPV_CaseHelper {
                     nuevaPretension.OwnerId = mapaReclamacionNuevoOwnwer.get(pretension.SAC_Reclamacion__c);
                     mapaDatosCasosActualizar.put(nuevaPretension.Id, nuevaPretension);
                 }
+                
+                //Se actualiza también el campo Letrado propietario
+                /*CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+                caseExtension.Id = pretension.CBK_Case_Extension_Id__c;
+                if(mapaReclamacionNuevoOwnwer.get(pretension.SAC_Reclamacion__c) == colaPteAsignar.Id){ //Si el nuevo owner es la cola Pte. Asignar, se vacía el campo Letrado Propietario, ya que es un lookup a User
+                    caseExtension.SPV_LetradoPropietario__c = null;
+                }else{
+                    caseExtension.SPV_LetradoPropietario__c = mapaReclamacionNuevoOwnwer.get(pretension.SAC_Reclamacion__c);
+                }
+                listaCaseExtensionActualizar.add(caseExtension);*/
             }
+
+            /*if(!listaCaseExtensionActualizar.isEmpty()){
+                SPV_DatabaseDML.updateListDML(listaCaseExtensionActualizar, true);
+            }*/
+
         }
 
         //Actualización de SAC_Letrado__c en la reclamación: 
@@ -3917,8 +4872,6 @@ public with sharing class SPV_CaseHelper {
             listaUsuarios = [SELECT Id, Name FROM User WHERE Id IN :idsUsuarios];
         }
         
-
-
         //Crear mapa con los usuarios obtenidos
         Map<Id, User> mapaUsersOwners = new Map<Id, User>();
         if(!listaUsuarios.isEmpty()){
@@ -3928,8 +4881,6 @@ public with sharing class SPV_CaseHelper {
                 }
             }
         }
-
-
         //Añadir al mapa de casos a actualizar, las reclamaciones cuyas pretensiones hayan cambiado de owner, con el campo SAC_Letrado__c actualizado
         for(Case pretension : listaPretensionesCambiaOwnerInicial){
             if(mapaDatosCasosActualizar.containsKey(pretension.SAC_Reclamacion__c)){
@@ -4423,208 +5374,6 @@ public with sharing class SPV_CaseHelper {
     }
 
 
-    /***********************************************************************************************
-     * Proposito: Completar el SLA de asignacion a Letrado si se asigna un letrado a la pretensión
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR           DATE         Description
-     * 1.0             US942879     Sergio Martín     11/10/24        Creación
-     ***********************************************************************************************/
-    /**
-     * @description  Completar el SLA de asignacion a Letrado si se asigna un letrado a la pretensión
-     * @param listNewCase
-     * @param mapOldObj
-     * @param colaPendienteAsignar
-     */
-    public static void cambioSLAAsignacionLetrado(List<Case> listNewCase, Map<Id, Case> mapOldObj, Group colaPendienteAsignar) {
-        List<CaseMilestone> listaCaseMilestoneUpdatear = new List<CaseMilestone>();
-        Set<Id> setIdRecCambioLetrado = new Set<Id>();
-
-        for (Case caso : listNewCase) {
-            //Si la pretension cambia de owner y anteriormente era la cola de Pte. Asignar
-            if (caso.RecordTypeId == RECTYPEPRETENSION && mapOldObj.containsKey(caso.Id) && caso.SAC_EsPrincipal__c && mapOldObj.get(caso.Id).OwnerId == colaPendienteAsignar.Id && mapOldObj.get(caso.Id).OwnerId != caso.OwnerId) {
-                setIdRecCambioLetrado.add(caso.SAC_Reclamacion__c);
-            } 
-        }
-
-        if(!setIdRecCambioLetrado.isEmpty() && Schema.sObjectType.CaseMilestone.isAccessible()){
-            List<CaseMilestone> listaCaseMilestone = [SELECT caseid, startdate, IsCompleted, IsViolated, CompletionDate, MilestoneType.Name FROM CaseMilestone WHERE caseId IN :setIdRecCambioLetrado];
-            for (CaseMilestone caseMil : listaCaseMilestone) {
-                if (String.isBlank(String.valueOf(caseMil.CompletionDate)) && caseMil.MilestoneType.Name == 'SLA Alta y Asignación Letrado') {
-                    caseMil.CompletionDate = system.now();
-                    listaCaseMilestoneUpdatear.add(caseMil);
-                }
-            }
-            if(!listaCaseMilestoneUpdatear.isEmpty() && Schema.sObjectType.CaseMilestone.isUpdateable()) {
-                SPV_DatabaseDML.updateListDML(listaCaseMilestoneUpdatear, true);
-            }
-        }
-    }
-
-
-    /***********************************************************************************************
-     * Proposito: Desmarcar el campo SPV_EscaladoAJ__c cuando se cambia de estado en la reclamacion
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR           DATE         Description
-     * 1.0             US942879     Sergio Martín     14/10/24        Creación
-     ***********************************************************************************************/
-        /**
-     * @description  Desmarcar el campo SPV_EscaladoAJ__c cuando se cambia de estado en la reclamacion
-     * @param listaCasosSPV
-     * @param mapOldObj
-     */
-    public static void desactivarEscaladoAJ(List<Case> listaCasosSPV, Map<Id, Case> mapOldObj){
-        for(Case caso : listaCasosSPV){
-            if (caso.RecordTypeId == RECTYPERECLAMACION && ((mapOldObj.get(caso.Id).SEG_Subestado__c != caso.SEG_Subestado__c && caso.Status == 'SPV_AnalisisDecision') || mapOldObj.get(caso.Id).Status != caso.Status)) {
-                //Si cambia una reclamación y el owner es el usuario que ejecuta, es el gestor
-                if (caso.SPV_EscaladoAJ__c) {
-                    caso.SPV_EscaladoAJ__c = false;
-                }
-            }
-        }
-    }
-
-
-    /***********************************************************************************
-    * Proposito: Cerrar los SLA de la reclamación cuando se va cambiando de estado
-    * 
-    * Historial
-    * -------
-    * VERSION        USER_STORY       AUTHOR         DATE         Description
-    * 1.0            US942879     Sergio Martín    16/10/24         Creacion
-    ***********************************************************************************/
-    /**
-     * @description  Cerrar los SLA de la reclamación cuando se va cambiando de estado
-     * @param listCasosSPV
-     * @param mapOldObj
-     */
-    public static void cerrarSLAReclamacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj){
-
-        Set<Id> listaIdsReclamaciones = new Set<Id>();
-        List<Case> listaCerrarSLAFases = new List<Case>();
-        List<Case> listaCerrarSLAReclamaciones = new List<Case>();
-
-        for(Case caso : listCasosSPV){
-            //Detectar la salida del subestado "Analisis"
-            if (caso.RecordTypeId == RECTYPERECLAMACION && mapOldObj.containsKey(caso.Id) && caso.SEG_Subestado__c != mapOldObj.get(caso.Id).SEG_Subestado__c && mapOldObj.get(caso.Id).SEG_Subestado__c == 'Analisis') {
-                listaIdsReclamaciones.add(caso.Id);
-                listaCerrarSLAFases.add(caso);
-            }
-            //Detectar la salida del subestado "Alegaciones"
-            if (caso.RecordTypeId == RECTYPERECLAMACION && mapOldObj.containsKey(caso.Id) && caso.SEG_Subestado__c != mapOldObj.get(caso.Id).SEG_Subestado__c && mapOldObj.get(caso.Id).SEG_Subestado__c == 'Alegaciones') {
-                listaIdsReclamaciones.add(caso.Id);
-                listaCerrarSLAFases.add(caso);
-            }
-
-            //Detectar la salida del subestado "Allanamiento"
-            if (caso.RecordTypeId == RECTYPERECLAMACION && mapOldObj.containsKey(caso.Id) && caso.SEG_Subestado__c != mapOldObj.get(caso.Id).SEG_Subestado__c && mapOldObj.get(caso.Id).SEG_Subestado__c == 'Allanamiento') {
-                listaIdsReclamaciones.add(caso.Id);
-                listaCerrarSLAFases.add(caso);
-            }
-
-            //Detectar la salida de la complementarias de organismo
-            if (caso.RecordTypeId == RECTYPERECLAMACION && mapOldObj.containsKey(caso.Id) && caso.SPV_ComplementariaOrganismo__c != mapOldObj.get(caso.Id).SPV_ComplementariaOrganismo__c && mapOldObj.get(caso.Id).SPV_ComplementariaOrganismo__c == false) {
-                listaIdsReclamaciones.add(caso.Id);
-                listaCerrarSLAFases.add(caso);
-            }
-
-            //Detectar la salida de la rectificacion
-            if(caso.RecordTypeId == RECTYPERECLAMACION && mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && mapOldObj.get(caso.Id).Status == 'SPV_Rectificacion'){
-                listaIdsReclamaciones.add(caso.Id);
-                listaCerrarSLAFases.add(caso);
-            }
-
-            //Detectar el cambio de estado a "Cerrado"
-            if(caso.RecordTypeId == RECTYPERECLAMACION && mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'Cerrado'){
-                listaIdsReclamaciones.add(caso.Id);
-                listaCerrarSLAReclamaciones.add(caso);
-            }
-
-            //Detectar el cambio de estado a "Descartado"
-            if(caso.RecordTypeId == RECTYPERECLAMACION && mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'Descartado'){
-                listaIdsReclamaciones.add(caso.Id);
-                listaCerrarSLAReclamaciones.add(caso);
-            }
-        }
-
-
-        if(!listaIdsReclamaciones.isEmpty()){
-            if(!listaCerrarSLAFases.isEmpty()){
-                //Cerrar el SLA de la fase en la que se encuentra la reclamación
-                cerrarSLAFasesReclamacion(listaIdsReclamaciones);
-            }
-
-            if(!listaCerrarSLAReclamaciones.isEmpty()){
-                // Completar todos los SLA de la reclamación
-                cerrarSLAActivosReclamacion(listaIdsReclamaciones);
-            }            
-        }
-    }
-
-
-
-    /***********************************************************************************************
-     * Proposito: Cerrar los SLA internos de la reclamación cuando se sales de la fase
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR           DATE         Description
-     * 1.0             US942879     Sergio Martín     16/10/24         Creacion
-     ***********************************************************************************************/
-        /**
-     * @description  Cerrar los SLA internos de la reclamación cuando se sales de la fase
-     * @param setIdReclamaciones
-     */
-    public static void cerrarSLAFasesReclamacion(Set<Id> setIdReclamaciones) {
-        if(!setIdReclamaciones.isEmpty() && Schema.sObjectType.CaseMilestone.isAccessible()){
-            List<CaseMilestone> listaCaseMilestone = [SELECT caseid, startdate, IsCompleted, CompletionDate, MilestoneType.Name FROM CaseMilestone WHERE caseId IN :setIdReclamaciones];
-            List<CaseMilestone> listaCaseMilestoneUpdatear = new List<CaseMilestone>();
-            for (CaseMilestone caseMil : listaCaseMilestone) {
-                if (String.isBlank(String.valueOf(caseMil.CompletionDate)) && caseMil.MilestoneType.Name != 'Plazo Regulatorio Supervisor' && caseMil.MilestoneType.Name != 'SLA Alta y Asignación Letrado') {
-                    caseMil.CompletionDate = system.now();
-                    listaCaseMilestoneUpdatear.add(caseMil);
-                }
-            }
-            
-            if(!listaCaseMilestoneUpdatear.isEmpty() && Schema.sObjectType.CaseMilestone.isUpdateable()) { 
-                SPV_DatabaseDML.updateListDML(listaCaseMilestoneUpdatear, false);
-            }
-        }
-    }
-
-    /***********************************************************************************************
-     * Proposito: Cerrar los SLA de la reclamación cuando se cierra o descarta una reclamación
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR           DATE         Description
-     * 1.0             US942879     Sergio Martín     09/10/24        Creación
-     ***********************************************************************************************/
-    /**
-     * @description  Cerrar los SLA de la reclamación cuando se cierra o descarta una reclamación
-     * @param setIdReclamaciones
-     */
-    public static void cerrarSLAActivosReclamacion(Set<Id> setIdReclamaciones) {
-        if(!setIdReclamaciones.isEmpty() && Schema.sObjectType.CaseMilestone.isAccessible()){
-            List<CaseMilestone> listaCaseMilestone = [SELECT caseid, startdate, IsCompleted, CompletionDate, MilestoneType.Name FROM CaseMilestone WHERE caseId IN :setIdReclamaciones];
-            List<CaseMilestone> listaCaseMilestoneUpdatear = new List<CaseMilestone>();
-            for (CaseMilestone caseMil : listaCaseMilestone) {
-                if (String.isBlank(String.valueOf(caseMil.CompletionDate))) {
-                    caseMil.CompletionDate = system.now();
-                    listaCaseMilestoneUpdatear.add(caseMil);
-                }
-            }
-            
-            if(!listaCaseMilestoneUpdatear.isEmpty() && Schema.sObjectType.CaseMilestone.isUpdateable()) { 
-                SPV_DatabaseDML.updateListDML(listaCaseMilestoneUpdatear, false);
-            }
-        }
-    }
-
-
     /*******************************************************************************************************************
      * Proposito: Método para crear un registro asociado del CBK_Case_Extension__c a la reclamacion
      * 
@@ -4667,6 +5416,135 @@ public with sharing class SPV_CaseHelper {
                     SPV_DatabaseDML.updateListDML(listaCase, false);
                 }
             }
+        }
+    }
+    
+    /*********************************************************************************************************************
+     * Proposito: Método para comprobar si hay alertas SLA Letrado/Regulatorio a lanzar y generarlas si es el caso
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY                AUTHOR                DATE         Description
+     * 1.0            US1276839 + US1279552     Jose M. Fernández     26/06/2025   Creación
+    **********************************************************************************************************************/
+    /**
+     * @description  Método para comprobar si hay alertas SLA Letrado/Regulatorio a lanzar y generarlas si es el caso
+     * @param listCase
+     * @param listCaseSelect
+     * @param cola
+     */
+    public static void generarAlertasSLALetradoRegulatorio(List<Case> listCase, List<Case> listCaseSelect, Group cola){
+        //Variables utilizadas en la lógica
+        Map<Id, Case> mapCaseSelect = new Map<Id, Case>(listCaseSelect);
+        List<SAC_WrapperAlerta> listWrapperAlerta = new List<SAC_WrapperAlerta>();
+
+        //Se recorren las reclamaciones para generar los WrapperAlerta para lanzar las alertas
+        for(Case caso: listCase){
+            SAC_WrapperAlerta wrapAlerta;
+
+            //Si se trata de una alerta de Letrado 48h
+            if(caso.OS_SLA_Completado__c == '48LetradoEntitlement' && caso.recordTypeId == RECTYPERECLAMACION){
+                //Preparación de la alerta
+                wrapAlerta = new SAC_WrapperAlerta(caso.Id,
+                                                'SPV_SLALetrado48',
+                                                'SPV - Quedan 48 Horas para cumplir el SLA de la reclamación ' + caso.CaseNumber + '. Revisar la reclamación ' + caso.CaseNumber,
+                                                caso.OwnerId,
+                                                caso.Id,
+                                                '',
+                                                '');
+                                                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+            }
+            
+            //Si se trata de una alerta de Letrado 24h
+            else if(caso.OS_SLA_Completado__c == '24LetradoEntitlement' && caso.recordTypeId == RECTYPERECLAMACION){
+                //Preparación de la alerta
+                wrapAlerta = new SAC_WrapperAlerta(caso.SAC_Reclamacion__c,
+                                                'SPV_SLALetrado24',
+                                                'SPV - SLA Letrado excedido. El SLA de la pretensión ' + caso.CaseNumber + ' ha sido excedido',
+                                                caso.OwnerId,
+                                                caso.Id,
+                                                '',
+                                                '');
+                                                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+                
+            }
+
+            //Si se trata de una alerta de Regulatorio 48h y es una reclamación con una pretensión principal con letrado, se manda al letrado
+            else if(caso.OS_SLA_Completado__c == '48RegulatorioEntitlement' && caso.recordTypeId == RECTYPERECLAMACION && mapCaseSelect.containsKey(caso.SAC_PretensionPrincipal__c)){
+                //Preparación de la alerta
+                wrapAlerta = new SAC_WrapperAlerta(caso.Id,
+                                                'SPV_SLARegulatorio48',
+                                                'SPV - Quedan 48 horas para cumplir el SLA Regulatorio de la reclamación ' + caso.CaseNumber + '. Revisar la Reclamación ' + caso.CaseNumber,
+                                                mapCaseSelect.get(caso.SAC_PretensionPrincipal__c).OwnerId,
+                                                '',
+                                                '',
+                                                '');
+                                                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+                if (mapCaseSelect.get(caso.SAC_PretensionPrincipal__c).OwnerId == cola.Id && String.isNotBlank(mapCaseSelect.get(caso.SAC_PretensionPrincipal__c).SEG_Grupo__r.SAC_Email__c)) {
+                    wrapAlerta.listaEmailsGrupo.add(mapCaseSelect.get(caso.SAC_PretensionPrincipal__c).SEG_Grupo__r.SAC_Email__c);
+                }
+            }
+            
+            //Si se trata de una alerta de Regulatorio 48h y es una reclamación SIN pretensión principal con letrado, se manda al gestor
+            else if(caso.OS_SLA_Completado__c == '48RegulatorioEntitlement' && caso.recordTypeId == RECTYPERECLAMACION && !mapCaseSelect.containsKey(caso.SAC_PretensionPrincipal__c) && mapCaseSelect.containsKey(caso.Id)){
+                //Preparación de la alerta
+                wrapAlerta = new SAC_WrapperAlerta(caso.Id,
+                                                'SPV_SLARegulatorio48',
+                                                'SPV - Quedan 48 horas para cumplir el SLA Regulatorio de la reclamación ' + caso.CaseNumber + '. Revisar la Reclamación ' + caso.CaseNumber,
+                                                caso.OwnerId,
+                                                '',
+                                                '',
+                                                '');
+                                                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+                if (mapCaseSelect.get(caso.Id).OwnerId == cola.Id && String.isNotBlank(mapCaseSelect.get(caso.Id).SEG_Grupo__r.SAC_Email__c)) {
+                    wrapAlerta.listaEmailsGrupo.add(mapCaseSelect.get(caso.Id).SEG_Grupo__r.SAC_Email__c);
+                }
+            }
+
+            //Si se trata de una alerta de Regulatorio 48h y es una reclamación con una pretensión principal con letrado, se manda al letrado
+            else if(caso.OS_SLA_Completado__c == '24RegulatorioEntitlement' && caso.recordTypeId == RECTYPERECLAMACION && mapCaseSelect.containsKey(caso.SAC_PretensionPrincipal__c)){
+                //Preparación de la alerta
+                wrapAlerta = new SAC_WrapperAlerta(caso.Id,
+                                                'SPV_SLARegulatorio24',
+                                                'SPV - SLA Regulatorio Excedido. Revisar la Reclamación ' + caso.CaseNumber + ', el SLA de la reclamación ha sido excedido',
+                                                mapCaseSelect.get(caso.SAC_PretensionPrincipal__c).OwnerId,
+                                                '',
+                                                '',
+                                                '');
+                                                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+                if (mapCaseSelect.get(caso.SAC_PretensionPrincipal__c).OwnerId == cola.Id && String.isNotBlank(mapCaseSelect.get(caso.SAC_PretensionPrincipal__c).SEG_Grupo__r.SAC_Email__c)) {
+                    wrapAlerta.listaEmailsGrupo.add(mapCaseSelect.get(caso.SAC_PretensionPrincipal__c).SEG_Grupo__r.SAC_Email__c);
+                }
+            }
+
+            //Si se trata de una alerta de Regulatorio 48h y es una reclamación SIN pretensión principal con letrado, se manda al gestor
+            else if(caso.OS_SLA_Completado__c == '24RegulatorioEntitlement' && caso.recordTypeId == RECTYPERECLAMACION && !mapCaseSelect.containsKey(caso.SAC_PretensionPrincipal__c) && mapCaseSelect.containsKey(caso.Id)){
+                //Preparación de la alerta
+                wrapAlerta = new SAC_WrapperAlerta(caso.Id,
+                                                'SPV_SLARegulatorio24',
+                                                'SPV - SLA Regulatorio Excedido. Revisar la Reclamación ' + caso.CaseNumber + ', el SLA de la reclamación ha sido excedido',
+                                                caso.OwnerId,
+                                                '',
+                                                '',
+                                                '');
+                                                wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + caso.Id;
+                if (mapCaseSelect.get(caso.Id).OwnerId == cola.Id && String.isNotBlank(mapCaseSelect.get(caso.Id).SEG_Grupo__r.SAC_Email__c)) {
+                    wrapAlerta.listaEmailsGrupo.add(mapCaseSelect.get(caso.Id).SEG_Grupo__r.SAC_Email__c);
+                }
+            }
+
+            //Se añade el WrapperAlerta a la lista para posteriormente llamar al método que las genera
+            if(wrapAlerta != null){
+                listWrapperAlerta.add(wrapAlerta);
+            }
+
+            //Se blanquea el campo de Milestone Completado
+            caso.OS_SLA_Completado__c = '';
+        }
+
+        //Si hay alertas a enviar, se llama al método que las envía
+        if(!listWrapperAlerta.isEmpty()) {
+            SAC_Alertas.generarAlertas(listWrapperAlerta);
         }
     }
 }

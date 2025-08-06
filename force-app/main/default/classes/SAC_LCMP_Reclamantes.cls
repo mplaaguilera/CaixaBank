@@ -19,6 +19,8 @@ public without sharing class SAC_LCMP_Reclamantes {
     final static Id RECTYPECONSULTACOPS = mapRTsObjects.get('Case').get('SAC_Consulta').getRecordTypeId();
     final static Id RECTYPECONSULTASAC = mapRTsObjects.get('Case').get('SAC_ConsultaSAC').getRecordTypeId();
 
+    final static Id RECTYPERECLAMACION_SPV = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
+
     /*****************************************************************
     * Proposito: Recupera los reclamantes de una reclamación
     * 
@@ -34,20 +36,29 @@ public without sharing class SAC_LCMP_Reclamantes {
             Id sacCaracteristicaClienteRT = Schema.SObjectType.CC_Caracteristica__c.getRecordTypeInfosByDeveloperName().get('SAC_CaracteristicaClienteCuenta').getRecordTypeId();
 
             Set<Id> idsReclamantes = new Set<Id>();
+            Boolean esSPV = false;
 
             //Esta lista recupera todos los reclamantes que pertenezcan a la reclamación, sin tener en cuenta los de las pretensiones
             List<SAC_CaseReclamante__c> listaReclamantes = [SELECT Id, SAC_Account__c, SAC_Case__c, SAC_Account__r.Name, SAC_ReclamantePrincipal__c, SAC_Pretension__c, SAC_Empleado__c,
                                                             SAC_Account__r.AV_EAPGestor__c, SAC_Account__r.CC_OficinaGestoraId__c, SAC_Account__r.AV_OfficeManager__c,
-                                                            SAC_TelefonoNoAlf__c, SAC_EmailNoAlf__c, SAC_DireccionNoAlf__c, SAC_TieneDatosNoAlf__c
+                                                            SAC_TelefonoNoAlf__c, SAC_EmailNoAlf__c, SAC_DireccionNoAlf__c, SAC_TieneDatosNoAlf__c, SAC_Case__r.RecordTypeId, SAC_Case__r.RecordType.DeveloperName
                                                             FROM SAC_CaseReclamante__c 
                                                             WHERE SAC_Case__c = :caseId
                                                             AND (SAC_Pretension__c = null)];
 
             for(SAC_CaseReclamante__c reclamante : listaReclamantes){
                 idsReclamantes.add(reclamante.SAC_Account__c);
+
+                if(!esSPV && reclamante.SAC_Case__r.RecordTypeId == RECTYPERECLAMACION_SPV){
+                    esSPV = true;
+                }
             }
 
-            List<CC_Caracteristica_Detalle__c> listaCaracReclamantes = [SELECT Id, SAC_Cuenta__c, CC_Caracteristica__c, CC_Caracteristica__r.Name, CC_Caracteristica__r.CC_Descripcion__c FROM CC_Caracteristica_Detalle__c WHERE SAC_Cuenta__c = :idsReclamantes AND CC_Caracteristica__r.RecordTypeId = :sacCaracteristicaClienteRT AND CC_Caracteristica__r.CC_Activo__c = true];
+            List<CC_Caracteristica_Detalle__c> listaCaracReclamantes = new List<CC_Caracteristica_Detalle__c>();
+            if(!esSPV){
+                listaCaracReclamantes  = [SELECT Id, SAC_Cuenta__c, CC_Caracteristica__c, CC_Caracteristica__r.Name, CC_Caracteristica__r.CC_Descripcion__c FROM CC_Caracteristica_Detalle__c WHERE SAC_Cuenta__c = :idsReclamantes AND CC_Caracteristica__r.RecordTypeId = :sacCaracteristicaClienteRT AND CC_Caracteristica__r.CC_Activo__c = true];
+            }
+
             InfoReclamantesWrapper infoReclamantes = new InfoReclamantesWrapper(listaReclamantes, listaCaracReclamantes);
             return infoReclamantes;
 
@@ -181,6 +192,7 @@ public without sharing class SAC_LCMP_Reclamantes {
                     caso.SAC_DireccionPostalNotificacion__c = caso.SAC_Reclamacion__r.SAC_DireccionPostalNotificacion__c;
 
                 } else if(caso.RecordTypeId == RECTYPERECLAMACION) {
+                    caso.AccountId = reclamanteActualizar.SAC_Account__c;
                     // caso.CC_Idioma__c = reclamanteActualizar.SAC_Account__r.CC_Idioma__pc;
                     caso.CC_Oficina__c = reclamanteActualizar.SAC_Account__r.AV_OfficeManager__c;
                 }

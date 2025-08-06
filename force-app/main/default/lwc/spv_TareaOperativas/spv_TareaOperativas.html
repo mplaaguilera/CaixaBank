@@ -130,6 +130,9 @@
                     </button>
                     <h2 id="modal-heading-03" class="slds-text-heading_medium slds-hyphenate">¿Cómo quiere finalizar la tarea?</h2>
                 </header>
+                <div class="slds-modal__content slds-p-around_medium slds-text-align_center" id="modal-content-id-44">
+                    Por favor, seleccione Descartar o Finalizar.
+                </div>
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
                     <template if:true={mostrarComentarios}>
                         <lightning-textarea name="inputComentarios" value={comentariosFinalizarTarea} onchange={changeComentarios} label="Por favor, deje aquí sus comentarios"></lightning-textarea>
@@ -142,7 +145,7 @@
                         <!--Botón descartar-->
                         <lightning-button variant="neutral" label="Descartar" title="Descartar" onclick={handleAbrirDescartar} class="slds-var-p-right_small"></lightning-button>
                         <!--Botón finalizada incompleta-->
-                        <lightning-button variant="neutral" label="Finalizada incompleta" title="Finalizada incompleta" onclick={handleAbrirFinalizadaIncompleta} class="slds-var-p-right_small"></lightning-button>
+                        <!--<lightning-button variant="neutral" label="Finalizada incompleta" title="Finalizada incompleta" onclick={handleAbrirFinalizadaIncompleta} class="slds-var-p-right_small"></lightning-button>-->
                         <!--Botón finalizada-->
                         <lightning-button variant="neutral" label="Finalizada" title="Finalizada" onclick={handleAbrirFinalizada}></lightning-button>
                     </template>
@@ -150,10 +153,9 @@
                         <!--Botón descartar-->
                         <lightning-button variant="brand" label="Descartar" title="Descartar" onclick={handleDescartarTarea}></lightning-button>
                     </template>
-                    <template if:true={mostrarBotonesFinalizadaIncompleta}>
-                        <!--Botón Finalizar incompleta-->
+                    <!--<template if:true={mostrarBotonesFinalizadaIncompleta}>
                         <lightning-button variant="brand" label="Finalizar incompleta" title="Finalizada incompleta" onclick={handleFinalizarIncompleta}></lightning-button>
-                    </template>
+                    </template>-->
                     <template if:true={mostrarBotonesFinalizada}>
                         <!--Botón Finalizar-->
                         <lightning-button variant="brand" label="Finalizar" title="Finalizada" onclick={handleFinalizarTarea}></lightning-button>

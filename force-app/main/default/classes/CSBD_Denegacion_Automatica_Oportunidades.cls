@@ -71,7 +71,7 @@ public with sharing class CSBD_Denegacion_Automatica_Oportunidades {
             correo.setTreatTargetObjectAsRecipient(false);
             correo.setWhatId(idOportunidad);
             correo.setToAddresses(new List<String>{destinatario});
-            correo.setOrgWideEmailAddressId([SELECT Id FROM OrgWideEmailAddress WHERE DisplayName = :(empresaProveedora == 'imaginBank' ? 'CSBD - ImaginBank' : 'CSBD - CaixaBank')].Id);
+            correo.setOrgWideEmailAddressId(CSBD_MetodosComunes.obtenerIdBuzonSalida(empresaProveedora));
             Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{correo});
         }
     }

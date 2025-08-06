@@ -77,7 +77,9 @@ public with sharing class SEG_ContactPendienteAsociar_P2_Batch implements Databa
         for (Database.SaveResult resultado : updR) {
             if (!resultado.isSuccess()) {
                 for (Database.Error error : resultado.getErrors()) {
-                    cbk_log.error(resultado.getId() + '  ' + error.getMessage());
+                   // cbk_log.error(resultado.getId() + '  ' + error.getMessage());
+                    CBK_Log.DebugProcessConfigBuilder builder = new CBK_Log.DebugProcessConfigBuilder().setLogMessage('SEG_ContactPendienteAsociar_P2_Batch: error returned ' + error.getMessage()).setLevel(LoggingLevel.ERROR);
+                    builder.addLog();
                 }
             }
         }
@@ -94,10 +96,14 @@ public with sharing class SEG_ContactPendienteAsociar_P2_Batch implements Databa
         for (Database.DeleteResult resultado : delR) {
             if (!resultado.isSuccess()) {
                 for (Database.Error error : resultado.getErrors()) {
-                    cbk_log.error(resultado.getId()+ '  ' + error.getMessage());
+                    // cbk_log.error(resultado.getId()+ '  ' + error.getMessage());
+                    CBK_Log.DebugProcessConfigBuilder builder = new CBK_Log.DebugProcessConfigBuilder().setLogMessage('SEG_ContactPendienteAsociar_P2_Batch: error returned ' + error.getMessage()).setLevel(LoggingLevel.ERROR);
+                    builder.addLog();
                 }
             }
         }
+        //Se insertan los CBK_Logs
+        CBK_Log.insertDML();
         cbk_log.debug('eliminar: ' + eliminar.size());    
     }
 

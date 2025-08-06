@@ -29,7 +29,7 @@
                 esUserGeneral ||
                 (
                     !esUserGeneral &&
-                    file.SAC_Bloque__c !== 'SAC_Tramitacion' &&
+                    !file.SAC_Bloque__c.includes('SAC_Tramitacion') &&  /*Antes en esta linea ponía: file.SAC_Bloque__c !== 'SAC_Tramitacion' US1194593*/
                     (
                         file.SAC_Bloque__c !== 'SAC_Respuesta' ||
                         (file.SAC_Bloque__c === 'SAC_Respuesta' && file.SAC_Enviado__c)

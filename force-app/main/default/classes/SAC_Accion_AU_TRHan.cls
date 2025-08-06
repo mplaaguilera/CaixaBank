@@ -245,7 +245,7 @@ public without sharing class SAC_Accion_AU_TRHan extends CC_TriggerHandlerBase {
     * @description método que actualiza los importes de la reclamación cuando se actualiza una tarea de una pretensión
     */
     public void calcularImportes(Set<Id> setIdsReclamacion) {
-        List<Case> listCasosSelect = [SELECT Id, RecordTypeId, SAC_Reclamacion__c, CC_Importe_Reclamado__c, SAC_Importe_Resuelto__c, CC_Importe_Abonado__c, SAC_Quebranto__c FROM Case 
+        List<Case> listCasosSelect = [SELECT Id, RecordTypeId, SAC_Reclamacion__c, CC_Importe_Reclamado__c, SAC_Importe_Resuelto__c, CC_Importe_Abonado__c, SAC_Quebranto__c, Status FROM Case 
                                         WHERE (RecordTypeId = :RECTYPERECLAMACION AND Id IN :setIdsReclamacion) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__C IN :setIdsReclamacion)];
         
         if (setIdsReclamacion == null) {

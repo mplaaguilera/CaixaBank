@@ -46,7 +46,8 @@ public with sharing class SAC_GenialView_Controller {
                             SAC_Naturaleza__c, SAC_Idioma__c, SAC_Oficina_Afectada_Lookup__c, SAC_MCC_Tematica__c, SAC_MCC_Motivo__c, SAC_MCC_ProdServ__c, 
                             SAC_Detalle__c, SAC_EsPrincipal__c, SAC_Email__c, recordType.developerName, 
                             SAC_Telefono_Contacto__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, 
-                            SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c, SAC_NombreContacto__c, SAC_Resumen__c
+                            SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c, SAC_NombreContacto__c, SAC_Resumen__c,
+                            SAC_UmbralNombre__c, SAC_UmbralApellido__c, SAC_UmbralEmail__c, SAC_UmbralNIF__c
                             FROM SAC_Genial_Resultado__c 
                             WHERE (SAC_Reclamacion__c = :idCaso OR SAC_Pretension__c = :idCaso)
                             WITH SECURITY_ENFORCED];
@@ -153,7 +154,7 @@ public with sharing class SAC_GenialView_Controller {
         for(SAC_Genial_Resultado__c reclamanteSecundarioIA : [SELECT Id, SAC_AccountId__c, SAC_Email__c, SAC_SuppliedNIF__c,
                                                     SAC_Telefono_Contacto__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c,
                                                     SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c,
-                                                    SAC_NombreContacto__c
+                                                    SAC_NombreContacto__c, SAC_UmbralNombre__c, SAC_UmbralApellido__c, SAC_UmbralEmail__c, SAC_UmbralNIF__c                                                    
                                                     FROM SAC_Genial_Resultado__c 
                                                     WHERE SAC_Reclamacion__c = : reclamacionId and recordType.developerName = 'SAC_Reclamante_IA'
 													WITH SECURITY_ENFORCED]) {

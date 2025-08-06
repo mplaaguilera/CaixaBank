@@ -106,7 +106,7 @@ global with sharing class SAC_Genial_WS extends CBK_HttpServiceIntegration_Abstr
             }*/
             genialRequest.jsonRequest = jsonEntrada;
             genialRequest.reclamaOriginal = reclamaOriginal.get(0);
-            genialRequest.pdteIA = true; //(colaIA.Id == reclamaOriginal[0].ownerId);
+            genialRequest.pdteIA = true;//(colaIA.Id == reclamaOriginal[0].ownerId);
             System.enqueueJob(new SAC_GenialQueueable(genialRequest, 0));
 
             res.statusCode = 200;
@@ -150,7 +150,7 @@ global with sharing class SAC_Genial_WS extends CBK_HttpServiceIntegration_Abstr
         public account reclamante;
         public string document;
         public string page;
-        public string tipo;
+        public list<Umbral> umbrales;
     }
 
     public class DatosRecPrincipal {

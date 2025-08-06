@@ -24,7 +24,7 @@ public with sharing class CC_WS_Autenticacion_Test {
         customSetting.RegistroTrazaIntegracion__c = true;
         CBK_IntegrationSetting__c customSetting2 = new CBK_IntegrationSetting__c();
         customSetting2.Name = 'CC_Autenticacion_Robusta_Estado';
-        customSetting2.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthorization/v2/authorizations/{authorizationId}/approver/status';
+        customSetting2.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthvalidarAutorizacionKoorization/v2/authorizations/{authorizationId}/approver/status';
         customSetting2.RegistroTrazaIntegracion__c = true;
         insert new List<CBK_IntegrationSetting__c>{customSetting, customSetting2};
 
@@ -237,7 +237,7 @@ public with sharing class CC_WS_Autenticacion_Test {
             String resultado = CC_OTP.validarAutorizacion(aut.Id, aut.CC_Case__c);
             Test.stopTest();
 
-            System.assertEquals(resultado, 'null (404)');
+            System.assertEquals(resultado, 'null (404)(ERROR)');
             System.assertEquals('Error', [SELECT CC_Estado__c FROM CC_Comunicaciones__c WHERE Id = :aut.Id].CC_Estado__c);
         }
     }

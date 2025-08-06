@@ -445,4 +445,25 @@ public class CSBD_MetodosComunes_Test {
         }
     }
 
+    @isTest
+    public static void obtenerIdBuzonSalida() {
+     
+
+        System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
+            OrgWideEmailAddress owa = [SELECT Id, Address, DisplayName FROM OrgWideEmailAddress WHERE DisplayName LIKE '%CSBD%' LIMIT 1];
+
+            CSBD_Remitente_Enviar_Correo__c config = new CSBD_Remitente_Enviar_Correo__c();
+            config.CSBD_Buzon_CaixaBank__c = owa.Address;
+            config.CSBD_Buzon_ImaginBank__c = owa.Address;
+            config.CSBD_Buzon_Alta_digital_de_menores__c = owa.Address;
+            insert config;
+            
+            Test.startTest();
+                Id idBuzonSalida = CSBD_MetodosComunes.obtenerIdBuzonSalida('CaixaBank');
+            Test.stopTest();
+            System.assertNotEquals(idBuzonSalida, null);
+            System.assertEquals(idBuzonSalida, owa.Id);
+        }
+    }
+
 }

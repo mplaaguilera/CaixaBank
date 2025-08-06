@@ -192,11 +192,14 @@ public with sharing class OS_Case {
     @future(callout=true)
     public static void envioCorreoTrasladoRemitidoAutomatico(Set<Id> casosIds, Set<Id> MCCIds){
         
+        System.debug('caso.Id: ' + casosIds);
+        System.debug('mcc.Id: ' + MCCIds);
+
         //Traslados a colaborador automáticos que entran por EmailService
         List<Case> casos = [SELECT Id, CC_Buzon_Salida__c, CC_MCC_Motivo__c, CC_Referencia_Correo_Saliente__c FROM Case WHERE Id=: casosIds];
 
-        List<CC_MCC_Grupo_Colaborador__c> listaMotivosGrupos = [SELECT CC_Grupo_Colaborador__c, CC_MCC__c  FROM CC_MCC_Grupo_Colaborador__c WHERE CC_MCC__c IN :MCCIds];
-        List<CC_MCC_Plantilla__c> listaMotivosPlantilla = [SELECT CC_MCC__c, CC_MCC_Plantilla_DeveloperName__c  FROM CC_MCC_Plantilla__c WHERE CC_MCC__c IN :MCCIds];
+        List<CC_MCC_Grupo_Colaborador__c> listaMotivosGrupos = [SELECT CC_Grupo_Colaborador__c, CC_MCC__c  FROM CC_MCC_Grupo_Colaborador__c WHERE CC_MCC__c IN : MCCIds];
+        List<CC_MCC_Plantilla__c> listaMotivosPlantilla = [SELECT CC_MCC__c, CC_MCC_Plantilla_DeveloperName__c  FROM CC_MCC_Plantilla__c WHERE CC_MCC__c IN : MCCIds];
                   
         if (!listaMotivosGrupos.isEmpty() && !listaMotivosPlantilla.isEmpty()){
                         

@@ -120,5 +120,34 @@
         component.set('v.grupoAbuscar', '');
         component.set('v.grupoAbuscarId', '');
         component.set('v.isLoading', false);     
+    },
+
+
+    cambiarContactoReclamante : function(component, event){
+        var reclamante = component.get('v.reclamanteSelected');
+        console.log('Kevin: ' + reclamante);
+
+        // Llamar al método de Apex
+        var action = component.get("c.cambiarContactoReclamante");
+        action.setParams({
+            reclamanteId: reclamante,
+            idCaso: component.get("v.recordId")
+        });
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                // Manejar la respuesta si es necesario
+                 var doInitAction = component.get("c.doInit");
+            $A.enqueueAction(doInitAction);
+                component.set('v.isLoading', false);   
+            } else {
+                // Manejar errores si ocurren
+            }
+        });
+        $A.enqueueAction(action);
+
+        
+
+        
     }
 })

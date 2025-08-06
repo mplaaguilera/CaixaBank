@@ -4,7 +4,7 @@ private class CSBD_WS_PuntoServicioTest {
     @TestSetup
     static void setup() {
         // Configuración inicial si es necesaria
-        User usuarioAdministrador = CSBD_Usuarios.usuarioAdministrador();
+        User usuarioAdministrador = CSBD_TestDataFactory.usuarioAdministrador();
     }
     
     @IsTest
@@ -16,7 +16,7 @@ private class CSBD_WS_PuntoServicioTest {
             contactInfo.name = 'Test';
             contactInfo.lastname = 'User';
             contactInfo.documentType = 1;
-            contactInfo.documentId = '12345678';
+            contactInfo.documentIds = new List<String>{'12345678'};
             contactInfo.requestPrescriberId = 'PRESCRIBER123';
             
             String jsonBody = JSON.serialize(contactInfo);

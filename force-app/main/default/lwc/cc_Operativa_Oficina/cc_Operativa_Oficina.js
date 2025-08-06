@@ -1,14 +1,14 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-// import { refreshApex } from '@salesforce/apex';
-import {notifyRecordUpdateAvailable} from 'lightning/uiRecordApi';
+import { refreshApex } from '@salesforce/apex';
+import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import { RefreshEvent } from 'lightning/refresh';
 import getDatos from '@salesforce/apex/CC_Operativa_Oficina_Controller.getDatos';
 import crearTarea from '@salesforce/apex/CC_Operativa_Oficina_Controller.crearTarea';
 import buscarOficinas from '@salesforce/apex/CC_Operativa_Oficina_Controller.buscarOficinas';
 import loguearTrazasAutenticacionSAU from '@salesforce/apex/CC_Operativa_Oficina_Controller.loguearTrazasAutenticacionSAU';
-// import buscarEmpleados from '@salesforce/apex/CC_Operativa_Oficina_Controller.buscarEmpleados';
+import buscarEmpleados from '@salesforce/apex/CC_Operativa_Oficina_Controller.buscarEmpleados';
 import altaCitaGestor from '@salesforce/apex/CC_Operativa_Oficina_Controller.altaCitaGestor';
 import esClienteDigital from '@salesforce/apex/CC_Operativa_Oficina_Controller.esClienteDigital';
 import dniTestamentaria from '@salesforce/apex/CC_Operativa_Oficina_Controller.dniTestamentaria';
@@ -26,31 +26,42 @@ import crearCasoFraude from '@salesforce/apex/CC_Gestion_Derivar_Fraude.crearCas
 import llamarOnboarding from '@salesforce/apex/CC_WS_Onboarding.recuperarCliente';
 import crearTareaRellamadaApex from '@salesforce/apex/CC_Gestion_Derivar_CSBD.crearTareasRellamada';
 import crearOportunidadCSBDApex from '@salesforce/apex/CC_Gestion_Derivar_CSBD.crearOportunidadCSBD';
+import crearTareaRellamadaCSBDApex from '@salesforce/apex/CC_Gestion_Derivar_CSBD.crearTareaRellamadaCSBD';
 import crearActividadPhishingSinRiesgo from '@salesforce/apex/CC_Activity.crearActividadPhishingSinRiesgo';
-import crearActividadComunidadesPropietarios from '@salesforce/apex/CC_Activity.crearActividadComunidadesPropietarios';
+import crearActividadComunidadesPropietarios from '@salesforce/apex/CC_Activity.crearActividadComunidadesPropietarios'; 
 import crearActividadCSBDTelefonoNoCoincidente from '@salesforce/apex/CC_Activity.crearActividadCSBDTelefonoNoCoincidente';
 import rellenarPreguntasArgos from '@salesforce/apex/CC_Gestion_Derivar_Global.rellenarPreguntasArgos';
 import derivarSACApex from '@salesforce/apex/CC_Operativa_Oficina_Controller.derivarSAC';
 import devolverSACApex from '@salesforce/apex/CC_Operativa_Oficina_Controller.devolverSAC';
-// import emailsAutoEmail from '@salesforce/apex/CC_Gestion_Derivar_Emails_Auto.operativasEmail';
+import emailsAutoEmailAmenazas from '@salesforce/apex/CC_Gestion_Derivar_Amenazas.operativasEmail';
 import actualizarDatosCashBack from '@salesforce/apex/CC_Gestion_Derivar_CashBack.actualizarDatosCashBack';
 import guardarContratos from '@salesforce/apex/CC_Gestion_Derivar_Refinanciacion.guardarContratos';
 import crearTareaMGT from '@salesforce/apex/CC_Gestion_Derivar_Refinanciacion.crearTareaMGT';
 import procesarOrigin from '@salesforce/apex/CC_Gestion_Derivar_Refinanciacion.procesarOrigin';
+import identificarCliente from '@salesforce/apex/CC_Gestion_Derivar_SinClienteAsociado.identificarCliente';
+import actualizarCasoMGT from '@salesforce/apex/CC_Gestion_Derivar_SinClienteAsociado.actualizarCasoMGT';
+import crearTareaDerivacionesSinCliente from '@salesforce/apex/CC_Gestion_Derivar_SinClienteAsociado.crearTareaDerivacionesSinCliente';
+import recuperarMensajeDerivacionesSinCuenta from '@salesforce/apex/CC_Gestion_Derivar_SinClienteAsociado.recuperarMensaje';
+import buscarTareaSinCliente from '@salesforce/apex/CC_Gestion_Derivar_SinClienteAsociado.buscarTareaSinCliente';
 
-import calculoKPI from '@salesforce/apex/CC_Activity.rellenarCalculoKPITareas';
 import crearActividadCajeros from '@salesforce/apex/CC_Activity.crearActividadCajeros';
 import updateCasoOperativaDerivar from '@salesforce/apex/CC_Operativa_Oficina_Controller.updateCasoOperativaDerivar';
 import crearCasoMecanismoFirma from '@salesforce/apex/CC_Gestion_Derivar_Mecanismo_Firma.crearCasoMecanismoFirma';
-import elegirCircuitoMecanismoFirma from '@salesforce/apex/CC_Gestion_Derivar_Mecanismo_Firma.elegirCircuitoMecanismoFirma';
 import comprobarCasoCreadoMecanismoFirma from '@salesforce/apex/CC_Gestion_Derivar_Mecanismo_Firma.comprobarCasoCreadoMecanismoFirma';
 import recuperarArgosMecanismoFirma from '@salesforce/apex/CC_Gestion_Derivar_Mecanismo_Firma.recuperarArgos';
-//import recuperarArgos from '@salesforce/apex/CC_Gestion_Derivar_Global.recuperarArgos';
-//import actualizarDetallesSolucionArgos from '@salesforce/apex/CC_Gestion_Derivar_Global.actualizarDetallesSolucionArgos';
+import recuperarArgos from '@salesforce/apex/CC_Gestion_Derivar_Global.recuperarArgos';
+import actualizarDetallesSolucionArgos from '@salesforce/apex/CC_Gestion_Derivar_Global.actualizarDetallesSolucionArgos';
+import recuperarArgosDenied from '@salesforce/apex/CC_Gestion_Derivar_Global.recuperarArgosDenied';
+import recuperarArgosRestricted from '@salesforce/apex/CC_Gestion_Derivar_Global.recuperarArgosRestricted';
 
 import crearActividadOficinaSinTarea from '@salesforce/apex/CC_Activity.crearActividadOficinaSinTarea';
 import envioCorreoOnboarding from '@salesforce/apex/CC_Gestion_Derivar_Onboarding.envioCorreoAutomatico';
 import cerrarCasoOnboarding from '@salesforce/apex/CC_Gestion_Derivar_Onboarding.cerrarCaso';
+import crearActividadIdentificadorBloqueado from '@salesforce/apex/CC_Activity.crearActividadIdentificadorBloqueado'; 
+import crearTareaColectivosVulnerables from '@salesforce/apex/CC_Gestion_Derivar_Col_Vulnerable.crearTareaColectivosVulnerables';
+//import crearTareaCBP from '@salesforce/apex/CC_Gestion_Derivar_CBP.crearTareaCBP';
+import emailResponderClienteCBP from '@salesforce/apex/CC_Gestion_Derivar_CBP.emailResponderClienteCBP';
+import emailRemitirColaboradorColectivoVulnerable from '@salesforce/apex/CC_Gestion_Derivar_Col_Vulnerable.emailRemitirColaboradorColectivoVulnerable';
 
 import { createMessageContext } from 'lightning/messageService';
 
@@ -66,7 +77,7 @@ import derivarInteraccionChannel from "@salesforce/messageChannel/CC_DerivarInte
 //import preguntaEnrollmentDatosSi from '@salesforce/apex/CC_Operativa_Oficina_Controller.preguntaEnrollmentDatosSi';
 
 export default class ccOperativaOficina extends NavigationMixin(LightningElement) {
-
+	
 	@api recordId;
 
 	@api oportunidadCreadaAPI;
@@ -74,7 +85,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	@api otpDerivar = null;
 
 	@api derivarB = false;
-
+	
 	@track gestores = [];
 
 	//Manejo de mensaje de derivar interaccion
@@ -85,9 +96,9 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	subscription = null;
 	//FIN Manejo de mensaje de derivar interaccion
 	ambitoMotivo;
-
+	
 	showSpinner = false;
-
+		
 	mostrarBuscadorOficina = false;
 
 	mostrarModalDNITestamentaria = false;
@@ -99,129 +110,129 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	textoOperativaDerivarGestor;
 
 	mostrarModalCita;
-
+	
 	alertaTexto;
-
+	
 	esClienteDigital;
-
+	
 	tieneGestor;
-
+	
 	numeroGestor;
-
+	
 	numeroGestorKO = false;
-
+	
 	nombreGestor;
 
 	fecha;
-
+	
 	gestorGenerico = false;
-
+	
 	oficinaGestor;
-
+	
 	nombreGestorAsignado;
-
+	
 	gestorAsignadoCoincide = true;
-
+	
 	mensajeErrorInt;
-
+	
 	cargandoGestor;
-
+	
 	gestor;
 
 	dni;
-
+	
 	motivoVentas;
-
+	
 	cambioOficina = false;
-
+	
 	cambioGestor = false;
-
+	
 	mostrarModalGestionGestorAsignado;
-
+	
 	mostrarModalGestionGestorGenerico;
-
+	
 	mostrarModalCreacionTarea;
-
+	
 	ocultarOpcionCitaGestor;
-
+	
 	fechasDisponibilidad;
-
+	
 	horasDisponibilidad;
-
+	
 	disponibilidadConsultada;
-
+	
 	sinFechasDisponibles = false;
-
+	
 	mensajeSinDisponibilidadGestor;
-
+	
 	existeBackup = true;
 
 	botonBackupDesactivado = true;
 
 	botonConsultarDisponibilidadDesactivado = true;
-
+	
 	gestorBackupActivoDos;
 
 	@track gestorBackupActivo = false;
 
 	gestoresBackup = [];
-
+	
 	gestorElegido;
-
+	
 	nombreGestorElegido;
 
 	fechaElegida;
-
+	
 	lookupOficinaResultadoSeleccionado = '';
-
+	
 	lookupOficinaInputValue = '';
-
-	// lookupEmpleadoInputValue = '';
-
+	
+	lookupEmpleadoInputValue = '';
+	
 	lookupOficinaResultados = [];
-
-	// lookupEmpleadoResultados = [];
-
+	
+	lookupEmpleadoResultados = [];
+	
 	oficinaPrincipal;
-
+	
 	lookupOficinaTimeout;
-
+	
 	lookupGestorResultadoSeleccionado = '';
-
+	
 	lookupGestorInputValue = '';
-
+	
 	lookupGestorResultados = [];
-
+	
 	lookupGestorTimeout;
-
+	
 	enviarTareaOficinaCliente = false;
-
+	
 	mostrarTareaModalCitaGestor = false;
-
+	
 	mostrarBuscadorGestor = false;
-
+	
 	crearTareaCitaGestor = false;
-
+	
 	tipoCita;
-
+	
 	clienteTieneGestor = false;
-
+	
 	ocultarBotonCita = true;
-
+	
 	horaCitaSelecionada;
-
+	
 	grupoColaborador;
-
+	
 	preguntaGrupoColaborador;
-
+	
 	comentariosTarea;
-
+	
 	realizarRemitido;
-
+		
 	preguntaCajeros;
-
+	
 	preguntaCajerosExternos;
-
+	
 	preguntaRealizarRemitido;
 
 	preguntaSenal;
@@ -253,7 +264,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	mostrarFlowDerivar = false;
 
 	toastNoClienteError;
-
+	
 	//preguntaEnrollment;
 
 	//preguntaEnrollmentDatos;
@@ -275,6 +286,8 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	textoMotivoCSBDNoContratar;
 
 	mostrarModalCSBDNoContratar;
+
+	modalParametrizableCSBD;
 
 	urlTF;
 
@@ -306,7 +319,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	textoRellamadaCSBDEnGestion;
 
-	existeOppFormalizada = false;
+	existeOppFormalizada = false; 
 
 	existeOppEnGestion = false;
 
@@ -415,16 +428,16 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	trasladarDocumentacion;
 
-	//preguntaIdBancaDigital;
-
-	//detallesSolucion;
+	preguntaIdBancaDigital;
+	
+	detallesSolucion;
 	//Argos
 
-	//Success Toast
+	//Success Toast 
 
 	mostrarModalToast = false;
 	mensajeMostrarModalToast = '';
-
+	
 	mostrarModalToastUrl = false;
 	mensajeMostrarModalToastUrl = '';
 
@@ -441,9 +454,9 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	preguntaTelefonoCSBDNoEncontrado;
 
 	botonDesabilitado = false;
-
+	
 	autenticacionSAU = false;
-
+	
 	//CSBD
 
 	//Phising/Smishing/Malware
@@ -483,42 +496,81 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	contratos = [];
 	//Refinanciación Deudas
 
-	// // //Amenazas
-	// mensajeSolicitudDatosAmenazasEmpleados;
+	//Derivaciones sin cliente asociado
+	derivacionesSinClienteAsociado1;
+	derivacionesSinClienteAsociado2;
+	derivacionesSinClienteAsociado3;
+	derivacionesSinClienteAsociado4;
+	@track mostrarModalDNI = false;
+    @track dni;
+	@track mostrarModalDatosContacto = false;
+	@track mostrarModalTipoCuenta = false;
+	@track tipoCuentaFicticia;
+	@track datosClienteNoEncontrado = [
+    { label: 'Nombre', value: '' },
+    { label: 'Apellidos', value: '' },
+    { label: 'Teléfono de contacto', value: '' },
+    { label: 'Correo electrónico de contacto', value: '' }
+	];
+	camposRequeridos = '';
+	mostrarModalCreacionTareaMGT;
+	// tareaEncontrada = false;
+	//Derivaciones sin cliente asociado
 
-	// oficinaAmenazadaSeleccionada;
+	//Amenazas
 
-	// empleadoAmenazadoSeleccionado;
+	mensajeDerivacionAmenazasTipo;
 
-	// motivoAmenazaInputValue = '';
+	tipoAmenaza;
 
-	// detalllesAmenazaInputValue = '';
+	derivacionAmenazas = false;
 
-	// motivoAmenazaSuicidiosInputValue = '';
+	mensajeSolicitudDatosAmenazasEmpleados;
 
-	// direccionAmenazasSuicidiosInputValue = '';
+	oficinaAmenazadaSeleccionada;
 
-	// mensajeSolicitudDatosAmenazasSuicidios;
+	empleadoAmenazadoSeleccionado;
 
-	// emailSuccess;
+	motivoAmenazaInputValue = '';
 
-	// nombrePlantilla;
+	detalllesAmenazaInputValue = '';
 
-	// parametrizacionesMensaje = [];
+	@track motivoAmenazaSuicidiosInputValue = '';
 
-	// grupoCol;
+	direccionAmenazasSuicidiosInputValue = '';
 
-	// nameOWA;
-	// // //Amenazas
+	mensajeSolicitudDatosAmenazasSuicidios;
+
+	emailSuccess;
+
+	nombrePlantilla;
+
+	nombrePlantillaAmenazasEmpleados;
+
+	parametrizacionesMensaje = [];
+
+	grupoCol;
+
+	grupoColClientesAmenazas;
+
+	grupoColEmpleadosAmenazas;
+
+	nameOWA;
+
+	isRemitirAmenazasDisabled;
+
+	isRemitirAmenazasSuicidiosDisabled;
+
+	//Amenazas
 
 	//MECANISMO FIRMA
-
+	
 	preguntaMecanismoFirma;
 
 	preguntaMecanismoFirmaDatos;
 
 	preguntaMecanismoFirmaDatosValores;
-
+	
 	preguntaMecanismoFirmaIdentificador;
 
 	toastMecanismoFirmaDatosIncompletos;
@@ -546,7 +598,9 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	toastMecanismoFirmaCasoCreado;
 
 	mostrarModalTrasladarGrupoColaborador = false;
-
+	
+	preguntaIdentificadorSigueBloqueado;
+	
 	deshabilitadoPaisMF = false;
 
 	deshabilitadoIdentificadorMF = false;
@@ -565,8 +619,12 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	//Accionistas
 
 	//Colectivo vulnerable
+	
+	mensajeColectivosVulnerables;
 
-	//mensajeColectivosVulnerables;
+	preguntaColectivosVulnerables;
+
+	modalFinalizarColectivosVulnerables;
 
 	//Colectivo vulnerable
 
@@ -589,6 +647,21 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	CSBDConfidencial = false;
 	//Confidencial
 
+	//CBP
+
+	mostrarModalCBP = false;
+	preguntaCBP;
+	ambitoCBP;
+	refinanciacionCBP;
+	@track esIntouch;
+	@track grupoColaborador;
+	@track plantilla;
+	@track mccId;
+	@track casoId;
+	mostrarModalCreacionTareaCBP = false;
+
+	//CBP
+
 	filterGestor = {
 		criteria: [
 			{
@@ -603,21 +676,21 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			}
 		]
 	};
-
+	
 	displayInfoGestor = {
 		primaryField: 'Name',
 		additionalFields: ['CC_Matricula__c']
 	};
-
+	
 	opcionesCitaDigital = [{ label: 'Cita telefónica', value: '43' }];
-
+	
 	opcionesCita = [
 		{ label: 'Cita presencial', value: '42' },
 		{ label: 'Cita telefónica', value: '43' }
 	];
 
 	opcionesCitaRapida = [];
-
+	
 	connectedCallback() {
 		this.grupoColaborador = [];
 		this.subscribeToMessageChannel();
@@ -627,12 +700,12 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	//Manejo de mensaje de derivar interaccion
 	subscribeToMessageChannel() {
 		if (!this.subscription) {
-			this.subscription = subscribe(
-				this.messageContext,
-				derivarInteraccionChannel,
-				(message) => this.procesarMensajeDerivarInteraccion(message),
-				{ scope: APPLICATION_SCOPE },
-			);
+		  this.subscription = subscribe(
+			this.messageContext,
+			derivarInteraccionChannel,
+			(message) => this.procesarMensajeDerivarInteraccion(message),
+			{ scope: APPLICATION_SCOPE },
+		  );
 		}
 	}
 
@@ -642,12 +715,12 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 
 	procesarMensajeDerivarInteraccion(message) {
-	}
+	}	
 
 	publicarMensajeDerivarInteraccion(origenDerivacion, destinoDerivacion, datosAdicionales) {
 		if (this.messageContext) {
-			const payload = {
-				recordId: this.recordId,
+			const payload = { 
+				recordId: this.recordId, 
 				origen: origenDerivacion,
 				destino: destinoDerivacion,
 				datosAdicionales: datosAdicionales
@@ -656,7 +729,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		}
 	}
 	//FIN Manejo de mensaje de derivar interaccion
-
+	
 	@wire(getDatos, { recordId: '$recordId', otpDerivar: '$otpDerivar' })
 	async wiredDatos(response) {
 		let refrescarDataService = false;
@@ -664,421 +737,464 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		let error = response && response.error;
 		let data = response && response.data;
 		this._wiredDatosResult = response;
-
+		refreshApex(this._wiredDatosResult); // Devuelto al código. Pendiente aclarar unas dudas con Marc
 		if (error) {
 			this.toast('error', 'Problema recuperando los datos principales', error.body.message);
 			this._wiredDatosResult = false;
+			
+		} else if (data) {		
 
-		} else if (data) {
+			//Derivaciones sin cliente asociado
+			this.casoActual = data.casoActual;
+			if (!this.casoActual.AccountId) {
+				this.fecha = new Date().toISOString().substring(0, 10);
+				this.mostrarModalDNI = true;
+				recuperarMensajeDerivacionesSinCuenta({ numero: 1 })
+					.then(mensaje => {
+						this.derivacionesSinClienteAsociado1 = mensaje;
+					})
+					.catch(error => {
+						console.error('Error al recuperar mensaje:', error);
+					});
+				// this.template.querySelector('.modal')?.classList.add('slds-fade-in-open');
+				// this.template.querySelector('.backdrop')?.classList.add('slds-backdrop--open');
+				return;
+			}
+			//Derivaciones sin cliente asociado
 			const resultado = data;
-			this.fecha = new Date().toISOString().substring(0, 10);
-			this.derivar = resultado.derivar;
-			this.toastTrasladarDesdeDerivar = resultado.toastTrasladarDesdeDerivar;
-			this.toastRemitirDesdeDerivar = resultado.toastRemitirDesdeDerivar;
-			this.ambitoFraude = resultado.ambitoFraude;
-			this.ambitoMotivo = resultado.ambitoMotivo;
-			this.grupoColaborador = resultado.grupoColaborador;
-			this.alertaTexto = resultado.alerta;
-			this.toastCSBDNoContratar = resultado.toastCSBDNoContratar;
-			this.textoMotivoCSBDNoContratar = resultado.textoMotivoCSBDNoContratar;
-			this.toastNoClienteError = resultado.toastNoClienteError;
-			this.toastTrasladar3N = resultado.toastTrasladar3N;
-			this.realizarRemitidoDesdeMetodo = resultado.realizarRemitido;
-			this.toastCajerosIncidencias = resultado.toastCajerosIncidencias;
-			this.tituloCajerosIncidencias = resultado.tituloCajerosIncidencias;
-			this.toastNoCliente = resultado.toastNoCliente;
-			this.oficinaPrincipal = resultado.oficinaPrincipal;
-			this.numOficina = resultado.numOficina;
-			this.gestorGenericoName = resultado.gestorGenericoName;
-			this.citaRapida = resultado.citaRapida;
-			this.preguntaCSBDContratar = resultado.preguntaCSBDContratar;
-			this.preguntaCSBDContratar2 = resultado.preguntaCSBDContratar2;
-			this.toastCrearOportunidad = resultado.toastCrearOportunidad;
-			this.preguntaCajeros = resultado.preguntaCajeros;
-			this.preguntaCajerosExternos = resultado.preguntaCajerosExternos;
-			this.toastCajerosExternos = resultado.toastCajerosExternos;
-			this.urlCajeros = resultado.urlCajeros;
-			this.preguntaSenal = resultado.preguntaSenal;
-			this.preguntaSenalAntigua = resultado.preguntaSenalAntigua;
-			this.toastRemitir = resultado.toastRemitir;
-			this.preguntaRealizarRemitido = resultado.preguntaRealizarRemitido;
-			this.preguntaGrupoColaborador = resultado.preguntaGrupoColaborador;
-			this.gestor = resultado.gestor;
-			this.motivoVentas = resultado.motivoVentas;
-			this.mostrarModalGestionGestorAsignado = resultado.mostrarModalGestionGestorAsignado;
-			this.mostrarModalGestionGestorGenerico = resultado.mostrarModalGestionGestorGenerico;
-			this.mostrarModalCreacionTarea = resultado.mostrarModalCreacionTarea;
-			this.mostrarModalDNITestamentaria = resultado.mostrarModalDNITestamentaria;
-			this.textoTestamentariaDocumentacion = resultado.textoTestamentariaDocumentacion;
-			this.textoOperativaDerivarOficina = resultado.textoOperativaDerivarOficina;
-			this.textoOperativaDerivarGestor = resultado.textoOperativaDerivarGestor;
-			this.mostrarModalResponderCliente = resultado.mostrarModalResponderCliente;
-			this.textoDocumentacionCertificado = resultado.textoDocumentacionCertificado;
-			this.preguntaInformacionRequeridaDocumentacion = resultado.preguntaInformacionRequeridaDocumentacion;
-			this.preguntaInformacionCompletaDocumentacion = resultado.preguntaInformacionCompletaDocumentacion;
-			this.toastDocumentacionCasoCreado = resultado.toastDocumentacionCasoCreado;
-			this.modalDocumentacionCasoCreado = resultado.modalDocumentacionCasoCreado;
-			this.toastDocumentacionCasoYaCreado = resultado.toastDocumentacionCasoYaCreado;
-			this.documentacionCaseExtension = resultado.documentacionCaseExtension;
-			//this.toastDniInvalido = resultado.toastDniInvalido;
-			this.cambioOficina = resultado.cambioOficina;
-			this.cambioGestor = resultado.cambioGestor;
-			this.clienteTieneGestor = resultado.clienteTieneGestor;
-			this.flowDerivar = resultado.flowDerivar;
-			this.urlTF = resultado.urlTF;
-			this.numperso = resultado.numperso;
-			this.nif = resultado.nif;
-			this.imagin = resultado.imagin;
-			this.citaRapidaPresencialToast = resultado.citaRapidaPresencialToast;
-			this.oportunidadCreada = resultado.oportunidadCreada;
-			this.casoDerivadoAFraude = resultado.casoDerivadoAFraude;
-			this.oficinaFisica = resultado.oficinaFisica;
-			this.documentacionDecisionCaixa = resultado.documentacionDecisionCaixa;
-			this.motivoDevolucionTemaFraude = resultado.motivoDevolucionTemaFraude;
-			this.grupoColaboradorFraudeSI = resultado.grupoColaboradorFraudeSI;
-			this.grupoColaboradorFraudeNO = resultado.grupoColaboradorFraudeNO;
-
+				this.fecha = new Date().toISOString().substring(0, 10);
+				this.derivar = resultado.derivar;
+				this.toastTrasladarDesdeDerivar = resultado.toastTrasladarDesdeDerivar;
+				this.toastRemitirDesdeDerivar = resultado.toastRemitirDesdeDerivar;
+				this.ambitoFraude = resultado.ambitoFraude;
+				this.ambitoMotivo = resultado.ambitoMotivo;
+				this.grupoColaborador = resultado.grupoColaborador;
+				this.alertaTexto = resultado.alerta;
+				this.toastCSBDNoContratar = resultado.toastCSBDNoContratar;
+				this.textoMotivoCSBDNoContratar = resultado.textoMotivoCSBDNoContratar;
+				this.modalParametrizableCSBD = resultado.modalParametrizableCSBD;
+				this.toastNoClienteError = resultado.toastNoClienteError;
+				this.toastTrasladar3N = resultado.toastTrasladar3N;
+				this.realizarRemitidoDesdeMetodo = resultado.realizarRemitido;
+				this.toastCajerosIncidencias = resultado.toastCajerosIncidencias;
+				this.tituloCajerosIncidencias = resultado.tituloCajerosIncidencias;
+				this.toastNoCliente = resultado.toastNoCliente;
+				this.oficinaPrincipal = resultado.oficinaPrincipal;
+				this.numOficina = resultado.numOficina;
+				this.gestorGenericoName = resultado.gestorGenericoName;
+				this.citaRapida = resultado.citaRapida;
+				this.preguntaCSBDContratar = resultado.preguntaCSBDContratar;
+				this.preguntaCSBDContratar2 = resultado.preguntaCSBDContratar2;
+				this.toastCrearOportunidad = resultado.toastCrearOportunidad;
+				this.preguntaCajeros = resultado.preguntaCajeros;
+				this.preguntaCajerosExternos = resultado.preguntaCajerosExternos;
+				this.toastCajerosExternos = resultado.toastCajerosExternos;
+				this.urlCajeros = resultado.urlCajeros;
+				this.preguntaSenal = resultado.preguntaSenal;
+				this.preguntaSenalAntigua = resultado.preguntaSenalAntigua;
+				this.toastRemitir = resultado.toastRemitir;
+				this.preguntaRealizarRemitido = resultado.preguntaRealizarRemitido;
+				this.preguntaGrupoColaborador = resultado.preguntaGrupoColaborador;
+				this.gestor = resultado.gestor;
+				this.motivoVentas = resultado.motivoVentas;
+				this.mostrarModalGestionGestorAsignado = resultado.mostrarModalGestionGestorAsignado;
+				this.mostrarModalGestionGestorGenerico = resultado.mostrarModalGestionGestorGenerico;
+				console.log('::: mostrarModalGestionGestorGenerico: ', this.mostrarModalGestionGestorGenerico);
+				this.mostrarModalCreacionTarea = resultado.mostrarModalCreacionTarea;
+				this.mostrarModalCreacionTareaMGT = resultado.mostrarModalCreacionTarea;
+				this.mostrarModalDNITestamentaria = resultado.mostrarModalDNITestamentaria;
+				this.textoTestamentariaDocumentacion = resultado.textoTestamentariaDocumentacion;
+				this.textoOperativaDerivarOficina = resultado.textoOperativaDerivarOficina;	
+				this.textoOperativaDerivarGestor = resultado.textoOperativaDerivarGestor;
+				this.mostrarModalResponderCliente = resultado.mostrarModalResponderCliente;
+				this.textoDocumentacionCertificado = resultado.textoDocumentacionCertificado;
+				this.preguntaInformacionRequeridaDocumentacion = resultado.preguntaInformacionRequeridaDocumentacion;
+				this.preguntaInformacionCompletaDocumentacion = resultado.preguntaInformacionCompletaDocumentacion;
+				this.toastDocumentacionCasoCreado = resultado.toastDocumentacionCasoCreado;
+				this.modalDocumentacionCasoCreado = resultado.modalDocumentacionCasoCreado;
+				this.toastDocumentacionCasoYaCreado = resultado.toastDocumentacionCasoYaCreado;
+				this.documentacionCaseExtension = resultado.documentacionCaseExtension;
+				//this.toastDniInvalido = resultado.toastDniInvalido;
+				this.cambioOficina = resultado.cambioOficina;
+				this.cambioGestor = resultado.cambioGestor;
+				this.clienteTieneGestor = resultado.clienteTieneGestor;
+				this.flowDerivar = resultado.flowDerivar;
+				this.urlTF = resultado.urlTF;
+				this.numperso = resultado.numperso;
+				this.nif = resultado.nif;
+				this.imagin = resultado.imagin;
+				this.citaRapidaPresencialToast = resultado.citaRapidaPresencialToast;
+				this.oportunidadCreada = resultado.oportunidadCreada;
+				this.casoDerivadoAFraude = resultado.casoDerivadoAFraude;
+				this.oficinaFisica = resultado.oficinaFisica;
+				this.documentacionDecisionCaixa = resultado.documentacionDecisionCaixa;
+				this.motivoDevolucionTemaFraude = resultado.motivoDevolucionTemaFraude;
+				this.grupoColaboradorFraudeSI = resultado.grupoColaboradorFraudeSI;
+				this.grupoColaboradorFraudeNO = resultado.grupoColaboradorFraudeNO;
+				
 			if (this.oportunidadCreadaAPI || this.oportunidadCreada) {
-				this.textoOportunidadExistente = resultado.textoOportunidadExistente;
-			}
+					this.textoOportunidadExistente = resultado.textoOportunidadExistente;
+				}
 			if (this.casoDerivadoAFraude) {
-				this.textoOportunidadExistente = resultado.textoOportunidadExistente;
-			}
-			this.hubImagin = resultado.hubImagin;
-			this.hubGestion = resultado.hubGestion;
+					this.textoOportunidadExistente = resultado.textoOportunidadExistente;
+				}
+				this.hubImagin = resultado.hubImagin;
+				this.hubGestion = resultado.hubGestion;
+				
+				this.fraudeANivelDeMotivo = resultado.fraudeANivelDeMotivo;
+				//Argos
+				this.preguntasArgos = resultado.preguntasArgos;
+				this.diarioMFAArgos = resultado.diarioMFAArgos;
+				this.preguntaConfirmacionArgos = resultado.preguntaConfirmacionArgos;
+				this.operacionMFAArgos = resultado.operacionMFAArgos;
+				this.cabeceraPreguntasMFAArgos = resultado.cabeceraPreguntasMFAArgos;
+				this.cyberfraude = resultado.cyberfraude;
+				this.cybersoc = resultado.cybersoc;
+				this.preguntaIdBancaDigital = resultado.preguntaIdBancaDigital;
+				//Argos
+	
+				
+				//Phising/Smishing/Malware
+				this.PhisingSmishingMalware1 = resultado.PhisingSmishingMalware1;
+				this.PhisingSmishingMalware2 = resultado.PhisingSmishingMalware2;
+				this.PhisingSmishingMalware3 = resultado.PhisingSmishingMalware3;
+				this.PhisingSmishingMalware5 = resultado.PhisingSmishingMalware5;
+				this.PhisingSmishingMalware6 = resultado.PhisingSmishingMalware6;
+				//Phising/Smishing/Malware
+	
+				//CashBack
+				this.CashBack1 = resultado.CashBack1;
+				this.CashBack2 = resultado.CashBack2;
+				this.CashBack3 = resultado.CashBack3;
+				this.CashBack4 = resultado.CashBack4;
+				this.CashBack5 = resultado.CashBack5;
+				//CashBack
+	
+				//Refinanciación Deudas
+				this.RefinanciacionDeudas1 = resultado.RefinanciacionDeudas1;
+				this.RefinanciacionDeudas2 = resultado.RefinanciacionDeudas2;
+				this.RefinanciacionDeudas3 = resultado.RefinanciacionDeudas3;
+				this.RefinanciacionDeudas4 = resultado.RefinanciacionDeudas4;
+				//Refinanciación Deudas
 
-			this.fraudeANivelDeMotivo = resultado.fraudeANivelDeMotivo;
-			//Argos
-			this.preguntasArgos = resultado.preguntasArgos;
-			this.diarioMFAArgos = resultado.diarioMFAArgos;
-			this.preguntaConfirmacionArgos = resultado.preguntaConfirmacionArgos;
-			this.operacionMFAArgos = resultado.operacionMFAArgos;
-			this.cabeceraPreguntasMFAArgos = resultado.cabeceraPreguntasMFAArgos;
-			this.cyberfraude = resultado.cyberfraude;
-			this.cybersoc = resultado.cybersoc;
-			//this.preguntaIdBancaDigital = resultado.preguntaIdBancaDigital;
-			//Argos
+				//CSBD
+				this.ambitoCSBD = resultado.ambitoCSBD;
+				this.preguntaTelefonoCSBD = resultado.preguntaTelefonoCSBD;
+				this.preguntaTelefonoCSBDNoEncontrado = resultado.preguntaTelefonoCSBDNoEncontrado;
+				this.autenticacionSAU = resultado.autenticacionSAU ?? false;
+				let reqAutenticacionSAU = JSON.parse(resultado.reqAutenticacionSAU ?? '[]');
+				let resAutenticacionSAU = JSON.parse(resultado.resAutenticacionSAU ?? '[]');
+				let nombreTraza = resultado.nombreTraza ?? '';
+				//CSBD
+	
+				//Migración de toast success 
+				this.mensajeMostrarModalToast = resultado.mensajeMostrarModalToast;
+				this.mostrarModalToast = resultado.mostrarModalToast;
+				//Migración de toast success
+	
+				//Accionistas
+				this.mensajeDerivarAccionistas = resultado.mensajeDerivarAccionistas;
+				//Accionistas
+	
+				//Mecanismo firma
+				
+				this.preguntaMecanismoFirma = resultado.preguntaMecanismoFirma;
+				this.preguntaMecanismoFirmaDatos = resultado.preguntaMecanismoFirmaDatos;
+				this.preguntaMecanismoFirmaDatosValores = resultado.preguntaMecanismoFirmaDatosValores;
+				this.toastMecanismoFirmaIdentificadorBloqueado = resultado.toastMecanismoFirmaIdentificadorBloqueado;		
+				this.toastMecanismoFirmaIdentificadorSinBloquear = resultado.toastMecanismoFirmaIdentificadorSinBloquear;		
+				this.toastMecanismoFirmaArgosCorrecto = resultado.toastMecanismoFirmaArgosCorrecto;		
+				this.preguntaMecanismoFirmaClienteAutenticado = resultado.preguntaMecanismoFirmaClienteAutenticado;		
+				this.toastMecanismoFirmaAsuntoEnvioCodigo = resultado.toastMecanismoFirmaAsuntoEnvioCodigo;
+				this.preguntaMecanismoFirmaIdentificador = resultado.preguntaMecanismoFirmaIdentificador;
+				this.toastMecanismoFirmaDatosIncompletos = resultado.toastMecanismoFirmaDatosIncompletos;
+				this.circuitoExtranjero = resultado.circuitoExtranjero;
+				this.circuitoCodigoFirma = resultado.circuitoCodigoFirma;
+				this.cybersocMF = resultado.cybersocMF;
+				this.toastMecanismoFirmaCasoCreado = resultado.toastMecanismoFirmaCasoCreado;
+				this.preguntaIdentificadorSigueBloqueado = resultado.preguntaIdentificadorSigueBloqueado;
+				
+				//Mecanismo firma
+	
+				//Oficina sin tarea
+				this.mensajeOficinaSinTarea = resultado.mensajeOficinaSinTarea;
+				//Oficina sin tarea
+	
+	
+				//Comunidades de propietarios
+				this.detallesConsulta = resultado.detallesConsulta;
+				//Comunidades de propietarios
+	
+				//Colectivo vulnerable
+				this.mensajeColectivosVulnerables = resultado.mensajeColectivosVulnerables;
+				this.preguntaColectivosVulnerables = resultado.preguntaColectivosVulnerables;
+				console.log('mensajeColectivosVulnerables: ', this.mensajeColectivosVulnerables);
+				console.log('preguntaColectivosVulnerables: ', this.preguntaColectivosVulnerables);
+				//Colectivo vulnerable
+	
+				//Cita normal
+				this.mensajeSinDisponibilidadGestor = resultado.mensajeSinDisponibilidadGestor;
+	
+				//Amenazas
 
+				this.mensajeDerivacionAmenazasTipo = resultado.mensajeDerivacionAmenazasTipo;
 
-			//Phising/Smishing/Malware
-			this.PhisingSmishingMalware1 = resultado.PhisingSmishingMalware1;
-			this.PhisingSmishingMalware2 = resultado.PhisingSmishingMalware2;
-			this.PhisingSmishingMalware3 = resultado.PhisingSmishingMalware3;
-			this.PhisingSmishingMalware5 = resultado.PhisingSmishingMalware5;
-			this.PhisingSmishingMalware6 = resultado.PhisingSmishingMalware6;
-			//Phising/Smishing/Malware
+				//Amenazas empleados
+				this.mensajeSolicitudDatosAmenazasEmpleados = resultado.mensajeSolicitudDatosAmenazasEmpleados;
+				this.emailSuccess = resultado.emailSuccess;
+				this.nombrePlantilla = resultado.nombrePlantilla;
+				this.nombrePlantillaAmenazasEmpleados = resultado.nombrePlantillaAmenazasEmpleados;
+				this.grupoColEmpleadosAmenazas = resultado.grupoColEmpleadosAmenazas;
+				this.grupoColClientesAmenazas = resultado.grupoColClientesAmenazas;
+				//Amenazas empleados
+	
+				//Amenazas suicidios
+				this.mensajeSolicitudDatosAmenazasSuicidios = resultado.mensajeSolicitudDatosAmenazasSuicidios;
+				this.nameOWA = resultado.nameOWA;
+				//Amenazas suicidios
 
-			//CashBack
-			this.CashBack1 = resultado.CashBack1;
-			this.CashBack2 = resultado.CashBack2;
-			this.CashBack3 = resultado.CashBack3;
-			this.CashBack4 = resultado.CashBack4;
-			this.CashBack5 = resultado.CashBack5;
-			//CashBack
+				//Amenazas
+	
+				//Derivar/Devolver SAC
+				this.mostrarDerivarSAC = resultado.mostrarDerivarSAC;
+				this.mostrarDevolverSAC = resultado.mostrarDevolverSAC;
+				this.mostrarCanalProcedenciaErroneo = resultado.mostrarCanalProcedenciaErroneo;
+				this.mensajeDerivarAlSAC = resultado.mensajeDerivarAlSAC;
+				this.mensajeDerivarAlSACSuccess = resultado.mensajeDerivarAlSACSuccess;
+				this.mensajeDevolverAlSAC = resultado.mensajeDevolverAlSAC;
+				this.mensajeDevolverAlSACSuccess = resultado.mensajeDevolverAlSACSuccess;
+				this.mensajeCanalProcedenciaErroneo = resultado.mensajeCanalProcedenciaErroneo;
+				this.casoActual = resultado.casoActual;
+				//Derivar/Devolver SAC
+	
+				//Onboarding/Desistir
+				this.ambitoOnboarding = resultado.ambitoOnboarding;
+				this.casoAutenticado = resultado.casoAutenticado;
+				this.empresaONB = resultado.empresaONB;
+				this.estadoONB = resultado.estadoONB;
+				this.subestadoONB = resultado.subestadoONB;
+				this.fechaEstadoONB = resultado.fechaEstadoONB;
+				this.motivoCierreONB = resultado.motivoCierreONB;
+				this.numSR = resultado.numSR;
+				this.codigONB = resultado.codigONB;
+				this.textoModalOnboarding = resultado.textoModalOnboarding;
+				this.textoModalDesistir = resultado.textoModalDesistir;
+				this.derivadoBPO = resultado.derivadoBPO;
+				this.textoCorreoEnviado = resultado.textoCorreoEnviado;
+				this.textoModalOnboardingCodigos = resultado.textoModalOnboardingCodigos;
+				//Onboarding/Desistir
+	
+				this.ocultarModalTrasladar = resultado.ocultarModalTrasladar;
+	
+				//Confidencial
+				this.CSBDConfidencial = resultado.CSBDConfidencial;
+				//Confidencial
 
-			//Refinanciación Deudas
-			this.RefinanciacionDeudas1 = resultado.RefinanciacionDeudas1;
-			this.RefinanciacionDeudas2 = resultado.RefinanciacionDeudas2;
-			this.RefinanciacionDeudas3 = resultado.RefinanciacionDeudas3;
-			this.RefinanciacionDeudas4 = resultado.RefinanciacionDeudas4;
-			//Refinanciación Deudas
+				//CBP 
 
-			//CSBD
-			this.ambitoCSBD = resultado.ambitoCSBD;
-			this.preguntaTelefonoCSBD = resultado.preguntaTelefonoCSBD;
-			this.preguntaTelefonoCSBDNoEncontrado = resultado.preguntaTelefonoCSBDNoEncontrado;
-			this.autenticacionSAU = resultado.autenticacionSAU ?? false;
-			let reqAutenticacionSAU = JSON.parse(resultado.reqAutenticacionSAU ?? '[]');
-			let resAutenticacionSAU = JSON.parse(resultado.resAutenticacionSAU ?? '[]');
-			let nombreTraza = resultado.nombreTraza ?? '';
-			//CSBD
+				this.mostrarModalCBP = resultado.mostrarModalCBP;
+				this.preguntaCBP = resultado.preguntaCBP;
+				this.ambitoCBP = resultado.ambitoCBP;
+				this.esIntouch = resultado.esIntouch;
+				this.grupoCol = resultado.grupoCol;
+				this.mostrarModalCreacionTareaCBP = resultado.mostrarModalCreacionTareaCBP;
 
-			//Migración de toast success
-			this.mensajeMostrarModalToast = resultado.mensajeMostrarModalToast;
-			this.mostrarModalToast = resultado.mostrarModalToast;
-			//Migración de toast success
-
-			//Accionistas
-			this.mensajeDerivarAccionistas = resultado.mensajeDerivarAccionistas;
-			//Accionistas
-
-			//Mecanismo firma
-
-			this.preguntaMecanismoFirma = resultado.preguntaMecanismoFirma;
-			this.preguntaMecanismoFirmaDatos = resultado.preguntaMecanismoFirmaDatos;
-			this.preguntaMecanismoFirmaDatosValores = resultado.preguntaMecanismoFirmaDatosValores;
-			this.toastMecanismoFirmaIdentificadorBloqueado = resultado.toastMecanismoFirmaIdentificadorBloqueado;
-			this.toastMecanismoFirmaIdentificadorSinBloquear = resultado.toastMecanismoFirmaIdentificadorSinBloquear;
-			this.toastMecanismoFirmaArgosCorrecto = resultado.toastMecanismoFirmaArgosCorrecto;
-			this.preguntaMecanismoFirmaClienteAutenticado = resultado.preguntaMecanismoFirmaClienteAutenticado;
-			this.toastMecanismoFirmaAsuntoEnvioCodigo = resultado.toastMecanismoFirmaAsuntoEnvioCodigo;
-			this.preguntaMecanismoFirmaIdentificador = resultado.preguntaMecanismoFirmaIdentificador;
-			this.toastMecanismoFirmaDatosIncompletos = resultado.toastMecanismoFirmaDatosIncompletos;
-			this.circuitoExtranjero = resultado.circuitoExtranjero;
-			this.circuitoCodigoFirma = resultado.circuitoCodigoFirma;
-			this.cybersocMF = resultado.cybersocMF;
-			this.toastMecanismoFirmaCasoCreado = resultado.toastMecanismoFirmaCasoCreado;
-
-			//Mecanismo firma
-
-			//Oficina sin tarea
-			this.mensajeOficinaSinTarea = resultado.mensajeOficinaSinTarea;
-			//Oficina sin tarea
-
-
-			//Comunidades de propietarios
-			this.detallesConsulta = resultado.detallesConsulta;
-			//Comunidades de propietarios
-			/*
-						//Colectivo vulnerable
-						this.mensajeColectivosVulnerables = resultado.mensajeColectivosVulnerables;
-						//Colectivo vulnerable
-			*/
-			//Cita normal
-			this.mensajeSinDisponibilidadGestor = resultado.mensajeSinDisponibilidadGestor;
-
-			// //Amenazas empleados
-			// this.mensajeSolicitudDatosAmenazasEmpleados = resultado.mensajeSolicitudDatosAmenazasEmpleados;
-			// this.emailSuccess = resultado.emailSuccess;
-			// this.nombrePlantilla = resultado.nombrePlantilla;
-			// this.grupoCol = resultado.grupoCol;
-			// //Amenazas empleados
-
-			// //Amenazas suicidios
-			// this.mensajeSolicitudDatosAmenazasSuicidios = resultado.mensajeSolicitudDatosAmenazasSuicidios;
-			// this.nameOWA = resultado.nameOWA;
-			// //Amenazas suicidios
-
-			//Derivar/Devolver SAC
-			this.mostrarDerivarSAC = resultado.mostrarDerivarSAC;
-			this.mostrarDevolverSAC = resultado.mostrarDevolverSAC;
-			this.mostrarCanalProcedenciaErroneo = resultado.mostrarCanalProcedenciaErroneo;
-			this.mensajeDerivarAlSAC = resultado.mensajeDerivarAlSAC;
-			this.mensajeDerivarAlSACSuccess = resultado.mensajeDerivarAlSACSuccess;
-			this.mensajeDevolverAlSAC = resultado.mensajeDevolverAlSAC;
-			this.mensajeDevolverAlSACSuccess = resultado.mensajeDevolverAlSACSuccess;
-			this.mensajeCanalProcedenciaErroneo = resultado.mensajeCanalProcedenciaErroneo;
-			this.casoActual = resultado.casoActual;
-			//Derivar/Devolver SAC
-
-			//Onboarding/Desistir
-			this.ambitoOnboarding = resultado.ambitoOnboarding;
-			this.casoAutenticado = resultado.casoAutenticado;
-			this.empresaONB = resultado.empresaONB;
-			this.estadoONB = resultado.estadoONB;
-			this.subestadoONB = resultado.subestadoONB;
-			this.fechaEstadoONB = resultado.fechaEstadoONB;
-			this.motivoCierreONB = resultado.motivoCierreONB;
-			this.numSR = resultado.numSR;
-			this.codigONB = resultado.codigONB;
-			this.textoModalOnboarding = resultado.textoModalOnboarding;
-			this.textoModalDesistir = resultado.textoModalDesistir;
-			this.derivadoBPO = resultado.derivadoBPO;
-			this.textoCorreoEnviado = resultado.textoCorreoEnviado;
-			this.textoModalOnboardingCodigos = resultado.textoModalOnboardingCodigos;
-			//Onboarding/Desistir
-
-			this.ocultarModalTrasladar = resultado.ocultarModalTrasladar;
-
-			//Confidencial
-			this.CSBDConfidencial = resultado.CSBDConfidencial;
-			//Confidencial
-
-			if (this.grupoColaborador && !this.ocultarModalTrasladar) {
-				this.mostrarModalTrasladarGrupoColaborador = true;
-			} else {
-				this.mostrarModalTrasladarGrupoColaborador = false;
-			}
-
+				//CBP
+	
+				if (this.grupoColaborador && !this.ocultarModalTrasladar) {
+					this.mostrarModalTrasladarGrupoColaborador = true;
+				} else {
+					this.mostrarModalTrasladarGrupoColaborador = false;
+				}
+				
 			if (this.imagin) {
-				this.tipoCita = 43;
-			}
+					this.tipoCita = 43;
+				}
 
 			if (this.oficinaPrincipal) {
 				for (let i = 0; i < resultado.gestores.length; i++) {
 					this.gestores.push({ label: resultado.gestores[i].Name, value: resultado.gestores[i].Id });
+					}
 				}
-			}
 
 			if (this.toastTrasladar3N && !this.alertaTexto && !this.ambitoFraude && !this.grupoColaborador && !this.preguntaTelefonoCSBD) {
 				refrescarDataService = true;
-				this.realizarTraslado3N();
-			}
+					this.realizarTraslado3N();
+				}
 
 			if (this.realizarRemitidoDesdeMetodo && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
-				this.handleRemitir();
-			} else if (this.realizarRemitidoDesdeMetodo && (this.alertaTexto || this.grupoColaborador || this.ambitoFraude)) {
-				this.abrirModal();
-			}
+					this.handleRemitir();
+				} else if (this.realizarRemitidoDesdeMetodo && (this.alertaTexto || this.grupoColaborador || this.ambitoFraude)) {
+					this.abrirModal();
+				}
 
 			if (this.toastCSBDNoContratar && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude && !this.oportunidadCreadaAPI && !this.textoDocumentacionCertificado) {
 				refrescarDataService = true;
-				this.crearOportunidad();
-			}
+					this.crearOportunidad();
+				}
 
 			if (this.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
-				//this.toast('error', this.tituloCajerosIncidencias, resultado.toastCajerosIncidencias);
-				this.handleModalToast(this.toastCajerosIncidencias);
-			} else if (this.toastCajerosIncidencias && (this.alertaTexto || this.grupoColaborador || this.ambitoFraude)) {
-				this.abrirModal();
-			}
-
+					//this.toast('error', this.tituloCajerosIncidencias, resultado.toastCajerosIncidencias);
+					this.handleModalToast(this.toastCajerosIncidencias);
+				} else if (this.toastCajerosIncidencias && (this.alertaTexto || this.grupoColaborador || this.ambitoFraude)) {
+					this.abrirModal();
+				}
+	
 			if (this.toastNoClienteError && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
-				//this.toast('error', 'Error en los datos', resultado.toastNoClienteError);
-				this.handleModalToast(resultado.toastNoClienteError);
-			} else {
-				this.abrirModal();
-			}
+					//this.toast('error', 'Error en los datos', resultado.toastNoClienteError);
+					this.handleModalToast(resultado.toastNoClienteError);
+					
+				} else {
+					this.abrirModal();
+				}
 
-			/*if(resultado.preguntaEnrollment){
-				this.preguntaEnrollment= resultado.preguntaEnrollment;
-				this.preguntaEnrollmentDatos= resultado.preguntaEnrollmentDatos;
-				//this.toastEnrollmentNo = resultado.toastEnrollmentNo;
-				this.toastEnrollmentDatosSi = resultado.toastEnrollmentDatosSi;
-				this.toastEnrollmentDatosNo = resultado.toastEnrollmentDatosNo;
-			}*/
+				/*if(resultado.preguntaEnrollment){
+					this.preguntaEnrollment= resultado.preguntaEnrollment;
+					this.preguntaEnrollmentDatos= resultado.preguntaEnrollmentDatos;
+					//this.toastEnrollmentNo = resultado.toastEnrollmentNo;
+					this.toastEnrollmentDatosSi = resultado.toastEnrollmentDatosSi;
+					this.toastEnrollmentDatosNo = resultado.toastEnrollmentDatosNo;
+				}*/
 
 			if (this.preguntaRealizarRemitido && !this.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
-				this.abrirModal();
-			}
+						this.abrirModal();
+					}
 
 			if (resultado.comentarioCambioGestor) {
-				this.comentariosTarea = resultado.comentarioCambioGestor;
+					this.comentariosTarea = resultado.comentarioCambioGestor;
 			} else if (resultado.comentarioCambioOficina) {
-				this.comentariosTarea = resultado.comentarioCambioOficina;
-			}
+					this.comentariosTarea = resultado.comentarioCambioOficina;
+				}
 
 			if ((this.grupoColaborador === null || this.grupoColaborador === undefined) && this.flowDerivar === true) {
-				this.mostrarFlowDerivar = this.flowDerivar;
-			}
+					this.mostrarFlowDerivar = this.flowDerivar;
+				}
 
 			if (this.comentariosTarea === undefined) {
-				this.comentariosTarea = resultado.detallesConsulta;
-			}
+					this.comentariosTarea = resultado.detallesConsulta;
+				}				
 
-			if (!this.alertaTexto && !this.toastTrasladar3N && !this.toastCSBDNoContratar && !this.preguntaTelefonoCSBD) {
+				if (!this.alertaTexto && !this.toastTrasladar3N && !this.toastCSBDNoContratar && !this.preguntaTelefonoCSBD) {
 				refrescarDataService = true;
-				this.handleContinuarProceso();
-			}
+					this.handleContinuarProceso();
+				}
 
-			this.llamadaIntegracionClienteDigital();
+				this.llamadaIntegracionClienteDigital();
 
-			if (!resultado.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude && !this.realizarRemitidoDesdeMetodo) {
-				this.abrirModal();
-			}
+				if (!resultado.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude && !this.realizarRemitidoDesdeMetodo) {
+					this.abrirModal();
+				}
 			if (this.nif != null && this.nif.startsWith('H')) { // Comunidades de propietarios
 				crearActividadComunidadesPropietarios({ recordId: this.recordId, detallesConsulta: this.detallesConsulta, mensaje: this.mensajeMostrarModalToast })
 					.catch(error => {
 						console.error(error);
 						this.cerrarModal();
 					});
-			}
-
+				}
+	
 			if (resultado.opcionesCitaRapida && this.citaRapida) {
-				this.opcionesCitaRapida = Object.entries(resultado.opcionesCitaRapida).map(([key, value]) => ({
-					label: key, // Cita presencial, o Cita telefonica
-					value: value   // 42 o 43
-				}));
-			}
-
-			//Oficina sin tarea
+					this.opcionesCitaRapida = Object.entries(resultado.opcionesCitaRapida).map(([key, value]) => ({
+						label: key, // Cita presencial, o Cita telefonica
+						value: value   // 42 o 43
+					}));
+				}
+	
+				//Oficina sin tarea
 			if (this.mensajeOficinaSinTarea) {
-				//this.handleModalToast(this.mensajeOficinaSinTarea);
-				this.handleOficinaSinTarea();
-			}
-			//Oficina sin tarea
+					//this.handleModalToast(this.mensajeOficinaSinTarea);
+					this.handleOficinaSinTarea();
+				}
+				//Oficina sin tarea
 
-			//Argos
-			/*if(this.operacionMFAArgos){
-				recuperarArgos({recordId: this.recordId})
-				.then(resultado => {
-					if(resultado){
-						this.trasladoColaboradorArgos();
-					}else{
-						this.preguntaMFAArgosOficina();
-					}
-				})
-				.catch(error => {
-					console.error(error);
-					this.cerrarModal();
-				});
-
-			}
-
-			if(this.diarioMFAArgos){
-				recuperarArgos({recordId: this.recordId})
-				.then(resultado => {
-					if(resultado){
-						this.preguntaMFAArgosSeguridad();
-					}else{
-						this.preguntaMFAArgosOficina();
-					}
-				})
-				.catch(error => {
-					console.error(error);
-					this.cerrarModal();
-				});
-
-			}*/
+				//CBP
+			if (this.ambitoCBP) {
+					this.handleCBP();
+				}
+				//CBP
+	
+				//Argos
+			if (this.operacionMFAArgos) {
+				recuperarArgos({ recordId: this.recordId })
+					.then(resultado => {
+						if (resultado) {
+							this.trasladoColaboradorArgos();
+						} else {
+							this.preguntaMFAArgosOficina();
+						}
+					})
+					.catch(error => {
+						console.error(error);
+						this.cerrarModal();
+					});
+	
+				}
+	
+			if (this.diarioMFAArgos) {
+				recuperarArgos({ recordId: this.recordId })
+					.then(resultado => {
+						if (resultado) {
+							this.preguntaMFAArgosSeguridad();
+						} else {
+							this.preguntaMFAArgosOficina();
+						}
+					})
+					.catch(error => {
+						console.error(error);
+						this.cerrarModal();
+					});
+	
+				}
 
 			if (this.autenticacionSAU && nombreTraza && reqAutenticacionSAU.length && resAutenticacionSAU.length) { /*reqAutenticacionSAU != '' && resAutenticacionSAU != ''*/
-				//LLamar a Apex para loguear las trazas y pasar el valor que se devuelve en el retorno del get datos
+					//LLamar a Apex para loguear las trazas y pasar el valor que se devuelve en el retorno del get datos
 				loguearTrazasAutenticacionSAU({ recordId: this.recordId, nombreTraza, reqAutenticacionSAU, resAutenticacionSAU })
 					.catch(error => console.error(error));
-			}
+				}
 			//Argos
-			/*
-						//Colectivo vulnerable
-						if(this.mensajeColectivosVulnerables){
-							const fechaActividad = new Date().toISOString().slice(0,16);
 
-							this.enviarTareaOficinaCliente = true;
+			//Mecanismo firma
+			if (this.preguntaMecanismoFirmaDatos) {
+				recuperarArgos({ recordId: this.recordId })
+				.then(resultado => {
+						if (!resultado) {
+						this.handleMFNull();
+					}
+				})
+				.catch(error => {
+					console.error(error);
+					this.cerrarModal();
+				});
+			}
 
-							this.handleModalToast(this.mensajeColectivosVulnerables);
-							crearTarea({
-								recordId: this.recordId,
-								asunto: 'Solicitud contacto gestor (Contact Center)',
-								fechaActividad: fechaActividad,
-								enviarTareaOficinaCliente: this.enviarTareaOficinaCliente
-
-							}).then(resultado => {
-							/*if (resultado.existeTareaCitaCreada) {
-								this.handleModalToast(resultado.textoTareaCitaCreada);
-							}
-						}).catch(error => {
-							console.error(error);
-							this.handleModalToast(error.body.message);
-						});
-						}
-						//Colectivo vulnerable*/
+			//Mecanismo firma
 
 			//TEST MMC
 		}
-
+		
 		refrescarDataService |= await updateCasoOperativaDerivar({ recordId: this.recordId })
 
 		if (refrescarDataService) {
-			await notifyRecordUpdateAvailable([{recordId: this.recordId}]); //refreshApex(this._wiredDatosResult);
+			await notifyRecordUpdateAvailable([{ recordId: this.recordId }]); //refreshApex(this._wiredDatosResult);
 		}
 
 		// window.setTimeout(() => this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail: { data: null } })), 400);
-		this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail: { data: null } }));
+this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail: { data: null } }));
 
 	}
 
 	async recuperarCampoDerivar() {
 		let resultado = false;
 		recuperarCampoDerivar({ recordId: this.recordId })
-			.then(retorno => {
-				resultado = retorno;
-			})
-			.catch(error => {
-				console.error(error);
-				this.toast('error', 'Problema recuperando los datos de campo derivar', error.body.message);
-				this.cerrarModal();
-			}).finally(() => this.derivar = resultado);
+		.then(retorno => {
+			resultado = retorno;
+		})
+		.catch(error => {
+			console.error(error);
+			this.toast('error', 'Problema recuperando los datos de campo derivar', error.body.message);
+			this.cerrarModal();
+		}).finally(() => this.derivar = resultado);
 	}
-
+	
 	abrirModal() {
 		if (this.documentacionCaseExtension) {
 			this.toast('error', 'No se puede derivar este caso', this.toastDocumentacionCasoYaCreado);
@@ -1089,14 +1205,14 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		}
 		const customEvent = new CustomEvent('abrirmodal', {
 			detail: { data: null }
-		});
-		this.dispatchEvent(customEvent);
+        });
+        this.dispatchEvent(customEvent);
 	}
 
 	// get backdropClass() {
-	//     return this.backgroundblack ? 'fullscreen-backdrop' : 'slds-backdrop slds-backdrop_open';
-	// }
-
+    //     return this.backgroundblack ? 'fullscreen-backdrop' : 'slds-backdrop slds-backdrop_open';
+    // }
+	
 	cerrarModal() {
 
 		this.template.querySelector('.backdrop')?.classList.remove('slds-backdrop--open');
@@ -1106,10 +1222,10 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		//window.setTimeout(() =>	this.dispatchEvent(new CustomEvent('modalcerrado', {detail: {data: null}})), 400);
 		const customEvent = new CustomEvent('modalcerrado', {
 			detail: { data: null }
-		});
-		this.dispatchEvent(customEvent);
+        });
+        this.dispatchEvent(customEvent);
 	}
-
+	
 	handleContinuarProceso() {
 		this.alertaTexto = false;
 		if ((!this.grupoColaborador || this.toastTrasladar3N) && !this.ambitoFraude && !this.preguntaTelefonoCSBD) {
@@ -1119,7 +1235,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.mostrarModalCita = false;
 		}
 	}
-
+	
 	ocultarModalCitaGestor() {
 		this.mostrarModalCita = false;
 		this.mostrarModalCreacionTarea = true;
@@ -1128,10 +1244,10 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	handleUploadFinished(event) {
 		const uploadedFiles = event.detail.files;
-
+		
 		this.archivos = uploadedFiles;
 	}
-
+	
 	handleCrearTareaGestor() {
 		if (!this.template.querySelector('.comentariosTarea').value || !this.template.querySelector('.fechaActividad').value) {
 			this.toast('warning', 'Campos vacíos', 'Por favor, informe todos los campos del formulario');
@@ -1157,7 +1273,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 					this.showSpinner = false;
 					this.mostrarModalCreacionTarea = false;
 					this.handleModalToast(resultado.textoTareaCitaCreada);
-
+					
 				} else {
 					if (resultado.contactoSinAccount) {
 						this.showSpinner = false;
@@ -1173,32 +1289,38 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 							this.toast('warning', 'Gestor no encontrado', resultado.mensajeGestorNoEncontrado);
 							this.enviarTareaOficinaCliente = true;
 							this.crearTareaCitaGestor = false;
+						} 
+						console.log('oficina:' + this.cambioOficina);
+						console.log('CBP ambito:' + this.ambitoCBP);
+						if (this.ambitoCBP /*&& this.cambioOficina*/) {
+							
+							this.handleRespuestaClienteCBP();
 						}
 					}
-
+					
 				}
 
 			}).catch(error => {
 				console.error(error);
 				this.handleModalToast(error.body.message);
-
+				
 			});
 		}
 	}
-
+	
 	mostrarToastOficinaResultado(mensajeToast, idCuenta) {
 		getUrlNumeroOficinaApex({ recordId: idCuenta })
 			.then(resultado => {
 				if (resultado.url) {
 					this.urlOficina = resultado.url;
-					this.numeroOficina = resultado.numeroOficina;
+          			this.numeroOficina = resultado.numeroOficina;
 					this.mostrarModalToast = false;
 					this.showSpinner = false;
 
 					this.handleModalToastUrl(mensajeToast);
 				}
 			});
-
+		
 
 		/*
 		getUrlNumeroOficinaApex({recordId: idCuenta})
@@ -1210,21 +1332,21 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			}
 		});*/
 	}
-
+	
 	toast(variant, title, message, messageData) {
-
-		this.dispatchEvent(new ShowToastEvent({
-			variant,
-			title,
-			message,
-			mode: messageData ? 'sticky' : 'dismissable',
-			duration: messageData ? null : 9000,
-			messageData
-		}));
-
+		
+			this.dispatchEvent(new ShowToastEvent({
+				variant,
+				title,
+				message,
+				mode: messageData ? 'sticky' : 'dismissable',
+				duration: messageData ? null : 9000,
+				messageData
+			}));
+		
 	}
 
-
+	
 	async llamadaIntegracionClienteDigital() {
 		this.cargandoGestor = true;
 		try {
@@ -1243,7 +1365,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 						this.ocultarOpcionCitaGestor = true;
 						this.tipoCita = 43;
 					}
-				} else {
+				} else {					
 					if (resultado.gestorClienteName === this.gestorGenericoName) {
 						this.nombreGestor = resultado.gestorClienteName;
 						this.gestorGenerico = true;
@@ -1255,7 +1377,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 					this.nombreGestorAsignado = resultado.nombreGestorAsignado;
 				}
 				if (this.numeroGestor != null && this.numeroGestor != undefined) {
-					this.gestorBackup();
+				this.gestorBackup();
 				}
 			} else if (resultado.resultado === 'KO') {
 				this.numeroGestor = 'KO';
@@ -1270,25 +1392,25 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		}
 
 	}
-
+	
 	modalTeclaPulsada(event) {
 		if (event.keyCode === 27) { //ESC
 			this.cerrarModal();
 		}
 	}
-
+	
 	handleAbrirModalCita() {
 		this.mostrarModalCita = true;
 		this.mostrarModalGestionGestorAsignado = false;
 	}
-
+	
 	handleGestionGestorDistintoSi() {
 		if (this.citaRapida) {
 			if (this.numOficina === 'carteraVacia') {
 				this.mostrarModalCita = false;
 				//this.toast('error', 'Cartera no encontrada','No se encuentra la cartera asignada al cliente');
 				this.handleModalToast('No se encuentra la cartera asignada al cliente');
-
+				
 			} else {
 				this.mostrarModalCita = true;
 			}
@@ -1299,7 +1421,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		}
 		this.mostrarModalGestionGestorGenerico = false;
 	}
-
+	
 	handleGestionGestorDistintoNo() {
 		this.mostrarModalCreacionTarea = true;
 		this.mostrarModalGestionGestorGenerico = false;
@@ -1307,13 +1429,13 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		this.cambioOficina = true;
 		this.mostrarBuscadorOficina = true;
 	}
-
+	
 	handleGestionGestorAsignadoNo() {
 		this.mostrarModalCreacionTarea = true;
 		this.mostrarModalGestionGestorAsignado = false;
 		this.mostrarBuscadorGestor = true;
 	}
-
+	
 	resetDisponibilidadConsultada(event) {
 		this.disponibilidadConsultada = false;
 		this.ocultarBotonCita = true;
@@ -1337,7 +1459,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 				console.error(error);
 			});
 	}
-
+	
 	//Backup gestores -> Llamado desde el checkbox de 'Otros gestores'
 	mostrarGestorBackup(event) {
 		this.gestorBackupActivo = event.target.checked;
@@ -1382,26 +1504,26 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		this.botonConsultarDisponibilidadDesactivado = this.gestorSeleccionado !== null && this.gestorSeleccionado !== undefined ? false : true;
 		this.disponibilidadConsultada = false;
 	}
-
+	
 	//Backup gestores -> Carga las fechas de disponibilidad del gestor seleccionado, se realiza al pulsar el boton consultar disponibilidad
 	consultarFechasDisponibilidadBackup(event) {
 		if (this.gestorSeleccionado !== undefined && this.gestorSeleccionado !== null) {
 			//Busca las fechas del gestor que se ha seleccionado, referenciando al caso y el tipo de cita que se ha seleccionado
 			obtenerFechasDisponiblidadGestor({ recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.gestorSeleccionado, eventType: this.tipoCita })
-				.then(resultado => {
-					//Oculta el boton de consultar disponibilidad y asigna las fechas, en caso de no encontrar fechas, se muestra un mensaje
-					this.disponibilidadConsultada = true;
-					this.ocultarBotonCita = false;
-					this.fechasDisponibilidad = resultado;
+			.then(resultado => {
+				//Oculta el boton de consultar disponibilidad y asigna las fechas, en caso de no encontrar fechas, se muestra un mensaje
+				this.disponibilidadConsultada = true;
+				this.ocultarBotonCita = false;
+				this.fechasDisponibilidad = resultado;
 					if (this.fechasDisponibilidad === null || this.fechasDisponibilidad.length === 0 || this.fechasDisponibilidad === undefined) {
-						this.sinFechasDisponibles = true;
-						this.ocultarBotonCita = true;
-					}
-				})
-				.catch(error => {
-					console.error(error);
-					this.handleModalToast(error.body.message);
-				});
+					this.sinFechasDisponibles = true;
+					this.ocultarBotonCita = true;
+				}
+			})
+			.catch(error => {
+				console.error(error);
+				this.handleModalToast(error.body.message);
+			});
 		}
 	}
 
@@ -1410,21 +1532,21 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		let fechasDisponibilidad = this.template.querySelector('.fechasDisponibilidad').value;
 		this.fechaSeleccionada = this.template.querySelector('.fechasDisponibilidad').value;
 		obtenerHorasDisponiblidadGestor({ recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.gestorSeleccionado, eventType: this.tipoCita, fechaElegida: fechasDisponibilidad })
-			.then(resultado => {
-				//Establece las horas de disponibilidad
-				this.horasDisponibilidad = resultado;
-			})
-			.catch(error => {
-				console.error(error);
-				this.handleModalToast(error.body.message);
-			});
-
+		.then(resultado => {
+			//Establece las horas de disponibilidad
+			this.horasDisponibilidad = resultado;
+		})
+		.catch(error => {
+			console.error(error);
+			this.handleModalToast(error.body.message);
+		});	
+		
 	}
 	//Backup gestores
 	setHorasDisponibilidadGestorBackup(event) {
 		this.horaCitaSelecionada = event.target.value;
 	}
-
+	
 	consultarFechasDisponibilidadGestor() {
 		var codigoEvento;
 		if (this.tipoCita == 'Cita telefónica') {
@@ -1433,22 +1555,22 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			codigoEvento = '42';
 		}
 		obtenerFechasDisponiblidadGestor({ recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.numeroGestor, eventType: codigoEvento })
-			.then(resultado => {
-				this.disponibilidadConsultada = true;
-				this.ocultarBotonCita = false;
-				this.fechasDisponibilidad = resultado;
+		.then(resultado => {
+			this.disponibilidadConsultada = true;
+			this.ocultarBotonCita = false;
+			this.fechasDisponibilidad = resultado;
 				if (this.fechasDisponibilidad === null || this.fechasDisponibilidad.length === 0 || this.fechasDisponibilidad === undefined) {
-					this.sinFechasDisponibles = true;
-					this.ocultarBotonCita = true;
-				}
-			})
-			.catch(error => {
-				console.error(error);
-				this.handleModalToast(error.body.message);
-
-			});
+				this.sinFechasDisponibles = true;
+				this.ocultarBotonCita = true;
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			this.handleModalToast(error.body.message);
+			
+		});
 	}
-
+	
 	consultarHorasDisponibilidadGestor() {
 		var codigoEvento;
 		if (this.tipoCita == 'Cita telefónica') {
@@ -1458,22 +1580,22 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		}
 		let fechasDisponibilidad = this.template.querySelector('.fechasDisponibilidad').value;
 		obtenerHorasDisponiblidadGestor({ recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.numeroGestor, eventType: codigoEvento, fechaElegida: fechasDisponibilidad })
-			.then(resultado => {
-				this.horasDisponibilidad = resultado;
-			})
-			.catch(error => {
-				console.error(error);
-				this.handleModalToast(error.body.message);
-
-			});
+		.then(resultado => {
+			this.horasDisponibilidad = resultado;
+		})
+		.catch(error => {
+			console.error(error);
+			this.handleModalToast(error.body.message);
+			
+		});
 		this.gestorElegido = this.numeroGestor;
 		this.nombreGestorElegido = this.nombreGestor;
 	}
-
+	
 	guardarHorasDisponibilidad(event) {
 		this.horaCitaSelecionada = event.detail.value;
 	}
-
+	
 	lookupDeseleccionar() {
 		if (this.comentariosTarea) {
 			const comentariosTareaReplace = this.comentariosTarea.replace(this.lookupOficinaResultadoSeleccionado.Name + '.', '[oficina destino]');
@@ -1494,47 +1616,60 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 
 	//AMENAZAS
-	// lookupDeseleccionarEmpleadoAmenazado() {
-	// 	this.empleadoAmenazadoSeleccionado = null;
-	// 	//eslint-disable-next-line @lwc/lwc/no-async-operation
-	// 	window.setTimeout(() => {
-	// 		this.lookupEmpleadoAbrir();
-	// 		this.template.querySelector('.lookupEmpleadoInput').focus();
-	// 	}, 200);
-	// }
 
-	// lookupEmpleadoAbrir() {
-	// 	const lookupEmpleadoInput = this.template.querySelector('.lookupEmpleadoInput');
-	// 	lookupEmpleadoInput.setCustomValidity('');
-	// 	lookupEmpleadoInput.reportValidity();
-	// 	if (this.lookupEmpleadoInputValue.length > 1) {
-	// 		this.template.querySelector('.lookupEmpleado').classList.add('slds-is-open');
-	// 	}
-	// }
+	tipoAmenazaEmpleado() {
+		this.mensajeDerivacionAmenazasTipo = null;
+		this.derivacionAmenazas = true;
+		this.tipoAmenaza = true;
+	}
 
-	// lookupEmpleadoCerrar() {
-	// 	//eslint-disable-next-line @lwc/lwc/no-async-operation
-	// 	window.setTimeout(() => {
-	// 		const lookupEmpleado = this.template.querySelector('.lookupEmpleado');
-	// 		if (lookupEmpleado) {
-	// 			lookupEmpleado.classList.remove('slds-is-open');
-	// 		}
-	// 	}, 150);
-	// }
+	tipoAmenazaCliente() {
+		this.mensajeDerivacionAmenazasTipo = null;
+		this.derivacionAmenazas = true;
+		this.tipoAmenaza = false;
+	}
 
-	// lookupEmpleadoOnchange(event) {
-	// 	this.lookupEmpleadoInputValue = event.detail.value;
-	// 	window.clearTimeout(this.lookupOficinaTimeout);
-	// 	if (this.lookupEmpleadoInputValue.length > 2) {
-	// 		//eslint-disable-next-line @lwc/lwc/no-async-operation
-	// 		this.lookupOficinaTimeout = window.setTimeout(() => this.buscarEmpleados(this.lookupEmpleadoInputValue), 500);
-	// 	} else {
-	// 		event.target.isLoading = false;
-	// 		this.template.querySelector('.lookupEmpleado').classList.remove('slds-is-open');
-	// 		this.lookupEmpleadoResultados = [];
-	// 	}
-	// }
-	// //AMENAZAS
+	lookupDeseleccionarEmpleadoAmenazado() {
+		this.empleadoAmenazadoSeleccionado = null;
+		//eslint-disable-next-line @lwc/lwc/no-async-operation
+		window.setTimeout(() => {
+			this.lookupEmpleadoAbrir();
+			this.template.querySelector('.lookupEmpleadoInput').focus();
+		}, 200);
+	}
+
+	lookupEmpleadoAbrir() {
+		const lookupEmpleadoInput = this.template.querySelector('.lookupEmpleadoInput');
+		lookupEmpleadoInput.setCustomValidity('');
+		lookupEmpleadoInput.reportValidity();
+		if (this.lookupEmpleadoInputValue.length > 1) {
+			this.template.querySelector('.lookupEmpleado').classList.add('slds-is-open');
+		}
+	}
+
+	lookupEmpleadoCerrar() {
+		//eslint-disable-next-line @lwc/lwc/no-async-operation
+		window.setTimeout(() => {
+			const lookupEmpleado = this.template.querySelector('.lookupEmpleado');
+			if (lookupEmpleado) {
+				lookupEmpleado.classList.remove('slds-is-open');
+			}
+		}, 150);
+	}
+
+	lookupEmpleadoOnchange(event) {
+		this.lookupEmpleadoInputValue = event.detail.value;
+		window.clearTimeout(this.lookupOficinaTimeout);
+		if (this.lookupEmpleadoInputValue.length > 2) {
+			//eslint-disable-next-line @lwc/lwc/no-async-operation
+			this.lookupOficinaTimeout = window.setTimeout(() => this.buscarEmpleados(this.lookupEmpleadoInputValue), 500);
+		} else {
+			event.target.isLoading = false;
+			this.template.querySelector('.lookupEmpleado').classList.remove('slds-is-open');
+			this.lookupEmpleadoResultados = [];
+		}
+	}
+	//AMENAZAS
 
 
 	lookupOficinaOnchange(event) {
@@ -1549,7 +1684,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.lookupOficinaResultados = [];
 		}
 	}
-
+	
 	lookupOficinaAbrir() {
 		const lookupOficinaInput = this.template.querySelector('.lookupOficinaInput');
 		lookupOficinaInput.setCustomValidity('');
@@ -1558,7 +1693,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.template.querySelector('.lookupOficina').classList.add('slds-is-open');
 		}
 	}
-
+	
 	lookupOficinaCerrar() {
 		//eslint-disable-next-line @lwc/lwc/no-async-operation
 		window.setTimeout(() => {
@@ -1581,7 +1716,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.comentariosTarea = this.comentariosTarea.replace(gestorAnterior.label, this.gestorSeleccionado.label);
 		}
 	}
-
+	
 	lookupOficinaSeleccionar(event) {
 		const oficina = this.lookupOficinaResultados.find(c => c.Id === event.currentTarget.dataset.id);
 		this.lookupOficinaResultadoSeleccionado = oficina;
@@ -1590,17 +1725,17 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		}
 	}
 
-	// lookupOficinaAmenazadaSeleccionar(event) {
-	// 	const oficina = this.lookupOficinaResultados.find(c => c.Id === event.currentTarget.dataset.id);
-	// 	this.oficinaAmenazadaSeleccionada = oficina;
-	// }
+	lookupOficinaAmenazadaSeleccionar(event) {
+		const oficina = this.lookupOficinaResultados.find(c => c.Id === event.currentTarget.dataset.id);
+		this.oficinaAmenazadaSeleccionada = oficina;
+	}
 
-	// lookupEmpleadoAmenazadoSeleccionar(event) {
-	// 	const emp = this.lookupEmpleadoResultados.find(c => c.Id === event.currentTarget.dataset.id);
-	// 	this.empleadoAmenazadoSeleccionado = emp;
-	// }
-
-	lookupGestorDeseleccionar() {
+	lookupEmpleadoAmenazadoSeleccionar(event) {
+		const emp = this.lookupEmpleadoResultados.find(c => c.Id === event.currentTarget.dataset.id);
+		this.empleadoAmenazadoSeleccionado = emp;
+	}
+	
+	lookupGestorDeseleccionar() {		
 		this.lookupGestorResultadoSeleccionado = null;
 		//eslint-disable-next-line @lwc/lwc/no-async-operation
 		window.setTimeout(() => {
@@ -1608,7 +1743,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.template.querySelector('.lookupGestorInput').focus();
 		}, 200);
 	}
-
+	
 	lookupGestorOnchange(event) {
 		this.lookupGestorInputValue = event.detail.value;
 		window.clearTimeout(this.lookupGestorTimeout);
@@ -1621,7 +1756,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.lookupGestorResultados = [];
 		}
 	}
-
+	
 	lookupGestorAbrir() {
 		const lookupGestorInput = this.template.querySelector('.lookupGestorInput');
 		lookupGestorInput.setCustomValidity('');
@@ -1630,7 +1765,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.template.querySelector('.lookupGestor').classList.add('slds-is-open');
 		}
 	}
-
+	
 	lookupGestorCerrar() {
 		//eslint-disable-next-line @lwc/lwc/no-async-operation
 		window.setTimeout(() => {
@@ -1640,80 +1775,80 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			}
 		}, 150);
 	}
-
+	
 	lookupGestorSeleccionar(event) {
 		const gestor = this.lookupGestorResultados.find(c => c.Id === event.currentTarget.dataset.id);
 		this.lookupGestorResultadoSeleccionado = gestor;
 	}
-
+	
 	buscarOficinas(cadenaBusqueda) {
 		let lookupOficinaInput = this.template.querySelector('.lookupOficinaInput');
 		lookupOficinaInput.isLoading = true;
 		buscarOficinas({ cadenaBusqueda: cadenaBusqueda })
-			.then(oficinas => {
-				if (cadenaBusqueda === this.lookupOficinaInputValue) {
-					//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
-					this.lookupOficinaResultados = oficinas;
-					this.template.querySelector('.lookupOficina').classList.add('slds-is-open');
-				}
-			})
-			.catch(error => {
-				console.error(error);
-				this.handleModalToast(error.body.message);
-
-			})
-			.finally(() => lookupOficinaInput.isLoading = false);
+		.then(oficinas => {
+			if (cadenaBusqueda === this.lookupOficinaInputValue) {
+				//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
+				this.lookupOficinaResultados = oficinas;
+				this.template.querySelector('.lookupOficina').classList.add('slds-is-open');
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			this.handleModalToast(error.body.message);
+			
+		})
+		.finally(() => lookupOficinaInput.isLoading = false);
 	}
-
-	// buscarEmpleados(cadenaBusqueda) {
-	// 	let lookupEmpleadoInput = this.template.querySelector('.lookupEmpleadoInput');
-	// 	lookupEmpleadoInput.isLoading = true;
-	// 	buscarEmpleados({cadenaBusqueda: cadenaBusqueda})
-	// 	.then(empleados => {
-	// 		if (cadenaBusqueda === this.lookupEmpleadoInputValue) {
-	// 			//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
-	// 			this.lookupEmpleadoResultados = empleados;
-	// 			this.template.querySelector('.lookupEmpleado').classList.add('slds-is-open');
-	// 		}
-	// 	})
-	// 	.catch(error => {
-	// 		console.error(error);
-	// 		this.handleModalToast(error.body.message);
-	// 	})
-	// 	.finally(() => lookupEmpleadoInput.isLoading = false);
-	// }
-
+	
+	buscarEmpleados(cadenaBusqueda) {
+		let lookupEmpleadoInput = this.template.querySelector('.lookupEmpleadoInput');
+		lookupEmpleadoInput.isLoading = true;
+		buscarEmpleados({ cadenaBusqueda: cadenaBusqueda })
+		.then(empleados => {
+			if (cadenaBusqueda === this.lookupEmpleadoInputValue) {
+				//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
+				this.lookupEmpleadoResultados = empleados;
+				this.template.querySelector('.lookupEmpleado').classList.add('slds-is-open');
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			this.handleModalToast(error.body.message);
+		})
+		.finally(() => lookupEmpleadoInput.isLoading = false);
+	}
+	
 	buscarGestoresGlobal(cadenaBusqueda) {
 		let lookupGestorInput = this.template.querySelector('.lookupGestorInput');
 		lookupGestorInput.isLoading = true;
 		buscarGestoresGlobal({ cadenaBusqueda: cadenaBusqueda })
-			.then(gestores => {
-				if (cadenaBusqueda === this.lookupGestorInputValue) {
-					//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
-					this.lookupGestorResultados = gestores;
-					this.template.querySelector('.lookupGestor').classList.add('slds-is-open');
-				}
-			})
-			.catch(error => {
-				console.error(error);
-				this.handleModalToast(error.body.message);
-
-
-			})
-			.finally(() => lookupGestorInput.isLoading = false);
+		.then(gestores => {
+			if (cadenaBusqueda === this.lookupGestorInputValue) {
+				//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
+				this.lookupGestorResultados = gestores;
+				this.template.querySelector('.lookupGestor').classList.add('slds-is-open');
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			this.handleModalToast(error.body.message);
+			
+			
+		})
+		.finally(() => lookupGestorInput.isLoading = false);
 	}
-
+	
 	//Backup gestores -> Botón Agendar cita gestor
 	confirmarCitaGestor() {
-		if (!this.template.querySelector('.asuntoEvento').value ||
-			(!this.citaRapida && !this.template.querySelector('.fechasDisponibilidad').value) ||
-			(!this.citaRapida && !this.horaCitaSelecionada) ||
-			(this.citaRapida && !this.fechaSeleccionada) ||
-			(this.citaRapida && !this.franjaSeleccionada) ||
+		if (!this.template.querySelector('.asuntoEvento').value || 
+			(!this.citaRapida && !this.template.querySelector('.fechasDisponibilidad').value) || 
+			(!this.citaRapida && !this.horaCitaSelecionada) || 
+			(this.citaRapida && !this.fechaSeleccionada) || 
+			(this.citaRapida && !this.franjaSeleccionada) || 
 			this.tipoCita === undefined
 		) {
 			this.toast('warning', 'Campos vacíos', 'Por favor, informe todos los campos del formulario y seleccione una opción de Tipo de Cita.');
-
+			
 		} else {
 			if (this.esClienteDigital) {
 				this.tipoCita = 43;
@@ -1732,74 +1867,72 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 					horaIni: this.horaCitaSelecionada,
 					medio: this.tipoCita
 				})
-					.then(resultado => {
-						if (!(resultado.existeTareaCitaCreada === 'true')) {
-							if (resultado.resultat === 'OK') {
+				.then(resultado => {
+					if (!(resultado.existeTareaCitaCreada === 'true')) {
+					if (resultado.resultat === 'OK') {
 								if (this.tipoCita == '43') {
-									//this.toast('success', 'Cita creada con éxito', resultado.mensaje);
-									this.handleModalToast(resultado.mensaje);
-									this.calculoKPI();
-								} else {
-									this.handleModalToast(resultado.mensaje);
-									//this.mostrarToastOficinaResultado(resultado.mensaje, resultado.cuenta); PRUEBA MODAL MBO
-								}
-								//this.cerrarModal();
-							} else {
-								//this.toast('error', 'No es posible crear la cita', resultado.txtError);
-								this.handleModalToast(resultado.txtError);
-								//this.cerrarModal();
-							}
+							//this.toast('success', 'Cita creada con éxito', resultado.mensaje);
+							this.handleModalToast(resultado.mensaje);
 						} else {
-							//this.toast('warning', 'No es posible crear la tarea', resultado.textoTareaCitaCreada);
-							this.handleModalToast(resultado.textoTareaCitaCreada);
-							//this.cerrarModal();
+							this.handleModalToast(resultado.mensaje);
+							//this.mostrarToastOficinaResultado(resultado.mensaje, resultado.cuenta); PRUEBA MODAL MBO
 						}
-					})
-					.catch(error => {
-						console.error(error);
-						this.handleModalToast(error.body.message);
-					});
+						//this.cerrarModal();
+					} else {
+						//this.toast('error', 'No es posible crear la cita', resultado.txtError);
+						this.handleModalToast(resultado.txtError);
+						//this.cerrarModal();
+						}
+					} else {
+						//this.toast('warning', 'No es posible crear la tarea', resultado.textoTareaCitaCreada);
+						this.handleModalToast(resultado.textoTareaCitaCreada);
+						//this.cerrarModal();		
+					}
+				})
+				.catch(error => {
+					console.error(error);
+					this.handleModalToast(error.body.message);
+				});
 			} else {
 				altaCitaRapida({
 					numOficina: this.numOficina,
-					numPer: this.numperso,
-					fechaSeleccionada: this.fechaSeleccionada,
+					numPer: this.numperso, 
+					fechaSeleccionada: this.fechaSeleccionada, 
 					franjaSeleccionada: this.franjaSeleccionada,
 					asunto: this.template.querySelector('.asuntoEvento').value,
 					recordId: this.recordId,
 					tipoCita: this.tipoCita
 				})
-					.then(retorno => {
-						if (!(retorno.existeTareaCitaCreada)) {
+				.then(retorno => {
+					if (!(retorno.existeTareaCitaCreada)) {
 							if (retorno.resultado == 'OK') {
 								if (this.tipoCita == '43') {
-									this.handleModalToast(retorno.mensaje);
-									this.cargandoGestor = false;
-									this.calculoKPI();
-								} else {
-									this.handleModalToast(retorno.mensaje);
-								}
+								this.handleModalToast(retorno.mensaje);
+								this.cargandoGestor = false;	
 							} else {
-								console.error('Error mensaje ' + retorno.resultadoMensaje);
-								this.handleModalToast(retorno.resultadoMensaje);
-								this.cargandoGestor = false;
+								this.handleModalToast(retorno.mensaje);
+							}
+						} else {
+							console.error('Error mensaje ' + retorno.resultadoMensaje);
+							this.handleModalToast(retorno.resultadoMensaje);
+							this.cargandoGestor = false;
 							}
 						} else {
 							this.handleModalToast(retorno.textoTareaCitaCreada);
 						}
-					})
-					.catch(error => {
-						console.error('Error al crear la cita:', error);
-						this.handleModalToast(error.body.message);
-					})
-					.finally(() => {
-						this.cargandoGestor = false;
-					})
-					;
+				})
+				.catch(error => {
+					console.error('Error al crear la cita:', error);
+					this.handleModalToast(error.body.message);
+				})
+				.finally(() => {
+					this.cargandoGestor = false;
+				})
+				;
 			}
 		}
 	}
-
+		
 	checkCrearTareaOnchange() {
 		var checkBoxMostrarTarea = this.template.querySelector('.checkBoxCitaGestor').checked;
 		if (checkBoxMostrarTarea) {
@@ -1808,7 +1941,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.mostrarTareaModalCitaGestor = false;
 		}
 	}
-
+	
 	get inputVariables() {
 		return [
 			{
@@ -1818,17 +1951,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			}
 		];
 	}
-
-	handleStatusChange(event) {
-		this.value = event.detail.status;
-		if (this.value === 'FINISHED') {
-			if (this.ambitoMotivo != null && this.ambitoMotivo === 'Cajeros Incidencias') {
-				this.calculoKPI();
-			}
-			this.cerrarModal();
-		}
-	}
-
+	
 	handleGrupoColaboradorDerivar() {
 		this.mostrarFlowDerivar = this.flowDerivar;
 		this.grupoColaborador = false;
@@ -1848,13 +1971,13 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		if (this.toastCajerosIncidencias) {
 			//this.toast('error', this.tituloCajerosIncidencias, this.toastCajerosIncidencias);
 			this.handleModalToast(this.toastCajerosIncidencias);
-
-
+			
+			
 		}
 		if (this.toastNoClienteError) {
 			//this.toast('error', 'Error en los datos', this.toastNoClienteError);
 			this.handleModalToast(this.toastNoClienteError);
-
+			
 		}
 		if (this.trasladarDocumentacion) {
 			this.trasladarDocumentacion = false;
@@ -1878,12 +2001,12 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		if (this.toastCajerosIncidencias) {
 			//this.toast('error', this.tituloCajerosIncidencias, this.toastCajerosIncidencias);
 			this.handleModalToast(this.toastCajerosIncidencias);
-
+			
 		}
 		if (this.toastNoClienteError) {
 			//this.toast('error', 'Error en los datos', this.toastNoClienteError);
 			this.handleModalToast(this.toastNoClienteError);
-
+			
 		}
 		if (this.preguntaRealizarRemitido || this.textoDocumentacionCertificado || this.preguntaInformacionCompletaDocumentacion) {
 			if (!this.toastCajerosIncidencias) {
@@ -1891,15 +2014,15 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			}
 		}
 	}
-
+	
 	handleGrupoColaboradorTrasladar() {
 		this.recuperarCampoDerivar();
 		//if(!this.derivarB) {
 		if (!this.derivarB) {
-
+			
 			//this.toast('alert', 'Alerta', this.toastTrasladarDesdeDerivar);
 			this.handleModalToast(this.toastTrasladarDesdeDerivar);
-
+			
 		} else {
 			let datosAdicionales = '';
 			let origen = 'operativaDerivar';
@@ -1907,7 +2030,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.cerrarModal();
 			this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
 			//window.setTimeout(() =>	this.dispatchEvent(new CustomEvent('realizartrasladocolaborador', {detail: {data: null}})), 400);
-
+			
 		}
 	}
 
@@ -1916,28 +2039,28 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.dni = this.template.querySelector('.DNITestamentaria').value;
 			if (!this.template.querySelector('.DNITestamentaria').value) {
 				this.toast('warning', 'Campos vacíos', 'Por favor, informe un documento');
-
+				
 			} else {
 				this.showSpinner = true;
 				dniTestamentaria({
 					dni: this.dni,
 					recordId: this.recordId
 				})
-					.then(retorno => {
-						this.handleRemitir();
-					})
-					.catch(error => {
-						console.error(error);
-						this.toast('error', 'Problema estableciendo dni', error.body.message);
-
-						return false;
-					}).finally(() => {
-						this.showSpinner = false;
-					});
+				.then(retorno => {
+					this.handleRemitir();
+				})
+				.catch(error => {
+					console.error(error);
+					this.toast('error', 'Problema estableciendo dni', error.body.message);
+					
+					return false;
+				}).finally(() => {
+					this.showSpinner = false;
+				});
 			}
 		}
 	}
-
+	
 	handleRemitir() {
 		//if(!this.derivar) {
 		if (!this.derivarB) {
@@ -1954,42 +2077,70 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		}
 	}
 
-	// parametrizacionDatos(){
-	// 	this.parametrizacionesMensaje = Object.fromEntries([
-	// 		['[Oficina amenazada]', this.oficinaAmenazadaSeleccionada.Name],
-	// 		['[Empleado amenazado]', this.empleadoAmenazadoSeleccionado.Name],
-	// 		['[Motivo amenaza]', this.template.querySelector('.motivoAmenazaInputValue').value],
-	// 		['[Detalles amenaza]', this.template.querySelector('.detalllesAmenazaInputValue').value]
-	// 	  ]);
-	// 	this.handleRemitirAuto();
-	// }
+	get isBotonAmenazasDisabled() {
+		return this.isRemitirAmenazasDisabled || !(
+			this.oficinaAmenazadaSeleccionada &&
+			this.empleadoAmenazadoSeleccionado &&
+			this.template.querySelector('.motivoAmenazaInputValue')?.value &&
+			this.template.querySelector('.detalllesAmenazaInputValue')?.value
+		);
+	}
 
-	// parametrizacionDatosAmenazasSuicidios(){
-	// 	this.parametrizacionesMensaje = Object.fromEntries([
-	// 		['[Motivo amenaza]', this.template.querySelector('.motivoAmenazaSuicidiosInputValue').value],
-	// 		['[Direccion amenaza]', this.direccionAmenazasSuicidiosInputValue]
-	// 	  ]);
-	// 	this.handleRemitirAuto();
-	// }
+	get isBotonAmenazasSuicidiosDisabled() {
+		return this.isRemitirAmenazasSuicidiosDisabled || !(
+			this.motivoAmenazaSuicidiosInputValue && this.direccionAmenazasSuicidiosInputValue
+		);
+	}
 
-	// handleRemitirAuto() {
-	// 	emailsAutoEmail(
-	// 		{
-	// 			recordId: this.recordId,
-	// 			grupoCol: this.grupoCol,
-	// 			nombrePlantilla: this.nombrePlantilla,
-	// 			parametrizacionesMensaje: this.parametrizacionesMensaje,
-	// 			ambito: this.ambitoMotivo,
-	// 			nameOWA:this.nameOWA
-	// 		}
-	// 	).then (retorno =>{
-	// 		this.handleModalToast(this.emailSuccess);
-	// 	}).catch(error =>{
-	// 		this.toast('error', 'Error en la creación de emails', error.body.message);
-	// 	}).finally(() =>{
-	// 		this.parametrizacionesMensaje = null;
-	// 	});
-	// }
+	handleMotivoAmenazaSuicidiosInputChange(event) {
+		this.motivoAmenazaSuicidiosInputValue = event.target.value;
+	}
+	
+	parametrizacionDatos() {
+		this.isRemitirAmenazasDisabled = true;
+		this.grupoCol = this.grupoColEmpleadosAmenazas;
+		this.parametrizacionesMensaje = Object.fromEntries([
+			['[Oficina amenazada]', this.oficinaAmenazadaSeleccionada.Name],
+			['[Empleado amenazado]', this.empleadoAmenazadoSeleccionado.Name],
+			['[Motivo amenaza]', this.template.querySelector('.motivoAmenazaInputValue').value],
+			['[Detalles amenaza]', this.template.querySelector('.detalllesAmenazaInputValue').value]
+		  ]);
+		this.nombrePlantilla = this.nombrePlantillaAmenazasEmpleados;
+		this.handleRemitirAutoAmenazas();
+	}
+
+	parametrizacionDatosAmenazasSuicidios() {
+		this.isRemitirAmenazasSuicidiosDisabled = true;
+		this.grupoCol = this.grupoColClientesAmenazas;
+		this.parametrizacionesMensaje = Object.fromEntries([
+			['[Motivo amenaza]', this.template.querySelector('.motivoAmenazaSuicidiosInputValue').value],
+			['[Direccion amenaza]', this.direccionAmenazasSuicidiosInputValue]
+		  ]);
+		this.handleRemitirAutoAmenazas();
+	}
+
+	handleRemitirAutoAmenazas() {
+		this.showSpinner = true;
+		emailsAutoEmailAmenazas(
+			{
+				recordId: this.recordId,
+				tipo: this.tipoAmenaza,
+				grupoCol: this.grupoCol,
+				nombrePlantilla: this.nombrePlantilla,
+				parametrizacionesMensaje: this.parametrizacionesMensaje,
+				ambito: this.ambitoMotivo,
+				nameOWA: this.nameOWA
+			}
+		).then(_retorno => {
+			this.handleModalToast(this.emailSuccess);
+		}).catch(error => {
+			console.error(JSON.stringify(error, null, 2));
+			this.toast('error', 'Error en la creación de emails', error.body.message);
+		}).finally(() => {
+			this.showSpinner = false;
+			this.parametrizacionesMensaje = null;
+		});
+	}
 
 	handleSolicitarInfo() {
 		let datosAdicionales = '';
@@ -2002,10 +2153,10 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 
 	handleMostrarMensajeRemitir() {
-
+		
 		//this.toast('warning', 'Atención', this.toastRemitir); prueba
 		this.mostrarPhisingSmishingMalware5 = true;
-		this.mostrarPhisingSmishingMalware4 = true;
+    	this.mostrarPhisingSmishingMalware4 = true;
 		this.mostrarPregunta = false;
 		this.PhisingSmishingMalware1 = '';
 		this.mostrarModalPreguntaRealizarRemitido = false;
@@ -2031,26 +2182,26 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	preguntaCajerosSi() {
 		this.preguntaCajeros = '';
 	}
-
+	
 	preguntaCajerosNo() {
-
+		
 		crearActividadCajeros({ recordId: this.recordId });
-		this.preguntaCajeros = null;
-		this.preguntaCajerosExternos = null;
+		this.preguntaCajeros = null; 
+		this.preguntaCajerosExternos = null; 
 		this.handleModalToast(this.toastCajerosExternos);
-
-
-
-
+		
+		
+		
+		
 	}
 
 
-
+	
 	preguntaCajerosExternosSi() {
 		this.cerrarModal();
 		crearActividadCajeros({ recordId: this.recordId });
 	}
-
+	
 	preguntaCajerosExternosNo() {
 		this[NavigationMixin.GenerateUrl]({
 			type: 'standard__webPage',
@@ -2103,22 +2254,22 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		this.cerrarModal();
 		this.toast('success','Pendiente', this.toastEnrollmentDatosNo);
 	}*/
-
+	
 	realizarTraslado3N() {
 		this.showSpinner = true;
 		realizarTraslado3N({ recordId: this.recordId })
-			.then(resultado => {
-				this.showSpinner = false;
-				this.handleModalToast(this.toastTrasladar3N);
-			})
-			.catch(error => {
-				console.error(error);
-				this.handleModalToast(error.body.message);
-			}).finally(() => {
-				this.showSpinner = false;
-
+		.then(resultado => {
+			this.showSpinner = false;
+			this.handleModalToast(this.toastTrasladar3N);
+		})
+		.catch(error => {
+			console.error(error);
+			this.handleModalToast(error.body.message);
+		}).finally(() => {
+			this.showSpinner = false;
+			
 				this.dispatchEvent(new CustomEvent('refrescartab', { detail: {} }));
-			});
+		});
 	}
 
 	crearOportunidadModal() {
@@ -2133,35 +2284,73 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 
 	crearOportunidadApex() {
-		this.showSpinner = true;
+		this.showSpinner = true;	
 		let oportunidadSuccess = false;
 		let toast;
 		crearOportunidadCSBDApex({ recordId: this.recordId })
-			.then(resultado => {
+		.then(resultado => {		
 				if (resultado.oppCreada !== null && resultado.oppCreada !== undefined && resultado.oppCreada) {
-					oportunidadSuccess = true;
+				oportunidadSuccess = true;
 					if (this.toastCSBDNoContratar) {
-						toast = this.toastCSBDNoContratar;
-					} else {
-						toast = this.toastCrearOportunidad;
-					}
-					//this.toast('success', 'Oportunidad creada con éxito', toast);
-
-					this.dispatchEvent(new CustomEvent('refrescartab', { detail: { data: { 'oportunidadSuccess': oportunidadSuccess } } }));
-					this.showSpinner = false;
-					this.handleModalToast(toast);
+					toast = this.toastCSBDNoContratar;
 				} else {
+					toast = this.toastCrearOportunidad;
+				}
+				//this.toast('success', 'Oportunidad creada con éxito', toast);
+				
+					this.dispatchEvent(new CustomEvent('refrescartab', { detail: { data: { 'oportunidadSuccess': oportunidadSuccess } } }));
+				this.showSpinner = false;
+				this.handleModalToast(toast);
+			} else {
 					if (resultado.tipo == 'En curso') {
-						this.existeOppEnGestion = true;
-						this.textoRellamadaCSBDEnGestion = resultado.mensaje;
-						this.showSpinner = false;
+					this.existeOppEnGestion = true;		
+					this.textoRellamadaCSBDEnGestion = resultado.mensaje;
+					this.showSpinner = false;				
 					} else if (resultado.tipo == 'Formalizada') {
-						this.existeOppFormalizada = true;
-						this.textoRellamadaCSBDFormalizada = resultado.mensaje;
-						this.showSpinner = false;
+					this.existeOppFormalizada = true;
+					this.textoRellamadaCSBDFormalizada = resultado.mensaje;
+					this.showSpinner = false;
 					} else {
-						//this.toast('error', 'Problema al crear la oportunidad', 'Existe una oportunidad, pero no se identifica si esta Formalizada o en Gestión');
-						this.handleModalToast('Existe una oportunidad, pero no se identifica si esta Formalizada o en Gestión');
+					//this.toast('error', 'Problema al crear la oportunidad', 'Existe una oportunidad, pero no se identifica si esta Formalizada o en Gestión');
+					this.handleModalToast('Existe una oportunidad, pero no se identifica si esta Formalizada o en Gestión');
+					this.showSpinner = false;	
+				}
+			}
+		})
+		.catch(error => {
+			this.showSpinner = false;
+			console.error(error);
+			this.handleModalToast(error.body.message);
+			
+			});
+	}
+
+
+	crearOportunidad() {
+		if (!this.oportunidadCreada) {
+			this.showSpinner = true;			
+			crearOportunidad({ recordId: this.recordId })
+			.then(resultado => {
+					if (resultado.validacionCrearOportunidad !== null && resultado.validacionCrearOportunidad !== undefined && resultado.validacionCrearOportunidad) {
+					this.showSpinner = false;
+					this.crearOportunidadModal();
+				}
+					else {
+					// let oppExiste = (resultado.oportunidadSiExiste !== null && resultado.oportunidadSiExiste !==  undefined) ? resultado.oportunidadSiExiste : false;
+					let oppTareasCitas = (resultado.oppTareasCitas !== null && resultado.oppTareasCitas !== undefined) ? resultado.oppTareasCitas : false;
+					let tareaRellamada = (resultado.tareasRellamadas !== null && resultado.tareasRellamadas !== undefined) ? resultado.tareasRellamadas : false;
+
+						if (oppTareasCitas) {
+						this.existeOppTareasCSBD = true;
+						this.textoOppTareasCSBD = resultado.mensajeOppTareas;
+						this.showSpinner = false;
+						this.preguntaCSBDContratar = false;
+						this.preguntaCSBDContratar2 = false;
+							this.mostrarModalGestionGestorAsignado = false;
+						this.ambitoCSBD = false;//::
+						} else if (tareaRellamada) {
+						this.existeTareaRellamada = true;
+						this.textoTareaRellamada = resultado.mensajeTareasRellamadas;
 						this.showSpinner = false;
 					}
 				}
@@ -2170,51 +2359,31 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 				this.showSpinner = false;
 				console.error(error);
 				this.handleModalToast(error.body.message);
-
-			});
-	}
-
-
-	crearOportunidad() {
-		if (!this.oportunidadCreada) {
-			this.showSpinner = true;
-			crearOportunidad({ recordId: this.recordId })
-				.then(resultado => {
-					if (resultado.validacionCrearOportunidad !== null && resultado.validacionCrearOportunidad !== undefined && resultado.validacionCrearOportunidad) {
-						this.showSpinner = false;
-						this.crearOportunidadModal();
-					}
-					else {
-						// let oppExiste = (resultado.oportunidadSiExiste !== null && resultado.oportunidadSiExiste !==  undefined) ? resultado.oportunidadSiExiste : false;
-						let oppTareasCitas = (resultado.oppTareasCitas !== null && resultado.oppTareasCitas !== undefined) ? resultado.oppTareasCitas : false;
-						let tareaRellamada = (resultado.tareasRellamadas !== null && resultado.tareasRellamadas !== undefined) ? resultado.tareasRellamadas : false;
-
-						if (oppTareasCitas) {
-							this.existeOppTareasCSBD = true;
-							this.textoOppTareasCSBD = resultado.mensajeOppTareas;
-							this.showSpinner = false;
-							this.preguntaCSBDContratar = false;
-							this.preguntaCSBDContratar2 = false;
-							this.mostrarModalGestionGestorAsignado = false;
-							this.ambitoCSBD = false;//::
-						} else if (tareaRellamada) {
-							this.existeTareaRellamada = true;
-							this.textoTareaRellamada = resultado.mensajeTareasRellamadas;
-							this.showSpinner = false;
-						}
-					}
-				})
-				.catch(error => {
-					this.showSpinner = false;
-					console.error(error);
-					this.handleModalToast(error.body.message);
-
+				
 				});/*.finally(() => {
 				this.dispatchEvent(new CustomEvent('refrescartab', {detail: {data: {'oportunidadSuccess': oportunidadSuccess}}}));
 				this.showSpinner = false;
 				this.cerrarModal();
 			});*/
 		}
+	}
+
+	cerrarModalParametrizableCSBD() {
+		this.modalParametrizableCSBD = null;
+	}
+
+	modalParametrizableCSBDSi() {
+		// Crear tarea
+		// Enlazar ambito nulo
+		this.ambitoCSBD = false;
+		this.modalParametrizableCSBD = null;
+	}
+
+	modalParametrizableCSBDNo() {
+		crearTareaRellamadaCSBDApex({ recordId: this.recordId })
+		.then(resultado => {
+			this.cerrarModal();
+		});
 	}
 
 	actualizarComentario(event) {
@@ -2224,20 +2393,20 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	crearTareaRellamada() {
 		this.procesandoCreacionTarea = true;
 		crearTareaRellamadaApex({ recordId: this.recordId, descriptionTask: this.comentarioTareaRellamada })
-			// crearTareaRellamada({recordId: this.recordId, descriptionTask: 'MGT Prueba crearTareaRellamada Descripción'})
+		// crearTareaRellamada({recordId: this.recordId, descriptionTask: 'MGT Prueba crearTareaRellamada Descripción'})
 
-			.then(resultado => {
-				this.procesandoCreacionTarea = false;
-				//this.toast('success', 'Información', 'Las tareas han sido creadas con éxito');
-				this.handleModalToast('Las tareas han sido creadas con éxito');
-
-			})
-			.catch(error => {
-				console.error(error);
-				this.procesandoCreacionTarea = false;
-				this.handleModalToast(error.body.message);
-
-			});
+		.then(resultado => {
+			this.procesandoCreacionTarea = false;
+			//this.toast('success', 'Información', 'Las tareas han sido creadas con éxito'); 
+			this.handleModalToast('Las tareas han sido creadas con éxito');
+			
+		})
+		.catch(error => {
+			console.error(error);
+			this.procesandoCreacionTarea = false;
+			this.handleModalToast(error.body.message);
+			
+		});
 	}
 
 	preguntaCSBDContratarSi() {
@@ -2245,7 +2414,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 
 	preguntaCSBDContratarNo() {
-		this.crearOportunidad();
+		this.crearOportunidad();			
 	}
 
 	preguntaCSBDContratar2Si() {
@@ -2269,7 +2438,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 				this.crearOportunidad();
 			} else {
 				this.textoDocumentacionCertificado = null;
-			}
+			}		
 		}
 	}
 
@@ -2284,20 +2453,20 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	preguntaInformacionRequeridaDocumentacionNo() {
 		this.showSpinner = true;
 		crearNuevoCasoDocumentacion({ recordId: this.recordId })
-			.then({
-			})
-			.catch(error => {
-				//this.toast('error', 'Problema al crear el caso', error.body.message);
-				this.showSpinner = false;
-				this.handleModalToast(error.body.message);
-
-			}).finally(() => {
-				this.showSpinner = false;
-				this.casoCreadoDocumentacion = true;//(puede ser variable booleana de mostrar modal anterior)
-				//this.toast('success', 'Caso creado con éxito', this.toastDocumentacionCasoCreado);
-				this.handleModalToast(this.toastDocumentacionCasoCreado);
+		.then({
+		})
+		.catch(error => {
+			//this.toast('error', 'Problema al crear el caso', error.body.message);
+			this.showSpinner = false;
+			this.handleModalToast(error.body.message);
+			
+		}).finally(() => {
+			this.showSpinner = false;
+			this.casoCreadoDocumentacion = true;//(puede ser variable booleana de mostrar modal anterior)
+			//this.toast('success', 'Caso creado con éxito', this.toastDocumentacionCasoCreado);
+			this.handleModalToast(this.toastDocumentacionCasoCreado);
 				this.dispatchEvent(new CustomEvent('refrescartab', { detail: {} }));
-			});
+		});
 		this.preguntaInformacionRequeridaDocumentacion = null;
 	}
 
@@ -2370,69 +2539,69 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	handleFraudeRemitir() {
 		this.pulsadoGenerarCasoFraude = true;
 		crearCasoFraude({ recordId: this.recordId })
-			.then(resultado => {
-				this.pulsadoGenerarCasoFraude = false;
+		.then(resultado => {
+			this.pulsadoGenerarCasoFraude = false;
 				if (resultado.casoYaDerivado) {
-					//this.toast('error', 'No se puede derivar', resultado.comentarioCasoYaDerivado);
-					//this.preguntaRealizarRemitido = null;
-					this.preguntaRealizarRemitido = null;
-					this.mostrarModalPreguntaRealizarRemitido = false;
-					this.handleModalToast(resultado.comentarioCasoYaDerivado);
+				//this.toast('error', 'No se puede derivar', resultado.comentarioCasoYaDerivado);
+				//this.preguntaRealizarRemitido = null;
+				this.preguntaRealizarRemitido = null;
+				this.mostrarModalPreguntaRealizarRemitido = false;
+				this.handleModalToast(resultado.comentarioCasoYaDerivado);
 				} else {
-					//this.toast('success', 'Caso derivado con éxito.', resultado.comentarioDerivadoExito);
-
-					this.mostrarModalPreguntaRealizarRemitido = false;
-					this.preguntaRealizarRemitido = null;
-					this.ambitoFraude = false;
-					this.ambitoCSBD = false;
-					this.handleModalToast(resultado.comentarioDerivadoExito);
-
-
-				}
-			})
-			.catch(error => {
-				this.pulsadoGenerarCasoFraude = false;
-				//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
-				this.handleModalToast(error.body.message);
-
-			}).finally(() => {
-				this.showSpinner = false;
-
-			});
+				//this.toast('success', 'Caso derivado con éxito.', resultado.comentarioDerivadoExito); 
+				
+				this.mostrarModalPreguntaRealizarRemitido = false;
+				this.preguntaRealizarRemitido = null;
+				this.ambitoFraude = false;
+				this.ambitoCSBD = false;
+				this.handleModalToast(resultado.comentarioDerivadoExito);
+				
+				
+			}
+		})
+		.catch(error => {
+			this.pulsadoGenerarCasoFraude = false;
+			//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
+			this.handleModalToast(error.body.message);
+			
+		}).finally(() => {
+			this.showSpinner = false;
+			
+		});
 	}
 
 	llamadaWSOnboarding() {
 		let crearTareaOnboarding = false;
 		this.showSpinner = true;
 		llamarOnboarding({ recordId: this.recordId, nif: this.nif })
-			.then(resultado => {
-				if (resultado === 'El cliente no esta en proceso de Onboarding') {
-					// llamar a tarea oficina
-					this.handleGestionGestorDistintoNo();
-					crearTareaOnboarding = this;
-				} else if (resultado === 'OK' || resultado === 'El cliente esta en proceso de Onboarding') {
-					this.handleRemitir();
-				}
-			})
-			.catch(error => {
-				this.entroCatch = true;
-			})
-			.finally(() => {
-				this.showSpinner = false;
-				if (!crearTareaOnboarding) {
-					this.cerrarModal();
-				}
+		.then(resultado => {
+			if (resultado === 'El cliente no esta en proceso de Onboarding') {
+				// llamar a tarea oficina
+				this.handleGestionGestorDistintoNo();
+				crearTareaOnboarding = this;
+			} else if (resultado === 'OK' || resultado === 'El cliente esta en proceso de Onboarding') {
+				this.handleRemitir();
+			}
+		})
+		.catch(error => {
+			this.entroCatch = true;
+		})
+		.finally(() => {
+			this.showSpinner = false;
+			if (!crearTareaOnboarding) {
+				this.cerrarModal();
+			}
 			});
 	}
 
 	//ARGOS
-	/*
-	confirmarRespuestasArgos(){
+	
+	confirmarRespuestasArgos() {
 		let pass = false;
 		this.respuestasPreguntasArgos.forEach((item) => {
-			if(item.value === 'Si'){
+			if (item.value === 'Si') {
 				pass = true;
-				return;
+				return; 
 			}
 		})
 
@@ -2449,11 +2618,11 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		}
 	}
 
-	aceptarBancaDigitalArgos(){
+	aceptarBancaDigitalArgos() {
 		this.ambitoFraude = true;
-		if (!this.idBancaDigital) {
+        if (!this.idBancaDigital) {
 			this.toast('warning', 'Campos vacíos', 'Por favor, informe el ID de Banca Digital.');
-		}else{
+		} else {
 			this.preguntaIdBancaDigital = false;
 			const respuestasFormateadas = this.respuestasPreguntasArgos
 			.map(item => `${item.key}: ${item.value}`)
@@ -2466,27 +2635,28 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 				recordId: this.recordId,
 				detallesSolucion: this.detallesSolucion
 			}).then(resultado => {
-				crearCasoFraude({recordId: this.recordId})
+				this.showSpinner = true;
+				crearCasoFraude({ recordId: this.recordId })
 				.then(resultado => {
-					if(resultado.comentarioDerivadoExito){
+						if (resultado.comentarioDerivadoExito) {
 						this.handleModalToast(resultado.comentarioDerivadoExito);
-					}else if(resultado.comentarioCasoYaDerivado){
+						} else if (resultado.comentarioCasoYaDerivado) {
 						this.handleModalToast(resultado.comentarioCasoYaDerivado);
-					}
+					}		
 				}).catch(error => {
 					this.pulsadoGenerarCasoFraude = false;
 					//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
 					this.handleModalToast(error.body.message);
 				}).finally(() => {
 					this.showSpinner = false;
-				});
+				});			
 			});
 		}
 	}
 
 	handleIdBancaDigitalChange(event) {
 		this.idBancaDigital = event.target.value;
-	}*/
+	}
 
 	trasladoColaboradorArgos() {
 		//Traslado a grupo colaborador indicado (CYBERFRAUDE AND CYBERSOC)
@@ -2495,7 +2665,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.respuestasPreguntasArgos.forEach((item) => {
 				if (item.value === 'Si') {
 					pass = true;
-					return;
+					return; 
 				}
 			});
 			if (pass) {
@@ -2528,7 +2698,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	preguntaMFAArgosOficina() {
 		//Ambito nulo
 		this.operacionMFAArgos = null;
-		//this.preguntaIdBancaDigital = false;
+		this.preguntaIdBancaDigital = false;
 		if (this.diarioMFAArgos) {
 			this.diarioMFAArgos = null;
 			this.preguntaConfirmacionArgosActiva = false;
@@ -2563,7 +2733,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 					}
 				}
 			}
-			if (this.respuestasPreguntasArgos.length === this.preguntasArgos.length) {
+			if (this.respuestasPreguntasArgos.length === this.preguntasArgos.length) { 
 				this.preguntasCompletasArgos = false;
 			}
 		}
@@ -2571,11 +2741,11 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	handleSubmit() {
 		rellenarPreguntasArgos({ recordId: this.recordId, preguntasArgos: JSON.stringify(this.respuestasPreguntasArgos) })
-			.then(resultado => {
-			})
-			.catch(error => {
-				console.error(error);
-			});
+		.then(resultado => {
+		})
+		.catch(error => {
+			console.error(error);
+		});
 		this.preguntasArgosActivas = false;
 		this.preguntaConfirmacionArgosActiva = true;
 	}
@@ -2604,33 +2774,33 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	handleSi() {
 		//A Mostrar pregunta al agente: ¿Has intentado transferir el caso en online al departamento de fraude?
 		this.mostrarPhisingSmishingMalware5 = false;//Prueba limpia de variables
-		this.mostrarPhisingSmishingMalware4 = false;//Prueba limpia de variables
+    	this.mostrarPhisingSmishingMalware4 = false;//Prueba limpia de variables
 		this.mostrarPregunta = true;
 		this.PhisingSmishingMalware1 = null;
 	}
 
 	handleNo() {
-		// B Mostrar mensaje al agente: "Si el cliente no ha accedido y/o no ha proporcionado información relacionada
-		// con su banca digital o tarjetas, se le debe aconsejar que elimine el mensaje lo antes posible sin realizar
+		// B Mostrar mensaje al agente: "Si el cliente no ha accedido y/o no ha proporcionado información relacionada 
+		// con su banca digital o tarjetas, se le debe aconsejar que elimine el mensaje lo antes posible sin realizar 
 		// ninguna operativa. No es necesario derivar el caso." (mensaje parametrizable)
 		//this.toast('warning', 'Atención', this.PhisingSmishingMalware5);
 
-
+		
 		this.mostrarPregunta = true;
 		this.mostrarPhisingSmishingMalware5 = true;
 		this.PhisingSmishingMalware1 = null;
-		this.mostrarPhisingSmishingMalware4 = true;
-
+    	this.mostrarPhisingSmishingMalware4 = true;
+		
 		this.handleModalToast(this.PhisingSmishingMalware5);
 		crearActividadPhishingSinRiesgo({ recordId: this.recordId, descriptionTask: '' })
-
-			.then(resultado => {
-				//this.cerrarModal();
-			})
-			.catch(error => {
-				console.error(error);
-				this.cerrarModal();
-			});
+		
+		.then(resultado => {
+			//this.cerrarModal();
+		})
+		.catch(error => {
+			console.error(error);
+			this.cerrarModal();
+		});
 	}
 
 	handleSiPregunta() {
@@ -2643,24 +2813,24 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		this.mostrarPhisingSmishingMalware4 = false;//Prueba limpia de variables*/
 
 		crearCasoFraude({ recordId: this.recordId })
-			.then(resultado => {
-				this.pulsadoGenerarCasoFraude = false;
+		.then(resultado => {
+			this.pulsadoGenerarCasoFraude = false;
 				if (resultado.casoYaDerivado) {
-					//this.toast('error', 'No se puede derivar', this.PhisingSmishingMalware3);
-					this.handleModalToast(this.PhisingSmishingMalware3);
+				//this.toast('error', 'No se puede derivar', this.PhisingSmishingMalware3);
+				this.handleModalToast(this.PhisingSmishingMalware3);
 				} else {
-					//this.toast('success', 'Caso derivado con éxito.', this.PhisingSmishingMalware2);
-					this.handleModalToast(this.PhisingSmishingMalware2);
-				}
-			})
-			.catch(error => {
-				this.pulsadoGenerarCasoFraude = false;
-				//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
-				this.handleModalToast(error.body.message);
-			}).finally(() => {
-				this.showSpinner = false;
-				//this.cerrarModal();
-			});
+				//this.toast('success', 'Caso derivado con éxito.', this.PhisingSmishingMalware2);
+				this.handleModalToast(this.PhisingSmishingMalware2);
+			}
+		})
+		.catch(error => {
+			this.pulsadoGenerarCasoFraude = false;
+			//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
+			this.handleModalToast(error.body.message);
+		}).finally(() => {
+			this.showSpinner = false;
+			//this.cerrarModal();
+		});
 	}
 
 	handleNoPregunta() {
@@ -2685,19 +2855,19 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 
 	handledetallesConsultaChange(event) {
-		this.detallesConsulta = event.target.value;
+    	this.detallesConsulta = event.target.value;
 	}
 
 	handleNombreComercioChange(event) {
-		this.nombreComercio = event.target.value;
+    	this.nombreComercio = event.target.value;
 	}
 
 	handleIdClienteChange(event) {
-		this.idCliente = event.target.value;
+    	this.idCliente = event.target.value;
 	}
 
 	handleFechaCompraChange(event) {
-		this.fechaCompra = event.target.value;
+    	this.fechaCompra = event.target.value;
 	}
 
 	continuarCashBack() {
@@ -2706,21 +2876,21 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			return;
 		}
 		actualizarDatosCashBack({ recordId: this.recordId, detallesConsulta: this.detallesConsulta, idCliente: this.idCliente, nombreComercio: this.nombreComercio, fechaCompra: this.fechaCompra })
-			.then(() => {
-				this.toast('success', 'Información', 'Se han guardado los datos correctamente');
-				//Traslado a grupo colaborador Cashback
-				let datosAdicionales = '';
-				let origen = 'operativaDerivar';
-				let destino = 'realizartrasladocolaborador';
-				this.cerrarModal();
-				this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
-			})
-			.catch(error => {
-				this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
-			}).finally(() => {
-				this.showSpinner = false;
-				//this.cerrarModal();
-			});
+		.then(() => {
+			this.toast('success', 'Información', 'Se han guardado los datos correctamente'); 
+			//Traslado a grupo colaborador Cashback
+			let datosAdicionales = '';
+			let origen = 'operativaDerivar';
+			let destino = 'realizartrasladocolaborador';
+			this.cerrarModal();
+			this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
+		})
+		.catch(error => {
+			this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
+		}).finally(() => {
+			this.showSpinner = false;
+			//this.cerrarModal();
+		});
 	}
 	//CashBack
 
@@ -2737,46 +2907,46 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		this.siguienteDeshabilitado = true;
 		this.numerosContratos = this.contratos.map(contrato => contrato.label).join(', ');
 		guardarContratos({ recordId: this.recordId, numerosContratos: this.numerosContratos })
-			.then(result => {
-				const params = {
-					recordId: this.recordId,
-					asunto: 'Refinanciación Deudas',
-					fechaActividad: new Date().toISOString().split('T')[0],
-					comentarios: this.numerosContratos,
-					crearTareaCitaGestor: true,
+		.then(result => {
+			const params = {
+				recordId: this.recordId,
+				asunto: 'Refinanciación Deudas',
+				fechaActividad: new Date().toISOString().split('T')[0],
+				comentarios: this.numerosContratos,
+				crearTareaCitaGestor: true,
 
-					oficinaDestino: this.lookupOficinaResultadoSeleccionado.Id,
-					enviarTareaOficinaCliente: true,
-					gestorSeleccionadoBuscador: this.lookupGestorResultadoSeleccionado,
+				oficinaDestino: this.lookupOficinaResultadoSeleccionado.Id,
+				enviarTareaOficinaCliente: true,
+				gestorSeleccionadoBuscador: this.lookupGestorResultadoSeleccionado,
 					otpDerivar: true
-				};
-				return crearTareaMGT(params);
-			})
-			.then(result => {
-				let mensaje;
-				let promise;
-				if (result && result.existeTareaCitaCreada) {
-					mensaje = 'No se crearon las tareas: Este caso ya tiene tareas de "Refinanciación Deudas"';
-					promise = this.handleModalToast(mensaje);
-				} else {
-					mensaje = 'Tareas creadas: A la mayor brevedad posible se pondrán en contacto con el cliente';
-					promise = this.handleModalToastMGT(mensaje).then(() => {
-						if (!result.existeTareaCitaCreada) {
-							this.RefinanciacionDeudas1 = null;
-							return procesarOrigin({ recordId: this.recordId });
-						}
-					});
-				}
-				return promise;
-			})
-			.then(result => {
-				if (result) {
-					this.handleModalToast(result);
-				}
-			})
-			.catch(error => {
-				this.toast('error', 'Problema', error.message || 'Error desconocido');
-			});
+			};
+			return crearTareaMGT(params);
+		})
+		.then(result => {
+			let mensaje;
+			let promise;
+			if (result && result.existeTareaCitaCreada) { 
+				mensaje = 'No se crearon las tareas: Este caso ya tiene tareas de "Refinanciación Deudas"';
+				promise = this.handleModalToast(mensaje);
+			} else {
+				mensaje = 'Tareas creadas: A la mayor brevedad posible se pondrán en contacto con el cliente';
+				promise = this.handleModalToastMGT(mensaje).then(() => {
+					if (!result.existeTareaCitaCreada) {
+						this.RefinanciacionDeudas1 = null;
+						return procesarOrigin({ recordId: this.recordId });
+					}
+				});
+			}
+			return promise;
+		})
+		.then(result => {
+			if (result) {
+				this.handleModalToast(result);
+			}
+		})
+		.catch(error => {
+			this.toast('error', 'Problema', error.message || 'Error desconocido');
+		});
 	}
 
 	handleModalToastMGT(mensajeMostrarModalToast) {
@@ -2799,29 +2969,202 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 
 	agregarContrato() {
-		if (this.nuevoContrato) {
-			this.contratos = [...this.contratos, {
+        if (this.nuevoContrato) {
+            this.contratos = [...this.contratos, { 
 				type: 'icon',
-				label: this.nuevoContrato,
-				name: this.nuevoContrato,
+				label: this.nuevoContrato, 
+				name: this.nuevoContrato,				
 				iconName: 'standard:account',
 				// iconName: 'doctype:attachment',
-				alternativeText: 'Contrato'
+            	alternativeText: 'Contrato'
 			}];
-			this.nuevoContrato = '';
-		}
-	}
+            this.nuevoContrato = '';
+        }
+    }
 
 	borrarContratos() {
 		this.contratos = [];
 	}
 
 	handleRemovePill(event) {
-		const name = event.detail.item.name;
-		this.contratos = this.contratos.filter(contrato => contrato.name !== name);
-	}
+        const name = event.detail.item.name;
+        this.contratos = this.contratos.filter(contrato => contrato.name !== name);
+    }
 	//Refinanciación Deudas
 
+	//Derivaciones sin cliente asociado
+	handleDNIChange(event) {
+		this.dni = event.target.value;
+	}
+
+	buscarCliente() {
+		if (!this.dni) {
+			this.toast('error', 'Campos vacíos', 'Por favor, informa el DNI');
+			return;
+		}
+		this.siguienteDeshabilitado = true;
+		identificarCliente({ sTipoBusqueda: 'DOC', sBusqueda: this.dni })
+			.then(resultado => {
+				if (resultado) {
+					// Actualizar el caso con los datos del cliente encontrado
+					if (resultado.CUENTAS && resultado.CUENTAS.length > 0) {
+						const cuentaId = resultado.CUENTAS[0].Id;
+						actualizarCasoMGT({ recordId: this.recordId, cuentaId: resultado.CUENTAS[0].Id })
+							.then(() => {
+								// this.toast('success', 'DNI encontrado', resultado.CUENTAS[0].Id);
+								this.toast('success', 'DNI encontrado', resultado.CUENTAS[0].Name);
+								this.casoActual = { ...this.casoActual, AccountId: cuentaId };
+								this.dispatchEvent(new RefreshEvent());
+
+								refreshApex(this._wiredDatosResult);
+								//Simular que se pulsa de nuevo el botón derivar
+								let origen = 'operativaDerivar';
+								let destino = 'derivarBotonera';
+								this.cerrarModal();
+								this.publicarMensajeDerivarInteraccion(origen, destino, '');
+							})
+					} else {
+						this.toast('warning', 'DNI no encontrado', 'No se encontró un cliente con ese DNI');
+						recuperarMensajeDerivacionesSinCuenta({ numero: 4 })
+							.then(mensaje => {
+								this.derivacionesSinClienteAsociado4 = mensaje;
+							})
+							.catch(error => {
+								console.error('Error al recuperar mensaje:', error);
+							});
+						this.mostrarModalDNI = false;
+						// this.mostrarModalDatosContacto = true;
+						this.mostrarModalTipoCuenta = true;
+						this.siguienteDeshabilitado = false;
+					}
+				} else {
+					this.toast('error', 'Problema', error.body.message || 'Error desconocido');
+				}
+			})
+			.catch(error => {
+				this.toast('error', 'Problema', error.body.message || 'Error desconocido');
+			});
+	}
+
+	handleTipoCuentaFicticiaParticular() {
+		this.tipoCuentaFicticia = 'F';
+		recuperarMensajeDerivacionesSinCuenta({ numero: 2 })
+			.then(mensaje => {
+				this.derivacionesSinClienteAsociado2 = mensaje;
+			})
+			.catch(error => {
+				console.error('Error al recuperar mensaje:', error);
+			});
+		this.mostrarModalTipoCuenta = false;
+		this.mostrarModalDatosContacto = true;
+	}
+
+	handleTipoCuentaFicticiaEmpresa() {
+		this.tipoCuentaFicticia = 'J';
+		recuperarMensajeDerivacionesSinCuenta({ numero: 2 })
+			.then(mensaje => {
+				this.derivacionesSinClienteAsociado2 = mensaje;
+			})
+			.catch(error => {
+				console.error('Error al recuperar mensaje:', error);
+			});
+		this.mostrarModalTipoCuenta = false;
+		this.mostrarModalDatosContacto = true;
+	}
+
+	guardarDatosContacto() {
+		const campos = this.datosClienteNoEncontrado;
+		const camposVacios = campos.filter(campo => !campo.value || campo.value.trim() === '');
+		if (camposVacios.length > 0) {
+			this.toast('error', 'Campos vacíos', 'Por favor, informa todos los campos requeridos');
+			return;
+		}
+		const correo = this.correo;
+		const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+		if (!emailRegex.test(correo)) {
+			this.toast('error', 'Formato de email inválido', 'Por favor, introduce un email válido');
+			return;
+		}
+		this.mostrarModalDatosContacto = false;
+		this.mostrarModalCreacionTareaMGT = true;
+	}
+
+	crearTareaClienteNoEncontrado() {
+		if (!this.lookupOficinaResultadoSeleccionado.Id || !this.template.querySelector('.comentariosTarea').value || !this.template.querySelector('.fechaActividad').value) {
+			this.toast('error', 'Campos vacíos', 'Por favor, informa todos los campos del formulario');
+		} else if (this.cambioOficina && !this.lookupOficinaResultadoSeleccionado) {
+			this.toast('error', 'Campos vacíos', 'Por favor, selecciona una oficina');
+		} else {
+			const params = {
+				recordId: this.recordId,
+				asunto: 'Derivaciones sin cliente asociado',
+				fechaActividad: this.template.querySelector('.fechaActividad').value,
+				comentarios: this.template.querySelector('.comentariosTarea').value,
+				archivos: this.archivos == null ? null : this.archivos.map(item => item.contentVersionId),
+				crearTareaCitaGestor: true,
+				oficinaDestino: this.lookupOficinaResultadoSeleccionado.Id,
+				enviarTareaOficinaCliente: this.enviarTareaOficinaCliente,
+				gestorSeleccionadoBuscador: this.lookupGestorResultadoSeleccionado,
+				otpDerivar: this.otpDerivar,
+				cuentaFicticia: this.tipoCuentaFicticia
+			};
+			this.siguienteDeshabilitado = true;
+			buscarTareaSinCliente({ recordId: this.recordId })
+				.then(existeTarea => {
+					if (existeTarea) {
+						const mensaje = 'No se crearon las tareas: Este caso ya tiene tareas de "Derivaciones sin cliente asociado"';
+						this.handleModalToast(mensaje);
+					} else {
+						return crearTareaDerivacionesSinCliente(params)
+							.then(result => {
+								this.mostrarModalCreacionTareaMGT = false;
+								return recuperarMensajeDerivacionesSinCuenta({ numero: 3 })
+									.then(mensaje => {
+										this.derivacionesSinClienteAsociado3 = mensaje;
+										return this.handleModalToast(mensaje);
+									});
+							});
+					}
+				})
+				.catch(error => {
+					this.toast('error', 'Error al recuperar mensaje:', error);
+				});
+
+		}
+	}
+
+	handleChangeDatosContacto(event) {
+		const campo = event.target.dataset.id;
+		const valor = event.target.value;
+		const datosClienteNoEncontrado = [...this.datosClienteNoEncontrado];
+		const indice = datosClienteNoEncontrado.findIndex(dato => dato.label === campo);
+		if (indice !== -1) {
+			datosClienteNoEncontrado[indice].value = valor;
+			this.datosClienteNoEncontrado = datosClienteNoEncontrado;
+		}
+	}
+
+	get comentarios() {
+		return `DNI: ${this.dni}, Nombre: ${this.nombre}, Apellidos: ${this.apellidos}, Teléfono: ${this.telefono}, Correo: ${this.correo}`;
+	}
+
+	get nombre() {
+		return this.datosClienteNoEncontrado.find(datoCliente => datoCliente.label === 'Nombre').value;
+	}
+
+	get apellidos() {
+		return this.datosClienteNoEncontrado.find(datoCliente => datoCliente.label === 'Apellidos').value;
+	}
+
+	get telefono() {
+		return this.datosClienteNoEncontrado.find(datoCliente => datoCliente.label === 'Teléfono de contacto').value;
+	}
+
+	get correo() {
+		return this.datosClienteNoEncontrado.find(datoCliente => datoCliente.label === 'Correo electrónico de contacto').value;
+	}
+	//Derivaciones sin cliente asociado
+	
 	//CSBD Telefono
 	handleTelefonoCorrecto() {
 		this.preguntaTelefonoCSBD = null;
@@ -2835,31 +3178,19 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	handleTelefonoIncorrecto() {
 		this.botonDesabilitado = true;
 		crearActividadCSBDTelefonoNoCoincidente({ recordId: this.recordId })
-			.then(resultado => {
-				this.ambitoCSBD = false;
-				this.preguntaTelefonoCSBD = null;
-				this.toast('warning', 'Teléfono no coincidente', this.preguntaTelefonoCSBDNoEncontrado);
-
-
-			})
-			.catch(error => {
-				console.error(error);
-				this.cerrarModal();
-			});
+		.then(resultado => {
+			this.ambitoCSBD = false;
+			this.preguntaTelefonoCSBD = null;
+			this.toast('warning', 'Teléfono no coincidente', this.preguntaTelefonoCSBDNoEncontrado);
+			
+			
+		})
+		.catch(error => {
+			console.error(error);
+			this.cerrarModal();
+		});
 	}
 	//CSBD Telefono
-
-	//KPI
-	calculoKPI() {
-		calculoKPI({ recordId: this.recordId })
-			.then(resultado => {
-			})
-			.catch(error => {
-				//this.toast('error', 'Problema en KPI ', error.body.message);
-				this.handleModalToast(error.body.message);
-			});
-	}
-	//KPI
 
 	//Accionistas
 	handleDerivarAccionistasNo() {
@@ -2868,36 +3199,37 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	//Accionistas
 
 	//MECANISMO FIRMA
-
+	
 	handleMFClienteEnElExtranjero() {
 		this.preguntaMecanismoFirma = false;
 	}
 
+	/*
 	handleMFClienteEnElPais() {
 		this.deshabilitadoPaisMF = true;
-		recuperarArgosMecanismoFirma({ recordId: this.recordId }).then(argosMF => {
-			comprobarCasoCreadoMecanismoFirma({ recordId: this.recordId })
-				.then(resultado => {
-					if (argosMF) {
-						if (resultado) {
-							this.handleModalToast(this.toastMecanismoFirmaCasoCreado);
-							//this.toast('warning', 'Atención', this.toastMecanismoFirmaCasoCreado);
-						} else {
-							crearCasoMecanismoFirma({ recordId: this.recordId, clienteExtranjero: false });
-							this.handleModalToast(this.toastMecanismoFirmaArgosCorrecto);
-							//this.toast('warning', 'Datos incompletos', this.toastMecanismoFirmaArgosCorrecto);
-						}
-						//this.cerrarModal();
+		recuperarArgosMecanismoFirma({recordId: this.recordId}).then(argosMF => {
+			comprobarCasoCreadoMecanismoFirma({recordId: this.recordId})
+			.then(resultado => {
+				if (argosMF) {
+					if (resultado) {
+						this.handleModalToast(this.toastMecanismoFirmaCasoCreado);
+						//this.toast('warning', 'Atención', this.toastMecanismoFirmaCasoCreado);
 					} else {
-						this.handleMFNull();
+						crearCasoMecanismoFirma({recordId: this.recordId, clienteExtranjero: false});
+						this.handleModalToast(this.toastMecanismoFirmaArgosCorrecto);
+						//this.toast('warning', 'Datos incompletos', this.toastMecanismoFirmaArgosCorrecto);
 					}
-				}).catch(error => {
-					console.error(error);
-					this.cerrarModal();
-				});
+					//this.cerrarModal();
+				} else {
+					this.handleMFNull();
+				}
+			}).catch(error => {
+				console.error(error);
+				this.cerrarModal();
+			});
 		});
-
-	}
+		
+	}*/
 
 	handleMFDatosConfirmar() {
 		const tieneNo = this.respuestasMecanismoFirmaDatos.some(item => item.value === 'No');
@@ -2923,27 +3255,33 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	handleMFIdentificadorBloqueado() {
 		//this.cerrarModal();
 		this.handleModalToast(this.toastMecanismoFirmaIdentificadorBloqueado);
+		crearActividadIdentificadorBloqueado({ recordId: this.recordId })
+		.then()
+		.catch(error => {
+			console.error(error);
+			this.cerrarModal();
+		});
 		//this.toast('warning', 'Identificador bloqueado', this.toastMecanismoFirmaIdentificadorBloqueado);
 
 	}
 
 	handleMFIdentificadorSinBloquear() {
 		comprobarCasoCreadoMecanismoFirma({ recordId: this.recordId })
-			.then(resultado => {
+		.then(resultado => {
 				if (resultado) {
-					this.handleModalToast(this.toastMecanismoFirmaCasoCreado);
-					//this.toast('warning', 'Atención', this.toastMecanismoFirmaCasoCreado);
+				this.handleModalToast(this.toastMecanismoFirmaCasoCreado);
+				//this.toast('warning', 'Atención', this.toastMecanismoFirmaCasoCreado);
 				} else {
-					this.handleModalToast(this.toastMecanismoFirmaIdentificadorSinBloquear);
-					//this.toast('warning', 'Identificador sin bloquear', this.toastMecanismoFirmaIdentificadorSinBloquear);
-					this.deshabilitadoIdentificadorMF = true;
+				this.handleModalToast(this.toastMecanismoFirmaIdentificadorSinBloquear);
+				//this.toast('warning', 'Identificador sin bloquear', this.toastMecanismoFirmaIdentificadorSinBloquear);
+				this.deshabilitadoIdentificadorMF = true;
 					crearCasoMecanismoFirma({ recordId: this.recordId, clienteExtranjero: true });
-				}
-				//this.cerrarModal();
-			}).catch(error => {
-				console.error(error);
-				this.cerrarModal();
-			});
+			}
+			//this.cerrarModal();
+		}).catch(error => {
+			console.error(error);
+			this.cerrarModal();
+		});
 	}
 
 	handleChangeMF(event) {
@@ -2970,32 +3308,63 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		}
 	}
 
+	/*
 	handleMFClienteIdentificado() {
 		let mecanismoFirmaCircuito;
 
 		elegirCircuitoMecanismoFirma({ recordId: this.recordId })
-			.then(retorno => {
-				mecanismoFirmaCircuito = retorno;
+		.then(retorno => {
+			mecanismoFirmaCircuito = retorno;
 
-				if (mecanismoFirmaCircuito) {
-					//Circuito extranjero
+			if(mecanismoFirmaCircuito){
+				//Circuito extranjero
+				let datosAdicionales = this.cybersocMF;
+				let origen = 'operativaDerivar';
+				let destino = 'realizartrasladocolaborador';
+				this.cerrarModal();
+				this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
+			}else{
+				//Circuito codigo firma
+				//this.cerrarModal();
+				this.handleModalToast(this.toastMecanismoFirmaAsuntoEnvioCodigo);
+				//this.toast('warning', 'Cliente autenticado', this.toastMecanismoFirmaAsuntoEnvioCodigo);
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			this.toast('error', 'Problema con el circuito actual', error.body.message);
+			this.cerrarModal();
+		});
+		}
+	*/
+
+
+	//El caso tiene el flag de mecanismo de firma
+	handleMFClienteIdentificado() {
+		let denied;
+		let restricted;
+
+		recuperarArgosDenied({ recordId: this.recordId })
+		.then(isDenied => {
+			denied = isDenied;
+				recuperarArgosRestricted({ recordId: this.recordId })
+			.then(isRestricted => {
+				restricted = isRestricted;
+						if (denied) {
 					let datosAdicionales = this.cybersocMF;
 					let origen = 'operativaDerivar';
 					let destino = 'realizartrasladocolaborador';
 					this.cerrarModal();
 					this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
-				} else {
-					//Circuito codigo firma
-					//this.cerrarModal();
+						} else if (restricted) {
 					this.handleModalToast(this.toastMecanismoFirmaAsuntoEnvioCodigo);
-					//this.toast('warning', 'Cliente autenticado', this.toastMecanismoFirmaAsuntoEnvioCodigo);
 				}
 			})
-			.catch(error => {
-				console.error(error);
-				this.toast('error', 'Problema con el circuito actual', error.body.message);
-				this.cerrarModal();
-			});
+		})
+		.catch(error => {
+			console.error(error);
+			this.cerrarModal();
+		});
 	}
 
 	handleMFNull() {
@@ -3004,29 +3373,83 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		this.preguntaMecanismoFirmaDatosValores = false;
 		this.preguntaMecanismoFirmaIdentificador = false;
 		this.preguntaMecanismoFirmaClienteAutenticado = false;
+		this.preguntaIdentificadorSigueBloqueado = false;
+	}
+		
+	//MECANISMO FIRMA
+
+	//CBP
+
+	handleRespuestaClienteCBP() {
+
+		emailResponderClienteCBP(
+			{
+
+				caso: this.casoActual,
+				grupoCol: this.grupoCol,
+				nombrePlantilla: this.nombrePlantilla,
+				parametrizacionesMensaje: this.parametrizacionesMensaje,
+				ambito: this.ambitoMotivo,
+				nameOWA:this.nameOWA
+			}
+		).then (_retorno =>{
+			//this.handleModalToast(this.emailSuccess);
+		}).catch(error =>{
+			this.toast('error', 'Error en la creación de emails', error.body.message);
+		}).finally(() =>{
+			this.parametrizacionesMensaje = null;
+		});
 	}
 
-	//MECANISMO FIRMA
+	handleCBP() {
+	this.mostrarModalCreacionTareaMGT = false;
+	this.mostrarModalCBP = true;
+	}
+
+	//Boton "Si o No lo sabe CBP"
+	handleCBPSi() {
+
+		this.RefinanciacionDeudas1 = false;
+		this.showSpinner = true;
+    	if (this.esIntouch) {
+			this.handleRemitir();
+
+   		} else {
+	
+		this.mostrarModalCBP = false;
+		this.mostrarModalCreacionTarea = true;		
+        this.showSpinner = false;
+
+		}	
+	}
+
+		//Botón "No" CBP
+		handleCBPNo() {
+		this.mostrarModalCBP = false;
+		this.preguntaCBP = false;
+		}
+
+	//CBP
 
 	//Oficina sin tarea
 	handleOficinaSinTarea() {
-
+		
 		getUrlNumeroOficinaApex({ recordId: this.oficinaPrincipal })
-			.then(resultado => {
-				if (resultado.url) {
-					this.urlOficina = resultado.url;
-					this.numeroOficina = resultado.numeroOficina;
-					this.mostrarModalToast = false;
+		.then(resultado => {
+			if (resultado.url) {
+				this.urlOficina = resultado.url;
+				this.numeroOficina = resultado.numeroOficina;
+				this.mostrarModalToast = false;
 
-					this.handleModalToastUrl(this.mensajeOficinaSinTarea);
-				}
-			});
+				this.handleModalToastUrl(this.mensajeOficinaSinTarea);
+			}
+		});
 
 		crearActividadOficinaSinTarea({ recordId: this.recordId })
-			.catch(error => {
-				console.error(error);
-				this.cerrarModal();
-			});
+		.catch(error => {
+			console.error(error);
+			this.cerrarModal();
+		});
 
 	}
 
@@ -3039,48 +3462,48 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	}
 	//Colectivos vulnerables*/
-
+	
 	//Derivar a SAC
 	handleDerivarSAC() {
 		this.activarSpinner();
 		derivarSACApex({ casoContactCenter: this.casoActual, motivo: 'Asignación de caso al SAC' })
-			.then(() => {
-				this.desactivarSpinner();
-				this.handleModalToast(this.mensajeDerivarAlSACSuccess);
-
-			})
-			.catch(error => {
-				console.error(error);
-				this.desactivarSpinner();
-				this.cerrarModal();
-			});
+		.then(() => {
+			this.desactivarSpinner();
+			this.handleModalToast(this.mensajeDerivarAlSACSuccess);
+        
+        })
+		.catch(error => {
+			console.error(error);
+			this.desactivarSpinner();
+			this.cerrarModal();
+		});
 	}
 	//Fin Derivar a SAC
 
 	//Devolver a SAC
 	handleDevolverSAC() {
 		if (this.motivoSAC === '' || this.motivoSAC === null || this.motivoSAC === undefined) {
-			//Mostrar toast de advertencia si el motivo está vacío
-			this.toast('warning', 'Advertencia', 'Por favor, rellene el motivo antes de continuar');
-		} else {
+            //Mostrar toast de advertencia si el motivo está vacío
+            this.toast('warning', 'Advertencia', 'Por favor, rellene el motivo antes de continuar');
+        } else {
 			this.activarSpinner();
 			devolverSACApex({ motivo: this.motivoSAC, casoContactCenter: this.casoActual })
-				.then(() => {
-					this.desactivarSpinner();
-					this.handleModalToast(this.mensajeDevolverAlSACSuccess);
-
-				})
-				.catch(error => {
-					console.error(error);
-					this.desactivarSpinner();
-					this.cerrarModal();
-				});
+			.then(() => {
+				this.desactivarSpinner();
+				this.handleModalToast(this.mensajeDevolverAlSACSuccess);
+				
+			})
+			.catch(error => {
+				console.error(error);
+				this.desactivarSpinner();
+				this.cerrarModal();
+			});
 		}
 	}
 
 	handleMotivoSACChange(event) {
-		this.motivoSAC = event.target.value;
-	}
+        this.motivoSAC = event.target.value;
+    }
 	//Fin Devolver a SAC
 
 	//Onboarding/Desistir
@@ -3108,6 +3531,62 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 	//Fin Onboarding/Desistir
 
+
+	//Colectivo vulnerable
+	crearTareaYRemitidoColectivoVulnerable() {
+	console.log('Entrada en crearTareaYRemitidoColectivoVulnerable 0');
+	this.showSpinner = true;
+	this.preguntaColectivosVulnerables = false;
+		crearTareaColectivosVulnerables({
+			recordId: this.recordId,
+			asunto: 'Solicitud contacto gestor (Contact Center)',
+			fechaActividad: new Date().toISOString().slice(0, 10),
+			crearTareaCitaGestor: false,
+			oficinaDestino: null,
+			enviarTareaOficinaCliente: false,
+			gestorSeleccionadoBuscador: null,
+			otpDerivar: this.otpDerivar,
+			comentarios: this.mensajeColectivosVulnerables
+		}).then((retorno)=> {
+			this.modalFinalizarColectivosVulnerables = retorno.mensaje;
+			console.log('retorno.mensaje: ' + retorno.mensaje);
+			console.log('this.modalFinalizarColectivosVulnerables: ' + this.modalFinalizarColectivosVulnerables);
+
+			console.log('Entrada en crearTareaColectivosVulnerables 1');
+			if (retorno.existeTareaCitaCreada) {
+				this.handleModalToast(retorno.textoTareaCitaCreada);
+			} else {
+				console.log('Entrada en crearTareaColectivosVulnerables 2');
+				this.parametrizacionesMensaje = Object.fromEntries([
+					['[NumOficina]', this.numOficina]
+				]);				
+				emailRemitirColaboradorColectivoVulnerable({
+					caso: this.casoActual,
+					grupoCol: this.grupoCol,
+					nombrePlantilla: this.nombrePlantilla,
+					parametrizacionesMensaje: this.parametrizacionesMensaje,
+					ambito: this.ambitoMotivo,
+					nameOWA:this.nameOWA
+				}
+				).then (_retorno =>{
+					console.log('Entrada en emailRemitirColaboradorColectivoVulnerable');
+					//Mensaje de que todo ha salido bien
+					console.log('this.modalFinalizarColectivosVulnerables 2: ' + this.modalFinalizarColectivosVulnerables);
+					this.handleModalToast(retorno.mensaje);
+				}).catch(error =>{
+					this.toast('error', 'Error en la creación de emails', error.body.message);
+				}).finally(() =>{
+					this.parametrizacionesMensaje = null;
+				});
+			}
+		}).catch(error => {
+			this.toast('error', 'Error', error?.body?.message || 'No se pudo crear la tarea');
+		}).finally(() => {
+			this.showSpinner = false;
+		});
+	}
+
+	//Colectivo vulnerable
 	activarSpinner() {
 		this.showSpinner = true;
 	}
@@ -3135,7 +3614,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	valorFechaCitaRapida(event) {
 		this.fechaSeleccionada = event.detail;
 	}
-
+	
 	valorFranjaCitaRapida(event) {
 		this.franjaSeleccionada = event.detail;
 	}

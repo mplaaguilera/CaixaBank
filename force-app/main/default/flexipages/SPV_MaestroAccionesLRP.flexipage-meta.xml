@@ -108,6 +108,12 @@
                 </visibilityRule>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.SPV_Organismo__c</fieldItem>
+                <identifier>RecordSPV_Organismo__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-abf26bda-d3e5-4839-a070-04d11ee4f586</name>
         <type>Facet</type>
     </flexiPageRegions>

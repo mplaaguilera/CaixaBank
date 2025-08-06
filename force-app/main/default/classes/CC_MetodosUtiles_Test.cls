@@ -38,7 +38,19 @@ public class CC_MetodosUtiles_Test {
             a4.CC_Activa__c = true;
             a4.RecordTypeId = sTipoRegL;
             oListVal.add(a4);
-            
+
+            CC_Lista_Valores__c a5Festivos = new CC_Lista_Valores__c();
+            a5Festivos.Name = 'Festivos nacionales';
+            a5Festivos.CC_Activa__c = true;
+            a5Festivos.RecordTypeId = sTipoRegL;
+            oListVal.add(a5Festivos);
+
+            CC_Lista_Valores__c a5CalendarioServicios = new CC_Lista_Valores__c();
+            a5CalendarioServicios.Name = 'Calendario_servicios';
+            a5CalendarioServicios.CC_Activa__c = true;
+            a5CalendarioServicios.RecordTypeId = sTipoRegL;
+            oListVal.add(a5CalendarioServicios);
+
             insert oListVal;
             
             CC_Lista_Valores__c a5 = new CC_Lista_Valores__c();
@@ -130,6 +142,26 @@ public class CC_MetodosUtiles_Test {
             a14.CC_Valor__c = 'Móvil';
             a14.CC_Valor_SFDC__c = '002';
             oListVal2.add(a14);
+
+            CC_Lista_Valores__c a15 = new CC_Lista_Valores__c();
+            a15.Name = '002';
+            a15.CC_Activa__c = true;
+            a15.RecordTypeId = sTipoRegV;
+            a15.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'Festivos nacionales'].Id;
+            a15.CC_Valor__c = '25';
+            a15.CC_Valor2__c = '12';
+            a15.CC_Valor_SFDC__c = '2024';
+            oListVal2.add(a15);
+
+            CC_Lista_Valores__c a16 = new CC_Lista_Valores__c();
+            a16.Name = '002';
+            a16.CC_Activa__c = true;
+            a16.RecordTypeId = sTipoRegV;
+            a16.CC_Lista__c = [SELECT Id FROM CC_Lista_Valores__c WHERE Name = 'Calendario_servicios'].Id;
+            a16.CC_Valor__c = '25';
+            a16.CC_Valor2__c = '12';
+            a16.CC_Valor_SFDC__c = '2024';
+            oListVal2.add(a16);
             
             insert oListVal2;
 
@@ -590,21 +622,21 @@ public class CC_MetodosUtiles_Test {
 
     @isTest
     static void buscarGestorTest() {
-        List<String> matriculas = new List<String>{'U0124112', 'XXXXXX'};
+        List<String> matriculas = new List<String>{'U012411X', 'XXXXXX'};
         Map<String,User> mapGestor = CC_TestDataFactory.insertUserOperadoresCliente(matriculas);
 
-        User usuarioGestor = mapGestor.get('U0124112');
+        User usuarioGestor = mapGestor.get('U012411X');
         User usuarioGenerico = mapGestor.get('XXXXXX');
         Test.startTest();
         System.runAs(CC_TestDataFactory.getUserAdmin()) {
             // Test with a specific gestor number
-            String numeroGestor = 'U0124112';
+            String numeroGestor = 'U012411X';
             User gestor = CC_MetodosUtiles.buscarGestor(numeroGestor);
             System.assertNotEquals(gestor, null, 'Gestor should not be null for a valid gestor number');
             System.assertEquals(gestor.Id, usuarioGestor.Id, 'Gestor devuelto no correponde con el esperado');
 
             // Test with a gestor number without U01
-            numeroGestor = '24112';
+            numeroGestor = '2411X';
             User gestor2 = CC_MetodosUtiles.buscarGestor(numeroGestor);
             System.assertNotEquals(gestor2, null, 'Gestor should not be null for a valid gestor number');
             System.assertEquals(gestor2.Id, usuarioGestor.Id, 'Gestor devuelto no correponde con el esperado');
@@ -691,6 +723,501 @@ public class CC_MetodosUtiles_Test {
             System.assertNotEquals(null, numPerso, 'El numPerso no debe ser nulo');
             //System.debug('Comunicacion Id: ' + comunicacion.Id + ', NumPerso: ' + numPerso);
         }
+        }
     }
-}
+    @isTest
+    static void getCustomSettingTest() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            CC_Settings__c mcs = new CC_Settings__c();
+            mcs.Name = 'test';
+            insert mcs;
+
+            CC_Settings__c mcsResult = CC_MetodosUtiles.getCustomSetting('test');
+
+            System.assertEquals('test', mcsResult.Name, 'no se ha recuperado el setting');
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    static void generarURLsLimeSurveyTest() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            
+            // Crear configuración de encuestas
+            List<CC_Envio_Encuesta__c> configEncuestas = new List<CC_Envio_Encuesta__c>();
+            
+            CC_Envio_Encuesta__c configBase = new CC_Envio_Encuesta__c(
+                Name = 'CC_URL_Encuesta',
+                CC_Tipo_Encuesta__c = 'URL base',
+                CC_Link_LimeSurvey__c = 'https://test.limesurvey.com/survey/index/sid/',
+                CC_Id_Encuesta__c = '123456'
+            );
+            configEncuestas.add(configBase);
+            
+            CC_Envio_Encuesta__c configPhone = new CC_Envio_Encuesta__c(
+                Name = 'CC_TipoLlamada',
+                CC_Tipo_Encuesta__c = 'Phone',
+                CC_Id_Encuesta__c = '789012'
+            );
+            configEncuestas.add(configPhone);
+            
+            CC_Envio_Encuesta__c configChat = new CC_Envio_Encuesta__c(
+                Name = 'TipoChat',
+                CC_Tipo_Encuesta__c = 'Chat',
+                CC_Id_Encuesta__c = '345678'
+            );
+            configEncuestas.add(configChat);
+            
+            CC_Envio_Encuesta__c configTercerNivel = new CC_Envio_Encuesta__c(
+                Name = 'CC_TercerNivel',
+                CC_Tipo_Encuesta__c = 'Caso Tercer Nivel',
+                CC_Id_Encuesta__c = '901234'
+            );
+            configEncuestas.add(configTercerNivel);
+            
+            CC_Envio_Encuesta__c configFCO = new CC_Envio_Encuesta__c(
+                Name = 'CC_EncuestaFormularioOperativas',
+                CC_Id_Encuesta__c = '567890'
+            );
+            configEncuestas.add(configFCO);
+            
+            insert configEncuestas;
+
+            Id tematicaId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
+            Id rtEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
+
+
+            CC_MCC__c tematica = new CC_MCC__c(
+                Name = 'Tematica Test',
+                RecordTypeId = tematicaId,
+                CC_Tipo_Cliente__c = 'Cliente',
+                CC_Canal_Operativo__c = 'Cajero',
+                CC_Codigo_Externo__c = 'TE-000001'
+            );
+            insert tematica;
+
+            Contact contactoEmple1 = new Contact();
+            contactoEmple1.LastName = 'Contacto empleado';
+            contactoEmple1.FirstName = 'Prueba empleado';
+            contactoEmple1.CC_Inactivo__c = false;
+            contactoEmple1.Email = 'test@test.com';
+            contactoEmple1.CC_Matricula__c = 'U0124112';
+            contactoEmple1.AV_DescFuncion__c = 'DIRECCION';
+            contactoEmple1.RecordtypeId =  rtEmpleado;
+            contactoEmple1.CC_Num_Empleado_Generico__c = '12345';
+            insert contactoEmple1;
+            
+            // Recuperar el contacto para asegurar que el campo fórmula se calcule
+            contactoEmple1 = [SELECT Id, CC_Matricula__c FROM Contact WHERE Id = :contactoEmple1.Id];
+
+            // Crear casos de prueba
+            List<Case> casos = new List<Case>();
+            
+            // Caso 1: Empleado con llamada telefónica
+            Case caso1 = new Case(
+                Subject = 'Test Case 1 - Phone',
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado'),
+                Origin = 'Phone',
+                CC_Idioma__c = 'es',
+                Status = 'Activo',
+                CC_Tematica__c = tematica.Name,
+                CC_MCC_Tematica__c = tematica.Id,
+                ContactId = contactoEmple1.Id
+            );
+            casos.add(caso1);
+            
+            // Caso 2: Cliente con chat
+            Case caso2 = new Case(
+                Subject = 'Test Case 2 - Chat',
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado'),
+                Origin = 'Chat',
+                CC_Idioma__c = 'ca',
+                Status = 'Activo',
+                CC_Tematica__c = tematica.Name,
+                CC_MCC_Tematica__c = tematica.Id,
+                ContactId = contactoEmple1.Id
+            );
+            casos.add(caso2);
+            
+            // Caso 3: Empleado en tercer nivel
+            Case caso3 = new Case(
+                Subject = 'Test Case 3 - Tercer Nivel',
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado'),
+                Origin = 'Email',
+                CC_Idioma__c = 'en',
+                CC_En_Tercer_Nivel__c = true,
+                Status = 'Activo',
+                CC_Tematica__c = tematica.Name,
+                CC_MCC_Tematica__c = tematica.Id,
+                ContactId = contactoEmple1.Id
+            );
+            casos.add(caso3);
+            
+            insert casos;
+            
+            // Recuperar los casos para asegurar que los campos fórmula se calculen
+            casos = [SELECT Id, CC_Matricula_Empleado__c, CC_Idioma__c, CC_MCC_Tematica__c, CC_Tematica__c, 
+                     RecordTypeId, Origin, CC_En_Tercer_Nivel__c, CC_Canal_Procedencia__c, CaseNumber 
+                     FROM Case WHERE Id IN :casos];
+
+            System.debug('casos: ' + JSON.serializePretty(casos));
+            
+            // Crear tareas para los casos
+            List<Task> tareas = new List<Task>();
+            
+            // Tarea para caso 1
+            Task tarea1 = new Task(
+                WhatId = caso1.Id,
+                Type = 'Traslado Tercer Nivel',
+                Status = 'Completed'
+            );
+            tareas.add(tarea1);
+            
+            // Tarea para caso 2
+            Task tarea2 = new Task(
+                WhatId = caso2.Id,
+                Type = 'Llamada transferida',
+                Status = 'Completed'
+            );
+            tareas.add(tarea2);
+            
+            // Tarea para caso 3
+            Task tarea3 = new Task(
+                WhatId = caso3.Id,
+                Type = 'Traslado colaborador',
+                Status = 'Completed'
+            );
+            tareas.add(tarea3);
+            
+            insert tareas;
+
+            LiveChatVisitor chatVisitor = new LiveChatVisitor();
+            insert chatVisitor;
+            
+            // Crear LiveChatTranscript para caso 2
+            LiveChatTranscript chat = new LiveChatTranscript(
+                CaseId = caso2.Id,
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('LiveChatTranscript', 'CC_Empleados'),
+                LiveChatVisitorId = chatVisitor.Id,
+                CC_Cerrado_TimeOut__c = false
+            );
+            insert chat;
+            
+            // Llamar al método a probar
+            Map<Id, String> urlsEncuestas = CC_MetodosUtiles.generarURLsLimeSurvey(casos);
+            
+            // Verificar resultados
+            System.assertNotEquals(null, urlsEncuestas, 'El mapa de URLs no debe ser nulo');
+            
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    static void getValoresCSTest() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            CC_Settings__c mcs = new CC_Settings__c();
+            mcs.Name = 'test';
+            mcs.CC_Configuracion_1__c = 'test';
+            insert mcs;
+
+            List<String> valores = CC_MetodosUtiles.getValoresCS('test');
+            System.assertNotEquals(null, valores, 'No debe devolver null');
+        }
+        Test.stopTest();
+    }
+    
+    @isTest
+    static void testInicializarCuerpoCorreo() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            
+            Case testCase = new Case(
+                Subject='Test Case',
+                recordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente'),
+                Origin = 'Email',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                CC_Tipo_Contacto__c = 'Consulta',
+                Status = 'Activo',
+                CC_Referencia_Correo_Saliente__c = '123456789'
+            );
+            insert testCase;
+
+                        //Plantilla cuerpo - Buscar las carpetas específicas usando consultas anidadas
+            List<Folder> operativasFolders = [SELECT Id FROM Folder WHERE Name = 'Operativas' AND ParentId = null LIMIT 1];
+            
+            if (!operativasFolders.isEmpty()) {
+                Id idFolderOperativas = operativasFolders[0].Id;
+                
+                // Consulta anidada para obtener todas las carpetas necesarias en una sola consulta
+                List<Folder> subFolders = [
+                    SELECT Id, Name, ParentId 
+                    FROM Folder 
+                    WHERE ParentId = :idFolderOperativas 
+                    AND Name IN ('Trasladar a colaborador', 'Solicitud de información', 'Responder a cliente Accionista')
+                ];
+                
+                Map<String, Id> folderMap = new Map<String, Id>();
+                for (Folder folder : subFolders) {
+                    folderMap.put(folder.Name, folder.Id);
+                }
+                
+                // Buscar carpetas de idioma para las rutas específicas
+                Set<Id> parentFoldersForLanguage = new Set<Id>();
+                if (folderMap.containsKey('Trasladar a colaborador')) {
+                    parentFoldersForLanguage.add(folderMap.get('Trasladar a colaborador'));
+                }
+                if (folderMap.containsKey('Solicitud de información')) {
+                    parentFoldersForLanguage.add(folderMap.get('Solicitud de información'));
+                }
+                if (folderMap.containsKey('Responder a cliente Accionista')) {
+                    parentFoldersForLanguage.add(folderMap.get('Responder a cliente Accionista'));
+                }
+                
+                // Consulta anidada para obtener carpetas de idioma
+                List<Folder> languageFolders = [
+                    SELECT Id, Name, ParentId 
+                    FROM Folder 
+                    WHERE ParentId IN :parentFoldersForLanguage
+                    AND Name = 'Castellano'
+                ];
+                
+                Map<String, Id> languageFolderMap = new Map<String, Id>();
+                for (Folder folder : languageFolders) {
+                    languageFolderMap.put(folder.ParentId + '_Castellano', folder.Id);
+                }
+                
+                // Buscar carpetas de nivel inferior (Formal/Informal)
+                Set<Id> parentFoldersForSubLevel = new Set<Id>();
+                for (Id languageFolderId : languageFolderMap.values()) {
+                    parentFoldersForSubLevel.add(languageFolderId);
+                }
+                
+                List<Folder> subLevelFolders = [
+                    SELECT Id, Name, ParentId 
+                    FROM Folder 
+                    WHERE ParentId IN :parentFoldersForSubLevel
+                    AND Name IN ('Formal', 'Informal')
+                ];
+                
+                Map<String, Id> subLevelFolderMap = new Map<String, Id>();
+                for (Folder folder : subLevelFolders) {
+                    subLevelFolderMap.put(folder.ParentId + '_' + folder.Name, folder.Id);
+                }
+                
+                // Construir el conjunto de carpetas para buscar plantillas
+                Set<Id> carpetasParaBuscar = new Set<Id>{idFolderOperativas};
+                
+                // Agregar carpetas de las rutas específicas:
+                // 1. Operativas > Trasladar a colaborador > Castellano
+                if (folderMap.containsKey('Trasladar a colaborador') && 
+                    languageFolderMap.containsKey(folderMap.get('Trasladar a colaborador') + '_Castellano')) {
+                    carpetasParaBuscar.add(languageFolderMap.get(folderMap.get('Trasladar a colaborador') + '_Castellano'));
+                }
+                
+                // 2. Operativas > Solicitud de información > Castellano > Formal
+                if (folderMap.containsKey('Solicitud de información') && 
+                    languageFolderMap.containsKey(folderMap.get('Solicitud de información') + '_Castellano')) {
+                    Id castellanoSolicitudId = languageFolderMap.get(folderMap.get('Solicitud de información') + '_Castellano');
+                    carpetasParaBuscar.add(castellanoSolicitudId);
+                    
+                    if (subLevelFolderMap.containsKey(castellanoSolicitudId + '_Formal')) {
+                        carpetasParaBuscar.add(subLevelFolderMap.get(castellanoSolicitudId + '_Formal'));
+                    }
+                }
+                
+                // 3. Operativas > Responder Cliente > Castellano > Informal
+                if (folderMap.containsKey('Responder a cliente Accionista') && 
+                    languageFolderMap.containsKey(folderMap.get('Responder a cliente Accionista') + '_Castellano')) {
+                    Id castellanoResponderId = languageFolderMap.get(folderMap.get('Responder a cliente Accionista') + '_Castellano');
+                    carpetasParaBuscar.add(castellanoResponderId);
+                    
+                    if (subLevelFolderMap.containsKey(castellanoResponderId + '_Informal')) {
+                        carpetasParaBuscar.add(subLevelFolderMap.get(castellanoResponderId + '_Informal'));
+                    }
+                }
+                
+                // Crear mapas para identificar qué carpeta corresponde a cada operativa
+                Map<Id, String> carpetaToOperativaMap = new Map<Id, String>();
+                
+                // Mapear carpetas de Castellano a sus operativas correspondientes
+                if (folderMap.containsKey('Trasladar a colaborador') && 
+                    languageFolderMap.containsKey(folderMap.get('Trasladar a colaborador') + '_Castellano')) {
+                    carpetaToOperativaMap.put(languageFolderMap.get(folderMap.get('Trasladar a colaborador') + '_Castellano'), 'Trasladar a colaborador');
+                }
+                
+                if (folderMap.containsKey('Solicitud de información') && 
+                    languageFolderMap.containsKey(folderMap.get('Solicitud de información') + '_Castellano')) {
+                    Id carpetaCastellanoSolicitud = languageFolderMap.get(folderMap.get('Solicitud de información') + '_Castellano');
+                    carpetaToOperativaMap.put(carpetaCastellanoSolicitud, 'Solicitud de información');
+                    
+                    // Mapear también la carpeta Formal si existe
+                    if (subLevelFolderMap.containsKey(carpetaCastellanoSolicitud + '_Formal')) {
+                        carpetaToOperativaMap.put(subLevelFolderMap.get(carpetaCastellanoSolicitud + '_Formal'), 'Solicitud de información');
+                    }
+                }
+                
+                if (folderMap.containsKey('Responder a cliente Accionista') && 
+                    languageFolderMap.containsKey(folderMap.get('Responder a cliente Accionista') + '_Castellano')) {
+                    Id carpetaCastellanoResponder = languageFolderMap.get(folderMap.get('Responder a cliente Accionista') + '_Castellano');
+                    carpetaToOperativaMap.put(carpetaCastellanoResponder, 'Responder a cliente Accionista');
+                    
+                    // Mapear también la carpeta Informal si existe
+                    if (subLevelFolderMap.containsKey(carpetaCastellanoResponder + '_Informal')) {
+                        carpetaToOperativaMap.put(subLevelFolderMap.get(carpetaCastellanoResponder + '_Informal'), 'Responder a cliente Accionista');
+                    }
+                }
+                
+                // Buscar TODAS las plantillas existentes en las carpetas específicas
+                List<EmailTemplate> existingTemplates = [
+                    SELECT Id, Name, DeveloperName, Subject, HtmlValue, FolderId, Folder.Name, Folder.ParentId
+                    FROM EmailTemplate 
+                    WHERE FolderId IN :carpetasParaBuscar 
+                    AND IsActive = true 
+                    ORDER BY Name
+                ];
+                
+                if (!existingTemplates.isEmpty()) {
+                    // Agrupar plantillas por operativa
+                    Map<String, EmailTemplate> plantillasPorOperativa = new Map<String, EmailTemplate>();
+                    
+                    for (EmailTemplate template : existingTemplates) {
+                        String operativa = '';
+                        
+                        // Determinar la operativa basándose en la carpeta donde está la plantilla
+                        if (carpetaToOperativaMap.containsKey(template.FolderId)) {
+                            operativa = carpetaToOperativaMap.get(template.FolderId);
+                        }
+                        
+                        // Solo agregar si no tenemos ya una plantilla de esta operativa
+                        if (String.isNotBlank(operativa) && !plantillasPorOperativa.containsKey(operativa)) {
+                            plantillasPorOperativa.put(operativa, template);
+                        }
+                    }
+                    
+                    // Procesar una plantilla de cada operativa
+                        EmailTemplate testTemplateTrasladar = plantillasPorOperativa.get('Trasladar a colaborador');
+                        EmailTemplate testTemplateSolicitud = plantillasPorOperativa.get('Solicitud de información');
+                        EmailTemplate testTemplateResponder = plantillasPorOperativa.get('Responder a cliente Accionista');
+                        
+                        Map<String, String> resultTrasladar = CC_MetodosUtiles.inicializarCuerpoCorreo(testTemplateTrasladar, testCase);
+                        Map<String, String> resultSolicitud = CC_MetodosUtiles.inicializarCuerpoCorreo(testTemplateSolicitud, testCase);
+                        Map<String, String> resultResponder = CC_MetodosUtiles.inicializarCuerpoCorreo(testTemplateResponder, testCase);
+                        
+                        // Verify the result contains expected keys
+                        System.assertNotEquals(null, resultTrasladar, 'Result should not be null for Trasladar a colaborador');
+                        System.assert(resultTrasladar.containsKey('operativa'), 'Result should contain operativa key for Trasladar a colaborador');
+                        System.assert(resultTrasladar.containsKey('idioma'), 'Result should contain idioma key for Trasladar a colaborador');
+                        System.assert(resultTrasladar.containsKey('tratamiento'), 'Result should contain tratamiento key for Trasladar a colaborador');
+                    
+                } else {
+                    System.debug('No se encontraron plantillas en las carpetas especificadas');
+                    System.debug('Carpetas donde se buscó: ' + carpetasParaBuscar);
+                }
+            } else {
+                System.debug('No se encontró la carpeta Operativas');
+            }
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    static void subListaTest() {
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            Test.startTest();
+            List<Object> listaOriginal = new List<Object>{'a', 'b', 'c', 'd', 'e', 'f'};
+            List<Object> sublista = CC_MetodosUtiles.subLista(listaOriginal, 1, 3);
+            System.assertEquals(3, sublista.size(), 'Debe tener 3 elementos');
+            System.assertEquals('b', sublista[0], 'El primer elemento debe ser b');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void fechaLimiteFinSemanaFestivosTest() {
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            Test.startTest();
+                DateTime fecha = CBK_UtilsDate.todayDT();
+                DateTime fechaLimite = CC_MetodosUtiles.fechaLimiteFinSemanaFestivos('123', fecha);
+                System.assertNotEquals(null, fechaLimite);
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void sacarFestivosPorMesTest() {
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            Test.startTest();
+                Map<Integer, List<Integer>> festivos = CC_MetodosUtiles.sacarFestivosPorMes();
+                System.assertNotEquals(null, festivos);
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void testHorarioDiaTurno() {
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            // Crea el mapa de horarios de prueba
+            Map<String, List<Time>> horario = new Map<String, List<Time>>{
+                'L-V' => new List<Time>{Time.newInstance(9, 0, 0, 0), Time.newInstance(18, 0, 0, 0)}
+            };
+
+            // Prueba para el caso de día de la semana 5 y entrada al trabajo
+            Time horarioEntrada = CC_MetodosUtiles.horarioDiaTurno(horario, '5', 'Entrada');
+            System.assertEquals(Time.newInstance(9, 0, 0, 0), horarioEntrada);
+
+            // Prueba para el caso de día de la semana 5 y salida del trabajo
+            Time horarioSalida = CC_MetodosUtiles.horarioDiaTurno(horario, '5', 'Salida');
+            System.assertEquals(Time.newInstance(18, 0, 0, 0), horarioSalida);
+
+            // Prueba para el caso de día de la semana 3 y entrada al trabajo
+            horarioEntrada = CC_MetodosUtiles.horarioDiaTurno(horario, '3', 'Entrada');
+            System.assertEquals(Time.newInstance(9, 0, 0, 0), horarioEntrada);
+
+            // Prueba para el caso de día de la semana 3 y salida del trabajo
+            horarioSalida = CC_MetodosUtiles.horarioDiaTurno(horario, '3', 'Salida');
+            System.assertEquals(Time.newInstance(18, 0, 0, 0), horarioSalida);
+        }
+    }
+    
+    
+    @IsTest
+    public static void restarHorasTest() {
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            Time t1 = Time.newInstance(10, 0, 0, 0);
+            Time t2 = Time.newInstance(8, 30, 0, 0);
+
+            Double resultadoEsperado = 1.5;
+            Double resultadoReal = CC_MetodosUtiles.restarHoras(t1, t2);
+
+            System.assertEquals(resultadoEsperado, resultadoReal);
+        }
+    }
+
+    
+    @IsTest
+    public static void restarHorasTest2() {
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            DateTime t1 = DateTime.newInstance(2025, 7, 28, 10, 0, 0);
+            DateTime t2 = DateTime.newInstance(2025, 7, 28, 8, 30, 0);
+
+            Double resultadoEsperado = 1.5;
+            Double resultadoReal = CC_MetodosUtiles.restarHoras(t1, t2);
+
+            System.assertEquals(resultadoEsperado, resultadoReal);
+        }
+    }
+
+    @isTest
+    static void horariosPorCanalProcedenciaTest() {
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            Map<String, Map<String, List<Time>>> horarios = CC_MetodosUtiles.horariosPorCanalProcedencia();
+            System.assertNotEquals(null, horarios);
+        }
+    }
+    
+    
 }

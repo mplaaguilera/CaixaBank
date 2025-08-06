@@ -64,6 +64,16 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>sac_GenialView</componentName>
+                <identifier>c_sac_GenialView</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-e04b2799-bfd9-4943-a08e-918cb69d1292</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
                 <componentName>sAC_AsociarReclamacion</componentName>
                 <identifier>sAC_AsociarReclamacion</identifier>
             </componentInstance>
@@ -216,6 +226,43 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>detailTab</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-e04b2799-bfd9-4943-a08e-918cb69d1292</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Datos IA</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab2</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 OR 2 OR 3 OR 4</booleanFilter>
+                    <criteria>
+                        <leftValue>{!Record.SAC_GenialEstado__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>SAC_001</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SAC_GenialEstado__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>SAC_002</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SAC_GenialEstado__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>SAC_003</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SAC_GenialEstado__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>SAC_006</rightValue>
+                    </criteria>
+                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <itemInstances>

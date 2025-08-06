@@ -325,7 +325,7 @@ public class CC_Case_AU_TRHan_Test {
         Test.stopTest();
 
         System.assertEquals(1, [SELECT Count() FROM Task WHERE WhatId = :casoCAM.Id AND Type = 'Cerrado'
-                                AND Subject = 'Cerrado' AND ActivityDate = :System.today() AND CC_Detalles_Consulta__c = 'detalles consulta test2']);
+                                AND Subject = 'Cerrado' AND ActivityDate = :CBK_UtilsDate.todaySYS() AND CC_Detalles_Consulta__c = 'detalles consulta test2']);
 
 
     }
@@ -380,7 +380,7 @@ public class CC_Case_AU_TRHan_Test {
 
         List<Task> tareasReasignacion2 = [SELECT Id FROM Task WHERE WhatId = :caso2.Id AND Type = 'Reasignación'
                                             AND Subject = :('Reasignación del caso a ' + usuario4.FirstName + ' ' + usuario4.LastName)
-                                            AND ActivityDate = :System.today() AND Status = 'Completed'];
+                                            AND ActivityDate = :CBK_UtilsDate.todaySYS() AND Status = 'Completed'];
 
         System.assert(caso2 != null);
     }
@@ -644,4 +644,177 @@ public class CC_Case_AU_TRHan_Test {
 
         System.assertEquals(1, [SELECT Id FROM Task WHERE WhatId = :caso1.Id].size());
     }
+
+    @istest
+    static void test() {
+        // Crear Caracteristica principal
+        User admin = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1];
+        System.runAs(admin) {
+            // Crear una característica en desuso
+            CC_Caracteristica__c caracteristica = new CC_Caracteristica__c(
+                RecordTypeId = Schema.SObjectType.CC_Caracteristica__c.getRecordTypeInfosByDeveloperName().get('Marca').getRecordTypeId(),
+                Name = 'Test Característica',
+                CC_Descripcion__c = 'Test Característica',
+                CC_Fecha_vigencia_inicio__c= CBK_UtilsDate.todaySYS().addDays(-185),
+                CC_Fecha_vigencia_fin__c= CBK_UtilsDate.todaySYS().addDays(2)
+            );
+            insert caracteristica;
+
+            Account cuenta = new Account();
+            cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            cuenta.Name = 'Cuenta01';
+            Account cuentaCentro = new Account();
+            cuentaCentro.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+            cuentaCentro.Name = 'Centro Caixabank 1';
+			Account cuentaCentro2 = new Account();
+            cuentaCentro2.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+            cuentaCentro2.Name = 'Centro Caixabank 2';
+            Account cuentaCliente = new Account();
+            cuentaCliente.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            cuentaCliente.Name = 'Cliente 1';
+            Account cuentaCliente2 = new Account();
+            cuentaCliente2.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            cuentaCliente2.Name = 'Cliente 2';
+            insert new List<Account>{cuenta, cuentaCentro, cuentaCentro2, cuentaCliente, cuentaCliente2};
+
+            Contact cliente = new Contact();
+            cliente.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            cliente.AccountId = cuenta.Id;
+            cliente.FirstName = 'Contacto';
+            cliente.LastName = '01';
+            cliente.CC_NumPerso__c = '12345569';
+            cliente.CC_Idioma__c = 'Es';
+			Contact cliente2 = new Contact();
+            cliente2.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            cliente2.AccountId = cuenta.Id;
+            cliente2.FirstName = 'Contacto';
+            cliente2.LastName = '02';
+            cliente2.CC_NumPerso__c = '12345568';
+            cliente2.CC_Idioma__c = 'Es';
+            Contact empleado = new Contact();
+            empleado.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            empleado.AccountId = cuentaCentro.Id;
+            empleado.FirstName = 'Contacto';
+            empleado.LastName = '03';
+            empleado.CC_NumPerso__c = '12345570';
+            empleado.CC_Idioma__c = 'Es';
+			Contact empleado2 = new Contact();
+            empleado2.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            empleado2.AccountId = cuentaCentro.Id;
+            empleado2.FirstName = 'Contacto';
+            empleado2.LastName = '04';
+            empleado2.CC_NumPerso__c = '12345571';
+            empleado2.CC_Idioma__c = 'Es';
+            insert new List<Contact>{cliente, cliente2, empleado, empleado2};
+
+
+            
+            CC_Caracteristica_Detalle__c caracteristicaDetalle1 = new CC_Caracteristica_Detalle__c();
+            caracteristicaDetalle1.CC_Caracteristica__c = caracteristica.Id;
+            caracteristicaDetalle1.CC_Cliente__c = cliente.Id;
+            CC_Caracteristica_Detalle__c caracteristicaDetalle2 = new CC_Caracteristica_Detalle__c();
+            caracteristicaDetalle2.CC_Caracteristica__c = caracteristica.Id;
+            caracteristicaDetalle2.CC_Empleado__c = empleado.Id;
+            CC_Caracteristica_Detalle__c caracteristicaDetalleCuentaCentro = new CC_Caracteristica_Detalle__c();
+            caracteristicaDetalleCuentaCentro.CC_Caracteristica__c = caracteristica.Id;
+            caracteristicaDetalleCuentaCentro.CC_Centro_CaixaBank__c = cuentaCentro.Id;
+            CC_Caracteristica_Detalle__c caracteristicaDetalleCuentaCliente = new CC_Caracteristica_Detalle__c();
+            caracteristicaDetalleCuentaCliente.CC_Caracteristica__c = caracteristica.Id;
+            caracteristicaDetalleCuentaCliente.CC_Cuenta__c = cuentaCliente.Id;
+            // Crear 4 Caracteristicas Detalle
+            insert new List<CC_Caracteristica_Detalle__c>{
+                caracteristicaDetalle1,
+                caracteristicaDetalle2,
+                caracteristicaDetalleCuentaCentro,
+                caracteristicaDetalleCuentaCliente
+            };
+            //Creo casos
+            Case caso1 = new Case();
+            caso1.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            //Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            caso1.CC_Idioma__c = 'es';
+            caso1.Subject = 'Asunto';
+            caso1.Description = 'Descripción';
+            caso1.CC_Tipo_Contacto__c = 'Consulta';
+            caso1.CC_Canal_Procedencia__c = 'Accionista';
+            caso1.CC_Canal_Resolucion__c = 'Accionista';
+            caso1.CC_Canal_Operativo__c = 'App CaixaBankPay';
+            caso1.Origin = 'Email';
+            caso1.Status = 'Activo';
+			caso1.CC_Admin__c = true;
+            caso1.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            caso1.CC_Detalles_Solucion__c = 'Detalles Solución';
+            Case caso2 = new Case();
+            caso2.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            //Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            caso2.CC_Idioma__c = 'es';
+            caso2.Subject = 'Asunto';
+            caso2.Description = 'Descripción';
+            caso2.CC_Tipo_Contacto__c = 'Consulta';
+            caso2.CC_Canal_Procedencia__c = 'Accionista';
+            caso2.CC_Canal_Resolucion__c = 'Accionista';
+            caso2.CC_Canal_Operativo__c = 'App CaixaBankPay';
+            caso2.Origin = 'Email';
+            caso2.Status = 'Activo';
+			caso2.CC_Admin__c = true;
+            caso2.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            caso2.CC_Detalles_Solucion__c = 'Detalles Solución';
+            Case caso3 = new Case();
+            caso3.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+            //Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso3.CC_Idioma__c = 'es';
+            caso3.Subject = 'Asunto';
+            caso3.Description = 'Descripción';
+            caso3.CC_Tipo_Contacto__c = 'Consulta';
+            caso3.CC_Canal_Procedencia__c = 'Formulario Consultas Operativas';
+            caso3.CC_Canal_Resolucion__c = 'Domiciliaciones';
+            caso3.CC_Canal_Operativo__c = 'App CaixaBankPay';
+            caso3.Origin = 'Email';
+            caso3.Status = 'Activo';
+			caso3.CC_Admin__c = true;
+            caso3.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            caso3.CC_Detalles_Solucion__c = 'Detalles Solución';
+            Case caso4 = new Case();
+            caso4.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+            //Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            caso4.CC_Idioma__c = 'es';
+            caso4.Subject = 'Asunto';
+            caso4.Description = 'Descripción';
+            caso4.CC_Tipo_Contacto__c = 'Consulta';
+            caso4.CC_Canal_Procedencia__c = 'Formulario Consultas Operativas';
+            caso4.CC_Canal_Resolucion__c = 'Domiciliaciones';
+            caso4.CC_Canal_Operativo__c = 'App CaixaBankPay';
+            caso4.Origin = 'Email';
+            caso4.Status = 'Activo';
+			caso4.CC_Admin__c = true;
+            caso4.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            caso4.CC_Detalles_Solucion__c = 'Detalles Solución';
+            insert new List<Case>{caso1, caso2, caso3, caso4};
+
+            Test.startTest();
+            caso1.AccountId = cuentaCentro.Id;
+            caso1.ContactId = cliente.Id;
+            caso2.AccountId = cuentaCentro2.Id;
+            caso2.ContactId = cliente2.Id;
+            caso3.AccountId = cuentaCliente.Id;
+            caso3.ContactId = empleado.Id;
+            caso4.AccountId = cuentaCliente2.Id;
+            caso4.ContactId = empleado2.Id;
+            update new List<Case>{caso1, caso2, caso3, caso4};
+            
+            Map<Id,Contact> mapContactos = new Map<Id,Contact>([SELECT Id, CC_Tiene_Caracteristica_Detalle__c FROM Contact WHERE Id IN :new List<Id>{cliente.Id, empleado.Id, cliente2.Id, empleado2.Id}]);
+            Map<Id,Account> mapCuentas = new Map<Id,Account>([SELECT Id, CC_Tiene_Caracteristica_Detalle__c FROM Account WHERE Id IN :new List<Id>{cuentaCentro.Id, cuentaCentro2.Id, cuentaCliente.Id, cuentaCliente2.Id}]);
+            System.assertEquals(true, mapContactos.get(cliente.Id).CC_Tiene_Caracteristica_Detalle__c, 'El contacto cliente 1 tiene la característica detalle');
+            System.assertEquals(false, mapContactos.get(cliente2.Id).CC_Tiene_Caracteristica_Detalle__c, 'El contacto cliente 2 no tiene la característica detalle');
+            System.assertEquals(true, mapContactos.get(empleado.Id).CC_Tiene_Caracteristica_Detalle__c, 'El contacto empleado 1 no tiene la característica detalle');  
+            System.assertEquals(false, mapContactos.get(empleado2.Id).CC_Tiene_Caracteristica_Detalle__c, 'El contacto empleado 2 tiene la característica detalle');
+            System.assertEquals(false, mapCuentas.get(cuentaCentro.Id).CC_Tiene_Caracteristica_Detalle__c, 'La cuenta centro 1 tiene la característica detalle');
+            System.assertEquals(false, mapCuentas.get(cuentaCentro2.Id).CC_Tiene_Caracteristica_Detalle__c, 'La cuenta centro 2 tiene la característica detalle');
+            System.assertEquals(true, mapCuentas.get(cuentaCliente.Id).CC_Tiene_Caracteristica_Detalle__c, 'La cuenta cliente 1 tiene la característica detalle');
+            System.assertEquals(false, mapCuentas.get(cuentaCliente2.Id).CC_Tiene_Caracteristica_Detalle__c, 'La cuenta cliente 2 tiene la característica detalle');
+            Test.stopTest(); 
+            
+        }
+    }
+
 }

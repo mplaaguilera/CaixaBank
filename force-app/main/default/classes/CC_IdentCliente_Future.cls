@@ -581,7 +581,151 @@ public with sharing class CC_IdentCliente_Future {
     */
     static public Map<String,Object> IdentificarPersALFSync (String sTipoBusqueda, String sBusqueda)
     {
-        return IdentificarPersALFSync_CC(sTipoBusqueda, sBusqueda, false);
+        Map<String,Object> oRes = new Map<String,Object>();
+        // Si no hay datos, salir.
+        if (sBusqueda == '' || sBusqueda == null || sTipoBusqueda == '' || sTipoBusqueda == null)
+        {
+            return null;
+        }
+
+        // Búsqueda datos en Alfabético (Síncrono).
+        Map<String, String> oNumDoc = new Map<String, String>();
+        String sALFBusqueda = sTipoBusqueda;
+        Boolean bBuscar = true;
+
+        if (sALFBusqueda == 'DOC' || sALFBusqueda == 'TEL')
+            {sALFBusqueda = 'DATA' + sALFBusqueda;}
+        else if (sALFBusqueda == 'NP')
+        {
+            sALFBusqueda = 'Cliente';
+
+            // Las búsquedas por NumPerso son automáticas, incorporar si se ha de realizar llamada a ALF por fecha de refresco.
+            Set<String> oNumPerIni = new Set<String>();
+            oNumPerIni.add(sBusqueda);
+            Set<String> oNumPerAct = getNumPerSinActualizar (oNumPerIni);
+
+            if (oNumPerAct.isEmpty())
+            {
+                // NumPer Actualizado.
+                bBuscar = false;
+            }
+        }
+
+        if (bBuscar)
+        {
+            oNumDoc.put(sBusqueda,sALFBusqueda);
+            CC_IdentCliente_Future.CallUpdatePERSALFSync(oNumDoc);
+        }
+
+        // Tras refrescar la información, buscar datos en la BBDD.
+        List<Contact> oContactos = new List<Contact>();
+        List<Account> oCuentas = new List<Account>();
+        List<Contact> oRepresentantes = new List<Contact>();
+
+        if (sTipoBusqueda == 'DOC')
+        {
+            // Buscar en cuentas (aquellos que no hemos encontrado en contactos)
+            String sRecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            String sClientePARecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
+            List<Account> cuentas = [SELECT Id, Name, AV_Cliente__c, CreatedDate FROM Account WHERE CC_Numero_Documento__c = :sBusqueda AND CC_NumPerso__c <> null AND (RecordTypeId = :sRecordType OR RecordTypeId = :sClientePARecordType)];
+ 
+            List<Account> cuentasConAV = new List<Account>();
+            List<Account> cuentasSinAV = new List<Account>();
+            
+            for (Account cuenta : cuentas) {
+                if (cuenta.AV_Cliente__c == True) {
+                    cuentasConAV.add(cuenta);
+                } else {
+                    cuentasSinAV.add(cuenta);
+                }
+            }
+            
+            if (cuentasConAV.size() > 0) {
+                if (cuentasConAV.size() > 1) {
+                    Account cuentaMasReciente = cuentasConAV[0];
+                    for (Account cuenta : cuentasConAV) {
+                        if (cuenta.CreatedDate > cuentaMasReciente.CreatedDate) {
+                            cuentaMasReciente = cuenta;
+                        }
+                    }
+                    oCuentas = new List<Account>{cuentaMasReciente};
+                } else {
+                    oCuentas = cuentasConAV;
+                }
+            } else if (cuentasSinAV.size() > 0) {
+                Account cuentaMasReciente = cuentasSinAV[0];
+                for (Account cuenta : cuentasSinAV) {
+                    if (cuenta.CreatedDate > cuentaMasReciente.CreatedDate) {
+                        cuentaMasReciente = cuenta;
+                    }
+                }
+                oCuentas = new List<Account>{cuentaMasReciente};
+            }                            
+        }else if (sTipoBusqueda == 'TEL') {
+            // Buscar en canales de comunicación.
+            String sRecordType = Schema.SObjectType.CC_Canal_Com__c.getRecordTypeInfosByDeveloperName().get('CC_Telefono').getRecordTypeId();
+            sBusqueda = '%' + sBusqueda;
+            List<CC_Canal_Com__c> oCanales = [SELECT Id, CC_CuentaId__c, CC_ContactoId__c FROM CC_Canal_Com__c WHERE CC_TelefonoIDX__c LIKE :sBusqueda AND RecordTypeId = :sRecordType];
+
+            Set<String> oIDs = new Set<String>();
+            for (CC_Canal_Com__c oCanal : oCanales)
+            {
+                if (oCanal.CC_ContactoId__c != null)
+                    {oIDs.add(oCanal.CC_ContactoId__c);}
+
+                if (oCanal.CC_CuentaId__c != null)
+                    {oIDs.add(oCanal.CC_CuentaId__c);}
+            }
+
+            // Buscar en contactos.
+            //sRecordType = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            //oContactos = [SELECT Id, AccountId, Name, Account.Name FROM Contact WHERE Id IN :oIDs AND CC_NumPerso__c <> null AND RecordTypeId = :sRecordType];
+
+            // Buscar en cuentas (aquellos que no hemos encontrado en contactos)
+            sRecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            String sClientePARecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
+            oCuentas = [SELECT Id, Name FROM Account WHERE Id = :oIDs AND CC_NumPerso__c <> null AND (RecordTypeId = :sRecordType OR RecordTypeId = :sClientePARecordType)];
+        }else if (sTipoBusqueda == 'NP') {
+            // Buscar en cuentas.
+            String sClienteRecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            String sClientePARecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
+            oCuentas = [SELECT Id, Name FROM Account WHERE CC_NumPerso__c = :sBusqueda AND (RecordTypeId = :sClienteRecordType OR RecordTypeId = :sClientePARecordType)];
+            // Buscar contactos de la cuenta.
+            List<ID> oAuxCli = new List<ID>();
+            for (Account oCliente : oCuentas)
+            {
+                oAuxCli.add(oCliente.Id);
+            }
+
+            //sRecordType = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            //oContactos = [SELECT Id, AccountId, Name, Account.Name FROM Contact WHERE AccountId IN :oAuxCli AND RecordTypeId = :sRecordType];
+            String sRTRep = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Representante').getRecordTypeId();
+            oContactos = [SELECT Id, AccountId, Name, Account.Name
+                            FROM Contact
+                            WHERE AccountId IN :oAuxCli
+                            AND RecordTypeId <> :sRTRep];
+
+            // Modificación para representantes e identificación de llamadas automática.
+            oRepresentantes = [SELECT Id, AccountId, Name, Account.Name
+                                FROM Contact
+                                WHERE CC_CuentaRepresentada__c IN :oAuxCli
+                                AND RecordTypeId = :sRTRep];
+        }
+
+        // Devolver los datos encontrados.
+        if (!oContactos.isEmpty())
+        {
+            oRes.put('CONTACTOS', oContactos);
+        }
+        oRes.put('CUENTAS', oCuentas);
+
+        if (!oRepresentantes.isEmpty())
+        {
+            oRes.put('REPRESENTANTES', oRepresentantes);
+        }
+
+
+        return oRes;
     }
 
     /*
@@ -2419,168 +2563,5 @@ public with sharing class CC_IdentCliente_Future {
     static public void IdentificarPersALFASynchronous (String sTipoBusqueda, String sBusqueda)
     {
         Map<String,Object> oRes = IdentificarPersALFSync (sTipoBusqueda, sBusqueda);
-    }
-
-    // MGT US1194447: Identificación de clientes con clientes duplicados
-    static public Map<String,Object> IdentificarPersALFSync_CC (String sTipoBusqueda, String sBusqueda, Boolean limpiarDuplicados)
-    {
-        Map<String,Object> oRes = new Map<String,Object>();
-        // Si no hay datos, salir.
-        if (sBusqueda == '' || sBusqueda == null || sTipoBusqueda == '' || sTipoBusqueda == null)
-        {
-            return null;
-        }
-
-        // Búsqueda datos en Alfabético (Síncrono).
-        Map<String, String> oNumDoc = new Map<String, String>();
-        String sALFBusqueda = sTipoBusqueda;
-        Boolean bBuscar = true;
-
-        if (sALFBusqueda == 'DOC' || sALFBusqueda == 'TEL')
-            {sALFBusqueda = 'DATA' + sALFBusqueda;}
-        else if (sALFBusqueda == 'NP')
-        {
-            sALFBusqueda = 'Cliente';
-
-            // Las búsquedas por NumPerso son automáticas, incorporar si se ha de realizar llamada a ALF por fecha de refresco.
-            Set<String> oNumPerIni = new Set<String>();
-            oNumPerIni.add(sBusqueda);
-            Set<String> oNumPerAct = getNumPerSinActualizar (oNumPerIni);
-
-            if (oNumPerAct.isEmpty())
-            {
-                // NumPer Actualizado.
-                bBuscar = false;
-            }
-        }
-
-        if (bBuscar)
-        {
-            oNumDoc.put(sBusqueda,sALFBusqueda);
-            CC_IdentCliente_Future.CallUpdatePERSALFSync(oNumDoc);
-        }
-
-        // Tras refrescar la información, buscar datos en la BBDD.
-        List<Contact> oContactos = new List<Contact>();
-        List<Account> oCuentas = new List<Account>();
-        List<Contact> oRepresentantes = new List<Contact>();
-
-        if (sTipoBusqueda == 'DOC')
-            {
-                // Buscar en cuentas (aquellos que no hemos encontrado en contactos)
-                String sRecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-                String sClientePARecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
-                List<Account> cuentas = [SELECT Id, Name, AV_Cliente__c, CreatedDate FROM Account WHERE CC_Numero_Documento__c = :sBusqueda AND CC_NumPerso__c <> null AND (RecordTypeId = :sRecordType OR RecordTypeId = :sClientePARecordType)];
-                
-                if (limpiarDuplicados) {
-                    system.debug('***DOC');
-                    
-                    List<Account> cuentasConAV = new List<Account>();
-                    List<Account> cuentasSinAV = new List<Account>();
-                    
-                    for (Account cuenta : cuentas) {
-                        if (cuenta.AV_Cliente__c == True) {
-                            cuentasConAV.add(cuenta);
-                        } else {
-                            cuentasSinAV.add(cuenta);
-                        }
-                    }
-                    
-                    if (cuentasConAV.size() > 0) {
-                        if (cuentasConAV.size() > 1) {
-                            Account cuentaMasReciente = cuentasConAV[0];
-                            for (Account cuenta : cuentasConAV) {
-                                if (cuenta.CreatedDate > cuentaMasReciente.CreatedDate) {
-                                    cuentaMasReciente = cuenta;
-                                }
-                            }
-                            oCuentas = new List<Account>{cuentaMasReciente};
-                        } else {
-                            oCuentas = cuentasConAV;
-                        }
-                    } else if (cuentasSinAV.size() > 0) {
-                        Account cuentaMasReciente = cuentasSinAV[0];
-                        for (Account cuenta : cuentasSinAV) {
-                            if (cuenta.CreatedDate > cuentaMasReciente.CreatedDate) {
-                                cuentaMasReciente = cuenta;
-                            }
-                        }
-                        oCuentas = new List<Account>{cuentaMasReciente};
-                    }                
-                    
-                    system.debug('***oCuentas'+oCuentas);
-                } else {
-                    system.debug('***DOC');
-                    // Buscar en contactos.
-                    //String sRecordType = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-                    //oContactos = [SELECT Id, AccountId, Name, Account.Name FROM Contact WHERE Account.CC_Numero_Documento__c = :sBusqueda AND Account.CC_NumPerso__c <> null AND RecordTypeId = :sRecordType];
-
-                    oCuentas = cuentas;
-                    system.debug('***oCuentas'+oCuentas);
-                }               
-            } else if (sTipoBusqueda == 'TEL') {
-            // Buscar en canales de comunicación.
-            String sRecordType = Schema.SObjectType.CC_Canal_Com__c.getRecordTypeInfosByDeveloperName().get('CC_Telefono').getRecordTypeId();
-            sBusqueda = '%' + sBusqueda;
-            List<CC_Canal_Com__c> oCanales = [SELECT Id, CC_CuentaId__c, CC_ContactoId__c FROM CC_Canal_Com__c WHERE CC_TelefonoIDX__c LIKE :sBusqueda AND RecordTypeId = :sRecordType];
-
-            Set<String> oIDs = new Set<String>();
-            for (CC_Canal_Com__c oCanal : oCanales)
-            {
-                if (oCanal.CC_ContactoId__c != null)
-                    {oIDs.add(oCanal.CC_ContactoId__c);}
-
-                if (oCanal.CC_CuentaId__c != null)
-                    {oIDs.add(oCanal.CC_CuentaId__c);}
-            }
-
-            // Buscar en contactos.
-            //sRecordType = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-            //oContactos = [SELECT Id, AccountId, Name, Account.Name FROM Contact WHERE Id IN :oIDs AND CC_NumPerso__c <> null AND RecordTypeId = :sRecordType];
-
-            // Buscar en cuentas (aquellos que no hemos encontrado en contactos)
-            sRecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-            String sClientePARecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
-            oCuentas = [SELECT Id, Name FROM Account WHERE Id = :oIDs AND CC_NumPerso__c <> null AND (RecordTypeId = :sRecordType OR RecordTypeId = :sClientePARecordType)];
-        }else if (sTipoBusqueda == 'NP') {
-            // Buscar en cuentas.
-            String sClienteRecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-            String sClientePARecordType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
-            oCuentas = [SELECT Id, Name FROM Account WHERE CC_NumPerso__c = :sBusqueda AND (RecordTypeId = :sClienteRecordType OR RecordTypeId = :sClientePARecordType)];
-            // Buscar contactos de la cuenta.
-            List<ID> oAuxCli = new List<ID>();
-            for (Account oCliente : oCuentas)
-            {
-                oAuxCli.add(oCliente.Id);
-            }
-
-            //sRecordType = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-            //oContactos = [SELECT Id, AccountId, Name, Account.Name FROM Contact WHERE AccountId IN :oAuxCli AND RecordTypeId = :sRecordType];
-            String sRTRep = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Representante').getRecordTypeId();
-            oContactos = [SELECT Id, AccountId, Name, Account.Name
-                            FROM Contact
-                            WHERE AccountId IN :oAuxCli
-                            AND RecordTypeId <> :sRTRep];
-
-            // Modificación para representantes e identificación de llamadas automática.
-            oRepresentantes = [SELECT Id, AccountId, Name, Account.Name
-                                FROM Contact
-                                WHERE CC_CuentaRepresentada__c IN :oAuxCli
-                                AND RecordTypeId = :sRTRep];
-        }
-
-        // Devolver los datos encontrados.
-        if (!oContactos.isEmpty())
-        {
-            oRes.put('CONTACTOS', oContactos);
-        }
-        oRes.put('CUENTAS', oCuentas);
-
-        if (!oRepresentantes.isEmpty())
-        {
-            oRes.put('REPRESENTANTES', oRepresentantes);
-        }
-
-        return oRes;
     }
 }

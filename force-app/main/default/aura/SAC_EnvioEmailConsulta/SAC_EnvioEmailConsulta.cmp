@@ -9,12 +9,16 @@
     <aura:attribute name="caso"  type="Case"/>
     <aura:attribute name="recordId"  type="String"/>
     <aura:attribute name="esReclamacionoPretension"  type="Boolean" default="false"/>
+    <aura:attribute name="esSupervisores"  type="Boolean" default="false"/>
     <aura:attribute name="isLoading" type="Boolean" default="false" />
     <aura:attribute name="modalSeleccion" type="Boolean" default="false"/>
+    <aura:attribute name="modalReclamantes" type="Boolean" default="false"/>
     <aura:attribute name="derivacionOconsulta" type="String"/>
+    <aura:attribute name="reclamanteSelected" type="SAC_CaseReclamante__c"/>
 
     <aura:attribute name="grupos" type="CC_Grupo_Colaborador__c[]"/>
     <aura:attribute name="options" type="List"/>
+    <aura:attribute name="reclamantesOptions" type="List" />
     <aura:attribute name="grupoAbuscar"   type="String" default=""/>
     <aura:attribute name="grupoAbuscarId"   type="Id"/>
     <aura:attribute name="value" type="String" default="" />
@@ -58,6 +62,28 @@
             <lightning:button variant="brand" label="Grupos de consulta" title="Grupos de consulta" onclick="{!c.abrirModalGruposConsulta}" /> 
         </div>
     </aura:if>
+
+    
+<!-- picklistSupervisaores-->
+    <aura:if isTrue="{!v.esSupervisores}">
+    <div class="slds-grid slds-gutters slds-align_absolute-center slds-p-top_x-large">
+        <div class="slds-col slds-size_1-of-4 slds-text-align_right slds-p-right_small">
+            <label class="slds-form-element__label" for="grpuosLetrado">Reclamante</label>
+        </div>
+        <div class="slds-col slds-size_1-of-4">
+            <lightning:combobox aura:id="grpuosLetrado"
+                                name="Grupos"
+                                placeholder="-Select-"
+                                value="{!v.reclamanteSelected}"
+                                options="{!v.reclamantesOptions}" 
+                                />
+        </div>
+        
+            <lightning:button variant="brand" label="Enviar reclamante" title="Grupos de derivación" onclick="{!c.abrirModalEmailReclamante}" />
+
+    </div>
+    <br/>
+</aura:if>
 
     <aura:if isTrue="{!v.modalSeleccion}">
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open  "> <!-- slds-modal_small -->
@@ -135,6 +161,25 @@
                     <div class="slds-float--left slds-p-top_x-large">
                         <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalSeleccion }" />
                     </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.modalReclamantes}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open  "> <!-- slds-modal_small -->
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">  
+                    <lightning:buttonIcon iconName="utility:close" onclick="{!c.ocultaModalReclamantes}" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />                  
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Envio email reclamante</h2>                     
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 
+                    <!-- NO existen grupos de derivacion o de consultas -->    <!-- AQUI VA TODO LO DE METER EL BUSCADOR IGUAL QUE ESTA EN DERIVAR --> 
+                    <c:SAC_GestionEmails recordId="{!v.recordId}" para="{!v.para}" copia="{!v.CC}" asunto="{!v.asunto}" cuerpo="{!v.cuerpo}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}"/>
                 </div>
             </div>
         </section>

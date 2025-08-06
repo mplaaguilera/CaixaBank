@@ -1,73 +1,74 @@
 <template>
 
-	<template lwc:if={banners.length}>
-		<article lwc:ref="cardBanners" lwc:if={_verBanners} class="slds-card cardBanners oculto">
-			<div class="slds-card__body slds-is-relative" style="margin: unset;">
+  <template lwc:if={banners.length}>
+    <article lwc:ref="cardBanners" lwc:if={_verBanners} class="slds-card cardBanners oculto">
+      <div class="slds-card__body slds-is-relative" style="margin: unset;">
 
-				<div class="botonCambiarVista">
+        <div class="botonCambiarVista">
 					<!--sldsValidatorIgnoreNextLine-->
 					<lightning-button-icon icon-name="utility:collection_alt" size="x-small" variant="border" onclick={cambiarTipoVista}></lightning-button-icon>
-				</div>
+        </div>
 
-				<template iterator:banner={banners}>
-					<c-csbd_-banner
-						key={banner.value.idBanner}
-						id-banner={banner.value.idBanner}
-						record-id={recordId}
-						icon-name={banner.value.iconName}
-						texto={banner.value.texto}
-						enlace={banner.value.enlace}
-						click-to-dial-num-telefono={banner.value.clickToDialNumTelefono}
-						background-color={banner.value.backgroundColor}
-						color={banner.value.color}
-						descartable={banner.value.descartable}
-						lista
-						lista-primero={banner.first}
-						lista-ultimo={banner.last}
-						onenlaceonclick={bannerEnlaceOnclick}
-						oncerrarbanner={cerrarBanner}>
-					</c-csbd_-banner>
-				</template>
-			</div>
-		</article>
+        <template iterator:banner={banners}>
+			<c-csbd_-banner
+				key={banner.value.idBanner}
+				id-banner={banner.value.idBanner}
+				record-id={recordId}
+				icon-name={banner.value.iconName}
+				texto={banner.value.texto}
+				enlace={banner.value.enlace}
+				click-to-dial-num-telefono={banner.value.clickToDialNumTelefono}
+				background-color={banner.value.backgroundColor}
+				color={banner.value.color}
+				descartable={banner.value.descartable}
+				lista
+				lista-primero={banner.first}
+				lista-ultimo={banner.last}
+				onenlaceonclick={bannerEnlaceOnclick}
+				oncerrarbanner={cerrarBanner}>
+			</c-csbd_-banner>
+        </template>
+
+      </div>
+    </article>
 
 
-		<div lwc:ref="pillContainer" lwc:else class="slds-pill_container pillContainer oculto">
-			<template iterator:banner={banners}>
+    <div lwc:ref="pillContainer" lwc:else class="slds-pill_container pillContainer oculto">
+      <template iterator:banner={banners}>
 				<span key={banner.value.idBanner} class="pillContainerItem" data-background-color={banner.value.backgroundColor} onmouseenter={pillContainerItemOnmouseenter} onmouseleave={pillContainerItemOnmouseleave} data-id-banner={banner.value.idBanner}>
-					<div class="pillPopover pillPopoverOculto" role="tooltip">
-						<div class="slds-popover__body">
-							<c-csbd_-banner
-								id-banner={banner.value.idBanner}
-								record-id={recordId}
-								icon-size="x-small"
-								icon-name={banner.value.iconName}
-								texto={banner.value.texto}
-								enlace={banner.value.enlace}
-								click-to-dial-num-telefono={banner.value.clickToDialNumTelefono}
-								background-color={banner.value.backgroundColor}
-								color={banner.value.color}
-								onenlaceonclick={bannerEnlaceOnclick}>
-							</c-csbd_-banner>
-						</div>
-					</div>
+          <div class="pillPopover pillPopoverOculto" role="tooltip">
+            <div class="slds-popover__body">
+              <c-csbd_-banner
+                id-banner={banner.value.idBanner}
+                record-id={recordId}
+                icon-size="x-small"
+                icon-name={banner.value.iconName}
+                texto={banner.value.texto}
+                enlace={banner.value.enlace}
+                click-to-dial-num-telefono={banner.value.clickToDialNumTelefono}
+                background-color={banner.value.backgroundColor}
+                color={banner.value.color}
+                onenlaceonclick={bannerEnlaceOnclick}>
+              </c-csbd_-banner>
+            </div>
+          </div>
 
-					<c-csbd_-pill
-						label={banner.value.pillLabel}
-						icon-name={banner.value.pillIconName}
-						background-color={banner.value.backgroundColor}
-						color={banner.value.color}>
-					</c-csbd_-pill>
+          <c-csbd_-pill
+            label={banner.value.pillLabel}
+            icon-name={banner.value.pillIconName}
+            background-color={banner.value.backgroundColor}
+            color={banner.value.color}>
+          </c-csbd_-pill>
 
-				</span>
+        </span>
 
 				<!--Boton para cambiar a la lista de banners-->
-				<div key={banner.value.idBanner} lwc:if={banner.last} class="botonCambiarVista">
+        <div key={banner.value.idBanner} lwc:if={banner.last} class="botonCambiarVista">
 					<!--sldsValidatorIgnoreNextLine-->
 					<lightning-button-icon icon-name="utility:collection_alt" size="x-small" variant="border" onclick={cambiarTipoVista}></lightning-button-icon>
-				</div>
-			</template>
-		</div>
-	</template>
+        </div>
+      </template>
+    </div>
+  </template>
 
 </template>

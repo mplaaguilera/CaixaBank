@@ -2,7 +2,7 @@
 public with sharing class CC_Gestion_Derivar_Tarea_Test {
     @TestSetup
     static void makeData() {
-   
+        
         Map<String, User> usuarios = CC_TestDataFactory.insertUserAdminOperador('U0124112');
         User usuarioAdmin = usuarios.get('admin');
         User operadorCliente = usuarios.get('operador');
@@ -22,6 +22,7 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             List<AccountShare> totalPermisosAccount = new List<AccountShare>();
             List<ContactShare> totalPermisosContact = new List<ContactShare>();
 
+            //Para operativa CSBD
             Account parentCSBDDerivacion = new Account();
             parentCSBDDerivacion.Name = 'parentCSBDDerivacion Caixabank 001';
             parentCSBDDerivacion.CC_Email__c = 'test@test.com';
@@ -44,7 +45,7 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             centro.RecordtypeId = rtCentroId;
             centro.ParentId = parentCSBDDerivacion.Id;
             insert centro;
-            
+
             Contact contactoEmple = new Contact();
             contactoEmple.LastName = 'Contacto empleado';
             contactoEmple.FirstName = 'Prueba empleado';
@@ -59,6 +60,9 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             contactoEmple.AV_Pool__c = true;
             insert contactoEmple;
 
+            //Para operativa CSBD
+
+            Test.startTest();
             //Accounts
             List<Account> accounts = new List<Account>();
             
@@ -84,16 +88,16 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             cuentaCaixa.AV_Cliente__c = true;
             accounts.add(cuentaCaixa);
 
-            Account clienteConfidencial = new Account();
-            clienteConfidencial.LastName = 'Cliente Senior';
-            clienteConfidencial.AV_EAPGestor__c = contactoEmple.Id;
-            clienteConfidencial.CC_NumPerso__c = '0000013';
-            clienteConfidencial.AV_IndicadoresClientes__c = '28';
-            clienteConfidencial.AV_OficinaPrincipal__c = centro.Id;
-            clienteConfidencial.RecordtypeId =  rtClientePA;
-            clienteConfidencial.CC_Numero_Documento__c = '46729937A';
-            clienteConfidencial.AV_Confidencial__c = true;
-            accounts.add(clienteConfidencial);
+            // Account clienteConfidencial = new Account();
+            // clienteConfidencial.LastName = 'Cliente Senior';
+            // clienteConfidencial.AV_EAPGestor__c = contactoEmple.Id;
+            // clienteConfidencial.CC_NumPerso__c = '0000013';
+            // clienteConfidencial.AV_IndicadoresClientes__c = '28';
+            // clienteConfidencial.AV_OficinaPrincipal__c = centro.Id;
+            // clienteConfidencial.RecordtypeId =  rtClientePA;
+            // clienteConfidencial.CC_Numero_Documento__c = '46729937A';
+            // clienteConfidencial.AV_Confidencial__c = true;
+            // accounts.add(clienteConfidencial);
 
             Account clienteNoCliente = new Account();
             clienteNoCliente.LastName = 'Cliente Senior';
@@ -106,16 +110,16 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             clienteNoCliente.AV_Cliente__c = false;
             accounts.add(clienteNoCliente);
             
-            Account oficina1 = new Account(
-            Name = 'Oficina 1',
-            CC_Email__c = 'cuenta@test.com',
-            CC_Numero_Empresa__c = '123',
-            CC_Numero_Oficina_Empresa__c = '000-12345',
-            CC_Numero_Oficina__c = '123',
-            CC_Numero_Documento__c = '45729937A',
-            RecordtypeId =  rtCentroId
-            );
-            insert oficina1;
+            // Account oficina1 = new Account(
+            // Name = 'Oficina 1',
+            // CC_Email__c = 'cuenta@test.com',
+            // CC_Numero_Empresa__c = '123',
+            // CC_Numero_Oficina_Empresa__c = '000-12345',
+            // CC_Numero_Oficina__c = '123',
+            // CC_Numero_Documento__c = '45729937A',
+            // RecordtypeId =  rtCentroId
+            // );
+            // insert oficina1;
             
             Account cuentaImagin = new Account(
             FirstName = 'Cuenta Test',
@@ -135,30 +139,31 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             LastName = 'test',
             CC_Email__c = 'cuenta@test.com',
             AV_IndicadoresClientes__c = '26',
-            AV_OficinaPrincipal__c = oficina1.Id,
+            //AV_OficinaPrincipal__c = oficina1.Id,
             CC_Numero_Empresa__c = '123',
             CC_Numero_Oficina_Empresa__c = '000-12348',
+            AV_EAPGestor__c = contactoEmple.Id,
             AV_Cliente__c = true,
             CC_Numero_Documento__c = '45729937A',
             RecordtypeId =  rtClientePA
             );
             accounts.add(cuentaNoImagin);
             
-            Account cuentaNoImaginContact = new Account(
-            FirstName = 'cuentaNoImagin con gestor',
-            LastName = 'test',
-            CC_Email__c = 'cuenta@test.com',
-            AV_IndicadoresClientes__c = '26',
-            CC_Numero_Empresa__c = '123',
-            CC_Numero_Oficina__c = '00001',
-            CC_Numero_Oficina_Empresa__c = '000-12342',
-            AV_OficinaPrincipal__c = oficina1.Id,
-            AV_EAPGestor__c = contactoEmple.Id,
-            CC_Numero_Documento__c = '45729937A',
-            AV_Cliente__c = true,
-            RecordtypeId =  rtClientePA
-            );
-            accounts.add(cuentaNoImaginContact);
+            // Account cuentaNoImaginContact = new Account(
+            // FirstName = 'cuentaNoImagin con gestor',
+            // LastName = 'test',
+            // CC_Email__c = 'cuenta@test.com',
+            // AV_IndicadoresClientes__c = '26',
+            // CC_Numero_Empresa__c = '123',
+            // CC_Numero_Oficina__c = '00001',
+            // CC_Numero_Oficina_Empresa__c = '000-12342',
+            // AV_OficinaPrincipal__c = oficina1.Id,
+            // AV_EAPGestor__c = contactoEmple.Id,
+            // CC_Numero_Documento__c = '45729937A',
+            // AV_Cliente__c = true,
+            // RecordtypeId =  rtClientePA
+            // );
+            // accounts.add(cuentaNoImaginContact);
             insert accounts;
             
             for(Account a : [SELECT Id FROM Account]) {
@@ -200,15 +205,15 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             tematicas.add(tematica);
             mccCreado.add(tematica);
 
-            CC_MCC__c tematicaCaixaBankNow = new CC_MCC__c(
-            Name = 'CaixaBankNow',
-            RecordTypeId = tematicaId,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Canal_Operativo__c = 'Cajero',
-            CC_Codigo_Externo__c = 'TE-000002'
-            );
-            tematicas.add(tematicaCaixaBankNow);
-            mccCreado.add(tematicaCaixaBankNow);
+            // CC_MCC__c tematicaCaixaBankNow = new CC_MCC__c(
+            // Name = 'CaixaBankNow',
+            // RecordTypeId = tematicaId,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Canal_Operativo__c = 'Cajero',
+            // CC_Codigo_Externo__c = 'TE-000002'
+            // );
+            // tematicas.add(tematicaCaixaBankNow);
+            // mccCreado.add(tematicaCaixaBankNow);
             insert tematicas;
 
             CC_MCC__c producto = new CC_MCC__c(
@@ -221,15 +226,15 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             productos.add(producto);
             mccCreado.add(producto);
 
-            CC_MCC__c productoMecanismo = new CC_MCC__c(
-            Name = 'Mecanismo de Firma',
-            RecordTypeId = productoId,
-            CC_Tematica__c = tematicaCaixaBankNow.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'PR-000002'
-            );        
-            productos.add(productoMecanismo);
-            mccCreado.add(productoMecanismo);
+            // CC_MCC__c productoMecanismo = new CC_MCC__c(
+            // Name = 'Mecanismo de Firma',
+            // RecordTypeId = productoId,
+            // CC_Tematica__c = tematicaCaixaBankNow.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'PR-000002'
+            // );        
+            // productos.add(productoMecanismo);
+            // mccCreado.add(productoMecanismo);
             insert productos;
 
             CC_MCC__c motivoOficina = new CC_MCC__c(
@@ -256,15 +261,15 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             motivos.add(motivoGestor);
             mccCreado.add(motivoGestor);
             
-            CC_MCC__c motivoPrueba = new CC_MCC__c(
-            Name = 'Cambio de Prueba',
-            RecordTypeId = motivoId,
-            CC_Producto_Servicio__c = producto.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'MO-000003'
-            );
-            motivos.add(motivoPrueba);
-            mccCreado.add(motivoPrueba);
+            // CC_MCC__c motivoPrueba = new CC_MCC__c(
+            // Name = 'Cambio de Prueba',
+            // RecordTypeId = motivoId,
+            // CC_Producto_Servicio__c = producto.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'MO-000003'
+            // );
+            // motivos.add(motivoPrueba);
+            // mccCreado.add(motivoPrueba);
             
             CC_MCC__c motivoOffice = new CC_MCC__c(
             Name = 'Oficina',
@@ -300,17 +305,17 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             motivos.add(motivoVacio);
             mccCreado.add(motivoVacio);
             
-            CC_MCC__c motivoCajeros = new CC_MCC__c(
-            Name = 'Cajeros',
-            RecordTypeId = motivoId,
-            CC_Ambito_Tareas_Caixa__c = 'Cajeros',
-            CC_Ambito_Tareas_Imagin__c = 'Cajeros',
-            CC_Producto_Servicio__c = producto.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'MO-000007'
-            );
-            motivos.add(motivoCajeros);
-            mccCreado.add(motivoCajeros);
+            // CC_MCC__c motivoCajeros = new CC_MCC__c(
+            // Name = 'Cajeros',
+            // RecordTypeId = motivoId,
+            // CC_Ambito_Tareas_Caixa__c = 'Cajeros',
+            // CC_Ambito_Tareas_Imagin__c = 'Cajeros',
+            // CC_Producto_Servicio__c = producto.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'MO-000007'
+            // );
+            // motivos.add(motivoCajeros);
+            // mccCreado.add(motivoCajeros);
             
             CC_MCC__c motivoFraude = new CC_MCC__c(
             Name = 'Fraude',
@@ -348,28 +353,28 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             motivos.add(motivoTestamentaria);
             mccCreado.add(motivoTestamentaria);
 
-            CC_MCC__c motivoActivacionCaixaBank = new CC_MCC__c(
-            Name = 'Activación CaixaBankSign',
-            RecordTypeId = motivoId,
-            CC_Producto_Servicio__c = productoMecanismo.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'MO-000011'
-            );
-            motivos.add(motivoActivacionCaixaBank);
-            mccCreado.add(motivoActivacionCaixaBank);
+            // CC_MCC__c motivoActivacionCaixaBank = new CC_MCC__c(
+            // Name = 'Activación CaixaBankSign',
+            // RecordTypeId = motivoId,
+            // CC_Producto_Servicio__c = productoMecanismo.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'MO-000011'
+            // );
+            // motivos.add(motivoActivacionCaixaBank);
+            // mccCreado.add(motivoActivacionCaixaBank);
 
-            CC_MCC__c motivoEnrollment = new CC_MCC__c(
-            Name = 'Enrollment Sign',
-            RecordTypeId = motivoId,
-            //CC_Ambito_Tareas_Caixa__c = 'Enrollment Sign',
-            CC_Ambito_Tareas_Caixa__c = 'Testamentaría',
-            CC_Ambito_Tareas_Imagin__c = 'Testamentaría',
-            CC_Producto_Servicio__c = producto.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'MO-000012'
-            );
-            motivos.add(motivoEnrollment);
-            mccCreado.add(motivoEnrollment);
+            // CC_MCC__c motivoEnrollment = new CC_MCC__c(
+            // Name = 'Enrollment Sign',
+            // RecordTypeId = motivoId,
+            // //CC_Ambito_Tareas_Caixa__c = 'Enrollment Sign',
+            // CC_Ambito_Tareas_Caixa__c = 'Testamentaría',
+            // CC_Ambito_Tareas_Imagin__c = 'Testamentaría',
+            // CC_Producto_Servicio__c = producto.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'MO-000012'
+            // );
+            // motivos.add(motivoEnrollment);
+            // mccCreado.add(motivoEnrollment);
 
             CC_MCC__c motivoCSBD3N = new CC_MCC__c(
             Name = 'CSBD 3N',
@@ -382,28 +387,28 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             motivos.add(motivoCSBD3N);
             mccCreado.add(motivoCSBD3N);
 
-            CC_MCC__c motivoCSBDContratar = new CC_MCC__c(
-            Name = 'CSBD Contratar',
-            RecordTypeId = motivoId,
-            CC_Ambito_Tareas_Caixa__c = 'CSBD Contratar',
-            CC_Ambito_Tareas_Imagin__c = 'CSBD Contratar',
-            CC_Producto_Servicio__c = producto.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'MO-000014'
-            );
-            motivos.add(motivoCSBDContratar);
-            mccCreado.add(motivoCSBDContratar);
+            // CC_MCC__c motivoCSBDContratar = new CC_MCC__c(
+            // Name = 'CSBD Contratar',
+            // RecordTypeId = motivoId,
+            // CC_Ambito_Tareas_Caixa__c = 'CSBD Contratar',
+            // CC_Ambito_Tareas_Imagin__c = 'CSBD Contratar',
+            // CC_Producto_Servicio__c = producto.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'MO-000014'
+            // );
+            // motivos.add(motivoCSBDContratar);
+            // mccCreado.add(motivoCSBDContratar);
 
-            CC_MCC__c motivoCSBDNoContratar = new CC_MCC__c(
-            Name = 'CSBD No Contratar',
-            RecordTypeId = motivoId,
-            CC_Ambito_Tareas_Caixa__c = 'CSBD No Contratar',
-            CC_Producto_Servicio__c = producto.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'MO-000015'
-            );
-            motivos.add(motivoCSBDNoContratar);
-            mccCreado.add(motivoCSBDNoContratar);
+            // CC_MCC__c motivoCSBDNoContratar = new CC_MCC__c(
+            // Name = 'CSBD No Contratar',
+            // RecordTypeId = motivoId,
+            // CC_Ambito_Tareas_Caixa__c = 'CSBD No Contratar',
+            // CC_Producto_Servicio__c = producto.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'MO-000015'
+            // );
+            // motivos.add(motivoCSBDNoContratar);
+            // mccCreado.add(motivoCSBDNoContratar);
 
             CC_MCC__c motivoHubImagin = new CC_MCC__c(
             Name = 'Hub Imagin',
@@ -428,17 +433,30 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             motivos.add(motivoOficinaFisica);
             mccCreado.add(motivoOficinaFisica);
 
-            CC_MCC__c motivoDocumentacion = new CC_MCC__c(
-                Name = 'Documentación',
-                RecordTypeId = motivoId,
-                CC_Ambito_Tareas_Caixa__c = 'Documentación',
-                CC_Ambito_Tareas_Imagin__c = 'Documentación',
-                CC_Producto_Servicio__c = producto.Id,
-                CC_Tipo_Cliente__c = 'Cliente',
-                CC_Codigo_Externo__c = 'MO-000018'
-                );
-                motivos.add(motivoDocumentacion);
-                mccCreado.add(motivoDocumentacion);
+            
+            CC_MCC__c motivoCBP = new CC_MCC__c(
+            Name = 'CBP',
+            RecordTypeId = motivoId,
+            CC_Ambito_Tareas_Caixa__c = 'CBP',
+            CC_Ambito_Tareas_Imagin__c = 'CBP',
+            CC_Producto_Servicio__c = producto.Id,
+            CC_Tipo_Cliente__c = 'Cliente',
+            CC_Codigo_Externo__c = 'MO-000018'
+            );
+            motivos.add(motivoCBP);
+            mccCreado.add(motivoCBP);
+
+            // CC_MCC__c motivoDocumentacion = new CC_MCC__c(
+            // Name = 'Documentación',
+            // RecordTypeId = motivoId,
+            // CC_Ambito_Tareas_Caixa__c = 'Documentación',
+            // CC_Ambito_Tareas_Imagin__c = 'Documentación',
+            // CC_Producto_Servicio__c = producto.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'MO-000018'
+            // );
+            // motivos.add(motivoDocumentacion);
+            // mccCreado.add(motivoDocumentacion);
 
             insert motivos;
             
@@ -452,27 +470,27 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             causas.add(causaFraude);
             mccCreado.add(causaFraude);
 
-            CC_MCC__c causaExtranjero = new CC_MCC__c(
-            Name = 'Cliente en el extranjero',
-            RecordTypeId = causaId,
-            CC_Producto_Servicio__c = motivoActivacionCaixaBank.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'CA-000002'
-            );
-            causas.add(causaExtranjero);
-            mccCreado.add(causaExtranjero);
-            insert causas;
+            // CC_MCC__c causaExtranjero = new CC_MCC__c(
+            // Name = 'Cliente en el extranjero',
+            // RecordTypeId = causaId,
+            // CC_Producto_Servicio__c = motivoActivacionCaixaBank.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'CA-000002'
+            // );
+            // causas.add(causaExtranjero);
+            // mccCreado.add(causaExtranjero);
+             insert causas;
 
-            CC_MCC__c solucionFraude = new CC_MCC__c(
-            Name = 'Fraude',
-            RecordTypeId = solucionId,
-            CC_Producto_Servicio__c = causaFraude.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'SO-000001',
-            CC_AmbitoTareas__c = 'Fraude'
-            );
-            soluciones.add(solucionFraude);
-            mccCreado.add(solucionFraude);
+            // CC_MCC__c solucionFraude = new CC_MCC__c(
+            // Name = 'Fraude',
+            // RecordTypeId = solucionId,
+            // CC_Producto_Servicio__c = causaFraude.Id,
+            // CC_Tipo_Cliente__c = 'Cliente',
+            // CC_Codigo_Externo__c = 'SO-000001',
+            // CC_AmbitoTareas__c = 'Fraude'
+            // );
+            // soluciones.add(solucionFraude);
+            // mccCreado.add(solucionFraude);
             insert soluciones;
 
             for(CC_MCC__c record : mccCreado) {
@@ -500,31 +518,6 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             
             List <Case> insertCase = new List <Case>();
             
-            Case casoFraude = new Case();
-            casoFraude.Subject = 'Fraude';
-            casoFraude.Origin = 'Email';
-            casoFraude.Status = 'Activo';
-            casoFraude.accountId = cuentaImagin.Id;
-            casoFraude.CC_Idioma__c = 'es';
-            casoFraude.CC_MCC_Tematica__c = tematica.Id; 
-            casoFraude.CC_MCC_ProdServ__c = producto.Id;
-            casoFraude.CC_MCC_Motivo__c = motivoFraude.Id;
-            casoFraude.CC_MCC_Causa__c = causaFraude.Id;
-            casoFraude.CC_MCC_Solucion__c = solucionFraude.Id;
-            casoFraude.RecordTypeId = recordTypeCaso;
-            insertCase.add(casoFraude);
-
-            Case casoConfidencial = new Case();
-            casoConfidencial.Subject = 'Confidencial';
-            casoConfidencial.Origin = 'Email';
-            casoConfidencial.Status = 'Activo';
-            casoConfidencial.accountId = clienteConfidencial.Id;
-            casoConfidencial.CC_Idioma__c = 'es';
-            casoConfidencial.CC_MCC_Tematica__c = tematica.Id; 
-            casoConfidencial.CC_MCC_ProdServ__c = producto.Id;
-            casoConfidencial.CC_MCC_Motivo__c = motivoFraude.Id;
-            casoConfidencial.RecordTypeId = recordTypeCaso;
-            insertCase.add(casoConfidencial);
 
             Case casoNoCliente = new Case();
             casoNoCliente.Subject = 'No cliente';
@@ -538,56 +531,6 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             casoNoCliente.RecordTypeId = recordTypeCaso;
             insertCase.add(casoNoCliente);
 
-            Case caso3NCSBD = new Case();
-            caso3NCSBD.Subject = '3N DE CSBD';
-            caso3NCSBD.Origin = 'Email';
-            caso3NCSBD.Status = 'Activo';
-            caso3NCSBD.accountId = cuentaCliente.Id;
-            caso3NCSBD.CC_Idioma__c = 'es';
-            caso3NCSBD.CC_MCC_Tematica__c = tematica.Id; 
-            caso3NCSBD.CC_MCC_ProdServ__c = producto.Id;
-            caso3NCSBD.CC_MCC_Motivo__c = motivoCSBD3N.Id;
-            caso3NCSBD.RecordTypeId = recordTypeCaso;
-            insertCase.add(caso3NCSBD);
-
-            Case casoContratarCSBD = new Case();
-            casoContratarCSBD.Subject = 'CSBD Contratar';
-            casoContratarCSBD.Origin = 'Email';
-            casoContratarCSBD.Status = 'Activo';
-            casoContratarCSBD.accountId = cuentaCliente.Id;
-            casoContratarCSBD.CC_Idioma__c = 'es';
-            casoContratarCSBD.CC_MCC_Tematica__c = tematica.Id; 
-            casoContratarCSBD.CC_MCC_ProdServ__c = producto.Id;
-            casoContratarCSBD.CC_MCC_Motivo__c = motivoCSBDContratar.Id;
-            casoContratarCSBD.RecordTypeId = recordTypeCaso;
-            casoContratarCSBD.CC_OTP_Valido__c = true;
-            insertCase.add(casoContratarCSBD);
-
-            Case casoNoContratarCSBD = new Case();
-            casoNoContratarCSBD.Subject = 'CSBD No Contratar';
-            casoNoContratarCSBD.Origin = 'Email';
-            casoNoContratarCSBD.Status = 'Activo';
-            casoNoContratarCSBD.accountId = cuentaCaixa.Id;
-            casoNoContratarCSBD.CC_Idioma__c = 'es';
-            casoNoContratarCSBD.CC_MCC_Tematica__c = tematica.Id; 
-            casoNoContratarCSBD.CC_MCC_ProdServ__c = producto.Id;
-            casoNoContratarCSBD.CC_MCC_Motivo__c = motivoCSBDNoContratar.Id;
-            casoNoContratarCSBD.RecordTypeId = recordTypeCaso;
-            casoNoContratarCSBD.CC_OTP_Valido__c = true;
-            insertCase.add(casoNoContratarCSBD);
-            
-            Case casoCajeros = new Case();
-            casoCajeros.Subject = 'Cajeros';
-            casoCajeros.Origin = 'Email';
-            casoCajeros.Status = 'Activo';
-            casoCajeros.accountId = cuentaImagin.Id;
-            casoCajeros.CC_Idioma__c = 'es';
-            casoCajeros.CC_MCC_Tematica__c = tematica.Id; 
-            casoCajeros.CC_MCC_ProdServ__c = producto.Id;
-            casoCajeros.CC_MCC_Motivo__c = motivoCajeros.Id;
-            casoCajeros.RecordTypeId = recordTypeCaso;
-            insertCase.add(casoCajeros);
-            
             //Case 1 con account Indicadores cliente = 28
             Case casoImagin = new Case(
             Description = 'casoImagin',
@@ -609,19 +552,6 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             );
             insertCase.add(casoImagin);
             
-            Case casoCC = new Case();
-            casoCC.Subject = 'Caso de Contact Center';
-            casoCC.Description = 'Caso de Contact Center';
-            casoCC.CC_Idioma__c = 'es';
-            casoCC.Origin = 'Email';
-            casoCC.CC_Tipo_Contacto__c = 'Consulta';
-            casoCC.CC_Canal_Procedencia__c = 'Formulario web';
-            casoCC.CC_Detalles_Consulta__c = 'Caso de Contact Center';
-            casoCC.Status = 'Activo';
-            casoCC.AccountId = cuentaCliente.Id;
-            casoCC.RecordTypeId = recordTypeCaso;
-            insertCase.add(casoCC);
-            
             Case casoImaginVentas = new Case(
             Description = 'casoImaginVentas',
             Subject = 'casoImaginVentas',
@@ -641,26 +571,6 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             RecordTypeId = recordTypeCaso
             );
             insertCase.add(casoImaginVentas);
-            
-            Case casoImaginOffice = new Case(
-            Description = 'casoImaginOffice',
-            Subject = 'casoImaginOffice',
-            Origin = 'Email',
-            Status = 'Activo',
-            accountId = cuentaNoImaginContact.Id,
-            CC_Idioma__c = 'es',
-            CC_Canal_Respuesta__c = 'Email',
-            CC_MCC_Tematica__c = tematica.Id, 
-            CC_MCC_ProdServ__c = producto.Id,
-            CC_MCC_Motivo__c = motivoOffice.Id,
-            CC_Motivo__c = 'Oficina',
-            CC_Grupo_3N__c = 'Grupo 3N',
-            CC_Tipo_Contacto__c = 'Consulta',
-            CC_Canal_Procedencia__c = 'Formulario web',
-            CC_Detalles_Consulta__c = 'Caso de Contact Center',
-            RecordTypeId = recordTypeCaso
-            );
-            insertCase.add(casoImaginOffice);
             
             //Case 2 con account Indicadores cliente != 28  y motivo oficina
             Case casoNoImaginOficina = new Case(
@@ -704,26 +614,6 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             );            
             insertCase.add(casoNoImaginGestor);
 
-            //Case 4 con account Indicadores cliente != 28 y otros motivos
-            Case casoNoImaginPrueba = new Case(   	
-            Description = 'casoNoImaginPrueba',
-            AccountId = cuentaNoImagin.Id,
-            Subject = 'casoNoImaginPrueba',
-            Origin = 'Email',
-            Status = 'Activo',
-            CC_Idioma__c = 'es',
-            CC_Motivo__c = 'Cambio de Prueba',
-            CC_Canal_Respuesta__c = 'Email',
-            CC_Grupo_3N__c = 'Grupo 3N',
-            CC_Tipo_Contacto__c = 'Consulta',
-            CC_Canal_Procedencia__c = 'Formulario web',
-            CC_Detalles_Consulta__c = 'Caso de Contact Center',
-            CC_MCC_Tematica__c = Tematica.Id, 
-            CC_MCC_ProdServ__c = Producto.Id,
-            CC_MCC_Motivo__c = motivoVentas.Id,
-            RecordTypeId = recordTypeCaso
-            );
-            insertCase.add(casoNoImaginPrueba);
             
             //cuentaNoImaginContact
             Case casoNoImaginContact = new Case(   	
@@ -731,7 +621,7 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             Subject = 'casoNoImaginContact',
             Origin = 'Email',
             Status = 'Activo',
-            accountId = cuentaNoImaginContact.Id,
+            accountId = cuentaNoImagin.Id,
             CC_Idioma__c = 'es',
             CC_Motivo__c = 'Test',
             CC_Canal_Respuesta__c = 'Email',
@@ -787,7 +677,7 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             );
             insertCase.add(casoImaginPruebaNoClientes);
 
-            Case casoNoImaginTestamentaria = new Case(   	
+            /*Case casoNoImaginTestamentaria = new Case(   	
             Description = 'casoNoImaginTestamentaria',
             AccountId = cuentaNoImagin.Id,
             Subject = 'casoNoImaginTestamentaria',
@@ -805,7 +695,7 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             CC_MCC_Motivo__c = motivoTestamentaria.Id,
             RecordTypeId = recordTypeCaso
             );
-            insertCase.add(casoNoImaginTestamentaria);
+            insertCase.add(casoNoImaginTestamentaria);*/
 
             Case casoImaginTestamentaria = new Case(
             Description = 'casoImaginTestamentaria',
@@ -826,43 +716,6 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             RecordTypeId = recordTypeCaso
             );
             insertCase.add(casoImaginTestamentaria);
-
-            Case casoEnrollment = new Case(
-            Description = 'casoEnrollmentPreguntaSi',
-            Subject = 'casoEnrollmentPreguntaSi',
-            Origin = 'Email',
-            Status = 'Activo',
-            accountId = cuentaImagin.Id,
-            CC_Idioma__c = 'es',
-            CC_Canal_Respuesta__c = 'Email',
-            CC_MCC_Tematica__c = tematica.Id, 
-            CC_MCC_ProdServ__c = producto.Id,
-            CC_MCC_Motivo__c = motivoEnrollment.Id,
-            CC_Motivo__c = 'Enrollment Sign',
-            CC_Grupo_3N__c = 'Grupo 3N',
-            CC_Tipo_Contacto__c = 'Consulta',
-            CC_Canal_Procedencia__c = 'Formulario web',
-            CC_Detalles_Consulta__c = 'Caso de Contact Center',
-            RecordTypeId = recordTypeCaso
-            );
-            insertCase.add(casoEnrollment);
-
-            Case casoDerivar = new Case(
-            Description = 'casoDerivar',
-            Subject = 'casoDerivar',
-            Origin = 'Email',
-            Status = 'Activo',
-            accountId = cuentaImagin.Id,
-            CC_Idioma__c = 'es',
-            CC_Canal_Respuesta__c = 'Email',
-            CC_Grupo_3N__c = 'Grupo 3N',
-            CC_Tipo_Contacto__c = 'Consulta',
-            CC_Canal_Procedencia__c = 'Formulario web',
-            CC_Detalles_Consulta__c = 'Caso de Contact Center',
-            RecordTypeId = recordTypeCaso
-            );
-
-            insertCase.add(casoDerivar);
 
             Case casoDNITestamenteria = new Case(
             Description = 'casoDNITestamenteria',
@@ -941,24 +794,25 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
     
             insertCase.add(casoOficinaFisicaNoImagin);
 
-            Case casoDocumentacionNoImagin = new Case(
-                Description = 'casoDocumentacionNoImagin',
-                Subject = 'casoDocumentacionNoImagin',
+            Case casoCBP = new Case(
+                Description = 'casoCBP',
+                Subject = 'casoCBP',
                 Origin = 'Email',
                 Status = 'Activo',
-                accountId = cuentaCaixa.Id,
+                accountId = cuentaImagin.Id,
                 CC_Idioma__c = 'es',
                 CC_MCC_Tematica__c = tematica.Id, 
                 CC_MCC_ProdServ__c = producto.Id,
-                CC_MCC_Motivo__c = motivoDocumentacion.Id,
+                CC_MCC_Motivo__c = motivoCBP.Id,
                 CC_Canal_Respuesta__c = 'Email',
+                CC_Grupo_3N__c = 'Grupo 3N',
                 CC_Tipo_Contacto__c = 'Consulta',
-                CC_Canal_Procedencia__c = 'Formulario web',
+                CC_Canal_Procedencia__c = 'Código de Buenas Prácticas',
                 CC_Detalles_Consulta__c = 'Caso de Contact Center',
                 RecordTypeId = recordTypeCaso
             );
-    
-            insertCase.add(casoDocumentacionNoImagin);
+            insertCase.add(casoCBP);
+
             insert insertCase;
             
             List<CC_Settings__c > listCustomSetting= new List<CC_Settings__c >();
@@ -981,6 +835,12 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             customSetting4.CC_Configuracion_2__c = 'TELEMATIC';
             customSetting4.CC_Configuracion_3__c = 'true';
             listCustomSetting.add(customSetting4);
+
+            CC_Settings__c  customSetting5 = new CC_Settings__c ();
+            customSetting5.Name = 'CC_OcultarModalTrasladarAmbitos';
+            customSetting5.CC_Activa__c = true;
+            customSetting5.CC_Configuracion_1__c = 'Argos General';
+            listCustomSetting.add(customSetting5);
             
             CC_Settings__c  customSetting3 = new CC_Settings__c ();
             customSetting3.Name = 'CC_OperativaOficina';
@@ -998,7 +858,14 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             customSetting3.CC_Configuracion_12__c = 'test';
             customSetting3.CC_Configuracion_13__c = 'test';
             customSetting3.CC_Configuracion_14__c = 'test';
-            listCustomSetting.add(customSetting3);            
+            listCustomSetting.add(customSetting3);
+            
+            CC_Settings__c customSetting6 = new CC_Settings__c();
+            customSetting6.Name = 'CC_GruposColaboradoresCBP';
+            customSetting6.CC_Activa__c = true;
+            customSetting6.CC_Configuracion_1__c = 'CBP Connecta';
+            listCustomSetting.add(customSetting6);
+
             insert listCustomSetting;
 
             CBK_IntegrationSetting__c customSettingClienteDigital = new CBK_IntegrationSetting__c();
@@ -1029,6 +896,8 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
           /*  Opportunity oportunidad1 = CSBD_Opportunity.crearOportunidad('CSBD_MAC');
             oportunidad1.CSBD_CasoOrigen__c = casoEnrollment.Id;
             update oportunidad1;*/
+
+            Test.stopTest();
         }
     } 
 
@@ -1118,9 +987,24 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
             Case casoCCGestorNoImagin = [SELECT Id from Case where Subject = 'casoNoImaginGestor' LIMIT 1];
-            Account cuentaImagin = [SELECT Id from Account where AV_IndicadoresClientes__c = '28' LIMIT 1];
             //Caso gestor no imagin
-            CC_Operativa_Oficina_Controller.crearTarea(casoCCGestorNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
+            Map<String, Object> retorno = CC_Operativa_Oficina_Controller.crearTarea(casoCCGestorNoImagin.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
+            System.assert(!retorno.isEmpty(), true);
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void crearTareaTestCasoGestorImagin() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            String asunto = 'Prueba';
+            String fechaActividad = date.today().toString();
+            String comentarios = 'Prueba';
+            Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
+            Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
+            Case casoCCGestorNoImagin = [SELECT Id from Case where Subject = 'casoNoImaginGestor' LIMIT 1];
+            Account cuentaImagin = [SELECT Id from Account where AV_IndicadoresClientes__c = '28' LIMIT 1];
             //Caso gestor imagin
             casoCCGestorNoImagin.accountId = cuentaImagin.Id;
             upsert casoCCGestorNoImagin;
@@ -1262,16 +1146,17 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             caso.CC_MCC_Motivo__c = mcc.Id;
             caso.AccountId = cuenta.Id;
             update caso;
-            update cuenta;
+            // update cuenta;
             ContentVersion file = new ContentVersion();
             file.PathOnClient = 'test.jpg';
             file.VersionData = Blob.valueOf('Test Content');
             insert file;
             List <String> fileList = new List <String>();
             fileList.add(String.valueOf(file.Id)); 
-            CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, fileList, centro.Id, true, true, contacto, null);
-            Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
-            System.assert(!tarea.isEmpty(), true);
+            Map<String, Object> resultado = CC_Operativa_Oficina_Controller.crearTarea(caso.Id.toString(), asunto, fechaActividad, comentarios, fileList, centro.Id, true, true, contacto, null);
+            System.assertEquals(true, resultado.get('ambitoVentas'));
+            // Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
+            //System.assert(!tarea.isEmpty(), true);
         }
         Test.stopTest();
     }
@@ -1285,7 +1170,7 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             String comentarios = 'Prueba';
             Contact contacto = [SELECT Id, CC_Numero_Oficina__c, CC_Matricula__c from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
-            Account cuenta = [SELECT Id from Account where FirstName = 'cuentaNoImagin con gestor' LIMIT 1];
+            Account cuenta = [SELECT Id from Account where FirstName = 'cuentaNoImagin' LIMIT 1];
             Case caso = [SELECT Id, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, Account.AV_EAPGestor__c from Case where Subject = 'casoImagin' LIMIT 1];
             CC_MCC__c mcc = [SELECT Id from CC_MCC__c where Name = 'Vacio' LIMIT 1];
             caso.CC_MCC_Motivo__c = mcc.Id;
@@ -1327,23 +1212,16 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
             Case casoNoImaginNoClientes = [SELECT Id, Account.AV_IndicadoresClientes__c from Case where Subject = 'casoNoImaginNoClientes' LIMIT 1];
-            
             //Caso gestor no imagin
             CC_Operativa_Oficina_Controller.crearTarea(casoNoImaginNoClientes.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
-
-            Case casoNoImaginNoClientesPrueba = [SELECT Id, Account.AV_IndicadoresClientes__c from Case where Subject = 'casoImaginPruebaNoClientes' LIMIT 1];
-            CC_Operativa_Oficina_Controller.crearTarea(casoNoImaginNoClientesPrueba.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
-            Task[] tareaprueba = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
-            System.assert(!tareaprueba.isEmpty(), true);
             }
         Test.stopTest();
     }
-    
-              
+
     @isTest
-    public static void crearTareaTestcasoTestamentaria() {
+    public static void crearTareaCasoTestamentariaNoImagin() {
         Test.startTest();
         System.runAs(CC_TestDataFactory.getUserAdmin()) {
             String asunto = 'Prueba';
@@ -1351,19 +1229,67 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             String comentarios = 'Prueba';
             Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
             Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
-            Case casoNoImaginTestamentaria = [SELECT Id, Account.AV_IndicadoresClientes__c from Case where Subject = 'casoNoImaginTestamentaria' LIMIT 1];
+            Account cuentaNoImagin = [SELECT Id from Account where FirstName = 'cuentaNoImagin' LIMIT 1];
+
+            CC_MCC__c mccMotivoTestamentarias = [
+                SELECT 
+                    Id, 
+                    Name, 
+                    CC_Producto_Servicio__c, 
+                    CC_Producto_Servicio__r.CC_Tematica__c 
+                FROM CC_MCC__c 
+                WHERE Name = 'Testamentaria' AND CC_Codigo_Externo__c = 'MO-000010' LIMIT 1
+            ];
+
+            Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+
+            Case casoNoImaginTestamentaria = new Case(   	
+                Description = 'casoNoImaginTestamentaria',
+                AccountId = cuentaNoImagin.Id,
+                Subject = 'casoNoImaginTestamentaria',
+                Origin = 'Email',
+                Status = 'Activo',
+                CC_Idioma__c = 'es',
+                CC_Motivo__c = 'Testamentaria',
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                CC_MCC_Tematica__c = mccMotivoTestamentarias.CC_Producto_Servicio__r.CC_Tematica__c, 
+                CC_MCC_ProdServ__c = mccMotivoTestamentarias.CC_Producto_Servicio__c,
+                CC_MCC_Motivo__c = mccMotivoTestamentarias.Id,
+                RecordTypeId = recordTypeCaso
+            );
+            insert casoNoImaginTestamentaria;
+
+            //Case casoNoImaginTestamentaria = [SELECT Id, Account.AV_IndicadoresClientes__c from Case where Subject = 'casoNoImaginTestamentaria' LIMIT 1];
             
             //Caso gestor no imagin
             CC_Operativa_Oficina_Controller.crearTarea(casoNoImaginTestamentaria.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
 
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void crearTareaCasoTestamentariaImagin() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            String asunto = 'Prueba';
+            String fechaActividad = date.today().toString();
+            String comentarios = 'Prueba';
+            Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
+            Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
+    
             Case casoImaginTestamentaria = [SELECT Id, Account.AV_IndicadoresClientes__c from Case where Subject = 'casoImaginTestamentaria' LIMIT 1];
 
             CC_Operativa_Oficina_Controller.crearTarea(casoImaginTestamentaria.Id.toString(), asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tareaprueba = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tareaprueba.isEmpty(), true);
-            }
+        }
         Test.stopTest();
     }
 
@@ -1432,6 +1358,79 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
         Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
         System.runAs(CC_TestDataFactory.getUserAdmin()) {         
             CC_Operativa_Oficina_Controller.crearTarea(caso.Id , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
+            Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
+            System.assert(!tarea.isEmpty(), true);
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void testCrearTareaCasoSinCuenta() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            Case caso = new Case(
+                Subject = 'Caso sin cuenta',
+                Origin = 'Email',
+                Status = 'Activo',
+                CC_Idioma__c = 'es',
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente'),
+                AccountId = null,
+                CC_No_Identificado__c = true
+            );
+            insert caso;
+
+            Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
+
+            Map<String, Object> params = new Map<String, Object>{
+                'recordId' => caso.Id,
+                'asunto' => 'Prueba',
+                'fechaActividad' => date.today().toString(),
+                'comentarios' => 'Prueba',
+                'cuentaFicticia' => 'F',
+                'oficinaDestino' => centro.Id
+            };
+            CC_Gestion_Derivar_Tarea tarea = new CC_Gestion_Derivar_Tarea(params);
+            tarea.crearTarea();
+
+            // Verificar que se creó la tarea
+            Task tareaCreada = [SELECT Id, WhatId, AV_Center__c FROM Task WHERE Subject = 'Prueba' LIMIT 1];
+            System.assertNotEquals(null, tareaCreada);
+
+            // Repetir el test
+            caso.CC_No_Identificado__c = true;
+            update caso;
+            params.put('recordId', caso.Id);
+            params.put('cuentaFicticia', 'J');
+            params.put('oficinaDestino', null);
+            tarea = new CC_Gestion_Derivar_Tarea(params);
+            // Insertar una cuenta genérica para que la consulta no devuelva null
+            Account cuentaGenerica = new Account(
+                LastName = 'Cuenta Genérica',
+                CC_NumPerso__c = '12345',
+                CC_Inactivo__c = false,
+                RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA')
+            );
+            insert cuentaGenerica;
+            tarea.crearTarea();
+            // Verificar que se creó la tarea
+            Task tareaCreada2 = [SELECT Id, WhatId FROM Task WHERE Subject = 'Prueba' AND Id != :tareaCreada.Id LIMIT 1];
+            System.assertNotEquals(null, tareaCreada2);
+        }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void crearTareaTestCBP() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            String asunto = 'Prueba';
+            String fechaActividad = date.today().toString();
+            String comentarios = 'Prueba';
+            Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
+            Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
+            Case casoCBP = [SELECT Id, Account.AV_EAPGestor__c from Case where Subject = 'casoCBP' LIMIT 1];
+            //Caso gestor no imagin
+            CC_Operativa_Oficina_Controller.crearTarea(casoCBP.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }

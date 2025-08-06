@@ -34,7 +34,6 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
             SAC_DocumentoEnvio__c docEnvio = [SELECT SAC_Caso__c, SAC_Documento__c, SAC_DocPDF__c, SAC_Version__c, Id
                                                 FROM SAC_DocumentoEnvio__c 
                                                 WHERE Id =: id and SAC_Documento__c = null  limit 1];
-
         String vfHostname = DomainCreator.getVisualforceHostname(null);
         String urlVF =  vfHostname + '/apex/SAC_DocumentoRedaccionPDF?id=' + docEnvio.Id;
  
@@ -47,7 +46,7 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
 
     @AuraEnabled
     public static void adjuntarPDFaCaso(String url, Id parentId, String procedencia, Boolean reenvio){
-        Case caso = [SELECT CaseNumber, CC_Idioma__c, recordType.DeveloperName FROM Case WHERE id =: parentId LIMIT 1];
+        Case caso = [SELECT CaseNumber, CC_Idioma__c, CC_Canal_Respuesta__c, recordType.DeveloperName FROM Case WHERE id =: parentId LIMIT 1];
         String numCaso = caso.CaseNumber;
         String nombreDocumento;
         String proyecto;
@@ -103,6 +102,12 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
                 SAC_Bloque__c = 'SAC_Respuesta',
                 SAC_ValidadoCV__c = true
             );
+
+            //Si se responde via carta, se marca como enviado desde que se genera. Si es email, se marcará enviado cuando se envíe
+            if(caso.CC_Canal_Respuesta__c == 'SAC_CartaPostal'){
+                cv.SAC_Enviado__c = true;
+            }
+
             SAC_DatabaseDML.insertDML(cv, false);
         }else{
             if(!cvs.isEmpty()){
@@ -123,6 +128,10 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
                 SAC_Bloque__c = 'SAC_Respuesta',
                 SAC_ValidadoCV__c = true
             );
+            //Si se responde via carta, se marca como enviado desde que se genera. Si es email, se marcará enviado cuando se envíe
+            if(caso.CC_Canal_Respuesta__c == 'SAC_CartaPostal'){
+                cv.SAC_Enviado__c = true;
+            }
             SAC_DatabaseDML.insertDML(cv, false);
         }
 
@@ -340,7 +349,6 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
             } else {
                 datosTemplate = new WrapperTemplate('Header', 'Footer');
             }
-            System.debug('datosTemplate ' + datosTemplate);
             return datosTemplate;
         } catch (Exception e) {
             throw new AuraHandledException('La plantilla seleccionada no puede aplicarse debido a que no tiene relación con el objeto actual.');

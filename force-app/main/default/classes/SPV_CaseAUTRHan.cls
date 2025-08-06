@@ -46,14 +46,27 @@ public with sharing class SPV_CaseAUTRHan extends CC_TriggerHandlerBase{
             //Si se actualiza el estado de una reclamación, el estado debe arrastrarse a sus pretensiones activas
             SPV_CaseHelper.arrastrarEstadoReclamacionPretension(listCasosSPV, mapOldObj);
 
-            //Si se actualiza el estado de una reclamación, se deben cerrar los SLA correspondientes
-            SPV_CaseHelper.cerrarSLAReclamacion(listCasosSPV, mapOldObj);
-
             //Si se actualiza la ofician afectada de la reclamacion, añadir un registro del objeto intermedio que relaciona reclaamción-Oficinas Afectadas
             SPV_CaseHelper.addOficinaAfectada(lstReclamaciones, mapOldObj, mapaDatosCasosActualizar);
 
             //Si se actualiza algún dato del reclamante de una reclamación, se debe actualizar de cada una de sus pretensiones
             SPV_CaseHelper.actualizarDatosReclamantePretensiones(lstReclamaciones, mapOldObj, mapaDatosCasosActualizar);
+            
+            //Si se actualiza algún campo de una reclamación, se debe actualizar de cada una de sus pretensiones
+            SPV_CaseHelper.actualizarCamposPretensiones(lstReclamaciones, mapOldObj, mapaDatosCasosActualizar);
+            
+            //Si se actualiza algún campo de una reclamación que haya que registrar, crear actividades
+            SPV_CaseHelper.registrarCamposActividades(lstReclamaciones, mapOldObj, 'SPV_Reclamacion');
+
+            //Si se cambia de estado, se comprueba si será necesario completar o reabrir algún SLA
+            SPV_CaseHelper.completarOReabrirSLAs(lstReclamaciones, mapOldObj);
+
+            //Al cambiar de estado, será necesario añadir los TMO correspondientes, o si ya existía, asignarle un nuevo TPE a ese TMO
+            SPV_AsignarTMEs.insertarTMOconTPE(lstReclamaciones, mapOldObj);
+
+            //Al cambiar de estado, será necesario cerrar los TPE de los TMO que pertenecen al estado del cual se sale
+            SPV_AsignarTMEs.finalizarTMO(lstReclamaciones, mapOldObj);
+
         }
        
         if(!lstPretensiones.isEmpty()){
@@ -66,7 +79,8 @@ public with sharing class SPV_CaseAUTRHan extends CC_TriggerHandlerBase{
             SPV_CaseHelper.calcular(listCasosSPV, mapOldObj, mapaDatosCasosActualizar); //Cuando se actualiza el importe de una pretensión, se calculará el de la reclamación padre
             SPV_CaseHelper.actualizarOwnerPretensionesHermanas(lstPretensiones, mapOldObj, mapaDatosCasosActualizar);     //Cuando se actualiza el owner una pretensión, se actualiza el owner de sus pretensiones hermanas
             SPV_CaseHelper.actualizarResumenManual(lstPretensiones, mapOldObj, mapaDatosCasosActualizar); 
-            }
+            SPV_CaseHelper.registrarCamposActividades(lstReclamaciones, mapOldObj, 'SPV_Pretension');
+        }
 
         if(!mapaDatosCasosActualizar.isEmpty()){
             SPV_DatabaseDML.updateListDML(mapaDatosCasosActualizar.values(), false);

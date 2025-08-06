@@ -6,7 +6,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar {
         } else {
             Map<String, Object> retorno = new Map<String, Object>();
             Case caso = CC_Gestion_Derivar_Global.obtenerCaso(recordId);
-            List<CC_MCC_Grupo_Colaborador__c> listaGrupoColaborador = CC_Gestion_Derivar_Global.obtenerListaGrupoColaborador(caso);
+            retorno.put('casoActual', caso);
             Map<String, Object> textosMap = CC_MetodosUtiles.getLOVNameValue(new List<String>{'Textos operativa Derivar'}, 'CC_Mensajes_Mostrar__c');          
             Map<String, String> gestorGenerico = CC_MetodosUtiles.buscarGestorGenerico();
             String gestorGenericoName = gestorGenerico.get('nombre');
@@ -19,26 +19,36 @@ public with sharing class CC_Gestion_Derivar_Inicializar {
             String ambitoMotivo = (String) retorno.get('ambitoMotivo');
             Boolean ambitoFraude = (Boolean) retorno.get('ambitoFraude');
 
+            //Lista de Ambitos que se remiten automaticamente a su grupo colaborador asignado
+            List<String> ambitosRemitidos = CC_Settings__c.getValues('CC_DerivacionRemitidosAutomaticos').CC_Configuracion_1__c.split(';');
 
-            
-            if(caso.Account.AV_Confidencial__c && otpDerivar == null) {
-                retorno.put('toastTrasladar3N', textosMap.get('Toast traslado 3N confidencial'));
-            } else {
+            //Lista de Ambitos que tiene pririoridad aunque no sea cliente
+            List<String> ambitosPrioridadNoClientes = CC_Settings__c.getValues('CC_AmbitosPrioridadSobreNoClientes').CC_Configuracion_1__c.split(';');
+
+            Boolean ambitoAccionistas = retorno.get('ambitoMotivo') == 'Accionistas' ? true : false;
+
+            if(caso.Account.AV_Confidencial__c && !caso.CC_En_Segundo_Nivel__c && !caso.CC_En_Tercer_Nivel__c && otpDerivar == null) {
+                CC_Gestion_Derivar_Global.rellenarDatosClienteConfidencial(retorno, textosMap, caso, gestorGenericoName, consultarGestorPool);
+            } else if (caso.Account != null && caso.Account.CC_Numero_Documento__c != null && String.valueOf(caso.Account.CC_Numero_Documento__c).startsWith('H')){   // COMUNDADES DE VECINOS
+                CC_Gestion_Derivar_Global.rellenarDatosComunidadesVecinos(caso, retorno, textosMap);
+            }else {
                 //Grupo Colaborador
-                if(!listaGrupoColaborador.isEmpty() && otpDerivar == null) {
-                    CC_Gestion_Derivar_Global.rellenarDatosGrupoColaborador(listaGrupoColaborador, retorno, textosMap);
-                }
-
-                //Chequear por MOTIVO
-                if(!caso.Account.AV_Cliente__c && otpDerivar == null && (caso.Account.Recordtype.Developername == 'CC_ClientePA'|| caso.Account.Recordtype.Developername == 'CC_Cliente')) {
-                    CC_Gestion_Derivar_Global.rellenarDatosCliente(retorno);
-                } else if(ambitoFraude && caso.CC_MCC_Solucion__r.CC_AmbitoTareas__c == 'Fraude') {
+                if(ambitoFraude && caso.CC_MCC_Solucion__r.CC_AmbitoTareas__c == 'Fraude') {
                     CC_Gestion_Derivar_Global.rellenarDatosFraudeSolucion(retorno, textosMap);
-                } else if(ambitoMotivo == '' || ambitoMotivo == null) {
-                    CC_Gestion_Derivar_Global.rellenarDatosOficinaNull(retorno, consultarGestorPool);
-                }else if(ambitoMotivo == 'Ventas' || ambitoMotivo == 'Oficina'){
-                    CC_Gestion_Derivar_Global.rellenarDatosVentaOficina(retorno);
-                }else if(ambitoMotivo == 'Cambio de oficina') {
+                }
+                if(!(Boolean) retorno.get('ocultarModalTrasladar')){
+                    List<CC_MCC_Grupo_Colaborador__c> listaGrupoColaborador = CC_Gestion_Derivar_Global.obtenerListaGrupoColaborador(caso);
+                    if(!listaGrupoColaborador.isEmpty() && otpDerivar == null) {
+                        CC_Gestion_Derivar_Global.rellenarDatosGrupoColaborador(listaGrupoColaborador, retorno, textosMap);
+                    }            
+                }
+                retorno.put('otpDerivar', otpDerivar);
+                //Chequear por MOTIVO
+                if(!caso.Account.AV_Cliente__c && otpDerivar == null && (caso.Account.Recordtype.Developername == 'CC_ClientePA'|| caso.Account.Recordtype.Developername == 'CC_Cliente') && !ambitoAccionistas && !ambitosPrioridadNoClientes.contains(ambitoMotivo)) {
+                    CC_Gestion_Derivar_Global.rellenarDatosCliente(retorno);
+                } else if (ambitoAccionistas){
+                    CC_Gestion_Derivar_Global.rellenarDatosAmbitoAccionistas(caso, retorno, textosMap);
+                } else if(ambitoMotivo == 'Cambio de oficina') {
                     CC_Gestion_Derivar_Global.rellenarDatosCambioOficina(caso, retorno, textosMap);
                 } else if(ambitoMotivo == 'Cambio de gestor') {
                     CC_Gestion_Derivar_Global.rellenarDatosCambioGestor(caso, retorno, textosMap);
@@ -46,7 +56,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar {
                     CC_Gestion_Derivar_Global.rellenarDatosCajeros(retorno, textosMap);
                 } else if(ambitoMotivo == 'Cajeros Incidencias') {
                     CC_Gestion_Derivar_Global.rellenarDatosCajerosIncidencias(caso, retorno, textosMap);
-                } else if(ambitoMotivo == 'Testamentaría') {                
+                } else if(ambitoMotivo == 'Testamentaría') {
                     CC_Gestion_Derivar_Global.rellenarDatosTestamentaria(retorno, textosMap);
                 } else if(ambitoMotivo == 'Vidacaixa' || ambitoMotivo == 'CaixaBank Talks') {
                     retorno.put('realizarRemitido', true);
@@ -58,8 +68,8 @@ public with sharing class CC_Gestion_Derivar_Inicializar {
                     CC_Gestion_Derivar_Global.rellenarDatosOficinaFisica(caso, retorno);
                 } else if(ambitoMotivo == 'Documentación') {
                     CC_Gestion_Derivar_Global.rellenarDatosDocumentacion(caso, retorno, textosMap);
-                } else if (ambitoMotivo == 'Onboarding') {
-                    CC_Gestion_Derivar_Global.rellenarDatosOnboarding(caso, retorno);
+                } else if (ambitoMotivo == 'Onboarding' || ambitoMotivo == 'Desistir') {
+                    CC_Gestion_Derivar_Global.rellenarDatosOnboarding(caso, retorno, textosMap);
                 } else if ((ambitoMotivo == 'Bizum Fraude' || ambitoMotivo == 'Caso a Fraude') && caso.CC_MCC_Solucion__r.CC_AmbitoTareas__c != 'Fraude') {
                     CC_Gestion_Derivar_Global.rellenarDatosFraude(retorno, textosMap);
                 }  else if (ambitoMotivo == 'Argos Xpays') {
@@ -68,13 +78,29 @@ public with sharing class CC_Gestion_Derivar_Inicializar {
                     CC_Gestion_Derivar_Global.rellenarDatosArgosGeneral(retorno, textosMap);
                 } else if (ambitoMotivo == 'Phising/Smishing/Malware') {
                     CC_Gestion_Derivar_Global.rellenarDatosPhisingSmishingMalware(retorno, textosMap);
+                } else if (ambitoMotivo == 'CashBack') {
+                CC_Gestion_Derivar_Global.rellenarDatosCashBack(retorno, textosMap);
+                } else if (ambitoMotivo == 'Refinanciación deudas') {
+                CC_Gestion_Derivar_Global.rellenarDatosRefinanciacionDeudas(retorno, textosMap);
                 } else if(ambitoCSBD) {
                     CC_Gestion_Derivar_Global.rellenarDatosAmbitoCSBD(caso, retorno, textosMap);   
                 } else if (ambitoMotivo == 'Mecanismo de firma'){
-                    CC_Gestion_Derivar_Global.rellenarDatosMecanismoFirma(caso,retorno, textosMap);   
+                    CC_Gestion_Derivar_Global.rellenarDatosMecanismoFirma(caso, retorno, textosMap);
+                } else if (ambitoMotivo == 'CBP'){
+                    CC_Gestion_Derivar_Global.rellenarDatosCBP(caso, retorno, textosMap);//CBP    
+                } else if(ambitoMotivo == 'Oficina sin tarea'){
+                    CC_Gestion_Derivar_Global.rellenarDatosOficinaSinTarea(retorno, textosMap);
+                } else if(ambitoMotivo == 'Colectivo vulnerable'){
+                    CC_Gestion_Derivar_Global.rellenarDatosColectivosVulnerables(retorno, textosMap);
+                } else if(ambitosRemitidos.contains(ambitoMotivo)){ //Lista de Ámbitos a remitir automaticamente a su grupo colaborador asignado
+                    retorno.put('realizarRemitido', true);
+                } else if(ambitoMotivo == 'Amenazas'){
+                    CC_Gestion_Derivar_Global.rellenarDatosAmenazas(caso, retorno, textosMap);
+                } else if(caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c == 'SAC' || caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c == 'SAC'){
+                    CC_Gestion_Derivar_Global.rellenarDatosSAC(caso, retorno, textosMap);
                 }
-
                 //Gestion Ambito VENTAS
+                
                 Boolean ambitoVentas = (Boolean) retorno.get('ambitoVentas');
                 if(ambitoVentas) {
                    CC_Gestion_Derivar_Global.rellenarDatosAmbitoVentas(caso, retorno, gestorGenericoName, consultarGestorPool,textosMap);

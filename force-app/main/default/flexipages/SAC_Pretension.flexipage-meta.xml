@@ -284,12 +284,6 @@
         </itemInstances>
         <itemInstances>
             <fieldInstance>
-                <fieldItem>Record.CBK_Case_Extension_Id__r.SAC_ImporteAbonadoSAC__c</fieldItem>
-                <identifier>RecordCBK_Case_Extension_Id_rSAC_ImporteAbonadoSAC_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
                     <value>none</value>
@@ -594,6 +588,36 @@
                 <identifier>RecordSAC_ReclamanteConformeNegociacion_cField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_DetalleResultadoNegociacion__c</fieldItem>
+                <identifier>RecordSAC_DetalleResultadoNegociacion_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Motivoresultadonegociacion__c</fieldItem>
+                <identifier>RecordSAC_Motivoresultadonegociacion_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Observaciones__c</fieldItem>
+                <identifier>RecordSAC_Observaciones_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-edd60da6-865d-4cbd-b81d-5d97c5de9ad4</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -612,10 +636,40 @@
             <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>none</value>
+                    <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.SAC_DetalleResultadoNegociacion__c</fieldItem>
-                <identifier>RecordSAC_DetalleResultadoNegociacion_cField</identifier>
+                <fieldItem>Record.CC_Importe_Reclamado__c</fieldItem>
+                <identifier>RecordCC_Importe_Reclamado_cField5</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Importe_Resuelto__c</fieldItem>
+                <identifier>RecordSAC_Importe_Resuelto_cField5</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_TipoInteresContrato__c</fieldItem>
+                <identifier>RecordSAC_TipoInteresContrato_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_TipoInteresNegociado__c</fieldItem>
+                <identifier>RecordSAC_TipoInteresNegociado_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-c5a72100-8837-46c7-b441-2ff3bd1d7cd9</name>
@@ -964,6 +1018,12 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection3</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>sac_InfoSubsanacion</componentName>
+                <identifier>c_sac_InfoSubsanacion</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -1961,6 +2021,36 @@
                 <identifier>RecordSAC_ReclamanteConformeNegociacion_cField2</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_DetalleResultadoNegociacion__c</fieldItem>
+                <identifier>RecordSAC_DetalleResultadoNegociacion_cField5</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Motivoresultadonegociacion__c</fieldItem>
+                <identifier>RecordSAC_Motivoresultadonegociacion_cField2</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Observaciones__c</fieldItem>
+                <identifier>RecordSAC_Observaciones_cField2</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-293c87b3-36d0-4c30-bd27-de836a405307</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -1979,10 +2069,40 @@
             <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>none</value>
+                    <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.SAC_DetalleResultadoNegociacion__c</fieldItem>
-                <identifier>RecordSAC_DetalleResultadoNegociacion_cField2</identifier>
+                <fieldItem>Record.CC_Importe_Reclamado__c</fieldItem>
+                <identifier>RecordCC_Importe_Reclamado_cField6</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Importe_Resuelto__c</fieldItem>
+                <identifier>RecordSAC_Importe_Resuelto_cField6</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_TipoInteresContrato__c</fieldItem>
+                <identifier>RecordSAC_TipoInteresContrato_cField2</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_TipoInteresNegociado__c</fieldItem>
+                <identifier>RecordSAC_TipoInteresNegociado_cField2</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-3f7b210f-0e31-48df-b65b-ae19c586ffb0</name>
@@ -2331,6 +2451,12 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection11</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>sac_InfoSubsanacion</componentName>
+                <identifier>c_sac_InfoSubsanacion2</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -3302,6 +3428,36 @@
                 <identifier>RecordSAC_ReclamanteConformeNegociacion_cField3</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_DetalleResultadoNegociacion__c</fieldItem>
+                <identifier>RecordSAC_DetalleResultadoNegociacion_cField3</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Motivoresultadonegociacion__c</fieldItem>
+                <identifier>RecordSAC_Motivoresultadonegociacion_cField3</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Observaciones__c</fieldItem>
+                <identifier>RecordSAC_Observaciones_cField3</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-d7d6d6a7-e079-42ca-8eba-87d7283e4bd1</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -3320,10 +3476,40 @@
             <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>none</value>
+                    <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.SAC_DetalleResultadoNegociacion__c</fieldItem>
-                <identifier>RecordSAC_DetalleResultadoNegociacion_cField3</identifier>
+                <fieldItem>Record.CC_Importe_Reclamado__c</fieldItem>
+                <identifier>RecordCC_Importe_Reclamado_cField7</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Importe_Resuelto__c</fieldItem>
+                <identifier>RecordSAC_Importe_Resuelto_cField7</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_TipoInteresContrato__c</fieldItem>
+                <identifier>RecordSAC_TipoInteresContrato_cField3</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_TipoInteresNegociado__c</fieldItem>
+                <identifier>RecordSAC_TipoInteresNegociado_cField3</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-ae48a873-5791-44a6-b415-7d7511209895</name>
@@ -3672,6 +3858,12 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection18</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>sac_InfoSubsanacion</componentName>
+                <identifier>c_sac_InfoSubsanacion3</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -4687,6 +4879,36 @@
                 <identifier>RecordSAC_ReclamanteConformeNegociacion_cField4</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_DetalleResultadoNegociacion__c</fieldItem>
+                <identifier>RecordSAC_DetalleResultadoNegociacion_cField4</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Motivoresultadonegociacion__c</fieldItem>
+                <identifier>RecordSAC_Motivoresultadonegociacion_cField4</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Observaciones__c</fieldItem>
+                <identifier>RecordSAC_Observaciones_cField4</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-8cde61b8-f20a-403f-b833-0fb23588a5a7</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -4705,10 +4927,40 @@
             <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>none</value>
+                    <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.SAC_DetalleResultadoNegociacion__c</fieldItem>
-                <identifier>RecordSAC_DetalleResultadoNegociacion_cField4</identifier>
+                <fieldItem>Record.CC_Importe_Reclamado__c</fieldItem>
+                <identifier>RecordCC_Importe_Reclamado_cField8</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_Importe_Resuelto__c</fieldItem>
+                <identifier>RecordSAC_Importe_Resuelto_cField8</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_TipoInteresContrato__c</fieldItem>
+                <identifier>RecordSAC_TipoInteresContrato_cField4</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SAC_TipoInteresNegociado__c</fieldItem>
+                <identifier>RecordSAC_TipoInteresNegociado_cField4</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-013d9e27-e480-4af9-841a-dbc821bc4d6b</name>
@@ -5057,6 +5309,12 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection27</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>sac_InfoSubsanacion</componentName>
+                <identifier>c_sac_InfoSubsanacion4</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -5688,6 +5946,79 @@
                         <leftValue>{!Record.Status}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>SAC_007</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>actionNames</name>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>maxRecordsToDisplay</name>
+                    <value>10</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>parentFieldApiName</name>
+                    <value>Case.Id</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListApiName</name>
+                    <value>CBK_CaseHistories__r</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListDisplayType</name>
+                    <value>ADVGRID</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListFieldAliases</name>
+                    <valueList>
+                        <valueListItems>
+                            <value>CBK_Field__c</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>CBK_OldValue__c</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>CBK_NewValue__c</value>
+                        </valueListItems>
+                    </valueList>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListLabel</name>
+                    <value>Case History Campos Cerrado</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>showActionBar</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>sortFieldAlias</name>
+                    <value>__DEFAULT__</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>sortFieldOrder</name>
+                    <value>Default</value>
+                </componentInstanceProperties>
+                <componentName>lst:dynamicRelatedList</componentName>
+                <identifier>lst_dynamicRelatedList10</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 OR 2 OR 3</booleanFilter>
+                    <criteria>
+                        <leftValue>{!Record.Status}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Cerrado</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.Status}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Descartado</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.Status}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>SAC_009</rightValue>
                     </criteria>
                 </visibilityRule>
             </componentInstance>

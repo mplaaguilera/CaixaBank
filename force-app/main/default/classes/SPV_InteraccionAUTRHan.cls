@@ -17,6 +17,9 @@ public with sharing class SPV_InteraccionAUTRHan extends CC_TriggerHandlerBase {
             SPV_InteraccionHelper.actualizarPendienteEscaladoReclamacion(listInteraccionesSPV, mapOldObj, mapaCasosActualizar); //Si se ha resuelto un escalado, se indica en el campo "Pendiente Escalado" de su reclamación
             SPV_InteraccionHelper.actualizarReclamacionAlEnviarEscalado(listInteraccionesSPV, mapOldObj, mapaCasosActualizar); //Si se envía un escalado, la reclamación estará en pendiente de resolución
             SPV_InteraccionHelper.lanzarAlertasInteraccion(listInteraccionesSPV, mapOldObj); //Lanzamiento de alertas
+            SPV_InteraccionHelper.pausarORenaudarTME(listInteraccionesSPV, mapOldObj);                                    //Si se envía escalado, se pausan ciertos TMEs
+            SPV_InteraccionHelper.registrarCambiosActividades(listInteraccionesSPV, mapOldObj);                           //Cuando se cambian determinados campos, se tienen que registrar en Actividades
+			SPV_InteraccionHelper.rellenarCamposAlActualizarAfterUpdate(listInteraccionesSPV, mapOldObj);
         }
 
         if(!mapaCasosActualizar.isEmpty()){

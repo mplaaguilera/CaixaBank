@@ -4,13 +4,9 @@ public with sharing class CSBD_CitaGestorController {
     public static Map<String, Object> obtenerConfiguraciones(Boolean esPool) {
 
         CSBD_CitaGestorSetting__c setting = CSBD_CitaGestorSetting__c.getInstance();
-        System.debug('setting: ' + setting);
         if (setting == null) {
             throw new AuraHandledException('No se ha encontrado el custom setting de cita gestor');
         }
-
-        System.debug('esPool: ' + esPool);
-
 
         String tipoCitaDefault = '43';
         Map<String, Object> tiposCita = new Map<String, Object>();
@@ -99,8 +95,8 @@ public with sharing class CSBD_CitaGestorController {
                     respuesta.put('result', 'KO');
                     respuesta.put('errorMessage', 'La integracion AVE de caracterizar cliente no ha devuelto gestor para el cliente');
                     return respuesta;
-                }
-
+                }               
+                respuesta.put('gestorAVEOficina', datosCliente.oficina1);  
                 Map<String, Object> disponibilidad = obtenerDisponibilidadAVE(matriculaGestorAVE, tipoCitaDefault, opp[0].Account.AV_NumPerso__c);
                 respuesta.putAll(disponibilidad);
                 respuesta.put('matricula', 'U01' + matriculaGestorAVE.leftPad(5, '0'));
@@ -129,9 +125,15 @@ public with sharing class CSBD_CitaGestorController {
         params.put('fecha', fecha);
 
         Map<String, Object> respuestaLegoDisponibilidad = CSBD_WS_LegoDisponibilidad.obtenerDisponibilidadesOficina(params);
-        if(respuestaLegoDisponibilidad.get('result') == 'OK'){
-            respuesta.put('result', 'OK');
-            respuesta.put('disponibilidadPorFecha', transformarRespuestaDisponibilidad(respuestaLegoDisponibilidad, true));
+        if(respuestaLegoDisponibilidad.get('result') == 'OK'){           
+            Map<String, List<Map<String, Object>>> disponibilidadPorFecha = transformarRespuestaDisponibilidad(respuestaLegoDisponibilidad, true);
+            if(!disponibilidadPorFecha.isEmpty()){
+                respuesta.put('result', 'OK');
+                respuesta.put('disponibilidadPorFecha', disponibilidadPorFecha);
+            } else {
+                respuesta.put('result', 'KO');
+                respuesta.put('errorMessage', 'El servidor de agendar citas LEGO no ha devuelto disponibilidad para la oficina ' + oficina);
+            }
         } else {
             respuesta.put('result', 'KO');
             respuesta.put('errorMessage', respuestaLegoDisponibilidad.get('errorMessage'));
@@ -165,8 +167,14 @@ public with sharing class CSBD_CitaGestorController {
 
         Map<String, Object> respuestaAveDisponibilidad = CSBD_WS_AVEDisponibilidad.obtenerDisponibilidadesGestor(params);
         if(respuestaAveDisponibilidad.get('result') == 'OK'){
-            respuesta.put('result', 'OK');
-            respuesta.put('disponibilidadPorFecha', transformarRespuestaDisponibilidad(respuestaAveDisponibilidad, false));
+            Map<String, List<Map<String, Object>>> disponibilidadPorFecha = transformarRespuestaDisponibilidad(respuestaAveDisponibilidad, false);
+            if(!disponibilidadPorFecha.isEmpty()){
+                respuesta.put('result', 'OK');
+                respuesta.put('disponibilidadPorFecha', disponibilidadPorFecha);
+            } else {
+                respuesta.put('result', 'KO');
+                respuesta.put('errorMessage', 'El servidor de agendar citas AVE no ha devuelto disponibilidad para el gestor ' + 'U01' + matriculaGestorAVE);
+            }
             respuesta.putAll(procesarInformacionGestor(respuestaAveDisponibilidad));
         } else {
             respuesta.put('result', 'KO');
@@ -180,8 +188,10 @@ public with sharing class CSBD_CitaGestorController {
     @AuraEnabled
     public static Map<String, Object> altaCitaGestorLEGO(Map<String, Object> params){
         Map<String, Object> respuesta = CSBD_WS_LegoAltaCita.altaCita(params);
-
+     
         if(respuesta.get('result') == 'OK'){
+            String tipoCita = getTipoCita((String)params.get('tipoCita'), true);   
+            String tipoCitaTarea = String.isNotBlank(tipoCita) ? tipoCita : (String)params.get('tipoCita');
             //Crear Tarea
             CSBD_Activity.crearActividad(
                 (String)params.get('recordId'),
@@ -192,7 +202,7 @@ public with sharing class CSBD_CitaGestorController {
                     'Fecha: ' + params.get('fechaSeleccionada') + '\n' +
                     'Hora: ' + params.get('franjaSeleccionada') + '\n' +
                     'Asunto: ' + params.get('asunto') + '\n' +
-                    'Tipo de cita: ' + params.get('tipoCita')
+                    'Tipo de cita: ' + tipoCitaTarea
             );
         }
         return respuesta;
@@ -203,6 +213,8 @@ public with sharing class CSBD_CitaGestorController {
 
         Map<String, Object> respuesta = CSBD_WS_AVEAltaCita.altaCitaGestor(params);
         if(respuesta.get('result') == 'OK'){
+            String tipoCita = getTipoCita((String)params.get('medio'), false);
+            String tipoCitaTarea = String.isNotBlank(tipoCita) ? tipoCita : (String)params.get('tipoCita');
             //Crear Tarea
             String gestorMatricula = params.get('gestorMatricula') != null ? (String)params.get('gestorMatricula') : '';
             CSBD_Activity.crearActividad(
@@ -214,11 +226,22 @@ public with sharing class CSBD_CitaGestorController {
                     'Fecha: ' + params.get('fecContacto') + '\n' +
                     'Hora: ' + params.get('horaIni') + '\n' +
                     'Asunto: ' + params.get('asunto') + '\n' +
-                    'Tipo de cita: ' + params.get('medio') + '\n' +
+                    'Tipo de cita: ' + tipoCitaTarea + '\n' +
                     'Oficina: ' + params.get('centroEx')
             );
         }
         return respuesta;
+    }
+
+    private static String getTipoCita(String tipoCitaCode, Boolean esPool){
+        CSBD_CitaGestorSetting__c setting = CSBD_CitaGestorSetting__c.getInstance();   
+        String tiposCitaJson = esPool ? setting.CSBD_TipoCita_Lego__c : setting.CSBD_TiposCita_AVE__c;
+        String tipoCitaSeleccionada = '';
+        if (String.isNotBlank(tiposCitaJson)) {
+            Map<String, Object> tiposCitasMap = (Map<String, Object>)JSON.deserializeUntyped(tiposCitaJson);
+            tipoCitaSeleccionada = (String)tiposCitasMap.get(tipoCitaCode);
+        }
+        return tipoCitaSeleccionada;
     }
 
     private static Map<String, List<Map<String, Object>>> transformarRespuestaDisponibilidad(Map<String, Object> respuesta, Boolean esPool) {
@@ -238,7 +261,8 @@ public with sharing class CSBD_CitaGestorController {
                             'horaInicio' => slot.starTimeSlot,
                             'horaFin' => slot.endTimeSlot,
                             'plazasDisponibles' => slot.numberPlacesAvailable,
-                            'plazasTotales' => slot.numberPlaces
+                            'plazasTotales' => slot.numberPlaces,
+                            'oficina' => null //esto se utiliza solo en el caso de AVE 
                         };
                         slotsPorFecha.add(slotInfo);
                     }
@@ -262,14 +286,15 @@ public with sharing class CSBD_CitaGestorController {
                 // Convertir las horas de inicio y fin a minutos para facilitar el cálculo
                 Integer horaInicioMinutos = convertirHoraAMinutos(disponibilidad.startTime);
                 Integer horaFinMinutos = convertirHoraAMinutos(disponibilidad.endTime);
-
+                String oficina = disponibilidad.branchId;
                 // Generar slots de 30 minutos
                 for(Integer tiempo = horaInicioMinutos; tiempo < horaFinMinutos; tiempo += 30) {
                     Map<String, Object> slotInfo = new Map<String, Object>{
                         'horaInicio' => convertirMinutosAHora(tiempo),
                         'horaFin' => convertirMinutosAHora(tiempo + 30),
                         'plazasDisponibles' => 1,
-                        'plazasTotales' => 1
+                        'plazasTotales' => 1,
+                        'oficina' => oficina //Enviar la oficina ya que puede variar por disponibilidad
                     };
                     slotsPorFecha.add(slotInfo);
                 }
@@ -299,7 +324,6 @@ public with sharing class CSBD_CitaGestorController {
     private static Map<String, Object> procesarInformacionGestor(Map<String, Object> respuestaAVEDisponibilidad) {
         String name = '';
         String lastname = '';
-        String gestorAVEOficina = '';
         Map<String, Object> result = new Map<String, Object>();
 
 
@@ -310,14 +334,11 @@ public with sharing class CSBD_CitaGestorController {
             name = primerGestor.name != null ? primerGestor.name : '';
             String surname = primerGestor.surname != null ? primerGestor.surname : '';
             String secondSurname = primerGestor.secondSurname != null ? primerGestor.secondSurname : '';
-            lastname = String.isNotBlank(secondSurname) ? surname + ' ' + secondSurname : surname;
-            gestorAVEOficina = primerGestor.branchId != null ? primerGestor.branchId : '';
+            lastname = String.isNotBlank(secondSurname) ? surname + ' ' + secondSurname : surname;        
         }
 
         result.put('name', name);
-        result.put('lastname', lastname);
-        result.put('gestorAVEOficina', gestorAVEOficina);
-        //result.put('gestorAVEOficina', '3223');
+        result.put('lastname', lastname);      
         return result;
     }
 

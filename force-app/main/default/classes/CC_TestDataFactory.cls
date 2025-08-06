@@ -58,8 +58,8 @@ public class CC_TestDataFactory {
         User usuarioAdmin = new User();
         usuarioAdmin.profileId = profileAdmin;
         usuarioAdmin.UserRoleId = roleCC;        
-        usuarioAdmin.FirstName = '';
-        usuarioAdmin.LastName = 'Administrador de sistema';
+        usuarioAdmin.FirstName = 'CC_Administrador_Test';
+        usuarioAdmin.LastName = 'CC_Administrador_Test';
         usuarioAdmin.Email = 'tuser000@amamama.com';
         usuarioAdmin.Username = 'tuser000@amama.com' + System.currentTimeMillis();
         usuarioAdmin.CompanyName = 'MST';
@@ -202,11 +202,11 @@ public class CC_TestDataFactory {
     }
 
     public static User getUserAdmin(){
-        return [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1];
+        return [SELECT Id FROM User WHERE LastName = 'CC_Administrador_Test' AND Email = 'tuser000@amamama.com' ORDER BY CreatedDate DESC LIMIT 1 ];
     }
 
     public static User getUserOperadorCliente(){
-        return [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1];
+        return [SELECT Id FROM User Where LastName = 'Operador Cliente' AND Email = 'tuser001@amamama.com' ORDER BY CreatedDate DESC LIMIT 1];
     }
 
     public static void insertarLOVDerivar(){
@@ -964,48 +964,46 @@ public class CC_TestDataFactory {
         return mcc;
     }
 
-    public static Account insertAccount(Map<String, Object> params){
-        Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
-        params.put('recordTypeId', recordTypeCaso);
-        Account nuevoAccount = new Account();
-        for (String campo : params.keySet()) {
-            try {
-                nuevoAccount.put(campo, params.get(campo));
-            } catch (Exception e) {
-                throw new AuraHandledException(e.getMessage());
-            }
-        }
-        try {
-            insert nuevoAccount;
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
+    // public static Account insertAccount(Map<String, Object> params){
+    //     Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
+    //     params.put('recordTypeId', recordTypeCaso);
+    //     Account nuevoAccount = new Account();
+    //     for (String campo : params.keySet()) {
+    //         try {
+    //             nuevoAccount.put(campo, params.get(campo));
+    //         } catch (Exception e) {
+    //             throw new AuraHandledException(e.getMessage());
+    //         }
+    //     }
+    //     try {
+    //         insert nuevoAccount;
+    //     } catch (Exception e) {
+    //         throw new AuraHandledException(e.getMessage());
+    //     }
+    //     return nuevoAccount;
+    // }
 
-        }
-        return nuevoAccount;
-    }
-
-    public static Contact insertContacts(Map<String, Object> params){
-        Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
-        params.put('recordTypeId', recordTypeCaso);
-        Contact nuevoContact = new Contact();
-        Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.Account.fields.getMap();
-        for (String campo : params.keySet()) {
-            if (fieldMap.containsKey(campo)) {
-                try {
-                    nuevoContact.put(campo, params.get(campo));
-                } catch (Exception e) {
-                    throw new AuraHandledException(e.getMessage());
-                }
-            }
-        }
-        try {
-            insert nuevoContact;
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-
-        }
-        return nuevoContact;
-    }
+    // public static Contact insertContacts(Map<String, Object> params){
+    //     Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
+    //     params.put('recordTypeId', recordTypeCaso);
+    //     Contact nuevoContact = new Contact();
+    //     Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.Account.fields.getMap();
+    //     for (String campo : params.keySet()) {
+    //         if (fieldMap.containsKey(campo)) {
+    //             try {
+    //                 nuevoContact.put(campo, params.get(campo));
+    //             } catch (Exception e) {
+    //                 throw new AuraHandledException(e.getMessage());
+    //             }
+    //         }
+    //     }
+    //     try {
+    //         insert nuevoContact;
+    //     } catch (Exception e) {
+    //         throw new AuraHandledException(e.getMessage());
+    //     }
+    //     return nuevoContact;
+    // }
 
     public static Case insertCase(Map<String, Object> params){
         Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');

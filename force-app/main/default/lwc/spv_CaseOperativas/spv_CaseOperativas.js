@@ -50,7 +50,7 @@ import MOTIVODEVOLUCIONENVIO_FIELD from '@salesforce/schema/CBK_Case_Extension__
 import MOTIVODEVOLUCIONENVIOCOMPLEMENTARIA_FIELD from '@salesforce/schema/CBK_Case_Extension__c.SPV_MotivoDevolucionComplementaria__c';
 import MOTIVODEVOLUCIONENVIORECTIFICACION_FIELD from '@salesforce/schema/CBK_Case_Extension__c.SPV_MotivoDevolucionRectificacion__c';
 
-const FIELDS = ['Case.OwnerId', 'Case.Status', 'Case.SAC_MotivoRechazo__c', 'Case.SAC_MotivoDescarte__c' ,'Case.RecordType.DeveloperName', 'Case.SEG_Grupo__c', 'Case.SEG_Subestado__c', 'Case.SAC_EsPrincipal__c', 'Case.SPV_Complementaria_Entidad__c', 'Case.SAC_Prorrogado__c', 'Case.SPV_Rectificado__c', 'Case.SPV_ComplementariaOrganismo__c', 'Case.SPV_Organismo__c', 'Case.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c', 'Case.SAC_PretensionPrincipal__c', 'Case.SAC_PretensionPrincipal__r.OS_Propietario__c'];
+const FIELDS = ['Case.OwnerId', 'Case.SAC_Reclamacion__c', 'Case.SAC_Reclamacion__r.OwnerId', 'Case.Status', 'Case.SAC_MotivoRechazo__c', 'Case.SAC_MotivoDescarte__c' ,'Case.RecordType.DeveloperName', 'Case.SEG_Grupo__c', 'Case.SEG_Subestado__c', 'Case.SAC_EsPrincipal__c', 'Case.SPV_Complementaria_Entidad__c', 'Case.SAC_Prorrogado__c', 'Case.SPV_Rectificado__c', 'Case.SPV_ComplementariaOrganismo__c', 'Case.SPV_Organismo__c', 'Case.CBK_Case_Extension_Id__r.SPV_CasoEnNegociacion__c', 'Case.SAC_PretensionPrincipal__c', 'Case.SAC_PretensionPrincipal__r.OS_Propietario__c'];
 
 const columns = [
     { label: 'Temática', fieldName: 'CC_MCC_Tematica' }, 
@@ -64,7 +64,9 @@ export default class Spv_CaseOperativas extends LightningElement {
     @api selectedOptionGrupoLet = '';
 
     @track esPropietario;
+    @track esPropietarioReclamacion;
     @track owner;
+    @track ownerReclamacion;
     @track recordType;
     @track status; 
     @track subestado;
@@ -374,6 +376,15 @@ export default class Spv_CaseOperativas extends LightningElement {
                 this.esPropietario = false;
             }
 
+            if(this.esPretension) {
+                this.ownerReclamacion = data.fields.SAC_Reclamacion__r.value.fields.OwnerId.value;
+                if(USER_ID === this.ownerReclamacion){
+                    this.esPropietarioReclamacion = true;
+                }else{
+                    this.esPropietarioReclamacion = false;
+                }    
+            }
+
             this.status = data.fields.Status.value;
             this.subestado = data.fields.SEG_Subestado__c.value;
             this.esComplementariaEntidad = data.fields.SPV_Complementaria_Entidad__c.value;
@@ -403,7 +414,10 @@ export default class Spv_CaseOperativas extends LightningElement {
 
             this.esPretPpal = data.fields.SAC_EsPrincipal__c.value;
             // Comprobar si el botón de Pretensión principal debe mostrarse
-            if(this.esPretPpal || (this.noEsPropietario && !this.esCOPSAJ)){
+
+            if (!this.esPretPpal && this.esPropietarioReclamacion && this.status == this.statusAlta) {
+                this.deshabilitarPretPrincipal = false;
+            } else if (this.esPretPpal || (this.noEsPropietario && !this.esCOPSAJ)) {
                 this.deshabilitarPretPrincipal = true;
             }
 
@@ -411,7 +425,7 @@ export default class Spv_CaseOperativas extends LightningElement {
             if(this.status == this.statusBaja){
                 this.esBaja = true;
             }
-            if(this.status == this.statusBaja || (this.noEsPropietario && !this.esCOPSAJ)){
+            if(this.status == this.statusBaja || (this.noEsPropietario && !this.esCOPSAJ && !this.esPropietarioReclamacion)){
                 this.deshabilitarBaja = true;
             }
 
@@ -981,10 +995,10 @@ export default class Spv_CaseOperativas extends LightningElement {
     }
 
     get noEsPropietario(){
-        if(this.esCOPSAJ){
-            return this.esPropietario;
+        if(this.esCOPSAJ || this.esPropietario){
+            return false;
         }else{
-            return !this.esPropietario;
+            return true;
         }
     }
 

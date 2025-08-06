@@ -14,7 +14,7 @@ global with sharing class CSBD_WS_PuntoServicio extends CBK_HttpServiceIntegrati
             // Parse the JSON body into a Map<String, Object>
             ContactInfo contactInfo = (ContactInfo) JSON.deserialize(jsonBody, ContactInfo.class);
             CSBD_DetectarOportunidadesSimilares controller = CSBD_DetectarOportunidadesSimilares.getInstance(
-                new List<String>{contactInfo.documentId}, 
+                contactInfo.documentIds, //diferentes nif de diff titulares. 
                 contactInfo.requestPrescriberId, 
                 'Plataformas Hipotecarias Digitales'
             );
@@ -53,7 +53,7 @@ global with sharing class CSBD_WS_PuntoServicio extends CBK_HttpServiceIntegrati
         public String name;
         public String lastname;
         public Integer documentType;
-        public String documentId;
+        public List<String> documentIds;
         public String requestPrescriberId;     
     }
     

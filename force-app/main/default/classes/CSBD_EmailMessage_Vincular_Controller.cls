@@ -4,16 +4,20 @@ public without sharing class CSBD_EmailMessage_Vincular_Controller {
     public static List<EmailMessage> obtenerCorreosNoVinculados(String empresa) {
         if (String.isNotBlank(empresa)) {
 
-            Map<String, String> buzonesCSBD = new Map<String, String>();
-            for (OrgWideEmailAddress buzonCSBD : [SELECT DisplayName, Address FROM OrgWideEmailAddress WHERE DisplayName LIKE 'CSBD%' OR DisplayName LIKE 'Now In Sales%']) {
+           /* Map<String, String> buzonesCSBD = new Map<String, String>();
+            for (OrgWideEmailAddress buzonCSBD : [SELECT DisplayName, Address FROM OrgWideEmailAddress WHERE DisplayName LIKE 'CSBD%' OR DisplayName LIKE 'Banca Digital - Caixabank']) {
                 buzonesCSBD.put(buzonCSBD.DisplayName, buzonCSBD.Address);
-            }
+            }*/
 
             List<String> buzonesMostrar = new List<String>();
-            if (empresa == 'CaixaBank') {
-                buzonesMostrar.add(buzonesCSBD.get('CSBD - CaixaBank'));
+            /*if (empresa == 'CaixaBank') {
+                buzonesMostrar.add(buzonesCSBD.get('Banca Digital - Caixabank'));
             } else if (empresa == 'imaginBank') {
                 buzonesMostrar.add(buzonesCSBD.get('CSBD - ImaginBank'));
+            }*/
+            Id idBuzonSalida = CSBD_MetodosComunes.obtenerIdBuzonSalida(empresa);
+            if (idBuzonSalida != null) {
+                buzonesMostrar.add([SELECT Address FROM OrgWideEmailAddress WHERE Id = :idBuzonSalida]?.Address);
             }
             return [SELECT CC_Id_Aux__c, MessageDate, FromAddress, ToAddress, Status, Subject, HtmlBody, HasAttachment FROM EmailMessage
                     WHERE CC_Aplicacion__c = 'CSBD' AND Incoming = True

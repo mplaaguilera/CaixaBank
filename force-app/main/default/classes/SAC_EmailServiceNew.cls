@@ -75,6 +75,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
         List<SAC_Interaccion__c> lstInteracciones = new List<SAC_Interaccion__c>();
         List<SAC_Accion__c> lstAcciones = new List<SAC_Accion__c>();
         
+        //Se inicializa la variable de esta forma para que en el caso de que no encuentre threadID no encuentre resultados si busca por un threadId vacío
+        String threadId = 'ref:_:ref';
         try{
 
             String texto = email.htmlBody;
@@ -82,20 +84,20 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                 texto = email.plainTextBody;
             }
             
-            String threadId = '';
             Boolean encontradoThread = false;
             Boolean encontradoInteraccionTarea = false;
             // US682922 - TA646298 - Guardar la fecha original del mensaje entrante
             Datetime emailDate = SAC_Utils.recuperarFechaEmail(email);
             
-            //Obtenemos el ThreadId del mensaje entrante en el formato correcto.
-            if (String.isNotBlank(texto)){
+            //Obtenemos el ThreadId del mensaje entrante en el formato correcto, y que contenga ambos bordes para extraerlo
+            if (String.isNotBlank(texto) && texto.contains('ref:_') && texto.contains(':ref')){
                 threadId = texto.substringAfter('ref:_').substringBefore(':ref');
                 if(String.isNotBlank(threadId)){  
                     encontradoThread = true;
                 }
                 threadId = ('ref:_' + threadId + ':ref');
             }
+
             if(encontradoThread){
                
                 lstInteracciones = [SELECT Id, SAC_Reclamacion__c,SAC_FechaRespuesta__c,SAC_EmailRespuesta__c,SAC_Estado__c,SAC_IndexedThreadId__c, RecordTypeId, SAC_Respuesta__c,
@@ -343,7 +345,7 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
             }
         }catch(Exception e){
             // Método sobrecargado para registrar errores en con el objeto Messaging.InboundEmail.
-            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage(), email);
+            CBK_Log.error(e, 'Error procesando el correo entrante. ' + 'CLASSNAME: ' + CLASSNAME + ' - METHODNAME: ' + methodname + ' - MSG ERROR: ' + e.getMessage() + ' - THREAD ID: ' + threadId, email);
             CBK_Log.ResultWrapper resultado = new CBK_Log.ResultWrapper();
 
             resultado.Status = 'KO';

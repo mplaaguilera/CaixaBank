@@ -282,6 +282,7 @@ public with sharing class CSBD_WS_AltaOportunidad_Input_Test {
         inputSolicitud.solucion = 'valor';
         inputSolicitud.detallesConsulta = 'valor';
         inputSolicitud.detallesSolucion = 'valor';
+        inputSolicitud.indicadoresCliente = 'valor';
         inputSolicitud.casoOrigen = 'valor';
         inputSolicitud.accountId = 'valor';
         inputSolicitud.contactId = 'valor';

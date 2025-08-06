@@ -52,6 +52,7 @@ const columnsPretensionExpandida = [
     { label: 'Tipo', fieldName: 'SAC_Tipo__c', type: 'text', sortable: true },
     { label: 'Descripción', fieldName: 'SAC_Descripcion__c', type: 'text', sortable: true },
     { label: 'Nº Contrato', fieldName: 'N_Contrato__c', type: 'text', sortable: true },
+    { label: 'Contrato a Remediar', fieldName: 'SAC_ContratoRemediarTexto__c', type: 'text', sortable: true },
     { label: 'Tae máximo aplicado', fieldName: 'SAC_TaeMaximoAplicado__c', type: 'number', sortable: true, cellAttributes: { iconName: 'utility:percent', iconPosition: 'right' }, typeAttributes: { minimumFractionDigits: 2, maximumFractionDigits: 2 } },
     { label: 'Tae inicial contrato', fieldName: 'SAC_TaeInicialContrato__c', type: 'number', sortable: true, cellAttributes: { iconName: 'utility:percent', iconPosition: 'right' }, typeAttributes: { minimumFractionDigits: 2, maximumFractionDigits: 2 } },
     { label: 'Negociar', fieldName: 'SAC_Negociar__c', type: 'text', sortable: true },
@@ -98,8 +99,14 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
     sacDisponemosContrato;
     sacProcedenciaContrato;
     sacCajaProcedencia; //Campo solo visible si la procedencia del contrato es Banca Cívica
+    sacOficina;
+    sacContrato;
+    sacModalidad;
+    sacDigitoControl;
     @track caseNumber;
     @track mostrarCajaProcedencia = false;
+    sacContratoRemediar = false;
+    mostrarCamposAdicionales = false;
 
     @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
     case;
@@ -281,7 +288,8 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
                 SAC_FechaApertura__c: prod.SAC_FechaApertura__c,
                 SAC_FechaCancelacion__c: prod.SAC_FechaApertura__c,
                 SAC_ProcedenciaContrato__c: prod.SAC_ProcedenciaContrato__c,
-                SAC_CajaProcedencia__c: prod.SAC_CajaProcedencia__c
+                SAC_CajaProcedencia__c: prod.SAC_CajaProcedencia__c,
+                SAC_ContratoRemediarTexto__c: prod.SAC_ContratoRemediarTexto__c
             };
         });
     }
@@ -345,6 +353,22 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
             }
         }else if (field === 'SAC_CajaProcedencia__c'){
             this.sacCajaProcedencia = event.target.value;
+        }else if (field === 'SAC_ContratoRemediar__c') {
+            this.sacContratoRemediar = event.target.value;
+            console.log('🔍 Valor de sacContratoRemediar:', this.sacContratoRemediar);
+            if (this.sacContratoRemediar) {
+                this.mostrarCamposAdicionales = true;
+            } else {
+                this.mostrarCamposAdicionales = false;
+            }
+        } else if (field === 'SAC_Oficina__c') { 
+            this.sacOficina = event.target.value;
+        } else if (field === 'SAC_Modalidad__c') { 
+            this.sacModalidad = event.target.value;
+        } else if (field === 'SAC_Contrato__c') { 
+            this.sacContrato = event.target.value;
+        } else if (field === 'SAC_DigitoControl__c') { 
+            this.sacDigitoControl = event.target.value;
         }
     }
 
@@ -386,7 +410,14 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
                 negociar: this.sacNegociar,
                 disponemosContrato: this.sacDisponemosContrato,
                 procedenciaContrato: this.sacProcedenciaContrato,
-                cajaProcedencia: this.sacCajaProcedencia
+                cajaProcedencia: this.sacCajaProcedencia,
+
+                contratoR: this.sacContrato,
+                oficina: this.sacOficina,
+                modalidad: this.sacModalidad,
+                digitoControl: this.sacDigitoControl,
+                contratoRemediar: this.sacContratoRemediar
+
             })
             .then(result => {
                 this.showToast('Éxito', 'Se ha creado el producto correctamente', 'success');
@@ -415,6 +446,12 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
         this.sacProcedenciaContrato = null;
         this.sacCajaProcedencia = null;
         this.mostrarCajaProcedencia = false;
+        this.mostrarCamposAdicionales = false;
+        this.sacContratoRemediar = false;
+        this.sacOficina = null;
+        this.sacContrato = null;
+        this.sacModalidad = null;
+        this.sacDigitoControl = null;
     }
 
     // Manejar éxito al guardar el registro
@@ -455,7 +492,14 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
                 negociar: this.sacNegociar,
                 disponemosContrato: this.sacDisponemosContrato,
                 procedenciaContrato: this.sacProcedenciaContrato,
-                cajaProcedencia : this.sacCajaProcedencia
+                cajaProcedencia : this.sacCajaProcedencia,
+
+                contratoR: this.sacContrato,
+                oficina: this.sacOficina,
+                modalidad: this.sacModalidad,
+                digitoControl: this.sacDigitoControl,
+                contratoRemediar: this.sacContratoRemediar
+
             })
             .then(result => {
                 this.showToast('Éxito', 'Se ha editado el producto correctamente', 'success');
@@ -504,6 +548,16 @@ export default class Sac_ProductosPretension extends NavigationMixin(LightningEl
 
             this.editProductModalOpen = true;
             this.abrirModalListaProductos = false;
+            this.sacOficina = producto.SAC_Oficina__c;
+            this.sacModalidad = producto.SAC_Modalidad__c;
+            this.sacContrato = producto.SAC_Contrato__c;
+            this.sacDigitoControl = producto.SAC_DigitoControl__c;
+            this.sacContratoRemediar = producto.SAC_ContratoRemediar__c;
+
+            if (this.sacContratoRemediar) {
+                this.mostrarCamposAdicionales = true;
+            }
+            
         }
     }
 

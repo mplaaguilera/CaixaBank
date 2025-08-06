@@ -26,6 +26,7 @@ public with sharing class CC_Gestion_Derivar_Global {
                 AccountId,
                 CreatedDate,
                 RecordTypeId,
+                CC_No_Identificado__c,
                 //MOTIVO
                 CC_MCC_Motivo__c, 
                 CC_MCC_Motivo__r.CC_Alerta_Caixa__c,
@@ -109,6 +110,7 @@ public with sharing class CC_Gestion_Derivar_Global {
         Boolean ambitoCSBD = false;
         Boolean imagin = false;
         Boolean ambitoFraude = false;
+        Boolean ambitoCBP = false;//CBP
         Boolean preguntaTrasladarDocumentacion = true;
         String ambitoMotivo;
 
@@ -151,6 +153,7 @@ public with sharing class CC_Gestion_Derivar_Global {
                ambitoVentas = true;
             }
         }
+
         //devolucion desde CSBD a CC
         if(caso.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c != null && caso.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__r.CSBD_Resolucion__c == 'Devolución a contact') {
             ambitoMotivo = null;
@@ -182,6 +185,14 @@ public with sharing class CC_Gestion_Derivar_Global {
 
         if(ambitoMotivo == 'Mecanismo de firma') {
             ambitoVentas = true;
+        }
+
+        if(ambitoMotivo == 'CBP') { //CBP
+            ambitoCBP = true;
+            if(!caso.Account.CC_EsIntouch__c) {
+                ambitoVentas = true;
+            } 
+
         }
 
         if(ambitoMotivo == 'Documentación') {
@@ -220,6 +231,7 @@ public with sharing class CC_Gestion_Derivar_Global {
         retorno.put('imagin', imagin);
         retorno.put('ambitoVentas', ambitoVentas);
         retorno.put('ambitoFraude', ambitoFraude);
+        retorno.put('ambitoCBP', ambitoCBP);//CBP
         retorno.put('preguntaTrasladarDocumentacion', preguntaTrasladarDocumentacion);
     }
 
@@ -383,14 +395,14 @@ public with sharing class CC_Gestion_Derivar_Global {
                 retorno.put('ambitoVentas', true);
                 rellenarDatosAmbitoVentas(caso, retorno, gestorGenericoName, consultarGestorPool, textosMap);
             } else {
-            retorno.put('ambitoCSBD', true);
-            retorno.put('oportunidadCreada', caso.CC_Oportunidad_Creada__c);
-            retorno.put('toastCSBDNoContratar', textosMap.get('Toast CSBD No Contratar cliente confidencial'));
-            retorno.put('textoOportunidadExistente', textosMap.get('Texto Oportunidad Existente'));
-            retorno.put('textoMotivoCSBDNoContratar', textosMap.get('Texto motivo CSBD No Contratar cliente confidencial'));
-            retorno.put('CSBDConfidencial', true);
+                retorno.put('ambitoCSBD', true);
+                retorno.put('oportunidadCreada', caso.CC_Oportunidad_Creada__c);
+                retorno.put('toastCSBDNoContratar', textosMap.get('Toast CSBD No Contratar cliente confidencial'));
+                retorno.put('textoOportunidadExistente', textosMap.get('Texto Oportunidad Existente'));
+                retorno.put('textoMotivoCSBDNoContratar', textosMap.get('Texto motivo CSBD No Contratar cliente confidencial'));
+                retorno.put('CSBDConfidencial', true);
+            }
         }
-    }
     }
 
     public static void rellenarDatosHubImagin(Map<String, Object> retorno, Map<String, Object> textosMap){
@@ -432,11 +444,16 @@ public with sharing class CC_Gestion_Derivar_Global {
             }
         }
     }
-    public static void rellenarDatosAmbitoCSBD(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
+    public static void rellenarDatosAmbitoCSBD(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap) {
         Boolean ambitoVentas = (Boolean) retorno.get('ambitoVentas');
         String ambitoMotivo = (String) retorno.get('ambitoMotivo');
         Boolean ambitoCSBD = (Boolean) retorno.get('ambitoCSBD');
         Boolean imagin = (Boolean) retorno.get('imagin');
+        List<String> valoresParametrizacionCSBD = String.valueOf(CC_MetodosUtiles.getCustomSetting('CC_ParametrizacionesCSBD').CC_Configuracion_1__c).split(';');
+        Boolean condicionClienteDigital = Boolean.valueOf(valoresParametrizacionCSBD[0]);
+        Boolean condicionTipoPersona = Boolean.valueOf(valoresParametrizacionCSBD[1]);
+        Boolean condicionOTP = Boolean.valueOf(valoresParametrizacionCSBD[2]);
+        
         if(caso.Account.AV_OficinaPrincipal__r.Parent.CC_Derivacion_CSBD__c) {
             String numPerso = CC_OTP.recuperarNumperso(caso);          
             Map<String, String> retornoAutenticacionSAU = CC_WS_Autenticacion_SAU.ccWsEnvioAutenticacion(imagin, numPerso,false, caso);//MBO
@@ -445,21 +462,24 @@ public with sharing class CC_Gestion_Derivar_Global {
             retorno.put('resAutenticacionSAU', retornoAutenticacionSAU.get('allRes'));
             retorno.put('nombreTraza', retornoAutenticacionSAU.get('nombreTraza'));
             retorno.put('autenticacionSAU', true);
-            if(clienteDigital == 'exist_contract' && caso.Account.CC_Tipo_Persona__c == 'F') {
-                if(caso.CC_OTP_Nivel__c != null && caso.CC_Status_Autorizacion__c != 'APPROVED' && caso.CC_OTP_Valido__c == false) {
+            if((clienteDigital == 'exist_contract' && condicionClienteDigital) && (caso.Account.CC_Tipo_Persona__c == 'F' && condicionTipoPersona)) {
+                if(caso.CC_OTP_Nivel__c != null && caso.CC_Status_Autorizacion__c != 'APPROVED' && caso.CC_OTP_Valido__c == false && condicionOTP) {
                     ambitoCSBD = false;
                     ambitoVentas = true;
                 } else {
-                Boolean telefonoCSBD = CC_MetodosUtiles.getCustomSetting('CC_TelefonoActivoCSBD').CC_Configuracion_1__c == 'true' ? true : false;
-                String preguntaTelefonoCSBD = textosMap.get('Pregunta Telefono CSBD').toString();
-                if(telefonoCSBD) {
-                    preguntaTelefonoCSBD = preguntaTelefonoCSBD.replace('[telefono]', caso.Account.PersonMobilePhone != null ? caso.Account.PersonMobilePhone : 'no definido');
-                    retorno.put('preguntaTelefonoCSBD', preguntaTelefonoCSBD);
-                    retorno.put('preguntaTelefonoCSBDNoEncontrado', textosMap.get('Pregunta Telefono CSBD No Encontrado'));
-                }
+                    Boolean telefonoCSBD = CC_MetodosUtiles.getCustomSetting('CC_TelefonoActivoCSBD').CC_Configuracion_1__c == 'true' ? true : false;
+                    String preguntaTelefonoCSBD = textosMap.get('Pregunta Telefono CSBD').toString();
+                    if(telefonoCSBD) {
+                        preguntaTelefonoCSBD = preguntaTelefonoCSBD.replace('[telefono]', caso.Account.PersonMobilePhone != null ? caso.Account.PersonMobilePhone : 'no definido');
+                        retorno.put('preguntaTelefonoCSBD', preguntaTelefonoCSBD);
+                        retorno.put('preguntaTelefonoCSBDNoEncontrado', textosMap.get('Pregunta Telefono CSBD No Encontrado'));
+                    }
                     if(ambitoMotivo == 'CSBD 3N') {
                         retorno.put('toastTrasladar3N', textosMap.get('Toast trasladar 3N'));
                     } else if(ambitoMotivo == 'CSBD No Contratar') {
+                        if (CC_MetodosUtiles.getCustomSetting('CC_ParametrizacionesCSBD').CC_Configuracion_2__c == 'true' ? true : false) {
+                            retorno.put('modalParametrizableCSBD', textosMap.get('Modal CSBD No Contratar parametrizable'));
+                        }
                         retorno.put('oportunidadCreada', caso.CC_Oportunidad_Creada__c);
                         retorno.put('toastCSBDNoContratar', textosMap.get('Toast CSBD No Contratar'));
                         retorno.put('textoOportunidadExistente', textosMap.get('Texto Oportunidad Existente'));
@@ -626,7 +646,7 @@ public with sharing class CC_Gestion_Derivar_Global {
         CC_Settings__c configuracion = CC_Settings__c.getValues('CC_GruposColaboradoresFraude');
         retorno.put('cyberfraude', configuracion.CC_Configuracion_3__c);
         retorno.put('cybersoc', configuracion.CC_Configuracion_4__c);
-        //retorno.put('preguntaIdBancaDigital', textosMap.get('Pregunta Identificador Banca Digital'));
+        retorno.put('preguntaIdBancaDigital', textosMap.get('Pregunta Identificador Banca Digital'));
     }
 
     @AuraEnabled
@@ -661,34 +681,42 @@ public with sharing class CC_Gestion_Derivar_Global {
     //MGT
     public static void rellenarDatosMecanismoFirma(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
         //Obtener el custom setting con los circuitos
-		CC_Settings__c configuracion = CC_Settings__c.getValues('CC_MecanismoFirmaCircuitos');
-		String circuitoExtranjero = configuracion.CC_Configuracion_1__c;
-		String circuitoCodigoFirma = configuracion.CC_Configuracion_2__c;
+		CC_Settings__c configuracion = CC_Settings__c.getValues('CC_MecanismoFirmaCircuitoCaso');
+		Boolean circuitoEncendido = configuracion.CC_Activa__c;
 
         Boolean mecanismoFirma = [SELECT CBK_Case_Extension_Id__r.CC_MecanismoFirma__c FROM Case WHERE Id = :caso.Id LIMIT 1].CBK_Case_Extension_Id__r.CC_MecanismoFirma__c; 
+        List<Task> tareaIdentoficadorBloqueado = [SELECT Id FROM Task WHERE WhatId = :caso.Id AND Type ='Identificador bloqueado' LIMIT 1]; 
 
         if(!mecanismoFirma){
-            // Obtener el string original de textosMap
-            String mecanismoFirmaDatosValores = textosMap.get('Pregunta mecanismo firma datos preguntas').toString();
-            
-            // Dividir el string en una lista utilizando una coma como delimitador
-            List<String> mecanismoFirmaDatosValoresLista = mecanismoFirmaDatosValores.split(',');
-            retorno.put('preguntaMecanismoFirma', textosMap.get('Pregunta mecanismo firma'));
-            retorno.put('preguntaMecanismoFirmaDatos', textosMap.get('Pregunta mecanismo firma datos'));
-            retorno.put('preguntaMecanismoFirmaDatosValores', mecanismoFirmaDatosValoresLista);
-            retorno.put('preguntaMecanismoFirmaIdentificador', textosMap.get('Pregunta mecanismo firma identificador'));
-            retorno.put('toastMecanismoFirmaIdentificadorBloqueado', textosMap.get('Toast mecanismo firma identificador bloqueado'));
-            retorno.put('toastMecanismoFirmaIdentificadorSinBloquear', textosMap.get('Toast mecanismo firma identificador no bloqueado'));
-            retorno.put('toastMecanismoFirmaArgosCorrecto', textosMap.get('Toast  mecanismo firma argos correcto'));
-            retorno.put('toastMecanismoFirmaDatosIncompletos', textosMap.get('Toast mecanismo firma datos incompletos'));
-            retorno.put('toastMecanismoFirmaCasoCreado', textosMap.get('Toast mecanismo firma caso creado'));
+            if(!tareaIdentoficadorBloqueado.isEmpty()){
+                retorno.put('preguntaIdentificadorSigueBloqueado', textosMap.get('Pregunta identificador sigue bloqueado'));
+            } else {
+                // Obtener el string original de textosMap
+                String mecanismoFirmaDatosValores = textosMap.get('Pregunta mecanismo firma datos preguntas').toString();
+                
+                // Dividir el string en una lista utilizando una coma como delimitador
+                List<String> mecanismoFirmaDatosValoresLista = mecanismoFirmaDatosValores.split(',');
+                retorno.put('preguntaMecanismoFirma', textosMap.get('Pregunta mecanismo firma'));
+                retorno.put('preguntaMecanismoFirmaDatos', textosMap.get('Pregunta mecanismo firma datos'));
+                retorno.put('preguntaMecanismoFirmaDatosValores', mecanismoFirmaDatosValoresLista);
+                retorno.put('preguntaMecanismoFirmaIdentificador', textosMap.get('Pregunta mecanismo firma identificador'));
+                retorno.put('toastMecanismoFirmaIdentificadorBloqueado', textosMap.get('Toast mecanismo firma identificador bloqueado'));
+                retorno.put('toastMecanismoFirmaArgosCorrecto', textosMap.get('Toast  mecanismo firma argos correcto'));
+                retorno.put('toastMecanismoFirmaDatosIncompletos', textosMap.get('Toast mecanismo firma datos incompletos'));
+                retorno.put('toastMecanismoFirmaCasoCreado', textosMap.get('Toast mecanismo firma caso creado'));
+
+            }
+           
+            if (circuitoEncendido) {
+                retorno.put('toastMecanismoFirmaIdentificadorSinBloquear', textosMap.get('Toast mecanismo firma identificador no bloqueado'));
+            }else{
+                retorno.put('toastMecanismoFirmaIdentificadorSinBloquear', textosMap.get('Toast mecanismo firma identificador no bloqueado circuito apagado'));
+            }
+           
             retorno.put('ambitoVentas', true);
 
         }else{
             //Obtener el custom setting con los circuitos
-            retorno.put('circuitoExtranjero', circuitoExtranjero);
-            retorno.put('circuitoCodigoFirma', circuitoCodigoFirma);
-
             CC_Settings__c configuracion2 = CC_Settings__c.getValues('CC_GruposColaboradoresMecanismoFirma');
             retorno.put('cybersocMF', configuracion2.CC_Configuracion_1__c);
 
@@ -702,23 +730,36 @@ public with sharing class CC_Gestion_Derivar_Global {
         //retorno.put('mostrarModalToast', true);
     }
 
-    // //Amenazas
-    // public static void rellenarDatosAmenazasSuicidios(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
-    //     retorno.put('mensajeSolicitudDatosAmenazasSuicidios', textosMap.get('Mensaje solicitud datos amenazas suicidios'));
-    //     retorno.put('emailSuccess', textosMap.get('Mensaje email enviado OK'));
-    //     retorno.put('nombrePlantilla', textosMap.get('Nombre Plantilla Amenazas Suicidios'));
-    //     retorno.put('grupoCol', CC_Settings__c.getValues('CC_GruposColaboradoresParamDerivar').CC_Configuracion_2__c);
-    //     retorno.put('nameOWA', textosMap.get('OWA activa amenazas'));
-    // }
-    // public static void rellenarDatosAmenazasEmpleados(Map<String, Object> retorno, Map<String, Object> textosMap){
-    //     retorno.put('mensajeSolicitudDatosAmenazasEmpleados', textosMap.get('Mensaje solicitud datos amenazas empleados'));
-    //     retorno.put('cambioOficina', true);
-    //     retorno.put('nombrePlantilla', textosMap.get('Nombre Plantilla Amenazas Empleados'));
-    //     retorno.put('emailSuccess', textosMap.get('Mensaje email enviado OK'));
-    //     retorno.put('grupoCol', CC_Settings__c.getValues('CC_GruposColaboradoresParamDerivar').CC_Configuracion_1__c);
-    //     retorno.put('nameOWA', textosMap.get('OWA activa amenazas'));
-    // }
-    // //Amenazas
+    //Amenazas
+    public static void rellenarDatosAmenazas(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
+        //Comunes
+        retorno.put('mensajeDerivacionAmenazasTipo', textosMap.get('Mensaje derivacion amenazas tipo'));
+        retorno.put('nameOWA', CC_Settings__c.getValues('CC_OWA_Por_Defecto_Email_Automatico').CC_Configuracion_1__c);
+        //Amenazas suicidios
+        retorno.put('mensajeSolicitudDatosAmenazasSuicidios', textosMap.get('Mensaje solicitud datos amenazas suicidios'));
+        retorno.put('emailSuccess', textosMap.get('Mensaje email enviado OK'));
+        retorno.put('nombrePlantilla', textosMap.get('Nombre Plantilla Amenazas Suicidios'));
+        retorno.put('grupoColClientesAmenazas', CC_Settings__c.getValues('CC_GruposColaboradoresParamDerivar').CC_Configuracion_2__c);
+        //Amenazas empleados
+        retorno.put('mensajeSolicitudDatosAmenazasEmpleados', textosMap.get('Mensaje solicitud datos amenazas empleados'));
+        retorno.put('cambioOficina', true);
+        retorno.put('nombrePlantillaAmenazasEmpleados', textosMap.get('Nombre Plantilla Amenazas Empleados'));
+        retorno.put('emailSuccess', textosMap.get('Mensaje email enviado OK'));
+        retorno.put('grupoColEmpleadosAmenazas', CC_Settings__c.getValues('CC_GruposColaboradoresParamDerivar').CC_Configuracion_1__c);
+    }
+    
+    // CBP
+
+    public static void rellenarDatosCBP(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap) {
+        Boolean esIntouch = caso.Account.CC_EsIntouch__c;
+        retorno.put('nameOWA', CC_Settings__c.getValues('CC_OWA_Por_Defecto_Email_Automatico').CC_Configuracion_2__c);
+        retorno.put('mostrarModalCBP', true);
+        retorno.put('RefinanciacionDeudas1', textosMap.get('Pregunta números de contrato'));
+        retorno.put('esIntouch', esIntouch);
+        retorno.put('preguntaCBP', textosMap.get('Pregunta CBP')); 
+        retorno.put('nombrePlantilla', 'Plantilla CBP');
+        retorno.put('grupoCol', CC_Settings__c.getValues('CC_GruposColaboradoresCBP').CC_Configuracion_1__c);
+    }
 
     public static void rellenarDatosSAC(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap) {
         Boolean mostrarDerivarSAC = false;
@@ -764,13 +805,18 @@ public with sharing class CC_Gestion_Derivar_Global {
         retorno.put('mostrarModalToast', true);
     }
 
-    /*
+
+
+    
     // Colectivos vulnerables
     @AuraEnabled
     public static void rellenarDatosColectivosVulnerables(Map<String, Object> retorno, Map<String, Object> textosMap) {
         retorno.put('mensajeColectivosVulnerables', textosMap.get('Texto para oficina gestora'));
-        retorno.put('mostrarModalToast', true);
-    }*/
+        retorno.put('preguntaColectivosVulnerables', textosMap.get('Pregunta colectivo vulnerable'));  
+        retorno.put('nameOWA', CC_Settings__c.getValues('CC_OWA_Por_Defecto_Email_Automatico').CC_Configuracion_3__c);
+        retorno.put('nombrePlantilla', CC_Settings__c.getValues('CC_GruposColaboradoresColVulnerable').CC_Configuracion_2__c);
+        retorno.put('grupoCol', CC_Settings__c.getValues('CC_GruposColaboradoresColVulnerable').CC_Configuracion_1__c);      
+    }
     
     public static void rellenarDatosCashBack(Map<String, Object> retorno, Map<String, Object> textosMap){
         retorno.put('CashBack1', textosMap.get('CashBack 1'));
@@ -787,14 +833,35 @@ public with sharing class CC_Gestion_Derivar_Global {
         retorno.put('RefinanciacionDeudas4', textosMap.get('Final Operativa'));
     }
 
-    /*
+
+    
     @AuraEnabled
     public static Boolean recuperarArgos(String recordId) {
+        List<Task> tareasArgos = [SELECT Id, CC_Detalles_Solucion__c FROM Task WHERE Type = 'Argos' AND WhatId= :recordId ORDER BY CreatedDate DESC LIMIT 1];
+        Case caso = [SELECT Id, AccountId, ContactId FROM Case WHERE Id = :recordId LIMIT 1];
+
         Boolean restricted = recuperarArgosRestricted(recordId);
         Boolean denied = recuperarArgosDenied(recordId);
+        Boolean retorno = false;
         Boolean argos = denied || restricted;
+
+        // Extraer AccountId y ContactId de CC_Detalles_Solucion__c
+        String detallesSolucion = tareasArgos[0].CC_Detalles_Solucion__c;
+        Boolean idsCoinciden = false;
+        if (String.isNotBlank(detallesSolucion) && detallesSolucion.contains('-')) {
+            List<String> partes = detallesSolucion.split('-');
+            if (partes.size() == 2) {
+                String accountIdDetalle = partes[0].trim();
+                String contactIdDetalle = partes[1].trim();
+                if (accountIdDetalle == caso.AccountId.toString() && contactIdDetalle == caso.ContactId.toString() ) {
+                    idsCoinciden = true;
+                }
+            }
+        }
+
+        retorno = argos && idsCoinciden;
         
-        return argos;
+        return retorno;
     }
 
     @AuraEnabled
@@ -826,6 +893,5 @@ public with sharing class CC_Gestion_Derivar_Global {
         Case caso = [SELECT Id FROM Case WHERE Id = :recordId LIMIT 1];
         caso.CC_Detalles_Solucion__c = detallesSolucion;
         update caso;
-    }*/
-
+    }
 }

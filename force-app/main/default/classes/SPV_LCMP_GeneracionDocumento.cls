@@ -46,7 +46,7 @@ public with sharing class SPV_LCMP_GeneracionDocumento {
     }
 
     @AuraEnabled
-    public static void generarDocumento(String id){
+    public static void generarDocumento(String id, String nombreDocumento){
         try {
             String procedencia = 'generacionDocSPV';
             
@@ -57,25 +57,57 @@ public with sharing class SPV_LCMP_GeneracionDocumento {
             String vfHostname = DomainCreator.getVisualforceHostname(null);
             String urlVF =  vfHostname + '/apex/SAC_DocumentoRedaccionPDF?id=' + docEnvio.Id;
     
-            adjuntarPDFaCaso(urlVF, docEnvio.SAC_Caso__c , procedencia);
+            adjuntarPDFaCaso(urlVF, docEnvio.SAC_Caso__c , procedencia, nombreDocumento);
 
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
     }
 
-    public static void adjuntarPDFaCaso(String url, Id parentId, String procedencia){
-        Case caso = [SELECT CaseNumber, CC_Idioma__c, recordType.DeveloperName FROM Case WHERE id =: parentId LIMIT 1];
-        String numCaso = caso.CaseNumber;
-        String nombreDocumento;
 
-        if(caso.CC_Idioma__c == 'es') { nombreDocumento = '  documento generado ESP'; }
+    //metodo que extrae el numero de caso y el idioma en el que se va a generar el documento
+    @AuraEnabled
+    public static Map<String, Object> informacionCaso(String id) {
+        try {
+            String procedencia = 'generacionDocSPV';
+
+            SAC_DocumentoEnvio__c docEnvio = [SELECT SAC_Caso__c, SAC_Documento__c, SAC_DocPDF__c, SAC_Version__c, Id
+                                            FROM SAC_DocumentoEnvio__c 
+                                            WHERE Id =: id 
+                                            AND SAC_Documento__c = null 
+                                            AND SAC_TipoDocumento__c =: procedencia 
+                                            ORDER BY CreatedDate DESC 
+                                            LIMIT 1];
+
+            Case caso = [SELECT CaseNumber, CC_Idioma__c, RecordType.DeveloperName 
+                        FROM Case 
+                        WHERE Id = :docEnvio.SAC_Caso__c 
+                        LIMIT 1];
+
+            Map<String, Object> resultado = new Map<String, Object>();
+            resultado.put('numeroCaso', caso.CaseNumber);
+            resultado.put('idioma', caso.CC_Idioma__c);
+            return resultado;
+
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+
+    public static void adjuntarPDFaCaso(String url, Id parentId, String procedencia, String nombreDocumentoParametro){
+        Case caso = [SELECT CaseNumber, CC_Idioma__c, recordType.DeveloperName FROM Case WHERE id =: parentId LIMIT 1];
+        //String numCaso = caso.CaseNumber;
+        //String numCaso = nombreDocumentoParametro;
+        //String nombreDocumento;
+
+        /*if(caso.CC_Idioma__c == 'es') { nombreDocumento = '  documento generado ESP'; }
         else if(caso.CC_Idioma__c == 'ca') { nombreDocumento = '  documento generado CAT '; }
         else if(caso.CC_Idioma__c == 'en') { nombreDocumento = '  documento generado ENG'; }
         else if(caso.CC_Idioma__c == 'va') { nombreDocumento = '  documento generado VAL'; }
         else if(caso.CC_Idioma__c == 'ga') { nombreDocumento = '  documento generado GAL'; }
         else if(caso.CC_Idioma__c == 'eu') { nombreDocumento = '  documento generado EUSK'; }
-        else { nombreDocumento = ' documento generado DEFAULT'; }
+        else { nombreDocumento = ' documento generado DEFAULT'; }*/
 
         PageReference pageRef = new PageReference('https://' + url);          
         Blob body;
@@ -106,7 +138,7 @@ public with sharing class SPV_LCMP_GeneracionDocumento {
         //     SAC_DatabaseDML.deleteListDML(cds, false);
         // }
         cv = new ContentVersion(
-            Title = numCaso + nombreDocumento, 
+            Title = nombreDocumentoParametro, 
             PathOnClient ='SampleTitle.pdf',
             VersionData = body,
             FirstPublishLocationId = parentId,

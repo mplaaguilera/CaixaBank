@@ -14,15 +14,17 @@
 
 public with sharing class SPV_LCMP_NuevaConsulta {
 
-    private static Set<String> objetos = new Set<String>{'SAC_Interaccion__c', 'Case', 'CC_Grupo_Colaborador__c'};
+    private static Set<String> objetos = new Set<String>{'SAC_Interaccion__c', 'Case', 'CC_Grupo_Colaborador__c','SAC_Accion__c','SAC_ImagenDocumento__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
-    // private static final Id RECTYPEMAESTROTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_MaestroDeTareas').getRecordTypeId();
-    // private static final Id RECTYPEOTRASTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_OtrasTareas').getRecordTypeId();
+    private static final Id RECTYPEMAESTROTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SPV_MaestroDeTareas').getRecordTypeId();
+    private static final Id RECTYPEOTRASTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SPV_Acciones').getRecordTypeId();
     private static final Id RECORDTYPERECLAMACION = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
     private static final Id RECORDTYPEPRETENSION = mapRTsObjects.get('Case').get('SPV_Pretension').getRecordTypeId();
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
+    private static final Id RECTYPECONSULTA_TAREA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_ConsultaTarea').getRecordTypeId();
     private static final Id RECTYPEGRUPOTAREAS = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SPV_GrupoDeTareas').getRecordTypeId();
+    private static final Id RECTYPEOFICINAS = mapRTsObjects.get('SAC_ImagenDocumento__c').get('SPV_OficinaAfectada').getRecordTypeId();
 
 
 
@@ -35,12 +37,23 @@ public with sharing class SPV_LCMP_NuevaConsulta {
      * 1.0             US945746     Raúl Santos     18/06/24         Creación
     *********************************************************************************************/
     @AuraEnabled
-    public static String insertarConsulta(String casoId, String grupoId){
+    public static String insertarConsulta(String idRegistro, String grupoId, String idOficina, String tipoRegistro){
 
         SAC_Interaccion__c consulta = new SAC_Interaccion__c();
-        consulta.RecordTypeId = RECTYPECONSULTA;
-        consulta.SAC_Reclamacion__c = casoId;
         consulta.SAC_GrupoColaborador__c = grupoId;
+        if(String.isNotBlank(idOficina)){
+            Account oficina = [SELECT Id, CC_Email__c FROM Account WHERE Id = :idOficina LIMIT 1];
+            consulta.SAC_Oficina__c = oficina.Id;
+            consulta.SAC_EmailOficina__c = oficina.CC_Email__c;
+        }
+
+        if(tipoRegistro == 'Case'){
+            consulta.RecordTypeId = RECTYPECONSULTA;
+            consulta.SAC_Reclamacion__c = idRegistro;
+        }else if(tipoRegistro == 'SAC_Accion__c'){
+            consulta.RecordTypeId = RECTYPECONSULTA_TAREA;
+            consulta.SPV_TareaRelacionada__c = idRegistro;
+        }        
 
         try {
             SPV_DatabaseDML.insertDML(consulta, true);
@@ -58,36 +71,46 @@ public with sharing class SPV_LCMP_NuevaConsulta {
     * -------
     * VERSION        USER_STORY       AUTHOR         DATE          Description
     * 1.0             US945746     Raúl Santos     18/06/24         Creación
+    *
     *****************************************************************/
     @AuraEnabled(cacheable=true)
-    public static Boolean tienePermisos(String idCaso){ 
+    public static Boolean tienePermisos(String idRegistro, String tipoRegistro){ 
         Boolean tienePermiso= false;      
 
         try {
-            if(!Schema.sObjectType.Case.isAccessible()){ throw new AuraHandledException( 'No puede recuperar el caso.' ); }
-            List<Case> listCasos = [SELECT Id, OwnerId, RecordTypeId FROM Case WHERE (RecordTypeId = :RECORDTYPERECLAMACION OR RecordTypeId = :RECORDTYPEPRETENSION) AND (Id = :idCaso OR SAC_Reclamacion__c = :idCaso)];
+            if(tipoRegistro == 'Case'){
+                if(!Schema.sObjectType.Case.isAccessible()){ throw new AuraHandledException( 'No puede recuperar el caso.' ); }
+                List<Case> listCasos = [SELECT Id, OwnerId, RecordTypeId FROM Case WHERE (RecordTypeId = :RECORDTYPERECLAMACION OR RecordTypeId = :RECORDTYPEPRETENSION) AND (Id = :idRegistro OR SAC_Reclamacion__c = :idRegistro)];
 
-            if(!listCasos.isEmpty()){
-                String idUsuario = UserInfo.getUserId();
-                String idReclamacion = '';
+                if(!listCasos.isEmpty()){
+                    String idUsuario = UserInfo.getUserId();
+                    String idReclamacion = '';
 
-                // Comprobamos si el usuario es propietario de la reclamación o pretensión
-                for (Case caso : listCasos) {
-                    if(caso.OwnerId == idUsuario){
-                        tienePermiso=true;
+                    // Comprobamos si el usuario es propietario de la reclamación o pretensión
+                    for (Case caso : listCasos) {
+                        if(caso.OwnerId == idUsuario){
+                            tienePermiso=true;
+                            return tienePermiso;
+                        }
+                        if(caso.RecordTypeId == RECORDTYPERECLAMACION){
+                            idReclamacion = caso.Id;
+                        }
+                    }
+
+                    // Si el usuario no es propietario de la reclamación/pretensión comprobamos es miembro del grupo al que se ha realizado una consulta interna anteriomente en la reclamación o es miembro del grupo al que se ha realizado una tarea anteriomente 
+                    if(tienePermiso == false){
+                        tienePermiso = tienePermisosGrupoConsultaOrAccion(idReclamacion);
                         return tienePermiso;
                     }
-                    if(caso.RecordTypeId == RECORDTYPERECLAMACION){
-                        idReclamacion = caso.Id;
-                    }
-                }
+                }  
+            }else if(tipoRegistro == 'SAC_Accion__c'){
+                List<SAC_Accion__c> listAcciones = [SELECT Id, OwnerId FROM SAC_Accion__c WHERE RecordTypeId IN (:RECTYPEOTRASTAREAS, :RECTYPEMAESTROTAREAS) AND Id = :idRegistro LIMIT 1];
 
-                // Si el usuario no es propietario de la reclamación/pretensión comprobamos es miembro del grupo al que se ha realizado una consulta interna anteriomente en la reclamación o es miembro del grupo al que se ha realizado una tarea anteriomente 
-                if(tienePermiso == false){
-                    tienePermiso = tienePermisosGrupoConsultaOrAccion(idReclamacion);
+                if(!listAcciones.isEmpty() && listAcciones[0].OwnerId == UserInfo.getUserId()){
+                    tienePermiso=true;
                     return tienePermiso;
                 }
-            }  
+            }
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
@@ -165,26 +188,24 @@ public with sharing class SPV_LCMP_NuevaConsulta {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0             US945746     Raúl Santos     23/07/24         Creación
     **************************************************************************/  
-    @AuraEnabled(cacheable=true)
-    public static List<SAC_Interaccion__c> getConsultasCaso(String caseId, Boolean tienePermisosInsertar, String caseOwner) {
+    @AuraEnabled
+    public static List<SAC_Interaccion__c> getConsultas(String idRegistro, String ownerId) {
         List<SAC_Interaccion__c> consultasPendientes = new List<SAC_Interaccion__c>();
-        List<SAC_Interaccion__c> consultasCaso = new List<SAC_Interaccion__c>();
+        List<SAC_Interaccion__c> consultas = new List<SAC_Interaccion__c>();
 
         try {
-            if(tienePermisosInsertar) {
-                if(caseOwner == UserInfo.getUserId()){
-                    consultasCaso = [SELECT id, Name, SAC_GrupoColaborador__c ,SAC_GrupoColaborador__r.Name, CreatedDate, SAC_FechaRespuesta__c, SAC_Pregunta__c, toLabel(SAC_Estado__c) FROM SAC_Interaccion__c  WHERE RecordTypeId = :RECTYPECONSULTA AND SAC_Reclamacion__c =: caseId];
-                    for(SAC_Interaccion__c consulta : consultasCaso) {
-                        if((consulta.SAC_Estado__c == 'Pendiente Respuesta' || consulta.SAC_Estado__c == 'Pendiente Respuesta Definitiva' || ((consulta.SAC_GrupoColaborador__c == null || String.isBlank(consulta.SAC_Pregunta__c)) && consulta.SAC_Estado__c != 'Finalizada'))) {
-                            consultasPendientes.add(consulta);
-                        }
+            if(ownerId == UserInfo.getUserId()){
+                consultas = [SELECT id, Name, SAC_GrupoColaborador__c ,SAC_GrupoColaborador__r.Name, CreatedDate, SAC_FechaRespuesta__c, SAC_Pregunta__c, toLabel(SAC_Estado__c) FROM SAC_Interaccion__c  WHERE (RecordTypeId = :RECTYPECONSULTA AND SAC_Reclamacion__c =: idRegistro) OR (RecordTypeId = :RECTYPECONSULTA_TAREA AND SPV_TareaRelacionada__c =: idRegistro)];
+                for(SAC_Interaccion__c consulta : consultas) {
+                    if((consulta.SAC_Estado__c == 'Pendiente Respuesta' || consulta.SAC_Estado__c == 'Pendiente Respuesta Definitiva' || ((consulta.SAC_GrupoColaborador__c == null || String.isBlank(consulta.SAC_Pregunta__c)) && consulta.SAC_Estado__c != 'Finalizada'))) {
+                        consultasPendientes.add(consulta);
                     }
-                }else{
-                    consultasCaso = [SELECT id, Name, SAC_GrupoColaborador__c ,SAC_GrupoColaborador__r.Name, CreatedDate, toLabel(SAC_Estado__c), SAC_FechaRespuesta__c, SAC_Pregunta__c FROM SAC_Interaccion__c  WHERE RecordTypeId = :RECTYPECONSULTA AND CreatedById =: Userinfo.getUserId() AND  SAC_Reclamacion__c =: caseId];
-                    for(SAC_Interaccion__c consulta : consultasCaso) {
-                        if((consulta.SAC_Estado__c == 'Pendiente Respuesta' || consulta.SAC_Estado__c == 'Pendiente Respuesta Definitiva' || ((consulta.SAC_GrupoColaborador__c == null || String.isBlank(consulta.SAC_Pregunta__c)) && consulta.SAC_Estado__c != 'Finalizada'))) {
-                            consultasPendientes.add(consulta);
-                        }
+                }
+            }else{
+                consultas = [SELECT id, Name, SAC_GrupoColaborador__c ,SAC_GrupoColaborador__r.Name, CreatedDate, toLabel(SAC_Estado__c), SAC_FechaRespuesta__c, SAC_Pregunta__c FROM SAC_Interaccion__c  WHERE (RecordTypeId = :RECTYPECONSULTA AND CreatedById =: Userinfo.getUserId() AND SAC_Reclamacion__c =: idRegistro) OR (RecordTypeId = :RECTYPECONSULTA_TAREA AND CreatedById =: Userinfo.getUserId() AND SPV_TareaRelacionada__c =: idRegistro)];
+                for(SAC_Interaccion__c consulta : consultas) {
+                    if((consulta.SAC_Estado__c == 'Pendiente Respuesta' || consulta.SAC_Estado__c == 'Pendiente Respuesta Definitiva' || ((consulta.SAC_GrupoColaborador__c == null || String.isBlank(consulta.SAC_Pregunta__c)) && consulta.SAC_Estado__c != 'Finalizada'))) {
+                        consultasPendientes.add(consulta);
                     }
                 }
             }
@@ -205,7 +226,7 @@ public with sharing class SPV_LCMP_NuevaConsulta {
     **************************************************************************/  
     @AuraEnabled
     public static void finalizarConsultasCaso(String[] idConsultas, String motivo) {
-        List<SAC_Interaccion__c> listaConsultasAFinalizar = [SELECT id, SAC_Estado__c, SAC_MotivoDeFinalizado__c FROM SAC_Interaccion__c  WHERE RecordTypeId = :RECTYPECONSULTA AND Id IN: Idconsultas AND (SAC_Estado__c = 'SAC_PendienteRespuesta' OR SAC_Estado__c = 'SAC_PendienteRespuestaDefinitiva' OR SAC_Estado__c = '')];
+        List<SAC_Interaccion__c> listaConsultasAFinalizar = [SELECT id, SAC_Estado__c, SAC_MotivoDeFinalizado__c FROM SAC_Interaccion__c  WHERE RecordTypeId IN (:RECTYPECONSULTA, :RECTYPECONSULTA_TAREA) AND Id IN: Idconsultas AND (SAC_Estado__c = 'SAC_PendienteRespuesta' OR SAC_Estado__c = 'SAC_PendienteRespuestaDefinitiva' OR SAC_Estado__c = '')];
         if (!listaConsultasAFinalizar.isEmpty()) {
             for (SAC_Interaccion__c consulta : listaConsultasAFinalizar) {
                 consulta.SAC_Estado__c = 'SAC_Finalizada';
@@ -213,5 +234,23 @@ public with sharing class SPV_LCMP_NuevaConsulta {
             }
             SPV_DatabaseDML.updateListDML(listaConsultasAFinalizar, false);
         }
+    }
+
+    /*
+    * @description: Comprueba si el grupo seleccionado es una oficina y en caso afirmativo, compruebas las oficinas de la reclamación
+    * @author: Raúl Sanatos
+    * @date: 12 mayo 2025
+    */
+    @AuraEnabled
+    public static List<SAC_ImagenDocumento__c> comprobarPosibleOficina(String idGrupo, String idRegistro){
+
+        List<SAC_ImagenDocumento__c> oficinasReclamacion = new List<SAC_ImagenDocumento__c>();
+        List<CC_Grupo_Colaborador__c> listaGrupos = [SELECT id, SAC_DeveloperName__c FROM CC_Grupo_Colaborador__c WHERE RecordTypeId = : RECTYPEGRUPOTAREAS AND id = :idGrupo LIMIT 1];
+
+        if(!listaGrupos.isEmpty() && listaGrupos[0].SAC_DeveloperName__c == 'OFICINA' ){
+            oficinasReclamacion = [SELECT Id, SPV_OficinaAfectada_Lookup__c, SPV_OficinaAfectada_Lookup__r.Name FROM SAC_ImagenDocumento__c WHERE RecordTypeId = :RECTYPEOFICINAS AND SAC_Caso__c = :idRegistro AND SPV_OficinaAfectada_Lookup__c != null];
+        }
+
+        return oficinasReclamacion;
     }
 }

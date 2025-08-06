@@ -17,12 +17,12 @@ public class OS_Llamada_Test {
         tematica.OS_Departamento__c = 'UAC';
         tematica.OS_Horario__c = businessHoursId;
         tematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
-        tematica.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        tematica.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
 		tematica.CC_Codigo_Externo__c = 'TE-000001';
         insert tematica;
         
         CC_Grupo_Colaborador__c grupo = new CC_Grupo_Colaborador__c();
-        grupo.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_GrupoTrabajo').getRecordTypeId();
+        grupo.RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('OS_GrupoTrabajo').getRecordTypeId();
         grupo.name = 'Grupo CCI Holabank';
         grupo.OS_GrupoTrabajo__c = 'CCI Holabank';
         grupo.OS_Tematica__c = tematica.Id;
@@ -30,14 +30,14 @@ public class OS_Llamada_Test {
         
         List<OS_Cartera__c> carteras = new List<OS_Cartera__c>();
         OS_Cartera__c cartera = new OS_Cartera__c();
-        cartera.RecordTypeId = Schema.getGlobalDescribe().get('OS_Cartera__c').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cartera').getRecordTypeId();
+        cartera.RecordTypeId = Schema.SObjectType.OS_Cartera__c.getRecordTypeInfosByDeveloperName().get('OS_Cartera').getRecordTypeId();
         cartera.OS_Cola_Telefonia__c = 'Cola de prueba';
         cartera.Name = 'Prueba';
        // carteras.add(cartera);
         insert cartera;
         
         OS_Cartera__c colaTelefonia = new OS_Cartera__c();
-        colaTelefonia.RecordTypeId = Schema.getGlobalDescribe().get('OS_Cartera__c').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cola_Telefonia').getRecordTypeId();
+        colaTelefonia.RecordTypeId = Schema.SObjectType.OS_Cartera__c.getRecordTypeInfosByDeveloperName().get('OS_Cola_Telefonia').getRecordTypeId();
         colaTelefonia.Name = '12345';
         colaTelefonia.OS_GrupoTrabajo_ColaTelefonia__c = grupo.Id;
         //carteras.add(colaTelefonia);
@@ -45,17 +45,18 @@ public class OS_Llamada_Test {
         //insert carteras;
 
         Account cuenta = new Account();
-        cuenta.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         cuenta.OS_Cartera__c = cartera.Id;
         cuenta.name = 'Cuenta de prueba';
         insert cuenta;
         
 		Contact contacto = new Contact();
-        contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         contacto.Email = 'llamada@pruebas.com';
         contacto.LastName = 'Pruebas LLamada';
         contacto.Phone = '666555777';
         contacto.AccountId = cuenta.Id;
+        contacto.OwnerId = usuarioOperador.Id;
         insert contacto;
 
         //Lista de valores para clasificación automática
@@ -105,7 +106,7 @@ public class OS_Llamada_Test {
         mensaje.nombreFicheroGrabacion = 'PENDENT';
 
         Contact contacto = new Contact();
-		contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
+		contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
         contacto.Phone = '650399855';
         contacto.LastName = 'PRUEBAS BUZON COPS';
         insert contacto;
@@ -124,7 +125,7 @@ public class OS_Llamada_Test {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
         Contact contacto = new Contact();
-		contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
+		contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
         contacto.Phone = '650399855';
         contacto.LastName = 'PRUEBAS BUZON COPS';
         insert contacto;
@@ -182,76 +183,80 @@ public class OS_Llamada_Test {
     @isTest
     public static void transferirLlamada() { 
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
+        Contact contactotest = [SELECT id FROM Contact LIMIT 1];
 
         CC_Lista_Valores__c[] listaDNIS = [SELECT Id FROM CC_Lista_Valores__c WHERE Name ='COPS: Relación DNIS y Canal de procedencia'];
         CC_Lista_Valores__c[] valoresListaDNIS = [SELECT Id,CC_Valor__c,CC_Lista__c,Name,CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Lista__c =: listaDNIS[0].Id];
         
-        //Llamada entrante
-        OS_Llamada.Input mensajeRegistrarLlamada = new OS_Llamada.Input();
-        mensajeRegistrarLlamada.usuario = 'u0190345';
-        mensajeRegistrarLlamada.connId = 'connId01';
-        mensajeRegistrarLlamada.ani = '666555777';
-        mensajeRegistrarLlamada.dnis = '666555445';
-        mensajeRegistrarLlamada.multiParametros = 'tipoCliente=cliente';
-        mensajeRegistrarLlamada.nombreFicheroGrabacion = 'PENDENT';
-        
-        //Creación de la llamada entrante inicial
-        CC_Llamada__c llamada = new CC_Llamada__c();
-        llamada.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'OS_Cliente');
-        llamada.CC_Tipo__c = 'Entrante';
-        llamada.CC_Agente__c = mensajeRegistrarLlamada.usuario.toUpperCase();
-        llamada.CC_ANI__c = mensajeRegistrarLlamada.ani;
-        llamada.CC_DNIS__c = mensajeRegistrarLlamada.dnis;
-        llamada.CC_Fecha_Inicio__c = System.now();
-        llamada.CC_Fecha_Fin__c = null;
-        llamada.CC_ConnId__c = mensajeRegistrarLlamada.connId;
-        llamada.OS_Nombre_Fichero_Grabacion__c = mensajeRegistrarLlamada.nombreFicheroGrabacion;
-        insert llamada;
-
-        //Creación de la llamada destino consulta
-        CC_Llamada__c llamada2 = new CC_Llamada__c();
-        llamada2.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'OS_Cliente');
-        llamada2.CC_Tipo__c = 'Entrante';
-        llamada2.CC_Agente__c = mensajeRegistrarLlamada.usuario.toUpperCase();
-        llamada2.CC_ANI__c = mensajeRegistrarLlamada.ani;
-        llamada2.CC_DNIS__c = mensajeRegistrarLlamada.dnis;
-        llamada2.CC_Fecha_Inicio__c = System.now();
-        llamada2.CC_Fecha_Fin__c = null;
-        llamada2.CC_ConnId_Consulta__c = mensajeRegistrarLlamada.connId;
-        llamada2.OS_Nombre_Fichero_Grabacion__c = mensajeRegistrarLlamada.nombreFicheroGrabacion;
-        insert llamada2;
-
-        //Creación del caso vinculada a la llamada inicial
-        Case caso = new Case();
-        caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'OS_Cliente');
-        caso.Subject='caso de llamada';
-        caso.Origin = 'Email';
-        caso.CC_Canal_Procedencia__c = 'Buzón CCI Holabank';
-        caso.CC_Canal_Resolucion__c = 'Buzón CCI Holabank';
-        caso.CC_Tipo_Contacto__c  = 'Asesoramiento';
-        caso.OwnerId = usuarioOperador.Id;
-        insert caso;
-
-        //Creación de la tarea vinculada a la llamada inicial
-        Task tarea = new Task();
-        tarea.CC_Llamada_Id__c = llamada.Id;
-        tarea.ActivityDate = System.today();
-        tarea.CC_Fecha_Inicio__c = System.now();
-        tarea.WhatId = caso.Id;
-        tarea.OwnerId = usuarioOperador.Id;
-        insert tarea;
-
-        Contact contacto = new Contact();
-		contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
-        contacto.Phone = '650399855';
-        contacto.LastName = 'PRUEBAS BUZON COPS';
-        insert contacto;
-
         System.runAs (usuarioOperador) {       
+
+
+            //Llamada entrante
+            OS_Llamada.Input mensajeRegistrarLlamada = new OS_Llamada.Input();
+            mensajeRegistrarLlamada.usuario = 'u0190345';
+            mensajeRegistrarLlamada.connId = 'connId17';
+            mensajeRegistrarLlamada.ani = '666555777';
+            mensajeRegistrarLlamada.dnis = '666555445';
+            mensajeRegistrarLlamada.multiParametros = 'tipoCliente=cliente';
+            mensajeRegistrarLlamada.nombreFicheroGrabacion = 'PENDENT';
+            
+            //Creación de la llamada entrante inicial
+            CC_Llamada__c llamada = new CC_Llamada__c();
+            llamada.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'OS_Cliente');
+            llamada.CC_Tipo__c = 'Entrante';
+            llamada.CC_Agente__c = mensajeRegistrarLlamada.usuario.toUpperCase();
+            llamada.CC_ANI__c = mensajeRegistrarLlamada.ani;
+            llamada.CC_DNIS__c = mensajeRegistrarLlamada.dnis;
+            llamada.CC_Fecha_Inicio__c = System.now();
+            llamada.CC_Fecha_Fin__c = null;
+            llamada.CC_ConnId__c = mensajeRegistrarLlamada.connId;
+            llamada.OS_Nombre_Fichero_Grabacion__c = mensajeRegistrarLlamada.nombreFicheroGrabacion;
+            llamada.CC_Contacto__c = contactotest.Id;
+            insert llamada;
+
+            //Creación de la llamada destino consulta
+            CC_Llamada__c llamada2 = new CC_Llamada__c();
+            llamada2.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'OS_Cliente');
+            llamada2.CC_Tipo__c = 'Entrante';
+            llamada2.CC_Agente__c = mensajeRegistrarLlamada.usuario.toUpperCase();
+            llamada2.CC_ANI__c = mensajeRegistrarLlamada.ani;
+            llamada2.CC_DNIS__c = mensajeRegistrarLlamada.dnis;
+            llamada2.CC_Fecha_Inicio__c = System.now();
+            llamada2.CC_Fecha_Fin__c = null;
+            llamada2.CC_ConnId_Consulta__c = mensajeRegistrarLlamada.connId;
+            llamada2.OS_Nombre_Fichero_Grabacion__c = mensajeRegistrarLlamada.nombreFicheroGrabacion;
+            insert llamada2;
+
+            //Creación del caso vinculada a la llamada inicial
+            Case caso = new Case();
+            caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'OS_Cliente');
+            caso.Subject='caso de llamada';
+            caso.Origin = 'Email';
+            caso.CC_Canal_Procedencia__c = 'Buzón CCI Holabank';
+            caso.CC_Canal_Resolucion__c = 'Buzón CCI Holabank';
+            caso.CC_Tipo_Contacto__c  = 'Asesoramiento';
+            caso.OwnerId = usuarioOperador.Id;
+            insert caso;
+
+            //Creación de la tarea vinculada a la llamada inicial
+            Task tarea = new Task();
+            tarea.CC_Llamada_Id__c = llamada.Id;
+            tarea.ActivityDate = System.today();
+            tarea.CC_Fecha_Inicio__c = System.now();
+            tarea.WhatId = caso.Id;
+            tarea.OwnerId = usuarioOperador.Id;
+            insert tarea;
+
+            Contact contacto = new Contact();
+            contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
+            contacto.Phone = '650399855';
+            contacto.LastName = 'PRUEBAS BUZON COPS';
+            insert contacto;
+
             Test.startTest();        
             OS_Llamada.openCTI_transferirLlamada(mensajeRegistrarLlamada);
-            
-            CC_Llamada__c llamadaOrigen = [SELECT CC_Tipo_Cierre__c FROM CC_Llamada__c WHERE CC_ConnId__c = 'connId01' ORDER BY CreatedDate ASC LIMIT 1];
+
+            CC_Llamada__c llamadaOrigen = [SELECT id, CC_Tipo_Cierre__c FROM CC_Llamada__c WHERE CC_ConnId__c = 'connId17' AND CC_Tipo_Cierre__c != NULL ORDER BY CreatedDate ASC LIMIT 1];
             Task tareaOrigen = [SELECT WhatId FROM Task WHERE CC_Llamada_Id__c = :llamadaOrigen.Id ORDER BY CreatedDate ASC LIMIT 1];
             Case casoOrigen = [SELECT Id, Subject, CC_Idioma__c, AccountId, ContactId FROM Case WHERE Id = :tareaOrigen.WhatId];
             Task tareaNueva = [SELECT Id, Status FROM Task WHERE WhatId = :casoOrigen.Id AND Type = 'Llamada transferida'];
@@ -309,7 +314,7 @@ public class OS_Llamada_Test {
         mensaje.servicio = ''; 
 
         Contact contacto = new Contact();
-		contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
+		contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
         contacto.Phone = '650399855';
         contacto.LastName = 'PRUEBAS BUZON COPS';
         insert contacto;
@@ -342,7 +347,7 @@ public class OS_Llamada_Test {
         insert llamada;
 
         Contact contacto = new Contact();
-		contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
+		contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
         contacto.Phone = '650399855';
         contacto.LastName = 'PRUEBAS BUZON COPS';
         insert contacto;
@@ -361,7 +366,7 @@ public class OS_Llamada_Test {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
         Account cuenta = new Account();
-        cuenta.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Buzon_Account').getRecordTypeId();
+        cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('OS_Buzon_Account').getRecordTypeId();
         cuenta.Name = 'CUENTA BUZON COPS';
         insert cuenta;
 
@@ -374,7 +379,7 @@ public class OS_Llamada_Test {
         insert acshare;
         
         Contact contacto = new Contact();
-		contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
+		contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('OS_Buzon_Contact').getRecordTypeId(); 
         contacto.Phone = '650399855';
         contacto.LastName = 'PRUEBAS BUZON COPS';
         contacto.AccountId = cuenta.Id;
@@ -404,7 +409,7 @@ public class OS_Llamada_Test {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
         Account cuenta = new Account();
-        cuenta.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         cuenta.Name = 'CUENTA BUZON COPS';
         insert cuenta;
         
@@ -417,7 +422,7 @@ public class OS_Llamada_Test {
         insert acshare;
 
         Contact contacto = new Contact();
-		contacto.RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId(); 
+		contacto.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId(); 
         contacto.Phone = '650399855';
         contacto.LastName = 'PRUEBAS BUZON COPS';
         contacto.AccountId = cuenta.Id;

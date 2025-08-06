@@ -16,16 +16,15 @@ public with sharing class SPV_Utils_Test {
     static void makeData(){
         
         Test.startTest();
+            User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
+            SPV_DatabaseDML.insertDML(usuarioAdmin, true);
 
-        User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(usuarioAdmin);
+            List<User> listUsuarios ;
 
-        List<User> listUsuarios ;
-
-        System.runAs(usuarioAdmin){
-            listUsuarios  = SPV_TestDataFactory.crearUsuarioSPVGeneral(2);
-            Database.insert(listUsuarios );
-        }
+            System.runAs(usuarioAdmin){
+                listUsuarios  = SPV_TestDataFactory.crearUsuarioSPVGeneral(2);
+                SPV_DatabaseDML.insertListDML(listUsuarios, true);
+            }
         Test.stopTest();
 
         //Reclamacion
@@ -39,13 +38,14 @@ public with sharing class SPV_Utils_Test {
 
         Case casoReclamacion = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion);
         listaReclamaciones.add(casoReclamacion);
-        Database.insert(listaReclamaciones);
+        SPV_DatabaseDML.insertListDML(listaReclamaciones, true);
+
         //Email Backlist
         SAC_MaestroTemas__c maestroTema = new SAC_MaestroTemas__c();
         maestroTema.Name ='emailtestinvalido@prueba.com';
         maestroTema.SAC_Activo__c = true;
         maestroTema.RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SPV_BlackListEmails').getRecordTypeId();
-        Database.insert(maestroTema);
+        SPV_DatabaseDML.insertDML(maestroTema, true);
     }
 
     @isTest
@@ -223,5 +223,56 @@ public with sharing class SPV_Utils_Test {
             Assert.areNotEqual(emailBody, htmlResult, 'Error al parsear la imagen del email body');
             Assert.areEqual(true, htmlResult.contains(developerNameFinal), 'Error al convertir la imagen del email body');
         }
+    }
+
+    @isTest
+    static void comprobarTieneByPassTest(){
+
+        Test.startTest();
+        User usuario = [SELECT Id, Name FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        Boolean resultado;
+
+        System.runAs(usuario){
+            resultado = SPV_Utils.comprobarTieneByPass();
+        }
+
+        Assert.areEqual(resultado, false, 'No se ha comprobado correctamente');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void procesarPermisionSetTest(){
+
+        Test.startTest();
+        User usuario = [SELECT Id, Name FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        Boolean esAdmin = false;
+
+
+        System.runAs(usuario){
+            SPV_Utils.procesarPermisionSet(true, usuario.Id, 'SPV_SystemAdmin');
+
+            List<PermissionSetAssignment> psas = [SELECT ID FROM PermissionSetAssignment WHERE PermissionSet.Name = 'SPV_SystemAdmin' AND AssigneeId =: usuario.Id LIMIT 1];
+            if(!psas.isEmpty()){
+                esAdmin = true;
+            }
+        }
+
+        Assert.areNotEqual(false, esAdmin, 'No ha podido insertar el PS al usuario');
+        Test.stopTest();
+    }
+
+
+    @isTest
+    static void minutosHastaMedianocheTest(){
+        Test.startTest();
+        User usuario = [SELECT Id, Name FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        Integer minutosDiaCompleto = 0;
+
+        System.runAs(usuario){
+            minutosDiaCompleto = SPV_Utils.minutosHastaMedianoche(CBK_UtilsDate.nowSYS());
+        }
+
+        Assert.areNotEqual(0, minutosDiaCompleto, 'No ha calcular la diferencia de tiempo');
+        Test.stopTest();
     }
 }

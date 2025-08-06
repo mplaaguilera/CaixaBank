@@ -347,7 +347,6 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                         //US9788023
                         datosRecPrincipal.numPerso = confidenciales.get(datosReclamante.reclamante.CC_Numero_Documento__c).AV_NumPerso__c;                 
                     } else {
-                        if(datosReclamante.tipo == 'SAC_001'){
                             genialRequest.reclamacion.OS_Email__c = datosReclamante.reclamante.PersonEmail;
                             genialRequest.reclamacion.CC_Telefono_Contacto__c = datosReclamante.reclamante.PersonMobilePhone;
                             genialRequest.reclamacion.SAC_DireccionContacto__c = datosReclamante.reclamante.BillingStreet;
@@ -366,9 +365,6 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                                 //US9788023
                                 datosRecPrincipal.lastName = datosReclamante.reclamante.lastName;
                             }
-                            
-                            
-                        }
                         genialRequest.datosRecPrincipal = datosRecPrincipal;
                     }
                 }
@@ -412,96 +408,100 @@ public with sharing class SAC_GenialQueueable implements Queueable {
      * @param genialRequest     datos recibidos de SAC_Genial_WS.
      */
     private integer crearDatosPretensiones(SAC_Genial_WS.genialRequest genialRequest) {
-
-        String rECORDTYPEPRETENSION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
-
-        list<sobject> pretensiones = new list<sobject>();
-
-        list<id> setIdsDetalleAux = new list<id>();
-        //sacamos una lista de detalles proporcionados por la IA
-        for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
-			case pretension = pretensionW.pretension;
-            //agregamos a la lista ids de detalle para buscarlos luego y acabar de completar los datos a rellenar de la pretensión
-            setIdsDetalleAux.add(pretension.SEG_Detalle__c);
-
-        }
-        //obtener mapa MCCs para su clasificación
-        map<id, CC_MCC__c> mapaMcc = new map<id, CC_MCC__c>([SELECT id, Name, SAC_EntidadAfectada__c, SAC_EntidadProductora__c, SAC_EsPsd2__c, CC_Motivo__c, CC_Motivo__r.CC_Producto_Servicio__c, CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__c, 
-        CC_Motivo__r.CC_Producto_Servicio__r.Name, CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__r.CC_Codigo_Externo__c
-        FROM CC_MCC__c 
-        WHERE Id IN: setIdsDetalleAux 
-        AND RecordType.DeveloperName = 'SAC_Detalle']);
-
-        //a revisar optimización del proceso(ya se recupera en la API REST)
-        case reclamacionActual = [SELECT Id, Origin, Status, AccountId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, ContactId, CC_SuppliedNIF__c, OS_Email__c, CC_Telefono_Contacto__c, SAC_DireccionPostalNotificacion__c, SuppliedEmail FROM Case WHERE Id = : genialRequest.reclamacion.Id];
-        
-        //version 2 con el generador de SAC_LCMP_InsertarPretension
-        for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
-            // obtener umbrales por cada nivel de MCC
-            Decimal umbralTematica;
-            Decimal umbralProductoServicio;
-            Decimal umbralMotivo;
-            Decimal umbralDetalle;
-            for(SAC_Genial_WS.Umbral umbral: pretensionW.umbrales){
-                if(umbral.nivel == 'Tematica'){
-                    umbralTematica = umbral.valor;
-                }else if(umbral.nivel == 'ProductoServicio'){
-                    umbralProductoServicio = umbral.valor;
-                }else if(umbral.nivel == 'Motivo'){
-                    umbralMotivo = umbral.valor;
-                }else if(umbral.nivel == 'Detalle'){
-                    umbralDetalle = umbral.valor;
-                }
-            }
-			case pretension = pretensionW.pretension;
-            if(string.isNotBlank(pretension.SEG_Detalle__c) && string.isNotBlank(pretension.CC_MCC_Motivo__c) 
-            && string.isNotBlank(pretension.CC_MCC_ProdServ__c) && string.isNotBlank(pretension.CC_MCC_Tematica__c)){
-                String asunto = mapaMcc.get(pretension.SEG_Detalle__c).CC_Motivo__r.CC_Producto_Servicio__r.Name + ' - ' + mapaMcc.get(pretension.SEG_Detalle__c).Name;
-                
-                Case pretensionGenerada = null;
-                // comprobar umbrales de MCCs y no informarlos en la pretensión si no se cumplen
-                if(umbralTematica >= this.settings.SAC_UmbralTematica__c && umbralProductoServicio >= this.settings.SAC_UmbralProductoServicio__c && umbralMotivo >= this.settings.SAC_UmbralMotivo__c && umbralDetalle >= this.settings.SAC_UmbralDetalle__c){
-                    pretensionGenerada = SAC_LCMP_InsertarPretension.camposPretension(reclamacionActual, pretension.SEG_Detalle__c, pretension.CC_MCC_Motivo__c, pretension.CC_MCC_ProdServ__c, pretension.CC_MCC_Tematica__c, RECORDTYPEPRETENSION, asunto, mapaMcc);
-                    Map<String, Object> camposPretGenerada = pretensionGenerada.getPopulatedFieldsAsMap();
-                    for (String nombreCampo : camposPretGenerada.keySet()) {
-                        pretension.put(nombreCampo, pretensionGenerada.get(nombreCampo)); 
-                    }
-                    //pretension.AccountId = genialRequest.reclamacion.AccountId; 
-                    pretension.SAC_GenialEstado__c = 'SAC_003';
-                    pretensiones.add((sObject)pretension);
-                }
-            }
-        }
-        /*
-        for(case pretension : genialRequest.pretensiones) {
-            pretension.recordTypeId = RECORDTYPEPRETENSION;
+        if(genialRequest.pretensiones != null){
             
-            if(string.isNotBlank(pretension.SEG_Detalle__c) && string.isNotBlank(pretension.CC_MCC_Motivo__c) 
-            && string.isNotBlank(pretension.CC_MCC_ProdServ__c) && string.isNotBlank(pretension.CC_MCC_Tematica__c)){
-                pretension.subject = mapaMcc.get(pretension.SEG_Detalle__c).CC_Motivo__r.CC_Producto_Servicio__r.Name + ' - ' + mapaMcc.get(pretension.SEG_Detalle__c).Name;
-
-                pretension.status = reclamacionActual.Status;
-                pretension.SAC_StatusAuxiliar__c = reclamacionActual.Status;
-                pretension.Origin = reclamacionActual.Origin;
-                pretension.SAC_TiempoSLARegulatorio__c = 30;
-                pretension.SAC_TiempoSLALetradoAlta__c = 30;
-                pretension.CC_No_Identificado__c  = true;
-                pretension.CC_IdentCliente__c     = '0';
-                pretension.SAC_CasoEspecial__c = reclamacionActual.SAC_CasoEspecial__c;
-                pretension.AccountId = genialRequest.reclamacion.AccountId; 
-
-                pretension.SAC_Entidad_Afectada__c = mapaMcc.get(pretension.SEG_Detalle__c).SAC_EntidadAfectada__c;
-                pretension.SAC_EntidadProductora__c = mapaMcc.get(pretension.SEG_Detalle__c).SAC_EntidadProductora__c;
-                pretension.SAC_CASE_esPSD2__c = mapaMcc.get(pretension.SEG_Detalle__c).SAC_EsPsd2__c;
-                pretension.CC_Codigo_Externo_Tematica__c = mapaMcc.get(pretension.SEG_Detalle__c).CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__r.CC_Codigo_Externo__c;
-                pretension.SAC_GenialEstado__c = 'SAC_003';
-                pretensiones.add((sObject)pretension);
+            String rECORDTYPEPRETENSION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
+            
+            list<sobject> pretensiones = new list<sobject>();
+            
+            list<id> setIdsDetalleAux = new list<id>();
+            //sacamos una lista de detalles proporcionados por la IA
+            for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
+                case pretension = pretensionW.pretension;
+                //agregamos a la lista ids de detalle para buscarlos luego y acabar de completar los datos a rellenar de la pretensión
+                setIdsDetalleAux.add(pretension.SEG_Detalle__c);
+                
             }
-        }
-        */
+            //obtener mapa MCCs para su clasificación
+            map<id, CC_MCC__c> mapaMcc = new map<id, CC_MCC__c>([SELECT id, Name, SAC_EntidadAfectada__c, SAC_EntidadProductora__c, SAC_EsPsd2__c, CC_Motivo__c, CC_Motivo__r.CC_Producto_Servicio__c, CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__c, 
+                                                                 CC_Motivo__r.CC_Producto_Servicio__r.Name, CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__r.CC_Codigo_Externo__c
+                                                                 FROM CC_MCC__c 
+                                                                 WHERE Id IN: setIdsDetalleAux 
+                                                                 AND RecordType.DeveloperName = 'SAC_Detalle']);
+            
+            //a revisar optimización del proceso(ya se recupera en la API REST)
+            case reclamacionActual = [SELECT Id, Origin, Status, AccountId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, ContactId, CC_SuppliedNIF__c, OS_Email__c, CC_Telefono_Contacto__c, SAC_DireccionPostalNotificacion__c, SuppliedEmail FROM Case WHERE Id = : genialRequest.reclamacion.Id];
+            
+            //version 2 con el generador de SAC_LCMP_InsertarPretension
+            for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
+                // obtener umbrales por cada nivel de MCC
+                Decimal umbralTematica;
+                Decimal umbralProductoServicio;
+                Decimal umbralMotivo;
+                Decimal umbralDetalle;
+                for(SAC_Genial_WS.Umbral umbral: pretensionW.umbrales){
+                    if(umbral.nivel == 'Tematica'){
+                        umbralTematica = umbral.valor;
+                    }else if(umbral.nivel == 'ProductoServicio'){
+                        umbralProductoServicio = umbral.valor;
+                    }else if(umbral.nivel == 'Motivo'){
+                        umbralMotivo = umbral.valor;
+                    }else if(umbral.nivel == 'Detalle'){
+                        umbralDetalle = umbral.valor;
+                    }
+                }
+                case pretension = pretensionW.pretension;
+                if(string.isNotBlank(pretension.SEG_Detalle__c) && string.isNotBlank(pretension.CC_MCC_Motivo__c) 
+                   && string.isNotBlank(pretension.CC_MCC_ProdServ__c) && string.isNotBlank(pretension.CC_MCC_Tematica__c)){
+                       String asunto = mapaMcc.get(pretension.SEG_Detalle__c).CC_Motivo__r.CC_Producto_Servicio__r.Name + ' - ' + mapaMcc.get(pretension.SEG_Detalle__c).Name;
+                       
+                       Case pretensionGenerada = null;
+                       // comprobar umbrales de MCCs y no informarlos en la pretensión si no se cumplen
+                       if(umbralTematica >= this.settings.SAC_UmbralTematica__c && umbralProductoServicio >= this.settings.SAC_UmbralProductoServicio__c && umbralMotivo >= this.settings.SAC_UmbralMotivo__c && umbralDetalle >= this.settings.SAC_UmbralDetalle__c){
+                           pretensionGenerada = SAC_LCMP_InsertarPretension.camposPretension(reclamacionActual, pretension.SEG_Detalle__c, pretension.CC_MCC_Motivo__c, pretension.CC_MCC_ProdServ__c, pretension.CC_MCC_Tematica__c, RECORDTYPEPRETENSION, asunto, mapaMcc);
+                           Map<String, Object> camposPretGenerada = pretensionGenerada.getPopulatedFieldsAsMap();
+                           for (String nombreCampo : camposPretGenerada.keySet()) {
+                               pretension.put(nombreCampo, pretensionGenerada.get(nombreCampo)); 
+                           }
+                           //pretension.AccountId = genialRequest.reclamacion.AccountId; 
+                           pretension.SAC_GenialEstado__c = 'SAC_003';
+                           pretensiones.add((sObject)pretension);
+                       }
+                   }
+            }
+            /*
+for(case pretension : genialRequest.pretensiones) {
+pretension.recordTypeId = RECORDTYPEPRETENSION;
 
-        //devuelve las pretensiones que se han insertado
-        return SAC_MetodosSinSharing.modificarInsertarObjetos(pretensiones, 'insert');
+if(string.isNotBlank(pretension.SEG_Detalle__c) && string.isNotBlank(pretension.CC_MCC_Motivo__c) 
+&& string.isNotBlank(pretension.CC_MCC_ProdServ__c) && string.isNotBlank(pretension.CC_MCC_Tematica__c)){
+pretension.subject = mapaMcc.get(pretension.SEG_Detalle__c).CC_Motivo__r.CC_Producto_Servicio__r.Name + ' - ' + mapaMcc.get(pretension.SEG_Detalle__c).Name;
+
+pretension.status = reclamacionActual.Status;
+pretension.SAC_StatusAuxiliar__c = reclamacionActual.Status;
+pretension.Origin = reclamacionActual.Origin;
+pretension.SAC_TiempoSLARegulatorio__c = 30;
+pretension.SAC_TiempoSLALetradoAlta__c = 30;
+pretension.CC_No_Identificado__c  = true;
+pretension.CC_IdentCliente__c     = '0';
+pretension.SAC_CasoEspecial__c = reclamacionActual.SAC_CasoEspecial__c;
+pretension.AccountId = genialRequest.reclamacion.AccountId; 
+
+pretension.SAC_Entidad_Afectada__c = mapaMcc.get(pretension.SEG_Detalle__c).SAC_EntidadAfectada__c;
+pretension.SAC_EntidadProductora__c = mapaMcc.get(pretension.SEG_Detalle__c).SAC_EntidadProductora__c;
+pretension.SAC_CASE_esPSD2__c = mapaMcc.get(pretension.SEG_Detalle__c).SAC_EsPsd2__c;
+pretension.CC_Codigo_Externo_Tematica__c = mapaMcc.get(pretension.SEG_Detalle__c).CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__r.CC_Codigo_Externo__c;
+pretension.SAC_GenialEstado__c = 'SAC_003';
+pretensiones.add((sObject)pretension);
+}
+}
+*/
+            
+            //devuelve las pretensiones que se han insertado
+            return SAC_MetodosSinSharing.modificarInsertarObjetos(pretensiones, 'insert');
+        }else{
+            return 0;
+        }
     }
 
     /**
@@ -538,44 +538,63 @@ public with sharing class SAC_GenialQueueable implements Queueable {
         // añadimos documento y página del reclamante principal
         if(genialRequest.reclamantes != null && !genialRequest.reclamantes.isEmpty()){
             for(SAC_Genial_WS.DatosReclamante dtRec: genialRequest.reclamantes){
-                genRes.SAC_TipoReclamante__c = dtRec.tipo;
                 if(dtRec.reclamantePrincipal && dtRec.document != null){
                     Id contentDocumentId = getContentDocumentId(dtRec.document);
                     genRes.SAC_DocumentoURL__c = contentDocumentId;
                     genRes.SAC_PaginaDocumento__c = dtRec.page;
-                    break;
+                }
+                if(dtRec.reclamantePrincipal && dtRec.umbrales != null) {
+                    for(SAC_Genial_WS.Umbral umbral: dtRec.umbrales) {
+                        if(umbral.nivel == 'nombre') {
+                            genRes.SAC_UmbralNombre__c = umbral.valor;
+                        } else if(umbral.nivel == 'apellido') {
+                            genRes.SAC_UmbralApellido__c = umbral.valor;
+                        } else if(umbral.nivel == 'email') {
+                            genRes.SAC_UmbralEmail__c = umbral.valor;
+                        } else if(umbral.nivel == 'nif') {
+                            if(umbral.valor == 1){
+                                genRes.SAC_UmbralNIF__c = 'EXISTE';
+                            }else if(umbral.valor == 0){
+                                genRes.SAC_UmbralNIF__c = 'NO EXISTE'; 
+                            }
+                        }
+                    }
                 }
             }
         }
         genialRequest.reclamacion.SAC_Resumen__c = '';
-       
+        if(genialRequest.pretensiones == null){
+            objRes.add((sobject)genRes);
+        }
         // Pretensión Principal
-        for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
-            if(pretensionW.pretension != null){
-                case pretension = pretensionW.pretension;
-                genialRequest.reclamacion.SAC_Resumen__c += pretension.SAC_Resumen__c + ' ';
-                if(pretension.SAC_EsPrincipal__c){
-                    genialRequest.reclamacion.SAC_PretensionPrincipal__c = pretension.id;
-                    genRes.SAC_MCC_Tematica__c = pretensionW.pretension.CC_MCC_Tematica__c;
-                    genRes.SAC_MCC_ProdServ__c = pretensionW.pretension.CC_MCC_ProdServ__c;
-                    genRes.SAC_MCC_Motivo__c = pretensionW.pretension.CC_MCC_Motivo__c;
-                    genRes.SAC_Detalle__c = pretensionW.pretension.SEG_Detalle__c;
-                    for(SAC_Genial_WS.PretensionWrapper pw : genialRequest.pretensiones) {
-                        if(pw.pretension.SAC_EsPrincipal__c){
-                            for(SAC_Genial_WS.Umbral umbral: pw.umbrales){
-                                if(umbral.nivel == 'Tematica'){
-                                    genRes.SAC_UmbralTematica__c = umbral.valor;
-                                }else if(umbral.nivel == 'ProductoServicio'){
-                                    genRes.SAC_UmbralProdServ__c = umbral.valor;
-                                }else if(umbral.nivel == 'Motivo'){
-                                    genRes.SAC_UmbralMotivo__c = umbral.valor;
-                                }else if(umbral.nivel == 'Detalle'){
-                                    genRes.SAC_UmbralDetalle__c = umbral.valor;
+        if(genialRequest.pretensiones != null){
+            for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
+                if(pretensionW.pretension != null){
+                    case pretension = pretensionW.pretension;
+                    genialRequest.reclamacion.SAC_Resumen__c += pretension.SAC_Resumen__c + ' ';
+                    if(pretension.SAC_EsPrincipal__c){
+                        genialRequest.reclamacion.SAC_PretensionPrincipal__c = pretension.id;
+                        genRes.SAC_MCC_Tematica__c = pretensionW.pretension.CC_MCC_Tematica__c;
+                        genRes.SAC_MCC_ProdServ__c = pretensionW.pretension.CC_MCC_ProdServ__c;
+                        genRes.SAC_MCC_Motivo__c = pretensionW.pretension.CC_MCC_Motivo__c;
+                        genRes.SAC_Detalle__c = pretensionW.pretension.SEG_Detalle__c;
+                        for(SAC_Genial_WS.PretensionWrapper pw : genialRequest.pretensiones) {
+                            if(pw.pretension.SAC_EsPrincipal__c){
+                                for(SAC_Genial_WS.Umbral umbral: pw.umbrales){
+                                    if(umbral.nivel == 'Tematica'){
+                                        genRes.SAC_UmbralTematica__c = umbral.valor;
+                                    }else if(umbral.nivel == 'ProductoServicio'){
+                                        genRes.SAC_UmbralProdServ__c = umbral.valor;
+                                    }else if(umbral.nivel == 'Motivo'){
+                                        genRes.SAC_UmbralMotivo__c = umbral.valor;
+                                    }else if(umbral.nivel == 'Detalle'){
+                                        genRes.SAC_UmbralDetalle__c = umbral.valor;
+                                    }
                                 }
                             }
                         }
+                        objRes.add((sobject)genRes);
                     }
-                    objRes.add((sobject)genRes);
                 }
             }
         }
@@ -583,30 +602,32 @@ public with sharing class SAC_GenialQueueable implements Queueable {
         objRes.clear();
         genialRequest.idShadow = genRes.id;
         // Todas las pretensiones
-        for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
-            if(pretensionW.pretension != null){
-                case pretension = pretensionW.pretension;
-                genRes = new SAC_Genial_Resultado__c();
-                genRes = SAC_GenialUtils.casteoCaseAgenialResultado(pretension);
-                genRes.SAC_Reclamacion__c = genialRequest.reclamacion.id;
-                if(pretension.id != null) {
-                    genRes.SAC_Pretension__c = pretension.id;
-                }
-                genRes.SAC_Json__c = JSON.serialize(pretension);
-                genRes.recordTypeId = pretResRT;
-                genRes.SAC_ParentId__c = genialRequest.idShadow;
-                for(SAC_Genial_WS.Umbral umbral: pretensionW.umbrales){
-                    if(umbral.nivel == 'Tematica'){
-                        genRes.SAC_UmbralTematica__c = umbral.valor;
-                    }else if(umbral.nivel == 'ProductoServicio'){
-                        genRes.SAC_UmbralProdServ__c = umbral.valor;
-                    }else if(umbral.nivel == 'Motivo'){
-                        genRes.SAC_UmbralMotivo__c = umbral.valor;
-                    }else if(umbral.nivel == 'Detalle'){
-                        genRes.SAC_UmbralDetalle__c = umbral.valor;
+        if(genialRequest.pretensiones != null){
+            for(SAC_Genial_WS.PretensionWrapper pretensionW : genialRequest.pretensiones) {
+                if(pretensionW.pretension != null){
+                    case pretension = pretensionW.pretension;
+                    genRes = new SAC_Genial_Resultado__c();
+                    genRes = SAC_GenialUtils.casteoCaseAgenialResultado(pretension);
+                    genRes.SAC_Reclamacion__c = genialRequest.reclamacion.id;
+                    if(pretension.id != null) {
+                        genRes.SAC_Pretension__c = pretension.id;
                     }
+                    genRes.SAC_Json__c = JSON.serialize(pretension);
+                    genRes.recordTypeId = pretResRT;
+                    genRes.SAC_ParentId__c = genialRequest.idShadow;
+                    for(SAC_Genial_WS.Umbral umbral: pretensionW.umbrales){
+                        if(umbral.nivel == 'Tematica'){
+                            genRes.SAC_UmbralTematica__c = umbral.valor;
+                        }else if(umbral.nivel == 'ProductoServicio'){
+                            genRes.SAC_UmbralProdServ__c = umbral.valor;
+                        }else if(umbral.nivel == 'Motivo'){
+                            genRes.SAC_UmbralMotivo__c = umbral.valor;
+                        }else if(umbral.nivel == 'Detalle'){
+                            genRes.SAC_UmbralDetalle__c = umbral.valor;
+                        }
+                    }
+                    objRes.add((sObject)genRes);
                 }
-                objRes.add((sObject)genRes);
             }
         }
         SAC_MetodosSinSharing.modificarInsertarObjetos(objRes, 'insert');
@@ -706,7 +727,6 @@ public with sharing class SAC_GenialQueueable implements Queueable {
      *                         varia segun el canal de entrada, pero se obtiene el que le corresponde en la constructora.
      */
     private static void crearCaseReclamantes(SAC_Genial_WS.genialRequest genialRequest, SAC_GenialSettingsCanal__c settings) {
-
         String reclaShadowRT = Schema.SObjectType.SAC_Genial_Resultado__c.getRecordTypeInfosByDeveloperName().get('SAC_Reclamante_IA').getRecordTypeId();
         //SAC_CaseReclamante__c caseRec;
         //list<sObject> caseRecInsert = new list<SAC_CaseReclamante__c>();
@@ -731,13 +751,6 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                 reclaShadow.SAC_Reclamacion__c = genialRequest.reclamacion.Id;
                 reclaShadow.recordTypeId = reclaShadowRT;
                 reclaShadow.SAC_ParentId__c = genialRequest.idShadow;
-                // añadimos documento y página del reclamante
-                if(reclamante.reclamantePrincipal && reclamante.document != null){
-                    Id contentDocumentId = getContentDocumentId(reclamante.document);
-                    reclaShadow.SAC_DocumentoURL__c = contentDocumentId;
-                    reclaShadow.SAC_PaginaDocumento__c = reclamante.page;
-                    break;
-                }
                 // Verificamos si el account es confidencial o el dummy confidencial
                 if (reclamante.reclamante.CC_Confidencial__c || reclamante.reclamante.AV_Confidencial__c) {
                     reclaShadow.SAC_NombreContacto__c = 'CONFIDENCIAL';
@@ -761,7 +774,29 @@ public with sharing class SAC_GenialQueueable implements Queueable {
                     }
                     if (reclamante.reclamante.lastName != null){
                         reclaShadow.SAC_NombreContacto__c += reclamante.reclamante.lastName;
+                    } 
+                }
+                if(!reclamante.reclamantePrincipal && reclamante.umbrales != null) {
+                    for(SAC_Genial_WS.Umbral umbral: reclamante.umbrales) {
+                        if(umbral.nivel == 'nombre') {
+                            reclaShadow.SAC_UmbralNombre__c = umbral.valor;
+                        } else if(umbral.nivel == 'apellido') {
+                            reclaShadow.SAC_UmbralApellido__c = umbral.valor;
+                        } else if(umbral.nivel == 'email') {
+                            reclaShadow.SAC_UmbralEmail__c = umbral.valor;
+                        } else if(umbral.nivel == 'nif') {
+                            if(umbral.valor == 1){
+                                reclaShadow.SAC_UmbralNIF__c = 'EXISTE';
+                            }else if(umbral.valor == 0){
+                                reclaShadow.SAC_UmbralNIF__c = 'NO EXISTE'; 
+                            }
+                        }
                     }
+                }
+                if(!reclamante.reclamantePrincipal && reclamante.document != null){
+                    Id contentDocumentId = getContentDocumentId(reclamante.document);
+                    reclaShadow.SAC_DocumentoURL__c = contentDocumentId;
+                    reclaShadow.SAC_PaginaDocumento__c = reclamante.page;
                 }
                 if(settings.SAC_Shadow__c) {
                     reclaShadowList.add((sObject)reclaShadow);

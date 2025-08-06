@@ -96,6 +96,10 @@ public without sharing class SAC_GeneracionCartas {
         if(contador == ''){
             cv.Title = numCaso + ' Carta postal ' + procedencia;
         }
+        
+        //Añadido en US1194593
+        cv.SAC_Enviado__c = true;
+
         insert cv;
 
         ContentVersion content = [SELECT Id, Title, ContentDocumentId FROM ContentVersion WHERE Id =: cv.Id AND FirstPublishLocationId =: parentId AND SAC_StringRedaccion_fileupload__c =: redaccion LIMIT 1];
@@ -104,6 +108,7 @@ public without sharing class SAC_GeneracionCartas {
         carta.SAC_Version__c = content.Id;
         carta.SAC_Documento__c = content.ContentDocumentId;
         carta.SAC_URL__c = url;
+
 
         update carta;        
     }

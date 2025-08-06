@@ -68,15 +68,17 @@ global class EmailPublisherLoader implements QuickAction.QuickActionDefaultsHand
 
     private static void inicializarCuerpoCorreo(EmailMessage correo, QuickAction.SendEmailQuickActionDefaults parametrosQuickAction, String negocio) {
         //Se recuperan las plantillas a utilizar
-        Case caso = [SELECT CC_Email_Cabecera__c, CC_Email_Pie__c, CC_MCC_Plantilla__c, CC_Referencia_Correo_Saliente__c, OS_Email_Seleccionado__c, CC_URL_Encuesta_3N__c, CC_Ultima_Operativa_Correo__c, CC_Idioma__c
-                    FROM Case WHERE Id = :parametrosQuickAction.getContextId()];
+        //Si la plantilla tiene un replacement custom desde el Case Extension, se debe incluir el campo en la query. 
+        Case caso = [SELECT CC_Email_Cabecera__c, CC_Email_Pie__c, CC_MCC_Plantilla__c, CC_Referencia_Correo_Saliente__c, OS_Email_Seleccionado__c, CC_URL_Encuesta_3N__c, CC_Ultima_Operativa_Correo__c, CC_Idioma__c,
+        CBK_Case_Extension_Id__r.CC_ID_cliente__c,
+        CBK_Case_Extension_Id__r.CC_Nombre_Comercio__c,
+        CBK_Case_Extension_Id__r.CC_Fecha_De_Compra__c
+        FROM Case WHERE Id = :parametrosQuickAction.getContextId()];
 
         //Plantilla de cabecera
         String textoPlantillaCabecera = '';
         List<EmailTemplate> plantillasCabecera = [SELECT HtmlValue FROM EmailTemplate WHERE DeveloperName = :caso.CC_Email_Cabecera__c];
         if (!plantillasCabecera.isEmpty() && plantillasCabecera[0].HtmlValue != null) {
-            
-            //textoPlantillaCabecera = plantillasCabecera[0].HtmlValue + '<br/><br/>';
             textoPlantillaCabecera = plantillasCabecera[0].HtmlValue;
             textoPlantillaCabecera = textoPlantillaCabecera.replaceAll('</body>','');
             textoPlantillaCabecera = textoPlantillaCabecera.replaceAll('<br />','');
@@ -89,7 +91,6 @@ global class EmailPublisherLoader implements QuickAction.QuickActionDefaultsHand
         String textoPlantillaPie = '';
         List<EmailTemplate> plantillasPie = [SELECT HtmlValue FROM EmailTemplate WHERE DeveloperName = :caso.CC_Email_Pie__c];
         if (!plantillasPie.isEmpty() && plantillasPie[0].HtmlValue != null) {
-            //textoPlantillaPie = '<br/><br/>' + plantillasPie[0].HtmlValue;
             textoPlantillaPie = plantillasPie[0].HtmlValue;
             textoPlantillaPie = textoPlantillaPie.replaceAll('<body>','');
             textoPlantillaPie = textoPlantillaPie.replaceAll('<head>','');
@@ -106,7 +107,6 @@ global class EmailPublisherLoader implements QuickAction.QuickActionDefaultsHand
         String idioma = 'es';
         List<EmailTemplate> plantillasCuerpo = [SELECT Subject, DeveloperName, HtmlValue, FolderId
                                                 FROM EmailTemplate WHERE Id = :caso.CC_MCC_Plantilla__c];
-        //if (!plantillasCuerpo.isEmpty() && plantillasCuerpo[0].HtmlValue != null) {
         if (!plantillasCuerpo.isEmpty()) {
             if (plantillasCuerpo[0].HtmlValue != null) {
                 textoPlantillaCuerpo = plantillasCuerpo[0].HtmlValue;
@@ -118,7 +118,7 @@ global class EmailPublisherLoader implements QuickAction.QuickActionDefaultsHand
                 textoPlantillaCuerpo = textoPlantillaCuerpo.replaceAll('</head>','');
                 textoPlantillaCuerpo = textoPlantillaCuerpo.replaceAll('</html>','');
                 textoPlantillaCuerpo = textoPlantillaCuerpo.replaceAll('<title>','');
-                textoPlantillaCuerpo = textoPlantillaCuerpo.replaceAll('</title>','');
+                textoPlantillaCuerpo = textoPlantillaCuerpo.replaceAll('</title>','');              
             }
 
             Map<String, String> retorno = new Map<String, String>();
@@ -133,10 +133,13 @@ global class EmailPublisherLoader implements QuickAction.QuickActionDefaultsHand
             throw new OtherException('No se permiten enviar correos que no se originen de una operativa.');
         }
 
+        if(negocio == 'CC'){    
+            //Replacement custom desde Apex para campos de case extension
+            textoPlantillaCuerpo = reemplazarCamposCaseExtension(textoPlantillaCuerpo, caso.CBK_Case_Extension_Id__r);
+        }
         //Se concatenan las plantillas
         String textoCuerpo = textoPlantillaCabecera + textoPlantillaCuerpo + textoPlantillaPie;
        
-    
         //En función de la operativa recupera el histórico de correos para añadirlo al final del correo
         String historicoCorreos = '';
         if (negocio == 'CC'|| negocio == 'SACH' || negocio == 'HDT' || negocio == 'TMS' || negocio == 'GRR') {
@@ -392,5 +395,53 @@ global class EmailPublisherLoader implements QuickAction.QuickActionDefaultsHand
         retorno += mesesES.get(mesesEN.indexOf(fecha.format('MMM'))) + ' de ' + fecha.year() + ' ' + fecha.format('HH:mm');
 
         return retorno;
+    }
+
+    /**
+     * @description Método que reemplaza dinámicamente los campos de CBK_Case_Extension en el texto de la plantilla
+     * @param textoPlantilla El texto de la plantilla donde se realizarán los reemplazos
+     * @param caseExtension El registro de CBK_Case_Extension del que se obtendrán los valores
+     * @return String El texto con los reemplazos realizados
+     */
+    private static String reemplazarCamposCaseExtension(String textoPlantilla, CBK_Case_Extension__c caseExtension) {
+        if (textoPlantilla == null || caseExtension == null) {
+            return textoPlantilla;
+        }
+        
+        String resultado = textoPlantilla;
+        
+        // Obtener el mapa de campos del objeto para verificar tipos
+        Map<String, Schema.SObjectField> fieldMap = CBK_Case_Extension__c.SObjectType.getDescribe().fields.getMap();
+        
+        // Buscar patrones [[[CBK_Case_Extension_Id__r.XXXX]]] en el texto
+        Pattern pattern = Pattern.compile('\\[\\[\\[CBK_Case_Extension_Id__r\\.([^\\]]+)\\]\\]\\]');
+        Matcher matcher = pattern.matcher(textoPlantilla);
+        
+        while (matcher.find()) {
+            String campo = matcher.group(1);
+            String valor = '';
+            
+            try {
+                Object valorCampo = caseExtension.get(campo);
+                if (valorCampo != null) {
+                    // Verificar si el campo es de tipo Date
+                    if (fieldMap.containsKey(campo) && fieldMap.get(campo).getDescribe().getType() == Schema.DisplayType.DATE) {
+                        Date fecha = (Date)valorCampo;
+                        DateTime fechaTime = DateTime.newInstance(fecha.year(), fecha.month(), fecha.day());
+                        valor = fechaTime.format('dd/MM/yyyy');
+                    } else {
+                        valor = String.valueOf(valorCampo);
+                    }
+                }
+            } catch(Exception e) {
+                // Si hay algún error al obtener el valor del campo, se deja vacío
+                valor = '';
+            }
+            
+            // Reemplazar el patrón con el valor del campo
+            resultado = resultado.replace('[[[CBK_Case_Extension_Id__r.' + campo + ']]]', valor);
+        }
+        
+        return resultado;
     }
 }

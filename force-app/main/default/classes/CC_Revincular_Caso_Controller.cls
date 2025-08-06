@@ -405,7 +405,7 @@ public without sharing class CC_Revincular_Caso_Controller {
             tareaCC.WhatId = casoContactCenter.Id;
             tareaCC.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
             tareaCC.Subject = 'Devuelto a SAC';
-            tareaCC.Type = 'Automática';
+            tareaCC.Type = 'SAC';
             tareaCC.Description = motivo;
             tareaCC.ActivityDate = System.today();
             tareaCC.Status = 'Completed';
@@ -414,7 +414,7 @@ public without sharing class CC_Revincular_Caso_Controller {
             
             casos.add(casoSAC);
             update casos;
-            System.debug('Pablo: casos '+casos);
+
             SAC_Notificacion.enviarNotificacion(casoSAC.OwnerId, casoSAC.Id, 'Reclamación reabierta', 'La reclamación ' + casoSAC.CaseNumber + ' ha sido reabierta desde CC.');
              
         } catch (Exception e) {
@@ -475,7 +475,7 @@ public without sharing class CC_Revincular_Caso_Controller {
             tareaCC.WhatId = casoContactCenter.Id;
             tareaCC.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
             tareaCC.Subject = 'Derivado a SAC';
-            tareaCC.Type = 'Automática';
+            tareaCC.Type = 'SAC';
             tareaCC.Description = 'Derivado a SAC';
             tareaCC.ActivityDate = System.today();
             tareaCC.Status = 'Completed';
@@ -490,8 +490,6 @@ public without sharing class CC_Revincular_Caso_Controller {
             update casoCC;
 
             addAdjuntos(casoSac, adjuntosParaSAC/*, emailsParaSAC*/);
-
-            
 
             //insert listadoAuxiliarRegistro;
         }

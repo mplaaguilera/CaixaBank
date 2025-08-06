@@ -35,12 +35,12 @@
     <aura:if isTrue="{!v.sObjectName == 'CC_Llamada__c'}">
         <force:recordData aura:id="recordLoader" recordId="{!v.recordId}" fields="CC_Fecha_Fin__c, CC_No_Identificado__c" recordUpdated="{!c.recordUpdated}" />
         <aura:set attribute="else">
-			<aura:if isTrue="{!v.sObjectName == 'Opportunity'}">
+            <aura:if isTrue="{!v.sObjectName == 'Opportunity'}">
                 <lightning:messageChannel type="CSBD_Opportunity_MessageChannel__c" onMessage="{!c.csbdMessageChannelOnmessage}"/>
-				<force:recordData aura:id="oppData" recordId="{!v.recordId}" fields="Id, AccountId, CSBD_Contact__c, CSBD_No_Identificado__c" targetFields="{!v.oportunidad}" targetError="{!v.errorLds}" mode="EDIT" recordUpdated="{!c.recordUpdated}"/>
-				<aura:set attribute="else">
-					<force:recordData aura:id="recordLoader" recordId="{!v.recordId}" fields="AccountId, ContactId, CC_No_Identificado__c, CC_Representante__c, Contact.RecordType.DeveloperName" targetFields="{!v.caso}" recordUpdated="{!c.recordUpdated}" />
-				</aura:set>
+                <force:recordData aura:id="oppData" recordId="{!v.recordId}" fields="Id, AccountId, CSBD_Contact__c, CSBD_No_Identificado__c" targetFields="{!v.oportunidad}" targetError="{!v.errorLds}" mode="EDIT" recordUpdated="{!c.recordUpdated}"/>
+                <aura:set attribute="else">
+                    <force:recordData aura:id="recordLoader" recordId="{!v.recordId}" fields="AccountId, ContactId, CC_No_Identificado__c, CC_Representante__c, Contact.RecordType.DeveloperName" targetFields="{!v.caso}" recordUpdated="{!c.recordUpdated}" />
+                </aura:set>
             </aura:if>
         </aura:set>
     </aura:if>

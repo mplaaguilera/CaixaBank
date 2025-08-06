@@ -4,30 +4,31 @@ public class CSBD_InfobipSenderTest {
     @testSetup
     static void setupData() {
         
-        CSBD_Usuarios.usuarioAdministrador();
+        User usuarioAdministrador = CSBD_TestDataFactory.usuarioAdministrador();
+        System.runAs(usuarioAdministrador) {
+            Map<String, SObject> cuentaContacto = CSBD_TestDataFactory.crearCuentaContacto('12345678Z');
+            Account cuenta = (Account)cuentaContacto.get('cuenta');
+            Opportunity opportunity = CSBD_Opportunity_Test.crearOportunidadPrestamo(cuenta);
+            //Set a phone number
+            opportunity.CSBD_Telefono_Solicitud__c = '663125698';
+            update opportunity;
+            // Create test data and setup records necessary for testing.
+            CSBD_Infobip_Setting__c settings = new CSBD_Infobip_Setting__c(
+                CSBD_Sender_Id__c = 'InfobipSender',
+                CSBD_URL_Imagen__c = 'http://example.com/image.png',
+                CSBD_Tiempo_Espera__c = 60,
+                CSBD_Tipo_Tarea__c = 'Envio Mensaje RCS',
+                CSBD_Card_Size__c = 'MEDIUM',
+                CSBD_Envio_Automatico_Activo__c = true
+            );
+            insert settings;
 
-        Map<String, SObject> cuentaContacto = CSBD_TestDataFactory.crearCuentaContacto('12345678Z');
-        Account cuenta = (Account)cuentaContacto.get('cuenta');
-        Opportunity opportunity = CSBD_Opportunity_Test.crearOportunidadPrestamo(cuenta);
-        //Set a phone number
-        opportunity.CSBD_Telefono_Solicitud__c = '663125698';
-        update opportunity;
-        // Create test data and setup records necessary for testing.
-        CSBD_Infobip_Setting__c settings = new CSBD_Infobip_Setting__c(
-            CSBD_Sender_Id__c = 'InfobipSender',
-            CSBD_URL_Imagen__c = 'http://example.com/image.png',
-            CSBD_Tiempo_Espera__c = 60,
-            CSBD_Tipo_Tarea__c = 'Envio Mensaje RCS',
-            CSBD_Card_Size__c = 'MEDIUM',
-            CSBD_Envio_Automatico_Activo__c = true
-        );
-        insert settings;
-
-        //Create Custom Setting FWK 
-        CBK_IntegrationSetting__c integrationSetting = new CBK_IntegrationSetting__c();
-        integrationSetting.Name = 'CSBD_Infobip_SendMessage';
-        integrationSetting.NamedCredential__c = 'callout:CSBD_Infobip_Named_Credentials/rcs/2/messages';
-        insert integrationSetting;
+            //Create Custom Setting FWK 
+            CBK_IntegrationSetting__c integrationSetting = new CBK_IntegrationSetting__c();
+            integrationSetting.Name = 'CSBD_Infobip_SendMessage';
+            integrationSetting.NamedCredential__c = 'callout:CSBD_Infobip_Named_Credentials/rcs/2/messages';
+            insert integrationSetting;
+        }
        
     }
 

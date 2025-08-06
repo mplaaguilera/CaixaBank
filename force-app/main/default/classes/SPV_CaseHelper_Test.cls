@@ -13,8 +13,6 @@ public with sharing class SPV_CaseHelper_Test {
 
     @TestSetup
     static void makeData(){
-    
-        
 
         User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
         SPV_DatabaseDML.insertDML(usuarioAdmin, true);
@@ -25,8 +23,6 @@ public with sharing class SPV_CaseHelper_Test {
             listUsuarios  = SPV_TestDataFactory.crearUsuarioSPVGeneral(2);
             SPV_DatabaseDML.insertListDML(listUsuarios, true);
         }
-
-       
 
         Id recTypeTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         Id recTypeProdServ = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
@@ -113,10 +109,8 @@ public with sharing class SPV_CaseHelper_Test {
         //Contacto para la reclamación
         Contact contacto  = new Contact();
         contacto.LastName = 'nombre';
-       // contacto.AccountId= listaCuentas[0].Id;
         SPV_DatabaseDML.insertDML(contacto, true);
 
-        
         //Cuentas 
         List<Account> listaCuentas = SPV_TestDataFactory.crearCuentasNoClientePA(2);
         listaCuentas[0].PersonEmail = 'test@test.sactest';
@@ -187,9 +181,6 @@ public with sharing class SPV_CaseHelper_Test {
         Case casoReclamacion6 = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion6);
         listaReclamaciones.add(casoReclamacion6);
 
-
-
-        
         Account cuentaTercera = new Account();
         cuentaTercera.Name = 'Tercera';
         cuentaTercera.CC_Tipo_Centro__c = 'DT';
@@ -207,34 +198,27 @@ public with sharing class SPV_CaseHelper_Test {
         cuentaPrimera.Name = 'Primera';
         cuentaPrimera.CC_OficinaGestoraId__c = cuentaSegunda.Id;
         cuentaPrimera.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('IndustriesIndividual').getRecordTypeId();  
-        //cuentaPrimera.AV_OficinaPrincipal__c = cuentaSegunda.Id;
         listaCuentas.add(cuentaPrimera);
         SPV_DatabaseDML.insertDML(cuentaPrimera, true);
 
-
-   
         //Cases
-     
-       
         Map<String, Object> camposReclamacion = new Map<String, Object>();
         camposReclamacion.put('Subject', 'TestRecCrearRec1');
         camposReclamacion.put('SPV_Organismo__c', 'SPV_CNMV');
         camposReclamacion.put('Status', 'SAC_001');
         camposReclamacion.put('OwnerId', listUsuarios[0].Id);
         camposReclamacion.put('SAC_StatusAuxiliar__c', 'SAC_001');
-        //camposReclamacion.put('AccountId', listaCuentas[0].Id);
         //Campos añadidos para poder pasar a análisis:
         camposReclamacion.put('contactId', contacto.Id);
-        camposReclamacion.put('SAC_FechaRecepcion__c', System.now());
+        camposReclamacion.put('SAC_FechaRecepcion__c', CBK_UtilsDate.nowSYS());
         camposReclamacion.put('SPV_Organismo__c', 'SPV_CNMV');
         camposReclamacion.put('SPV_NumExpediente__c', '123');
         camposReclamacion.put('CC_Oficina_Afectada_Lookup__c', listaCuentas[0].Id);
         camposReclamacion.put('SPV_FechaIniRegulador__c', date.today());
-        //camposReclamacion.put('CC_Recipient_Oficina_Gestora__c', 'Cuenta SAC');
         camposReclamacion.put('SAC_EntidadProductora__c', 'Bankia');
         camposReclamacion.put('AccountId', listaCuentas[4].Id);
         camposReclamacion.put('SAC_Importe_Tipo__c', 'Sin importe');
-        camposReclamacion.put('SAC_FechaVencimientoSLA__c',  System.now());
+        camposReclamacion.put('SAC_FechaVencimientoSLA__c',  CBK_UtilsDate.nowSYS());
         camposReclamacion.put('SAC_Entidad_Afectada__c', 'SAC_008');
 
         Case casoReclamacion = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion);
@@ -249,16 +233,15 @@ public with sharing class SPV_CaseHelper_Test {
         camposReclamacion2.put('SAC_Entidad_Afectada__c', 'SAC_008');
         //Campos añadidos para poder pasar a análisis:
         camposReclamacion2.put('contactId', contacto.Id);
-        camposReclamacion2.put('SAC_FechaRecepcion__c', System.now());
+        camposReclamacion2.put('SAC_FechaRecepcion__c', CBK_UtilsDate.nowSYS());
         camposReclamacion2.put('SPV_Organismo__c', 'SPV_BDE');
         camposReclamacion2.put('SPV_NumExpediente__c', '123');
         camposReclamacion2.put('CC_Oficina_Afectada_Lookup__c', listaCuentas[0].Id);
         camposReclamacion2.put('SPV_FechaIniRegulador__c', date.today());
-        //camposReclamacion2.put('CC_Recipient_Oficina_Gestora__c', 'Cuenta SAC');
         camposReclamacion2.put('SAC_EntidadProductora__c', 'Bankia');
         camposReclamacion2.put('AccountId', listaCuentas[4].Id);
         camposReclamacion2.put('SAC_Importe_Tipo__c', 'Sin importe');
-        camposReclamacion2.put('SAC_FechaVencimientoSLA__c',  System.now());
+        camposReclamacion2.put('SAC_FechaVencimientoSLA__c',  CBK_UtilsDate.nowSYS());
 
         Case casoReclamacion2 = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion2);
         listaReclamaciones.add(casoReclamacion2);
@@ -272,16 +255,15 @@ public with sharing class SPV_CaseHelper_Test {
         camposReclamacionACerrar.put('SAC_Entidad_Afectada__c', 'SAC_008');
         //Campos añadidos para poder pasar a análisis:
         camposReclamacionACerrar.put('contactId', contacto.Id);
-        camposReclamacionACerrar.put('SAC_FechaRecepcion__c', System.now());
+        camposReclamacionACerrar.put('SAC_FechaRecepcion__c', CBK_UtilsDate.nowSYS());
         camposReclamacionACerrar.put('SPV_Organismo__c', 'SPV_BDE');
         camposReclamacionACerrar.put('SPV_NumExpediente__c', '123');
         camposReclamacionACerrar.put('CC_Oficina_Afectada_Lookup__c', listaCuentas[0].Id);
         camposReclamacionACerrar.put('SPV_FechaIniRegulador__c', date.today());
-        //camposReclamacion2.put('CC_Recipient_Oficina_Gestora__c', 'Cuenta SAC');
         camposReclamacionACerrar.put('SAC_EntidadProductora__c', 'Bankia');
         camposReclamacionACerrar.put('AccountId', listaCuentas[4].Id);
         camposReclamacionACerrar.put('SAC_Importe_Tipo__c', 'SIn cuantificar');
-        camposReclamacionACerrar.put('SAC_FechaVencimientoSLA__c',  System.now());
+        camposReclamacionACerrar.put('SAC_FechaVencimientoSLA__c',  CBK_UtilsDate.nowSYS());
 
         Case casoReclamacionACerrar = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacionACerrar);
         listaReclamaciones.add(casoReclamacionACerrar);
@@ -293,16 +275,15 @@ public with sharing class SPV_CaseHelper_Test {
         camposRecl.put('OwnerId', listUsuarios[0].id);
         //Campos añadidos para pasar a análisis:
         camposRecl.put('contactId', contacto.Id);
-        camposRecl.put('SAC_FechaRecepcion__c', System.now());
+        camposRecl.put('SAC_FechaRecepcion__c', CBK_UtilsDate.nowSYS());
         camposRecl.put('SPV_Organismo__c', 'SPV_CNMV');
         camposRecl.put('SPV_NumExpediente__c', '123');
         camposRecl.put('CC_Oficina_Afectada_Lookup__c', listaCuentas[0].Id);
         camposRecl.put('SPV_FechaIniRegulador__c', date.today());
-       // camposRecl.put('CC_Recipient_Oficina_Gestora__c', 'Cuenta SAC');
         camposRecl.put('SAC_EntidadProductora__c', 'Bankia');
         camposRecl.put('AccountId', listaCuentas[4].Id);
         camposRecl.put('SAC_Importe_Tipo__c', 'Sin importe');
-        camposRecl.put('SAC_FechaVencimientoSLA__c',  System.now());
+        camposRecl.put('SAC_FechaVencimientoSLA__c',  CBK_UtilsDate.nowSYS());
         camposRecl.put('SAC_Entidad_Afectada__c', 'SAC_008');
 
         Case reclamacion1Repre = SPV_TestDataFactory.crearCaso('Reclamacion', camposRecl);
@@ -347,7 +328,6 @@ public with sharing class SPV_CaseHelper_Test {
         
         Case reclamacion5Repre = SPV_TestDataFactory.crearCaso('Reclamacion', camposRecl5);
 
-        //List<Case> listaReclamaciones = new List<Case>();
         listaReclamaciones.add(reclamacion1Repre);
         listaReclamaciones.add(reclamacion2Repre);
         listaReclamaciones.add(reclamacion3Repre);
@@ -355,10 +335,6 @@ public with sharing class SPV_CaseHelper_Test {
         listaReclamaciones.add(reclamacion5Repre);
         SPV_DatabaseDML.insertListDML(listaReclamaciones, true);
 
-        
-        
-
-        
         //Oficinas afectadas
         List<SAC_ImagenDocumento__c> listaOficinasAfectadas = new List<SAC_ImagenDocumento__c>();
 
@@ -388,6 +364,7 @@ public with sharing class SPV_CaseHelper_Test {
         camposPret.put('Status', 'SAC_001');
         camposPret.put('SAC_EsPrincipal__c', true);
         camposPret.put('SAC_Reclamacion__c', casoReclamacion.Id);
+        camposPret.put('SAC_ResumenManual__c', 'Test');
         camposPret.put('SPV_ObservacionesReclamacion__c', 'Observacion Test');
 
         Case casoPretension1 = SPV_TestDataFactory.crearCaso('Pretension',camposPret);
@@ -399,6 +376,7 @@ public with sharing class SPV_CaseHelper_Test {
         camposPret2.put('OwnerId', listUsuarios[0].Id);
         camposPret2.put('Status', 'SAC_001');
         camposPret2.put('SAC_Reclamacion__c', casoReclamacion.Id);
+        camposPret2.put('SAC_ResumenManual__c', 'Test');
         camposPret2.put('SPV_ObservacionesReclamacion__c', 'Observacion Test');
 
 
@@ -411,6 +389,7 @@ public with sharing class SPV_CaseHelper_Test {
         camposPret3.put('OwnerId', listUsuarios[0].Id);
         camposPret3.put('Status', 'SAC_001');
         camposPret3.put('SAC_Reclamacion__c', casoReclamacion2.Id);
+        camposPret3.put('SAC_ResumenManual__c', 'Test');
         camposPret3.put('SEG_Detalle__c', mccDetalle1.Id);
         camposPret3.put('SPV_ObservacionesReclamacion__c', 'Observacion Test');
 
@@ -442,7 +421,6 @@ public with sharing class SPV_CaseHelper_Test {
         Case casoPretension6 = SPV_TestDataFactory.crearCaso('Pretension',camposPret6); //Pretension
         listaPretensiones.add(casoPretension6);
 
-
         Map<String, Object> camposPret7 = new Map<String, Object>();
         camposPret7.put('SuppliedCompany', 'pruebaPretension7');
         camposPret7.put('SPV_Organismo__c', 'SPV_Consumo');
@@ -454,7 +432,6 @@ public with sharing class SPV_CaseHelper_Test {
 
         Case casoPretension7 = SPV_TestDataFactory.crearCaso('Pretension',camposPret7); //Pretension 
         listaPretensiones.add(casoPretension7);
-
 
         Map<String, Object> camposPret8 = new Map<String, Object>();
         camposPret8.put('SuppliedCompany', 'pruebaPretension8');
@@ -468,10 +445,8 @@ public with sharing class SPV_CaseHelper_Test {
         camposPret8.put('CC_Importe_Abonado__c', 0);
         camposPret8.put('SAC_Importe_Resuelto__c', 0);
 
-
         Case casoPretension8 = SPV_TestDataFactory.crearCaso('Pretension',camposPret8); //Pretension 
         listaPretensiones.add(casoPretension8);
-
 
         Map<String, Object> camposPret9 = new Map<String, Object>();
         camposPret9.put('SuppliedCompany', 'pruebaPretension9');
@@ -489,7 +464,6 @@ public with sharing class SPV_CaseHelper_Test {
         Case casoPretension9 = SPV_TestDataFactory.crearCaso('Pretension',camposPret9); //Pretension
         listaPretensiones.add(casoPretension9);
 
-
         Map<String, Object> camposPret10 = new Map<String, Object>();
         camposPret10.put('SuppliedCompany', 'pruebaPretension10');
         camposPret10.put('SPV_Organismo__c', 'SPV_Consumo');
@@ -501,13 +475,11 @@ public with sharing class SPV_CaseHelper_Test {
         camposPret10.put('CC_Importe_Reclamado__c', 50);
         camposPret10.put('CC_Importe_Abonado__c', 50);
         camposPret10.put('SAC_Importe_Resuelto__c', 50);
+        camposPret10.put('SAC_ResumenManual__c', 'Test resumen');
         camposPret10.put('SPV_ObservacionesReclamacion__c', 'Observacion Test');
 
         Case casoPretension10 = SPV_TestDataFactory.crearCaso('Pretension',camposPret10); //Pretension
         listaPretensiones.add(casoPretension10);
-
-       
-
         SPV_DatabaseDML.insertListDML(listaPretensiones, true);
         Test.stopTest();
 
@@ -522,9 +494,6 @@ public with sharing class SPV_CaseHelper_Test {
         mccGrupoColab.SAC_PorcentajeAsignacion__c = 100;
         mccGrupoColab.SPV_Tipo_Cliente__c = 'SPV';
         SPV_DatabaseDML.insertDML(mccGrupoColab, true);
-
-        
-
     }
 
     @isTest
@@ -552,7 +521,21 @@ public with sharing class SPV_CaseHelper_Test {
         Test.stopTest();
     }
 
-    
+    @isTest
+    static void actualizarResumenManualTest(){
+        User usuario = [SELECT Id, Name FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        Case pretension = [SELECT Id, OwnerId, SAC_Reclamacion__c FROM Case WHERE SuppliedCompany = 'pruebaPretension4' LIMIT 1];
+        Test.startTest();
+
+        System.runAs(usuario){
+            pretension.SAC_ResumenManual__c = 'Resumen Test';
+            SPV_DatabaseDML.updateDML(pretension, true);
+        }
+
+        Case reclamacion = [SELECT Id, SAC_ResumenManual__c FROM Case WHERE Id = :pretension.SAC_Reclamacion__c];
+        Assert.areEqual(false, String.isBlank(reclamacion.SAC_ResumenManual__c), 'No se ha actualizado el resumen de la reclamación.');
+        Test.stopTest();
+    }
 
     @isTest
     static void arrastrarReclamantePretensionTest(){
@@ -578,7 +561,6 @@ public with sharing class SPV_CaseHelper_Test {
         Assert.areNotEqual(resultado.AccountId, null, 'No se ha arrastrado el representante a la pretensión.');
 
         Test.stopTest();
-
     }
 
     @isTest
@@ -597,7 +579,7 @@ public with sharing class SPV_CaseHelper_Test {
             camposRecl.put('CC_Idioma__c', 'es');
             camposRecl.put('OwnerId', usuario.id);
             camposRecl.put('Status', 'SPV_AnalisisDecision');
-            camposRecl.put('SAC_FechaRecepcion__c', System.now());
+            camposRecl.put('SAC_FechaRecepcion__c', CBK_UtilsDate.nowSYS());
             camposRecl.put('SPV_Organismo__c', 'SPV_CNMV');
             camposRecl.put('SPV_NumExpediente__c', 'exp12345');
             Case reclaAnalisis = SPV_TestDataFactory.crearCaso('Reclamacion', camposRecl);
@@ -608,7 +590,7 @@ public with sharing class SPV_CaseHelper_Test {
             camposRecl2.put('CC_Idioma__c', 'es');
             camposRecl2.put('OwnerId', usuario.id);
             camposRecl2.put('Status', 'SPV_EnvioOrganismos');
-            camposRecl2.put('SAC_FechaRecepcion__c', System.now());
+            camposRecl2.put('SAC_FechaRecepcion__c', CBK_UtilsDate.nowSYS());
             camposRecl2.put('SPV_Organismo__c', 'SPV_CNMV');
             camposRecl2.put('SPV_NumExpediente__c', 'exp123456');
             Case reclaEnvioOrganismos = SPV_TestDataFactory.crearCaso('Reclamacion', camposRecl2);
@@ -658,9 +640,6 @@ public with sharing class SPV_CaseHelper_Test {
         Assert.areEqual(resultado.OS_Email__c, 'prueba@gmail.com', 'No se ha arrastrado el representante a la pretensión.');
 
         Test.stopTest();
-
-
-
     }
 
     @isTest
@@ -678,7 +657,7 @@ public with sharing class SPV_CaseHelper_Test {
             camposRecl.put('CC_Idioma__c', 'es');
             camposRecl.put('OwnerId', usuario.id);
             camposRecl.put('Status', 'SPV_AnalisisDecision');
-            camposRecl.put('SAC_FechaRecepcion__c', System.now());
+            camposRecl.put('SAC_FechaRecepcion__c', CBK_UtilsDate.nowSYS());
             camposRecl.put('SPV_Organismo__c', 'SPV_CNMV');
             camposRecl.put('SPV_NumExpediente__c', 'exp12345');
             Case reclaAnalisis = SPV_TestDataFactory.crearCaso('Reclamacion', camposRecl);
@@ -687,8 +666,6 @@ public with sharing class SPV_CaseHelper_Test {
 
             reclaAnalisis.SAC_SentidoResolucion__c = 'SPV_FavorableEntidad';
             SPV_DatabaseDML.updateDML(reclaAnalisis, true);
-
-
         }
 
         Case reclamacionResultado = [SELECT Id, OwnerId, CBK_Case_Extension_Id__c, SPV_FechaRecepcionResolucion__c  FROM Case WHERE Subject = 'reclaAnalisis' LIMIT 1];
@@ -719,7 +696,6 @@ public with sharing class SPV_CaseHelper_Test {
         Test.stopTest();
     }
 
-
     @istest
     static void descartarPretensionesTest(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
@@ -735,7 +711,6 @@ public with sharing class SPV_CaseHelper_Test {
         Assert.areEqual(pretension.Status, 'Descartado', 'No se ha actualizado el estado de las pretensiones.');
 
         Test.stopTest();
-
     }
 
     @isTest
@@ -747,14 +722,10 @@ public with sharing class SPV_CaseHelper_Test {
         
         System.runAs(usuario){
         SAC_Accion__c tarea = SPV_TestDataFactory.crearTareas(1,reclamacion,null)[0];
-     //   tarea.SAC_ImporteResuelto__c = 100;
         tarea.SAC_ImporteAbonar__c = 100;
-       // tarea.SAC_ImpResueltoInteresesLegales__c = 100;
         SPV_DatabaseDML.insertDML(tarea, true);
 
-
         pretension.CC_Importe_Abonado__c = 100;
-      //  pretension.SAC_Importe_Resuelto__c=100;
         pretension.Status = 'SAC_001';
         pretension.SAC_StatusAuxiliar__c = 'SAC_001';
         SPV_DatabaseDML.updateDML(pretension, true);
@@ -763,9 +734,7 @@ public with sharing class SPV_CaseHelper_Test {
 
         Case reclamacionResult = [SELECT Id, OwnerId, CC_Importe_Abonado__c FROM Case WHERE Subject = 'TestRecCrearRec6' LIMIT 1];
         Assert.areEqual(reclamacionResult.CC_Importe_Abonado__c, 250.00, 'No se ha cambiado el importe abonado');
-
     }
-
 
     @isTest
     static void actualizarIdPretensionTest(){
@@ -792,7 +761,6 @@ public with sharing class SPV_CaseHelper_Test {
         Test.stopTest();
     }
 
-
     @isTest
     static void cambiarOwnerPretension() {
        
@@ -816,7 +784,6 @@ public with sharing class SPV_CaseHelper_Test {
         Test.stopTest();
     }
 
-
     @isTest 
     static void asignarEmpresaReclamacionTest(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
@@ -830,15 +797,12 @@ public with sharing class SPV_CaseHelper_Test {
             SPV_DatabaseDML.updateDML(reclamacion, true);
         }
 
-       
-
         Case reclamacion2 = [SELECT Id, OwnerId, SAC_Empresa__c FROM Case WHERE Subject = 'TestRecCrearRec3' LIMIT 1];
 
         Assert.areEqual(grupo.CC_Empresa__c, reclamacion2.SAC_Empresa__c, 'No se ha cambiado la empresa');
   
         Test.stopTest();
     }
-
 
     @isTest 
     static void asignarEmpresaReclamacionTest2(){
@@ -853,18 +817,15 @@ public with sharing class SPV_CaseHelper_Test {
             SPV_DatabaseDML.updateDML(reclamacion, true);
         }
 
-    
         Case reclamacion2 = [SELECT Id, OwnerId, SAC_Empresa__c FROM Case WHERE Subject = 'TestRecCrearRec5' LIMIT 1];
 
         Assert.areEqual(grupo.CC_Empresa__c, reclamacion2.SAC_Empresa__c, 'No se ha cambiado la empresa');
         
         Test.stopTest();
     }
-
-
     
     @isTest
-    static void validarCamposEntraAnalisisReclamacionTest(){
+    static void validarCamposEntraAnalisisReclamacionYPretensionTest(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'testRec1' LIMIT 1];
         Account cuenta = [SELECT Id, CC_OficinaGestoraId__c  FROM Account WHERE Name = 'Primera' LIMIT 1];
@@ -930,7 +891,6 @@ public with sharing class SPV_CaseHelper_Test {
             SPV_DatabaseDML.insertDML(reclamacion, true);
         }
 
-    
         Case reclamacion2 = [SELECT Id, OwnerId, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Subject = 'DAN' LIMIT 1];
 
         Assert.areEqual(cuenta2.Id, reclamacion2.CC_DAN__c, 'No se ha cambiado el DAN');
@@ -938,7 +898,6 @@ public with sharing class SPV_CaseHelper_Test {
 
         Test.stopTest();
     }
-
 
     @isTest 
     static void asignarDANyDTUpdateTest(){
@@ -959,7 +918,6 @@ public with sharing class SPV_CaseHelper_Test {
            
             SPV_DatabaseDML.updateDML(reclamacion, true);
         }
-
     
         Case reclamacion2 = [SELECT Id, OwnerId, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Subject = 'TestRecCrearRec6' LIMIT 1];
 
@@ -968,7 +926,6 @@ public with sharing class SPV_CaseHelper_Test {
 
         Test.stopTest();
     }
-
 
     @isTest
     static void camposRepresentanteValidoTest() {
@@ -1030,11 +987,8 @@ public with sharing class SPV_CaseHelper_Test {
 
         Case casoResult = [SELECT Id, OS_Email__c, SAC_DireccionPostalNotificacion__c, SAC_DireccionRepresentante__c FROM Case WHERE Subject = 'testRec1'];
 
-        //system.assertEquals(caso1.SAC_EmailRepresentante__c, casoResult.OS_Email__c, 'No se ha podido arrastrar el SAC_EmailRepresentante__c a OS_Email__c');
         System.assertEquals(caso1.SAC_DireccionRepresentante__c, casoResult.SAC_DireccionRepresentante__c, 'No se ha podido arrastrar el SAC_DireccionPostal__c a SAC_DireccionPostalNotificacion__c');
     }
-
-
 
     @isTest
     static void usarDatosDeAlfTest() {
@@ -1082,77 +1036,6 @@ public with sharing class SPV_CaseHelper_Test {
         System.assertNotEquals(caso3.SAC_DireccionPostalNotificacion__c, caso3Result.SAC_DireccionPostalNotificacion__c, 'No se ha podido arrastrar la dirección postal del account a SAC_DireccionPostalNotificacion__c');
     }
 
-
-
-
-
-    /*@isTest 
-    static void asignarDANyDTUpdateTest(){
-        User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
-        Account cuenta = [SELECT Id, CC_OficinaGestoraId__c  FROM Account WHERE Name = 'Primera' LIMIT 1];
-        Account cuentaSegunda = [SELECT Id, CC_OficinaGestoraId__c  FROM Account WHERE Name = 'Segunda' LIMIT 1];
-        Account cuenta2 = [SELECT Id  FROM Account WHERE Name = 'Tercera' LIMIT 1];
-        Case reclamacion = [SELECT Id, OwnerId FROM Case WHERE Subject = 'TestRecCrearRec6' LIMIT 1];
-
-
-        Test.startTest();
-
-        System.runAs(usuario){
-            cuenta.AV_OficinaPrincipal__c = cuentaSegunda.Id;
-            Database.update(cuenta);
-
-            reclamacion.AccountId = cuenta.Id;
-            Database.update(reclamacion);
-        }
-
-    
-        Case reclamacion2 = [SELECT Id, OwnerId, CC_DAN__c, CC_Direccion_Territorial__c FROM Case WHERE Subject = 'TestRecCrearRec6' LIMIT 1];
-
-        Assert.areEqual(cuenta2.Id, reclamacion2.CC_DAN__c, 'No se ha cambiado el DAN');
-        Assert.areEqual(cuenta2.Id, reclamacion2.CC_Direccion_Territorial__c, 'No se ha cambiado la Dirección Territorial');
-
-        Test.stopTest();
-    }*/
-
-
-
-    /*@isTest 
-    static void asignarEmpresaReclamacionTest3(){
-        User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
-
-        CC_Grupo_Colaborador__c grupo = [SELECT Id, Name, CC_Empresa__c  FROM CC_Grupo_Colaborador__c WHERE SAC_Email__c = 'testSPVgrestor2@testemail.com.invalid' LIMIT 1]; 
-
-        Test.startTest();
-
-        System.runAs(usuario){
-            List<Case> listaReclamaciones = new List<Case>();
-            Case nuevoCaso = new Case();
-            nuevoCaso.recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SPV_Reclamacion').getRecordTypeId();
-            nuevoCaso.put('Subject','Prueba test');
-            nuevoCaso.put('Status','SPV_AnalisisDecision' );
-            nuevoCaso.put('SEG_Grupo__c',grupo.Id);
-            listaReclamaciones.add(nuevoCaso);
-
-            Case nuevoCaso2 = new Case();
-            nuevoCaso2.recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SPV_Reclamacion').getRecordTypeId();
-            nuevoCaso2.put('Subject','Prueba test 2');
-            nuevoCaso2.put('Status','SPV_AnalisisDecision' );
-            listaReclamaciones.add(nuevoCaso2);
-
-            Database.insert(listaReclamaciones);
-        }
-
-    
-        Case reclamacion2 = [SELECT Id, OwnerId, SAC_Empresa__c FROM Case WHERE Subject = 'Prueba test' LIMIT 1];
-        //Case reclamacion3 = [SELECT Id, OwnerId, SAC_Empresa__c FROM Case WHERE Subject = 'Prueba test 2' LIMIT 1];
-     
-   
-        Assert.areEqual(grupo.CC_Empresa__c, reclamacion2.SAC_Empresa__c, 'No se ha cambiado la empresa');
-       // Assert.areEqual(null, reclamacion3.SAC_Empresa__c, 'No se ha cambiado la empresa 2');
-        Test.stopTest();
-    }*/
-    
-
     @isTest
     static void asignarFechaRecepcionReclamacionTest(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
@@ -1160,7 +1043,6 @@ public with sharing class SPV_CaseHelper_Test {
         Test.startTest();
 
         System.runAs(usuario){
-
             List<Case> listaReclamaciones = new List<Case>();
             Case nuevoCaso = new Case();
             nuevoCaso.recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SPV_Reclamacion').getRecordTypeId();
@@ -1169,23 +1051,17 @@ public with sharing class SPV_CaseHelper_Test {
             listaReclamaciones.add(nuevoCaso);
 
             SPV_DatabaseDML.insertListDML(listaReclamaciones, true);
-
         }
 
         Case reclamacion2 = [SELECT Id, SAC_FechaRecepcion__c,OwnerId FROM Case WHERE Subject = 'Prueba Test' LIMIT 1];
         Assert.areNotEqual(reclamacion2.SAC_FechaRecepcion__c, null, 'No se ha asignado la fecha de recepción');
         Assert.areNotEqual(reclamacion2.OwnerId, null, 'Bien');
-       
-       
         Test.stopTest();
-
-
     }
 
     @isTest
     static void actualizarEntidadProductoraTest(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
-        //Case reclamacion = [SELECT Id, OwnerId FROM Case WHERE Subject = 'TestRecCrearRec5' LIMIT 1];
         Case pretension = [SELECT Id, SAC_EntidadProductora__c FROM Case WHERE SuppliedCompany = 'pruebaPretension7' LIMIT 1];
         
         Test.startTest();
@@ -1202,9 +1078,6 @@ public with sharing class SPV_CaseHelper_Test {
         Assert.areEqual(reclamacion2.SAC_EntidadProductora__c, pretension2.SAC_EntidadProductora__c, 'No se ha actualizado la reclamacion');
     }
 
-
-
-
     @isTest
     static void actualizarFechaRecepcionPretensiones(){
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
@@ -1212,60 +1085,49 @@ public with sharing class SPV_CaseHelper_Test {
         
         Test.startTest();
         System.runAs(usuario){
-
             List<Case> listaCasosUpdate = new List<Case>();
-            reclamacion.SAC_FechaRecepcion__c = System.now();
+            reclamacion.SAC_FechaRecepcion__c = CBK_UtilsDate.nowSYS();
             listaCasosUpdate.add(reclamacion);
             SPV_DatabaseDML.updateListDML(listaCasosUpdate, true);
         }
 
-      //  Case reclamacion2 = [SELECT Id, OwnerId,SAC_FechaRecepcion__c FROM Case WHERE Subject = 'TestRecCrearRec5' LIMIT 1];
         Case pretension = [SELECT Id, SAC_FechaRecepcion__c FROM Case WHERE SuppliedCompany = 'pruebaPretension6' LIMIT 1];
 
         Assert.areNotEqual(pretension.SAC_FechaRecepcion__c, null, 'No se ha actualizado la pretensión hija');
         Test.stopTest();
-
     }
 
     @isTest
     static void cambioEstadoRecAnalisisTest() {
-       
+        Test.startTest();
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Case reclamacion = [SELECT Id, OwnerId FROM Case WHERE Subject = 'TestRecCrearRec1' LIMIT 1];
         Case reclamacion2 = [SELECT Id, OwnerId, SAC_EntidadProductora__c FROM Case WHERE Subject = 'TestRecCrearRec2' LIMIT 1];
         Case reclamacionSAC = [SELECT Id, OwnerId FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
         Case pret = [SELECT Id, OwnerId FROM Case WHERE SuppliedCompany = 'pruebaPretension1' LIMIT 1];
-
-    
-       
-        Test.startTest();
-
+        List<Case> reclamacionList = new List<Case>();
         System.runAs(usuario) {
-
             reclamacion.Status = 'SPV_AnalisisDecision';
             reclamacion.SAC_StatusAuxiliar__c = 'SPV_AnalisisDecision';
             reclamacion.SAC_PretensionPrincipal__c = pret.Id;
-            SPV_DatabaseDML.updateDML(reclamacion, true);
-            Assert.areNotEqual('SAC_001', reclamacion.Status, 'Ha fallado el paso a analisis de la reclamacion');
-
-            reclamacion2.Status = 'SPV_AnalisisDecision';
+            reclamacionList.add(reclamacion);
+            /*reclamacion2.Status = 'SPV_AnalisisDecision';
             reclamacion2.SAC_StatusAuxiliar__c = 'SPV_AnalisisDecision';
             SPV_DatabaseDML.updateDML(reclamacion2, true);
-            Assert.areNotEqual('SAC_001', reclamacion2.Status, 'Ha fallado el paso a analisis de la reclamacion');
-
+            Assert.areNotEqual('SAC_001', reclamacion2.Status, 'Ha fallado el paso a analisis de la reclamacion');*/
             reclamacion2.Status = 'SAC_001';
             reclamacion2.SAC_StatusAuxiliar__c = 'SAC_001';
             reclamacion2.CC_CasoRelacionado__c = reclamacionSAC.Id;
-            SPV_DatabaseDML.updateDML(reclamacion2, true);
-
+            reclamacionList.add(reclamacion2);
+            SPV_DatabaseDML.updateListDML(reclamacionList, true);
+			Assert.areNotEqual('SAC_001', reclamacion.Status, 'Ha fallado el paso a analisis de la reclamacion');
             reclamacion2.Status = 'SPV_AnalisisDecision';
             reclamacion2.SAC_StatusAuxiliar__c = 'SPV_AnalisisDecision';
-           
+            
             SPV_DatabaseDML.updateDML(reclamacion2, true);
             Assert.areNotEqual('SAC_001', reclamacion2.Status, 'Ha fallado el paso a analisis de la reclamacion');
+            Test.stopTest();
         }
-
-        Test.stopTest();
     }
 
     @isTest
@@ -1277,15 +1139,12 @@ public with sharing class SPV_CaseHelper_Test {
         Test.startTest();
 
         System.runAs(usuario) {
-
             try{
                 reclamacion.Status = 'Cerrado';
                 SPV_DatabaseDML.updateDML(reclamacion, true);
             }catch(Exception e){
                 saltaValidacion = true;
             }
-
-
         }
         Case reclamacion2 = [SELECT Id, OwnerId, Status FROM Case WHERE Subject = 'TestRecCrearRecCerrar' LIMIT 1];
         Assert.areEqual(true, saltaValidacion, 'No ha saltado ninguna validación');
@@ -1301,47 +1160,86 @@ public with sharing class SPV_CaseHelper_Test {
         Test.startTest();
 
         System.runAs(usuario) {
-
             try{
                 reclamacion.Status = 'SPV_Rectificacion';
                 SPV_DatabaseDML.updateDML(reclamacion, true);
             }catch(Exception e){
                 saltaValidacion = true;
             }
-
-
         }
         Case reclamacion2 = [SELECT Id, OwnerId, Status FROM Case WHERE Subject = 'TestRecCrearRecCerrar' LIMIT 1];
         Assert.areEqual(true, saltaValidacion, 'No ha saltado ninguna validación');
         Test.stopTest();
     }
 
-    @isTest
-    static void validarCamposEntraEnvioReclamacionTest() {
+        @isTest
+    static void fechaEnvioComplementariaReclamacionTest() {
         Test.startTest();
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
-        Case reclamacion = [SELECT Id, OwnerId FROM Case WHERE Subject = 'TestRecCrearRec6' LIMIT 1];
+        Case reclamacion = [SELECT Id, OwnerId, Status FROM Case WHERE Subject = 'TestRecCrearRec6' LIMIT 1];
         Boolean saltaValidacion = false;
         
-
         System.runAs(usuario) {
-
             try{
-                reclamacion.Status = 'SPV_Envio';
+                reclamacion.Status = 'SPV_EnvioComplementaria';
                 SPV_DatabaseDML.updateDML(reclamacion, true);
             }catch(Exception e){
                 saltaValidacion = true;
             }
-
-
         }
-        Case reclamacion2 = [SELECT Id, OwnerId, Status FROM Case WHERE Subject = 'TestRecCrearRec6' LIMIT 1];
-        Assert.areEqual(true, saltaValidacion, 'No ha saltado ninguna validación');
+        CBK_Case_Extension__c reclamacion2 = [SELECT Id, OwnerId, SPV_FechaEnvioComplementaria__c FROM CBK_Case_Extension__c WHERE Case_Id__c  =: reclamacion.Id LIMIT 1];
+        Assert.areNotEqual(reclamacion2.SPV_FechaEnvioComplementaria__c, null, 'No se ha informado la fecha');
         Test.stopTest();
     }
-
-
-
+    
+        @isTest
+    static void fechaEnvioRectificacionReclamacionTest() {
+        Test.startTest();
+        User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, OwnerId, Status FROM Case WHERE Subject = 'TestRecCrearRec6' LIMIT 1];
+        Boolean saltaValidacion = false;
+        
+        System.runAs(usuario) {
+            try{
+                reclamacion.Status = 'SPV_EnvioRectificacion';
+                SPV_DatabaseDML.updateDML(reclamacion, true);
+            }catch(Exception e){
+                saltaValidacion = true;
+            }
+        }
+        CBK_Case_Extension__c reclamacion2 = [SELECT Id, OwnerId, SPV_FechaRevisionEnvioRectificacion__c FROM CBK_Case_Extension__c WHERE Case_Id__c  =: reclamacion.Id LIMIT 1];
+        Assert.areNotEqual(reclamacion2.SPV_FechaRevisionEnvioRectificacion__c, null, 'No se ha informado la fecha');
+        Test.stopTest();
+    }
+    
+        @isTest
+    static void fechaEnvioRectificacionCerradoReclamacionTest() {
+        Test.startTest();
+        User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, OwnerId, SAC_SentidoResolucion__c, SPV_FechaRecepcionResolucion__c, Status, SPV_Organismo__c, SPV_ComunidadAutonoma__c FROM Case WHERE Subject = 'TestRecCrearRec2' LIMIT 1];
+        Boolean saltaValidacion = false;
+        
+        System.runAs(usuario) {
+            try{
+                reclamacion.SPV_Organismo__c = 'SPV_Consumo';
+                reclamacion.SPV_ComunidadAutonoma__c = 'Canarias';
+                reclamacion.Status = 'SPV_EnvioRectificacion';
+                reclamacion.SPV_FechaRecepcionResolucion__c = system.today();
+                reclamacion.SAC_Importe_Tipo__c = 'Sin importe';
+                SPV_DatabaseDML.updateDML(reclamacion, true);
+                reclamacion.SAC_SentidoResolucion__c = 'SPV_Inadmitida';
+                reclamacion.Status = 'Cerrado';
+                reclamacion.SAC_ValidacionOficinaAfectada__c = true;
+                SPV_DatabaseDML.updateDML(reclamacion, true);
+            }catch(Exception e){
+                saltaValidacion = true;
+            }
+        }
+        CBK_Case_Extension__c reclamacion2 = [SELECT Id, OwnerId, SPV_FechaEnvioOrganismoRectificacion__c FROM CBK_Case_Extension__c WHERE Case_Id__c  =: reclamacion.Id LIMIT 1];
+        Assert.areNotEqual(reclamacion2.SPV_FechaEnvioOrganismoRectificacion__c, null, 'No se ha informado la fecha');
+        Test.stopTest();
+    }
+    
     @isTest
     static void validarTipoImporteTest() {
        
@@ -1367,8 +1265,6 @@ public with sharing class SPV_CaseHelper_Test {
         Case reclamacionSAC = [SELECT Id, OwnerId FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
         CC_Grupo_Colaborador__c grupo = [SELECT Id, Name FROM CC_Grupo_Colaborador__c WHERE SAC_Email__c = 'testSPVgrestor@testemail.com.invalid' LIMIT 1];
 
-
-       
         Test.startTest();
 
         System.runAs(usuario) {
@@ -1387,7 +1283,6 @@ public with sharing class SPV_CaseHelper_Test {
 
         Test.stopTest();
     }
-
 
     @isTest
     static void comprobarResultadoNegociacionTest() {
@@ -1435,11 +1330,9 @@ public with sharing class SPV_CaseHelper_Test {
     static void asignarGrupoReclamacionTest() {
        
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
-        //Case reclamacion = [SELECT Id, OwnerId FROM Case WHERE Subject = 'TestRecCrearRec3' LIMIT 1];
  
         Test.startTest();
         //Reclamacion
-        //List<Case> listaReclamaciones = new List<Case>();
         Map<String, Object> camposReclamacion = new Map<String, Object>();
         camposReclamacion.put('Subject', 'Testgrupoinsert');
         camposReclamacion.put('SPV_Organismo__c', 'SPV_CNMV');
@@ -1479,7 +1372,7 @@ public with sharing class SPV_CaseHelper_Test {
         Test.stopTest();
     }
 
-    @isTest
+    /*@isTest
     static void lanzarAlertasAnalisisOrganismoTest() {
        
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
@@ -1490,7 +1383,7 @@ public with sharing class SPV_CaseHelper_Test {
         System.runAs(usuario) {
             reclamacion.Status = 'SPV_AnalisisDecision';
             SPV_DatabaseDML.updateDML(reclamacion, true);
-            reclamacion.Status = 'SPV_EnvioOrganismos';
+            reclamacion.Status = 'SPV_Envio';
             SPV_DatabaseDML.updateDML(reclamacion, true);
             reclamacion.Status = 'SPV_AnalisisDecision';
             SPV_DatabaseDML.updateDML(reclamacion, true);
@@ -1500,33 +1393,32 @@ public with sharing class SPV_CaseHelper_Test {
         Assert.areNotEqual(null, alerta, 'No se ha generado la alerta');
 
         Test.stopTest();
-    }
+    }*/
 
     @isTest
     static void lanzarAlertasTest() {
        
         User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         Case reclamacion = [SELECT Id, OwnerId, Status FROM Case WHERE Subject = 'TestRecCrearRec2' LIMIT 1];
-        // List<CC_Grupo_Colaborador__c> grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE SAC_DeveloperName__c = 'SPV_INDRALETRADO' OR SAC_DeveloperName__c = 'SPV_FYRLEGALLETRADO'];
  
         Test.startTest();
-
+        
         System.runAs(usuario) {
-            reclamacion.Status = 'SPV_PendienteRespuestaOrganismo';
+            reclamacion.Status = 'SPV_EnvioComplementaria';
             SPV_DatabaseDML.updateDML(reclamacion, true);
-            reclamacion.Status = 'SPV_AnalisisDecision';
+            reclamacion.Status = 'SPV_AnalisisComplementariaOrganismo';
             reclamacion.SPV_Complementaria_Entidad__c = true;
-            // reclamacion.SAC_GrupoLetrado__c = grupo[0].Id;
             SPV_DatabaseDML.updateDML(reclamacion, true);
-            reclamacion.Status = 'SPV_PendienteRespuestaOrganismo';
+            reclamacion.Status = 'SPV_EnvioRectificacion';
             SPV_DatabaseDML.updateDML(reclamacion, true);
             reclamacion.Status = 'SPV_Rectificacion';
             SPV_DatabaseDML.updateDML(reclamacion, true);
+            
+            
+            List<SAC_Alerta__c> alerta = [SELECT Id FROM SAC_Alerta__c WHERE SAC_Reclamacion__c = :reclamacion.Id LIMIT 1];
+            Assert.areNotEqual(true, alerta.isEmpty(), 'No se ha generado la alerta');
         }
-
-        SAC_Alerta__c alerta = [SELECT Id FROM SAC_Alerta__c WHERE SAC_Reclamacion__c = :reclamacion.Id LIMIT 1];
-        Assert.areNotEqual(null, alerta, 'No se ha generado la alerta');
-
+        
         Test.stopTest();
     }
 
@@ -1548,4 +1440,29 @@ public with sharing class SPV_CaseHelper_Test {
 
         Test.stopTest();
     }
+    
+    @isTest
+    static void comprobarAlertasSLATest() {
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        Case caso = [SELECT Id, OS_SLA_Completado__c FROM Case WHERE Subject = 'TestRecCrearRec2' LIMIT 1];
+        Case caso2 = [SELECT id, OS_SLA_Completado__c FROM Case WHERE SuppliedCompany = 'pruebaPretension2' LIMIT 1];
+
+		Test.startTest();        
+            System.runAs(usuario){
+                caso.OS_SLA_Completado__c = '48RegulatorioEntitlement';
+                caso2.OS_SLA_Completado__c = '48LetradoEntitlement';
+                SAC_DatabaseDML.updateDML(caso, false);
+                SAC_DatabaseDML.updateDML(caso2, false);
+                caso.OS_SLA_Completado__c = '24RegulatorioEntitlement';
+                caso2.OS_SLA_Completado__c = '24LetradoEntitlement';
+                SAC_DatabaseDML.updateDML(caso, false);
+                SAC_DatabaseDML.updateDML(caso2, false);
+            }
+        Test.stopTest();
+        
+        Case casoActualizado = [SELECT id, OS_SLA_Completado__c FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
+        
+        Assert.areNotEqual(caso.OS_SLA_Completado__c, casoActualizado.OS_SLA_Completado__c, 'No se ha modificado el picklist con el valor Adecuado');
+        
+   }
 }

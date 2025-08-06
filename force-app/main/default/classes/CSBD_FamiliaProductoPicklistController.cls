@@ -18,10 +18,12 @@ public with sharing class CSBD_FamiliaProductoPicklistController {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<CC_Lista_Valores__c> getProductos(String familia) {
+    public static List<CC_Lista_Valores__c> getProductos(String familia, String nombreRecordType, String empresaProveedora) {
         return [SELECT Name FROM CC_Lista_Valores__c WHERE CC_Activa__c = TRUE
                 AND RecordType.DeveloperName = 'CC_Valor'
                 AND CC_Lista__r.Name != NULL AND CC_Lista__r.Name = :familia
+                AND CC_Lista__r.CSBD_Tipo_de_oportunidad__c INCLUDES (:nombreRecordType)
+                AND CC_Lista__r.CSBD_Empresa_Proveedora_Multi__c INCLUDES (:empresaProveedora)
                 ORDER BY Name];
     }
 

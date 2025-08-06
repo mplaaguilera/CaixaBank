@@ -61,6 +61,12 @@
                 <identifier>RecordGRR_Informacion_cField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.GRR_Role_Participante__c</fieldItem>
+                <identifier>RecordGRR_Role_Participante__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-ae2c05a9-cdf8-43bf-b02c-c5c4e0126686</name>
         <type>Facet</type>
     </flexiPageRegions>

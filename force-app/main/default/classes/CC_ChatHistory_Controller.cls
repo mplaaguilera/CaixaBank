@@ -22,10 +22,6 @@ public with sharing class CC_ChatHistory_Controller {
     @AuraEnabled(cacheable=true)
     public static List<CC_LiveAgent_Cognitive_Chat_Model> getHistoryChat(Id recordId, Boolean cognitivo) {
 
-		System.debug('getHistoryChat(' + recordId + ', ' + cognitivo + ')');
-		System.debug('recordId.getSObjectType() = ' + recordId.getSObjectType());
-		System.debug('LiveChatTranscript.getSObjectType() = ' + LiveChatTranscript.getSObjectType());
-
         List<CC_LiveAgent_Cognitive_Chat_Model> oListConv = new List<CC_LiveAgent_Cognitive_Chat_Model>();
         List<LiveChatTranscript> conversaciones = new List<LiveChatTranscript>();
 
@@ -46,9 +42,14 @@ public with sharing class CC_ChatHistory_Controller {
             conversaciones = [SELECT Body, ContactId, Contact.Name, EndedBy, CaseId, CC_Cognitive_chat__c,
                                     CC_Nickname__c, CC_Tipo__c, StartTime, EndTime, CC_ChatOrigen__c, RecordTypeId, RecordType.Name
                                 FROM LiveChatTranscript WHERE Id = :recordId LIMIT 1];
+                   
         } else if (recordId.getSObjectType() == LiveChatTranscript.sObjectType && cognitivo) {
             //Transcripción de chat (con flag mostrar cognitivo)
             Id idChatOrigen = [SELECT CC_ChatOrigen__c, CC_Source_Conversation_Id__c, CC_Source_Aplicacion_Corpus__c FROM LiveChatTranscript WHERE Id = :recordId LIMIT 1].CC_ChatOrigen__c;
+
+            if(idChatOrigen == null && recordId != null) {
+                idChatOrigen = recordId;
+            }
             conversaciones = [SELECT Body, ContactId, Contact.Name, EndedBy, CaseId, CC_Cognitive_chat__c,
                                     CC_Nickname__c, CC_Tipo__c, StartTime, EndTime, CC_ChatOrigen__c, CC_ChatOrigen__r.CC_Tipo__c, RecordTypeId, RecordType.Name
                                     FROM LiveChatTranscript WHERE Id = :idChatOrigen LIMIT 1];
@@ -98,7 +99,6 @@ public with sharing class CC_ChatHistory_Controller {
 
         //Se recupera la conversación a partir del JSON recibido
         CC_Cognitive_Chat_JSON json = CC_Cognitive_Chat_JSON.parse(oChat.CC_Cognitive_chat__c);
-
         //Si se ha podido recuperar la conversación se retorna su estructura para renderizarla, si no se retorna nulo
         if (json != null) {
             List<CC_LiveAgent_Cognitive_Chat_Model> listaChats = json.getConversacion(oChat.CC_Nickname__c, traspasadoAgente, oChat.RecordType.Name);

@@ -18,7 +18,7 @@ public with sharing class CC_Gestion_Derivar_Fraude {
             Id rtCasoCC = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             Id rtCasoFraude = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente');
             
-            List<Case> listaCasos = [SELECT Id, OwnerId, ContactId, Subject, Description, CC_Idioma__c, CC_Tipo_Contacto__c, CC_Detalles_Consulta__c, CC_Detalles_Solucion__c, AccountId, Comments, CC_ContactoRelacionado__c, CC_Oficina__c, CC_MCC_Tematica__r.Name, CC_MCC_Motivo__c
+            List<Case> listaCasos = [SELECT Id, OwnerId, ContactId, Contact.AccountId, Subject, Description, CC_Idioma__c, CC_Tipo_Contacto__c, CC_Detalles_Consulta__c, CC_Detalles_Solucion__c, AccountId, Comments, CC_ContactoRelacionado__c, CC_Oficina__c, CC_MCC_Tematica__r.Name, CC_MCC_Motivo__c
                                      FROM Case WHERE RecordTypeId = :rtCasoCC AND Id = :recordId LIMIT 1];
 
             if(!listaCasos.isEmpty()){
@@ -89,7 +89,7 @@ public with sharing class CC_Gestion_Derivar_Fraude {
                 update casoParaFraude;
 
                 //Crear la task asociada al caso de CC
-                CC_Activity.crearActividadFraude(recordId, casoActual.OwnerId, casoActual.ContactId); 
+                CC_Activity.crearActividadFraude(recordId, casoActual); 
 
                 String comentarioDerivadoExito = (String) textosMap.get('Caso derivado a fraude');
                 retorno.put('comentarioDerivadoExito', comentarioDerivadoExito);
@@ -110,37 +110,53 @@ public with sharing class CC_Gestion_Derivar_Fraude {
 
         String casoIdString = (String)respuesta.get('casoId');
         String motivo = (String)respuesta.get('motivo');
-        for(Case casoTarea : [
-            SELECT Id, 
-                CC_Resolucion__c,
-                Status,
-                (
-                    SELECT OwnerId, Description, Status
-                    FROM Tasks                    
-                    WHERE Subject = 'Creación caso a Fraude' 
-                    AND Type = 'Fraude'
-                    ORDER BY CreatedDate DESC
-                    LIMIT 1
-                )
-            FROM Case 
-            WHERE Id = :casoIdString
-        ]){
-            if(casoTarea.Tasks.size()> 0){  
-                Task tareaActualizar = casoTarea.Tasks[0];
-                tareaActualizar.Description = 'El caso fue rechazado por Fraude. Motivo: ' + motivo;
-                tareaActualizar.Status = 'Rechazada';   
-                tareasUpdate.add(tareaActualizar); 
-                //actualizar caso
-                casoTarea.Status = 'Activo';
-                casoTarea.CC_Resolucion__c = motivo;
-                casosAbrir.add(casoTarea);
-            }     
-        }     
+
+        if(casoIdString != null && casoIdString != ''){
+            List<Case> casoTarea = [SELECT Id,CC_Resolucion__c, Status FROM Case Where Id = :casoIdString LIMIT 1];
+            Task tareaRechazo = new Task(
+                WhatId = casoIdString,
+                Description = 'El caso fue rechazado por Fraude. Motivo: ' + motivo,
+                Status = 'Completed',
+                Type = 'Caso Rechazado en Fraude',
+                Subject = 'Caso Rechazado en Fraude'
+            );
+            casoTarea[0].Status = 'Activo';
+            casoTarea[0].CC_Resolucion__c = motivo;
+
+            insert tareaRechazo;
+            update casoTarea;
+        }
+        // for(Case casoTarea : [
+        //     SELECT Id, 
+        //         CC_Resolucion__c,
+        //         Status,
+        //         (
+        //             SELECT OwnerId, Description, Status
+        //             FROM Tasks                    
+        //             WHERE Subject = 'Creación caso a Fraude' 
+        //             AND Type = 'Fraude'
+        //             ORDER BY CreatedDate DESC
+        //             LIMIT 1
+        //         )
+        //     FROM Case 
+        //     WHERE Id = :casoIdString
+        // ]){
+        //     if(casoTarea.Tasks.size()> 0){  
+        //         Task tareaActualizar = casoTarea.Tasks[0];
+        //         tareaActualizar.Description = 'El caso fue rechazado por Fraude. Motivo: ' + motivo;
+        //         tareaActualizar.Status = 'Rechazada';   
+        //         tareasUpdate.add(tareaActualizar); 
+        //         //actualizar caso
+        //         casoTarea.Status = 'Activo';
+        //         casoTarea.CC_Resolucion__c = motivo;
+        //         casosAbrir.add(casoTarea);
+        //     }     
+        // }     
       
-        if(casosAbrir.size() > 0 && tareasUpdate.size() > 0){
-            update casosAbrir;
-            update tareasUpdate;
-        }   
+        // if(casosAbrir.size() > 0 && tareasUpdate.size() > 0){
+        //     update casosAbrir;
+        //     update tareasUpdate;
+        // }   
     }
 
     //llamado desde el Oficina Operativa Controller

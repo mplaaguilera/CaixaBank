@@ -147,10 +147,10 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         auditoriaAutomatica.SAC_GrupoLetrado__c = listGrupos[1].Id;
         auditoriaAutomatica.SAC_ImporteAbonadoDesde__c = 40;
         auditoriaAutomatica.SAC_ImporteAbonadoHasta__c = 60;
-        auditoriaAutomatica.SAC_MCCTematica__c = mccTematica1.Id;
-        auditoriaAutomatica.SAC_MCCProducto__c = mccProdServ1.Id;
-        auditoriaAutomatica.SAC_MCCMotivo__c = mccMotivo1.Id;
-        auditoriaAutomatica.SAC_MCCDetalle__c = mccDetalle2.Id;
+        auditoriaAutomatica.SAC_MCCTematicaList__c = mccTematica1.Id;
+        auditoriaAutomatica.SAC_MCCProductoList__c = mccProdServ1.Id;
+        auditoriaAutomatica.SAC_MCCMotivoList__c = mccMotivo1.Id;
+        auditoriaAutomatica.SAC_MCCDetalleList__c = mccDetalle2.Id;
         listAuditorias.add(auditoriaAutomatica);
 
         SEG_Auditoria__c auditoriaAutomatica2 = new SEG_Auditoria__c();
@@ -169,10 +169,10 @@ public with sharing class SAC_AuditoriaAutomatica_Test {
         auditoriaAutomatica2.SAC_GrupoLetrado__c = listGrupos[1].Id;
         auditoriaAutomatica2.SAC_ImporteAbonadoDesde__c = 40;
         auditoriaAutomatica2.SAC_ImporteAbonadoHasta__c = 60;
-        auditoriaAutomatica2.SAC_MCCTematica__c = mccTematica1.Id;
-        auditoriaAutomatica2.SAC_MCCProducto__c = mccProdServ1.Id;
-        auditoriaAutomatica2.SAC_MCCMotivo__c = mccMotivo1.Id;
-        auditoriaAutomatica2.SAC_MCCDetalle__c = mccDetalle2.Id;
+        auditoriaAutomatica2.SAC_MCCTematicaList__c = mccTematica1.Id;
+        auditoriaAutomatica2.SAC_MCCProductoList__c = mccProdServ1.Id;
+        auditoriaAutomatica2.SAC_MCCMotivoList__c = mccMotivo1.Id;
+        auditoriaAutomatica2.SAC_MCCDetalleList__c = mccDetalle2.Id;
         listAuditorias.add(auditoriaAutomatica2);
 
         SAC_DatabaseDML.insertListDML(listAuditorias, false);

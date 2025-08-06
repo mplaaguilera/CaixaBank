@@ -70,6 +70,12 @@ public class CC_Clasificacion_Casos_Controller_Test {
             listaMensajes.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
             lista.add(listaMensajes);
 
+            CC_Lista_Valores__c listaDerivar = new CC_Lista_Valores__c();
+            listaDerivar.Name = 'Textos operativa Derivar';
+            listaDerivar.CC_Activa__c = true;
+            listaDerivar.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
+            lista.add(listaDerivar);
+
             insert lista;
             
             
@@ -126,6 +132,30 @@ public class CC_Clasificacion_Casos_Controller_Test {
             mensaje1.CC_Valor__c = 'Prueba';
             mensaje1.CC_Valor2__c = 'mensajePrueba';
             val.add(mensaje1);
+
+            CC_Lista_Valores__c mensajeDerivar = new CC_Lista_Valores__c();
+            mensajeDerivar.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            mensajeDerivar.CC_Activa__c = true;
+            mensajeDerivar.CC_Lista__c = listaDerivar.Id;
+            mensajeDerivar.Name = 'Mensaje';
+            mensajeDerivar.CC_Mensajes_Mostrar__c = 'mensajePrueba';
+            val.add(mensajeDerivar);
+
+            CC_Lista_Valores__c mensajeDerivar2 = new CC_Lista_Valores__c();
+            mensajeDerivar2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            mensajeDerivar2.CC_Activa__c = true;
+            mensajeDerivar2.CC_Lista__c = listaDerivar.Id;
+            mensajeDerivar2.Name = 'Texto modal Onboarding ya derivado';
+            mensajeDerivar2.CC_Mensajes_Mostrar__c = 'mensajePrueba2';
+            val.add(mensajeDerivar2);
+
+            CC_Lista_Valores__c mensajeDerivar3 = new CC_Lista_Valores__c();
+            mensajeDerivar3.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            mensajeDerivar3.CC_Activa__c = true;
+            mensajeDerivar3.CC_Lista__c = listaDerivar.Id;
+            mensajeDerivar3.Name = 'Argos true guardar';
+            mensajeDerivar3.CC_Mensajes_Mostrar__c = 'A partir de la tipificación del caso, se ha detectado que el cliente cuenta con una denegación reciente por parte de ARGOS. Si menciona algún error al intentar realizar una operativa desde la App, te recomiendo derivarlo utilizando el botón "Derivar"';
+            val.add(mensajeDerivar3);
 
             insert val;
             
@@ -280,7 +310,7 @@ public class CC_Clasificacion_Casos_Controller_Test {
             CC_MCC__c mccCausa2 = new CC_MCC__c();
             mccCausa2.Name = 'Causa 2';
             mccCausa2.CC_Tipo_Cliente__c = 'Cliente';
-            mccCausa2.CC_Fecha_Vigencia_Inicio__c = Date.today().addDays(-1);
+            mccCausa2.CC_Fecha_Vigencia_Inicio__c = CBK_UtilsDate.todayDT().addDays(-1);
             mccCausa2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Causa');
             mccCausa2.CC_Motivo__c = mccMotivo2.Id;
             mccCausa2.CC_Codigo_Externo__c = 'CA-000002';
@@ -361,6 +391,7 @@ public class CC_Clasificacion_Casos_Controller_Test {
             Account cuenta = new Account(); 
             cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
             cuenta.Name = 'Cuenta Cliente Test 1';
+            cuenta.AV_IndicadoresClientes__c = '28';
             insert cuenta;
             
             Contact contacto = new Contact();
@@ -404,6 +435,7 @@ public class CC_Clasificacion_Casos_Controller_Test {
             caso2.CC_MCC_Solucion__c = mccSolucion2.Id;
             caso2.CC_En_Tercer_Nivel__c=true;
             caso2.Status='Activo';
+            caso2.AccountId = cuenta.Id;
             casos.add(caso2);
             
             Id recordTypeCasoEmpleadoCSI = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_CSI_Bankia');
@@ -444,6 +476,24 @@ public class CC_Clasificacion_Casos_Controller_Test {
             customSetting8.Name = 'CC_Agrupador_CIM_Asignacion_Casos';
             customSetting8.CC_Activa__c = false;
             listCustomSetting.add(customSetting8);
+
+            CC_Settings__c configuracion9 = new CC_Settings__c();
+            configuracion9.CC_Activa__c = true;
+            configuracion9.Name = 'CC_Parametrizacion_WS_Argos';
+            listCustomSetting.add(configuracion9);
+
+            CC_Settings__c configuracion10 = new CC_Settings__c();
+            configuracion10.CC_Activa__c = true;
+            configuracion10.Name = 'CC_CodigosOnboarding';
+            configuracion10.CC_Configuracion_2__c = '0';
+            listCustomSetting.add(configuracion10);
+
+            CC_Settings__c configuracion11 = new CC_Settings__c();
+            configuracion11.CC_Activa__c = true;
+            configuracion11.Name = 'CC_AmbitosArgosGuardar';
+            configuracion11.CC_Configuracion_1__c = 'Argos general;Argos Xpays';
+            listCustomSetting.add(configuracion11);
+
             insert listCustomSetting;
 
             CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
@@ -563,17 +613,17 @@ public class CC_Clasificacion_Casos_Controller_Test {
         
         Id prodCli = [SELECT Id, Name FROM CC_MCC__c WHERE Name = 'Cuenta corriente 2'].Id;
         Id prodEmp = [SELECT Id, Name FROM CC_MCC__c WHERE Name = 'Cuenta corriente'].Id;
-        
-        Test.startTest();
-        List<CC_Clasificacion_Casos_Controller.PickListWrapper> motivos=CC_Clasificacion_Casos_Controller.getMotivos('',prodCli,'');
-        List<CC_Clasificacion_Casos_Controller.PickListWrapper> motivosCliente=CC_Clasificacion_Casos_Controller.getMotivos('Cliente',prodCli,'');
-        List<CC_Clasificacion_Casos_Controller.PickListWrapper> motivosEmpleado=CC_Clasificacion_Casos_Controller.getMotivos('Empleado',prodEmp,'');
-        
-        System.assertNotEquals(null, motivosCliente);
-        System.assertNotEquals(null, motivosEmpleado);
-        
-        Test.stopTest();
-        
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            Test.startTest();
+            List<CC_Clasificacion_Casos_Controller.PickListWrapper> motivos=CC_Clasificacion_Casos_Controller.getMotivos('',prodCli,'');
+            List<CC_Clasificacion_Casos_Controller.PickListWrapper> motivosCliente=CC_Clasificacion_Casos_Controller.getMotivos('Cliente',prodCli,'');
+            List<CC_Clasificacion_Casos_Controller.PickListWrapper> motivosEmpleado=CC_Clasificacion_Casos_Controller.getMotivos('Empleado',prodEmp,'');
+            
+            System.assertNotEquals(null, motivosCliente);
+            System.assertNotEquals(null, motivosEmpleado);
+            
+            Test.stopTest();
+        }
     }
     @isTest
     public static void getCausas() {
@@ -609,6 +659,26 @@ public class CC_Clasificacion_Casos_Controller_Test {
         
         Test.stopTest();
         
+    }
+
+        @isTest
+    public static void testVarios() {
+   System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            Test.startTest();
+        
+        Case casoOrigen = [SELECT Id FROM Case WHERE Subject = 'Caso de prueba TF7'];
+
+        Boolean casoFraude = CC_Clasificacion_Casos_Controller.validarActividadesFraude(casoOrigen.Id);
+            CC_Clasificacion_Casos_Controller.crearCasoFraude(casoOrigen.Id);
+
+
+        system.assertEquals(true, casoFraude);
+
+
+           Test.stopTest();
+        }
+
+
     }
     
     @isTest
@@ -706,6 +776,7 @@ public class CC_Clasificacion_Casos_Controller_Test {
     @isTest
     public static void validarGuardarCerrarTest() {
         System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            CBK_UtilsDate.todayDate = Date.newInstance(2025,1,15); // Simulamos la fecha en la ejecución del test
             Test.startTest();
             Id recordTypeOficinaGestora = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
             
@@ -729,7 +800,7 @@ public class CC_Clasificacion_Casos_Controller_Test {
             CC_MCC__c mccTematica = new CC_MCC__c();
             mccTematica.Name = 'Alfabético';
             mccTematica.CC_Tipo_Cliente__c = 'Empleado';
-            mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
+            mccTematica.CC_Fecha_Vigencia_Inicio__c = CBK_UtilsDate.todayDT() - 1;
             mccTematica.RecordTypeId = recordTypeIdTematica;
             mccTematica.CC_Codigo_Externo__c = 'TE-000011';
             insert mccTematica;
@@ -738,7 +809,7 @@ public class CC_Clasificacion_Casos_Controller_Test {
             CC_MCC__c mccProducto = new CC_MCC__c();
             mccProducto.Name = 'Personas';
             mccProducto.CC_Tipo_Cliente__c = 'Empleado';
-            mccProducto.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
+            mccProducto.CC_Fecha_Vigencia_Inicio__c = CBK_UtilsDate.todayDT() - 1;
             mccProducto.RecordTypeId = recordTypeIdProducto;
             mccProducto.CC_Tematica__c = mccTematica.Id;
             mccProducto.CC_Codigo_Externo__c = 'PR-000011';
@@ -748,13 +819,14 @@ public class CC_Clasificacion_Casos_Controller_Test {
             CC_MCC__c mccMotivo = new CC_MCC__c();
             mccMotivo.Name = 'Personas confidenciales';
             mccMotivo.CC_Tipo_Cliente__c = 'Empleado';
-            mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
+            mccMotivo.CC_Fecha_Vigencia_Inicio__c = CBK_UtilsDate.todayDT() - 1;
             mccMotivo.RecordTypeId = recordTypeIdMotivo;
             mccMotivo.CC_Tematica__c = mccTematica.Id;
             mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
             mccMotivo.CC_Codigo_Externo__c = 'MO-000011';
             insert mccMotivo;      
             
+            List<Case> casos= new List<Case>();
             Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
             Case caso = new Case();
             caso.Subject = 'Prueba';
@@ -776,31 +848,34 @@ public class CC_Clasificacion_Casos_Controller_Test {
             caso.CC_Canal_Resolucion__c = 'Oficina Feedback';
             caso.ContactId = oContacto.Id;
             caso.AccountId = cuenta.Id;
-            insert caso;     
+            casos.add(caso);     
+
             
             CC_MCC__c nuevoMccMotivo = new CC_MCC__c();
             nuevoMccMotivo.Name = 'Personas confidenciales';
             nuevoMccMotivo.CC_Tipo_Cliente__c = 'Empleado';
-            nuevoMccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
+            nuevoMccMotivo.CC_Fecha_Vigencia_Inicio__c = CBK_UtilsDate.todayDT() - 1;
             nuevoMccMotivo.RecordTypeId = recordTypeIdMotivo;
             nuevoMccMotivo.CC_Tematica__c = mccTematica.Id;
             nuevoMccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
             nuevoMccMotivo.CC_Codigo_Externo__c = 'MO-100011';
             insert nuevoMccMotivo;
             
-            mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
+            mccTematica.CC_Fecha_Vigencia_Inicio__c = CBK_UtilsDate.todayDT();
             update mccTematica;
             
-            mccProducto.CC_Fecha_Vigencia_Inicio__c = date.today();
+            mccProducto.CC_Fecha_Vigencia_Inicio__c = CBK_UtilsDate.todayDT();
             update mccProducto;
             
-            nuevoMccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today();
+            nuevoMccMotivo.CC_Fecha_Vigencia_Inicio__c = CBK_UtilsDate.todayDT();
             update nuevoMccMotivo;
             
             //Caso vacío
             Case casoVacio = new Case();
             casoVacio.RecordTypeId = recordTypeCaso;
-            insert casoVacio;        
+            casos.add(casoVacio);   
+            insert casos;
+
             
             try{
                 Map<String, Object> validar = CC_Clasificacion_Casos_Controller.validarGuardarCerrar(caso.Id,true, 'Comentarios Stores', mccTematica.Id, mccProducto.Id, nuevoMccMotivo.Id, 'test');
@@ -813,6 +888,41 @@ public class CC_Clasificacion_Casos_Controller_Test {
             } catch(AuraHandledException e) {
                 System.assertEquals('Script-thrown exception', e.getMessage());
             }        
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void validarGuardarCerrarClientesTest() {
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            Test.startTest();
+            Contact contacto = [SELECT Id, AccountId FROM Contact WHERE LastName = 'Contacto Cliente Test 1' LIMIT 1];
+
+            Case casoCliente = new Case();
+            casoCliente.Subject = 'Prueba';
+            casoCliente.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            casoCliente.CC_Idioma__c = 'es';
+            casoCliente.CC_NumPerso__c = '123456';
+            casoCliente.CC_Tipo_Cliente__c = 'Cliente';
+            casoCliente.Status = 'Activo';
+            casoCliente.Origin = 'Phone';
+            casoCliente.CC_Numero_Documento__c = '60236085V';
+            casoCliente.CC_Tipo_Contacto__c = 'Consulta';
+            casoCliente.CC_Canal_Procedencia__c = 'Accionista';
+            casoCliente.CC_MCC_Motivo__c = [SELECT Id FROM CC_MCC__c WHERE CC_Tipo_Cliente__c = 'Cliente' AND CC_Codigo_Externo__c = 'MO-000002' LIMIT 1]?.Id;
+            casoCliente.CC_MCC_ProdServ__c = [SELECT Id FROM CC_MCC__c WHERE CC_Tipo_Cliente__c = 'Cliente' AND CC_Codigo_Externo__c = 'PR-000002' LIMIT 1]?.Id;
+            casoCliente.CC_MCC_Tematica__c =[SELECT Id FROM CC_MCC__c WHERE CC_Tipo_Cliente__c = 'Cliente' AND CC_Codigo_Externo__c = 'TE-000002' LIMIT 1]?.Id;
+            casoCliente.CC_Canal_Resolucion__c = 'Accionista';
+            casoCliente.ContactId = contacto?.Id;
+            casoCliente.AccountId = contacto.AccountId;
+            insert casoCliente;  
+        
+        
+            Map<String, Object> validar = CC_Clasificacion_Casos_Controller.validarGuardarCerrar(casoCliente.Id,false, '', null, null, null, 'test');
+            
+            system.assertEquals(false, validar.get('cambiarStatusAuto'));
+            
+
             Test.stopTest();
         }
     }
@@ -1456,6 +1566,17 @@ public class CC_Clasificacion_Casos_Controller_Test {
     }
 
     @isTest
+    public static void tituloDerivarTest() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor){
+            Test.startTest();
+                String titulo = CC_Clasificacion_Casos_Controller.tituloDerivar('Mensaje');
+            Test.stopTest();
+            System.assertEquals(titulo, 'mensajePrueba');
+        }
+    }
+
+    @isTest
     public static void testLlamadaWSOnboardingApex() {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         System.runAs(supervisor){
@@ -1488,6 +1609,63 @@ public class CC_Clasificacion_Casos_Controller_Test {
             Test.stopTest();
             System.assertEquals(listaValores.Name, 'Mensaje');
             System.assertEquals(listaValores.CC_Valor__c, 'Prueba');
+        }
+    }
+
+    @isTest
+    public static void comprobarCodigoOnboardingTest() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor){
+            Test.startTest();
+                System.assertEquals(true, CC_Clasificacion_Casos_Controller.comprobarCodigoOnboarding('0'));
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void tituloYaDerivadoTest() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor){
+            Test.startTest();
+                String titulo = CC_Clasificacion_Casos_Controller.tituloYaDerivado();
+            Test.stopTest();
+            System.assertEquals(titulo, 'mensajePrueba2');
+        }
+    }
+
+     @isTest
+    public static void getCanalesEscritosTest() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor){
+            Test.startTest();
+                List<String> titulo = CC_Clasificacion_Casos_Controller.getCanalesEscritos();
+            Test.stopTest();
+            System.assertEquals(true, titulo.isEmpty());
+        }
+    }
+
+    @isTest
+    public static void mostrarModalArgosTest() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        Case caso =[SELECT Id FROM Case WHERE Subject = 'Caso de prueba TF7' LIMIT 1];
+        User usuarioAdmin = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+
+        System.runAs(usuarioAdmin){
+            Test.startTest();
+                Boolean resultado = CC_Clasificacion_Casos_Controller.mostrarModalArgos(caso.Id);
+            Test.stopTest();
+            System.assertEquals(false, resultado);
+        }
+    }
+
+    @isTest
+    public static void getMensajeOperativaDerivarArgosTest() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        System.runAs(supervisor){
+            Test.startTest();
+                String resultado = CC_Clasificacion_Casos_Controller.getMensajeOperativaDerivarArgos();
+            Test.stopTest();
+            System.assertEquals('A partir de la tipificación del caso, se ha detectado que el cliente cuenta con una denegación reciente por parte de ARGOS. Si menciona algún error al intentar realizar una operativa desde la App, te recomiendo derivarlo utilizando el botón "Derivar"', resultado);
         }
     }
 }

@@ -123,7 +123,7 @@ public with sharing class SPV_LCMP_GestionEmails_Test {
     @isTest
     static void comprobarEmailsEnvioTest() {
         
-        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         string para = 'emailtest@prueba.com';
         string copia1 ='emailtestcopia1@prueba.com';
         string copia2 ='emailtestcopia2@prueba.com';

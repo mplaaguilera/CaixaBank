@@ -19,7 +19,7 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos {
     * 1.0            US1013702     Sergio Martín    11/09/24        Creación
     *****************************************************************************/
     @AuraEnabled
-    public static void enviarDocOrganismos(String caseId, Boolean enviarReclamante, Boolean enviarOrganismos, String organismo, List<string> listaSeleccionados) { //string estado,
+    public static void enviarDocOrganismos(String caseId, Boolean enviarReclamante, Boolean enviarOrganismos, String organismo, List<string> listaSeleccionados) {
         List<ContentVersion> listaAdjuntos = obtieneAdjuntosEnvio(caseId, listaSeleccionados);
 
         if(enviarReclamante) {
@@ -229,7 +229,6 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos {
 
     @AuraEnabled(cacheable=true)
     public static List<ContentVersion> getDocumentosValidados(String caseId){
-        Map<Id, Boolean> contentOculto = new Map<Id, Boolean>();
         List<Id> idsDocumentLink = new List<Id>();
 
         try {
@@ -241,20 +240,6 @@ public with sharing class SPV_LCMP_RedaccionEnvioOrganismos {
                 idsDocumentLink.add(recordCdL.ContentDocumentId);
             }
             List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, SAC_Oculto__c, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_Numero_Prestamo__c FROM ContentVersion WHERE SAC_ValidadoCV__c = true AND ContentDocumentId IN: idsDocumentLink ORDER BY CreatedDate ASC];
-
-            // for(ContentVersion recordCv : cv){
-            //     contentOculto.put(recordCv.id, recordCv.SAC_Oculto__c);
-            // }
-
-            // ContentVersion[] resultado =  new List<ContentVersion>();
-            // for(ContentDocumentLink record : cdL){
-
-            //     if(contentOculto.get(record.id) != null){
-
-            //         resultado.add(new ContentVersion (ContentDocumentId=record.ContentDocumentId, Title=record.ContentDocument.Title, SAC_Oculto__c=contentOculto.get(record.id)));
-
-            //     }else{resultado.add(new ContentVersion (ContentDocumentId=record.ContentDocumentId, Title=record.ContentDocument.Title, SAC_Oculto__c=false));}
-            // }
 
             return cv;
         } catch (Exception e) {

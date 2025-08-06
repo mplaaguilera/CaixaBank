@@ -6,6 +6,7 @@ public with sharing class SPV_LCMP_GestionEmails {
     final static Id RECORDTYPEBLACKLIST = mapRTsObjects.get('SAC_MaestroTemas__c').get('SPV_BlackListEmails').getRecordTypeId();
     final static Id RECORDTYPEESCALADO = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Escalado').getRecordTypeId();
     final static Id RECORDTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
+    final static Id RECORDTYPECONSULTA_TAREA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_ConsultaTarea').getRecordTypeId();
     final static Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
     final static Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SPV_Pretension').getRecordTypeId();
     final static Id RECTYPETAREAS = mapRTsObjects.get('SAC_Accion__c').get('SPV_Acciones').getRecordTypeId();
@@ -75,7 +76,7 @@ public with sharing class SPV_LCMP_GestionEmails {
             caso = [SELECT Id, CaseNumber, CC_SuppliedID__c, RecordTypeId, Status, SAC_M2P__c, SAC_Reclamacion__r.SAC_M2P__c FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND Id =: id  LIMIT 1];
         }else if(tipoObjeto == expectedInteraccion){
             interaccion = [SELECT Id, SAC_IndexedThreadId__c, SAC_Oficina__c, SAC_Reclamacion__c, SAC_GrupoColaborador__c, SAC_DNI__c, SAC_Reclamante__c, SAC_Respuesta__c, RecordTypeId, SAC_GrupoColaborador__r.SAC_Externo__c, SAC_Reclamacion__r.SAC_M2P__c
-                                FROM SAC_Interaccion__c WHERE RecordTypeId IN (:RECORDTYPECONSULTA, :RECORDTYPEESCALADO) AND Id =: id LIMIT 1];
+                                FROM SAC_Interaccion__c WHERE RecordTypeId IN (:RECORDTYPECONSULTA, :RECORDTYPECONSULTA_TAREA, :RECORDTYPEESCALADO) AND Id =: id LIMIT 1];
                                  
         }else if(tipoObjeto == expectedAccion){
             accion = [SELECT Id, SAC_IndexedThreadId__c, SAC_Oficina__c, SAC_Reclamacion__c, SAC_EquipoResponsable__c, SAC_Reclamacion__r.SAC_M2P__c
@@ -123,7 +124,7 @@ public with sharing class SPV_LCMP_GestionEmails {
             cuerpoConcatenado = '<div style="display:none;">' + caso.CC_SuppliedID__c + ' </div>' + cuerpo;
         }
         else if(tipoObjeto == expectedInteraccion){
-            if(interaccion.RecordTypeId == RECORDTYPECONSULTA && interaccion.SAC_GrupoColaborador__r.SAC_Externo__c == true){
+            if((interaccion.RecordTypeId == RECORDTYPECONSULTA || interaccion.RecordTypeId == RECORDTYPECONSULTA_TAREA) && interaccion.SAC_GrupoColaborador__r.SAC_Externo__c == true){
                 String htmlArrastrarEmails = '';
 
                 List<EmailMessage> listEmailMessages = [SELECT Id, FromAddress, ToAddress, CcAddress, BccAddress, MessageDate, Subject, HtmlBody FROM EmailMessage WHERE RelatedToId =: interaccion.Id ORDER BY CreatedDate DESC LIMIT 1];

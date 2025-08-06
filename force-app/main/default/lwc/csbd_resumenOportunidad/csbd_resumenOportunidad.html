@@ -1,53 +1,36 @@
 <template>
-
-	<div lwc:ref="sectionResumenOportunidad" class="section-layout-container slds-section slds-is-open">
-		<h3 class="label slds-truncate slds-var-p-around_xx-small slds-theme_shade" style="border-radius: 4px;">
-			<!-- sldsValidatorIgnoreNextLine -->
-			<button lwc:ref="botonSectionToggle" class="botonSectionToggle slds-button slds-section__title-action" aria-expanded="true" style="line-height: 34px;" onclick={botonSectionToggleOnclick}>
-				<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-p-right_xx-small" style="width: 100%;">
-					<div class="slds-col">
-						<lightning-icon icon-name="utility:switch" size="x-small" class="slds-section__title-action-icon slds-var-m-right_small"></lightning-icon>
-						<span class="sectionTitleLabel slds-truncate slds-var-m-left_xx-small">Resumen de la oportunidad</span>
-					</div>
-					<div class="slds-col">
-						<!-- sldsValidatorIgnoreNextLine -->
-						<lightning-button-icon
-							class="iconoContenidoGeneradoConIa"
-							icon-name="utility:sparkles"
-							tooltip="Contenido generado con IA"
-							size="medium"
-							variant="bare"
-							onclick={iconoContenidoGeneradoConIaOnclick}
-							tabindex="-1">
-						</lightning-button-icon>
-					</div>
-				</div>
-			</button>
-		</h3>
-		<div class="slds-section__content slds-is-relative slds-var-p-horizontal_xx-large">
-			<template if:true={isLoadingOpp}>
-				<lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
-			</template>
-
-			<template lwc:if={muestraCopiaOpp}>
-				<lightning-formatted-rich-text value={copiaResOpp}></lightning-formatted-rich-text>
-			</template>
-			<template lwc:else>
-				<lightning-formatted-rich-text value={resumenOportunidad}></lightning-formatted-rich-text>
-			</template>
-
-			<div class="slds-m-top_medium">
-				<lightning-record-edit-form object-api-name="Opportunity" record-id={recordId} mode="edit" onsubmit={handleSubmitOpp}>
-					<lightning-messages></lightning-messages>
-					<lightning-input-field field-name="CSBD_InstruccionesGPT__c"></lightning-input-field>
-
-					<div class="slds-m-top_large slds-align_absolute-center">
-						<!-- <lightning-button class="slds-m-horizontal_x-small" variant="brand" label="Actualizar" onclick={handleRefrescarOpp}></lightning-button> -->
-						<lightning-button class="slds-m-horizontal_x-small" variant="brand" type="submit" label="Actualizar"></lightning-button>
-					</div>
-				</lightning-record-edit-form>
-			</div>
-		</div>
-	</div>
-
+    <div class="slds-m-horizontal_x-small">
+        <lightning-card  class="slds-m-bottom_xx-large">
+            <template if:true={isLoadingOpp}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+            <template lwc:if={muestraCopiaOpp}>
+                <lightning-formatted-rich-text
+                value={copiaResOpp}
+                ></lightning-formatted-rich-text>
+            </template>
+            <template lwc:else>
+                <lightning-formatted-rich-text
+                value={resumenOportunidad}
+                ></lightning-formatted-rich-text>
+            </template>
+            <div class="slds-m-top_medium slds-m-bottom_x-large">
+                <lightning-record-edit-form
+                    object-api-name="Opportunity"
+                    record-id={recordId}
+                    onsubmit={handleSubmitOpp}
+                    >
+                        <lightning-messages></lightning-messages>
+                        <lightning-input-field
+                            field-name="CSBD_InstruccionesGPT__c"
+                        ></lightning-input-field>
+                        
+                        <div class="slds-m-top_large slds-align_absolute-center">
+                            <!-- <lightning-button class="slds-m-horizontal_x-small" variant="brand" label="Actualizar" onclick={handleRefrescarOpp}></lightning-button> -->
+                            <lightning-button class="slds-m-horizontal_x-small" variant="brand" type="submit" label="Actualizar"></lightning-button>
+                        </div>
+                </lightning-record-edit-form>
+            </div>
+        </lightning-card>
+    </div>
 </template>

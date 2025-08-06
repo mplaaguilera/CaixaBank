@@ -18,7 +18,6 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         //Usuario SAC_General
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
         SAC_DatabaseDML.insertDML(usuarioGeneral, false);
-        //Database.insert(usuarioGeneral);
 
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
@@ -30,28 +29,25 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
         SAC_DatabaseDML.insertDML(casoReclamacion, false);
-        //Database.insert(casoReclamacion);
-
 
         Topic topic = new Topic(Name = 'SACTopic1');
         SAC_DatabaseDML.insertDML(topic, false);
-        //Database.insert(topic);
+
         Topic topic2 = new Topic(Name = 'SACTopic2');
         SAC_DatabaseDML.insertDML(topic2, false);
-        //Database.insert(topic2);
 
         TopicAssignment topicAssig = new TopicAssignment(TopicId=topic.Id, EntityId=casoReclamacion.Id);
         SAC_DatabaseDML.insertDML(topicAssig, false);
-        //Database.insert(topicAssig);
 
         SAC_MaestroTemas__c maestroT= new SAC_MaestroTemas__c(Name = 'SACTopic1', SAC_OrdenPrelacion__c = 1);
+        maestroT.RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SAC_Temas').getRecordTypeId();
         SAC_DatabaseDML.insertDML(maestroT, false);
-        //Database.insert(maestroT);
-        SAC_MaestroTemas__c maestroT2= new SAC_MaestroTemas__c(Name = 'SACTopic2', SAC_OrdenPrelacion__c = 2);
-        SAC_DatabaseDML.insertDML(maestroT2, false);
-        //Database.insert(maestroT2);
 
+        SAC_MaestroTemas__c maestroT2= new SAC_MaestroTemas__c(Name = 'SACTopic2', SAC_OrdenPrelacion__c = 2);
+        maestroT2.RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SAC_Temas').getRecordTypeId();
+        SAC_DatabaseDML.insertDML(maestroT2, false);
     }
+
     @istest
     static void cargarDatosTest() {
         SAC_LCMP_BuscadorTopic.TopicsWrapper  tw;
@@ -62,53 +58,56 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
         SAC_DatabaseDML.insertDML(permiSetAssi, false);
-        //Database.insert(permiSetAssi);
+
         Test.startTest();
         System.runAs(usuario) {
             tw = SAC_LCMP_BuscadorTopic.cargarDatos(usuario.id, caso.id);
         }
         Test.stopTest();
 
-        System.assertNotEquals(Null, tw, 'No ha devuelto los datos');
+        Assert.areNotEqual(Null, tw, 'No ha devuelto los datos');
     }
+
     @istest
     static void getResultadosTest() {
 
         List<SAC_MaestroTemas__c> maestroTemas;
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        Case caso= [SELECT id, OwnerId  FROM Case WHERE Subject = 'Test1Rec'];
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
         SAC_DatabaseDML.insertDML(permiSetAssi, false);
-        //Database.insert(permiSetAssi);
+
         Test.startTest();
         System.runAs(usuario) {
-            maestroTemas = SAC_LCMP_BuscadorTopic.getResultados('Topic');
+            maestroTemas = SAC_LCMP_BuscadorTopic.getResultados('Topic', caso.Id);
         }
         Test.stopTest();
 
-        System.assertNotEquals(null, maestroTemas, 'No se han obtenido resultados');
+        Assert.areNotEqual(null, maestroTemas, 'No se han obtenido resultados');
     }
 
     @istest
     static void newTopicTest() {
 
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        Case caso= [SELECT id, OwnerId  FROM Case WHERE Subject = 'Test1Rec'];
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
         SAC_DatabaseDML.insertDML(permiSetAssi, false);
-        //Database.insert(permiSetAssi);
+
         Boolean insertado;
         Test.startTest();
         System.runAs(usuario) {
-            insertado = SAC_LCMP_BuscadorTopic.newTopic('topic');
+            insertado = SAC_LCMP_BuscadorTopic.newTopic('topic', caso.Id);
         }
         Test.stopTest();
 
-        System.assertEquals(false, insertado, 'No se ha podido crear el Topic');
+        Assert.areEqual(false, insertado, 'No se ha podido crear el Topic');
     }
 
     @istest
@@ -122,7 +121,7 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         permiSetAssi.AssigneeId = usuario.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
         SAC_DatabaseDML.insertDML(permiSetAssi, false);
-        //Database.insert(permiSetAssi);
+
         Test.startTest();
         System.runAs(usuario) {
             try {
@@ -133,8 +132,9 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
         }        
         Test.stopTest();
 
-        System.assertEquals(false, error, 'No se ha podido eliminar el Topic');
+        Assert.areEqual(false, error, 'No se ha podido eliminar el Topic');
     }
+
     @istest
     static void setTopicACaseTest() {
         Boolean error = false;
@@ -151,14 +151,13 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
             }  
             Test.stopTest();
         }
-        System.assertEquals(false, error, 'No se ha podido asignar el Topic');
+        Assert.areEqual(false, error, 'No se ha podido asignar el Topic');
     }
 
     @istest
     static void setTopicACaseTest2() {
         Boolean error = false;
         Case caso= [SELECT id, OwnerId  FROM Case WHERE Subject = 'Test1Rec'];
-        Topic topic =[SELECT id, Name FROM Topic WHERE Name = 'SACTopic1'];
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         
         System.runAs(usuario){
@@ -170,7 +169,7 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
             }  
             Test.stopTest();
         }
-        System.assertEquals(false, error, 'No se ha podido asignar el Topic');
+        Assert.areEqual(false, error, 'No se ha podido asignar el Topic');
     }
 
     @istest
@@ -184,6 +183,6 @@ public with sharing class SAC_LCMP_BuscadorTopic_Test {
             caseEstado = SAC_LCMP_BuscadorTopic.cargarEstado(caso.id);
             Test.stopTest();
         }
-        System.assertNotEquals(null, caseEstado.Status, 'No se ha podido recuperar el estado de la reclamacion');
+        Assert.areNotEqual(null, caseEstado.Status, 'No se ha podido recuperar el estado de la reclamacion');
     }
 }

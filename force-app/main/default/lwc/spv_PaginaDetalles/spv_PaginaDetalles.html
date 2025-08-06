@@ -989,15 +989,20 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Campo SPV_GrupoAltas__c CBK_Case_Extension__c -->
+                        <!-- Campo SEG_Grupo__c -->
                         <div class="slds-col slds-size_1-of-2 elemento-form">
-                            <div class="slds-form-element">
-                                <div class="slds-form-element__control">
-                                    <lightning-record-edit-form object-api-name="CBK_Case_Extension__c" data-record-id={caseExtensionId} record-id={caseExtensionId}>
-                                        <lightning-input-field field-name="SPV_GrupoAltas__c"></lightning-input-field>
-                                    </lightning-record-edit-form>
-                                </div>
-                            </div>
+                            <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                <lightning-layout>
+                                    <lightning-layout-item size="4" style="padding-left: 4px">
+                                        <label class="slds-form-element__label" for="form-element-01" style="color: rgb(68, 68, 68); display: block;">
+                                            Grupo altas
+                                        </label>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="8">
+                                        <lightning-input-field variant="label-hidden" field-name="SEG_Grupo__c"></lightning-input-field>
+                                    </lightning-layout-item>
+                                </lightning-layout>
+                            </lightning-layout-item>
                         </div>
                         <!-- Campo SAC_FechaRecepcion__c -->
                         <div class="slds-col slds-size_1-of-2 elemento-form">
@@ -1660,20 +1665,23 @@
                                 </lightning-layout>
                             </lightning-layout-item>
                         </div>
-                        <!-- Campo SPV_GrupoAltas__c CBK_Case_Extension__c -->
+                        <!-- Campo SEG_Grupo__c -->
                         <div class="slds-col slds-size_1-of-2 elemento-form">
-                            <lightning-record-view-form object-api-name="CBK_Case_Extension__c" data-record-id={caseExtensionId} record-id={caseExtensionId}>
-                                <lightning-layout-item class="slds-form-element_readonly" size="12">
-                                    <lightning-layout>
-                                        <lightning-layout-item size="11" class="slds-border_bottom">
-                                            <lightning-output-field field-name="SPV_GrupoAltas__c"></lightning-output-field>
-                                        </lightning-layout-item>
-                                        <lightning-layout-item size="1" class="slds-border_bottom">
-                                            <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
-                                        </lightning-layout-item>
-                                    </lightning-layout>
-                                </lightning-layout-item>
-                            </lightning-record-view-form>
+                            <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                <lightning-layout>
+                                    <lightning-layout-item size="3" class="slds-border_bottom" style="padding-left: 4px">
+                                        <label class="slds-form-element__label" for="form-element-01" style="color: rgb(68, 68, 68); margin-bottom: 15px; display: block;">
+                                            Grupo de altas
+                                        </label>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="7" class="slds-border_bottom" style="padding-left: 35px">
+                                        <lightning-output-field variant="label-hidden" field-name="SEG_Grupo__c"></lightning-output-field>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="2" class="slds-border_bottom">
+                                        <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                    </lightning-layout-item>
+                                </lightning-layout>
+                            </lightning-layout-item>
                         </div>
                         <!-- Campo SAC_FechaRecepcion__c -->
                         <div class="slds-col slds-size_1-of-2 elemento-form">
@@ -3283,7 +3291,107 @@
     </template> 
     <!--Fin desplegable Resolución organismo-->
     
-    
+        <!--Desplegable Resolución organismo Consumo-->
+    <template if:true={mostrarResolucionOrganismoConsumo}>
+        <div class={toggleSeccionResolucionOrganismo}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-ResolucionOrganismo" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirResolucionOrganismo}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Resolución organismo</span>
+                </button>
+            </h1>
+            <div class="slds-section__content cuerpo-seccion" id="expando-unique-id-contenidoResolucionOrganismoConsumo">  
+                <lightning-record-edit-form object-api-name="Case" data-record-id={recordId} record-id={recordId}>            
+                    <!-- CAMPOS EDITABLES -->
+                    <template if:true={editarCampos}>
+                        <div class="slds-grid slds-wrap" style="margin-left: 15px;margin-bottom: 20px;">
+                            <!-- Campo SAC_SentidoResolucion__c -->
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        <lightning-input-field field-name="SAC_SentidoResolucion__c" onchange={handleSentidoResolucionChange}></lightning-input-field>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- SOLO EN CASO DE QUE SEA SAC_SentidoResolucion__c DESFAVORABLE A ENTIDAD -->
+                            <template if:true={mostrarInformeDesfavorable}>
+                                <!-- Campo SPV_Conclusion__c CBK_Case_Extension__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-record-edit-form object-api-name="CBK_Case_Extension__c" data-record-id={caseExtensionId} record-id={caseExtensionId}>
+                                                <lightning-input-field field-name="SPV_Conclusion__c"></lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Campo SPV_TipoDesfavorable__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <lightning-input-field field-name="SPV_TipoDesfavorable__c"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <!-- CAMPOS SIN EDITAR -->  
+                    <template if:false={editarCampos}>
+                        <div class="slds-grid slds-wrap" style="margin-left: 15px; margin-bottom: 20px;">
+                            <!-- Campo SAC_SentidoResolucion__c -->
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_SentidoResolucion__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                            <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>      
+                            <!-- SOLO EN CASO DE QUE SEA SAC_SentidoResolucion__c DESFAVORABLE A ENTIDAD -->
+                            <template if:true={mostrarInformeDesfavorable}>                      
+                                <!-- Campo SPV_Conclusion__c CBK_Case_Extension__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-record-view-form object-api-name="CBK_Case_Extension__c" data-record-id={caseExtensionId} record-id={caseExtensionId}>
+                                        <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                            <lightning-layout>
+                                                <lightning-layout-item size="11" class="slds-border_bottom">
+                                                    <lightning-output-field field-name="SPV_Conclusion__c"></lightning-output-field>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="1" class="slds-border_bottom">
+                                                    <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-layout-item>
+                                    </lightning-record-view-form>
+                                </div>
+                                <!-- Campo SPV_TipoDesfavorable__c -->
+                                <div class="slds-col slds-size_1-of-2 elemento-form">
+                                    <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                        <lightning-layout>
+                                            <lightning-layout-item size="11" class="slds-border_bottom">
+                                                <lightning-output-field field-name="SPV_TipoDesfavorable__c"></lightning-output-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="1" class="slds-border_bottom">
+                                                <lightning-button-icon class="slds-float_right" size="medium" icon-name="utility:edit"  onclick={handleEditarCampos} variant="bare"></lightning-button-icon>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                    </lightning-layout-item>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </lightning-record-edit-form>  
+            </div>
+        </div>    
+    </template> 
+    <!--Fin desplegable Resolución organismo Consumo-->
     <!--Desplegable Rectificación-->
     <template if:true={casoRectificado}>
         <div class={toggleSeccionRectificacion}>

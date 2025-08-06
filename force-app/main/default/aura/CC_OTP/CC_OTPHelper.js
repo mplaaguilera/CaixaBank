@@ -101,6 +101,10 @@
                                 component.set("v.ambitoMotivoImagin", respuestaDatos[key]);
                             } else if (key === "mccVacio") {
                                 component.set("v.mccVacio", respuestaDatos[key]);
+                            } else if (key === "NivelDosAUTTerceros") {
+                                component.set("v.nivelDosAUTTerceros", respuestaDatos[key]);
+                            } else if (key === "SettingIntegracionNivelDos") {
+                                component.set("v.settingIntegracionNivelDos", respuestaDatos[key]);
                             }
                         }
                         let obtenerOTPCliente = component.get("c.obtenerOTPCliente");
@@ -130,18 +134,20 @@
                                     component.set("v.otpCliente", null);
                                 }
                             }
-                            let obtenerHistoricoOTPCliente = component.get("c.obtenerHistoricoOTPCliente");
-                            obtenerHistoricoOTPCliente.setParams({ "recordId": component.get("v.recordId"), "idCliente": component.get("v.idCliente") });
-                            obtenerHistoricoOTPCliente.setCallback(this, function(response) {
+                            let obtenerHistoricoOTPClienteDividido = component.get("c.obtenerHistoricoOTPClienteDividido");
+                            obtenerHistoricoOTPClienteDividido.setParams({ "recordId": component.get("v.recordId"), "idCliente": component.get("v.idCliente") });
+                            obtenerHistoricoOTPClienteDividido.setCallback(this, function(response) {
                                 if (response.getState() === "SUCCESS") {
-                                    component.set("v.historicoOtpCliente", response.getReturnValue());
+                                    let result = response.getReturnValue();
+                                    component.set("v.autenticacionesRecientes", result.autenticacionesRecientes);
+                                    component.set("v.historicoAutenticacionesAntiguas", result.historicoAutenticaciones);
                                     resolve();
                                 } else if (response.getState() === "ERROR") {
                                     console.error(response.getError());
                                     reject(response.getError());
                                 }
                             });
-                            $A.enqueueAction(obtenerHistoricoOTPCliente);
+                            $A.enqueueAction(obtenerHistoricoOTPClienteDividido);
                             
                         });
                         $A.enqueueAction(obtenerOTPCliente);
@@ -217,46 +223,46 @@
        
     //Obtener preguntas aleatorias de segundo nivel y parametrizar tipo y maximo de caracteres
     obtenerPreguntasAleatorias: function(component){
-                if(component.get("v.omitirPreguntasNvl2") === false){
-                    if (component.get("v.labelPregunta1") != null && (component.get("v.labelPregunta1").toLowerCase().includes("cuenta") || component.get("v.labelPregunta1").toLowerCase().includes("tarjeta") || component.get("v.labelPregunta1").toLowerCase().includes("año") )) {
-                        component.set("v.maxLengthPregunta1", 4);
-                        component.set("v.minLengthPregunta1", 4);
-                        component.set("v.typePregunta1", "text");
-                    } else if(component.get("v.labelPregunta1") != null && component.get("v.labelPregunta1").toLowerCase().includes("edad")){
-                        component.set("v.maxLengthPregunta1", 2);
-                        component.set("v.minLengthPregunta1", 2);
-                        component.set("v.typePregunta1", "text");
-                    } else {
-                        component.set("v.maxLengthPregunta1", 255);
-                        component.set("v.minLengthPregunta1", 1);
-                        component.set("v.typePregunta1", "text");
-                    }
-                    if (component.get("v.labelPregunta2") != null && (component.get("v.labelPregunta2").toLowerCase().includes("cuenta") || component.get("v.labelPregunta2").toLowerCase().includes("tarjeta") || component.get("v.labelPregunta2").toLowerCase().includes("año")  )) {
-                        component.set("v.maxLengthPregunta2", 4);
-                        component.set("v.minLengthPregunta2", 4);
-                        component.set("v.typePregunta2", "text");
-                    } else if(component.get("v.labelPregunta2") != null && component.get("v.labelPregunta2").toLowerCase().includes("edad")){
-                        component.set("v.maxLengthPregunta2", 2);
-                        component.set("v.minLengthPregunta2", 2);
-                        component.set("v.typePregunta2", "text");
-                    } else {
-                        component.set("v.maxLengthPregunta2", 255);
-                        component.set("v.minLengthPregunta2", 1);
-                        component.set("v.typePregunta2", "text");
-                    }
+        if(component.get("v.omitirPreguntasNvl2") === false){
+            if (component.get("v.labelPregunta1") != null && (component.get("v.labelPregunta1").toLowerCase().includes("cuenta") || component.get("v.labelPregunta1").toLowerCase().includes("tarjeta") || component.get("v.labelPregunta1").toLowerCase().includes("año") )) {
+                component.set("v.maxLengthPregunta1", 4);
+                component.set("v.minLengthPregunta1", 4);
+                component.set("v.typePregunta1", "text");
+            } else if(component.get("v.labelPregunta1") != null && component.get("v.labelPregunta1").toLowerCase().includes("edad")){
+                component.set("v.maxLengthPregunta1", 2);
+                component.set("v.minLengthPregunta1", 2);
+                component.set("v.typePregunta1", "text");
+            } else {
+                component.set("v.maxLengthPregunta1", 255);
+                component.set("v.minLengthPregunta1", 1);
+                component.set("v.typePregunta1", "text");
+            }
+            if (component.get("v.labelPregunta2") != null && (component.get("v.labelPregunta2").toLowerCase().includes("cuenta") || component.get("v.labelPregunta2").toLowerCase().includes("tarjeta") || component.get("v.labelPregunta2").toLowerCase().includes("año")  )) {
+                component.set("v.maxLengthPregunta2", 4);
+                component.set("v.minLengthPregunta2", 4);
+                component.set("v.typePregunta2", "text");
+            } else if(component.get("v.labelPregunta2") != null && component.get("v.labelPregunta2").toLowerCase().includes("edad")){
+                component.set("v.maxLengthPregunta2", 2);
+                component.set("v.minLengthPregunta2", 2);
+                component.set("v.typePregunta2", "text");
+            } else {
+                component.set("v.maxLengthPregunta2", 255);
+                component.set("v.minLengthPregunta2", 1);
+                component.set("v.typePregunta2", "text");
+            }
 
 
-                    if(component.get("v.labelPregunta1") != null && component.get("v.labelPregunta2") != null ){
-                            $A.util.addClass(component.find("ModalboxPreguntas"), "slds-fade-in-open");
-                            $A.util.addClass(component.find("ModalBackdropPreguntas"), "slds-backdrop--open");
-                            window.setTimeout($A.getCallback(() => component.find("Validado").focus()), 0);
-                    
-                    }else{
-                        console.error("Error en alguna pregunta");
-                    }
-                }else{
-                $A.enqueueAction(component.get("c.enviarNivelDos")); 
-                }
+            if(component.get("v.labelPregunta1") != null && component.get("v.labelPregunta2") != null ){
+                    $A.util.addClass(component.find("ModalboxPreguntas"), "slds-fade-in-open");
+                    $A.util.addClass(component.find("ModalBackdropPreguntas"), "slds-backdrop--open");
+                    window.setTimeout($A.getCallback(() => component.find("Validado").focus()), 0);
+            
+            }else{
+                console.error("Error en alguna pregunta");
+            }
+        } else {
+            $A.enqueueAction(component.get("c.enviarNivelDos")); 
+        }
         
     },
    

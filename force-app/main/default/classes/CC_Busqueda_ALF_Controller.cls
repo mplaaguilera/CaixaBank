@@ -2,7 +2,7 @@ public with sharing class CC_Busqueda_ALF_Controller {
 
 	@AuraEnabled
 	public static Map<String, Object> getIdentidad(String tipoBusqueda, String valorBusqueda) {
-		return CC_IdentCliente_Future.IdentificarPersALFSync_CC(tipoBusqueda, valorBusqueda, true);
+		return CC_IdentCliente_Future.IdentificarPersALFSync(tipoBusqueda, valorBusqueda);
 	}
 
 	public class ContratoPicklistItemWrapper {

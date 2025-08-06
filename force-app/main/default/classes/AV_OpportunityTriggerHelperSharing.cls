@@ -86,7 +86,7 @@ public without sharing class AV_OpportunityTriggerHelperSharing {
 		tarea.Priority = 'Y';
 		tarea.RecordTypeId = rt;
 		tarea.OwnerId = opp.OwnerId;
-		tarea.AV_Center__c = numCent.substring(numCent.length()-5);
+		//tarea.AV_Center__c = numCent.substring(numCent.length()-5);
 		tarea.AV_OrigenApp__c = AV_AppConstants.OPPLLAMADA_RT;
 		tarea.AV_Tipo__c = AV_AppConstants.LLAMADA_TIPO;
 		return tarea;

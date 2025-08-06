@@ -140,19 +140,21 @@ global class CC_ST_ReviewsCaseBatch implements Database.Batchable<sObject>, Data
         for(CC_ST_AppReviews__c Review : scope){
             if (appCaseCreate.get(Review.Rating__c + '-' + Review.App_ID__c)){
                 Case c = cMap.get(Review.Review_ID__c);
-                String CaseId = '' + c.Id;
+                if(c != null && c.Id != null){
+                    String CaseId = '' + c.Id;
                 
-                SocialPost socPost = CC_ST_ReviewsController.createSocialPost(Review.Review_ID__c,
-                                                                              CaseId,
-                                                                              Review.Author_Name__c,
-                                                                              Review.Content__c,
-                                                                              Review.Title__c,
-                                                                              'Comment',
-                                                                              false,false);
-                lstPost.add(socPost);
-                pMap.put(Review.Review_ID__c,socPost);
-                Review.Case__c = c.Id;
-                
+                    SocialPost socPost = CC_ST_ReviewsController.createSocialPost(Review.Review_ID__c,
+                                                                                  CaseId,
+                                                                                  Review.Author_Name__c,
+                                                                                  Review.Content__c,
+                                                                                  Review.Title__c,
+                                                                                  'Comment',
+                                                                                  false,false);
+                    
+                    lstPost.add(socPost);
+                    pMap.put(Review.Review_ID__c,socPost);
+                    Review.Case__c = c.Id;                    
+                }   
             }
         }
         //insert lstPost;
@@ -164,15 +166,18 @@ global class CC_ST_ReviewsCaseBatch implements Database.Batchable<sObject>, Data
         for(CC_ST_AppReviews__c Review : scope){
             if (appCaseCreate.get(Review.Rating__c + '-' + Review.App_ID__c)){
                 Case c = cMap.get(Review.Review_ID__c);
-                String CaseId = '' + c.Id;
-                SocialPost p = pMap.get(Review.Review_ID__c);	
-                String PostId = '' + p.Id;
-                SocialPersona sp = CC_ST_ReviewsController.buscarSocialPersona(Review.Author_Name__c,Review.Source__c,PostId,false);
-                
-                lstPersona.add(sp);
-                spMap.put(p.Id,sp);
-                //Guardamos para cada caso su Social Persona
-                spCaseMap.put(CaseId, sp);
+                if(c != null && c.Id != null){
+                    String CaseId = '' + c.Id;
+                    SocialPost p = pMap.get(Review.Review_ID__c);	
+                    if(p != null && p.Id != null){
+                        String PostId = '' + p.Id;
+                        SocialPersona sp = CC_ST_ReviewsController.buscarSocialPersona(Review.Author_Name__c,Review.Source__c,PostId,false);
+                        lstPersona.add(sp);
+                        spMap.put(p.Id,sp);
+                        //Guardamos para cada caso su Social Persona
+                        spCaseMap.put(CaseId, sp);
+                    }
+                }
             }
         }
         //upsert lstPersona;
@@ -187,11 +192,15 @@ global class CC_ST_ReviewsCaseBatch implements Database.Batchable<sObject>, Data
         //Actualizar el caso informando cual es su Social Persona
         Map<Id, Case> oListCaseUpd = new Map<Id, Case>();
         for(CC_ST_AppReviews__c Review : scope){
-        	SocialPersona sp = spCaseMap.get(Review.Case__c);
-            Case c = new Case();
-            c.Id = Id.valueOf(Review.Case__c);
-            c.CC_Social_Persona__c = sp.Id;
-            oListCaseUpd.put(c.Id, c);
+            if(Review.Case__c != null) {
+                SocialPersona sp = spCaseMap.get(Review.Case__c);
+                if(sp != null) {
+                    Case c = new Case();
+                    c.Id = Id.valueOf(Review.Case__c);
+                    c.CC_Social_Persona__c = sp.Id;
+                    oListCaseUpd.put(c.Id, c);
+                }
+            }
         }
         
         if (!oListCaseUpd.isEmpty()){
@@ -200,9 +209,9 @@ global class CC_ST_ReviewsCaseBatch implements Database.Batchable<sObject>, Data
         
         //Actualizar Social Post
         for(SocialPost p : lstPost){
-            if(spMap.get(p.Id) != null){
-            	p.PersonaId = spMap.get(p.Id).Id;
-        	}
+            if(p != null && p.Id != null && spMap.containsKey(p.Id) && spMap.get(p.Id) != null){
+                p.PersonaId = spMap.get(p.Id).Id;
+            }
         }
         //update lstPost;
         if (!lstPost.isEmpty()){
@@ -215,10 +224,12 @@ global class CC_ST_ReviewsCaseBatch implements Database.Batchable<sObject>, Data
             Review.Procesado__c=true; 
             if (appCaseCreate.get(Review.Rating__c + '-' + Review.App_ID__c)){
                 SocialPost socPost = pMap.get(Review.Review_ID__c);                    
-                Review.SocialPost__c = socPost.Id;
+                if(socPost != null && socPost.Id != null) {
+                    Review.SocialPost__c = socPost.Id;
+                }
                 if (appCaseAction.get(Review.Rating__c + '-' + Review.App_ID__c) !=null) {
                     SocialPost socPostResp = CC_ST_ReviewsController.Acciones(Review, appCaseAction.get(Review.Rating__c + '-' + Review.App_ID__c), oMapLOV);
-                    if (socPostResp.Name != '' && socPostResp.Name != null){
+                    if (socPostResp != null && socPostResp.Name != '' && socPostResp.Name != null){
                         lstRespuestas.add(socPostResp);
                     }
                     // Update Case fecha respuesta Stores

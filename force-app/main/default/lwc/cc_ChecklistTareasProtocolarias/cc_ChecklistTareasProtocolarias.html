@@ -13,34 +13,82 @@
                 <div class="slds-grid slds-wrap">
                     <template if:true={mapaSecciones}>
                         <template for:each={mapaSecciones} for:item="mapaKey">
-                            <div key={mapaKey.key} class="slds-col slds-size_1-of-2 elemento-form">
+                            <div key={mapaKey.key} class="slds-col slds-size_1-of-1 elemento-form">
                                 <details open>
-                                    <summary class="slds-button slds-section__title-action">                            
-                                        <h3 class="slds-section__title">                                
-                                            {mapaKey.key}                                
-                                        </h3>
+                                    <summary class="slds-button slds-section__title-action" style="padding-inline: 0.5rem;">  
+                                        <div class="slds-col slds-size_4-of-12 elemento-form">
+                                            <h3 class="slds-section__title">                                
+                                                {mapaKey.key}                                
+                                            </h3>
+                                        </div>  
+                                        <div class="slds-col slds-size_1-of-12 elemento-form">
+                                            <h3 class="slds-section__title">                                
+                                                <!-- <p>#####</p>                              -->
+                                            </h3>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12 elemento-form">
+                                            <h3 class="slds-section__title slds-text-align_center" style="padding-inline: 0.0rem;">                             
+                                                <p>Hecho</p>                             
+                                            </h3>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-12 elemento-form">
+                                            <h3 class="slds-section__title slds-text-align_center" style="padding-inline: 0.4rem;">                               
+                                                <p>N/A</p>                             
+                                            </h3>
+                                        </div>  
+                                        <div class="slds-col slds-size_4-of-12 elemento-form">
+                                            <h3 class="slds-section__title">                                
+                                                <p>Razón de que no aplique (N/A)</p>                             
+                                            </h3>
+                                        </div>                 
                                     </summary>
                                     <template if:true={mapaKey.value}>
                                         <template for:each={mapaKey.value} for:item="object">  
-                                            <div key={object.idControl} class="slds-form-element slds-form-element_readonly slds-form-element__control">
-                                                <div class="slds-col slds-size_3-of-5 elemento-form">
+                                            <!-- <div key={object.idControl} class="slds-form-element slds-form-element_readonly slds-form-element__control" style="padding: 0.2rem;"> -->
+                                            <div key={object.idControl} class="slds-form-element slds-form-element_readonly slds-form-element__control" style="padding-inline: 0.5rem;">
+                                                <div class="slds-col slds-size_4-of-12 elemento-form">
                                                     <span class="slds-text-title labelControl">{object.nameControl}</span>
                                                 </div>
-                                                <div class="slds-col slds-size_1-of-5 elemento-form slds-float_left">
+                                                <div class="slds-col slds-size_1-of-12 elemento-form" style="padding-inline: 0.0rem;">
                                                     <lightning-helptext class="textoInfo" content={object.descControl}></lightning-helptext>
                                                     <!-- <lightning-helptext class="textoInfo" content={object.nombreChecklist}></lightning-helptext> -->
                                                 </div>
-                                                <div class="slds-col slds-size_1-of-5 elemento-form">
+                                                <div class="slds-col slds-size_1-of-12 elemento-form" style="padding-inline: 0.6rem;">
                                                     <lightning-input 
                                                         type="checkbox" 
+                                                        label=""
                                                         class="selector"
                                                         checked={object.selecionadoControl}
                                                         value={object.idControl}
                                                         disabled={object.desactivarControl}
-                                                        onchange={handleChange}>
+                                                        onchange={handleChangeCompletada}>
                                                     </lightning-input>
                                                 </div>
-                                            </div> 
+                                                <div class="slds-col slds-size_1-of-12 elemento-form" style="padding-inline: 0.5rem;">
+                                                    <lightning-input 
+                                                        type="checkbox" 
+                                                        label=""
+                                                        class="selector"
+                                                        checked={object.noAplicaControl}
+                                                        value={object.idControl}
+                                                        disabled={object.desactivarControl}
+                                                        onchange={handleChangeNoAplica}>
+                                                    </lightning-input>
+                                                </div>
+                                                <div class="slds-col slds-size_4-of-12 elemento-form" style="padding-inline: 0.0rem;">
+                                                    <lightning-input 
+                                                        type="text" 
+                                                        data-id={object.idControl}
+                                                        value={object.razonNoAplica}
+                                                        onchange={handleChangeRazonNoAplica}
+                                                        disabled={object.disabledRazonNoAplica}
+                                                        style="height: 4.5rem;">
+                                                    </lightning-input>
+                                                    <!-- <h3 class="slds-section__title">                                
+                                                        <p>#####_#####_#####_#####_#####_#####_</p>                             
+                                                    </h3> -->
+                                                </div> 
+                                            </div>
                                         </template>
                                     </template>
                                 </details><br/>

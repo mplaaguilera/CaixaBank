@@ -36,10 +36,10 @@ public with sharing class OS_WS_AltaCasoValija_Test {
 		
         Account cuenta1 = new Account();
         cuenta1.Name = 'Cuenta Test Cliente';
-        cuenta1.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        cuenta1.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         insert cuenta1;
         
-		Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+		Id recordTypeContacto = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
 		Contact contacto = new Contact();
         contacto.RecordTypeId = recordTypeContacto;
         contacto.Email = 'servicio.bastanteo@caixabank.com';    
@@ -47,7 +47,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         contacto.AccountId = cuenta1.Id;
         insert contacto;
         
-        Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+        Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
 
         CC_Grupo_Colaborador__c grupoColaborador  = new CC_Grupo_Colaborador__c();
         grupoColaborador.RecordTypeId = recordTypeGrupoColaborador;
@@ -86,7 +86,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         mccTematica.CC_Fecha_Vigencia_Inicio__c = Date.today();
         mccTematica.OS_Horario__c = businessHoursId;
         mccTematica.OS_Departamento__c = 'UAC';
-        mccTematica.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        mccTematica.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         mccTematica.CC_Codigo_Externo__c = 'TEC-000001';
 		mccTematica.OS_Buzon_Salida__c = [SELECT DisplayName FROM OrgWideEmailAddress WHERE DISPLAYNAME = 'Buzón de pruebas COPS' OR DISPLAYNAME = 'Buzón KYC Renewal' OR DISPLAYNAME = 'Buzón Service Desk' OR DISPLAYNAME = 'Buzón Comercio Exterior' OR DISPLAYNAME = 'Buzón Export Online' OR DISPLAYNAME = 'Buzón International Support'OR DISPLAYNAME = 'Buzón Contact Center International' LIMIT 1].DisplayName;
         insert mccTematica;
@@ -95,7 +95,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Empleado (COPS)';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccProducto.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        mccProducto.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PRC-000001'; 
         insert mccProducto; 
@@ -104,7 +104,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         motivo.Name = 'Apertura sin autorización';
         motivo.CC_Tipo_Cliente__c = 'Empleado (COPS)';
         motivo.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        motivo.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        motivo.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         motivo.CC_Tematica__c = mccTematica.Id;
         motivo.CC_Producto_Servicio__c = mccProducto.Id;
         motivo.CC_Codigo_Externo__c = 'MOC-000001';
@@ -114,7 +114,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         motivo2.Name = 'Pruebas bastanteo';
         motivo2.CC_Tipo_Cliente__c = 'Empleado (COPS)';
         motivo2.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        motivo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        motivo2.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         motivo2.CC_Tematica__c = mccTematica.Id;
         motivo2.CC_Producto_Servicio__c = mccProducto.Id;
         motivo2.CC_Codigo_Externo__c = 'MOC-000002';
@@ -177,10 +177,10 @@ public with sharing class OS_WS_AltaCasoValija_Test {
 		
         Account cuenta1 = new Account();
         cuenta1.Name = 'Cuenta Test Cliente';
-        cuenta1.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        cuenta1.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         insert cuenta1;
         
-		Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+		Id recordTypeContacto = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
 		Contact contacto = new Contact();
         contacto.RecordTypeId = recordTypeContacto;
         contacto.Email = 'servicio.bastanteo@caixabank.com';    
@@ -188,7 +188,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         contacto.AccountId = cuenta1.Id;
         insert contacto;
         
-        Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+        Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
 
         CC_Grupo_Colaborador__c grupoColaborador  = new CC_Grupo_Colaborador__c();
         grupoColaborador.RecordTypeId = recordTypeGrupoColaborador;
@@ -228,7 +228,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         mccTematica.CC_Fecha_Vigencia_Inicio__c = Date.today();
         mccTematica.OS_Horario__c = businessHoursId;
         mccTematica.OS_Departamento__c = 'UAC';
-        mccTematica.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        mccTematica.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         mccTematica.CC_Codigo_Externo__c = 'TEC-000001';
 		mccTematica.OS_Buzon_Salida__c = [SELECT DisplayName FROM OrgWideEmailAddress WHERE DISPLAYNAME = 'Buzón de pruebas COPS' OR DISPLAYNAME = 'Buzón KYC Renewal' OR DISPLAYNAME = 'Buzón Service Desk' OR DISPLAYNAME = 'Buzón Comercio Exterior' OR DISPLAYNAME = 'Buzón Export Online' OR DISPLAYNAME = 'Buzón International Support'OR DISPLAYNAME = 'Buzón Contact Center International' LIMIT 1].DisplayName;
         insert mccTematica;
@@ -237,7 +237,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Empleado (COPS)';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccProducto.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        mccProducto.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PRC-000001'; 
         insert mccProducto; 
@@ -246,7 +246,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         motivo.Name = 'Apertura sin autorización';
         motivo.CC_Tipo_Cliente__c = 'Empleado (COPS)';
         motivo.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        motivo.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        motivo.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         motivo.CC_Tematica__c = mccTematica.Id;
         motivo.CC_Producto_Servicio__c = mccProducto.Id;
         motivo.CC_Codigo_Externo__c = 'MOC-000001';
@@ -256,7 +256,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
         motivo2.Name = 'Pruebas bastanteo';
         motivo2.CC_Tipo_Cliente__c = 'Empleado (COPS)';
         motivo2.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        motivo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        motivo2.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         motivo2.CC_Tematica__c = mccTematica.Id;
         motivo2.CC_Producto_Servicio__c = mccProducto.Id;
         motivo2.CC_Codigo_Externo__c = 'MOC-000002';
@@ -295,7 +295,7 @@ public with sharing class OS_WS_AltaCasoValija_Test {
     private static void acuseReciboValijaDigital() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
         
-        Id rtCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        Id rtCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
 
         Account cuenta = new Account();
         cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');

@@ -1,5 +1,84 @@
 @isTest
 public with sharing class FRA_Llamada_GC_Test {
+    @TestSetup
+	private static void testSetup() {
+
+        Account cuenta = new Account();
+        cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        cuenta.Name = 'Cuenta Test asw vv';
+        cuenta.CC_NumPerso__c = '777';
+        //cuenta.CC_OficinaGestoraId__c = listaCuentas[3].Id;
+        //cuenta.AV_OficinaPrincipal__c = listaCuentas[3].Id;
+        //cuenta.AV_EAPGestor__c = listaContactos[3].Id;
+        insert cuenta;
+
+        Contact contacto2 = new Contact();
+        contacto2.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        contacto2.FirstName = 'Contacto mio';
+        contacto2.LastName = 'Contacto Test mio';
+        contacto2.AccountId = cuenta.Id;
+        insert contacto2;
+
+    CC_MCC__c tematica = new CC_MCC__c();
+    tematica.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+    tematica.CC_Tipo_Cliente__c = 'Cliente';
+    tematica.Name = 'Temática';
+    tematica.CC_Codigo_Externo__c = 'T1';
+    tematica.CC_Canal_Operativo__c = 'Oficina';
+    insert tematica;
+
+    CC_MCC__c producto = new CC_MCC__c();
+    producto.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+    producto.CC_Tipo_Cliente__c = 'Cliente';
+    producto.Name = 'Producto';
+    producto.CC_Tematica__c = tematica.Id;
+    producto.CC_Codigo_Externo__c = 'P1';
+    insert producto;
+
+    CC_MCC__c motivo = new CC_MCC__c();
+    motivo.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+    motivo.CC_Tipo_Cliente__c = 'Cliente';
+    motivo.Name = 'Motivo';
+    motivo.CC_Producto_Servicio__c = producto.Id;
+    motivo.CC_Codigo_Externo__c = 'M1';
+    insert motivo;
+
+    CC_MCC__c causa = new CC_MCC__c();
+    causa.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+    causa.CC_Tipo_Cliente__c = 'Cliente';
+    causa.Name = 'Causa';
+    causa.CC_Motivo__c = motivo.Id;
+    causa.CC_Codigo_Externo__c = 'C1';
+    insert causa;
+
+    CC_MCC__c solucion = new CC_MCC__c();
+    solucion.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+    solucion.CC_Tipo_Cliente__c = 'Cliente';
+    solucion.Name = 'Solucion';
+    solucion.CC_Causa__c = causa.Id;
+    solucion.CC_Codigo_Externo__c = 'S1';
+    insert solucion;
+
+    Case casoCliente = new Case();
+			casoCliente.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+			casoCliente.Subject = 'Caso cliente Test';
+
+			casoCliente.Origin = 'Phone';
+			casoCliente.CC_Canal_Respuesta__c = 'Phone';
+			casoCliente.CC_Tipo_Cliente__c = 'Cliente';
+			casoCliente.CC_No_Identificado__c = true;
+			casoCliente.CC_Canal_Procedencia__c = 'CaixaBankNow';
+			casoCliente.CC_MCC_Tematica__c = tematica.Id;
+			casoCliente.CC_MCC_ProdServ__c = producto.Id;
+			casoCliente.CC_MCC_Motivo__c = motivo.Id;
+			casoCliente.CC_MCC_Causa__c = causa.Id;
+			casoCliente.CC_MCC_Solucion__c = solucion.Id;
+            casoCliente.AccountId = cuenta.Id;
+            casoCliente.ContactId = contacto2.Id;
+        
+        insert casoCliente;
+
+    }
    
 	private static CC_Servicio_Genesys__c crearServicio() {
         CC_Servicio_Genesys__c servicio = new CC_Servicio_Genesys__c(
@@ -114,10 +193,14 @@ public with sharing class FRA_Llamada_GC_Test {
        
         
         System.runAs(FRA_TestDataFactory.usuarioPruebasFRA()) {
+
+            Test.startTest();
+            
              Contact contact = crearContacto();
             Case miCase = crearCasoConContacto(contact.Id);
             crearServicio();
             
+         
             
             CC_Llamada_Input input1 = new CC_Llamada_Input();
             input1.connId = 'ef208127-2e21-4086-b016-febfa4c43384';
@@ -135,7 +218,7 @@ public with sharing class FRA_Llamada_GC_Test {
             input3.dnis = '888999000';
             input3.urlGrabacion = 'www.grabaciones.com/llamada1.mp3';
             
-    		Test.startTest();
+    		
             Map<String, Object> mapa1 = FRA_Llamada_GC.registrarLlamadaSaliente(input1);
             Map<String, Object> mapa2 = FRA_Llamada_GC.registrarLlamadaSaliente(input2);
             Map<String, Object> mapa3 = FRA_Llamada_GC.registrarLlamadaSaliente(input3);
@@ -204,6 +287,7 @@ public with sharing class FRA_Llamada_GC_Test {
             
     		Test.startTest();
             String resultado = FRA_Llamada_GC.buscarLlamada(input, false);
+
             System.assert(resultado != null);
     
             Test.stopTest();
@@ -361,6 +445,8 @@ public with sharing class FRA_Llamada_GC_Test {
         
 
         System.runAs(FRA_TestDataFactory.usuarioPruebasFRA()) {
+            Test.startTest();
+
             CC_Servicio_Genesys__c servicio = crearServicio();
             Contact contacto = crearContacto();
             CC_Llamada__c llamada1 = crearLlamada();
@@ -375,10 +461,12 @@ public with sharing class FRA_Llamada_GC_Test {
             llamada2.CC_Idioma__c = 'es';
             llamada2.CC_Contacto__c = contacto.Id;
             llamada2.CC_Cuenta__c = contacto.AccountId;
-            Test.startTest();
+            
+            Case caso = null;
+
     
-            Case caso1 = FRA_Llamada_GC.crearCaso(llamada1, servicio, true, false);
-            Case caso2 = FRA_Llamada_GC.crearCaso(llamada2, servicio, false, false);
+            Case caso1 = FRA_Llamada_GC.crearCaso(llamada1, servicio, true, false,caso);
+            Case caso2 = FRA_Llamada_GC.crearCaso(llamada2, servicio, false, false,caso);
                 System.assertEquals(caso1.CC_ContactoRelacionado__c, llamada1.CC_Contacto__c);
                 System.assertEquals(caso1.CC_Oficina__c, llamada1.CC_Cuenta__c);   
                 System.assertEquals(caso2.ContactId, llamada2.CC_Contacto__c);
@@ -386,4 +474,66 @@ public with sharing class FRA_Llamada_GC_Test {
             }  
             Test.stopTest();   
     }
+
+    @isTest
+    public static void testCrearCasodesdeCC() {
+       
+        System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
+       // System.runAs(FRA_TestDataFactory.usuarioPruebasFRA()) {
+            Case casoEmpleado = new Case();
+			casoEmpleado.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+			casoEmpleado.Subject = 'Caso empleado Test';
+			casoEmpleado.Origin = 'Phone';
+			casoEmpleado.CC_Canal_Respuesta__c = 'Phone';
+			casoEmpleado.CC_Tipo_Cliente__c = 'Empleado';
+			casoEmpleado.CC_No_Identificado__c = true;
+			casoEmpleado.CC_Canal_Procedencia__c = 'RRHH';
+			casoEmpleado.CC_Canal_Resolucion__c = 'RRHH';
+
+            Test.startTest();
+
+            Case casoContact = [SELECT Id,Subject,CC_Canal_Contacto__c,CC_Idioma__c,CC_Tipo_Contacto__c,Origin,CC_Detalles_Consulta__c,CC_Detalles_Solucion__c,
+            CC_ContactoRelacionado__c,CC_Oficina__c,CC_CasoRelacionado__c,Comments,CC_MCC_Tematica__r.Name,Description,CC_MCC_Motivo__c,CC_MCC_Tematica__c,
+            CC_MCC_ProdServ__c
+            from Case WHERE CC_Canal_Procedencia__c = 'CaixaBankNow' LIMIT 1];
+
+        
+            CC_Servicio_Genesys__c servicio = crearServicio();
+           Contact contacto = crearContacto();
+            //Contact contacto = [SELECT Id from Contact WHERE FirstName = 'Contacto mio' LIMIT 1];
+
+           // Contact contacto = [SELECT Id,AccountId FROM Contact WHERE FirstName = 'Contacto mio'];
+
+            CC_Llamada__c llamada1 = crearLlamada();
+            llamada1.CC_Asunto__c = 'Llamada Entrante';
+            llamada1.CC_ANI__c = '642462269';
+            llamada1.CC_Idioma__c = 'es';
+            llamada1.CC_Contacto__c = contacto.Id;
+            llamada1.CC_Cuenta__c = contacto.AccountId;
+            CC_Llamada__c llamada2 = crearLlamada();
+            llamada2.CC_Asunto__c = 'Llamada Entrante';
+            llamada2.CC_ANI__c = '642462269';
+            llamada2.CC_Idioma__c = 'es';
+            llamada2.CC_Contacto__c = contacto.Id;
+            llamada2.CC_ConnId_Consulta__c = 'ef208127-2e21-4086-b016-febfa4c43384';
+            llamada2.CC_Cuenta__c = contacto.AccountId;
+            llamada2.CC_ConnId__c = llamada2.CC_ConnId_Consulta__c;
+           
+            Case caso = null;
+
+            
+            Case caso1 = FRA_Llamada_GC.crearCaso(llamada1, servicio, false, true,casoContact);
+           
+            //Case caso2 = FRA_Llamada_GC.crearCaso(llamada2, servicio, false, false,caso);
+            System.assertEquals(caso1.Subject, 'Caso cliente Test');
+
+            //System.assertEquals(caso1.CC_ContactoRelacionado__c, llamada1.CC_Contacto__c);
+               // System.assertEquals(caso1.CC_Oficina__c, llamada1.CC_Cuenta__c);   
+               // System.assertEquals(caso2.ContactId, llamada2.CC_Contacto__c);
+                //System.assertEquals(caso2.AccountId, llamada2.CC_Cuenta__c);
+            }  
+            Test.stopTest();   
+    }
+
+
 }

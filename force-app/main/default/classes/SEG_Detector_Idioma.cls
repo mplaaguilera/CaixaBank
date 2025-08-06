@@ -61,6 +61,7 @@ public with sharing class SEG_Detector_Idioma
                 requestWrp.intSetting = intSetting;
                 requestWrp.method = 'POST';
                 requestWrp.mHeaders = mHeaders;
+                requestWrp.body = cuerpo;
                 requestWrp.mUriParams = null;
                 requestWrp.mQueryParams = null;
 

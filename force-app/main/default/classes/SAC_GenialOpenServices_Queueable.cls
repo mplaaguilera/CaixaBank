@@ -202,6 +202,10 @@ public with sharing class SAC_GenialOpenServices_Queueable implements Queueable,
      * @param document datos que contienen el id generado por la IA que hay que guardar
      */
     public void actualizarDocumento (SAC_GenialOpenServicesIntegracion.DocumentsInfo document){
+        String cleanDocument = '';
+        if(document != null && document.name != null){
+            cleanDocument = SAC_GenialOpenServicesIntegracion.limpiarCaracteresEspeciales(document.name);
+        }
         List<User> sacIntegracion = [SELECT Id FROM User WHERE Username like '%sacintegracion%' LIMIT 1];
         List<ContentDocumentLink> cdlToInsert = new List<ContentDocumentLink>();
         List<ContentVersion> contentVersionsToUpdate = new List<ContentVersion>();
@@ -209,7 +213,7 @@ public with sharing class SAC_GenialOpenServices_Queueable implements Queueable,
         List<ContentDocumentLink> cdlList = [SELECT Id, ContentDocumentId, ContentDocument.Title, Visibility FROM ContentDocumentLink WHERE LinkedEntityId =: this.reclamaId];
         for(ContentDocumentLink cdl: cdlList){
             String title = SAC_GenialOpenServicesIntegracion.limpiarCaracteresEspeciales(cdl.ContentDocument.Title);
-            if(title == document.name){
+            if(title == cleanDocument){
                 mapDocumentId.put(cdl.ContentDocumentId, document.documentId);
                 ContentDocumentLink newCdl = new ContentDocumentLink();
                 newCdl.ContentDocumentId = cdl.ContentDocumentId;

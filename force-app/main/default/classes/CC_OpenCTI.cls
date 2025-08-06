@@ -26,24 +26,25 @@ global class CC_OpenCTI {
         CC_Llamada_Input input = parseJson(llamadaJson);
         if (esServicioSach(input.servicio)) {
              return SACH_Llamada.registrarLlamadaEntrante(input).Id;
-        }else if (esServicioCSBD(input.servicio)) {
-            return CSBD_Llamada.registrarLlamadaEntrante(input).Id;
-        } else {
+        // }else if (esServicioCSBD(input.servicio)) {
+        //     return CSBD_Llamada.registrarLlamadaEntrante(input).Id;
+         } else {
         return CC_Llamada.registrarLlamadaEntrante(input).Id;
     }
     }
 
     webService static Id registrarLlamadaSaliente(String llamadaJson) {
         CC_Llamada_Input input = parseJson(llamadaJson);
-        if (input.negocio == 'CSBD') {
-            return CSBD_Llamada.registrarLlamadaSaliente(input).Id;
-        } else if (input.negocio == 'CSBD + CC') {
-            Id objetId = input.casoId;
-            if(objetId.getSobjectType() == Schema.Opportunity.SObjectType){
-                return CSBD_Llamada.registrarLlamadaSaliente(input).Id;
-            }else{
+        // if (input.negocio == 'CSBD') {
+        //     return CSBD_Llamada.registrarLlamadaSaliente(input).Id;
+        // } else
+         if (input.negocio == 'CSBD + CC') {
+            // Id objetId = input.casoId;
+            // if(objetId.getSobjectType() == Schema.Opportunity.SObjectType){
+            //     return CSBD_Llamada.registrarLlamadaSaliente(input).Id;
+            // }else{
                 return CC_Llamada.registrarLlamadaSaliente(input).Id;
-            }            
+            // }            
         }else if (esRegistroSach(input)) {
             return SACH_Llamada.registrarLlamadaSaliente(input).Id;
         } else {
@@ -117,9 +118,10 @@ global class CC_OpenCTI {
 //PENDENT
 webService static void finalizarLlamada(String llamadaJson, String tipoCierre) {
     CC_Llamada_Input input = parseJson(llamadaJson);
-    if (input.negocio == 'CSBD') {
-        CSBD_Llamada.finalizarLlamada(input, tipoCierre);
-    } else if (input.negocio == 'CSBD + CC') {
+    // if (input.negocio == 'CSBD') {
+    //     CSBD_Llamada.finalizarLlamada(input, tipoCierre);
+    // } else 
+    if (input.negocio == 'CSBD + CC') {
         List<Task> actividades = new List<Task>();
         Id recordId = String.valueOf(input.llamadaId);
         if(String.valueOf(recordId?.getSobjectType()) == 'Opportunity') {
@@ -133,11 +135,11 @@ webService static void finalizarLlamada(String llamadaJson, String tipoCierre) {
         else {
             actividades = [SELECT Id,RecordTypeId FROM Task WHERE CC_Llamada_Id__c = :input.llamadaId AND RecordType.DeveloperName = 'CSBD_Task' LIMIT 1];
         }
-        if(!actividades.isEmpty()){
-            CSBD_Llamada.finalizarLlamada(input, tipoCierre);
-        }else{
+        // if(!actividades.isEmpty()){
+        //     CSBD_Llamada.finalizarLlamada(input, tipoCierre);
+        // }else{
             CC_Llamada.finalizarLlamada(input, tipoCierre);
-        } 
+        // } 
     } else if (esRegistroSach(input)) {
         SACH_Llamada.finalizarLlamada(input, tipoCierre);
     } else {
@@ -184,13 +186,13 @@ webService static void finalizarLlamada(String llamadaJson, String tipoCierre) {
 
     webService static String obtenerIdiomaRegistro(String recordId) {
         Id id = recordId;
-        if (id.getSobjectType() == Schema.getGlobalDescribe().get('Opportunity')) {
-            //CSBD
-            return CSBD_Llamada.getIdiomaOportunidad(id);
-        } else {
+        // if (id.getSobjectType() == Schema.getGlobalDescribe().get('Opportunity')) {
+        //     //CSBD
+        //     return CSBD_Llamada.getIdiomaOportunidad(id);
+        // } else {
             //CC
             return CC_Case.getDatosCaso(id)?.CC_Idioma__c;
-        }
+        // }
     }
 
     //Obtiene todos los metadatos de telefonía

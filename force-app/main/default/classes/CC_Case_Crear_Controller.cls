@@ -32,10 +32,11 @@ public with sharing class CC_Case_Crear_Controller {
                 recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SACH_Cliente').getRecordTypeId();
             } else if (roles[0].Name == 'Testamentarías'){
                 recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('TMS_Expediente').getRecordTypeId();
-            } else if (roles[0].Name == 'GRR' || roles[0].Name == 'GRR Agente') {
+            } else if (roles[0].Name == 'GRR' || roles[0].Name == 'GRR Agente'  || roles[0].Name == 'GRR Agente COPS') {
                 recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'GRR_Cliente'); 
             }
         }
+        
         return new RetornoComprobarRol(roles.isEmpty() ? '' : roles[0].Name, recordTypeId);
     }
 

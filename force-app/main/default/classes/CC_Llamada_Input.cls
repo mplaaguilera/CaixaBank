@@ -29,4 +29,5 @@ public with sharing class CC_Llamada_Input {
     public String assistantResponse {get;set;}
     public String userQuery {get;set;}
     public String telefonoUnico {get;set;}
+    public String vRUDoc {get;set;}
 }

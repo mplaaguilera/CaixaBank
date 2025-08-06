@@ -5,7 +5,6 @@ public with sharing class SPV_ContentVersionAITRHan extends CC_TriggerHandlerBas
     }
     
     private void process(List<ContentVersion> listNewObj, Map<Id, ContentVersion> mapNewObj) {
-        
         Map<Id, Case> mapaDatosCasos = new Map<Id, Case>();
 
         List<ContentVersion> listNewObjFiltrado = SPV_ContentVersionHelper.filtrarRTSPV(listNewObj, mapaDatosCasos);

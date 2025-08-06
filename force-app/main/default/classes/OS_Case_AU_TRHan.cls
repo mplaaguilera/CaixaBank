@@ -51,7 +51,7 @@ public with sharing class OS_Case_AU_TRHan extends CC_TriggerHandlerBase {
             crearActividadReasignacionCOPS(mapOldObjCops, listNewObjCops);
             crearActividadReasignacionGruposTrabajoCOPS(mapOldObjCops, listNewObjCops);
             envioCorreoTrasladoRemitidoAutomatico(mapOldObjCops, listNewObjCops);
-            gestionarDANDGDT(mapOldObjCops, listNewObjCops);
+            //gestionarDANDGDT(mapOldObjCops, listNewObjCops);
             envioFeedback(mapOldObjCops, listNewObjCops);
             OS_CaseTriggerHelper.reasignacionDelCaso(listNewObjCops,mapOldObjCops);
             OS_CaseTriggerHelper.eliminarSituacion(listNewObjCops,mapOldObjCops);
@@ -217,18 +217,6 @@ public with sharing class OS_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 OS_Case.envioCorreoTrasladoRemitidoAutomatico(casosIds, MCCIds);
             }
         }
-    }
-
-    private void gestionarDANDGDT(Map<Id, Case> mapOldObj, List<Case> listNewObj){
-        Set<Id> casosInformarDANDGDT = new Set<Id>();
-        for(Case caso: listNewObj){
-            if(caso.AccountId != mapOldObj.get(caso.Id).AccountId){
-                if(caso.AccountId != null){
-                    casosInformarDANDGDT.add(caso.Id);
-                }
-            }
-        }
-        OS_Informar_DAN_DG_DT_Caso.informarCampos(casosInformarDANDGDT);
     }
 
     /**

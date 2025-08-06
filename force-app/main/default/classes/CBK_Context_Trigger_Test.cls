@@ -197,6 +197,60 @@ private class CBK_Context_Trigger_Test {
         }   
     }
     
+    @isTest static void testGRRSche() {        
+        System.runAs(createUser()) {          
+            Test.startTest();    
+            boolean result = schedTest('GRR');
+            Test.stopTest();
+            System.assertEquals(true, result);   
+        }   
+    }
+    
+    @isTest static void testFRASche() {        
+        System.runAs(createUser()) {          
+            Test.startTest();    
+            boolean result = schedTest('FRA');
+            Test.stopTest();
+            System.assertEquals(true, result);   
+        }   
+    }
+    
+    @isTest static void testSACSche() {        
+        System.runAs(createUser()) {          
+            Test.startTest();    
+            boolean result = schedTest('SAC');
+            Test.stopTest();
+            System.assertEquals(true, result);   
+        }   
+    }
+
+    @isTest static void testGRRBatch() {        
+        System.runAs(createUser()) {          
+            Test.startTest();    
+            boolean result = batchTest('GRR');
+            Test.stopTest();
+            System.assertEquals(true, result);   
+        }   
+    }
+    
+    @isTest static void testFRABatch() {        
+        System.runAs(createUser()) {          
+            Test.startTest();    
+            boolean result = batchTest('FRA');
+            Test.stopTest();
+            System.assertEquals(true, result);   
+        }   
+    }
+    
+    @isTest static void testSACBatch() {        
+        System.runAs(createUser()) {          
+            Test.startTest();    
+            boolean result = batchTest('FRA');
+            Test.stopTest();
+            System.assertEquals(true, result);   
+        }   
+    }
+    
 	private static boolean batchTest(string userPlatformEvent) {    
         Type tipoObjeto = Type.forName('CBK_Context_' + userPlatformEvent + '__e');
         sObject evento = (sObject) tipoObjeto.newInstance();
@@ -309,5 +363,4 @@ private class CBK_Context_Trigger_Test {
         insert u;
         return(u);
     }
-
 }

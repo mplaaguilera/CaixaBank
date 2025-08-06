@@ -4,6 +4,7 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
     @testSetup
     public static void testSetup()
     {
+        Test.startTest();
         //Obtenemos los RecordTypes de la lista de valores
         Id listaRelacionRT = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         Id listaValorRT = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
@@ -37,6 +38,7 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         relacionEspacioCategoriaServicio.add(relacion2);
 
         insert relacionEspacioCategoriaServicio;
+        Test.stopTest();
     }
 
     @isTest
@@ -85,6 +87,8 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
     
     @isTest
     static void testBU() {
+
+        
         Id recordApp = Schema.SObjectType.CC_FAQ__c.getRecordTypeInfosByDeveloperName().get('CC_Aplicaciones').getRecordTypeId();
         CC_FAQ__c app = new CC_FAQ__c();
         app.RecordTypeId = recordApp;
@@ -117,15 +121,19 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         
         List<LiveChatTranscript> oChats;
         
+
         LiveChatVisitor liveChatVisitor = new LiveChatVisitor();
         insert liveChatVisitor;
         
+
         Account cuenta = new Account(Name='cuenta', RecordTypeId=CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente'));
         insert cuenta;
         
         Contact contacto = new Contact(LastName='contacto', RecordTypeId=CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente'), AccountId=cuenta.Id);
         insert contacto;
-        
+
+        Test.startTest();
+
         Case caso = new Case(RecordTypeId=CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente'), AccountId=cuenta.Id, ContactId=contacto.Id,CC_Id_Cognitivo__c='test01');
         insert caso;
         
@@ -149,9 +157,9 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         liveChatTranscript.ContactId = contacto.Id;
         liveChatTranscript.CaseId = caso.Id;
         
-        Test.startTest();
-            update liveChatTranscript;
         Test.stopTest();
+        update liveChatTranscript;
+        
         
         /* TODO: no se está verificando el envío a Siebel, se supone que tiene su propia clase de test */
         
@@ -171,7 +179,8 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         /* Verificamos que se crea una actividad para el chat del chatbot */
         List<Task> actividadChatbot = [SELECT Id FROM Task WHERE CC_LiveChatTranscript_Id__c = :chatCognitivoId AND Status = 'Completed'];
         //System.assertEquals(actividadChatbot.size(), 1);
-        System.assertnotEquals(actividadChatbot.size(), 0);        
+        System.assertnotEquals(actividadChatbot.size(), 0);
+              
     }
 
     @isTest
@@ -377,7 +386,9 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         c1.CC_Telefono__c = '34 956565656';
         c1.RecordTypeId = sRecordType1;
         insert c1;
+
         
+
         List<CC_Canal_Com__c> o3 = [SELECT Id FROM CC_Canal_Com__c WHERE CC_Telefono__c = '34 956565656'];
         System.assertEquals(o3.size(), 1);
         
@@ -406,6 +417,9 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         
         insert oCasos;
         
+
+        Test.startTest();
+
         LiveChatVisitor liveChatVisitor = new LiveChatVisitor();
         insert liveChatVisitor;
         
@@ -467,9 +481,9 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         // Se pone try/catch por configuración de valores de entorno.
         try
         {
-            Test.startTest();
+            
                 insert liveChatTranscript2;
-            Test.stopTest();
+            
         }catch(Exception e){
             CBK_Log.error('Error en la creación del chat: ' + e.getMessage());
         }
@@ -483,6 +497,7 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         }catch(Exception e){
             CBK_Log.error('Error gestión entrada chats: ' + e.getMessage());
         }        
+        Test.stopTest();
     }
 
     @isTest
@@ -527,5 +542,76 @@ public class CC_LiveChatTrans_BU_TRHan_Test {
         listaChats = [SELECT Id, CC_Servicio_Chat__c FROM LiveChatTranscript WHERE Id = :liveChatTranscript.Id];
         System.assertEquals(1, listaChats.size());
         //System.assertEquals('Servicio1', listaChats[0].CC_Servicio_Chat__c);
+    }
+
+    @isTest
+    static void testIdentificarClientes() {
+        Test.startTest();
+        User adminUser = CC_TestDataFactory.insertUserAdmin();
+        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Analista_Cliente' LIMIT 1];
+        insert new PermissionSetAssignment(AssigneeId = adminUser.Id, PermissionSetId = ps.Id);
+
+        System.runAs(adminUser) {
+            
+
+            //Creamos un LiveChatTranscript de prueba
+            Account acc = new Account();
+            acc.Name = 'Prueba';
+            acc.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
+            acc.CC_Numero_Documento__c = '45855598S';
+            acc.CC_NumPerso__c = '533752';
+            insert acc;
+
+            Id clienteContactRT = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
+            Contact contacto = new Contact ();
+            contacto.RecordTypeId = clienteContactRT;
+            contacto.LastName = 'cnt';
+            contacto.FirstName = 'prueba';
+            contacto.Email = 'test@test.com';
+            contacto.AccountId = acc.Id;
+            insert contacto;
+
+
+
+            Case caso = new Case();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            caso.CC_Idioma__c = 'es';
+            caso.Subject = 'Asunto';
+            caso.Description = 'Descripción';
+            caso.CC_Tipo_Contacto__c = 'Consulta';
+            caso.CC_Canal_Procedencia__c = 'Accionista';
+            caso.CC_Canal_Resolucion__c = 'Accionista';
+            caso.CC_Canal_Operativo__c = 'App CaixaBankPay';
+            caso.Origin = 'Email';
+            caso.Status = 'Activo';
+            caso.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            caso.CC_Detalles_Solucion__c = 'Detalles Solución';
+            caso.AccountId = acc.Id;
+            caso.ContactId = contacto.Id;
+
+            insert caso;
+
+            LiveChatVisitor liveChatVisitor = new LiveChatVisitor();
+            insert liveChatVisitor;
+
+            LiveChatTranscript chat = new LiveChatTranscript();
+            chat.CC_Actualizar_ALF__c = false;
+            chat.ContactId = contacto.Id;
+            chat.AccountId = acc.Id;
+            chat.CaseId = caso.Id;
+            chat.LiveChatVisitorId = liveChatVisitor.Id;
+            chat.Status = 'InProgress';
+            insert chat;
+
+            List<LiveChatTranscript> chats = [SELECT Id, CC_Actualizar_ALF__c, ContactId, AccountId, CaseId, LiveChatVisitorId, Status FROM LiveChatTranscript WHERE Id = :chat.Id];
+
+            chat.CC_Actualizar_ALF__c = true;
+            update chat;
+
+            List<LiveChatTranscript> chats2 = [SELECT Id, CC_Actualizar_ALF__c, ContactId, AccountId, CaseId, LiveChatVisitorId, Status FROM LiveChatTranscript WHERE Id = :chat.Id];
+
+            System.assertEquals(chats2[0].CC_Actualizar_ALF__c, false);
+        }
+        Test.stopTest();
     }
 }

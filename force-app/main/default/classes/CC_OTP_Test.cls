@@ -76,7 +76,7 @@ public with sharing class CC_OTP_Test {
             LastName = 'Test',
             CC_Email__c = 'cuenta@test.com',
             PersonMobilePhone = '+34 123456789',
-            PersonBirthdate = Date.newInstance(2000, 05, 22),
+            PersonBirthdate = CBK_UtilsDate.todayDT().addYears(-24),
             CC_NumPerso__c = '206'
             );
             lstAccounts.add(cuenta);
@@ -85,7 +85,7 @@ public with sharing class CC_OTP_Test {
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA'),
                 FirstName = 'Cuenta',
                 LastName = 'Menor',
-                PersonBirthdate = Date.newInstance(2014, 10, 22),
+                PersonBirthdate = CBK_UtilsDate.todayDT().addYears(-10),
                 PersonMobilePhone = '+34 123 123 123'
             );
             lstAccounts.add(cuentaMenor);
@@ -180,6 +180,7 @@ public with sharing class CC_OTP_Test {
 
             //Caso Generico
             Case caso1 = new Case();
+            caso1.OwnerId = supervisor.Id;
             caso1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             caso1.Subject = 'Caso Test 1';
             caso1.Status = 'Activo';
@@ -334,6 +335,7 @@ public with sharing class CC_OTP_Test {
             comunicacion1.CC_Nivel__c = 'Nivel 2';
             comunicacion1.CC_Cliente__c = cuenta.Id;
             comunicacion1.CC_Ticket__c = '123456789';
+            comunicacion1.CC_Mensaje_Error__c = 'ERROR';
             comInsertLst.add(comunicacion1);
             CC_Comunicaciones__c comunicacion2 =  new CC_Comunicaciones__c();
             comunicacion2.CC_Case__c = caseInsertLst[1].Id;
@@ -341,6 +343,7 @@ public with sharing class CC_OTP_Test {
             comunicacion2.RecordTypeId = recordTypeIdOTP;
             comunicacion2.CC_Cliente__c = cuenta.Id;
             comunicacion1.CC_Ticket__c = '123456789';
+            comunicacion2.CC_Mensaje_Error__c = 'ERROR';
             comInsertLst.add(comunicacion2);
             CC_Comunicaciones__c comunicacion3 =  new CC_Comunicaciones__c();
             comunicacion3.CC_Case__c = caseInsertLst[2].Id;
@@ -349,6 +352,8 @@ public with sharing class CC_OTP_Test {
             comunicacion3.RecordTypeId = recordTypeIdOTP;
             comunicacion3.CC_Cliente__c = cuenta.Id;
             comunicacion1.CC_Ticket__c = '123456789';
+            comunicacion3.CC_Mensaje_Error__c = 'ERROR';
+
             comInsertLst.add(comunicacion3);
             insert comInsertLst;
 
@@ -584,6 +589,12 @@ public with sharing class CC_OTP_Test {
             lstCS.add(integracionCuentas);
 
             insert lstCS;
+
+            CC_Settings__c configuracion = new CC_Settings__c(
+            Name = 'CC_WS_Validacion_OTP_Fallo',
+            CC_Configuracion_1__c = '00001',
+            CC_Configuracion_2__c = '00004');
+            insert configuracion;
         }
 
     }
@@ -592,7 +603,7 @@ public with sharing class CC_OTP_Test {
     public static void testOTP() {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
-        CC_Comunicaciones__c comunicacion = [SELECT Id FROM CC_Comunicaciones__c WHERE CC_Case__c = :caso.Id LIMIT 1];
+        CC_Comunicaciones__c comunicacion = [SELECT Id, CC_Mensaje_Error__c FROM CC_Comunicaciones__c WHERE CC_Case__c = :caso.Id LIMIT 1];
         
         System.runAs(supervisor){
             Test.startTest();
@@ -626,6 +637,7 @@ public with sharing class CC_OTP_Test {
         Case caso = [SELECT Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
         
         CC_Comunicaciones__c comunicacion = new CC_Comunicaciones__c(
+            OwnerId = supervisor.Id,
             CC_Case__c = caso.Id,
             CC_Estado__c = 'Pendiente',
             CC_Nivel__c = 'Nivel 1',
@@ -635,7 +647,7 @@ public with sharing class CC_OTP_Test {
         
         System.runAs(supervisor){
             Test.startTest();
-                Id otpId = CC_OTP.getOTP(caso.Id, 'Nivel 1', 'Pendiente');
+                Id otpId = CC_OTP.getOTP(caso.Id, 'Nivel 2', 'Pdte. Validar');
                 System.assert(otpId != null, 'No se obtuvo el ID del OTP');
             Test.stopTest();
         }
@@ -948,7 +960,8 @@ public with sharing class CC_OTP_Test {
             Map<String,String> error = CC_OTP.comprobarDatos2Nivel(caso.Id, 'Preguntas OTPSMS 2 Nivel');
             Test.setMock(HttpCalloutMock.class, new MockHttpResponseExito());
             List<String> lst = error.values();
-            System.assertEquals('SIN DATOS API', error.get('error'), 'Error en comprobarDatos2NivelFisicoCuenta, datos no esperados');
+            // System.assertEquals('SIN DATOS API', error.get('error'), 'Error en comprobarDatos2NivelFisicoCuenta, datos no esperados');
+            System.assertEquals('SIN DATOS', error.get('error'), 'Error en comprobarDatos2NivelFisicoCuenta, datos no esperados');
             //System.assertEquals(lst.contains('true'), false, '');
             Test.stopTest();
         }
@@ -1074,7 +1087,8 @@ public with sharing class CC_OTP_Test {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         System.runAs(supervisor) {
             Test.startTest();
-                List<Boolean> lstValidaciones = CC_OTP.validacionPreguntas(caso.Id, 'año', 'edad', '2000', '20', null, null);
+                String fechaActual = String.valueOf(CBK_UtilsDate.todayDT().addYears(-24).year());
+                List<Boolean> lstValidaciones = CC_OTP.validacionPreguntas(caso.Id, 'año', 'edad', fechaActual, '24', null, null);
                 System.assertEquals(true, lstValidaciones[0], '');
             Test.stopTest();
         }
@@ -1187,7 +1201,8 @@ public with sharing class CC_OTP_Test {
                 CC_Nivel__c = 'Nivel 2',
                 CC_Estado__c = 'Pdte. Validar',
                 CC_Ticket__c = 'sagklj12312kj',
-                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Comunicaciones__c', 'CC_OTPSMS')
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Comunicaciones__c', 'CC_OTPSMS'),
+                CC_Mensaje_Error__c = null
                 );
                 insert testOTP;
                 

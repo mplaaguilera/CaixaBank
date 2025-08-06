@@ -17,6 +17,7 @@ public with sharing class SAC_LCMP_AuditoriasController {
     final static Id RECORDTYPEAUDITORIAAUTOMATICA = mapRTsObjects.get('SEG_Auditoria__c').get('SAC_AuditoriaAutomatica').getRecordTypeId();
     final static Id RECTYPEPUNTOSCONTROL = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_PuntoDeControl').getRecordTypeId();
     final static Id RECORDTYPEBLACKLIST = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_BlackListEmails').getRecordTypeId();
+    final static Id RECORDTYPEDICTAMEN = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_DetalleDictamenAuditoria').getRecordTypeId();
 
 
     /*********************************************************************************************
@@ -25,10 +26,10 @@ public with sharing class SAC_LCMP_AuditoriasController {
      * Historial
      * VERSION        USER_STORY            AUTHOR                DATE        Description
      * 1.0             US742491           Raúl Santos           22/11/23       Creación
+     * 1.2            US1278233             Jose M. Fernández     10/06/2025  Modificado: cambiar queries para usar campos nuevos
      * *******************************************************************************************/
     @AuraEnabled(cacheable=true)
     public static List<SObject> buscarResultados(String searchTerm, String tipoBusqueda, String id) {
-
         List<String> idList = new List<String>();
         List<SObject> listaResultado = new List<sObject>();
         String cadenaBusqueda= '%'+searchTerm+'%';
@@ -69,23 +70,48 @@ public with sharing class SAC_LCMP_AuditoriasController {
         }
 
         if(tipoBusqueda == 'buscadorTematica'){
-            listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPETEMATICA AND  CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' AND Name LIKE :cadenaBusqueda ORDER BY Name ASC LIMIT 20];
+            listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPETEMATICA AND  CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' ORDER BY Name ASC];
+            
+            //Se agrupan aquellos que tengan el mismo nombre con sus IDs juntas, separadas por ','
+            listaResultado = combineIDsOfDuplicateNames(listaResultado);
         }
 
         if(tipoBusqueda == 'buscadorProducto'){
-            listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPEPRODSERV AND CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' AND CC_Tematica__c IN :idList AND Name LIKE :cadenaBusqueda ORDER BY Name ASC LIMIT 20]; 
+            if(!idList.isEmpty()){
+                listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPEPRODSERV AND CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' AND CC_Tematica__c IN :idList ORDER BY Name ASC]; 
+            }else{
+                listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPEPRODSERV AND CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' ORDER BY Name ASC]; 
+            }
+
+            //Se agrupan aquellos que tengan el mismo nombre con sus IDs juntas, separadas por ','
+            listaResultado = combineIDsOfDuplicateNames(listaResultado);
         }
 
         if(tipoBusqueda == 'buscadorMotivo'){
-            listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPEMOTIVO AND CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' AND CC_Producto_Servicio__c IN :idList AND Name LIKE :cadenaBusqueda ORDER BY Name ASC LIMIT 20]; 
+            if(!idList.isEmpty()){
+                listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPEMOTIVO AND CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' AND CC_Producto_Servicio__c IN :idList ORDER BY Name ASC]; 
+            }else{
+                listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPEMOTIVO AND CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' ORDER BY Name ASC]; 
+            }
+
+            //Se agrupan aquellos que tengan el mismo nombre con sus IDs juntas, separadas por ','
+            listaResultado = combineIDsOfDuplicateNames(listaResultado);
         }
 
         if(tipoBusqueda == 'buscadorDetalle'){
-            listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPEDETALLE AND CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' AND CC_Motivo__c IN :idList AND Name LIKE :cadenaBusqueda ORDER BY Name ASC LIMIT 20]; 
+
+            if(!idList.isEmpty()){
+                listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPEDETALLE AND CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' AND CC_Motivo__c IN :idList ORDER BY Name ASC]; 
+            }else{
+                listaResultado = [SELECT Id, Name FROM CC_MCC__c WHERE RecordTypeId = :RECORDTYPEDETALLE AND CC_Activo__c = true AND CC_Tipo_Cliente__c = 'SAC' ORDER BY Name ASC]; 
+            }
+
+            //Se agrupan aquellos que tengan el mismo nombre con sus IDs juntas, separadas por ','
+            listaResultado = combineIDsOfDuplicateNames(listaResultado);
         }
 
         if(tipoBusqueda == 'buscadorGrupoResolver'){
-            listaResultado = [SELECT Id, Name FROM CC_Grupo_Colaborador__c WHERE ((RecordTypeId = :RECORDTYPEGRUPOPROV AND SAC_PermiteDerivacion__c = false) OR RecordTypeId = :RECORDTYPEGRUPOLET) AND Name LIKE :cadenaBusqueda ORDER BY Name ASC LIMIT 20];
+            listaResultado = [SELECT Id, Name FROM CC_Grupo_Colaborador__c WHERE ((RecordTypeId = :RECORDTYPEGRUPOPROV AND SAC_PermiteDerivacion__c = false) OR RecordTypeId = :RECORDTYPEGRUPOLET) AND Name LIKE: cadenaBusqueda ORDER BY Name ASC LIMIT 20];
         }
 
         return listaResultado;
@@ -98,16 +124,17 @@ public with sharing class SAC_LCMP_AuditoriasController {
      * Historial
      * VERSION        USER_STORY            AUTHOR                DATE        Description
      * 1.0             US742491           Raúl / Carlos         22/11/23       Creación
+     * 1.2            US1278233             Jose M. Fernández   10/06/2025    Modificado: cambiar campos String de IDs a List
      * *******************************************************************************************/
     @AuraEnabled
-    public static List<ReclamacionWrapper> buscarReclamacionAuditoria(String tipoAuditoria, Boolean soloPretPpal, Date fechaDesde, Date fechaHasta, String grupoProvId, String despachosId, String gestorId, String letrado, Decimal impAbonadoDesde, Decimal impAbonadoHasta, List<String> sentidoResolucion, String tematicaId, String productoId, String motivoId, String detalleId, Integer numMaxReclamaciones){
+    public static List<ReclamacionWrapper> buscarReclamacionAuditoria(String tipoAuditoria, Boolean soloPretPpal, Date fechaDesde, Date fechaHasta, String grupoProvId, String despachosId, String gestorId, String letrado, Decimal impAbonadoDesde, Decimal impAbonadoHasta, List<String> sentidoResolucion, List<String> listIdsTematica, List<String> listIdsProducto, List<String> listIdsMotivo, List<String> listIdsDetalle, Integer numMaxReclamaciones){
         
         List<ReclamacionWrapper> listRecl = new List<ReclamacionWrapper>();
 
         if(soloPretPpal == true){
-            listRecl = buscarReclamacionPretPrincipal(tipoAuditoria, fechaDesde, fechaHasta, grupoProvId, despachosId, gestorId, letrado, impAbonadoDesde, impAbonadoHasta, sentidoResolucion, tematicaId, productoId, motivoId, detalleId, numMaxReclamaciones);
+            listRecl = buscarReclamacionPretPrincipal(tipoAuditoria, fechaDesde, fechaHasta, grupoProvId, despachosId, gestorId, letrado, impAbonadoDesde, impAbonadoHasta, sentidoResolucion, listIdsTematica, listIdsProducto, listIdsMotivo, listIdsDetalle, numMaxReclamaciones);
         }else if(soloPretPpal == false){
-            listRecl = buscarReclamacionPretensiones(tipoAuditoria, fechaDesde, fechaHasta, grupoProvId, despachosId, gestorId, letrado, impAbonadoDesde, impAbonadoHasta, sentidoResolucion, tematicaId, productoId, motivoId, detalleId, numMaxReclamaciones);
+            listRecl = buscarReclamacionPretensiones(tipoAuditoria, fechaDesde, fechaHasta, grupoProvId, despachosId, gestorId, letrado, impAbonadoDesde, impAbonadoHasta, sentidoResolucion, listIdsTematica, listIdsProducto, listIdsMotivo, listIdsDetalle, numMaxReclamaciones);
         }
         return listRecl;
     }   
@@ -121,8 +148,9 @@ public with sharing class SAC_LCMP_AuditoriasController {
      * VERSION        USER_STORY            AUTHOR                DATE        Description
      * 1.0             US742491           Raúl / Carlos         22/11/23       Creación
      * 1.1             US844784           Raúl Santos           24/04/24       Modificado: Añadida la búsqueda por estados y por sentido de resolucion
+     * 1.2            US1278233             Jose M. Fernández   10/06/2025    Modificado: cambiar campos String de IDs a List
      * *******************************************************************************************/
-    public static List<ReclamacionWrapper> buscarReclamacionPretensiones(String tipoAuditoria, Date fechaDesde, Date fechaHasta, String grupoProvId, String despachosId, String gestorId, String letrado, Decimal impAbonadoDesde, Decimal impAbonadoHasta, List<String> sentidoResolucion, String tematicaId, String productoId, String motivoId, String detalleId, Integer numMaxReclamaciones){
+    public static List<ReclamacionWrapper> buscarReclamacionPretensiones(String tipoAuditoria, Date fechaDesde, Date fechaHasta, String grupoProvId, String despachosId, String gestorId, String letrado, Decimal impAbonadoDesde, Decimal impAbonadoHasta, List<String> sentidoResolucion, List<String> listIdsTematica, List<String> listIdsProducto, List<String> listIdsMotivo, List<String> listIdsDetalle, Integer numMaxReclamaciones){
 
         List<Case> listPrets = new List<Case>();
         Map<String,ReclamacionWrapper> mapReclamaciones = new Map<String,ReclamacionWrapper>();
@@ -134,7 +162,7 @@ public with sharing class SAC_LCMP_AuditoriasController {
         }
 
         String selectQ = 'SELECT Id, SAC_Reclamacion__c, SAC_Reclamacion__r.Subject, SAC_Reclamacion__r.CaseNumber, toLabel(SAC_Reclamacion__r.Status) FROM Case';
-        String whereQ = ' WHERE RecordTypeId =: RECORDTYPEPRETENSION AND SAC_Reclamacion__r.Status IN :estadosRec AND SAC_Reclamacion__r.SEG_SRAuditoria__c = false AND SAC_Reclamacion__r.ClosedDate != null';
+        String whereQ = ' WHERE RecordTypeId =: RECORDTYPEPRETENSION AND SAC_Reclamacion__r.Status IN :estadosRec AND SAC_Reclamacion__r.SEG_SRAuditoria__c = true AND SAC_Reclamacion__r.ClosedDate != null';
         String limitQ = ' LIMIT :numMaxRec';
         
         if(String.isnotBlank(tipoAuditoria) && !tipoAuditoria.contains('Todas')){  
@@ -189,17 +217,17 @@ public with sharing class SAC_LCMP_AuditoriasController {
         if(!sentidoResolucion.isEmpty()){
             whereQ = whereQ + ' AND SAC_Reclamacion__r.SAC_SentidoResolucion__c IN :sentidoResolucion';
         }
-        if(string.isNotBlank(tematicaId)){
-            whereQ = whereQ + ' AND CC_MCC_Tematica__c =: tematicaId';
+        if(listIdsTematica != null && !listIdsTematica.isEmpty()){
+            whereQ = whereQ + ' AND CC_MCC_Tematica__c IN :listIdsTematica';
         }
-        if(string.isNotBlank(productoId)){
-            whereQ = whereQ + ' AND CC_MCC_ProdServ__c =: productoId';
+        if(listIdsProducto != null && !listIdsProducto.isEmpty()){
+            whereQ = whereQ + ' AND CC_MCC_ProdServ__c IN :listIdsProducto';
         }
-        if(string.isNotBlank(motivoId)){
-            whereQ = whereQ + ' AND CC_MCC_Motivo__c =: motivoId';
+        if(listIdsMotivo != null && !listIdsMotivo.isEmpty()){
+            whereQ = whereQ + ' AND CC_MCC_Motivo__c IN :listIdsMotivo';
         }
-        if(string.isNotBlank(detalleId)){
-            whereQ = whereQ + ' AND SEG_Detalle__c =: detalleId';
+        if(listIdsDetalle != null && !listIdsDetalle.isEmpty()){
+            whereQ = whereQ + ' AND SEG_Detalle__c IN :listIdsDetalle';
         }
 
         if(String.isnotBlank(whereQ)){
@@ -229,8 +257,9 @@ public with sharing class SAC_LCMP_AuditoriasController {
      * VERSION        USER_STORY            AUTHOR                DATE        Description
      * 1.0             US742491           Raúl / Carlos         22/11/23       Creación
      * 1.1             US844784           Raúl Santos           24/04/24       Modificado: Añadida la búsqueda por estados y por sentido de resolucion
+     * 1.2            US1278233             Jose M. Fernández   10/06/2025    Modificado: cambiar campos String de IDs a List
      * *******************************************************************************************/
-    public static List<ReclamacionWrapper> buscarReclamacionPretPrincipal (String tipoAuditoria, Date fechaDesde, Date fechaHasta, String grupoProvId, String despachosId, String gestorId, String letrado, Decimal impAbonadoDesde, Decimal impAbonadoHasta, List<String> sentidoResolucion, String tematicaId, String productoId, String motivoId, String detalleId, Integer numMaxReclamaciones){
+    public static List<ReclamacionWrapper> buscarReclamacionPretPrincipal (String tipoAuditoria, Date fechaDesde, Date fechaHasta, String grupoProvId, String despachosId, String gestorId, String letrado, Decimal impAbonadoDesde, Decimal impAbonadoHasta, List<String> sentidoResolucion, List<String> listIdsTematica, List<String> listIdsProducto, List<String> listIdsMotivo, List<String> listIdsDetalle, Integer numMaxReclamaciones){
 
         List<Case> reclamacionesAuditoria = new List<Case>();
         List<ReclamacionWrapper> listWrapperRec = new List<ReclamacionWrapper>();
@@ -292,17 +321,17 @@ public with sharing class SAC_LCMP_AuditoriasController {
         if(!sentidoResolucion.isEmpty()){
             whereQ = whereQ + ' AND SAC_SentidoResolucion__c IN :sentidoResolucion';
         }
-        if(string.isNotBlank(tematicaId)){
-            whereQ = whereQ + ' AND CC_MCC_Tematica__c =: tematicaId';
+        if(listIdsTematica != null && !listIdsTematica.isEmpty()){
+            whereQ = whereQ + ' AND CC_MCC_Tematica__c IN :listIdsTematica';
         }
-        if(string.isNotBlank(productoId)){
-            whereQ = whereQ + ' AND CC_MCC_ProdServ__c =: productoId';
+        if(listIdsProducto != null && !listIdsProducto.isEmpty()){
+            whereQ = whereQ + ' AND CC_MCC_ProdServ__c IN :listIdsProducto';
         }
-        if(string.isNotBlank(motivoId)){
-            whereQ = whereQ + ' AND CC_MCC_Motivo__c =: motivoId';
+        if(listIdsMotivo != null && !listIdsMotivo.isEmpty()){
+            whereQ = whereQ + ' AND CC_MCC_Motivo__c IN :listIdsMotivo';
         }
-        if(string.isNotBlank(detalleId)){
-            whereQ = whereQ + ' AND SEG_Detalle__c =: detalleId';
+        if(listIdsDetalle != null && !listIdsDetalle.isEmpty()){
+            whereQ = whereQ + ' AND SEG_Detalle__c IN :listIdsDetalle';
         }
 
         if(String.isnotBlank(whereQ)){
@@ -329,12 +358,11 @@ public with sharing class SAC_LCMP_AuditoriasController {
      * 1.0             US742491           Raúl Santos           22/11/23       Creación
      * *******************************************************************************************/
     @AuraEnabled
-    public static SEG_Auditoria__c crearAuditoria(String nombreAuditoria, String tipoAuditoria, String slaCalidad,  Date fechaDesde, Date fechaHasta, String grupoProvId, String despachosId, String gestorId, String letradoId, Decimal impAbonadoDesde, Decimal impAbonadoHasta, String sentidoResolucion, String tematicaId, String productoId, String motivoId, String detalleId, String grupoResolverId, List<String> listaCasos){
-        
+    public static SEG_Auditoria__c crearAuditoria(String nombreAuditoria, String tipoAuditoria, String slaCalidad,  Date fechaDesde, Date fechaHasta, String grupoProvId, String despachosId, String gestorId, String letradoId, Decimal impAbonadoDesde, Decimal impAbonadoHasta, String sentidoResolucion, String tematicaId, String productoId, String motivoId, String detalleId, String tematicaLabel, String productoLabel, String motivoLabel, String detalleLabel, String grupoResolverId, List<String> listaCasos){
         List<Case> listRecUpdate = new List<Case>();
         List<SEG_Auditoria__c> listAuditorias = new List<SEG_Auditoria__c>();
         SEG_Auditoria__c auditoriaCreada = new SEG_Auditoria__c();
-        DetallesAuditoria detallesNuevaAuditoria = new DetallesAuditoria(tipoAuditoria, slaCalidad, fechaDesde, fechaHasta, grupoProvId, despachosId, gestorId, letradoId, impAbonadoDesde, impAbonadoHasta, tematicaId, productoId, motivoId, detalleId, grupoResolverId);
+        DetallesAuditoria detallesNuevaAuditoria = new DetallesAuditoria(tipoAuditoria, slaCalidad, fechaDesde, fechaHasta, grupoProvId, despachosId, gestorId, letradoId, impAbonadoDesde, impAbonadoHasta, tematicaId, productoId, motivoId, detalleId, tematicaLabel, productoLabel, motivoLabel, detalleLabel, grupoResolverId);
 
         List<Case> listRec = [SELECT Id FROM Case WHERE RecordTypeId = :RECORDTYPERECLAMACION AND Id IN :listaCasos];
 
@@ -397,6 +425,7 @@ public with sharing class SAC_LCMP_AuditoriasController {
      * Historial
      * VERSION        USER_STORY            AUTHOR                DATE        Description
      * 1.0             US742491           Raúl Santos          22/11/23       Creación
+     * 1.2            US1278233             Jose M. Fernández   10/06/2025    Modificado: cambiar campos String de IDs a List
      * *******************************************************************************************/
     public static SEG_Auditoria__c generarAuditoria(Id idRecordType, DetallesAuditoria detallesAudit){      
 
@@ -439,17 +468,29 @@ public with sharing class SAC_LCMP_AuditoriasController {
         if(detallesAudit.impAbonadoHasta  != null && detallesAudit.impAbonadoHasta != 0){
             auditoria.SAC_ImporteAbonadoHasta__c = detallesAudit.impAbonadoHasta;
         }
-        if(detallesAudit.tematicaId != null && detallesAudit.tematicaId != ''){
-            auditoria.SAC_MCCTematica__c = detallesAudit.tematicaId;
+        if(detallesAudit.listIdsTematica != null && detallesAudit.listIdsTematica != ''){
+            auditoria.SAC_MCCTematicaList__c = detallesAudit.listIdsTematica;
         }
-        if(detallesAudit.productoId != null && detallesAudit.productoId != ''){
-            auditoria.SAC_MCCProducto__c = detallesAudit.productoId;
+        if(detallesAudit.listIdsProducto != null && detallesAudit.listIdsProducto != ''){
+            auditoria.SAC_MCCProductoList__c = detallesAudit.listIdsProducto;
         }
-        if(detallesAudit.motivoId != null && detallesAudit.motivoId != ''){
-            auditoria.SAC_MCCMotivo__c = detallesAudit.motivoId;
+        if(detallesAudit.listIdsMotivo != null && detallesAudit.listIdsMotivo != ''){
+            auditoria.SAC_MCCMotivoList__c = detallesAudit.listIdsMotivo;
         }
-        if(detallesAudit.detalleId != null && detallesAudit.detalleId != ''){
-            auditoria.SAC_MCCDetalle__c = detallesAudit.detalleId;
+        if(detallesAudit.listIdsDetalle != null && detallesAudit.listIdsDetalle != ''){
+            auditoria.SAC_MCCDetalleList__c = detallesAudit.listIdsDetalle;
+        }
+        if(detallesAudit.listIdsTematicaLabel != null && detallesAudit.listIdsTematicaLabel != ''){
+            auditoria.SAC_MCCTematicaListLabel__c = detallesAudit.listIdsTematicaLabel;
+        }
+        if(detallesAudit.listIdsProductoLabel != null && detallesAudit.listIdsProductoLabel != ''){
+            auditoria.SAC_MCCProductoListLabel__c = detallesAudit.listIdsProductoLabel;
+        }
+        if(detallesAudit.listIdsMotivoLabel != null && detallesAudit.listIdsMotivoLabel != ''){
+            auditoria.SAC_MCCMotivoListLabel__c = detallesAudit.listIdsMotivoLabel;
+        }
+        if(detallesAudit.listIdsDetalleLabel != null && detallesAudit.listIdsDetalleLabel != ''){
+            auditoria.SAC_MCCDetalleListLabel__c = detallesAudit.listIdsDetalleLabel;
         }
         if(detallesAudit.grupoResolverId != null && detallesAudit.grupoResolverId != ''){
             auditoria.SAC_GrupoResponsableResolver__c = detallesAudit.grupoResolverId;
@@ -567,15 +608,20 @@ public with sharing class SAC_LCMP_AuditoriasController {
         public String letradoId{get; set;}
         public Decimal impAbonadoDesde {get; set;}
         public Decimal impAbonadoHasta {get; set;}
-        public String tematicaId{get; set;}
-        public String productoId {get; set;}
-        public String motivoId {get; set;}
-        public String detalleId{get; set;}
+        public String listIdsTematica{get; set;}
+        public String listIdsProducto {get; set;}
+        public String listIdsMotivo {get; set;}
+        public String listIdsDetalle {get; set;}
+        public String listIdsTematicaLabel {get; set;}
+        public String listIdsProductoLabel {get; set;}
+        public String listIdsMotivoLabel {get; set;}
+        public String listIdsDetalleLabel {get; set;}
         public String grupoResolverId {get; set;}
 
         public detallesAuditoria(String tipoAuditoriaActual, String slaCalidadActual, Date fechaDesdeActual, Date fechaHastaActual, String grupoProvIdActual,
-        String despachosIdActual, String gestorIdActual, String letradoIdActual, Decimal impAbonadoDesdeActual, Decimal impAbonadoHastaActual, String tematicaIdActual, String productoIdActual,
-        String motivoIdActual, String detalleIdActual, String grupoResolverIdActual)
+        String despachosIdActual, String gestorIdActual, String letradoIdActual, Decimal impAbonadoDesdeActual, Decimal impAbonadoHastaActual, String listIdsTematicaActual, String listIdsProductoActual,
+        String listIdsMotivoActual, String listIdsDetalleActual, String listIdsTematicaLabelActual, String listIdsProductoLabelActual,
+        String listIdsMotivoLabelActual, String listIdsDetalleLabelActual, String grupoResolverIdActual)
         {
             tipoAuditoria = tipoAuditoriaActual;
             slaCalidad = slaCalidadActual;
@@ -587,10 +633,14 @@ public with sharing class SAC_LCMP_AuditoriasController {
             letradoId = letradoIdActual;
             impAbonadoDesde = impAbonadoDesdeActual;
             impAbonadoHasta = impAbonadoHastaActual;
-            tematicaId = tematicaIdActual;
-            productoId = productoIdActual;
-            motivoId = motivoIdActual;
-            detalleId = detalleIdActual;
+            listIdsTematica = listIdsTematicaActual;
+            listIdsProducto = listIdsProductoActual;
+            listIdsMotivo = listIdsMotivoActual;
+            listIdsDetalle = listIdsDetalleActual;
+            listIdsTematicaLabel = listIdsTematicaLabelActual;
+            listIdsProductoLabel = listIdsProductoLabelActual;
+            listIdsMotivoLabel = listIdsMotivoLabelActual;
+            listIdsDetalleLabel = listIdsDetalleLabelActual;
             grupoResolverId = grupoResolverIdActual;
         }
     }
@@ -845,6 +895,7 @@ public with sharing class SAC_LCMP_AuditoriasController {
         @AuraEnabled public SEG_Auditoria__c auditoria {get; set;}
         @AuraEnabled public List<SEG_Auditoria__c> lstAuditoria {get; set;}
         @AuraEnabled public List<SAC_PuntosControlAuditoria__c> lstPuntos {get; set;}
+        @AuraEnabled public List<SAC_MaestroTemas__c> listaOpcionesDetalleDictamen {get; set;}
         @AuraEnabled public Map<String,String> mapTiposDisponibles {get; set;}
         @AuraEnabled public Boolean permitirReabrir {get; set;}
         @AuraEnabled public Map<id,List<SAC_PuntosControlAuditoria__c>> mapAuditoriaPuntos {get; set;}
@@ -852,13 +903,14 @@ public with sharing class SAC_LCMP_AuditoriasController {
         @AuraEnabled public Boolean esAuditorGestor {get; set;}
         @AuraEnabled public Boolean esAuditorLetrado {get; set;}
 
-        public infoAuditoriaReclamacion(SEG_Auditoria__c auditoriaActual, List<SEG_Auditoria__c> lstAuditoriaActual, List<SAC_PuntosControlAuditoria__c> lstPuntosActual, 
+        public infoAuditoriaReclamacion(SEG_Auditoria__c auditoriaActual, List<SEG_Auditoria__c> lstAuditoriaActual, List<SAC_PuntosControlAuditoria__c> lstPuntosActual, List<SAC_MaestroTemas__c> listaOpcionesDetalleDictamenActual,
                                         Map<String,String> mapTiposDisponiblesActual, Boolean permitirReabrirActual, Map<id,List<SAC_PuntosControlAuditoria__c>> mapAuditoriaPuntosActual,
                                         Boolean tienePermisosEditarActual, Boolean esAuditorGestorActual, Boolean esAuditorLetradoActual)
         {
             auditoria = auditoriaActual;
             lstAuditoria = lstAuditoriaActual;
             lstPuntos = lstPuntosActual;
+            listaOpcionesDetalleDictamen = listaOpcionesDetalleDictamenActual;
             mapTiposDisponibles = mapTiposDisponiblesActual;
             permitirReabrir = permitirReabrirActual;
             mapAuditoriaPuntos = mapAuditoriaPuntosActual;
@@ -892,8 +944,14 @@ public with sharing class SAC_LCMP_AuditoriasController {
             listaSize = lstAuditorias;
 
             if (lstAuditorias != null && !lstAuditorias.isEmpty()) {
-                List<SAC_PuntosControlAuditoria__c> lstPuntos = [SELECT Id, Name, SAC_Dictamen__c, SAC_PuntoDeControl__c, SAC_Auditoria__c, SAC_PuntoDeControl__r.name, toLabel(SAC_PuntoDeControl__r.SAC_TipoAuditoria__c), SAC_PuntoDeControl__r.SAC_Critico__c 
+                List<SAC_PuntosControlAuditoria__c> lstPuntos = [SELECT Id, Name, SAC_Dictamen__c, SAC_PuntoDeControl__c, SAC_Auditoria__c, SAC_PuntoDeControl__r.name, toLabel(SAC_PuntoDeControl__r.SAC_TipoAuditoria__c), SAC_PuntoDeControl__r.SAC_Critico__c, SAC_DetalleDictamen__c
                                                                 FROM SAC_PuntosControlAuditoria__c WHERE SAC_Auditoria__c IN :lstAuditorias ORDER BY SAC_PuntoDeControl__r.SAC_TipoAuditoria__c]; 
+                Set<Id> lstPuntosMaestro= new Set<Id>();
+                for(SAC_PuntosControlAuditoria__c punto : lstPuntos) {
+                    lstPuntosMaestro.add(punto.SAC_PuntoDeControl__c);
+                }
+                List<SAC_MaestroTemas__c> listaOpcionesDetalleDictamen = [SELECT Id, Name, CC_Maestro_Temas__c  FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECORDTYPEDICTAMEN AND (CC_Maestro_Temas__c IN :lstPuntosMaestro OR CC_Maestro_Temas__c = null) AND SAC_Activo__c = true];
+
                 // Obtener los tipos de auditoria con los que podrá reabrir la auditoría  
                 Integer contador = 1;       
                 List<SAC_PuntosControlAuditoria__c> lstPuntosAuditoriaActual = new List<SAC_PuntosControlAuditoria__c>();                                                                   
@@ -950,7 +1008,7 @@ public with sharing class SAC_LCMP_AuditoriasController {
                 // Quitar la auditoria actual de la lista
                 lstAuditorias.remove(listaSize.size()-1);
                 
-                InfoAuditoriaReclamacion infoAuditoria = new InfoAuditoriaReclamacion(auditorianueva, lstAuditorias, lstPuntosAuditoriaActual, mapValoresPicklist, puedeReabrir, mapAuditoriaPuntos, infoEdicion.tienePermisosEditar, infoEdicion.esAuditorGestor, infoEdicion.esAuditorLetrado);
+                InfoAuditoriaReclamacion infoAuditoria = new InfoAuditoriaReclamacion(auditorianueva, lstAuditorias, lstPuntosAuditoriaActual, listaOpcionesDetalleDictamen, mapValoresPicklist, puedeReabrir, mapAuditoriaPuntos, infoEdicion.tienePermisosEditar, infoEdicion.esAuditorGestor, infoEdicion.esAuditorLetrado);
                 return infoAuditoria;
             }
         }  
@@ -1358,11 +1416,12 @@ public with sharing class SAC_LCMP_AuditoriasController {
      * Historial
      * VERSION        USER_STORY            AUTHOR                DATE        Description
      * 1.0             US791098           Raúl Santos           04/01/24       Creación
+     * 1.2            US1278233             Jose M. Fernández   10/06/2025    Modificado: cambiar campos String de IDs a List
      * *******************************************************************************************/
     @AuraEnabled
-    public static SEG_Auditoria__c crearProgramacionAuditoria(String nombreAuditoria, String tipoAuditoria, String slaCalidad, Date fechaInicio, Date fechaFin, String fechaCierre, String grupoProvId, String despachosId, Decimal impAbonadoDesde, Decimal impAbonadoHasta, String sentidoResolucion, String tematicaId, String productoId, String motivoId, String detalleId, Integer numMaxReclamaciones, String grupoResolverId, Boolean soloPretPpal, String periocidad){
+    public static SEG_Auditoria__c crearProgramacionAuditoria(String nombreAuditoria, String tipoAuditoria, String slaCalidad, Date fechaInicio, Date fechaFin, String fechaCierre, String grupoProvId, String despachosId, Decimal impAbonadoDesde, Decimal impAbonadoHasta, String sentidoResolucion, String listIdsTematica, String listIdsProducto, String listIdsMotivo, String listIdsDetalle, String listIdsTematicaLabel, String listIdsProductoLabel, String listIdsMotivoLabel, String listIdsDetalleLabel, Integer numMaxReclamaciones, String grupoResolverId, Boolean soloPretPpal, String periocidad){
 
-        DetallesAuditoria detallesNuevaAuditoria = new DetallesAuditoria(tipoAuditoria, slaCalidad, null, null, grupoProvId, despachosId, null, null, impAbonadoDesde, impAbonadoHasta, tematicaId, productoId, motivoId, detalleId, grupoResolverId);
+        DetallesAuditoria detallesNuevaAuditoria = new DetallesAuditoria(tipoAuditoria, slaCalidad, null, null, grupoProvId, despachosId, null, null, impAbonadoDesde, impAbonadoHasta, listIdsTematica, listIdsProducto, listIdsMotivo, listIdsDetalle, listIdsTematicaLabel, listIdsProductoLabel, listIdsMotivoLabel, listIdsDetalleLabel, grupoResolverId);
 
         //Creamos la programación de la auditoría
         SEG_Auditoria__c auditoria = generarAuditoria(RECORDTYPEAUDITORIAAUTOMATICA, detallesNuevaAuditoria); 
@@ -1397,5 +1456,91 @@ public with sharing class SAC_LCMP_AuditoriasController {
             this.subject = subject;
             this.status = status;
         }
+    }
+
+
+    /***********************************************************************************
+    * Proposito: Método para recoger los valores de las picklist parametrizables
+    * ***************************************************************
+    * Historial
+    * -------
+    * VERSION         USER_STORY       AUTHOR          DATE         Description
+    * 1.0             US1164775     Sergio Martín    20/05/25        Creación
+    ***********************************************************************************/
+    @AuraEnabled(cacheable=true)
+    public static List<String> obtenerValoresPicklist(){
+        List<String> listValoresDictamen = new List<String>();
+        List<SAC_MaestroTemas__c> listValoresPicklist = [SELECT Name, RecordTypeId FROM SAC_MaestroTemas__c WHERE RecordTypeId =: RECORDTYPEDICTAMEN AND SAC_Activo__c = true ORDER BY Name ASC];
+        for(SAC_MaestroTemas__c valor : listValoresPicklist) {
+            listValoresDictamen.add(valor.name);
+        }
+        return listValoresDictamen;    
+    }
+
+
+    /*****************************************************************
+    * Proposito: Updatear los puntos de control de la auditoría
+    * 
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR          DATE         Description
+    * 1.0             US1164775     Sergio Martín    02/06/25        Creación
+    *****************************************************************/
+    /**
+	 * @description    Updatear los objetos que vienen de la página de detalles
+	 * @param recordsToUpdate
+	 */
+    @AuraEnabled
+    public static void updateRecordsPuntos(List<SObject> recordsToUpdate) {
+        if (recordsToUpdate == null || recordsToUpdate.isEmpty()) {
+            throw new AuraHandledException('No se recibieron registros para actualizar.');
+        }
+
+        try {
+            SPV_DatabaseDML.updateListDML(recordsToUpdate, false);
+        } catch (DmlException e) {
+            throw new AuraHandledException('Error al actualizar los registros: ' + e.getMessage());
+        }
+    }
+
+    /*****************************************************************
+    * Proposito: Se agrupan aquellas entradas que tengan el mismo nombre con sus IDs juntas, separadas por ','
+    * 
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR              DATE         Description
+    * 1.0            US1278233        Jose M. Fernández   10/06/2025   Creación
+    *****************************************************************/
+    private static List<sObject> combineIDsOfDuplicateNames(List<sObject> listaResultado){
+        //Variables utilizadas para el proceso
+        List<sObject> listaResultadoEdit = new List<sObject>();
+        SObject oObjEdit;
+        Integer iCount = 0;
+        String sNameAnterior;
+        String sIDsActuales;
+
+        //Se recorren todas las entradas
+        for(SObject oObj : listaResultado){
+            oObjEdit = oObj;
+
+            //En el caso de que el nombre del elemento anterior sea el mismo al del actual, se le actualiza el valor de ID con las anteriores que haya encontrado
+            //y se quita de la lista el anterior, ya que está obsoleto
+            if(sNameAnterior == oObjEdit.get('Name')){
+                if(String.isNotBlank(sIDsActuales)){
+                    oObjEdit.put('Id', oObjEdit.get('Id') + ',' + sIDsActuales);
+                }
+                listaResultadoEdit.remove(iCount - 1);
+                iCount--;
+            }
+
+            //Se guarda lo/s ID/s y Name del elemento actual para la comprobación en la siguiente iteración, y se añade a la lista
+            sIDsActuales = (String)oObjEdit.get('Id');
+            sNameAnterior = (String)oObjEdit.get('Name');
+            listaResultadoEdit.add(oObjEdit);
+            iCount++;
+        }
+
+        //Retorno
+        return listaResultadoEdit;
     }
 }

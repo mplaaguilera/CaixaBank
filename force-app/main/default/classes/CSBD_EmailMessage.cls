@@ -115,7 +115,7 @@ public inherited sharing class CSBD_EmailMessage {
         List<String> buzonesSalidaCsbd = new List<String>();
         if (comprobarCorreosSalientes) {
             buzonesSalidaCsbd = CC_MetodosUtiles.listaCampo(
-                [SELECT Address FROM OrgWideEmailAddress WHERE DisplayName LIKE 'CSBD - %' OR DisplayName LIKE 'Now In Sales - %'],
+                [SELECT Address FROM OrgWideEmailAddress WHERE DisplayName LIKE 'CSBD - %' OR DisplayName LIKE 'Now In Sales - %' OR DisplayName LIKE 'Banca Digital - %'],
                 'Address'
             );
         }

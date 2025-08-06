@@ -157,6 +157,7 @@ public class CSBD_Desistimiento_Test {
         camposDesistimiento.put('Amount',10);
         camposDesistimiento.put('CSBD_Email_Solicitud__c', 'prueba2@test.com');
         camposDesistimiento.put('CSBD_Now_Codigo_Producto__c', 'producto NO VidaCaixa');
+        camposDesistimiento.put('CSBD_Empresa_Proveedora__c', 'CaixaBank');
         Opportunity desistimiento = CSBD_Opportunity.crearOportunidad('CSBD_Desistimiento', camposDesistimiento);
         OpportunityShare oppshare = new OpportunityShare();
         oppshare.UserOrGroupId = usuarioGestor.Id;
@@ -165,10 +166,17 @@ public class CSBD_Desistimiento_Test {
         insert oppshare;
 
         System.runAs(usuarioGestor) {
+            OrgWideEmailAddress owa = [SELECT Id, Address, DisplayName FROM OrgWideEmailAddress WHERE DisplayName LIKE '%CSBD%' LIMIT 1];
+            CSBD_Remitente_Enviar_Correo__c config = new CSBD_Remitente_Enviar_Correo__c();
+            config.CSBD_Buzon_CaixaBank__c = owa.Address;
+            config.CSBD_Buzon_ImaginBank__c = owa.Address;
+            config.CSBD_Buzon_Alta_digital_de_menores__c = owa.Address;
+            insert config;
+
             Test.startTest();
-            desistimiento.OwnerId = usuarioGestor.Id;
-            update desistimiento;
-            desistimiento = CSBD_Opportunity.cerrarOportunidad(desistimiento.Id, 'Formalizada', 'Desistimiento realizado');
+                desistimiento.OwnerId = usuarioGestor.Id;
+                update desistimiento;
+                desistimiento = CSBD_Opportunity.cerrarOportunidad(desistimiento.Id, 'Formalizada', 'Desistimiento realizado');
             Test.stopTest();
 
             System.assert(
@@ -314,6 +322,38 @@ public class CSBD_Desistimiento_Test {
             System.assert([SELECT Count() FROM EmailMessage WHERE RelatedToId = :desistimientoVidaCaixa.Id] > 0, 'No se han enviado los correos automáticos');
             System.assert([SELECT Count() FROM EmailMessage WHERE RelatedToId = :desistimiento.Id] == 0, 'No se deberían haber enviado correos automáticos');
             System.assert([SELECT Count() FROM EmailMessage WHERE RelatedToId = :desistimientoPai.Id] > 0, 'No se han enviado los correos automáticos');
+        }
+    }
+
+    @isTest
+    public static void cerrarDesistimientoFallido() {
+        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD'];
+        Account oficinaGestora = [SELECT Name, CC_Numero_Documento__c FROM Account WHERE Name = 'test centro'];
+        Account cuenta = [SELECT Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '46979496X'];
+        cuenta.CC_OficinaGestoraId__c = oficinaGestora.Id;
+
+        Map<String, Object> camposDesistimiento = new Map<String, Object>();
+        camposDesistimiento.put('AccountId', cuenta.Id);
+        camposDesistimiento.put('CSBD_Email_Solicitud__c', 'prueba2@test.com');
+        Opportunity desistimiento = CSBD_Opportunity.crearOportunidad('CSBD_Desistimiento', camposDesistimiento);
+        OpportunityShare oppshare = new OpportunityShare();
+        oppshare.UserOrGroupId = usuarioGestor.Id;
+        oppshare.OpportunityId = desistimiento.Id;
+        oppshare.OpportunityAccessLevel = 'Edit';
+        insert oppshare;
+
+        System.runAs(usuarioGestor) {
+
+            Test.startTest();
+                desistimiento.OwnerId = usuarioGestor.Id;
+                update desistimiento;
+                desistimiento = CSBD_Opportunity.cerrarOportunidad(desistimiento.Id, 'Formalizada', 'Desistimiento realizado');
+            Test.stopTest();
+
+            System.assert(
+                [SELECT Count() FROM Task WHERE WhatId = :desistimiento.Id AND Type = 'Error notificando resultado de desistimiento a cliente'] > 0,
+                'No se ha creado la tarea registrando el problema enviado el correo automático al cliente'
+            );
         }
     }
 

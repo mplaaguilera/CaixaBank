@@ -110,7 +110,7 @@ public with sharing class SPV_LCMP_ConsultasOperativas_Test {
 
     @isTest
     static void tomarPropiedadConsultaFailTest() {
-        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+        User usuario = [SELECT Id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
         CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'grupotest' LIMIT 1];
         SAC_Interaccion__c consulta = [SELECT Id, OwnerId FROM SAC_Interaccion__c WHERE SAC_Titulo__c = 'ConsultaTestSPV' LIMIT 1];
 

@@ -4,6 +4,8 @@ import getRutaVS from '@salesforce/apex/SPV_LCMP_GeneracionDocumento.getRutaVS';
 import insertarimagen from '@salesforce/apex/SPV_LCMP_GeneracionDocumento.insertarimagen';
 import generarDocumento from '@salesforce/apex/SPV_LCMP_GeneracionDocumento.generarDocumento';
 import comprobarDocumentoGuardado from '@salesforce/apex/SPV_LCMP_GeneracionDocumento.comprobarDocumentoGuardado';
+import informacionCaso from '@salesforce/apex/SPV_LCMP_GeneracionDocumento.informacionCaso';
+
 
 import { RefreshEvent } from 'lightning/refresh';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -25,6 +27,9 @@ export default class Spv_GeneracionDocumento extends LightningElement {
     @track rutaVS;
     @track ruta;
     @track mostrarInsertarImagen = false;
+    @track mostrarInsertarNombreDocumento = false;
+    @track nombreDocumento;
+    @track nombreDocumentoInsertar;
     @track rutaRespuesta;
     messageFromVF = '';
     @track botonGenerar = true;
@@ -42,6 +47,12 @@ export default class Spv_GeneracionDocumento extends LightningElement {
     @track textEditado = false;
     @track modalSalirSinGuardar = false;
     @track documentoGenerado = false;
+
+    //datos recibidos documento generado
+    @track numeroCasoRecibido;
+    @track idiomaRecibido;
+
+
 
     //Desarrollo descripcion (alt) imagenes
     @track modalAñadirDesc = false;
@@ -128,7 +139,7 @@ export default class Spv_GeneracionDocumento extends LightningElement {
                     }
                 }
             });
-        });       
+        });
     }
 
     renderedCallback() {   
@@ -149,11 +160,12 @@ export default class Spv_GeneracionDocumento extends LightningElement {
 
     generarDoc(){
         this.spinnerLoading = true;
-        generarDocumento({'id': this.idDocGenerado}).then(result => {
+        generarDocumento({'id': this.idDocGenerado,'nombreDocumento': this.nombreDocumento}).then(result => {
             this.mostrarEdicion = false;
             this.botonGenerar = true;
             this.tieneDocGuardado = false;
             this.documentoGenerado = true;
+            console.log('Valor de nombreDocumento:', this.nombreDocumento);
            
             this.dispatchEvent(
                 new ShowToastEvent({
@@ -228,8 +240,38 @@ export default class Spv_GeneracionDocumento extends LightningElement {
         this.mostrarInsertarImagen = true;
     }
 
+    //modal insercion nombre documento
+    mostrarModalInsertarNombreDocumento() { 
+        this.mostrarInsertarNombreDocumento = true;
+        informacionCaso({ id: this.idDocGenerado })
+            .then(result => {
+                // result es el Map convertido en objeto JS
+                this.numeroCasoRecibido = result.numeroCaso;
+                this.idiomaRecibido = result.idioma;
+
+                console.log('Número de caso dentro:', this.numeroCasoRecibido);
+                console.log('Idioma dentro:', this.idiomaRecibido);
+                
+                if(this.idiomaRecibido == 'es') { this.nombreDocumentoInsertar = this.numeroCasoRecibido +' documento generado ESP'; }
+                else if(this.idiomaRecibido == 'ca') { this.nombreDocumentoInsertar = this.numeroCasoRecibido +' documento generado CAT'; }
+                else if(this.idiomaRecibido == 'en') { this.nombreDocumentoInsertar = this.numeroCasoRecibido +' documento generado ENG'; }
+                else if(this.idiomaRecibido == 'va') { this.nombreDocumentoInsertar = this.numeroCasoRecibido +' documento generado VAL'; }
+                else if(this.idiomaRecibido == 'ga') { this.nombreDocumentoInsertar = this.numeroCasoRecibido +' documento generado GAL'; }
+                else if(this.idiomaRecibido == 'eu') { this.nombreDocumentoInsertar = this.numeroCasoRecibido +' documento generado EUSK'; }
+                this.nombreDocumento = this.nombreDocumentoInsertar;
+                console.log('nombre del documento final: ', this.nombreDocumento);
+            })
+            .catch(error => {
+                console.error('Error al obtener información del caso:', error);
+        });
+    }
+
     closeModalImagen() { 
         this.mostrarInsertarImagen = false;
+    }
+
+    closeModalNombreDocumento() { 
+        this.mostrarInsertarNombreDocumento = false;
     }
 
     insertarImagen() { 
@@ -290,6 +332,10 @@ export default class Spv_GeneracionDocumento extends LightningElement {
             this.mostrarMensajeNoImagen = true;
             this.rutaimagen = '';
         }
+    }
+
+    handleNombreDocumentoChange(event){
+        this.nombreDocumento = event.target.value;
     }
 
     rellenarMapaImg(rutaImagenes){

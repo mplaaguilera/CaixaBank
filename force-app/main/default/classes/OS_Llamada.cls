@@ -356,7 +356,7 @@ public without sharing class OS_Llamada {
         // if (procedenciaTelefonia.CC_Valor2__c == 'GOC') {
         //     caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'OS_Empleado');
         // } else {
-            caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', Schema.getGlobalDescribe().get('CC_Llamada__c').getDescribe().getRecordTypeInfosById().get(llamada.RecordTypeId).getDeveloperName());
+            caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosById().get(llamada.RecordTypeId).getDeveloperName());
         // }
 
         insert caso;

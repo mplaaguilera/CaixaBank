@@ -76,8 +76,8 @@ export function esperar(callback, delay = 0) {
 	.then(() => typeof callback === 'function' && callback());
 }
 
-export function usuarioDesarrollador(idUsuario) {
-	return getUsuarioDesarrolladorApex({idUsuario});
+export function usuarioDesarrollador() {
+	return getUsuarioDesarrolladorApex().then(result => result);
 }
 
 export function transitionThenCallback(element, className, callback, property) {

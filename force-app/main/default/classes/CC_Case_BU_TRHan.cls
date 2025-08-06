@@ -46,6 +46,7 @@ public with sharing class CC_Case_BU_TRHan extends CC_TriggerHandlerBase {
             List<Id> idsCAM = obtenerIdsCAM(listNewObjCC);
             enmascararPANs(mapOldObjCC, listNewObjCC); // Se enmascaran los PANs de tarjeta de crédito en caso de detectarse
             encryptPANs(mapOldObjCC, listNewObjCC); // Se encripta el campo PAN en hexadecimal
+            actualizarEstadoAutenticacion(mapOldObjCC, listNewObjCC); // US1182102: Autenticación - Reseteo del estado de autenticación en reclasificaciones de MCC
             validarCierreCaso(mapOldObjCC, listNewObjCC,idsCAM);
             cierreCasos(mapOldObjCC, listNewObjCC,idsCAM);
             actualizarBuzonSalida(listNewObjCC, mapOldObjCC);
@@ -74,7 +75,30 @@ public with sharing class CC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                 vincularCasoOrigen(mapOldObjCC, listNewObjCC);
             }
             CC_CaseTriggerHelper.caseGestionado(listNewObjCC, mapOldObjCC, idsCAM);
-            CC_CaseTriggerHelper.calcularFacturacion(listNewObjCC, mapOldObjCC, idsCAM);            
+            CC_CaseTriggerHelper.calcularFacturacion(listNewObjCC, mapOldObjCC, idsCAM);     
+        }
+    }
+
+    // US1182102: Autenticación - Reseteo del estado de autenticación en reclasificaciones de MCC
+    private void actualizarEstadoAutenticacion(Map<Id, Case> mapOldObj, List<Case> listNewObj) {
+        Id rtCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+        Set<Id> idsMotivos = new Set<Id>();
+        for (Case caso : listNewObj) {
+            if (caso.RecordTypeId == rtCliente && caso.CC_MCC_Motivo__c != mapOldObj.get(caso.Id).CC_MCC_Motivo__c) {
+                idsMotivos.add(caso.CC_MCC_Motivo__c);
+            }
+        }
+        if (!idsMotivos.isEmpty()) {
+            Map<Id, CC_MCC__c> mapMotivos = new Map<Id, CC_MCC__c>([SELECT Id, CC_ImpedirNivel2__c FROM CC_MCC__c WHERE Id IN :idsMotivos]);
+            for (Case caso : listNewObj) {
+                Case casoAnterior = mapOldObj.get(caso.Id);
+                if (caso.RecordTypeId == rtCliente && caso.CC_MCC_Motivo__c != casoAnterior.CC_MCC_Motivo__c) {
+                    CC_MCC__c nuevoMotivo = mapMotivos.get(caso.CC_MCC_Motivo__c);
+                    if (nuevoMotivo.CC_ImpedirNivel2__c && casoAnterior.CC_OTP_Nivel__c == 'Nivel 2' && casoAnterior.CC_Status_Autorizacion__c == 'APPROVED') {
+                        caso.CC_Status_Autorizacion__c = 'SIN ESTADO';
+                    }
+                }
+            }
         }
     }
     
@@ -765,28 +789,49 @@ public with sharing class CC_Case_BU_TRHan extends CC_TriggerHandlerBase {
             if (caso.CC_Canal_Procedencia__c != mapOldObj.get(caso.Id).CC_Canal_Procedencia__c
             || caso.CC_Idioma__c != mapOldObj.get(caso.Id).CC_Idioma__c) {
                 //El canal de procedencia o el idioma han cambiado, se actualiza el buz�n de salida del caso
-                caso.CC_Buzon_Salida__c = obtenerBuzon(caso.CC_Canal_Procedencia__c, caso.CC_Idioma__c);
+                caso.CC_Buzon_Salida__c = obtenerBuzon(caso.CC_Canal_Procedencia__c, caso.CC_Idioma__c, caso.recordTypeId);
             }
         }
     }
     
-    private String obtenerBuzon(String canalProcedencia, String idioma) {
+    private String obtenerBuzon(String canalProcedencia, String idioma, Id recordTypeId) {
         idioma = idioma == 'ca' ? 'Català' : idioma == 'en' ? 'Inglés' : 'Castellano';
         
+        Id rtCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+		Id rtEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+
         List<CC_Buzones_Por_Defecto__mdt> buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
         WHERE CC_Canal_Procedencia__c = :canalProcedencia AND CC_Idioma__c = :idioma];
+
         if (buzones.isEmpty() && canalProcedencia == 'Formulario Consultas Operativas') {
             buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
             WHERE  DeveloperName = 'CC_Buzon_Defecto_Empleados' AND CC_Idioma__c = 'Castellano' AND CC_Activo__c = TRUE];
         }
-        if (buzones.isEmpty()) { //Si no se ha encontrado  ningún buzón se usa el por defecto en el idioma del caso
+        		//Si no se ha encontrado  ningún buzón se usa el por defecto en el idioma del caso para clientes
+        if (buzones.isEmpty() && recordTypeId == rtCliente){
             buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
-            WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = :idioma AND CC_Activo__c = TRUE];
+						WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = :idioma
+						AND CC_Activo__c = true];
         }
-        if (buzones.isEmpty()) { //Si no se ha encontrado  ningún buzón se usa el por defecto en castellano
+		//Si no se ha encontrado  ningún buzón se usa el por defecto en el idioma del caso para empleados
+		if (buzones.isEmpty() && recordTypeId == rtEmpleado){
             buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
-            WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano' AND CC_Activo__c = TRUE];
+						WHERE CC_Canal_Procedencia__c = 'Por defecto empleados' AND CC_Idioma__c = :idioma
+						AND CC_Activo__c = true];
         }
+
+		//Si no encuentra ningún buzón se usa el por defecto en castellano para clientes
+		if (buzones.isEmpty() && recordTypeId == rtCliente){
+			buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
+						WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano'
+						AND CC_Activo__c = true];
+		}
+		//Si no encuentra ningún buzón se usa el por defecto en castellano para empleados		
+		if (buzones.isEmpty() && recordTypeId == rtEmpleado){
+			buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
+						WHERE CC_Canal_Procedencia__c = 'Por defecto empleados' AND CC_Idioma__c = 'Castellano'
+						AND CC_Activo__c = true];
+		}
         return !buzones.isEmpty() ? buzones[0].CC_Direccion_Correo__c : null;
     }
     

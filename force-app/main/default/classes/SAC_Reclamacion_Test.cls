@@ -174,6 +174,17 @@ public class SAC_Reclamacion_Test {
         reclamaciones.add(casoReclamacion6);
 
         mapaCamposCaso.clear();
+        mapaCamposCaso.put('Subject', 'TestRec7');
+        mapaCamposCaso.put('Origin', 'Otros');
+        mapaCamposCaso.put('Status', 'Cerrado');
+        mapaCamposCaso.put('SAC_TipoConsumidor__c', 'No');
+        mapaCamposCaso.put('SAC_Naturaleza__c', 'SAC_004');
+        mapaCamposCaso.put('CC_Idioma__c', 'es');
+        mapaCamposCaso.put('OwnerId', listaUsers[0].id);
+        Case casoReclamacion10 = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
+        reclamaciones.add(casoReclamacion10);
+
+        mapaCamposCaso.clear();
         mapaCamposCaso.put('Subject', 'Complementaria');
         mapaCamposCaso.put('Origin', 'Otros');
         mapaCamposCaso.put('Status', 'SAC_001');
@@ -303,6 +314,20 @@ public class SAC_Reclamacion_Test {
         mapaCamposCaso.put('OwnerId', listaUsers[1].Id);
         Case casoPretension6 = SAC_TestDataFactory.crearCaso('Pretension', mapaCamposCaso);
         pretensiones.add(casoPretension6);
+
+
+        mapaCamposCaso.clear();
+        mapaCamposCaso.put('SuppliedCompany', 'Pret7');
+        mapaCamposCaso.put('Origin', 'Backoffice');
+        mapaCamposCaso.put('Status', 'Cerrado');
+        mapaCamposCaso.put('SAC_Reclamacion__c', casoReclamacion10.Id);
+        mapaCamposCaso.put('SEG_Detalle__c', mccDetalle2.id);
+        mapaCamposCaso.put('CC_MCC_Tematica__c', mccTematica1.id);
+        mapaCamposCaso.put('CC_MCC_Motivo__c', mccMotivo1.id);
+        mapaCamposCaso.put('CC_MCC_ProdServ__c', mccProdServ1.id);
+        mapaCamposCaso.put('OwnerId', listaUsers[1].Id);
+        Case casoPretension7 = SAC_TestDataFactory.crearCaso('Pretension', mapaCamposCaso);
+        pretensiones.add(casoPretension7);
 
         SAC_DatabaseDML.insertListDML(pretensiones, false);
         //Database.insert(pretensiones);
@@ -1157,4 +1182,41 @@ public class SAC_Reclamacion_Test {
         System.assertEquals(sharings.isEmpty(), false, 'Existen sharings en las pretensiones');
     }
 
+
+    @isTest
+    static void crearCaseHistoryReclamacionCerradaTest() {
+        Case reclamacion = [SELECT Id, Status, CC_Idioma__c FROM Case WHERE Subject = 'TestRec7' LIMIT 1];
+        String idioma = reclamacion.CC_Idioma__c;
+
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        System.runAs(usuario){
+            Test.startTest();
+            reclamacion.CC_Idioma__c = 'en';
+            SAC_DatabaseDML.updateDML(reclamacion, true);
+            Test.stopTest();
+        }
+
+        Case reclamacionResult = [SELECT Id, Status, CC_Idioma__c FROM Case WHERE Subject = 'TestRec7' LIMIT 1];
+        
+        Assert.areNotEqual(idioma, reclamacionResult.CC_Idioma__c, 'No se ha cambiado el idioma.');
+    }	
+
+    @isTest
+    static void crearCaseExtensionHistoryReclamacionCerradaTest() {
+        Case reclamacion = [SELECT Id, Status, CC_Idioma__c FROM Case WHERE Subject = 'TestRec7' LIMIT 1];
+        CBK_Case_Extension__c caseExtensionRecla = [SELECT Id, SAC_PendienteEnvioProrroga__c FROM CBK_Case_Extension__c WHERE Case_Id__c =: reclamacion.id LIMIT 1];
+        Boolean pendienteEnvio = caseExtensionRecla.SAC_PendienteEnvioProrroga__c;
+
+        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
+        System.runAs(usuario){
+            Test.startTest();
+            caseExtensionRecla.SAC_PendienteEnvioProrroga__c = true;
+            SAC_DatabaseDML.updateDML(caseExtensionRecla, true);
+            Test.stopTest();
+        }
+
+        CBK_Case_Extension__c caseExtensionReclaResult = [SELECT Id, SAC_PendienteEnvioProrroga__c FROM CBK_Case_Extension__c WHERE Case_Id__c =: reclamacion.id LIMIT 1];
+        
+        Assert.areNotEqual(pendienteEnvio, caseExtensionReclaResult.SAC_PendienteEnvioProrroga__c, 'No se ha cambiado el case extension.');
+    }		
 }

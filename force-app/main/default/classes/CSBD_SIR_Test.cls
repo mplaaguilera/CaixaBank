@@ -28,10 +28,10 @@ public class CSBD_SIR_Test {
     @isTest
     public static void actualizarDatosRiesgoClientesOportunidades() {
         System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
-            Map<String, Object> cuentaContacto = CSBD_TestDataFactory.crearCuentaContacto('46979396X', new Map<String, Object>{'CC_NumPerso__c' => '21444982'});
+            Map<String, Object> cuentaContacto = CSBD_TestDataFactory.crearCuentaContacto('46979396X', new Map<String, Object>{'AV_NumPerso__c' => '21444982'});
             Account cuenta = (Account)cuentaContacto.get('cuenta');
             Contact contacto1 = (Contact)cuentaContacto.get('contacto');
-            Contact contacto2 = CSBD_TestDataFactory.crearContacto(new Map<String, Object>{'AccountId' => cuenta.Id, 'CC_NumPerso__c' => '21444983'});
+            Contact contacto2 = CSBD_TestDataFactory.crearContacto(new Map<String, Object>{'AccountId' => cuenta.Id, 'AV_NumPerso__c' => '21444983'});
 
             System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
                 //Preparación de respuestas de prueba de los servicios web guardadas como static resources

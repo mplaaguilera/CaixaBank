@@ -18,23 +18,19 @@ public with sharing class SAC_Validaciones_Test {
     static void makeData(){
 
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];    
-        SAC_DatabaseDML.insertDML(usuarioAdmin, false); 
-        //Database.insert(usuarioAdmin);
-        
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);         
         
         User usuarioGeneral;
         System.runAs(usuarioAdmin) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];     
             SAC_DatabaseDML.insertDML(usuarioGeneral, false); 
-            //Database.insert(usuarioGeneral);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
             SAC_DatabaseDML.insertDML(permiSetAssi, false); 
-            //Database.insert(permiSetAssi);
         }
 
         Test.startTest();
@@ -46,13 +42,11 @@ public with sharing class SAC_Validaciones_Test {
         listaMCC.add(mccDetalle);
         listaMCC.add(mccGGH);
         SAC_DatabaseDML.insertListDML(listaMCC, false); 
-        //Database.insert(listaMCC);
 
         // Cuenta
         Account a = SAC_TestDataFactory.crearCuentas(1)[0];
         a.Name = 'test';
         SAC_DatabaseDML.insertDML(a, true); 
-        //Database.insert(a);
 
         // Casos
         List<Case> listaReclamaciones = new List<Case>();
@@ -165,8 +159,6 @@ public with sharing class SAC_Validaciones_Test {
         SAC_DatabaseDML.insertListDML(listaComplementariasVinculadas, false);
 
 
-        //Database.insert(listaReclamaciones);
-
         // Pretension
         Map<String, Object> camposPret = new Map<String, Object>();
         camposPret.put('Origin', 'Backoffice');
@@ -247,7 +239,6 @@ public with sharing class SAC_Validaciones_Test {
         listaPretensiones.add(casoPreteEntidad);
 
         SAC_DatabaseDML.insertListDML(listaPretensiones, true); 
-        //Database.insert(listaPretensiones);
         Test.stopTest();
 
         // Parametrizacion escalado
@@ -262,7 +253,6 @@ public with sharing class SAC_Validaciones_Test {
         
         SAC_ParametrizacionEscalado__c parametrizacionEscalado = SAC_TestDataFactory.crearParamEsc(camposParam);
         SAC_DatabaseDML.insertDML(parametrizacionEscalado, true); 
-        //Database.insert(parametrizacionEscalado);
 
         // Escalado
         Map<String, Object> camposEsc = new Map<String, Object>();
@@ -274,7 +264,6 @@ public with sharing class SAC_Validaciones_Test {
         
         SAC_Interaccion__c escalado = SAC_TestDataFactory.crearInteraccion('Escalado',camposEsc);
         SAC_DatabaseDML.insertDML(escalado, true); 
-        //Database.insert(escalado);
 
         List<SAC_MaestroTemas__c> controlAlta = SAC_TestDataFactory.crearMaestroTemas(1, 'SAC_ControlAltas');
 		SAC_DatabaseDML.insertListDML(controlAlta, false);
@@ -294,12 +283,10 @@ public with sharing class SAC_Validaciones_Test {
             listaTareas[1].SAC_ImporteAbonar__c=150.0;
             listaTareas[1].SAC_ImpResueltoInteresesLegales__c=150.0;
             SAC_DatabaseDML.insertListDML(listaTareas, true); 
-            //Database.insert(listaTareas);
 
             // Tareas Pretension 2
             List<SAC_Accion__c> listaTareasPret2 = SAC_TestDataFactory.crearTareas(2, casoPretension2, false);
             SAC_DatabaseDML.insertListDML(listaTareasPret2, true); 
-            //Database.insert(listaTareasPret2);
         }
     }
 
@@ -401,7 +388,6 @@ public with sharing class SAC_Validaciones_Test {
         Test.startTest();
         System.runAs(usuario){
             SAC_DatabaseDML.updateDML(caso, true); 
-            //Database.update(caso);
         }
         Test.stopTest();
 
@@ -423,7 +409,6 @@ public with sharing class SAC_Validaciones_Test {
         System.runAs(usuario){
             try {
                 SAC_DatabaseDML.updateDML(caso, true); 
-                //Database.update(caso);
             } catch (Exception e) {
                 hayError = true;
             }  
@@ -447,7 +432,6 @@ public with sharing class SAC_Validaciones_Test {
         System.runAs(usuario){
             try {
                 SAC_DatabaseDML.updateDML(pretension, true); 
-                //Database.update(pretension); 
             } catch (Exception e) {
                 hayError=true;
             }
@@ -469,7 +453,6 @@ public with sharing class SAC_Validaciones_Test {
         System.runAs(usuario){
             try {
                 SAC_DatabaseDML.updateDML(pretension, true); 
-                //Database.update(pretension);
             } catch (Exception e) {
                 hayError = true;
             }
@@ -490,7 +473,6 @@ public with sharing class SAC_Validaciones_Test {
         Test.startTest();
         System.runAs(usuario){
             SAC_DatabaseDML.updateDML(caso, true); 
-            //Database.update(caso);
         }
         Test.stopTest();
 
@@ -511,7 +493,6 @@ public with sharing class SAC_Validaciones_Test {
         Test.startTest();
         System.runAs(usuario){
             SAC_DatabaseDML.updateDML(caso, true); 
-            //Database.update(caso);
         }
         Test.stopTest();
 
@@ -533,7 +514,6 @@ public with sharing class SAC_Validaciones_Test {
                 caso.Status = 'SAC_002';
                 caso.SAC_StatusAuxiliar__c = caso.Status;
                 SAC_DatabaseDML.updateDML(caso, true); 
-                //Database.update(caso);
             } catch (Exception e) {
                 hayError = true;
             } 
@@ -554,7 +534,6 @@ public with sharing class SAC_Validaciones_Test {
                 caso.SAC_StatusAuxiliar__c = caso.Status;
                 caso.SAC_MotivoRechazo__c = 'Rechazada por vinculacion';
                 SAC_DatabaseDML.updateDML(caso, true); 
-                //Database.update(caso);
             } catch (Exception e) {
                 hayError = true;
             }  
@@ -578,7 +557,6 @@ public with sharing class SAC_Validaciones_Test {
                 caso.Comments = null;
                 caso.CC_Rechazar_Reabrir_Caso__c = true;
                 SAC_DatabaseDML.updateDML(caso, true); 
-                //Database.update(caso);
             } catch (Exception e) {
                 hayError = true;
             }  
@@ -601,7 +579,6 @@ public with sharing class SAC_Validaciones_Test {
         System.runAs(usuario){
             try{
                 SAC_DatabaseDML.updateDML(caso, true); 
-                //Database.update(caso);
             } catch (Exception e) {
                 hayError = true;
             } 
@@ -632,7 +609,6 @@ public with sharing class SAC_Validaciones_Test {
         Case caso = [SELECT id, SAC_Importe_Resuelto__c FROM Case WHERE subject = 'TestRec' limit 1]; 
         caso.SAC_Importe_Resuelto__c = 300;
         SAC_DatabaseDML.updateDML(caso, true); 
-        //Database.update(caso);
 
         Test.startTest();
         System.runAs(usuario){
@@ -649,7 +625,6 @@ public with sharing class SAC_Validaciones_Test {
         Case caso = [SELECT id, SAC_Importe_Resuelto__c FROM Case WHERE subject = 'TestRec2' limit 1]; 
         caso.SAC_Importe_Resuelto__c = 300;
         SAC_DatabaseDML.updateDML(caso, true); 
-        //Database.update(caso);
 
         Test.startTest();
         System.runAs(usuario){
@@ -666,7 +641,6 @@ public with sharing class SAC_Validaciones_Test {
         Case caso = [SELECT id, SAC_Importe_Resuelto__c, SAC_CasoEspecial__c FROM Case WHERE subject = 'TestRec' limit 1]; 
         caso.SAC_CasoEspecial__c = 'SAC_Presidencia';
         SAC_DatabaseDML.updateDML(caso, true); 
-        //Database.update(caso);
 
         Test.startTest();
         System.runAs(usuario){
@@ -683,7 +657,6 @@ public with sharing class SAC_Validaciones_Test {
         Case caso = [SELECT id, SAC_Importe_Resuelto__c, SAC_CasoEspecial__c FROM Case WHERE subject = 'TestRec2' limit 1]; 
         caso.SAC_Importe_Resuelto__c = 100;
         SAC_DatabaseDML.updateDML(caso, true); 
-        //Database.update(caso);
 
         Test.startTest();
         System.runAs(usuario){
@@ -710,11 +683,9 @@ public with sharing class SAC_Validaciones_Test {
                 tarea.SAC_ImporteResuelto__c = 50;
             }
             SAC_DatabaseDML.updateListDML(tareas, true); 
-            //Database.update(tareas);
             caso.SAC_Importe_Resuelto__c = 100;
             caso.CC_Importe_Abonado__c = 300;
             SAC_DatabaseDML.updateDML(caso, true); 
-            //Database.update(caso);
 
             error = SAC_Validaciones.validarEscaladoEnvioTarea(null, caso.Id, '');
         }

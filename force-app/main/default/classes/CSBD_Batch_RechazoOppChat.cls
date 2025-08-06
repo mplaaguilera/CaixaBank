@@ -19,9 +19,8 @@ public with sharing class CSBD_Batch_RechazoOppChat implements Database.Batchabl
         String query = 'SELECT Id, CSBD_Estado__c, RecordType.DeveloperName, CSBD_Alta_omnichannel__c FROM Opportunity' +
             ' WHERE RecordTypeId = ' + '\''+ recType + '\'' +
             ' AND ( OwnerId = ' + '\''+ usuarioGestorId + '\''+ ' OR OwnerId = '  + '\''+ usuarioAutoProcessId + '\''+ ') ' + 
-            ' AND CreatedDate <= ' +  startTimeFormat ;
-
-        System.debug('query ' + query);
+            ' AND CreatedDate = LAST_N_DAYS:7' + 
+            ' AND IsClosed = false';
 
         return Database.query(query);
         

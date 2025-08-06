@@ -1,4 +1,4 @@
-public with sharing class CC_Contact_BI_TRHan extends CC_TriggerHandlerBase {
+public with sharing class CC_Contact_BI_TRHan extends CC_TriggerHandlerBase { 
 
     public override void mainEntry(CC_TriggerParameters tp) { 
         process((List<Contact>)tp.newList, (Map<Id, Contact>)tp.newMap);

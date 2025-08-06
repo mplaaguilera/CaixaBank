@@ -55,10 +55,12 @@ public with sharing class SAC_LCMP_UpdateStatus_Test {
         camposRecl.put('Subject', 'TestRec');
         camposRecl.put('Origin', 'Otros');
         camposRecl.put('Status', 'SAC_001');
+        camposRecl.put('CC_Canal_Respuesta__c', 'Email');
         camposRecl.put('OwnerId', usuario.Id);
         camposRecl.put('SAC_StatusAuxiliar__c', 'SAC_001');
         camposRecl.put('AccountId', cuenta.Id);
         camposRecl.put('SAC_ProrrogaCounter__c', 0);
+        camposRecl.put('OS_Email__c', 'test.t@t.t');
         camposRecl.put('SuppliedEmail', 't.t@t.t');
         camposRecl.put('SAC_TipoConsumidor__c', 'Si');
         camposRecl.put('CC_Idioma__c', 'de');
@@ -600,7 +602,9 @@ public with sharing class SAC_LCMP_UpdateStatus_Test {
         User usuario = [SELECT id FROM User WHERE Username = 'Name12345@test.com' AND isActive = true LIMIT 1];
         
 		System.runAs(usuario){
-            
+            reclamacion.CC_Canal_Respuesta__c = 'Email';
+            reclamacion.OS_Email__c = 'testsac@testsac.testsac';
+            SAC_DatabaseDML.updateDML(reclamacion, false);
             SAC_LCMP_UpdateStatus.subsanarCaso(reclamacion.id, 'Varios', 'SAC_006', 'prueba@test.com', 'copiaprueba@test.com', '', 'pruebaCuerpo', 'pruebaAsunto', idsAdjuntos);
             
         }

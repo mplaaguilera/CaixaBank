@@ -411,7 +411,7 @@ public with sharing class SAC_AcuseRecibo_Email {
 
             if(!listaCasosSinAcuse.isEmpty()){
                 for(Case caso : listaCasosSinAcuse){
-                    caso.CC_AcuseRecibo__c = '1';
+                    caso.CC_AcuseRecibo__c = '0';
                 }
 
                 SAC_DatabaseDML.updateListDML(listaCasosSinAcuse, true);

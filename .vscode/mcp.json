@@ -1,6 +1,12 @@
 {
 	"servers": {
-
+		"test_research4": {
+			"command": "npx",
+			"args": [
+				"test_research4"
+			],
+			"type": "stdio"
+		}
 	},
 	"inputs": []
 }

@@ -1142,4 +1142,17 @@ public without sharing class SAC_Utils {
     public static List<String> listaCampo(List<SObject> lista, String campo) {
         return listaCampo(lista, campo, false);
     }
+
+
+	@AuraEnabled(cacheable=true)  
+    public static List<RecordType> obtenerRecordTypes(){
+        
+        List<String> nombresObjetos = new List<String>{'Case'};
+        List<String> nombresRT = new List<String>{'SAC_Reclamacion', 'SAC_Pretension', 'SAC_Consulta', 'SAC_ConsultaSAC'};
+        List<RecordType> listaRecordTypes = new List<RecordType>();
+
+        listaRecordTypes = [SELECT Id, DeveloperName FROM RecordType WHERE sObjectType IN :nombresObjetos AND DeveloperName IN :nombresRT];
+        
+        return listaRecordTypes;
+    }
 }

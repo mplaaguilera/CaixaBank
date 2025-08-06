@@ -1659,7 +1659,8 @@ public class SEG_EmailService_Test{
         
         System.runAs (usuarioTest) {
             Test.startTest();
-				List<Case> returnCasos = SEG_EmailService.procesarReferencias(lstSemillas,lstCaseNumbers,'Banca Corporativa','Corporativa');
+				Map<String,List<Case>> mapCasosProcesados = SEG_EmailService.procesarReferencias(lstSemillas,lstCaseNumbers,'Banca Corporativa','Corporativa');
+                List<Case> returnCasos = mapCasosProcesados.get('casoReciente');
             Test.stopTest();
             System.assertNotEquals(returnCasos, null,'No se ha encontrado el caso');  
         }
@@ -1737,7 +1738,8 @@ public class SEG_EmailService_Test{
             String casoCOPSNumber = casosNumFiltrados[0].CaseNumber;
             System.runAs (usuarioTest) {
                 Test.startTest();
-                List<Case> casosEncontrados = SEG_EmailService.procesarReferencias(lstSemillas, lstCaseNumbers, 'Banca Corporativa', 'Corporativa');
+                Map<String,List<Case>> mapCasosProcesados = SEG_EmailService.procesarReferencias(lstSemillas, lstCaseNumbers, 'Banca Corporativa', 'Corporativa');
+                List<Case> casosEncontrados = mapCasosProcesados.get('casoReciente');
                 Test.stopTest();
                 System.assertNotEquals(casosEncontrados, null, 'No se ha encontrado el caso');  
                 System.assertEquals(casosEncontrados[0].CaseNumber, casoCOPSNumber, 'No se ha encontrado el caso de COPS');

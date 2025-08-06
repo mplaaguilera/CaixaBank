@@ -6,7 +6,7 @@ public class OS_Event_AU_Test {
 
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
-        caso.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
         caso.Subject = 'Prueba Alerta';
         caso.Status = 'Pendiente Alerta';
         caso.Origin = 'Phone';

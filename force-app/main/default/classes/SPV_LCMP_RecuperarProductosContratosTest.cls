@@ -63,7 +63,6 @@ public with sharing class SPV_LCMP_RecuperarProductosContratosTest {
             Map<String, Object> camposEsc = new Map<String, Object>();
             camposEsc.put('SAC_Titulo__c', 'propuesta test');
             camposEsc.put('SAC_Propuesta__c', 'propuesta test');
-            camposEsc.put('SAC_MotivoEscalado__c', 'SPV_Alegación');
             camposEsc.put('SAC_CasoEscalado__c', reclamacion.Id);
             camposEsc.put('OwnerId', listaUsuarios[0].Id);
             camposEsc.put('SAC_GrupoColaborador__c', grupo.Id);

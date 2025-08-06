@@ -19,8 +19,13 @@ public with sharing class CC_WS_Autenticacion {
 			Opportunity oportunidad = (Opportunity)retorno.get('oportunidad');
 
 			Datetime fechaCaducidad = Datetime.valueOf(datos.get('fechaCaducidad'));
+			System.debug('::: operationKey: ' + String.valueOf(datos.get('operationKey')));
 			String body = '{"operationKey": "' + String.valueOf(datos.get('operationKey')) + '",';
-			body += '"taskData":{"telephone": "' + String.valueOf(datos.get('telefono')) + '","language": "' + String.valueOf(datos.get('idioma')) + '", "casoId":"' + String.valueOf(datos.get('casoId')) + '", "casoUso":"' + String.valueOf(datos.get('casoUso')) + '"},';
+			if (tipoAutenticacion == 'ClienteDigital') {
+				body += '"taskData":{"telephone": "' + String.valueOf(datos.get('telefono')) + '","language": "' + String.valueOf(datos.get('idioma')) + '", "casoId":"' + String.valueOf(datos.get('casoId')) + '", "casoUso":"' + String.valueOf(datos.get('casoUso')) + '"},';
+			} else if (tipoAutenticacion == 'Nivel2') {
+				body += '"taskData":{"telephone": "' + String.valueOf(datos.get('telefono')) + '","language": "' + String.valueOf(datos.get('idioma')) + '", "casoId":"' + String.valueOf(datos.get('casoId')) + '", "casoUso":"' + String.valueOf(datos.get('casoUso')) + '", "prefix":"' + String.valueOf('34') + '", "executionOrganizationId":"' + String.valueOf('001') + '"},';
+			}
 			body += '"expirationDate": "' + String.valueOf(fechaCaducidad.date()) + '",';
 			body += '"expirationTime": "' + String.valueOf(fechaCaducidad.time()).substring(0, 5) + '",';
 			body += '"customerInternalId": "' + CC_MetodosUtiles.encriptarSHA('SHA-512', String.valueOf(datos.get('numperso'))).toLowerCase() + '",';
@@ -29,7 +34,8 @@ public with sharing class CC_WS_Autenticacion {
 				body += '"visualizationData": {"tickets": [{"datum": "' + String.valueOf(datos.get('telefono')) + '","ticketvalue": "' + String.valueOf(datos.get('ticketvalue')) + '"}]},';
 			}
 			body += '"customerId" : "' + String.valueOf(datos.get('documento')) + '"}';
-
+			
+			System.debug('::: body: ' + body);
 			CC_TrazaInt__c traza = new CC_TrazaInt__c();
 			traza.Name = 'CC_WS_Envio_Autenticacion';
 			traza.CC_Identificador__c = autenticacionId + ' - ' + datos.get('numperso');
@@ -43,18 +49,25 @@ public with sharing class CC_WS_Autenticacion {
 				integracion.intSetting = 'CC_Autenticacion_Robusta';
 				integracion.body = body;
 				integracion.mHeaders = getRequestHeaders();
-				HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
-				response = CBK_HttpServiceIntegration.callHttpService(request, autenticacionId, 'CC_Autenticacion_Robusta');
+				HttpRequest requestt = CBK_HttpServiceIntegration.getRequest(integracion);
+				response = CBK_HttpServiceIntegration.callHttpService(requestt, autenticacionId, 'CC_Autenticacion_Robusta');
+				
+				Request reqInfo = Request.getCurrent();
+				String currentRequestId = reqInfo.getRequestId();
+				System.debug('::: request id: ' + currentRequestId);
 
-				response.setStatusCode(200); //DPK comentar
+				// response.setStatusCode(200); //Solo TEST
+
+				// Response para Nivel 2
+				// String body =  '{"authorizationId": "SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq", "status": "APPROVED", "mfa" : "", "challenge" : "", "EncryptionData" : ""}';
+				// Response.setBody(body); //Solo TEST
 
 				CC_Comunicaciones__c autenticacion = new CC_Comunicaciones__c(Id = autenticacionId);
 				autenticacion.CC_Fecha_Envio__c = Datetime.now();
 				traza.CC_FechaFin__c = Datetime.now();
 				traza.CC_MensajeSalida__c = response.getBody();
 
-				System.debug('::: response.getBody(): ' + response.getBody());
-
+				System.debug('::: response: ' + response.getStatusCode());
 				if (response.getStatusCode() != 200) { //KO
 
 					if (tipoObjeto == 'Case') {
@@ -260,12 +273,10 @@ public with sharing class CC_WS_Autenticacion {
 			HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
 			request.setEndpoint(request.getEndpoint().replace('{authorizationId}', autenticacion.CC_AuthorizationId__c ?? ''));
 
-			//HttpResponse responseConsulta = httpConsulta.send(requestConsulta);
-
 			HttpResponse responseConsulta = CBK_HttpServiceIntegration.callHttpService(request, idAutenticacion, 'CC_Autenticacion_Robusta_Estado');
-			responseConsulta.setStatusCode(200);//DPK comentar
-			String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"APPROVED"}';
-			responseConsulta.setBody(body);//DPK comentar
+			// responseConsulta.setStatusCode(200); //Solo TEST
+			// String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"APPROVED"}'; //Solo TEST
+			// responseConsulta.setBody(body); //Solo TEST
 
 			if (tipoObjeto == 'Case') {
 				caso = new Case(Id = recordId);
@@ -370,7 +381,7 @@ public with sharing class CC_WS_Autenticacion {
 				headers.put(lov.Name, lov.CC_Valor__c);
 			}
 		}
-        // system.debug('DPK headers' + headers);
+        system.debug('::: headers' + headers);
 		return headers;
 	}
 }

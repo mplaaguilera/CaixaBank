@@ -1,4 +1,4 @@
-public with sharing class CC_EmailMessage_BI_TRHan extends CC_TriggerHandlerBase {
+public with sharing class CC_EmailMessage_BI_TRHan extends CC_TriggerHandlerBase { 
     private static String handlerClass = 'CC_EmailMessage_BI_TRHan';
     private static String vEventType = 'beforeInsert';
     
@@ -17,7 +17,6 @@ public with sharing class CC_EmailMessage_BI_TRHan extends CC_TriggerHandlerBase
         informarOperativa(correosCc);
         comprobarContactos(correosCc);
         esAccionista(correosCc);
-        emailInbound(correosCc);
         idiomaCorreo(correosCc);
     }
     
@@ -63,12 +62,16 @@ public with sharing class CC_EmailMessage_BI_TRHan extends CC_TriggerHandlerBase
         List<String> referencias = new List<String>();
         List<Id> idsCasos = new List<Id>();
         List<EmailMessage> nuevoListadoCorreos = new List<EmailMessage>();
+        Map<Id, EmailMessage> nuevoListadoCorreosOutcoming = new Map<Id, EmailMessage>();
+
         for (EmailMessage correo : listNewObj) {
             String referencia = CC_EmailMessage.referenciaCorreo(correo);
             if (referencia != null && correo.Incoming) {
                 idsCasos.add(correo.ParentId);
                 referencias.add(referencia);
                 nuevoListadoCorreos.add(correo);
+            } else if (referencia != null && !correo.Incoming && correo.CC_Procedencia__c == null) {
+                nuevoListadoCorreosOutcoming.put(correo.parentId, correo);
             }
         }
         if (!referencias.isEmpty()){
@@ -77,7 +80,6 @@ public with sharing class CC_EmailMessage_BI_TRHan extends CC_TriggerHandlerBase
             for (Task tarea : tareasOrigen) {
                 mapaTipoTareaDelCorreo.put(tarea.WhatId, tarea.Type);
             }
-            
             for (EmailMessage correo : nuevoListadoCorreos) {
                 if (mapaTipoTareaDelCorreo.get(correo.parentId) == 'Traslado Colaborador') {
                     //Respuesta entrante de grupo colaborador
@@ -93,8 +95,15 @@ public with sharing class CC_EmailMessage_BI_TRHan extends CC_TriggerHandlerBase
                     correo.CC_Interno__c = true;
                 }
             }
-        }
+        }  
         
+        if(!nuevoListadoCorreosOutcoming.isEmpty()){
+            List<Case> casosOutcoming = [SELECT Id, CC_Referencia_Correo_Saliente__c, CC_Ultima_Operativa_Correo__c, CC_Grupo_Colaborador__c FROM Case WHERE Id IN :nuevoListadoCorreosOutcoming.keySet()];
+            for(Case caso : casosOutcoming){
+                nuevoListadoCorreosOutcoming.get(caso.Id).CC_Procedencia__c = caso.CC_Ultima_Operativa_Correo__c != null ? caso.CC_Ultima_Operativa_Correo__c : null;
+                nuevoListadoCorreosOutcoming.get(caso.Id).CC_Grupo_Colab__c = caso.CC_Grupo_Colaborador__c != null ? caso.CC_Grupo_Colaborador__c : null;
+            }
+        }
     }
     
     private static void comprobarContactos(List<EmailMessage> listNewObj) {
@@ -310,13 +319,9 @@ public with sharing class CC_EmailMessage_BI_TRHan extends CC_TriggerHandlerBase
             }
             
             if(!casosActualizar.isEmpty()) {
-                try {
-                    update casosActualizar;
-                    System.debug('Casos actualizados exitosamente: ' + casosActualizar.size());
-                } catch(Exception e) {
-                    System.debug('Error al actualizar casos: ' + e.getMessage());
-                    System.debug('Stack trace: ' + e.getStackTraceString());
-                }
+               
+                update casosActualizar;
+               
             }
         }
         
@@ -390,26 +395,5 @@ public with sharing class CC_EmailMessage_BI_TRHan extends CC_TriggerHandlerBase
         
     }
     
-    private static void emailInbound (List<EmailMessage> correos) {
-        List<EmailMessage> correosInbound = new List<EmailMessage>();
-        for (EmailMessage correo : correos) {
-            if (correo.Incoming = true && correo.CC_Aplicacion__c != 'SAC' && correo.CC_Aplicacion__c != 'CSBD') {
-                correosInbound.add(correo);
-            }
-        }
-        if(!correosInbound.isEmpty()) {
-            for(EmailMessage correo : correosInbound) {
-                try {
-                    Map<String, Object> flowInputs = new Map<String, Object>();
-                    flowInputs.put('recordId', correo.Id);
-                    Flow.Interview miFlow = Flow.Interview.createInterview('CC_Correo_No_Identificado', flowInputs);
-                    miFlow.start();
-                } catch(Exception e) {
-                    System.debug('Error al ejecutar el flow CC_Correo_No_Identificado para el correo ' + correo.Id + ': ' + e.getMessage());
-                }
-                
-            }
-        }
-    }
     
 }

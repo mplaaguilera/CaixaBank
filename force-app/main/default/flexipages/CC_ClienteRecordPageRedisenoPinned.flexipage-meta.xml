@@ -44,7 +44,7 @@
                         <valueListItems>
                             <value>Case.cc_Remitir_a_colaborador_QuickAction</value>
                             <visibilityRule>
-                                <booleanFilter>1 AND 2</booleanFilter>
+                                <booleanFilter>(1 AND 2) AND (NOT(3) OR 4 OR 5 OR 6 OR 7)</booleanFilter>
                                 <criteria>
                                     <leftValue>{!Record.Origin}</leftValue>
                                     <operator>NE</operator>
@@ -54,6 +54,31 @@
                                     <leftValue>{!$Permission.CustomPermission.CC_Remitir_Colaborador}</leftValue>
                                     <operator>EQUAL</operator>
                                     <rightValue>true</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!$Permission.CustomPermission.CC_Remitir_Colaborador_Ocultar_Boton}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>true</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!Record.CC_Canal_Procedencia__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Soporte Clientes CompraEstrella</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!Record.CC_Canal_Procedencia__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Soporte Empleados CompraEstrella</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!Record.CC_Canal_Procedencia__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Emisiones PromoCaixa</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!Record.CC_Canal_Procedencia__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Postventa CompraEstrella</rightValue>
                                 </criteria>
                             </visibilityRule>
                         </valueListItems>
@@ -201,10 +226,36 @@
                         <valueListItems>
                             <value>Case.cc_Trasladar_Colaborador_QuickAction</value>
                             <visibilityRule>
+                                <booleanFilter>1 AND (NOT(2) OR 3 OR 4 OR 5 OR 6)</booleanFilter>
                                 <criteria>
                                     <leftValue>{!$Permission.CustomPermission.CC_Trasladar_Colaborador}</leftValue>
                                     <operator>EQUAL</operator>
                                     <rightValue>true</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!$Permission.CustomPermission.CC_Trasladar_Colaborador_Ocultar_Boton}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>true</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!Record.CC_Canal_Procedencia__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Soporte Clientes CompraEstrella</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!Record.CC_Canal_Procedencia__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Soporte Empleados CompraEstrella</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!Record.CC_Canal_Procedencia__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Emisiones PromoCaixa</rightValue>
+                                </criteria>
+                                <criteria>
+                                    <leftValue>{!Record.CC_Canal_Procedencia__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Postventa CompraEstrella</rightValue>
                                 </criteria>
                             </visibilityRule>
                         </valueListItems>
@@ -239,9 +290,23 @@
                         </valueListItems>
                         <valueListItems>
                             <value>Case.cc_Derivar_SAC_QuickAction</value>
+                            <visibilityRule>
+                                <criteria>
+                                    <leftValue>{!$Permission.CustomPermission.CC_Derivar_SAC_Ocultar_Boton}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>false</rightValue>
+                                </criteria>
+                            </visibilityRule>
                         </valueListItems>
                         <valueListItems>
                             <value>Case.cc_Devolver_SAC_QuickAction</value>
+                            <visibilityRule>
+                                <criteria>
+                                    <leftValue>{!$Permission.CustomPermission.CC_Devolver_SAC_Ocultar_Boton}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>false</rightValue>
+                                </criteria>
+                            </visibilityRule>
                         </valueListItems>
                         <valueListItems>
                             <value>Case.Asociar_a_Caso</value>
@@ -1787,6 +1852,38 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>timelineConfigs</name>
+                    <valueList>
+                        <valueListItems>
+                            <value>Casos_y_oportunidades_del_Cliente</value>
+                        </valueListItems>
+                    </valueList>
+                </componentInstanceProperties>
+                <componentName>industries_common:timeline</componentName>
+                <identifier>industries_common_timeline</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-1ae949cc-16de-4e7d-99bd-b6a79b36ff50</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>showLegacyActivityComposer</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentName>runtime_sales_activities:activityPanel</componentName>
+                <identifier>runtime_sales_activities_activityPanel2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-1edbb1b5-3930-471c-bcbd-be908c020271</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
                     <name>active</name>
                     <value>true</value>
                 </componentInstanceProperties>
@@ -1883,6 +1980,34 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>flexipage_tab4</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-1ae949cc-16de-4e7d-99bd-b6a79b36ff50</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Casos Contact/Fraude/CSBD</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab8</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-1edbb1b5-3930-471c-bcbd-be908c020271</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Historial Oficina</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab9</identifier>
             </componentInstance>
         </itemInstances>
         <name>Facet-c669838e-e330-4731-967f-3ec1112fb0e2</name>

@@ -1,0 +1,24 @@
+<template>
+    <lightning-card>
+        <div class={toggleIconResumenIA}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-resumenIA" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableResumenIA}>
+                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                    </svg>
+                    <span class="slds-truncate" title="Section Title"> Resumen de Oportunidad IA</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-resumenIA">
+                <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                    <span class="slds-assistive-text">warning</span>
+                    <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small" title="Description of icon when needed">
+                    <lightning-icon icon-name="utility:warning" alternative-text="Warning!" title="Warning"></lightning-icon>
+                    </span>
+                    <h2>{label.mensajeIAResponsable}</h2>
+                </div>
+                <c-csbd-_resumen-oportunidad record-id={idOportunidad} plan-opo={planOpo} plan-ampli={planAmpli}></c-csbd-_resumen-oportunidad>
+            </div>
+        </div>
+    </lightning-card>
+</template>

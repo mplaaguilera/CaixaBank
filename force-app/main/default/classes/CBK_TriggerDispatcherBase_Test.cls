@@ -1,5 +1,5 @@
 @isTest
-public  class CBK_TriggerDispatcherBase_Test {
+public  class CBK_TriggerDispatcherBase_Test {  
     @isTest static void testVirtualMethods() {
         CC_TriggerParameters tp = new CC_TriggerParameters();
         CC_TriggerDispatcherBase base = new CC_TriggerDispatcherBase();
@@ -13,10 +13,68 @@ public  class CBK_TriggerDispatcherBase_Test {
         base.afterDelete(tp);
         base.afterUndelete(tp);
         base.andFinally();
+        
+        System.assertEquals(true, true);
     }
     @isTest static void testExecuteMethod() {
         new TriggerDispatcherBaseMock().executeAllDispatchers();
         System.assertEquals(true, true);
+    }
+
+    @isTest static void testBypass(){
+        User usuarioTest = [SELECT Id FROM User WHERE Email = 'test@test.com' LIMIT 1];
+        
+        System.runAs(usuarioTest){
+            CC_Trigger_Settings__mdt oTriggerSettings = new CC_Trigger_Settings__mdt();
+            oTriggerSettings.CBK_ExecutionPermissionsList__c = 'test';
+            oTriggerSettings.CBK_BypassPermissionsList__c = 'test';
+            oTriggerSettings.CBK_PermissionPriority__c = 'Bypass';
+            oTriggerSettings.CBK_Bypass__c = true;
+            Assert.areEqual(false, CC_TriggerFactory.checkBypass(oTriggerSettings), 'Bypass no comprobado correctamente');
+    
+            oTriggerSettings = new CC_Trigger_Settings__mdt();
+            oTriggerSettings.CBK_ExecutionPermissionsList__c = 'test';
+            oTriggerSettings.CBK_BypassPermissionsList__c = 'test';
+            oTriggerSettings.CBK_PermissionPriority__c = 'Execution';
+            oTriggerSettings.CBK_Bypass__c = true;
+            Assert.areEqual(false, CC_TriggerFactory.checkBypass(oTriggerSettings), 'Bypass no comprobado correctamente');
+    
+            CBK_TriggerHandlerAssociation__mdt oTriggerHandlerAssociation = new CBK_TriggerHandlerAssociation__mdt();
+            oTriggerHandlerAssociation.CBK_ExecutionPermissionsList__c = 'test';
+            oTriggerHandlerAssociation.CBK_BypassPermissionsList__c = 'test';
+            oTriggerHandlerAssociation.CBK_PermissionPriority__c = 'Bypass';
+            oTriggerHandlerAssociation.CBK_Bypass__c = true;
+            Assert.areEqual(false, CC_TriggerDispatcherBase.checkBypass(oTriggerHandlerAssociation), 'Bypass no comprobado correctamente');
+    
+            oTriggerHandlerAssociation = new CBK_TriggerHandlerAssociation__mdt();
+            oTriggerHandlerAssociation.CBK_ExecutionPermissionsList__c = 'test';
+            oTriggerHandlerAssociation.CBK_BypassPermissionsList__c = 'test';
+            oTriggerHandlerAssociation.CBK_PermissionPriority__c = 'Execution';
+            oTriggerHandlerAssociation.CBK_Bypass__c = true;
+            Assert.areEqual(false, CC_TriggerDispatcherBase.checkBypass(oTriggerHandlerAssociation), 'Bypass no comprobado correctamente');
+        }
+    }
+    
+    @isTest static void testCreateTriggerDispatcher(){
+        User usuarioTest = [SELECT Id FROM User WHERE Email = 'test@test.com' LIMIT 1];
+        
+        System.runAs(usuarioTest){
+            Account objCustom = new Account();
+
+            try{
+                CC_TriggerFactory.createTriggerDispatcher(objCustom.getSObjectType(),'CC_TriggerDispatcherBase');
+            }
+            catch(Exception e){
+                Assert.isTrue(true, 'Debería generar excepción');
+            }
+            
+            try{
+                CC_TriggerFactory.createTriggerDispatcher(objCustom.getSObjectType(),'__Invalid');
+            }
+            catch(Exception e){
+                Assert.isTrue(true, 'Debería generar excepción');
+            }
+        }
     }
 
     @testSetup

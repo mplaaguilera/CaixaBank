@@ -147,6 +147,7 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
         List<Case> listaComplementariasResueltas = new List<Case>();
         Set<Id> idsCambioNaturalezaComplementarias = new Set<Id>();
         List<Case> listaCambioNaturalezaComplementarias = new List<Case>();
+        Set<Id> idsCasosRelacionados = new Set<Id>();
 
         for (case caso : listNewObj) { 
             if (caso.RecordTypeId == RECTYPERECLAMACION) {
@@ -364,8 +365,12 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                 if(mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.SAC_ValidacionOficinaAfectada__c == false && ((mapOldObj.get(caso.Id).Status == 'SAC_002' && (caso.Status == 'SAC_003' || caso.Status == 'SAC_007'))
                                                                                                                                                         || (mapOldObj.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SAC_003')
                                                                                                                                                         || (mapOldObj.get(caso.Id).Status == 'SAC_006' && caso.Status == 'SAC_003'))) {
-                    System.debug('Entra en la validacion de ofiicna de la reclamacion');
                     listaValidarOficinaAfectada.add(caso);
+                }
+
+                //Si cambia el campo CC_CasoRelacionado__c de la reclamación, debe validar que el campo asignado es Reclamación SAC, Consulta SAC o Consulta COPS
+                if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).CC_CasoRelacionado__c != caso.CC_CasoRelacionado__c && caso.CC_CasoRelacionado__c != null) {
+                    idsCasosRelacionados.add(caso.CC_CasoRelacionado__c);
                 }
             }
             else if(caso.RecordTypeId == RECTYPEPRETENSION){
@@ -453,7 +458,6 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                 if(mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && ((mapOldObj.get(caso.Id).Status == 'SAC_002' && (caso.Status == 'SAC_003' || caso.Status == 'SAC_007'))
                                                                                                     || (mapOldObj.get(caso.Id).Status == 'SAC_001' && caso.Status == 'SAC_003')
                                                                                                     || (mapOldObj.get(caso.Id).Status == 'SAC_006' && caso.Status == 'SAC_003'))) {
-                    System.debug('Entra en la validacion de ofiicna de la pretension');
                     listaValidarOficinaAfectada.add(caso);
                 }
             }
@@ -513,6 +517,10 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                 if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status) {
                     listaCambioEstado.add(caso);
                 }
+                //Si cambia el campo CC_CasoRelacionado__c de la consulta COPS, debe validar que el campo asignado es Reclamación SAC, Consulta SAC o Consulta COPS
+                if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).CC_CasoRelacionado__c != caso.CC_CasoRelacionado__c && caso.CC_CasoRelacionado__c != null) {
+                    idsCasosRelacionados.add(caso.CC_CasoRelacionado__c);
+                }
                 listaConsulta.add(caso);   
                 listaRecPret.add(caso);
                 listaRecPretCons.add(caso);
@@ -562,6 +570,10 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                 if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status) {
                     listaCambioEstado.add(caso);
                 }
+                //Si cambia el campo CC_CasoRelacionado__c de la consulta SAC, debe validar que el campo asignado es Reclamación SAC, Consulta SAC o Consulta COPS
+                if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).CC_CasoRelacionado__c != caso.CC_CasoRelacionado__c && caso.CC_CasoRelacionado__c != null) {
+                    idsCasosRelacionados.add(caso.CC_CasoRelacionado__c);
+                }
             }
 
         }   
@@ -587,7 +599,6 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                         OR (RecordTypeId = :RECTYPERECLAMACION AND (Id IN :idsComplementariasAltaAnalisis OR Id IN :idsComplementariasResueltas))
                         OR (RecordTypeId = :RECTYPEPRETENSION AND Id IN :idsComplementariasAnalisisResolucion)
                         )];
-
 
         if (!procesado) {
             if (!listaReclamaciones.isEmpty()) {
@@ -643,7 +654,6 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                     //for(Case caso: listaCasos) { System.debug('Buscando el caso 9 ' + caso.Id);}
                     SAC_SeleccionDireccionRespuesta.setCanalRespuesta(listaRecRepresentanteValido);
                 }
-                if (!listaCaseAccALF.isEmpty()) { SAC_LCMP_RepresentanteValido.usarDatosDeAlf(listaCaseAccALF); }
                 if (!mapaBuscarPretensiones.isEmpty()){ 
                     if(!listaCasos.isEmpty()){
                         for (Case pretensionAux : listaCasos) {
@@ -819,7 +829,6 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                     //for(Case caso: listaCasos) { System.debug('Buscando el caso 14 ' + caso.Id);}
                     SAC_SeleccionDireccionRespuesta.setCanalRespuesta(listaRecRepresentanteValido);
                 }
-                if (!listaCaseAccALF.isEmpty()) {SAC_LCMP_RepresentanteValido.usarDatosDeAlf(listaCaseAccALF);}
                 if(!listaContactoPostal.isEmpty()){
                     SAC_Reclamacion.informarDireccionPostar(listaContactoPostal);
                 }
@@ -831,7 +840,6 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
                     // for(Case caso: listaCasos) { System.debug('Buscando el caso 15 ' + caso.Id);}
                     SAC_SeleccionDireccionRespuesta.setCanalRespuesta(listaRecRepresentanteValido);
                 }
-                if (!listaCaseAccALF.isEmpty()) { SAC_LCMP_RepresentanteValido.usarDatosDeAlf(listaCaseAccALF); }
                 if(!listaContactoPostal.isEmpty()){
                     SAC_Reclamacion.informarDireccionPostar(listaContactoPostal);
                 }
@@ -857,6 +865,10 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
             listaCaseMilestoneUpdatear.addAll(SAC_ComportamientoSLAs.finyReinicioSLAs(listaReclamaciones, mapOldObj));
             segundoProcesado=true;
         }*/
+
+        if (!listaCaseAccALF.isEmpty()) { 
+            SAC_LCMP_RepresentanteValido.usarDatosDeAlf(listaCaseAccALF); 
+        }
         
         if (!listaRecPretCons.isEmpty()) {
             SAC_Pretension.datosClienteReclamacion(listaRecPretCons, mapOldObj); //Rellena el campo NIF de la reclamación con el NIF de la Account asociada
@@ -903,6 +915,10 @@ public without sharing class SAC_Case_BU_TRHan extends CC_TriggerHandlerBase {
         //Rellena el campo SAC_GrupoLetrado__c de la consulta SAC que tiene vinculada la reclamación en cuestión
         if (!listaRecCambioGrupoLetrado.isEmpty()) {
             SAC_Reclamacion.informarGrupoLetradoConsultaSAC(listaRecCambioGrupoLetrado, idesReclaGlobal);
+        }
+
+        if(!idsCasosRelacionados.isEmpty()){
+            SAC_Reclamacion.validarCambioCasoRelacionado(listaRecPretCons, mapOldObj, idsCasosRelacionados);
         }
 
         SAC_DatabaseDML.upsertListDML(objetos, false); 

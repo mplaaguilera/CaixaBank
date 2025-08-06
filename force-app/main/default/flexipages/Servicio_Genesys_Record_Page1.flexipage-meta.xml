@@ -122,6 +122,12 @@
                 <identifier>RecordCC_Activo_Salesforce_cField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.CC_Grupo__c</fieldItem>
+                <identifier>RecordCC_Grupo__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-c83abaaa-b282-406a-8f6d-5f07c924c15a</name>
         <type>Facet</type>
     </flexiPageRegions>

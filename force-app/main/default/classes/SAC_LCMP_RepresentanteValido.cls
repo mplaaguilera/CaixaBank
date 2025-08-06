@@ -35,7 +35,6 @@ public without sharing class SAC_LCMP_RepresentanteValido {
                         WHERE (RecordType.DeveloperName = :'SAC_Reclamacion' OR RecordType.DeveloperName = :'SAC_Consulta' 
                         OR RecordType.DeveloperName = :'SAC_ConsultaSAC' OR RecordType.DeveloperName = :'SPV_Reclamacion') 
                         AND Id = :caseId LIMIT 1];
-
             return caso;
 
             //En caso de querer separarlo por perfiles, descomentar lo siguiente:

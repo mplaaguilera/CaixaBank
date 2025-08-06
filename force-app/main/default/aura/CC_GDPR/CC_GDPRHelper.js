@@ -66,5 +66,25 @@
         } else {
             alert('Este evento no está soportado');
         }
+    },
+
+    /*
+     * Este método crea una nueva tarea en el caso cuando se selecciona un derecho GDPR.
+     */
+    crearTareaEnCaso : function(component, derechoEjercido) {
+        let idCaso = component.get("v.recordId");
+        let crearTareaGDPR = component.get('c.crearTareaGDPR');
+        crearTareaGDPR.setParams({
+            'idCaso': idCaso,
+            'derechoEjercido': derechoEjercido
+        });
+        crearTareaGDPR.setCallback(this, $A.getCallback(function (response) {
+            let state = response.getState();
+            if (state === "ERROR") {
+                let errors = response.getError();
+                console.error('Error al crear tarea GDPR:', errors);
+            }
+        }));
+        $A.enqueueAction(crearTareaGDPR);
     }
 })

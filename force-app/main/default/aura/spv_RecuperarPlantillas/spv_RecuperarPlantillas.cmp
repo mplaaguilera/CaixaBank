@@ -16,7 +16,8 @@
     <aura:attribute name="idRaiz" type="String" />
     <aura:attribute name="puedeVolver" type="Boolean" default="true" />
 
-
+    <!-- Atributos para el desarrollo de añadir un tag a las imágenes insertadas -->
+    <aura:attribute name="flagCambioPlantilla" type="Boolean" default="false" />
 
     <!--Init-->
     <aura:handler name="init" value="{! this }" action="{! c.init }" /> 
@@ -49,7 +50,7 @@
                                         alternativeText="close"
                                         variant="bare-inverse"
                                         class="slds-modal__close"/>
-                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Directorio de plantillas</h2>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Directorio de plantillas de SPV</h2>
                 </header>
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                     <div class="slds-grid slds-gutters ">

@@ -551,6 +551,7 @@ public with sharing class CC_EmailSendController {
         permisos.put('CC_DeepLinking', FeatureManagement.checkPermission('CC_DeepLinking'));
         permisos.put('CC_GDPR', FeatureManagement.checkPermission('CC_GDPR'));
 		permisos.put('CC_Lync', FeatureManagement.checkPermission('CC_Lync'));
+        permisos.put('CC_Transferir_HDT', FeatureManagement.checkPermission('CC_Transferir_HDT'));
 
         //permisos SAC
         permisos.put('CC_parentIdRecordTypeIsSAC', caso.ParentId != null && CC_Revincular_Caso_Controller.getParentIdRecordTypeDeveloperName(caso) == 'SAC_Reclamacion');
@@ -680,6 +681,13 @@ public with sharing class CC_EmailSendController {
         }
 
         return obj;
+    }
+
+    @AuraEnabled
+    public static CC_CaseTransfer.TransferResult callTransferCaseToHDT(Id caseId) {
+        // Llamamos directamente al método de la clase CC_CaseTransfer
+        CC_CaseTransfer.TransferResult result = CC_CaseTransfer.transferCaseToHDT(caseId);
+        return result;
     }
 
     @AuraEnabled(cacheable=true)
@@ -1052,7 +1060,7 @@ public with sharing class CC_EmailSendController {
     @AuraEnabled
     public static void actualizarCaso(Id idCaso, String plantilla, Boolean informarReferenciaCorreo, String tratamiento, String operativa, String canalRespuesta, String canalProcedencia, String tipoRegistro) {
 		Case caso = new Case(Id = idCaso);
-        List<Case> casoRef = [SELECT Id, CC_MCC_Plantilla__c,CC_Email_Cabecera__c, CC_Email_Pie__c, CC_Matricula_Empleado__c, CaseNumber, CC_MCC_Tematica__r.name, CC_MCC_Tematica__c, CC_Tematica__c, CC_Idioma__c, Origin, CC_Canal_Procedencia__c, CC_Grupo_Colaborador__c, RecordtypeId, CC_En_Tercer_Nivel__c FROM Case WHERE Id = :idCaso LIMIT 1];
+        List<Case> casoRef = [SELECT Id, CC_MCC_Plantilla__c,CC_Email_Cabecera__c, CC_Email_Pie__c, CC_Matricula_Empleado__c, CaseNumber, CC_MCC_Tematica__r.name, CC_MCC_Tematica__c, CC_Tematica__c, CC_Idioma__c, Origin, CC_Canal_Procedencia__c, CC_Grupo_Colaborador__c, RecordtypeId, CC_En_Tercer_Nivel__c, CC_Fecha_Traslado_3N__c FROM Case WHERE Id = :idCaso LIMIT 1];
         if(casoRef[0].CC_MCC_Plantilla__c != null || casoRef[0].CC_Email_Cabecera__c != null || casoRef[0].CC_Email_Pie__c != null){
             vaciarPlantilla(idCaso);
             }
@@ -1289,9 +1297,22 @@ public with sharing class CC_EmailSendController {
     public static Boolean envioPoseidon(String sObjectId, String app, String numPer, String textoPublico, String textoPrivado, String asunto, String deeplink, String idioma,String titulo, String sobreTitulo, String textoBoton, String segundoParametro){
         Boolean validacion = true;
         String res = CC_Push_Notificacion_App.enviarNotificacionPushApp(sObjectId, app, numPer, textoPublico, textoPrivado, asunto, deeplink, idioma, titulo, sobreTitulo, textoBoton, segundoParametro);
+        system.debug('Resultado envioPoseidon: ' + res);
         if(String.isBlank(res)){
             validacion = false;
         }
+
+            // Actualizar el campo físico en el Caso
+        try {
+            Case c = [SELECT Id, CC_Excluido_Poseidon__c FROM Case WHERE Id = :sObjectId LIMIT 1];
+            c.CC_Excluido_Poseidon__c = !validacion; // true si falló => excluido
+            system.debug('Validacion '+validacion);
+            system.debug('Caso actualizado: ' + c.Id + ' | CC_Excluido_Poseidon__c = ' + c.CC_Excluido_Poseidon__c);
+            update c;
+        } catch (Exception e) {
+            CBK_Log.debug('Error al actualizar campo CC_Excluido_Poseidon__c: ' + e.getMessage());
+        }
+
         //update caso;
         return validacion;
     }

@@ -19,25 +19,28 @@ global with sharing class OS_Milestone implements Support.MilestoneTriggerTimeCa
             CC_MCC_Causa__r.OS_Horas_SLA__c, OS_Cola_Telefonia__c FROM Case WHERE Id = :caseId LIMIT 1];
         }
 
-        if (Cache.Org.contains('local.COPS.OSCalendario')) {
+        //if(!Test.isRunningTest()){
+            if (Cache.Org.contains('local.COPS.OSCalendario')) {
              businessHoursList = (List<BusinessHours>)Cache.Org.get('local.COPS.OSCalendario');
-            
-        }
-        else{
-            businessHoursList = [SELECT Id, name, MondayEndTime, TuesdayEndTime, WednesdayEndTime, ThursdayEndTime, FridayEndTime, SaturdayEndTime, SundayEndTime FROM BusinessHours];
-            Cache.Org.put('local.COPS.OSCalendario', businessHoursList,300);
-        }
+            }
+            else{
+                businessHoursList = [SELECT Id, name, MondayEndTime, TuesdayEndTime, WednesdayEndTime, ThursdayEndTime, FridayEndTime, SaturdayEndTime, SundayEndTime FROM BusinessHours];
+                Cache.Org.put('local.COPS.OSCalendario', businessHoursList,300);
+            }
 
-        if (Cache.Org.contains('local.COPS.OSListas')) {
-             listaBuzonesEmailColasTlfSLA = (List<CC_Lista_Valores__c>)Cache.Org.get('local.COPS.OSListas');
-            
-        }
-        else{
-            listaBuzonesEmailColasTlfSLA = [SELECT Id,Name, CC_Valor__c, CC_Lista__r.Name FROM CC_Lista_Valores__c WHERE 
-            (CC_Lista__r.Name = 'COPS: SLA Relación colas telefonía y canal de procedencia email' OR CC_Lista__r.Name = 'COPS: Horas SLA para servicios UAFE')
-            AND CC_Activa__c = true];
-            Cache.Org.put('local.COPS.OSListas', listaBuzonesEmailColasTlfSLA,300);
-        }
+            if (Cache.Org.contains('local.COPS.OSListas')) {
+                listaBuzonesEmailColasTlfSLA = (List<CC_Lista_Valores__c>)Cache.Org.get('local.COPS.OSListas');
+                
+            }
+            else{
+                listaBuzonesEmailColasTlfSLA = [SELECT Id,Name, CC_Valor__c, CC_Lista__r.Name FROM CC_Lista_Valores__c WHERE 
+                (CC_Lista__r.Name = 'COPS: SLA Relación colas telefonía y canal de procedencia email' OR CC_Lista__r.Name = 'COPS: Horas SLA para servicios UAFE')
+                AND CC_Activa__c = true];
+                Cache.Org.put('local.COPS.OSListas', listaBuzonesEmailColasTlfSLA,300);
+            }
+        //}
+
+        
         //Case caso = [SELECT Id, Entitlement.Name, CreatedDate, Origin, CC_Canal_Procedencia__c, CC_MCC_Tematica__c, CC_MCC_Tematica__r.OS_Horario__c, CC_MCC_ProdServ__c, CC_MCC_ProdServ__r.OS_Horario__c, CC_MCC_Causa__c, CC_MCC_Causa__r.OS_Horas_SLA__c, OS_Cola_Telefonia__c FROM Case WHERE Id = :caseId LIMIT 1];
         
         //List<CaseMilestone> milestonesEnCurso = [SELECT CompletionDate, TargetDate, CaseId, TargetResponseInMins FROM CaseMilestone WHERE CaseId =:caseId];

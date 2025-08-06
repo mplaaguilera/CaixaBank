@@ -10,10 +10,6 @@
 	// 	$A.enqueueAction(getActividadesTrasladoColaborador);
 	// },
 
-	onInit : function(component, event, helper) {
-        helper.subscribeToEvent(component);
-    },
-
 	recordDataUpdated: function(component, event, helper) {
 		if (event.getParams().changeType === 'LOADED' || event.getParams().changeType === 'CHANGED') {
 			component.set('v.estadoInicial', component.get('v.caso.Status'));
@@ -395,7 +391,7 @@
 				}
 			});
 			$A.enqueueAction(action);
-		} else if (component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Onboarding' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Onboarding' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Desistir' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Desistir') {
+		} else if ((component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Onboarding' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Onboarding' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c') === 'Desistir' || component.get('v.caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c') === 'Desistir') && component.get('v.caso.CBK_Case_Extension_Id__c') != null) {
 			if (component.get('v.caso.CBK_Case_Extension_Id__r.CC_DerivadoBPO__c') === false) {
 				let action = component.get("c.comprobarCodigoOnboarding");
 				action.setParams({'codigo': component.get('v.caso.CBK_Case_Extension_Id__r.CC_CodigoONB__c')});
@@ -721,6 +717,31 @@
 			helper.mostrarToast('error', 'Campo obligatorio', 'Es necesario que informes el campo Reapertura Válida');
 		} else {
 			helper.mostrarToast('success', 'Se actualizó Caso', 'Se actualizaron correctamente los datos del caso ' + component.get('v.caso.CaseNumber'));
+			//MBO
+			if (!component.get('v.cerrarCaso')) {
+				try {
+					let comprobarArgos = component.get('c.mostrarModalArgos');
+					comprobarArgos.setParams({ recordId: component.get('v.recordId') });
+					comprobarArgos.setCallback(this, response => {
+						if (response.getState() === 'SUCCESS' && response.getReturnValue() === true) {
+							// SOLO ahora pedimos el texto
+							let actionMsg = component.get('c.getMensajeOperativaDerivarArgos');
+							actionMsg.setCallback(this, respMsg => {
+								if (respMsg.getState() === 'SUCCESS') {
+									component.set('v.mensajeOperativaOficinaArgos', respMsg.getReturnValue());
+								}
+								// Abrimos el modal Y el backdrop _una vez_ tenemos o no el mensaje
+								$A.util.addClass(component.find('modalOperativaOficinaArgos'), 'slds-fade-in-open');
+								$A.util.addClass(component.find('backdrop'), 'slds-backdrop_open');
+							});
+							$A.enqueueAction(actionMsg);
+						}
+					});
+					$A.enqueueAction(comprobarArgos);
+				} catch (e) {
+					console.error('Error al abrir el modal de derivación a oficina Argos: ', e);
+				}
+			}
 		}
 		/*if(component.get('v.continuarGuardarCerrar')) {
 			$A.enqueueAction(component.get('c.modalDerivarCerrar'));
@@ -793,6 +814,7 @@
 		component.set('v.cierroCaso', false);
 		component.set('v.mostrarComponenteOperativaDerivar', true);
 		$A.util.removeClass(component.find('modalOperativaOficina'), 'slds-fade-in-open');
+		$A.util.removeClass(component.find('modalOperativaOficinaArgos'), 'slds-fade-in-open');//MBO
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 		if (component.get('v.cerrarCaso')) {
 			helper.guardarCerrarAuxiliar(component);
@@ -821,7 +843,8 @@
 
 		//component.set('v.mostrarAvisoOperativaOficina', false);
 		$A.util.removeClass(component.find('modalOperativaOficina'), 'slds-fade-in-open');
-		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
+		$A.util.removeClass(component.find('modalOperativaOficinaArgos'), 'slds-fade-in-open');//MBO
+		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop_open');
 		if (component.get('v.cerrarCaso')) {
 			component.set('v.cierroCaso', true);
 			helper.guardarCerrarAuxiliar(component);

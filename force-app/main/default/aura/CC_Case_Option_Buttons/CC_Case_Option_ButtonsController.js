@@ -598,9 +598,47 @@
 														$A.enqueueAction(component.get('c.llamadaWSOnboarding'));
 
 													}
+												} else if (nombreBoton === 'Transferir HDT') {
+													if ((!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) && !component.get('v.noIdentificado') ||
+													!component.get('v.canalProcedencia') || !component.get('v.canalEntrada') || !component.get('v.canalOperativo') || !component.get('v.causa')){ //|| (!component.get('v.solucion') && component.get('v.tipoRegistro') != 'CC_Cliente')
+														helper.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Canal de entrada, Canal de procedencia, Idioma, Tipo de contacto, Canal operativo, Causa, Cuenta y Contacto');
+													} else {
+														$A.enqueueAction(component.get('c.abrirModalTransferirHDT'));
+													}
+													// Llamada al método de Apex para iniciar la transferencia
+													let action = component.get('c.transferCaseToHDT'); // Este es el método de Apex que crearás
+													action.setParams({
+														caseId: recordId,
+													});
+
+
+												action.setCallback(this, function(response) {
+													component.set('v.spinnerActivado', false); // Desactivar spinner al recibir respuesta
+
+												let state = response.getState();
+												if (state === 'SUCCESS') {
+													let result = response.getReturnValue();
+													if (result.isSuccess) {
+														helper.mostrarToast('success', 'Transferencia Exitosa', result.message);
+														// Opcional: Recargar la vista del caso para ver los cambios (ej. estado, vínculo)
+														$A.get('e.force:refreshView').fire();
+													} else {
+														helper.mostrarToast('error', 'Error en Transferencia', result.message);
+													}
+												} else if (state === 'ERROR') {
+													let errors = response.getError();
+													let errorMessage = 'Error desconocido al transferir el caso.';
+													if (errors && errors[0] && errors[0].message) {
+														errorMessage = errors[0].message;
+													}
+													helper.mostrarToast('error', 'Error del Servidor', errorMessage);
 												}
-											}
+
+													});
+													$A.enqueueAction(action);
+												}
 										}
+									}
 									});
 									$A.enqueueAction(validarCamposCaso);
 								}
@@ -713,7 +751,106 @@
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
+	 transferirHDT: function(component, event, helper) { 
+        //  Validar la selección del grupo 
+        /*let selectedGroup = null;
+        if (!component.get('v.verTodosLosGrupos')) {
+            selectedGroup = component.find('selectGroups').get('v.value');
+            if (!selectedGroup) {
+                helper.mostrarToast('error', 'Error de Validación', 'Debe seleccionar un grupo para transferir el caso.');
+                return; // Detiene la ejecución si la validación falla
+            }
+        }*/
+
+		console.log('Iniciando transferencia HDT...');
+
+		$A.util.removeClass(component.find('ModalboxTransferirHDT'), 'slds-fade-in-open');
+    	$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
+    
+		component.set('v.spinnerActivado', true);
+
+        // Obtener el ID del caso actual
+        let recordId = component.get('v.recordId');
+
+        //  Preparar la llamada al método de Apex
+        // Se obtiene una referencia al método 'transferCaseToHDT' de la clase Apex 'CC_CaseTransfer'
+
+		try {
+	
+			let action = component.get('c.callTransferCaseToHDT'); 
+			action.setParams({
+				caseId: recordId,
+			});
+
+			action.setCallback(this, function(response) {
+
+				console.log('--- INICIO DEL CALLBACK DE APEX ---');
+
+				component.set('v.spinnerActivado', false);
+
+				
+
+				let state = response.getState();
+				console.log('Estado de la respuesta de Apex:', state);
+
+				if (state === 'SUCCESS') {
+					let result = response.getReturnValue(); 
+					if (result.isSuccess) {
+						helper.mostrarToast('success', 'Transferencia Exitosa', result.message);
+						$A.get('e.force:refreshView').fire(); 
+					} else {
+						helper.mostrarToast('error', 'Error en Transferencia', result.message);
+					}
+				} else if (state === 'ERROR') {
+					let errors = response.getError();
+					let errorMessage = 'Error desconocido al transferir el caso.';
+					if (errors && errors[0] && errors[0].message) {
+						errorMessage = errors[0].message;
+					}
+					helper.mostrarToast('error', 'Error del Servidor', errorMessage);
+				}
+				
+
+			});
+
+			// Encolar la acción para que sea enviada al servidor y se ejecute el Apex
+			$A.enqueueAction(action);
+
+		} catch (e) { // <--- Fin del try-catch envolviendo la acción y encolado
+            console.error('Error JavaScript al iniciar la acción Apex:', e.message, e.stack);
+            component.set('v.spinnerActivado', false); // Asegúrate de desactivar el spinner si falla al iniciar
+            helper.mostrarToast('error', 'Error de Inicio', 'No se pudo iniciar la transferencia: ' + e.message);
+        }
+    },
+
+	cerrarModalTransferirHDT: function(component) {
+		try {
+		console.log('Intentando cerrar el modal.');
+		let modalTransferirHDT = component.find('ModalboxTransferirHDT');
+		console.log('Referencia del modal TransferirHDT:', modalTransferirHDT); 
+
+		if (modalTransferirHDT) { 
+			$A.util.removeClass(modalTransferirHDT, 'slds-fade-in-open');
+			console.log('Clase slds-fade-in-open eliminada del modal.');
+		} else {
+			console.error('ERROR: No se encontró el modal con aura:id "ModalboxTransferirHDT"'); 
+		}
+
+		let backdropRef = component.find('backdrop');
+		console.log('Referencia del backdrop:', backdropRef); 
+		if (backdropRef) {
+			$A.util.removeClass(backdropRef, 'slds-backdrop--open');
+			console.log('Clase slds-backdrop--open eliminada del backdrop.');
+		} else {
+			console.error('ERROR: No se encontró el backdrop con aura:id "backdrop"'); 
+		}
+		}catch (e){
+			console.log('Error al cerrar el modal:', e.message, e.stack);
+		}
+	},
+
 	prepararCuerpoEmail: function(component, event, helper) {
+		console.log('Preparar cuerpo email');
 		let listPara = [];
 		let listCC = [];
 		let contador = 0; //Utilizado para limitar el numero de copias en traslados y remitidos
@@ -728,7 +865,9 @@
 		const segundaOficinaName = segundaOficina ? segundaOficina.Name : null;
 		const segundaOficinaEmail = segundaOficina ? segundaOficina.CC_Email__c : null;
 		if (component.get('v.idBoton') === 'tab1') {
+			console.log('Preparar cuerpo email desde Trasladar Colaborador');
 			if (oficinaGestoraSeleccionada && oficinaSeleccionada) {
+				console.log('Preparar cuerpo email desde Trasladar Colaborador con oficina gestora y seleccionada');
 				//OficinaGestora del cliente
 				let buscarEmpleadoOfi = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleadoOfi.setParams({
@@ -810,6 +949,7 @@
 				});
 				$A.enqueueAction(buscarEmpleadoOfi);
 			} else if (oficinaSeleccionada && !oficinaGestoraSeleccionada) {
+				console.log('Preparar cuerpo email desde Trasladar Colaborador con oficina seleccionada');
 				//Otra oficina
 				let buscarEmpleadoOfi = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleadoOfi.setParams({
@@ -896,6 +1036,7 @@
 
 				$A.enqueueAction(buscarEmpleadoOfi);
 			} else if (empleadoSeleccionado && empleadoGestorSeleccionado) {
+				console.log('Preparar cuerpo email desde Trasladar Colaborador con empleado gestor y seleccionado');
 				let buscarEmpleOfi = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleOfi.setParams({
 					'idOficina': component.get('v.oficinaGestor'),
@@ -998,6 +1139,7 @@
 				});
 				$A.enqueueAction(buscarEmpleOfi);
 			} else if (empleadoSeleccionado && !empleadoGestorSeleccionado) {
+				console.log('Preparar cuerpo email desde Trasladar Colaborador con empleado seleccionado');
 				let buscarEmpleado = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleado.setParams({
 					'idOficina': component.get('v.selectedRecord').Id,
@@ -1083,6 +1225,7 @@
 				});
 				$A.enqueueAction(buscarEmpleado);
 			} else {
+				console.log('Preparar cuerpo email desde Trasladar Colaborador sin empleado ni oficina');
 				let buscarColaborador = component.get('c.buscarColaborador');
 				buscarColaborador.setParams({'idGrupoColaborador': component.get('v.grupoSeleccionadoValue')});
 				buscarColaborador.setCallback(this, responseBuscarColaborador => {
@@ -1101,23 +1244,30 @@
 								listCC.pop();
 							}
 							while (listPara.length) {
+								console.log('listPara1: ' + listPara);
 								listPara.pop();
+								console.log('listPara2: ' + listPara);
 							}
 						} else if (listCC[0] === undefined) {
 							while (listCC.length) {
 								listCC.pop();
 							}
 						} else if (listPara[0] === undefined) {
+							console.log('listPara3: ' + listPara);
 							while (listPara.length) {
 								listPara.pop();
 							}
+							console.log('listPara4: ' + listPara);
 						}
 
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+							console.log('Preparar cuerpo email desde Trasladar Colaborador con tipo registro CC_Cliente');
+							console.log('listPara: ' + JSON.stringify(listPara));
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', component.get('v.grupoSeleccionadoName'), 'Traslado Colaborador');
 
 						}else{
+							console.log('Preparar cuerpo email desde Trasladar Colaborador con tipo registro diferente a CC_Cliente');
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -1141,6 +1291,7 @@
 
 					}
 				});
+				console.log('ListParaFinal '+listPara);
 				$A.enqueueAction(buscarColaborador);
 			}
 		} else if (component.get('v.idBoton') === 'tab2') {
@@ -1517,8 +1668,10 @@
 
 						//Preparar borrador de correo con la plantilla seleccionada
 						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+							console.log('v.tipoRegistro == CC_Cliente');
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoSeleccionadoName, 'Remitir Colaborador');
-						}else{
+
+						}else{						
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -1546,6 +1699,7 @@
 	},
 
 	trasladarColaborador: function(component, event) {
+		console.log('Trasladar Colaborador');
 		let buttonClicked = event.getSource().getLocalId();
 		component.set('v.idBoton', buttonClicked);
 		let plantilla = '';
@@ -1561,6 +1715,7 @@
 					let oficina = responseOficinaAccount.getReturnValue();
 					component.set('v.oficinaAccount', oficina);
 					if (oficinaSeleccionada && (oficinaGestoraSeleccionada || !oficinaGestoraSeleccionada)) {
+						console.log('Preparar cuerpo email desde Trasladar Colaborador con oficina seleccionada');
 						if (!component.get('v.oficinaAccount')) {
 							let toastEvent = $A.get('e.force:showToast');
 							toastEvent.setParams({title: 'Oficina no permitida', message: 'No se puede realizar la operativa con esta oficina.', type: 'error', mode: 'dismissable', duration: '4000'});
@@ -1595,6 +1750,7 @@
 							$A.enqueueAction(actualizarCaso);
 						}
 					} else if (!oficinaSeleccionada) {
+						console.log('Preparar cuerpo email desde Trasladar Colaborador sin oficina seleccionada');
 						if (component.get('v.uncheckedPlantilla')) {
 							plantilla = component.get('v.selectedRecordPlantilla.Id');
 							nombrePlantilla = component.get('v.selectedRecordPlantilla.Name');
@@ -2009,6 +2165,18 @@
 		$A.get('e.force:refreshView').fire();
 	},
 
+	abrirModalTransferirHDT: function(component, event, helper) {
+
+		$A.util.addClass(component.find('ModalboxTransferirHDT'), 'slds-fade-in-open');
+		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
+		helper.getPicklistMCCGrupo(component, event, helper);
+
+		if (component.find('selectGroups')) {
+			//eslint-disable-next-line @lwc/lwc/no-async-operation
+			window.setTimeout($A.getCallback(() => component.find('selectGroups').focus()), 50);
+		}
+	},
+
 	//Funciones referentes al Trasladar a 3N
 	abrirModalTrasladar3N: function(component, event, helper) {
 
@@ -2360,12 +2528,16 @@
 			if(event) {
 				myData = event.getParam('data') || {};
 			}
+			//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			if(myData && myData.responderClienteDerivar != null) {
 				component.set('v.tipoOperativa', 'responderClienteDerivar');
+				//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			} else {
 				component.set('v.tipoOperativa', 'responder');
 			}
+			//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			helper.loadCarpetasIdioma(component, event, helper);
+			//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			if (component.get('v.tipoRegistro') === 'CC_Cliente' && canalRespuesta === 'Carta' && component.get('v.psSdocs')) {
 				$A.util.addClass(component.find('ModalboxPrevioResponderCliente'), 'slds-fade-in-open');
 			} else {
@@ -2563,6 +2735,7 @@
 
 	seleccionarPlantilla: function(component, event) {
 		component.set('v.plantillaEstaSeleccionada', true);
+		//console.log('LOG seleccionar plantilla ' + Date.now());
 		let tipoOperativa = component.get('v.tipoOperativa');
 
 		let plantillaId = event.getParam('value');
@@ -3181,6 +3354,12 @@
 	modalTrasladar2NTeclaPulsada: function(component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalTrasladar2N'));
+		}
+	},
+
+	modalTransferirHDTTeclaPulsada: function(component, event) {
+		if (event.keyCode === 27) { //ESC
+			$A.enqueueAction(component.get('c.cerrarModalTransferirHDT'));
 		}
 	},
 
@@ -3852,7 +4031,11 @@
 			let nombreBoton = 'Remitir Colaborador';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "derivarBotonera" && origen == "derivarButton"){
+		}else if(destino == "derivarBotonera" && origen == "derivarButton"){ //utilizado para levantar el derivar desde el quickaction
+			let nombreBoton = 'operativaOficina';
+			component.set('v.botonName', nombreBoton);
+			$A.enqueueAction(component.get('c.validacionesOperativa'));
+		}else if(destino == "derivarBotonera" && origen == "operativaDerivar"){ //utilizado para levantar el derivar desde el LWC de operativa oficina
 			let nombreBoton = 'operativaOficina';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));

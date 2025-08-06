@@ -1,0 +1,120 @@
+<template>
+    <!--Desplegable Negociación-->
+    <template if:true={mostrarNegociaciones}>
+        <!--Bucle para recorrer los campos de las pretensiones -->
+        <template for:each={listPretensionesNegociacion} for:item="pretension">
+            <div data-id={pretension.Id} class={toggleSeccionPretensiones} key={pretension.Id}>
+                <h1 class="slds-section__title">
+                    <button data-name={pretension.Id} aria-controls="expando-unique-id-negociacion" aria-expanded="true" class="slds-button slds-section__title-action seccion" onclick={handleExpandirPretension}>
+                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon_x-small flecha" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                    </svg>
+                    <span class="slds-truncate" title="Section Title"> Pretension {pretension.CaseNumber}</span>
+                    </button>
+                </h1>
+                <div class="slds-section__content" key={pretension.Id}> 
+                    <lightning-record-view-form object-api-name="Case" data-record-id={pretension.Id} record-id={pretension.Id}>
+                        <div class="slds-grid slds-wrap" style="margin-left: 15px;margin-bottom: 20px;">
+                            <!-- Campo SAC_ResultadoNegociacion__c -->
+                            <div class="slds-col slds-size_1-of-1 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_ResultadoNegociacion__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                            <!-- Campo CC_Importe_Reclamado__c -->
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="CC_Importe_Reclamado__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                            <!-- Campo SAC_DetalleResultadoNegociacion__c -->
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_DetalleResultadoNegociacion__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                            <!-- Campo SAC_Importe_Resuelto__c -->
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_Importe_Resuelto__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                            <!-- Campo SAC_Motivoresultadonegociacion__c -->
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_Motivoresultadonegociacion__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                            <!-- Campo SAC_TipoInteresContrato__c -->
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_TipoInteresContrato__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                            <!-- Campo SAC_TipoInteresNegociado__c -->
+                            <div class="slds-col slds-size_1-of-2 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_TipoInteresNegociado__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                            <!-- Campo SAC_Observaciones__c -->
+                            <div class="slds-col slds-size_1-of-1 elemento-form">
+                                <lightning-layout-item class="slds-form-element_readonly" size="12">
+                                    <lightning-layout>
+                                        <lightning-layout-item size="11" class="slds-border_bottom">
+                                            <lightning-output-field field-name="SAC_Observaciones__c"></lightning-output-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="1" class="slds-border_bottom">
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-layout-item>
+                            </div>
+                        </div>
+                    </lightning-record-view-form> 
+                </div>
+            </div>
+    </template>                 
+    <!--Fin desplegable Negociación-->
+</template>

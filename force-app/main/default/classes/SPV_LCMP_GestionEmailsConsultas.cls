@@ -19,7 +19,7 @@ public with sharing class SPV_LCMP_GestionEmailsConsultas {
 
         if(!Schema.sObjectType.Case.isAccessible() || !Schema.sObjectType.SAC_Interaccion__c.isAccessible() || !Schema.sObjectType.EmailTemplate.isAccessible() || !Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()){ throw new AuraHandledException( 'Fallo al acutalizar.' ); }
 
-        SAC_Interaccion__c interaccion = [SELECT Id, SAC_IndexedThreadId__c, SAC_Oficina__c, SAC_Reclamacion__c, SAC_GrupoColaborador__c, SAC_DNI__c, SAC_Reclamante__c, SAC_Respuesta__c     //Obtener el caso relacionado
+        SAC_Interaccion__c interaccion = [SELECT Id, SAC_IndexedThreadId__c, SAC_Oficina__c, SAC_Reclamacion__c, SPV_TareaRelacionada__r.SAC_Reclamacion__c, SAC_GrupoColaborador__c, SAC_DNI__c, SAC_Reclamante__c, SAC_Respuesta__c     //Obtener el caso relacionado
                                     FROM SAC_Interaccion__c
                                     WHERE Id =: record];
 
@@ -29,7 +29,7 @@ public with sharing class SPV_LCMP_GestionEmailsConsultas {
 
         Case reclamacion = [SELECT Id, Origin, OS_Email__c, SAC_DireccionPostal__c, CC_Canal_Respuesta__c, SuppliedEmail, Account.CC_Email__c, RecordTypeId,
                              Status, CaseNumber, RecordType.Name, AccountId, CC_Idioma__c, Account.RecordTypeId, SAC_Reclamacion__c, SAC_Reclamacion__r.CC_Canal_Respuesta__c
-                                FROM Case WHERE RecordTypeId =: RECTYPERECLAMACION AND Id =: interaccion.SAC_Reclamacion__c];
+                                FROM Case WHERE RecordTypeId =: RECTYPERECLAMACION AND Id IN (:interaccion.SAC_Reclamacion__c, :interaccion.SPV_TareaRelacionada__r.SAC_Reclamacion__c)];
 
         List<String> body = new List<String>();
         body.add(et.HtmlValue);

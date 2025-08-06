@@ -108,6 +108,23 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
+                <fieldItem>Record.SAC_PermiteDerivacion__c</fieldItem>
+                <identifier>RecordSAC_PermiteDerivacion_cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>SPV_GrupoGestor</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
                 <fieldItem>Record.SAC_NivelGrupo__c</fieldItem>
                 <identifier>RecordSAC_NivelGrupo_cField</identifier>
                 <visibilityRule>

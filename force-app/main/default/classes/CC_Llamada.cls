@@ -197,7 +197,7 @@ public with sharing class CC_Llamada {
             CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
                                                         FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :inputConsulta.servicio LIMIT 1];
             String tipoActividad = tipoConsulta(servicioGenesys);
-            return crearActividad(inputLlamada.llamadaId, inputConsulta.casoId, tipoActividad, servicioGenesys.Name, 'Consulta no atendida');
+            return crearActividad(inputLlamada.llamadaId, inputConsulta.casoId, tipoActividad, servicioGenesys.Name, 'Consulta no atendida', null);
         } else if (String.isNotBlank(inputConsulta.empleadoTelefono)) {
             return crearActividadEmpleado(inputConsulta.salesforceParentId, inputConsulta.casoId, inputConsulta.empleadoId, inputConsulta.empleadoTelefono, 'Consulta no atendida', 'Consulta externa a empleado no atendida');
         } else {
@@ -288,7 +288,7 @@ public with sharing class CC_Llamada {
         if (String.isNotBlank(inputConsulta.servicio)) {
             CC_Servicio_Genesys__c servicioGenesys = [SELECT CC_Tipo__c, CC_Activo_Salesforce__c FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :inputConsulta.servicio LIMIT 1];
             if (!servicioGenesys.CC_Activo_Salesforce__c) {
-                crearActividad(inputConsulta.salesforceParentId, inputConsulta.casoId, servicioGenesys.CC_Tipo__c.equals('Empleado') ? 'Consulta externa a empleado' : 'Consulta externa', inputConsulta.servicio, tipoCierre);
+                crearActividad(inputConsulta.salesforceParentId, inputConsulta.casoId, servicioGenesys.CC_Tipo__c.equals('Empleado') ? 'Consulta externa a empleado' : 'Consulta externa', inputConsulta.servicio, tipoCierre, null);
             }
         } else if (String.isNotBlank(inputConsulta.empleadoTelefono)) {
             crearActividadEmpleado(inputConsulta.salesforceParentId, inputConsulta.casoId, inputConsulta.empleadoId, inputConsulta.empleadoTelefono, tipoCierre, 'Consulta externa a empleado');
@@ -417,7 +417,7 @@ public with sharing class CC_Llamada {
         } else {
             tipoActividad = llamada.CC_Tipo__c.equals('Saliente') ? 'Llamada saliente' : 'Llamada entrante';
         }
-        crearActividadFuture(llamada.Id, caso.Id, tipoActividad, servicioGenesys.Name);
+        crearActividadFuture(llamada.Id, caso.Id, tipoActividad, servicioGenesys.Name, llamada.CC_Contacto__c);
     }
 
     private static void identificarPorNumPerso(CC_Llamada__c llamada, String numPerso) {
@@ -442,9 +442,6 @@ public with sharing class CC_Llamada {
             List<Account> cuentas = (List<Account>)mapaCuentasContactos.get('CUENTAS');
             List<Account> cuentasAct = new List<Account>();
 
-            system.debug('DPK cuentas --->' + cuentas.size());
-            system.debug('DPK cuentas --->' + cuentas);
-
             if (cuentas.size() == 1) {
                if (llamada.CC_Perfil__c == 'EMPLEADOSEAP'){
 					cuentas[0].CC_Empleados_Familiares__c = true;
@@ -457,9 +454,6 @@ public with sharing class CC_Llamada {
                     Account cuentaSinNombre = new Account(Id=cuentas[0].Id, CC_Perfil__c=cuentas[0].CC_Perfil__c);
                     cuentasAct.add(cuentaSinNombre);
                  }
-                 system.debug('DPK cuentasAct --->' + cuentasAct.size());
-                 system.debug('DPK cuentasAct --->' + cuentasAct);
-     
 
                 // Cambio para añadir representantes.
                 if (mapaCuentasContactos.containsKey('REPRESENTANTES')) {
@@ -608,6 +602,7 @@ public with sharing class CC_Llamada {
     }
 
     private static Task crearObjetoActividad(Id llamadaId, Id casoId, String tipoActividad, String detalle, String tipoCierre) {
+        Id contactId = [SELECT Id, CC_Contacto__c FROM CC_Llamada__c WHERE Id =: llamadaId].CC_Contacto__c; 
         Task actividad = new Task(
             Subject = tipoActividad + (detalle != null ? ' (' + detalle + ')' : ''),
             CC_Llamada_Id__c = llamadaId,
@@ -616,7 +611,8 @@ public with sharing class CC_Llamada {
             WhatId = casoId,
             Type = tipoActividad,
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task'),
-            CC_validacion_tarea_manual__c = true
+            CC_validacion_tarea_manual__c = true,
+            whoId = contactId
         );
 
         if (tipoCierre != null) {
@@ -627,25 +623,37 @@ public with sharing class CC_Llamada {
         return actividad;
     }
 
-    private static Id crearActividad(Id llamadaId, Id casoId, String tipoActividad, String detalle, String tipoCierre) {
+    private static Id crearActividad(Id llamadaId, Id casoId, String tipoActividad, String detalle, String tipoCierre, Id contactId) {
         Task actividad = crearObjetoActividad(llamadaId, casoId, tipoActividad, detalle, tipoCierre);
+        if(contactId != null && actividad.whoId == null){
+            actividad.WhoId = contactId;
+        }
         insert actividad;
         return actividad.Id;
     }
 
     private static Id crearActividad(Id llamadaId, Id casoId, String tipoActividad, String telefono) {
-        return crearActividad(llamadaId, casoId, tipoActividad, telefono, null);
+        return crearActividad(llamadaId, casoId, tipoActividad, telefono, null, null);
     }
 
     @future
-    private static void crearActividadFuture(Id llamadaId, Id casoId, String tipoActividad, String telefono) {
-        crearActividad(llamadaId, casoId, tipoActividad, telefono, null);
+    private static void crearActividadFuture(Id llamadaId, Id casoId, String tipoActividad, String telefono, Id contactId) {
+        crearActividad(llamadaId, casoId, tipoActividad, telefono, null, contactId);
     }
 
     @future
     private static void crearActividadCasos(Id llamadaId, String tipoActividad, String detalle, String tipoCierre) {
         List<Task> actividades = new List<Task>();
+        List<Id> lstCaseId = new List<Id>();
         List<AggregateResult> casoIds = [SELECT WhatId FROM Task WHERE CC_Llamada_Id__c = :llamadaId GROUP BY WhatId];
+        for(AggregateResult resultado : casoIds){
+            Id casoId = String.valueOf(resultado.get('WhatId'));
+            lstCaseId.add(casoId);
+        }
+        Map<String,String> mpIdCasosAccount = new Map<String,String>();
+        for(Case caso : [SELECT Id, contactId FROM Case WHERE Id IN :lstCaseId]){
+            mpIdCasosAccount.put(caso.Id, caso.contactId);
+        }
         for(AggregateResult resultado : casoIds) {
             Id casoId = String.valueOf(resultado.get('WhatId'));
             Task actividad = crearObjetoActividad(llamadaId, casoId, tipoActividad, detalle, tipoCierre);

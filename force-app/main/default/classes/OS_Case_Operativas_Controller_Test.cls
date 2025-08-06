@@ -1,6 +1,16 @@
 @isTest
 public class OS_Case_Operativas_Controller_Test {
 
+    public static String mccTematicaRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+    public static String mccProductoServicioRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+    public static String mccMotivoRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+    public static String mccCausaRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+    public static String mccSolucionRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+    public static String mccGrupoColaboradorRecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+    public static String caseOSEmpleadoRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+    public static String caseOSClienteRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+    public static String contactCCColaboradorRecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+
     @testSetup
     public static void altaDatosPrueba() {
         User usuarioOperador = OS_Usuarios.usuarioOperador();
@@ -11,7 +21,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccTematica.Name = 'MCC Tematica';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccTematica.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        mccTematica.RecordTypeId = mccTematicaRecordTypeId;
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
         mccTematica.OS_Departamento__c = 'UAFE';
         mccTematica.CC_idCognitivo__c = '985792';
@@ -21,7 +31,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccTematica2.Name = 'MCC Tematica 2';
         mccTematica2.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccTematica2.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccTematica2.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        mccTematica2.RecordTypeId = mccTematicaRecordTypeId;
         mccTematica2.CC_Codigo_Externo__c = 'TE-000002';
         mccTematica2.OS_Departamento__c = 'UAFE';
         listaTematicas.add(mccTematica2);
@@ -30,7 +40,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccTematica3.Name = 'MCC Tematica 3';
         mccTematica3.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccTematica3.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccTematica3.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        mccTematica3.RecordTypeId = mccTematicaRecordTypeId;
         mccTematica3.CC_Codigo_Externo__c = 'TE-000003';
         mccTematica3.OS_Departamento__c = 'UAFE';
         listaTematicas.add(mccTematica3);
@@ -43,7 +53,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccProducto.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        mccProducto.RecordTypeId = mccProductoServicioRecordTypeId;
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PR-000001';
         listaProductos.add(mccProducto);
@@ -52,7 +62,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccProducto2.Name = 'Cuenta corriente 2';
         mccProducto2.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccProducto2.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccProducto2.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        mccProducto2.RecordTypeId = mccProductoServicioRecordTypeId;
         mccProducto2.CC_Tematica__c = mccTematica2.Id;
         mccProducto2.CC_Codigo_Externo__c = 'PR-000002';
         listaProductos.add(mccProducto2);
@@ -61,7 +71,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccProducto3.Name = 'Cuenta corriente 3';
         mccProducto3.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccProducto3.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccProducto3.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        mccProducto3.RecordTypeId = mccProductoServicioRecordTypeId;
         mccProducto3.CC_Tematica__c = mccTematica.Id;
         mccProducto3.CC_Codigo_Externo__c = 'PR-000003';
         listaProductos.add(mccProducto3);
@@ -74,7 +84,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccMotivo.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccMotivo.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        mccMotivo.RecordTypeId = mccMotivoRecordTypeId;
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
         mccMotivo.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente desiste';
@@ -84,7 +94,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccMotivo2.Name = 'Apertura sin autorización 2';
         mccMotivo2.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccMotivo2.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccMotivo2.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        mccMotivo2.RecordTypeId = mccMotivoRecordTypeId;
         mccMotivo2.CC_Codigo_Externo__c = 'MO-000002';
         mccMotivo2.CC_Producto_Servicio__c = mccProducto2.Id;
         mccMotivo2.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente desiste';
@@ -94,7 +104,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccMotivo3.Name = 'Apertura sin autorización 3';
         mccMotivo3.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccMotivo3.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccMotivo3.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        mccMotivo3.RecordTypeId = mccMotivoRecordTypeId;
         mccMotivo3.CC_Codigo_Externo__c = 'MO-000003';
         mccMotivo3.CC_Producto_Servicio__c = mccProducto.Id;
         mccMotivo3.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente desiste';
@@ -108,7 +118,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccCausa.Name = 'Causa 1';
         mccCausa.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccCausa.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccCausa.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        mccCausa.RecordTypeId = mccCausaRecordTypeId;
         mccCausa.CC_Motivo__c = mccMotivo.Id;
         mccCausa.CC_Codigo_Externo__c = 'CA-000001';
         listaCausas.add(mccCausa);
@@ -117,7 +127,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccCausa2.Name = 'Causa 2';
         mccCausa2.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccCausa2.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccCausa2.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        mccCausa2.RecordTypeId = mccCausaRecordTypeId;
         mccCausa2.CC_Motivo__c = mccMotivo2.Id;
         mccCausa2.CC_Codigo_Externo__c = 'CA-000002';
         listaCausas.add(mccCausa2);
@@ -126,7 +136,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccCausa3.Name = 'Causa 3';
         mccCausa3.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccCausa3.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccCausa3.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        mccCausa3.RecordTypeId = mccCausaRecordTypeId;
         mccCausa3.CC_Motivo__c = mccMotivo.Id;
         mccCausa3.CC_Codigo_Externo__c = 'CA-000003';
         listaCausas.add(mccCausa3);
@@ -139,7 +149,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccSolucion.Name = 'Solucion 1';
         mccSolucion.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccSolucion.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccSolucion.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+        mccSolucion.RecordTypeId = mccSolucionRecordTypeId;
         mccSolucion.CC_Causa__c = mccCausa.Id;
         mccSolucion.CC_Codigo_Externo__c = 'SO-000001';
         mccSolucion.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente no localizado por FEDEX;Error KYC;Recibe por error la tarjeta de otro cliente';
@@ -149,7 +159,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccSolucion2.Name = 'Solucion 2';
         mccSolucion2.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccSolucion2.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccSolucion2.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+        mccSolucion2.RecordTypeId = mccSolucionRecordTypeId;
         mccSolucion2.CC_Causa__c = mccCausa2.Id;
         mccSolucion2.CC_Codigo_Externo__c = 'SO-000002';
         mccSolucion2.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente no localizado por FEDEX;Error KYC;Recibe por error la tarjeta de otro cliente';
@@ -159,7 +169,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccSolucion3.Name = 'Solucion 3';
         mccSolucion3.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccSolucion3.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccSolucion3.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+        mccSolucion3.RecordTypeId = mccSolucionRecordTypeId;
         mccSolucion3.CC_Causa__c = mccCausa.Id;
         mccSolucion3.CC_Codigo_Externo__c = 'SO-000003';
         mccSolucion3.CC_Motivo_NOK__c = 'Cliente anula la solicitud;Cliente no localizado por FEDEX;Error KYC;Recibe por error la tarjeta de otro cliente';
@@ -168,7 +178,7 @@ public class OS_Case_Operativas_Controller_Test {
         
         
         CC_Grupo_Colaborador__c	grupo = new CC_Grupo_Colaborador__c();
-        grupo.RecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+        grupo.RecordTypeId = mccGrupoColaboradorRecordTypeId;
         grupo.name='Servicio bastanteo';
         grupo.OS_Negocio__c = 'COPS';
         insert grupo;
@@ -207,7 +217,7 @@ public class OS_Case_Operativas_Controller_Test {
         insert contacto;
                 
         List<Case> casos= new List<Case>();
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        Id recordTypeCaso = caseOSEmpleadoRecordTypeId;
         Case caso = new Case();
         caso.Subject='Caso de prueba TF7';
         caso.recordtypeId= recordTypeCaso;
@@ -234,7 +244,7 @@ public class OS_Case_Operativas_Controller_Test {
         
         Case caso2 = new Case();
         caso2.Subject = 'Caso de prueba mcc';
-        caso2.recordtypeId =  Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        caso2.recordtypeId =  caseOSEmpleadoRecordTypeId;
         caso2.Origin = 'Email';
         caso2.CC_Canal_Procedencia__c = 'Buzón UAFE';
         caso2.CC_Tipo_Contacto__c = 'Formación';
@@ -319,7 +329,7 @@ public class OS_Case_Operativas_Controller_Test {
     public static void obenerColaboradores() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id colaboradorRecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+        Id colaboradorRecordTypeId = contactCCColaboradorRecordTypeId;
         //Creamos una cuenta y un grupo asociado a ésta, además creamos y asignamos un contacto a dicho grupo
         Account cuenta = new Account(
             Name = 'Cuenta Test',
@@ -337,7 +347,7 @@ public class OS_Case_Operativas_Controller_Test {
         );
         insert contacto;
 
-        Id grupoColaboradorRecordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+        Id grupoColaboradorRecordTypeId = mccGrupoColaboradorRecordTypeId;
         CC_Grupo_Colaborador__c grupoColaborador = new CC_Grupo_Colaborador__c(
             Name = 'Grupo colaborador Test',
             CC_External__c = 'GC-00003',
@@ -375,7 +385,7 @@ public class OS_Case_Operativas_Controller_Test {
         contacto.LastName = 'Apellido';
         insert contacto;
 
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = mccTematicaRecordTypeId;
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
@@ -385,7 +395,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccTematica.OS_Departamento__c = 'UAFE';
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = mccProductoServicioRecordTypeId;
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
@@ -395,7 +405,7 @@ public class OS_Case_Operativas_Controller_Test {
         mccProducto.CC_Codigo_Externo__c = 'PR-00000121';
         insert mccProducto;
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = mccMotivoRecordTypeId;
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
@@ -453,7 +463,7 @@ public class OS_Case_Operativas_Controller_Test {
     public static void obtenerListaPlantillasGrupo() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeIdGrupo = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+        Id recordTypeIdGrupo = mccGrupoColaboradorRecordTypeId;
 
         Contact contacto = new Contact();
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
@@ -487,7 +497,8 @@ public class OS_Case_Operativas_Controller_Test {
             //Comprobamos que obtenemos la lista de plantillas
             List<OT_Picklist.Item> plantillaListGrupo = OS_Case_Operativas_Controller.getPlantillaGrupoList(grupo.Id, 'Trasladar');
             Test.stopTest();
-
+            
+            //Jaime Villaron: el uso de size no provocaría una perdida de rendimiento ya que tras las SOQL se hace uso de la listas
             System.assertEquals(plantillas.size(), plantillaListGrupo.size(), 'Validamos haya plantillas.');
         }
     }
@@ -497,9 +508,9 @@ public class OS_Case_Operativas_Controller_Test {
     public static void obtenerListaPlantillasResponder() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id tematicaId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
-        Id productoId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
-        Id motivoId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();      
+        Id tematicaId = mccTematicaRecordTypeId;
+        Id productoId = mccProductoServicioRecordTypeId;
+        Id motivoId = mccMotivoRecordTypeId;      
         
         Contact contacto = new Contact();
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
@@ -718,7 +729,7 @@ public class OS_Case_Operativas_Controller_Test {
         contacto.LastName = 'Apellido';
         insert contacto;
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
         Case caso1 = new Case();
         caso1.CC_Idioma__c = 'es';
         caso1.RecordTypeId = recordTypeCaso;
@@ -755,7 +766,7 @@ public class OS_Case_Operativas_Controller_Test {
         contacto.LastName = 'Apellido';
         insert contacto;
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
         Case caso1 = new Case();
         caso1.CC_Idioma__c = 'es';
         caso1.RecordTypeId = recordTypeCaso;
@@ -980,7 +991,7 @@ public class OS_Case_Operativas_Controller_Test {
     public static void getEmailsCaso() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-		Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+		Id recordTypeGrupoColaborador = mccGrupoColaboradorRecordTypeId;
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo Colaborador Temporal';
         grupoColab.OS_Negocio__c = 'COPS';
@@ -1098,7 +1109,7 @@ public class OS_Case_Operativas_Controller_Test {
         List<Case> casos = new List<Case>();
 
         Case casoMaster = new Case();
-        casoMaster.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Empleado').getRecordTypeId();
+        casoMaster.RecordTypeId = caseOSEmpleadoRecordTypeId;
         casoMaster.Subject = 'CASO INICIAL';
         casoMaster.Status = 'Activo';
         casoMaster.Origin = 'Email';
@@ -1109,7 +1120,7 @@ public class OS_Case_Operativas_Controller_Test {
                 
         Case casoFusionado = new Case();
         casoFusionado.Subject = 'CORREO ENTRANTE';
-        casoFusionado.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        casoFusionado.RecordTypeId = caseOSClienteRecordTypeId;
         casoFusionado.Status = 'Activo';
         casoFusionado.Origin = 'Email';
         casoFusionado.CC_Canal_Procedencia__c='Buzón Comercio Exterior';
@@ -1119,7 +1130,7 @@ public class OS_Case_Operativas_Controller_Test {
         
         Case casoFusionado2 = new Case();
         casoFusionado2.Subject = 'CORREO ENTRANTE';
-        casoFusionado2.RecordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        casoFusionado2.RecordTypeId = caseOSClienteRecordTypeId;
         casoFusionado2.Status = 'Activo';
         casoFusionado2.Origin = 'Email';
         casoFusionado2.CC_Canal_Procedencia__c='Buzón Comercio Exterior';
@@ -1159,7 +1170,7 @@ public class OS_Case_Operativas_Controller_Test {
         contacto.RecordTypeId = recordTypeCliente;
         insert contacto;
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
 
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
@@ -1204,7 +1215,7 @@ public class OS_Case_Operativas_Controller_Test {
         contacto.RecordTypeId = recordTypeCliente;
         insert contacto;
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
         
         String carpeta = 'Carpeta';
         

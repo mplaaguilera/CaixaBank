@@ -1,275 +1,249 @@
 @isTest
-public class CC_WS_Recupera_LogConversacion_Test {
-    
-    /*@isTest
-    public static void testSetup() {
-        
-        Account cuenta = new Account(Name = 'Prueba');
-        insert cuenta;
-        
-        CC_Servicio_Genesys__c s1 = CC_Llamada_Test.crearServicio1();
-        String jsonLlamada = CC_Llamada_Test.obtenerJsonLlamada(s1.CC_Codigo__c, '', '', '12345678');
-        Id idLlamada = CC_OpenCTI.registrarLlamadaEntrante(jsonLlamada);
-        CC_Llamada__c llamada = [SELECT Id, Name, CC_Asunto__c, CC_Id_Cognitivo__c, CC_Idioma__c, CC_Servicio_Genesys__c, CC_Tipo__c, CC_ConnId__c,
-                                 CC_ANI__c, CC_Agente__c, CC_Canal_del_Empleado__c, CC_Case_Consulta__c, CC_Cognitivo__c, CC_ConnId_Cognitivo__c,
-                                 CC_ConnId_Consulta__c, CC_Contacto__c, CC_Cuenta__c, CC_Datos_Genesys__c, CC_DNIS__c , CC_Extension__c , CC_IdentCliente__c,
-                                 CC_Identificado_Manualmente__c, CC_No_Identificado__c
-                                 FROM CC_Llamada__c WHERE Id = :idLlamada AND CC_Fecha_Fin__c = NULL];
-        llamada.CC_Cuenta__c = cuenta.Id;
-        update llamada;
-        
-        Boolean cuentaAsociada = CC_Llamada_Caso_Nuevo_Controller.cuentaAsociada(idLlamada);
-        System.assert(cuentaAsociada);
-        
-        Boolean cerrada = CC_Llamada_Caso_Nuevo_Controller.getLlamada(idLlamada);
-        System.assertEquals(false, cerrada);
-        
-        Case oCaso = new Case();
-        oCaso = CC_WS_Recupera_LogConversacion.CC_WS_Recupera_Conversacion(llamada);
-        
-    }*/
+public with sharing class CC_WS_Recupera_LogConversacion_Test {
+    @testSetup 
+    static void setup() {
+        Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank_Empleados'].Id;
+        Id profileAdmin = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
+        UserRole rolCC = [SELECT Id, DeveloperName FROM UserRole WHERE DeveloperName = 'Contact_Center'];
+        PermissionSet psOperador = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO'];
+        PermissionSet psClasses = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Classes'];
+        List<Account> lstAccounts = new List<Account>();
+        List<Contact> lstContacts = new List<Contact>();
+
+        User usuarioAdmin = new User();        
+        usuarioAdmin.profileId = profileAdmin;
+        usuarioAdmin.UserRoleId = rolCC.Id;
+        usuarioAdmin.FirstName = '';
+        usuarioAdmin.LastName = 'Administrador de sistema';
+        usuarioAdmin.Email = 'tuser000@amamama.com';
+        usuarioAdmin.Username = 'tuser000@amamama.com' + System.currentTimeMillis();
+        usuarioAdmin.CompanyName = 'MST';
+        usuarioAdmin.Title = 'title';
+        usuarioAdmin.Alias = 'alias';
+        usuarioAdmin.TimeZoneSidKey = 'Europe/Paris';
+        usuarioAdmin.EmailEncodingKey = 'UTF-8';
+        usuarioAdmin.LanguageLocaleKey = 'es';
+        usuarioAdmin.LocaleSidKey = 'es_ES';
+                 
+        User operador = new User();
+        operador.ProfileId = profileId;
+        operador.FirstName = 'OperadorEmpleadoTest';
+        operador.LastName = 'last11';
+        operador.Email = 'tuser000@amamama.com';
+        operador.Phone = '+34 123456789';
+        operador.Username = 'tuser000@operador.com' + System.currentTimeMillis();
+        operador.CompanyName = 'MST';
+        operador.Title = 'title';
+        operador.Alias = 'alias';
+        operador.TimeZoneSidKey = 'Europe/Paris';
+        operador.EmailEncodingKey = 'UTF-8';
+        operador.LanguageLocaleKey = 'es';
+        operador.LocaleSidKey = 'es_ES';
+        operador.UserRoleId = rolCC.Id;
+        insert new List<User>{operador, usuarioAdmin};
+
+        insert new List<PermissionSetAssignment> {
+            new PermissionSetAssignment(AssigneeId = operador.Id, PermissionSetId = psOperador.Id),
+            new PermissionSetAssignment(AssigneeId = operador.Id, PermissionSetId = psClasses.Id)
+        };
+
+        System.runAs(usuarioAdmin) {
+            Account cuenta = new Account();
+            cuenta.Name = 'Prueba';
+            cuenta.CC_Numero_Oficina_Empresa__c = '11111-001';
+            cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
+            insert cuenta;
+
+            Contact contacto = new Contact();
+            contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
+            contacto.AccountId = cuenta.Id;
+            contacto.LastName = 'empleado prueba 1';
+            contacto.FirstName = 'empleado prueba 1';
+            contacto.CC_Idioma__c = 'es';
+            contacto.Email = 'test@contact.com';
+            contacto.CC_Matricula__c = '9265';
+            contacto.CC_NumPerso__c = '123456';
+            insert contacto;
+
+            List<CC_Canal_Com__c> listaCanales = new List<CC_Canal_Com__c>();
+			Id recordTypeTelefono = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Canal_Com__c', 'CC_Telefono');
+			listaCanales.add(new CC_Canal_Com__c(CC_Telefono__c='666001122', CC_ContactoId__c=contacto.Id, CC_CuentaId__c=cuenta.Id, RecordTypeId = recordTypeTelefono));
+			insert listaCanales;
+
+            CC_MCC__c mcc = new CC_MCC__c();
+            mcc.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
+            mcc.Name = 'App\'s';
+            mcc.CC_Tipo_Cliente__c = 'Empleado';
+            mcc.CC_Codigo_Externo__c = 'TE-000001';
+            mcc.CC_Canal_Operativo__c = 'App BrokerNow';
+            insert mcc;
+            CC_MCC__c mcc1 = new CC_MCC__c();
+            mcc1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
+            mcc1.Name = 'APP CaixaBank';
+            mcc1.CC_Detalle__c = 'CaixaBank';
+            mcc1.CC_Tipo_Cliente__c = 'Empleado';
+            mcc1.CC_Tematica__c = mcc.Id;
+            mcc1.CC_Codigo_Externo__c = 'PR-000001';
+            insert mcc1;
+            CC_MCC__c mcc2 = new CC_MCC__c();
+            mcc2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
+            mcc2.Name = 'Valoración positiva';
+            mcc2.CC_Tipo_Cliente__c = 'Empleado';
+            mcc2.CC_Producto_Servicio__c = mcc1.Id;
+            mcc2.CC_Codigo_Externo__c = 'MO-000001';
+            mcc2.CC_ImpedirNivel2__c = true;
+            mcc2.CC_ImpedirClienteDigital__c = false;
+            insert mcc2;
+            CC_MCC__c mcc3 = new CC_MCC__c();
+            mcc3.Name = 'Solicita reversión';
+            mcc3.CC_Tipo_Cliente__c = 'Empleado';
+            mcc3.CC_Fecha_Vigencia_Inicio__c = date.today();
+            mcc3.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Causa');
+            mcc3.CC_Motivo__c = mcc2.Id;
+            mcc3.CC_Codigo_Externo__c = 'CA-000001';
+            insert mcc3;
+            CC_MCC__c mcc4 = new CC_MCC__c();
+            mcc4.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Solucion');
+            mcc4.Name = 'Actualizar Sistema';
+            mcc4.CC_Tipo_Cliente__c = 'Empleado';
+            mcc4.CC_Causa__c = mcc3.Id;
+            mcc4.CC_Codigo_Externo__c = 'CA-000002';
+            insert mcc4;
+            
+            List<Case> caseInsertLst = new List<Case>();
+            Case caso1 = new Case();
+            caso1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+            caso1.Subject = 'Caso Test 1';
+            caso1.Status = 'Activo';
+            caso1.CC_Canal_Procedencia__c = 'Activo';
+            caso1.CC_Canal_Respuesta__c = 'Activo';
+            caso1.CC_Idioma__c = 'es';
+            caso1.Origin = 'Chat';
+            caso1.OwnerId = operador.Id;
+            caso1.AccountId = cuenta.Id;
+            caso1.ContactId = contacto.Id;
+            caso1.CC_MailTelfNotif__c  = 'contacto@test.com';
+            caso1.CC_MCC_Tematica__c = mcc.Id;
+            caso1.CC_MCC_ProdServ__c = mcc1.Id;
+            caso1.CC_MCC_Motivo__c = mcc2.Id;
+            caso1.CC_MCC_Causa__c = mcc3.Id;
+            caso1.CC_MCC_Solucion__c = mcc4.Id;
+            caso1.CC_Tipo_Contacto__c = 'Consulta';
+            caso1.CC_Tipo_ChatTranscript__c = 'Hidden';
+            caso1.CC_Detalles_Consulta__c = 'Prueba';
+            caso1.CC_Detalles_Solucion__c = 'Prueba';
+            caso1.CC_Id_Cognitivo__c = '87654321_9999998';
+            caseInsertLst.add(caso1);
+            insert caseInsertLst;
+
+            List<CC_MCC__Share> totalPermisosMCC = new List<CC_MCC__Share>();
+            for(CC_MCC__c record : [SELECT Id FROM CC_MCC__c]) {
+                CC_MCC__Share mccShare = new CC_MCC__Share();
+                mccShare.ParentId = record.Id;
+                mccShare.UserOrGroupId = operador.Id;
+                mccShare.AccessLevel = 'Edit';
+                totalPermisosMCC.add(mccShare);
+            }
+            insert totalPermisosMCC;
+
+            List<AccountShare> totalPermisosAccount = new List<AccountShare>();
+            for(Account a : [SELECT Id FROM Account]) {
+                AccountShare acshare = new AccountShare();
+                acshare.AccountId = a.Id;
+                acshare.UserOrGroupId = operador.Id;
+                acshare.AccountAccessLevel = 'Edit';
+                acshare.OpportunityAccessLevel = 'Edit';
+                acshare.CaseAccessLevel = 'Edit';
+                totalPermisosAccount.add(acshare);
+            }
+            Database.insert(totalPermisosAccount, false);
+
+            
+            List<ContactShare> totalPermisosContact = new List<ContactShare>();
+            for(Contact c : [SELECT Id FROM Contact]) {
+            ContactShare contactShare = new ContactShare();
+            contactShare.ContactId = c.Id;
+            contactShare.UserOrGroupId = operador.Id;
+            contactShare.ContactAccessLevel = 'Edit';
+            totalPermisosContact.add(contactShare);
+            }
+
+            Database.insert(totalPermisosContact, false);
+
+            List<CaseShare> totalPermisosCase = new List<CaseShare>();
+            for(Case c : [SELECT Id FROM Case]) {
+                CaseShare cseShr = new CaseShare();
+
+                cseShr.CaseId = c.Id;
+                cseShr.UserOrGroupId = operador.Id;
+                cseShr.CaseAccessLevel  = 'Edit';
+                totalPermisosCase.add(cseShr);
+            }
+            Database.insert(totalPermisosCase, false);
+
+            List<CC_Settings__c> listaSettings = new List<CC_Settings__c>();
+            CC_Settings__c configuracion = new CC_Settings__c();
+            configuracion.CC_Activa__c = false;
+            configuracion.Name = 'CC_Agrupador_CI_Asignacion_Casos';
+            configuracion.CC_Configuracion_1__c = 'false';
+            listaSettings.add(configuracion);           
+            CC_Settings__c configuracion1 = new CC_Settings__c();
+            configuracion1.CC_Activa__c = false;
+            configuracion1.Name = 'CC_Agrupador_CIC_Asignacion_Casos';
+            configuracion1.CC_Configuracion_1__c = 'true';
+            listaSettings.add(configuracion1);    
+            CC_Settings__c configuracion2 = new CC_Settings__c();
+            configuracion2.CC_Activa__c = false;
+            configuracion2.Name = 'CC_Agrupador_CIM_Asignacion_Casos';
+            configuracion2.CC_Configuracion_1__c = 'true';
+            listaSettings.add(configuracion2);
+            insert listaSettings;
+
+        }
+
+    }
     
     // Test con caso existente para que lo devuelva con status='Activo'
     @isTest
-    public static void testCasoCerrado() {        
-        // Crear cliente.
-        Account cuenta = new Account();
-        cuenta.Name = 'Prueba';
-        cuenta.CC_Numero_Oficina_Empresa__c = '11111-001';
-        cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-        insert cuenta;
-        
-        // Crear contacto.
-        Contact b = new Contact();
-     	Id RecordType = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-		b.RecordTypeId = RecordType;
-        b.AccountId = cuenta.Id;
-        b.LastName = 'empleado prueba 1';
-        b.FirstName = 'empleado prueba 1';
-        b.CC_Idioma__c = 'es';
-        b.Email = 'test@contact.com';
-        b.CC_Matricula__c = '9265';
-        insert b;
-        /*
-        CC_Servicio_Genesys__c s1 = CC_Llamada_Test.crearServicio1();
-        String jsonLlamada = CC_Llamada_Test.obtenerJsonLlamada(s1.CC_Codigo__c, '', '', '12345678');
-        Id idLlamada = CC_OpenCTI.registrarLlamadaEntrante(jsonLlamada);
-        CC_Llamada__c llamada = [SELECT Id, Name, CC_Asunto__c, CC_Id_Cognitivo__c, CC_Idioma__c, CC_Servicio_Genesys__c, CC_Tipo__c, CC_ConnId__c,
-                                 CC_ANI__c, CC_Agente__c, CC_Canal_del_Empleado__c, CC_Case_Consulta__c, CC_Cognitivo__c, CC_ConnId_Cognitivo__c,
-                                 CC_ConnId_Consulta__c, CC_Contacto__c, CC_Cuenta__c, CC_Datos_Genesys__c, CC_DNIS__c , CC_Extension__c , CC_IdentCliente__c,
-                                 CC_Identificado_Manualmente__c, CC_No_Identificado__c
-                                 FROM CC_Llamada__c WHERE Id = :idLlamada AND CC_Fecha_Fin__c = NULL];
-        llamada.CC_Cuenta__c = cuenta.Id;
-        llamada.CC_ConnId_Cognitivo__c = 'FCL-000001';
-        update llamada;
-        
-        Boolean cuentaAsociada = CC_Llamada_Caso_Nuevo_Controller.cuentaAsociada(idLlamada);
-        System.assert(cuentaAsociada);
-        
-        Boolean cerrada = CC_Llamada_Caso_Nuevo_Controller.getLlamada(idLlamada);
-        System.assertEquals(false, cerrada);
-        */
-                
-        Id recordTem = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
-        Id recordProd = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
-        Id recordMot = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
-        Id recordCau = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
-        Id recordSol = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
-        
-                
-        CC_MCC__c mcc = new CC_MCC__c();
-        mcc.RecordTypeId = recordTem;
-        mcc.Name = 'App\'s';
-        mcc.CC_Tipo_Cliente__c = 'Empleado';
-        mcc.CC_Codigo_Externo__c = 'TE-000001';
-        insert mcc;
-        CC_MCC__c tem = [SELECT Id FROM CC_MCC__c WHERE Name='App\'s' LIMIT 1];
-        CC_MCC__c mcc1 = new CC_MCC__c();
-        mcc1.RecordTypeId = recordProd;
-        mcc1.Name = 'APP CaixaBank';
-        mcc1.CC_Detalle__c = 'CaixaBank';
-        mcc1.CC_Tipo_Cliente__c = 'Empleado';
-        mcc1.CC_Tematica__c = tem.Id;
-        mcc1.CC_Codigo_Externo__c = 'PR-000001';
-        insert mcc1;        
-        CC_MCC__c prod = [SELECT Id FROM CC_MCC__c WHERE Name='APP CaixaBank' LIMIT 1];
-		//'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
-        CC_MCC__c mcc2 = new CC_MCC__c();
-        mcc2.RecordTypeId = recordMot;
-        mcc2.Name = 'Valoración positiva';
-        mcc2.CC_Tipo_Cliente__c = 'Empleado';
-        mcc2.CC_Producto_Servicio__c = prod.Id;
-        mcc2.CC_Codigo_Externo__c = 'MO-000001';
-        insert mcc2; 
-        CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
-        CC_MCC__c mcc3 = new CC_MCC__c();
-        mcc3.RecordTypeId = recordCau;
-        mcc3.Name = 'Causa';
-        mcc3.CC_Tipo_Cliente__c = 'Empleado';
-        mcc3.CC_Codigo_Externo__c = 'CA-000001';
-        insert mcc3;  
-		CC_MCC__c causa = [SELECT Id FROM CC_MCC__c WHERE Name='Causa' LIMIT 1];
-        CC_MCC__c mcc4 = new CC_MCC__c();
-        mcc4.RecordTypeId = recordSol;
-        mcc4.Name = 'Solucion';
-        mcc4.CC_Tipo_Cliente__c = 'Empleado';
-        mcc4.CC_Codigo_Externo__c = 'SO-000001';
-        insert mcc4;
-		CC_MCC__c sol = [SELECT Id FROM CC_MCC__c WHERE Name='Solucion' LIMIT 1];
-        
-        Case oCaseCerrado = new Case();
-        oCaseCerrado.Subject = 'Prueba';
-        oCaseCerrado.CC_Idioma__c = 'es';
-        oCaseCerrado.CC_NumPerso__c = '123456';
-        oCaseCerrado.CC_Tipo_Cliente__c = 'Cliente';
-        oCaseCerrado.Status = 'Activo';
-        oCaseCerrado.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-        oCaseCerrado.Origin = 'Chat';
-		oCaseCerrado.CC_Tipo_Contacto__c = 'Consulta';
-        oCaseCerrado.CC_Canal_Procedencia__c = 'Activo';
-        oCaseCerrado.CC_Tipo_ChatTranscript__c = 'Hidden';
-        oCaseCerrado.CC_Detalles_Consulta__c = 'Prueba';
-        oCaseCerrado.CC_Detalles_Solucion__c = 'Prueba';
-        oCaseCerrado.CC_Id_Cognitivo__c = '87654321_9999999';
-        oCaseCerrado.CC_MCC_Motivo__c = motiv.Id;
-		oCaseCerrado.CC_MCC_ProdServ__c = prod.Id;
-        oCaseCerrado.CC_MCC_Tematica__c = tem.Id;
-        oCaseCerrado.CC_MCC_Causa__c = causa.Id;
-        oCaseCerrado.CC_MCC_Solucion__c = sol.Id;
-        oCaseCerrado.AccountId = cuenta.Id;
-        oCaseCerrado.ContactId = b.Id;
-        insert oCaseCerrado;
-        
-        CC_Servicio_Genesys__c s1 = CC_Llamada_Test.crearServicioEmpleado();
-        String jsonLlamada = CC_Llamada_Test.obtenerJsonLlamada(s1.CC_Codigo__c, '', oCaseCerrado.Id, '');
-        Id idLlamada = CC_OpenCTI.registrarLlamadaEntrante(jsonLlamada);
-        CC_Llamada__c llamada = [SELECT Id, Name, CC_Asunto__c, CC_Id_Cognitivo__c, CC_Idioma__c, CC_Servicio_Genesys__c, CC_Tipo__c, CC_ConnId__c,
-                                 CC_ANI__c, CC_Agente__c, CC_Canal_del_Empleado__c, CC_Case_Consulta__c, CC_Cognitivo__c, CC_ConnId_Cognitivo__c,
-                                 CC_ConnId_Consulta__c, CC_Contacto__c, CC_Cuenta__c, CC_Datos_Genesys__c, CC_DNIS__c , CC_Extension__c , CC_IdentCliente__c,
-                                 CC_Identificado_Manualmente__c, CC_No_Identificado__c
-                                 FROM CC_Llamada__c WHERE Id = :idLlamada AND CC_Fecha_Fin__c = NULL];
-        llamada.CC_Cuenta__c = cuenta.Id;
-        llamada.CC_ConnId_Cognitivo__c = '87654321_9999999';
-        llamada.CC_Id_Cognitivo__c = '87654321_9999999';
-        update llamada;
-        
+    public static void testCasoCerrado() {       
+    User operador = [SELECT Id FROM User WHERE FirstName = 'OperadorEmpleadoTest' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1]; 
+    System.runAs(operador) {
+        Test.startTest();
+        Case oCaseCerrado = [SELECT Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
         oCaseCerrado.Status = 'Cerrado';
         update oCaseCerrado;
-        
-        Case oCaso = new Case();
-        oCaso = CC_WS_Recupera_LogConversacion.CC_WS_Recupera_Conversacion(llamada);
+        Account cuenta = [SELECT Id FROM Account WHERE Name = 'Prueba' LIMIT 1];
+        Contact contacto = [SELECT Id, CC_NumPerso__c FROM Contact WHERE LastName = 'empleado prueba 1' LIMIT 1];
+        CC_Servicio_Genesys__c s1 = CC_Llamada_GC_Test.crearServicioEmpleado();
+            CC_Llamada_Input inputLlamada = CC_Llamada_GC_Test.obtenerInputLlamada(s1.CC_Codigo__c, '', '', contacto.CC_NumPerso__c, null);
+            inputLlamada.cognitivoId = '87654321_9999998';
+            inputLlamada.connIdCognitivo = '87654321_9999998';
+            Map<String, Object> retornoRegistrarLlamadaEntrante = CC_Llamada_GC.registrarLlamadaEntrante(inputLlamada);
+                    
+            Case  oCaso = (Case)retornoRegistrarLlamadaEntrante.get('caso');
+            assert.areEqual('Activo', oCaso.Status, 'El caso no se ha reactivado correctamente');
+        Test.stopTest();
+        }
     }
     
     @isTest
     public static void testCasoChat() {        
-        // Crear oficina.
-        Account cuenta = new Account();
-        cuenta.Name = 'Prueba';
-        cuenta.CC_Numero_Oficina_Empresa__c = '11111-001';
-        cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-        insert cuenta;
-        
-        // Crear empleado.
-        Contact b = new Contact();
-     	Id RecordType = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-		b.RecordTypeId = RecordType;
-        b.AccountId = cuenta.Id;
-        b.LastName = 'empleado prueba 1';
-        b.FirstName = 'empleado prueba 1';
-        b.CC_Idioma__c = 'es';
-        b.Email = 'test@contact.com';
-        b.CC_Matricula__c = '9265';
-        insert b;
-        
-        Id recordTem = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
-        Id recordProd = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
-        Id recordMot = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
-        Id recordCau = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
-        Id recordSol = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
-        
-        CC_MCC__c mcc = new CC_MCC__c();
-        mcc.RecordTypeId = recordTem;
-        mcc.Name = 'App\'s';
-        mcc.CC_Tipo_Cliente__c = 'Empleado';
-        mcc.CC_Codigo_Externo__c = 'TE-000001';
-        insert mcc;
-        CC_MCC__c tem = [SELECT Id FROM CC_MCC__c WHERE Name='App\'s' LIMIT 1];
-        CC_MCC__c mcc1 = new CC_MCC__c();
-        mcc1.RecordTypeId = recordProd;
-        mcc1.Name = 'APP CaixaBank';
-        mcc1.CC_Detalle__c = 'CaixaBank';
-        mcc1.CC_Tipo_Cliente__c = 'Empleado';
-        mcc1.CC_Tematica__c = tem.Id;
-        mcc1.CC_Codigo_Externo__c = 'PR-000001';
-        insert mcc1;        
-        CC_MCC__c prod = [SELECT Id FROM CC_MCC__c WHERE Name='APP CaixaBank' LIMIT 1];
-		//'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
-        CC_MCC__c mcc2 = new CC_MCC__c();
-        mcc2.RecordTypeId = recordMot;
-        mcc2.Name = 'Valoración positiva';
-        mcc2.CC_Tipo_Cliente__c = 'Empleado';
-        mcc2.CC_Producto_Servicio__c = prod.Id;
-        mcc2.CC_Codigo_Externo__c = 'MO-000001';
-        insert mcc2; 
-        CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
-        CC_MCC__c mcc3 = new CC_MCC__c();
-        mcc3.RecordTypeId = recordCau;
-        mcc3.Name = 'Causa';
-        mcc3.CC_Tipo_Cliente__c = 'Empleado';
-        mcc3.CC_Codigo_Externo__c = 'CA-000001';
-        insert mcc3;  
-		CC_MCC__c causa = [SELECT Id FROM CC_MCC__c WHERE Name='Causa' LIMIT 1];
-        CC_MCC__c mcc4 = new CC_MCC__c();
-        mcc4.RecordTypeId = recordSol;
-        mcc4.Name = 'Solucion';
-        mcc4.CC_Tipo_Cliente__c = 'Empleado';
-        mcc4.CC_Codigo_Externo__c = 'SO-000001';
-        insert mcc4;
-		CC_MCC__c sol = [SELECT Id FROM CC_MCC__c WHERE Name='Solucion' LIMIT 1];
-        
-        Case oCaseCerrado = new Case();
-        oCaseCerrado.Subject = 'Prueba';
-        oCaseCerrado.CC_Idioma__c = 'es';
-        oCaseCerrado.CC_NumPerso__c = '123456';
-        oCaseCerrado.CC_Tipo_Cliente__c = 'Empleado';
-        oCaseCerrado.Status = 'Cerrado';
-        oCaseCerrado.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-        oCaseCerrado.Origin = 'Chat';
-		oCaseCerrado.CC_Tipo_Contacto__c = 'Consulta';
-        oCaseCerrado.CC_Canal_Procedencia__c = 'Activo';
-        oCaseCerrado.CC_MCC_Motivo__c = motiv.Id;
-		oCaseCerrado.CC_MCC_ProdServ__c = prod.Id;
-        oCaseCerrado.CC_MCC_Tematica__c = tem.Id;
-        oCaseCerrado.CC_Tipo_ChatTranscript__c = 'Hidden';
-        oCaseCerrado.CC_Detalles_Consulta__c = 'Prueba';
-        oCaseCerrado.CC_Detalles_Solucion__c = 'Prueba';
-        oCaseCerrado.CC_Id_Cognitivo__c = '87654321_9999999';
-        oCaseCerrado.CC_MCC_Causa__c = causa.Id;
-        oCaseCerrado.CC_MCC_Solucion__c = sol.Id;
-        oCaseCerrado.AccountId = cuenta.Id;
-        oCaseCerrado.ContactId = b.Id;
-        insert oCaseCerrado;
-        
-        CC_Servicio_Genesys__c s1 = CC_Llamada_Test.crearServicioEmpleado();
-        String jsonLlamada = CC_Llamada_Test.obtenerJsonLlamada(s1.CC_Codigo__c, '', oCaseCerrado.Id, '');
-        Id idLlamada = CC_OpenCTI.registrarLlamadaEntrante(jsonLlamada);
-        CC_Llamada__c llamada = [SELECT Id, Name, CC_Asunto__c, CC_Id_Cognitivo__c, CC_Idioma__c, CC_Servicio_Genesys__c, CC_Tipo__c, CC_ConnId__c,
-                                 CC_ANI__c, CC_Agente__c, CC_Canal_del_Empleado__c, CC_Case_Consulta__c, CC_Cognitivo__c, CC_ConnId_Cognitivo__c,
-                                 CC_ConnId_Consulta__c, CC_Contacto__c, CC_Cuenta__c, CC_Datos_Genesys__c, CC_DNIS__c , CC_Extension__c , CC_IdentCliente__c,
-                                 CC_Identificado_Manualmente__c, CC_No_Identificado__c
-                                 FROM CC_Llamada__c WHERE Id = :idLlamada AND CC_Fecha_Fin__c = NULL];
-        llamada.CC_Cuenta__c = cuenta.Id;
-        llamada.CC_ConnId_Cognitivo__c = '87654321_9999999';
-        llamada.CC_Id_Cognitivo__c = '87654321_9999998';
-        update llamada;
-        
-        Boolean cuentaAsociada = CC_Llamada_Caso_Nuevo_Controller.cuentaAsociada(idLlamada);
-        System.assert(cuentaAsociada);
-        
-        Boolean cerrada = CC_Llamada_Caso_Nuevo_Controller.getLlamada(idLlamada);
-        System.assertEquals(false, cerrada);        
-        
-        Case oCaso = new Case();
-        oCaso = CC_WS_Recupera_LogConversacion.CC_WS_Recupera_Conversacion(llamada);
+        User operador = [SELECT Id FROM User WHERE FirstName = 'OperadorEmpleadoTest' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1]; 
+        System.runAs(operador) {
+            Test.startTest();
+            Account cuenta = [SELECT Id FROM Account WHERE Name = 'Prueba' LIMIT 1];
+            Contact contacto = [SELECT Id, CC_NumPerso__c FROM Contact WHERE LastName = 'empleado prueba 1' LIMIT 1];
+
+            CC_Servicio_Genesys__c s1 = CC_Llamada_GC_Test.crearServicioEmpleado();
+            CC_Llamada_Input inputLlamada = CC_Llamada_GC_Test.obtenerInputLlamada(s1.CC_Codigo__c, '', null, contacto.CC_NumPerso__c, '666001122');
+            inputLlamada.cognitivoId = '87654321_9999999';
+            inputLlamada.connIdCognitivo = '87654321_9999999';
+            Map<String, Object> retornoRegistrarLlamadaEntrante = CC_Llamada_GC.registrarLlamadaEntrante(inputLlamada);
+
+            Case  oCaso = [SELECT Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE CC_Id_Cognitivo__c = '87654321_9999999' LIMIT 1];
+            assert.areEqual('Activo', oCaso.Status, 'Hubo un problema al crear el caso');
+
+            Test.stopTest();
+            }     
     }
 }

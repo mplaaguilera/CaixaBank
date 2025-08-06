@@ -14,9 +14,15 @@
 public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
     @TestSetup
     static void makeData(){
+        Test.startTest();
+        //Usuario Admin
+        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
+
+        User usuario = new User();
 
         User usuarioGeneral;
-        System.runAs(new User(Id = Userinfo.getUserId())) {
+        System.RunAs(usuarioAdmin) {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];   
             SAC_DatabaseDML.insertDML(usuarioGeneral, false);
@@ -68,13 +74,15 @@ public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
         CC_Grupo_Colaborador__c grupoColaborador = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion', 1)[0];
         grupoColaborador.Name = 'Grupo Proveedores Test';
         grupoColaborador.SAC_PermiteTareas__c = true;
-        grupoColaborador.SAC_Email__c='mneira@viewnext.com';
+        grupoColaborador.SAC_Email__c='test@test.com.invalid';
         SAC_DatabaseDML.insertDML(grupoColaborador, false);
         
         //Accion
         SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1, reclamacion, false)[0];
         tarea.SAC_EquipoResponsable__c= grupoColaborador.id;
         SAC_DatabaseDML.insertDML(tarea, false);
+
+        Test.stopTest();
     }
 
     @istest
@@ -176,12 +184,12 @@ public with sharing class SAC_LCMP_RedaccionReclamacion_Test {
         reclamacion.CC_Oficina_Afectada_Lookup__c = cuenta.id;
         SAC_DatabaseDML.updateDML(reclamacion, false);
 
-        //System.runAs(usuario){
+        System.runAs(usuario){
             Test.startTest();
             SAC_LCMP_RedaccionReclamacion.guardarRedaccion(reclamacion.id, 'texto');
             DateTime fechaResolucion = SAC_LCMP_RedaccionReclamacion.finalizarRedaccion(reclamacion.id);
             Test.stopTest();
-        //}
+        }
         String estado =[SELECT Status FROM Case WHERE Subject = 'Reclamación' LIMIT 1].Status;
 
         System.assertEquals('SAC_004', estado, 'Esta reclamación no ha finalizado su redacción');

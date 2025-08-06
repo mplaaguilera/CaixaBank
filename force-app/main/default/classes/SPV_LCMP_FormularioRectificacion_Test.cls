@@ -17,14 +17,13 @@ public with sharing class SPV_LCMP_FormularioRectificacion_Test {
             usuarioGeneral = SPV_TestDataFactory.crearUsuarioSPVGeneral(1)[0];
             SPV_DatabaseDML.insertDML(usuarioGeneral, true);
 
-            PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SPV_Administrador'];
+            PermissionSet permiSetAdmin = [SELECT Id FROM PermissionSet WHERE Name = 'SPV_General'];
             PermissionSetAssignment permiSetAssiAdmin = new PermissionSetAssignment();
             permiSetAssiAdmin.AssigneeId = usuarioAdmin.Id;
             permiSetAssiAdmin.PermissionSetId = permiSetAdmin.Id;
             SPV_DatabaseDML.insertDML(permiSetAssiAdmin, true);
         }
         Test.stopTest();
-
 
          //Reclamacion
          Map<String, Object> camposRecl = new Map<String, Object>();
@@ -40,7 +39,22 @@ public with sharing class SPV_LCMP_FormularioRectificacion_Test {
          List<Case> reclamaciones = new List<Case>();
          reclamaciones.add(casoReclamacion);
          SPV_DatabaseDML.insertListDML(reclamaciones, true);
-
+        
+        //Pretension
+        Map<String, Object> camposPret = new Map<String, Object>();
+        camposPret.put('SuppliedCompany', 'testPret');
+        camposPret.put('Origin', 'Otros');
+        camposPret.put('Status', 'SAC_001');
+        camposPret.put('SAC_Reclamacion__c', casoReclamacion.Id);
+        camposPret.put('OwnerId', usuarioGeneral.Id);
+        
+        Case casoPretension = SPV_TestDataFactory.crearCaso('Pretension',camposPret); 
+        
+        //Pretensiones
+        List<Case> pretensiones = new List<Case>();
+        pretensiones.add(casoPretension);
+        SPV_DatabaseDML.insertListDML(pretensiones, true);
+        
         //Crear formulario
         SPV_Formulario__c formulario = new SPV_Formulario__c();
         formulario.RecordTypeId = Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SPV_FormularioRectificacion').getRecordTypeId();
@@ -76,6 +90,7 @@ public with sharing class SPV_LCMP_FormularioRectificacion_Test {
 
         System.runAs(usuario1){
             Test.startTest();
+            Id formularioId = SPV_LCMP_FormularioRectificacion.crearNuevoFormularioRectificacion(reclamacion.Id);
             String resultado = SPV_LCMP_FormularioRectificacion.getFormularioExistente(reclamacion.Id);
 
             Assert.areNotEqual(null, resultado, 'No se han recuperado el formulario');
@@ -116,6 +131,51 @@ public with sharing class SPV_LCMP_FormularioRectificacion_Test {
             Boolean resultado=SPV_LCMP_FormularioRectificacion.compruebaLetradoSPV(reclamacion.Id);
 
             Assert.areNotEqual(null, resultado, 'error comprobacion');
+            Test.stopTest();
+        }
+    }
+    
+        @isTest
+    static void getPretensionesTest(){
+
+        User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec'];
+		
+        System.runAs(usuario1){
+            Test.startTest();
+            List<Case> resultado = SPV_LCMP_FormularioRectificacion.getPretensiones(reclamacion.Id);
+			
+            Assert.areNotEqual(null, resultado, 'No se han recuperado pretensiones');
+            Test.stopTest();
+        }
+    }
+    
+    @isTest
+    static void getImporteAbonadoTest(){
+        
+        User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec'];
+        
+        System.runAs(usuario1){
+            Test.startTest();
+            Decimal resultado = SPV_LCMP_FormularioRectificacion.getImporteAbonadoTotal(reclamacion.Id);
+            
+            Assert.areNotEqual(null, resultado, 'No se ha recuperado el importe');
+            Test.stopTest();
+        }
+    }
+    
+    @isTest
+    static void completarRectificacionAnteriorTest(){
+        
+        User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        Case reclamacion = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec'];
+        SPV_Formulario__c formulario = [SELECT Id FROM SPV_Formulario__c WHERE SPV_Caso__c =: reclamacion.Id LIMIT 1];
+        System.runAs(usuario1){
+            Test.startTest();
+            Boolean resultado = SPV_LCMP_FormularioRectificacion.completarRectificacionAnterior(formulario.Id);
+            
+            Assert.areNotEqual(null, resultado, 'No se ha recuperado el formulario');
             Test.stopTest();
         }
     }

@@ -4,6 +4,32 @@ public with sharing class SEG_MetodosComunes_Test {
 	@TestSetup
 	public static void crearDatosPrueba() {
 
+
+		System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+            Profile perfil = [SELECT Id FROM Profile WHERE Name='System Administrator'];
+            UserRole rol = [SELECT Id FROM UserRole WHERE Name='Segmentos + FFEE'];
+			String orgId = UserInfo.getOrganizationId();
+            Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
+            String uniqueName = orgId + randomInt;
+            User thisUser = new User(alias = 'user2', email='testSEGBI2@acme.com',
+                emailencodingkey='UTF-8', lastname='Smith',
+                languagelocalekey='en_US',
+                localesidkey='en_US', profileid = perfil.Id, userroleid = rol.Id,
+                timezonesidkey='America/Los_Angeles',
+                Username = uniqueName + '@test' + orgId + '.org');
+            insert thisUser;
+            List<PermissionSetAssignment> listPermissionSetAssignment = new List<PermissionSetAssignment>();
+            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('SEG_Operativo','SEG_Supervisor')]){
+                PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
+                nuevoPermiso.PermissionSetId = permisoUnitario.PermissionSetId;
+                nuevoPermiso.AssigneeId = thisUser.id;
+                listPermissionSetAssignment.add(nuevoPermiso);
+            }
+            if (listPermissionSetAssignment.isEmpty()){
+                insert listPermissionSetAssignment;
+            }
+        }
+
 		Account cuenta = new Account(Name = 'Cuenta', AV_Idioma__c = '001');
 		insert cuenta;
 
@@ -221,23 +247,9 @@ public with sharing class SEG_MetodosComunes_Test {
         grupoRTGrupoColRemitir.SEG_GrupoSegmentos__c = true;
 		insert grupoRTGrupoColRemitir;
 
-		Profile prof = [select id from profile where name LIKE '%marketing%'];
-		User userA = new User();
-        userA.firstName = 'test1';
-        userA.lastName = 'test2';
-        userA.profileId = prof.id;
-        userA.SEG_Tipo_usuario_SEG__c='BO';
-        userA.username = 'test@testsegmentos.com';
-        userA.email = 'test@testsegmentos.com';
-        userA.EmailEncodingKey = 'UTF-8';
-        userA.LanguageLocaleKey = 'es';
-		userA.LocaleSidKey = 'es';
-		userA.TimeZoneSidKey = 'Europe/Berlin';
-        userA.Alias = 'seg';
-        insert userA;
-
+		User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
 		CC_Grupo_Colaborador_Contact__c colaboradorA = new CC_Grupo_Colaborador_Contact__c();
-        colaboradorA.CC_Usuario__c = userA.id;
+        colaboradorA.CC_Usuario__c = usuarioTest.id;
         colaboradorA.CC_Grupo_Colaborador__c=grupoRTGrupoCol.Id;
 		colaboradorA.CC_Para_CC__c= 'Para';
 		colaboradorA.CC_Contacto__c= colab.id;
@@ -851,14 +863,14 @@ public with sharing class SEG_MetodosComunes_Test {
         //acc.AV_EAPGestor__c = empleado.Id;
         update acc;
 		Case caso = [SELECT id, SEG_Organizacion__c, SEG_Zona__c, ContactId FROM Case WHERE Subject = 'Detalle' LIMIT 1];
-		CC_MCC_Grupo_Colaborador__c MCCgrupoC = [SELECT id, CC_Grupo_Colaborador__c,
+		CC_MCC_Grupo_Colaborador__c mCCgrupoC = [SELECT id, CC_Grupo_Colaborador__c,
 		                                         CC_Grupo_Colaborador__r.RecordType.DeveloperName, CC_MCC__c,
 		                                         SEG_Zona__c, SEG_Organizacion__c, CC_Grupo_Colaborador__r.Name,SEG_Grupo_respuesta__c
 		                                         FROM CC_MCC_Grupo_Colaborador__c
 		                                         WHERE name = 'Envío Correo Gestor Financiación Estructurada' LIMIT 1];
 		Test.startTest();
-		//SEG_MetodosComunes.asignarGrupo(caso, MCCgrupoC, acc);
-		SEG_MetodosComunes.recuperarGrupo(MCCgrupoC, acc.id, caso.SEG_Zona__c, caso.SEG_Organizacion__c, false, caso.id);
+		//SEG_MetodosComunes.asignarGrupo(caso, mCCgrupoC, acc);
+		SEG_MetodosComunes.recuperarGrupo(mCCgrupoC, acc.id, caso.SEG_Zona__c, caso.SEG_Organizacion__c, false, caso.id);
 		Test.stopTest();
 		System.assert(caso != null,'ok');
 	}
@@ -867,14 +879,14 @@ public with sharing class SEG_MetodosComunes_Test {
 	static void asignarGrupoRTGrupoColaborador() { 
 		Account acc = [SELECT id FROM Account LIMIT 1];
 		Case caso = [SELECT id, SEG_Organizacion__c, SEG_Zona__c, ContactId FROM Case WHERE Subject = 'Detalle' LIMIT 1];
-		CC_MCC_Grupo_Colaborador__c MCCgrupoC = [SELECT id, CC_Grupo_Colaborador__c,
+		CC_MCC_Grupo_Colaborador__c mCCgrupoC = [SELECT id, CC_Grupo_Colaborador__c,
 		                                         CC_Grupo_Colaborador__r.RecordType.DeveloperName, CC_MCC__c,
 		                                         SEG_Zona__c, SEG_Organizacion__c, CC_Grupo_Colaborador__r.Name
 		                                         FROM CC_MCC_Grupo_Colaborador__c
 		                                         WHERE name = 'Colaborador' LIMIT 1];
 		Test.startTest();
-		//SEG_MetodosComunes.asignarGrupo(caso, MCCgrupoC, acc);
-		SEG_MetodosComunes.recuperarGrupo(MCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
+		//SEG_MetodosComunes.asignarGrupo(caso, mCCgrupoC, acc);
+		SEG_MetodosComunes.recuperarGrupo(mCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
 		Test.stopTest();
 		System.assert(caso != null,'ok');
 	}
@@ -882,14 +894,14 @@ public with sharing class SEG_MetodosComunes_Test {
 	static void asignarGrupoRTGrupoColaborador2() {
 		Account acc = [SELECT id FROM Account LIMIT 1];
 		Case caso = [SELECT id, SEG_Organizacion__c, SEG_Zona__c, ContactId FROM Case WHERE Subject = 'Detalle' LIMIT 1];
-		CC_MCC_Grupo_Colaborador__c MCCgrupoC = [SELECT id, CC_Grupo_Colaborador__c,
+		CC_MCC_Grupo_Colaborador__c mCCgrupoC = [SELECT id, CC_Grupo_Colaborador__c,
 		                                         CC_Grupo_Colaborador__r.RecordType.DeveloperName, CC_MCC__c,
 		                                         SEG_Zona__c, SEG_Organizacion__c, CC_Grupo_Colaborador__r.Name
 		                                         FROM CC_MCC_Grupo_Colaborador__c
 		                                         WHERE name = 'Colaborador Remitir' LIMIT 1];
 		Test.startTest();
-		//SEG_MetodosComunes.asignarGrupo(caso, MCCgrupoC, acc);
-		SEG_MetodosComunes.recuperarGrupo(MCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, false);
+		//SEG_MetodosComunes.asignarGrupo(caso, mCCgrupoC, acc);
+		SEG_MetodosComunes.recuperarGrupo(mCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, false);
 		Test.stopTest();
 		System.assert(caso != null,'ok');
 	}
@@ -897,15 +909,15 @@ public with sharing class SEG_MetodosComunes_Test {
 	static void asignarGrupoRTGestorComercial() {
 		Account acc = [SELECT id,SEG_Prioridad_Carterizacion_Segmentos__c,AV_EAPGestor__c FROM Account LIMIT 1];
 		Case caso = [SELECT id, AccountId, SEG_Organizacion__c, SEG_Zona__c, ContactId FROM Case WHERE Subject = 'Detalle' LIMIT 1];
-		CC_MCC_Grupo_Colaborador__c MCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
+		CC_MCC_Grupo_Colaborador__c mCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
 		                                         CC_Grupo_Colaborador__r.RecordType.DeveloperName, CC_MCC__c,
 		                                         SEG_Zona__c, SEG_Organizacion__c, CC_Grupo_Colaborador__r.Name
 		                                         FROM CC_MCC_Grupo_Colaborador__c
 		                                         WHERE name = 'Gestor Comercial'];
 		Test.startTest();
-		//SEG_MetodosComunes.asignarGrupo(caso, MCCgrupoC, acc);
-		SEG_MetodosComunes.recuperarGrupo(MCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
-        SEG_MetodosComunes.calcularGrupoAutomatico(MCCgrupoC.Name, MCCgrupoC.SEG_Grupo_respuesta__c, caso.AccountId, false, caso.id);
+		//SEG_MetodosComunes.asignarGrupo(caso, mCCgrupoC, acc);
+		SEG_MetodosComunes.recuperarGrupo(mCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
+        SEG_MetodosComunes.calcularGrupoAutomatico(mCCgrupoC.Name, mCCgrupoC.SEG_Grupo_respuesta__c, caso.AccountId, false, caso.id);
 		Test.stopTest();
 		System.assert(caso != null,'ok');
 	}
@@ -913,15 +925,15 @@ public with sharing class SEG_MetodosComunes_Test {
 	static void asignarGrupoRTGestorOperativaComercial() {
 		Account acc = [SELECT id,SEG_Prioridad_Carterizacion_Segmentos__c,AV_EAPGestor__c,SEG_GestorOperativaNacional__c FROM Account LIMIT 1];
 		Case caso = [SELECT id, AccountId, SEG_Organizacion__c, SEG_Zona__c, ContactId FROM Case WHERE Subject = 'Detalle' LIMIT 1];
-		CC_MCC_Grupo_Colaborador__c MCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
+		CC_MCC_Grupo_Colaborador__c mCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
 		                                         CC_Grupo_Colaborador__r.RecordType.DeveloperName, CC_MCC__c,
 		                                         SEG_Zona__c, SEG_Organizacion__c, CC_Grupo_Colaborador__r.Name
 		                                         FROM CC_MCC_Grupo_Colaborador__c
 		                                         WHERE name = 'Gestor Operativa Nacional'];
 		Test.startTest();
-		//SEG_MetodosComunes.asignarGrupo(caso, MCCgrupoC, acc);
-		SEG_MetodosComunes.recuperarGrupo(MCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
-        SEG_MetodosComunes.calcularGrupoAutomatico(MCCgrupoC.Name, MCCgrupoC.SEG_Grupo_respuesta__c, caso.AccountId, false, caso.id);
+		//SEG_MetodosComunes.asignarGrupo(caso, mCCgrupoC, acc);
+		SEG_MetodosComunes.recuperarGrupo(mCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
+        SEG_MetodosComunes.calcularGrupoAutomatico(mCCgrupoC.Name, mCCgrupoC.SEG_Grupo_respuesta__c, caso.AccountId, false, caso.id);
 		Test.stopTest();
 		System.assert(caso != null,'ok');
 	}
@@ -929,15 +941,15 @@ public with sharing class SEG_MetodosComunes_Test {
 	static void asignarGrupoRTGestorOperativaInternacional() {
 		Account acc = [SELECT id,SEG_Prioridad_Carterizacion_Segmentos__c,AV_EAPGestor__c,SEG_GestorOperativaInternacional__c FROM Account LIMIT 1];
 		Case caso = [SELECT id, AccountId, SEG_Organizacion__c, SEG_Zona__c, ContactId FROM Case WHERE Subject = 'Motivo' LIMIT 1];
-		CC_MCC_Grupo_Colaborador__c MCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
+		CC_MCC_Grupo_Colaborador__c mCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
 		                                         CC_Grupo_Colaborador__r.RecordType.DeveloperName, CC_MCC__c,
 		                                         SEG_Zona__c, SEG_Organizacion__c, CC_Grupo_Colaborador__r.Name
 		                                         FROM CC_MCC_Grupo_Colaborador__c
 		                                         WHERE name = 'Gestor Operativa Internacional'];
 		Test.startTest();
-		//SEG_MetodosComunes.asignarGrupo(caso, MCCgrupoC, acc);
-		SEG_MetodosComunes.recuperarGrupo(MCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
-        SEG_MetodosComunes.calcularGrupoAutomatico('Envío correo Gestor Operativa Internacional', MCCgrupoC.SEG_Grupo_respuesta__c, caso.AccountId, false, caso.id);
+		//SEG_MetodosComunes.asignarGrupo(caso, mCCgrupoC, acc);
+		SEG_MetodosComunes.recuperarGrupo(mCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
+        SEG_MetodosComunes.calcularGrupoAutomatico('Envío correo Gestor Operativa Internacional', mCCgrupoC.SEG_Grupo_respuesta__c, caso.AccountId, false, caso.id);
 		Test.stopTest();
 		System.assert(caso != null,'ok');
 	}
@@ -945,15 +957,15 @@ public with sharing class SEG_MetodosComunes_Test {
 	static void asignarGrupoRTGestorFinanciacionEstructurada() {
 		Account acc = [SELECT id,SEG_Prioridad_Carterizacion_Segmentos__c,AV_EAPGestor__c,SEG_GestorFinEstructurada__c FROM Account LIMIT 1];
 		Case caso = [SELECT id, AccountId, SEG_Organizacion__c, SEG_Zona__c, ContactId FROM Case WHERE Subject = 'Detalle' LIMIT 1];
-		CC_MCC_Grupo_Colaborador__c MCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
+		CC_MCC_Grupo_Colaborador__c mCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
 		                                         CC_Grupo_Colaborador__r.RecordType.DeveloperName, CC_MCC__c,
 		                                         SEG_Zona__c, SEG_Organizacion__c, CC_Grupo_Colaborador__r.Name
 		                                         FROM CC_MCC_Grupo_Colaborador__c
 		                                         WHERE name = 'Gestor Financiación Estructurada'];
 		Test.startTest();
-		//SEG_MetodosComunes.asignarGrupo(caso, MCCgrupoC, acc);
-		SEG_MetodosComunes.recuperarGrupo(MCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
-        SEG_MetodosComunes.calcularGrupoAutomatico(MCCgrupoC.Name, MCCgrupoC.SEG_Grupo_respuesta__c, caso.AccountId, false, caso.id);
+		//SEG_MetodosComunes.asignarGrupo(caso, mCCgrupoC, acc);
+		SEG_MetodosComunes.recuperarGrupo(mCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, true);
+        SEG_MetodosComunes.calcularGrupoAutomatico(mCCgrupoC.Name, mCCgrupoC.SEG_Grupo_respuesta__c, caso.AccountId, false, caso.id);
 		Test.stopTest();
 		System.assert(caso != null,'ok'); 
 	}  
@@ -1683,18 +1695,22 @@ public with sharing class SEG_MetodosComunes_Test {
 
 	@IsTest
 	static void asignarGrupoCSO() {
+
+		User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
 		
 		Account acc = [SELECT id FROM Account LIMIT 1];
 		Case caso = [SELECT id, SEG_Organizacion__c, SEG_Zona__c, ContactId FROM Case WHERE Subject = 'Detalle' LIMIT 1];
-		CC_MCC_Grupo_Colaborador__c MCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
+		CC_MCC_Grupo_Colaborador__c mCCgrupoC = [SELECT id, Name, CC_Grupo_Colaborador__c, SEG_Grupo_respuesta__c,
 												 CC_Grupo_Colaborador__r.RecordType.DeveloperName, CC_MCC__c,
 												 SEG_Zona__c, SEG_Organizacion__c, CC_Grupo_Colaborador__r.Name 
 												 FROM CC_MCC_Grupo_Colaborador__c 
 												 WHERE name = 'Grupo CSO' AND CC_Grupo_Colaborador__r.SEG_Tipologia__c = 'CSO' LIMIT 1];
 	
-		Test.startTest();
-		Map<String,String> resultado = SEG_MetodosComunes.recuperarGrupo(MCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, false, caso.id);
-		Test.stopTest();
-		System.assertEquals(MCCgrupoC.CC_Grupo_Colaborador__c, resultado.get('grupoCol'), 'No se ha encontrado el grupo colaborador correcto');
+		System.runAs ( usuarioTest ) {
+			Test.startTest();
+			Map<String,String> resultado = SEG_MetodosComunes.recuperarGrupo(mCCgrupoC, acc.id, caso.SEG_Organizacion__c, caso.SEG_Zona__c, false, caso.id);
+			System.assertEquals(mCCgrupoC.CC_Grupo_Colaborador__c, resultado.get('grupoCol'), 'No se ha encontrado el grupo colaborador correcto');
+			Test.stopTest();
+		}
 	}
 }

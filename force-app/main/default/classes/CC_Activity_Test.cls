@@ -160,15 +160,50 @@ public with sharing class CC_Activity_Test {
                 ContactId = contacto2.Id,
                 RecordTypeId = recordTypeCaso
             );
-
             insertCase.add(casoConOportunidad);
 
+            Case casoGenerico = new Case(
+                Description = 'casoGenerico',
+                Subject = 'casoGenerico',
+                Origin = 'Email',
+                Status = 'Activo',
+                accountId = cuenta.Id,
+                CC_Idioma__c = 'es',
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                OwnerId = usuario2.Id,
+                ContactId = contacto2.Id,
+                RecordTypeId = recordTypeCaso
+            );
+
+            insertCase.add(casoGenerico);
+
             insert insertCase;
+
+            List<CC_Settings__c> configuraciones = new List<CC_Settings__c>();
+            CC_Settings__c configuracion = new CC_Settings__c(
+                Name = 'CC_MecanismoFirmaCircuitos',
+                CC_Configuracion_1__c = 'Circuito cliente en el extranjero',
+                CC_Configuracion_2__c = 'Circuito cliente envío código de firma '
+            );
+            configuraciones.add(configuracion);
+            CC_Settings__c configuracionUnblu = new CC_Settings__c(
+                Name = 'CC_Url_Unblu',
+                CC_Configuracion_1__c = 'https://test.com/es/conversation/'
+            );
+            configuraciones.add(configuracionUnblu);
+
+            insert configuraciones;
         }
+
     }
 
     @isTest
     public static void finalizarActividad() {
+        Test.startTest();
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Prueba';
@@ -186,7 +221,6 @@ public with sharing class CC_Activity_Test {
         actividad.RecordTypeId = taskRecordTypeId;
         insert actividad;
 
-        Test.startTest();
         CC_Activity.finalizarActividad(actividad.Id);
         Test.stopTest();
 
@@ -197,8 +231,8 @@ public with sharing class CC_Activity_Test {
 
     @isTest
     public static void finalizarActividadCaso() {
+        Test.startTest();
         List<Task> insertTareas = new List<Task>();
-
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Prueba';
@@ -227,7 +261,6 @@ public with sharing class CC_Activity_Test {
 
         insert insertTareas;
 
-        Test.startTest();
         CC_Activity.finalizarActividadCaso(caso.Id, 'Rechazar Primer Nivel', 'Devuelta 3N', 'descripción');
         Test.stopTest();
 
@@ -244,6 +277,7 @@ public with sharing class CC_Activity_Test {
     
     @isTest
     public static void finalizarActividadCaso3N() {
+        Test.startTest();
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Prueba';
@@ -269,12 +303,11 @@ public with sharing class CC_Activity_Test {
         actividad2.RecordTypeId = taskRecordTypeId;
         insert actividad2;
 
-        Test.startTest();
         CC_Activity.finalizarActividadCaso(caso.Id, 'Traslado Tercer Nivel', 'Rechazado por Tercer Nivel', 'descripción');
         Test.stopTest();
 
         actividad1 = [SELECT Status, CC_Tipo_Cierre__c, Description FROM Task WHERE Id = :actividad1.Id AND RecordTypeId =: taskRecordTypeId LIMIT 1];
-        actividad2 = [SELECT Status, CC_Tipo_Cierre__c, Description FROM Task WHERE Id = :actividad2.Id AND RecordTypeId =: taskRecordTypeId LIMIT 1];
+        //actividad2 = [SELECT Status, CC_Tipo_Cierre__c, Description FROM Task WHERE Id = :actividad2.Id AND RecordTypeId =: taskRecordTypeId LIMIT 1];
 
         System.assertEquals('Open', actividad1.Status);
         //System.assertEquals('Rechazado por Tercer Nivel', actividad1.CC_Tipo_Cierre__c);
@@ -286,6 +319,7 @@ public with sharing class CC_Activity_Test {
     
     @isTest
     public static void finalizarActividadCasoTrasladoColaborador() {
+        Test.startTest();
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Prueba';
@@ -304,7 +338,6 @@ public with sharing class CC_Activity_Test {
         actividad1.RecordTypeId = taskRecordTypeId;
         insert actividad1;
         
-        Test.startTest();
         CC_Activity.finalizarActividadCaso(caso.Id, 'Traslado Colaborador', 'Traslado Colaborador', 'descripción');
         Test.stopTest();
 
@@ -315,6 +348,7 @@ public with sharing class CC_Activity_Test {
     
     @isTest
     public static void informarFechaVencimientoSLACol() {
+        Test.startTest();
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Prueba';
@@ -336,12 +370,14 @@ public with sharing class CC_Activity_Test {
         Task act = [SELECT Id, Status, Type FROM Task WHERE Type = 'Traslado Grupo Colaborador' AND RecordTypeId =: taskRecordTypeId LIMIT 1];
         
         String tipo = 'Grupo colaborador';
-        
         CC_Activity.informarFechaVencimientoSLA(tipo, 'Grupo Colaborador', act);
+        Test.stopTest();
+
     }
     
     @isTest
     public static void informarFechaVencimientoSLA3N() {
+        Test.startTest();
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Prueba';
@@ -363,8 +399,9 @@ public with sharing class CC_Activity_Test {
         Task act = [SELECT Id, Status, Type FROM Task WHERE Type = 'Traslado Tercer Nivel' AND RecordTypeId =: taskRecordTypeId LIMIT 1];
         
 		String tipo = 'Grupo 3N';
-        
         CC_Activity.informarFechaVencimientoSLA(tipo, 'Grupo 1', act);
+        Test.stopTest();
+
     }
     
     @isTest
@@ -372,25 +409,28 @@ public with sharing class CC_Activity_Test {
          List<User> usuario = [SELECT Id FROM User WHERE Profile.name LIKE 'CC_Usuario_CaixaBank' AND IsActive=true];
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
-     	Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
-        Case caso = new Case();
-        caso.Subject = 'Prueba';
-        caso.RecordTypeId = recordTypeCaso;
-        caso.CC_Idioma__c = 'es';
-        caso.CC_Tipo_Cliente__c = 'Empleado';
-        caso.Status = 'Activo';
-        caso.Origin = 'Email';
-		caso.CC_Tipo_Contacto__c = 'Petición de servicio';
-        caso.CC_Canal_Procedencia__c = 'Oficina Feedback';        
-        caso.CC_Canal_Resolucion__c = 'Oficina Feedback';        
-        insert caso;     
-        
-  		Task actividad1 = new Task();
-        actividad1.WhatId = caso.Id;
-        actividad1.Type = 'Rechazar Primer Nivel';
-        actividad1.Status = 'Open';
-        
-        System.assertNotEquals(null, CC_Activity.crearActividad(actividad1));
+                Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+                Test.startTest();
+                Case caso = new Case();
+                caso.Subject = 'Prueba';
+                caso.RecordTypeId = recordTypeCaso;
+                caso.CC_Idioma__c = 'es';
+                caso.CC_Tipo_Cliente__c = 'Empleado';
+                caso.Status = 'Activo';
+                caso.Origin = 'Email';
+                caso.CC_Tipo_Contacto__c = 'Petición de servicio';
+                caso.CC_Canal_Procedencia__c = 'Oficina Feedback';        
+                caso.CC_Canal_Resolucion__c = 'Oficina Feedback';        
+                insert caso;     
+                
+                Task actividad1 = new Task();
+                actividad1.WhatId = caso.Id;
+                actividad1.Type = 'Rechazar Primer Nivel';
+                actividad1.Status = 'Open';
+                Task actividad = CC_Activity.crearActividad(actividad1);
+                Test.stopTest();
+
+                System.assertNotEquals(null, actividad);
             }
         }
     }
@@ -399,6 +439,8 @@ public with sharing class CC_Activity_Test {
     @isTest
     public static void crearActividades1Test() {
      	Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+        
+        Test.startTest();
         Case caso = new Case();
         caso.Subject = 'Prueba';
         caso.RecordTypeId = recordTypeCaso;
@@ -423,9 +465,11 @@ public with sharing class CC_Activity_Test {
         
         List<Task> tareas = new List<Task>();
         tareas.add(actividad1);
-        tareas.add(actividad2);       
-        
+        tareas.add(actividad2); 
+
         CC_Activity.crearActividades(tareas, true);
+        Test.stopTest();
+
         System.assertEquals(2,  [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
         
         List<Task> listaTareasComprobar = [SELECT Id FROM Task WHERE WhatId = :caso.Id];
@@ -435,6 +479,8 @@ public with sharing class CC_Activity_Test {
     @isTest
     public static void crearActividades2Test() {
      	Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+
+        Test.startTest();
         Case caso = new Case();
         caso.Subject = 'Prueba';
         caso.RecordTypeId = recordTypeCaso;
@@ -459,15 +505,18 @@ public with sharing class CC_Activity_Test {
         
         List<Task> tareas = new List<Task>();
         tareas.add(actividad1);
-        tareas.add(actividad2);       
-        
+        tareas.add(actividad2);  
+
         CC_Activity.crearActividades(tareas);
+        Test.stopTest();
+
         System.assertEquals(2, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
     }
     
     @isTest
     public static void crearActividadesPasandoRecordTypeTest() {
      	Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+        Test.startTest();
         Case caso = new Case();
         caso.Subject = 'Prueba';
         caso.RecordTypeId = recordTypeCaso;
@@ -495,44 +544,47 @@ public with sharing class CC_Activity_Test {
         tareas.add(actividad2);       
         
         CC_Activity.crearActividades(tareas, 'CC_Task');
+        Test.stopTest();
+
         System.assertEquals(2, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
     }
     
      @isTest
     public static void llamadaQueueableCrearActividadesTest() {
-     	Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
-        Case caso = new Case();
-        caso.Subject = 'Prueba';
-        caso.RecordTypeId = recordTypeCaso;
-        caso.CC_Idioma__c = 'es';
-        caso.CC_Tipo_Cliente__c = 'Empleado';
-        caso.Status = 'Activo';
-        caso.Origin = 'Email';
-		caso.CC_Tipo_Contacto__c = 'Petición de servicio';
-        caso.CC_Canal_Procedencia__c = 'Oficina Feedback';        
-        caso.CC_Canal_Resolucion__c = 'Oficina Feedback';        
-        insert caso;     
-        
-  		Task actividad1 = new Task();
-        actividad1.WhatId = caso.Id;
-        actividad1.Type = 'Rechazar Primer Nivel';
-        actividad1.Status = 'Open';
-        
-        Task actividad2 = new Task();
-        actividad2.WhatId = caso.Id;
-        actividad2.Type = 'Rechazar Primer Nivel';
-        actividad2.Status = 'Open';
-        
-        List<Task> tareas = new List<Task>();
-        tareas.add(actividad1);
-        tareas.add(actividad2);       
-
         List<User> usuario = [SELECT Id FROM User WHERE Profile.name LIKE 'CC_Usuario_CaixaBank' AND IsActive=true];
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
-        
-        CC_Activity.llamadaQueueableCrearActividades(tareas);
-        System.assertEquals(0, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+                Test.startTest();
+                Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
+                Case caso = new Case();
+                caso.Subject = 'Prueba';
+                caso.RecordTypeId = recordTypeCaso;
+                caso.CC_Idioma__c = 'es';
+                caso.CC_Tipo_Cliente__c = 'Empleado';
+                caso.Status = 'Activo';
+                caso.Origin = 'Email';
+                caso.CC_Tipo_Contacto__c = 'Petición de servicio';
+                caso.CC_Canal_Procedencia__c = 'Oficina Feedback';        
+                caso.CC_Canal_Resolucion__c = 'Oficina Feedback';        
+                insert caso;     
+                
+                  Task actividad1 = new Task();
+                actividad1.WhatId = caso.Id;
+                actividad1.Type = 'Rechazar Primer Nivel';
+                actividad1.Status = 'Open';
+                
+                Task actividad2 = new Task();
+                actividad2.WhatId = caso.Id;
+                actividad2.Type = 'Rechazar Primer Nivel';
+                actividad2.Status = 'Open';
+                
+                List<Task> tareas = new List<Task>();
+                tareas.add(actividad1);
+                tareas.add(actividad2);    
+
+                CC_Activity.llamadaQueueableCrearActividades(tareas);
+                Test.stopTest(); 
+                System.assertEquals(2, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
             }
         }
     }
@@ -542,36 +594,39 @@ public with sharing class CC_Activity_Test {
         List<User> usuario = [SELECT Id FROM User WHERE Profile.name LIKE 'CC_Usuario_CaixaBank' AND IsActive=true];
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
-     	Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
-        Case caso = new Case();
-        caso.Subject = 'Prueba';
-        caso.RecordTypeId = recordTypeCaso;
-        caso.CC_Idioma__c = 'es';
-        caso.CC_Tipo_Cliente__c = 'Empleado';
-        caso.Status = 'Activo';
-        caso.Origin = 'Email';
-		caso.CC_Tipo_Contacto__c = 'Petición de servicio';
-        caso.CC_Canal_Procedencia__c = 'Oficina Feedback';        
-        caso.CC_Canal_Resolucion__c = 'Oficina Feedback';        
-        insert caso;     
-        
-  		Task actividad1 = new Task();
-        actividad1.WhatId = caso.Id;
-        actividad1.Type = 'Rechazar Primer Nivel';
-        actividad1.Status = 'Open';
-        
-        Task actividad2 = new Task();
-        actividad2.WhatId = caso.Id;
-        actividad2.Type = 'Rechazar Primer Nivel';
-        actividad2.Status = 'Open';
-        
-        List<Task> tareas = new List<Task>();
-        tareas.add(actividad1);
-        tareas.add(actividad2);       
-        
+                Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
 
-        CC_Activity.crearActividades(tareas);
-        System.assertEquals(2, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+                Test.startTest();
+                Case caso = new Case();
+                caso.Subject = 'Prueba';
+                caso.RecordTypeId = recordTypeCaso;
+                caso.CC_Idioma__c = 'es';
+                caso.CC_Tipo_Cliente__c = 'Empleado';
+                caso.Status = 'Activo';
+                caso.Origin = 'Email';
+                caso.CC_Tipo_Contacto__c = 'Petición de servicio';
+                caso.CC_Canal_Procedencia__c = 'Oficina Feedback';        
+                caso.CC_Canal_Resolucion__c = 'Oficina Feedback';        
+                insert caso;     
+                
+                Task actividad1 = new Task();
+                actividad1.WhatId = caso.Id;
+                actividad1.Type = 'Rechazar Primer Nivel';
+                actividad1.Status = 'Open';
+                
+                Task actividad2 = new Task();
+                actividad2.WhatId = caso.Id;
+                actividad2.Type = 'Rechazar Primer Nivel';
+                actividad2.Status = 'Open';
+                
+                List<Task> tareas = new List<Task>();
+                tareas.add(actividad1);
+                tareas.add(actividad2);       
+                
+                CC_Activity.crearActividades(tareas);
+                Test.stopTest();
+
+                System.assertEquals(2, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
             }
         }
     }
@@ -581,35 +636,39 @@ public with sharing class CC_Activity_Test {
         List<User> usuario = [SELECT Id FROM User WHERE Profile.name LIKE 'CC_Usuario_CaixaBank' AND IsActive=true];
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
-     	Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
-        Case caso = new Case();
-        caso.Subject = 'Prueba';
-        caso.RecordTypeId = recordTypeCaso;
-        caso.CC_Idioma__c = 'es';
-        caso.CC_Tipo_Cliente__c = 'Empleado';
-        caso.Status = 'Activo';
-        caso.Origin = 'Email';
-		caso.CC_Tipo_Contacto__c = 'Petición de servicio';
-        caso.CC_Canal_Procedencia__c = 'Oficina Feedback';        
-        caso.CC_Canal_Resolucion__c = 'Oficina Feedback';        
-        insert caso;     
-        
-  		Task actividad1 = new Task();
-        actividad1.WhatId = caso.Id;
-        actividad1.Type = 'Rechazar Primer Nivel';
-        actividad1.Status = 'Open';
-        
-        Task actividad2 = new Task();
-        actividad2.WhatId = caso.Id;
-        actividad2.Type = 'Rechazar Primer Nivel';
-        actividad2.Status = 'Open';
-        
-        List<Task> tareas = new List<Task>();
-        tareas.add(actividad1);
-        tareas.add(actividad2);       
+                Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
 
-        CC_Activity.crearActividades(tareas, 'CC_Task');
-        System.assertEquals(2, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+                Test.startTest();
+                Case caso = new Case();
+                caso.Subject = 'Prueba';
+                caso.RecordTypeId = recordTypeCaso;
+                caso.CC_Idioma__c = 'es';
+                caso.CC_Tipo_Cliente__c = 'Empleado';
+                caso.Status = 'Activo';
+                caso.Origin = 'Email';
+                caso.CC_Tipo_Contacto__c = 'Petición de servicio';
+                caso.CC_Canal_Procedencia__c = 'Oficina Feedback';        
+                caso.CC_Canal_Resolucion__c = 'Oficina Feedback';        
+                insert caso;     
+                
+                Task actividad1 = new Task();
+                actividad1.WhatId = caso.Id;
+                actividad1.Type = 'Rechazar Primer Nivel';
+                actividad1.Status = 'Open';
+                
+                Task actividad2 = new Task();
+                actividad2.WhatId = caso.Id;
+                actividad2.Type = 'Rechazar Primer Nivel';
+                actividad2.Status = 'Open';
+                
+                List<Task> tareas = new List<Task>();
+                tareas.add(actividad1);
+                tareas.add(actividad2);       
+
+                CC_Activity.crearActividades(tareas, 'CC_Task');
+                Test.stopTest();
+                
+                System.assertEquals(2, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
             }
         }
     }
@@ -619,6 +678,7 @@ public with sharing class CC_Activity_Test {
         List<User> usuario = [SELECT Id FROM User WHERE Profile.name LIKE 'CC_Usuario_CaixaBank' AND IsActive=true];
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
+                Test.startTest();
                 Case caso = new Case();
                 caso.CC_Idioma__c = 'es';
                 caso.Subject = 'Prueba';
@@ -646,7 +706,6 @@ public with sharing class CC_Activity_Test {
                 Id llamadaId = null;
                 String estado = 'Open';
 
-                Test.startTest();
                 CC_Activity.createActivityTraslados(caso.Id, comentario, subject, tipoTarea, grupo3N, grupoId, llamadaId, estado);
                 Test.stopTest();
 
@@ -661,6 +720,8 @@ public with sharing class CC_Activity_Test {
         Contact contacto = [SELECT Id FROM Contact WHERE LastName ='01'];
         User operadorCliente = CC_TestDataFactory.getUserAdmin();
         System.runAs(operadorCliente) {
+            Test.startTest();
+
             Case caso = new Case();
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Prueba';
@@ -672,8 +733,8 @@ public with sharing class CC_Activity_Test {
             caso.OwnerId = operadorCliente.Id;
             insert caso;               
 
-            Test.startTest();
-                CC_Activity.crearActividadOportunidad(caso.Id, operadorCliente.Id, contacto.Id);
+            CC_Activity.crearActividadOportunidad(caso.Id, caso);
+
             Test.stopTest();
 
             System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
@@ -689,7 +750,8 @@ public with sharing class CC_Activity_Test {
 
                 String asunto = 'Derivación de Caso';
                 String comentarios = 'Comentarios de prueba';
-                Date fechaActividad = Date.today().addDays(7);
+                Date todayDate = CBK_UtilsDate.todayDT();
+                Date fechaActividad = todayDate.addDays(7);
 
                 Test.startTest();
                 Task tarea = CC_Activity.crearActividadBaseDerivar(taskRecordTypeId, asunto, comentarios, fechaActividad);
@@ -709,6 +771,7 @@ public with sharing class CC_Activity_Test {
 
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
+                Test.startTest();
                 Case caso = new Case();
                 caso.RecordTypeId = recordTypeCaso;
                 caso.CC_Idioma__c = 'es';
@@ -736,7 +799,6 @@ public with sharing class CC_Activity_Test {
                     'gestorClienteId' => gestorClienteId
                 };
     
-                Test.startTest();
                 Task tarea = CC_Activity.crearTareaDirector(respuesta);
                 insert tarea;
                 Test.stopTest();
@@ -754,6 +816,8 @@ public with sharing class CC_Activity_Test {
     
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
+
+                Test.startTest();
                 Case caso = new Case();
                 caso.CC_Idioma__c = 'es';
                 caso.Subject = 'Caso Gestor';
@@ -767,17 +831,17 @@ public with sharing class CC_Activity_Test {
     
                 Id gestorClienteId = caso.OwnerId;
                 Id taskRecordTypeId = taskRecordTypeId;
+                Date todayDate = CBK_UtilsDate.todayDT();
     
                 Map<String, Object> respuesta = new Map<String, Object>{
                     'recordTypeTarea' => taskRecordTypeId,
                     'asunto' => 'Tarea para Gestor',
                     'comentarios' => 'Se requiere seguimiento del caso',
-                    'fechaActividad' => Date.today().addDays(5),
+                    'fechaActividad' => todayDate.addDays(5),
                     'whatId' => caso.Id,
                     'ownerId' => gestorClienteId
                 };
     
-                Test.startTest();
                 Task tarea = CC_Activity.crearTareaGestor(respuesta);
                 insert tarea;
                 Test.stopTest();
@@ -795,6 +859,7 @@ public with sharing class CC_Activity_Test {
         
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
+                Test.startTest();
                 Case caso = new Case();
                 caso.CC_Idioma__c = 'es';
                 caso.Subject = 'Caso de Fraude';
@@ -807,9 +872,8 @@ public with sharing class CC_Activity_Test {
                 insert caso;
     
                 Id ownerId = caso.OwnerId;
-    
-                Test.startTest();
-                CC_Activity.crearActividadFraude(caso.Id, ownerId, contacto.Id);
+
+                CC_Activity.crearActividadFraude(caso.Id, caso);
                 Test.stopTest();
     
                 System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
@@ -822,25 +886,24 @@ public with sharing class CC_Activity_Test {
         List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
-        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoConOportunidad' LIMIT 1];
-        String descripcion = 'descripcion';
-        String type = 'Cita gestor';
-
-        Id rtOportunidad = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_MAC');
-
-        Opportunity oportunidad = new Opportunity(
-            RecordTypeId = rtOportunidad,
-            Name = 'Oportunidad Test',
-            StageName = 'Solicitud',
-            CSBD_Estado__c = 'Activa',
-            CSBD_CasoOrigen__c = caso.Id,
-            OwnerId = usuario[0].Id
-        );
-    
-        insert oportunidad;
-
-
                 Test.startTest();
+                Case caso = [SELECT Id FROM Case WHERE Subject = 'casoConOportunidad' LIMIT 1];
+                String descripcion = 'descripcion';
+                String type = 'Cita gestor';
+
+                Id rtOportunidad = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_MAC');
+
+                Opportunity oportunidad = new Opportunity(
+                    RecordTypeId = rtOportunidad,
+                    Name = 'Oportunidad Test',
+                    StageName = 'Solicitud',
+                    CSBD_Estado__c = 'Activa',
+                    CSBD_CasoOrigen__c = caso.Id,
+                    OwnerId = usuario[0].Id
+                );
+            
+                insert oportunidad;
+
                 Task tarea = CC_Activity.crearTareaRellamadaCSBD(oportunidad, caso, descripcion);
                 Test.stopTest();
 
@@ -856,30 +919,32 @@ public with sharing class CC_Activity_Test {
         Account cuenta = [SELECT Id FROM Account WHERE Name = 'Cuenta02' LIMIT 1];
         Contact contacto = [SELECT Id FROM Contact WHERE LastName = '02' LIMIT 1];
         
-        Case caso = new Case(
-            Description = 'casoConOportunidad',
-            Subject = 'casoConOportunidad',
-            Origin = 'Email',
-            Status = 'Activo',
-            accountId = cuenta.Id,
-            CC_Idioma__c = 'es',
-            CC_Canal_Respuesta__c = 'Email',
-            CC_Grupo_3N__c = 'Grupo 3N',
-            CC_Tipo_Contacto__c = 'Consulta',
-            CC_Canal_Procedencia__c = 'Formulario web',
-            CC_Detalles_Consulta__c = 'Caso de Contact Center',
-            OwnerId = usuario[0].Id,
-            ContactId = contacto.Id
-        );
-        insert caso;
-
-        String descripcion = 'Descripcion';
-        String type = 'Consulta oportunidad formalizada';
-
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
 
                 Test.startTest();
+
+                Case caso = new Case(
+                    Description = 'casoConOportunidad',
+                    Subject = 'casoConOportunidad',
+                    Origin = 'Email',
+                    Status = 'Activo',
+                    accountId = cuenta.Id,
+                    CC_Idioma__c = 'es',
+                    CC_Canal_Respuesta__c = 'Email',
+                    CC_Grupo_3N__c = 'Grupo 3N',
+                    CC_Tipo_Contacto__c = 'Consulta',
+                    CC_Canal_Procedencia__c = 'Formulario web',
+                    CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                    OwnerId = usuario[0].Id,
+                    ContactId = contacto.Id
+                );
+                insert caso;
+
+                String descripcion = 'Descripcion';
+                String type = 'Consulta oportunidad formalizada';
+
+
                 Task tarea = CC_Activity.crearTareaRellamadaCC(caso, descripcion, type);
                 Test.stopTest();
 
@@ -895,31 +960,32 @@ public with sharing class CC_Activity_Test {
         Account cuenta = [SELECT Id FROM Account WHERE Name = 'Cuenta02' LIMIT 1];
         Contact contacto = [SELECT Id FROM Contact WHERE LastName = '02' LIMIT 1];
         
-        Case caso = new Case(
-            Description = 'casoConOportunidad',
-            Subject = 'casoConOportunidad',
-            Origin = 'Email',
-            Status = 'Activo',
-            accountId = cuenta.Id,
-            CC_Idioma__c = 'es',
-            CC_Canal_Respuesta__c = 'Email',
-            CC_Grupo_3N__c = 'Grupo 3N',
-            CC_Tipo_Contacto__c = 'Consulta',
-            CC_Canal_Procedencia__c = 'Formulario web',
-            CC_Detalles_Consulta__c = 'Caso de Contact Center',
-            OwnerId = usuario[0].Id,
-            ContactId = contacto.Id
-        );
-        insert caso;
-
-        String descripcion = 'Descripcion';
-        String type = 'Consulta oportunidad formalizada';
-
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
 
                 Test.startTest();
-                   Boolean valor = CC_Task.permisosNuevaTarea(caso.Id);
+
+                Case caso = new Case(
+                    Description = 'casoConOportunidad',
+                    Subject = 'casoConOportunidad',
+                    Origin = 'Email',
+                    Status = 'Activo',
+                    accountId = cuenta.Id,
+                    CC_Idioma__c = 'es',
+                    CC_Canal_Respuesta__c = 'Email',
+                    CC_Grupo_3N__c = 'Grupo 3N',
+                    CC_Tipo_Contacto__c = 'Consulta',
+                    CC_Canal_Procedencia__c = 'Formulario web',
+                    CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                    OwnerId = usuario[0].Id,
+                    ContactId = contacto.Id
+                );
+                insert caso;
+
+                String descripcion = 'Descripcion';
+                String type = 'Consulta oportunidad formalizada';
+
+                Boolean valor = CC_Task.permisosNuevaTarea(caso.Id);
                 Test.stopTest();
 
                 System.assertEquals(true, valor, 'Error al recuperar el permisosNuevaTarea');
@@ -931,37 +997,180 @@ public with sharing class CC_Activity_Test {
     @isTest
     public static void crearActividadCSBDTelefonoNoCoincidenteTest() {
         List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
-        Account cuenta = [SELECT Id FROM Account WHERE Name = 'Cuenta02' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = '02' LIMIT 1];
-        
-        Case caso = new Case(
-            Description = 'caso',
-            Subject = 'caso',
-            Origin = 'Email',
-            Status = 'Activo',
-            accountId = cuenta.Id,
-            CC_Idioma__c = 'es',
-            CC_Canal_Respuesta__c = 'Email',
-            CC_Grupo_3N__c = 'Grupo 3N',
-            CC_Tipo_Contacto__c = 'Consulta',
-            CC_Canal_Procedencia__c = 'Formulario web',
-            CC_Detalles_Consulta__c = 'Caso de Contact Center',
-            OwnerId = usuario[0].Id,
-            ContactId = contacto.Id
-        );
-        insert caso;
-
         if (!usuario.isEmpty()) {
             System.runAs(usuario[0]) {
-
                 Test.startTest();
+                
+                Account cuenta = [SELECT Id FROM Account WHERE Name = 'Cuenta02' LIMIT 1];
+                Contact contacto = [SELECT Id FROM Contact WHERE LastName = '02' LIMIT 1];
+
+                Case caso = new Case(
+                    Description = 'caso',
+                    Subject = 'caso',
+                    Origin = 'Email',
+                    Status = 'Activo',
+                    accountId = cuenta.Id,
+                    CC_Idioma__c = 'es',
+                    CC_Canal_Respuesta__c = 'Email',
+                    CC_Grupo_3N__c = 'Grupo 3N',
+                    CC_Tipo_Contacto__c = 'Consulta',
+                    CC_Canal_Procedencia__c = 'Formulario web',
+                    CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                    OwnerId = usuario[0].Id,
+                    ContactId = contacto.Id
+                );
+
+                insert caso;
+
+
                 CC_Activity.crearActividadCSBDTelefonoNoCoincidente(caso.Id);
                 Test.stopTest();
-
                 System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
-
             }
         }
     }
 
+    @isTest
+    public static void crearActividadMecanismoFirmaTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = '02' LIMIT 1];
+        
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Case caso = new Case();
+                caso.CC_Idioma__c = 'es';
+                caso.Subject = 'Caso Mecanismo Firma';
+                caso.CC_Tipo_Cliente__c = 'Cliente';
+                caso.Status = 'Activo';
+                caso.Origin = 'Comentarios Stores';
+                caso.CC_Tipo_Contacto__c = 'Consulta';
+                caso.CC_Canal_Procedencia__c = 'Google Play Store';
+                caso.OwnerId = usuario[0].Id;
+                
+                insert caso;
+    
+                Test.startTest();
+                CC_Activity.crearActividadMecanismoFirma(caso, caso.OwnerId);
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+    }
+
+    
+    @isTest
+    public static void crearActividadCajerosTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearActividadCajeros(caso.Id);
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+    }
+
+    @isTest
+    public static void crearTaskPhishingSinRiesgoTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Case caso = [SELECT Id, OwnerId, ContactId, Contact.AccountId FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearTaskPhishingSinRiesgo(caso, 'Comentario de prueba', 'Consulta oportunidad formalizada');
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+    }
+
+    @isTest
+    public static void crearActividadPhishingSinRiesgoTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearActividadPhishingSinRiesgo(caso.Id, 'Comentario de prueba');
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+    }
+
+        @isTest
+    public static void crearActividadOficinaSinTareaTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearActividadOficinaSinTarea(caso.Id);
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+    }
+
+    @isTest
+    public static void crearActividadComunidadesPropietarios() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearActividadComunidadesPropietarios(caso.Id, '', 'MENSAJE');
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+        
+    }
+
+    
+    @isTest
+    public static void crearActividadCobrowsingTest() {
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        List<Case> caso = [SELECT Id FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        List<String> listacasos = new List <String>();
+        listacasos.add(caso[0].Id.toString());
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearActividadCobrowsing(listacasos);
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso[0].Id]);
+            }
+        }
+        
+    }
+
+    @isTest
+    public static void crearActividadIdentificadorBloqueadoTest(){
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearActividadIdentificadorBloqueado(caso.Id);
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+
+    }
 }

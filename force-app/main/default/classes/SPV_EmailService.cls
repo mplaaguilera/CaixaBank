@@ -7,6 +7,7 @@ public with sharing class SPV_EmailService implements Messaging.InboundEmailHand
     final static String RECORDTYPEPRETENSION = mapRTsObjects.get('Case').get('SPV_Pretension').getRecordTypeId();
     final static String RECORDTYPEGRUPORESPONSABLE = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SPV_GrupoDeTareas').getRecordTypeId();
     final static String RECORDTYPEINTERACCION = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
+    final static String RECORDTYPEINTERACCION_TAREA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_ConsultaTarea').getRecordTypeId();
     final static String RECORDTYPEACCION = mapRTsObjects.get('SAC_Accion__c').get('SPV_MaestroDeTareas').getRecordTypeId();
     
     public Messaging.InboundEmailResult handleInboundEmail(Messaging.InboundEmail email, Messaging.InboundEnvelope envelope) {
@@ -53,7 +54,7 @@ public with sharing class SPV_EmailService implements Messaging.InboundEmailHand
                 lstInteracciones = [SELECT Id, SAC_Reclamacion__c,SAC_FechaRespuesta__c,SAC_EmailRespuesta__c,SAC_Estado__c,SAC_IndexedThreadId__c, RecordTypeId, SAC_Respuesta__c,
                                                           SAC_GrupoColaborador__r.SAC_DeveloperName__c
                                                           FROM SAC_Interaccion__c
-                                                          WHERE RecordTypeId = :RECORDTYPEINTERACCION AND SAC_IndexedThreadId__c = :threadID LIMIT 1];
+                                                          WHERE RecordTypeId IN (:RECORDTYPEINTERACCION, :RECORDTYPEINTERACCION_TAREA) AND SAC_IndexedThreadId__c = :threadID LIMIT 1];
                 //Búsqueda de acciones
                 lstAcciones = [SELECT Id, SAC_Reclamacion__c,SAC_Estado__c,SAC_IndexedThreadId__c, RecordTypeId
                                                 FROM SAC_Accion__c

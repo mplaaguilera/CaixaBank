@@ -96,7 +96,7 @@ public abstract with sharing class OS_Usuarios {
 
     
             List<PermissionSetAssignment> nuevosPermisos = new List<PermissionSetAssignment>();
-            List<PermissionSet> permissionSet = [SELECT Id FROM PermissionSet WHERE Name LIKE 'OS%'];
+            List<PermissionSet> permissionSet = [SELECT Id FROM PermissionSet WHERE Name LIKE 'OS%' AND LicenseId = null];
             for (PermissionSet permissionSet1:permissionSet )
             {
                 PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();

@@ -11,7 +11,7 @@
 *****************************************************************/
 public with sharing class SPV_LCMP_CrearTarea {
     //Obtención record types
-    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'CC_Grupo_Colaborador__c', 'SAC_MaestroAccionesReclamacion__c'};
+    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'CC_Grupo_Colaborador__c', 'SAC_MaestroAccionesReclamacion__c','SAC_ImagenDocumento__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPERECLAMACION =  mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
@@ -20,6 +20,8 @@ public with sharing class SPV_LCMP_CrearTarea {
     private static final Id RECTYPEOTRASTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SPV_Acciones').getRecordTypeId();
     private static final Id RECTYPEGRUPODETAREAS = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SPV_GrupoDeTareas').getRecordTypeId();
     private static final Id RECTYPEMAESTROACCIONESREC = mapRTsObjects.get('SAC_MaestroAccionesReclamacion__c').get('SPV_MaestroAcciones').getRecordTypeId();
+    private static final Id RECTYPEGRUPOTAREAS = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SPV_GrupoDeTareas').getRecordTypeId();
+    private static final Id RECTYPEOFICINAS = mapRTsObjects.get('SAC_ImagenDocumento__c').get('SPV_OficinaAfectada').getRecordTypeId();
 
 
     /********************************************************************************************************
@@ -164,10 +166,13 @@ public with sharing class SPV_LCMP_CrearTarea {
      * 1.0            --------         CS             21/06/2024    Creación    
     *********************************************************************************************/
     @AuraEnabled
-    public static String insertarTarea(String tareaId, String descripcion, String equipoResponsableId, Boolean esMaestroOrOtras){
+    public static String insertarTarea(String tareaId, String descripcion, String equipoResponsableId, String idOficina, Boolean esMaestroOrOtras){
         
         Case caso = [SELECT Id, RecordTypeId, SAC_Reclamacion__c FROM Case WHERE Id =: tareaId];   
         SAC_Accion__c tarea = new SAC_Accion__c();
+        if(String.isNotBlank(idOficina)){
+            tarea.SAC_Oficina__c = idOficina;
+        }
 
         // esMaestroOrOtras viene con valor true en caso de ser Otras Tareas
         if(esMaestroOrOtras == true){
@@ -215,5 +220,31 @@ public with sharing class SPV_LCMP_CrearTarea {
         }
 
         return tarea.Id;
+    }
+
+    /*
+    * @description: Comprueba si el grupo seleccionado es una oficina y en caso afirmativo, compruebas las oficinas de la reclamación
+    * @author: Raúl Sanatos
+    * @date: 12 mayo 2025
+    */
+    @AuraEnabled
+    public static List<SAC_ImagenDocumento__c> comprobarPosibleOficina(String idGrupoOrMaestro, String idRegistro){
+
+        List<SAC_ImagenDocumento__c> oficinasReclamacion = new List<SAC_ImagenDocumento__c>();
+        List<CC_Grupo_Colaborador__c> listaGrupos = [SELECT id, SAC_DeveloperName__c FROM CC_Grupo_Colaborador__c WHERE RecordTypeId = :RECTYPEGRUPOTAREAS AND id = :idGrupoOrMaestro LIMIT 1];
+        List<SAC_MaestroAccionesReclamacion__c> listaMaestro = [SELECT id, SAC_EquipoResponsable__r.SAC_DeveloperName__c FROM SAC_MaestroAccionesReclamacion__c WHERE RecordTypeId = :RECTYPEMAESTROACCIONESREC AND id = :idGrupoOrMaestro  AND SAC_Activo__c = true LIMIT 1];
+
+        if((!listaGrupos.isEmpty() && listaGrupos[0].SAC_DeveloperName__c == 'OFICINA') || (!listaMaestro.isEmpty() && listaMaestro[0].SAC_EquipoResponsable__r.SAC_DeveloperName__c == 'OFICINA')){
+
+            Case caso = [SELECT Id, RecordTypeId, SAC_Reclamacion__c FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND Id =: idRegistro LIMIT 1];  
+
+            if(caso.RecordTypeId ==  RECTYPERECLAMACION){
+                oficinasReclamacion = [SELECT Id, SPV_OficinaAfectada_Lookup__c, SPV_OficinaAfectada_Lookup__r.Name FROM SAC_ImagenDocumento__c WHERE RecordTypeId = :RECTYPEOFICINAS AND SAC_Caso__c = :caso.Id AND SPV_OficinaAfectada_Lookup__c != null];
+            }else if(caso.RecordTypeId ==  RECTYPEPRETENSION){
+                oficinasReclamacion = [SELECT Id, SPV_OficinaAfectada_Lookup__c, SPV_OficinaAfectada_Lookup__r.Name FROM SAC_ImagenDocumento__c WHERE RecordTypeId = :RECTYPEOFICINAS AND SAC_Caso__c = :caso.SAC_Reclamacion__c AND SPV_OficinaAfectada_Lookup__c != null];
+            } 
+        }
+
+        return oficinasReclamacion;
     }
 }

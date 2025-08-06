@@ -14,7 +14,7 @@
 */
 public without sharing class SAC_Reclamacion {
 
-    private static Set<String> objetos = new Set<String>{'Case','SAC_Accion__c', 'CC_Grupo_Colaborador__c'};
+    private static Set<String> objetos = new Set<String>{'Case','SAC_Accion__c', 'CC_Grupo_Colaborador__c','CBK_Case_Extension__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('Case').get('SAC_Consulta').getRecordTypeId();  
@@ -24,6 +24,7 @@ public without sharing class SAC_Reclamacion {
     private static final String RECTYPEACCIONMAESTRO = mapRTsObjects.get('SAC_Accion__c').get('SAC_MaestroDeTareas').getRecordTypeId();
     private static final String RECTYPEACCIONOTRAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_OtrasTareas').getRecordTypeId();
     private static final String RECTYPEGRUPORESPONSABLEACCION = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SAC_GrupoResponsableAccion').getRecordTypeId();
+    private static final Id RECTYPERECLAMACIONEXTENSION = mapRTsObjects.get('CBK_Case_Extension__c').get('SAC_ReclamacionCaseExt').getRecordTypeId();
 
     private static final String STATUS_RECHAZADO = 'Rechazado';
     /**************************************************************************
@@ -1462,7 +1463,7 @@ public without sharing class SAC_Reclamacion {
             
             Boolean esValida = true;
             for(Id idPretehija : mapReclaPret.get(idCaso).keySet()){
-                if(!mapReclaPret.get(idCaso).get(idPretehija).SAC_ValidacionMCC__c){
+                if(!mapReclaPret.get(idCaso).get(idPretehija).SAC_ValidacionMCC__c && mapReclaPret.get(idCaso).get(idPretehija).Status != 'SAC_009'){
                     esValida = false;
                     break;
                 }
@@ -1763,6 +1764,119 @@ public without sharing class SAC_Reclamacion {
     public static void reasignarOwnerLetrado(List<Case> listConsultaSAC){
         for(Case caso : listConsultaSAC){
             caso.SAC_Letrado__c = 'Pte. Asignar';
+        }
+    }
+
+    /**
+	 * @description Al cambiar el campo CC_CasoRelacionado__c, verificar que el registro informado es una reclamación SAC
+	 */  
+
+    public static void validarCambioCasoRelacionado(List<Case> listUpdate, Map<Id, Case> mapOldCase, Set<Id> idsRelacionados){
+
+        Set<Id> idsCasosRel = new Set<Id>();
+        List<Case> listRelacionadas = [SELECT Id FROM Case WHERE RecordTypeId = :RECTYPERECLAMACION AND Id IN :idsRelacionados];
+        if(!listRelacionadas.isEmpty()){
+            for(Case rel : listRelacionadas){
+                idsCasosRel.add(rel.Id);
+            }
+        }
+
+        if(!idsCasosRel.isEmpty()){ //Vinculación con botón o vinculación editando el campo CC_CasoRelacionado__c (Reclamacion SAC)
+            for(Case caso : listUpdate){
+                if(!idsCasosRel.contains(caso.Id)){
+                    if(caso.CC_CasoRelacionado__c != null && !idsCasosRel.contains(caso.CC_CasoRelacionado__c)){
+                        caso.addError('Solo puede informar registros de SAC reclamación en el campo "Caso relacionado"');
+                    }
+                }
+            }
+        }else{ //Conversión a consulta COPS o vinculación editando el campo CC_CasoRelacionado__c (Consulta COPS/SAC)
+            for(Case caso : listUpdate){
+                if(mapOldCase.containsKey(caso.Id) && caso.Status == mapOldCase.get(caso.Id).Status){ //Edicción del campo CC_CasoRelacionado__c (no cambia estado), lanzamos error que no se puede vincular a una consulta SAC/COPS
+                                                                                                      //En caso de conversión a una consulta COPS, no debe saltar error
+                    caso.addError('Solo puede informar registros de SAC reclamación en el campo "Caso relacionado"');
+                }
+            }
+        }
+    }
+
+
+    /**************************************************************************************************************
+     * Proposito: Al modificar los campos de una reclamación cerrada se debe registrar en el case history
+     *
+     * Historial
+     * -------
+     * VERSION         USER_STORY       AUTHOR           DATE         Description
+     * 1.0             US1278295     Sergio Martín    28/07/25         Creación
+    **************************************************************************************************************/
+    public static void crearCaseHistoryReclamacionCerrada(Map<Id, Case> mapOldObj, List<Case> listNewObj) {
+        List<CBK_CaseHistory__c> caseHistoryRecords = new List<CBK_CaseHistory__c>();
+
+        SObjectType caseFields = Schema.getGlobalDescribe().get('Case');
+        Map<String,Schema.SObjectField> mfields = caseFields.getDescribe().fields.getMap();
+        Schema.DescribeFieldResult fieldDescribe;
+        
+        for (Case newCase : listNewObj) {
+            Case oldCase = mapOldObj.get(newCase.Id);
+            for (String fieldName : mfields.keySet()) {
+                
+                if (newCase.get(fieldName) != oldCase.get(fieldName) && (fieldName.startsWith('sac_') || fieldName.startsWith('cc_') || fieldName.startsWith('seg_'))) {
+                    fieldDescribe = mfields.get(fieldName).getDescribe();
+                    String fieldLabel = fieldDescribe.getLabel();
+                    Schema.SObjectField field = mfields.get(fieldName);      
+                    CBK_CaseHistory__c caseHistoryRecord = new CBK_CaseHistory__c();
+                    caseHistoryRecord.CBK_IsDeleted__c = false;
+                    caseHistoryRecord.CBK_CaseId__c = newCase.Id;
+                    caseHistoryRecord.CBK_CreatedDate__c = CBK_UtilsDate.todayDT();
+                    caseHistoryRecord.CBK_DataType__c = String.valueOf(fieldDescribe.getType());
+                    caseHistoryRecord.CBK_Field__c = fieldLabel;
+                    caseHistoryRecord.CBK_OldValue__c = String.valueOf(oldCase.get(fieldName));
+                    caseHistoryRecord.CBK_NewValue__c = String.valueOf(newCase.get(fieldName));
+                    caseHistoryRecords.add(caseHistoryRecord);
+                }
+            }
+        }
+        if (!caseHistoryRecords.isEmpty()) {
+            SAC_DatabaseDML.insertListDML(caseHistoryRecords, false);  
+        }
+    }
+
+
+    /**************************************************************************************************************
+     * Proposito: Al modificar los campos de una reclamación cerrada se debe registrar en el case history
+     *
+     * Historial
+     * -------
+     * VERSION         USER_STORY       AUTHOR           DATE         Description
+     * 1.0             US1278295     Sergio Martín    28/07/25         Creación
+    **************************************************************************************************************/
+    public static void crearCaseExtensionHistoryReclamacionCerrada(Map<Id, CBK_Case_Extension__c> mapOldObj, List<CBK_Case_Extension__c> listNewObj) {
+        List<CBK_CaseHistory__c> caseHistoryRecords = new List<CBK_CaseHistory__c>();
+
+        SObjectType caseExtensionFields = Schema.getGlobalDescribe().get('CBK_Case_Extension__c');
+        Map<String,Schema.SObjectField> mfields = caseExtensionFields.getDescribe().fields.getMap();
+        Schema.DescribeFieldResult fieldDescribe;
+        for (CBK_Case_Extension__c newCaseExtension : listNewObj) {
+            CBK_Case_Extension__c oldCaseExtension = mapOldObj.get(newCaseExtension.Id);
+            for (String fieldName : mfields.keySet()) {
+                if (newCaseExtension.get(fieldName) != oldCaseExtension.get(fieldName) && newCaseExtension.SAC_ReclamacionCerrada__c && (fieldName.startsWith('sac_') || fieldName.startsWith('cc_') || fieldName.startsWith('seg_'))) {
+                    fieldDescribe = mfields.get(fieldName).getDescribe();
+
+                    String fieldLabel = fieldDescribe.getLabel();
+                    Schema.SObjectField field = mfields.get(fieldName);      
+                    CBK_CaseHistory__c caseHistoryRecord = new CBK_CaseHistory__c();
+                    caseHistoryRecord.CBK_IsDeleted__c = false;
+                    caseHistoryRecord.CBK_CaseId__c = newCaseExtension.Case_Id__c;
+                    caseHistoryRecord.CBK_CreatedDate__c = CBK_UtilsDate.todayDT();
+                    caseHistoryRecord.CBK_DataType__c = String.valueOf(fieldDescribe.getType());
+                    caseHistoryRecord.CBK_Field__c = fieldLabel;
+                    caseHistoryRecord.CBK_OldValue__c = String.valueOf(oldCaseExtension.get(fieldName));
+                    caseHistoryRecord.CBK_NewValue__c = String.valueOf(newCaseExtension.get(fieldName));
+                    caseHistoryRecords.add(caseHistoryRecord);
+                }
+            }
+        }
+        if (!caseHistoryRecords.isEmpty()) {
+            SAC_DatabaseDML.insertListDML(caseHistoryRecords, false);  
         }
     }
 }

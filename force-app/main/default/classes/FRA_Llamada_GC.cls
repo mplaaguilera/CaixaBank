@@ -5,7 +5,25 @@ public with sharing class FRA_Llamada_GC {
 												  FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :identificarCodigoCola(inputLlamada.servicio) LIMIT 1];
 		Case casoVinculado;
 		Boolean llamadaEmpleado = false;
-		Boolean llamadaCC = !String.isEmpty(inputLlamada.asunto) ? true : false;
+		
+		//Boolean llamadaCC = !String.isEmpty(inputLlamada.asunto) ? true : false;
+		Boolean llamadaCC = false;
+		//Comprobamos que existen tareas asociadas con la llamda en contact es decir tiene un
+		List<Task> tareas = [
+				SELECT WhatId 
+				FROM Task 
+				WHERE RecordType.DeveloperName = 'CC_Task' 
+				  AND CC_Llamada_Id__r.CC_ConnId__c = :inputLlamada.connId ORDER by CreatedDate DESC
+				LIMIT 1
+			];
+		
+		if(!tareas.isEmpty()){
+			llamadaCC = true;
+		}else{
+			llamadaCC = false;
+		}
+		
+
 
 		CC_Llamada__c llamada = new CC_Llamada__c(
 			KIN_Genesys_Cloud__c = true,
@@ -24,14 +42,9 @@ public with sharing class FRA_Llamada_GC {
 			RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'FRA_Cliente')
 		);
 
-		// if (!esCallCenter(inputLlamada.servicio)) {
-			//llamadaEmpleado = identificarPorTelefono(llamada, inputLlamada.ani, llamadaCC);
-			Map<String, Object> resultado = identificarPorTelefono(llamada, inputLlamada.ani, llamadaCC);
-			llamadaEmpleado = (Boolean)resultado.get('Empleado');
-			Case casoContactCenter = (Case)resultado.get('Caso');
-
-		// }
-
+		Map<String, Object> resultado = identificarPorTelefono(llamada, inputLlamada.ani, llamadaCC);
+		llamadaEmpleado = (Boolean)resultado.get('Empleado');
+		Case casoContactCenter = (Case)resultado.get('Caso');
 
         finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 		insert llamada;
@@ -270,8 +283,10 @@ public with sharing class FRA_Llamada_GC {
 	}
 
 	public static Case crearVincularCaso(CC_Llamada__c llamada, Boolean llamadaEmpleado, Boolean llamadaCC,Case casoContactCenter) {
+		
 		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Canal_Procedencia__c, CC_Canal_de_Entrada__c,CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
 													FROM CC_Servicio_Genesys__c WHERE Id = :llamada.CC_Servicio_Genesys__c];
+
 		Case caso = crearCaso(llamada, servicioGenesys, llamadaEmpleado, llamadaCC,casoContactCenter);
 		vincularCaso(caso, llamada, servicioGenesys);
 		return [SELECT CaseNumber, Status, Owner.Name, CreatedDate, Subject FROM Case WHERE Id = :caso.Id];
@@ -280,39 +295,66 @@ public with sharing class FRA_Llamada_GC {
 	public static Case crearCaso(CC_Llamada__c llamada, CC_Servicio_Genesys__c servicioGenesys, Boolean llamadaEmpleado, Boolean llamadaCC,Case casoContactCenter) {
 		Case caso = new Case(
 			RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente'),
-			//Subject = llamada.CC_Asunto__c,
-            //Origin = servicioGenesys.CC_Canal_de_Entrada__c == 'Telefono' ? 'Phone' : String.isBlank(servicioGenesys.CC_Canal_de_Entrada__c) ? 'Phone' : servicioGenesys.CC_Canal_de_Entrada__c,
+			Subject = llamada.CC_Asunto__c,
+            Origin = servicioGenesys.CC_Canal_de_Entrada__c == 'Telefono' ? 'Phone' : String.isBlank(servicioGenesys.CC_Canal_de_Entrada__c) ? 'Phone' : servicioGenesys.CC_Canal_de_Entrada__c,
 			FRA_Origen_Creacion__c = 'Llamada',
 			CC_Canal_Respuesta__c = 'Phone',
 			CC_Telefono_Contacto__c = llamada.CC_ANI__c,
 			CC_No_Identificado__c = llamada.CC_No_Identificado__c,
 			CC_Canal_Procedencia__c = servicioGenesys.CC_Canal_Procedencia__c,
 			CC_Canal_Resolucion__c = servicioGenesys.CC_Canal_Procedencia__c,
-			//CC_Idioma__c = llamada.CC_Idioma__c,
-			CC_IdentCliente__c = llamada.CC_IdentCliente__c,
-			Subject = casoContactCenter.Subject,
-			Description = casoContactCenter.Description,
-			CC_Idioma__c = casoContactCenter.CC_Idioma__c,
-			CC_Tipo_Contacto__c = casoContactCenter.CC_Tipo_Contacto__c,
-			Origin = casoContactCenter.Origin,
-			CC_Detalles_Consulta__c = casoContactCenter.CC_Detalles_Consulta__c,
-			CC_Detalles_Solucion__c = casoContactCenter.CC_Detalles_Solucion__c,
-			CC_ContactoRelacionado__c = casoContactCenter.CC_ContactoRelacionado__c,
-			CC_Oficina__c = casoContactCenter.CC_Oficina__c,
-			CC_CasoRelacionado__c = casoContactCenter.Id,
-			Comments = casoContactCenter.Comments
+			CC_Idioma__c = llamada.CC_Idioma__c,
+			CC_IdentCliente__c = llamada.CC_IdentCliente__c
 		);
 
+		
 		// Si es un empleado pone el Contacto y la Cuenta en Contacto relacionado y Oficina
 		if(llamadaEmpleado) {
 			caso.CC_ContactoRelacionado__c = llamada.CC_Contacto__c != null ? llamada.CC_Contacto__c : null ;
 			caso.CC_Oficina__c = llamada.CC_Cuenta__c != null ? llamada.CC_Cuenta__c : null;
 			caso.CC_Canal_Contacto__c='FRA_Oficina';
+
+		//La llamada viene directamente a FRAUDE 
 		}else {
 			caso.ContactId = llamada.CC_Contacto__c != null ? llamada.CC_Contacto__c : null;
 			caso.AccountId = llamada.CC_Cuenta__c != null ? llamada.CC_Cuenta__c : null;	
+
+			//Llamada transferida desde el Contact Center
 			if(llamadaCC){
-				caso.CC_Canal_Contacto__c='FRA_Call Center';
+				if (casoContactCenter != null) {
+
+					caso.Subject = casoContactCenter.Subject;
+					caso.CC_Canal_Contacto__c='FRA_Call Center';
+
+					//Añadimos los nuevos valores de la llamada si hay llamada desde el Contact Center
+					caso.Subject = casoContactCenter.Subject;
+					caso.Description = casoContactCenter.Description;
+					caso.CC_Idioma__c = casoContactCenter.CC_Idioma__c;
+					caso.CC_Tipo_Contacto__c = casoContactCenter.CC_Tipo_Contacto__c;
+					//caso.Origin = casoContactCenter.Origin;
+					//caso.Origin = 'CC';
+					caso.CC_Detalles_Consulta__c = casoContactCenter.CC_Detalles_Consulta__c;
+					caso.CC_Detalles_Solucion__c = casoContactCenter.CC_Detalles_Solucion__c;
+					caso.CC_ContactoRelacionado__c = casoContactCenter.CC_ContactoRelacionado__c;
+					caso.CC_Oficina__c = casoContactCenter.CC_Oficina__c;
+					caso.CC_CasoRelacionado__c = casoContactCenter.Id;
+					caso.Comments = casoContactCenter.Comments;
+					
+					//Para asignar los niveles de MCC de temática, producto y motivo, nos basamos en la tabla de equivalencias del objeto CC_Lista_Valores__c
+					if(casoContactCenter.CC_MCC_Motivo__c != null){
+						Id rtTablaEquivlaneciasccfraude = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'FRA_TablaEquivalenciasDerivacion_CC_FRAUDE');
+						List<CC_Lista_Valores__c> tablaEquivalencias = [SELECT Id, FRA_MotivoDestino__c, FRA_MotivoDestino__r.CC_Producto_Servicio__c, FRA_MotivoDestino__r.CC_Producto_Servicio__r.CC_Tematica__c FROM CC_Lista_Valores__c WHERE RecordTypeId = :rtTablaEquivlaneciasccfraude AND CC_Activa__c = true AND FRA_MotivoOrigen__c = :casoContactCenter.CC_MCC_Motivo__c AND FRA_MotivoDestino__c != null LIMIT 1];
+
+						if(!tablaEquivalencias.isEmpty()){
+							caso.CC_MCC_Tematica__c = tablaEquivalencias[0].FRA_MotivoDestino__r.CC_Producto_Servicio__r.CC_Tematica__c;
+							caso.CC_MCC_ProdServ__c = tablaEquivalencias[0].FRA_MotivoDestino__r.CC_Producto_Servicio__c;
+							caso.CC_MCC_Motivo__c = tablaEquivalencias[0].FRA_MotivoDestino__c;
+						}
+					}
+				}
+
+			// Llamada directa a Fraude
+			// Sino es una llamada desde el Contact Center, asignamos los valores de la llamada
 			}else{
 				caso.CC_Canal_Contacto__c = caso.CC_Canal_Procedencia__c =='Teléfono FRAUDE Tarjetas Consumer' ? 'FRA_Cliente Consumer' : 'FRA_Cliente cbk';		
 			}
@@ -329,18 +371,36 @@ public with sharing class FRA_Llamada_GC {
         return caso;
 	}
 
-	private static Case buscarCasoCC (String connId) {
+	
+	private static Case buscarCasoCC(String connId) {
 		Case casoCC = new Case();
-		if(!String.isEmpty(connId)){
-		Id caso = [SELECT WhatId FROM Task WHERE RecordType.DeveloperName = 'CC_Task' and CC_Llamada_Id__r.CC_ConnId__c = :connId]?.WhatId;
-		//casoCC = [SELECT Id, AccountId, ContactId FROM Case WHERE Id = :caso LIMIT 1];
-		casoCC = [SELECT Id, AccountId, ContactId,Subject,Description,CC_Idioma__c,CC_Tipo_Contacto__c,Origin,CC_Detalles_Consulta__c,CC_Detalles_Solucion__c,
-				  CC_ContactoRelacionado__c,CC_Oficina__c,CaseNumber,Comments,CC_CasoRelacionado__c
-		 		  FROM Case WHERE Id = :caso LIMIT 1];
+		
+		if (!String.isEmpty(connId)) {
+			List<Task> tareas = [
+				SELECT WhatId 
+				FROM Task 
+				WHERE RecordType.DeveloperName = 'CC_Task' 
+				  AND CC_Llamada_Id__r.CC_ConnId__c = :connId ORDER by CreatedDate DESC
+				LIMIT 1
+			];
+	
+			if (!tareas.isEmpty() && tareas[0].WhatId != null) {
+				List<Case> casos = [
+					SELECT Id, AccountId, ContactId, Subject, Description, CC_Idioma__c, CC_Tipo_Contacto__c, CC_Detalles_Consulta__c, CC_Detalles_Solucion__c,
+					CC_ContactoRelacionado__c, CC_Oficina__c, Comments, CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_Motivo__c
+					FROM Case 
+					WHERE Id = :tareas[0].WhatId 
+					LIMIT 1
+				];
+				if (!casos.isEmpty()) {
+					return casos[0];
+				}
+			}
 		}
-		return casoCC;
+	
+		return null;
 	}
-
+	
 	public static void vincularCaso(Case caso, CC_Llamada__c llamada, CC_Servicio_Genesys__c servicioGenesys) {
 		String tipoActividad;
 		if (llamada.CC_ConnId__c == null) { //Si es una consulta
@@ -362,19 +422,31 @@ public with sharing class FRA_Llamada_GC {
 		
 		if(llamadaCC){
 			casoCC = buscarCasoCC(llamada.CC_ConnId__c);
-			llamada.CC_Cuenta__c = casoCC.AccountId != null ? casoCC.AccountId : null;
-			llamada.CC_Contacto__c = casoCC.ContactId != null ? casoCC.ContactId : null;
+			
+			 if (casoCC != null) {
+				llamada.CC_Cuenta__c = casoCC.AccountId != null ? casoCC.AccountId : null;
+				llamada.CC_Contacto__c = casoCC.ContactId != null ? casoCC.ContactId : null;
+			} else {
+				llamada.CC_Cuenta__c = null;
+				llamada.CC_Contacto__c = null;
+			}
+
 		}
 
 		if(!String.isEmpty(telefono) && ((!llamadaCC) || (llamadaCC && (casoCC.AccountId == null || casoCC.ContactId == null)))){
 			//Busca los canales de comunicación por el teléfono
-				List<CC_Canal_Com__c> oCanales = [SELECT CC_ContactoId__c, CC_CuentaId__c, CC_ContactoId__r.RecordType.DeveloperName FROM CC_Canal_Com__c 
-													WHERE CC_Telefono__c IN :telefonos AND RecordType.DeveloperName = 'CC_Telefono'];
+				List<CC_Canal_Com__c> oCanales = [SELECT CC_ContactoId__c, CC_CuentaId__c, CC_ContactoId__r.RecordType.DeveloperName,CC_ContactoId__r.Account.Id
+											      FROM CC_Canal_Com__c 
+												   WHERE CC_Telefono__c IN :telefonos AND RecordType.DeveloperName = 'CC_Telefono'];
+			
 			Set<String> oIDs = new Set<String>();
         	for (CC_Canal_Com__c oCanal : oCanales) {
             	if (oCanal.CC_CuentaId__c != null) {
 					oIDs.add(oCanal.CC_CuentaId__c);
+				}else {
+					oIDs.add(oCanal.CC_ContactoId__r.Account.Id);	//Se añade esta parte por si no trae informada la oficina en el canal de comunicación
 				}
+
         	}
 			//Busca las cuentas de RT CC_Cliente y CC_ClientePA que se encuentra en la consulta anterior
 			List<Account> oCuentas = [SELECT Id, Name, RecordType.DeveloperName FROM Account 

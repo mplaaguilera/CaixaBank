@@ -1,0 +1,64 @@
+<template>    
+    <template if:true={showForm}>
+        <lightning-card title="Crear Nuevo Cirbe" icon-name="standard:dataset">
+            <lightning-record-edit-form
+                object-api-name="GRR_Gestion__c"
+                record-type-id={recordTypeId}
+                onsuccess={handleSuccess}
+                onerror={handleError}
+                onsubmit={handleSubmit}
+            > 
+                <lightning-input-field field-name="GRR_Interviniente__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Cirbe_Externo__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Importe_Riesgo_directo__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Morosidad_Riesgo_directo__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Importe_Riesgo_Indirecto__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Morosidad_Riesgo_Indirecto__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Nombre_BBDD_Externa__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Importe_BDDD_Externa__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Detalle_BBDD_Externa__c"></lightning-input-field>
+                
+                
+                <div class="slds-grid slds-grid_align-center slds-m-top_medium">
+                    <lightning-button variant="neutral" label="Cancelar" onclick={handleCancel}></lightning-button>
+                    <lightning-button class="slds-m-left_small" variant="brand" type="submit" label="Guardar Cirbe"></lightning-button>
+                </div>
+            </lightning-record-edit-form>
+         </lightning-card>
+    </template>
+   
+
+        <template if:false={showForm}>
+            <div class="slds-p-around_medium slds-theme_shade"></div>
+            <lightning-card title={tituloGestiones} icon-name="standard:dataset">
+                <template if:true={gestiones}>
+                    <template for:each={gestionesConLinks} for:item="gestion">
+                        <div key={gestion.Id} class="slds-p-around_x-small slds-border_bottom slds-grid slds-align-start">
+                            <div class="slds-m-right_small">
+                                <lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+                            </div>
+                            <div>
+                                <p><strong>Cirbe externo :</strong> 
+                                     <a
+                                        href={gestion.link}
+                                        target="_blank"
+                                        class="slds-text-link"
+                                    >
+                                    {gestion.GRR_Cirbe_Externo__c}
+                                    </a>
+                                </p>
+                                <p><strong>Importe riesgo directo : </strong>
+                                    {gestion.GRR_Importe_Riesgo_directo__c}
+                                    
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <div class="slds-grid slds-grid_align-center slds-m-top_medium">
+                    <lightning-button variant="brand" class="sld-m-around_small" label="Crear Nuevo Cirbe" onclick={handleShowForm}></lightning-button>
+                </div>
+            </lightning-card>
+        </template>
+    
+</template>

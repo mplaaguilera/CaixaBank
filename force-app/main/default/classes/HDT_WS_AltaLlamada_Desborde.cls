@@ -107,6 +107,19 @@ global with sharing class HDT_WS_AltaLlamada_Desborde extends CBK_HttpServiceInt
 					}
 					*/
 					insert llamadaDesborde;
+
+					//Moficaciones para la US : US1133185 : Creación de caso en la API de agente de desborde 
+					// Obtener el Id de la cola por nombre
+					//Creamos el caso de la llamada entrante de desborde
+					
+					HDT_Llamada_GC.crearVincularCasoDesborde(llamadaDesborde);
+					/*
+					if (caso != null) {
+						insert caso;
+					} else {
+						throw new DefaultException('Error: No se pudo crear el caso en la API de agente de desborde');
+					}*/
+
 				} catch (Exception e) {
 					CBK_Log.error(e);
 					throw new DefaultException('ExceptionType: ' + e.getTypeName() + ' - ExceptionMessage: ' + e.getMessage() + ' - Line: ' + e.getStackTraceString().substringBetween('Class.', '\nClass.'));

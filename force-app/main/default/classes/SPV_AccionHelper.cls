@@ -459,29 +459,29 @@ public with sharing class SPV_AccionHelper {
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0            --               CS             18/07/24     Creación
     *****************************************************************************/
-    public static void cerrarReclamaciones(List<Id> reclamacionesParaCerrar){
-        List<Case> listaReclamaciones = [SELECT id, status, SEG_Subestado__c, SPV_Organismo__c, RecordTypeId FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION AND Id IN: reclamacionesParaCerrar) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN: reclamacionesParaCerrar)];
-        List<Case> casosUpdate = new List<Case>();
+    // public static void cerrarReclamaciones(List<Id> reclamacionesParaCerrar){
+    //     List<Case> listaReclamaciones = [SELECT id, status, SEG_Subestado__c, SPV_Organismo__c, RecordTypeId FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION AND Id IN: reclamacionesParaCerrar) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN: reclamacionesParaCerrar)];
+    //     List<Case> casosUpdate = new List<Case>();
 
-        for(Case reclamacion: listaReclamaciones){
-            // Una vez que las tareas se finalicen, el subestado pasaría automáticamente a ser el mismo que el estado “Pendiente respuesta Organismo” excepto en el caso de Consumo Autonómico en el que el estado pasaría directamente a “Cerrado”
-            if(reclamacion.RecordTypeId == RECTYPERECLAMACION && reclamacion.Status == 'SPV_PendienteRespuestaOrganismos' && reclamacion.SEG_Subestado__c == 'Ejecucion y Pendiente Respuesta Organismo') {
-                if(reclamacion.SPV_Organismo__c == 'SPV_Consumo') {
-                    reclamacion = SPV_CaseHelper.cerrarReclamacion(reclamacion);
-                } else {
-                    reclamacion.SEG_Subestado__c='Pendiente respuesta Organismos';
-                }
-                casosUpdate.add(reclamacion);
-            } else if(reclamacion.RecordTypeId == RECTYPEPRETENSION && reclamacion.Status != 'Descartado') {
-                reclamacion.Status = 'Cerrado';
-                casosUpdate.add(reclamacion);
-            }
-        }
+    //     for(Case reclamacion: listaReclamaciones){
+    //         // Una vez que las tareas se finalicen, el subestado pasaría automáticamente a ser el mismo que el estado “Pendiente respuesta Organismo” excepto en el caso de Consumo Autonómico en el que el estado pasaría directamente a “Cerrado”
+    //         if(reclamacion.RecordTypeId == RECTYPERECLAMACION && reclamacion.Status == 'SPV_PendienteRespuestaOrganismos' && reclamacion.SEG_Subestado__c == 'Ejecucion y Pendiente Respuesta Organismo') {
+    //             if(reclamacion.SPV_Organismo__c == 'SPV_Consumo') {
+    //                 reclamacion = SPV_CaseHelper.cerrarReclamacion(reclamacion);
+    //             } else {
+    //                 reclamacion.SEG_Subestado__c='Pendiente respuesta Organismos';
+    //             }
+    //             casosUpdate.add(reclamacion);
+    //         } else if(reclamacion.RecordTypeId == RECTYPEPRETENSION && reclamacion.Status != 'Descartado') {
+    //             reclamacion.Status = 'Cerrado';
+    //             casosUpdate.add(reclamacion);
+    //         }
+    //     }
 
-        if(!casosUpdate.isEmpty()){            
-            Database.update(casosUpdate);
-        }
-    }
+    //     if(!casosUpdate.isEmpty()){            
+    //         Database.update(casosUpdate);
+    //     }
+    // }
 
     /*****************************************************************
      * Proposito: Comprueba si ha habido un cambio del maestro de acciones en la accion y lanza su correspondiente funcionalidad
@@ -556,7 +556,7 @@ public with sharing class SPV_AccionHelper {
         for (SAC_Accion__c accion : listaAcciones) {
             if(accion.SAC_PlazoMaximo__c != null){
                 if(accion.CreatedDate ==null){//Viene del BI
-                    accion.SAC_FechaVencimientoInicial__c = BusinessHours.add(ideBH, System.now(), cacularMilisegundos(accion.SAC_PlazoMaximo__c)).date();
+                    accion.SAC_FechaVencimientoInicial__c = BusinessHours.add(ideBH, CBK_UtilsDate.nowSYS(), cacularMilisegundos(accion.SAC_PlazoMaximo__c)).date();
                 }else{
                     accion.SAC_FechaVencimientoInicial__c = BusinessHours.add(ideBH, accion.CreatedDate, cacularMilisegundos(accion.SAC_PlazoMaximo__c)).date();
                 }
@@ -613,7 +613,7 @@ public with sharing class SPV_AccionHelper {
             }
         }
         
-        if(accionNew.SAC_FechaVencimientoProrroga__c > fechaHastaQueSePuedeProrrogar  ||  accionNew.SAC_FechaVencimientoProrroga__c < Date.today()){
+        if(accionNew.SAC_FechaVencimientoProrroga__c > fechaHastaQueSePuedeProrrogar  ||  accionNew.SAC_FechaVencimientoProrroga__c < CBK_UtilsDate.todayDT()){
             accionNew.adderror('La fecha de vencimiento de prórroga no es válida.');
         }else{
             /**El valor de SAC_FechaVencimientoProrroga__c es tipo Date para poder comprobar que el día que se elige no es festivo debemos utilizar
@@ -622,7 +622,7 @@ public with sharing class SPV_AccionHelper {
              */
             Datetime fechaprorroga = accionNew.SAC_FechaVencimientoProrroga__c;
             if(BusinessHours.isWithin(ideBH, fechaprorroga.addHours(12))){
-                accionNew.SAC_FechaSolitudProrroga__c = Date.today();
+                accionNew.SAC_FechaSolitudProrroga__c = CBK_UtilsDate.todayDT();
                 accionNew.SAC_ProrrogaCounter__c = accionNew.SAC_ProrrogaCounter__c+1; 
                 accionNew.SAC_ProrrogaTareaCheck__c = true;      
                 
@@ -921,17 +921,12 @@ public with sharing class SPV_AccionHelper {
                         String[] gruposUsuario = usuario2[0].SAC_GruposPerteneciente__c.split(';');
                         //Comprobamos que el usuario pertenece al grupo de la reclamación
                         if(gruposUsuario.contains(mapaRec.get(tarea.SAC_Reclamacion__c).SEG_Grupo__c)){
-                                //Cargamos en el campo SAC_GrupoCreadorTarea__c el grupo de la reclamación
-                                tarea.SAC_GrupoCreadorTarea__c = mapaRec.get(tarea.SAC_Reclamacion__c).SEG_Grupo__r.Name;
-                                //Añadido DE71137 03/02/23
-                                if (mapaEquiposResponsables.containsKey(tarea.SAC_EquipoResponsable__c) && mapaEquiposResponsables.get(tarea.SAC_EquipoResponsable__c).Name.contains('Oficina')) {
-                                    tarea.SAC_Oficina__c = mapaRec.get(tarea.SAC_Reclamacion__c).CC_Oficina_Afectada_Lookup__c;
-                                }
+                            //Cargamos en el campo SAC_GrupoCreadorTarea__c el grupo de la reclamación
+                            tarea.SAC_GrupoCreadorTarea__c = mapaRec.get(tarea.SAC_Reclamacion__c).SEG_Grupo__r.Name;
                         }
                     }else{
                         //US577617
                         //Comprobar si el usuario que crea la tarea, es un usuario perteneciente al equipo responsable de algunas de las tareas creadas, y en caso afirmativo completar el campo SAC_GrupoCreadorTarea__c.
-    
                         Boolean crearTarea = false;
                         crearTarea = comprobarPermisosCrearTarea(mapTareasCaso, tarea, listaGruposUserAct);
             
@@ -954,10 +949,6 @@ public with sharing class SPV_AccionHelper {
                                 if(gruposUsuario.contains(mapaPret.get(tarea.SAC_Pretension__c).SEG_Grupo__c)){
                                     //Cargamos en el campo SAC_GrupoCreadorTarea__c el grupo de la reclamación
                                     tarea.SAC_GrupoCreadorTarea__c = mapaPret.get(tarea.SAC_Pretension__c).SEG_Grupo__r.Name;
-                                    //Añadido DE71137 03/02/23
-                                    if (mapaEquiposResponsables.containsKey(tarea.SAC_EquipoResponsable__c) && mapaEquiposResponsables.get(tarea.SAC_EquipoResponsable__c).Name.contains('Oficina')) {
-                                        tarea.SAC_Oficina__c = mapaPret.get(tarea.SAC_Pretension__c).SAC_Reclamacion__r.CC_Oficina_Afectada_Lookup__c;
-                                    }
                                 }        
                             }else if(String.isNotBlank(mapaPret.get(tarea.SAC_Pretension__c).SAC_Reclamacion__r.SEG_Grupo__c)){
                                 String[] gruposUsuario = usuario2[0].SAC_GruposPerteneciente__c.split(';');
@@ -965,10 +956,6 @@ public with sharing class SPV_AccionHelper {
                                 if(gruposUsuario.contains(mapaPret.get(tarea.SAC_Pretension__c).SAC_Reclamacion__r.SEG_Grupo__c)){
                                     //Cargamos en el campo SAC_GrupoCreadorTarea__c el grupo de la reclamación
                                     tarea.SAC_GrupoCreadorTarea__c = mapaPret.get(tarea.SAC_Pretension__c).SAC_Reclamacion__r.SEG_Grupo__r.Name;
-                                    //Añadido DE71137 03/02/23
-                                    if (mapaEquiposResponsables.containsKey(tarea.SAC_EquipoResponsable__c) && mapaEquiposResponsables.get(tarea.SAC_EquipoResponsable__c).Name.contains('Oficina')) {
-                                        tarea.SAC_Oficina__c = mapaPret.get(tarea.SAC_Pretension__c).SAC_Reclamacion__r.CC_Oficina_Afectada_Lookup__c;
-                                    }
                                 }
                             } 
                         }else{
@@ -1025,14 +1012,6 @@ public with sharing class SPV_AccionHelper {
 
         //Cargamos en el campo SAC_GrupoCreadorTarea__c el grupo al que pertenece el usuario que crea la tarea
         tarea.SAC_GrupoCreadorTarea__c = eqResponsables.get(tarea.SAC_EquipoResponsable__c).Name;
-
-        if (eqResponsables.containsKey(tarea.SAC_EquipoResponsable__c) && eqResponsables.get(tarea.SAC_EquipoResponsable__c).Name.contains('Oficina')) {
-            if(mapaCasos.containsKey(tarea.SAC_Pretension__c)){
-                tarea.SAC_Oficina__c = mapaPret.get(tarea.SAC_Pretension__c).SAC_Reclamacion__r.CC_Oficina_Afectada_Lookup__c;
-            }else if(mapaCasos.containsKey(tarea.SAC_Reclamacion__c)){
-                tarea.SAC_Oficina__c = mapaRec.get(tarea.SAC_Reclamacion__c).CC_Oficina_Afectada_Lookup__c;
-            }
-        }
     }
 
     /*********************************************************************************************
@@ -1576,6 +1555,21 @@ public with sharing class SPV_AccionHelper {
                     listaIdsRecPretPadres.add(accion.SAC_Pretension__c);
                 }
             }
+            //Si la tarea ha sido anulada (pasa a estado 'SPV_Anulada')
+            else if (mapOldObj.get(accion.id).SAC_Estado__c != accion.SAC_Estado__c && accion.SAC_Estado__c == 'SPV_Anulada') {
+                //Preparar una alerta
+                SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(accion.SAC_Reclamacion__c,
+                                                                    'SPV_025',
+                                                                    'La tarea ' + accion.Name + ' ha sido anulada.',
+                                                                    accion.CreatedById,
+                                                                    '',
+                                                                    accion.Id,
+                                                                    '');
+                                                                    wrapAlerta.enlaceParaEmail = URL.getSalesforceBaseUrl().toExternalForm() + '/' + accion.Id;
+                                                                    wrapAlerta.proyecto = 'SPV';
+                //Añadirla a la lista para posteriormente llamar al método
+                listaWrapperAlerta.add(wrapAlerta);
+            }
         }
 
         if (!listaIdsRecPretPadres.isEmpty()) {
@@ -1642,42 +1636,64 @@ public with sharing class SPV_AccionHelper {
         return listaWrapperAlerta;
     }
 
-    /**************************************************************************
-     * Proposito: Al finalizar una tarea, comprueba si su maestro es de tipo cambio de estado, en caso afirmativo, la reclamcion cambia de estado al indicado por el maestro
-     ***************************************************************************
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR         DATE         Description
-     * 1.0            --             Raúl Santos     11/04/25       Creación
-    *****************************************************************************/
+    /*
+    * @description: Al finalizar una tarea, comprueba si su maestro es de tipo cambio de estado, en caso afirmativo, la reclamcion cambia de estado al indicado por el maestro
+    * Modificación: Se añade la comprobación de si se ha finalizado la tarea de envío prórroga
+    * @author: Raúl Santos
+    * @date: 11/04/25
+    */
     public static void comprobarTareaFinalizada(Set<Id> idsTareasFinalizadas){
-
-        List<SAC_Accion__c> listTareas = [SELECT Id, SAC_MaestroAccionesReclamacion__r.SAC_tipo_formulario__c, SAC_Reclamacion__c, SAC_MaestroAccionesReclamacion__r.SPV_EstadoAlFinalizar__c FROM SAC_Accion__c WHERE (RecordTypeId = :RECTYPEMAESTROTAREAS OR RecordTypeId = :RECTYPEACCION) AND Id IN : idsTareasFinalizadas];
+        List<SAC_Accion__c> listTareas = [SELECT Id, SAC_MaestroAccionesReclamacion__r.SAC_tipo_formulario__c, SAC_Reclamacion__c, SAC_Reclamacion__r.SPV_Organismo__c, SAC_MaestroAccionesReclamacion__r.SPV_EstadoAlFinalizar__c, SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c, SAC_MaestroAccionesReclamacion__r.SPV_Organismo__c FROM SAC_Accion__c WHERE (RecordTypeId = :RECTYPEMAESTROTAREAS OR RecordTypeId = :RECTYPEACCION) AND Id IN : idsTareasFinalizadas];
 
         if(!listTareas.isEmpty()){
             Map<Id, String> mapRecEstado = new Map<Id, String>();
+            List<Id> listRecsProrrogadas = new List<Id>();
+			List<String> valoresMultipicklist = new List<String>();
 
-            //Recorro las tareas finalizadas, si es una tarea cuyp maestro es de cambio de estado, la añado al mapa para posteriormente actualizar la reclamación
+            //Recorro las tareas finalizadas, si es una tarea cuyo maestro es de cambio de estado, la añado al mapa para posteriormente actualizar la reclamación
             for(SAC_Accion__c tarea : listTareas){
                 if(tarea.SAC_MaestroAccionesReclamacion__r.SAC_tipo_formulario__c == 'Cambio de estado'){
-                    if(!mapRecEstado.containsKey(tarea.SAC_Reclamacion__c)){
-                        mapRecEstado.put(tarea.SAC_Reclamacion__c, tarea.SAC_MaestroAccionesReclamacion__r.SPV_EstadoAlFinalizar__c);
+                    if(tarea.SAC_MaestroAccionesReclamacion__r.SPV_Organismo__c != null) {
+                        valoresMultipicklist = tarea.SAC_MaestroAccionesReclamacion__r.SPV_Organismo__c.split(';');
                     }
+                    if(!mapRecEstado.containsKey(tarea.SAC_Reclamacion__c)){
+                        if(valoresMultipicklist.contains(tarea.SAC_Reclamacion__r.SPV_Organismo__c)){
+                            mapRecEstado.put(tarea.SAC_Reclamacion__c, tarea.SAC_MaestroAccionesReclamacion__r.SPV_EstadoAlFinalizar__c);
+                        }
+                    }
+                }
+                if(tarea.SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c == 'SPV_EnvioProrroga'){
+                    listRecsProrrogadas.add(tarea.SAC_Reclamacion__c);
                 }
             }
 
-            if(!mapRecEstado.isEmpty()){
+            if(!mapRecEstado.isEmpty() || !listRecsProrrogadas.isEmpty()){
 
-                List<Case> listRecs = [SELECT Id, Status FROM Case WHERE RecordTypeId = :RECTYPERECLAMACION AND Id IN :mapRecEstado.keySet()];
+                List<Case> listRecs = [SELECT Id, Status, SPV_ComplementariaOrganismo__c, SPV_Organismo__c FROM Case WHERE RecordTypeId = :RECTYPERECLAMACION AND (Id IN :mapRecEstado.keySet() OR Id IN :listRecsProrrogadas)];
 
                 if(!listRecs.isEmpty()){
                     for(Case caso : listRecs){
                         if(mapRecEstado.containsKey(caso.Id)){
                             caso.Status = mapRecEstado.get(caso.Id);
+
+                            if(caso.SPV_ComplementariaOrganismo__c){
+                                caso.SPV_ComplementariaOrganismo__c = false;
+                            }
+                        }
+
+                        // Para todas las reclamaciones en las que se ha finalizado la tarea de envío prórroga se debe sumar el tiempo estipulado en cada organismo
+                        if(listRecsProrrogadas.contains(caso.Id)) {
+                            // Si NO es organismo consumo se deben sumar 11 días naturales
+                            if(caso.SPV_Organismo__c != 'SPV_Consumo') {
+                                caso.SPV_DiasProrroga__c = 11;
+                            // Si es organismo consumo se deben sumar 7 días naturales
+                            } else {
+                                caso.SPV_DiasProrroga__c = 7;
+                            }
                         }
                     }
 
-                    SAC_DatabaseDML.updateListDML(listRecs, true);
+                    SPV_DatabaseDML.updateListDML(listRecs, true);
                 }
             }
         }

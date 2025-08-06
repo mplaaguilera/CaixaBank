@@ -829,10 +829,14 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 			for (Database.SaveResult sr : results) {
 				if (!sr.isSuccess()) {
 					for (Database.Error err : sr.getErrors()) {
-					CBK_log.debug('SEG_Case_BU_TRHan: SLA error returned: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+ 		            CBK_Log.addError(null, null, 'SEG_Case_BU_TRHan: SLA error returned: ' + err.getMessage(), null, null);
+					// CBK_log.debug('SEG_Case_BU_TRHan: SLA error returned: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
 					}
 				}
 			}
+			
+		//Se insertan los CBK_Logs
+        CBK_Log.insertDML();
 
 			}
 		}

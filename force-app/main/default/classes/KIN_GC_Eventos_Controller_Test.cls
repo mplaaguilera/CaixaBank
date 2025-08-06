@@ -3,11 +3,42 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
 
     @TestSetup
     private static void testSetup() {
+        List<Profile> profiles = [SELECT Id, Name FROM Profile WHERE Name = 'System Administrator'];
+        User usuarioAdmin = new User();
+        usuarioAdmin.ProfileId = profiles[0].Id;
+        usuarioAdmin.FirstName = 'Usuario Admin Prueba';
+        usuarioAdmin.LastName = 'System Administrator';
+        usuarioAdmin.Email = 'aalsdna@kfsb.com';
+        usuarioAdmin.Username = 'tuser000@amamama.com' + System.currentTimeMillis();
+        usuarioAdmin.CompanyName = 'MST';
+        usuarioAdmin.Title = 'title';
+        usuarioAdmin.Alias = 'alias';
+        usuarioAdmin.TimeZoneSidKey = 'Europe/Paris';
+        usuarioAdmin.EmailEncodingKey = 'UTF-8';
+        usuarioAdmin.LanguageLocaleKey = 'es';
+        usuarioAdmin.LocaleSidKey = 'es_ES';
+        usuarioAdmin.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'Contact Center'].Id;
+        insert usuarioAdmin;
 
-
-		User usuarioAdmin = [SELECT Id FROM User WHERE IsActive = TRUE
-							AND Profile.Name IN ('System Administrator', 'Administrador del sistema') LIMIT 1];
+        List<PermissionSet> permissionSets = [SELECT Id, Name FROM PermissionSet WHERE Name IN ('CC_Operador_CCO', 'CC_Classes', 'CC_Supervisor_PS')];
+        List<PermissionSetAssignment> psAssignmentsAdmin = new List<PermissionSetAssignment>();
+			
+        for (PermissionSet ps : permissionSets) {
+            PermissionSetAssignment psAssignment1 = new PermissionSetAssignment();
+            psAssignment1.AssigneeId = usuarioAdmin.Id;
+            psAssignment1.PermissionSetId = ps.Id;
+            psAssignmentsAdmin.add(psAssignment1);
+        }
+        insert psAssignmentsAdmin;
+        
+		/*User usuarioAdmin = [SELECT Id FROM User WHERE IsActive = TRUE
+							AND Profile.Name IN ('System Administrator', 'Administrador del sistema') LIMIT 1];*/
         System.runAs(usuarioAdmin) {
+            CSBD_LlamadaSettings__c setting = new CSBD_LlamadaSettings__c();
+            setting.Name = 'Test Setting Name';
+            setting.CSBD_EntranteCrearSiempreOportunidad__c = true;
+            insert setting;
+
             Id idPerfilContactCenter = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
             Id idRolContactCenter = [SELECT Id FROM UserRole WHERE Name = 'Contact Center'].Id;
 
@@ -37,9 +68,9 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
 
             insert new List<User>{usuario1, usuario2};
 
-			List<String> permissionSets = new List<String>{'CC_Classes', 'CC_Operador_Cliente', 'CC_Supervisor_PS', 'CSBD_PS_Gestor'};
+			//List<String> permissionSets = new List<String>{'CC_Classes', 'CC_Operador_Cliente', 'CC_Supervisor_PS', 'CSBD_PS_Gestor'};
             List<PermissionSetAssignment> psAssignments = new List<PermissionSetAssignment>();
-			for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name IN :permissionSets]) {
+			for (PermissionSet ps : permissionSets) {
                 PermissionSetAssignment psAssignment1 = new PermissionSetAssignment();
                 psAssignment1.AssigneeId = usuario1.Id;
                 psAssignment1.PermissionSetId = ps.Id;
@@ -272,7 +303,7 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
         inputCsbd.asunto = 'Asunto';
         inputCsbd.numPerso = '11111';
 
-        User usuarioTest = [SELECT Id FROM User WHERE Lastname = 'Agente Test 1'];
+        User usuarioTest = [SELECT Id FROM User WHERE Lastname = 'Agente Test 2'];
         System.runAs(usuarioTest) {
             Test.startTest();
             KIN_Genesys_Cloud_Eventos_Controller.registrarLlamadaEntrante(JSON.serialize(inputCc));
@@ -356,7 +387,7 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
         inputHdt2.numPerso = '11111';
         inputHdt2.casoId = caso2.Id;
 
-        User usuarioTest = [SELECT Id FROM User WHERE Lastname = 'Agente Test 1'];
+        User usuarioTest = [SELECT Id FROM User WHERE FirstName = 'Usuario Admin Prueba'];
         System.runAs(usuarioTest) {
             Test.startTest();
             KIN_Genesys_Cloud_Eventos_Controller.registrarLlamadaSaliente(JSON.serialize(inputCc));
@@ -613,7 +644,7 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
             CC_Llamada__c llamada = (CC_Llamada__c)respuestaRegistrarLlamadaEntrante.get('llamada');
             Case caso = (Case)respuestaRegistrarLlamadaEntrante.get('caso');
 
-            User agenteDestino = [SELECT Id FROM User WHERE Lastname = 'Agente Test 2'];
+            User agenteDestino = [SELECT Id FROM User WHERE FirstName = 'Usuario Admin Prueba'];
             System.runAs(agenteDestino) {
                 CC_Llamada_Input inputRegistrarConsulta = new CC_Llamada_Input();
                 inputRegistrarConsulta.connId = 'ef208127-2e21-4086-b016-febfa4c43385';
@@ -669,10 +700,11 @@ public with sharing class KIN_GC_Eventos_Controller_Test {
         llamadaInicial.CC_Asunto__c = 'Llamada Test Inicial';
         insert llamadaInicial;
 
-        User usuarioTest = [SELECT Id FROM User WHERE Lastname = 'Agente Test 1'];
+        User usuarioTest = [SELECT Id FROM User WHERE FirstName = 'Usuario Admin Prueba'];
         System.runAs(usuarioTest) {
             Test.startTest();
             KIN_Genesys_Cloud_Eventos_Controller.atributosLlamadaInicial(llamada.CC_ConnId__c);
+            KIN_Genesys_Cloud_Eventos_Controller.atributosLlamadaInicial('ef208127-2e21-4086-b016-febfa4c43344');
             Test.stopTest();
         }
         System.assertEquals(true, true, 'PENDIENTE');

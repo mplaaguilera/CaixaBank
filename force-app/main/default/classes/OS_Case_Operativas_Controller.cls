@@ -493,7 +493,7 @@ public without sharing class OS_Case_Operativas_Controller {
         List<CC_Llamada__c> llamadas = [SELECT Name, CC_Tipo__c FROM CC_Llamada__c
                                         WHERE RecordTypeId IN :recordTypesLlamadasCOPS
                                         AND OwnerId = :UserInfo.getUserId() AND CC_Fecha_Fin__c = NULL];
-        if (llamadas.size() == 1) {
+        if (!llamadas.isEmpty()) {
 
             //Vincular caso con llamada
 

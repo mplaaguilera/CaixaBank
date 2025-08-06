@@ -29,7 +29,7 @@ public with sharing class CC_CaseTriggerHelper {
         informarOficinaAfectadaDetalleBU(listNewObjCC, mapOldObjCC, idsCAM);
         cambioContactoEmpleadoBU(listNewObjCC, mapOldObjCC, idsCAM);
         reperturaCaso(listNewObjCC, mapOldObjCC, idsCAM);
-
+        comprobarCambioCuentaAutenticacionBU(listNewObjCC, mapOldObjCC);
         //generarEncuestaHDT1N(listNewObjCC, mapOldObjCC);
     }
 
@@ -289,6 +289,7 @@ public with sharing class CC_CaseTriggerHelper {
     }
 
     public static void crearActividadCierreCC(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
+        Id rtCC = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
         List<Task> lstTareas = new List<Task>();
         for (Case caso : lstCasos) {
             if(mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'Cerrado' && caso.OwnerId != null){
@@ -304,10 +305,10 @@ public with sharing class CC_CaseTriggerHelper {
                 if (caso.CC_Detalles_Solucion__c != null && caso.CC_Detalles_Solucion__c.length() > 254) {
                     detallesSolucion = caso.CC_Detalles_Solucion__c.substring(0,255);
                 } else {
-                    detallesConsulta = caso.CC_Detalles_Solucion__c;
+                    detallesSolucion = caso.CC_Detalles_Solucion__c;
                 }
 
-                Task createTask = new Task( Type = 'Cerrado' ,Subject = 'Cerrado' ,ActivityDate = System.today() ,Status = 'Completed' ,WhatId = caso.Id ,CC_Detalles_Consulta__c = detallesConsulta ,CC_Detalles_Solucion__c = detallesSolucion ,CC_Fecha_Inicio__c = Datetime.now() ,Priority = 'Normal');
+                Task createTask = new Task( Type = 'Cerrado', RecordTypeId = rtCC, Subject = 'Cerrado' ,ActivityDate = CBK_UtilsDate.todayDT() ,Status = 'Completed' ,WhatId = caso.Id ,CC_Detalles_Consulta__c = detallesConsulta ,CC_Detalles_Solucion__c = detallesSolucion ,CC_Fecha_Inicio__c = CBK_UtilsDate.nowSYS() ,Priority = 'Normal');
                 lstTareas.add(createTask);
             }
         }
@@ -745,7 +746,7 @@ public with sharing class CC_CaseTriggerHelper {
         }
         if (!casosNuevosOwners.isEmpty()){
             for (User nuevoOwner : [SELECT Id FROM User WHERE Id IN :casosNuevosOwners.keySet()
-                                    AND UserRoleId NOT IN (SELECT Id FROM UserRole WHERE DeveloperName IN ('Contact_Center', 'Contact_Center_sin_acceso_a_Directorio'))
+                                    AND UserRoleId NOT IN (SELECT Id FROM UserRole WHERE DeveloperName IN ('Contact_Center', 'Contact_Center_sin_acceso_a_Directorio', 'SACH'))
                                     AND ProfileId NOT IN (SELECT Id FROM Profile WHERE Name IN ('System Administrator', 'Administrador de sistema'))
                                     AND Name NOT IN ('System', 'Automated Process', 'Administrador de sistema', 'System Administrator')]) {
                 casosNuevosOwners.get(nuevoOwner.Id).addError('Únicamente se pueden vincular a trabajadores del Contact Center');
@@ -2277,6 +2278,163 @@ public with sharing class CC_CaseTriggerHelper {
             } catch (Exception e) {
                 CBK_Log.error('Error al enviar emails reaperturaNoValida: ' + e.getMessage());
             }
+        }
+    }
+
+
+    public static void comprobarCambioCuentaAutenticacionBU(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
+        Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        for (Case caso : lstCasos) {
+            if(caso.RecordTypeId == rtCliente || caso.RecordTypeId == rtEmpleado){            //Se cambia de cuenta o contacto en el caso y no es ni pasa a nulo
+                if(caso.ContactId != mapOldObj.get(caso.Id).ContactId) {
+                    if(caso.CC_Status_Autorizacion__c != 'SIN ESTADO'){  //Resetea el estado de autorización si ya se ha autorizado
+                        caso.CC_Status_Autorizacion__c = 'SIN ESTADO';
+                    }
+                }
+            }
+        }
+    }
+
+    public static void asignacionAccountTareaLlamada(Map<Id,Case> lstCasos){
+        //Buscamos las tareas
+        List<Task> tareasLlamadaUpdate = [SELECT Id, WhatId, WhoId FROM Task WHERE WhatId IN :lstCasos.keySet() AND Type = 'Llamada entrante' AND WhoId = null];
+        List<Task> tareasUpdate = new List<Task>();
+        //Recorremos las tareas y los casos, actualizamos el valor
+        for(Task tarea : tareasLlamadaUpdate){
+            if(lstCasos.containsKey(tarea.whatId)){
+                tarea.WhoId = lstCasos.get(tarea.WhatId).ContactId;
+                tareasUpdate.add(tarea);
+            }
+        }
+        if(!tareasUpdate.isEmpty()){
+            update tareasUpdate;
+        }
+    }
+
+    public static void crearActividadCobrowsing(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
+        if(!lstCasos.isEmpty()){
+            List<Case> casosUnbluCobrowsing = new list<Case>();        
+            for (Case caso : lstCasos) {
+                //Componente unblu
+                if((caso.unblusuite__Conversation_Id__c != null && mapOldObj.get(caso.Id).unblusuite__Conversation_Id__c == null)  //se registra por primera vez
+                    || (caso.unblusuite__Conversation_Id__c != null && mapOldObj.get(caso.Id).unblusuite__Conversation_Id__c != caso.unblusuite__Conversation_Id__c)
+                ){
+                    casosUnbluCobrowsing.add(caso);
+                }
+            }
+            if(!casosUnbluCobrowsing.isEmpty()){
+                CC_Activity.crearActividadCobrowsing(casosUnbluCobrowsing);
+            } 
+        }
+    }
+
+    public static void crearOportunidadCierreCaso(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
+        if(!lstCasos.isEmpty()) {
+            List<Case> casosParaCrearOportunidad = new List<Case>();
+            Set<Id> caseIds = new Set<Id>();
+            
+            // Recopilar los IDs de casos que se cerraron
+            for (Case caso : lstCasos) {
+                if(caso.Status == 'Cerrado' && mapOldObj.get(caso.Id).Status != caso.Status) {
+                    caseIds.add(caso.Id);
+                }
+            }
+            
+            // Consultar las extensiones de casos para verificar el campo CC_CrearOportunidadTrigger__c
+            Map<Id, CBK_Case_Extension__c> caseExtensionsMap = new Map<Id, CBK_Case_Extension__c>();
+            if(!caseIds.isEmpty()) {
+                for(CBK_Case_Extension__c extension : [SELECT Id, Case_Id__c, CC_CrearOportunidadTrigger__c 
+                                                       FROM CBK_Case_Extension__c 
+                                                       WHERE Case_Id__c IN :caseIds]) {
+                    caseExtensionsMap.put(extension.Case_Id__c, extension);
+                }
+            }
+            
+            for (Case caso : lstCasos) {
+                if(caso.Status == 'Cerrado' && mapOldObj.get(caso.Id).Status != caso.Status) {
+                    // Verificar si el campo CC_CrearOportunidadTrigger__c está activo
+                    Boolean crearOportunidadTrigger = false;
+                    if(caseExtensionsMap.containsKey(caso.Id)) {
+                        crearOportunidadTrigger = caseExtensionsMap.get(caso.Id).CC_CrearOportunidadTrigger__c;
+                    }
+                    
+                    // Verificar si se puede crear oportunidad si el campo está a True
+                    if(crearOportunidadTrigger) {
+                        // Verificar si se puede crear oportunidad
+                        Map<String, Object> validacion = CC_Gestion_Derivar_CSBD.crearOportunidad(caso.Id);
+                        
+                        if((Boolean)validacion.get('validacionCrearOportunidad')) {
+                            casosParaCrearOportunidad.add(caso);
+                        }
+                    } else {
+                        System.debug('No se creará oportunidad para el caso ' + caso.Id + ' porque CC_CrearOportunidadTrigger__c no está activo');
+                    }
+                }
+            }
+            
+            // Crear oportunidades para los casos válidos
+            if(!casosParaCrearOportunidad.isEmpty()) {
+                for(Case caso : casosParaCrearOportunidad) {
+                    try {
+                        Map<String, Object> resultado = CC_Gestion_Derivar_CSBD.crearOportunidadCSBD(caso.Id);
+                        
+                        if((Boolean)resultado.get('oppCreada')) {
+                            // Oportunidad creada exitosamente
+                            System.debug('Oportunidad creada exitosamente para el caso: ' + caso.Id);
+                        } else if(resultado.containsKey('oportunidadSiExiste') && (Boolean)resultado.get('oportunidadSiExiste')) {
+                            // Ya existe una oportunidad similar
+                            System.debug('Oportunidad similar ya existe para el caso: ' + caso.Id + ' - Mensaje: ' + resultado.get('mensaje'));
+                        }
+                    } catch (Exception e) {
+                        System.debug('Error al crear oportunidad para el caso ' + caso.Id + ': ' + e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    public static void devolucionCasosCCO_HDT(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
+        Id rtEmpleadoCCO = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id rtEmpleadoHDT = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
+        
+        Set<Id> casosRelacionadosParaReabrir = new Set<Id>();
+        
+        for (Case caso : lstCasos) {
+            if(caso.RecordTypeId == rtEmpleadoCCO //Casos de empleado
+                && caso.CC_Canal_Procedencia__c == 'CCO' //Canal de procedencia CCO
+                && (caso.CC_CasoRelacionado__c != null //Caso relacionado rellenado
+                && caso.CC_CasoRelacionado__r.recordTypeId == rtEmpleadoHDT)) { //Caso relacionado de empleado HDT
+                
+                if((caso.Status == 'Rechazado' && mapOldObj.get(caso.Id).Status != caso.Status) //Caso hijo rechazado (CCO)
+                && caso.CC_CasoRelacionado__r.Status == 'Cerrado' //Caso padre cerrado (HDT)
+                ){
+                    casosRelacionadosParaReabrir.add(caso.CC_CasoRelacionado__c);
+                }
+            }
+        }
+        
+        // Usar Future para evitar problemas de contexto del trigger
+        if(!casosRelacionadosParaReabrir.isEmpty()){
+            reabrirCasosRelacionadosFuture(new List<Id>(casosRelacionadosParaReabrir));
+        }
+    }
+    
+    public static void reabrirCasosRelacionadosFuture(List<Id> casosRelacionadosIds) {
+        try {
+            List<Case> casosParaActualizar = new List<Case>();
+            for(Id casoId : casosRelacionadosIds) {
+                casosParaActualizar.add(new Case(
+                    Id = casoId,
+                    Status = 'Abierto'
+                ));
+            }
+            
+            if(!casosParaActualizar.isEmpty()) {
+                update casosParaActualizar;
+            }
+        } catch(Exception e) {
+            CBK_Log.error('Error en reabrirCasosRelacionadosFuture: ' + e.getMessage());
         }
     }
 }

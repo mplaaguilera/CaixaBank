@@ -41,8 +41,42 @@ public without sharing class SAC_LCMP_ReenvioCartaPostal {
             if(cv.ContentDocumentId != null){
                 documentoReenvio.SAC_Documento__c = cv.ContentDocumentId;
             }
-
+            
             SAC_DatabaseDML.insertDML(documentoReenvio, true);
+
+
+            //Añadido US1194593 -------------
+            List<ContentVersion> listCvAct = new List<ContentVersion>();
+            List<ContentVersion> lstCV = new List<ContentVersion>();
+            if(String.isNotBlank(idAdjuntos) && idAdjuntos != '[]'){
+                Set<Id> idsAdjuntos = (Set<Id>)JSON.deserialize(idAdjuntos, Set<Id>.class);
+                Set<Id> idsAdjuntosFinal = new Set<Id>();
+                for (Id adj : idsAdjuntos) {
+                    if (adj != null) {
+                        idsAdjuntosFinal.add(adj);
+                    }
+                }
+                
+                if(!idsAdjuntosFinal.isEmpty()){
+                    lstCV = [SELECT Id, ContentDocumentId, VersionData, SAC_Enviado__c FROM ContentVersion WHERE ContentDocumentId IN: idsAdjuntosFinal AND SAC_BloqueoTotalVisibilidad__c = false];  
+                }
+        
+                if(!lstCV.isEmpty()){
+                    for(ContentVersion contentVersion : lstCV){
+                        if(!contentVersion.SAC_Enviado__c){
+                            listCvAct.add(new ContentVersion(Id=contentVersion.Id,SAC_Enviado__c=true));
+                        }
+                    }
+                }
+                
+                if(!listCvAct.isEmpty()){
+                    SAC_DatabaseDML.updateListDML(listCvAct, true);
+                }
+
+                
+            }
+            //-------------------
+
 
             // SAC_DocumentoEnvio__c test = [SELECT Id FROM SAC_DocumentoEnvio__c WHERE SAC_Caso__c = :idCaso 
             // AND SAC_TipoDocumento__c = 'reenvioRedaccion' ];

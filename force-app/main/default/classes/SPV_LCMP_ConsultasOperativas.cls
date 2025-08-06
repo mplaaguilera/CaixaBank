@@ -4,6 +4,7 @@ public with sharing class SPV_LCMP_ConsultasOperativas {
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
+    private static final Id RECTYPECONSULTA_TAREA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_ConsultaTarea').getRecordTypeId();
     
     /**************************************************************************************
      * Proposito: Actualizar el estado de la consulta a pendiente de repuesta definitiva
@@ -17,7 +18,7 @@ public with sharing class SPV_LCMP_ConsultasOperativas {
     public static void marcarPendienteRespuestaDefinitiva(Id consultaId) {
 
         if(Schema.sObjectType.SAC_Interaccion__C.isAccessible()){
-            SAC_Interaccion__c consulta = [SELECT Id, SAC_Estado__c FROM SAC_Interaccion__C WHERE RecordTypeId = :RECTYPECONSULTA AND Id = :consultaId];
+            SAC_Interaccion__c consulta = [SELECT Id, SAC_Estado__c FROM SAC_Interaccion__C WHERE RecordTypeId IN (:RECTYPECONSULTA, :RECTYPECONSULTA_TAREA) AND Id = :consultaId];
 
             if(consulta.SAC_Estado__c == 'SAC_Resuelta') {
                 consulta.SAC_Estado__c = 'SAC_PendienteRespuestaDefinitiva';
@@ -44,16 +45,19 @@ public with sharing class SPV_LCMP_ConsultasOperativas {
             if (!colabContact.isEmpty()) {
                 consulta.OwnerId = usuarioActualId;
                 if(Schema.sObjectType.SAC_Interaccion__c.isUpdateable()){   
-                    Database.update(consulta);
+                    SPV_DatabaseDML.updateDML(consulta, true);
                 }else{
                     mensajeError = 'No tienes permisos para actualizar la consulta';
+                    system.debug('*** '+mensajeError);
                     throw new AuraHandledException(mensajeError);
                 }
             } else {
                 mensajeError = 'No perteneces al grupo de la consulta';
+                system.debug('*** '+mensajeError);
                 throw new AuraHandledException(mensajeError);
             }
         } catch (Exception e) {
+            system.debug('*** '+mensajeError);
             if (String.isNotBlank(mensajeError)) { e.setMessage(mensajeError); }
             throw new AuraHandledException(e.getMessage());
         }
@@ -72,7 +76,7 @@ public with sharing class SPV_LCMP_ConsultasOperativas {
             if(!cola.isEmpty()){
                 consulta.OwnerId = cola[0].id;
                 if(Schema.sObjectType.SAC_Interaccion__c.isUpdateable()){   
-                    Database.update(consulta);
+                    SPV_DatabaseDML.updateDML(consulta, true);
                 }else{
                     throw new AuraHandledException('No tienes permisos para actualizar e la consulta');
                 }

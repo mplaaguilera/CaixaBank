@@ -544,4 +544,36 @@ public with sharing class SAC_Utils_Test {
             Assert.areEqual(true, htmlResult.contains(developerNameFinal), 'Error al convertir la imagen del email body');
         }
     }
+
+    @isTest
+    static void listaCampoTest() {
+        
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        List<Id> ids;
+
+        System.runAs(usuario) {
+            Test.startTest();
+            ids = SAC_Utils.listaCampo([SELECT Id, RecordTypeId FROM Case WHERE Subject = 'Test' LIMIT 1], 'Case', true);
+            Test.stopTest();
+        }
+        
+        Assert.areNotEqual(true, ids.isEmpty(), 'No se han recuperado los casos.');
+    }
+
+    @isTest
+    static void obtenerRecordTypesTest(){
+        User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        
+        Test.startTest();
+
+        List<RecordType> listaResult = new List<RecordType>();
+        System.runAs(usuario){
+            
+            listaResult = SAC_Utils.obtenerRecordTypes();
+            
+        }
+
+        Assert.areNotEqual(true, listaResult.isEmpty(), 'No se han recuperado los record types.');
+        Test.stopTest();
+    }
 }

@@ -1,6 +1,15 @@
 @isTest
 public class OS_Case_Test {
 
+    public static Id mccProductoServicioRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+    public static Id mccMotivoRecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+    public static Id caseOSClienteRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+    public static Id contactCCColaboradorRecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+    public static Id ccGrupoColaboradorGCRecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+    public static Id ccMCCTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+    public static Id contactCCClienteRecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+    public static Id recordTypeCuenta = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+
     @TestSetup
     static void makeData(){
         User usuarioOperador = OS_Usuarios.usuarioOperador();
@@ -20,7 +29,7 @@ public class OS_Case_Test {
     public static void duplicarCaso() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
 
         Case caso1 = new Case();
         caso1.CC_Idioma__c = 'es';
@@ -76,10 +85,7 @@ public class OS_Case_Test {
             System.assertNotEquals(null, casoHijo.Id, 'Los campos no coinciden');
 
             //Probar que se ha creado la actividad de caso duplicado
-            List<Task> tareasDuplicar = [SELECT Id FROM Task
-                                            WHERE WhatId = :casoHijo.Id AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')];
-
-            System.assert(tareasDuplicar.size() == 4, 'Los campos no coinciden');
+            System.assert([SELECT COUNT() FROM Task WHERE WhatId = :casoHijo.Id AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')] == 4, 'Los campos no coinciden');
         }
     }
 
@@ -87,7 +93,7 @@ public class OS_Case_Test {
     public static void accionesCambioCanalProcedencia() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
 
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
@@ -113,9 +119,7 @@ public class OS_Case_Test {
             insert contacto;
             Test.stopTest();
 
-            List<Task> tareas = [SELECT Id FROM Task WHERE WhatId = :caso.Id AND Type = 'Canal de procedencia modificado'];
-
-            System.assertEquals(1, tareas.size(), 'Los campos no coinciden');
+            System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id AND Type = 'Canal de procedencia modificado'], 'Los campos no coinciden');
         }
     }
     
@@ -130,7 +134,7 @@ public class OS_Case_Test {
         contacto.LastName = 'Apellido';
         insert contacto;
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
 
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
@@ -183,7 +187,7 @@ public class OS_Case_Test {
         contacto.LastName = 'Apellido';
 
         List<Contact> listContacto = new List<Contact>();
-        Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+        Id recordTypeContacto = contactCCColaboradorRecordTypeId;
 		Contact contacto1 = new Contact();
         contacto1.RecordTypeId = recordTypeContacto;
         contacto1.Email = 'servicio.factoring@caixabank.com';
@@ -199,7 +203,7 @@ public class OS_Case_Test {
         listContacto.add(contacto2);
         insert listContacto;
         
-        Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+        Id recordTypeGrupoColaborador = ccGrupoColaboradorGCRecordTypeId;
  
         CC_Grupo_Colaborador__c grupoColaborador  = new CC_Grupo_Colaborador__c();
         grupoColaborador.RecordTypeId = recordTypeGrupoColaborador;
@@ -222,40 +226,37 @@ public class OS_Case_Test {
         listcolaborador.add(colaborador2);    
 		insert listcolaborador;        
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'KYC Renewal';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccTematica.RecordTypeId = recordTypeIdTematica;
+        mccTematica.RecordTypeId = ccMCCTematica;
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
         mccTematica.OS_Departamento__c = 'UAFE';
         mccTematica.OwnerId = usuarioOperador.Id;
         mccTematica.OS_Buzon_Salida__c = [SELECT DISPLAYNAME FROM OrgWideEmailAddress WHERE DISPLAYNAME = 'Buzón KYC Renewal' LIMIT 1].DISPLAYNAME;
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'producto de prueba';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccProducto.RecordTypeId = recordTypeIdProducto;
+        mccProducto.RecordTypeId = mccProductoServicioRecordTypeId;
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'motivo de prueba';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccMotivo.RecordTypeId = recordTypeIdMotivo;
+        mccMotivo.RecordTypeId = mccMotivoRecordTypeId;
         mccMotivo.CC_Tematica__c = mccTematica.Id;
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         insert mccMotivo;
 
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.RecordTypeId = recordTypeCaso;
@@ -324,15 +325,14 @@ public class OS_Case_Test {
     public static void actualizarTelefonoEmailCaso() {   
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 		Contact contacto = new Contact();
-        contacto.RecordTypeId = recordTypeContacto;
+        contacto.RecordTypeId = contactCCClienteRecordTypeId;
         contacto.Email = 'pruebasg@caixabank.com';
         contacto.Phone = '778855994';
         contacto.LastName = 'Pruebas telefono Contacto';
         insert contacto;
 
-    	Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+    	Id recordTypeCaso = caseOSClienteRecordTypeId;
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.RecordTypeId = recordTypeCaso;
@@ -388,14 +388,13 @@ public class OS_Case_Test {
     public static void responderCerrar() {  
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 		Contact contacto = new Contact();
-        contacto.RecordTypeId = recordTypeContacto;
+        contacto.RecordTypeId = contactCCClienteRecordTypeId;
         contacto.Email = 'pruebasg@caixabank.com';
         contacto.Phone = '778855994';
         contacto.LastName = 'Pruebas telefono Contacto';
 
-    	Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+    	Id recordTypeCaso = caseOSClienteRecordTypeId;
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.RecordTypeId = recordTypeCaso;
@@ -422,14 +421,13 @@ public class OS_Case_Test {
     public static void crearActividadRetipificacion() {  
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-    	Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 		Contact contacto = new Contact();
-        contacto.RecordTypeId = recordTypeContacto;
+        contacto.RecordTypeId = contactCCClienteRecordTypeId;
         contacto.Email = 'pruebasg@caixabank.com';
         contacto.Phone = '778855994';
         contacto.LastName = 'Pruebas telefono Contacto';
 
-    	Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+    	Id recordTypeCaso = caseOSClienteRecordTypeId;
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.RecordTypeId = recordTypeCaso;
@@ -458,7 +456,6 @@ public class OS_Case_Test {
     public static void actualizarTelefonoAccountCaso() {   
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeCuenta = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         Account cuenta = new Account();
         cuenta.RecordTypeId = recordTypeCuenta;
         cuenta.CC_Email__c = 'pruebasg@caixabank.com';
@@ -480,7 +477,7 @@ public class OS_Case_Test {
         contacto.FirstName = 'Nombre';
         contacto.LastName = 'Apellido';
 
-    	Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+    	Id recordTypeCaso = caseOSClienteRecordTypeId;
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.RecordTypeId = recordTypeCaso;
@@ -545,7 +542,7 @@ public class OS_Case_Test {
         insert acshare;
         
         List<Contact> listContacto = new List<Contact>();
-        Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Colaborador').getRecordTypeId();
+        Id recordTypeContacto = contactCCColaboradorRecordTypeId;
 		Contact contacto1 = new Contact();
         contacto1.RecordTypeId = recordTypeContacto;
         contacto1.Email = 'servicio.factoring@caixabank.com';
@@ -566,11 +563,9 @@ public class OS_Case_Test {
         contacto.Email = 'test@test.com';
         contacto.FirstName = 'Nombre';
         contacto.LastName = 'Apellido';
-                
-        Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
- 
+     
         CC_Grupo_Colaborador__c grupoColaborador  = new CC_Grupo_Colaborador__c();
-        grupoColaborador.RecordTypeId = recordTypeGrupoColaborador;
+        grupoColaborador.RecordTypeId = ccGrupoColaboradorGCRecordTypeId;
         grupoColaborador.name='Servicio bastanteo';
         grupoColaborador.OS_Negocio__c = 'COPS';
         grupoColaborador.OwnerId = usuarioOperador.Id;
@@ -590,39 +585,37 @@ public class OS_Case_Test {
         listcolaborador.add(colaborador2);    
 		insert listcolaborador;        
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'KYC Renewal';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccTematica.RecordTypeId = recordTypeIdTematica;
+        mccTematica.RecordTypeId = ccMCCTematica;
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
         mccTematica.OS_Departamento__c = 'UAFE';
         mccTematica.OS_Buzon_Salida__c = [SELECT DISPLAYNAME FROM OrgWideEmailAddress WHERE DISPLAYNAME = 'Buzón KYC Renewal' LIMIT 1].DISPLAYNAME;
         insert mccTematica;
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'producto de prueba';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccProducto.RecordTypeId = recordTypeIdProducto;
+        mccProducto.RecordTypeId = mccProductoServicioRecordTypeId;
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PR-000001'; 
         insert mccProducto; 
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'motivo de prueba';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today();
-        mccMotivo.RecordTypeId = recordTypeIdMotivo;
+        mccMotivo.RecordTypeId = mccMotivoRecordTypeId;
         mccMotivo.CC_Tematica__c = mccTematica.Id;
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
+        mccMotivo.OwnerId = usuarioOperador.Id;
         insert mccMotivo;
         
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Id recordTypeCaso = caseOSClienteRecordTypeId;
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.RecordTypeId = recordTypeCaso;
@@ -649,8 +642,11 @@ public class OS_Case_Test {
         grupoColaboradorMCC.CC_Grupo_Colaborador__c = grupoColaborador.Id;
 
         grupoColaboradorMCC.Name = 'Grupo Colaborador MCC';
-
+        grupoColaboradorMCC.CreatedById = usuarioOperador.id;
         insert grupoColaboradorMCC;
+        
+        List<CC_MCC_Grupo_Colaborador__c> listaMotivosGrupos = [SELECT CC_Grupo_Colaborador__c, CC_MCC__c  FROM CC_MCC_Grupo_Colaborador__c WHERE CC_MCC__c = : mccMotivo.Id];
+        system.debug('listaMotivosGrupos: ' + listaMotivosGrupos);
 
         CC_MCC_Plantilla__c mccPlantilla = new CC_MCC_Plantilla__c(
 
@@ -658,7 +654,8 @@ public class OS_Case_Test {
 
             CC_MCC_Plantilla_Name__c = plantilla.Name,
 
-            CC_MCC_Plantilla_DeveloperName__c = plantilla.DeveloperName
+            CC_MCC_Plantilla_DeveloperName__c = plantilla.DeveloperName,
+            CreatedById = usuarioOperador.id
 
         );
 
@@ -706,13 +703,23 @@ public class OS_Case_Test {
         insert contentDoc;
 
         Set<Id> idCaso = new Set<Id>();
+        System.debug('caso.Id: ' + caso.Id);
         idCaso.add(caso.Id);
+        System.debug('caso.Id: ' + idCaso);
+
 
         Set<Id> idMcc = new Set<Id>();
+        System.debug('caso.Id: ' + mccMotivo.Id);
         idMcc.add(mccMotivo.Id);
+        System.debug('caso.Id: ' + mccMotivo.Id);
+        System.debug('caso.Id: ' + idMcc);
 
         System.runAs (usuarioOperador) {
             Test.startTest();
+
+            System.debug('caso.Id: ' + idCaso);
+            System.debug('mcc.Id: ' + idMcc);
+
             OS_Case.envioCorreoTrasladoRemitidoAutomatico(idCaso,idMcc);  
             insert contacto; 
             Test.stopTest();

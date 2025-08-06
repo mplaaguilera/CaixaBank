@@ -39,6 +39,66 @@
         { label: "Resultado validación", fieldName: "resultado" },
         { label: "Mensaje de error", fieldName: "codigoError" }]);
 
+         // Columnas para "Autenticaciones recientes"
+        component.set("v.columnasAutenticacionesRecientes", [
+            {
+            label: "Acciones", type: "button", typeAttributes: {
+                label: { fieldName: "nombreBoton" },
+                name: { fieldName: "nombreBoton" },
+                title: { fieldName: "nombreBoton" },
+                value: { fieldName: "nombreBoton" },
+                iconPosition: "left"
+            }
+            },
+            { label: "Caso", fieldName: "numeroCaso", type: "text", sortable: false },
+            { label: "Nivel", fieldName: "nivel", type: "text", sortable: false },
+            { label: "Estado", fieldName: "estado", type: "text", sortable: false },
+            { label: "Resultado de validación", fieldName: "resultado", type: "text", sortable: false },
+            {
+                label: "Fecha de envío", fieldName: "fechaEnvio", type: "date", sortable: true, typeAttributes: {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                }
+            },
+            { label: "Intentos", fieldName: "intentosValidacion", type: "number", initialWidth: 70 },
+            { label: "Código OTPSMS", fieldName: "codigoOTP" },
+            { label: "Resultado validación", fieldName: "resultado" },
+            { label: "Mensaje de error", fieldName: "codigoError" }
+        ]);
+
+           // Columnas para "Histórico autenticaciones" (antiguas)
+        component.set("v.columnasHistoricoAutenticacionesAntiguas", [
+            {
+            label: "Acciones", type: "button", typeAttributes: {
+                label: { fieldName: "nombreBoton" },
+                name: { fieldName: "nombreBoton" },
+                title: { fieldName: "nombreBoton" },
+                value: { fieldName: "nombreBoton" },
+                iconPosition: "left"
+            }
+            },
+            { label: "Caso", fieldName: "numeroCaso", type: "text", sortable: false },
+            { label: "Nivel", fieldName: "nivel", type: "text", sortable: false },
+            { label: "Estado", fieldName: "estado", type: "text", sortable: false },
+            { label: "Resultado de validación", fieldName: "resultado", type: "text", sortable: false },
+            {
+                label: "Fecha de envío", fieldName: "fechaEnvio", type: "date", sortable: true, typeAttributes: {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                }
+            },
+            { label: "Intentos", fieldName: "intentosValidacion", type: "number", initialWidth: 70 },
+            { label: "Código OTPSMS", fieldName: "codigoOTP" },
+            { label: "Resultado validación", fieldName: "resultado" },
+            { label: "Mensaje de error", fieldName: "codigoError" }
+        ]);
+
         component.set("v.columnasOTPHistoricoCliente", [
             { label: "Caso", fieldName: "numeroCaso", type: "text", sortable: false },
             { label: "Estado", fieldName: "estado", type: "text", sortable: false },
@@ -122,7 +182,7 @@
                         }else if(component.get("v.datosVacios") === "SIN DATOS API") {
                             helper.recuperarMensajeToast(component, "error", "SIN_DATOS_API");
                             component.set("v.disabledBotones", false);
-                        } else if (component.get("v.labelPregunta1") == null || component.get("v.labelPregunta2") == null) {
+                        } else if ((component.get("v.labelPregunta1") == null || component.get("v.labelPregunta2") == null) && component.get("v.omitirPreguntasNvl2") === false) {
                             helper.recuperarMensajeToast(component, "error", "DATOS_VACIOS");
                             component.set("v.disabledBotones", false);
                         } else if (component.get("v.datosVacios") === "OK") {
@@ -136,11 +196,11 @@
     //Boton Emergencia
     emergenciaAut: function(component, event, helper){
         component.set("v.nivelSeleccionado", event.getSource().getLocalId());
-                helper.obtenerPreguntasEmergencia(component);
-                $A.util.addClass(component.find("ModalboxPreguntas"), "slds-fade-in-open");
-                $A.util.addClass(component.find("ModalBackdropPreguntas"), "slds-backdrop--open");
+        helper.obtenerPreguntasEmergencia(component);
+        $A.util.addClass(component.find("ModalboxPreguntas"), "slds-fade-in-open");
+        $A.util.addClass(component.find("ModalBackdropPreguntas"), "slds-backdrop--open");
 
-                window.setTimeout($A.getCallback(() => component.find("Validado").focus()), 0);
+        window.setTimeout($A.getCallback(() => component.find("Validado").focus()), 0);
     },
 
     //Boton Cliente Digital
@@ -179,12 +239,16 @@
     accionRegistroController: function (component, event, helper) {
         var id = event.getParam("row").recordId;
         var actionName = event.getParam("row").nombreBoton;
-        var nivel = component.get("v.nivel");
+        console.log("::: id: " + id);
+        console.log("::: actionName: " + actionName);
         let enviarRegistro;
         if (actionName === "Enviar") {
-            enviarRegistro = component.get("c.enviarRegistro");
-            enviarRegistro.setParams({ "recordId": id });
-
+            if (component.get("v.settingIntegracionNivelDos") === true || (component.get("v.settingIntegracionNivelDos") === false && component.get("v.nivelDosAUTTerceros"))) {
+                enviarRegistro = component.get("c.enviarAutorizacion");
+                enviarRegistro.setParams({ "recordId": component.get("v.recordIdPdteValidar"), "casoId": component.get("v.recordId"), "tipoAutenticacion": "Nivel2" });
+            } else {enviarRegistro = component.get("c.enviarRegistro");
+                enviarRegistro.setParams({ "recordId": id });
+            }
             enviarRegistro.setCallback(this, function (response) {
                 if (response.getState() === "SUCCESS") {
                     component.set("v.validarRegistro", true);
@@ -462,12 +526,25 @@
                                     if (canalValido) {
                                         helper.generarComunicacionNivelDos(component, event, helper).then(() => {
                                             if ((component.get("v.validacionPregunta1") === true && component.get("v.validacionPregunta2") === true) || component.get("v.omitirPreguntasNvl2") === 'true') {
-                                                if(component.get("v.OmitirSMSNvl2") === false){
+                                                if(component.get("v.OmitirSMSNvl2") === false) {
+                                                    console.log("::: Enviando SMS Nivel 2");
                                                     let id = component.get("v.recordIdPdteValidar");
-                                                    let enviarRegistro = component.get("c.enviarRegistro");
-                                                    enviarRegistro.setParams({ "recordId": id });
+                                                    // let enviarRegistro = component.get("c.enviarRegistro");
+                                                    let enviarRegistro;
+                                                    console.log("::: settingIntegracionNivelDos: " + component.get("v.settingIntegracionNivelDos"));
+                                                    console.log("::: nivelDosAUTTerceros: " + component.get("v.nivelDosAUTTerceros"));
+                                                    if (component.get("v.settingIntegracionNivelDos") === true || (component.get("v.settingIntegracionNivelDos") === false && component.get("v.nivelDosAUTTerceros"))) {
+                                                        console.log("::: dentro if");
+                                                        enviarRegistro = component.get("c.enviarAutorizacion");
+                                                        enviarRegistro.setParams({ "recordId": component.get("v.recordIdPdteValidar"), "casoId": component.get("v.recordId"), "tipoAutenticacion": "Nivel2" });
+                                                    } else {
+                                                        console.log("::: dentro else");
+                                                        enviarRegistro = component.get("c.enviarRegistro");
+                                                        enviarRegistro.setParams({ "recordId": id });
+                                                    }
                                                     enviarRegistro.setCallback(this, function (response) {
                                                         if (response.getState() === "SUCCESS") {
+                                                            console.log("::: SUCCESS");
                                                             component.set("v.validarRegistro", true);            
                                                             $A.enqueueAction(component.get("c.abrirModalValidarRegistro"));
                                                         }
@@ -551,7 +628,7 @@
                 component.set("v.recordIdPdteValidar", response.getReturnValue());
             }
             enviarRegistro = component.get("c.enviarAutorizacion");
-            enviarRegistro.setParams({ "recordId": component.get("v.recordIdPdteValidar"), "casoId": component.get("v.recordId") });
+            enviarRegistro.setParams({ "recordId": component.get("v.recordIdPdteValidar"), "casoId": component.get("v.recordId"), "tipoAutenticacion": "ClienteDigital" });
             enviarRegistro.setCallback(this, function (response) {
                 if (response.getState() === "SUCCESS") {
                     if (response.getReturnValue() === "KO") {

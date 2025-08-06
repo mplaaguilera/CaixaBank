@@ -117,7 +117,7 @@ public without sharing class SAC_CaseCalcularImporte {
             Decimal importeAbonado = 0;
 
             for(Case pretension: mapListPretensiones.get(key)){
-                if((pretension.CC_Importe_Reclamado__c != null)/* && (pretension.CC_Importe_Reclamado__c !=0 )*/){
+                if((pretension.CC_Importe_Reclamado__c != null && pretension.Status != 'SAC_009')/* && (pretension.CC_Importe_Reclamado__c !=0 )*/){
                     if(!mapaReclImporteParaActualizar.containsKey(key)){
                         mapaReclImporteParaActualizar.put(key, 0);
                     }
@@ -136,20 +136,24 @@ public without sharing class SAC_CaseCalcularImporte {
             for(Case pretension: mapListPretensiones.get(key)){
 
                 Decimal importeTarea = pretension.SAC_Importe_Resuelto__c == null ? 0 : pretension.SAC_Importe_Resuelto__c;
-                if(mapaReclImporteResueltoParaActualizar.containsKey(key)){
-                    importeTarea = mapaReclImporteResueltoParaActualizar.get(key);
+                if((pretension.SAC_Importe_Resuelto__c != null && pretension.Status != 'SAC_009')){
+                    if(mapaReclImporteResueltoParaActualizar.containsKey(key)){
+                        importeTarea = mapaReclImporteResueltoParaActualizar.get(key);
+                    }
+                    importeResuelto += importeTarea;
                 }
-                importeResuelto += importeTarea;
             }
 
             //Calculo importe abonado
             //O o null se tiene que tener en cuenta para poner el valor a 0 si en todas las pretensiones se ha cambiado a null o a 0
             for(Case pretension: mapListPretensiones.get(key)){
                 Decimal importeTarea = pretension.CC_Importe_Abonado__c == null ? 0 : pretension.CC_Importe_Abonado__c;
-                if(mapaReclImporteAbonadoParaActualizar.containsKey(key)){
-                    importeTarea = mapaReclImporteAbonadoParaActualizar.get(key);
+                if((pretension.CC_Importe_Abonado__c != null && pretension.Status != 'SAC_009')){
+                    if(mapaReclImporteAbonadoParaActualizar.containsKey(key)){
+                        importeTarea = mapaReclImporteAbonadoParaActualizar.get(key);
+                    }
+                    importeAbonado += importeTarea;
                 }
-                importeAbonado += importeTarea;
             }
 
             //añadir al resuelto y el abonado el importe de sus tareas directas
@@ -163,7 +167,7 @@ public without sharing class SAC_CaseCalcularImporte {
             //Calculo quebranto -- Añadido
             Decimal importe2 = 0;
             for(Case pretension: mapListPretensiones.get(key)){
-                if((pretension.SAC_Quebranto__c != null) && (pretension.SAC_Quebranto__c !=0 )){
+                if((pretension.SAC_Quebranto__c != null) ){ //&& (pretension.SAC_Quebranto__c !=0 )
                     if(!mapaReclQuebrantoParaActualizar.containsKey(key)){
                         mapaReclQuebrantoParaActualizar.put(key, 0);
                     }

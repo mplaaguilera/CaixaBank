@@ -62,10 +62,14 @@ public with sharing class SEG_ContactPendienteAsociar_P5_Batch implements Databa
             for (Database.SaveResult resultado : updR) {
                 if (!resultado.isSuccess()) {
                     for (Database.Error error : resultado.getErrors()) {
-                        cbk_log.error(resultado.getId() + '  ' + error.getMessage());
+                        //cbk_log.error(resultado.getId() + '  ' + error.getMessage());
+                        CBK_Log.addError(null, null, 'SEG_ContactPendienteAsociar_P5_Batch: error returned: ' + error.getMessage(), null, null);
                     }
                 }
             }
+            
+        //Se insertan los CBK_Logs
+        CBK_Log.insertDML();
         }
 
         if (!contactsToDelete.isEmpty()) {

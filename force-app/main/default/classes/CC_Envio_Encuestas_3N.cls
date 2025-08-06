@@ -12,11 +12,11 @@ public without sharing class CC_Envio_Encuestas_3N {
         ////No enviar encuesta si es un caso de CSI Bankia
         
     	// List<Case> casosTelefonia = Database.query('SELECT Id, Origin, CaseNumber, CC_En_Tercer_Nivel__c, ContactId, CC_Canal_Resolucion__c, CC_Canal_Procedencia__c, CC_Idioma__c, CC_URL_Encuesta_3N__c, RecordTypeId, CC_Matricula_Empleado__c, CC_MCC_Tematica__c,CC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_Tematica__r.CC_IdCognitivo__c, RecordType.Name FROM Case WHERE Id IN :idsCasos AND RecordType.DeveloperName = \'CC_Empleado\' AND ContactId <> NULL AND Contact.Email <> NULL AND Origin = \'Phone\' AND AccountId <> NULL AND Account.CC_Tipo_Centro__c = \'OF\' AND Account.CC_SubTipo_Centro__c = \'BP\'');
-    	List<Case> casosTelefonia = Database.query('SELECT Id, Origin, CaseNumber, CC_En_Tercer_Nivel__c, ContactId, CC_Canal_Resolucion__c, CC_Canal_Procedencia__c, CC_Idioma__c, CC_URL_Encuesta_3N__c, RecordTypeId, CC_Matricula_Empleado__c, CC_Grupo_Colaborador__c, CC_MCC_Tematica__c,CC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_Tematica__r.CC_IdCognitivo__c, RecordType.Name FROM Case WHERE Id IN :idsCasos AND RecordType.DeveloperName = \'CC_Empleado\' AND ContactId <> NULL AND Contact.Email <> NULL AND Origin = \'Phone\' AND AccountId <> NULL');
+    	List<Case> casosTelefonia = Database.query('SELECT Id, Origin, CaseNumber, CC_En_Tercer_Nivel__c, ContactId, CC_Canal_Resolucion__c, CC_Canal_Procedencia__c, CC_Idioma__c, CC_URL_Encuesta_3N__c, RecordTypeId, CC_Matricula_Empleado__c, CC_Grupo_Colaborador__c, CC_MCC_Tematica__c,CC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_Tematica__r.CC_IdCognitivo__c, RecordType.Name, RecordType.DeveloperName, CC_Tipo_Contacto__c, CC_Fecha_Traslado_3N__c FROM Case WHERE Id IN :idsCasos AND RecordType.DeveloperName = \'CC_Empleado\' AND ContactId <> NULL AND Contact.Email <> NULL AND Origin = \'Phone\' AND AccountId <> NULL');
         if (casosTelefonia.size() > 0) {
             enviarEncuestaFuture(casosTelefonia, true);
         } else{
-        	List<Case> casos = Database.query('SELECT Id, Origin, CaseNumber, ContactId, CC_En_Tercer_Nivel__c, CC_Canal_Resolucion__c, CC_Canal_Procedencia__c, CC_Idioma__c, CC_URL_Encuesta_3N__c, RecordTypeId, CC_Matricula_Empleado__c, CC_Grupo_Colaborador__c, CC_MCC_Tematica__c,CC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_Tematica__r.CC_IdCognitivo__c, RecordType.Name FROM Case WHERE Id IN :idsCasos AND CC_Canal_Resolucion__c IN :valoresCanales AND RecordType.DeveloperName  <> \'CC_CSI_Bankia\' AND ContactId <> NULL AND Contact.Email <> NULL');       
+        	List<Case> casos = Database.query('SELECT Id, Origin, CaseNumber, ContactId, CC_En_Tercer_Nivel__c, CC_Canal_Resolucion__c, CC_Canal_Procedencia__c, CC_Idioma__c, CC_URL_Encuesta_3N__c, RecordTypeId, CC_Matricula_Empleado__c, CC_Grupo_Colaborador__c, CC_MCC_Tematica__c,CC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_Tematica__r.CC_IdCognitivo__c, RecordType.Name, RecordType.DeveloperName, CC_Tipo_Contacto__c, CC_Fecha_Traslado_3N__c FROM Case WHERE Id IN :idsCasos AND CC_Canal_Resolucion__c IN :valoresCanales AND RecordType.DeveloperName  <> \'CC_CSI_Bankia\' AND ContactId <> NULL AND Contact.Email <> NULL');       
 			if (casos.size() > 0) {
             	enviarEncuestaFuture(casos, false);
             }
@@ -26,15 +26,40 @@ public without sharing class CC_Envio_Encuestas_3N {
     public static void enviarEncuestaFuture(List<Case> casos, Boolean casoTelefonia) {
         Set<Id> idsCasosSet = new Set<Id>();
         Set<Id> idsCasosEnvioEncuesta = new Set<Id>();
+        Set<Id> setCasosSinFiltrar = new Set<Id>();
+        Set<Id> setCasosNoSeEnviaEncuesta = new Set<Id>();
         //Solucion IN Too many Email Invocations: 11
         List<Messaging.SingleEmailmessage> oListMail = new List<Messaging.SingleEmailmessage>();
         
         if(casoTelefonia) {
+            //Añadido US1223379 No enviar la encuesta si el caso tiene tarea de respuesta cliente y no es N3
+            Set<Id> setIdsCasosTelefonia = new Set<Id>();
+            Set<Id> setIdsCasosSinTareaRespuestaCliente = new Set<Id>();
+            Map<Id, Case> mapaCasos = new Map<Id, Case>();
             for (Case caso : casos) {
-                idsCasosEnvioEncuesta.add(caso.Id);
+                setIdsCasosTelefonia.add(caso.Id);
+                mapaCasos.put(caso.Id, caso);
+            }
+            
+            for (Task tarea : [SELECT Id, Type, WhatId FROM Task WHERE WhatId IN :setIdsCasosTelefonia]) {
+                if (tarea.Type == 'Responder a cliente' && String.isNotBlank(tarea.WhatId) && mapaCasos.containsKey(tarea.WhatId) && !mapaCasos.get(tarea.WhatId).CC_En_Tercer_Nivel__c) {
+                    setCasosNoSeEnviaEncuesta.add(tarea.WhatId);
+                }
+            }
+
+            for (Case caso : casos) {
+                //Añadido US1223379 No enviar la encuesta si el caso es de empleado y de petición documentación
+                Boolean esEmpleadoYPeticionDocumentacion = false;
+                if (caso.RecordType.DeveloperName == 'CC_Empleado' && caso.CC_Tipo_Contacto__c == 'Petición documentación') {
+                    esEmpleadoYPeticionDocumentacion = true;
+                }
+                if (!esEmpleadoYPeticionDocumentacion && !setCasosNoSeEnviaEncuesta.contains(caso.Id)) {
+                    idsCasosEnvioEncuesta.add(caso.Id);    
+                }                
             }
         } else {
-            Map<Id, String> mapAgrupadores = new Map<Id, String>();        
+            Map<Id, String> mapAgrupadores = new Map<Id, String>();
+            Map<Id, Case> mapaCasos = new Map<Id, Case>();
             mapAgrupadores.put(CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Agrupador__c', 'CC_Seguimiento'), 'CC_Seguimiento');
             mapAgrupadores.put(CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Agrupador__c', 'CC_Comunicacion_Informativa'), 'CC_Comunicacion_Informativa');
             mapAgrupadores.put(CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Agrupador__c', 'CC_Comunicacion_Informativa_de_Campana'), 'CC_Comunicacion_Informativa_de_Campana');
@@ -42,20 +67,42 @@ public without sharing class CC_Envio_Encuestas_3N {
             mapAgrupadores.put(CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Agrupador__c', 'CC_Masiva_Control'), 'CC_Masiva_Control');
             
             for (Case caso : casos) {
-                idsCasosSet.add(caso.Id);
+                //Añadido US1223379 No enviar la encuesta si el caso es de empleado y de petición documentación
+                //Añadido US1223379 No enviar la encuesta si el caso es de empleado y de Oficina Feedback
+                Boolean esEmpleadoYPeticionDocumentacion = false;
+                if ((caso.RecordType.DeveloperName == 'CC_Empleado' && caso.CC_Tipo_Contacto__c == 'Petición documentación') || (caso.RecordType.DeveloperName == 'CC_Empleado' && caso.CC_Canal_Procedencia__c == 'Oficina Feedback')) {
+                    esEmpleadoYPeticionDocumentacion = true;
+                }
+                if (!esEmpleadoYPeticionDocumentacion) {
+                    idsCasosSet.add(caso.Id);
+                    mapaCasos.put(caso.Id, caso);
+                }
             }
             
-            for(Task oTask : [SELECT Id, Type, status, Agrupador__c, WhatId FROM Task WHERE WhatId IN :idsCasosSet]){
+            for(Task oTask : [SELECT Id, Type, status, Agrupador__c, WhatId, What.RecordType.DeveloperName FROM Task WHERE WhatId IN :idsCasosSet]){
+                //Añadido US1223379 No enviar la encuesta si no es tercer nivel y se ha hecho una tarea de responder cliente
+                if (oTask.Type == 'Responder a cliente' && String.isNotBlank(oTask.WhatId) && mapaCasos.containsKey(oTask.WhatId) && !mapaCasos.get(oTask.WhatId).CC_En_Tercer_Nivel__c) {
+                    setCasosNoSeEnviaEncuesta.add(oTask.WhatId);
+                }
                 if((oTask.Type=='Traslado Tercer Nivel' && oTask.status != 'Rechazada') ||
                 (oTask.Type=='Traslado Colaborador' && oTask.status != 'Rechazada') ||
                 oTask.Type=='Traslado Incidencia' && mapAgrupadores.get(oTask?.Id) != 'CC_Seguimiento')
                 {
-                    idsCasosEnvioEncuesta.add(oTask.WhatId);
+                    setCasosSinFiltrar.add(oTask.WhatId);
+                    //idsCasosEnvioEncuesta.add(oTask.WhatId);
+                } else if (oTask.Type=='Llamada transferida' && String.isNotBlank(oTask.WhatId) && oTask.WhatId.getSObjectType().getDescribe().getName() == 'Case' && oTask.What.RecordType.DeveloperName == 'CC_Empleado') {
+                    setCasosSinFiltrar.add(oTask.WhatId);
+                    //idsCasosEnvioEncuesta.add(oTask.WhatId);
                 }
             }
         }
-        
-        //Comprobar que hay un caso para enviar la encuesta
+        //Preparar la encuesta en los casos que no están en el setCasosNoSeEnviaEncuesta
+        for (Id idCaso : setCasosSinFiltrar) {
+            if (!setCasosNoSeEnviaEncuesta.contains(idCaso)) {
+                idsCasosEnvioEncuesta.add(idCaso);
+            }
+        }
+
         if (idsCasosEnvioEncuesta.size() > 0) {
             
             List<Case> listCasos = new List<Case>();
@@ -89,7 +136,7 @@ public without sharing class CC_Envio_Encuestas_3N {
             
             List<Task> tasks = new List<Task>();          
             List<CC_Buzones_Por_Defecto__mdt> buzones = [SELECT CC_Direccion_Correo__c, CC_Canal_Procedencia__c FROM CC_Buzones_Por_Defecto__mdt
-            WHERE (CC_Canal_Procedencia__c = 'Por defecto empleados' OR CC_Canal_Procedencia__c = 'Por defecto') AND CC_Idioma__c <> 'CSI'];
+            WHERE (CC_Canal_Procedencia__c = 'Por defecto empleados' OR CC_Canal_Procedencia__c = 'Por defecto empleados 3N' OR CC_Canal_Procedencia__c = 'Por defecto') AND CC_Idioma__c <> 'CSI'];
             Map<String, String> mapBuzonesDefecto = new Map<String, String> ();            
             for(CC_Buzones_Por_Defecto__mdt buzondefecto : buzones){
                 mapBuzonesDefecto.put(buzondefecto.CC_Canal_Procedencia__c, buzondefecto.CC_Direccion_Correo__c);
@@ -106,13 +153,23 @@ public without sharing class CC_Envio_Encuestas_3N {
             
             for(Integer i = 0; i< listCasos.size(); i++){
                 
-                String remitente = mapBuzonesDefecto.get('Por defecto empleados');
+                String remitente;
                 
                 Id remitenteId;
-                remitenteId = mapIdOrgWide.get(remitente);             
-
+                
                 //Si el caso es de FCO no se debe enviar la encuesta (US859756)
-                if ((listCasos[i].CC_En_Tercer_Nivel__c && listCasos[i].CC_Canal_Procedencia__c != 'Formulario Consultas Operativas') || (!listCasos[i].CC_En_Tercer_Nivel__c && mapaResultados.get(listCasos[i].Id) == false || mapaResultados.isEmpty())) {
+                //Añadido US1223379. Se ha quitado la condición para entrar en el envío.
+                //Ahora en lugar de comprobar que es tercer nivel y canal de procedencia distinto a Formulario Consultas Operativas, solo comprueba que es tercer nivel
+                if ((listCasos[i].CC_En_Tercer_Nivel__c) || (!listCasos[i].CC_En_Tercer_Nivel__c && mapaResultados.get(listCasos[i].Id) == false || mapaResultados.isEmpty())) {
+                    
+                    if(listCasos[i].CC_En_Tercer_Nivel__c){
+                        remitente = mapBuzonesDefecto.get('Por defecto empleados 3N');
+                    }else{
+                        remitente = mapBuzonesDefecto.get('Por defecto empleados');
+                    }
+                    
+                    remitenteId = mapIdOrgWide.get(remitente);             
+                    
                     Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                     mail.setSaveAsActivity(true);
                     mail.setWhatId(listCasos[i].Id);

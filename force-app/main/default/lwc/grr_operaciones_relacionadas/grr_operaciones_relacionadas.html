@@ -1,0 +1,56 @@
+<template>    
+    <template if:true={showForm}>
+        <lightning-card title="Crear Nueva Gestión" icon-name="utility:service_contract">
+            <lightning-record-edit-form
+                object-api-name="GRR_Gestion__c"
+                record-type-id={recordTypeId}
+                onsuccess={handleSuccess}
+                onerror={handleError}
+                onsubmit={handleSubmit}
+            > 
+                <lightning-input-field field-name="GRR_Interviniente__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Tipo_Producto__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Numero_Producto__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Situacion__c"></lightning-input-field>
+                <lightning-input-field field-name="GRR_Saldo__c"></lightning-input-field>
+                
+                <div class="slds-grid slds-grid_align-center slds-m-top_medium">
+                    <lightning-button variant="neutral" label="Cancelar" onclick={handleCancel}></lightning-button>
+                    <lightning-button class="slds-m-left_small" variant="brand" type="submit" label="Guardar Operación"></lightning-button>
+                </div>
+            </lightning-record-edit-form>
+         </lightning-card>
+    </template>
+   
+
+        <template if:false={showForm}>
+            <div class="slds-p-around_medium slds-theme_shade"></div>
+            <lightning-card title={tituloGestiones} icon-name="utility:service_contract">
+                <template if:true={gestiones}>
+                    <template for:each={gestionesConLinks} for:item="gestion">
+                        <div key={gestion.Id} class="slds-p-around_x-small slds-border_bottom slds-grid slds-align-start">
+                            <div class="slds-m-right_small">
+                                <lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+                            </div>
+                            <div>
+                                <p><strong>Tipo de producto :</strong> {gestion.GRR_Tipo_Producto__c}</p>
+                                <p><strong>Número de producto : </strong> 
+                                    <a
+                                        href={gestion.link}
+                                        target="_blank"
+                                        class="slds-text-link"
+                                    >
+                                        {gestion.GRR_Numero_Producto__c}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <div class="slds-grid slds-grid_align-center slds-m-top_medium">
+                    <lightning-button variant="brand" class="sld-m-around_small" label="Crear Nueva Operación" onclick={handleShowForm}></lightning-button>
+                </div>
+            </lightning-card>
+        </template>
+    
+</template>

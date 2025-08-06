@@ -1,0 +1,38 @@
+.subseccion {
+    margin-left: 20px;
+}
+
+.seccion {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.flecha {
+    color: rgb(116, 116, 116);
+    margin-left: 1px;
+}
+
+.cuerpo-subseccion {
+    margin-left: 20px;
+}
+
+.cuerpo-seccion {
+    margin-left: 20px;
+}
+
+.elemento-form {
+    padding-right: 25px;
+    
+}
+
+.botonesEditar {
+    margin-top: 10px;
+}
+
+.contenedor {
+    display: flex;
+}
+
+.mi-boton {
+    margin-bottom: 10px;
+}

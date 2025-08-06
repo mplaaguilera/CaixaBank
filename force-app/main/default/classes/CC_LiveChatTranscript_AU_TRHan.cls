@@ -5,7 +5,6 @@ public with sharing class CC_LiveChatTranscript_AU_TRHan extends CC_TriggerHandl
 	}
 	
     private void process(List<LiveChatTranscript> listNewObj, Map<Id, LiveChatTranscript> mapNewObj) {
-        
 
 
         //Informa Origen a partir de la Procedencia antes de guardar el registro
@@ -23,11 +22,11 @@ public with sharing class CC_LiveChatTranscript_AU_TRHan extends CC_TriggerHandl
         
 	}
 
-
 	private void processAux(List<LiveChatTranscript> listNewObj, Map<Id, LiveChatTranscript> mapOldObj) { //Map<Id, LiveChatTranscript> mapNewObj
       
-        
-		List<LiveChatTranscript> chatsUpdCase = new list<LiveChatTranscript>();        
+        List<Id> chatsUnbluCobrowsing = new list<Id>();        
+		List<LiveChatTranscript> chatsUpdCase = new list<LiveChatTranscript>();      
+
         for (LiveChatTranscript chatAgente : listNewObj){            
             //Se modifica el espacio, la categor?a o el caso asociado
             if ((chatAgente.CC_Espacio__c!=mapOldObj.get(chatAgente.Id).CC_Espacio__c) ||
@@ -37,14 +36,20 @@ public with sharing class CC_LiveChatTranscript_AU_TRHan extends CC_TriggerHandl
             {
                 chatsUpdCase.add(chatAgente);
             }
+            if((chatAgente.unblusuite__Conversation_Id__c != null && mapOldObj.get(chatAgente.Id).unblusuite__Conversation_Id__c == null)
+            || (chatAgente.unblusuite__Conversation_Id__c != null && mapOldObj.get(chatAgente.Id).unblusuite__Conversation_Id__c != chatAgente.unblusuite__Conversation_Id__c)
+            && chatAgente.caseId != null){ //se registra por primera vez
+                chatsUnbluCobrowsing.add(chatAgente.caseId);
+            }
         }
         
         if (!chatsUpdCase.isEmpty()) {
-            system.debug('NMA AU');
                 CC_MCC_Preclasificacion.preclasificarCasosObj(chatsUpdCase);
                 // NO DESCOMENTAR ESTO: CC_Encuestas_Chat.generarEncuesta(chatsUpdCase);
         }
        
+        if(!chatsUnbluCobrowsing.isEmpty()){
+                CC_Activity.crearActividadCobrowsing(chatsUnbluCobrowsing);
+        } 
     }
-   
 }

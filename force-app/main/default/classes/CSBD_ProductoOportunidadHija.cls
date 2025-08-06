@@ -131,7 +131,7 @@ public with sharing class CSBD_ProductoOportunidadHija {
 
 		Map<Id, List<Opportunity>> oportunidadIdListaHijas = new Map<Id, List<Opportunity>>();
 		for (Opportunity oportunidadHija : [SELECT StageName, CSBD_Estado__c, CSBD_Parent_Id__c, CSBD_Identificador__c, CSBD_Resolucion__c,
-											RecordType.DeveloperName, CSBD_Alta_omnichannel__c, CSBD_Empresa_Proveedora__c, CSBD_Contact__c
+											RecordType.DeveloperName, CSBD_Alta_omnichannel__c, CSBD_Empresa_Proveedora__c, CSBD_Contact__c, Description
 											FROM Opportunity WHERE Recordtype.DeveloperName = 'CSBD_Accion_Comercial'
 											AND CSBD_Parent_Id__c = :idOportunidad.keySet() AND IsClosed = FALSE]) {
 

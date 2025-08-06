@@ -104,7 +104,27 @@ public with sharing class SAC_ParametrizacionSLATME_BU_TRHan extends CC_TriggerH
                 if(registroTME.SAC_Estados__c != null && String.valueOf(registroTME.SAC_Estados__c).toUppercase().contains('SAC_009')){
                     cadenaFormar = cadenaFormar + 'SAC_009';
                 }
-
+                if(registroTME.SAC_Estados__c != null && String.valueOf(registroTME.SAC_Estados__c).toUppercase().contains('SPV_ENVIO')){
+                    cadenaFormar = cadenaFormar + 'SPV_Envio';
+                }
+                if(registroTME.SAC_Estados__c != null && String.valueOf(registroTME.SAC_Estados__c).toUppercase().contains('SPV_ENVIOCOMPLEMENTARIA')){
+                    cadenaFormar = cadenaFormar + 'SPV_EnvioComplementaria';
+                }
+                if(registroTME.SAC_Estados__c != null && String.valueOf(registroTME.SAC_Estados__c).toUppercase().contains('SPV_RECEPCIONRESOLUCION')){
+                    cadenaFormar = cadenaFormar + 'SPV_RecepcionResolucion';
+                }
+                if(registroTME.SAC_Estados__c != null && String.valueOf(registroTME.SAC_Estados__c).toUppercase().contains('SPV_ANALISISCOMPLEMENTARIAORGANISMO')){
+                    cadenaFormar = cadenaFormar + 'SPV_AnalisisComplementariaOrganismo';
+                }
+                if(registroTME.SAC_Estados__c != null && String.valueOf(registroTME.SAC_Estados__c).toUppercase().contains('SPV_ANALISISDECISION')){
+                    cadenaFormar = cadenaFormar + 'SPV_AnalisisDecision';
+                }
+                if(registroTME.SAC_Estados__c != null && String.valueOf(registroTME.SAC_Estados__c).toUppercase().contains('SPV_RECTIFICACION')){
+                    cadenaFormar = cadenaFormar + 'SPV_Rectificacion';
+                }
+                if(registroTME.SAC_Estados__c != null && String.valueOf(registroTME.SAC_Estados__c).toUppercase().contains('SPV_ENVIORECTIFICACION')){
+                    cadenaFormar = cadenaFormar + 'SPV_EnvioRectificacion';
+                }
                 //Se le asigana la cadena construida al campo
 
                 registroTME.SAC_DuplicadoMCCProcedenciaEstado__c = cadenaFormar;

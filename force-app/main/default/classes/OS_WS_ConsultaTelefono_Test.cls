@@ -4,30 +4,31 @@ public with sharing class OS_WS_ConsultaTelefono_Test {
     private static void setup() {
         User usuarioResponsable = OS_Usuarios.usuarioResponsable();
 
-        Account cuenta = new Account();
-        cuenta.Name = 'Cuenta Caixabank Gestor';
-        cuenta.RecordTypeId = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-        //cuenta.OwnerId = usuarioAdministrador.Id;
-        cuenta.CC_Email__c = [SELECT Id, Address FROM OrgWideEmailAddress LIMIT 1].Address;
-        cuenta.CC_Numero_Oficina__c = '00044';
-        cuenta.Phone = '123456789';
-        insert cuenta;
+            Account cuenta = new Account();
+            cuenta.Name = 'Cuenta Caixabank Gestor';
+            cuenta.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+            //cuenta.OwnerId = usuarioAdministrador.Id;
+            cuenta.CC_Email__c = [SELECT Id, Address FROM OrgWideEmailAddress LIMIT 1].Address;
+            cuenta.CC_Numero_Oficina__c = '00044';
+            cuenta.Phone = '123456789';
+            insert cuenta;
 
-        Contact contacto = new Contact();
-        contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
-        contacto.AccountId = cuenta.Id;
-        contacto.Phone = '987654321';
-        contacto.LastName = 'contacto test';
-        insert contacto;
+            Contact contacto = new Contact();
+            contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
+            contacto.AccountId = cuenta.Id;
+            contacto.Phone = '987654321';
+            contacto.LastName = 'contacto test';
+            insert contacto;
 
-        AccountShare acshare = new AccountShare();
-        acshare.AccountId = cuenta.Id;
-        acshare.UserOrGroupId = [SELECT Id FROM User WHERE FirstName = 'ResponsableOS' LIMIT 1].Id;
-        acshare.AccountAccessLevel = 'Edit';
-        //acshare.ContactAccessLevel = 'Edit';
-        acshare.OpportunityAccessLevel = 'Edit';
-        acshare.CaseAccessLevel = 'Edit';
-        insert acshare;
+            AccountShare acshare = new AccountShare();
+            acshare.AccountId = cuenta.Id;
+            acshare.UserOrGroupId = [SELECT Id FROM User WHERE FirstName = 'ResponsableOS' LIMIT 1].Id;
+            acshare.AccountAccessLevel = 'Edit';
+            acshare.ContactAccessLevel = 'Edit';
+            acshare.OpportunityAccessLevel = 'Edit';
+            acshare.CaseAccessLevel = 'Edit';
+            insert acshare;
+        
     }
 
     @isTest

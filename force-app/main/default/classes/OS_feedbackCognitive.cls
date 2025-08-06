@@ -9,7 +9,6 @@ public class OS_feedbackCognitive implements Queueable, Database.AllowsCallouts{
 
     public void execute(QueueableContext context) 
     {
-        CC_InterfaceSettings__mdt oConfig = OS_cognitiveCR.getConfig ('OS_fbCognitive');
         List<CC_TrazaInt__c> oListTrazas = new List<CC_TrazaInt__c>();
         
 
@@ -37,7 +36,6 @@ public class OS_feedbackCognitive implements Queueable, Database.AllowsCallouts{
                 CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
                 requestWrp.body = '[' + jsonToCognitive + ']';
                 requestWrp.intSetting = intSetting;
-                requestWrp.method = 'PUT';
                 requestWrp.mHeaders = mHeaders;
                 requestWrp.mUriParams = null;
                 requestWrp.mQueryParams = null;
@@ -49,17 +47,11 @@ public class OS_feedbackCognitive implements Queueable, Database.AllowsCallouts{
                 
                 if (response.getStatusCode() == 200) {
                     OS_receiveFromCognitive results = new OS_receiveFromCognitive();
-                    oTraza.CC_MensajeSalida__c = response.getBody();
-                    oTraza.CC_FechaFin__c = datetime.now();
-                    oTraza.CC_FinOK__c = true;
+                    oTraza.CC_MensajeSalida__c = response.getBody(); oTraza.CC_FechaFin__c = datetime.now(); oTraza.CC_FinOK__c = true;
                     oListTrazas.add(oTraza);          
                 } else {
                     sDescError = 'Error comunicaciones.';
-                    sDetalleError = response.getStatusCode() + ':' + response.getBody();
-                    oTraza.CC_FechaFin__c = datetime.now();
-                    oTraza.CC_FinOK__c = false;
-                    oTraza.CC_TipoError__c = sDescError;
-                    oTraza.CC_DetalleError__c = sDetalleError;
+                    sDetalleError = response.getStatusCode() + ':' + response.getBody(); oTraza.CC_FechaFin__c = datetime.now(); oTraza.CC_FinOK__c = false; oTraza.CC_TipoError__c = sDescError; oTraza.CC_DetalleError__c = sDetalleError;
                     oListTrazas.add(oTraza);
                 }
             } catch (Exception e) {

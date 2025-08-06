@@ -10,6 +10,8 @@
                 var wrapper = response.getReturnValue(); 
 
                 component.set('v.para', wrapper.para);
+                console.log('Para: ' + wrapper.para);
+                
                 component.set('v.asunto', wrapper.asunto);
                 component.set('v.cuerpo', wrapper.cuerpo);
                 component.set('v.copia', wrapper.copia);

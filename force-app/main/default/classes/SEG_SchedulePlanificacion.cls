@@ -6,8 +6,7 @@ public with sharing class SEG_SchedulePlanificacion extends CBK_SCH_Queueable_Ab
     public override void execute(QueueableContext ctx) {
         integer counter=0;
         boolean startNewQueue=false;
-        try
-        {   
+        try{   
             procesadosList = New List<CBK_SCH_PendingProcess__c>();
             noProcesadosList = New List<CBK_SCH_PendingProcess__c>();
             List<CBK_SCH_PendingProcess__c> incomingPendingProcessList = this.lstInfoProcess;          
@@ -22,17 +21,14 @@ public with sharing class SEG_SchedulePlanificacion extends CBK_SCH_Queueable_Ab
 
             for(CBK_SCH_PendingProcess__c pending :incomingPendingProcessList)
             {
-                if(!startNewQueue)
-                {
+                if(!startNewQueue){
                     if(pending!=null)
                     {
                         try
                         {
                             ProcesadosList.add(pending);
                         }
-                        catch(Exception ex)
-                        {
-                            CBK_Log.error(ex);
+                        catch(Exception ex){ CBK_Log.addError(null, ex, 'SEG_SchedulePlanificacion:  error returned: ' + ex.getMessage(), null, null);
                         }
                         counter=counter+1;
                     }
@@ -45,6 +41,8 @@ public with sharing class SEG_SchedulePlanificacion extends CBK_SCH_Queueable_Ab
                     noProcesadosList.add(pending);
                 }
             }
+            //Se insertan los CBK_Logs
+            CBK_Log.insertDML();
 
             if (procesadosList.size()>0) {
                 //Se procesa el primer subconjunto limitado a MAX_RECORD
@@ -54,19 +52,13 @@ public with sharing class SEG_SchedulePlanificacion extends CBK_SCH_Queueable_Ab
             Type typeProcessAction = Type.forName('SEG_SchedulePlanificacion');
             CBK_SCH_Queueable_Abstract processAction = (CBK_SCH_Queueable_Abstract) typeProcessAction.newInstance();
             processAction.lstInfoProcess = noProcesadosList;
-            if(startNewQueue)
-            { 
+            if(startNewQueue){ 
                 //Se planificaN nuevo Queuables con los no procesados                	
 				System.enqueueJob(processAction);				     
                 counter=0;               
             }
         }
-        catch(Exception ex)
-        {
-            CBK_Log.error(ex);
-        }
-
-
+        catch(Exception ex){ CBK_Log.error(ex);}
     }
 
     private void work(List<CBK_SCH_PendingProcess__c> incomingPendingProcessList) {  
@@ -112,15 +104,14 @@ public with sharing class SEG_SchedulePlanificacion extends CBK_SCH_Queueable_Ab
                         if(i == 0 || (caso.AccountId != casoAnterior.AccountId && caso.ContactId != casoAnterior.ContactId)){
                             lstCasosUpdt.add(casoUpdt);
                         } else {
-                            lstCasosAccContIguales.add(casoUpdt);
-                        }
-                    } catch (Exception e) {
-                        CBK_Log.error(e);
-                        throw(e);
+                            lstCasosAccContIguales.add(casoUpdt);                      }
+                    } catch (Exception e) { CBK_Log.addError(caso.Id, e, 'SEG_SchedulePlanificacion: error returned: ' + e.getMessage(), null, null);
                     }
                 }
             }
         }
+        //Se insertan los CBK_Logs
+        CBK_Log.insertDML();
 
         if(!lstCasosAccContIguales.isEmpty()){
             lstCasosUpdt.addAll(lstCasosAccContIguales);
@@ -128,25 +119,27 @@ public with sharing class SEG_SchedulePlanificacion extends CBK_SCH_Queueable_Ab
 
         if(!lstCasosUpdt.isEmpty()){
             if (Schema.sObjectType.Case.fields.OwnerId.isUpdateable() && Schema.sObjectType.Case.fields.Status.isUpdateable()  && Schema.sObjectType.Case.fields.SEG_Subestado__c.isUpdateable()) {
-
                 caseToset.addAll(lstCasosUpdt);
                 lstCaseDup.addAll(caseToset);
                 List<Database.SaveResult> results = Database.update(lstCaseDup,false);
                 for (Database.SaveResult sr : results) {
                     if (sr.isSuccess()) {
-                        CBK_log.debug('SEG_SchedulePlanification: Caso planificación actualizado.', LoggingLevel.INFO);
+                        // CBK_log.debug('SEG_SchedulePlanification: Caso planificación actualizado.', LoggingLevel.INFO);
+                     	CBK_Log.addError(null, null, 'SEG_SchedulePlanification: Caso planificación actualizado.' , null, null);
                     } else {
                         for(Database.Error err : sr.getErrors()) {
-                            CBK_log.debug('SEG_SchedulePlanification: Error returned: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+                           // CBK_log.debug('SEG_SchedulePlanification: Error returned: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+                         	CBK_Log.addError(null, null, 'SEG_SchedulePlanification: Error returned: ' + err.getStatusCode() + ' - ' + err.getMessage(), null, null);
                         }
                         if(mapCasoProceso.containsKey(sr.getId())){
                             procesosFallidos.add(mapCasoProceso.get(sr.getId()));
                         }
                     }       
                 }             
+            //Se insertan los CBK_Logs
+            CBK_Log.insertDML();          
             }
         }
-
         if(!procesosFallidos.isEmpty()){
             DateTime proximaEjecucion = Datetime.now().addMinutes(2);
             CBK_ScheduleProcess_Controller.updateRecordSchProcess(procesosFallidos,proximaEjecucion,true);

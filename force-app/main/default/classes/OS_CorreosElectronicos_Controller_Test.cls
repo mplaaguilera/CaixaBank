@@ -32,7 +32,7 @@ public with sharing class OS_CorreosElectronicos_Controller_Test {
     public static void recuperarCampos() {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
-        Id recordTypeGrupoColaborador = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+        Id recordTypeGrupoColaborador = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
         CC_Grupo_Colaborador__c grupoColab = new CC_Grupo_Colaborador__c();
         grupoColab.Name = 'Grupo';
         grupoColab.RecordTypeId = recordTypeGrupoColaborador;
@@ -45,7 +45,7 @@ public with sharing class OS_CorreosElectronicos_Controller_Test {
 		mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente (COPS)';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccTematica.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        mccTematica.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         mccTematica.CC_Codigo_Externo__c = 'TEC-000001';
 		//mccTematica.OS_Buzon_Salida__c = [SELECT DISPLAYNAME FROM OrgWideEmailAddress WHERE DISPLAYNAME LIKE 'Buzón %' LIMIT 1].DISPLAYNAME;
         mccTematica.OS_Buzon_Salida__c = 'Buzón UAFE';
@@ -57,7 +57,7 @@ public with sharing class OS_CorreosElectronicos_Controller_Test {
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente (COPS)';
         mccProducto.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        mccProducto.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        mccProducto.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PRC-000001'; 
         insert mccProducto; 
@@ -66,7 +66,7 @@ public with sharing class OS_CorreosElectronicos_Controller_Test {
         motivo.Name = 'Apertura sin autorización';
         motivo.CC_Tipo_Cliente__c = 'Cliente (COPS)';
         motivo.CC_Fecha_Vigencia_Inicio__c = Date.today();
-        motivo.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        motivo.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         motivo.CC_Tematica__c = mccTematica.Id;
         motivo.CC_Producto_Servicio__c = mccProducto.Id;
         motivo.CC_Codigo_Externo__c = 'MOC-000001';
@@ -95,14 +95,17 @@ public with sharing class OS_CorreosElectronicos_Controller_Test {
         //Actividades correo
         List<Task> listaActividades = new List<Task>();
         Task actividadCorreo1 = new Task();
-        actividadCorreo1.RecordTypeId = Schema.getGlobalDescribe().get('Task').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Task').getRecordTypeId();
+
+        Id taskOSTaskRecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('OS_Task').getRecordTypeId();
+
+        actividadCorreo1.RecordTypeId = taskOSTaskRecordTypeId;
         actividadCorreo1.Type = 'Traslado Colaborador';
         actividadCorreo1.WhatId = caso.Id;
         actividadCorreo1.CC_Referencia_Correo_Saliente__c = '1234567890';
         listaActividades.add(actividadCorreo1);
         
         Task actividadCorreo2 = new Task();
-        actividadCorreo2.RecordTypeId = Schema.getGlobalDescribe().get('Task').getDescribe().getRecordTypeInfosByDeveloperName().get('OS_Task').getRecordTypeId();
+        actividadCorreo2.RecordTypeId = taskOSTaskRecordTypeId;
         actividadCorreo2.Type = 'Traslado Colaborador';
         actividadCorreo2.WhatId = caso.Id;
         actividadCorreo2.CC_Referencia_Correo_Saliente__c = '1234567890';

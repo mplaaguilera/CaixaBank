@@ -1,0 +1,76 @@
+<template>    
+        <lightning-quick-action-panel header="Cambiar Estado del Caso">
+            
+                <!-- Cuerpo del Panel -->
+                <div class="slds-p-around_medium spinner-container">
+                    <template if:true={isLoading}>
+                        <div class="spinner-overlay">
+                            <lightning-spinner alternative-text="Cargando..." size="medium"></lightning-spinner>
+                        </div>
+                    </template>
+
+                    <template lwc:if={errorMessage}>
+                        <div class="slds-m-bottom_medium slds-p-around_small " style="display: flex; align-items: flex-start;">
+                            <lightning-icon icon-name="utility:warning" size="x-small" class="slds-m-right_small"></lightning-icon>
+                            <div>
+                                {errorMessage}
+                            </div>
+                        </div>
+                    </template>
+
+                    <template lwc:else>
+                         <!-- Combobox 1 -->
+                        <lightning-combobox
+                            lwc:ref="inputEstado"
+                            name="estado"
+                            label="Estado"
+                            value={estadoValue}
+                            options={estadoOptions}
+                            onchange={handleEstadoChange}
+                            class="slds-m-bottom_medium"
+                            required >
+                            
+                        </lightning-combobox>
+
+                        <!-- Combobox 2, solo visible si se selecciona 'Cerrado' -->
+                        <template if:true={showAccionCombobox}>
+                            <lightning-radio-group
+                                lwc:ref="inputAccion"
+                                name="accion"
+                                label="Solución Articulo"
+                                options={accionOptions}
+                                value={accionValue}
+                                type="button"
+                                onchange={handleAccionChange}
+                                class="slds-m-bottom_medium"
+                                required>
+                            </lightning-radio-group>
+
+                            <template if:true={accionValue}>
+                                <div if:true={accionHelpText} class="slds-m-bottom_medium slds-p-around_small " style="display: flex; align-items: flex-start;">
+                                    <lightning-icon icon-name="utility:info" size="x-small" class="slds-m-right_small"></lightning-icon>
+                                    <div>
+                                        {accionHelpText}
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                    </template>
+                </div>
+
+                <!-- Pie de página del Panel -->
+                <div slot="footer">
+                    <lightning-button 
+                        class="slds-m-right_x-small"
+                        label="Cancelar" 
+                        onclick={handleCancel}>
+                    </lightning-button>
+                    <lightning-button 
+                        variant="brand" 
+                        label="Guardar" 
+                        onclick={handleSave}
+                        disabled={saveDisabled}>
+                    </lightning-button>
+                </div>      
+        </lightning-quick-action-panel>
+</template>

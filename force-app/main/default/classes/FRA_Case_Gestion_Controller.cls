@@ -198,13 +198,14 @@ public with sharing class FRA_Case_Gestion_Controller {
         );
     }
 }
+
 @AuraEnabled @future
     public static void rechazarCasoFraude(Id recordId, String motivo) {
         
+            
             // Obtener el caso de Fraude rechazado
             Case casoFraude = [SELECT Id, Status, CC_CasoRelacionado__c FROM Case WHERE Id = :recordId LIMIT 1];
-            
-            
+          
             // (Opcional) Cerrar el caso de Fraude si ya no es necesario
             casoFraude.Status = 'Rechazado';
 
@@ -218,10 +219,34 @@ public with sharing class FRA_Case_Gestion_Controller {
                 };
                 CC_Gestion_Derivar_Fraude.devolverCasoCC(parametro);
 
-            }
-           
+            }     
+    }
 
-            
+    @AuraEnabled 
+    public static Boolean validarCasoEnContactCenter(Id recordId) {
+
+         // Obtener el caso de Fraude rechazado
+         Case casoFraude = [SELECT Id, Status, CC_CasoRelacionado__c FROM Case WHERE Id = :recordId LIMIT 1];
+         //Se busca que exista una tarea asociada al caso del Contact Center para comprobar que se ha trasladdo a Fraude
+         Boolean existeTarea = false;
+        if (casoFraude == null || casoFraude.CC_CasoRelacionado__c == null) {
+            return false;
+        }
+
+         List<Task> tareas = [
+                SELECT WhatId 
+                FROM Task 
+                WHERE RecordType.DeveloperName = 'CC_Task' AND Type = 'Fraude' AND WhatId = :casoFraude.CC_CasoRelacionado__c AND Status = 'Completed'
+                    ORDER by CreatedDate DESC
+                LIMIT 1
+            ];
+         if(!tareas.isEmpty()){
+            return true;
+         }else{
+            return false;
+         }
+
+        
     }
 
 }

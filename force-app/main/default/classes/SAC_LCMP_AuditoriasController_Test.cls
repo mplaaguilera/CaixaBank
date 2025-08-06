@@ -253,8 +253,8 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         List<String> sentidoResolucion = new List<String>();
         sentidoResolucion.add('SAC_001');
         System.RunAs(usuario){
-            wrapperRec1 = SAC_LCMP_AuditoriasController.buscarReclamacionAuditoria('Negociación',true,null,null,g1.Id,g2.Id,usuario.Id,usuario.Name,10,100, sentidoResolucion, mcct.Id,mccp.Id,mccm.Id,mccd.Id,1);
-            wrapperRec2 = SAC_LCMP_AuditoriasController.buscarReclamacionAuditoria('Negociación', false,null,null,g1.Id,g2.Id,usuario.Id,usuario.Name,10,100,sentidoResolucion, mcct.Id,mccp.Id,mccm.Id,mccd.Id,1);
+            wrapperRec1 = SAC_LCMP_AuditoriasController.buscarReclamacionAuditoria('Negociación',true,null,null,g1.Id,g2.Id,usuario.Id,usuario.Name,10,100, sentidoResolucion, new List<String>{mcct.Id}, new List<String>{mccp.Id}, new List<String>{mccm.Id}, new List<String>{mccd.Id}, 1);
+            wrapperRec2 = SAC_LCMP_AuditoriasController.buscarReclamacionAuditoria('Negociación', false,null,null,g1.Id,g2.Id,usuario.Id,usuario.Name,10,100,sentidoResolucion, new List<String>{mcct.Id}, new List<String>{mccp.Id}, new List<String>{mccm.Id}, new List<String>{mccd.Id}, 1);
         }
         Test.stopTest();
 
@@ -288,10 +288,10 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
 
         CC_Grupo_Colaborador__c g1 = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE RecordType.DeveloperName = 'SAC_GrupoProveedores' LIMIT 1];
         CC_Grupo_Colaborador__c g2 = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE RecordType.DeveloperName = 'SAC_Letrados' LIMIT 1];
-        CC_MCC__c mcct = [SELECT id FROM CC_MCC__c WHERE Name = 'Avales MCC Clase Test' LIMIT 1];
-        CC_MCC__c mccp = [SELECT id FROM CC_MCC__c WHERE Name = 'Avales Fianzas y Otras Garantías MCC Clase Test' LIMIT 1];
-        CC_MCC__c mccm = [SELECT id FROM CC_MCC__c WHERE Name = 'Discrepancia con importe deuda reclamada MCC Clase Test' LIMIT 1];
-        CC_MCC__c mccd = [SELECT id FROM CC_MCC__c WHERE Name = 'Discrepancia con importe deuda MCC Clase Test' LIMIT 1];
+        CC_MCC__c mcct = [SELECT id, Name FROM CC_MCC__c WHERE Name = 'Avales MCC Clase Test' LIMIT 1];
+        CC_MCC__c mccp = [SELECT id, Name FROM CC_MCC__c WHERE Name = 'Avales Fianzas y Otras Garantías MCC Clase Test' LIMIT 1];
+        CC_MCC__c mccm = [SELECT id, Name FROM CC_MCC__c WHERE Name = 'Discrepancia con importe deuda reclamada MCC Clase Test' LIMIT 1];
+        CC_MCC__c mccd = [SELECT id, Name FROM CC_MCC__c WHERE Name = 'Discrepancia con importe deuda MCC Clase Test' LIMIT 1];
         List<Case> reclamaciones = [SELECT id FROM Case WHERE Subject = 'TestRec'];
         List<String> listCasos = new List<String>();
 
@@ -302,7 +302,7 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
 
         
         System.RunAs(usuario){
-            SAC_LCMP_AuditoriasController.crearAuditoria('AuditoriaTest', 'SAC_Altas', 'SAC_SLACalidadTrue', null, null, g1.id, g2.Id, usuario.id, usuario.id, 10, 100, 'SAC_001',mcct.id, mccp.id, mccm.id, mccd.id, g1.id, listCasos);
+            SAC_LCMP_AuditoriasController.crearAuditoria('AuditoriaTest', 'SAC_Altas', 'SAC_SLACalidadTrue', null, null, g1.id, g2.Id, usuario.id, usuario.id, 10, 100, 'SAC_001', mcct.id, mccp.id, mccm.id, mccd.id, mcct.Name, mccp.Name, mccm.Name, mccd.Name, g1.id, listCasos);
         }
         Test.stopTest();
 
@@ -391,6 +391,12 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
+
+        PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
+        PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
+        permiSetAssi.AssigneeId = usuario.Id;
+        permiSetAssi.PermissionSetId = permiSet.Id;
+        lstPsAssigment.add(permiSetAssi);
         SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         System.RunAs(usuario){
@@ -431,6 +437,12 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         permiSetAssi2.AssigneeId = usuario.Id;
         permiSetAssi2.PermissionSetId = permiSet2.Id;
         lstPsAssigment.add(permiSetAssi2);
+        
+        PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_Administrador'];
+        PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
+        permiSetAssi.AssigneeId = usuario.Id;
+        permiSetAssi.PermissionSetId = permiSet.Id;
+        lstPsAssigment.add(permiSetAssi);
         SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         System.RunAs(usuario){
@@ -526,7 +538,8 @@ public with sharing class SAC_LCMP_AuditoriasController_Test {
         SAC_DatabaseDML.insertListDML(lstPsAssigment, false);
 
         System.runAs(usuario) {
-            SAC_LCMP_AuditoriasController.crearProgramacionAuditoria('testAuditoriaAutomaticaTest', 'SAC_Altas', 'SAC_SLACalidadTrue', Date.today(), Date.today(), 'Hoy', null, null, 10, 11, null, null, null, null, null,  1, null, true, 'Diaria: Lunes');
+            Date dToday = CBK_UtilsDate.todayDT();
+            SAC_LCMP_AuditoriasController.crearProgramacionAuditoria('testAuditoriaAutomaticaTest', 'SAC_Altas', 'SAC_SLACalidadTrue', dToday, dToday, 'Hoy', null, null, 10, 11, null, null, null, null, null, null, null, null, null,  1, null, true, 'Diaria: Lunes');
         }
     
         SEG_Auditoria__c auditoria = [SELECT Id FROM SEG_Auditoria__c WHERE RecordType.DeveloperName = 'SAC_AuditoriaAutomatica' AND SAC_NombreAuditoria__c = 'testAuditoriaAutomaticaTest' LIMIT 1];

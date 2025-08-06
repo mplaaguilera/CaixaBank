@@ -59,7 +59,6 @@ public with sharing class OS_Detector_Idioma
                 CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
                 requestWrp.body = '{"text":"' + cuerpoAnalisis + '"}';
                 requestWrp.intSetting = intSetting;
-                requestWrp.method = 'POST';
                 requestWrp.mHeaders = mHeaders;
                 requestWrp.mUriParams = null;
                 requestWrp.mQueryParams = null;
@@ -84,18 +83,9 @@ public with sharing class OS_Detector_Idioma
                     
                     if (confianza>paramDETIDI.OS_Sensibilidad__c) {
                         idioma=(String)agencymap.get('language');
-                        if(idioma=='cat')
-                        {
-                            idioma='ca';
-                        }
-                        if(idioma=='esp')
-                        {
-                            idioma='es';
-                        }
-                        if(idioma=='eng')
-                        {
-                            idioma='en';
-                        }
+                        if(idioma=='cat'){idioma='ca';}
+                        if(idioma=='esp'){idioma='es';}
+                        if(idioma=='eng'){idioma='en';}
                     }                        
                     
                 }else {
@@ -143,7 +133,7 @@ public with sharing class OS_Detector_Idioma
         
         if(isAcuse)
         {
-           
+           //Jaime: el import de la Clase no es necesario por tener with sharing
             OS_Acuse_Recibo.enviarAcuse(listCase[0], fromAddress, buzon, nombreBuzon, eBody);   
         } 
     }
@@ -151,10 +141,13 @@ public with sharing class OS_Detector_Idioma
     static private OS_DETIDI__mdt getParamtersDETIDI()
     {
         OS_DETIDI__mdt parameter;
-        List<OS_DETIDI__mdt> oConfig = [SELECT Id, OS_Sensibilidad__c, OS_WS_Activo__c FROM OS_DETIDI__mdt WHERE DeveloperName = 'Parametros'];
-        if (oConfig.size()==1){
+        List<OS_DETIDI__mdt> oConfig = [SELECT Id, OS_Sensibilidad__c, OS_WS_Activo__c FROM OS_DETIDI__mdt WHERE DeveloperName = 'Parametros' LIMIT 1];
+
+        if (!oConfig.isEmpty()){
             parameter = oConfig[0];
         }
         return parameter;
+
+
     }
 }

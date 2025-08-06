@@ -337,6 +337,7 @@ global with sharing class SAC_WS_FormularioCasos extends CBK_HttpServiceIntegrat
      * 1.0            --              Iria ANPC     01/10/24        Creación
     *****************************************************************/
     public static void createFormularioFraude(List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oDatosList, String caseId){
+		system.debug('***create fraude ' + caseId);
         List<SPV_Formulario__c> formularios = new List<SPV_Formulario__c>();
         for(SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input oDatos: oDatosList){
             if(oDatos.aplicacion == 'FORMFRAUDE'){
@@ -358,8 +359,16 @@ global with sharing class SAC_WS_FormularioCasos extends CBK_HttpServiceIntegrat
                 formularios.add(fFraude);
             }
         }
+		system.debug('***formularios '+formularios);
+
         if(!formularios.isEmpty()){
-            insert formularios;
+            try{
+                insert formularios;
+                system.debug('***OK crear formularios');
+            }catch(Exception e){
+                system.debug('***KO crear formularios ' + e.getMessage());
+            }
+            
         }
     }
     /*****************************************************************
@@ -1661,6 +1670,7 @@ global with sharing class SAC_WS_FormularioCasos extends CBK_HttpServiceIntegrat
     @HttpPost
     global static List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> createCase(List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oDataIn)
     {	
+        system.debug('***cretae ');
         String sTipoNif = '';
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output>();
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oResPortal = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output>();
@@ -1965,6 +1975,7 @@ global with sharing class SAC_WS_FormularioCasos extends CBK_HttpServiceIntegrat
             if (!oNewCase.isEmpty())
             {
                 Schema.SObjectField oCampoSearch = Case.Fields.CC_RefExterna__c;
+                system.debug('***oNewCase '+oNewCase);
                 Database.UpsertResult[] oResUp = Database.upsert(oNewCase, oCampoSearch, false);
 				/* *****************************
                 * ********GGH Y FRAUDE*********

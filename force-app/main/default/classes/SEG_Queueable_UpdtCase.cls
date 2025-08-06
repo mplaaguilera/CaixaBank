@@ -31,7 +31,8 @@ public with sharing class SEG_Queueable_UpdtCase extends CBK_SCH_Queueable_Abstr
                         }
                         catch(Exception ex)
                         {
-                            CBK_Log.error(ex);
+                            //CBK_Log.error(ex);
+                            CBK_Log.addError(null, ex, 'SEG_Queueable_UpdtCase:  error returned: ' + ex.getMessage(), null, null);
                         }
                         counter=counter+1;
                     }
@@ -44,6 +45,9 @@ public with sharing class SEG_Queueable_UpdtCase extends CBK_SCH_Queueable_Abstr
                     noProcesadosList.add(pending);
                 }
             }
+
+            //Se insertan los CBK_Logs
+            CBK_Log.insertDML();
 
             if (procesadosList.size()>0) {
                 //Se procesa el primer subconjunto limitado a MAX_RECORD

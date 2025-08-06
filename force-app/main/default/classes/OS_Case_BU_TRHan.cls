@@ -656,16 +656,28 @@ public with sharing class OS_Case_BU_TRHan extends CC_TriggerHandlerBase {
     }
 
     private void gestionarDANDGDT(Map<Id, Case> mapOldObj, List<Case> listNewObj){
-        List<Case> casosDesinformarDANDGDT = new List<Case>();
+        List<Case> casosInformarDANDGDT = new  List<Case>();
+        List<Case> casosdesInformarDANDGDT = new  List<Case>();
         for(Case caso: listNewObj){
             if(caso.AccountId != mapOldObj.get(caso.Id).AccountId){
-                if(caso.AccountId == null){
-                    casosDesinformarDANDGDT.add(caso);
+                if (caso.AccountId != null) {
+                    casosInformarDANDGDT.add(caso);
+                } else {
+                    casosdesInformarDANDGDT.add(caso);
                 }
+                
             }
         }
-        OS_Informar_DAN_DG_DT_Caso.desinformarCampos(casosDesinformarDANDGDT);
+
+        if(!casosInformarDANDGDT.isEmpty()){
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(casosInformarDANDGDT);
+        }
+
+        if(!casosdesInformarDANDGDT.isEmpty()){
+            OS_Informar_DAN_DG_DT_Caso.desinformarCampos(casosdesInformarDANDGDT);
+        }
     }
+
 
     private void reasignarCasoBackup(Map<Id, Case> mapOldObj, List<Case> listNewObj) {
         

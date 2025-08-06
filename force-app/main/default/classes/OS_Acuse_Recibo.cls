@@ -16,7 +16,7 @@ public with sharing class OS_Acuse_Recibo {
 
             if(!clasificacionesLV.isEmpty()){
                 for(CC_Lista_Valores__c lv : clasificacionesLV){
-                    if(lstCaso.size() > 0 && !(buzon == lv.Name && fromAddress == lv.CC_Valor__c)){
+                    if(!lstCaso.isEmpty() && !(buzon == lv.Name && fromAddress == lv.CC_Valor__c)){
                         listaEnvio.add(lv);
                         listaBuzones.add(lv.Name);
                         enviarAcuse = true;
@@ -34,12 +34,12 @@ public with sharing class OS_Acuse_Recibo {
                     String idioma = idiomaCaso.toUpperCase();
                     String eTempName = 'Acuse recibo ' + idioma;
         
-                    eTemplates = new List<EmailTemplate>([SELECT id FROM EmailTemplate WHERE Name = :eTempName AND Folder.Name IN :listaBuzones]);                
+                    eTemplates = new List<EmailTemplate>([SELECT id, Subject FROM EmailTemplate WHERE Name = :eTempName AND Folder.Name IN :listaBuzones]);                
                 }
     
-                if(eTemplates.size() == 0)
+                if(eTemplates.isEmpty())
                 {
-                    eTemplates = new List<EmailTemplate>([SELECT id FROM EmailTemplate WHERE Name = 'Acuse recibo ES' AND Folder.Name IN :listaBuzones]);
+                    eTemplates = new List<EmailTemplate>([SELECT id, Subject FROM EmailTemplate WHERE Name = 'Acuse recibo ES' AND Folder.Name IN :listaBuzones]);
                 }
             }
         }
@@ -81,10 +81,11 @@ public with sharing class OS_Acuse_Recibo {
             List<String> address = new List<String>();
             address.add(fromAddress);
             
-            if(eTemplates.size() > 0)
+            if(!eTemplates.isEmpty())
             {
                 email = Messaging.renderStoredEmailTemplate(eTemplates[0].id, null, caso.id);
                 message.setToAddresses(address);
+                message.setSubject(eTemplates[0].Subject);
             }
             
             
@@ -95,7 +96,6 @@ public with sharing class OS_Acuse_Recibo {
             mensajeSemilla += '<br/><br/><font color="gray">';
             mensajeSemilla += 'Por favor, mantenga las siguientes referencias al responder a este correo electrónico: #@' + nuevaReferencia + '#.';
             mensajeSemilla += '</font>';
-            
             //Mostrar cuerpo del correo y el histórico             
             String body = email.htmlbody; // + '<br><br>_________________________________________________________________________________________________________________________________<br><br>' 
             //+ 'de: ' + fromAddress + '<br><br>' + eBody + '<br><br><br><br>' + mensajeSemilla; 
@@ -105,7 +105,6 @@ public with sharing class OS_Acuse_Recibo {
                 body = body + '<br><br>_________________________________________________________________________________________________________________________________<br><br>'
                 + 'de: ' + eM.FromName + '<br><br>' + eM.TextBody + '<br><br><br><br>' + mensajeSemilla;
             }
-            
             message.setUseSignature(false);
             message.setBccSender(false);
             message.setSaveAsActivity(true);
@@ -128,14 +127,15 @@ public with sharing class OS_Acuse_Recibo {
             
             //Insertar actividad con la semilla en el caso
             Task nuevaTarea = new Task();
+            Date todaysDate = system.today();
             nuevaTarea.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task');
             nuevaTarea.WhatId = caso.id;
             nuevaTarea.Type = 'Acuse de recibo';
             nuevaTarea.Subject = 'Acuse de recibo';
             nuevaTarea.Status = 'Completed';
-            nuevaTarea.ActivityDate = System.today();
-            nuevaTarea.CC_Fecha_Inicio__c = System.now();
-            nuevaTarea.CC_Fecha_Fin__c = System.now();
+            nuevaTarea.ActivityDate = todaysDate;
+            nuevaTarea.CC_Fecha_Inicio__c = Datetime.valueOf(System.now());
+            nuevaTarea.CC_Fecha_Fin__c = Datetime.valueOf(System.now());
             nuevaTarea.Description = 'Caso principal: ' + caso.id;
             nuevaTarea.CC_Referencia_Correo_Saliente__c = nuevaReferencia;
             

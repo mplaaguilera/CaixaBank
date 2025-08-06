@@ -10,27 +10,20 @@ public with sharing class CC_MCC_AU_TRHan extends CC_TriggerHandlerBase{
 		Id rtProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
 		Id rtMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
 		Id rtCausa = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
-        Id rtConversionWeb = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_ConvMCCWeb').getRecordTypeId();
+       
         
 
-        List<CC_MCC__c> lstMCC = new List<CC_MCC__c>();
-        List<CC_MCC__c> lstMCCWeb = new List<CC_MCC__c>();       
+        List<CC_MCC__c> lstMCC = new List<CC_MCC__c>();    
         for (CC_MCC__c mcc : listNewObj){            
             
             if(mcc.RecordTypeId == rtTematica || mcc.RecordTypeId == rtProducto || 
             mcc.RecordTypeId == rtMotivo || mcc.RecordTypeId == rtCausa){
                 lstMCC.add(mcc);
             }
-            if(mcc.RecordTypeId == rtConversionWeb){
-                lstMCCWeb.add(mcc);
-            }
         }
 
         if(!lstMCC.isEmpty()){
             autoBajaMCC(lstMCC, mapOldObj, rtTematica, rtProducto, rtMotivo, rtCausa);
-        }
-        if(!lstMCCWeb.isEmpty()){
-            calcularReferenciaConvWeb(lstMCCWeb, mapOldObj);
         }
     }
     private void autoBajaMCC(List<CC_MCC__c> lstMCC, Map<Id, CC_MCC__c> mapOldObj, String rtTematica, String rtProducto, String rtMotivo, String rtCausa){
@@ -58,22 +51,6 @@ public with sharing class CC_MCC_AU_TRHan extends CC_TriggerHandlerBase{
                 }
             }
             
-        }
-    }
-
-    private void calcularReferenciaConvWeb(List<CC_MCC__c> lstMCCWeb, Map<Id, CC_MCC__c> mapOldObj){
-        List<CC_MCC__c> lstMccUpd = new List<CC_MCC__c>();
-        for(CC_MCC__c mcc : lstMCCWeb){
-                CC_MCC__c mccUpd = new CC_MCC__c(
-                    Id = mcc.Id,
-                    Name = mcc.CC_MCCWeb_Origen__c+'-'+mcc.CC_MCCWeb_Motivo__c+'-'+mcc.CC_MCCWeb_Producto__c+'-'+mcc.CC_MCCWeb_Ambito__c,
-                    CC_Equivalencia_Formulario__c = mcc.CC_MCCWeb_Origen__c+'-'+mcc.CC_MCCWeb_Motivo__c+'-'+mcc.CC_MCCWeb_Producto__c+'-'+mcc.CC_MCCWeb_Ambito__c
-                );
-                lstMccUpd.add(mccUpd);
-        }
-        
-        if(!lstMccUpd.isEmpty()){
-            update lstMccUpd;
         }
     }
 }

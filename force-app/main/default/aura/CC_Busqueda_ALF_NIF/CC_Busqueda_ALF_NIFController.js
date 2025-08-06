@@ -737,10 +737,12 @@
 
 	csbdMessageChannelOnmessage: function(component, message) {
 		const {recordId, type} = message.getParams();
-		if (recordId === component.get('v.recordId') && type === 'identificarFocus') {
-			const inputBusqueda = component.find('valorBusqueda');
-			window.addEventListener('scrollend', () => inputBusqueda.focus(), {once: true});
-			inputBusqueda.getElement().scrollIntoView({block: 'center', behavior: 'smooth'});
+		if (recordId === component.get('v.recordId')) {
+			if (type === 'identificarFocus') {
+				const inputBusqueda = component.find('valorBusqueda');
+				window.addEventListener('scrollend', () => inputBusqueda.focus(), {once: true});
+				inputBusqueda.getElement().scrollIntoView({block: 'center', behavior: 'smooth'});
+			}
 		}
 	}
 });

@@ -518,7 +518,7 @@ public class CSBD_Llamada_GC_Test {
 
 				domingp = domingp.addDays(-1);
 				Test.setCreatedDate(oportunidad.Id, domingp);
-
+				
 				Test.startTest();
 				CC_Llamada_Input inputLlamadaSaliente = obtenerInputLlamada(svcGenesysSalida.CC_Codigo__c, '', oportunidad.Id);
 				Map<String, Object> responseRegistrarLlamadaSaliente = CSBD_Llamada_GC.registrarLlamadaSaliente(inputLlamadaSaliente);

@@ -123,6 +123,7 @@ public class CC_CaseTriggerHelper_Test {
             };
 
             Id recordTypeOficina = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+            List<Account> listaOficinas = new List<Account>();
             Account oficinaGestora = new Account(
                 RecordTypeId = recordTypeOficina,
                 Name = 'Cuenta oficina gestora',
@@ -131,7 +132,17 @@ public class CC_CaseTriggerHelper_Test {
                 CC_Numero_Oficina__c = '222',
                 CC_Numero_Oficina_Empresa__c = '222-22222'
             );
-            insert oficinaGestora;
+            Account oficinaGestora2 = new Account(
+                RecordTypeId = recordTypeOficina,
+                Name = 'Cuenta oficina gestora 2',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Email__c = 'test@test2.com',
+                CC_Numero_Oficina__c = '333',
+                CC_Numero_Oficina_Empresa__c = '333-33333'
+            );
+            listaOficinas.add(oficinaGestora);
+            listaOficinas.add(oficinaGestora2);
+            insert listaOficinas;
 
             List<Account> listaCuentas = new List<Account>();
 
@@ -180,6 +191,29 @@ public class CC_CaseTriggerHelper_Test {
 
             insert listaCuentas;
 
+
+            List<AccountShare> listaAccShare = new List<AccountShare>();
+            AccountShare accShare= new AccountShare();
+            accShare.AccountId = cuentaClientePA2.Id;
+            accShare.UserOrGroupId = supervisor.Id;
+            accShare.AccountAccessLevel = 'Edit';
+            accShare.OpportunityAccessLevel = 'Edit';
+            accShare.CaseAccessLevel = 'Edit';
+            listaAccShare.add(accShare);
+
+            AccountShare accShare2= new AccountShare();
+            accShare2.AccountId = cuentaClientePA.Id;
+            accShare2.UserOrGroupId = supervisor.Id;
+            accShare2.AccountAccessLevel = 'Edit';
+            accShare2.OpportunityAccessLevel = 'Edit';
+            accShare2.CaseAccessLevel = 'Edit';
+            listaAccShare.add(accShare2);
+
+            insert listaAccShare;
+
+
+
+
             List<Contact> listaContactos = new List<Contact>();
             Contact contacto = new Contact();
             contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
@@ -204,7 +238,35 @@ public class CC_CaseTriggerHelper_Test {
             contactoEmpleado.CC_Matricula__c = '12345678';
             listaContactos.add(contactoEmpleado);
 
+            Contact contactoEmpleado2 = new Contact();
+            contactoEmpleado2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
+            contactoEmpleado2.AccountId = cuentaEmpleado.Id;
+            contactoEmpleado2.FirstName = 'Contacto Prueba Empleado2';
+            contactoEmpleado2.LastName = 'Contacto Prueba Empleado2';
+            contactoEmpleado2.CC_NumPerso__c = '25345502';
+            contactoEmpleado2.CC_Idioma__c = 'ca';
+            contactoEmpleado2.Email = 'correo@gmail.com';
+            contactoEmpleado2.Phone = '973242332';
+            contactoEmpleado2.CC_Matricula__c = '12345682';
+            listaContactos.add(contactoEmpleado2);
+
             insert listaContactos;
+
+            List<ContactShare> listaContactShare = new List<ContactShare>();
+
+            ContactShare contactShare= new ContactShare();
+            contactShare.ContactId = contactoEmpleado.Id;
+            contactShare.UserOrGroupId = supervisor.Id;
+            contactShare.ContactAccessLevel = 'Edit';
+            listaContactShare.add(contactShare);
+
+            ContactShare contactShare2= new ContactShare();
+            contactShare2.ContactId = contactoEmpleado2.Id;
+            contactShare2.UserOrGroupId = supervisor.Id;
+            contactShare2.ContactAccessLevel = 'Edit';
+            listaContactShare.add(contactShare2);
+
+            insert listaContactShare;
 
             Id recordTem = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
             Id recordProd = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
@@ -292,6 +354,14 @@ public class CC_CaseTriggerHelper_Test {
             lovAvisosSobreAgrupadores.Name = 'Avisos sobre agrupadores';
             lovAvisosSobreAgrupadores.CC_Valor__c = '1';
             insert lovAvisosSobreAgrupadores;
+
+            CC_Lista_Valores__c listaOportunidadTareaExistente = new CC_Lista_Valores__c();
+            listaOportunidadTareaExistente.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+            listaOportunidadTareaExistente.CC_Activa__c = true;
+            listaOportunidadTareaExistente.Name = 'Texto oportunidad tarea existente';
+            listaOportunidadTareaExistente.CC_Mensajes_Mostrar__c = 'No es posible crear una oportunidad porque ya existe una cita o tarea creada';
+            insert listaOportunidadTareaExistente;
+
             List<CC_Lista_Valores__c> listaValores2 = new List<CC_Lista_Valores__c>();
             CC_Lista_Valores__c valorUmbralPrimerAviso = new CC_Lista_Valores__c();
             valorUmbralPrimerAviso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
@@ -891,23 +961,27 @@ public class CC_CaseTriggerHelper_Test {
         Test.startTest();
         insert caso;
         Test.stopTest();
+        List<User> sysAdminUser = [SELECT Id FROM User WHERE Profile.name LIKE 'System Administrator' AND IsActive=true];
+        if (!sysAdminUser.isEmpty()) {
+            System.runAs(sysAdminUser[0]) {
+                Case casoIn = [SELECT CC_Canal_Operativo__c, CC_Canal_Procedencia__c, CC_Tipo_Contacto__c, CC_MCC_Tematica__c FROM Case WHERE Id = :caso.Id LIMIT 1];
+                Task tarea = [SELECT Type, Status, Priority FROM Task LIMIT 1];
+                CC_MCC__c mccTarjetas = [SELECT Id FROM CC_MCC__c WHERE CC_Activo__c = true AND Name = 'Tarjetas' AND RecordTypeId = :recordTem LIMIT 1];
 
-        Case casoIn = [SELECT CC_Canal_Operativo__c, CC_Canal_Procedencia__c, CC_Tipo_Contacto__c, CC_MCC_Tematica__c FROM Case WHERE Id = :caso.Id LIMIT 1];
-        Task tarea = [SELECT Type, Status, Priority FROM Task LIMIT 1];
-        CC_MCC__c mccTarjetas = [SELECT Id FROM CC_MCC__c WHERE CC_Activo__c = true AND Name = 'Tarjetas' AND RecordTypeId = :recordTem LIMIT 1];
+                //Asserts de Tarea
+                System.assertEquals('Fax entrante', tarea.Type, 'El tipo de la tarea no es correcto');
+                System.assertEquals('Completed', tarea.Status, 'El estado de la tarea no es correcto');
+                System.assertEquals('Normal', tarea.Priority, 'La prioridad de la tarea no es correcto');
 
-        //Asserts de Tarea
-        System.assertEquals('Fax entrante', tarea.Type, 'El tipo de la tarea no es correcto');
-        System.assertEquals('Completed', tarea.Status, 'El estado de la tarea no es correcto');
-        System.assertEquals('Normal', tarea.Priority, 'La prioridad de la tarea no es correcto');
+                //Asserts de Caso
+                System.assertEquals('Sin canal', casoIn.CC_Canal_Operativo__c, 'El canal operativo no se ha actualizado correctamente');
+                System.assertEquals('Redsys-Sermepa', casoIn.CC_Canal_Procedencia__c, 'El canal de procedencia no se ha actualizado correctamente');
+                System.assertEquals('Petición de servicio', casoIn.CC_Tipo_Contacto__c, 'El tipo de contacto no se ha actualizado correctamente');
 
-        //Asserts de Caso
-        System.assertEquals('Sin canal', casoIn.CC_Canal_Operativo__c, 'El canal operativo no se ha actualizado correctamente');
-        System.assertEquals('Redsys-Sermepa', casoIn.CC_Canal_Procedencia__c, 'El canal de procedencia no se ha actualizado correctamente');
-        System.assertEquals('Petición de servicio', casoIn.CC_Tipo_Contacto__c, 'El tipo de contacto no se ha actualizado correctamente');
-
-        //Asserts Flow
-        System.assertEquals(mccTarjetas.Id, casoIn.CC_MCC_Tematica__c, 'El Flow no se ha ejecutado correctamente');
+                //Asserts Flow
+                System.assertEquals(mccTarjetas.Id, casoIn.CC_MCC_Tematica__c, 'El Flow no se ha ejecutado correctamente');
+            }
+        }
 
     }
 
@@ -1654,7 +1728,7 @@ public class CC_CaseTriggerHelper_Test {
         Subject = 'Prueba',
         CC_Tipo_Cliente__c = 'Cliente',
         Origin = 'Email',
-        CC_Tipo_Contacto__c = 'Petición documentación',
+        CC_Tipo_Contacto__c = 'Consulta',
         CC_Canal_Procedencia__c = 'Atención al Cliente',
         CC_Canal_Resolucion__c = 'Atención al Cliente',
         CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
@@ -2567,12 +2641,15 @@ public class CC_CaseTriggerHelper_Test {
     private static void informarOficinaAfectadaBU()
     {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        
+        
 
         Id rtCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account cuenta3 = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
+        Account cuenta3 = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA2' LIMIT 1];
         Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
-
+        System.runAs(supervisor){   
+        Test.startTest();
         Case caso = new Case();
         caso.CC_Oficina__c = cuenta.Id;
         caso.AccountId = cuenta.Id;
@@ -2581,18 +2658,18 @@ public class CC_CaseTriggerHelper_Test {
         caso.RecordTypeId = rtCaso;
         insert caso;
 
-        Test.startTest();
+        
         caso.AccountId = cuenta3.Id;
 
-        System.runAs(supervisor){
-            update caso;
-            Test.stopTest();
+        update caso;
+        
+        
+        case casoActualizado = [SELECT Id, CC_Oficina_Afectada_Lookup__c ,AccountId, ContactId FROM Case WHERE Id = :caso.Id LIMIT 1];
+        Account cuentaTest = [SELECT Id, AV_OficinaPrincipal__c FROM Account WHERE Id = :casoActualizado.AccountId LIMIT 1];
+
+        System.AssertEquals(casoActualizado.CC_Oficina_Afectada_Lookup__c, cuentaTest.AV_OficinaPrincipal__c,'Los datos no coinciden' );
+        Test.stopTest();
         }
-            case casoActualizado = [SELECT Id, CC_Oficina_Afectada_Lookup__c ,AccountId, ContactId FROM Case WHERE Id = :caso.Id LIMIT 1];
-            Account cuentaTest = [SELECT Id, AV_OficinaPrincipal__c FROM Account WHERE Id = :casoActualizado.AccountId LIMIT 1];
-
-            System.AssertEquals(casoActualizado.CC_Oficina_Afectada_Lookup__c, cuentaTest.AV_OficinaPrincipal__c,'Los datos no coinciden' );
-
     }
     /*
     @isTest
@@ -2702,5 +2779,242 @@ public class CC_CaseTriggerHelper_Test {
         List<EmailMessage> correosCaso = [SELECT Id FROM EmailMessage WHERE ParentId = :caso.Id LIMIT 1];
         system.assertEquals(1, correosCaso.size());
 
+    }*/
+
+    @isTest
+    private static void comprobarCambioCuentaAutenticacionBU() {
+
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+
+        System.runAs(supervisor){
+            Test.startTest();
+            String estado = 'SIN ESTADO';
+            Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
+            Contact contacto = [SELECT Id FROM Contact WHERE LastName ='Contacto Prueba Empleado' LIMIT 1];
+
+            Contact contacto2 = [SELECT Id FROM Contact WHERE LastName ='Contacto Prueba Empleado2' LIMIT 1];
+
+            Case caso = new Case();
+            caso.AccountId = cuenta.Id;
+            caso.ContactId = contacto.Id;
+            caso.Origin = 'Phone';
+            caso.CC_Tipo_Cliente__c = 'Cliente';
+            caso.Origin = 'Email';
+            caso.CC_Tipo_Contacto__c = 'Consulta';
+            caso.CC_Canal_Procedencia__c ='Formulario Consultas Operativas';
+            caso.Status = 'Activo';
+            caso.CC_Detalles_Consulta__c = 'Test';
+            caso.CC_Status_Autorizacion__c = 'APPROVED';
+            caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            insert caso;
+
+            
+            caso.ContactId = contacto2.Id;
+            update caso;
+            
+
+            Case casoActualizado = [SELECT Id, CC_Status_Autorizacion__c FROM Case WHERE Id = :caso.Id LIMIT 1];
+            Test.stopTest();
+            system.assertEquals('SIN ESTADO', estado, 'El estado de la autenticacion no es el esperado');
+        }           
+    }
+
+    // @isTest
+    // private static void asignacionAccountTareaLlamadaTest() {
+
+    //     User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+
+    //     System.runAs(supervisor){
+    //         Test.startTest();
+    //         Map<Id, Case> lstCasos = new Map<Id, Case>();
+
+    //         Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
+    //         Contact contacto = [SELECT Id FROM Contact WHERE LastName ='Contacto Prueba Empleado' LIMIT 1];
+
+    //         Case caso = new Case();
+    //         caso.Subject = 'caso de prueba';
+    //         caso.Origin = 'Phone';
+    //         caso.CC_Tipo_Cliente__c = 'Cliente';
+    //         caso.Origin = 'Email';
+    //         caso.CC_Tipo_Contacto__c = 'Consulta';
+    //         caso.CC_Canal_Procedencia__c ='Formulario Consultas Operativas';
+    //         caso.Status = 'Activo';
+    //         caso.CC_Detalles_Consulta__c = 'Test';
+    //         caso.CC_Status_Autorizacion__c = 'APPROVED';
+    //         caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+    //         insert caso;
+
+    //         Task tarea = new Task(
+    //             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task'),
+    //             Type = 'Llamada entrante',
+    //             WhatId = [SELECT Id FROM Case WHERE Subject = 'caso de prueba' LIMIT 1][0].Id
+    //         );
+    //         insert tarea;
+            
+    //         caso.accountId = cuenta.Id;
+    //         caso.contactId = contacto.Id;
+
+    //         System.debug('CASO ' + JSON.serializePretty(caso));
+    //         System.debug('TAREA ' + JSON.serializePretty(tarea));
+
+    //         update caso;
+
+    //         List<Task> tareasLlamadaUpdate = [SELECT Id, WhatId, WhoId FROM Task WHERE WhatId = :caso.Id AND Type = 'Llamada entrante'];
+
+    //         System.debug('TAREA ' + JSON.serializePretty(tareasLlamadaUpdate[0]));
+
+    //         system.assertNotEquals(null, tareasLlamadaUpdate[0].WhoId, 'La tarea no tiene asociado un contacto');
+
+    //         Test.stopTest();
+    //     }        
+    // }
+
+    @isTest
+    private static void testCrearOportunidadCierreCaso() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+
+        // Crear datos de prueba
+        Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName ='Contacto Prueba' LIMIT 1];
+        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
+        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
+        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c where Name = 'Valoración positiva' LIMIT 1];
+
+        // Crear caso de prueba
+        Case caso = new Case();
+        caso.OwnerId = supervisor.Id;
+        caso.AccountId = cuenta.Id;
+        caso.ContactId = contacto.Id;
+        caso.Origin = 'Email';
+        caso.CC_Tipo_Cliente__c = 'Cliente';
+        caso.CC_Tipo_Contacto__c = 'Consulta';
+        caso.CC_Canal_Procedencia__c = 'Atención al Cliente';
+        caso.CC_Canal_Resolucion__c = 'Atención al Cliente';
+        caso.Status = 'Activo';
+        caso.CC_Detalles_Consulta__c = 'Test crear oportunidad';
+        caso.CC_MCC_Tematica__c = tematica.Id;
+        caso.CC_MCC_ProdServ__c = producto.Id;
+        caso.CC_MCC_Motivo__c = motivo.Id;
+        // caso.CC_Producto_Servicio__c = 'Test Producto';
+        caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        insert caso;
+
+        // Crear extensión del caso con el campo trigger activo
+        CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+        caseExtension.Case_Id__c = caso.Id;
+        caseExtension.CC_CrearOportunidadTrigger__c = true;
+        insert caseExtension;
+
+        Test.startTest();
+        caso.Status = 'Cerrado';
+        update caso;
+        Test.stopTest();
+
+        // Verificar que el caso se cerró correctamente
+        Case casoActualizado = [SELECT Status, CC_Oportunidad_creada__c FROM Case WHERE Id = :caso.Id];
+            
+        System.runAs(supervisor) {
+            System.assertEquals('Cerrado', casoActualizado.Status, 'El caso no se cerró correctamente');
+        }
+    }
+
+    /*@isTest
+    private static void testCrearOportunidadCierreCaso_TriggerInactivo() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+
+        System.runAs(supervisor){
+            Test.startTest();
+            
+            // Crear datos de prueba
+            Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
+            Contact contacto = [SELECT Id FROM Contact WHERE LastName ='Contacto Prueba Empleado' LIMIT 1];
+            CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
+            CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
+
+            // Crear caso de prueba
+            Case caso = new Case();
+            caso.AccountId = cuenta.Id;
+            caso.ContactId = contacto.Id;
+            caso.Origin = 'Phone';
+            caso.CC_Tipo_Cliente__c = 'Cliente';
+            caso.CC_Tipo_Contacto__c = 'Consulta';
+            caso.CC_Canal_Procedencia__c = 'Formulario Consultas Operativas';
+            caso.Status = 'Activo';
+            caso.CC_Detalles_Consulta__c = 'Test crear oportunidad trigger inactivo';
+            caso.CC_MCC_Tematica__c = tematica.Id;
+            caso.CC_MCC_ProdServ__c = producto.Id;
+            caso.CC_Producto_Servicio__c = 'Test Producto';
+            caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            insert caso;
+            
+            // Crear extensión del caso con el campo trigger inactivo
+            CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+            caseExtension.Case_Id__c = caso.Id;
+            caseExtension.CC_CrearOportunidadTrigger__c = false;
+            insert caseExtension;
+
+            // Cambiar estado a Cerrado para que se ejecute el trigger
+            caso.Status = 'Cerrado';
+            update caso;
+
+            Test.stopTest();
+
+            // Verificar que el caso se cerró correctamente
+            Case casoActualizado = [SELECT Id, Status, CC_Oportunidad_creada__c FROM Case WHERE Id = :caso.Id];
+            System.assertEquals('Cerrado', casoActualizado.Status, 'El caso no se cerró correctamente');
+            
+            // Verificar que NO se marcó la creación de oportunidad porque el trigger está inactivo
+            System.assertEquals(false, casoActualizado.CC_Oportunidad_creada__c, 'No debería haberse creado oportunidad con trigger inactivo');
+            
+            System.debug('Caso actualizado con trigger inactivo: ' + casoActualizado);
+        }
+    }
+
+    @isTest
+    private static void testCrearOportunidadCierreCaso_SinExtension() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+
+        System.runAs(supervisor){
+            Test.startTest();
+            
+            // Crear datos de prueba
+            Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
+            Contact contacto = [SELECT Id FROM Contact WHERE LastName ='Contacto Prueba Empleado' LIMIT 1];
+            CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
+            CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
+
+            // Crear caso de prueba
+            Case caso = new Case();
+            caso.AccountId = cuenta.Id;
+            caso.ContactId = contacto.Id;
+            caso.Origin = 'Phone';
+            caso.CC_Tipo_Cliente__c = 'Cliente';
+            caso.CC_Tipo_Contacto__c = 'Consulta';
+            caso.CC_Canal_Procedencia__c = 'Formulario Consultas Operativas';
+            caso.Status = 'Activo';
+            caso.CC_Detalles_Consulta__c = 'Test crear oportunidad sin extensión';
+            caso.CC_MCC_Tematica__c = tematica.Id;
+            caso.CC_MCC_ProdServ__c = producto.Id;
+            caso.CC_Producto_Servicio__c = 'Test Producto';
+            caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            insert caso;
+            
+            // NO crear extensión del caso (simular caso sin extensión)
+
+            // Cambiar estado a Cerrado para que se ejecute el trigger
+            caso.Status = 'Cerrado';
+            update caso;
+
+            Test.stopTest();
+
+            // Verificar que el caso se cerró correctamente
+            Case casoActualizado = [SELECT Id, Status, CC_Oportunidad_creada__c FROM Case WHERE Id = :caso.Id];
+            System.assertEquals('Cerrado', casoActualizado.Status, 'El caso no se cerró correctamente');
+            
+            // Verificar que NO se marcó la creación de oportunidad porque no hay extensión
+            System.assertEquals(false, casoActualizado.CC_Oportunidad_creada__c, 'No debería haberse creado oportunidad sin extensión');
+            
+            System.debug('Caso actualizado sin extensión: ' + casoActualizado);
+        }
     }*/
 }

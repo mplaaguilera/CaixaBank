@@ -47,12 +47,13 @@ public with sharing class SAC_CloneDocuments {
 
         // create Content Document Link records for each To ID
         set<Id> fromIdSet = fromToMap.keySet();
-        for (ContentDocumentLink cdl : [SELECT ContentDocumentId,LinkedEntityId,ShareType,Visibility 
+        system.debug('*** '+fromIdSet);
+        for (ContentDocumentLink cdl : [SELECT ContentDocumentId,LinkedEntityId,ShareType,Visibility  
                                             FROM ContentDocumentLink 
                                             WHERE LinkedEntityId IN :fromIdSet]) {
             // by Link Id
             cdlMap.put(cdl.Id, cdl);
-
+			system.debug('*** '+cdlMap);
             // by Document Id
             list<contentLinkCls> cdlList = docIdCdlListMap.get(cdl.ContentDocumentId);
             if (null == cdlList) {
@@ -97,8 +98,11 @@ public with sharing class SAC_CloneDocuments {
                 }
             }            
         }
+        System.debug('CGR Lista de documentos clonados: ' + cdlInsertList);
 
         if (!cdlInsertList.isEmpty()) {
+            system.debug('*** ' + cdlInsertList[0].ContentDocumentId);
+            system.debug('*** ' + cdlInsertList[0].LinkedEntityId);
             insert cdlInsertList;
         }
     }

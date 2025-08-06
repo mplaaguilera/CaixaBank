@@ -4,6 +4,8 @@ public with sharing class SPV_InteraccionBITRHan extends CC_TriggerHandlerBase{
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
+    private static final Id RECTYPECONSULTA_TAREA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_ConsultaTarea').getRecordTypeId();
+    private static final Id RECTYPEESCALADO = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Escalado').getRecordTypeId();
 
 
     public override void mainEntry(CC_TriggerParameters tp) {
@@ -13,19 +15,25 @@ public with sharing class SPV_InteraccionBITRHan extends CC_TriggerHandlerBase{
     private void process(List<SAC_Interaccion__c> listNewObj, Map<Id, SAC_Interaccion__c> mapNewObj) {
 
         List<SAC_Interaccion__c> listaConsultas = new List<SAC_Interaccion__c>();
-
+		List<SAC_Interaccion__c> listaEscalados = new List<SAC_Interaccion__c>();
         //Recorremos la lista de interacciones
         for (SAC_Interaccion__c interaccion : listNewObj) {
 
-           if(interaccion.RecordTypeId == RECTYPECONSULTA){
+           if(interaccion.RecordTypeId == RECTYPECONSULTA || interaccion.RecordTypeId == RECTYPECONSULTA_TAREA){
                 listaConsultas.add(interaccion);
-            }
+           }else if(interaccion.RecordTypeId == RECTYPEESCALADO){
+               listaEscalados.add(interaccion);
+           }
         }
 
         if(!listaConsultas.isEmpty()){
             SPV_InteraccionHelper.rellenarNifYNombreReclamante(listaConsultas);
             SPV_InteraccionHelper.rellenarGrupoCreador(listaConsultas);
             SPV_InteraccionHelper.informarOficinaConsulta(listaConsultas);
+        }
+        if(!listaEscalados.isEmpty()){
+            SPV_InteraccionHelper.rellenarCamposIniciales(listaEscalados);
+            
         }
     }
 }

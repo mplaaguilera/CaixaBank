@@ -39,7 +39,6 @@ public without sharing class SAC_MCC_AI_TRHan extends CC_TriggerHandlerBase{
         // Se recuperan las parametrizaciones creadas manualmente con el record type SAC_Maestro
         List<SAC_ParametrizacionSLATME__c> lstParametrizaciones = [SELECT Id, name, SAC_Duracion__c, SAC_CanalProcedencia__c FROM SAC_ParametrizacionSLATME__c WHERE RecordType.id =: rtMaestro];
         List<SAC_ParametrizacionSLATME__c> lstParametrizacionesInsertar = new List <SAC_ParametrizacionSLATME__c>();
-        
         try { 
             for(CC_MCC__c mcc :lstMcc) {
                 // Se recorren las Parametrizaciones recuperadas en la lista y según su nombre se crea un nuevo registro SAC_ParametrizacionSLATME__c con record type diferente
@@ -56,7 +55,6 @@ public without sharing class SAC_MCC_AI_TRHan extends CC_TriggerHandlerBase{
                     }     
                 }
             }
-            
             insert lstParametrizacionesInsertar;
         } catch (Exception e) {
             CBK_Log.error(e);

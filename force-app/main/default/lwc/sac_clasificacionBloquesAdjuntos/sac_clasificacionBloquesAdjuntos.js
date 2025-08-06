@@ -90,11 +90,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
                     // Convertir el campo multipicklist en un array de strings
                     const sacBloqueArray = this.fichero.SAC_Bloque__c.split(';');
                     // Verificar si el array contiene el valor de bloqueAcordeon
-                    if (sacBloqueArray.includes(this.bloqueAcordeon)) {
-                        console.log('this.esUserGeneral -> ' + this.esUserGeneral);
-                        console.log('this.bloqueAcordeon -> ' + this.bloqueAcordeon);
-                        console.log('this.fichero.SAC_Enviado__c -> ' + this.fichero.SAC_Enviado__c);
-                        
+                    if (sacBloqueArray.includes(this.bloqueAcordeon)) {   
                         if(this.esUserGeneral || (!this.esUserGeneral && (this.bloqueAcordeon != 'SAC_Respuesta' || (this.bloqueAcordeon == 'SAC_Respuesta' && this.fichero.SAC_Enviado__c)))){
                             this.bloqueContieneElFichero = true;
                             //Guardar los valores que contiene el campo en una lista
@@ -102,7 +98,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
                             this.opcionesBloquesSeleccionadas = this.opcionesBloquesFichero;
                         }
 
-                        //LO NUEVO - ALEX
+                        //Añadido - US1194593 - Álex
                         if(this.esUserGeneral == false && this.estaEnTramitacion == true){
                             this.bloqueContieneElFichero = false;
                         }

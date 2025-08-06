@@ -12,6 +12,7 @@ public with sharing class SAC_Interaccion_BU_TRHan extends CC_TriggerHandlerBase
         List<SAC_Interaccion__c> listaConsultasPreg = new List<SAC_Interaccion__c>();
         List<SAC_Interaccion__c> listaEscaladosNV2 = new List<SAC_Interaccion__c>();
         List<SAC_Interaccion__c> listaEscaladosNV3 = new List<SAC_Interaccion__c>();
+        List<SAC_Interaccion__c> listaValidarCampos = new List<SAC_Interaccion__c>();
         List<SAC_Interaccion__c> listaConsultaRespondida = new List<SAC_Interaccion__c>();
         List<SAC_Interaccion__c> listaConsultasGrupoCambiado = new List<SAC_Interaccion__c>();
         List<SAC_Interaccion__c> listaConsultasOficinaCambiada = new List<SAC_Interaccion__c>();
@@ -41,7 +42,12 @@ public with sharing class SAC_Interaccion_BU_TRHan extends CC_TriggerHandlerBase
 
             if (consulta.RecordTypeId == recTypeEscaladoNv2) {
                 listaEscaladosNV2.add(consulta);
-                if( mapOldObj.containsKey(consulta.id) && consulta.SAC_Estado__c != mapOldObj.get(consulta.Id).SAC_Estado__c ){
+
+                if(mapOldObj.containsKey(consulta.id) && (consulta.SAC_Titulo__c != mapOldObj.get(consulta.Id).SAC_Titulo__c || consulta.SAC_Observaciones_Interaccion__c != mapOldObj.get(consulta.Id).SAC_Observaciones_Interaccion__c || consulta.SAC_GrupoColaborador__c != mapOldObj.get(consulta.Id).SAC_GrupoColaborador__c || consulta.SAC_PropuestaCOPS__c != mapOldObj.get(consulta.Id).SAC_PropuestaCOPS__c)){
+                    listaValidarCampos.add(consulta);
+                }
+
+                if(mapOldObj.containsKey(consulta.id) && consulta.SAC_Estado__c != mapOldObj.get(consulta.Id).SAC_Estado__c ){
                     if(consulta.SAC_Estado__c == 'SAC_Atendida' || consulta.SAC_Estado__c == 'SAC_Reescalada') {
                         consulta.SAC_FechaFin__c = System.now();
                     }else{
@@ -51,6 +57,10 @@ public with sharing class SAC_Interaccion_BU_TRHan extends CC_TriggerHandlerBase
             }
             if (consulta.RecordTypeId == recTypeEscaladoNv3) {
                 listaEscaladosNV3.add(consulta);
+
+                if(mapOldObj.containsKey(consulta.id) && (consulta.SAC_Titulo__c != mapOldObj.get(consulta.Id).SAC_Titulo__c || consulta.SAC_Observaciones_Interaccion__c != mapOldObj.get(consulta.Id).SAC_Observaciones_Interaccion__c || consulta.SAC_GrupoColaborador__c != mapOldObj.get(consulta.Id).SAC_GrupoColaborador__c || consulta.SAC_PropuestaCOPS__c != mapOldObj.get(consulta.Id).SAC_PropuestaCOPS__c)){
+                    listaValidarCampos.add(consulta);
+                }
             }
         }
 
@@ -75,6 +85,10 @@ public with sharing class SAC_Interaccion_BU_TRHan extends CC_TriggerHandlerBase
             }
         } 
 
+        if(!listaValidarCampos.isEmpty()){
+            validarUpdateCampos(listaValidarCampos);
+        }
+
         if (!listaConsultasGrupoCambiado.isEmpty()) {
             // Se recuperan los grupos colaboradores de la lista de interacciones listaConsultasGrupoCambiado
             List<CC_Grupo_Colaborador__c> listaGrupos = SAC_Interaccion.recuperarGruposConsulta(listaConsultasGrupoCambiado);
@@ -83,6 +97,22 @@ public with sharing class SAC_Interaccion_BU_TRHan extends CC_TriggerHandlerBase
         }
         if (!listaConsultasOficinaCambiada.isEmpty()) {
             SAC_Interaccion.informarCorreoOficina(listaConsultasOficinaCambiada);
+        }
+    }
+
+    /*
+    * @description Campo para validar que solo el owner y los usuarios con PS SAC_Administrador puedan modificar los campos
+    */
+    public static void validarUpdateCampos(List<SAC_Interaccion__c> listEscalados) {
+
+        Id userId = userinfo.getUserId();
+
+        List<PermissionSetAssignment> psa = [SELECT Id FROM PermissionSetAssignment WHERE AssigneeId = :userId AND PermissionSet.Name = 'SAC_Administrador' LIMIT 1];
+
+        for(SAC_Interaccion__c escalado : listEscalados){
+            if(escalado.OwnerId != userId && psa.isEmpty()){
+                escalado.addError('No tiene permisos para editar el registro.');
+            }  
         }
     }
 }

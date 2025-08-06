@@ -3,21 +3,22 @@ public class CSBD_Opp_AltaCMBIntouch_Cont_Test {
 
     @TestSetup
     static void cargaDeDatos(){
-        User usuarioAdministrador = CSBD_Usuarios.usuarioAdministrador();
+        User usuarioAdministrador = CSBD_TestDataFactory.usuarioAdministrador();
+        System.runAs(usuarioAdministrador) {
+            Account cuenta = new Account();
+            cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
+            cuenta.Name = 'test@test.com';
+            cuenta.CC_Numero_Documento__c = '12345678N';
+            insert cuenta;
 
-        Account cuenta = new Account();
-        cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
-        cuenta.Name = 'test@test.com';
-        cuenta.CC_Numero_Documento__c = '12345678N';
-        insert cuenta;
-
-        AccountShare acshare = new AccountShare();
-        acshare.AccountId = cuenta.Id;
-        acshare.UserOrGroupId = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1].Id;
-        acshare.AccountAccessLevel = 'Edit';
-        acshare.OpportunityAccessLevel = 'Edit';
-        acshare.CaseAccessLevel = 'Edit';
-        insert acshare;
+            /*AccountShare acshare = new AccountShare();
+            acshare.AccountId = cuenta.Id;
+            acshare.UserOrGroupId = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' AND LastName = '1' AND Email = 'usuario_test@test.com' LIMIT 1].Id;
+            acshare.AccountAccessLevel = 'Edit';
+            acshare.OpportunityAccessLevel = 'Edit';
+            acshare.CaseAccessLevel = 'Edit';
+            insert acshare;*/
+        }
     }
 
     @isTest

@@ -7,18 +7,26 @@
 	<template if:true={casoCargado}>
 		<!-- Botones -->
 		<div style="padding-top: 5px" align="center">
-			<lightning-button label="Fusionar" icon-name="utility:merge" onclick={handleButtonFusionar} disabled={operativasDisabled}></lightning-button>
+			<template if:false={isRoleGestiones}>
+				<lightning-button label="Fusionar" icon-name="utility:merge" onclick={handleButtonFusionar} disabled={operativasDisabled}></lightning-button>
+			</template>
+			
 			<lightning-button data-id="btnPropiedad" label="Tomar propiedad" icon-name="utility:change_owner" onclick={handleButtonPropiedad} disabled={esPropietario} class="slds-var-m-left_small"></lightning-button>
-			<lightning-button label="Trasladar a colaborador" icon-name="utility:email" onclick={modalTrasladarAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
-			<template if:true={perteneceServiciosCentrales}>
-				<lightning-button label="Recuperar traslado" icon-name="utility:redo" onclick={modalRecuperarTrasladoAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
+			
+			<template if:false={isRoleGestiones}>
+				<lightning-button label="Trasladar a colaborador" icon-name="utility:email" onclick={modalTrasladarAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
+				<template if:true={perteneceServiciosCentrales}>
+					<lightning-button label="Recuperar traslado" icon-name="utility:redo" onclick={modalRecuperarTrasladoAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
+				</template>
+				<lightning-button label="Remitir a colaborador" icon-name="utility:email" onclick={modalRemitirAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
+				<lightning-button label="Solicitud Información" icon-name="utility:email" onclick={modalSolicitarAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
+				<lightning-button label="Responder Cliente" icon-name="utility:email" onclick={modalResponderAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
+				<template if:false={perteneceServiciosCentrales}>
+					<lightning-button label="Gestionado en el mes" icon-name="utility:task" onclick={handleCrearTarea} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
+				</template>
 			</template>
-			<lightning-button label="Remitir a colaborador" icon-name="utility:email" onclick={modalRemitirAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
-			<lightning-button label="Solicitud Información" icon-name="utility:email" onclick={modalSolicitarAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
-			<lightning-button label="Responder Cliente" icon-name="utility:email" onclick={modalResponderAbrir} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
-			<template if:false={perteneceServiciosCentrales}>
-				<lightning-button label="Gestionado en el mes" icon-name="utility:task" onclick={handleCrearTarea} disabled={operativasDisabled} class="slds-var-m-left_small"></lightning-button>
-			</template>
+			
+				
 		</div>
 		<!-- Modales -->
 		<template if:true={showOperativas}>

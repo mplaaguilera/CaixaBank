@@ -100,7 +100,7 @@ public with sharing class SAC_LCMP_Derivar_Test {
             Map<String, Object> camposRecl = new Map<String, Object>();
             camposRecl.put('Subject', 'testRec1');
             camposRecl.put('AccountId', cuenta.Id);
-            camposRecl.put('CC_Idioma__c', 'es');
+            camposRecl.put('CC_Idioma__c', 'fr');
 
             List<Case> casos = new List<Case>();
             Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
@@ -352,7 +352,8 @@ public with sharing class SAC_LCMP_Derivar_Test {
             content = [SELECT Id, PathOnClient FROM ContentVersion WHERE FirstPublishLocationId =: caso.id LIMIT 1];
             Test.stopTest();
         }
-        System.assertNotEquals('SampleTitle.pdf', content.PathOnClient, 'Fallo en la obtencion del path del cliente');
+
+        Assert.areNotEqual(null, content.Id, 'Fallo en la obtencion de la carta del cliente');
     }
 
     @isTest

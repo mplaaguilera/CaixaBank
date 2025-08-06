@@ -1,4 +1,3 @@
-//CC_TriggerDispatcherBase STINT
 public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 
 	/*
@@ -192,20 +191,39 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 		}
 	}
 
-	protected List<String> getAssociatedHandlers(String objectApiName, String triggerEvent) {
-
+	protected List<String> getAssociatedHandlers(String objectApiName, String triggerEvent) {		
 		List<String> handlerClassNames = new List<String>();
-		List<CBK_TriggerHandlerAssociation__mdt> triggerHandlerAssociations = [SELECT CBK_HandlerClassName__c, DeveloperName FROM CBK_TriggerHandlerAssociation__mdt WHERE CBK_ObjectApiName__c = :objectApiName AND CBK_TriggerEvent__c = :triggerEvent ORDER BY CBK_Order__c, DeveloperName asc];
-        for (CBK_TriggerHandlerAssociation__mdt triggerHandlerAssociation : triggerHandlerAssociations){
-			if (String.isNotBlank(triggerHandlerAssociation.CBK_HandlerClassName__c)){
-				Type handlerClassType = Type.forName(triggerHandlerAssociation.CBK_HandlerClassName__c);
-				if(handlerClassType != null){
-					handlerClassNames.add(triggerHandlerAssociation.CBK_HandlerClassName__c);
-				}else{
-					CBK_Log.error('Trigger Handler Associations - No existe la clase: ' + triggerHandlerAssociation.CBK_HandlerClassName__c + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + triggerEvent);
+		List<CBK_TriggerHandlerAssociation__mdt> triggerHandlerAssociations = [SELECT CBK_HandlerClassName__c, DeveloperName, 
+																			   CBK_Bypass__c, CBK_BypassPermissionsList__c, CBK_ExecutionPermissionsList__c, CBK_PermissionOrder__c, CBK_PermissionPriority__c
+																			   FROM CBK_TriggerHandlerAssociation__mdt
+																			   WHERE CBK_ObjectApiName__c = :objectApiName
+																			   AND CBK_TriggerEvent__c = :triggerEvent
+																			   ORDER BY CBK_Order__c, DeveloperName ASC];
+        
+		Boolean bBypass = false;
+		for(CBK_TriggerHandlerAssociation__mdt oTriggerHandlerAssociation : triggerHandlerAssociations){
+			//Se comprueba si se debe hacer bypass de este Trigger Handler
+			bBypass = checkBypass(oTriggerHandlerAssociation);
+
+			//En el caso de tener que hacer bypass, simplemente se elimina de la lista para que no se procese
+			if(!bBypass){
+				if(String.isNotBlank(oTriggerHandlerAssociation.CBK_HandlerClassName__c)){
+					Type handlerClassType = Type.forName(oTriggerHandlerAssociation.CBK_HandlerClassName__c);
+					if(handlerClassType != null){
+						handlerClassNames.add(oTriggerHandlerAssociation.CBK_HandlerClassName__c);
+					}else{
+						new CBK_Log.DebugProcessConfigBuilder()
+							.setMessage('Trigger Handler Associations - No existe la clase: ' + oTriggerHandlerAssociation.CBK_HandlerClassName__c + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + triggerEvent)
+							.setLevel(LoggingLevel.ERROR)
+							.addLog();
+					}
 				}
 			}
 		}
+
+		//Se insertan los CBK_LogEvent generados
+        CBK_Log.insertPlatformEvent();
+
 		return handlerClassNames;
 	}
 
@@ -214,7 +232,7 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 		for(SObject ob : newList){
 			Id mId = string.valueOf(ob.get('Id'));
 			mObj.put(mId, ob);
-		}
+		}	
 		return mObj;
 	}
 
@@ -234,4 +252,63 @@ public virtual class CC_TriggerDispatcherBase implements CC_ITriggerDispatcher {
 		}
 		return lstOld;
 	}
+
+	//Función para comprobar si se debe hacer bypass o no dependiendo de los valores informados en un TriggerHandlerAssociation
+    public static Boolean checkBypass(CBK_TriggerHandlerAssociation__mdt oTriggerHandlerAssociation){
+        //Boolean para guardar el valor de las validaciones
+        Boolean bBypass = false;
+
+        //Se comprueba si tiene el bypass activo
+        if(oTriggerHandlerAssociation != null && oTriggerHandlerAssociation.CBK_Bypass__c){
+			//Se inicializa el Boolean como true en el caso de que esté activo el Bypass
+            bBypass = true;
+
+            //Se comprueba qué debe comprobarse último, en el caso de tener los dos informados
+            //En el caso de ser 'Bypass', se comprueba primero 'Execution' y después 'Bypass'
+            if(oTriggerHandlerAssociation.CBK_PermissionPriority__c == 'Bypass'){
+                //Se comprueba si tiene alguno de los Custom Permissions informados en ExecutionPermissions
+                //En el caso de encontrar una coincidencia en ExecutionPermissions, se informa que no debe hacerse bypass
+                if(String.isNotBlank(oTriggerHandlerAssociation.CBK_ExecutionPermissionsList__c) && checkPermissionInBypassExecution(oTriggerHandlerAssociation.CBK_ExecutionPermissionsList__c)){
+                    bBypass = false;
+                }
+
+                //Se comprueba si tiene alguno de los Custom Permissions informados en BypassPermissions
+                //En el caso de NO encontrar una coincidencia en BypassPermissions, se informa que no debe hacerse bypass
+                if(String.isNotBlank(oTriggerHandlerAssociation.CBK_BypassPermissionsList__c) && !checkPermissionInBypassExecution(oTriggerHandlerAssociation.CBK_BypassPermissionsList__c)){
+                    bBypass = false;
+                }
+            }
+            
+            //En el caso de ser 'Execution' o no tener preferencia informada, se comprueba primero 'Bypass' y después 'Execution'
+            else{
+                //Se comprueba si tiene alguno de los Custom Permissions informados en BypassPermissions
+                //En el caso de NO encontrar una coincidencia en BypassPermissions, se informa que no debe hacerse bypass
+                if(String.isNotBlank(oTriggerHandlerAssociation.CBK_BypassPermissionsList__c) && !checkPermissionInBypassExecution(oTriggerHandlerAssociation.CBK_BypassPermissionsList__c)){
+                    bBypass = false;
+                }
+
+                //Se comprueba si tiene alguno de los Custom Permissions informados en ExecutionPermissions
+                //En el caso de encontrar una coincidencia en ExecutionPermissions, se informa que no debe hacerse bypass
+                if(String.isNotBlank(oTriggerHandlerAssociation.CBK_ExecutionPermissionsList__c) && checkPermissionInBypassExecution(oTriggerHandlerAssociation.CBK_ExecutionPermissionsList__c)){
+                    bBypass = false;
+                }
+            }
+        }
+
+        //Retorno
+        return bBypass;
+    }
+
+    //Función para comprobar si el usuario tiene un Permission en concreto en una lista de Permissions separada por ';'
+    private static Boolean checkPermissionInBypassExecution(String sPermissions){
+        //En el caso de encontrar una coincidencia, se devuelve true
+        //En el caso de tener ninguno de los CustomPermissions informados, se devuelve false
+        for(String sCustomPermission : sPermissions.split(';')){
+            if(FeatureManagement.checkPermission(sCustomPermission)){
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

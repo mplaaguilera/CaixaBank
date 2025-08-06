@@ -227,4 +227,294 @@ public class CC_Task_AI_TRHan_Test
             Test.stopTest();
         }
     }
+
+    @isTest
+    static void actualizarCasesTest()
+    {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Test Incidencia'];
+
+        System.runAs(supervisor)
+        {
+            Test.startTest();
+            Task tarea = new Task();
+            tarea.type = 'Traslado Tercer Nivel';
+            tarea.Priority = 'Normal';
+            tarea.Subject = 'Personalizada';
+            tarea.RecordTypeId = tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tarea.WhatId = caso.Id;
+            tareas.add(tarea);
+            insert tareas;
+
+            Case casoResult = [SELECT Id, CC_Trasladado_Tercer_Nivel__c, CC_Respuesta_Personalizada__c FROM Case WHERE Subject = 'Test Incidencia'];
+            
+            System.assertEquals(true, casoResult.CC_Trasladado_Tercer_Nivel__c, 'No se ha actualizado el caso');
+            System.assertEquals(true, casoResult.CC_Respuesta_Personalizada__c, 'No se ha actualizado el caso');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void notificarCasoAClienteTest()
+    {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+
+        System.runAs(supervisor)
+        {
+            Test.startTest();
+            Task tarea = new Task();
+            tarea.type = 'Traslado Tercer Nivel';
+            tarea.Priority = 'Normal';
+            tarea.Subject = 'Personalizada';
+            tarea.RecordTypeId = tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tareas.add(tarea);
+            insert tareas;
+            
+            List<Task> tareaResult = [SELECT Id FROM Task WHERE Type = 'Traslado Tercer Nivel'];
+            System.assertEquals(false, tareaResult.isEmpty(), 'No se ha insertado la tarea');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void actualizarPropietarioTest()
+    {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+
+        System.runAs(supervisor)
+        {
+            Test.startTest();
+            Task tarea = new Task();
+            tarea.type = 'Traslado Tercer Nivel';
+            tarea.Priority = 'Normal';
+            tarea.Subject = 'Personalizada';
+            tarea.RecordTypeId = tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tareas.add(tarea);
+            insert tareas;
+            
+            List<Task> tareaResult = [SELECT Id FROM Task WHERE Type = 'Traslado Tercer Nivel'];
+            System.assertEquals(false, tareaResult.isEmpty(), 'No se ha insertado la tarea');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void crearReclamacionMaximoTest()
+    {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Test Incidencia'];
+
+        System.runAs(supervisor)
+        {
+            Test.startTest();
+            Task tarea = new Task();
+            tarea.type = 'Actividad manual';
+            tarea.Priority = 'Normal';
+            tarea.Subject = 'Reclamación de cliente';
+            tarea.RecordTypeId = tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tarea.WhatId = caso.Id;
+            tareas.add(tarea);
+            insert tareas;
+            
+            List<Task> tareaResult = [SELECT Id FROM Task WHERE Type = 'Actividad manual'];
+            System.assertEquals(false, tareaResult.isEmpty(), 'No se ha insertado la tarea');
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void schedulablesTaskTest()
+    {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+        //Case caso = [SELECT Id FROM Case WHERE Subject = 'Test Incidencia'];
+
+        System.runAs(supervisor)
+        {
+            Id recordTypeIdCSIBankia = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CSI_Bankia').getRecordTypeId();
+            Case oCaso = new Case();
+            oCaso.Subject = 'Test Incidencia';
+            oCaso.Origin = 'Email';
+            oCaso.Status = 'Pendiente Colaborador';
+            //oCaso.ContactId = testContact.Id;
+            oCaso.CC_NotIncidencia__c = '1';
+            oCaso.CC_MailTelfNotif__c = 'testcs@testcs.es';
+            oCaso.CC_CanalNotifCli__c = 'Email';
+            oCaso.CC_Idioma__c = 'es';
+            oCaso.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            oCaso.CC_Detalles_Solucion__c = 'Detalles Solución';
+            oCaso.RecordTypeId = recordTypeIdCSIBankia;
+            oCaso.Canal_del_Empleado__c = 'CSI';
+            oCaso.CC_Canal_Procedencia__c = 'CCO CSI';
+            oCaso.CC_Canal_Respuesta__c = 'Email';
+            insert oCaso;
+
+            Test.startTest();
+            Task tarea = new Task();
+            tarea.type = 'Actividad manual';
+            tarea.Priority = 'Normal';
+            tarea.Subject = 'Verificación cliente';
+            tarea.RecordTypeId = tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tarea.WhatId = oCaso.Id;
+            tareas.add(tarea);
+            insert tareas;
+
+            List<CBK_SCH_PendingProcess__c> pdp = [SELECT Id FROM CBK_SCH_PendingProcess__c WHERE RecordId__c = :tarea.Id];
+            Case casoResult =  [SELECT Id, Status FROM Case WHERE CC_MailTelfNotif__c = 'testcs@testcs.es'];
+
+            System.assertEquals(false, pdp.isEmpty(), 'No se ha programado el pending process');
+            System.assertEquals('Pendiente Cliente', casoResult.Status, 'No se ha actualizado el status del caso');
+            
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void schedulablesTask2Test()
+    {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+        //Case caso = [SELECT Id FROM Case WHERE Subject = 'Test Incidencia'];
+
+        System.runAs(supervisor)
+        {
+            Id recordTypeIdCSIBankia = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CSI_Bankia').getRecordTypeId();
+            Case oCaso = new Case();
+            oCaso.Subject = 'Test Incidencia';
+            oCaso.Origin = 'Email';
+            oCaso.Status = 'Pendiente Colaborador';
+            //oCaso.ContactId = testContact.Id;
+            oCaso.CC_NotIncidencia__c = '1';
+            oCaso.CC_MailTelfNotif__c = 'testcs@testcs.es';
+            oCaso.CC_CanalNotifCli__c = 'Email';
+            oCaso.CC_Idioma__c = 'es';
+            oCaso.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            oCaso.CC_Detalles_Solucion__c = 'Detalles Solución';
+            oCaso.RecordTypeId = recordTypeIdCSIBankia;
+            oCaso.Canal_del_Empleado__c = 'CSI';
+            oCaso.CC_Canal_Procedencia__c = 'CCO CSI';
+            oCaso.CC_Canal_Respuesta__c = 'Email';
+            insert oCaso;
+
+            Test.startTest();
+            Task tarea = new Task();
+            tarea.type = 'Traslado Colaborador';
+            tarea.Status = 'Open';
+            tarea.Priority = 'Normal';
+            tarea.Subject = 'Reclamación de cliente';
+            tarea.RecordTypeId = tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tarea.WhatId = oCaso.Id;
+            tarea.CC_Fecha_1_Reclamacion_Auto__c = system.now();
+            tarea.CC_Fecha_2_Reclamacion_Auto__c = system.now();
+            tarea.CC_Fecha_3_Reclamacion_Auto__c = system.now();
+            tarea.OS_Fecha_Fin_Reclamacion_Auto__c = system.now();
+            tareas.add(tarea);
+            insert tareas;
+
+            List<CBK_SCH_PendingProcess__c> pdp = [SELECT Id FROM CBK_SCH_PendingProcess__c WHERE RecordId__c = :tarea.Id];
+
+            System.assertEquals(4, pdp.size(), 'No se ha programado el pending process');
+            
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void cierreAutomaticoSolicitudInformacionTest()
+    {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+        //Case caso = [SELECT Id FROM Case WHERE Subject = 'Test Incidencia'];
+
+        System.runAs(supervisor)
+        {
+            Id recordTypeIdCSIBankia = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CSI_Bankia').getRecordTypeId();
+            Case oCaso = new Case();
+            oCaso.Subject = 'Test Incidencia';
+            oCaso.Origin = 'Email';
+            oCaso.Status = 'Pendiente Colaborador';
+            //oCaso.ContactId = testContact.Id;
+            oCaso.CC_NotIncidencia__c = '1';
+            oCaso.CC_MailTelfNotif__c = 'testcs@testcs.es';
+            oCaso.CC_CanalNotifCli__c = 'Email';
+            oCaso.CC_Idioma__c = 'es';
+            oCaso.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            oCaso.CC_Detalles_Solucion__c = 'Detalles Solución';
+            oCaso.RecordTypeId = recordTypeIdCSIBankia;
+            oCaso.Canal_del_Empleado__c = 'CSI';
+            oCaso.CC_Canal_Procedencia__c = 'CCO CSI';
+            oCaso.CC_Canal_Respuesta__c = 'Email';
+            insert oCaso;
+
+            Test.startTest();
+            Task tarea = new Task();
+            tarea.type = 'Solicitud Información';
+            tarea.Status = 'Open';
+            tarea.Priority = 'Normal';
+            tarea.Subject = 'Reclamación de cliente';
+            tarea.RecordTypeId = tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tarea.WhatId = oCaso.Id;
+            tarea.CC_Fecha_FinPlazo_SolInf__c = system.now();
+            tareas.add(tarea);
+            insert tareas;
+
+            List<CBK_SCH_PendingProcess__c> pdp = [SELECT Id FROM CBK_SCH_PendingProcess__c WHERE RecordId__c = :tarea.WhatId];
+
+            System.assertEquals(false, pdp.isEmpty(), 'No se ha programado el pending process');
+            
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void casoGestionTareasNoTiempoTest()
+    {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        List<Task> tareas = new List<Task>();
+        
+        System.runAs(supervisor)
+        {
+            Test.startTest();
+
+            Case caso = new Case();
+            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            caso.CC_Idioma__c = 'es';
+            caso.Subject = 'Asunto';
+            caso.Description = 'Descripción';
+            caso.CC_Tipo_Contacto__c = 'Consulta';
+            caso.CC_Canal_Procedencia__c = 'Accionista';
+            caso.CC_Canal_Resolucion__c = 'Accionista';
+            caso.CC_Canal_Operativo__c = 'App CaixaBankPay';
+            caso.Origin = 'Email';
+            caso.Status = 'Inactivo ';
+            caso.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            caso.CC_Detalles_Solucion__c = 'Detalles Solución';
+            insert caso;
+
+            
+            Task tarea = new Task();
+            tarea.type = 'Traslado Colaborador';
+            tarea.Status = 'Rechazada';
+            tarea.Priority = 'Normal';
+            tarea.Subject = 'Reclamación de cliente';
+            tarea.RecordTypeId = tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tarea.WhatId = caso.Id;
+            tareas.add(tarea);
+            insert tareas;
+
+            caso = [SELECT Id, CC_Fecha_Ultima_Reclamacion__c, CC_Numero_Reclamaciones_Cliente__c, Status FROM Case WHERE Id = :caso.Id];
+
+            System.assertEquals(true, caso.CC_Fecha_Ultima_Reclamacion__c != null, 'No se ha actualizado la fecha de la última reclamación, sigue a Nulo');
+            System.assertEquals(true, caso.Status == 'Activo', 'No se ha actualizado el status del caso');
+            System.assertNotEquals(null, caso.CC_Numero_Reclamaciones_Cliente__c, 'No se ha actualizado el número de reclamaciones del caso');
+            System.assert(caso.CC_Numero_Reclamaciones_Cliente__c > 0, 'El número de reclamaciones debe ser mayor que 0');
+
+            Test.stopTest();
+        }
+    }
+   
 }

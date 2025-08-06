@@ -1409,4 +1409,50 @@ public class SEG_Case_Operativas_Controller_2_Test {
             System.assert(!retorno.isEmpty(), 'No se ha recuperado la info del cliente');
         }
     }
+
+    @isTest
+    static void testCalcularTipoOperacionporNIF_Empresa() {
+        User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+
+        Account account = new Account(
+            Name = 'Empresa Test',
+            CC_Numero_Documento__c = 'J35340579',
+            RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId()
+        );
+        insert account;
+
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Test.startTest();
+            Map<String, String> resultadoMap = SEG_Case_Operativas_Controller.calcularTipoOperacionporNIF('J35340579', true);
+            Test.stopTest();
+
+            System.assertEquals('0-Empresa', resultadoMap.get('tipoAccount'), 'El tipoAccount debe ser 0-Empresa para NIF de empresa');
+            System.assertEquals('Empresa Test', resultadoMap.get('nombreTitular'), 'El nombreTitular debe coincidir con el nombre de la Account');
+        }
+    }
+
+    @isTest
+    static void testCalcularTipoOperacionporNIF_Particular() {
+        User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+        System.runAs(usuarioTest) {
+
+            //IMPORTANTE: El recordType CC_ClientePA no acepta Name directamente, si no Fistname + LastName
+            Account account = new Account(
+                FirstName = 'Particular',
+                LastName = 'Test',
+                CC_Numero_Documento__c = '81832926F',
+                RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId()
+            );
+            insert account;
+
+            Test.startTest();
+            Map<String, String> resultadoMap = SEG_Case_Operativas_Controller.calcularTipoOperacionporNIF('81832926F', true);
+            Test.stopTest();
+
+            System.assertEquals('1-Particular', resultadoMap.get('tipoAccount'), 'El tipoAccount debe ser 1-Particular para NIF de particular');
+            System.assertEquals('Particular Test', resultadoMap.get('nombreTitular'), 'El nombreTitular debe coincidir con el nombre de la Account');
+        }
+    }
+
+
 }

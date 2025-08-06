@@ -5,6 +5,10 @@ public class CC_Task_BI_TRHan extends CC_TriggerHandlerBase {
     }
     
     private void process(List<Task> listNewObj, Map<Id, Task> mapNewObj) {
+        //Obtener las tareas CC_Task
+        List<Task> listCCTask = new List<Task>();
+        Id ccTaskRTId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+
         //Obtención de RT CC_
         Schema.DescribeSObjectResult R = task.SObjectType.getDescribe();
         List<Schema.RecordTypeInfo> lstRT = R.getRecordTypeInfos();
@@ -36,6 +40,10 @@ public class CC_Task_BI_TRHan extends CC_TriggerHandlerBase {
             if(idRecordtypeOSSet.contains(tk.RecordTypeId)){
                 listNewObjOS.add(tk);
             }
+            //CC_Task
+            if (tk.RecordTypeId == ccTaskRTId){
+                listCCTask.add(tk);
+            }
         }
         
 		if ((mapNewObjCC.size() != 0) || (listNewObjCC.size() != 0)){
@@ -48,6 +56,11 @@ public class CC_Task_BI_TRHan extends CC_TriggerHandlerBase {
         }
         if(!listNewObjOS.isEmpty()){
             copiarTaskType(listNewObjOS);
+        }
+        //Funciones Task con RT CC_Task
+        if (!listCCTask.isEmpty()) {
+            completarTask(listCCTask); //Si la task que se esta insertando lo está haciendo con type Actividad manual y subject Otros, debe pasar su status a Completed.
+            tareasNoTiempo(lisTCCTask);
         }
     }
     
@@ -117,5 +130,30 @@ public class CC_Task_BI_TRHan extends CC_TriggerHandlerBase {
                 tarea.OS_Tipo__c = tarea.Type;
             }
         }
+    }
+
+    /*****************************************************************
+     * Si la task que se esta insertando lo está haciendo con type Actividad manual y subject Otros,
+     * debe pasar su status a Completed.
+    *****************************************************************/
+    private void completarTask(List<Task> listNewTask) {
+        for (Task newTask : listNewTask) {
+            if (newTask.Type == 'Actividad manual' && newTask.Subject == 'Otros') {
+                newTask.Status = 'Completed';
+            }
+        }
+    }
+
+    private void tareasNoTiempo(List<Task> listNewObjCC){
+        //Actualizar la fecha de fin de las tareas que se han cerrado
+        for (Task newTask : listNewObjCC) {
+            if(String.isNotBlank(newTask.WhatId) && newTask.WhatId.getSObjectType().getDescribe().getName() == 'Case'){
+                if(newTask.Status == 'Completed' || newTask.Status == 'Rechazada'){
+                    newTask.CC_Fecha_Fin__c = CBK_UtilsDate.nowSYS();
+
+                }
+            }
+        }
+
     }
 }

@@ -25,6 +25,8 @@ public with sharing class CC_Metodos_EmailServices {
         return referencia;
     }
     
+    
+    
     public static void respuestaTrasladoColaborador(Messaging.inboundEmail email, Id whatIdTarea, String myPlainText, String emailDestino) {
         //Cambio de estado del caso
         Case caso = [SELECT Id, Status, Subject, CC_Canal_Procedencia__c, Origin, CC_Autoasignado_Coordinador__c, CC_Cola_Procedencia__c, CC_En_Tercer_Nivel__c, Canal_del_Empleado__c,
@@ -66,6 +68,8 @@ public with sharing class CC_Metodos_EmailServices {
             }
             
             //Informamos la fecha de respuesta para el report de Stores
+            //
+            //
             //if (caso.Origin == 'Comentarios Stores') {
                 caso.CC_Fecha_Respuesta_Colaborador__c = Datetime.valueOf(System.now());
             //}
@@ -99,8 +103,9 @@ public with sharing class CC_Metodos_EmailServices {
     
     public static void respuestaRemitirColaborador(Messaging.inboundEmail correo, Id whatIdTarea, String myPlainText, String emailDestino) {
 
+        
         //Cambio de estado del caso
-        Case caso = [SELECT Id, ContactId, Status, CC_Canal_Procedencia__c, Canal_del_Empleado__c FROM Case WHERE Id = :whatIdTarea LIMIT 1];
+                Case caso = [SELECT Id, ContactId, Status, CC_Canal_Procedencia__c, Canal_del_Empleado__c FROM Case WHERE Id = :whatIdTarea LIMIT 1];
         if (caso.Status == 'Pendiente Colaborador') {
             caso.Status = 'Activo';
             update caso;

@@ -27,7 +27,7 @@ public with sharing class CC_Llamada_GC {
 			CC_NumPerso__c = inputLlamada.numPerso,
 			CC_Llamada_Padre__c = String.isEmpty(inputLlamada.salesforceParentId) ? null : inputLlamada.salesforceParentId,
 			CC_No_Identificado__c = false,
-			CC_Fecha_Inicio__c = System.now(),
+			CC_Fecha_Inicio__c = CBK_UtilsDate.nowSYS(),
 			CC_Id_Cognitivo__c = inputLlamada.cognitivoId,
 			CC_IdentCliente__c = '0',  //Sin datos ALF
 			CC_Campana_Genesys__c = inputLlamada.nombreCampana,
@@ -60,8 +60,77 @@ public with sharing class CC_Llamada_GC {
             }
         } else {
 			llamada.RecordTypeId = Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-            Contact contactoAsociado = identificarPorNumPerso(llamada, inputLlamada.numPerso);
-            if(!String.isEmpty(inputLlamada.summary)){
+            
+			//GLM Logica para identificar el contacto en funcion de si viene o no el numperso, o por el numero de documento o por el ani
+			Contact contactoAsociado = identificarPorNumPerso(llamada, inputLlamada.numPerso);
+			if(contactoAsociado== null){
+				//Buscamos contacto por numero de documento. Si encontramos varios, revisamos si hay alguno que sea cliente, si hay varios cogeremos el mas reciente, y sino hay cogeremos el mas reciente de los encontrados
+				if(inputLlamada.vRUDoc != null && inputLlamada.vRUDoc !=''){
+					List<Contact> lstContactos = [SELECT Id, AccountId, Account.AV_Cliente__c, Account.CC_MarcaSenior__c, Account.CC_Empleado_Familiar__c 
+												FROM Contact WHERE CC_Numero_Documento__c = :inputLlamada.vRUDoc 
+												AND (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_ClientePA') AND Account.AV_Confidencial__c = false
+												ORDER BY CreatedDate DESC];
+					
+					Contact cliente = null;
+					Contact noCliente = null;
+					for(Contact c: lstContactos){
+						if(c.Account.AV_Cliente__c && cliente == null){
+							cliente = c;
+						}
+						if(!c.Account.AV_Cliente__c && noCliente == null){
+							noCliente = c;
+						}
+					}
+					if(cliente != null){
+						llamada.CC_Cuenta__c = cliente.AccountId;
+						llamada.CC_Contacto__c = cliente.Id;
+						llamada.CC_IdentCliente__c = '0'; //Sin datos ALF
+						contactoAsociado = cliente;
+					}else if(noCliente != null){
+						llamada.CC_Cuenta__c = noCliente.AccountId;
+						llamada.CC_Contacto__c = noCliente.Id;
+						llamada.CC_IdentCliente__c = '0'; //Sin datos ALF
+						contactoAsociado = noCliente;
+					}
+				}
+				//Buscamos por ANI. Si encontramos varios, revisamos si hay alguno que sea cliente, si hay varios cogeremos el mas reciente, y sino hay cogeremos el mas reciente de los encontrados
+				if(contactoAsociado==null && inputLlamada.ani !=null && inputLlamada.ani!=''){
+					String telefono = inputLlamada.ani;
+					telefono = telefono.replace('+3400', '');
+					telefono = telefono.replace('+34', '');
+					List<CC_Canal_Com__c> telefonos = [SELECT CC_ContactoId__c, CC_ContactoId__r.AccountId, CC_ContactoId__r.Account.AV_Cliente__c
+														FROM CC_Canal_Com__c
+														WHERE CC_Telefono__c =:telefono AND RecordType.DeveloperName = 'CC_Telefono'
+														AND CC_ContactoId__r.Account.AV_Confidencial__c = false 
+														AND (CC_ContactoId__r.RecordType.DeveloperName = 'CC_Cliente' OR CC_ContactoId__r.Account.RecordType.DeveloperName = 'CC_ClientePA')
+														ORDER BY CreatedDate DESC];
+					Id clienteId = null;
+					Id noClienteId = null;
+					for(CC_Canal_Com__c c: telefonos){
+						if(c.CC_ContactoId__r.Account.AV_Cliente__c && clienteId == null){
+							clienteId = c.CC_ContactoId__c;
+						}
+						if(!c.CC_ContactoId__r.Account.AV_Cliente__c && noClienteId == null){
+							noClienteId = c.CC_ContactoId__c;
+						}
+					}
+					if(clienteId != null){
+						Contact cliente = [SELECT Id, AccountId, Account.CC_MarcaSenior__c, Account.CC_Empleado_Familiar__c FROM Contact WHERE Id = :clienteId LIMIT 1];
+						llamada.CC_Cuenta__c = cliente.AccountId;
+						llamada.CC_Contacto__c = cliente.Id;
+						llamada.CC_IdentCliente__c = '0'; //Sin datos ALF
+						contactoAsociado = cliente;
+					}else if(noClienteId != null){
+						Contact noCliente = [SELECT Id, AccountId, Account.CC_MarcaSenior__c, Account.CC_Empleado_Familiar__c FROM Contact WHERE Id = :noClienteId LIMIT 1];
+						llamada.CC_Cuenta__c = noCliente.AccountId;
+						llamada.CC_Contacto__c = noCliente.Id;
+						llamada.CC_IdentCliente__c = '0'; //Sin datos ALF
+						contactoAsociado = noCliente;
+					}
+				}
+			}
+			
+			if(!String.isEmpty(inputLlamada.summary)){
 				llamada.CC_Resumen_AI__c = inputLlamada.summary;
             }else if(llamada.CC_Idioma__c == 'en' || contactoAsociado != null && (contactoAsociado.Account.CC_Empleado_Familiar__c || contactoAsociado.Account.CC_MarcaSenior__c)){
 				llamada.CC_Resumen_AI__c = 'No hay conversación con el asistente';   
@@ -90,8 +159,10 @@ public with sharing class CC_Llamada_GC {
 			if (caso != null) {
 				actualizarCaso(caso.Id, UserInfo.getUserId());
 				vincularCaso(caso, llamada, servicioGenesys);
-			}
+				casoVinculado = caso;
+			}else {
 			casoVinculado = crearVincularCaso(llamada);
+			}
 		} else {
 			//Cuando se pasa el caso, es que se ha hecho una transferencia ciega y entra como llamada
 			crearActividad(llamada.Id, inputLlamada.casoId, 'Llamada transferida', servicioGenesys.Name);
@@ -110,13 +181,20 @@ public with sharing class CC_Llamada_GC {
 				CC_Comunicaciones__c comunicacion = crearComunicacion(llamada, casoIdCom, 'Rechazado');
 			}
 		}
-		return new Map<String, Object>{
+		
+		Map<String, Object> mapReturn = new Map<String, Object>{
 			'className' => CC_Llamada_GC.class.getName(),
 			'llamada' => llamada,
 			'caso' => casoVinculado,
 			'encuestaId' => servicioGenesys.CC_Encuesta__r.CC_Codigo__c,
 			'abrirTabId' => llamada.Id 
 		};
+		List<Task> tarea = [SELECT Id, WhatId, What.RecordType.DeveloperName FROM Task WHERE CC_Llamada_Id__c = :llamada.Id];
+		if (!tarea.isEmpty() && String.isNotBlank(tarea[0].What.RecordType.DeveloperName) && tarea[0].What.RecordType.DeveloperName == 'CC_Empleado') {
+			mapReturn.put('abrirTabId', tarea[0].WhatId);
+		}
+
+		return mapReturn;
 	}
 
 	public static Map<String, Object> registrarLlamadaSaliente(CC_Llamada_Input inputLlamada) {
@@ -147,7 +225,7 @@ public with sharing class CC_Llamada_GC {
 				CC_Idioma__c = codigoIdioma(inputLlamada.idioma),
 				CC_Asunto__c = String.isNotBlank(inputLlamada.asunto) ? inputLlamada.asunto.left(255) : null,
 				CC_No_Identificado__c = false,
-				CC_Fecha_Inicio__c = System.now(),
+				CC_Fecha_Inicio__c = CBK_UtilsDate.nowSYS(),
 				CC_IdentCliente__c = '0',
 				KIN_Genesys_Cloud_URL_Grabacion__c = inputLlamada.urlGrabacion
 			);
@@ -211,7 +289,7 @@ public with sharing class CC_Llamada_GC {
 			CC_Contacto__c = llamada.CC_Contacto__c,
 			CC_Cuenta__c = llamada.CC_Cuenta__c,
 			CC_No_Identificado__c = llamada.CC_No_Identificado__c,
-			CC_Fecha_Inicio__c = System.now(),
+			CC_Fecha_Inicio__c = CBK_UtilsDate.nowSYS(),
 			CC_IdentCliente__c = llamada.CC_IdentCliente__c,
 			KIN_Genesys_Cloud_URL_Grabacion__c = inputConsulta.urlGrabacion
 		);
@@ -241,7 +319,7 @@ public with sharing class CC_Llamada_GC {
 		String nombreEncuesta;
 		if (String.isNotBlank(inputLlamada.llamadaId)) {
 			String connId = String.valueOf(inputLlamada.connId);
-			List<CC_Llamada__c> llamada = [SELECT Id, CC_Servicio_Genesys__r.CC_Encuesta__r.Name, CC_Tipo__c FROM CC_Llamada__c WHERE CC_ConnId__c = :connId ORDER BY CreatedDate DESC];
+			List<CC_Llamada__c> llamada = [SELECT Id, CC_Servicio_Genesys__r.CC_Encuesta__r.Name, CC_Tipo__c FROM CC_Llamada__c WHERE CC_ConnId__c = :connId AND RecordType.DeveloperName IN ('CC_Cliente', 'CC_Empleado') ORDER BY CreatedDate DESC];
 			Id idLlamada = llamada[0].Id;
 
 			llamada[0].CC_Encuesta__c = llamada[0].CC_Servicio_Genesys__r.CC_Encuesta__c;
@@ -362,19 +440,24 @@ public with sharing class CC_Llamada_GC {
 		}
 	}
 
-	public static void completarConsulta(String connIdConsulta, Id idNuevoOwner) {
+	public static Map<String, Object> completarConsulta(String connIdConsulta, Id idNuevoOwner) {
 		CC_Llamada__c consulta = [SELECT CC_ConnId_Consulta__c, CC_Llamada_Padre__c, CC_Case_Consulta__c, OwnerId, CC_Servicio_Genesys__r.Name,
-									CC_Servicio_Genesys__r.CC_Tipo__c, CC_Servicio_Genesys__r.CC_Activo_Salesforce__c, CC_Servicio_Genesys__r.CC_Canal_Procedencia__c,  CC_Servicio_Genesys__r.CC_Tipo_Cliente__c
+									CC_Servicio_Genesys__r.CC_Tipo__c, CC_Servicio_Genesys__r.CC_Activo_Salesforce__c, CC_Servicio_Genesys__r.CC_Canal_Procedencia__c,  CC_Servicio_Genesys__r.CC_Tipo_Cliente__c,
+									CC_Servicio_Genesys__r.CC_Grupo__c, RecordType.DeveloperName, CC_Case_Consulta__r.ContactId
 									FROM CC_Llamada__c WHERE RecordType.DeveloperName IN ('CC_Cliente', 'CC_Empleado')
 									AND CC_ConnId_Consulta__c = :connIdConsulta AND CC_Fecha_Fin__c = NULL AND OwnerId = :idNuevoOwner AND KIN_Consulta__c = TRUE];
 		consulta.CC_ConnId__c = consulta.CC_ConnId_Consulta__c;
 		update consulta;
 		finalizarActividadesLlamada(consulta, 'Consulta%', 'Consulta completada');
 
-		crearActividad(consulta.Id, consulta.CC_Case_Consulta__c, 'Llamada transferida',  consulta.CC_Servicio_Genesys__r.Name, 'Llamada transferida');
+		if (consulta.RecordType.DeveloperName == 'CC_Empleado') {
+			crearActividadEmpleados(consulta.Id, consulta.CC_Case_Consulta__c, 'Llamada transferida', consulta.CC_Servicio_Genesys__r.Name, 'Llamada transferida', consulta.CC_Servicio_Genesys__r.CC_Grupo__c, consulta.CC_Case_Consulta__r.ContactId);
+		} else {
+			crearActividad(consulta.Id, consulta.CC_Case_Consulta__c, 'Llamada transferida',  consulta.CC_Servicio_Genesys__r.Name, 'Llamada transferida');
+		}
 		
 		if (consulta.CC_Servicio_Genesys__r.CC_Tipo__c.equals('Tercer nivel')) {
-				traspasarTercerNivel(consulta.CC_Case_Consulta__c, idNuevoOwner, consulta.CC_Servicio_Genesys__r.Name, consulta.Id, consulta.CC_Servicio_Genesys__r.CC_Tipo_Cliente__c);
+				traspasarTercerNivel(consulta.CC_Case_Consulta__c, idNuevoOwner, consulta.CC_Servicio_Genesys__r.Name, consulta.Id, consulta.CC_Servicio_Genesys__r.CC_Tipo_Cliente__c, consulta.CC_Servicio_Genesys__r.CC_Grupo__c);
 		} else if (consulta.CC_Case_Consulta__c != null) {
 			if (consulta.CC_Servicio_Genesys__r.CC_Tipo__c.equals('Servicio')) {
 				//El canal de resolución sólo se actualiza para transferencias entre servicios normales
@@ -387,6 +470,8 @@ public with sharing class CC_Llamada_GC {
 		CC_Llamada__c llamadaCliente = [SELECT CC_Servicio_Genesys__r.Name FROM CC_Llamada__c WHERE Id = :consulta.CC_Llamada_Padre__c];
 		//Cierre de la llamada con el cliente
 		finalizarLlamadaActividades(llamadaCliente, 'Llamada%', 'Llamada finalizada');
+		//DMV: Devuelve un mapa con el tipo de consulta que se completó: consulta.CC_Servicio_Genesys__r.CC_Tipo__c y con la llamada id nueva.. 
+		return new Map<String, Object>{'tipoServicio' => consulta.CC_Servicio_Genesys__r.CC_Tipo__c, 'llamadaId' => consulta.Id};
 	}
 
 	public static Case crearVincularCaso(CC_Llamada__c llamada) {
@@ -609,7 +694,7 @@ public with sharing class CC_Llamada_GC {
 		List<Task> tareas = [SELECT Id FROM Task WHERE CC_Llamada_Id__c IN :CC_MetodosUtiles.listaCampo(llamadas, 'Id')
 								AND Status = 'Open' AND Type LIKE :tipoActividad AND RecordType.DeveloperName = 'CC_Task'];
 		for (Task actividad : tareas) {
-			actividad.CC_Fecha_Fin__c = System.now();
+			actividad.CC_Fecha_Fin__c = CBK_UtilsDate.nowSYS();
 			actividad.CC_Tipo_Cierre__c = obtenerTipoCierre(tipoCierre);
 			actividad.Status = 'Completed';
 		}
@@ -632,7 +717,7 @@ public with sharing class CC_Llamada_GC {
 				} else if (actividad.Type.startsWith('Llamada')) {
 					actividad.CC_Tipo_Cierre__c = obtenerTipoCierre('Llamada finalizada');
 				}
-				actividad.CC_Fecha_Fin__c = System.now();
+				actividad.CC_Fecha_Fin__c = CBK_UtilsDate.nowSYS();
 				actividad.Status = 'Completed';
 				actividadesActualizar.add(actividad);
 			}
@@ -644,7 +729,7 @@ public with sharing class CC_Llamada_GC {
 
 	private static void finalizarLlamadas(List<CC_Llamada__c> llamadas, String tipoCierre) {
 		for (CC_Llamada__c llamada : llamadas) {
-			llamada.CC_Fecha_Fin__c = System.now();
+			llamada.CC_Fecha_Fin__c = CBK_UtilsDate.nowSYS();
 			llamada.CC_Tipo_Cierre__c = tipoCierre;
 		}
 		update llamadas;
@@ -668,27 +753,56 @@ public with sharing class CC_Llamada_GC {
 		finalizarActividadesNew(llamadas);
 	}
 
-	private static Task crearObjetoActividad(Id llamadaId, Id whatId, String tipoActividad, String asunto, String tipoCierre) {
+	private static Task crearObjetoActividad(Id llamadaId, Id whatId, String tipoActividad, String asunto, String tipoCierre, Id contactId) {
 		Task actividad = new Task(
 			Subject = tipoActividad + (asunto != null ? ' (' + asunto + ')' : ''),
 			CC_Llamada_Id__c = llamadaId,
-			ActivityDate = System.today(),
-			CC_Fecha_Inicio__c = System.now(),
+			ActivityDate = CBK_UtilsDate.todaySYS(),
+			CC_Fecha_Inicio__c = CBK_UtilsDate.nowSYS(),
 			WhatId = whatId,
+			WhoId = contactId,
 			Type = tipoActividad,
 			CC_validacion_tarea_manual__c = true,
 			RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId()
 		);
 		if (tipoCierre != null) {
-			actividad.CC_Fecha_Fin__c = System.now();
+			actividad.CC_Fecha_Fin__c = CBK_UtilsDate.nowSYS();
 			actividad.CC_Tipo_Cierre__c = obtenerTipoCierre(tipoCierre);
 			actividad.Status = 'Completed';
 		}
 		return actividad;
 	}
 
+	private static Id crearActividadEmpleados(Id llamadaId, Id casoId, String tipoActividad, String asunto, String tipoCierre, String grupo, String contactId) {
+		Task actividad = new Task(
+			Subject = tipoActividad + (asunto != null ? ' (' + asunto + ')' : ''),
+			CC_Llamada_Id__c = llamadaId,
+			ActivityDate = CBK_UtilsDate.todaySYS(),
+			CC_Fecha_Inicio__c = CBK_UtilsDate.nowSYS(),
+			WhatId = casoId,
+			Type = tipoActividad,
+			CC_validacion_tarea_manual__c = true,
+			RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId()
+		);
+		if (tipoCierre != null) {
+			actividad.CC_Fecha_Fin__c = CBK_UtilsDate.nowSYS();
+			actividad.CC_Tipo_Cierre__c = obtenerTipoCierre(tipoCierre);
+			actividad.Status = 'Completed';
+		}
+		if (String.isNotBlank(grupo)) {
+			actividad.CC_Grupo_Colaborador_Id__c = grupo;
+		}
+		if (String.isNotBlank(contactId)) {
+			actividad.WhoId = contactId;
+		}
+		
+		insert actividad;
+		return actividad.Id;
+	}
+
 	private static Id crearActividad(Id llamadaId, Id casoId, String tipoActividad, String asunto, String tipoCierre) {
-		Task actividad = crearObjetoActividad(llamadaId, casoId, tipoActividad, asunto, tipoCierre);
+		Id contactId = [SELECT Id, contactId FROM Case WHERE Id =: casoId].contactId;
+		Task actividad = crearObjetoActividad(llamadaId, casoId, tipoActividad, asunto, tipoCierre, contactId);
 		insert actividad;
 		return actividad.Id;
 	}
@@ -699,16 +813,28 @@ public with sharing class CC_Llamada_GC {
 
 	private static void crearActividadCasosNoFuture(Id llamadaId, String tipoActividad, String detalle, String tipoCierre) {
 		List<Task> actividades = new List<Task>();
+        List<Id> lstCaseId = new List<Id>();
+        List<AggregateResult> casoIds = [SELECT WhatId FROM Task WHERE CC_Llamada_Id__c = :llamadaId GROUP BY WhatId];
+        for(AggregateResult resultado : casoIds){
+            Id casoId = String.valueOf(resultado.get('WhatId'));
+            lstCaseId.add(casoId);
+        }
+
+		Map<String,String> mpIdCasosAccount = new Map<String,String>();
+        for(Case caso : [SELECT Id, contactId FROM Case WHERE Id IN :lstCaseId]){
+            mpIdCasosAccount.put(caso.Id, caso.contactId);
+        }
 		for (AggregateResult resultado : [SELECT WhatId FROM Task WHERE CC_Llamada_Id__c = :llamadaId GROUP BY WhatId]) {
-			actividades.add(crearObjetoActividad(llamadaId, String.valueOf(resultado.get('WhatId')), tipoActividad, detalle, tipoCierre));
+			 Id casoId = String.valueOf(resultado.get('WhatId'));
+			actividades.add(crearObjetoActividad(llamadaId, String.valueOf(resultado.get('WhatId')), tipoActividad, detalle, tipoCierre, mpIdCasosAccount.containsKey(casoId) ? mpIdCasosAccount.get(casoId) : null));
 		}
 		insert actividades;
 	}
 
 	private static Id crearActividadEmpleado(Id llamadaId, Id casoId, String empleadoId, String empleadoTelefono, String tipoCierre, String tipoActividad) {
 		Task actividad = new Task(
-			ActivityDate = System.today(),
-			CC_Fecha_Inicio__c = System.now(),
+			ActivityDate = CBK_UtilsDate.todaySYS(),
+			CC_Fecha_Inicio__c = CBK_UtilsDate.nowSYS(),
 			CC_Llamada_Id__c = llamadaId,
 			Type = tipoActividad,
 			CC_validacion_tarea_manual__c = true,
@@ -738,7 +864,7 @@ public with sharing class CC_Llamada_GC {
 		}
 
 		if (tipoCierre != null) {
-			actividad.CC_Fecha_Fin__c = System.now();
+			actividad.CC_Fecha_Fin__c = CBK_UtilsDate.nowSYS();
 			actividad.CC_Tipo_Cierre__c = obtenerTipoCierre(tipoCierre);
 			actividad.Status = 'Completed';
 		}
@@ -772,13 +898,13 @@ public with sharing class CC_Llamada_GC {
 	}
 	
 
-	private static void traspasarTercerNivel(Id casoId, Id propietarioId, String grupo3n, Id llamadaId, String tipoCliente) {
+	private static void traspasarTercerNivel(Id casoId, Id propietarioId, String grupo3n, Id llamadaId, String tipoCliente, String idGrupoServicioGenesys) {
 		String grupoApiName = '3N de Carteras CAM'.equals(grupo3N) ? 'CC_3n_Carteras_CAM' : '3N de Valores CAM'.equals(grupo3N) ? 'CC_3n_Valores_CAM' :'3N de Fondos CAM'.equals(grupo3N) ? 'CC_3n_Fondos_CAM' : '';
 		
 		Case caso = new Case(Id = casoId);
 		caso.Status = 'Activo';
 		caso.CC_En_Tercer_Nivel__c = true;
-		caso.CC_Fecha_Traslado_3N__c  = System.now();
+		caso.CC_Fecha_Traslado_3N__c  = CBK_UtilsDate.nowSYS();
 		caso.CC_Grupo_3N__c = grupo3n;
 		caso.OwnerId = propietarioId;
 
@@ -788,11 +914,9 @@ public with sharing class CC_Llamada_GC {
 			Datetime ahora = DateTime.now();
 			caso.CC_Tiempo_Nivel_1__c = (casoEmple[0].CC_Tiempo_Nivel_1__c ?? 0) + ((ahora.getTime() - casoEmple[0].CC_Fecha_Traslado_1N__c.getTime()) / 1000);
 
-			CC_Activity.createActivityTraslados(casoEmple[0].Id, null, 'Traslado a ' + grupo3n + ' de Tercer Nivel', 'Traslado Tercer Nivel', idGrupo, null, llamadaId, 'Completed');
-
+			CC_Activity.createActivityTraslados(casoEmple[0].Id, null, 'Traslado a ' + grupo3n + ' de Tercer Nivel', 'Traslado Tercer Nivel', idGrupo, idGrupoServicioGenesys, llamadaId, 'Completed');				
 		}else{
 			CC_Activity.createActivityTraslados(caso.Id, null, 'Traslado a ' + grupo3n + ' de Tercer Nivel', 'Traslado Tercer Nivel', grupo3n, null, llamadaId, 'Open');
-			
 		}
 
 		update caso;
@@ -869,4 +993,40 @@ public with sharing class CC_Llamada_GC {
 			return 'Castellano';
 		}
 	}
+
+	/*private static void crearTareaTransfer(Id casoId, Id contactoId, Id llamadaId){
+		String transfer;
+		List<Case> casos = [SELECT Id, CaseNumber, CC_CasoRelacionado__c, CC_CasoRelacionado__r.CaseNumber, recordType.DeveloperName,
+							(SELECT Id, Subject, WhatId, WhoId FROM Task WHERE WhatId = :casoId AND Type LIKE '%Transferencia de caso%')
+							FROM Case 
+							WHERE Id = :casoId 
+							AND CC_CasoRelacionado__c != null];
+		if(casos.size() > 0){
+			Case caso = casos[0];
+			transfer = caso.recordType.DeveloperName == 'CC_Empleado' ? 'CCO' : caso.recordType.DeveloperName == 'HDT_Empleado' ? 'HDT' : '';
+			CC_Settings__c settings = CC_Settings__c.getValues('CC_Transferencia_Casos_HDT_CCO').CC_Configuracion_1__c ?? null;
+			if(caso.Tasks.size() == 0 || (settings != null && settings.CC_Configuracion_1__c == 'Insert')){
+				Task actividad = new Task(
+					Subject = 'Transferencia de caso ' + transfer + ' (' + caso.CaseNumber + ')' + ' a ' + ' (' + caso.CC_CasoRelacionado__r.CaseNumber + ')',
+					Type = 'Transferencia de caso',
+					CC_Llamada_Id__c = llamadaId,
+					ActivityDate = CBK_UtilsDate.todaySYS(),
+					CC_Fecha_Inicio__c = CBK_UtilsDate.nowSYS(),
+					WhatId = casoId,
+					WhoId = contactoId,
+					Status = 'Completed',
+					RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId()
+				);
+				insert actividad;
+			} else if (caso.Tasks.size() > 0 && (settings != null && settings.CC_Configuracion_1__c == 'Update')){
+				Task actividad = caso.Tasks[0];
+				actividad.Subject = 'Transferencia de caso ' + transfer + ' (' + caso.CaseNumber + ')' + ' a ' + ' (' + caso.CC_CasoRelacionado__r.CaseNumber + ')',
+				actividad.CC_Llamada_Id__c = llamadaId;
+				actividad.CC_Fecha_Inicio__c = CBK_UtilsDate.nowSYS();
+				actividad.CC_Fecha_Fin__c = CBK_UtilsDate.nowSYS();
+				actividad.Status = 'Completed';
+				update actividad;
+			}
+		}
+	}*/
 }

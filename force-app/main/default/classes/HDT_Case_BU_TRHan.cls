@@ -599,6 +599,7 @@ public without sharing class HDT_Case_BU_TRHan extends CC_TriggerHandlerBase {
             for (Case caso : listNewObj) {
                 if (mapOldObj.get(caso.Id).Status != 'Cerrado' && caso.Status == 'Cerrado') {
                     if (!Test.isRunningTest() && !System.isBatch()
+                    && !caso.CC_CierreAutomaticoCSBD__c
                     && profileName != null && profileName != 'CC_Integración' && profileName.startsWith('CC')
                     && (mapOldObj.get(caso.Id).CC_Cerrado_Operativa__c == caso.CC_Cerrado_Operativa__c)
                     && (mapOldObj.get(caso.Id).CC_Fecha_Cierre_SolInf__c == caso.CC_Fecha_Cierre_SolInf__c)) {

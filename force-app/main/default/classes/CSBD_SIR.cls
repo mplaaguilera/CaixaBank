@@ -136,16 +136,16 @@ public with sharing class CSBD_SIR {
 
         Set<Id> idsContactos = new Set<Id>(idContactos);
         List<Opportunity> oportunidadesContactoList = new List<Opportunity>();
-        List<Contact> contactos = [SELECT CC_NumPerso__c FROM Contact WHERE Id IN :idsContactos];
+        List<Contact> contactos = [SELECT AV_NumPerso__c FROM Contact WHERE Id IN :idsContactos];
         for (Contact contacto : contactos) {
-            if (String.isNotBlank(contacto.CC_NumPerso__c) && idContactoOportunidadesMap.containsKey(contacto.Id)) {
+            if (String.isNotBlank(contacto.AV_NumPerso__c) && idContactoOportunidadesMap.containsKey(contacto.Id)) {
                 oportunidadesContactoList = idContactoOportunidadesMap.get(contacto.Id);
                 for (Opportunity oportunidad: oportunidadesContactoList) {
                     //Invocación al servicio de consulta de importes preconcedidos
-                    Map<String, Object> respuestaLimites = sirCalcLimites(contacto.CC_NumPerso__c, oportunidad.CSBD_Now_Presolicitud__c);
+                    Map<String, Object> respuestaLimites = sirCalcLimites(contacto.AV_NumPerso__c, oportunidad.CSBD_Now_Presolicitud__c);
                     /*
                     //Invocación al servicio de consulta de scoring
-                    Map<String, Integer> respuestaScoring = sirConsultaScorings(contacto.CC_NumPerso__c);
+                    Map<String, Integer> respuestaScoring = sirConsultaScorings(contacto.AV_NumPerso__c);
                     */
 
                     //Actualización de los importes prconcedidos del contacto

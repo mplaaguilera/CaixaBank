@@ -150,8 +150,7 @@ public with sharing class CSBD_DetectarOportunidadesSimilares {
         update this.oportunidadIdentificada;
      }
 
-     public void enviarCorreoInformativo(){        
-        String nombreBuzonSalida = this.oportunidadIdentificada.CSBD_Empresa_Proveedora__c == 'imaginBank' ? 'CSBD - ImaginBank' : 'CSBD - CaixaBank';
+     public void enviarCorreoInformativo(){   
         String plantillaName = this.esFacilitea ? this.settingManager.getPlantillaCorreoFacilitea() : this.esPHD ? this.settingManager.getPlantillaCorreoPHD() : '';
         if(String.isBlank(plantillaName)){
             CSBD_Activity.crearActividad(
@@ -163,7 +162,7 @@ public with sharing class CSBD_DetectarOportunidadesSimilares {
             );
         }
         Id plantilla = [SELECT Id FROM EmailTemplate WHERE DeveloperName = :plantillaName LIMIT 1]?.Id;
-        Id buzonSalida = [SELECT Id FROM OrgWideEmailAddress WHERE DisplayName = :nombreBuzonSalida LIMIT 1]?.Id;
+        Id buzonSalida = CSBD_MetodosComunes.obtenerIdBuzonSalida(this.oportunidadIdentificada.CSBD_Empresa_Proveedora__c);
         if (plantilla == null || buzonSalida == null) {
             CSBD_Activity.crearActividad(this.oportunidadIdentificada.Id,
                 'Error enviando correo automatico de duplicado',

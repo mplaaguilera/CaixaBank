@@ -344,8 +344,10 @@
 		let idioma = component.get('v.idioma');
 		let tipoRegistro = component.get('v.tipoRegistro');
 		let carpetaOperativa;
-		let carpetaGenerica;	
-		if (operativa === 'responder' || operativa === 'responderClienteDerivar') {		
+		let carpetaGenerica;
+		console.log('LOG load carpetas idioma ' + Date.now());
+		if (operativa === 'responder' || operativa === 'responderClienteDerivar') {
+			console.log('LOG load carpetas idioma 1 ' + Date.now());
 			//idioma = 'CC_Responder_' + canalProcedencia+'_' + idioma;
 			if (tipoRegistro === 'CC_Empleado') {
 				if (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa') {
@@ -358,7 +360,8 @@
 				carpetaOperativa = 'CC_Responder_CSI_Bankia_' + canalProcedencia;
 			} else if (tipoRegistro === 'CC_Cliente' && (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa')) {
 				carpetaOperativa = 'CC_Responder_EmisionesPromoCaixa';
-			} else {			
+			} else {
+				console.log('LOG load carpetas idioma 2 ' + Date.now());
 				carpetaOperativa = 'CC_Responder_' + canalProcedencia;
 			}
 		} else if (operativa === 'solicitar') {
@@ -377,7 +380,8 @@
 		existeCarpeta.setCallback(this, function(response) {
 			if (response.getState() === 'SUCCESS') {
 				if (response.getReturnValue()) {
-					if (operativa === 'responder' || operativa === 'responderClienteDerivar') {						
+					if (operativa === 'responder' || operativa === 'responderClienteDerivar') {
+						console.log('LOG load carpetas idioma 3 ' + Date.now());
 						if (tipoRegistro === 'CC_Empleado') {
 							if (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa') {
 								idioma = 'CC_Responder_Empleado_Wivai_' + idioma;
@@ -392,7 +396,8 @@
 						} else if (tipoRegistro === 'CC_Cliente' && (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa')) {
 							idioma = 'CC_Responder_EmisionesPromoCaixa_' + idioma;
 							carpetaGenerica = 'CC_Responder_EmisionesPromoCaixa';
-						} else {							
+						} else {
+							console.log('LOG load carpetas idioma 4 ' + Date.now());
 							idioma = 'CC_Responder_' + canalProcedencia + '_' + idioma;
 							carpetaGenerica = 'CC_Responder';
 						}
@@ -442,7 +447,8 @@
 					}
 				}
 				let opcionesIdiomaFolder = [];
-				let getCarpetas = component.get('c.getCarpetas');				
+				let getCarpetas = component.get('c.getCarpetas');
+				console.log('LOG ' + carpetaOperativa);
 				getCarpetas.setParams({
 					'carpetaDeveloperName': carpetaOperativa,
 					'carpetaGenerica': carpetaGenerica
@@ -504,13 +510,15 @@
 	getPlantillasResponder: function(component) {
 		let recordId = component.get('v.recordId');
 		let tratamiento = component.get('v.tratamiento');
-		let action = component.get('c.getPlantillasResponder');		
+		let action = component.get('c.getPlantillasResponder');
+		console.log('LOG getPlantillas ' + tratamiento);
 		action.setParams({
 			'recordId': recordId,
 			'carpeta': tratamiento
 		});
 		action.setCallback(this, response => {
-			if (response.getState() === 'SUCCESS') {				
+			if (response.getState() === 'SUCCESS') {
+				console.log('LOG getPlantillas ' + JSON.stringify(response.getReturnValue()));
 				let options = response.getReturnValue();
 				component.set('v.optionsPlantillaResponder', options);
 			}
@@ -1042,7 +1050,7 @@
 
 	abrirEmailColaboradorActionHelper: function(component, listPara, listCC, listBcc, plantillaName, segundaOficinaName, grupocolaborador, procedencia) {
 		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
-		component.set('v.listPara', listPara);	
+		component.set('v.listPara', listPara);
 		component.set('v.listCC', listCC);
 		//component.set('v.listBcc', listBcc);
 		component.set('v.plantillaName', plantillaName);

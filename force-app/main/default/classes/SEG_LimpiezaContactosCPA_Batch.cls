@@ -18,10 +18,14 @@ public class SEG_LimpiezaContactosCPA_Batch implements Database.Batchable<sObjec
             for (Database.DeleteResult resDelete : resultadoDelete) {
                 if (!resDelete.isSuccess() || Test.IsRunningTest()) {
                     for(Database.Error err : resDelete.getErrors()){
-                        CBK_log.debug('SEG_LimpiezaContactosCPA_Batch: Deletion error returned: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+                        //CBK_log.debug('SEG_LimpiezaContactosCPA_Batch: Deletion error returned: ' + err.getStatusCode() + ' - ' + err.getMessage(), LoggingLevel.ERROR);
+                     	CBK_Log.DebugProcessConfigBuilder builder = new CBK_Log.DebugProcessConfigBuilder().setLogMessage('SEG_LimpiezaContactosCPA_Batch: Deletion error returned: ' + err.getStatusCode() + ' - ' + err.getMessage()).setLevel(LoggingLevel.ERROR);
+                        builder.addLog();
                     }
                 }
             }
+            //Se insertan los CBK_Logs
+            CBK_Log.insertDML();
         }
     }
 

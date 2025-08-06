@@ -180,11 +180,14 @@ public with sharing class CC_Case_BI_TRHan extends CC_TriggerHandlerBase {
 	private void actualizarBuzonSalida(List<Case> listNewObj) {
 		for (Case caso : listNewObj) {
 			//Se actualiza el buzón de salida del caso
-			caso.CC_Buzon_Salida__c = obtenerBuzon(caso.CC_Canal_Procedencia__c, caso.CC_Idioma__c);
+			caso.CC_Buzon_Salida__c = obtenerBuzon(caso.CC_Canal_Procedencia__c, caso.CC_Idioma__c, caso.recordTypeId);
 		}
 	}
 
-	private String obtenerBuzon(String canalProcedencia, String idioma) {
+	private String obtenerBuzon(String canalProcedencia, String idioma, Id recordTypeId) {
+
+		Id rtCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+		Id rtEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado');
 
 		if (idioma == 'ca') {
 			idioma = 'Català';
@@ -203,18 +206,33 @@ public with sharing class CC_Case_BI_TRHan extends CC_TriggerHandlerBase {
 			buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
 						WHERE  DeveloperName = 'CC_Buzon_Defecto_Empleados' AND CC_Idioma__c = 'Castellano' AND CC_Activo__c = true];
         }
-        if (buzones.isEmpty()){
+
+		//Si no se ha encontrado  ningún buzón se usa el por defecto en el idioma del caso para clientes
+        if (buzones.isEmpty() && recordTypeId == rtCliente){
             buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
 						WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = :idioma
 						AND CC_Activo__c = true];
         }
+		//Si no se ha encontrado  ningún buzón se usa el por defecto en el idioma del caso para empleados
+		if (buzones.isEmpty() && recordTypeId == rtEmpleado){
+            buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
+						WHERE CC_Canal_Procedencia__c = 'Por defecto empleados' AND CC_Idioma__c = :idioma
+						AND CC_Activo__c = true];
+        }
 
-		//Si no se ha encontrado  ningún buzón se usa el por defecto en castellano
-		if (buzones.isEmpty()) {
+		//Si no encuentra ningún buzón se usa el por defecto en castellano para clientes
+		if (buzones.isEmpty() && recordTypeId == rtCliente){
 			buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
 						WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano'
 						AND CC_Activo__c = true];
 		}
+		//Si no encuentra ningún buzón se usa el por defecto en castellano para empleados		
+		if (buzones.isEmpty() && recordTypeId == rtEmpleado){
+			buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
+						WHERE CC_Canal_Procedencia__c = 'Por defecto empleados' AND CC_Idioma__c = 'Castellano'
+						AND CC_Activo__c = true];
+		}
+
 
 		if (!buzones.isEmpty()) {
 			return buzones[0].CC_Direccion_Correo__c;

@@ -948,7 +948,9 @@ Método para crear la Reclamacion en Máximo
                     // Crear Actividad Reclamación MAXIMO
                     Task tarea = new Task();
                     tarea.WhatId = sAgrupador.CC_Agrupador_Id__c;
-                    tarea.Type = 'Reclamación';
+                    // Modificación para HDT IOP MAYO 25
+                    tarea.Type = sAgrupador.CC_Tipo_de_actividad__c;
+                    //tarea.Type = 'Reclamación';
                     tarea.Subject = 'Reclamación MAXIMO';
                     tarea.Status = 'Completed';
                     tarea.ActivityDate = System.today();
@@ -1059,7 +1061,10 @@ Método para realizar el envío de la Reclamación a Máximo.
             oWORKLOG.DESCRIPTION_LONGDESCRIPTION = sAgrupador.CC_Contenido__c;
             oWORKLOG.ITDCREATEDATE = convertirFechaMaximo(sAgrupador.CreatedDate);
             oWORKLOG.CREATEBY = oUsuarios.get(sAgrupador.CreatedById);
-            oWORKLOG.LOGTYPE = oCfgInt.CC_WORKLOG_LOGTYPE__c;
+            //Modificado para HDT en la IOP MAYO 25
+            oWORKLOG.LOGTYPE = sAgrupador.CC_Tipo_de_actividad__c;
+
+            //oWORKLOG.LOGTYPE = oCfgInt.CC_WORKLOG_LOGTYPE__c;
             oWORKLOG.action = 'Add';
 
             List<CC_WS_Maximo.ITNINCSIEBEL8V4_WORKLOGType> oListWORKLOG = new List<CC_WS_Maximo.ITNINCSIEBEL8V4_WORKLOGType>();

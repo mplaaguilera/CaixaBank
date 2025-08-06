@@ -146,4 +146,36 @@ public with sharing class SAC_ParametrizacionSLATME_BI_Test {
         Test.stopTest();
 
     }
+
+        @isTest
+        static void comprobarTMEDuplicadoInsertTest2(){
+        Id recTypeTme = Schema.SObjectType.SAC_ParametrizacionSLATME__c.getRecordTypeInfosByDeveloperName().get('SPV_TMO').getRecordTypeId();
+        User usuario = [SELECT id FROM User WHERE Username = 'Name12345@test.com' AND isActive = true LIMIT 1];
+        CC_MCC__c mccDetalle1 = [SELECT Id FROM CC_MCC__c WHERE CC_Codigo_Externo__c = 'TEST-010101012' LIMIT 1];
+        //User usuario2 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
+        
+        Test.startTest();
+
+        SAC_ParametrizacionSLATME__c registro = new SAC_ParametrizacionSLATME__c();
+        System.runAs(usuario){
+            List<SAC_ParametrizacionSLATME__c> listaParametrizacionSLATME = new List<SAC_ParametrizacionSLATME__c>();
+            
+            registro.RecordTypeId = recTypeTme;
+            registro.SAC_MCC__c = mccDetalle1.Id;
+            registro.SAC_CanalProcedencia__c = 'Junta Andalucia';
+            registro.Name = 'Test2';
+            registro.SAC_Duracion__c = 12;
+            registro.SAC_Estados__c = 'SPV_ENVIO;SPV_ENVIOCOMPLEMENTARIA;SPV_RECEPCIONRESOLUCION;SPV_ANALISISCOMPLEMENTARIAORGANISMO;SPV_ANALISISDECISION;SPV_RECTIFICACION;SPV_ENVIORECTIFICACION';
+            listaParametrizacionSLATME.add(registro);                                                                  
+
+            SAC_DatabaseDML.insertListDML(listaParametrizacionSLATME, false);
+
+        }
+
+        SAC_ParametrizacionSLATME__c resultado = [SELECT Id, SAC_DuplicadoMCCProcedenciaEstado__c FROM SAC_ParametrizacionSLATME__c WHERE RecordTypeId = :recTypeTme AND SAC_CanalProcedencia__c = 'Junta Andalucia'];
+        Assert.areNotEqual(null, resultado, 'No se ha añadido el registro correctamente.');
+
+        Test.stopTest();
+
+    }
 }

@@ -5,6 +5,7 @@ public with sharing class KIN_Genesys_Cloud_CTI_Extensions_Test {
        // Creamos un registro de Custom Setting HDT_Parametros__c para la prueba
         HDT_Parametros__c customSetting = new HDT_Parametros__c(
             Name = 'HDT_Llamadas_Salientes_No_Atendidas',
+            HDT_Configuracion_1__c = 'HDT_GenesysCloudOutboundDefault',
             HDT_Activo__c = true
         );
         insert customSetting;
@@ -29,7 +30,8 @@ public with sharing class KIN_Genesys_Cloud_CTI_Extensions_Test {
     @isTest
     public static void onClickToDial2() {
        
-		System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+		//System.runAs(CSBD_TestDataFactory.usuarioGestor()) {
+            System.runAs(CSBD_TestDataFactory.usuarioAdministrador()) {
             /*
             Case caso = new Case();
             insert caso;*/
@@ -38,7 +40,7 @@ public with sharing class KIN_Genesys_Cloud_CTI_Extensions_Test {
             s1.CBK_Negocio__c = 'HDT';
             s1.CC_Tipo__C = 'Servicio';
             s1.Name = 'HDT Genesys Cloud Outbound Default';
-            s1.CC_Codigo__c = 'HDT Genesys Cloud Outbound Default';
+            s1.CC_Codigo__c = 'HDT_GenesysCloudOutboundDefault';
             s1.CC_VDN__c = '4444444';
             s1.CC_Prefijo__c = '0';
             s1.CC_Tipo_Cliente__c = 'Empleado';

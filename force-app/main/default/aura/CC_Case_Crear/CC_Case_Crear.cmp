@@ -24,6 +24,8 @@
     <aura:attribute name="zona" type="String" />
     <aura:attribute name="valorGRR" type="String"/> 
     <aura:attribute name="esCasoSPV" type="Boolean" default="false"/>
+    <aura:attribute name="esCasoGRRCOPS" type="Boolean" default="false"/>
+    <aura:attribute name="valorServicio" type="String" default="Servicio Recobro"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
@@ -67,11 +69,13 @@
                         <lightning:messages/> <!--Mensajes de error al guardar-->
                         <div class="slds-grid slds-gutters">
                             <div class="slds-col slds-size_1-of-2">
-                                <lightning:inputField fieldName="Subject"/>
+                                <aura:if isTrue="{!not(v.esCasoGRRCOPS)}">
+                                    <lightning:inputField fieldName="Subject"/>
+                                </aura:if>      
                                 <lightning:inputField fieldName="Description" class="cc_textarea_alto"/>
                             </div>
                             <div class="slds-col slds-size_1-of-2">
-                                <aura:if isTrue="{!not(v.esClienteGRR)}">
+                                <aura:if isTrue="{!not(v.esClienteGRR || v.esCasoGRRCOPS)}">
                                     <lightning:inputField fieldName="CC_Idioma__c" required="true"/>
                                 </aura:if>
                                 <aura:if isTrue="{!v.procedenciasCops}">
@@ -84,7 +88,9 @@
                                         <aura:if isTrue="{!v.esClienteTMS}">
                                             <lightning:inputField fieldName="TMS_Numexp__c" required="true"/>
                                         </aura:if>
-                                        <lightning:inputField aura:id="canalEntradaElse" fieldName="Origin" value="{!v.nombreRol == 'SAC General' || v.nombreRol == 'Testamentarías' || v.nombreRol == 'SPV General' ? 'SAC_Manual' :''}" required="true" disabled = "{!v.nombreRol == 'SAC General' || v.nombreRol == 'Testamentarías' || v.nombreRol == 'SPV General'}"/>
+                                        <aura:if isTrue="{!not(v.esCasoGRRCOPS)}">
+                                            <lightning:inputField aura:id="canalEntradaElse" fieldName="Origin" value="{!v.nombreRol == 'SAC General' || v.nombreRol == 'Testamentarías' || v.nombreRol == 'SPV General' ? 'SAC_Manual' :''}" required="true" disabled = "{!v.nombreRol == 'SAC General' || v.nombreRol == 'Testamentarías' || v.nombreRol == 'SPV General'}"/>
+                                         </aura:if>
                                         <aura:if isTrue="{!v.esClienteCC}">
                                             <lightning:inputField fieldName="CC_Canal_Operativo__c" required="true"/>
                                         </aura:if>
@@ -95,6 +101,11 @@
                                         <aura:if isTrue="{!v.esClienteGRR}">
                                             <lightning:inputField aura:id="desplegableProcedenciaDos" fieldName="CC_Canal_Procedencia__c" required="{!v.canalProcedenciaRequired}" value="{!v.valorGRR}" onchange="{!c.grabarProcedenciaDos}"/>
                                         </aura:if>
+                                        <!-- Nueva Funcionalidad para el caso de GRR COPS - Servicio Recobro-->
+                                        <aura:if isTrue="{!v.esCasoGRRCOPS}">
+                                            <lightning:inputField  aura:id="origenCaso"  fieldName="SAC_OrigenConsulta__c" value="{!v.valorServicio}" class="slds-hidden" />          
+                                        </aura:if>
+
                                     </aura:set>
                                 </aura:if>
                                 <aura:if isTrue="{!v.grupoTrabajoCops}">

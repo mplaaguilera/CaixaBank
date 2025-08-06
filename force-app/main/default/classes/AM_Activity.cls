@@ -1,5 +1,5 @@
 public with sharing class AM_Activity {
-
+    
 	public static void crearActividad(Id idCaso, String tipo, String motivo) {
         insert new Task(
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'AM_Task'),

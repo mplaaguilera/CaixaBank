@@ -29,6 +29,8 @@
 			//Controlar RT Caso
 			component.set('v.RTSeguimiento', result.vRTSeguimiento);
 
+
+
 			if (!result.vRTSeguimiento && !result.vControlarPS) {
 
 				component.set('v.controlRTyPS', true);
@@ -283,6 +285,29 @@
 		component.set('v.dataAnexos', []);
 		component.set('v.datosTrasladoCalculados', '');
 		component.set('v.currentSelectedRowsAnexos', []);
+
+
+		/* Jaime: Limpieza de los campos de las operaciones 01 y 06 al Cerrar o al Cancelar la Autosignación*/
+		component.set('v.tipoOperacion', '');
+		component.set('v.numExpediente', '');
+		component.set('v.cifNif', '');
+		component.set('v.nombreTitular', '');
+		component.set('v.cifNif2', '');
+		component.set('v.nombreTitular2', '');
+		component.set('v.cifNif3', '');
+		component.set('v.nombreTitular3', '');
+		component.set('v.cifNif4', '');
+		component.set('v.nombreTitular4', '');
+		component.set('v.cifNif5', '');
+		component.set('v.nombreTitular5', '');
+		component.set('v.nameOwnerCase', '');
+		component.set('v.telefono', '');
+		component.set('v.prestamoICO', 	'NO');
+		component.set('v.cifOrdenante', '');
+		//component.set('v.numPer', '');
+		component.set('v.idEER', '');
+
+
 		$A.util.addClass(component.find('backdrop'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('modalAutoasignar'), 'slds-fade-in-open');
 		//eslint-disable-next-line @lwc/lwc/no-async-operation
@@ -361,6 +386,26 @@
 		component.set('v.datosTrasladoCalculados', '');
 		component.set('v.currentSelectedRowsAnexos', []);
 		component.find('idObservacionAutoasginacion').set('v.value', '');
+
+		/* Jaime: Limpieza de los campos de las operaciones 01 y 06 al Cerrar o al Cancelar la Autosignación*/
+		component.set('v.tipoOperacion', '');
+		component.set('v.numExpediente', '');
+		component.set('v.cifNif', '');
+		component.set('v.nombreTitular', '');
+		component.set('v.cifNif2', '');
+		component.set('v.nombreTitular2', '');
+		component.set('v.cifNif3', '');
+		component.set('v.nombreTitular3', '');
+		component.set('v.cifNif4', '');
+		component.set('v.nombreTitular4', '');
+		component.set('v.cifNif5', '');
+		component.set('v.nombreTitular5', '');
+		component.set('v.nameOwnerCase', '');
+		component.set('v.telefono', '');
+		component.set('v.prestamoICO', 	'NO');
+		component.set('v.cifOrdenante', '');
+		//component.set('v.numPer', '');
+		component.set('v.idEER', '');
 	},
 
 	autoasignar: function(component, event, helper) {
@@ -408,6 +453,10 @@
 					}
 				} else {
 					let avisoMostrado = false;
+
+					/* 	WARNING: SÍ se asigna el caso a un grupo
+						ERROR: NO se ha podido asignar el caso a un grupo
+					 */
 					if (datosAsignacion.errorGrupoAuto == '1') {
 						//Error en el cálculo de grupo automático sin cuenta informada.
 						avisoMostrado = true;
@@ -433,6 +482,9 @@
 					} else if (datosAsignacion.errorGrupoAuto == '9') {
 						avisoMostrado = true;
 						helper.mostrarToast('error', 'No se ha asignado el caso', 'No es posible asignar el caso a Valija sin tener el centro informado.');
+					} else if (datosAsignacion.errorGrupoAuto == '10') {
+						avisoMostrado = true;
+						helper.mostrarToast('error', 'No se ha asignado el caso', 'No es posible asignar un caso de Operación Expediente Persona a Valija sin que la cuenta tenga Num. Persona informado.');
 					}
 
 					if (datosAsignacion.requiereInfoAdicional == 'Y') {
@@ -455,9 +507,20 @@
 							component.set('v.loadingDatosAdicionales', true);
 							component.set('v.datosTrasladoCalculados', datosAsignacion.datosCalculadosTraslado);
 							component.set('v.datosImpuestosModificados', false);
+							//component.set("v.operacionTitulo", );
 
-							let caracteresRestantes = 255 - component.find('idObservacionValija').get('v.value').length;
-							component.set('v.enviarNotificacionCaracteresRestantes', caracteresRestantes);
+							/* 	Jaime:
+								Establecer el numero de la operacion valija, para que el modal de valija pueda mostrar los nuevos campos correspondientes.
+								La forma de controlar el modal es pasandole datos a modalValija y ahí, a traves de codigo aura incrustado es posible mostrar los campos necesarios del html
+							*/
+							component.set('v.operacionValijaMCC', datosAsignacion.operacionValijaMCC);
+							component.set('v.nameOwnerCase', datosAsignacion.nameOwnerCase);
+
+							if (datosAsignacion.operacionValijaMCC != null && datosAsignacion.operacionValijaMCC != '06' && datosAsignacion.operacionValijaMCC != '01' && component.find('idObservacionValija')) {
+								let caracteresRestantes = 255 - component.find('idObservacionValija').get('v.value').length;
+								component.set('v.enviarNotificacionCaracteresRestantes', caracteresRestantes);
+							}
+							
 
 							//Preparar apertura del modal Valija.
 							$A.util.addClass(component.find('backdrop'), 'slds-fade-in-open');
@@ -478,6 +541,9 @@
 							getAnexos.setCallback(this, response => {
 								if (response.getState() === 'SUCCESS') {
 									component.set('v.dataAnexos', response.getReturnValue());
+
+									//Jaime: tras cargar los anexos, cerrar spinner. Valido ya que todas las operaciones tienen anexos
+									component.set('v.loadingDatosAdicionales', false);
 								}
 							});
 							$A.enqueueAction(getAnexos);
@@ -529,15 +595,606 @@
 		$A.enqueueAction(asignar);
 	},
 
+	/**
+	 * @description       : Evita introducir espacios en blanco de un campo de entrada.
+	 * @author            : Jaime Villarón
+	 * @group             : 
+	 * @last modified on  : 2025-07-16
+	 * @last modified by  : Jaime Villarón
+	 * Modifications Log 
+	 * Ver   Date         Author             Modification
+	 * 1.0   2025-07-16  Jaime Villarón   Initial Version
+	 */
+	limpiarEspacios: function(component, event, helper) {
+        let inputCmp = event.getSource();           // El componente que disparó el evento
+        let valor = inputCmp.get("v.value") || '';  // Valor actual
+        let nuevoValor = valor.replace(/\s/g, '');  // Quitar espacios
+        if (nuevoValor !== valor) {
+            inputCmp.set("v.value", nuevoValor);    // Actualiza el mismo campo
+        }
+    },
+
+	/**
+	 * @description       : Valida el formato del CIF/NIF introducido en un campo de entrada.
+	 * @author            : Jaime Villarón
+	 * @group             : 
+	 * @last modified on  : 2025-07-16
+	 * @last modified by  : Jaime Villarón
+	 * Modifications Log 
+	 * Ver   Date         Author             Modification
+	 * 1.0   2025-07-16  Jaime Villarón   Initial Version
+	 */
+	validarCifNifOLD: function(component, event, helper) {
+		let esNIf1Boolean = false;
+		let esNIFValido = false;
+        let inputCmp = event.getSource(); 
+        let valor = inputCmp.get("v.value") || "";
+		inputCmp.set("v.value", valor); // Actualiza el valor del campo para que las letras siempre sean mayúsculas
+
+        valor = valor.replace(/\s+/g, "").toUpperCase();
+
+		console.log('Antes de llamar a la funcion');
+						
+		let calcularTipoOperacionporNIF = component.get('c.calcularTipoOperacionporNIF');
+		console.log('Despues de obtener la funcion: ' );
+
+        if (valor.length !== 9) {
+            inputCmp.setCustomValidity("Debe tener exactamente 9 caracteres");
+			inputCmp.reportValidity();
+        } else {
+            let letraInicial = valor.charAt(0);
+            let esEmpresa = /^[ABCDEFGHJNPQRSUVW]$/.test(letraInicial);
+            let esParticular = /^[0-9XYZ]$/.test(letraInicial);
+
+            if (esEmpresa) {
+                let regexCIF = /^[ABCDEFGHJNPQRSUVW][0-9]{7}[0-9A-J]$/;
+                if (!regexCIF.test(valor)) {
+                    inputCmp.setCustomValidity("Formato CIF no válido");
+					inputCmp.reportValidity();
+                } else {
+					esNIFValido = true;
+					inputCmp.setCustomValidity("");
+					inputCmp.reportValidity();
+
+					if (inputCmp.getLocalId() === "nif1") {
+						//NIF 1
+						esNIf1Boolean = true;
+					}	
+                }
+            } else if (esParticular) {
+				//NIF basado en persona con DNI español (dígitos + letra) o NIE extranjero (X,Y,Z + dígitos + letra) 
+                let regexNIF = /^[0-9XYZ][0-9]{7}[A-Z]$/;
+
+                if (!regexNIF.test(valor)) {
+                    inputCmp.setCustomValidity("Formato NIF no válido");
+					inputCmp.reportValidity();
+                } else {
+					esNIFValido = true;
+					inputCmp.setCustomValidity("");
+					inputCmp.reportValidity();
+					
+					if (inputCmp.getLocalId() === "nif1") {
+						//NIF 1
+						esNIf1Boolean = true;
+					}
+                }
+            } else {
+                inputCmp.setCustomValidity("Letra inicial no válida");
+				inputCmp.reportValidity();
+            }	
+        }
+
+        if (esNIFValido) {
+			// Si es un NIF válido, llamamos a la función para buscar nombres por NIFs
+			console.log('PRIMER NIF VALIDADO: ' + valor);
+
+			calcularTipoOperacionporNIF.setParams({ 'nif': valor, 'esNIf1Boolean': esNIf1Boolean.toString() });
+			console.log('Despues de dar parametros a la funcion: ');
+
+			calcularTipoOperacionporNIF.setCallback(this, response => {
+				console.log('Despues entrar al callback: ');
+				console.log('El estado de la respuesta es: ' + response.getState());
+				
+				if (response.getState() === 'SUCCESS') {
+					
+					console.log('Antes de obtener la response: ');
+					let mapaRetorno = response.getReturnValue();
+					console.log('Despues de obtener la response: ' + mapaRetorno.tipoAccount);
+
+					switch (inputCmp.getLocalId()) {
+						case 'nif1':
+							if (mapaRetorno.nombreTitular === 'No encontrado'){
+								inputCmp.setCustomValidity("CIF/NIF no encontrado");
+								inputCmp.reportValidity();
+								component.set('v.tipoOperacion', 'sinOperacion');
+							} else{
+								component.set('v.tipoOperacion', mapaRetorno.tipoAccount);
+								component.set('v.nombreTitular', mapaRetorno.nombreTitular);
+							}
+							break;
+
+						case 'nif2':
+							if (mapaRetorno.nombreTitular === 'No encontrado'){
+								inputCmp.setCustomValidity("CIF/NIF no encontrado");
+								inputCmp.reportValidity();
+							} else{
+								component.set('v.nombreTitular2', mapaRetorno.nombreTitular);
+							}
+							break;
+						case 'nif3':
+							if (mapaRetorno.nombreTitular === 'No encontrado'){
+								inputCmp.setCustomValidity("CIF/NIF no encontrado");
+								inputCmp.reportValidity();
+							} else{
+								component.set('v.nombreTitular3', mapaRetorno.nombreTitular);
+							}
+							break;
+
+						case 'nif4':
+							if (mapaRetorno.nombreTitular === 'No encontrado'){
+								inputCmp.setCustomValidity("CIF/NIF no encontrado");
+								inputCmp.reportValidity();
+							} else{
+								component.set('v.nombreTitular4', mapaRetorno.nombreTitular);
+							}
+							break;
+
+						case 'nif5':
+							if (mapaRetorno.nombreTitular === 'No encontrado'){
+								inputCmp.setCustomValidity("CIF/NIF no encontrado");
+								inputCmp.reportValidity();
+							} else{
+								component.set('v.nombreTitular5', mapaRetorno.nombreTitular);
+							}
+							break;
+						case 'nif6':
+						if (mapaRetorno.nombreTitular === 'No encontrado'){
+							inputCmp.setCustomValidity("CIF/NIF no encontrado");
+							inputCmp.reportValidity();
+						} else{
+							component.set('v.nombreTitular', mapaRetorno.nombreTitular);
+						}
+						break;
+					}
+				}
+			});
+
+			console.log('Antes de encolar la funcion: ');
+			$A.enqueueAction(calcularTipoOperacionporNIF);
+			console.log('Despues de encolar la funcion: ');
+		}
+
+	},
+
+	validarCifNif: function(component, event, helper) {
+		let esNIf1Boolean = false;
+		let esNIFValido = false;
+		let esEmpresa = false;
+		let esParticular = false;
+
+		let inputCmp = event.getSource(); 
+		let valor = inputCmp.get("v.value") || "";
+		inputCmp.set("v.value", valor); // Fuerza a mayúsculas
+
+		valor = valor.replace(/\s+/g, "").toUpperCase();
+
+		// Si el campo está vacío, no mostrar ninguna validación
+		if (valor.length === 0) {
+			inputCmp.setCustomValidity("");
+			inputCmp.reportValidity();
+			return;
+		}
+
+		console.log('Antes de llamar a la función');
+
+		let calcularTipoOperacionporNIF = component.get('c.calcularTipoOperacionporNIF');
+		console.log('Después de obtener la función');
+
+		if (valor.length !== 9) {
+			inputCmp.setCustomValidity("Debe tener exactamente 9 caracteres");
+			inputCmp.reportValidity();
+		} else {
+			let letraInicial = valor.charAt(0);
+			esEmpresa = /^[ABCDEFGHJNPQRSUVW]$/.test(letraInicial);
+			esParticular = /^[0-9XYZ]$/.test(letraInicial);
+
+			if (esEmpresa) {
+				let regexCIF = /^[ABCDEFGHJNPQRSUVW][0-9]{7}[0-9A-J]$/;
+				if (!regexCIF.test(valor) || !helper.esCIFValidoPorControl(valor)) {
+					inputCmp.setCustomValidity("CIF no válido");
+					inputCmp.reportValidity();
+				} else {
+					esNIFValido = true;
+					inputCmp.setCustomValidity("");
+					inputCmp.reportValidity();
+					esNIf1Boolean = inputCmp.getLocalId() === "nif1";
+				}
+			} else if (esParticular) {
+				let regexNIF = /^[0-9XYZ][0-9]{7}[A-Z]$/;
+				if (!regexNIF.test(valor) || !helper.esNIFValidoPorControl(valor)) {
+					inputCmp.setCustomValidity("NIF no válido");
+					inputCmp.reportValidity();
+				} else {
+					esNIFValido = true;
+					inputCmp.setCustomValidity("");
+					inputCmp.reportValidity();
+					esNIf1Boolean = inputCmp.getLocalId() === "nif1";
+				}
+			} else {
+				inputCmp.setCustomValidity("Letra inicial no válida");
+				inputCmp.reportValidity();
+			}
+		}
+
+		if (esNIFValido) {
+			console.log('PRIMER NIF VALIDADO: ' + valor);
+			calcularTipoOperacionporNIF.setParams({ 'nif': valor, 'esNIf1Boolean': esNIf1Boolean.toString() });
+			console.log('Después de dar parámetros a la función');
+
+			calcularTipoOperacionporNIF.setCallback(this, response => {
+				console.log('Entrando al callback');
+				console.log('Estado de la respuesta: ' + response.getState());
+
+				if (response.getState() === 'SUCCESS') {
+					let mapaRetorno = response.getReturnValue();
+					console.log('Respuesta obtenida: ' + mapaRetorno.tipoAccount);
+
+					// Mensaje según tipo
+					let mensajeNoEncontrado = esEmpresa ? "CIF no encontrado" : "NIF no encontrado";
+
+					switch (inputCmp.getLocalId()) {
+						case 'nif1':
+							mapaRetorno.nombreTitular === 'No encontrado'
+								? (inputCmp.setCustomValidity(mensajeNoEncontrado), inputCmp.reportValidity(), component.set('v.tipoOperacion', 'sinOperacion'))
+								: (component.set('v.tipoOperacion', mapaRetorno.tipoAccount), component.set('v.nombreTitular', mapaRetorno.nombreTitular));
+							break;
+
+						case 'nif2':
+							mapaRetorno.nombreTitular === 'No encontrado'
+								? (inputCmp.setCustomValidity(mensajeNoEncontrado), inputCmp.reportValidity())
+								: component.set('v.nombreTitular2', mapaRetorno.nombreTitular);
+							break;
+
+						case 'nif3':
+							mapaRetorno.nombreTitular === 'No encontrado'
+								? (inputCmp.setCustomValidity(mensajeNoEncontrado), inputCmp.reportValidity())
+								: component.set('v.nombreTitular3', mapaRetorno.nombreTitular);
+							break;
+
+						case 'nif4':
+							mapaRetorno.nombreTitular === 'No encontrado'
+								? (inputCmp.setCustomValidity(mensajeNoEncontrado), inputCmp.reportValidity())
+								: component.set('v.nombreTitular4', mapaRetorno.nombreTitular);
+							break;
+
+						case 'nif5':
+							mapaRetorno.nombreTitular === 'No encontrado'
+								? (inputCmp.setCustomValidity(mensajeNoEncontrado), inputCmp.reportValidity())
+								: component.set('v.nombreTitular5', mapaRetorno.nombreTitular);
+							break;
+
+						case 'nif6':
+							mapaRetorno.nombreTitular === 'No encontrado'
+								? (inputCmp.setCustomValidity(mensajeNoEncontrado), inputCmp.reportValidity())
+								: component.set('v.nombreTitular', mapaRetorno.nombreTitular);
+							break;
+					}
+				}
+			});
+
+			console.log('Antes de encolar la función');
+			$A.enqueueAction(calcularTipoOperacionporNIF);
+			console.log('Después de encolar la función');
+		}
+	},
+
+	/**
+	 * ValidateSpanishID. Returns the type of document and checks its validity.
+	 * 
+	 * Usage:
+	 *     ValidateSpanishID( str );
+	 * 
+	 *     > ValidateSpanishID( '12345678Z' );
+	 *     // { type: 'dni', valid: true }
+	 *     
+	 *     > ValidateSpanishID( 'B83375575' );
+	 *     // { type: 'cif', valid: false }
+	 * 
+	 * The algorithm is adapted from other solutions found at:
+	 * - http://www.compartecodigo.com/javascript/validar-nif-cif-nie-segun-ley-vigente-31.html
+	 * - http://es.wikipedia.org/wiki/C%C3%B3digo_de_identificaci%C3%B3n_fiscal
+	 */
+
+	/* ValidateSpanishID: function() {
+		'use strict';
+		
+		var DNI_REGEX = /^(\d{8})([A-Z])$/;
+		var CIF_REGEX = /^([ABCDEFGHJKLMNPQRSUVW])(\d{7})([0-9A-J])$/;
+		var NIE_REGEX = /^[XYZ]\d{7,8}[A-Z]$/;
+
+		var ValidateSpanishID = function( str ) {
+
+			// Ensure upcase and remove whitespace
+			str = str.toUpperCase().replace(/\s/, '');
+
+			var valid = false;
+			var type = spainIdType( str );
+
+			switch (type) {
+			case 'dni':
+				valid = validDNI( str );
+				break;
+			case 'nie':
+				valid = validNIE( str );
+				break;
+			case 'cif':
+				valid = validCIF( str );
+				break;
+			}
+
+			return {
+			type: type,
+			valid: valid
+			};
+
+		};
+
+		var spainIdType = function( str ) {
+			if ( str.match( DNI_REGEX ) ) {
+			return 'dni';
+			}
+			if ( str.match( CIF_REGEX ) ) {
+			return 'cif';
+			}
+			if ( str.match( NIE_REGEX ) ) {
+			return 'nie';
+			}
+		};
+
+		var validDNI = function( dni ) {
+			var dni_letters = "TRWAGMYFPDXBNJZSQVHLCKE";
+			var letter = dni_letters.charAt( parseInt( dni, 10 ) % 23 );
+			
+			return letter == dni.charAt(8);
+		};
+
+		var validNIE = function( nie ) {
+
+			// Change the initial letter for the corresponding number and validate as DNI
+			var nie_prefix = nie.charAt( 0 );
+
+			switch (nie_prefix) {
+			case 'X': nie_prefix = 0; break;
+			case 'Y': nie_prefix = 1; break;
+			case 'Z': nie_prefix = 2; break;
+			}
+
+			return validDNI( nie_prefix + nie.substr(1) );
+
+		};
+
+		var validCIF = function( cif ) {
+
+			var match = cif.match( CIF_REGEX );
+			var letter  = match[1],
+				number  = match[2],
+				control = match[3];
+
+			var even_sum = 0;
+			var odd_sum = 0;
+			var n;
+
+			for ( var i = 0; i < number.length; i++) {
+			n = parseInt( number[i], 10 );
+
+			// Odd positions (Even index equals to odd position. i=0 equals first position)
+			if ( i % 2 === 0 ) {
+				// Odd positions are multiplied first.
+				n *= 2;
+
+				// If the multiplication is bigger than 10 we need to adjust
+				odd_sum += n < 10 ? n : n - 9;
+
+			// Even positions
+			// Just sum them
+			} else {
+				even_sum += n;
+			}
+
+			}
+
+			var control_digit = (10 - (even_sum + odd_sum).toString().substr(-1) );
+			var control_letter = 'JABCDEFGHI'.substr( control_digit, 1 );
+
+			// Control must be a digit
+			if ( letter.match( /[ABEH]/ ) ) {
+			return control == control_digit;
+
+			// Control must be a letter
+			} else if ( letter.match( /[KPQS]/ ) ) {
+			return control == control_letter;
+
+			// Can be either
+			} else {
+			return control == control_digit || control == control_letter;
+			}
+
+		};
+
+		return ValidateSpanishID;
+		}
+	)(); */
+
+	//Llamada en el onChange
+	limpiarLetras: function(component, event, helper) {
+        helper.limpiarLetras(component, event); // llamada real
+    },
+
+	/**
+	 * @description       : Valida el número de expediente y lo asigna a idEER si tiene 15 dígitos.
+	 * @author            : Jaime Villarón
+	 * @group             : 
+	 * @last modified on  : 2025-07-22
+	 * @last modified by  : Jaime Villarón
+	 * Modifications Log 
+	 * Ver   Date         Author             Modification
+	 * 1.0   2025-07-22  Jaime Villarón   Initial Version
+	 */
+	validarYAsignarNumExpediente: function(component, event, helper) {
+
+		//Llamada en el onBlur: usado en caso de que el usuario pegue en el campo, pero no escriba nada.
+		helper.limpiarLetras(component, event, helper);
+
+		let inputCmp = event.getSource();
+		let numExpedienteValue = inputCmp.get("v.value") || '';
+
+		// Si tiene exactamente 15 dígitos, lo copiamos a idEER
+		if (numExpedienteValue.length === 15) {
+			component.set("v.idEER", numExpedienteValue);
+			inputCmp.setCustomValidity("");
+		} else {
+			inputCmp.setCustomValidity("El número de expediente debe tener 15 dígitos");
+			component.set("v.idEER", '');
+		}
+		inputCmp.reportValidity();
+	},
+
+	validarTelefono: function(component, event, helper) {
+		let inputCmp = event.getSource();
+		let telefono = inputCmp.get("v.value") || '';
+		//let telefono = component.get("v.telefono") || '';
+		telefono = telefono.trim();
+		let regex = /^\+?[0-9\s\-().]{6,20}$/;
+
+		if (!regex.test(telefono)) {
+			inputCmp.setCustomValidity("Teléfono no válido");
+		} else {
+			inputCmp.setCustomValidity("");
+		}
+		inputCmp.reportValidity();
+	},
+
+	/* Jaime OLD:
+	rellenarIDEER: function(component, event, helper) {
+		//Primero vemos si idEER tiene 15 caracteres
+		let inputCmp = event.getSource();
+		let numExpedienteValue = inputCmp.get("v.value") || "";
+		if (numExpedienteValue.length === 15) {
+			component.set("v.idEER", numExpedienteValue);
+			inputCmp.setCustomValidity("");
+		} else {
+			inputCmp.setCustomValidity("El número de expediente debe tener 15 dígitos");
+		}
+
+		
+		inputCmp.reportValidity();
+	}, */
+
+	/* Jaime OLD:
+	buscarNombresPorNifs: function(component) {
+		// Recojo los 5 nif en un array
+		let nifs = [
+			component.get("v.cifNif1") || "",
+			component.get("v.cifNif2") || "",
+			component.get("v.cifNif3") || "",
+			component.get("v.cifNif4") || "",
+			component.get("v.cifNif5") || ""
+		];
+
+		let action = component.get("c.buscarTitularesPorNifs");
+		action.setParams({ listaNifs: nifs });
+
+		action.setCallback(this, function(response) {
+			if (response.getState() === "SUCCESS") {
+				let resultados = response.getReturnValue(); // Map<String,String> NIF→Nombre
+
+				// Recorremos los NIF y asignamos nombres o mensaje de error
+				for(let i = 0; i < nifs.length; i++) {
+					let nif = nifs[i];
+					let nombreTitularCmp = component.find(`nombreTitular${i + 1}`);
+
+					if (nif && nombreTitularCmp) {
+						let nombre = resultados[nif];
+						if (nombre) {
+							nombreTitularCmp.set("v.value", nombre);
+							nombreTitularCmp.setCustomValidity("");
+						} else {
+							nombreTitularCmp.set("v.value", "");
+							nombreTitularCmp.setCustomValidity("No se ha encontrado ese nombre");
+						}
+						nombreTitularCmp.reportValidity();
+					}
+				}
+			} else {
+				console.error("Error en Apex:", response.getError());
+				// Opcional: mostrar toast error aquí
+			}
+		});
+
+    	$A.enqueueAction(action);
+	}, */
+
 	autoasignarValija: function(component, event, helper) {
 
-		//Validar que no existan cambios pendientes de guardar en relación a los impuestos.
+		
 
-		let datosImpuestosGuardados = component.get('v.datosImpuestosModificados');
-		if (datosImpuestosGuardados === true) {
-			let errorAux = 'Para poder traspasar a Valija debe guardar los datos de impuestos que has modificado (se ha de pulsar el botón <Actualizar caso> de la sección <Datos de impuestos>).';
-			helper.mostrarToast('warning', 'No se ha asignado el caso', errorAux);
-			return;
+		
+
+		
+
+        let operacionValijaMCC = component.get('v.operacionValijaMCC');
+		//Jaime: comprobacion de campos obligatorios al pulsar autoasignar a Valija
+		if(operacionValijaMCC === '01'){
+
+			let inputIdsOp01 = 
+			[
+				'tipoOperacion', 'nif1', 'nif2', 'nif3', 'nif4', 'nif5', 'numExpediente',
+				'nombreTitular', 'nombreTitular2', 'nombreTitular3', 'nombreTitular4', 'nombreTitular5',
+				'telefonoOp01', 'personaContacto01', 'prestamoICO01', 'idEER01'
+			];
+			const camposCorrectos = helper.validarCamposFormulario(component, inputIdsOp01);
+
+			if (!camposCorrectos) {
+						helper.mostrarToast(
+							'error',
+							'Formulario con errores',
+							'Por favor, revisa los campos resaltados antes de continuar.'
+						);
+						return;
+			}
+
+			let tipoOperacion = component.get('v.tipoOperacion');
+			let cifNif = component.get('v.cifNif');
+			let numExpediente = component.get('v.numExpediente');
+			if (tipoOperacion == null || tipoOperacion == undefined || tipoOperacion == '' ||
+				cifNif == null || cifNif == undefined || cifNif == '' ||
+				numExpediente == null || numExpediente == undefined || numExpediente == '') {
+				let errorAux = 'Para poder traspasar a Valija debe indicar todos los campos obligatorios de la operación';
+				helper.mostrarToast('warning', 'No se ha trasladado el caso', errorAux);
+				return;
+			}
+
+		} else if(operacionValijaMCC === '06'){
+
+			let inputIdsOp06 = ['nif6', 'telefonoOp06', 'nombreTitular06', 'personaContacto06', 'prestamoICO06'];
+			const camposCorrectos = helper.validarCamposFormulario(component, inputIdsOp06);
+
+			if (!camposCorrectos) {
+						helper.mostrarToast(
+							'error',
+							'Formulario con errores',
+							'Por favor, revisa los campos resaltados antes de continuar.'
+						);
+						return;
+			}
+
+			let cifOrdenante = component.get('v.cifOrdenante');
+			if(cifOrdenante == null || cifOrdenante == undefined || cifOrdenante == '') {
+				let errorAux = 'Para poder traspasar a Valija debe indicar todos los campos obligatorios de la operación';
+				helper.mostrarToast('warning', 'No se ha trasladado el caso', errorAux);
+				return;
+			}
+			
 		}
 
 		//Validar que exista un fichero como mínimo seleccionado.
@@ -548,25 +1205,6 @@
 			return;
 		}
 
-		//Validar que el caso tenga un número de operaciones informado.
-		let operacionesCaso = component.find('caseOperations').get('v.value');
-		if (operacionesCaso == null || operacionesCaso == undefined || operacionesCaso == '') {
-			let errorAux = 'Para poder traspasar a Valija debe indicar el número de operaciones del caso';
-			helper.mostrarToast('warning', 'No se ha asignado el caso', errorAux);
-			return;
-		}
-
-		//Validar el tamaño de las observaciones.
-		if (component.get('v.enviarNotificacionCaracteresRestantes') < 0) {
-			let errorAux = 'Para poder traspasar a Valija debe revisar la longitud de las notas que has escrito';
-			helper.mostrarToast('warning', 'No se ha asignado el caso', errorAux);
-			return;
-		}
-		if (component.get('v.emailNoInformadoValija')) {
-			let errorAux = 'No se permite realizar el envío a valija dado que el contacto no tiene email informado';
-			helper.mostrarToast('warning', 'No se ha asignado el caso', errorAux);
-			return;
-		}
 
 		/*component.find('modalAutoasignarBotonValija').set('v.disabled', true);
 		component.find('modalAutoasignarBotonValijaCancelar').set('v.disabled', true);*/
@@ -577,11 +1215,81 @@
 		let button2 = component.find('modalAutoasignarBotonValijaCancelar');
 		button2.set('v.disabled', true);
 		let datosTraslado = component.get('v.datosTrasladoCalculados');
-		let notasManuales = component.get('v.notasManuales');
-		let notaTipificada = component.get('v.selectedNotasTip');
+		if (typeof datosTraslado === 'string') {
+			datosTraslado = JSON.parse(datosTraslado);
+		}
+
+		/* Jaime: traer nuevos campos informados en el modal según la operación
+        */
+        let operacion = component.get('v.operacionValijaMCC');
+
+		let notasManuales = '';
+		let notaTipificada = '';
+
+        // Operación 01
+        if (operacion === '01') {
+            datosTraslado.tipoOperacion = component.get('v.tipoOperacion');
+            datosTraslado.numExpediente = component.get('v.numExpediente');
+            datosTraslado.cifNif = component.get('v.cifNif');
+            datosTraslado.nombreTitular = component.get('v.nombreTitular');
+            datosTraslado.cifNif2 = component.get('v.cifNif2');
+            datosTraslado.nombreTitular2 = component.get('v.nombreTitular2');
+            datosTraslado.cifNif3 = component.get('v.cifNif3');
+            datosTraslado.nombreTitular3 = component.get('v.nombreTitular3');
+            datosTraslado.cifNif4 = component.get('v.cifNif4');
+            datosTraslado.nombreTitular4 = component.get('v.nombreTitular4');
+			datosTraslado.cifNif5 = component.get('v.cifNif5');
+			datosTraslado.nombreTitular5 = component.get('v.nombreTitular5');
+            datosTraslado.contacto = component.get('v.nameOwnerCase');
+            datosTraslado.telefono = component.get('v.telefono');
+            datosTraslado.prestamoICO = component.get('v.prestamoICO');
+			datosTraslado.idEER = component.get('v.idEER');
+        }
+        // Operación 06
+        else if (operacion === '06') {
+            datosTraslado.cifOrdenante = component.get('v.cifOrdenante');
+            datosTraslado.nombreTitular = component.get('v.nombreTitular');
+            datosTraslado.contacto = component.get('v.nameOwnerCase');
+            datosTraslado.telefono = component.get('v.telefono');
+            datosTraslado.prestamoICO = component.get('v.prestamoICO');
+        } else {
+			notasManuales = component.get('v.notasManuales');
+			notaTipificada = component.get('v.selectedNotasTip');
+			//Validar que no existan cambios pendientes de guardar en relación a los impuestos.
+
+			//Validar que el caso tenga un número de operaciones informado.
+			let operacionesCaso = component.find('caseOperations').get('v.value');
+			if (operacionesCaso == null || operacionesCaso == undefined || operacionesCaso == '') {
+				let errorAux = 'Para poder traspasar a Valija debe indicar el número de operaciones del caso';
+				helper.mostrarToast('warning', 'No se ha asignado el caso', errorAux);
+				return;
+			}
+
+			//Validar el tamaño de las observaciones.
+			if (component.get('v.enviarNotificacionCaracteresRestantes') < 0) {
+				let errorAux = 'Para poder traspasar a Valija debe revisar la longitud de las notas que has escrito';
+				helper.mostrarToast('warning', 'No se ha asignado el caso', errorAux);
+				return;
+			}
+
+			if (component.get('v.emailNoInformadoValija')) {
+				let errorAux = 'No se permite realizar el envío a valija dado que el contacto no tiene email informado';
+				helper.mostrarToast('warning', 'No se ha asignado el caso', errorAux);
+				return;
+			}
+
+			let datosImpuestosGuardados = component.get('v.datosImpuestosModificados');
+			if (datosImpuestosGuardados === true) {
+				let errorAux = 'Para poder traspasar a Valija debe guardar los datos de impuestos que has modificado (se ha de pulsar el botón <Actualizar caso> de la sección <Datos de impuestos>).';
+				helper.mostrarToast('warning', 'No se ha asignado el caso', errorAux);
+				return;
+			}
+		}
+
 		let asignar = component.get('c.confirmarTrasladoValija');
+
 		asignar.setParams({
-			'datosTrasladoJSON': datosTraslado,
+			'datosTrasladoJSON': JSON.stringify(datosTraslado),
 			'notasManuales': notasManuales,
 			'listaFicheros': listaFicheros
 		});
@@ -1816,7 +2524,10 @@
 	inputNifRelacionChange: function(component) {
 		let listaNifsRelaciones = component.get('v.notasCIF').split(',');
 	},
-	enviarCanalBpo: function(component) {
+	enviarCanalBpo: function(component, event, helper) {
+		
+		console.log('Entro al método');
+
 		component.find('modalCanalBpoBotonIniciar').set('v.disabled', true);
 		let checkStatus = component.get('v.statusCasoBPO');
 		let listaFiche = component.get('v.currentSelectedRowsAnexos');
@@ -1829,11 +2540,27 @@
 		}*/
 		let envioBPO = component.get('c.enviarCanalBPO');
 		envioBPO.setParams({'caseId': component.get('v.recordId'), 'caseStatus': checkStatus, 'listaFicheros': listaFiche, 'notasCif': notaNifRel});
+		
 		envioBPO.setCallback(this, response => {
+
+			
 			if (response.getState() === 'SUCCESS') {
-				$A.enqueueAction(component.get('c.modalCanalBpoCerrar'));
+				let resultMap = response.getReturnValue();
+			
+				if (resultMap['enviarcanal'] === 'Y') {
+					helper.mostrarToast('success', '¡Éxito!', 'El caso se ha enviado correctamente a Canal BPO');
+				} else if (resultMap['enviarcanal'] === 'N') {
+					helper.mostrarToast('error', 'Error', 'No se pudo enviar el caso a Canal BPO');
+				} else if (resultMap['noexistemotivo'] === 'Y') {
+					helper.mostrarToast('warning', 'Atención', 'El caso no tiene motivo informado');
+				} else {
+					helper.mostrarToast('error', 'Error', 'Ha ocurrido un error inesperado');
+				}
+			} else if (response.getState() === 'ERROR') {
+				helper.mostrarToast('error', 'Error', 'Error en la llamada al servidor');
 			}
 			component.find('modalCanalBpoBotonIniciar').set('v.disabled', false);
+			$A.enqueueAction(component.get('c.modalCanalBpoCerrar'));
 		});
 		$A.enqueueAction(envioBPO);
 	},
@@ -2083,29 +2810,11 @@
 					helper.mostrarToast('error', 'Error en respuesta', 'No se ha podido completar la petición');					
 					$A.enqueueAction(component.get('c.modalAORCerrar'));
 				}
-
-				if(component.find('modalAORBotonIniciar') != null){
-					component.find('modalAORBotonIniciar').set('v.disabled', false);
-				}
-				
-				if(component.find('modalAORBotonIniciarRitm') != null){
-					component.find('modalAORBotonIniciarRitm').set('v.disabled', false);
-				}
-				
-				component.set('v.currentSelectedRowsAnexos', []);
-
-				if (component.find('tipologiaN1') != null) {
-					component.find('tipologiaN1').set('v.value', 'Seleccione un valor...');
-				}
-
-				if (component.find('tipologiaN2') != null) {
-					component.find('tipologiaN2').set('v.value', 'Seleccione un valor...');
-				}
-
-				if (component.find('tipologiaN2') != null) {
-
-				}
-
+				component.find('modalAORBotonIniciar').set('v.disabled', false);
+				component.find('modalAORBotonIniciarRitm').set('v.disabled', false);
+				component.find('tablaanexosAOR').set('v.currentSelectedRowsAnexos', []);
+				component.find('tipologiaN1').set('v.value', 'Seleccione un valor...');
+				component.find('tipologiaN2').set('v.value', 'Seleccione un valor...');
 				component.set('v.spinner', false);
 
 			});

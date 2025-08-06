@@ -24,8 +24,8 @@ public with sharing class SAC_CaseExtension_AU_TRHan extends CC_TriggerHandlerBa
         //Llamar al método del helper para filtrar y obtener los casos
         List<CBK_Case_Extension__c> listaCaseExtSAC = SAC_CaseExtensionHelper.filtrarCasosSAC(listNewObj);
 
-        /*if(!listaCaseExtSAC.isEmpty()){
-
-        }*/
+        if(!listaCaseExtSAC.isEmpty()){
+            SAC_Reclamacion.crearCaseExtensionHistoryReclamacionCerrada(mapOldObj, listNewObj);
+        }
     }
 }

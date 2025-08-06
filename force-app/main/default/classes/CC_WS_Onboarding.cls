@@ -47,29 +47,29 @@ public with sharing class CC_WS_Onboarding {
                     String subestado = (String) consultaEstadoSolicitudSalesforceResponse.get('subestado');
                     String motivoCierre = (String) consultaEstadoSolicitudSalesforceResponse.get('motivoCierre');
 
+                    CBK_Case_Extension__c caseExtension;
+                    String operacionCaseExtension;
                     if (caso.CBK_Case_Extension_Id__c != null) {
-                        CBK_Case_Extension__c caseExtension = [SELECT Id FROM CBK_Case_Extension__c WHERE Id = :caso.CBK_Case_Extension_Id__c LIMIT 1];
-                        caseExtension.CC_EmpresaONB__c = empresa;
-                        caseExtension.CC_EstadoONB__c = estado;
-                        caseExtension.CC_SubestadoONB__c = subestado;
-                        caseExtension.CC_FechaEstadoONB__c = fechaEstado;
-                        caseExtension.CC_MotivoCierreONB__c = motivoCierre;
-                        caseExtension.CC_NumSR__c = idReferencia;
-
-                        update caseExtension;
+                        caseExtension = [SELECT Id FROM CBK_Case_Extension__c WHERE Id = :caso.CBK_Case_Extension_Id__c LIMIT 1];
+                        operacionCaseExtension = 'update';
                     } else {
-                        CBK_Case_Extension__c caseExtensionNew = new CBK_Case_Extension__c();
-                        caseExtensionNew.Case_Id__c = recordId;
-                        caseExtensionNew.CC_EmpresaONB__c = empresa;
-                        caseExtensionNew.CC_EstadoONB__c = estado;
-                        caseExtensionNew.CC_SubestadoONB__c = subestado;
-                        caseExtensionNew.CC_FechaEstadoONB__c = fechaEstado;
-                        caseExtensionNew.CC_MotivoCierreONB__c = motivoCierre;
-                        caseExtensionNew.CC_NumSR__c = idReferencia;
-                        insert caseExtensionNew; 
-
-                        caso.CBK_Case_Extension_Id__c = caseExtensionNew.Id;
+                        caseExtension = new CBK_Case_Extension__c();
+                        caseExtension.Case_Id__c = recordId;
+                        operacionCaseExtension = 'insert';
+                    }
+                    caseExtension.CC_EmpresaONB__c = empresa;
+                    caseExtension.CC_EstadoONB__c = estado;
+                    caseExtension.CC_SubestadoONB__c = subestado;
+                    caseExtension.CC_FechaEstadoONB__c = fechaEstado;
+                    caseExtension.CC_MotivoCierreONB__c = motivoCierre;
+                    caseExtension.CC_NumSR__c = idReferencia;
+                    caseExtension.CC_CodigoONB__c = codigo;
+                    if (operacionCaseExtension == 'insert') {
+                        insert caseExtension;
+                        caso.CBK_Case_Extension_Id__c = caseExtension.Id;
                         actualizarCaso = true;
+                    } else {
+                        update caseExtension;
                     }
                     /****************************************/
 
@@ -99,17 +99,29 @@ public with sharing class CC_WS_Onboarding {
                         update cuenta;
                         retorno = 'OK';
                     } else {
-                        Account nuevaCuenta = new Account();
-                        nuevaCuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
-                        nuevaCuenta.CC_Numero_Documento__c = numeroDocumento;
-                        nuevaCuenta.FirstName = nombreSeparado[0];
-                        nuevaCuenta.LastName = nombreSeparado[1] + ' ' + nombreSeparado[2];
-                        nuevaCuenta.PersonMobilePhone = telefono;
-                        nuevaCuenta.PersonBirthdate = fechaNac;
-                        
-                        insert nuevaCuenta;
+                        String operacion;
+                        List<Account> lstCuenta = [SELECT CC_Numero_Documento__c, FirstName, LastName, PersonMobilePhone, PersonBirthdate FROM Account WHERE CC_Numero_Documento__c = :numeroDocumento LIMIT 1];
+                        Account cuenta;
+                        if (lstCuenta.isEmpty()) {
+                            cuenta = new Account();
+                            operacion = 'insert';
+                        } else {
+                            cuenta = lstCuenta[0];
+                            operacion = 'update';
+                        }
+                        cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
+                        cuenta.CC_Numero_Documento__c = numeroDocumento;
+                        cuenta.FirstName = nombreSeparado[0];
+                        cuenta.LastName = nombreSeparado[1] + ' ' + nombreSeparado[2];
+                        cuenta.PersonMobilePhone = telefono;
+                        cuenta.PersonBirthdate = fechaNac;
 
-                        caso.AccountId = nuevaCuenta.Id;
+                        if (operacion == 'insert') {
+                            insert cuenta;
+                        } else {
+                            update cuenta;
+                        }
+                        caso.AccountId = cuenta.Id;
                         actualizarCaso = true;
                         retorno = 'El cliente esta en proceso de Onboarding';
                     }
@@ -155,98 +167,49 @@ public with sharing class CC_WS_Onboarding {
 
     public static String matrizOnboarding(String estado, String subestado, String motivoCierre) {
         String comentarioCliente = '';
-
-        if (estado == 'Validación Vídeo Desasistida') {
-            if (subestado == 'Validación Vídeo Desasistida') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Espera Validación Vídeo Desasistida') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está resolviendo una incidencia técnica que se ha detectado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            }
-        } else if (estado == 'Alta Cliente') {
-            if (subestado == 'Alta Cliente') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Incidencia Alta Cliente') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está resolviendo una incidencia técnica que se ha detectado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            }
-        } else if (estado == 'Alta Contratos') {
-            if (subestado == 'Revisión Alta Contratos') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está resolviendo una incidencia técnica que se ha detectado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Revisión Señal 034 – Alta Cliente Internet') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Incidencia Alta Contratos') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está resolviendo una incidencia técnica que se ha detectado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            }
-        } else if (estado == 'Revisión Documentación') {
-            if (subestado == 'Revisión Señal 034 – Alta Cliente Internet') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Revisión Previa Salesforce') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está resolviendo una incidencia técnica que se ha detectado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Revisión Documentación Autónomo') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando, junto con tu documentación como autónomo, si ya nos la has enviado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud.';
-            } else if (subestado == 'Espera Documentación Autónomo') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos a la espera de recibir tu documentación como autónomo. Recuerda que debe ser un documento original, no una fotocopia. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Incidencia Revisión Documentación Autónomo') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está revisando tu documentación como autónomo. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Revisión Documentación Nómina') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando, junto con tu documentación de ingresos, tu nómina/pensión, si ya nos la has enviado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Espera Documentación Nómina') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos a la espera de recibir tus documentos de ingresos, tu nómina/pensión. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Incidencia Revisión Documentación Nómina') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está revisando, junto con tu documentación de ingresos, tu nómina/pensión. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Revisión Cert. UE') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando, junto con tu Certificado de la Unión Europea, si nos lo has enviado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Espera Cert. UE') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos a la espera de recibir tu Certificado de la Unión Europea. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Incidencia Cert. UE') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está revisando, junto con tu Certificado de la Unión Europea, si nos lo has enviado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Revisión Doc Id (ICAR)') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Espera Doc Id (ICAR)') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Incidencia revisión Doc Id (ICAR)') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está revisando. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Pendiente Digitalizar NIF') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Ver Error Envío NIF') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está gestionando. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            }
-        } else if (estado == 'Espera Firma o Iberpay o Señales') {
-            if (subestado == 'Revisión Previa Salesforce') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está resolviendo una incidencia técnica que se ha detectado. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Pendiente Firma') {
-                comentarioCliente = 'Tu solicitud ya está gestionada y el alta como cliente está pendiente de tu firma a través de la App. En cuanto firmes, recibirás el resto de información a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Validación Presencial') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos finalizando la gestión. Los compañeros de la oficina te irán informando del avance y recibirás también información a través del correo electrónico que nos facilitaste';
-            } else if (subestado == 'Pendiente Retirada Señal 213') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos finalizando la gestión. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Revisión Retirada Señal 213') {
-                comentarioCliente = 'Hemos recibido tu solicitud y se está resolviendo una incidencia técnica para finalizar la gestión. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Pendiente Retirada Señal Crédito') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos finalizando la gestión. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Revisión Retirada Señal Crédito') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos finalizando la gestión. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Pendiente Señal 034 – Pendiente Verificar Oficina') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos finalizando la gestión. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Revisión Señal 034 – Pendiente Verificar Oficina') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos finalizando la gestión. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            } else if (subestado == 'Gestión Productos Adicionales') {
-                comentarioCliente = 'Hemos recibido tu solicitud y estamos finalizando la gestión. Te iremos informando del avance en el proceso a través del correo electrónico que nos indicaste en la solicitud';
-            }
-        } else if (estado == 'Finalizado OK') {
-            if (subestado == 'Finalizado OK') {
-                comentarioCliente = 'Tu solicitud de alta ha finalizado correctamente, te hemos enviado un e-mail de bienvenida, revisa las carpetas de spam de tu correo electrónico y ya puedes empezar a operar a través de la app. ';
-            } else if (subestado == 'Revisión Salesforce') {
-                comentarioCliente = 'Tu solicitud de alta ha finalizado correctamente, te hemos enviado un e-mail de bienvenida, revisa las carpetas de spam de tu correo electrónico y ya puedes empezar a operar a través de la app.';
-            }else if (subestado == 'Espera Verificación Oficina') {
-                comentarioCliente = 'Tu solicitud de alta ha finalizado correctamente, te hemos enviado un e-mail de bienvenida, revisa las carpetas de spam de tu correo electrónico.  Contacta por favor con tu oficina para cualquier consulta.';
-            }else if (subestado == 'Revisión Espera Verificación Oficina') {
-                comentarioCliente = 'Tu solicitud de alta ha finalizado correctamente, te hemos enviado un e-mail de bienvenida, revisa las carpetas de spam de tu correo electrónico.  Contacta por favor con tu oficina para cualquier consulta.';
-            }else if (subestado == 'Comprobación Verificación Oficina') {
-                comentarioCliente = 'Tu solicitud de alta ha finalizado correctamente, te hemos enviado un e-mail de bienvenida, revisa las carpetas de spam de tu correo electrónico.  Contacta por favor con tu oficina para cualquier consulta.';
-            }else if (subestado == 'Revisión Alta S214') {
-                comentarioCliente = 'Tu solicitud de alta ha finalizado correctamente, sólo falta pasar por una oficina para validar tu documentación';
-            }
+        if (String.isNotBlank(motivoCierre)) {
+            comentarioCliente = recuperarMotivoCierre(motivoCierre);
+        } else {
+            comentarioCliente = recuperarEstadoSubestado(estado, subestado);
         }
+        
+        return comentarioCliente;
+    }
+
+    public static String recuperarMotivoCierre(String motivoCierre) {
+        String comentarioCliente = '';
+        Id idValorRT = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+
+        List<CC_Lista_Valores__c> listaValores = [SELECT CC_Mensajes_Mostrar__c
+                                                    FROM CC_Lista_Valores__c
+                                                    WHERE RecordTypeId = :idValorRT
+                                                    AND CC_Activa__c = true
+                                                    AND CC_Lista__r.CC_Activa__c = true
+                                                    AND CC_Valor2__c = 'Motivo Cierre'
+                                                    AND Name = :motivoCierre];
+
+        if (!listaValores.isEmpty() && String.isNotBlank(listaValores[0].CC_Mensajes_Mostrar__c)) {
+            comentarioCliente = listaValores[0].CC_Mensajes_Mostrar__c;
+        }
+        return comentarioCliente;
+    }
+
+    public static String recuperarEstadoSubestado(String estado, String subestado) {
+        String comentarioCliente = '';
+        Id idValorRT = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_ValorSubestado');
+
+        List<CC_Lista_Valores__c> listaValores = [SELECT CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c
+                                                  WHERE RecordTypeId = :idValorRT AND CC_Activa__c = true
+                                                  AND Name = :subestado AND CC_Valor2__c = 'Subestado'
+                                                  AND CC_Lista__r.Name = :estado
+                                                  AND CC_Activa__c = true
+                                                  AND CC_Lista__r.CC_Activa__c = true
+                                                  AND CC_Lista__r.CC_Lista__r.CC_Activa__c = true];
+        
+        if (!listaValores.isEmpty() && String.isNotBlank(listaValores[0].CC_Mensajes_Mostrar__c)) {
+            comentarioCliente = listaValores[0].CC_Mensajes_Mostrar__c;
+        }
+
         return comentarioCliente;
     }
 

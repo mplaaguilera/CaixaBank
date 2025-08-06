@@ -76,6 +76,12 @@ public with sharing class CC_ChatHistory_Controller_Test {
             CC_LiveChatTranscript_Id__c = chatAgenteSinTranscripcion.Id
         );
         insert actividadAgenteSinTranscripcion;
+
+        CC_Servicio_Genesys__c s1 = CC_Llamada_GC_Test.crearServicioEmpleado();
+        CC_Llamada_Input inputLlamada = CC_Llamada_GC_Test.obtenerInputLlamada(s1.CC_Codigo__c, '', '', null, null);
+        Map<String, Object> retornoRegistrarLlamadaEntrante = CC_Llamada_GC.registrarLlamadaEntrante(inputLlamada);
+        CC_Llamada__c llamada= (CC_Llamada__c) retornoRegistrarLlamadaEntrante.get('llamada');
+
         //Fin de la preparación de datos de prueba
 
         //Ejecución de las pruebas
@@ -92,10 +98,15 @@ public with sharing class CC_ChatHistory_Controller_Test {
         
         //Recuperar histórico de conversación a partir del caso creado
         List<CC_LiveAgent_Cognitive_Chat_Model> chatsTranscripcionCognitivo = CC_ChatHistory_Controller.getHistoryChat(chatAgenteSinTranscripcion.Id, true);
+
+        List<CC_LiveAgent_Cognitive_Chat_Model> chatsTranscripcionCognitivoLlamada = CC_ChatHistory_Controller.getHistoryChat(llamada.Id);
+        List<CC_LiveAgent_Cognitive_Chat_Model> chatsTranscripcionCognitivoTarea = CC_ChatHistory_Controller.getHistoryChat(actividadAgente.Id);
+
         
         
         //Recuperar histórico de conversación a partir del caso creado
         Boolean chatsTranscripcionVacio = CC_ChatHistory_Controller.getVacio(chatAgenteSinTranscripcion.Id, true);
+        Boolean chatsTranscripcionVacioLlamada = CC_ChatHistory_Controller.getVacio(llamada.Id, true);
         
          //Recuperar histórico de conversación whatsapp a partir del caso creado
         CC_LiveAgent_Cognitive_Chat_Model chatsTranscripcionWhatsapp = CC_ChatHistory_Controller.getChatWhatsappContext(chatAgenteSinTranscripcion);

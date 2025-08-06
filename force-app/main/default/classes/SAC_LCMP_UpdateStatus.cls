@@ -17,7 +17,7 @@
 *****************************************************************/
 public without sharing class SAC_LCMP_UpdateStatus {
 
-    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'SAC_MaestroAccionesReclamacion__c', 'SAC_MaestroTemas__c', 'CC_Grupo_Colaborador__c'};
+    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'SAC_MaestroAccionesReclamacion__c', 'SAC_MaestroTemas__c', 'CC_Grupo_Colaborador__c', 'SPV_Formulario__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
 
     private static final String MSG_ERROR_PERMISSIONS = 'No tienes permisos para realizar la acción.';
@@ -29,6 +29,7 @@ public without sharing class SAC_LCMP_UpdateStatus {
     private static final String RECTYPEMAESTROTEMASFT = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_FastTrack').getRecordTypeId();
     private static final String RECTYPEGRUPOLETRADOS = mapRTsObjects.get('CC_Grupo_Colaborador__c').get('SAC_Letrados').getRecordTypeId();
     private static final String RECORDTYPEBLACKLIST = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_BlackListEmails').getRecordTypeId();
+    private static final String RECTYPEFORMULARIOSUBSANACION = mapRTsObjects.get('SPV_Formulario__c').get('SAC_FormularioSubsanacion').getRecordTypeId();
 
     private static final String STATUS_ALTA = 'SAC_001';
 
@@ -231,7 +232,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
     public static void subsanarCaso(Id record, String motivo, String newStatus, String para, String copia, String copiaOculta, String cuerpo, String asunto, String ficherosAdjuntos){
 
        // updateRecordStatus(record, newStatus);
-        Case casoPorActualizar = [SELECT Id, Status, SAC_MotivoInadmision__c, CC_AcuseRecibo__c, Origin, CC_Idioma__c, SuppliedEmail, CaseNumber, OS_Email__c, SAC_M2P__c, RecordTypeId, CC_Canal_Respuesta__c
+        Case casoPorActualizar = [SELECT Id, Status, SAC_MotivoInadmision__c, CC_AcuseRecibo__c, Origin, CC_Idioma__c, SuppliedEmail, CaseNumber, OS_Email__c, SAC_M2P__c, RecordTypeId, CC_Canal_Respuesta__c, SEG_Grupo__c
                                     FROM Case 
                                     WHERE RecordType.DeveloperName LIKE 'SAC_%' AND Id =: record];
 
@@ -249,12 +250,21 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         casoPorActualizar.Status = newStatus;
         casoPorActualizar.SAC_StatusAuxiliar__c = newStatus;
         casoPorActualizar.SAC_TipoSubsanacion__c = motivo;
-        
+
+        //Crear un formulario para almacenar la subsanación
+        SPV_Formulario__c formulario = new SPV_Formulario__c();
+        formulario.RecordTypeId = RECTYPEFORMULARIOSUBSANACION;
+        formulario.SPV_Caso__c = casoPorActualizar.Id;
+        formulario.SAC_FechaSubsanacion__c = System.now();
+        formulario.SAC_Subsanador__c = UserInfo.getUserId();
+        formulario.SAC_GrupoSubsanador__c = casoPorActualizar.SEG_Grupo__c;
+        SAC_DatabaseDML.insertDML(formulario, false);
+
         SAC_DatabaseDML.updateDML(casoPorActualizar, false); 
         //Database.update(casoPorActualizar);  
 
         // Si el canal de respuesta es email y la dirección del correo electrónico web no coincide con la del email del caso se tiene que enviar un email indicando que se ha enviado la subsanación
-        if(String.isNotBlank(casoPorActualizar.SuppliedEmail) && casoPorActualizar.SuppliedEmail != casoPorActualizar.OS_Email__c && casoPorActualizar.CC_Canal_Respuesta__c == 'Email') {  
+        if(String.isNotBlank(casoPorActualizar.SuppliedEmail) && String.isNotBlank(casoPorActualizar.OS_Email__c) && casoPorActualizar.SuppliedEmail != casoPorActualizar.OS_Email__c && casoPorActualizar.CC_Canal_Respuesta__c == 'Email') {  
             comunicarResolucion(casoPorActualizar);
         }
 
@@ -278,7 +288,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         Case casoPorActualizar = new Case();
        // updateRecordStatus(record, newStatus);
        listaCasos = [SELECT Id, Status, SAC_MotivoInadmision__c, CC_AcuseRecibo__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_PaisContacto__c, SAC_NombreContacto__c, CaseNumber, Origin, CC_Idioma__c, 
-                                        SuppliedEmail, OS_Email__c, CreatedDate, RecordTypeId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, CC_Canal_Respuesta__c, SAC_Reclamacion__C
+                                        SuppliedEmail, OS_Email__c, CreatedDate, RecordTypeId, SAC_CasoEspecial__c, CC_Canal_Procedencia__c, CC_Canal_Respuesta__c, SAC_Reclamacion__C, SEG_Grupo__c
                                     FROM Case 
                                     WHERE Id =: record LIMIT 1];
 
@@ -315,6 +325,15 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 String urlVF = 'https://' + vfHostname + '/apex/SAC_CartaPDF?id=' + carta.Id;
         
                 SAC_GeneracionCartas.adjuntarPDFaCaso2(urlVF, record, 'subsanación');
+
+                //Crear un formulario para almacenar la subsanación
+                SPV_Formulario__c formulario = new SPV_Formulario__c();
+                formulario.RecordTypeId = RECTYPEFORMULARIOSUBSANACION;
+                formulario.SPV_Caso__c = casoPorActualizar.Id;
+                formulario.SAC_FechaSubsanacion__c = System.now();
+                formulario.SAC_Subsanador__c = UserInfo.getUserId();
+                formulario.SAC_GrupoSubsanador__c = casoPorActualizar.SEG_Grupo__c;
+                SAC_DatabaseDML.insertDML(formulario, false);
         
                 SAC_DatabaseDML.updateDML(casoPorActualizar, false); 
                 //Database.update(casoPorActualizar);  
@@ -567,7 +586,8 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     }
                     // Si se produce una segunda subsanación en el mismo día que una anterior no debe sumar un día más al SLA regulatorio
                     if(dias == 1 && reclamacion.SAC_FechaUltimaSubsanacion__c == Date.today()) {dias = 0;}
-    
+                    
+
                     if(casoPorActualizar.SAC_TiempoParadaSubsanacion__c != null) {
                         casoPorActualizar.SAC_MinutosParadaSubsanacion__c = casoPorActualizar.SAC_MinutosParadaSubsanacion__c + minutes;
                         casoPorActualizar.SAC_TiempoParadaSubsanacion__c = casoPorActualizar.SAC_TiempoParadaSubsanacion__c + dias;
@@ -1108,17 +1128,43 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
          * 1.2             US1100463     Raúl Santos     03/01/25       Modificación: verificar que los campos de control de altas de la reclamación están todos marcados
         *****************************************************************/
         if(!Schema.sObjectType.Case.isAccessible()){ throw new AuraHandledException( 'Fallo al acutalizar.' ); }
-        List<Case> listaCaso = [SELECT Id, recordTypeId, Status, SAC_MotivoInadmision__c, SAC_TipoConsumidor__c, SAC_Reclamacion__r.SAC_TipoConsumidor__c, CC_AcuseRecibo__c, Origin, CC_Idioma__c, SuppliedEmail, CaseNumber, OS_Email__c, SAC_M2P__c, CC_Canal_Respuesta__c,
-                                        SAC_PaisContacto__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_NombreContacto__c, CreatedDate, SAC_Reclamacion__r.Status
+        List<Case> listaCaso = [SELECT Id, recordTypeId, Status, SAC_MotivoInadmision__c, SAC_TipoConsumidor__c, SAC_Reclamacion__r.SAC_TipoConsumidor__c, SAC_Reclamacion__r.SAC_DetenidoHasta__c, SAC_Reclamacion__r.SAC_DetenidoDesde__c, CC_AcuseRecibo__c, Origin, CC_Idioma__c, SuppliedEmail, CaseNumber, OS_Email__c, SAC_M2P__c, CC_Canal_Respuesta__c, SAC_TiempoParadaSubsanacion__c, SAC_Reclamacion__r.SAC_TiempoParadaSubsanacion__c, SAC_MinutosParadaSubsanacion__c, SAC_Reclamacion__r.SAC_MinutosParadaSubsanacion__c,
+                                        SAC_PaisContacto__c, SAC_DireccionContacto__c, SAC_CodigoPostalContacto__c, SAC_PoblacionContacto__c, SAC_ProvinciaContacto__c, SAC_NombreContacto__c, CreatedDate, SAC_Reclamacion__r.Status, SAC_DetenidoHasta__c, SAC_DetenidoDesde__c, SAC_FechaUltimaSubsanacion__c, SAC_Reclamacion__r.SAC_FechaUltimaSubsanacion__c, SAC_FechaRecepcion__c, SAC_Reclamacion__r.SAC_FechaRecepcion__c
                                     FROM Case 
                                     WHERE Id =: record];
 		
         List<Case> listaFamiliaCasos = new List<Case>();
+        List<Case> listaCasosActualizar = new List<Case>();
+        Map<Id, Case> mapaCasosActualizar = new Map<Id, Case>();
+
+
         Boolean enviarAcuse = false;
         if(!listaCaso.isEmpty()){
 		Case casoPorActualizar = listaCaso[0];
         if(casoPorActualizar.recordTypeId == RECTYPERECLAMACION){
-            if (String.isBlank(casoPorActualizar.SAC_TipoConsumidor__c)) {throw new AuraHandledException('Debe seleccionar el tipo consumidor');}
+            /*if (String.isBlank(casoPorActualizar.SAC_TipoConsumidor__c)) {throw new AuraHandledException('Debe seleccionar el tipo consumidor');}*/
+            if (String.isBlank(casoPorActualizar.SAC_TipoConsumidor__c) || (casoPorActualizar.Status == 'SAC_006' && (casoPorActualizar.SAC_DetenidoHasta__c == null || casoPorActualizar.SAC_DetenidoHasta__c <= casoPorActualizar.SAC_DetenidoDesde__c || casoPorActualizar.SAC_DetenidoHasta__c > CBK_UtilsDate.nowSYS()))){
+                if(String.isBlank(casoPorActualizar.SAC_TipoConsumidor__c)){
+                    throw new AuraHandledException('Debe seleccionar el tipo consumidor en la reclamación.');
+                }else{
+                    throw new AuraHandledException('No se puede salir de subsanación sin tener el campo Detenido hasta de la reclamación informado correctamente.');
+                }
+            }
+            //Si se le da a inadmisión desde el estado de subsanación:
+            if(casoPorActualizar.Status == 'SAC_006'){
+                listaCasosActualizar = informarTiempoParadaSubsanacion(casoPorActualizar);      //Al entrar desde recla, devuelve tanto la recla como todas las prets. con campos tiempo actualizados
+                //Poner como casoPorActualizar el mismo caso que ya es (la reclamación), pero con los cambios hechos dentro de ese método
+                for(Case caso : listaCasosActualizar){
+                    if(caso.Id == casoPorActualizar.Id){
+                        //Se obtiene la reclamación con los campos actualizados del método informarTiempoParada
+                        casoPorActualizar.SAC_MinutosParadaSubsanacion__c = caso.SAC_MinutosParadaSubsanacion__c;
+                        casoPorActualizar.SAC_TiempoParadaSubsanacion__c = caso.SAC_TiempoParadaSubsanacion__c;
+                        casoPorActualizar.SAC_FechaUltimaSubsanacion__c = caso.SAC_FechaUltimaSubsanacion__c;   
+                    }
+                    mapaCasosActualizar.put(caso.Id, caso);
+                }
+
+            }   
 
             if(casoPorActualizar.Status == 'SAC_001' || casoPorActualizar.Status == 'SAC_006'){
                 List<Case> listaValidarControlAlta = new List<Case>();
@@ -1135,6 +1181,13 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     pretension.SAC_StatusAuxiliar__c = 'SAC_003';
                     pretension.SAC_MotivoInadmision__c = motivo;
                     pretension.SAC_SentidoResolucion__c = 'SAC_004';
+                    
+                    if(mapaCasosActualizar.containsKey(pretension.id)){
+                        pretension.SAC_MinutosParadaSubsanacion__c = mapaCasosActualizar.get(pretension.id).SAC_MinutosParadaSubsanacion__c;
+                        pretension.SAC_TiempoParadaSubsanacion__c = mapaCasosActualizar.get(pretension.id).SAC_TiempoParadaSubsanacion__c;
+                        pretension.SAC_FechaUltimaSubsanacion__c = mapaCasosActualizar.get(pretension.id).SAC_FechaUltimaSubsanacion__c;
+                    }
+
                 }
             }
 
@@ -1150,8 +1203,39 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 }
             }
 
+            //Si es en subsanación, también hay que actualizar la reclamación con los valores de tiempos parada calculados en informarTiempoParadaSubsanacion
+            if(casoPorActualizar.Status == 'SAC_006'){
+                listaFamiliaCasos.add(casoPorActualizar);
+            }
+
         } else {
-            if (String.isBlank(casoPorActualizar.SAC_Reclamacion__r.SAC_TipoConsumidor__c)) {throw new AuraHandledException('Debe seleccionar el tipo consumidor en la reclamación');}
+            /*if (String.isBlank(casoPorActualizar.SAC_Reclamacion__r.SAC_TipoConsumidor__c)) {throw new AuraHandledException('Debe seleccionar el tipo consumidor en la reclamación');}*/
+
+            if (String.isBlank(casoPorActualizar.SAC_Reclamacion__r.SAC_TipoConsumidor__c) || (casoPorActualizar.SAC_Reclamacion__r.Status == 'SAC_006' && (casoPorActualizar.SAC_Reclamacion__r.SAC_DetenidoHasta__c == null || casoPorActualizar.SAC_Reclamacion__r.SAC_DetenidoHasta__c <= casoPorActualizar.SAC_Reclamacion__r.SAC_DetenidoDesde__c || casoPorActualizar.SAC_Reclamacion__r.SAC_DetenidoHasta__c > CBK_UtilsDate.nowSYS()))){
+                if(String.isBlank(casoPorActualizar.SAC_Reclamacion__r.SAC_TipoConsumidor__c)){
+                    throw new AuraHandledException('Debe seleccionar el tipo consumidor en la reclamación.');
+                }else{
+                    throw new AuraHandledException('No se puede salir de subsanación sin tener el campo Detenido hasta de la reclamación informado correctamente.');
+                }
+            }
+
+            //Si se le da a inadmisión desde el estado de subsanación:
+            if(casoPorActualizar.SAC_Reclamacion__r.Status == 'SAC_006'){
+                listaCasosActualizar = informarTiempoParadaSubsanacion(casoPorActualizar);  //Al entrar desde pretensión, solo devuelve la propia pret y la reclamación con campos tiempo actualizados
+                for(Case caso : listaCasosActualizar){
+                    //Se recorren buscando la reclamación para indicar que hay que actualizarla con los nuevos valores de campos
+                    if(caso.Id == casoPorActualizar.SAC_Reclamacion__c){
+                        listaFamiliaCasos.add(caso);
+                    }
+                    if(caso.Id == casoPorActualizar.Id){
+                        //Se obtiene la pretensión con los campos actualizados del método informarTiempoParada
+                        casoPorActualizar.SAC_MinutosParadaSubsanacion__c = caso.SAC_MinutosParadaSubsanacion__c;
+                        casoPorActualizar.SAC_TiempoParadaSubsanacion__c = caso.SAC_TiempoParadaSubsanacion__c;
+                        casoPorActualizar.SAC_FechaUltimaSubsanacion__c = caso.SAC_FechaUltimaSubsanacion__c;   
+                    }
+                    mapaCasosActualizar.put(caso.Id, caso);
+                }
+            }   
 
             if(casoPorActualizar.SAC_Reclamacion__r.Status == 'SAC_001' || casoPorActualizar.SAC_Reclamacion__r.Status == 'SAC_006'){
                 List<Case> listaValidarControlAlta = new List<Case>();
@@ -1266,7 +1350,6 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
             }
             
         } else{ throw new AuraHandledException( 'Fallo al actualizar.' ); }
-        System.debug('HAce llamada SAC_ComportamientoSLAs.cerrarMilestoneLetradoAltaBaja desde update status');
         AsyncOptions options = new AsyncOptions();
         options.DuplicateSignature = QueueableDuplicateSignature.Builder()
         .addId(UserInfo.getUserId())
@@ -1317,7 +1400,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
     public static Case recuperarDatosCaso(Id record){
 
         Case caso = [SELECT Id, Origin, OS_Email__c, SAC_DireccionPostal__c, CC_Canal_Respuesta__c, SuppliedEmail, Account.CC_Email__c, SEG_Detalle__c, SEG_Detalle__r.SAC_AcompanyaLlamada__c,
-                        Status, RecordType.Name, AccountId, CC_Idioma__c, Account.RecordTypeId, SAC_Reclamacion__c, SAC_Reclamacion__r.CC_Canal_Respuesta__c, SAC_DireccionPostalNotificacion__c, CC_AcuseRecibo__c
+                        Status, RecordType.Name, AccountId, CC_Idioma__c, Account.RecordTypeId, SAC_Reclamacion__c, SAC_Reclamacion__r.CC_Canal_Respuesta__c, SAC_Reclamacion__r.CC_Idioma__c, SAC_DireccionPostalNotificacion__c, CC_AcuseRecibo__c
                         FROM CASE 
                         WHERE RecordType.DeveloperName LIKE 'SAC_%' AND Id=:record LIMIT 1];
 

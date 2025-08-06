@@ -41,6 +41,7 @@ public with sharing class OS_Case_BI_TRHan extends CC_TriggerHandlerBase {
             informarEntitlement(listNewObjCops);
             informarGrupoTrabajo(listNewObjCops);
             informarCentroManipulador(listNewObjCops);
+            gestionarDANDGDT(listNewObjCops);
             informarBuzonSalidaCaso(listNewObjCops);
             camposTrasladoRemitidoAutomatico(listNewObjCops);
             informarDepartamento(listNewObjCops);
@@ -58,6 +59,20 @@ public with sharing class OS_Case_BI_TRHan extends CC_TriggerHandlerBase {
         }
         if(!listCasos.isEmpty()){
             OS_Case.actualizarTelefonoEmailCaso(listCasos);
+        }
+    }
+
+    // Mejora de Trigger
+    private void gestionarDANDGDT(List<Case> listNewObjCops){
+        List<Case> casosInformarDANDGDT = new List<Case>();
+        for(Case caso: listNewObjCops){
+            if(caso.AccountId != null){
+                casosInformarDANDGDT.add(caso);
+            }
+        }
+        
+        if(!casosInformarDANDGDT.isEmpty()){
+            OS_Informar_DAN_DG_DT_Caso.informarCamposBeforeTrigger(casosInformarDANDGDT);
         }
     }
     

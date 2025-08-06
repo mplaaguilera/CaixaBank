@@ -112,7 +112,6 @@ public with sharing class SPV_TestDataFactory_Test {
             System.assertNotEquals(null, contacto[0].AccountId, 'No se ha asignado el contacto a la cuenta.');
             System.assertNotEquals(null, contactoDos[0].AccountId, 'No se ha asignado el contacto a la cuenta.');
 
-
             Test.stopTest();
         }
     }

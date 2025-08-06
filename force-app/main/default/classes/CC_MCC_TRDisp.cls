@@ -9,7 +9,7 @@ public with sharing class CC_MCC_TRDisp extends CC_TriggerDispatcherBase {
     private static Boolean isAfterUndeleteProcessing = false;
 	private static String objectApiName = 'CC_MCC__c';
     
- /*   public virtual override void beforeInsert(CC_TriggerParameters tp) {
+    public virtual override void beforeInsert(CC_TriggerParameters tp) {
         
         if (!isBeforeInsertProcessing) {           
             isBeforeInsertProcessing = true;
@@ -34,7 +34,7 @@ public with sharing class CC_MCC_TRDisp extends CC_TriggerDispatcherBase {
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
     }
-    
+ /*   
     public virtual override void beforeDelete(CC_TriggerParameters tp) {
         
         if (!isBeforeDeleteProcessing) {           

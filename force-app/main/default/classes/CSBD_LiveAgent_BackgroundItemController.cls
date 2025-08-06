@@ -27,7 +27,7 @@ public with sharing class CSBD_LiveAgent_BackgroundItemController {
                     if (chat.CSBD_Oportunidad_Id__r.CSBD_SLA_TGT__c == null && chat.CSBD_Oportunidad_Id__r.CSBD_PrimerContactoSLA__c != null) {
                         Datetime now = Datetime.now();
                         Datetime oppPrimerContact = chat.CSBD_Oportunidad_Id__r.CSBD_PrimerContactoSLA__c;
-                        Integer tiempoAtencion = Math.round((now.getTime() - oppPrimerContact.getTime() ) / 60000);
+                        Integer tiempoAtencion = Math.round((now.getTime() - oppPrimerContact.getTime() ) / 1000);
 
                         Opportunity opp = new Opportunity();
                         opp.Id = chat.CSBD_Oportunidad_Id__c;

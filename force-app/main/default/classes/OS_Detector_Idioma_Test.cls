@@ -42,7 +42,7 @@ Global class  OS_Detector_Idioma_Test implements HttpCalloutMock{
         tematica.OS_Departamento__c = 'BOS';
         tematica.OS_Horario__c = horario[0].id;
         tematica.CC_Fecha_Vigencia_Inicio__c = System.now();
-        tematica.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        tematica.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         tematica.CC_Codigo_Externo__c = 'TEC-000001';
         insert tematica;
 
@@ -50,7 +50,7 @@ Global class  OS_Detector_Idioma_Test implements HttpCalloutMock{
         producto.Name = 'producto cops test';
         producto.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         producto.CC_Fecha_Vigencia_Inicio__c = System.now();
-        producto.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        producto.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         producto.CC_Tematica__c = tematica.Id;
         producto.CC_Codigo_Externo__c = 'PRC-000001'; 
         insert producto;
@@ -59,7 +59,7 @@ Global class  OS_Detector_Idioma_Test implements HttpCalloutMock{
         motivo.Name = 'motivo cops test';
         motivo.CC_Tipo_Cliente__c = 'Cliente (COPS)/Empleado (COPS)';
         motivo.CC_Fecha_Vigencia_Inicio__c = System.now();
-        motivo.RecordTypeId = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        motivo.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         motivo.CC_Tematica__c = tematica.Id;
         motivo.CC_Producto_Servicio__c = producto.Id;
         motivo.CC_Codigo_Externo__c = 'MOC-000001';

@@ -1,15 +1,105 @@
-public  with sharing class CC_Agrupador_AI_TRHan extends CC_TriggerHandlerBase {
+public  with sharing class CC_Agrupador_AI_TRHan extends CC_TriggerHandlerBase { 
+
+    private static final Id COMINFORMATIVART = Schema.SObjectType.CC_Agrupador__c.getRecordTypeInfosByDeveloperName().get('CC_Comunicacion_Informativa').getRecordTypeId();
+    private static final Id COMINFORMATIVACAMPANART = Schema.SObjectType.CC_Agrupador__c.getRecordTypeInfosByDeveloperName().get('CC_Comunicacion_Informativa_de_Campana').getRecordTypeId();
+    private static final Id COMINFORMATIVAMARCART = Schema.SObjectType.CC_Agrupador__c.getRecordTypeInfosByDeveloperName().get('CC_Comunicacion_Informativa_de_Marca').getRecordTypeId();
+    private static final Id INCIDENCIART = Schema.SObjectType.CC_Agrupador__c.getRecordTypeInfosByDeveloperName().get('CC_Incidencia').getRecordTypeId();
+    private static final Id MASIVACONTROLRT = Schema.SObjectType.CC_Agrupador__c.getRecordTypeInfosByDeveloperName().get('CC_Masiva_Control').getRecordTypeId();
+    private static final Id SEGUIMIENTORT = Schema.SObjectType.CC_Agrupador__c.getRecordTypeInfosByDeveloperName().get('CC_Seguimiento').getRecordTypeId();
+
     
     public override void mainEntry(CC_TriggerParameters tp) {
-        String test;
-        //process((List<CC_Agrupador__c>)tp.newList, (Map<Id, CC_Agrupador__c>)tp.newMap);
+        process((List<CC_Agrupador__c>)tp.newList, (Map<Id, CC_Agrupador__c>)tp.newMap);
     }
 
-    /*private void process(List<CC_Agrupador__c> listNewObj, Map<Id, CC_Agrupador__c> mapNewObj) {
-        // Si se trata de una Comunicación Informativa, se asocian a ella todos los casos que tengan el mismo MCC o la misma Campaña especificada en la Comunicación Informativa
-        //asociarCasosAComunicacionInformativa(listNewObj);
+    private void process(List<CC_Agrupador__c> listNewObj, Map<Id, CC_Agrupador__c> mapNewObj) {
+
+        List<CC_Agrupador__c> listNotificarAgrupador = new List<CC_Agrupador__c>();
+        List<CC_Agrupador__c> listAgrupadoresActualizar = new List<CC_Agrupador__c>();
+        List<CC_Agrupador__c> listActAgrupador = new List<CC_Agrupador__c>();
+        
+        for(CC_Agrupador__c agrupador : listNewObj) {
+            /*
+            RT = CC_Incidencia
+            CC_Publica__c = true
+            */
+            if(agrupador.RecordTypeId == INCIDENCIART && agrupador.CC_Publica__c){  
+                listNotificarAgrupador.add(agrupador);
+            }
+
+            /*
+            RT != CC_Comunicacion_Informativa && RT != CC_Comunicacion_Informativa_de_Campana
+            */
+            if(agrupador.RecordTypeId != COMINFORMATIVART && agrupador.RecordTypeId != COMINFORMATIVACAMPANART){
+                listActAgrupador.add(agrupador);
+            }
+
+            /*
+            CC_Numero_Casos__c > 0
+            */
+            if(agrupador.CC_Numero_Casos__c  > 0) {
+                listAgrupadoresActualizar.add(agrupador);
+            }
+        }
+
+        if(!listNotificarAgrupador.isEmpty()){
+            notificarAgrupador(listNotificarAgrupador);
+        }
+
+        if(!listActAgrupador.isEmpty()) {
+            actualizarAgrupador(listActAgrupador);
+        }
+
+        if(!listAgrupadoresActualizar.isEmpty()) {
+            agrupadorAviso(listAgrupadoresActualizar, mapNewObj);
+        }
     }
-    
+
+    private void notificarAgrupador(List<CC_Agrupador__c> listAgrupadores) {
+
+        List<CC_Notificacion.AgrupadorMensajeInfo> listAgrupadoresNotificar = new List<CC_Notificacion.AgrupadorMensajeInfo>();
+        List<CC_Agrupador__c> listAgrupadoresActualizar = new List<CC_Agrupador__c>();
+        
+
+        for(CC_Agrupador__c agrupador : listAgrupadores){
+            //Generamos la notificacion
+            CC_Notificacion.AgrupadorMensajeInfo notificacion = new CC_Notificacion.AgrupadorMensajeInfo();
+            notificacion.idAgrupador = agrupador.Id;
+            notificacion.mensaje = 'Se ha generado una nueva incidencia pública: ' + agrupador.Name + ' - ' + agrupador.CC_Titulo__c;
+            listAgrupadoresNotificar.add(notificacion);
+        }
+        if(!listAgrupadoresNotificar.isEmpty()){
+            //Notificar a los usuarios de que se ha publicado un agrupador
+            CC_Notificacion.publicarToastAviso(listAgrupadoresNotificar);
+        }
+    }
+
+    private void actualizarAgrupador(List<CC_Agrupador__c> listAgrupadores) {
+
+        List<CC_Agrupador__c> listAgrupadoresActualizar = new List<CC_Agrupador__c>();
+
+        for(CC_Agrupador__c agrupador : listAgrupadores){
+            //Asignamos el id del agrupador a campo custom ID (Interno)
+            CC_Agrupador__c agrupadorActualizar = new CC_Agrupador__c();
+            agrupadorActualizar.Id = agrupador.Id;
+            agrupadorActualizar.CC_Id__c = agrupador.Id;
+            listAgrupadoresActualizar.add(agrupadorActualizar);
+        }
+
+        if(!listAgrupadoresActualizar.isEmpty()){
+            //Actualizar los agrupadores
+            update listAgrupadoresActualizar;
+        }
+    }
+
+    private void agrupadorAviso(List<CC_Agrupador__c> listAgrupadoresActualizar, Map<Id, CC_Agrupador__c> mapAgrupadoresAntiguos) {
+        Set<String> destinatarios = new Set<String>();
+        //Invocamos al método de agrupadorAviso
+        String tipoNoficicacion = [SELECT Id from CustomNotificationType WHERE DeveloperName = 'CC_Cierre_Maximo' LIMIT 1].Id;
+        //Llamar al metodo de aviso de agrupador
+        CC_Aviso_Agrupador.publicarEventoDeAviso(listAgrupadoresActualizar);
+    }
+    /*
     private void asociarCasosAComunicacionInformativa(List<CC_Agrupador__c> listNewObj) {
         List<Case> casosActualizar = new List<Case>();
         Set<Id> setCausas = new Set<Id>();

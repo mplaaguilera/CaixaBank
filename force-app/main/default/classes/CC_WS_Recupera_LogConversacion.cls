@@ -1,4 +1,4 @@
-public class CC_WS_Recupera_LogConversacion {
+public with sharing class CC_WS_Recupera_LogConversacion {
     /* 
      * A partir del id_cognitive que nos llega en la llamada buscamos si existe caso,
      * sino existe, se realiza una llamada al WS de recuperar los logs de la conversación y crear un caso con la transcripción del chat
@@ -7,8 +7,7 @@ public class CC_WS_Recupera_LogConversacion {
         // Comprobamos si existe algun caso con ese id de Cognitivo
         Case oCase = null;
         oCase = getDatosCaso(llamada);
-        CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Canal_Procedencia__c, CC_Canal_de_Entrada__c, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c 
-                                                  FROM CC_Servicio_Genesys__c WHERE Id = :llamada.CC_Servicio_Genesys__c];
+        CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Canal_Procedencia__c, CC_Canal_de_Entrada__c, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c, CC_Codigo__c    FROM CC_Servicio_Genesys__c WHERE Id = :llamada.CC_Servicio_Genesys__c];
         
         //Reapertura del caso si se trata de un caso cerrado de Hidden
         if (oCase != null){
@@ -58,6 +57,9 @@ public class CC_WS_Recupera_LogConversacion {
                     request.setEndpoint(recuperaLog.CC_EndPoint__c + llamada.CC_Id_Cognitivo__c);
                     request.setMethod(recuperaLog.CC_TipoPeticion__c);
                     request.setHeader('Content-Type', recuperaLog.CC_ContentType__c);
+                    //SOLO PRUEBA
+                    request.setHeader('HTTP-HEADER-ACTOR', 'CBCCSF');
+                    request.setClientCertificateName('cc_camaleon');
                     
                     if (!Test.isRunningTest())
                         request.setClientCertificateName(recuperaLog.CC_Certificado__c);
@@ -96,7 +98,7 @@ public class CC_WS_Recupera_LogConversacion {
                     sDetalleError = e.getMessage();
                 }
                 // Crear caso
-                oCase = CC_Llamada.crearCaso(llamada, servicioGenesys);
+                oCase = CC_Llamada_GC.crearCaso(llamada, servicioGenesys);
                 // A partir del caso creado, crear la Transcripción añadiendo la conversación recuperada
                 if (transcripcionCog != null && transcripcionCog != ''){
                     LiveChatTranscript oTranscipt = createLiveChatTranscript(oCase.Id, transcripcionCog, llamada.CC_Id_Cognitivo__c, llamada.CC_Idioma__c, llamada.CC_Asunto__c , user);
