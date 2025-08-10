@@ -52,5 +52,3 @@ $RECYCLE.BIN/
 
 # Sarif files
 *.sarif
-.pmdCache
-.pmdCache
