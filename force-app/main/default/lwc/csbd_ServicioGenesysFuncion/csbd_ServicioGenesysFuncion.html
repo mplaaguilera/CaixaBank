@@ -1,0 +1,20 @@
+<template>
+    <lightning-card>
+        <div class="slds-var-p-around_large">
+
+            <div class="slds-grid slds-grid_vertical-align-end slds-gutters_direct-x-small">
+
+                <div class="slds-col slds-grow-none"  style="width: 230px;">
+                    <label class="slds-form-element__label">Función</label>
+                    <lightning-combobox lwc:ref="inputFuncion" options={options} variant="label-hidden" onchange={inputFuncionOnchange} ></lightning-combobox>
+                </div>
+
+                <div class="slds-col">
+                    <lightning-button lwc:ref="botonGuardar" label="Guardar" variant="brand" onclick={guardar} class="fade oculto"></lightning-button>
+                </div>
+
+            </div>
+
+        </div>
+    </lightning-card>
+</template>

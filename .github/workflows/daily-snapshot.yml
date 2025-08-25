@@ -1,0 +1,33 @@
+name: Daily Snapshot
+
+on:
+  schedule:
+    # Executa cada dia a les 2:00 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Permet execució manual
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Create snapshot
+      run: |
+        # Aquí pots afegir comandes per crear el snapshot
+        echo "Snapshot created at $(date)" > snapshot.txt
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add snapshot.txt
+        git commit -m "Daily snapshot: $(date)"
+        git push

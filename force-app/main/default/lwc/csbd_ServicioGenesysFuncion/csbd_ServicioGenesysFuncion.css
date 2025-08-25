@@ -1,0 +1,11 @@
+@import 'c/csbd_lwcStyle';
+
+.fade {
+    transition: visibility 100ms, opacity 100ms linear;
+}
+
+.oculto {
+    visibility: hidden;
+    opacity: 0;
+}
+

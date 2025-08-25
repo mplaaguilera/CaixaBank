@@ -17,6 +17,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>CSBD_ServicioGenesysFuncionApex</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>CBK_SCH_CSBD_ScheduleBatchGestorOppty</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -965,6 +969,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>CSBD_AvisosOportunidadesUtility_Apex</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>CSBD_Bypass_Trigger</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -985,11 +993,27 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>CSBD_CerrarOportunidad_Apex</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CSBD_ChatOperativas_Apex</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CSBD_CitaGestorController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>CSBD_Control_Duplicados</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
         <apexClass>CSBD_CrearActividadEncuesta_Job</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CSBD_DatosEntrevistaHipoteca</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -1010,6 +1034,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>CSBD_DisponibilidadGestores_Apex</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CSBD_EinsteinUtils</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -1077,15 +1105,15 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>CSBD_Llamada</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <classAccesses>
         <apexClass>CSBD_Llamada_GC</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
         <apexClass>CSBD_Llamada_Oportunidad_Controller</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CSBD_LwcUtils_Apex</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -1138,6 +1166,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>CSBD_TiposOferta_Controller</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CSBD_Utils</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -1796,7 +1828,23 @@
         <enabled>true</enabled>
         <name>CC_Trasladar_Colaborador</name>
     </customPermissions>
+    <customSettingAccesses>
+        <enabled>true</enabled>
+        <name>CSBD_IdentificarOppsPHDSetting__c</name>
+    </customSettingAccesses>
+    <customSettingAccesses>
+        <enabled>true</enabled>
+        <name>CSBD_LlamadaSettings__c</name>
+    </customSettingAccesses>
     <description>Permission set para gestores</description>
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal>CSBD_API_CMN_Comdata_EC-ONE_CMN_Comdata</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal>CSBD_API_GWT_EC_TST-ONE_SIR_TST</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
     <externalCredentialPrincipalAccesses>
         <enabled>true</enabled>
         <externalCredentialPrincipal>CSBD_WS_CredentialAdobe_External-PS</externalCredentialPrincipal>
@@ -1817,8 +1865,23 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>Account.AV_Confidencial__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>Account.AV_EAPGestor__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Account.AV_Empleado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Account.AV_IndicadoresClientes__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -1914,6 +1977,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.CC_EmpleadoGestorId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.CC_Empleado_Familiar__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -2329,6 +2397,151 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>CC_Caracteristica__c.OS_Negocio__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_AuthorizationId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Case__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Cliente__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Codigo_Error__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Codigo_OTPSMS__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Detalle__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Estado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_FechaGMT_Com__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Fecha_Envio__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Fecha_Validacion__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CC_Comunicaciones__c.CC_FranjaHorariaAux__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CC_Comunicaciones__c.CC_Franja_Horaria__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Intentos_Validacion_OTP__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Mensaje_Error__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Nivel__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Origen__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Perfil_empleado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Pregunta_1__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Pregunta_2__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CC_Comunicaciones__c.CC_Record_Type_Name__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Respuesta_1__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Respuesta_2__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Respuesta_OTP__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Resultado_Validacion__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Tarjetas__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Ticket__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Tipo_Llamada__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Validacion_1__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CC_Comunicaciones__c.CC_Validacion_2__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -3247,6 +3460,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.AV_Pool__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Contact.AccountId</field>
         <readable>true</readable>
@@ -3434,6 +3652,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Contact.CC_TipoRepresentante__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Contact.CIBE_Telefono1__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -3757,8 +3980,18 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.CBK_Archivada__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>Opportunity.CIBE_Pais__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.CSBD_Account_Tipo_Persona__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -3769,6 +4002,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.CSBD_Anonimizada__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.CSBD_Aplicacion_Origen__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -3839,6 +4077,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.CSBD_Cliente_Internacional__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.CSBD_Cliente_Portal_Identificado__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -3929,6 +4172,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.CSBD_Dejar_Pendiente_Cliente__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.CSBD_Delimitador__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -4053,6 +4301,21 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Opportunity.CSBD_FeedBack2_Debido__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.CSBD_FeedBack3_MasInformacion__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.CSBD_Feedback1_Motivo__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Opportunity.CSBD_FeedbackCliente__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -4069,6 +4332,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.CSBD_Firma_segura__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.CSBD_Garantia__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -4537,6 +4805,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.CSBD_Owner_Name__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.CSBD_Pais__c</field>
         <readable>true</readable>
@@ -4784,6 +5057,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.CSBD_Tasacion__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.CSBD_Telefono_Solicitud_Normalizado__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -5141,7 +5419,7 @@
     </objectPermissions>
     <objectPermissions>
         <allowCreate>true</allowCreate>
-        <allowDelete>false</allowDelete>
+        <allowDelete>true</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
@@ -5476,6 +5754,58 @@
     </recordTypeVisibilities>
     <recordTypeVisibilities>
         <recordType>CC_Comunicaciones__c.CSBD_Autenticacion</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_Acceso</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_Cancelacion</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_DerechoDecisionAutomatizada</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_Limitacion</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_Oposicion</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_Oposicion_comunicaciones_interes_legitimo</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_Portabilidad</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_Rectificacion</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_RevocacionCondicionesContratosCotitularida</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_RevocacionConsentimiento</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_RevocacionConsentimientoBiometrico</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_RevocacionConsentimientoProductosServicios</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>CC_Derecho__c.CC_Revocacion_consentimiento_verificacion_actividad_economica_Seguridad_Social</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
     <recordTypeVisibilities>
