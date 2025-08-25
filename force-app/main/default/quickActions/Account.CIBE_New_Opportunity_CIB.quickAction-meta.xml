@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Botón de la cuenta que al pulsarlo crear una oportunidad relacionada. Para CIB</description>
+    <flowDefinition>CIBE_New_Opportunity_CIB</flowDefinition>
+    <label>Nueva oportunidad</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>Flow</type>
+</QuickAction>

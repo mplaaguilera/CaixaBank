@@ -13,7 +13,6 @@
 		"statusBar.background": null,
 		"activityBar.background": null
 	},
-	"eslint.useFlatConfig": false,
 	"salesforce.einsteinForDevelopers.enableAutocompletions": false,
 	"salesforce.einsteinForDevelopers.autocompletionLength": "Short",
 	"workbench.externalBrowser": "chrome",
@@ -21,7 +20,12 @@
 	"salesforcedx-vscode-slds.enhancements.autoSuggest": true,
 	"sarif-viewer.connectToGithubCodeScanning": "off",
 	"salesforce.einsteinForDevelopers.enable": true,
-	"chat.mcp.discovery.enabled": false,
+	"chat.mcp.discovery.enabled": {
+		"claude-desktop": false,
+		"windsurf": false,
+		"cursor-global": false,
+		"cursor-workspace": false
+	},
 	"chat.mcp.enabled": true,
 	"mcp": {
 		"inputs": [],
@@ -112,7 +116,6 @@
 	"explorer.decorations.colors": false,
 	"explorer.fileNesting.enabled": true,
 	"actionButtons": {
-
 		"commands": [
 			{
 				"name": "$(compare-changes)",
@@ -140,10 +143,12 @@
 			},
 			{
 				"name": "$(test-view-icon)",
-                "useVsCodeApi": true,
-                "command": "workbench.action.tasks.runTask",
-                "args": ["npm: tail"],
-                "color": "#a0a0d0"
+				"useVsCodeApi": true,
+				"command": "workbench.action.tasks.runTask",
+				"args": [
+					"npm: tail"
+				],
+				"color": "#a0a0d0"
 			}
 		],
 		"defaultColor": "currentColor",
@@ -164,7 +169,6 @@
 	},
 	"github.copilot.chat.reviewSelection.instructions": [],
 	"github.copilot.chat.codeGeneration.useInstructionFiles": false,
-	"github.copilot.chat.commitMessageGeneration.instructions": [
-
-	]
+	"github.copilot.chat.commitMessageGeneration.instructions": [],
+	"salesforcedx-vscode-apex.java.home": "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home"
 }

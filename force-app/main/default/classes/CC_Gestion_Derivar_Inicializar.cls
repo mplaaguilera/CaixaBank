@@ -71,7 +71,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar {
                 } else if (ambitoMotivo == 'Onboarding' || ambitoMotivo == 'Desistir') {
                     CC_Gestion_Derivar_Global.rellenarDatosOnboarding(caso, retorno, textosMap);
                 } else if ((ambitoMotivo == 'Bizum Fraude' || ambitoMotivo == 'Caso a Fraude') && caso.CC_MCC_Solucion__r.CC_AmbitoTareas__c != 'Fraude') {
-                    CC_Gestion_Derivar_Global.rellenarDatosFraude(retorno, textosMap);
+                    CC_Gestion_Derivar_Global.rellenarDatosFraude(/*caso,*/ retorno, textosMap);
                 }  else if (ambitoMotivo == 'Argos Xpays') {
                     CC_Gestion_Derivar_Global.rellenarDatosArgosXpays(retorno, textosMap);
                 } else if (ambitoMotivo == 'Argos General') {

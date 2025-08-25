@@ -1,6 +1,30 @@
 @isTest
 private class CSBD_MacRelatedList_Apex_Test {
 
+	@testSetup
+	private static void setupTestData() {
+		CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c(
+			RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId(),
+			Name = 'CSBD: Configuración de rellamadas'
+		);
+		insert listaValores;
+
+		insert new List<CC_Lista_Valores__c>{
+			new CC_Lista_Valores__c(
+				RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId(),
+				CC_Lista__c = listaValores.Id,
+				Name = 'Permitir vincular a llamadas abiertas con antigüedad de hasta N días',
+				CC_Valor__c = '21'
+			),
+			new CC_Lista_Valores__c(
+				RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId(),
+				CC_Lista__c = listaValores.Id,
+				Name = 'Permitir vincular a llamadas cerradas con antigüedad de hasta N días',
+				CC_Valor__c = '2'
+			)
+		};
+	}
+
 	@isTest
 	private static void getOtrasLlamadas() {
 		System.runAs(CSBD_TestDataFactory.usuarioGestor()) {

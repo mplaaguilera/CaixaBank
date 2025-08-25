@@ -1,6 +1,6 @@
 /*eslint-disable no-undef */
 ({
-	doInit: function(component, event, helper) {
+	doInit: function (component, event, helper) {
 		helper.getDatosCaso(component);
 		component.set('v.today', $A.localizationService.formatDate(new Date(), 'YYYY-MM-DD'));
 		helper.visibilidadBotonCitaTareaGestor(component);
@@ -8,7 +8,7 @@
 		//helper.vaciarPlantilla(component);
 	},
 
-	recordDataUpdated: function(component, event, helper) {
+	recordDataUpdated: function (component, event, helper) {
 		if (event.getParams().changeType === 'LOADED') { //|| event.getParams().changeType === 'CHANGED') {
 			if (component.get('v.caso.CC_MCC_Plantilla__c')) {
 				helper.vaciarPlantilla(component);
@@ -123,7 +123,7 @@
 	//Fin US969672
 
 
-	handleComponentEvent: function(component, event) {
+	handleComponentEvent: function (component, event) {
 		component.set('v.selectedRecord', event.getParam('accountByEvent'));
 		$A.enqueueAction(component.get('c.obtenerPlantillasGrupo'));
 
@@ -164,7 +164,7 @@
 		$A.util.removeClass(lookupField3, 'slds-show');
 	},
 
-	handleComponentEventOffice: function(component, event, helper) {
+	handleComponentEventOffice: function (component, event, helper) {
 		if (!event.getParam('segundaOficina')) {
 			component.set('v.selectedRecord', event.getParam('officeByEvent'));
 		} else {
@@ -220,7 +220,7 @@
 		$A.util.removeClass(lookupField3, 'slds-show');
 	},
 
-	handleComponentEventEmpleado: function(component, event, helper) {
+	handleComponentEventEmpleado: function (component, event, helper) {
 
 		component.set('v.selectedRecord', event.getParam('contactByEvent'));
 		//component.set('v.oficinaSeleccionada', true);
@@ -263,7 +263,7 @@
 		$A.util.removeClass(lookupField3, 'slds-show');
 	},
 
-	handleComponentEventNivel3: function(component, event) {
+	handleComponentEventNivel3: function (component, event) {
 		//get the selected Queue Group record from the COMPONETN event
 		let selectedGroupGetFromEvent = event.getParam('groupByEvent');
 		component.set('v.selectedRecordGroup', selectedGroupGetFromEvent);
@@ -287,7 +287,7 @@
 		$A.util.removeClass(component.find('lookupFieldGroup'), 'slds-show');
 	},
 
-	handleComponentEventNivel2: function(component, event) {
+	handleComponentEventNivel2: function (component, event) {
 		//get the selected Queue Group record from the COMPONENT event
 		let selectedGroupGetFromEvent = event.getParam('groupByEvent');
 		component.set('v.selectedRecordGroup', selectedGroupGetFromEvent);
@@ -304,7 +304,7 @@
 		$A.util.removeClass(component.find('lookupFieldGrop2N'), 'slds-show');
 	},
 
-	handleComponentEventPlantilla: function(component, event) {
+	handleComponentEventPlantilla: function (component, event) {
 		//This function call when the end User Select any record from the result list.
 		//get the selected Account record from the COMPONENT event
 		component.set('v.selectedRecordPlantilla', event.getParam('plantillaByEvent'));
@@ -322,14 +322,14 @@
 		$A.util.removeClass(lookupField, 'slds-show');
 	},
 
-	handleComponentEventPlantilla2: function(component, event) {
+	handleComponentEventPlantilla2: function (component, event) {
 		let plantillaSeleccionada = component.get('v.listOfSearchRecordsPlantilla').find(plantilla => plantilla.Id === event.currentTarget.id);
 		component.set('v.plantillaSeleccionada', plantillaSeleccionada);
 		component.set('v.plantillaSeleccionadaValue', plantillaSeleccionada.Id);
 		component.set('v.plantillaSeleccionadaName', plantillaSeleccionada.Name);
 	},
 
-	handleComponentEventTransfer: function(component, event) {
+	handleComponentEventTransfer: function (component, event) {
 		component.set('v.selectedRecordQueue', event.getParam('queueByEvent').Queue);
 
 		$A.util.addClass(component.find('lookup-pill-queue'), 'slds-show');
@@ -342,10 +342,10 @@
 		$A.util.removeClass(component.find('lookupFieldQueue'), 'slds-show');
 	},
 
-	validacionesOperativa: function(component, event, helper) {
+	validacionesOperativa: function (component, event, helper) {
 		component.set('v.botonOperativa', '');
-		let nombreBoton = event!==null&&event!==undefined?event.getSource().getLocalId():null;
-		if(nombreBoton === null || nombreBoton === undefined) {
+		let nombreBoton = event !== null && event !== undefined ? event.getSource().getLocalId() : null;
+		if (nombreBoton === null || nombreBoton === undefined) {
 			nombreBoton = component.get('v.botonName');
 		}
 		let recordId = component.get('v.recordId');
@@ -379,7 +379,7 @@
 		//Comprobación del propietario del caso
 		let getEsPropietarioCaso = component.get('c.getEsPropietarioCaso');
 		getEsPropietarioCaso.setParams({ownerId: component.get('v.caso.OwnerId')});
-		getEsPropietarioCaso.setCallback(this, function(response) {
+		getEsPropietarioCaso.setCallback(this, function (response) {
 			if (response.getState() === 'SUCCESS') {
 				if (!response.getReturnValue()) {
 					//No es propietario
@@ -394,7 +394,7 @@
 					//Sí es propietario
 					let datosCaso = component.get('c.datosCaso');
 					datosCaso.setParams({'recordId': recordId});
-					datosCaso.setCallback(this, function(responseDatosCaso) {
+					datosCaso.setCallback(this, function (responseDatosCaso) {
 						if (responseDatosCaso.getState() === 'SUCCESS') {
 							let datos = responseDatosCaso.getReturnValue();
 							component.set('v.oCaso', datos);
@@ -485,18 +485,18 @@
 													}
 												} else if (nombreBoton === 'Rechazar Nivel 1') {
 													$A.enqueueAction(component.get('c.abrirModalDevolver1N'));
-												} else if(nombreBoton === 'Devolver Nivel 1' ){
+												} else if (nombreBoton === 'Devolver Nivel 1') {
 													let grupoValido = component.get('v.permisos.CC_Devolver_1N_LOV');
-													if(grupoValido){
+													if (grupoValido) {
 														$A.enqueueAction(component.get('c.abrirModalDevolver1N'));
-													}else{
+													} else {
 														helper.mostrarToast('error', 'Devolver Nivel 1', 'El grupo 3N del caso no está configurado para devolver al nivel 1');
 													}
-												}else if (nombreBoton === 'Trasladar Incidencia') {
+												} else if (nombreBoton === 'Trasladar Incidencia') {
 
 													//Obligatoriedad de campos al trasladar incidencia
 													if ((!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) && !component.get('v.noIdentificado') ||
-													!component.get('v.canalProcedencia') || !component.get('v.canalEntrada') || !component.get('v.canalOperativo') || !component.get('v.causa')){ //|| (!component.get('v.solucion') && component.get('v.tipoRegistro') != 'CC_Cliente')
+													!component.get('v.canalProcedencia') || !component.get('v.canalEntrada') || !component.get('v.canalOperativo') || !component.get('v.causa')) { //|| (!component.get('v.solucion') && component.get('v.tipoRegistro') != 'CC_Cliente')
 														helper.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Canal de entrada, Canal de procedencia, Idioma, Tipo de contacto, Canal operativo, Causa, Cuenta y Contacto');
 													} else {
 														$A.enqueueAction(component.get('c.abrirQuickActionIncidencia'));
@@ -533,25 +533,25 @@
 													helper.finalizarLync(component, event, recordId);
 												} else if (nombreBoton === 'derivarAlSAC') {
 													let grupoValido = component.get('v.permisos.permisoDerivarAlSac');
-													if(grupoValido){
+													if (grupoValido) {
 														if (!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) {
 															helper.mostrarToast('error', 'Datos del Caso', 'Debe informar los siguientes campos obligatorios: Cuenta, Contacto o Representante');
 														} else {
 															$A.enqueueAction(component.get('c.onClickDerivarAlSac'));
 														}
-													}else{
+													} else {
 														helper.mostrarToast('error', 'Derivar Al SAC', 'No cumple con las condiciones para poder Derivar al SAC');
 													}
 
 												} else if (nombreBoton === 'devolverAlSAC') {
 													let grupoValido = component.get('v.permisos.permisoDevolverAlSac');
-													if(grupoValido){
+													if (grupoValido) {
 														if (!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) {
 															helper.mostrarToast('error', 'Datos del Caso', 'Debe informar los siguientes campos obligatorios: Cuenta, Contacto o Representante');
 														} else {
 															$A.enqueueAction(component.get('c.onClickDevolverAlSac'));
 														}
-													}else{
+													} else {
 														helper.mostrarToast('error', 'Devolver al SAC', 'No cumple con las condiciones para poder Devolver al SAC');
 													}
 
@@ -580,7 +580,7 @@
 															// 	helper.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Causa y Solución');
 															// 	component.set('v.bloqueadoBotonDerivar', false);
 															// } else {
-																$A.enqueueAction(component.get('c.handleModalOficina'));
+															$A.enqueueAction(component.get('c.handleModalOficina'));
 															// }
 														}
 													}
@@ -600,45 +600,43 @@
 													}
 												} else if (nombreBoton === 'Transferir HDT') {
 													if ((!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) && !component.get('v.noIdentificado') ||
-													!component.get('v.canalProcedencia') || !component.get('v.canalEntrada') || !component.get('v.canalOperativo') || !component.get('v.causa')){ //|| (!component.get('v.solucion') && component.get('v.tipoRegistro') != 'CC_Cliente')
+													!component.get('v.canalProcedencia') || !component.get('v.canalEntrada') || !component.get('v.canalOperativo') || !component.get('v.causa')) { //|| (!component.get('v.solucion') && component.get('v.tipoRegistro') != 'CC_Cliente')
 														helper.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Canal de entrada, Canal de procedencia, Idioma, Tipo de contacto, Canal operativo, Causa, Cuenta y Contacto');
 													} else {
 														$A.enqueueAction(component.get('c.abrirModalTransferirHDT'));
 													}
 													// Llamada al método de Apex para iniciar la transferencia
-													let action = component.get('c.transferCaseToHDT'); // Este es el método de Apex que crearás
-													action.setParams({
-														caseId: recordId,
-													});
+													let transferCaseToHdtApex = component.get('c.transferCaseToHDT'); // Este es el método de Apex que crearás
+													transferCaseToHdtApex.setParam('caseId', recordId);
 
 
-												action.setCallback(this, function(response) {
-													component.set('v.spinnerActivado', false); // Desactivar spinner al recibir respuesta
+													transferCaseToHdtApex.setCallback(this, transferCaseToHdtApexResponse => {
+														component.set('v.spinnerActivado', false); // Desactivar spinner al recibir respuesta
 
-												let state = response.getState();
-												if (state === 'SUCCESS') {
-													let result = response.getReturnValue();
-													if (result.isSuccess) {
-														helper.mostrarToast('success', 'Transferencia Exitosa', result.message);
-														// Opcional: Recargar la vista del caso para ver los cambios (ej. estado, vínculo)
-														$A.get('e.force:refreshView').fire();
-													} else {
-														helper.mostrarToast('error', 'Error en Transferencia', result.message);
-													}
-												} else if (state === 'ERROR') {
-													let errors = response.getError();
-													let errorMessage = 'Error desconocido al transferir el caso.';
-													if (errors && errors[0] && errors[0].message) {
-														errorMessage = errors[0].message;
-													}
-													helper.mostrarToast('error', 'Error del Servidor', errorMessage);
-												}
+														let state = transferCaseToHdtApexResponse.getState();
+														if (state === 'SUCCESS') {
+															let result = transferCaseToHdtApexResponse.getReturnValue();
+															if (result.isSuccess) {
+																helper.mostrarToast('success', 'Transferencia Exitosa', result.message);
+																// Opcional: Recargar la vista del caso para ver los cambios (ej. estado, vínculo)
+																$A.get('e.force:refreshView').fire();
+															} else {
+																helper.mostrarToast('error', 'Error en Transferencia', result.message);
+															}
+														} else if (state === 'ERROR') {
+															let errors = transferCaseToHdtApexResponse.getError();
+															let errorMessage = 'Error desconocido al transferir el caso.';
+															if (errors && errors[0] && errors[0].message) {
+																errorMessage = errors[0].message;
+															}
+															helper.mostrarToast('error', 'Error del Servidor', errorMessage);
+														}
 
 													});
-													$A.enqueueAction(action);
+													$A.enqueueAction(transferCaseToHdtApex);
 												}
+											}
 										}
-									}
 									});
 									$A.enqueueAction(validarCamposCaso);
 								}
@@ -667,7 +665,7 @@
 
 
 	//Funciones referentes al Traslado Colaborador
-	abrirModalTrasladarColaborador: function(component, event, helper) {
+	abrirModalTrasladarColaborador: function (component, event, helper) {
 		if (component.get('v.botonOperativa') === 'Trasladar Colaborador') {
 			component.set('v.remitir', false);
 			component.set('v.tipoOperativa', 'trasladar');
@@ -675,16 +673,16 @@
 			component.set('v.tipoOperativa', 'remitir');
 			component.set('v.remitir', true);
 		}
-			try {
-				if (event) {
-					let eventData = event.getParam('data');
-					if (eventData && eventData.grupoColaboradorFraude) {
-						component.set('v.grupoColaboradorFraude', eventData.grupoColaboradorFraude);
-					}
+		try {
+			if (event) {
+				let eventData = event.getParam('data');
+				if (eventData && eventData.grupoColaboradorFraude) {
+					component.set('v.grupoColaboradorFraude', eventData.grupoColaboradorFraude);
 				}
-			} catch(e) {
-				console.error('Error ' + e);
 			}
+		} catch (e) {
+			console.error('Error ' + e);
+		}
 		helper.getPicklistMCCGrupo(component, event, helper);
 		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 		$A.util.addClass(component.find('ModalboxColab'), 'slds-fade-in-open');
@@ -696,17 +694,17 @@
 	},
 
 	//Funciones referentes al Traslado Colaborador
-	abrirModalTrasladarColaboradorPublico: function(component, event) {
+	abrirModalTrasladarColaboradorPublico: function (component) {
 		component.set('v.ocultarBotonesOTP', true);
 		$A.enqueueAction(component.get('c.realizarTrasladoDesdeDerivar'));
 	},
 
-	abrirModalRemitirColaboradorPublico: function(component, event) {
+	abrirModalRemitirColaboradorPublico: function (component) {
 		component.set('v.ocultarBotonesOTP', true);
 		$A.enqueueAction(component.get('c.abrirModalTrasladarColaborador'));
 	},
 
-	cerrarModalTrasladarColaborador: function(component) {
+	cerrarModalTrasladarColaborador: function (component) {
 		if (component.find('selectGroups')) {
 			component.find('selectGroups').set('v.value', '');
 		}
@@ -751,53 +749,50 @@
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
-	 transferirHDT: function(component, event, helper) { 
-        //  Validar la selección del grupo 
-        /*let selectedGroup = null;
-        if (!component.get('v.verTodosLosGrupos')) {
-            selectedGroup = component.find('selectGroups').get('v.value');
-            if (!selectedGroup) {
-                helper.mostrarToast('error', 'Error de Validación', 'Debe seleccionar un grupo para transferir el caso.');
-                return; // Detiene la ejecución si la validación falla
-            }
-        }*/
+	transferirHDT: function (component, event, helper) {
+		//  Validar la selección del grupo
+		/*let selectedGroup = null;
+		if (!component.get('v.verTodosLosGrupos')) {
+		selectedGroup = component.find('selectGroups').get('v.value');
+		if (!selectedGroup) {
+		helper.mostrarToast('error', 'Error de Validación', 'Debe seleccionar un grupo para transferir el caso.');
+		return; // Detiene la ejecución si la validación falla
+		}
+		}*/
 
-		console.log('Iniciando transferencia HDT...');
 
 		$A.util.removeClass(component.find('ModalboxTransferirHDT'), 'slds-fade-in-open');
-    	$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
-    
+		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
+
 		component.set('v.spinnerActivado', true);
 
-        // Obtener el ID del caso actual
-        let recordId = component.get('v.recordId');
+		// Obtener el ID del caso actual
+		let recordId = component.get('v.recordId');
 
-        //  Preparar la llamada al método de Apex
-        // Se obtiene una referencia al método 'transferCaseToHDT' de la clase Apex 'CC_CaseTransfer'
+		//  Preparar la llamada al método de Apex
+		// Se obtiene una referencia al método 'transferCaseToHDT' de la clase Apex 'CC_CaseTransfer'
 
 		try {
-	
-			let action = component.get('c.callTransferCaseToHDT'); 
+
+			let action = component.get('c.callTransferCaseToHDT');
 			action.setParams({
-				caseId: recordId,
+				caseId: recordId
 			});
 
-			action.setCallback(this, function(response) {
+			action.setCallback(this, function (response) {
 
-				console.log('--- INICIO DEL CALLBACK DE APEX ---');
 
 				component.set('v.spinnerActivado', false);
 
-				
+
 
 				let state = response.getState();
-				console.log('Estado de la respuesta de Apex:', state);
 
 				if (state === 'SUCCESS') {
-					let result = response.getReturnValue(); 
+					let result = response.getReturnValue();
 					if (result.isSuccess) {
 						helper.mostrarToast('success', 'Transferencia Exitosa', result.message);
-						$A.get('e.force:refreshView').fire(); 
+						$A.get('e.force:refreshView').fire();
 					} else {
 						helper.mostrarToast('error', 'Error en Transferencia', result.message);
 					}
@@ -809,7 +804,7 @@
 					}
 					helper.mostrarToast('error', 'Error del Servidor', errorMessage);
 				}
-				
+
 
 			});
 
@@ -817,40 +812,34 @@
 			$A.enqueueAction(action);
 
 		} catch (e) { // <--- Fin del try-catch envolviendo la acción y encolado
-            console.error('Error JavaScript al iniciar la acción Apex:', e.message, e.stack);
-            component.set('v.spinnerActivado', false); // Asegúrate de desactivar el spinner si falla al iniciar
-            helper.mostrarToast('error', 'Error de Inicio', 'No se pudo iniciar la transferencia: ' + e.message);
-        }
-    },
-
-	cerrarModalTransferirHDT: function(component) {
-		try {
-		console.log('Intentando cerrar el modal.');
-		let modalTransferirHDT = component.find('ModalboxTransferirHDT');
-		console.log('Referencia del modal TransferirHDT:', modalTransferirHDT); 
-
-		if (modalTransferirHDT) { 
-			$A.util.removeClass(modalTransferirHDT, 'slds-fade-in-open');
-			console.log('Clase slds-fade-in-open eliminada del modal.');
-		} else {
-			console.error('ERROR: No se encontró el modal con aura:id "ModalboxTransferirHDT"'); 
-		}
-
-		let backdropRef = component.find('backdrop');
-		console.log('Referencia del backdrop:', backdropRef); 
-		if (backdropRef) {
-			$A.util.removeClass(backdropRef, 'slds-backdrop--open');
-			console.log('Clase slds-backdrop--open eliminada del backdrop.');
-		} else {
-			console.error('ERROR: No se encontró el backdrop con aura:id "backdrop"'); 
-		}
-		}catch (e){
-			console.log('Error al cerrar el modal:', e.message, e.stack);
+			console.error('Error JavaScript al iniciar la acción Apex:', e.message, e.stack);
+			component.set('v.spinnerActivado', false); // Asegúrate de desactivar el spinner si falla al iniciar
+			helper.mostrarToast('error', 'Error de Inicio', 'No se pudo iniciar la transferencia: ' + e.message);
 		}
 	},
 
-	prepararCuerpoEmail: function(component, event, helper) {
-		console.log('Preparar cuerpo email');
+	cerrarModalTransferirHDT: function (component) {
+		try {
+			let modalTransferirHDT = component.find('ModalboxTransferirHDT');
+
+			if (modalTransferirHDT) {
+				$A.util.removeClass(modalTransferirHDT, 'slds-fade-in-open');
+			} else {
+				console.error('ERROR: No se encontró el modal con aura:id "ModalboxTransferirHDT"');
+			}
+
+			let backdropRef = component.find('backdrop');
+			if (backdropRef) {
+				$A.util.removeClass(backdropRef, 'slds-backdrop--open');
+			} else {
+				console.error('ERROR: No se encontró el backdrop con aura:id "backdrop"');
+			}
+		} catch (e) {
+			console.error('Error al cerrar el modal:', e.message, e.stack);
+		}
+	},
+
+	prepararCuerpoEmail: function (component, event, helper) {
 		let listPara = [];
 		let listCC = [];
 		let contador = 0; //Utilizado para limitar el numero de copias en traslados y remitidos
@@ -865,9 +854,7 @@
 		const segundaOficinaName = segundaOficina ? segundaOficina.Name : null;
 		const segundaOficinaEmail = segundaOficina ? segundaOficina.CC_Email__c : null;
 		if (component.get('v.idBoton') === 'tab1') {
-			console.log('Preparar cuerpo email desde Trasladar Colaborador');
 			if (oficinaGestoraSeleccionada && oficinaSeleccionada) {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador con oficina gestora y seleccionada');
 				//OficinaGestora del cliente
 				let buscarEmpleadoOfi = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleadoOfi.setParams({
@@ -921,10 +908,10 @@
 								listPara.push(segundaOficinaEmail);
 							}
 						}
-						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+						if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.oficinaGestoraSeleccionadaName'), 'Traslado Colaborador');
-						}else{
+						} else {
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -949,7 +936,6 @@
 				});
 				$A.enqueueAction(buscarEmpleadoOfi);
 			} else if (oficinaSeleccionada && !oficinaGestoraSeleccionada) {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador con oficina seleccionada');
 				//Otra oficina
 				let buscarEmpleadoOfi = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleadoOfi.setParams({
@@ -1005,11 +991,11 @@
 								listPara.push(segundaOficinaEmail);
 							}
 						}
-						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+						if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.selectedRecord').Name, 'Traslado Colaborador');
 
-						}else{
+						} else {
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -1036,7 +1022,6 @@
 
 				$A.enqueueAction(buscarEmpleadoOfi);
 			} else if (empleadoSeleccionado && empleadoGestorSeleccionado) {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador con empleado gestor y seleccionado');
 				let buscarEmpleOfi = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleOfi.setParams({
 					'idOficina': component.get('v.oficinaGestor'),
@@ -1085,32 +1070,32 @@
 								/*if((para == undefined || para == '')
 								&&
 								!listCC[0]){
-									while(listCC.length) {
-										listCC.pop();
-									}
-									while(listPara.length) {
-										listPara.pop();
-									}
+								while(listCC.length) {
+								listCC.pop();
+								}
+								while(listPara.length) {
+								listPara.pop();
+								}
 								}
 								else if!listCC[0]{
-									while(listCC.length) {
-										listCC.pop();
-									}
+								while(listCC.length) {
+								listCC.pop();
+								}
 								}
 								else if(para == undefined || para == ''){
-									while(listPara.length) {
-										listPara.pop();
-									}
+								while(listPara.length) {
+								listPara.pop();
+								}
 								}
 								else{
-									listPara.push(para);
+								listPara.push(para);
 								}
 								*/
-								if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+								if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 									helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Traslado Colaborador');
 
-								}else{
+								} else {
 									let args = {
 										actionName: 'Case.Email_Colaborador',
 										targetFields: {
@@ -1139,7 +1124,6 @@
 				});
 				$A.enqueueAction(buscarEmpleOfi);
 			} else if (empleadoSeleccionado && !empleadoGestorSeleccionado) {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador con empleado seleccionado');
 				let buscarEmpleado = component.get('c.buscarEmpleadoOficina');
 				buscarEmpleado.setParams({
 					'idOficina': component.get('v.selectedRecord').Id,
@@ -1190,11 +1174,11 @@
 								} else {
 									listPara.push(para);
 								}
-								if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+								if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 									helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Traslado Colaborador');
 
-								}else{
+								} else {
 									let args = {
 										actionName: 'Case.Email_Colaborador',
 										targetFields: {
@@ -1225,7 +1209,6 @@
 				});
 				$A.enqueueAction(buscarEmpleado);
 			} else {
-				console.log('Preparar cuerpo email desde Trasladar Colaborador sin empleado ni oficina');
 				let buscarColaborador = component.get('c.buscarColaborador');
 				buscarColaborador.setParams({'idGrupoColaborador': component.get('v.grupoSeleccionadoValue')});
 				buscarColaborador.setCallback(this, responseBuscarColaborador => {
@@ -1244,30 +1227,23 @@
 								listCC.pop();
 							}
 							while (listPara.length) {
-								console.log('listPara1: ' + listPara);
 								listPara.pop();
-								console.log('listPara2: ' + listPara);
 							}
 						} else if (listCC[0] === undefined) {
 							while (listCC.length) {
 								listCC.pop();
 							}
 						} else if (listPara[0] === undefined) {
-							console.log('listPara3: ' + listPara);
 							while (listPara.length) {
 								listPara.pop();
 							}
-							console.log('listPara4: ' + listPara);
 						}
 
-						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-							console.log('Preparar cuerpo email desde Trasladar Colaborador con tipo registro CC_Cliente');
-							console.log('listPara: ' + JSON.stringify(listPara));
+						if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', component.get('v.grupoSeleccionadoName'), 'Traslado Colaborador');
 
-						}else{
-							console.log('Preparar cuerpo email desde Trasladar Colaborador con tipo registro diferente a CC_Cliente');
+						} else {
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -1291,7 +1267,6 @@
 
 					}
 				});
-				console.log('ListParaFinal '+listPara);
 				$A.enqueueAction(buscarColaborador);
 			}
 		} else if (component.get('v.idBoton') === 'tab2') {
@@ -1350,11 +1325,11 @@
 								listPara.push(component.get('v.selectedRecordSegundaOficina.CC_Email__c'));
 							}
 						}
-						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+						if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.oficinaGestoraSeleccionadaName'), 'Remitir Colaborador');
 
-						}else{
+						} else {
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -1435,11 +1410,11 @@
 								listPara.push(segundaOficinaEmail);
 							}
 						}
-						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+						if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 							$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, segundaOficinaName, component.get('v.selectedRecord').Name, 'Remitir Colaborador');
 
-						}else{
+						} else {
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -1515,10 +1490,10 @@
 									listPara.push(para);
 								}
 
-								if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+								if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 									helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Remitir Colaborador');
-								}else{
+								} else {
 									let args = {
 										actionName: 'Case.Email_Colaborador',
 										targetFields: {
@@ -1598,11 +1573,11 @@
 								} else {
 									listPara.push(para);
 								}
-								if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+								if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 									$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 									helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoColab, 'Remitir Colaborador');
 
-								}else{
+								} else {
 									let args = {
 										actionName: 'Case.Email_Colaborador',
 										targetFields: {
@@ -1667,11 +1642,10 @@
 						}
 
 						//Preparar borrador de correo con la plantilla seleccionada
-						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-							console.log('v.tipoRegistro == CC_Cliente');
+						if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 							helper.abrirEmailColaboradorActionHelper(component, listPara, listCC, '', plantillaName, '', grupoSeleccionadoName, 'Remitir Colaborador');
 
-						}else{						
+						} else {
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
@@ -1698,24 +1672,22 @@
 		}
 	},
 
-	trasladarColaborador: function(component, event) {
-		console.log('Trasladar Colaborador');
+	trasladarColaborador: function (component, event) {
 		let buttonClicked = event.getSource().getLocalId();
 		component.set('v.idBoton', buttonClicked);
 		let plantilla = '';
 		let nombrePlantilla = '';
-		let plantillaName = '';
+
 		if (!component.get('v.casoEnSegundoNivel') && !component.get('v.casoEnTercerNivel')) {
 			let oficinaSeleccionada = component.get('v.oficinaSeleccionada');
 			let oficinaGestoraSeleccionada = component.get('v.oficinaGestoraSeleccionada');
 			let oficinaCaso = component.get('c.oficinaPermiteTrasladarRemitir');
 			oficinaCaso.setParams({'recordId': component.get('v.recordId'), 'otraOficina': oficinaGestoraSeleccionada, 'oficinaSeleccionada': component.get('v.selectedRecord.Name')});
-			oficinaCaso.setCallback(this, function(responseOficinaAccount) {
+			oficinaCaso.setCallback(this, function (responseOficinaAccount) {
 				if (responseOficinaAccount.getState() === 'SUCCESS') {
 					let oficina = responseOficinaAccount.getReturnValue();
 					component.set('v.oficinaAccount', oficina);
 					if (oficinaSeleccionada && (oficinaGestoraSeleccionada || !oficinaGestoraSeleccionada)) {
-						console.log('Preparar cuerpo email desde Trasladar Colaborador con oficina seleccionada');
 						if (!component.get('v.oficinaAccount')) {
 							let toastEvent = $A.get('e.force:showToast');
 							toastEvent.setParams({title: 'Oficina no permitida', message: 'No se puede realizar la operativa con esta oficina.', type: 'error', mode: 'dismissable', duration: '4000'});
@@ -1750,7 +1722,6 @@
 							$A.enqueueAction(actualizarCaso);
 						}
 					} else if (!oficinaSeleccionada) {
-						console.log('Preparar cuerpo email desde Trasladar Colaborador sin oficina seleccionada');
 						if (component.get('v.uncheckedPlantilla')) {
 							plantilla = component.get('v.selectedRecordPlantilla.Id');
 							nombrePlantilla = component.get('v.selectedRecordPlantilla.Name');
@@ -1812,7 +1783,7 @@
 		}
 	},
 
-	teclaPulsadaLookupGrupoColaborador: function(component, event, helper) {
+	teclaPulsadaLookupGrupoColaborador: function (component, event, helper) {
 		let searchRes = component.find('searchRes');
 		if (component.get('v.SearchKeyWord').length > 0) {
 			$A.util.addClass(searchRes, 'slds-is-open');
@@ -1825,7 +1796,7 @@
 		}
 	},
 
-	teclaPulsadaLookupOficina: function(component, event, helper) {
+	teclaPulsadaLookupOficina: function (component, event, helper) {
 		let searchRes = component.find('searchRes2');
 		if (component.get('v.SearchKeyWordOfi')) {
 			$A.util.addClass(searchRes, 'slds-is-open');
@@ -1838,7 +1809,7 @@
 		}
 	},
 
-	teclaPulsadaLookup2aOficina: function(component, event, helper) {
+	teclaPulsadaLookup2aOficina: function (component, event, helper) {
 		let searchResSegundaOfi = component.find('searchResSegundaOfi');
 		if (component.get('v.SearchKeyWordSegundaOfi')) {
 			$A.util.addClass(searchResSegundaOfi, 'slds-is-open');
@@ -1851,7 +1822,7 @@
 		}
 	},
 
-	teclaPulsadaLookupEmpleado: function(component, event, helper) {
+	teclaPulsadaLookupEmpleado: function (component, event, helper) {
 		let searchRes = component.find('searchRes3');
 		if (component.get('v.SearchKeyWordEmp').length > 0) {
 			$A.util.addClass(searchRes, 'slds-is-open');
@@ -1863,7 +1834,7 @@
 			component.set('v.listOfSearchRecordsEmpl', null);
 		}
 	},
-	obtenerPlantillasGrupo: function(component, event) {
+	obtenerPlantillasGrupo: function (component, event) {
 		let grupoId;
 		if (component.get('v.verTodosLosGrupos')) {
 			grupoId = component.get('v.selectedRecord.Id');
@@ -1892,7 +1863,7 @@
 		$A.enqueueAction(action);
 	},
 
-	deseleccionarGrupoColaborador: function(component) {
+	deseleccionarGrupoColaborador: function (component) {
 		//Eliminar el grupo seleccionado
 		let pillTarget = component.find('lookup-pill');
 		$A.util.addClass(pillTarget, 'slds-hide');
@@ -1907,7 +1878,7 @@
 		component.set('v.grupoSeleccionado', false);
 		component.set('v.plantillaEstaSeleccionada', false);
 	},
-	deseleccionarOficina: function(component) {
+	deseleccionarOficina: function (component) {
 		let pillTarget = component.find('lookup-pill-2');
 		$A.util.addClass(pillTarget, 'slds-hide');
 		$A.util.removeClass(pillTarget, 'slds-show');
@@ -1921,7 +1892,7 @@
 		component.set('v.oficinaSeleccionada', false);
 		component.set('v.plantillaEstaSeleccionada', false);
 	},
-	deseleccionarEmpleado: function(component) {
+	deseleccionarEmpleado: function (component) {
 		let pillTarget = component.find('lookup-pill-3');
 		$A.util.addClass(pillTarget, 'slds-hide');
 		$A.util.removeClass(pillTarget, 'slds-show');
@@ -1937,20 +1908,19 @@
 	},
 
 	//Funciones referentes al Remitir Colaborador
-	remitirColaborador: function(component, event) {
+	remitirColaborador: function (component, event) {
 		let buttonClicked = event.getSource().getLocalId();
 		component.set('v.idBoton', buttonClicked);
 
 		let plantilla = '';
 		let nombrePlantilla = '';
-		let plantillaName = '';
 		if (!component.get('v.casoEnSegundoNivel') && !component.get('v.casoEnTercerNivel')) {
 			let oficinaSeleccionada = component.get('v.oficinaSeleccionada');
 			let oficinaGestoraSeleccionada = component.get('v.oficinaGestoraSeleccionada');
 			let oficinaCaso = component.get('c.oficinaPermiteTrasladarRemitir');
 			oficinaCaso.setParams({'recordId': component.get('v.recordId'), 'otraOficina': oficinaGestoraSeleccionada, 'oficinaSeleccionada': component.get('v.selectedRecord.Name')});
 
-			oficinaCaso.setCallback(this, function(responseOficinaAccount) {
+			oficinaCaso.setCallback(this, function (responseOficinaAccount) {
 				if (responseOficinaAccount.getState() === 'SUCCESS') {
 					let oficina = responseOficinaAccount.getReturnValue();
 					component.set('v.oficinaAccount', oficina);
@@ -2047,7 +2017,7 @@
 		}
 	},
 
-	abrirModalSolicitarInfo: function(component, event, helper) {
+	abrirModalSolicitarInfo: function (component, event, helper) {
 		//Solo se abre el modal de Solicitar info si el canal de respuesta es Email, Chat o vacío y si el campo canal operativa esta definido.
 		let canalRespuesta = component.get('v.canalRespuesta');
 		let canalOperativo = component.get('v.canalOperativo');
@@ -2058,20 +2028,20 @@
 			$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 		} else if (canalRespuesta === 'Twitter' && canalOperativo !== null) {
 
-			if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+			if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 				helper.publicarSolicitarInformacionMessage(component, 'true');
-			}else{
-			let actionAPI = component.find('quickActionAPI');
-			let args = {actionName: 'Case.SocialPublisher', targetFields: {'CC_Solicitud_Informacion__c': {value: true}}};
-			actionAPI.selectAction(args).then(() => {
-				actionAPI.setActionFieldValues(args);
-			});
+			} else {
+				let actionAPI = component.find('quickActionAPI');
+				let args = {actionName: 'Case.SocialPublisher', targetFields: {'CC_Solicitud_Informacion__c': {value: true}}};
+				actionAPI.selectAction(args).then(() => {
+					actionAPI.setActionFieldValues(args);
+				});
 			}
 
 		}
 	},
 
-	cerrarModalSolicitarInfo: function(component) {
+	cerrarModalSolicitarInfo: function (component) {
 		let selectItemIdioma = component.find('selectItemIdiomaSol').get('v.value');
 		if (selectItemIdioma) {
 			component.find('selectItemIdiomaSol').set('v.value', null);
@@ -2107,7 +2077,7 @@
 	},
 
 
-	solicitarInfo: function(component, event, helper) {
+	solicitarInfo: function (component, event, helper) {
 
 		let recordId = component.get('v.recordId');
 		let plantilla = component.get('v.plantillaSeleccionadaValue');
@@ -2126,22 +2096,22 @@
 			'canalProcedencia': canalProcedencia,
 			'tipoRegistro': component.get('v.tipoRegistro')
 		});
-		
-		update.setCallback(this, function(response) {
+
+		update.setCallback(this, function (response) {
 			if (response.getState() === 'SUCCESS') {
 
-				let action = component.get('c.buscarCorreoContacto');
-				action.setParams({'idCaso': component.get('v.recordId')});
-				action.setCallback(this, function(response) {
-					if (response.getState() === 'SUCCESS') {
-						if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-							helper.abrirEmailColaboradorActionHelper(component, response.getReturnValue(), '', '', plantillaName, '', '', 'Solicitud Información');
-						}else{
+				let buscarCorreoContactoApex = component.get('c.buscarCorreoContacto');
+				buscarCorreoContactoApex.setParams({'idCaso': component.get('v.recordId')});
+				buscarCorreoContactoApex.setCallback(this, buscarCorreoContactoApexResponse => {
+					if (buscarCorreoContactoApexResponse.getState() === 'SUCCESS') {
+						if (component.get('v.tipoRegistro') === 'CC_Cliente') {
+							helper.abrirEmailColaboradorActionHelper(component, buscarCorreoContactoApexResponse.getReturnValue(), '', '', plantillaName, '', '', 'Solicitud Información');
+						} else {
 							let actionAPI = component.find('quickActionAPI');
 							let args = {
 								actionName: 'Case.Email_Colaborador',
 								targetFields: {
-									'ToAddress': {value: response.getReturnValue()},
+									'ToAddress': {value: buscarCorreoContactoApexResponse.getReturnValue()},
 									'CC_Procedencia__c': {value: 'Solicitud Información'},
 									'BccAddress': {value: ''},
 									'CcAddress': {value: ''},
@@ -2153,7 +2123,7 @@
 
 					}
 				});
-				$A.enqueueAction(action);
+				$A.enqueueAction(buscarCorreoContactoApex);
 
 			}
 		});
@@ -2165,32 +2135,30 @@
 		$A.get('e.force:refreshView').fire();
 	},
 
-	abrirModalTransferirHDT: function(component, event, helper) {
+	abrirModalTransferirHDT: function (component, event, helper) {
 
 		$A.util.addClass(component.find('ModalboxTransferirHDT'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 		helper.getPicklistMCCGrupo(component, event, helper);
 
 		if (component.find('selectGroups')) {
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
 			window.setTimeout($A.getCallback(() => component.find('selectGroups').focus()), 50);
 		}
 	},
 
 	//Funciones referentes al Trasladar a 3N
-	abrirModalTrasladar3N: function(component, event, helper) {
+	abrirModalTrasladar3N: function (component, event, helper) {
 
 		$A.util.addClass(component.find('Modalbox3Nivel'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 		helper.getPicklistMCCGrupo3N(component, event, helper);
 
 		if (component.find('selectGroups3N')) {
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
 			window.setTimeout($A.getCallback(() => component.find('selectGroups3N').focus()), 50);
 		}
 	},
 
-	seleccionarGrupo3N: function(component, event) {
+	seleccionarGrupo3N: function (component, event) {
 		let unchecked = component.get('v.verTodosLosGrupos3N');
 		let grupoId = '';
 		let grupoName = '';
@@ -2213,7 +2181,7 @@
 		}
 	},
 
-	cerrarModalTrasladar3N: function(component) {
+	cerrarModalTrasladar3N: function (component) {
 
 		if (component.find('selectGroups3N')) {
 			component.find('selectGroups3N').set('v.value', '');
@@ -2237,7 +2205,7 @@
 		$A.enqueueAction(deseleccionarGrupo3N);
 	},
 
-	teclaPulsadaLookupGrupo3N: function(component, event, helper) {
+	teclaPulsadaLookupGrupo3N: function (component, event, helper) {
 		let getInputkeyWordGroup = component.get('v.SearchKeyWordGroup');
 		if (getInputkeyWordGroup.length > 0) {
 			$A.util.addClass(component.find('searchResGroup'), 'slds-is-open');
@@ -2250,7 +2218,7 @@
 		}
 	},
 
-	trasladar3N: function(component, event, helper) {
+	trasladar3N: function (component, event, helper) {
 		component.set('v.deshabilitarEscalar', true);
 		let recordId = component.get('v.recordId');
 		let colaName;
@@ -2272,7 +2240,7 @@
 
 		let guardarTipoGestion = component.get('c.guardaTipoGestion');
 		guardarTipoGestion.setParams({'sIdCaso': recordId, 'tipoGestion': tipoGestion});
-		guardarTipoGestion.setCallback(this, function(response) {
+		guardarTipoGestion.setCallback(this, function (response) {
 			if (response.getState() === 'SUCCESS') {
 				//alert('test');
 				let cambiarPropietario = component.get('c.cambiarPropietario');
@@ -2292,7 +2260,7 @@
 		$A.enqueueAction(guardarTipoGestion);
 	},
 
-	deseleccionarGrupo3N: function(component) {
+	deseleccionarGrupo3N: function (component) {
 		let pillTarget = component.find('lookup-pill-group');
 		$A.util.addClass(pillTarget, 'slds-hide');
 		$A.util.removeClass(pillTarget, 'slds-show');
@@ -2310,19 +2278,18 @@
 	},
 
 	//Funciones referentes al Trasladar a 2N
-	abrirModalTrasladar2N: function(component, event, helper) {
+	abrirModalTrasladar2N: function (component, event, helper) {
 
 		$A.util.addClass(component.find('Modalbox2Nivel'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 		helper.getPicklistMCCGrupo2N(component, event, helper);
 
 		if (component.find('selectGroups2N')) {
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
 			window.setTimeout($A.getCallback(() => component.find('selectGroups2N').focus()), 50);
 		}
 	},
 
-	seleccionarGrupo2N: function(component, event) {
+	seleccionarGrupo2N: function (component, event) {
 		let unchecked = component.get('v.verTodosLosGrupos2N');
 		let grupoId = '';
 		let grupoName = '';
@@ -2345,7 +2312,7 @@
 		}
 	},
 
-	cerrarModalTrasladar2N: function(component) {
+	cerrarModalTrasladar2N: function (component) {
 
 		if (component.find('selectGroups2N')) {
 			component.find('selectGroups2N').set('v.value', '');
@@ -2369,7 +2336,7 @@
 		$A.enqueueAction(deseleccionarGrupo2N);
 	},
 
-	teclaPulsadaLookupGrupo2N: function(component, event, helper) {
+	teclaPulsadaLookupGrupo2N: function (component, event, helper) {
 		let getInputkeyWordGroup = component.get('v.SearchKeyWordGroup');
 
 		if (getInputkeyWordGroup.length > 0) {
@@ -2383,7 +2350,7 @@
 		}
 	},
 
-	trasladar2N: function(component, event, helper) {
+	trasladar2N: function (component, event, helper) {
 		component.set('v.deshabilitarEscalar', true);
 		let recordId = component.get('v.recordId');
 		let colaName;
@@ -2403,7 +2370,7 @@
 		let comentario = '';
 		let guardarTipoGestion = component.get('c.guardaTipoGestion');
 		guardarTipoGestion.setParams({'sIdCaso': recordId, 'tipoGestion': tipoGestion});
-		guardarTipoGestion.setCallback(this, function(response) {
+		guardarTipoGestion.setCallback(this, function (response) {
 			if (response.getState() === 'SUCCESS') {
 				let cambiarPropietario = component.get('c.cambiarPropietario2N');
 				cambiarPropietario.setParams({'grupoName': grupoName, 'colaName': colaName, 'recordId': recordId, 'comentario': comentario, 'grupoId': grupoId});
@@ -2422,7 +2389,7 @@
 		$A.enqueueAction(guardarTipoGestion);
 	},
 
-	deseleccionarGrupo2N: function(component) {
+	deseleccionarGrupo2N: function (component) {
 		let pillTarget = component.find('lookup-pill-group2N');
 		$A.util.addClass(pillTarget, 'slds-hide');
 		$A.util.removeClass(pillTarget, 'slds-show');
@@ -2440,7 +2407,7 @@
 	},
 
 	//Funciones referentes al Devolver a 1N
-	abrirModalDevolver1N: function(component) {
+	abrirModalDevolver1N: function (component) {
 		let nombreBoton = component.get('v.botonOperativa');
 		if (nombreBoton === 'Devolver Nivel 1') {
 			component.set('v.tipoTarea', 'devolver');
@@ -2456,12 +2423,11 @@
 
 		//Al abrir el modal se pone el foco en el campo de motivo de devolución
 		if (component.find('inputMotivoDevolucion')) {
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
 			window.setTimeout($A.getCallback(() => component.find('inputMotivoDevolucion').focus()), 50);
 		}
 	},
 
-	cerrarModalDevolver1N: function(component) {
+	cerrarModalDevolver1N: function (component) {
 		let cmpTarget = component.find('ModalboxDevolver1N');
 		$A.util.removeClass(cmpTarget, 'slds-fade-in-open');
 
@@ -2472,7 +2438,7 @@
 
 	},
 
-	devolver1N: function(component, event, helper) {
+	devolver1N: function (component, event, helper) {
 		if (!component.get('v.comentario')) {
 			let mensaje = 'Es necesario indicar un motivo para continuar.';
 			let toastEvent = $A.get('e.force:showToast');
@@ -2517,7 +2483,7 @@
 	},
 
 	//Funciones referentes al Responder Cliente
-	abrirModalResponderCliente: function(component, event, helper) {
+	abrirModalResponderCliente: function (component, event, helper) {
 		let actionAPI = component.find('quickActionAPI');
 
 		//Solo se abre el modal de Solicitar info si el canal de respuesta es Email, Chat o vacío.
@@ -2525,19 +2491,15 @@
 		if (canalRespuesta === 'Email' || canalRespuesta === 'Chat' || canalRespuesta === 'Phone' || !canalRespuesta || canalRespuesta === 'Backoffice' || canalRespuesta === 'Carta') {
 			//Abre el modal de Responder Cliente
 			let myData;
-			if(event) {
+			if (event) {
 				myData = event.getParam('data') || {};
 			}
-			//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
-			if(myData && myData.responderClienteDerivar != null) {
+			if (myData && myData.responderClienteDerivar != null) {
 				component.set('v.tipoOperativa', 'responderClienteDerivar');
-				//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			} else {
 				component.set('v.tipoOperativa', 'responder');
 			}
-			//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			helper.loadCarpetasIdioma(component, event, helper);
-			//console.log('LOG abrir modal responder cliente ' + JSON.stringify(myData));
 			if (component.get('v.tipoRegistro') === 'CC_Cliente' && canalRespuesta === 'Carta' && component.get('v.psSdocs')) {
 				$A.util.addClass(component.find('ModalboxPrevioResponderCliente'), 'slds-fade-in-open');
 			} else {
@@ -2559,7 +2521,7 @@
 	},
 
 
-	cerrarModalPrevioResponderCliente: function(component) {
+	cerrarModalPrevioResponderCliente: function (component) {
 
 		component.set('v.procesoFinalSeleccion', false);
 		component.set('v.tipoOperativa', '');
@@ -2569,7 +2531,7 @@
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
-	responderEmail: function(component) {
+	responderEmail: function (component) {
 
 		$A.util.removeClass(component.find('ModalboxPrevioResponderCliente'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
@@ -2579,7 +2541,7 @@
 
 	},
 
-	responderCPostal: function(component, event) {
+	responderCPostal: function (component) {
 		component.set('v.mostrarModalGenerarDocumento', true);
 		//$A.util.removeClass(component.find('ModalboxPrevioResponderCliente'), 'slds-fade-in-open');
 		//$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
@@ -2589,7 +2551,7 @@
 
 	},
 
-	cerrarModalResponderCliente: function(component) {
+	cerrarModalResponderCliente: function (component) {
 		let selectItemIdioma = component.find('selectItemIdioma').get('v.value');
 		if (selectItemIdioma) {
 			component.find('selectItemIdioma').set('v.value', null);
@@ -2621,57 +2583,57 @@
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
-	responderCliente: function(component, event, helper) {
-		 let update = component.get('c.actualizarCaso');
-        let plantillaName = component.get('v.plantillaSeleccionadaName');
-        //añadir valor del campo url formulario del registro
-        update.setParams({
-            'idCaso': component.get('v.recordId'),
-            'plantilla': component.get('v.plantillaSeleccionadaValue'),
-            'informarReferenciaCorreo': true,
-            'tratamiento': component.get('v.tratamiento'),
-            'operativa': component.get('v.tipoOperativa'),
-            'canalRespuesta': component.get('v.canalRespuesta'),
-            'canalProcedencia': component.get('v.canalProcedencia'),
-            'tipoRegistro': component.get('v.tipoRegistro')
-        });
-        update.setCallback(this, response => {
-            //Una vez que retorne de APEX se ejecuta este codigo
-            let stateUpdate = response.getState();
-            if (stateUpdate === 'SUCCESS') {
-                let action = component.get('c.buscarCorreoContacto');
-                action.setParam('idCaso', component.get('v.recordId'));
-                action.setCallback(this, response => {
-                    let state = response.getState();
-                    if (state === 'SUCCESS') {
-                        if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-                            helper.abrirEmailColaboradorActionHelper(component, response.getReturnValue(), '', '', plantillaName, '', '', 'Responder Cliente');
-                        }else{
-                            let actionAPI = component.find('quickActionAPI');
-                            let args = {
-                                actionName: 'Case.Email_Colaborador',
-                                targetFields: {
-                                    'ToAddress': {value: response.getReturnValue()},
-                                    'CC_Procedencia__c': {value: 'Responder Cliente'},
-                                    'BccAddress': {value: ''},
-                                    'CcAddress': {value: ''},
-                                    'CC_Plantilla__c': {value: plantillaName}
-                                }
-                            };
-                            actionAPI.setActionFieldValues(args);
-                        }
-                    }
-                });
-                $A.enqueueAction(action);
-            }
-        });
-        $A.enqueueAction(update);
-        //Cierre del modal
-        $A.enqueueAction(component.get('c.cerrarModalResponderCliente'));
-        $A.get('e.force:refreshView').fire();
+	responderCliente: function (component, event, helper) {
+		let update = component.get('c.actualizarCaso');
+		let plantillaName = component.get('v.plantillaSeleccionadaName');
+		//añadir valor del campo url formulario del registro
+		update.setParams({
+			'idCaso': component.get('v.recordId'),
+			'plantilla': component.get('v.plantillaSeleccionadaValue'),
+			'informarReferenciaCorreo': true,
+			'tratamiento': component.get('v.tratamiento'),
+			'operativa': component.get('v.tipoOperativa'),
+			'canalRespuesta': component.get('v.canalRespuesta'),
+			'canalProcedencia': component.get('v.canalProcedencia'),
+			'tipoRegistro': component.get('v.tipoRegistro')
+		});
+		update.setCallback(this, response => {
+			//Una vez que retorne de APEX se ejecuta este codigo
+			let stateUpdate = response.getState();
+			if (stateUpdate === 'SUCCESS') {
+				let buscarCorreoContactoApex = component.get('c.buscarCorreoContacto');
+				buscarCorreoContactoApex.setParam('idCaso', component.get('v.recordId'));
+				buscarCorreoContactoApex.setCallback(this, buscarCorreoContactoApexResponse => {
+					let state = buscarCorreoContactoApexResponse.getState();
+					if (state === 'SUCCESS') {
+						if (component.get('v.tipoRegistro') === 'CC_Cliente') {
+							helper.abrirEmailColaboradorActionHelper(component, buscarCorreoContactoApexResponse.getReturnValue(), '', '', plantillaName, '', '', 'Responder Cliente');
+						} else {
+							let actionAPI = component.find('quickActionAPI');
+							let args = {
+								actionName: 'Case.Email_Colaborador',
+								targetFields: {
+									'ToAddress': {value: buscarCorreoContactoApexResponse.getReturnValue()},
+									'CC_Procedencia__c': {value: 'Responder Cliente'},
+									'BccAddress': {value: ''},
+									'CcAddress': {value: ''},
+									'CC_Plantilla__c': {value: plantillaName}
+								}
+							};
+							actionAPI.setActionFieldValues(args);
+						}
+					}
+				});
+				$A.enqueueAction(buscarCorreoContactoApex);
+			}
+		});
+		$A.enqueueAction(update);
+		//Cierre del modal
+		$A.enqueueAction(component.get('c.cerrarModalResponderCliente'));
+		$A.get('e.force:refreshView').fire();
 	},
 
-	responderCliente22: function(component, event, helper) {
+	responderCliente22: function (component, event, helper) {
 		let plantilla = '';
 		let nombrePlantilla = '';
 		let plantillaName = component.get('v.plantillaSeleccionadaName');
@@ -2706,10 +2668,10 @@
 		action.setCallback(this, response => {
 			let state = response.getState();
 			if (state === 'SUCCESS') {
-				if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+				if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 					helper.abrirEmailColaboradorActionHelper(component, response.getReturnValue(), '', '', plantillaName, '', '', 'Responder Cliente');
 
-				}else{
+				} else {
 					let actionAPI = component.find('quickActionAPI');
 					let args = {
 						actionName: 'Case.Email_Colaborador',
@@ -2733,13 +2695,12 @@
 		$A.get('e.force:refreshView').fire();
 	},
 
-	seleccionarPlantilla: function(component, event) {
+	seleccionarPlantilla: function (component, event) {
 		component.set('v.plantillaEstaSeleccionada', true);
-		//console.log('LOG seleccionar plantilla ' + Date.now());
 		let tipoOperativa = component.get('v.tipoOperativa');
 
 		let plantillaId = event.getParam('value');
-		let plantillaName = '';
+		// let plantillaName = '';
 
 		if (tipoOperativa === 'trasladar' || tipoOperativa === 'remitir') {
 			component.set('v.actualFirstOptionPlantilla', plantillaId);
@@ -2747,7 +2708,7 @@
 
 			for (let key in optionsPlantilla) {
 				if (plantillaId === optionsPlantilla[key].value) {
-					plantillaName = optionsPlantilla[key].label;
+					// plantillaName = optionsPlantilla[key].label;
 					component.set('v.plantillaSeleccionadaValue', optionsPlantilla[key].value);
 					component.set('v.plantillaSeleccionadaName', optionsPlantilla[key].label);
 				}
@@ -2757,7 +2718,7 @@
 			let picklistFirstOptionsPlantilla = component.get('v.optionsPlantillaResponder');
 			for (let key in picklistFirstOptionsPlantilla) {
 				if (plantillaId === picklistFirstOptionsPlantilla[key].value) {
-					plantillaName = picklistFirstOptionsPlantilla[key].label;
+					// plantillaName = picklistFirstOptionsPlantilla[key].label;
 					component.set('v.plantillaSeleccionadaValue', picklistFirstOptionsPlantilla[key].value);
 					component.set('v.plantillaSeleccionadaName', picklistFirstOptionsPlantilla[key].label);
 				}
@@ -2767,15 +2728,15 @@
 			let optionsPlantillaResponder = component.get('v.optionsPlantillaResponder');
 			for (let key in optionsPlantillaResponder) {
 				if (event.getParam('value') === optionsPlantillaResponder[key].value) {
-					plantillaName = optionsPlantillaResponder[key].label;
+					// plantillaName = optionsPlantillaResponder[key].label;
 					component.set('v.plantillaSeleccionadaValue', optionsPlantillaResponder[key].value);
 					component.set('v.plantillaSeleccionadaName', optionsPlantillaResponder[key].label);
 				}
 			}
 		}
-		
 	},
-	seeGrupos: function(component) {
+
+	seeGrupos: function (component) {
 		if (component.get('v.verGrupos')) {
 			component.set('v.verOficinas', false);
 			component.set('v.verEmpleados', false);
@@ -2794,7 +2755,7 @@
 			$A.enqueueAction(component.get('c.deseleccionarPlantilla2'));
 		}
 	},
-	seeOficinas: function(component, event, helper) {
+	seeOficinas: function (component, event, helper) {
 		if (component.get('v.verOficinas')) {
 			component.set('v.verGrupos', false);
 			component.set('v.verEmpleados', false);
@@ -2818,7 +2779,7 @@
 			helper.obtenerPlantillasOficina(component, event, helper);
 		}
 	},
-	allOficinas: function(component) {
+	allOficinas: function (component) {
 		if (component.get('v.verTodasLasOficinas')) {
 			component.set('v.noVerOficinas', false);
 			component.set('v.oficinaSeleccionada', false);
@@ -2830,7 +2791,7 @@
 			}
 		}
 	},
-	getOfiCliente: function(component, event, helper) {
+	getOfiCliente: function (component, event, helper) {
 		if (component.get('v.noVerOficinas')) {
 			component.set('v.verTodasLasOficinas', false);
 			component.set('v.oficinaSeleccionada', true);
@@ -2839,7 +2800,7 @@
 			helper.obtenerPlantillasOficina(component, event, helper);
 		}
 	},
-	seeEmpleados: function(component, event, helper) {
+	seeEmpleados: function (component, event, helper) {
 		if (component.get('v.verEmpleados')) {
 			component.set('v.verGrupos', false);
 			component.set('v.verOficinas', false);
@@ -2865,7 +2826,7 @@
 			helper.obtenerPlantillasEmpleado(component, event, helper);
 		}
 	},
-	allEmpleados: function(component) {
+	allEmpleados: function (component) {
 		if (component.get('v.verTodosLosEmpleados')) {
 			component.set('v.noVerEmpleados', false);
 			component.set('v.optionsPlantilla', null);
@@ -2873,7 +2834,7 @@
 			component.set('v.empleadoGestorSeleccionado', false);
 		}
 	},
-	getEmpleCliente: function(component, event, helper) {
+	getEmpleCliente: function (component, event, helper) {
 		if (component.get('v.noVerEmpleados')) {
 			component.set('v.verTodosLosEmpleados', false);
 			component.set('v.empleadoSeleccionado', true);
@@ -2884,7 +2845,7 @@
 		}
 	},
 
-	allGrupos: function(component, event, helper) {
+	allGrupos: function (component, event, helper) {
 		component.set('v.grupoSeleccionado', false);
 		if (component.get('v.verTodosLosGrupos')) {
 			component.set('v.canalProcedencia', false);
@@ -2894,32 +2855,35 @@
 		}
 	},
 
-	allGrupos3N: function(component, event, helper) {
+	allGrupos3N: function (component, event, helper) {
 		//component.set('v.grupoSeleccionado', false);
-		if (!component.get('v.verTodosLosGrupos3N')) {
-			helper.getPicklistMCCGrupo3N(component, event, helper);
+		let verTodosLosGrupos = component.get('v.verTodosLosGrupos3N');
+		if (!verTodosLosGrupos) {
+			helper.getPicklistMCCGrupo3N(component, verTodosLosGrupos);
 		}
+		/*let verTodosLosGrupos = component.get('v.verTodosLosGrupos3N');
+		helper.getPicklistMCCGrupo3N(component, verTodosLosGrupos);*/
 	},
 
-	allGrupos2N: function(component, event, helper) {
+	allGrupos2N: function (component, event, helper) {
 		//component.set('v.grupoSeleccionado', false);
 		if (!component.get('v.verTodosLosGrupos2N')) {
 			helper.getPicklistMCCGrupo2N(component, event, helper);
 		}
 	},
 
-	handleCarpetaIdiomaSeleccionada: function(component, event, helper) {
+	handleCarpetaIdiomaSeleccionada: function (component, event, helper) {
 		component.set('v.idiomaPlantilla', event.getParam('value'));
 		helper.loadCarpetasTratamiento(component, event, helper);
 	},
 
-	handleCarpetaTratamientoSeleccionada: function(component, event, helper) {
+	handleCarpetaTratamientoSeleccionada: function (component, event, helper) {
 		component.set('v.procesoFinalSeleccion', true);
 		component.set('v.tratamiento', event.getParam('value'));
 		helper.getPlantillasResponder(component, event, helper);
 	},
 
-	deseleccionarPlantilla: function(component) {
+	deseleccionarPlantilla: function (component) {
 		//Eliminar el grupo seleccionado
 		let pillTarget = component.find('lookup-pill-plantilla');
 		$A.util.addClass(pillTarget, 'slds-hide');
@@ -2937,7 +2901,7 @@
 		component.set('v.plantillaSeleccionada', null);
 	},
 
-	deseleccionarPlantilla2: function(component) {
+	deseleccionarPlantilla2: function (component) {
 		//Eliminar el grupo seleccionado
 		component.set('v.SearchKeyWordPlantilla', null);
 		component.set('v.listOfSearchRecordsPlantilla', null);
@@ -2947,7 +2911,7 @@
 		component.set('v.plantillaSeleccionada', null);
 	},
 
-	teclaPulsadaLookupPlantilla: function(component, event, helper) {
+	teclaPulsadaLookupPlantilla: function (component, event, helper) {
 		let searchRes = component.find('searchResPlantilla');
 		let getInputkeyWord = component.get('v.SearchKeyWordPlantilla');
 
@@ -2964,7 +2928,7 @@
 		}
 	},
 
-	teclaPulsadaLookupPlantilla2: function(component, event, helper) {
+	teclaPulsadaLookupPlantilla2: function (component, event, helper) {
 		let getInputkeyWord = component.get('v.SearchKeyWordPlantilla');
 		if (getInputkeyWord.length > 2) {
 			helper.buscarPlantillasResponder(component, event, getInputkeyWord);
@@ -2973,19 +2937,19 @@
 		}
 	},
 
-	abrirQuickActionIncidencia: function(component, event, helper) {
-		if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+	abrirQuickActionIncidencia: function (component, event, helper) {
+		if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 			//DMV: Agregar el quick action de Incidencia
 			//component.set('v.modalIdencencia', true);
 			helper.publicarTrasladarIncidenciaMessage(component);
-		}else{
+		} else {
 			let args = {actionName: 'Case.CC_Indicencia'};
 			component.find('quickActionAPI').selectAction(args);
 		}
 
 	},
 
-	onClickAutoasignarme: function(component) {
+	onClickAutoasignarme: function (component) {
 		let autoasignarmeCaso = component.get('c.autoasignarmeCaso');
 		autoasignarmeCaso.setParams({'recordId': component.get('v.recordId')});
 		autoasignarmeCaso.setCallback(this, response => {
@@ -3006,43 +2970,59 @@
 		$A.enqueueAction(autoasignarmeCaso);
 	},
 
-	abrirModalEnviarNotificacion: function(component) {
-		component.find('inputEnviarNotificacionDestinatario').set('v.value', component.get('v.oCaso.Contact.Phone'));
-
+	abrirModalEnviarNotificacion: function (component) {
 		$A.util.addClass(component.find('modalboxEnviarNotificacion'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 
-		//Cargar carpetas de idioma
-		let subdirectoriosOperativas = component.get('c.subdirectorios');
-		subdirectoriosOperativas.setParams({'rutaDevName': 'CC_Notificacion'});
-		subdirectoriosOperativas.setCallback(this, response => {
+		let actionGetIdiomas = component.get('c.obtenerIdiomasNotificacion');
+		actionGetIdiomas.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
+				let idiomas = response.getReturnValue();
 				let listaEnviarNotificacionIdiomas = [];
-				let retorno = response.getReturnValue();
-				retorno.forEach(element => listaEnviarNotificacionIdiomas.push({value: element.DeveloperName, label: element.Name}));
+				for (let key in idiomas) {
+					listaEnviarNotificacionIdiomas.push({
+						value: key,
+						label: idiomas[key]
+					});
+				}
 				component.set('v.enviarNotificacionIdiomas', listaEnviarNotificacionIdiomas);
+
 				let idioma = component.get('v.oCaso.CC_Idioma__c');
-				if (idioma === 'ca') {
-					idioma = 'CC_Notificacion_Catalan';
-				} else if (idioma === 'en') {
-					idioma = 'CC_Notificacion_Ingles';
-				} else {
-					idioma = 'CC_Notificacion_Castellano';
+				if (!idioma || !idiomas[idioma]) {
+					idioma = 'es'; //Establecer español como predeterminado
 				}
 				component.set('v.enviarNotificacionIdioma', idioma);
-				$A.enqueueAction(component.get('c.seleccionaEnviarNotificacionIdioma'));
 
-				if (component.find('inputEnviarNotificacionPlantilla')) {
-					//eslint-disable-next-line @lwc/lwc/no-async-operation
-					window.setTimeout($A.getCallback(() => component.find('inputEnviarNotificacionPlantilla').focus()), 50);
-				}
+				//Llamar al método Apex para obtener las plantillas
+				let actionGetPlantillas = component.get('c.obtenerPlantillas');
+				actionGetPlantillas.setParams({
+					idioma: idioma,
+					entidad: component.get('v.oCaso.Account.AV_IndicadoresClientes__c')
+				});
+				actionGetPlantillas.setCallback(this, responsePlantillas => {
+					if (responsePlantillas.getState() === 'SUCCESS') {
+						let plantillas = responsePlantillas.getReturnValue();
+						let opcionesPlantillas = [];
+						for (let key in plantillas) {
+							opcionesPlantillas.push({
+								label: plantillas[key],
+								value: key
+							});
+						}
+						component.set('v.enviarNotificacionPlantillas', opcionesPlantillas);
+					} else if (responsePlantillas.getState() === 'ERROR') {
+						let errors = responsePlantillas.getError();
+						console.error('Error al obtener plantillas:', errors);
+					}
+				});
+				$A.enqueueAction(actionGetPlantillas);
 			}
 		});
-		$A.enqueueAction(subdirectoriosOperativas);
-		$A.enqueueAction(component.get('c.actualizarEnviarNotificacionCaracteresRestantes'));
+		$A.enqueueAction(actionGetIdiomas);
+
 	},
 
-	abrirModalDeepLink: function(component) {
+	abrirModalDeepLink: function (component) {
 		component.set('v.spinnerActivado', true);
 		let numPersoParam = component.get('v.numPerso');
 		let validacionEnrollment = component.get('c.validarEnrollment');
@@ -3112,7 +3092,7 @@
 
 	},
 
-	seleccionplantillasDeeplinking: function(component, event) {
+	seleccionplantillasDeeplinking: function (component, event) {
 		component.set('v.plantillaDeeplink', event.getParam('value'));
 		let actualizaVariables = component.get('c.obtenerDatosSeleccionado');
 		let validarSegundoParametro = component.get('c.validacionParametroDeeplink');
@@ -3165,9 +3145,9 @@
 		$A.enqueueAction(validarSegundoParametro);
 	},
 
-	cerrarModalEnviarNotificacion: function(component) {
+	cerrarModalEnviarNotificacion: function (component) {
 		//Se vacía el contenido del destinatario y del mensaje
-		component.find('inputEnviarNotificacionDestinatario').set('v.value', '');
+		//component.find('inputEnviarNotificacionDestinatario').set('v.value', '');
 		component.find('inputEnviarNotificacionPlantilla').set('v.value', '');
 		component.find('inputEnviarNotificacionContenido').set('v.value', '');
 
@@ -3175,7 +3155,7 @@
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
-	cerrarModalDeepLinking: function(component) {
+	cerrarModalDeepLinking: function (component) {
 		$A.util.removeClass(component.find('modalboxDeepLink'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 
@@ -3186,7 +3166,7 @@
 
 	},
 
-	enviarNotificacionDeepLinking: function(component) {
+	enviarNotificacionDeepLinking: function (component) {
 		//alert('Test click envio deeplink');
 		$A.enqueueAction(component.get('c.cerrarModalDeepLinking'));
 		component.set('v.spinnerActivado', true);
@@ -3262,21 +3242,35 @@
 		$A.enqueueAction(envioDeeplink);
 	},
 
-	seleccionaEnviarNotificacionIdioma: function(component) {
-		let plantillas = component.get('c.plantillas');
-		plantillas.setParams({'rutaDevName': component.find('inputEnviarNotificacionIdioma').get('v.value')});
-		plantillas.setCallback(this, response => {
+	seleccionaEnviarNotificacionIdioma: function (component) {
+		let action = component.get('c.obtenerPlantillas');
+		action.setParams({
+			idioma: component.find('inputEnviarNotificacionIdioma').get('v.value'),
+			indicadorCliente: component.get('v.oCaso.Account.AV_IndicadoresClientes__c')
+		});
+		action.setCallback(this, function (response) {
 			if (response.getState() === 'SUCCESS') {
-				let listaPlantillas = [];
-				let retorno = response.getReturnValue();
-				retorno.forEach(element => listaPlantillas.push({value: element.DeveloperName, label: element.Name}));
-				component.set('v.enviarNotificacionPlantillas', listaPlantillas);
+				let plantillas = response.getReturnValue();
+				let opcionesPlantillas = [];
+				for (let key in plantillas) {
+					if (Object.prototype.hasOwnProperty.call(plantillas, key)) {
+						opcionesPlantillas.push({
+							label: plantillas[key],
+							value: key
+						});
+					}
+				}
+				component.set('v.enviarNotificacionPlantillas', opcionesPlantillas);
+				component.find('inputEnviarNotificacionContenido').set('v.value', '');
+			} else if (response.getState() === 'ERROR') {
+				let errors = response.getError();
+				console.error('Error al obtener plantillas:', errors);
 			}
 		});
-		$A.enqueueAction(plantillas);
+		$A.enqueueAction(action);
 	},
 
-	seleccionaEnviarNotificacionPlantilla: function(component) {
+	seleccionaEnviarNotificacionPlantilla: function (component) {
 		let plantillaCuerpo = component.get('c.plantillaCuerpo');
 		plantillaCuerpo.setParams({'developerName': component.find('inputEnviarNotificacionPlantilla').get('v.value'), 'convertirATextoPlano': true});
 		plantillaCuerpo.setCallback(this, response => {
@@ -3284,14 +3278,14 @@
 				//Cargar contenido de la plantilla en el campo de del modal
 				component.find('inputEnviarNotificacionContenido').set('v.value', response.getReturnValue());
 				//Actualizar contador de caracteres restantes
-				let actualizarEnviarNotificacionCaracteresRestantes = component.get('c.actualizarEnviarNotificacionCaracteresRestantes');
+				//let actualizarEnviarNotificacionCaracteresRestantes = component.get('c.actualizarEnviarNotificacionCaracteresRestantes');
 				$A.enqueueAction(actualizarEnviarNotificacionCaracteresRestantes);
 			}
 		});
 		$A.enqueueAction(plantillaCuerpo);
 	},
 
-	actualizarEnviarNotificacionCaracteresRestantes: function(component) {
+	actualizarEnviarNotificacionCaracteresRestantes: function (component) {
 		let caracteresRestantes = 160 - component.find('inputEnviarNotificacionContenido').get('v.value').length;
 		component.set('v.enviarNotificacionCaracteresRestantes', caracteresRestantes);
 
@@ -3302,141 +3296,132 @@
 		}
 	},
 
-	enviarNotificacion: function(component, event, helper) {
-		//Validación de campos obligatorios
-		let destinatario = component.find('inputEnviarNotificacionDestinatario').get('v.value');
-		let texto = component.find('inputEnviarNotificacionContenido').get('v.value');
-		if (!destinatario || !texto) {
-			//eslint-disable-next-line no-alert
-			alert('Debe indicar el destinatario y el contenido.');
-		} else {
-			//Se inhabilita el botón hasta recibir la respuesta
-			event.getSource().set('v.disabled', true);
+	enviarNotificacion: function (component, event, helper) {
+		event.getSource().set('v.disabled', true);
+		let plantillaSeleccionada = component.get('v.enviarNotificacionPlantilla');
+		let enviarSMS = component.get('c.enviarNotificacinPushSMS');
+		enviarSMS.setParams({'sObjectId': component.get('v.recordId'), 'plantillaDevName': plantillaSeleccionada, 'idioma': component.get('v.enviarNotificacionIdioma'), 'entidad': component.get('v.oCaso.Account.AV_IndicadoresClientes__c')});
+		enviarSMS.setCallback(this, response => {
+			if (response.getState() === 'SUCCESS') {
+				let resultado = response.getReturnValue();
+				if (resultado === 'OK') {
+					//Toast OK
+					helper.mostrarToast('success', 'Se envió la notificación', 'Se envió correctamente la notificación/SMS al destinatario');
 
-			let enviarSMS = component.get('c.enviarNotificacinPushSMS');
-			enviarSMS.setParams({'sObjectId': component.get('v.recordId'), 'destinatario': destinatario, 'texto': texto});
-			enviarSMS.setCallback(this, response => {
-				if (response.getState() === 'SUCCESS') {
-					let resultado = response.getReturnValue();
-					if (resultado === 'OK') {
-						//Toast OK
-						helper.mostrarToast('success', 'Se envió la notificación', 'Se envió correctamente la notificación/SMS al destinatario ' + destinatario);
+					//Se cierra el modal
+					$A.enqueueAction(component.get('c.cerrarModalEnviarNotificacion'));
 
-						//Se cierra el modal
-						$A.enqueueAction(component.get('c.cerrarModalEnviarNotificacion'));
-
-						//Refrescar la vista
-						$A.get('e.force:refreshView').fire();
-					} else {
-						//Toast KO
-						helper.mostrarToast('error', 'No se pudo enviar la notificación', resultado);
-					}
+					//Refrescar la vista
+					$A.get('e.force:refreshView').fire();
+				} else {
+					//Toast KO
+					helper.mostrarToast('error', 'No se pudo enviar la notificación', resultado);
 				}
-				//Se vuelve a habilitar el botón
-				event.getSource().set('v.disabled', false);
-			});
-			$A.enqueueAction(enviarSMS);
-		}
+			}
+			//Se vuelve a habilitar el botón
+			event.getSource().set('v.disabled', false);
+		});
+		$A.enqueueAction(enviarSMS);
 	},
 
-	modalTrasladarColaboradorTeclaPulsada: function(component, event) {
+	modalTrasladarColaboradorTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalTrasladarColaborador'));
 		}
 	},
 
-	modalTrasladar3NTeclaPulsada: function(component, event) {
+	modalTrasladar3NTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalTrasladar3N'));
 		}
 	},
 
-	modalTrasladar2NTeclaPulsada: function(component, event) {
+	modalTrasladar2NTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalTrasladar2N'));
 		}
 	},
 
-	modalTransferirHDTTeclaPulsada: function(component, event) {
+	modalTransferirHDTTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalTransferirHDT'));
 		}
 	},
 
-	modalSolicitarInfoTeclaPulsada: function(component, event) {
+	modalSolicitarInfoTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalSolicitarInfo'));
 		}
 	},
 
-	modalDevolver1NTeclaPulsada: function(component, event) {
+	modalDevolver1NTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalDevolver1N'));
 		}
 	},
 
-	modalResponderClienteTeclaPulsada: function(component, event) {
+	modalResponderClienteTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalResponderCliente'));
 		}
 	},
 
-	modalEnviarNotificacionTeclaPulsada: function(component, event) {
+	modalEnviarNotificacionTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalEnviarNotificacion'));
 		}
 	},
 
-	modalDeepLinkingTeclaPulsada: function(component, event) {
+	modalDeepLinkingTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalDeepLinking'));
 		}
 	},
 
-	modaAutenticacionTeclaPulsada: function(component, event) {
+	modaAutenticacionTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalAutenticacion'));
 		}
 	},
 
-	modalDevolverSACTeclaPulsada: function(component, event) {
+	modalDevolverSACTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.cerrarModalDevolverSAC'));
 		}
 	},
 
-	abrirModalAutenticacion: function(component, event, helper) {
-			component.set('v.modalAutenticacionVisible', true);
-			$A.util.addClass(component.find('modalboxAutenticacion'), 'slds-fade-in-open');
-			$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
+	abrirModalAutenticacion: function (component) {
+		component.set('v.modalAutenticacionVisible', true);
+		$A.util.addClass(component.find('modalboxAutenticacion'), 'slds-fade-in-open');
+		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
-	cerrarModalAutenticacion: function(component) {
+	cerrarModalAutenticacion: function (component) {
 		$A.util.removeClass(component.find('modalboxAutenticacion'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 		component.set('v.modalAutenticacionVisible', false);
 	},
 
-	abrirModalDevolverSAC: function(component) {
+	abrirModalDevolverSAC: function (component) {
 		component.set('v.modalDevolverSACVisible', true);
 		$A.util.addClass(component.find('ModalboxReturnSAC'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
 	/*abrirModalDevolverSAC: function(component) {
-		if (component.get('v.botonOperativa') === 'Devolver a SAC') {
-			$A.util.addClass(component.find('ModalboxReturnSAC'), 'slds-fade-in-open');
-			$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
-		}
+	if (component.get('v.botonOperativa') === 'Devolver a SAC') {
+	$A.util.addClass(component.find('ModalboxReturnSAC'), 'slds-fade-in-open');
+	$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
+	}
 	},*/
 
-	cerrarModalDevolverSAC: function(component) {
+	cerrarModalDevolverSAC: function (component) {
 		$A.util.removeClass(component.find('ModalboxReturnSAC'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 		component.set('v.modalDevolverSACVisible', false);
 	},
 
-	ampliarMotivoDevolverSAC: function(component) {
+	ampliarMotivoDevolverSAC: function (component) {
 		let check = component.get('v.ampliarInfoDevolverSAC');
 		let textarea = component.find('ampliarMotivoDevolucionSAC');
 		let text = component.find('motDevolucionSAC');
@@ -3457,7 +3442,7 @@
 		}
 	},
 
-	devolverSAC: function(component, helper) {
+	devolverSAC: function (component) {
 		let devolverAlSac = component.get('c.devolverCasoAlSAC');
 		let motivoDevolver = component.get('v.motivoDevolucionSAC');
 		if (motivoDevolver !== '' && motivoDevolver != null) {
@@ -3500,7 +3485,7 @@
 		}
 	},
 	//Inicio Métodos Devolver/Derivar al SAC
-	onClickDevolverAlSac: function(component) {
+	onClickDevolverAlSac: function (component) {
 		/**
 		* Todos los casos que nos derivan con cualquier RT de SAC?
 		* Actividad 'Devuelto al SAC'
@@ -3520,23 +3505,23 @@
 		devolverAlSac.setParams({ 'motivo': motivoDevolver, 'casoContactCenter': component.get('v.oCaso') });
 		devolverAlSac.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
-				let toastEvent = $A.get('e.force:showToast');
-				toastEvent.setParams({
-					message: 'El caso se ha devuelto al SAC.',
-					type: 'success',
-					mode: 'dismissible',
-					duration: '4000'
-				});
-				toastEvent.fire();
-				//component.find('devolverAlSac').set('v.disabled', false);
-				$A.get('e.force:refreshView').fire();
+		let toastEvent = $A.get('e.force:showToast');
+		toastEvent.setParams({
+		message: 'El caso se ha devuelto al SAC.',
+		type: 'success',
+		mode: 'dismissible',
+		duration: '4000'
+		});
+		toastEvent.fire();
+		//component.find('devolverAlSac').set('v.disabled', false);
+		$A.get('e.force:refreshView').fire();
 
-			}
+		}
 		});
 		$A.enqueueAction(devolverAlSac);*/
 	},
 
-	onClickDerivarAlSac: function(component, event, helper) {
+	onClickDerivarAlSac: function (component, event, helper) {
 		/**
 		* Actividad 'Derivado a SAC'
 		* Canal de entrada 'Email' y canal de procedencia 'Formulario web' --> OK
@@ -3557,7 +3542,7 @@
 	},
 
 
-	crearTarea: function(component, event, helper) {
+	crearTarea: function (component, event, helper) {
 		if (component.find('asuntoTarea').get('v.value') === '' || component.find('comentariosTarea').get('v.value') === '' || component.find('fechaActividad').get('v.value') === null) {
 			helper.mostrarToast('warning', 'Campos vacíos', 'Por favor, informe todos los campos del formulario');
 		} else {
@@ -3567,9 +3552,9 @@
 			/*cambiar parametro numeroGestor por la variable matriculaGestor
 			let matriculaGestor;
 			if (component.find('comboboxEmpleados').get('v.value') != null) {
-				matriculaGestor = component.find('comboboxEmpleados').get('v.value');
+			matriculaGestor = component.find('comboboxEmpleados').get('v.value');
 			} else {
-				matriculaGestor = component.get('v.numeroGestor');
+			matriculaGestor = component.get('v.numeroGestor');
 			}*/
 
 			crearTareaGestor.setParams({
@@ -3589,12 +3574,12 @@
 					} else if (!respuesta.cuenta.Id) {
 						helper.mostrarToast('success', 'Tarea creada con exito', respuesta.mensaje);
 					} else {
-						let comprobacionCaso = component.get('c.devolverMensaje');
-						comprobacionCaso.setParams({recordId: respuesta.cuenta.Id});
-						comprobacionCaso.setCallback(this, response => {
-							if (response.getState() === 'SUCCESS') {
-								if (response.getReturnValue() != null) {
-									let objetoRespuesta = response.getReturnValue();
+						let devolverMensajeApex = component.get('c.devolverMensaje');
+						devolverMensajeApex.setParams({recordId: respuesta.cuenta.Id});
+						devolverMensajeApex.setCallback(this, devolverMensajeApexResponse => {
+							if (devolverMensajeApexResponse.getState() === 'SUCCESS') {
+								if (devolverMensajeApexResponse.getReturnValue() != null) {
+									let objetoRespuesta = devolverMensajeApexResponse.getReturnValue();
 									let toastEvent = $A.get('e.force:showToast');
 									toastEvent.setParams({
 										title: 'Tarea creada con éxito',
@@ -3612,7 +3597,7 @@
 								}
 							}
 						});
-						$A.enqueueAction(comprobacionCaso);
+						$A.enqueueAction(devolverMensajeApex);
 					}
 					$A.enqueueAction(component.get('c.modalTareaGestorCerrar'));
 				} else {
@@ -3624,25 +3609,25 @@
 		}
 	},
 
-	resetDisponibilidadConsultada: function(component) {
+	resetDisponibilidadConsultada: function (component) {
 		component.set('v.disponibilidadConsultada', false);
 	},
 
-	consultarFechasDisponibilidadGestor: function(component, event, helper) {
+	consultarFechasDisponibilidadGestor: function (component, event, helper) {
 		helper.consultarFechasDisponibilidad(component, component.get('v.numeroGestor'));
 	},
 
-	consultarHorasDisponibilidadGestor: function(component, event, helper) {
+	consultarHorasDisponibilidadGestor: function (component, event, helper) {
 		helper.consultarHorasDisponibilidad(component, component.get('v.numeroGestor'));
 		component.set('v.gestorElegido', component.get('v.numeroGestor'));
 		component.set('v.nombreGestorElegido', component.get('v.nombreGestor'));
 	},
 
-	consultarFechasDisponibilidadBackup: function(component, event, helper) {
+	consultarFechasDisponibilidadBackup: function (component, event, helper) {
 		helper.consultarFechasDisponibilidad(component, component.find('gestoresBackup').get('v.value'));
 	},
 
-	consultarHorasDisponibilidadBackup: function(component, event, helper) {
+	consultarHorasDisponibilidadBackup: function (component, event, helper) {
 		helper.consultarHorasDisponibilidad(component, component.find('gestoresBackup').get('v.value'));
 		component.set('v.gestorElegido', component.find('gestoresBackup').get('v.value'));
 		let gestorSeleccionado = component.find('gestoresBackup').get('v.value');
@@ -3651,7 +3636,7 @@
 
 	},
 
-	mostrarGestorBackup: function(component, event, helper) {
+	mostrarGestorBackup: function (component, event, helper) {
 		if (component.get('v.gestorBackupActivo')) {
 			component.set('v.fechasDisponibilidad', undefined);
 			component.set('v.horasDisponibilidad', undefined);
@@ -3684,7 +3669,7 @@
 		}
 	},
 
-	confirmarCitaGestor: function(component, event, helper) {
+	confirmarCitaGestor: function (component, event, helper) {
 		if (component.find('asuntoEvento').get('v.value') === '' || component.find('fechasDisponibilidad').get('v.value') === undefined || component.find('horasDisponibilidad').get('v.value') === undefined) {
 			helper.mostrarToast('warning', 'Campos vacíos', 'Por favor, informe todos los campos del formulario');
 		} else {
@@ -3721,15 +3706,14 @@
 		}
 	},
 
-	mmodalCitaGestorAbrir: function(component, event, helper) {
+	mmodalCitaGestorAbrir: function (component, event, helper) {
 		$A.util.addClass(component.find('modalCitaGestor'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
 		window.setTimeout($A.getCallback(() => component.find('modalCitaGestorCancelar').focus()), 200);
 		helper.esClienteDigital(component, 'Cita gestor');
 	},
 
-	modalCitaGestorCerrar: function(component) {
+	modalCitaGestorCerrar: function (component) {
 		$A.util.removeClass(component.find('modalCitaGestor'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 		component.set('v.cargandoGestor', false);
@@ -3737,37 +3721,36 @@
 		$A.get('e.force:refreshView').fire();
 	},
 
-	modalCitaGestorTeclaPulsada: function(component, event) {
+	modalCitaGestorTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.modalCitaGestorCerrar'));
 		}
 	},
 
-	modalTareaGestorAbrir: function(component, event, helper) {
+	modalTareaGestorAbrir: function (component, event, helper) {
 		component.set('v.comentariosTarea', '');
 		helper.getDatosCaso(component);
 		//helper.obtenerEmpleadosOficina(component);
 		$A.util.addClass(component.find('modalTareaGestor'), 'slds-fade-in-open');
 		$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
 		window.setTimeout($A.getCallback(() => component.find('modalTareaGestorCancelar').focus()), 200);
 		helper.esClienteDigital(component, 'Tarea gestor');
 	},
 
-	modalTareaGestorCerrar: function(component) {
+	modalTareaGestorCerrar: function (component) {
 		$A.util.removeClass(component.find('modalTareaGestor'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 		component.set('v.cargandoGestor', false);
 		$A.get('e.force:refreshView').fire();
 	},
 
-	modalTareaGestorTeclaPulsada: function(component, event) {
+	modalTareaGestorTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.modalTareaGestorCerrar'));
 		}
 	},
 
-	checkboxPlantillaChange: function(component) {
+	checkboxPlantillaChange: function (component) {
 		component.set('v.SearchKeyWordPlantilla', null);
 		component.set('v.listOfSearchRecordsPlantilla', null);
 		component.set('v.plantillaSeleccionadaValue', null);
@@ -3776,7 +3759,7 @@
 		component.set('v.plantillaSeleccionada', null);
 	},
 
-	lookupAbrir: function(component) {
+	lookupAbrir: function (component) {
 		if (component.get('v.SearchKeyWordSegundaOfi').length > 1) {
 			let lookup2aOficina = component.find('lookup2aOficina');
 			$A.util.addClass(lookup2aOficina, 'slds-is-open');
@@ -3784,8 +3767,7 @@
 		}
 	},
 
-	lookupCerrar: function(component) {
-	//eslint-disable-next-line @lwc/lwc/no-async-operation
+	lookupCerrar: function (component) {
 		window.setTimeout(() => {
 			let lookup2aOficina = component.find('lookup2aOficina');
 			$A.util.addClass(lookup2aOficina, 'slds-is-close');
@@ -3793,11 +3775,10 @@
 		}, 100);
 	},
 
-	lookupOnchange: function(component, event, helper) {
+	lookupOnchange: function (component, event, helper) {
 		window.clearTimeout(component.get('v.timeoutTeclaPulsada'));
 		const lookupValue = component.get('v.SearchKeyWordSegundaOfi');
 		if (lookupValue.length > 1) {
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
 			component.set('v.timeoutTeclaPulsada', window.setTimeout($A.getCallback(() => helper.buscarListas(component, null, lookupValue, 'segundaOficina')), 500));
 		} else {
 			component.find('lookup2aOficinaInput').set('v.isLoading', false);
@@ -3808,22 +3789,21 @@
 		}
 	},
 
-	lookupSeleccionar: function(component, event) {
+	lookupSeleccionar: function (component, event) {
 		const segundaOficina = component.get('v.listOfSearchRecords2aOfi').find(record => record.Id === event.currentTarget.dataset.id);
 		component.set('v.selectedRecordSegundaOficina', segundaOficina);
 		//component.set('v.emailParaAux', segundaOficina.CC_Email__c);
 		component.set('v.emailCopiaAux', [segundaOficina.AV_DescFuncion__c, segundaOficina.AV_EAPGestor__pc]);
 	},
 
-	lookupDeseleccionar: function(component) {
+	lookupDeseleccionar: function (component) {
 		component.set('v.selectedRecordSegundaOficina', null);
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
 		window.setTimeout(() => component.find('lookup2aOficinaInput').focus(), 200);
 	},
 
 	//Ini: Función añadida por JH para US504352
 	//Funciones referentes al Ver Cliente Confidencial
-	mostrarInfoConfidencial: function(component) {
+	mostrarInfoConfidencial: function (component) {
 		let mostrarInfo = component.get('c.getCuentaConfidencial');
 		mostrarInfo.setParams({'AccountId': component.get('v.AccountId')});
 		mostrarInfo.setCallback(this, response => {
@@ -3854,12 +3834,12 @@
 	},
 	//Fin: Función añadida por JH para US504352
 
-	toggleVerTodasLasPlantillasOnclick: function(component) {
+	toggleVerTodasLasPlantillasOnclick: function (component) {
 		component.set('v.plantillaEstaSeleccionada', false);
 		component.set('v.selectedRecordPlantilla', false);
 	},
 
-	modalTransferAbrir: function(component) {
+	modalTransferAbrir: function (component) {
 		window.setTimeout($A.getCallback(() => {
 			$A.util.addClass(component.find('ModalBoxTransfer'), 'slds-fade-in-open');
 			$A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
@@ -3867,7 +3847,7 @@
 		}), 200);
 	},
 
-	modalTransferCerrar: function(component) {
+	modalTransferCerrar: function (component) {
 		component.set('v.selectedRecordQueue', null);
 		component.set('v.SearchKeyWordQueue', null);
 		component.set('v.listOfSearchRecordsQueue', []);
@@ -3884,13 +3864,13 @@
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
 
-	modalTransferTeclaPulsada: function(component, event) {
+	modalTransferTeclaPulsada: function (component, event) {
 		if (event.keyCode === 27) { //ESC
 			$A.enqueueAction(component.get('c.modalTransferCerrar'));
 		}
 	},
 
-	deseleccionarQueue: function(component) {
+	deseleccionarQueue: function (component) {
 		let pillTarget = component.find('lookup-pill-queue');
 		$A.util.addClass(pillTarget, 'slds-hide');
 		$A.util.removeClass(pillTarget, 'slds-show');
@@ -3907,7 +3887,7 @@
 		}
 	},
 
-	inputTextQueueOnchange: function(component, event, helper) {
+	inputTextQueueOnchange: function (component, event, helper) {
 		let searchRes = component.get('v.SearchKeyWordQueue');
 		if (searchRes.length > 0) {
 			$A.util.addClass(component.find('searchResQueue'), 'slds-is-open');
@@ -3920,7 +3900,7 @@
 		}
 	},
 
-	cambiarPropietarioTransfer: function(component, event, helper) {
+	cambiarPropietarioTransfer: function (component, event, helper) {
 		if (component.get('v.selectedRecordQueue')) {
 			component.set('v.deshabilitarTransfer', true);
 
@@ -3945,23 +3925,22 @@
 		}
 	},
 
-	handleModalOficina: function(component, event, helper) {
-		if(component.get('v.tipoRegistro') == 'CC_Cliente'){
-			//DMV: Agregar el quick action de Derivar
+	handleModalOficina: function (component, event, helper) {
+		if (component.get('v.tipoRegistro') === 'CC_Cliente') {
+		//DMV: Agregar el quick action de Derivar
 			helper.publicarDerivarMessage(component);
-		}else{
+		} else {
 			component.set('v.mostrarModalOficina', true);
 			component.set('v.spinnerActivado', true);
 		}
 	},
 
-	handleModalOficinaCerrado: function(component, event) {
+	handleModalOficinaCerrado: function (component) {
 		component.set('v.bloqueadoBotonDerivar', false);
 		component.set('v.mostrarModalOficina', false);
 	},
 
 	//handleModalCancelarCita: function(component) {
-	//console.log('entra handle');
 	//component.set('v.mostrarModalCancelarCita', true);
 	//},
 
@@ -3969,41 +3948,42 @@
 	//component.set('v.mostrarModalCancelarCita', false);
 	//},
 
-	onDerivarInteraccionChannel: function(component, message, helper) {
+	onDerivarInteraccionChannel: function (component, message) {
+		component.set('v.renderModales', true);
 
-		let datosAdicionales = message.getParam("datosAdicionales");
-		let origen = message.getParam("origen");
-		let destino = message.getParam("destino");
-		let recordId = message.getParam("recordId");
+		let datosAdicionales = message.getParam('datosAdicionales');
+		let origen = message.getParam('origen');
+		let destino = message.getParam('destino');
+		let recordId = message.getParam('recordId');
 		let recordLocalId = component.get('v.recordId');
 
-		if(recordId !== recordLocalId) {
-			//No se ejecuta porque no es el case que se esta mostrando en el modal
+		if (recordId !== recordLocalId) {
+		//No se ejecuta porque no es el case que se esta mostrando en el modal
 			return;
 		}
 
-		if(destino == "realizartrasladocolaborador" && origen == "operativaDerivar") {
-			if(datosAdicionales != null && datosAdicionales !== undefined && datosAdicionales !== '') {
+		if (destino === 'realizartrasladocolaborador' && origen === 'operativaDerivar') {
+			if (datosAdicionales != null && datosAdicionales !== undefined && datosAdicionales !== '') {
 				component.set('v.grupoColaboradorFraude', datosAdicionales);
 			}
 			let realizarTraslado = component.get('c.realizarTrasladoDesdeDerivarRefactor');
 			$A.enqueueAction(realizarTraslado);
-		}else if(destino == "realizarremitido" && origen == "operativaDerivar") {
+		} else if (destino === 'realizarremitido' && origen === 'operativaDerivar') {
 			component.set('v.botonOperativa', 'Remitir a Colaborador');
-			if(datosAdicionales != null && datosAdicionales !== undefined && datosAdicionales !== '') {
+			if (datosAdicionales != null && datosAdicionales !== undefined && datosAdicionales !== '') {
 				component.set('v.grupoColaboradorFraude', datosAdicionales);
 			}
 			$A.enqueueAction(component.get('c.abrirModalTrasladarColaborador'));
-		}else if(destino == "realizarremitidoautomatico" && origen == "operativaDerivar") {
+		} else if (destino === 'realizarremitidoautomatico' && origen === 'operativaDerivar') {
 			component.set('v.botonOperativa', 'Remitir a Colaborador');
-			if(datosAdicionales != null && datosAdicionales !== undefined && datosAdicionales !== '') {
+			if (datosAdicionales != null && datosAdicionales !== undefined && datosAdicionales !== '') {
 				component.set('v.grupoColaboradorFraude', datosAdicionales);
 			}
-		}else if(destino == "solicitarinfo" && origen == "operativaDerivar") {
+		} else if (destino === 'solicitarinfo' && origen === 'operativaDerivar') {
 			$A.enqueueAction(component.get('c.abrirModalSolicitarInfo'));
-		}else if(message.getParam("datosAdicionales") == "remitidoDesdeDerivar") {
-			//$A.enqueueAction(component.get('c.realizarRemitidoDesdeDerivar'));
-		}else if(destino == "responderClienteBotonera" && origen == "responderClienteButton"){
+		} else if (message.getParam('datosAdicionales') === 'remitidoDesdeDerivar') {
+		//$A.enqueueAction(component.get('c.realizarRemitidoDesdeDerivar'));
+		} else if (destino === 'responderClienteBotonera' && origen === 'responderClienteButton') {
 			let nombreBoton = '';
 			if (component.get('v.canalRespuesta') !== 'SMS' && component.get('v.canalRespuesta') !== 'Twitter' && component.get('v.canalRespuesta') !== 'Comentarios Apps') {
 				nombreBoton = 'Responder Cliente Email';
@@ -4016,7 +3996,7 @@
 			}
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "solicitarInfoBotonera" && origen == "solicitarInfoButton"){
+		} else if (destino === 'solicitarInfoBotonera' && origen === 'solicitarInfoButton') {
 			let nombreBoton = '';
 			if (component.get('v.canalRespuesta') !== 'SMS' && component.get('v.canalRespuesta') !== 'Twitter' && component.get('v.canalRespuesta') !== 'Comentarios Apps') {
 				nombreBoton = 'Solicitud Info Email';
@@ -4027,92 +4007,96 @@
 			}
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "remitirColaboradorBotonera" && origen == "remitirColaboradorButton"){
+		} else if (destino === 'remitirColaboradorBotonera' && origen === 'remitirColaboradorButton') {
 			let nombreBoton = 'Remitir Colaborador';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "derivarBotonera" && origen == "derivarButton"){ //utilizado para levantar el derivar desde el quickaction
+			setTimeout($A.getCallback(() => {
+				const modalTrasladarRemitirColaborador = component.find('ModalboxColab');
+				modalTrasladarRemitirColaborador && modalTrasladarRemitirColaborador.getElement().offsetTop;
+			}), 0);
+		} else if (destino === 'derivarBotonera' && origen === 'derivarButton') { //utilizado para levantar el derivar desde el quickaction
 			let nombreBoton = 'operativaOficina';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "derivarBotonera" && origen == "operativaDerivar"){ //utilizado para levantar el derivar desde el LWC de operativa oficina
+		} else if (destino === 'derivarBotonera' && origen === 'operativaDerivar') { //utilizado para levantar el derivar desde el LWC de operativa oficina
 			let nombreBoton = 'operativaOficina';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "trasladar3NBotonera" && origen == "trasladar3NButton"){
+		} else if (destino === 'trasladar3NBotonera' && origen === 'trasladar3NButton') {
 			let nombreBoton = 'Trasladar 3N';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "poseidonBotonera" && origen == "poseidonButton"){
+		} else if (destino === 'poseidonBotonera' && origen === 'poseidonButton') {
 			let nombreBoton = 'botonDeepLinking';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "trasladarIncidenciaBotonera" && origen == "trasladarIncidenciaButton"){
+		} else if (destino === 'trasladarIncidenciaBotonera' && origen === 'trasladarIncidenciaButton') {
 			let nombreBoton = 'Trasladar Incidencia';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "notificacionBotonera" && origen == "notificacionButton"){
+		} else if (destino === 'notificacionBotonera' && origen === 'notificacionButton') {
 			let nombreBoton = 'botonNotificacionPush';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "autenticarBotonera" && origen == "autenticarButton"){
+		} else if (destino === 'autenticarBotonera' && origen === 'autenticarButton') {
 			let nombreBoton = 'OTP';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "gdprBotonera" && origen == "gdprButton"){
+		} else if (destino === 'gdprBotonera' && origen === 'gdprButton') {
 			let nombreBoton = 'GDPR';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "trasladarColaboradorBotonera" && origen == "trasladarColaboradorButton"){
+		} else if (destino === 'trasladarColaboradorBotonera' && origen === 'trasladarColaboradorButton') {
 			let nombreBoton = 'Trasladar Colaborador';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "rechazarTrasladoBotonera" && origen == "rechazarTrasladoButton"){
+		} else if (destino === 'rechazarTrasladoBotonera' && origen === 'rechazarTrasladoButton') {
 			let nombreBoton = 'Rechazar Nivel 1';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "devolverNivel1Botonera" && origen == "devolverNivel1Button"){
+		} else if (destino === 'devolverNivel1Botonera' && origen === 'devolverNivel1Button') {
 			let nombreBoton = 'Devolver Nivel 1';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "devolverSACBotonera" && origen == "devolverSACButton"){
+		} else if (destino === 'devolverSACBotonera' && origen === 'devolverSACButton') {
 			let nombreBoton = 'devolverAlSAC';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
-		}else if(destino == "derivarSACBotonera" && origen == "derivarSACButton"){
+		} else if (destino === 'derivarSACBotonera' && origen === 'derivarSACButton') {
 			let nombreBoton = 'derivarAlSAC';
 			component.set('v.botonName', nombreBoton);
 			$A.enqueueAction(component.get('c.validacionesOperativa'));
 		}
 	},
-	realizarTrasladoDesdeDerivarRefactor: function(component, event, helper) {
+	realizarTrasladoDesdeDerivarRefactor: function (component) {
 		component.set('v.botonOperativa', 'Trasladar Colaborador');
 		$A.enqueueAction(component.get('c.abrirModalTrasladarColaborador'));
 	},
 
-	realizarTrasladoDesdeDerivar: function(component, event, helper) {
+	realizarTrasladoDesdeDerivar: function (component, event) {
 		component.set('v.botonOperativa', 'Trasladar Colaborador');
 		let myData = event.getParam('data') || {};
-		if((myData && myData.grupoColaboradorFraude != null)) {
+		if ((myData && myData.grupoColaboradorFraude != null)) {
 			component.set('v.grupoColaboradorFraude', datosAdicionales);
 		}
 		$A.enqueueAction(component.get('c.abrirModalTrasladarColaborador'));
 	},
 
-	messageChannelOnmessage: function(component) {
+	messageChannelOnmessage: function (component) {
 		$A.enqueueAction(component.get('c.abrirModalTrasladarColaborador'));
 
 		setTimeout($A.getCallback(() => component.find('botonDummy').getElement().offsetHeight), 0);
 	},
 
-	refreshTab: function(component, event) {
+	refreshTab: function (component, event) {
 		try {
 			let myData = event.getParam('data') || {};
-			if(myData) {
+			if (myData) {
 				component.set('v.derivadaCSBD', myData.derivadaCSBD);
 				component.set('v.derivadaCSBD', myData.oportunidadSuccess);
 			}
-		} catch(e) {
+		} catch (e) {
 			console.error('Error ' + e);
 		}
 		let workspaceAPI = component.find('workspace');
@@ -4123,7 +4107,7 @@
 				includeAllSubtabs: true
 			});
 		})
-		.catch();
+			.catch();
 	},
 
 
@@ -4192,24 +4176,24 @@
 	// },
 	//-------Fin Metodos onboarding---------
 
-	desactivarSpinnerDerivar: function(component) {
+	desactivarSpinnerDerivar: function (component) {
 		component.set('v.spinnerActivado', false);
 	}
 
 /*
 tareaGestorEmpleadoSeleccionadoOnChange: function(component, event) {
-	//Matrícula del gestor
-	let empleadoSeleccionadoValue = event.getParam('value');
-	component.set('v.comboboxEmpleadoSeleccionado', empleadoSeleccionadoValue);
+//Matrícula del gestor
+let empleadoSeleccionadoValue = event.getParam('value');
+component.set('v.comboboxEmpleadoSeleccionado', empleadoSeleccionadoValue);
 
-	//Nombre del gestor
-	let empleadoSeleccionadoLabel;
-	component.get('v.comboboxEmpleadosOptions').forEach(e => {
-		if (e.value === empleadoSeleccionadoValue) {
-			empleadoSeleccionadoLabel = e.label;
-		}
-	});
-	component.set('v.nombreGestor', empleadoSeleccionadoLabel);
+//Nombre del gestor
+let empleadoSeleccionadoLabel;
+component.get('v.comboboxEmpleadosOptions').forEach(e => {
+	if (e.value === empleadoSeleccionadoValue) {
+empleadoSeleccionadoLabel = e.label;
+}
+});
+component.set('v.nombreGestor', empleadoSeleccionadoLabel);
 }
 */
 });

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Permite crear un nuevo caso desde el objeto Account</description>
+    <fieldOverrides>
+        <field>AccountId</field>
+        <formula>Account.Id</formula>
+    </fieldOverrides>
+    <fieldOverrides>
+        <field>CC_Canal_Procedencia__c</field>
+        <formula>CASE( UPPER (Account.BillingState),  
+					&apos;ALAVA&apos;, &apos;DT Norte&apos;,
+					&apos;ALBACETE&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;,
+					&apos;ALICANTE&apos;, &apos;DT Comunidad Valenciana&apos;, 
+					&apos;ALMERIA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;ASTURIAS&apos;, &apos;DT Norte&apos;, 
+					&apos;AVILA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;BADAJOZ&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;,
+					&apos;BALEARES&apos;, &apos;DT Balears&apos;, 
+					&apos;I.BALEARS&apos;, &apos;DT Balears&apos;, 
+					&apos;ILLES BALEARS&apos;, &apos;DT Balears&apos;, 
+					&apos;BARCELONA&apos;, &apos;DT Barcelona&apos;, 
+					&apos;BURGOS&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;CACERES&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;,
+					&apos;CADIZ&apos;, &apos;DT Andalucía Occidental&apos;, 
+					&apos;CANTABRIA&apos;, &apos;DT Norte&apos;,
+					&apos;CASTELLON&apos;, &apos;DT Comunidad Valenciana&apos;, 
+					&apos;CEUTA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;CIUDAD REAL&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;, 
+					&apos;CORDOBA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;CUENCA&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;, 
+					&apos;GERONA&apos;, &apos;DT Catalunya&apos;,
+					&apos;GIRONA&apos;, &apos;DT Catalunya&apos;,
+					&apos;GRANADA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;GUADALAJARA&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;, 
+					&apos;GUIPUZCOA&apos;, &apos;DT Norte&apos;, 
+					&apos;GIPUZKOA&apos;, &apos;DT Norte&apos;, 
+					&apos;HUELVA&apos;, &apos;DT Andalucía Occidental&apos;, 
+					&apos;HUESCA&apos;, &apos;DT Ebro&apos;,
+					&apos;JAEN&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;LA CORUÑA&apos;, &apos;DT Norte&apos;, 
+					&apos;A CORUÑA&apos;, &apos;DT Norte&apos;, 
+					&apos;LA RIOJA&apos;, &apos;DT Ebro&apos;, 
+					&apos;LAS PALMAS&apos;, &apos;DT Canarias&apos;, 
+					&apos;PALMA&apos;, &apos;DT Canarias&apos;, 
+					&apos;LEON&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;LERIDA&apos;, &apos;DT Catalunya&apos;, 
+					&apos;LLEIDA&apos;, &apos;DT Catalunya&apos;, 
+					&apos;LUGO&apos;, &apos;DT Norte&apos;,
+					&apos;MADRID&apos;, &apos;DT Madrid&apos;,
+					&apos;MALAGA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;MELILLA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;MURCIA&apos;, &apos;DT Murcia&apos;, 
+					&apos;NAVARRA&apos;, &apos;DT Ebro&apos;,
+					&apos;ORENSE&apos;, &apos;DT Norte&apos;, 
+					&apos;OURENSE&apos;, &apos;DT Norte&apos;, 
+					&apos;PALENCIA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;PONTEVEDRA&apos;, &apos;DT Norte&apos;, 
+					&apos;SALAMANCA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;SANTA CRUZ DE TENERIFE&apos;, &apos;DT Canarias&apos;, 
+					&apos;S.C.TENERIFE&apos;, &apos;DT Canarias&apos;, 
+					&apos;SEGOVIA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;SEVILLA&apos;, &apos;DT Andalucía Occidental&apos;, 
+					&apos;SORIA&apos;, &apos;DT Castilla y León&apos;,
+					&apos;TARRAGONA&apos;, &apos;DT Catalunya&apos;, 
+					&apos;TERUEL&apos;, &apos;DT Ebro&apos;, 
+					&apos;TOLEDO&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;, 
+					&apos;VALENCIA&apos;, &apos;DT Comunidad Valenciana&apos;, 
+					&apos;VALLADOLID&apos;, &apos;DT Castilla y León&apos;,
+					&apos;VIZCAYA&apos;, &apos;DT Norte&apos;,
+					&apos;BIZKAIA&apos;, &apos;DT Norte&apos;,
+					&apos;ZAMORA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;ZARAGOZA&apos;, &apos;DT Ebro&apos;, 
+					&apos;&apos;)</formula>
+    </fieldOverrides>
+    <fieldOverrides>
+        <field>ContactId</field>
+        <formula>Account.PersonContactId</formula>
+    </fieldOverrides>
+    <fieldOverrides>
+        <field>Status</field>
+        <literalValue>Activo</literalValue>
+    </fieldOverrides>
+    <label>Nuevo Caso</label>
+    <optionsCreateFeedItem>true</optionsCreateFeedItem>
+    <quickActionLayout>
+        <layoutSectionStyle>TwoColumnsLeftToRight</layoutSectionStyle>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>Subject</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>Description</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>AccountId</field>
+                <uiBehavior>Readonly</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>Origin</field>
+                <uiBehavior>Required</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CC_Canal_Procedencia__c</field>
+                <uiBehavior>Required</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>ContactId</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+    </quickActionLayout>
+    <successMessage>Nuevo caso creado correctamente</successMessage>
+    <targetObject>Case</targetObject>
+    <targetParentField>Account</targetParentField>
+    <targetRecordType>Case.GRR_Cliente</targetRecordType>
+    <type>Create</type>
+</QuickAction>

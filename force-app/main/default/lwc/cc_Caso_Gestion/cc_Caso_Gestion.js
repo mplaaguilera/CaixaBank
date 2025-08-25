@@ -2,9 +2,9 @@ import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class Recordform extends LightningElement {
- 
+
     @api recordId;
-    
+
     handleSubmit(event) {
         console.log('onsubmit: '+ event.detail.fields);
     }

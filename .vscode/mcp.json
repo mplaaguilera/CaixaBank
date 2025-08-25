@@ -7,13 +7,6 @@
 				"test_research4"
 			],
 			"type": "stdio"
-		},
-		"test_research4 0.2.70": {
-			"command": "npx",
-			"args": [
-				"test_research4@0.2.70"
-			],
-			"type": "stdio"
 		}
 	}
 }

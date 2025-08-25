@@ -3,7 +3,7 @@
     <!--Atributos-->
     <aura:attribute name="recordId" type="String" />
     <aura:attribute name="cargando" type="Boolean" default="false" />
-    <aura:attribute name="renderModales" type="Boolean" default="false" />
+    <aura:attribute name="renderModales" type="Boolean" default="true" />
     <aura:attribute name="cargandoGestor" type="Boolean" default="false" />
     <aura:attribute name="spinnerActivado" type="Boolean" default="false" />
     <aura:attribute name="timeoutTeclaPulsada" type="String" />
@@ -276,7 +276,7 @@
     <aura:method name="metodoCerrarTest" action="{!c.cerrarModalPreguntasNivel2}"/>
 
     <!-- <aura:handler event="c:cc_DerivarEvent" action="{!c.realizarTrasladoDesdeDerivar}" /> -->
-    <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.onDerivarInteraccionChannel}" scope="APPLICATION" aura:id="derivarInteraccionChannel"/>
+    <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.onDerivarInteraccionChannel}" aura:id="derivarInteraccionChannel"/> <!-- scope="APPLICATION" -->
     <!--Lightning Data Service-->
     <force:recordData aura:id="recordDataCase" recordId="{!v.recordId}" layoutType="COMPACT" targetFields="{!v.caso}"
         fields="OwnerId, CC_MCC_Motivo__c,CaseNumber, CC_MCC_Plantilla__c, CC_Derivar__c,
@@ -286,14 +286,28 @@
     <div class="slds-backdrop" aura:id="backdrop" />
 
     <!--Spinner-->
-    <aura:if isTrue="{!v.spinnerActivado}">
+    <!-- <aura:if isTrue="{!v.spinnerActivado}"> -->
+    <aura:if isTrue="{!false}">
         <div><lightning:spinner size="medium" /></div>
     </aura:if>
 
-    <c:cc_EmailColaboradorAction recordId="{!v.recordId}" aura:id="emailColaboradorAction" listPara="{!v.listPara}" listCC="{!v.listCC}" listBcc="{!v.listBcc}" plantillaName="{!v.plantillaName}" segundaOficinaName="{!v.segundaOficinaName}" grupoColaborador="{!v.grupoColaborador}" procedencia="{!v.procedencia}"/>
+    <!--
+    <c:cc_EmailColaboradorAction
+        recordId="{!v.recordId}"
+        aura:id="emailColaboradorAction"
+        listPara="{!v.listPara}"
+        listCC="{!v.listCC}"
+        listBcc="{!v.listBcc}"
+        plantillaName="{!v.plantillaName}"
+        segundaOficinaName="{!v.segundaOficinaName}"
+        grupoColaborador="{!v.grupoColaborador}"
+        procedencia="{!v.procedencia}"
+    />
+    -->
 
     <!--Botonera-->
     <aura:if isTrue="{!and(!v.cargando, !v.ocultarBotonesOTP)}">
+    <!--  <aura:if isTrue="{!false}">-->
     <!-- <aura:if isTrue="{!!v.cargando}"> -->
         <div class="slds-var-m-vertical_x-small">
             <div class="filaBotones">
@@ -438,6 +452,19 @@
     </aura:if>
 
     <aura:if isTrue="{!v.renderModales}">
+
+        <c:cc_EmailColaboradorAction
+            recordId="{!v.recordId}"
+            aura:id="emailColaboradorAction"
+            listPara="{!v.listPara}"
+            listCC="{!v.listCC}"
+            listBcc="{!v.listBcc}"
+            plantillaName="{!v.plantillaName}"
+            segundaOficinaName="{!v.segundaOficinaName}"
+            grupoColaborador="{!v.grupoColaborador}"
+            procedencia="{!v.procedencia}"
+        />
+
         <!--Modal para trasladar/remitir a colaborador-->
         <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="ModalboxColab" onkeydown="{!c.modalTrasladarColaboradorTeclaPulsada}">
             <div class="slds-modal__container">
@@ -999,11 +1026,10 @@
         <!--Modal para solicitud de información-->
         <section role="dialog" tabindex="-1" aura:id="ModalboxSolicitarInfo" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" onkeydown="{!c.modalSolicitarInfoTeclaPulsada}">
             <div class="slds-modal__container">
-                <!--Cabecera del modal-->
                 <header class="slds-modal__header">
-                    <!--Icono de cierre-->
-                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalSolicitarInfo }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
-                    <!--Título-->
+                    <button class="slds-button slds-button_icon slds-modal__close" onclick="{! c.cerrarModalSolicitarInfo }">
+                        <lightning:icon iconName="utility:close" size="small"></lightning:icon>
+                    </button>
                     <h2 class="slds-text-heading_medium slds-hyphenate">Solicitar información</h2>
                     <p class="slds-var-m-top_x-small">
                         Seleccione la plantilla de correo a usar para la solicitud de información al cliente.<br />
@@ -1217,18 +1243,18 @@
                 <!--Contenido del modal-->
                 <div class="slds-modal__content slds-var-p-around_medium">
                     <lightning:layoutItem size="12" padding="around-small">
-                        <lightning:input name="inputEnviarNotificacionDestinatario" aura:id="inputEnviarNotificacionDestinatario" type="tel" label="Enviar a" placeholder="Indique el número de teléfono" required="true" />
+                        <!--<lightning:input name="inputEnviarNotificacionDestinatario" aura:id="inputEnviarNotificacionDestinatario" type="tel" label="Enviar a" placeholder="Indique el número de teléfono" required="true" />-->
                         <br />
                         <lightning:combobox aura:id="inputEnviarNotificacionIdioma" name="inputEnviarNotificacionIdioma" label="Idioma de la plantilla" placeholder="--Seleccione un idioma--" messageWhenValueMissing="Debe seleccionar un idioma." options="{!v.enviarNotificacionIdiomas}" value="{!v.enviarNotificacionIdioma}" onchange="{!c.seleccionaEnviarNotificacionIdioma}" />
                         <br />
                         <lightning:combobox aura:id="inputEnviarNotificacionPlantilla" name="inputEnviarNotificacionPlantilla" label="Plantilla" placeholder="--Seleccione una plantilla--" messageWhenValueMissing="Debe seleccionar una plantilla." options="{!v.enviarNotificacionPlantillas}" value="{!v.enviarNotificacionPlantilla}" onchange="{!c.seleccionaEnviarNotificacionPlantilla}" />
                         <br />
-                        <lightning:textarea label="Contenido" aura:id="inputEnviarNotificacionContenido" name="inputEnviarNotificacionContenido" placeholder="Indique el texto a enviar" onchange="{!c.actualizarEnviarNotificacionCaracteresRestantes}" required="true" maxlength="160" />
+                        <lightning:textarea label="Contenido" aura:id="inputEnviarNotificacionContenido" name="inputEnviarNotificacionContenido" placeholder="Indique el texto a enviar" disabled="true" />
 
                         <!--Indicador de caracteres restantes-->
-                        <div aura:id="divEnviarNotificacionCaracteresRestantes" class="slds-float_right">
+                        <!--<div aura:id="divEnviarNotificacionCaracteresRestantes" class="slds-float_right">
                             <lightning:formattedNumber label="Caracteres restantes" value="{!v.enviarNotificacionCaracteresRestantes}" /> caracteres restantes.
-                        </div>
+                        </div>-->
                     </lightning:layoutItem>
                     <div style="height:2rem;" />
                 </div>

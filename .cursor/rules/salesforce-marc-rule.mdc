@@ -1,6 +1,4 @@
 ---
-description:
-globs: *.cls,*.js,*.css,*.cmp,*.html
 alwaysApply: false
 ---
 <!-- Author: Marc Pla, IBM Consulting, February 2025 -->

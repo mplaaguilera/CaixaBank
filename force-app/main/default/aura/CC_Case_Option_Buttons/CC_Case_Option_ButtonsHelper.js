@@ -1,12 +1,12 @@
 /*eslint-disable no-undef */
 ({
-	buscarListas: function(component, event, cadenaBusqueda, lista) {
+	buscarListas: function (component, event, cadenaBusqueda, lista) {
 		let accionApex;
 		if (lista === 'grupo') {
 			accionApex = component.get('c.buscarGruposColaboradores');
 			const remitir = component.get('v.remitir');
 			const negocio = component.get('v.tipoRegistro') === 'CC_CSI_Bankia' ? 'CSI_Bankia' : 'CC';
-			accionApex.setParams({'cadenaBusqueda': cadenaBusqueda, 'negocio': negocio, 'remitir' : remitir, 'tipoCaso' : component.get('v.tipoRegistro')});
+			accionApex.setParams({'cadenaBusqueda': cadenaBusqueda, 'negocio': negocio, 'remitir': remitir, 'tipoCaso': component.get('v.tipoRegistro')});
 			accionApex.setCallback(this, response => {
 				if (response.getState() === 'SUCCESS') {
 					let storeResponse = response.getReturnValue();
@@ -62,7 +62,7 @@
 			//let filtrarNombreOficina = component.get('v.selectedRecord') ? component.get('v.selectedRecord').Id : null;
 			let lookup2aOficinaInput = component.find('lookup2aOficinaInput');
 			/*if(oficinaGestoraSeleccionada) {
-				filtrarNombreOficina = oficinaGestoraSeleccionada;
+			filtrarNombreOficina = oficinaGestoraSeleccionada;
 			}*/
 			lookup2aOficinaInput.set('v.isLoading', true);
 			accionApex = component.get('c.buscarOficina');
@@ -86,18 +86,22 @@
 		$A.enqueueAction(accionApex);
 	},
 
-	buscarGrupos3N: function(component, event, cadenaBusqueda) {
+	buscarGrupos3N: function (component, event, cadenaBusqueda) {
 		let action = component.get('c.buscarGrupos3N');
 		let caseRecordTypeName = component.get('v.tipoRegistro');
 		let negocio = 'CC';
 		if (caseRecordTypeName === 'CC_CSI_Bankia') {
 			negocio = 'CSI_Bankia';
-
 		}
+		// let verTodosLosGrupos = component.get('v.verTodosLosGrupos3N');
+
 		action.setParams({'cadenaBusqueda': cadenaBusqueda, 'negocio': negocio});
 		action.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				let storeResponse = response.getReturnValue();
+
+
+
 				if (storeResponse.length === 0) {
 					component.set('v.Message', 'No hay resultados.');
 				} else {
@@ -109,7 +113,7 @@
 		$A.enqueueAction(action);
 	},
 
-	buscarGrupos2N: function(component, event, cadenaBusqueda) {
+	buscarGrupos2N: function (component, event, cadenaBusqueda) {
 
 		let action = component.get('c.buscarGrupos2N');
 		let caseRecordTypeName = component.get('v.tipoRegistro');
@@ -134,17 +138,17 @@
 	},
 
 
-	getPSGestorDocumentos: function(component) {
-    	let datos = component.get('c.getPSGestorDocumentos');
+	getPSGestorDocumentos: function (component) {
+		let datos = component.get('c.getPSGestorDocumentos');
 		datos.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
-            	component.set('v.psSdocs', response.getReturnValue());
+				component.set('v.psSdocs', response.getReturnValue());
 			}
 		});
 		$A.enqueueAction(datos);
 	},
 
-	getDatosCaso: function(component) {
+	getDatosCaso: function (component) {
 		let datosCaso = component.get('c.datosCaso');
 		datosCaso.setParam('recordId', component.get('v.recordId'));
 		datosCaso.setCallback(this, response => {
@@ -243,13 +247,13 @@
 	},
 
 	//se vacía la plantilla para que no se cargue la anterior
-	vaciarPlantilla: function(component) {
+	vaciarPlantilla: function (component) {
 		let vaciarPlantilla = component.get('c.vaciarPlantilla');
 		vaciarPlantilla.setParam('recordId', component.get('v.recordId'));
 		$A.enqueueAction(vaciarPlantilla);
 	},
 
-	obtenerPermisos: function(component, caso) {
+	obtenerPermisos: function (component, caso) {
 		let getCustomPermissions = component.get('c.getCustomPermissions');
 		getCustomPermissions.setParams({nombreGrupo3N: component.get('v.ultimoGrupo3N'), caso: caso});
 		getCustomPermissions.setCallback(this, response => {
@@ -261,15 +265,14 @@
 				}
 				component.set('v.permisos', permisos);
 			}
-			component.set('v.cargando', false);
+			// component.set('v.cargando', false);
 
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
-			window.setTimeout($A.getCallback(() => component.set('v.renderModales', true)), 1000);
+			// window.setTimeout($A.getCallback(() => component.set('v.renderModales', true)), 1000);
 		});
 		$A.enqueueAction(getCustomPermissions);
 	},
 
-	getPicklistPlantillas: function(component) {
+	getPicklistPlantillas: function (component) {
 		let tipoOperativa = component.get('v.tipoOperativa');
 		let recordId = component.get('v.recordId');
 		let action = component.get('c.getPlantillaList');
@@ -287,9 +290,9 @@
 		$A.enqueueAction(action);
 	},
 
-	getPicklistMCCGrupo: function(component) {
+	getPicklistMCCGrupo: function (component) {
 		let getMCCGrupoList = component.get('c.getMCCGrupoList');
-		getMCCGrupoList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '', 'remitir' : component.get('v.remitir'), 'grupoColaboradorDerivarFraude' : component.get('v.grupoColaboradorFraude')});
+		getMCCGrupoList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '', 'remitir': component.get('v.remitir'), 'grupoColaboradorDerivarFraude': component.get('v.grupoColaboradorFraude')});
 		getMCCGrupoList.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				component.set('v.optionsGrupo', response.getReturnValue());
@@ -298,23 +301,32 @@
 		$A.enqueueAction(getMCCGrupoList);
 	},
 
-	getPicklistMCCGrupo3N: function(component) {
+	getPicklistMCCGrupo3N: function (component) {
 		let getMCCGrupo3NList = component.get('c.getMCCGrupoList');
-		getMCCGrupo3NList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '3N', 'remitir' : component.get('v.remitir'), 'grupoColaboradorDerivarFraude' : component.get('v.grupoColaboradorFraude')});
+		let verTodosLosGrupos = component.get('v.verTodosLosGrupos3N');
+		getMCCGrupo3NList.setParams({
+			'recordId': component.get('v.recordId'),
+			'tipoGrupo': '3N',
+			'remitir': component.get('v.remitir'),
+			'grupoColaboradorDerivarFraude': component.get('v.grupoColaboradorFraude'),
+			'verTodosLosGrupos': verTodosLosGrupos
+		});
 		getMCCGrupo3NList.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				let options = response.getReturnValue();
-				component.set('v.optionsGrupo3N', options);
 
+
+
+				component.set('v.optionsGrupo3N', options);
 			}
 		});
 		$A.enqueueAction(getMCCGrupo3NList);
 
 	},
 
-	getPicklistMCCGrupo2N: function(component) {
+	getPicklistMCCGrupo2N: function (component) {
 		let getMCCGrupo2NList = component.get('c.getMCCGrupoList');
-		getMCCGrupo2NList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '2N', 'remitir' : component.get('v.remitir'), 'grupoColaboradorDerivarFraude' : component.get('v.grupoColaboradorFraude')});
+		getMCCGrupo2NList.setParams({'recordId': component.get('v.recordId'), 'tipoGrupo': '2N', 'remitir': component.get('v.remitir'), 'grupoColaboradorDerivarFraude': component.get('v.grupoColaboradorFraude')});
 		getMCCGrupo2NList.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				let options = response.getReturnValue();
@@ -326,7 +338,7 @@
 
 	},
 
-	getPicklistGrupos: function(component) {
+	getPicklistGrupos: function (component) {
 		let action = component.get('c.getGrupoList');
 		action.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
@@ -337,7 +349,7 @@
 		$A.enqueueAction(action);
 	},
 
-	loadCarpetasIdioma: function(component, event, helper) {
+	loadCarpetasIdioma: function (component, event, helper) {
 		let operativa = component.get('v.tipoOperativa');
 		let canalProcedencia = component.get('v.canalProcedencia');
 		canalProcedencia = canalProcedencia.replace(/\s/g, '');
@@ -345,23 +357,20 @@
 		let tipoRegistro = component.get('v.tipoRegistro');
 		let carpetaOperativa;
 		let carpetaGenerica;
-		console.log('LOG load carpetas idioma ' + Date.now());
 		if (operativa === 'responder' || operativa === 'responderClienteDerivar') {
-			console.log('LOG load carpetas idioma 1 ' + Date.now());
 			//idioma = 'CC_Responder_' + canalProcedencia+'_' + idioma;
 			if (tipoRegistro === 'CC_Empleado') {
 				if (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa') {
 					component.set('v.canalProcedencia', 'Emisiones PromoCaixa');
 					carpetaOperativa = 'CC_Responder_Empleado_Wivai';
 				} else {
-                	carpetaOperativa = 'CC_Responder_Empleado_' + canalProcedencia;
+					carpetaOperativa = 'CC_Responder_Empleado_' + canalProcedencia;
 				}
 			} else if (tipoRegistro === 'CC_CSI_Bankia') {
 				carpetaOperativa = 'CC_Responder_CSI_Bankia_' + canalProcedencia;
 			} else if (tipoRegistro === 'CC_Cliente' && (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa')) {
 				carpetaOperativa = 'CC_Responder_EmisionesPromoCaixa';
 			} else {
-				console.log('LOG load carpetas idioma 2 ' + Date.now());
 				carpetaOperativa = 'CC_Responder_' + canalProcedencia;
 			}
 		} else if (operativa === 'solicitar') {
@@ -377,11 +386,10 @@
 
 		let existeCarpeta = component.get('c.existeCarpeta');
 		existeCarpeta.setParams({'carpetaDeveloperName': carpetaOperativa});
-		existeCarpeta.setCallback(this, function(response) {
+		existeCarpeta.setCallback(this, function (response) {
 			if (response.getState() === 'SUCCESS') {
 				if (response.getReturnValue()) {
 					if (operativa === 'responder' || operativa === 'responderClienteDerivar') {
-						console.log('LOG load carpetas idioma 3 ' + Date.now());
 						if (tipoRegistro === 'CC_Empleado') {
 							if (canalProcedencia.includes('CompraEstrella') || canalProcedencia === 'EmisionesPromoCaixa') {
 								idioma = 'CC_Responder_Empleado_Wivai_' + idioma;
@@ -397,7 +405,6 @@
 							idioma = 'CC_Responder_EmisionesPromoCaixa_' + idioma;
 							carpetaGenerica = 'CC_Responder_EmisionesPromoCaixa';
 						} else {
-							console.log('LOG load carpetas idioma 4 ' + Date.now());
 							idioma = 'CC_Responder_' + canalProcedencia + '_' + idioma;
 							carpetaGenerica = 'CC_Responder';
 						}
@@ -448,7 +455,6 @@
 				}
 				let opcionesIdiomaFolder = [];
 				let getCarpetas = component.get('c.getCarpetas');
-				console.log('LOG ' + carpetaOperativa);
 				getCarpetas.setParams({
 					'carpetaDeveloperName': carpetaOperativa,
 					'carpetaGenerica': carpetaGenerica
@@ -469,10 +475,8 @@
 
 						//Se pone en el foco en el campo de tratamiento del modal correspondiente
 						if (operativa === 'solicitar') {
-							//eslint-disable-next-line @lwc/lwc/no-async-operation
 							window.setTimeout($A.getCallback(() => component.find('selectItemTratamientoSol').focus()), 50);
 						} else if (operativa === 'responder'  || operativa === 'responderClienteDerivar') {
-							//eslint-disable-next-line @lwc/lwc/no-async-operation
 							window.setTimeout($A.getCallback(() => component.find('selectItemTratamiento').focus()), 50);
 						}
 					}
@@ -483,7 +487,7 @@
 		$A.enqueueAction(existeCarpeta);
 	},
 
-	loadCarpetasTratamiento: function(component, event, helper) {
+	loadCarpetasTratamiento: function (component, event, helper) {
 		let opcionesTratamientoFolder = [];
 		let idioma = component.get('v.idiomaPlantilla');
 		let action = component.get('c.getCarpetas');
@@ -507,18 +511,16 @@
 		$A.enqueueAction(action);
 	},
 
-	getPlantillasResponder: function(component) {
+	getPlantillasResponder: function (component) {
 		let recordId = component.get('v.recordId');
 		let tratamiento = component.get('v.tratamiento');
 		let action = component.get('c.getPlantillasResponder');
-		console.log('LOG getPlantillas ' + tratamiento);
 		action.setParams({
 			'recordId': recordId,
 			'carpeta': tratamiento
 		});
 		action.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
-				console.log('LOG getPlantillas ' + JSON.stringify(response.getReturnValue()));
 				let options = response.getReturnValue();
 				component.set('v.optionsPlantillaResponder', options);
 			}
@@ -526,7 +528,7 @@
 		$A.enqueueAction(action);
 	},
 
-	getBotones: function(component) {
+	getBotones: function (component) {
 		let mostrarBotonesPendienteColaborador = component.get('c.mostrarBotonesPendienteColaborador');
 		mostrarBotonesPendienteColaborador.setParams({'recordId': component.get('v.recordId')});
 		mostrarBotonesPendienteColaborador.setCallback(this, response => {
@@ -569,7 +571,7 @@
 		$A.enqueueAction(mostrarBotonesPendienteCliente);
 	},
 
-	buscarPlantillasResponder: function(component, event, cadenaBusqueda) {
+	buscarPlantillasResponder: function (component, event, cadenaBusqueda) {
 		let tratamiento = component.get('v.tratamiento');
 		let operativa = component.get('v.tipoOperativa');
 		let tipoRegistro = component.get('v.tipoRegistro');
@@ -609,7 +611,7 @@
 		$A.enqueueAction(action);
 	},
 
-	validacionesGDPR: function(component, event, recordId) {
+	validacionesGDPR: function (component, event, recordId) {
 		let obtenerDatosCasoGDPR = component.get('c.obtenerDatosCasoGDPR');
 		obtenerDatosCasoGDPR.setParams({'recordId': recordId});
 		obtenerDatosCasoGDPR.setCallback(this, response => {
@@ -617,9 +619,9 @@
 			if (state === 'SUCCESS') {
 				let datos = response.getReturnValue();
 				if (datos.productoGDPR && datos.tipoContacto === 'Petición de servicio' && datos.numPerso !== '' && datos.numeroDocumento !== '' && datos.edad >= 14 && !datos.confidencial && !datos.fallecido && datos.tipoPersona === 'F' && !datos.incapacitado) {
-					if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+					if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 						this.publicarGDPRMessage(component);
-					}else{
+					} else {
 						//Abrimos la QuickAction de GDPR
 						let actionAPI = component.find('quickActionAPI');
 						let args = {actionName: 'Case.CC_GDPR'};
@@ -667,10 +669,10 @@
 		$A.enqueueAction(obtenerDatosCasoGDPR);
 	},
 
-	validacionesOTP: function(component, event, recordId) {
+	validacionesOTP: function (component, event, recordId) {
 		let datosCaso = component.get('c.datosCaso');
 		datosCaso.setParams({'recordId': recordId});
-		datosCaso.setCallback(this, function(response) {
+		datosCaso.setCallback(this, function (response) {
 			if (response.getState() === 'SUCCESS') {
 				let datos = response.getReturnValue();
 				component.set('v.oCaso', datos);
@@ -714,15 +716,13 @@
 							let canalValido = responseValidarCanalAutenticacion.getReturnValue();
 							if (canalValido != null) {
 								if (canalValido) {
-									if(component.get('v.tipoRegistro') == 'CC_Cliente'){
+									if (component.get('v.tipoRegistro') === 'CC_Cliente') {
 										//DMV: Agregar el quick action de Autenticacion
 										this.publicarAutenticacionMessage(component);
-									}else{
+									} else {
 										let actionAPI = component.find('quickActionAPI');
 										let args = {actionName: 'Case.CC_OTP'};
-										actionAPI.selectAction(args).catch(error => {
-											console.error('Error selecting action:', error);
-										});
+										actionAPI.selectAction(args);
 									}
 								} else {
 									let toastEvent = $A.get('e.force:showToast');
@@ -751,16 +751,16 @@
 		$A.enqueueAction(datosCaso);
 	},
 
-	mostrarToast: function(tipo, titulo, mensaje) {
+	mostrarToast: function (tipo, titulo, mensaje) {
 		let toastEvent = $A.get('e.force:showToast');
 		toastEvent.setParams({title: titulo, message: mensaje, type: tipo, mode: 'dismissable', duration: '4000'});
 		toastEvent.fire();
 	},
 
-	inicializarLync: function(component, event, recordId) {
+	inicializarLync: function (component, event, recordId) {
 		let obtenerDatosEmpleado = component.get('c.recuperaMailEmpleado');
 		obtenerDatosEmpleado.setParams({'recordId': recordId});
-		obtenerDatosEmpleado.setCallback(this, function(response) {
+		obtenerDatosEmpleado.setCallback(this, function (response) {
 			let state = response.getState();
 			if (state === 'SUCCESS') {
 				let datos = response.getReturnValue();
@@ -806,7 +806,7 @@
 		component.set('v.mostrarFinLync', true);
 	},
 
-	finalizarLync: function(component, event, recordId) {
+	finalizarLync: function (component, event, recordId) {
 		let email = component.get('v.emailWebCollab');
 		let actualizarTareaWebCollab = component.get('c.updateTaskWebCollab');
 		actualizarTareaWebCollab.setParams({'recordId': recordId});
@@ -839,7 +839,7 @@
 		component.set('v.mostrarFinLync', false);
 	},
 
-	esClienteDigital: function(component, tipoActividad) {
+	esClienteDigital: function (component, tipoActividad) {
 		component.set('v.cargandoGestor', true);
 		let clienteDigital = component.get('c.esClienteDigital');
 		clienteDigital.setParams({
@@ -876,7 +876,7 @@
 		$A.enqueueAction(clienteDigital);
 	},
 
-	consultarFechasDisponibilidad: function(component, gestorElegidoId) {
+	consultarFechasDisponibilidad: function (component, gestorElegidoId) {
 		let consultarFechasDisponibilidad = component.get('c.obtenerFechasDisponiblidadGestor');
 		consultarFechasDisponibilidad.setParams({
 			'recordId': component.get('v.recordId'),
@@ -895,7 +895,7 @@
 		$A.enqueueAction(consultarFechasDisponibilidad);
 	},
 
-	consultarHorasDisponibilidad: function(component, gestorElegidoId) {
+	consultarHorasDisponibilidad: function (component, gestorElegidoId) {
 		let consultarHorasDisponibilidad = component.get('c.obtenerHorasDisponiblidadGestor');
 		consultarHorasDisponibilidad.setParams({
 			'recordId': component.get('v.recordId'),
@@ -914,7 +914,7 @@
 		$A.enqueueAction(consultarHorasDisponibilidad);
 	},
 
-	obtenerPlantillasOficina: function(component, event) {
+	obtenerPlantillasOficina: function (component, event) {
 		let ofiId;
 		let oficinaId = component.get('v.oficinaId');
 		if (component.get('v.verTodasLasOficinas')) {
@@ -973,7 +973,7 @@
 		$A.enqueueAction(action);
 	},
 
-	obtenerPlantillasEmpleado: function(component, event) {
+	obtenerPlantillasEmpleado: function (component, event) {
 		let empleId;
 
 		if (component.get('v.empleadoSeleccionado')) {
@@ -1013,7 +1013,7 @@
 		$A.enqueueAction(action);
 	},
 
-	buscarColas: function(component, event, cadenaBusqueda) {
+	buscarColas: function (component, event, cadenaBusqueda) {
 		let accionApex = component.get('c.buscarColasTransfer');
 		accionApex.setParams({'cadenaBusqueda': cadenaBusqueda});
 		accionApex.setCallback(this, response => {
@@ -1030,7 +1030,7 @@
 		$A.enqueueAction(accionApex);
 	},
 
-	visibilidadBotonCitaTareaGestor: function(component) {
+	visibilidadBotonCitaTareaGestor: function (component) {
 		let visibilidadBotones = component.get('c.comprobarVisibilidadBotonTareaCitaGestor');
 		visibilidadBotones.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
@@ -1042,13 +1042,13 @@
 		$A.enqueueAction(visibilidadBotones);
 	},
 
-	reiniciarDerivar: function(component) {
+	reiniciarDerivar: function (component) {
 		let reiniciarDerivar = component.get('c.reiniciarDerivar');
 		reiniciarDerivar.setParam('recordId', component.get('v.recordId'));
 		$A.enqueueAction(reiniciarDerivar);
 	},
 
-	abrirEmailColaboradorActionHelper: function(component, listPara, listCC, listBcc, plantillaName, segundaOficinaName, grupocolaborador, procedencia) {
+	abrirEmailColaboradorActionHelper: function (component, listPara, listCC, listBcc, plantillaName, segundaOficinaName, grupocolaborador, procedencia) {
 		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
 		component.set('v.listPara', listPara);
 		component.set('v.listCC', listCC);
@@ -1059,88 +1059,88 @@
 		component.set('v.procedencia', procedencia);
 
 		var payload = {
-            recordId: component.get('v.recordId'),
+			recordId: component.get('v.recordId'),
 			origen: 'caseOptionButtons',
 			destino: 'enviarCorreoColaboradorAction',
-		    datosAdicionales: ''
-        };
-        component.find("derivarInteraccionChannel").publish(payload);
-		
+			datosAdicionales: ''
+		};
+		component.find('derivarInteraccionChannel').publish(payload);
+
 	},
 
-	publicarSolicitarInformacionMessage: function(component, solicitudInformacion) {
+	publicarSolicitarInformacionMessage: function (component, solicitudInformacion) {
 		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
 		var payload = {
-            recordId: component.get('v.recordId'),
+			recordId: component.get('v.recordId'),
 			origen: 'caseOptionButtons',
 			destino: 'socialPublisherAction',
-		    datosAdicionales: solicitudInformacion
-        };
-        component.find("derivarInteraccionChannel").publish(payload);
-		
-	}, 
+			datosAdicionales: solicitudInformacion
+		};
+		component.find('derivarInteraccionChannel').publish(payload);
 
-	publicarTrasladarIncidenciaMessage: function(component) {
+	},
+
+	publicarTrasladarIncidenciaMessage: function (component) {
 		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
 		var payload = {
-            recordId: component.get('v.recordId'),
+			recordId: component.get('v.recordId'),
 			origen: 'caseOptionButtons',
 			destino: 'trasladarIncidenciaAction',
-		    datosAdicionales: ''
-        };
-        component.find("derivarInteraccionChannel").publish(payload);
-		
+			datosAdicionales: ''
+		};
+		component.find('derivarInteraccionChannel').publish(payload);
+
 	},
 
-	publicarAutenticacionMessage: function(component) {
+	publicarAutenticacionMessage: function (component) {
 		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
 		var payload = {
-            recordId: component.get('v.recordId'),
+			recordId: component.get('v.recordId'),
 			origen: 'caseOptionButtons',
 			destino: 'autenticacionAction',
-		    datosAdicionales: ''
-        };
-        component.find("derivarInteraccionChannel").publish(payload);
-		
+			datosAdicionales: ''
+		};
+		component.find('derivarInteraccionChannel').publish(payload);
+
 	},
 
-	publicarDerivarMessage: function(component) {
+	publicarDerivarMessage: function (component) {
 		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
 		var payload = {
-            recordId: component.get('v.recordId'),
+			recordId: component.get('v.recordId'),
 			origen: 'caseOptionButtons',
 			destino: 'derivarAction',
-		    datosAdicionales: ''
-        };
-        component.find("derivarInteraccionChannel").publish(payload);
-		
+			datosAdicionales: ''
+		};
+		component.find('derivarInteraccionChannel').publish(payload);
+
 	},
 
-	publicarGDPRMessage: function(component) {
+	publicarGDPRMessage: function (component) {
 		//Generamos un evento en el channel que se escucha desde cc_EmailColaboradorAction desde donde se levanta el quickAction
 		var payload = {
-            recordId: component.get('v.recordId'),
+			recordId: component.get('v.recordId'),
 			origen: 'caseOptionButtons',
 			destino: 'gdprAction',
-		    datosAdicionales: ''
-        };
-        component.find("derivarInteraccionChannel").publish(payload);
-		
+			datosAdicionales: ''
+		};
+		component.find('derivarInteraccionChannel').publish(payload);
+
 	}
 
 	/*obtenerEmpleadosOficina: function(component) {
-		if (!component.get('v.comboboxEmpleadosOptions').length) { //Si no se han cargado ya previamente
-			let getEmpleadosTareaGestor = component.get('c.getEmpleadosTareaGestor');
-			getEmpleadosTareaGestor.setParams({'recordId': component.get('v.recordId')});
-			getEmpleadosTareaGestor.setCallback(this, response => {
-				if (response.getState() === 'SUCCESS') {
-					component.set('v.comboboxEmpleadosOptions', response.getReturnValue().map(e => ({label: e.Name, value: e.CC_Matricula__c})));
-					//component.set('v.comboboxEmpleadoSeleccionado', true);
-				} else {
-					this.mostrarToast('error', 'Problema recuperando lista de empleados', 'Ha ocurrido un problema al recuperar los empleados de la oficina.');
-				}
-			});
-			$A.enqueueAction(getEmpleadosTareaGestor);
-		}
+	if (!component.get('v.comboboxEmpleadosOptions').length) { //Si no se han cargado ya previamente
+	let getEmpleadosTareaGestor = component.get('c.getEmpleadosTareaGestor');
+	getEmpleadosTareaGestor.setParams({'recordId': component.get('v.recordId')});
+	getEmpleadosTareaGestor.setCallback(this, response => {
+		if (response.getState() === 'SUCCESS') {
+	component.set('v.comboboxEmpleadosOptions', response.getReturnValue().map(e => ({label: e.Name, value: e.CC_Matricula__c})));
+	//component.set('v.comboboxEmpleadoSeleccionado', true);
+	} else {
+	this.mostrarToast('error', 'Problema recuperando lista de empleados', 'Ha ocurrido un problema al recuperar los empleados de la oficina.');
+	}
+	});
+	$A.enqueueAction(getEmpleadosTareaGestor);
+	}
 	}*/
 });

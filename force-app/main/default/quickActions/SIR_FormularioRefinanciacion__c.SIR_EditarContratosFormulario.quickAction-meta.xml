@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <description>MCS Nuevo boton que llama al lwc Sir_lwc_EditarContratosFormulario</description>
+    <label>Editar Contratos Formulario</label>
+    <lightningWebComponent>sir_lwc_EditarContratosFormulario</lightningWebComponent>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>LightningWebComponent</type>
+</QuickAction>

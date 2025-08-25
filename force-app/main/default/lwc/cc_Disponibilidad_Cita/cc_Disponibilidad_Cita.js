@@ -7,29 +7,29 @@ export default class Cc_Disponibilidad_Cita extends LightningElement {
     @track opcionesDisponibles = [];
     @api numOficina;
     @api numPer;
-    fechaDefault;
+    fechaDefault;d
     fechaMin;
     fechaSelecionada;
-    mostrarHoras = false;    
+    mostrarHoras = false;
     isDisponibilidadDisable = false;
 
     connectedCallback() {
         //Inicializar con la fecha actual
-        this.fechaDefault = new Date().toISOString().substring(0, 10);   
-        this.fechaMin = this.fechaDefault;   
-      
+        this.fechaDefault = new Date().toISOString().substring( 0, 10 );
+        this.fechaMin = this.fechaDefault;
+
         //buscar cuantos dias es lo permitido en el setting
         diasAdicionar()
-        .then(retorno => {     
+        .then(retorno => {
            let days = retorno.citaRapida ?? 0;
-           let fechaUpdated = this.addDays(new Date(), days);   
+           let fechaUpdated = this.addDays(new Date(), days);
            this.fechaDefault = fechaUpdated.toISOString().substring(0, 10);
            this.fechaMin = this.fechaDefault;
 		})
 		.catch(error => {
-            console.error('Error al cargar el setting:', error);        
+            console.error('Error al cargar el setting:', error);
 		});
-       
+
     }
 
     disponibilidadCitas() {
@@ -93,8 +93,8 @@ export default class Cc_Disponibilidad_Cita extends LightningElement {
         result.setDate(result.getDate() + days);
         return result;
     }
-    
 
 
-  
+
+
 }

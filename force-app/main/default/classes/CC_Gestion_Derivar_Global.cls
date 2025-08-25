@@ -162,11 +162,11 @@ public with sharing class CC_Gestion_Derivar_Global {
         }
 
         if(ambitoMotivo == '' || ambitoMotivo == null) {
-                if(imagin && Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c)) {
-                    ambitoVentas = true;                  
-                } else {
-                    ambitoVentas = true;
-                }
+            if(imagin && Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c)) {
+                ambitoVentas = true;
+            } else {
+                ambitoVentas = true;
+            }
         }
 
         if(ambitoMotivo == 'Ventas' || ambitoMotivo == 'Oficina') {
@@ -255,13 +255,28 @@ public with sharing class CC_Gestion_Derivar_Global {
         retorno.put('fraudeANivelDeMotivo', false);
     }
 
-    public static void rellenarDatosFraude(Map<String, Object> retorno, Map<String, Object> textosMap){
+    public static void rellenarDatosFraude(/*Case caso,*/ Map<String, Object> retorno, Map<String, Object> textosMap){
         String ambitoMotivo = (String) retorno.get('ambitoMotivo');
         retorno.put('fraudeANivelDeMotivo', true);
+
         if(ambitoMotivo == 'Caso a Fraude'){
+            
+            /*
+            List<Task> tareaIntentoTransferencia = [SELECT Id, Subject FROM Task WHERE WhatId = :caso.Id AND Type = 'Intento de transferencia' LIMIT 1];
+            
+            if (caso.Origin != 'Teléfono' || !tareaIntentoTransferencia.isEmpty()) {
+                retorno.put('intentoTranseferenciaLlamadaFraude', true);
+            }else if(caso.Origin == 'Teléfono' && tareaIntentoTransferencia.isEmpty()) {
+                retorno.put('intentoTranseferenciaLlamadaFraude', false);
+            }*/
+
             retorno.put('preguntaSenal', textosMap.get('Pregunta señal'));
             retorno.put('preguntaMotivoFraude', textosMap.get('Pregunta motivo fraude'));
             retorno.put('toastRemitir', textosMap.get('Toast remitir'));
+            /*
+            retorno.put('preguntaTransLlamFra', (String) textosMap.get('Pregunta transferencia llamada fraude'));
+            retorno.put('modalTransLlamFra', (String) textosMap.get('Modal transferencia llamada fraude'));
+            retorno.put('mensajeTransLlamFra', (String) textosMap.get('Mensaje transferencia llamada fraude'));*/
         } else if (ambitoMotivo == 'Bizum Fraude'){
             retorno.put('motivoDevolucionTemaFraude', textosMap.get('Pregunta motivo devolucion tema fraude'));
             CC_Settings__c configuracion = CC_Settings__c.getValues('CC_GruposColaboradoresFraude');
@@ -453,17 +468,16 @@ public with sharing class CC_Gestion_Derivar_Global {
         Boolean condicionClienteDigital = Boolean.valueOf(valoresParametrizacionCSBD[0]);
         Boolean condicionTipoPersona = Boolean.valueOf(valoresParametrizacionCSBD[1]);
         Boolean condicionOTP = Boolean.valueOf(valoresParametrizacionCSBD[2]);
-        
         if(caso.Account.AV_OficinaPrincipal__r.Parent.CC_Derivacion_CSBD__c) {
-            String numPerso = CC_OTP.recuperarNumperso(caso);          
+            String numPerso = CC_OTP.recuperarNumperso(caso);
             Map<String, String> retornoAutenticacionSAU = CC_WS_Autenticacion_SAU.ccWsEnvioAutenticacion(imagin, numPerso,false, caso);//MBO
             String clienteDigital = retornoAutenticacionSAU.get('resultado');
             retorno.put('reqAutenticacionSAU', retornoAutenticacionSAU.get('allReq'));
             retorno.put('resAutenticacionSAU', retornoAutenticacionSAU.get('allRes'));
             retorno.put('nombreTraza', retornoAutenticacionSAU.get('nombreTraza'));
             retorno.put('autenticacionSAU', true);
-            if((clienteDigital == 'exist_contract' && condicionClienteDigital) && (caso.Account.CC_Tipo_Persona__c == 'F' && condicionTipoPersona)) {
-                if(caso.CC_OTP_Nivel__c != null && caso.CC_Status_Autorizacion__c != 'APPROVED' && caso.CC_OTP_Valido__c == false && condicionOTP) {
+            if((clienteDigital == 'exist_contract' || !condicionClienteDigital) && (caso.Account.CC_Tipo_Persona__c == 'F' || !condicionTipoPersona)) {
+                if((caso.CC_OTP_Nivel__c != null && caso.CC_Status_Autorizacion__c != 'APPROVED' && caso.CC_OTP_Valido__c == false) && condicionOTP) {
                     ambitoCSBD = false;
                     ambitoVentas = true;
                 } else {
@@ -484,6 +498,7 @@ public with sharing class CC_Gestion_Derivar_Global {
                         retorno.put('toastCSBDNoContratar', textosMap.get('Toast CSBD No Contratar'));
                         retorno.put('textoOportunidadExistente', textosMap.get('Texto Oportunidad Existente'));
                         retorno.put('textoMotivoCSBDNoContratar', textosMap.get('Texto motivo CSBD No Contratar'));
+                        ambitoVentas = true;
                     } else if(ambitoMotivo == 'CSBD Contratar') {
                         retorno.put('urlTF', textosMap.get('URL TF'));
                         retorno.put('oportunidadCreada', caso.CC_Oportunidad_Creada__c);

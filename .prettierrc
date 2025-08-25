@@ -1,0 +1,25 @@
+{
+  "plugins": ["prettier-plugin-apex"],
+  "trailingComma": "none",
+  "tabWidth": 4,
+  "useTabs": true,
+  "singleQuote": true,
+  "semi": true,
+  "quoteProps": "consistent",
+  "endOfLine": "auto",
+  "bracketSpacing": false,
+  "jsxBracketSameLine": true,
+  "bracketSameLine": true,
+  "arrowParens": "avoid",
+  "printWidth": 300,
+  "overrides": [
+    {
+      "files": "**/lwc/**/*.html",
+      "options": { "parser": "lwc" }
+    },
+    {
+      "files": "*.{cmp,page,component}",
+      "options": { "parser": "html" }
+    }
+  ]
+}

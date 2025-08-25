@@ -1,9 +1,15 @@
-import { LightningElement, api, track, wire } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { refreshApex } from '@salesforce/apex';
-import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
-import { RefreshEvent } from 'lightning/refresh';
+import {LightningElement, api, track, wire} from 'lwc';
+import {NavigationMixin} from 'lightning/navigation';
+import {ShowToastEvent} from 'lightning/platformShowToastEvent';
+import {refreshApex} from '@salesforce/apex';
+import {getRecord, getFieldValue} from 'lightning/uiRecordApi'; //notifyRecordUpdateAvailable
+import {RefreshEvent} from 'lightning/refresh';
+// import { createMessageContext } from 'lightning/messageService';
+import {CloseActionScreenEvent} from 'lightning/actions';
+import {publish, MessageContext} from 'lightning/messageService'; // subscribe, unsubscribe, APPLICATION_SCOPE
+import derivarInteraccionChannel from '@salesforce/messageChannel/CC_DerivarInteraccionChannel__c';
+import currentUserId from '@salesforce/user/Id';
+
 import getDatos from '@salesforce/apex/CC_Operativa_Oficina_Controller.getDatos';
 import crearTarea from '@salesforce/apex/CC_Operativa_Oficina_Controller.crearTarea';
 import buscarOficinas from '@salesforce/apex/CC_Operativa_Oficina_Controller.buscarOficinas';
@@ -28,7 +34,7 @@ import crearTareaRellamadaApex from '@salesforce/apex/CC_Gestion_Derivar_CSBD.cr
 import crearOportunidadCSBDApex from '@salesforce/apex/CC_Gestion_Derivar_CSBD.crearOportunidadCSBD';
 import crearTareaRellamadaCSBDApex from '@salesforce/apex/CC_Gestion_Derivar_CSBD.crearTareaRellamadaCSBD';
 import crearActividadPhishingSinRiesgo from '@salesforce/apex/CC_Activity.crearActividadPhishingSinRiesgo';
-import crearActividadComunidadesPropietarios from '@salesforce/apex/CC_Activity.crearActividadComunidadesPropietarios'; 
+import crearActividadComunidadesPropietarios from '@salesforce/apex/CC_Activity.crearActividadComunidadesPropietarios';
 import crearActividadCSBDTelefonoNoCoincidente from '@salesforce/apex/CC_Activity.crearActividadCSBDTelefonoNoCoincidente';
 import rellenarPreguntasArgos from '@salesforce/apex/CC_Gestion_Derivar_Global.rellenarPreguntasArgos';
 import derivarSACApex from '@salesforce/apex/CC_Operativa_Oficina_Controller.derivarSAC';
@@ -48,7 +54,7 @@ import crearActividadCajeros from '@salesforce/apex/CC_Activity.crearActividadCa
 import updateCasoOperativaDerivar from '@salesforce/apex/CC_Operativa_Oficina_Controller.updateCasoOperativaDerivar';
 import crearCasoMecanismoFirma from '@salesforce/apex/CC_Gestion_Derivar_Mecanismo_Firma.crearCasoMecanismoFirma';
 import comprobarCasoCreadoMecanismoFirma from '@salesforce/apex/CC_Gestion_Derivar_Mecanismo_Firma.comprobarCasoCreadoMecanismoFirma';
-import recuperarArgosMecanismoFirma from '@salesforce/apex/CC_Gestion_Derivar_Mecanismo_Firma.recuperarArgos';
+// import recuperarArgosMecanismoFirma from '@salesforce/apex/CC_Gestion_Derivar_Mecanismo_Firma.recuperarArgos';
 import recuperarArgos from '@salesforce/apex/CC_Gestion_Derivar_Global.recuperarArgos';
 import actualizarDetallesSolucionArgos from '@salesforce/apex/CC_Gestion_Derivar_Global.actualizarDetallesSolucionArgos';
 import recuperarArgosDenied from '@salesforce/apex/CC_Gestion_Derivar_Global.recuperarArgosDenied';
@@ -57,48 +63,58 @@ import recuperarArgosRestricted from '@salesforce/apex/CC_Gestion_Derivar_Global
 import crearActividadOficinaSinTarea from '@salesforce/apex/CC_Activity.crearActividadOficinaSinTarea';
 import envioCorreoOnboarding from '@salesforce/apex/CC_Gestion_Derivar_Onboarding.envioCorreoAutomatico';
 import cerrarCasoOnboarding from '@salesforce/apex/CC_Gestion_Derivar_Onboarding.cerrarCaso';
-import crearActividadIdentificadorBloqueado from '@salesforce/apex/CC_Activity.crearActividadIdentificadorBloqueado'; 
+import crearActividadIdentificadorBloqueado from '@salesforce/apex/CC_Activity.crearActividadIdentificadorBloqueado';
 import crearTareaColectivosVulnerables from '@salesforce/apex/CC_Gestion_Derivar_Col_Vulnerable.crearTareaColectivosVulnerables';
 //import crearTareaCBP from '@salesforce/apex/CC_Gestion_Derivar_CBP.crearTareaCBP';
 import emailResponderClienteCBP from '@salesforce/apex/CC_Gestion_Derivar_CBP.emailResponderClienteCBP';
 import emailRemitirColaboradorColectivoVulnerable from '@salesforce/apex/CC_Gestion_Derivar_Col_Vulnerable.emailRemitirColaboradorColectivoVulnerable';
+import crearActividadGestionCitasApex from '@salesforce/apex/CC_Activity.crearActividadGestionCitas';
+import crearActividadTransferirLLamadaFraude from '@salesforce/apex/CC_Activity.crearActividadTransferirLLamadaFraude';
+import crearActividadTransferirLLamadaICP from '@salesforce/apex/CC_Activity.crearActividadTransferirLLamadaICP';
 
-import { createMessageContext } from 'lightning/messageService';
-
-import { CloseActionScreenEvent } from 'lightning/actions';
-import { encodeDefaultFieldValues } from "lightning/pageReferenceUtils";
-
-//agregar al canal de comunicacion entre aura botonera y LWC derivar
-import { subscribe, unsubscribe, APPLICATION_SCOPE, MessageContext, publish } from 'lightning/messageService';
-import derivarInteraccionChannel from "@salesforce/messageChannel/CC_DerivarInteraccionChannel__c";
-
-
+import validarCamposCasoApex from '@salesforce/apex/CC_EmailSendController.validarCamposCaso';
 
 //import preguntaEnrollmentDatosSi from '@salesforce/apex/CC_Operativa_Oficina_Controller.preguntaEnrollmentDatosSi';
 
+import CASE_OWNER_ID from '@salesforce/schema/Case.OwnerId';
+import CASE_STATUS from '@salesforce/schema/Case.Status';
+import CASE_ACCOUNT_ID from '@salesforce/schema/Case.AccountId';
+import CASE_CONTACT_ID from '@salesforce/schema/Case.ContactId';
+import CASE_REPRESENTANTE_ID from '@salesforce/schema/Case.CC_Representante__c';
+import CASE_NO_IDENTIFICADO from '@salesforce/schema/Case.CC_No_Identificado__c';
+
+const CASE_FIELDS = [CASE_OWNER_ID, CASE_ACCOUNT_ID, CASE_CONTACT_ID, CASE_REPRESENTANTE_ID, CASE_NO_IDENTIFICADO, CASE_STATUS];
 export default class ccOperativaOficina extends NavigationMixin(LightningElement) {
-	
+
 	@api recordId;
 
 	@api oportunidadCreadaAPI;
 
-	@api otpDerivar = null;
+	caso;
+
+	getRecordTimestamp;
+
+	refrescarDataService = false;
+
+	// @api otpDerivar = null;
+	otpDerivar = false;
 
 	@api derivarB = false;
-	
+
 	@track gestores = [];
 
 	//Manejo de mensaje de derivar interaccion
-	//@wire(MessageContext)
-	//messageContext;
-	messageContext = createMessageContext();
+	@wire(MessageContext)
+		messageContext;
+	// messageContext = createMessageContext();
 
-	subscription = null;
+	// subscription = null;
+
 	//FIN Manejo de mensaje de derivar interaccion
 	ambitoMotivo;
-	
-	showSpinner = false;
-		
+
+	showSpinner = true;
+
 	mostrarBuscadorOficina = false;
 
 	mostrarModalDNITestamentaria = false;
@@ -110,129 +126,129 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	textoOperativaDerivarGestor;
 
 	mostrarModalCita;
-	
+
 	alertaTexto;
-	
+
 	esClienteDigital;
-	
+
 	tieneGestor;
-	
+
 	numeroGestor;
-	
+
 	numeroGestorKO = false;
-	
+
 	nombreGestor;
 
 	fecha;
-	
+
 	gestorGenerico = false;
-	
+
 	oficinaGestor;
-	
+
 	nombreGestorAsignado;
-	
+
 	gestorAsignadoCoincide = true;
-	
+
 	mensajeErrorInt;
-	
+
 	cargandoGestor;
-	
+
 	gestor;
 
 	dni;
-	
+
 	motivoVentas;
-	
+
 	cambioOficina = false;
-	
+
 	cambioGestor = false;
-	
+
 	mostrarModalGestionGestorAsignado;
-	
+
 	mostrarModalGestionGestorGenerico;
-	
+
 	mostrarModalCreacionTarea;
-	
+
 	ocultarOpcionCitaGestor;
-	
+
 	fechasDisponibilidad;
-	
+
 	horasDisponibilidad;
-	
+
 	disponibilidadConsultada;
-	
+
 	sinFechasDisponibles = false;
-	
+
 	mensajeSinDisponibilidadGestor;
-	
+
 	existeBackup = true;
 
 	botonBackupDesactivado = true;
 
 	botonConsultarDisponibilidadDesactivado = true;
-	
+
 	gestorBackupActivoDos;
 
 	@track gestorBackupActivo = false;
 
 	gestoresBackup = [];
-	
+
 	gestorElegido;
-	
+
 	nombreGestorElegido;
 
-	fechaElegida;
-	
+	// fechaElegida;
+
 	lookupOficinaResultadoSeleccionado = '';
-	
+
 	lookupOficinaInputValue = '';
-	
+
 	lookupEmpleadoInputValue = '';
-	
+
 	lookupOficinaResultados = [];
-	
+
 	lookupEmpleadoResultados = [];
-	
+
 	oficinaPrincipal;
-	
+
 	lookupOficinaTimeout;
-	
+
 	lookupGestorResultadoSeleccionado = '';
-	
+
 	lookupGestorInputValue = '';
-	
+
 	lookupGestorResultados = [];
-	
+
 	lookupGestorTimeout;
-	
+
 	enviarTareaOficinaCliente = false;
-	
+
 	mostrarTareaModalCitaGestor = false;
-	
+
 	mostrarBuscadorGestor = false;
-	
+
 	crearTareaCitaGestor = false;
-	
+
 	tipoCita;
-	
+
 	clienteTieneGestor = false;
-	
+
 	ocultarBotonCita = true;
-	
+
 	horaCitaSelecionada;
-	
-	grupoColaborador;
-	
+
+	// grupoColaborador;
+
 	preguntaGrupoColaborador;
-	
+
 	comentariosTarea;
-	
-	realizarRemitido;
-		
+
+	// realizarRemitido;
+
 	preguntaCajeros;
-	
+
 	preguntaCajerosExternos;
-	
+
 	preguntaRealizarRemitido;
 
 	preguntaSenal;
@@ -243,11 +259,9 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	toastCajerosExternos;
 
-	toastDniInvalido;
+	// toastDniInvalido;
 
 	urlCajeros;
-
-	_wiredDatosResult;
 
 	toastTrasladarDesdeDerivar;
 
@@ -257,19 +271,19 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	mostrarModalPreguntaRealizarRemitido = false;
 
-	mostrarModalPreguntaEnrollmentDatos = false;
+	// mostrarModalPreguntaEnrollmentDatos = false;
 
 	flowDerivar = false;
 
 	mostrarFlowDerivar = false;
 
 	toastNoClienteError;
-	
+
 	//preguntaEnrollment;
 
 	//preguntaEnrollmentDatos;
 
-	toastEnrollmentNo;
+	// toastEnrollmentNo;
 
 	//toastEnrollmentDatosSi;
 
@@ -319,7 +333,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	textoRellamadaCSBDEnGestion;
 
-	existeOppFormalizada = false; 
+	existeOppFormalizada = false;
 
 	existeOppEnGestion = false;
 
@@ -371,18 +385,31 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	//Onboarding/Desistir
 	ambitoOnboarding;
+
 	casoAutenticado;
+
 	empresaONB;
+
 	estadoONB;
+
 	fechaEstadoONB;
+
 	motivoCierreONB;
+
 	subestadoONB;
+
 	numSR;
+
 	codigONB;
+
 	textoModalOnboarding;
+
 	textoModalDesistir;
+
 	derivadoBPO;
+
 	textoCorreoEnviado;
+
 	textoModalOnboardingCodigos;
 	//Onboarding/Desistir
 
@@ -392,9 +419,9 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	entroCatch = false;
 
-	textoTareaCitaCreada;
+	// textoTareaCitaCreada;
 
-	existeTareaCitaCreada = false;
+	// existeTareaCitaCreada = false;
 
 	//Argos
 
@@ -402,25 +429,23 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	operacionMFAArgos;
 
-	grupoColaboradorCyberFraude;
+	// grupoColaboradorCyberFraude;
 
-	preguntasArgos;
+	@track preguntasArgos;
 
 	diarioMFAArgos;
 
 	preguntaConfirmacionArgos;
 
-	cabeceraPreguntasMFAArgos;
+	@track cabeceraPreguntasMFAArgos;
 
-	respuestasPreguntasArgos = [];
+	@track respuestasPreguntasArgos = [];
 
-	preguntasCompletasArgos = true;
+	@track preguntasCompletasArgos = true;
 
-	preguntasArgosActivas = false;
+	@track preguntasArgosActivas = false;
 
 	preguntaConfirmacionArgosActiva = false;
-
-	preguntaConfirmacionArgos;
 
 	cyberfraude;
 
@@ -429,16 +454,17 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	trasladarDocumentacion;
 
 	preguntaIdBancaDigital;
-	
+
 	detallesSolucion;
 	//Argos
 
-	//Success Toast 
+	//Success Toast
 
 	mostrarModalToast = false;
 	mensajeMostrarModalToast = '';
-	
+
 	mostrarModalToastUrl = false;
+
 	mensajeMostrarModalToastUrl = '';
 
 	urlOficina;
@@ -454,46 +480,71 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	preguntaTelefonoCSBDNoEncontrado;
 
 	botonDesabilitado = false;
-	
+
 	autenticacionSAU = false;
-	
+
 	//CSBD
 
 	//Phising/Smishing/Malware
 	PhisingSmishingMalware1;
+
 	PhisingSmishingMalware2;
+
 	PhisingSmishingMalware3;
+
 	PhisingSmishingMalware5;
+
 	PhisingSmishingMalware6;
+
 	mostrarPhisingSmishingMalware4;
+
 	mostrarPhisingSmishingMalware5;
-	@track mostrarPregunta = false;
+
+	mostrarPregunta = false;
+
 	procesandoCreacionTareaPhishingSinRiesgo = false;
 	//Phising/Smishing/Malware
 
 	//CashBack
 	CashBack1;
+
 	CashBack2;
+
 	CashBack3;
+
 	CashBack4;
+
 	CashBack5;
+
 	fechaCompra;
+
 	nombreComercio;
+
 	idCliente;
 	//CashBack
 
 	//Refinanciación Deudas
 	RefinanciacionDeudas1;
+
 	RefinanciacionDeudas2;
+
 	RefinanciacionDeudas3;
+
 	RefinanciacionDeudas4;
+
 	nuevoContrato = '';
+
 	numerosContratos = '';
-	Origin;
-	@track mostrarModalToastDeudas = false;
-	@track mensajeMostrarModalToastDeudas = '';
+	// Origin;
+
+	mostrarModalToastDeudas = false;
+
+	mensajeMostrarModalToastDeudas = '';
+
 	siguienteDeshabilitado = false;
+
 	contratos = [];
+
 	//Refinanciación Deudas
 
 	//Derivaciones sin cliente asociado
@@ -501,20 +552,18 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	derivacionesSinClienteAsociado2;
 	derivacionesSinClienteAsociado3;
 	derivacionesSinClienteAsociado4;
-	@track mostrarModalDNI = false;
-    @track dni;
-	@track mostrarModalDatosContacto = false;
-	@track mostrarModalTipoCuenta = false;
-	@track tipoCuentaFicticia;
+	mostrarModalDNI = false;
+	mostrarModalDatosContacto = false;
+	mostrarModalTipoCuenta = false;
+	tipoCuentaFicticia;
 	@track datosClienteNoEncontrado = [
-    { label: 'Nombre', value: '' },
-    { label: 'Apellidos', value: '' },
-    { label: 'Teléfono de contacto', value: '' },
-    { label: 'Correo electrónico de contacto', value: '' }
+		{label: 'Nombre', value: ''},
+		{label: 'Apellidos', value: ''},
+		{label: 'Teléfono de contacto', value: ''},
+		{label: 'Correo electrónico de contacto', value: ''},
+		{label: 'Nombre de la empresa', value: ''}
 	];
-	camposRequeridos = '';
 	mostrarModalCreacionTareaMGT;
-	// tareaEncontrada = false;
 	//Derivaciones sin cliente asociado
 
 	//Amenazas
@@ -531,11 +580,11 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	empleadoAmenazadoSeleccionado;
 
-	motivoAmenazaInputValue = '';
+	// motivoAmenazaInputValue = '';
 
-	detalllesAmenazaInputValue = '';
+	// detalllesAmenazaInputValue = '';
 
-	@track motivoAmenazaSuicidiosInputValue = '';
+	motivoAmenazaSuicidiosInputValue = '';
 
 	direccionAmenazasSuicidiosInputValue = '';
 
@@ -564,13 +613,13 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	//Amenazas
 
 	//MECANISMO FIRMA
-	
+
 	preguntaMecanismoFirma;
 
 	preguntaMecanismoFirmaDatos;
 
 	preguntaMecanismoFirmaDatosValores;
-	
+
 	preguntaMecanismoFirmaIdentificador;
 
 	toastMecanismoFirmaDatosIncompletos;
@@ -598,10 +647,10 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	toastMecanismoFirmaCasoCreado;
 
 	mostrarModalTrasladarGrupoColaborador = false;
-	
+
 	preguntaIdentificadorSigueBloqueado;
-	
-	deshabilitadoPaisMF = false;
+
+	// deshabilitadoPaisMF = false;
 
 	deshabilitadoIdentificadorMF = false;
 
@@ -619,7 +668,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	//Accionistas
 
 	//Colectivo vulnerable
-	
+
 	mensajeColectivosVulnerables;
 
 	preguntaColectivosVulnerables;
@@ -632,15 +681,25 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	//Derivar/Devolver SAC
 	mostrarDerivarSAC = false;
+
 	mostrarDevolverSAC = false;
+
 	mostrarCanalProcedenciaErroneo = false;
+
 	mensajeDerivarAlSAC;
+
 	mensajeDerivarAlSACSuccess;
+
 	mensajeDevolverAlSAC;
+
 	mensajeDevolverAlSACSuccess;
+
 	mensajeCanalProcedenciaErroneo;
+
 	motivoSAC;
+
 	casoActual;
+
 	//Derivar/Devolver SAC
 
 	//Confidencial
@@ -650,18 +709,39 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	//CBP
 
 	mostrarModalCBP = false;
+
 	preguntaCBP;
+
 	ambitoCBP;
-	refinanciacionCBP;
+
+	// refinanciacionCBP;
+
 	@track esIntouch;
-	@track grupoColaborador;
-	@track plantilla;
-	@track mccId;
-	@track casoId;
+
+	@track grupoColaborador = [];
+
+	// @track plantilla;
+
+	// @track mccId;
+
+	// @track casoId;
+
 	mostrarModalCreacionTareaCBP = false;
 
 	//CBP
 
+	//Transferencia llamadas
+
+	preguntaTransLlamFra;
+	modalTransLlamFra;
+	mensajeTransLlamFra;
+	intentoTranseferenciaLlamadaFraude;
+	mostrarPreguntaTransLlamFra = false;
+	mostrarPreguntaSenal = true;
+
+	//Transferencia llamadas
+
+	/*
 	filterGestor = {
 		criteria: [
 			{
@@ -676,445 +756,493 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			}
 		]
 	};
-	
 	displayInfoGestor = {
 		primaryField: 'Name',
 		additionalFields: ['CC_Matricula__c']
 	};
-	
-	opcionesCitaDigital = [{ label: 'Cita telefónica', value: '43' }];
-	
+	*/
+
+	opcionesCitaDigital = [{label: 'Cita telefónica', value: '43'}];
+
 	opcionesCita = [
-		{ label: 'Cita presencial', value: '42' },
-		{ label: 'Cita telefónica', value: '43' }
+		{label: 'Cita presencial', value: '42'},
+		{label: 'Cita telefónica', value: '43'}
 	];
 
 	opcionesCitaRapida = [];
-	
-	connectedCallback() {
-		this.grupoColaborador = [];
-		this.subscribeToMessageChannel();
-	}
 
 	//KPI
 	//Manejo de mensaje de derivar interaccion
-	subscribeToMessageChannel() {
-		if (!this.subscription) {
-		  this.subscription = subscribe(
-			this.messageContext,
-			derivarInteraccionChannel,
-			(message) => this.procesarMensajeDerivarInteraccion(message),
-			{ scope: APPLICATION_SCOPE },
-		  );
-		}
-	}
+	// subscribeToMessageChannel() {
+	// 	if (!this.subscription) {
+	// 		this.subscription = subscribe(
+	// 			this.messageContext,
+	// 			derivarInteraccionChannel,
+	// 			(message) => this.procesarMensajeDerivarInteraccion(message),
+	// 			{ scope: APPLICATION_SCOPE },
+	// 		);
+	// 	}
+	// }
 
-	unsubscribeToMessageChannel() {
-		unsubscribe(this.subscription);
-		this.subscription = null;
-	}
+	// unsubscribeToMessageChannel() {
+	// 	unsubscribe(this.subscription);
+	// 	this.subscription = null;
+	// }
 
-	procesarMensajeDerivarInteraccion(message) {
-	}	
+	// procesarMensajeDerivarInteraccion(message) {
+	// }
 
-	publicarMensajeDerivarInteraccion(origenDerivacion, destinoDerivacion, datosAdicionales) {
-		if (this.messageContext) {
-			const payload = { 
-				recordId: this.recordId, 
-				origen: origenDerivacion,
-				destino: destinoDerivacion,
-				datosAdicionales: datosAdicionales
-			};
-			publish(this.messageContext, derivarInteraccionChannel, payload);
-		}
-	}
-	//FIN Manejo de mensaje de derivar interaccion
-	
-	@wire(getDatos, { recordId: '$recordId', otpDerivar: '$otpDerivar' })
-	async wiredDatos(response) {
-		let refrescarDataService = false;
-
-		let error = response && response.error;
-		let data = response && response.data;
-		this._wiredDatosResult = response;
-		refreshApex(this._wiredDatosResult); // Devuelto al código. Pendiente aclarar unas dudas con Marc
+	@wire(getRecord, {recordId: '$recordId', fields: CASE_FIELDS, getRecordTimestamp: '$getRecordTimestamp'})
+	wiredCase({error, data: caso}) {
 		if (error) {
-			this.toast('error', 'Problema recuperando los datos principales', error.body.message);
-			this._wiredDatosResult = false;
-			
-		} else if (data) {		
+			console.error(error);
+			this.toast('error', 'Problema recuperando el caso', error.body.message);
+
+		} else if (caso && !this.caso) {
+			this.caso = caso;
+
+			if (getFieldValue(caso, CASE_OWNER_ID) !== currentUserId) {
+				this.toast('info', 'Operativa no disponible', 'Esta operativa solo está disponible para el propietario del caso');
+				this.cerrarModal();
+
+
+			} else if (getFieldValue(caso, CASE_STATUS) !== 'Activo') {
+				this.toast('info', 'Operativa no disponible', 'Esta operativa solo está disponible para casos activos');
+				this.cerrarModal();
+
+
+			// } else if ((!getFieldValue(caso, CASE_ACCOUNT_ID) || !getFieldValue(caso, CASE_CONTACT_ID))
+			// && !getFieldValue(caso, CASE_REPRESENTANTE_ID)
+			// && !getFieldValue(caso, CASE_NO_IDENTIFICADO)) {
+			// 	this.toast('info', 'Operativa no disponible', 'Para poder realizar esta operativa, el caso debe estar vinculado a una cuenta, un contacto o un representante');
+			// 	this.cerrarModal();
+
+
+			} else {
+				validarCamposCasoApex({recordId: this.recordId})
+					.then(camposNoValidos => {
+						console.log('response: ', camposNoValidos);
+
+						if (camposNoValidos.length) {
+							let mensaje = '';
+							//Se comprueba si la clasificación está inactiva
+							if (camposNoValidos.indexOf('Clasificación inactiva') > -1) {
+							//Si lo está se prepara el mensaje y se quita el elemento del array
+								mensaje = 'La clasificación actual del caso ha sido inactivada, debe reclasificarlo. ';
+								camposNoValidos.splice(camposNoValidos.indexOf('Clasificación inactiva'), 1);
+							}
+							//El resto de elementos son campos obligatorios actualmente nulos
+							mensaje += 'Debe informar los siguientes campos obligatorios: ' + camposNoValidos.join(', ') + '.';
+							this.toast('info', 'Operativa no disponible', mensaje);
+							this.cerrarModal();
+						} else {
+							this.init();
+						}
+					}).catch(error => {
+						this.toast('error', 'Problema iniciando la operativa', error.message);
+						this.cerrarModal();
+					});
+			}
+		}
+	}
+
+	async init() {
+		try {
+			const datos = await getDatos({recordId: this.recordId, otpDerivar: this.otpDerivar, refrescarDataService: this.refrescarDataService});
+
+			this.showSpinner = false;
 
 			//Derivaciones sin cliente asociado
-			this.casoActual = data.casoActual;
+			this.casoActual = datos.casoActual;
 			if (!this.casoActual.AccountId) {
-				this.fecha = new Date().toISOString().substring(0, 10);
-				this.mostrarModalDNI = true;
-				recuperarMensajeDerivacionesSinCuenta({ numero: 1 })
+				// this.mostrarModalCreacionTareaMGT = datos.mostrarModalCreacionTarea;
+				// this.fecha = new Date().toISOString().substring(0, 10);
+				// this.mostrarModalDNI = true;
+
+				recuperarMensajeDerivacionesSinCuenta({numero: 1})
 					.then(mensaje => {
+						this.mostrarModalCreacionTareaMGT = datos.mostrarModalCreacionTarea;
+						this.mostrarModalDNI = true;
 						this.derivacionesSinClienteAsociado1 = mensaje;
-					})
-					.catch(error => {
-						console.error('Error al recuperar mensaje:', error);
+					}).catch(error => {
+						this.mostrarModalCreacionTareaMGT = datos.mostrarModalCreacionTarea;
+						console.error('Error recuperando la configuración:', error);
+						this.toast('error', 'Error recuperando la configuración', error.message);
 					});
+
 				// this.template.querySelector('.modal')?.classList.add('slds-fade-in-open');
 				// this.template.querySelector('.backdrop')?.classList.add('slds-backdrop--open');
 				return;
 			}
 			//Derivaciones sin cliente asociado
-			const resultado = data;
-				this.fecha = new Date().toISOString().substring(0, 10);
-				this.derivar = resultado.derivar;
-				this.toastTrasladarDesdeDerivar = resultado.toastTrasladarDesdeDerivar;
-				this.toastRemitirDesdeDerivar = resultado.toastRemitirDesdeDerivar;
-				this.ambitoFraude = resultado.ambitoFraude;
-				this.ambitoMotivo = resultado.ambitoMotivo;
-				this.grupoColaborador = resultado.grupoColaborador;
-				this.alertaTexto = resultado.alerta;
-				this.toastCSBDNoContratar = resultado.toastCSBDNoContratar;
-				this.textoMotivoCSBDNoContratar = resultado.textoMotivoCSBDNoContratar;
-				this.modalParametrizableCSBD = resultado.modalParametrizableCSBD;
-				this.toastNoClienteError = resultado.toastNoClienteError;
-				this.toastTrasladar3N = resultado.toastTrasladar3N;
-				this.realizarRemitidoDesdeMetodo = resultado.realizarRemitido;
-				this.toastCajerosIncidencias = resultado.toastCajerosIncidencias;
-				this.tituloCajerosIncidencias = resultado.tituloCajerosIncidencias;
-				this.toastNoCliente = resultado.toastNoCliente;
-				this.oficinaPrincipal = resultado.oficinaPrincipal;
-				this.numOficina = resultado.numOficina;
-				this.gestorGenericoName = resultado.gestorGenericoName;
-				this.citaRapida = resultado.citaRapida;
-				this.preguntaCSBDContratar = resultado.preguntaCSBDContratar;
-				this.preguntaCSBDContratar2 = resultado.preguntaCSBDContratar2;
-				this.toastCrearOportunidad = resultado.toastCrearOportunidad;
-				this.preguntaCajeros = resultado.preguntaCajeros;
-				this.preguntaCajerosExternos = resultado.preguntaCajerosExternos;
-				this.toastCajerosExternos = resultado.toastCajerosExternos;
-				this.urlCajeros = resultado.urlCajeros;
-				this.preguntaSenal = resultado.preguntaSenal;
-				this.preguntaSenalAntigua = resultado.preguntaSenalAntigua;
-				this.toastRemitir = resultado.toastRemitir;
-				this.preguntaRealizarRemitido = resultado.preguntaRealizarRemitido;
-				this.preguntaGrupoColaborador = resultado.preguntaGrupoColaborador;
-				this.gestor = resultado.gestor;
-				this.motivoVentas = resultado.motivoVentas;
-				this.mostrarModalGestionGestorAsignado = resultado.mostrarModalGestionGestorAsignado;
-				this.mostrarModalGestionGestorGenerico = resultado.mostrarModalGestionGestorGenerico;
-				console.log('::: mostrarModalGestionGestorGenerico: ', this.mostrarModalGestionGestorGenerico);
-				this.mostrarModalCreacionTarea = resultado.mostrarModalCreacionTarea;
-				this.mostrarModalCreacionTareaMGT = resultado.mostrarModalCreacionTarea;
-				this.mostrarModalDNITestamentaria = resultado.mostrarModalDNITestamentaria;
-				this.textoTestamentariaDocumentacion = resultado.textoTestamentariaDocumentacion;
-				this.textoOperativaDerivarOficina = resultado.textoOperativaDerivarOficina;	
-				this.textoOperativaDerivarGestor = resultado.textoOperativaDerivarGestor;
-				this.mostrarModalResponderCliente = resultado.mostrarModalResponderCliente;
-				this.textoDocumentacionCertificado = resultado.textoDocumentacionCertificado;
-				this.preguntaInformacionRequeridaDocumentacion = resultado.preguntaInformacionRequeridaDocumentacion;
-				this.preguntaInformacionCompletaDocumentacion = resultado.preguntaInformacionCompletaDocumentacion;
-				this.toastDocumentacionCasoCreado = resultado.toastDocumentacionCasoCreado;
-				this.modalDocumentacionCasoCreado = resultado.modalDocumentacionCasoCreado;
-				this.toastDocumentacionCasoYaCreado = resultado.toastDocumentacionCasoYaCreado;
-				this.documentacionCaseExtension = resultado.documentacionCaseExtension;
-				//this.toastDniInvalido = resultado.toastDniInvalido;
-				this.cambioOficina = resultado.cambioOficina;
-				this.cambioGestor = resultado.cambioGestor;
-				this.clienteTieneGestor = resultado.clienteTieneGestor;
-				this.flowDerivar = resultado.flowDerivar;
-				this.urlTF = resultado.urlTF;
-				this.numperso = resultado.numperso;
-				this.nif = resultado.nif;
-				this.imagin = resultado.imagin;
-				this.citaRapidaPresencialToast = resultado.citaRapidaPresencialToast;
-				this.oportunidadCreada = resultado.oportunidadCreada;
-				this.casoDerivadoAFraude = resultado.casoDerivadoAFraude;
-				this.oficinaFisica = resultado.oficinaFisica;
-				this.documentacionDecisionCaixa = resultado.documentacionDecisionCaixa;
-				this.motivoDevolucionTemaFraude = resultado.motivoDevolucionTemaFraude;
-				this.grupoColaboradorFraudeSI = resultado.grupoColaboradorFraudeSI;
-				this.grupoColaboradorFraudeNO = resultado.grupoColaboradorFraudeNO;
-				
+			const resultado = datos;
+			//console.log('resultado: ', JSON.stringify(resultado, null, 2));
+			this.fecha = new Date().toISOString().substring(0, 10);
+			this.derivar = resultado.derivar;
+			this.toastTrasladarDesdeDerivar = resultado.toastTrasladarDesdeDerivar;
+			this.toastRemitirDesdeDerivar = resultado.toastRemitirDesdeDerivar;
+			this.ambitoFraude = resultado.ambitoFraude;
+			this.ambitoMotivo = resultado.ambitoMotivo;
+			this.grupoColaborador = resultado.grupoColaborador;
+			this.alertaTexto = resultado.alerta;
+			this.toastCSBDNoContratar = resultado.toastCSBDNoContratar;
+			this.textoMotivoCSBDNoContratar = resultado.textoMotivoCSBDNoContratar;
+			this.modalParametrizableCSBD = resultado.modalParametrizableCSBD;
+			this.toastNoClienteError = resultado.toastNoClienteError;
+			this.toastTrasladar3N = resultado.toastTrasladar3N;
+			this.realizarRemitidoDesdeMetodo = resultado.realizarRemitido;
+			this.toastCajerosIncidencias = resultado.toastCajerosIncidencias;
+			this.tituloCajerosIncidencias = resultado.tituloCajerosIncidencias;
+			this.toastNoCliente = resultado.toastNoCliente;
+			this.oficinaPrincipal = resultado.oficinaPrincipal;
+			this.numOficina = resultado.numOficina;
+			this.gestorGenericoName = resultado.gestorGenericoName;
+			this.citaRapida = resultado.citaRapida;
+			this.preguntaCSBDContratar = resultado.preguntaCSBDContratar;
+			this.preguntaCSBDContratar2 = resultado.preguntaCSBDContratar2;
+			this.toastCrearOportunidad = resultado.toastCrearOportunidad;
+			this.preguntaCajeros = resultado.preguntaCajeros;
+			this.preguntaCajerosExternos = resultado.preguntaCajerosExternos;
+			this.toastCajerosExternos = resultado.toastCajerosExternos;
+			this.urlCajeros = resultado.urlCajeros;
+			this.preguntaSenal = resultado.preguntaSenal;
+			this.preguntaSenalAntigua = resultado.preguntaSenalAntigua;
+			this.toastRemitir = resultado.toastRemitir;
+			this.preguntaRealizarRemitido = resultado.preguntaRealizarRemitido;
+			this.preguntaGrupoColaborador = resultado.preguntaGrupoColaborador;
+			this.gestor = resultado.gestor;
+			this.motivoVentas = resultado.motivoVentas;
+			this.mostrarModalGestionGestorAsignado = resultado.mostrarModalGestionGestorAsignado;
+			this.mostrarModalGestionGestorGenerico = resultado.mostrarModalGestionGestorGenerico;
+			this.mostrarModalCreacionTarea = resultado.mostrarModalCreacionTarea;
+			this.mostrarModalDNITestamentaria = resultado.mostrarModalDNITestamentaria;
+			this.textoTestamentariaDocumentacion = resultado.textoTestamentariaDocumentacion;
+			this.textoOperativaDerivarOficina = resultado.textoOperativaDerivarOficina;
+			this.textoOperativaDerivarGestor = resultado.textoOperativaDerivarGestor;
+			this.mostrarModalResponderCliente = resultado.mostrarModalResponderCliente;
+			this.textoDocumentacionCertificado = resultado.textoDocumentacionCertificado;
+			this.preguntaInformacionRequeridaDocumentacion = resultado.preguntaInformacionRequeridaDocumentacion;
+			this.preguntaInformacionCompletaDocumentacion = resultado.preguntaInformacionCompletaDocumentacion;
+			this.toastDocumentacionCasoCreado = resultado.toastDocumentacionCasoCreado;
+			this.modalDocumentacionCasoCreado = resultado.modalDocumentacionCasoCreado;
+			this.toastDocumentacionCasoYaCreado = resultado.toastDocumentacionCasoYaCreado;
+			this.documentacionCaseExtension = resultado.documentacionCaseExtension;
+			//this.toastDniInvalido = resultado.toastDniInvalido;
+			this.cambioOficina = resultado.cambioOficina;
+			this.cambioGestor = resultado.cambioGestor;
+			this.clienteTieneGestor = resultado.clienteTieneGestor;
+			this.flowDerivar = resultado.flowDerivar;
+			this.urlTF = resultado.urlTF;
+			this.numperso = resultado.numperso;
+			this.nif = resultado.nif;
+			this.imagin = resultado.imagin;
+			this.citaRapidaPresencialToast = resultado.citaRapidaPresencialToast;
+			this.oportunidadCreada = resultado.oportunidadCreada;
+			this.casoDerivadoAFraude = resultado.casoDerivadoAFraude;
+			this.oficinaFisica = resultado.oficinaFisica;
+			this.documentacionDecisionCaixa = resultado.documentacionDecisionCaixa;
+			this.motivoDevolucionTemaFraude = resultado.motivoDevolucionTemaFraude;
+			this.grupoColaboradorFraudeSI = resultado.grupoColaboradorFraudeSI;
+			this.grupoColaboradorFraudeNO = resultado.grupoColaboradorFraudeNO;
+
 			if (this.oportunidadCreadaAPI || this.oportunidadCreada) {
-					this.textoOportunidadExistente = resultado.textoOportunidadExistente;
-				}
+				this.textoOportunidadExistente = resultado.textoOportunidadExistente;
+			}
 			if (this.casoDerivadoAFraude) {
-					this.textoOportunidadExistente = resultado.textoOportunidadExistente;
-				}
-				this.hubImagin = resultado.hubImagin;
-				this.hubGestion = resultado.hubGestion;
-				
-				this.fraudeANivelDeMotivo = resultado.fraudeANivelDeMotivo;
-				//Argos
-				this.preguntasArgos = resultado.preguntasArgos;
-				this.diarioMFAArgos = resultado.diarioMFAArgos;
-				this.preguntaConfirmacionArgos = resultado.preguntaConfirmacionArgos;
-				this.operacionMFAArgos = resultado.operacionMFAArgos;
-				this.cabeceraPreguntasMFAArgos = resultado.cabeceraPreguntasMFAArgos;
-				this.cyberfraude = resultado.cyberfraude;
-				this.cybersoc = resultado.cybersoc;
-				this.preguntaIdBancaDigital = resultado.preguntaIdBancaDigital;
-				//Argos
-	
-				
-				//Phising/Smishing/Malware
-				this.PhisingSmishingMalware1 = resultado.PhisingSmishingMalware1;
-				this.PhisingSmishingMalware2 = resultado.PhisingSmishingMalware2;
-				this.PhisingSmishingMalware3 = resultado.PhisingSmishingMalware3;
-				this.PhisingSmishingMalware5 = resultado.PhisingSmishingMalware5;
-				this.PhisingSmishingMalware6 = resultado.PhisingSmishingMalware6;
-				//Phising/Smishing/Malware
-	
-				//CashBack
-				this.CashBack1 = resultado.CashBack1;
-				this.CashBack2 = resultado.CashBack2;
-				this.CashBack3 = resultado.CashBack3;
-				this.CashBack4 = resultado.CashBack4;
-				this.CashBack5 = resultado.CashBack5;
-				//CashBack
-	
-				//Refinanciación Deudas
-				this.RefinanciacionDeudas1 = resultado.RefinanciacionDeudas1;
-				this.RefinanciacionDeudas2 = resultado.RefinanciacionDeudas2;
-				this.RefinanciacionDeudas3 = resultado.RefinanciacionDeudas3;
-				this.RefinanciacionDeudas4 = resultado.RefinanciacionDeudas4;
-				//Refinanciación Deudas
+				this.textoOportunidadExistente = resultado.textoOportunidadExistente;
+			}
+			this.hubImagin = resultado.hubImagin;
+			this.hubGestion = resultado.hubGestion;
 
-				//CSBD
-				this.ambitoCSBD = resultado.ambitoCSBD;
-				this.preguntaTelefonoCSBD = resultado.preguntaTelefonoCSBD;
-				this.preguntaTelefonoCSBDNoEncontrado = resultado.preguntaTelefonoCSBDNoEncontrado;
-				this.autenticacionSAU = resultado.autenticacionSAU ?? false;
-				let reqAutenticacionSAU = JSON.parse(resultado.reqAutenticacionSAU ?? '[]');
-				let resAutenticacionSAU = JSON.parse(resultado.resAutenticacionSAU ?? '[]');
-				let nombreTraza = resultado.nombreTraza ?? '';
-				//CSBD
-	
-				//Migración de toast success 
-				this.mensajeMostrarModalToast = resultado.mensajeMostrarModalToast;
-				this.mostrarModalToast = resultado.mostrarModalToast;
-				//Migración de toast success
-	
-				//Accionistas
-				this.mensajeDerivarAccionistas = resultado.mensajeDerivarAccionistas;
-				//Accionistas
-	
-				//Mecanismo firma
-				
-				this.preguntaMecanismoFirma = resultado.preguntaMecanismoFirma;
-				this.preguntaMecanismoFirmaDatos = resultado.preguntaMecanismoFirmaDatos;
-				this.preguntaMecanismoFirmaDatosValores = resultado.preguntaMecanismoFirmaDatosValores;
-				this.toastMecanismoFirmaIdentificadorBloqueado = resultado.toastMecanismoFirmaIdentificadorBloqueado;		
-				this.toastMecanismoFirmaIdentificadorSinBloquear = resultado.toastMecanismoFirmaIdentificadorSinBloquear;		
-				this.toastMecanismoFirmaArgosCorrecto = resultado.toastMecanismoFirmaArgosCorrecto;		
-				this.preguntaMecanismoFirmaClienteAutenticado = resultado.preguntaMecanismoFirmaClienteAutenticado;		
-				this.toastMecanismoFirmaAsuntoEnvioCodigo = resultado.toastMecanismoFirmaAsuntoEnvioCodigo;
-				this.preguntaMecanismoFirmaIdentificador = resultado.preguntaMecanismoFirmaIdentificador;
-				this.toastMecanismoFirmaDatosIncompletos = resultado.toastMecanismoFirmaDatosIncompletos;
-				this.circuitoExtranjero = resultado.circuitoExtranjero;
-				this.circuitoCodigoFirma = resultado.circuitoCodigoFirma;
-				this.cybersocMF = resultado.cybersocMF;
-				this.toastMecanismoFirmaCasoCreado = resultado.toastMecanismoFirmaCasoCreado;
-				this.preguntaIdentificadorSigueBloqueado = resultado.preguntaIdentificadorSigueBloqueado;
-				
-				//Mecanismo firma
-	
-				//Oficina sin tarea
-				this.mensajeOficinaSinTarea = resultado.mensajeOficinaSinTarea;
-				//Oficina sin tarea
-	
-	
-				//Comunidades de propietarios
-				this.detallesConsulta = resultado.detallesConsulta;
-				//Comunidades de propietarios
-	
-				//Colectivo vulnerable
-				this.mensajeColectivosVulnerables = resultado.mensajeColectivosVulnerables;
-				this.preguntaColectivosVulnerables = resultado.preguntaColectivosVulnerables;
-				console.log('mensajeColectivosVulnerables: ', this.mensajeColectivosVulnerables);
-				console.log('preguntaColectivosVulnerables: ', this.preguntaColectivosVulnerables);
-				//Colectivo vulnerable
-	
-				//Cita normal
-				this.mensajeSinDisponibilidadGestor = resultado.mensajeSinDisponibilidadGestor;
-	
-				//Amenazas
+			this.fraudeANivelDeMotivo = resultado.fraudeANivelDeMotivo;
+			//Argos
+			this.preguntasArgos = resultado.preguntasArgos;
+			this.diarioMFAArgos = resultado.diarioMFAArgos;
+			this.preguntaConfirmacionArgos = resultado.preguntaConfirmacionArgos;
+			this.operacionMFAArgos = resultado.operacionMFAArgos;
+			this.cabeceraPreguntasMFAArgos = resultado.cabeceraPreguntasMFAArgos;
+			this.cyberfraude = resultado.cyberfraude;
+			this.cybersoc = resultado.cybersoc;
+			this.preguntaIdBancaDigital = resultado.preguntaIdBancaDigital;
+			//Argos
 
-				this.mensajeDerivacionAmenazasTipo = resultado.mensajeDerivacionAmenazasTipo;
 
-				//Amenazas empleados
-				this.mensajeSolicitudDatosAmenazasEmpleados = resultado.mensajeSolicitudDatosAmenazasEmpleados;
-				this.emailSuccess = resultado.emailSuccess;
-				this.nombrePlantilla = resultado.nombrePlantilla;
-				this.nombrePlantillaAmenazasEmpleados = resultado.nombrePlantillaAmenazasEmpleados;
-				this.grupoColEmpleadosAmenazas = resultado.grupoColEmpleadosAmenazas;
-				this.grupoColClientesAmenazas = resultado.grupoColClientesAmenazas;
-				//Amenazas empleados
-	
-				//Amenazas suicidios
-				this.mensajeSolicitudDatosAmenazasSuicidios = resultado.mensajeSolicitudDatosAmenazasSuicidios;
-				this.nameOWA = resultado.nameOWA;
-				//Amenazas suicidios
+			//Phising/Smishing/Malware
+			this.PhisingSmishingMalware1 = resultado.PhisingSmishingMalware1;
+			this.PhisingSmishingMalware2 = resultado.PhisingSmishingMalware2;
+			this.PhisingSmishingMalware3 = resultado.PhisingSmishingMalware3;
+			this.PhisingSmishingMalware5 = resultado.PhisingSmishingMalware5;
+			this.PhisingSmishingMalware6 = resultado.PhisingSmishingMalware6;
+			//Phising/Smishing/Malware
 
-				//Amenazas
-	
-				//Derivar/Devolver SAC
-				this.mostrarDerivarSAC = resultado.mostrarDerivarSAC;
-				this.mostrarDevolverSAC = resultado.mostrarDevolverSAC;
-				this.mostrarCanalProcedenciaErroneo = resultado.mostrarCanalProcedenciaErroneo;
-				this.mensajeDerivarAlSAC = resultado.mensajeDerivarAlSAC;
-				this.mensajeDerivarAlSACSuccess = resultado.mensajeDerivarAlSACSuccess;
-				this.mensajeDevolverAlSAC = resultado.mensajeDevolverAlSAC;
-				this.mensajeDevolverAlSACSuccess = resultado.mensajeDevolverAlSACSuccess;
-				this.mensajeCanalProcedenciaErroneo = resultado.mensajeCanalProcedenciaErroneo;
-				this.casoActual = resultado.casoActual;
-				//Derivar/Devolver SAC
-	
-				//Onboarding/Desistir
-				this.ambitoOnboarding = resultado.ambitoOnboarding;
-				this.casoAutenticado = resultado.casoAutenticado;
-				this.empresaONB = resultado.empresaONB;
-				this.estadoONB = resultado.estadoONB;
-				this.subestadoONB = resultado.subestadoONB;
-				this.fechaEstadoONB = resultado.fechaEstadoONB;
-				this.motivoCierreONB = resultado.motivoCierreONB;
-				this.numSR = resultado.numSR;
-				this.codigONB = resultado.codigONB;
-				this.textoModalOnboarding = resultado.textoModalOnboarding;
-				this.textoModalDesistir = resultado.textoModalDesistir;
-				this.derivadoBPO = resultado.derivadoBPO;
-				this.textoCorreoEnviado = resultado.textoCorreoEnviado;
-				this.textoModalOnboardingCodigos = resultado.textoModalOnboardingCodigos;
-				//Onboarding/Desistir
-	
-				this.ocultarModalTrasladar = resultado.ocultarModalTrasladar;
-	
-				//Confidencial
-				this.CSBDConfidencial = resultado.CSBDConfidencial;
-				//Confidencial
+			//CashBack
+			this.CashBack1 = resultado.CashBack1;
+			this.CashBack2 = resultado.CashBack2;
+			this.CashBack3 = resultado.CashBack3;
+			this.CashBack4 = resultado.CashBack4;
+			this.CashBack5 = resultado.CashBack5;
+			//CashBack
 
-				//CBP 
+			//Refinanciación Deudas
+			this.RefinanciacionDeudas1 = resultado.RefinanciacionDeudas1;
+			this.RefinanciacionDeudas2 = resultado.RefinanciacionDeudas2;
+			this.RefinanciacionDeudas3 = resultado.RefinanciacionDeudas3;
+			this.RefinanciacionDeudas4 = resultado.RefinanciacionDeudas4;
+			//Refinanciación Deudas
 
-				this.mostrarModalCBP = resultado.mostrarModalCBP;
-				this.preguntaCBP = resultado.preguntaCBP;
-				this.ambitoCBP = resultado.ambitoCBP;
-				this.esIntouch = resultado.esIntouch;
-				this.grupoCol = resultado.grupoCol;
-				this.mostrarModalCreacionTareaCBP = resultado.mostrarModalCreacionTareaCBP;
+			//CSBD
+			this.ambitoCSBD = resultado.ambitoCSBD;
+			this.preguntaTelefonoCSBD = resultado.preguntaTelefonoCSBD;
+			this.preguntaTelefonoCSBDNoEncontrado = resultado.preguntaTelefonoCSBDNoEncontrado;
+			this.autenticacionSAU = resultado.autenticacionSAU ?? false;
+			let reqAutenticacionSAU = JSON.parse(resultado.reqAutenticacionSAU ?? '[]');
+			let resAutenticacionSAU = JSON.parse(resultado.resAutenticacionSAU ?? '[]');
+			let nombreTraza = resultado.nombreTraza ?? '';
+			//CSBD
 
-				//CBP
-	
-				if (this.grupoColaborador && !this.ocultarModalTrasladar) {
-					this.mostrarModalTrasladarGrupoColaborador = true;
-				} else {
-					this.mostrarModalTrasladarGrupoColaborador = false;
-				}
-				
+			//Migración de toast success
+			this.mensajeMostrarModalToast = resultado.mensajeMostrarModalToast;
+			this.mostrarModalToast = resultado.mostrarModalToast;
+			//Migración de toast success
+
+			//Accionistas
+			this.mensajeDerivarAccionistas = resultado.mensajeDerivarAccionistas;
+			//Accionistas
+
+			//Mecanismo firma
+
+			this.preguntaMecanismoFirma = resultado.preguntaMecanismoFirma;
+			this.preguntaMecanismoFirmaDatos = resultado.preguntaMecanismoFirmaDatos;
+			this.preguntaMecanismoFirmaDatosValores = resultado.preguntaMecanismoFirmaDatosValores;
+			this.toastMecanismoFirmaIdentificadorBloqueado = resultado.toastMecanismoFirmaIdentificadorBloqueado;
+			this.toastMecanismoFirmaIdentificadorSinBloquear = resultado.toastMecanismoFirmaIdentificadorSinBloquear;
+			this.toastMecanismoFirmaArgosCorrecto = resultado.toastMecanismoFirmaArgosCorrecto;
+			this.preguntaMecanismoFirmaClienteAutenticado = resultado.preguntaMecanismoFirmaClienteAutenticado;
+			this.toastMecanismoFirmaAsuntoEnvioCodigo = resultado.toastMecanismoFirmaAsuntoEnvioCodigo;
+			this.preguntaMecanismoFirmaIdentificador = resultado.preguntaMecanismoFirmaIdentificador;
+			this.toastMecanismoFirmaDatosIncompletos = resultado.toastMecanismoFirmaDatosIncompletos;
+			this.circuitoExtranjero = resultado.circuitoExtranjero;
+			this.circuitoCodigoFirma = resultado.circuitoCodigoFirma;
+			this.cybersocMF = resultado.cybersocMF;
+			this.toastMecanismoFirmaCasoCreado = resultado.toastMecanismoFirmaCasoCreado;
+			this.preguntaIdentificadorSigueBloqueado = resultado.preguntaIdentificadorSigueBloqueado;
+
+			//Mecanismo firma
+
+			//Oficina sin tarea
+			this.mensajeOficinaSinTarea = resultado.mensajeOficinaSinTarea;
+			//Oficina sin tarea
+
+
+			//Comunidades de propietarios
+			this.detallesConsulta = resultado.detallesConsulta;
+			//Comunidades de propietarios
+
+			//Colectivo vulnerable
+			this.mensajeColectivosVulnerables = resultado.mensajeColectivosVulnerables;
+			this.preguntaColectivosVulnerables = resultado.preguntaColectivosVulnerables;
+			//Colectivo vulnerable
+
+			//Cita normal
+			this.mensajeSinDisponibilidadGestor = resultado.mensajeSinDisponibilidadGestor;
+
+			//Amenazas
+
+			this.mensajeDerivacionAmenazasTipo = resultado.mensajeDerivacionAmenazasTipo;
+
+			//Amenazas empleados
+			this.mensajeSolicitudDatosAmenazasEmpleados = resultado.mensajeSolicitudDatosAmenazasEmpleados;
+			this.emailSuccess = resultado.emailSuccess;
+			this.nombrePlantilla = resultado.nombrePlantilla;
+			this.nombrePlantillaAmenazasEmpleados = resultado.nombrePlantillaAmenazasEmpleados;
+			this.grupoColEmpleadosAmenazas = resultado.grupoColEmpleadosAmenazas;
+			this.grupoColClientesAmenazas = resultado.grupoColClientesAmenazas;
+			//Amenazas empleados
+
+			//Amenazas suicidios
+			this.mensajeSolicitudDatosAmenazasSuicidios = resultado.mensajeSolicitudDatosAmenazasSuicidios;
+			this.nameOWA = resultado.nameOWA;
+			//Amenazas suicidios
+
+			//Amenazas
+
+			//Derivar/Devolver SAC
+			this.mostrarDerivarSAC = resultado.mostrarDerivarSAC;
+			this.mostrarDevolverSAC = resultado.mostrarDevolverSAC;
+			this.mostrarCanalProcedenciaErroneo = resultado.mostrarCanalProcedenciaErroneo;
+			this.mensajeDerivarAlSAC = resultado.mensajeDerivarAlSAC;
+			this.mensajeDerivarAlSACSuccess = resultado.mensajeDerivarAlSACSuccess;
+			this.mensajeDevolverAlSAC = resultado.mensajeDevolverAlSAC;
+			this.mensajeDevolverAlSACSuccess = resultado.mensajeDevolverAlSACSuccess;
+			this.mensajeCanalProcedenciaErroneo = resultado.mensajeCanalProcedenciaErroneo;
+			this.casoActual = resultado.casoActual;
+			//Derivar/Devolver SAC
+
+			//Onboarding/Desistir
+			this.ambitoOnboarding = resultado.ambitoOnboarding;
+			this.casoAutenticado = resultado.casoAutenticado;
+			this.empresaONB = resultado.empresaONB;
+			this.estadoONB = resultado.estadoONB;
+			this.subestadoONB = resultado.subestadoONB;
+			this.fechaEstadoONB = resultado.fechaEstadoONB;
+			this.motivoCierreONB = resultado.motivoCierreONB;
+			this.numSR = resultado.numSR;
+			this.codigONB = resultado.codigONB;
+			this.textoModalOnboarding = resultado.textoModalOnboarding;
+			this.textoModalDesistir = resultado.textoModalDesistir;
+			this.derivadoBPO = resultado.derivadoBPO;
+			this.textoCorreoEnviado = resultado.textoCorreoEnviado;
+			this.textoModalOnboardingCodigos = resultado.textoModalOnboardingCodigos;
+			//Onboarding/Desistir
+
+			this.ocultarModalTrasladar = resultado.ocultarModalTrasladar;
+
+			//Confidencial
+			this.CSBDConfidencial = resultado.CSBDConfidencial;
+			//Confidencial
+
+			//CBP
+
+			this.mostrarModalCBP = resultado.mostrarModalCBP;
+			this.preguntaCBP = resultado.preguntaCBP;
+			this.ambitoCBP = resultado.ambitoCBP;
+			this.esIntouch = resultado.esIntouch;
+			this.grupoCol = resultado.grupoCol;
+			this.mostrarModalCreacionTareaCBP = resultado.mostrarModalCreacionTareaCBP;
+
+			//CBP
+
+			//Transferencia llamadas
+
+			this.preguntaTransLlamFra = resultado.preguntaTransLlamFra;
+			this.modalTransLlamFra = resultado.modalTransLlamFra;
+			this.mensajeTransLlamFra = resultado.mensajeTransLlamFra;
+			this.intentoTranseferenciaLlamadaFraude = resultado.intentoTranseferenciaLlamadaFraude;
+
+			console.log('preguntaTransLlamFra: ', this.preguntaTransLlamFra);
+			console.log('modalTransLlamFra: ', this.modalTransLlamFra);
+			console.log('mensajeTransLlamFra: ', this.mensajeTransLlamFra);
+			console.log('intentoTranseferenciaLlamadaFraude: ', this.intentoTranseferenciaLlamadaFraude);
+			console.log('this.mostrarPreguntaTransLlamFra' + this.mostrarPreguntaTransLlamFra);
+			console.log('this.mostrarModalPreguntaRealizarRemitido' + this.mostrarModalPreguntaRealizarRemitido);
+			console.log('this.preguntaSenal' + this.preguntaSenal);
+			console.log('this.preguntaSenalAntigua' + this.preguntaSenalAntigua);
+			//Transferencia llamadas
+
+			if (this.grupoColaborador && !this.ocultarModalTrasladar) {
+				this.mostrarModalTrasladarGrupoColaborador = true;
+			} else {
+				this.mostrarModalTrasladarGrupoColaborador = false;
+			}
+
 			if (this.imagin) {
-					this.tipoCita = 43;
-				}
+				this.tipoCita = 43;
+			}
 
 			if (this.oficinaPrincipal) {
 				for (let i = 0; i < resultado.gestores.length; i++) {
-					this.gestores.push({ label: resultado.gestores[i].Name, value: resultado.gestores[i].Id });
-					}
+					this.gestores.push({label: resultado.gestores[i].Name, value: resultado.gestores[i].Id});
 				}
+			}
 
 			if (this.toastTrasladar3N && !this.alertaTexto && !this.ambitoFraude && !this.grupoColaborador && !this.preguntaTelefonoCSBD) {
-				refrescarDataService = true;
-					this.realizarTraslado3N();
-				}
+				this.refrescarDataService = true;
+				this.realizarTraslado3N();
+			}
 
 			if (this.realizarRemitidoDesdeMetodo && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
-					this.handleRemitir();
-				} else if (this.realizarRemitidoDesdeMetodo && (this.alertaTexto || this.grupoColaborador || this.ambitoFraude)) {
-					this.abrirModal();
-				}
+				this.handleRemitir();
+			} else if (this.realizarRemitidoDesdeMetodo && (this.alertaTexto || this.grupoColaborador || this.ambitoFraude)) {
+				this.abrirModal();
+			}
 
 			if (this.toastCSBDNoContratar && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude && !this.oportunidadCreadaAPI && !this.textoDocumentacionCertificado) {
-				refrescarDataService = true;
-					this.crearOportunidad();
-				}
+				this.refrescarDataService = true;
+				this.crearOportunidad();
+			}
 
 			if (this.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
-					//this.toast('error', this.tituloCajerosIncidencias, resultado.toastCajerosIncidencias);
-					this.handleModalToast(this.toastCajerosIncidencias);
-				} else if (this.toastCajerosIncidencias && (this.alertaTexto || this.grupoColaborador || this.ambitoFraude)) {
-					this.abrirModal();
-				}
-	
-			if (this.toastNoClienteError && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
-					//this.toast('error', 'Error en los datos', resultado.toastNoClienteError);
-					this.handleModalToast(resultado.toastNoClienteError);
-					
-				} else {
-					this.abrirModal();
-				}
+				//this.toast('error', this.tituloCajerosIncidencias, resultado.toastCajerosIncidencias);
+				this.handleModalToast(this.toastCajerosIncidencias);
+			} else if (this.toastCajerosIncidencias && (this.alertaTexto || this.grupoColaborador || this.ambitoFraude)) {
+				this.abrirModal();
+			}
 
-				/*if(resultado.preguntaEnrollment){
-					this.preguntaEnrollment= resultado.preguntaEnrollment;
-					this.preguntaEnrollmentDatos= resultado.preguntaEnrollmentDatos;
-					//this.toastEnrollmentNo = resultado.toastEnrollmentNo;
-					this.toastEnrollmentDatosSi = resultado.toastEnrollmentDatosSi;
-					this.toastEnrollmentDatosNo = resultado.toastEnrollmentDatosNo;
-				}*/
+			if (this.toastNoClienteError && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
+				//this.toast('error', 'Error en los datos', resultado.toastNoClienteError);
+				this.handleModalToast(resultado.toastNoClienteError);
+
+			} else {
+				this.abrirModal();
+			}
+
+			/*if(resultado.preguntaEnrollment){
+				this.preguntaEnrollment= resultado.preguntaEnrollment;
+				this.preguntaEnrollmentDatos= resultado.preguntaEnrollmentDatos;
+				//this.toastEnrollmentNo = resultado.toastEnrollmentNo;
+				this.toastEnrollmentDatosSi = resultado.toastEnrollmentDatosSi;
+				this.toastEnrollmentDatosNo = resultado.toastEnrollmentDatosNo;
+			}*/
 
 			if (this.preguntaRealizarRemitido && !this.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
-						this.abrirModal();
-					}
+				this.abrirModal();
+			}
 
 			if (resultado.comentarioCambioGestor) {
-					this.comentariosTarea = resultado.comentarioCambioGestor;
+				this.comentariosTarea = resultado.comentarioCambioGestor;
 			} else if (resultado.comentarioCambioOficina) {
-					this.comentariosTarea = resultado.comentarioCambioOficina;
-				}
+				this.comentariosTarea = resultado.comentarioCambioOficina;
+			}
 
 			if ((this.grupoColaborador === null || this.grupoColaborador === undefined) && this.flowDerivar === true) {
-					this.mostrarFlowDerivar = this.flowDerivar;
-				}
+				this.mostrarFlowDerivar = this.flowDerivar;
+			}
 
 			if (this.comentariosTarea === undefined) {
-					this.comentariosTarea = resultado.detallesConsulta;
-				}				
+				this.comentariosTarea = resultado.detallesConsulta;
+			}
 
-				if (!this.alertaTexto && !this.toastTrasladar3N && !this.toastCSBDNoContratar && !this.preguntaTelefonoCSBD) {
-				refrescarDataService = true;
-					this.handleContinuarProceso();
-				}
+			if (!this.alertaTexto && !this.toastTrasladar3N && !this.toastCSBDNoContratar && !this.preguntaTelefonoCSBD) {
+				this.refrescarDataService = true;
+				this.handleContinuarProceso();
+			}
 
-				this.llamadaIntegracionClienteDigital();
+			this.llamadaIntegracionClienteDigital();
 
-				if (!resultado.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude && !this.realizarRemitidoDesdeMetodo) {
-					this.abrirModal();
-				}
+			if (!resultado.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude && !this.realizarRemitidoDesdeMetodo) {
+				this.abrirModal();
+			}
 			if (this.nif != null && this.nif.startsWith('H')) { // Comunidades de propietarios
-				crearActividadComunidadesPropietarios({ recordId: this.recordId, detallesConsulta: this.detallesConsulta, mensaje: this.mensajeMostrarModalToast })
+				crearActividadComunidadesPropietarios({recordId: this.recordId, detallesConsulta: this.detallesConsulta, mensaje: this.mensajeMostrarModalToast})
 					.catch(error => {
 						console.error(error);
 						this.cerrarModal();
 					});
-				}
-	
-			if (resultado.opcionesCitaRapida && this.citaRapida) {
-					this.opcionesCitaRapida = Object.entries(resultado.opcionesCitaRapida).map(([key, value]) => ({
-						label: key, // Cita presencial, o Cita telefonica
-						value: value   // 42 o 43
-					}));
-				}
-	
-				//Oficina sin tarea
-			if (this.mensajeOficinaSinTarea) {
-					//this.handleModalToast(this.mensajeOficinaSinTarea);
-					this.handleOficinaSinTarea();
-				}
-				//Oficina sin tarea
+			}
 
-				//CBP
+			if (resultado.opcionesCitaRapida && this.citaRapida) {
+				this.opcionesCitaRapida = Object.entries(resultado.opcionesCitaRapida).map(([key, value]) => ({
+					label: key, // Cita presencial, o Cita telefonica
+					value: value   // 42 o 43
+				}));
+			}
+
+			//Oficina sin tarea
+			if (this.mensajeOficinaSinTarea) {
+				//this.handleModalToast(this.mensajeOficinaSinTarea);
+				this.handleOficinaSinTarea();
+			}
+			//Oficina sin tarea
+
+			//CBP
 			if (this.ambitoCBP) {
-					this.handleCBP();
-				}
-				//CBP
-	
-				//Argos
+				this.handleCBP();
+			}
+			//CBP
+
+			//Argos
 			if (this.operacionMFAArgos) {
-				recuperarArgos({ recordId: this.recordId })
+				recuperarArgos({recordId: this.recordId})
 					.then(resultado => {
 						if (resultado) {
 							this.trasladoColaboradorArgos();
@@ -1126,11 +1254,11 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 						console.error(error);
 						this.cerrarModal();
 					});
-	
-				}
-	
+
+			}
+
 			if (this.diarioMFAArgos) {
-				recuperarArgos({ recordId: this.recordId })
+				recuperarArgos({recordId: this.recordId})
 					.then(resultado => {
 						if (resultado) {
 							this.preguntaMFAArgosSeguridad();
@@ -1142,90 +1270,96 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 						console.error(error);
 						this.cerrarModal();
 					});
-	
-				}
+
+			}
 
 			if (this.autenticacionSAU && nombreTraza && reqAutenticacionSAU.length && resAutenticacionSAU.length) { /*reqAutenticacionSAU != '' && resAutenticacionSAU != ''*/
-					//LLamar a Apex para loguear las trazas y pasar el valor que se devuelve en el retorno del get datos
-				loguearTrazasAutenticacionSAU({ recordId: this.recordId, nombreTraza, reqAutenticacionSAU, resAutenticacionSAU })
+				//LLamar a Apex para loguear las trazas y pasar el valor que se devuelve en el retorno del get datos
+				loguearTrazasAutenticacionSAU({recordId: this.recordId, nombreTraza, reqAutenticacionSAU, resAutenticacionSAU})
 					.catch(error => console.error(error));
-				}
+			}
 			//Argos
 
 			//Mecanismo firma
 			if (this.preguntaMecanismoFirmaDatos) {
-				recuperarArgos({ recordId: this.recordId })
-				.then(resultado => {
+				recuperarArgos({recordId: this.recordId})
+					.then(resultado => {
 						if (!resultado) {
-						this.handleMFNull();
-					}
-				})
-				.catch(error => {
-					console.error(error);
-					this.cerrarModal();
-				});
+							this.handleMFNull();
+						}
+					})
+					.catch(error => {
+						console.error(error);
+						this.cerrarModal();
+					});
 			}
-
 			//Mecanismo firma
 
-			//TEST MMC
+			this.refrescarDataService |= await updateCasoOperativaDerivar({recordId: this.recordId});
+
+			if (this.refrescarDataService && this.recordId) {
+				this.caso = null;
+				refreshApex(this.wiredCase);
+			}
+
+			// this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail: { data: null } }));
+
+		} catch (error) {
+			console.error(error);
+			this.toast('error', 'Problema recuperando los datos principales', error.body.message);
 		}
-		
-		refrescarDataService |= await updateCasoOperativaDerivar({ recordId: this.recordId })
+	}
 
-		if (refrescarDataService) {
-			await notifyRecordUpdateAvailable([{ recordId: this.recordId }]); //refreshApex(this._wiredDatosResult);
+	publicarMensajeDerivarInteraccion(origenDerivacion, destinoDerivacion, datosAdicionales) {
+		if (this.messageContext) {
+			const payload = {
+				recordId: this.recordId,
+				origen: origenDerivacion,
+				destino: destinoDerivacion,
+				datosAdicionales: datosAdicionales
+			};
+			publish(this.messageContext, derivarInteraccionChannel, payload);
 		}
-
-		// window.setTimeout(() => this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail: { data: null } })), 400);
-this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail: { data: null } }));
-
 	}
 
 	async recuperarCampoDerivar() {
 		let resultado = false;
-		recuperarCampoDerivar({ recordId: this.recordId })
-		.then(retorno => {
-			resultado = retorno;
-		})
-		.catch(error => {
-			console.error(error);
-			this.toast('error', 'Problema recuperando los datos de campo derivar', error.body.message);
-			this.cerrarModal();
-		}).finally(() => this.derivar = resultado);
+		recuperarCampoDerivar({recordId: this.recordId})
+			.then(retorno => {
+				resultado = retorno;
+			})
+			.catch(error => {
+				console.error(error);
+				this.toast('error', 'Problema recuperando los datos de campo derivar', error.body.message);
+				this.cerrarModal();
+			}).finally(() => this.derivar = resultado);
 	}
-	
+
 	abrirModal() {
 		if (this.documentacionCaseExtension) {
 			this.toast('error', 'No se puede derivar este caso', this.toastDocumentacionCasoYaCreado);
 			this.cerrarModal();
 		} else {
-			this.template.querySelector('.modal')?.classList.add('slds-fade-in-open');
-			this.template.querySelector('.backdrop')?.classList.add('slds-backdrop--open');
+			// this.template.querySelector('.modal')?.classList.add('slds-fade-in-open');
+			// this.template.querySelector('.backdrop')?.classList.add('slds-backdrop--open');
 		}
-		const customEvent = new CustomEvent('abrirmodal', {
-			detail: { data: null }
-        });
-        this.dispatchEvent(customEvent);
+		this.dispatchEvent(new CustomEvent('abrirmodal', {detail: {data: null}}));
 	}
 
 	// get backdropClass() {
-    //     return this.backgroundblack ? 'fullscreen-backdrop' : 'slds-backdrop slds-backdrop_open';
-    // }
-	
+	//     return this.backgroundblack ? 'fullscreen-backdrop' : 'slds-backdrop slds-backdrop_open';
+	// }
+
 	cerrarModal() {
 
-		this.template.querySelector('.backdrop')?.classList.remove('slds-backdrop--open');
-		this.template.querySelector('.modal')?.classList.remove('slds-fade-in-open');
+		// this.template.querySelector('.backdrop')?.classList.remove('slds-backdrop--open');
+		// this.template.querySelector('.modal')?.classList.remove('slds-fade-in-open');
+		this.dispatchEvent(new CustomEvent('modalcerrado', {detail: {data: null}}));
 		this.dispatchEvent(new CloseActionScreenEvent());
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 		//window.setTimeout(() =>	this.dispatchEvent(new CustomEvent('modalcerrado', {detail: {data: null}})), 400);
-		const customEvent = new CustomEvent('modalcerrado', {
-			detail: { data: null }
-        });
-        this.dispatchEvent(customEvent);
 	}
-	
+
 	handleContinuarProceso() {
 		this.alertaTexto = false;
 		if ((!this.grupoColaborador || this.toastTrasladar3N) && !this.ambitoFraude && !this.preguntaTelefonoCSBD) {
@@ -1235,7 +1369,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.mostrarModalCita = false;
 		}
 	}
-	
+
 	ocultarModalCitaGestor() {
 		this.mostrarModalCita = false;
 		this.mostrarModalCreacionTarea = true;
@@ -1244,18 +1378,33 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	handleUploadFinished(event) {
 		const uploadedFiles = event.detail.files;
-		
+
 		this.archivos = uploadedFiles;
 	}
-	
-	handleCrearTareaGestor() {
-		if (!this.template.querySelector('.comentariosTarea').value || !this.template.querySelector('.fechaActividad').value) {
-			this.toast('warning', 'Campos vacíos', 'Por favor, informe todos los campos del formulario');
-		} else if (this.cambioGestor && !this.gestorSeleccionado) {
+
+	async handleCrearTareaGestor() {
+		let ok = true;
+		const comentariosTarea = this.template.querySelector('.comentariosTarea');
+		if (!comentariosTarea.value) {
+			comentariosTarea.reportValidity();
+			ok = false;
+		}
+
+		const fechaActividad = this.template.querySelector('.fechaActividad');
+		if (!fechaActividad.value) {
+			fechaActividad.reportValidity();
+			ok = false;
+		}
+
+		if (this.cambioGestor && !this.gestorSeleccionado) {
 			this.toast('warning', 'Campos vacíos', 'Por favor, seleccione un gestor');
+			ok = false;
 		} else if (this.cambioOficina && !this.lookupOficinaResultadoSeleccionado) {
 			this.toast('warning', 'Campos vacíos', 'Por favor, seleccione una oficina');
-		} else {
+			ok = false;
+		}
+
+		if (ok) {
 			this.showSpinner = true;
 			crearTarea({
 				recordId: this.recordId,
@@ -1270,17 +1419,13 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 				otpDerivar: this.otpDerivar
 			}).then(resultado => {
 				if (resultado.existeTareaCitaCreada) {
-					this.showSpinner = false;
 					this.mostrarModalCreacionTarea = false;
 					this.handleModalToast(resultado.textoTareaCitaCreada);
-					
 				} else {
 					if (resultado.contactoSinAccount) {
-						this.showSpinner = false;
 						this.handleModalToast(resultado.contactoSinAccount);
 					} else {
 						if (!resultado.cuenta || !resultado.cuenta.Id) {
-							this.showSpinner = false;
 							this.handleModalToast(resultado.mensaje);
 						} else {
 							this.mostrarToastOficinaResultado(resultado.mensaje, resultado.cuenta.Id);
@@ -1289,38 +1434,35 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 							this.toast('warning', 'Gestor no encontrado', resultado.mensajeGestorNoEncontrado);
 							this.enviarTareaOficinaCliente = true;
 							this.crearTareaCitaGestor = false;
-						} 
-						console.log('oficina:' + this.cambioOficina);
-						console.log('CBP ambito:' + this.ambitoCBP);
+						}
+
 						if (this.ambitoCBP /*&& this.cambioOficina*/) {
-							
 							this.handleRespuestaClienteCBP();
 						}
 					}
-					
 				}
 
 			}).catch(error => {
 				console.error(error);
 				this.handleModalToast(error.body.message);
-				
-			});
+
+			}).finally(() => this.showSpinner = false);
 		}
 	}
-	
+
 	mostrarToastOficinaResultado(mensajeToast, idCuenta) {
-		getUrlNumeroOficinaApex({ recordId: idCuenta })
+		getUrlNumeroOficinaApex({recordId: idCuenta})
 			.then(resultado => {
 				if (resultado.url) {
 					this.urlOficina = resultado.url;
-          			this.numeroOficina = resultado.numeroOficina;
+					this.numeroOficina = resultado.numeroOficina;
 					this.mostrarModalToast = false;
 					this.showSpinner = false;
 
 					this.handleModalToastUrl(mensajeToast);
 				}
 			});
-		
+
 
 		/*
 		getUrlNumeroOficinaApex({recordId: idCuenta})
@@ -1332,25 +1474,25 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			}
 		});*/
 	}
-	
+
 	toast(variant, title, message, messageData) {
-		
-			this.dispatchEvent(new ShowToastEvent({
-				variant,
-				title,
-				message,
-				mode: messageData ? 'sticky' : 'dismissable',
-				duration: messageData ? null : 9000,
-				messageData
-			}));
-		
+
+		this.dispatchEvent(new ShowToastEvent({
+			variant,
+			title,
+			message,
+			mode: messageData ? 'sticky' : 'dismissable',
+			duration: messageData ? null : 9000,
+			messageData
+		}));
+
 	}
 
-	
+
 	async llamadaIntegracionClienteDigital() {
 		this.cargandoGestor = true;
 		try {
-			const resultado = await esClienteDigital({ recordId: this.recordId, tipoActividad: '' });
+			const resultado = await esClienteDigital({recordId: this.recordId, tipoActividad: ''});
 			if (resultado.resultado === 'OK') {
 				this.esClienteDigital = resultado.clienteDigital;
 				if (this.esClienteDigital) {
@@ -1365,7 +1507,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 						this.ocultarOpcionCitaGestor = true;
 						this.tipoCita = 43;
 					}
-				} else {					
+				} else {
 					if (resultado.gestorClienteName === this.gestorGenericoName) {
 						this.nombreGestor = resultado.gestorClienteName;
 						this.gestorGenerico = true;
@@ -1377,7 +1519,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 					this.nombreGestorAsignado = resultado.nombreGestorAsignado;
 				}
 				if (this.numeroGestor != null && this.numeroGestor != undefined) {
-				this.gestorBackup();
+					this.gestorBackup();
 				}
 			} else if (resultado.resultado === 'KO') {
 				this.numeroGestor = 'KO';
@@ -1392,25 +1534,27 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		}
 
 	}
-	
+
+	/*
 	modalTeclaPulsada(event) {
 		if (event.keyCode === 27) { //ESC
 			this.cerrarModal();
 		}
 	}
-	
+	*/
+
 	handleAbrirModalCita() {
 		this.mostrarModalCita = true;
 		this.mostrarModalGestionGestorAsignado = false;
 	}
-	
+
 	handleGestionGestorDistintoSi() {
 		if (this.citaRapida) {
 			if (this.numOficina === 'carteraVacia') {
 				this.mostrarModalCita = false;
 				//this.toast('error', 'Cartera no encontrada','No se encuentra la cartera asignada al cliente');
 				this.handleModalToast('No se encuentra la cartera asignada al cliente');
-				
+
 			} else {
 				this.mostrarModalCita = true;
 			}
@@ -1421,7 +1565,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		}
 		this.mostrarModalGestionGestorGenerico = false;
 	}
-	
+
 	handleGestionGestorDistintoNo() {
 		this.mostrarModalCreacionTarea = true;
 		this.mostrarModalGestionGestorGenerico = false;
@@ -1429,13 +1573,13 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.cambioOficina = true;
 		this.mostrarBuscadorOficina = true;
 	}
-	
+
 	handleGestionGestorAsignadoNo() {
 		this.mostrarModalCreacionTarea = true;
 		this.mostrarModalGestionGestorAsignado = false;
 		this.mostrarBuscadorGestor = true;
 	}
-	
+
 	resetDisponibilidadConsultada(event) {
 		this.disponibilidadConsultada = false;
 		this.ocultarBotonCita = true;
@@ -1446,20 +1590,19 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	//Backup gestores -> Llamado desde cliente digital
 	gestorBackup() {
 		//Recoge los gestores backup disponibles, en el caso de que los haya, rellena la variable gestoresBackup y activa el boton
-		obtenerGestoresBackup({ recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.numeroGestor, eventType: this.tipoCita })
+		obtenerGestoresBackup({recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.numeroGestor, eventType: this.tipoCita})
 			.then(resultado => {
 				this.gestoresBackup = resultado;
 				if (this.gestoresBackup !== null && this.gestoresBackup !== undefined && this.gestoresBackup.length !== 0) {
 					this.existeBackup = true;
 					this.botonBackupDesactivado = false;
 				}
-			})
-			.catch(error => {
-				this.botonBackupDesactivado = true;
+			}).catch(error => {
 				console.error(error);
+				this.botonBackupDesactivado = true;
 			});
 	}
-	
+
 	//Backup gestores -> Llamado desde el checkbox de 'Otros gestores'
 	mostrarGestorBackup(event) {
 		this.gestorBackupActivo = event.target.checked;
@@ -1504,26 +1647,26 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.botonConsultarDisponibilidadDesactivado = this.gestorSeleccionado !== null && this.gestorSeleccionado !== undefined ? false : true;
 		this.disponibilidadConsultada = false;
 	}
-	
+
 	//Backup gestores -> Carga las fechas de disponibilidad del gestor seleccionado, se realiza al pulsar el boton consultar disponibilidad
 	consultarFechasDisponibilidadBackup(event) {
 		if (this.gestorSeleccionado !== undefined && this.gestorSeleccionado !== null) {
 			//Busca las fechas del gestor que se ha seleccionado, referenciando al caso y el tipo de cita que se ha seleccionado
-			obtenerFechasDisponiblidadGestor({ recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.gestorSeleccionado, eventType: this.tipoCita })
-			.then(resultado => {
-				//Oculta el boton de consultar disponibilidad y asigna las fechas, en caso de no encontrar fechas, se muestra un mensaje
-				this.disponibilidadConsultada = true;
-				this.ocultarBotonCita = false;
-				this.fechasDisponibilidad = resultado;
+			obtenerFechasDisponiblidadGestor({recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.gestorSeleccionado, eventType: this.tipoCita})
+				.then(resultado => {
+					//Oculta el boton de consultar disponibilidad y asigna las fechas, en caso de no encontrar fechas, se muestra un mensaje
+					this.disponibilidadConsultada = true;
+					this.ocultarBotonCita = false;
+					this.fechasDisponibilidad = resultado;
 					if (this.fechasDisponibilidad === null || this.fechasDisponibilidad.length === 0 || this.fechasDisponibilidad === undefined) {
-					this.sinFechasDisponibles = true;
-					this.ocultarBotonCita = true;
-				}
-			})
-			.catch(error => {
-				console.error(error);
-				this.handleModalToast(error.body.message);
-			});
+						this.sinFechasDisponibles = true;
+						this.ocultarBotonCita = true;
+					}
+				})
+				.catch(error => {
+					console.error(error);
+					this.handleModalToast(error.body.message);
+				});
 		}
 	}
 
@@ -1531,22 +1674,22 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	consultarHorasDisponibilidadBackup(event) {
 		let fechasDisponibilidad = this.template.querySelector('.fechasDisponibilidad').value;
 		this.fechaSeleccionada = this.template.querySelector('.fechasDisponibilidad').value;
-		obtenerHorasDisponiblidadGestor({ recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.gestorSeleccionado, eventType: this.tipoCita, fechaElegida: fechasDisponibilidad })
-		.then(resultado => {
-			//Establece las horas de disponibilidad
-			this.horasDisponibilidad = resultado;
-		})
-		.catch(error => {
-			console.error(error);
-			this.handleModalToast(error.body.message);
-		});	
-		
+		obtenerHorasDisponiblidadGestor({recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.gestorSeleccionado, eventType: this.tipoCita, fechaElegida: fechasDisponibilidad})
+			.then(resultado => {
+				//Establece las horas de disponibilidad
+				this.horasDisponibilidad = resultado;
+			})
+			.catch(error => {
+				console.error(error);
+				this.handleModalToast(error.body.message);
+			});
+
 	}
 	//Backup gestores
 	setHorasDisponibilidadGestorBackup(event) {
 		this.horaCitaSelecionada = event.target.value;
 	}
-	
+
 	consultarFechasDisponibilidadGestor() {
 		var codigoEvento;
 		if (this.tipoCita == 'Cita telefónica') {
@@ -1554,23 +1697,23 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		} else {
 			codigoEvento = '42';
 		}
-		obtenerFechasDisponiblidadGestor({ recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.numeroGestor, eventType: codigoEvento })
-		.then(resultado => {
-			this.disponibilidadConsultada = true;
-			this.ocultarBotonCita = false;
-			this.fechasDisponibilidad = resultado;
+		obtenerFechasDisponiblidadGestor({recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.numeroGestor, eventType: codigoEvento})
+			.then(resultado => {
+				this.disponibilidadConsultada = true;
+				this.ocultarBotonCita = false;
+				this.fechasDisponibilidad = resultado;
 				if (this.fechasDisponibilidad === null || this.fechasDisponibilidad.length === 0 || this.fechasDisponibilidad === undefined) {
-				this.sinFechasDisponibles = true;
-				this.ocultarBotonCita = true;
-			}
-		})
-		.catch(error => {
-			console.error(error);
-			this.handleModalToast(error.body.message);
-			
-		});
+					this.sinFechasDisponibles = true;
+					this.ocultarBotonCita = true;
+				}
+			})
+			.catch(error => {
+				console.error(error);
+				this.handleModalToast(error.body.message);
+
+			});
 	}
-	
+
 	consultarHorasDisponibilidadGestor() {
 		var codigoEvento;
 		if (this.tipoCita == 'Cita telefónica') {
@@ -1579,23 +1722,23 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			codigoEvento = '42';
 		}
 		let fechasDisponibilidad = this.template.querySelector('.fechasDisponibilidad').value;
-		obtenerHorasDisponiblidadGestor({ recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.numeroGestor, eventType: codigoEvento, fechaElegida: fechasDisponibilidad })
-		.then(resultado => {
-			this.horasDisponibilidad = resultado;
-		})
-		.catch(error => {
-			console.error(error);
-			this.handleModalToast(error.body.message);
-			
-		});
+		obtenerHorasDisponiblidadGestor({recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.numeroGestor, eventType: codigoEvento, fechaElegida: fechasDisponibilidad})
+			.then(resultado => {
+				this.horasDisponibilidad = resultado;
+			})
+			.catch(error => {
+				console.error(error);
+				this.handleModalToast(error.body.message);
+
+			});
 		this.gestorElegido = this.numeroGestor;
 		this.nombreGestorElegido = this.nombreGestor;
 	}
-	
+
 	guardarHorasDisponibilidad(event) {
 		this.horaCitaSelecionada = event.detail.value;
 	}
-	
+
 	lookupDeseleccionar() {
 		if (this.comentariosTarea) {
 			const comentariosTareaReplace = this.comentariosTarea.replace(this.lookupOficinaResultadoSeleccionado.Name + '.', '[oficina destino]');
@@ -1608,7 +1751,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			}
 		}
 		this.lookupOficinaResultadoSeleccionado = null;
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 		window.setTimeout(() => {
 			this.lookupOficinaAbrir();
 			this.template.querySelector('.lookupOficinaInput').focus();
@@ -1631,7 +1774,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	lookupDeseleccionarEmpleadoAmenazado() {
 		this.empleadoAmenazadoSeleccionado = null;
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 		window.setTimeout(() => {
 			this.lookupEmpleadoAbrir();
 			this.template.querySelector('.lookupEmpleadoInput').focus();
@@ -1648,7 +1791,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	}
 
 	lookupEmpleadoCerrar() {
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 		window.setTimeout(() => {
 			const lookupEmpleado = this.template.querySelector('.lookupEmpleado');
 			if (lookupEmpleado) {
@@ -1661,7 +1804,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.lookupEmpleadoInputValue = event.detail.value;
 		window.clearTimeout(this.lookupOficinaTimeout);
 		if (this.lookupEmpleadoInputValue.length > 2) {
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 			this.lookupOficinaTimeout = window.setTimeout(() => this.buscarEmpleados(this.lookupEmpleadoInputValue), 500);
 		} else {
 			event.target.isLoading = false;
@@ -1676,7 +1819,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.lookupOficinaInputValue = event.detail.value;
 		window.clearTimeout(this.lookupOficinaTimeout);
 		if (this.lookupOficinaInputValue.length > 2) {
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 			this.lookupOficinaTimeout = window.setTimeout(() => this.buscarOficinas(this.lookupOficinaInputValue), 500);
 		} else {
 			event.target.isLoading = false;
@@ -1684,7 +1827,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.lookupOficinaResultados = [];
 		}
 	}
-	
+
 	lookupOficinaAbrir() {
 		const lookupOficinaInput = this.template.querySelector('.lookupOficinaInput');
 		lookupOficinaInput.setCustomValidity('');
@@ -1693,15 +1836,26 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.template.querySelector('.lookupOficina').classList.add('slds-is-open');
 		}
 	}
-	
+
 	lookupOficinaCerrar() {
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 		window.setTimeout(() => {
 			const lookupOficina = this.template.querySelector('.lookupOficina');
 			if (lookupOficina) {
 				lookupOficina.classList.remove('slds-is-open');
 			}
 		}, 150);
+	}
+
+	lookupOficinaKey(event) {
+		if (event.key === 'Escape') {
+			if (typeof event.stopImmediatePropagation === 'function') {
+				event.stopImmediatePropagation();
+			}
+			event.stopPropagation();
+			event.preventDefault();
+			this.template.querySelector('.lookupOficina')?.classList.remove('slds-is-open');
+		}
 	}
 
 	nombreGestorSeleccionado(event) {
@@ -1716,7 +1870,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.comentariosTarea = this.comentariosTarea.replace(gestorAnterior.label, this.gestorSeleccionado.label);
 		}
 	}
-	
+
 	lookupOficinaSeleccionar(event) {
 		const oficina = this.lookupOficinaResultados.find(c => c.Id === event.currentTarget.dataset.id);
 		this.lookupOficinaResultadoSeleccionado = oficina;
@@ -1734,21 +1888,21 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		const emp = this.lookupEmpleadoResultados.find(c => c.Id === event.currentTarget.dataset.id);
 		this.empleadoAmenazadoSeleccionado = emp;
 	}
-	
-	lookupGestorDeseleccionar() {		
+
+	lookupGestorDeseleccionar() {
 		this.lookupGestorResultadoSeleccionado = null;
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 		window.setTimeout(() => {
 			this.lookupGestorAbrir();
 			this.template.querySelector('.lookupGestorInput').focus();
 		}, 200);
 	}
-	
+
 	lookupGestorOnchange(event) {
 		this.lookupGestorInputValue = event.detail.value;
 		window.clearTimeout(this.lookupGestorTimeout);
 		if (this.lookupGestorInputValue.length > 2) {
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 			this.lookupGestorTimeout = window.setTimeout(() => this.buscarGestoresGlobal(this.lookupGestorInputValue), 500);
 		} else {
 			event.target.isLoading = false;
@@ -1756,7 +1910,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.lookupGestorResultados = [];
 		}
 	}
-	
+
 	lookupGestorAbrir() {
 		const lookupGestorInput = this.template.querySelector('.lookupGestorInput');
 		lookupGestorInput.setCustomValidity('');
@@ -1765,9 +1919,9 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.template.querySelector('.lookupGestor').classList.add('slds-is-open');
 		}
 	}
-	
+
 	lookupGestorCerrar() {
-		//eslint-disable-next-line @lwc/lwc/no-async-operation
+
 		window.setTimeout(() => {
 			const lookupGestor = this.template.querySelector('.lookupGestor');
 			if (lookupGestor) {
@@ -1775,80 +1929,80 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			}
 		}, 150);
 	}
-	
+
 	lookupGestorSeleccionar(event) {
 		const gestor = this.lookupGestorResultados.find(c => c.Id === event.currentTarget.dataset.id);
 		this.lookupGestorResultadoSeleccionado = gestor;
 	}
-	
+
 	buscarOficinas(cadenaBusqueda) {
 		let lookupOficinaInput = this.template.querySelector('.lookupOficinaInput');
 		lookupOficinaInput.isLoading = true;
-		buscarOficinas({ cadenaBusqueda: cadenaBusqueda })
-		.then(oficinas => {
-			if (cadenaBusqueda === this.lookupOficinaInputValue) {
-				//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
-				this.lookupOficinaResultados = oficinas;
-				this.template.querySelector('.lookupOficina').classList.add('slds-is-open');
-			}
-		})
-		.catch(error => {
-			console.error(error);
-			this.handleModalToast(error.body.message);
-			
-		})
-		.finally(() => lookupOficinaInput.isLoading = false);
+		buscarOficinas({cadenaBusqueda: cadenaBusqueda})
+			.then(oficinas => {
+				if (cadenaBusqueda === this.lookupOficinaInputValue) {
+					//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
+					this.lookupOficinaResultados = oficinas;
+					this.template.querySelector('.lookupOficina').classList.add('slds-is-open');
+				}
+			})
+			.catch(error => {
+				console.error(error);
+				this.handleModalToast(error.body.message);
+
+			})
+			.finally(() => lookupOficinaInput.isLoading = false);
 	}
-	
+
 	buscarEmpleados(cadenaBusqueda) {
 		let lookupEmpleadoInput = this.template.querySelector('.lookupEmpleadoInput');
 		lookupEmpleadoInput.isLoading = true;
-		buscarEmpleados({ cadenaBusqueda: cadenaBusqueda })
-		.then(empleados => {
-			if (cadenaBusqueda === this.lookupEmpleadoInputValue) {
-				//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
-				this.lookupEmpleadoResultados = empleados;
-				this.template.querySelector('.lookupEmpleado').classList.add('slds-is-open');
-			}
-		})
-		.catch(error => {
-			console.error(error);
-			this.handleModalToast(error.body.message);
-		})
-		.finally(() => lookupEmpleadoInput.isLoading = false);
+		buscarEmpleados({cadenaBusqueda: cadenaBusqueda})
+			.then(empleados => {
+				if (cadenaBusqueda === this.lookupEmpleadoInputValue) {
+					//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
+					this.lookupEmpleadoResultados = empleados;
+					this.template.querySelector('.lookupEmpleado').classList.add('slds-is-open');
+				}
+			})
+			.catch(error => {
+				console.error(error);
+				this.handleModalToast(error.body.message);
+			})
+			.finally(() => lookupEmpleadoInput.isLoading = false);
 	}
-	
+
 	buscarGestoresGlobal(cadenaBusqueda) {
 		let lookupGestorInput = this.template.querySelector('.lookupGestorInput');
 		lookupGestorInput.isLoading = true;
-		buscarGestoresGlobal({ cadenaBusqueda: cadenaBusqueda })
-		.then(gestores => {
-			if (cadenaBusqueda === this.lookupGestorInputValue) {
-				//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
-				this.lookupGestorResultados = gestores;
-				this.template.querySelector('.lookupGestor').classList.add('slds-is-open');
-			}
-		})
-		.catch(error => {
-			console.error(error);
-			this.handleModalToast(error.body.message);
-			
-			
-		})
-		.finally(() => lookupGestorInput.isLoading = false);
+		buscarGestoresGlobal({cadenaBusqueda: cadenaBusqueda})
+			.then(gestores => {
+				if (cadenaBusqueda === this.lookupGestorInputValue) {
+					//No se ha modificado la cadena de búsqueda durante la ejecución del Apex
+					this.lookupGestorResultados = gestores;
+					this.template.querySelector('.lookupGestor').classList.add('slds-is-open');
+				}
+			})
+			.catch(error => {
+				console.error(error);
+				this.handleModalToast(error.body.message);
+
+
+			})
+			.finally(() => lookupGestorInput.isLoading = false);
 	}
-	
+
 	//Backup gestores -> Botón Agendar cita gestor
 	confirmarCitaGestor() {
-		if (!this.template.querySelector('.asuntoEvento').value || 
-			(!this.citaRapida && !this.template.querySelector('.fechasDisponibilidad').value) || 
-			(!this.citaRapida && !this.horaCitaSelecionada) || 
-			(this.citaRapida && !this.fechaSeleccionada) || 
-			(this.citaRapida && !this.franjaSeleccionada) || 
+		if (!this.template.querySelector('.asuntoEvento').value ||
+			(!this.citaRapida && !this.template.querySelector('.fechasDisponibilidad').value) ||
+			(!this.citaRapida && !this.horaCitaSelecionada) ||
+			(this.citaRapida && !this.fechaSeleccionada) ||
+			(this.citaRapida && !this.franjaSeleccionada) ||
 			this.tipoCita === undefined
 		) {
 			this.toast('warning', 'Campos vacíos', 'Por favor, informe todos los campos del formulario y seleccione una opción de Tipo de Cita.');
-			
+
 		} else {
 			if (this.esClienteDigital) {
 				this.tipoCita = 43;
@@ -1867,72 +2021,72 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 					horaIni: this.horaCitaSelecionada,
 					medio: this.tipoCita
 				})
-				.then(resultado => {
-					if (!(resultado.existeTareaCitaCreada === 'true')) {
-					if (resultado.resultat === 'OK') {
+					.then(resultado => {
+						if (!(resultado.existeTareaCitaCreada === 'true')) {
+							if (resultado.resultat === 'OK') {
 								if (this.tipoCita == '43') {
-							//this.toast('success', 'Cita creada con éxito', resultado.mensaje);
-							this.handleModalToast(resultado.mensaje);
+									//this.toast('success', 'Cita creada con éxito', resultado.mensaje);
+									this.handleModalToast(resultado.mensaje);
+								} else {
+									this.handleModalToast(resultado.mensaje);
+									//this.mostrarToastOficinaResultado(resultado.mensaje, resultado.cuenta); PRUEBA MODAL MBO
+								}
+								//this.cerrarModal();
+							} else {
+								//this.toast('error', 'No es posible crear la cita', resultado.txtError);
+								this.handleModalToast(resultado.txtError);
+								//this.cerrarModal();
+							}
 						} else {
-							this.handleModalToast(resultado.mensaje);
-							//this.mostrarToastOficinaResultado(resultado.mensaje, resultado.cuenta); PRUEBA MODAL MBO
+							//this.toast('warning', 'No es posible crear la tarea', resultado.textoTareaCitaCreada);
+							this.handleModalToast(resultado.textoTareaCitaCreada);
+							//this.cerrarModal();
 						}
-						//this.cerrarModal();
-					} else {
-						//this.toast('error', 'No es posible crear la cita', resultado.txtError);
-						this.handleModalToast(resultado.txtError);
-						//this.cerrarModal();
-						}
-					} else {
-						//this.toast('warning', 'No es posible crear la tarea', resultado.textoTareaCitaCreada);
-						this.handleModalToast(resultado.textoTareaCitaCreada);
-						//this.cerrarModal();		
-					}
-				})
-				.catch(error => {
-					console.error(error);
-					this.handleModalToast(error.body.message);
-				});
+					})
+					.catch(error => {
+						console.error(error);
+						this.handleModalToast(error.body.message);
+					});
 			} else {
 				altaCitaRapida({
 					numOficina: this.numOficina,
-					numPer: this.numperso, 
-					fechaSeleccionada: this.fechaSeleccionada, 
+					numPer: this.numperso,
+					fechaSeleccionada: this.fechaSeleccionada,
 					franjaSeleccionada: this.franjaSeleccionada,
 					asunto: this.template.querySelector('.asuntoEvento').value,
 					recordId: this.recordId,
 					tipoCita: this.tipoCita
 				})
-				.then(retorno => {
-					if (!(retorno.existeTareaCitaCreada)) {
+					.then(retorno => {
+						if (!(retorno.existeTareaCitaCreada)) {
 							if (retorno.resultado == 'OK') {
 								if (this.tipoCita == '43') {
-								this.handleModalToast(retorno.mensaje);
-								this.cargandoGestor = false;	
+									this.handleModalToast(retorno.mensaje);
+									this.cargandoGestor = false;
+								} else {
+									this.handleModalToast(retorno.mensaje);
+								}
 							} else {
-								this.handleModalToast(retorno.mensaje);
-							}
-						} else {
-							console.error('Error mensaje ' + retorno.resultadoMensaje);
-							this.handleModalToast(retorno.resultadoMensaje);
-							this.cargandoGestor = false;
+								console.error('Error mensaje ' + retorno.resultadoMensaje);
+								this.handleModalToast(retorno.resultadoMensaje);
+								this.cargandoGestor = false;
 							}
 						} else {
 							this.handleModalToast(retorno.textoTareaCitaCreada);
 						}
-				})
-				.catch(error => {
-					console.error('Error al crear la cita:', error);
-					this.handleModalToast(error.body.message);
-				})
-				.finally(() => {
-					this.cargandoGestor = false;
-				})
+					})
+					.catch(error => {
+						console.error('Error al crear la cita:', error);
+						this.handleModalToast(error.body.message);
+					})
+					.finally(() => {
+						this.cargandoGestor = false;
+					})
 				;
 			}
 		}
 	}
-		
+
 	checkCrearTareaOnchange() {
 		var checkBoxMostrarTarea = this.template.querySelector('.checkBoxCitaGestor').checked;
 		if (checkBoxMostrarTarea) {
@@ -1941,7 +2095,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.mostrarTareaModalCitaGestor = false;
 		}
 	}
-	
+
 	get inputVariables() {
 		return [
 			{
@@ -1951,7 +2105,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			}
 		];
 	}
-	
+
 	handleGrupoColaboradorDerivar() {
 		this.mostrarFlowDerivar = this.flowDerivar;
 		this.grupoColaborador = false;
@@ -1971,13 +2125,13 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		if (this.toastCajerosIncidencias) {
 			//this.toast('error', this.tituloCajerosIncidencias, this.toastCajerosIncidencias);
 			this.handleModalToast(this.toastCajerosIncidencias);
-			
-			
+
+
 		}
 		if (this.toastNoClienteError) {
 			//this.toast('error', 'Error en los datos', this.toastNoClienteError);
 			this.handleModalToast(this.toastNoClienteError);
-			
+
 		}
 		if (this.trasladarDocumentacion) {
 			this.trasladarDocumentacion = false;
@@ -2001,12 +2155,12 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		if (this.toastCajerosIncidencias) {
 			//this.toast('error', this.tituloCajerosIncidencias, this.toastCajerosIncidencias);
 			this.handleModalToast(this.toastCajerosIncidencias);
-			
+
 		}
 		if (this.toastNoClienteError) {
 			//this.toast('error', 'Error en los datos', this.toastNoClienteError);
 			this.handleModalToast(this.toastNoClienteError);
-			
+
 		}
 		if (this.preguntaRealizarRemitido || this.textoDocumentacionCertificado || this.preguntaInformacionCompletaDocumentacion) {
 			if (!this.toastCajerosIncidencias) {
@@ -2014,15 +2168,15 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			}
 		}
 	}
-	
+
 	handleGrupoColaboradorTrasladar() {
 		this.recuperarCampoDerivar();
 		//if(!this.derivarB) {
 		if (!this.derivarB) {
-			
+
 			//this.toast('alert', 'Alerta', this.toastTrasladarDesdeDerivar);
 			this.handleModalToast(this.toastTrasladarDesdeDerivar);
-			
+
 		} else {
 			let datosAdicionales = '';
 			let origen = 'operativaDerivar';
@@ -2030,7 +2184,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.cerrarModal();
 			this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
 			//window.setTimeout(() =>	this.dispatchEvent(new CustomEvent('realizartrasladocolaborador', {detail: {data: null}})), 400);
-			
+
 		}
 	}
 
@@ -2039,28 +2193,28 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.dni = this.template.querySelector('.DNITestamentaria').value;
 			if (!this.template.querySelector('.DNITestamentaria').value) {
 				this.toast('warning', 'Campos vacíos', 'Por favor, informe un documento');
-				
+
 			} else {
 				this.showSpinner = true;
 				dniTestamentaria({
 					dni: this.dni,
 					recordId: this.recordId
 				})
-				.then(retorno => {
-					this.handleRemitir();
-				})
-				.catch(error => {
-					console.error(error);
-					this.toast('error', 'Problema estableciendo dni', error.body.message);
-					
-					return false;
-				}).finally(() => {
-					this.showSpinner = false;
-				});
+					.then(retorno => {
+						this.handleRemitir();
+					})
+					.catch(error => {
+						console.error(error);
+						this.toast('error', 'Problema estableciendo dni', error.body.message);
+
+						return false;
+					}).finally(() => {
+						this.showSpinner = false;
+					});
 			}
 		}
 	}
-	
+
 	handleRemitir() {
 		//if(!this.derivar) {
 		if (!this.derivarB) {
@@ -2095,7 +2249,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	handleMotivoAmenazaSuicidiosInputChange(event) {
 		this.motivoAmenazaSuicidiosInputValue = event.target.value;
 	}
-	
+
 	parametrizacionDatos() {
 		this.isRemitirAmenazasDisabled = true;
 		this.grupoCol = this.grupoColEmpleadosAmenazas;
@@ -2104,7 +2258,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			['[Empleado amenazado]', this.empleadoAmenazadoSeleccionado.Name],
 			['[Motivo amenaza]', this.template.querySelector('.motivoAmenazaInputValue').value],
 			['[Detalles amenaza]', this.template.querySelector('.detalllesAmenazaInputValue').value]
-		  ]);
+		]);
 		this.nombrePlantilla = this.nombrePlantillaAmenazasEmpleados;
 		this.handleRemitirAutoAmenazas();
 	}
@@ -2115,23 +2269,22 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.parametrizacionesMensaje = Object.fromEntries([
 			['[Motivo amenaza]', this.template.querySelector('.motivoAmenazaSuicidiosInputValue').value],
 			['[Direccion amenaza]', this.direccionAmenazasSuicidiosInputValue]
-		  ]);
+		]);
 		this.handleRemitirAutoAmenazas();
 	}
 
 	handleRemitirAutoAmenazas() {
 		this.showSpinner = true;
-		emailsAutoEmailAmenazas(
-			{
-				recordId: this.recordId,
-				tipo: this.tipoAmenaza,
-				grupoCol: this.grupoCol,
-				nombrePlantilla: this.nombrePlantilla,
-				parametrizacionesMensaje: this.parametrizacionesMensaje,
-				ambito: this.ambitoMotivo,
-				nameOWA: this.nameOWA
-			}
-		).then(_retorno => {
+		emailsAutoEmailAmenazas({
+			recordId: this.recordId,
+			tipo: this.tipoAmenaza,
+			grupoCol: this.grupoCol,
+			nombrePlantilla: this.nombrePlantilla,
+			parametrizacionesMensaje: this.parametrizacionesMensaje,
+			ambito: this.ambitoMotivo,
+			nameOWA: this.nameOWA
+		}).then(_retorno => {
+			this.showSpinner = false;
 			this.handleModalToast(this.emailSuccess);
 		}).catch(error => {
 			console.error(JSON.stringify(error, null, 2));
@@ -2153,10 +2306,10 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	}
 
 	handleMostrarMensajeRemitir() {
-		
+
 		//this.toast('warning', 'Atención', this.toastRemitir); prueba
 		this.mostrarPhisingSmishingMalware5 = true;
-    	this.mostrarPhisingSmishingMalware4 = true;
+		this.mostrarPhisingSmishingMalware4 = true;
 		this.mostrarPregunta = false;
 		this.PhisingSmishingMalware1 = '';
 		this.mostrarModalPreguntaRealizarRemitido = false;
@@ -2182,26 +2335,19 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	preguntaCajerosSi() {
 		this.preguntaCajeros = '';
 	}
-	
+
 	preguntaCajerosNo() {
-		
-		crearActividadCajeros({ recordId: this.recordId });
-		this.preguntaCajeros = null; 
-		this.preguntaCajerosExternos = null; 
+		crearActividadCajeros({recordId: this.recordId});
+		this.preguntaCajeros = null;
+		this.preguntaCajerosExternos = null;
 		this.handleModalToast(this.toastCajerosExternos);
-		
-		
-		
-		
 	}
 
-
-	
 	preguntaCajerosExternosSi() {
 		this.cerrarModal();
-		crearActividadCajeros({ recordId: this.recordId });
+		crearActividadCajeros({recordId: this.recordId});
 	}
-	
+
 	preguntaCajerosExternosNo() {
 		this[NavigationMixin.GenerateUrl]({
 			type: 'standard__webPage',
@@ -2209,21 +2355,35 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 				url: ''
 			}
 		}).then(url => {
-			window.open(this.urlCajeros, "_blank");
-			crearActividadCajeros({ recordId: this.recordId });
+			window.open(this.urlCajeros, '_blank');
+			crearActividadCajeros({recordId: this.recordId});
 		});
 	}
 
 	handleMostrarPreguntaRealizarRemitido() {
-		if (this.fraudeANivelDeMotivo) {
-			this.mostrarModalPreguntaRealizarRemitido = true;
-			this.preguntaSenal = false;
+		if (this.intentoTranseferenciaLlamadaFraude) { //MBO
+			if (this.fraudeANivelDeMotivo) {
+				this.mostrarModalPreguntaRealizarRemitido = true;
+				//this.preguntaSenal = false;
+				this.preguntaSenalAntigua = false;
+				//this.preguntaTransLlamFra = false;
+				this.handleFraudeRemitir();
+				this.showSpinner = true;
+			} else {
+				this.mostrarModalPreguntaRealizarRemitido = true;
+				this.preguntaSenal = false;
+				this.mostrarPreguntaSenal = false;
+				this.preguntaSenalAntigua = false;
+			}
+		} else { //MBO
+			this.mostrarPreguntaTransLlamFra = true;
+			this.mostrarModalPreguntaRealizarRemitido = false;
+			//this.preguntaSenal = false;
 			this.preguntaSenalAntigua = false;
-		} else {
-			this.mostrarModalPreguntaRealizarRemitido = true;
-			this.preguntaSenal = false;
-			this.preguntaSenalAntigua = false;
+			this.mostrarPreguntaSenal = false;
+
 		}
+
 	}
 
 	/*handleMostrarEnrollmentDatos(){
@@ -2254,28 +2414,28 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.cerrarModal();
 		this.toast('success','Pendiente', this.toastEnrollmentDatosNo);
 	}*/
-	
+
 	realizarTraslado3N() {
 		this.showSpinner = true;
-		realizarTraslado3N({ recordId: this.recordId })
-		.then(resultado => {
-			this.showSpinner = false;
-			this.handleModalToast(this.toastTrasladar3N);
-		})
-		.catch(error => {
-			console.error(error);
-			this.handleModalToast(error.body.message);
-		}).finally(() => {
-			this.showSpinner = false;
-			
-				this.dispatchEvent(new CustomEvent('refrescartab', { detail: {} }));
-		});
+		realizarTraslado3N({recordId: this.recordId})
+			.then(resultado => {
+				this.showSpinner = false;
+				this.handleModalToast(this.toastTrasladar3N);
+			})
+			.catch(error => {
+				console.error(error);
+				this.handleModalToast(error.body.message);
+			}).finally(() => {
+				this.showSpinner = false;
+
+				this.dispatchEvent(new CustomEvent('refrescartab', {detail: {}}));
+			});
 	}
 
 	crearOportunidadModal() {
-		if (this.ambitoMotivo == 'CSBD No Contratar' || this.CSBDConfidencial || this.ambitoMotivo == 'Documentación') {
+		if (this.ambitoMotivo === 'CSBD No Contratar' || this.CSBDConfidencial || this.ambitoMotivo === 'Documentación') {
 			this.mostrarModalCSBDNoContratar = true;
-			if (this.ambitoMotivo == 'Documentación') {
+			if (this.ambitoMotivo === 'Documentación') {
 				this.ambitoCSBD = true;
 			}
 		} else {
@@ -2284,73 +2444,35 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	}
 
 	crearOportunidadApex() {
-		this.showSpinner = true;	
+		this.showSpinner = true;
 		let oportunidadSuccess = false;
 		let toast;
-		crearOportunidadCSBDApex({ recordId: this.recordId })
-		.then(resultado => {		
-				if (resultado.oppCreada !== null && resultado.oppCreada !== undefined && resultado.oppCreada) {
-				oportunidadSuccess = true;
-					if (this.toastCSBDNoContratar) {
-					toast = this.toastCSBDNoContratar;
-				} else {
-					toast = this.toastCrearOportunidad;
-				}
-				//this.toast('success', 'Oportunidad creada con éxito', toast);
-				
-					this.dispatchEvent(new CustomEvent('refrescartab', { detail: { data: { 'oportunidadSuccess': oportunidadSuccess } } }));
-				this.showSpinner = false;
-				this.handleModalToast(toast);
-			} else {
-					if (resultado.tipo == 'En curso') {
-					this.existeOppEnGestion = true;		
-					this.textoRellamadaCSBDEnGestion = resultado.mensaje;
-					this.showSpinner = false;				
-					} else if (resultado.tipo == 'Formalizada') {
-					this.existeOppFormalizada = true;
-					this.textoRellamadaCSBDFormalizada = resultado.mensaje;
-					this.showSpinner = false;
-					} else {
-					//this.toast('error', 'Problema al crear la oportunidad', 'Existe una oportunidad, pero no se identifica si esta Formalizada o en Gestión');
-					this.handleModalToast('Existe una oportunidad, pero no se identifica si esta Formalizada o en Gestión');
-					this.showSpinner = false;	
-				}
-			}
-		})
-		.catch(error => {
-			this.showSpinner = false;
-			console.error(error);
-			this.handleModalToast(error.body.message);
-			
-			});
-	}
-
-
-	crearOportunidad() {
-		if (!this.oportunidadCreada) {
-			this.showSpinner = true;			
-			crearOportunidad({ recordId: this.recordId })
+		crearOportunidadCSBDApex({recordId: this.recordId})
 			.then(resultado => {
-					if (resultado.validacionCrearOportunidad !== null && resultado.validacionCrearOportunidad !== undefined && resultado.validacionCrearOportunidad) {
-					this.showSpinner = false;
-					this.crearOportunidadModal();
-				}
-					else {
-					// let oppExiste = (resultado.oportunidadSiExiste !== null && resultado.oportunidadSiExiste !==  undefined) ? resultado.oportunidadSiExiste : false;
-					let oppTareasCitas = (resultado.oppTareasCitas !== null && resultado.oppTareasCitas !== undefined) ? resultado.oppTareasCitas : false;
-					let tareaRellamada = (resultado.tareasRellamadas !== null && resultado.tareasRellamadas !== undefined) ? resultado.tareasRellamadas : false;
+				if (resultado.oppCreada !== null && resultado.oppCreada !== undefined && resultado.oppCreada) {
+					oportunidadSuccess = true;
+					if (this.toastCSBDNoContratar) {
+						toast = this.toastCSBDNoContratar;
+					} else {
+						toast = this.toastCrearOportunidad;
+					}
+					//this.toast('success', 'Oportunidad creada con éxito', toast);
 
-						if (oppTareasCitas) {
-						this.existeOppTareasCSBD = true;
-						this.textoOppTareasCSBD = resultado.mensajeOppTareas;
+					this.dispatchEvent(new CustomEvent('refrescartab', {detail: {data: {'oportunidadSuccess': oportunidadSuccess}}}));
+					this.showSpinner = false;
+					this.handleModalToast(toast);
+				} else {
+					if (resultado.tipo == 'En curso') {
+						this.existeOppEnGestion = true;
+						this.textoRellamadaCSBDEnGestion = resultado.mensaje;
 						this.showSpinner = false;
-						this.preguntaCSBDContratar = false;
-						this.preguntaCSBDContratar2 = false;
-							this.mostrarModalGestionGestorAsignado = false;
-						this.ambitoCSBD = false;//::
-						} else if (tareaRellamada) {
-						this.existeTareaRellamada = true;
-						this.textoTareaRellamada = resultado.mensajeTareasRellamadas;
+					} else if (resultado.tipo == 'Formalizada') {
+						this.existeOppFormalizada = true;
+						this.textoRellamadaCSBDFormalizada = resultado.mensaje;
+						this.showSpinner = false;
+					} else {
+						//this.toast('error', 'Problema al crear la oportunidad', 'Existe una oportunidad, pero no se identifica si esta Formalizada o en Gestión');
+						this.handleModalToast('Existe una oportunidad, pero no se identifica si esta Formalizada o en Gestión');
 						this.showSpinner = false;
 					}
 				}
@@ -2359,7 +2481,44 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 				this.showSpinner = false;
 				console.error(error);
 				this.handleModalToast(error.body.message);
-				
+
+			});
+	}
+
+
+	crearOportunidad() {
+		if (!this.oportunidadCreada) {
+			this.showSpinner = true;
+			crearOportunidad({recordId: this.recordId})
+				.then(resultado => {
+					if (resultado.validacionCrearOportunidad !== null && resultado.validacionCrearOportunidad !== undefined && resultado.validacionCrearOportunidad) {
+						this.showSpinner = false;
+						this.crearOportunidadModal();
+					} else {
+						// let oppExiste = (resultado.oportunidadSiExiste !== null && resultado.oportunidadSiExiste !==  undefined) ? resultado.oportunidadSiExiste : false;
+						let oppTareasCitas = (resultado.oppTareasCitas !== null && resultado.oppTareasCitas !== undefined) ? resultado.oppTareasCitas : false;
+						let tareaRellamada = (resultado.tareasRellamadas !== null && resultado.tareasRellamadas !== undefined) ? resultado.tareasRellamadas : false;
+
+						if (oppTareasCitas) {
+							this.existeOppTareasCSBD = true;
+							this.textoOppTareasCSBD = resultado.mensajeOppTareas;
+							this.showSpinner = false;
+							this.preguntaCSBDContratar = false;
+							this.preguntaCSBDContratar2 = false;
+							this.mostrarModalGestionGestorAsignado = false;
+							this.ambitoCSBD = false;//::
+						} else if (tareaRellamada) {
+							this.existeTareaRellamada = true;
+							this.textoTareaRellamada = resultado.mensajeTareasRellamadas;
+							this.showSpinner = false;
+						}
+					}
+				})
+				.catch(error => {
+					this.showSpinner = false;
+					console.error(error);
+					this.handleModalToast(error.body.message);
+
 				});/*.finally(() => {
 				this.dispatchEvent(new CustomEvent('refrescartab', {detail: {data: {'oportunidadSuccess': oportunidadSuccess}}}));
 				this.showSpinner = false;
@@ -2377,13 +2536,14 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		// Enlazar ambito nulo
 		this.ambitoCSBD = false;
 		this.modalParametrizableCSBD = null;
+		crearActividadGestionCitasApex({recordId: this.recordId});
 	}
 
 	modalParametrizableCSBDNo() {
-		crearTareaRellamadaCSBDApex({ recordId: this.recordId })
-		.then(resultado => {
-			this.cerrarModal();
-		});
+		crearTareaRellamadaCSBDApex({recordId: this.recordId})
+			.then(resultado => {
+				this.cerrarModal();
+			});
 	}
 
 	actualizarComentario(event) {
@@ -2392,21 +2552,21 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	crearTareaRellamada() {
 		this.procesandoCreacionTarea = true;
-		crearTareaRellamadaApex({ recordId: this.recordId, descriptionTask: this.comentarioTareaRellamada })
+		crearTareaRellamadaApex({recordId: this.recordId, descriptionTask: this.comentarioTareaRellamada})
 		// crearTareaRellamada({recordId: this.recordId, descriptionTask: 'MGT Prueba crearTareaRellamada Descripción'})
 
-		.then(resultado => {
-			this.procesandoCreacionTarea = false;
-			//this.toast('success', 'Información', 'Las tareas han sido creadas con éxito'); 
-			this.handleModalToast('Las tareas han sido creadas con éxito');
-			
-		})
-		.catch(error => {
-			console.error(error);
-			this.procesandoCreacionTarea = false;
-			this.handleModalToast(error.body.message);
-			
-		});
+			.then(resultado => {
+				this.procesandoCreacionTarea = false;
+				//this.toast('success', 'Información', 'Las tareas han sido creadas con éxito');
+				this.handleModalToast('Las tareas han sido creadas con éxito');
+
+			})
+			.catch(error => {
+				console.error(error);
+				this.procesandoCreacionTarea = false;
+				this.handleModalToast(error.body.message);
+
+			});
 	}
 
 	preguntaCSBDContratarSi() {
@@ -2414,7 +2574,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	}
 
 	preguntaCSBDContratarNo() {
-		this.crearOportunidad();			
+		this.crearOportunidad();
 	}
 
 	preguntaCSBDContratar2Si() {
@@ -2438,7 +2598,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 				this.crearOportunidad();
 			} else {
 				this.textoDocumentacionCertificado = null;
-			}		
+			}
 		}
 	}
 
@@ -2452,21 +2612,21 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	preguntaInformacionRequeridaDocumentacionNo() {
 		this.showSpinner = true;
-		crearNuevoCasoDocumentacion({ recordId: this.recordId })
-		.then({
-		})
-		.catch(error => {
-			//this.toast('error', 'Problema al crear el caso', error.body.message);
-			this.showSpinner = false;
-			this.handleModalToast(error.body.message);
-			
-		}).finally(() => {
-			this.showSpinner = false;
-			this.casoCreadoDocumentacion = true;//(puede ser variable booleana de mostrar modal anterior)
-			//this.toast('success', 'Caso creado con éxito', this.toastDocumentacionCasoCreado);
-			this.handleModalToast(this.toastDocumentacionCasoCreado);
-				this.dispatchEvent(new CustomEvent('refrescartab', { detail: {} }));
-		});
+		crearNuevoCasoDocumentacion({recordId: this.recordId})
+			.then({
+			})
+			.catch(error => {
+				//this.toast('error', 'Problema al crear el caso', error.body.message);
+				this.showSpinner = false;
+				this.handleModalToast(error.body.message);
+
+			}).finally(() => {
+				this.showSpinner = false;
+				this.casoCreadoDocumentacion = true;//(puede ser variable booleana de mostrar modal anterior)
+				//this.toast('success', 'Caso creado con éxito', this.toastDocumentacionCasoCreado);
+				this.handleModalToast(this.toastDocumentacionCasoCreado);
+				this.dispatchEvent(new CustomEvent('refrescartab', {detail: {}}));
+			});
 		this.preguntaInformacionRequeridaDocumentacion = null;
 	}
 
@@ -2516,7 +2676,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			}).then(url => {
 				this.urlTF = this.urlTF.replace('{numperso}', '{' + this.numperso + '}');
 				this.urlTF = this.urlTF.replace('{nif}', '{' + this.nif + '}');
-				window.open(this.urlTF, "_blank");
+				window.open(this.urlTF, '_blank');
 			});
 		}
 	}
@@ -2538,72 +2698,72 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	handleFraudeRemitir() {
 		this.pulsadoGenerarCasoFraude = true;
-		crearCasoFraude({ recordId: this.recordId })
-		.then(resultado => {
-			this.pulsadoGenerarCasoFraude = false;
+		crearCasoFraude({recordId: this.recordId})
+			.then(resultado => {
+				this.pulsadoGenerarCasoFraude = false;
 				if (resultado.casoYaDerivado) {
-				//this.toast('error', 'No se puede derivar', resultado.comentarioCasoYaDerivado);
-				//this.preguntaRealizarRemitido = null;
-				this.preguntaRealizarRemitido = null;
-				this.mostrarModalPreguntaRealizarRemitido = false;
-				this.handleModalToast(resultado.comentarioCasoYaDerivado);
+					//this.toast('error', 'No se puede derivar', resultado.comentarioCasoYaDerivado);
+					//this.preguntaRealizarRemitido = null;
+					this.preguntaRealizarRemitido = null;
+					this.mostrarModalPreguntaRealizarRemitido = false;
+					this.handleModalToast(resultado.comentarioCasoYaDerivado);
 				} else {
-				//this.toast('success', 'Caso derivado con éxito.', resultado.comentarioDerivadoExito); 
-				
-				this.mostrarModalPreguntaRealizarRemitido = false;
-				this.preguntaRealizarRemitido = null;
-				this.ambitoFraude = false;
-				this.ambitoCSBD = false;
-				this.handleModalToast(resultado.comentarioDerivadoExito);
-				
-				
-			}
-		})
-		.catch(error => {
-			this.pulsadoGenerarCasoFraude = false;
-			//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
-			this.handleModalToast(error.body.message);
-			
-		}).finally(() => {
-			this.showSpinner = false;
-			
-		});
+					//this.toast('success', 'Caso derivado con éxito.', resultado.comentarioDerivadoExito);
+
+					this.mostrarModalPreguntaRealizarRemitido = false;
+					this.preguntaRealizarRemitido = null;
+					this.ambitoFraude = false;
+					this.ambitoCSBD = false;
+					this.handleModalToast(resultado.comentarioDerivadoExito);
+
+
+				}
+			})
+			.catch(error => {
+				this.pulsadoGenerarCasoFraude = false;
+				//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
+				this.handleModalToast(error.body.message);
+
+			}).finally(() => {
+				this.showSpinner = false;
+
+			});
 	}
 
 	llamadaWSOnboarding() {
 		let crearTareaOnboarding = false;
 		this.showSpinner = true;
-		llamarOnboarding({ recordId: this.recordId, nif: this.nif })
-		.then(resultado => {
-			if (resultado === 'El cliente no esta en proceso de Onboarding') {
-				// llamar a tarea oficina
-				this.handleGestionGestorDistintoNo();
-				crearTareaOnboarding = this;
-			} else if (resultado === 'OK' || resultado === 'El cliente esta en proceso de Onboarding') {
-				this.handleRemitir();
-			}
-		})
-		.catch(error => {
-			this.entroCatch = true;
-		})
-		.finally(() => {
-			this.showSpinner = false;
-			if (!crearTareaOnboarding) {
-				this.cerrarModal();
-			}
+		llamarOnboarding({recordId: this.recordId, nif: this.nif})
+			.then(resultado => {
+				if (resultado === 'El cliente no esta en proceso de Onboarding') {
+					// llamar a tarea oficina
+					this.handleGestionGestorDistintoNo();
+					crearTareaOnboarding = this;
+				} else if (resultado === 'OK' || resultado === 'El cliente esta en proceso de Onboarding') {
+					this.handleRemitir();
+				}
+			})
+			.catch(error => {
+				this.entroCatch = true;
+			})
+			.finally(() => {
+				this.showSpinner = false;
+				if (!crearTareaOnboarding) {
+					this.cerrarModal();
+				}
 			});
 	}
 
 	//ARGOS
-	
+
 	confirmarRespuestasArgos() {
 		let pass = false;
 		this.respuestasPreguntasArgos.forEach((item) => {
 			if (item.value === 'Si') {
 				pass = true;
-				return; 
+
 			}
-		})
+		});
 
 		if (pass) {
 			this.preguntaConfirmacionArgosActiva = false;
@@ -2620,36 +2780,36 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	aceptarBancaDigitalArgos() {
 		this.ambitoFraude = true;
-        if (!this.idBancaDigital) {
+		if (!this.idBancaDigital) {
 			this.toast('warning', 'Campos vacíos', 'Por favor, informe el ID de Banca Digital.');
 		} else {
 			this.preguntaIdBancaDigital = false;
 			const respuestasFormateadas = this.respuestasPreguntasArgos
-			.map(item => `${item.key}: ${item.value}`)
-			.join('\n');
+				.map(item => `${item.key}: ${item.value}`)
+				.join('\n');
 			this.detallesSolucion =
-			`Identificador Banca Digital: ${this.idBancaDigital}\n` +
-			`Respuestas Argos:\n${respuestasFormateadas}`;
+				`Identificador Banca Digital: ${this.idBancaDigital}\n` +
+				`Respuestas Argos:\n${respuestasFormateadas}`;
 
 			actualizarDetallesSolucionArgos({
 				recordId: this.recordId,
 				detallesSolucion: this.detallesSolucion
 			}).then(resultado => {
 				this.showSpinner = true;
-				crearCasoFraude({ recordId: this.recordId })
-				.then(resultado => {
+				crearCasoFraude({recordId: this.recordId})
+					.then(resultado => {
 						if (resultado.comentarioDerivadoExito) {
-						this.handleModalToast(resultado.comentarioDerivadoExito);
+							this.handleModalToast(resultado.comentarioDerivadoExito);
 						} else if (resultado.comentarioCasoYaDerivado) {
-						this.handleModalToast(resultado.comentarioCasoYaDerivado);
-					}		
-				}).catch(error => {
-					this.pulsadoGenerarCasoFraude = false;
-					//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
-					this.handleModalToast(error.body.message);
-				}).finally(() => {
-					this.showSpinner = false;
-				});			
+							this.handleModalToast(resultado.comentarioCasoYaDerivado);
+						}
+					}).catch(error => {
+						this.pulsadoGenerarCasoFraude = false;
+						//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
+						this.handleModalToast(error.body.message);
+					}).finally(() => {
+						this.showSpinner = false;
+					});
 			});
 		}
 	}
@@ -2665,7 +2825,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.respuestasPreguntasArgos.forEach((item) => {
 				if (item.value === 'Si') {
 					pass = true;
-					return; 
+
 				}
 			});
 			if (pass) {
@@ -2714,8 +2874,8 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	get options() {
 		return [
-			{ label: 'SI', value: 'Si' },
-			{ label: 'NO', value: 'No' }
+			{label: 'SI', value: 'Si'},
+			{label: 'NO', value: 'No'}
 		];
 	}
 
@@ -2724,7 +2884,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			let value = event.target.value;
 			let name = event.target.name;
 			if (!this.respuestasPreguntasArgos.some(item => item.key === name)) {
-				this.respuestasPreguntasArgos.push({ key: name, value: value });
+				this.respuestasPreguntasArgos.push({key: name, value: value});
 			} else {
 				for (let item of this.respuestasPreguntasArgos) {
 					if (item.key === name) {
@@ -2733,19 +2893,19 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 					}
 				}
 			}
-			if (this.respuestasPreguntasArgos.length === this.preguntasArgos.length) { 
+			if (this.respuestasPreguntasArgos.length === this.preguntasArgos.length) {
 				this.preguntasCompletasArgos = false;
 			}
 		}
 	}
 
 	handleSubmit() {
-		rellenarPreguntasArgos({ recordId: this.recordId, preguntasArgos: JSON.stringify(this.respuestasPreguntasArgos) })
-		.then(resultado => {
-		})
-		.catch(error => {
-			console.error(error);
-		});
+		rellenarPreguntasArgos({recordId: this.recordId, preguntasArgos: JSON.stringify(this.respuestasPreguntasArgos)})
+			.then(resultado => {
+			})
+			.catch(error => {
+				console.error(error);
+			});
 		this.preguntasArgosActivas = false;
 		this.preguntaConfirmacionArgosActiva = true;
 	}
@@ -2774,33 +2934,33 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	handleSi() {
 		//A Mostrar pregunta al agente: ¿Has intentado transferir el caso en online al departamento de fraude?
 		this.mostrarPhisingSmishingMalware5 = false;//Prueba limpia de variables
-    	this.mostrarPhisingSmishingMalware4 = false;//Prueba limpia de variables
+		this.mostrarPhisingSmishingMalware4 = false;//Prueba limpia de variables
 		this.mostrarPregunta = true;
 		this.PhisingSmishingMalware1 = null;
 	}
 
 	handleNo() {
-		// B Mostrar mensaje al agente: "Si el cliente no ha accedido y/o no ha proporcionado información relacionada 
-		// con su banca digital o tarjetas, se le debe aconsejar que elimine el mensaje lo antes posible sin realizar 
+		// B Mostrar mensaje al agente: "Si el cliente no ha accedido y/o no ha proporcionado información relacionada
+		// con su banca digital o tarjetas, se le debe aconsejar que elimine el mensaje lo antes posible sin realizar
 		// ninguna operativa. No es necesario derivar el caso." (mensaje parametrizable)
 		//this.toast('warning', 'Atención', this.PhisingSmishingMalware5);
 
-		
+
 		this.mostrarPregunta = true;
 		this.mostrarPhisingSmishingMalware5 = true;
 		this.PhisingSmishingMalware1 = null;
-    	this.mostrarPhisingSmishingMalware4 = true;
-		
+		this.mostrarPhisingSmishingMalware4 = true;
+
 		this.handleModalToast(this.PhisingSmishingMalware5);
-		crearActividadPhishingSinRiesgo({ recordId: this.recordId, descriptionTask: '' })
-		
-		.then(resultado => {
-			//this.cerrarModal();
-		})
-		.catch(error => {
-			console.error(error);
-			this.cerrarModal();
-		});
+		crearActividadPhishingSinRiesgo({recordId: this.recordId, descriptionTask: ''})
+
+			.then(() => {
+				//this.cerrarModal();
+			})
+			.catch(error => {
+				console.error(error);
+				this.cerrarModal();
+			});
 	}
 
 	handleSiPregunta() {
@@ -2812,25 +2972,25 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.mostrarPhisingSmishingMalware5 = false;//Prueba limpia de variables
 		this.mostrarPhisingSmishingMalware4 = false;//Prueba limpia de variables*/
 
-		crearCasoFraude({ recordId: this.recordId })
-		.then(resultado => {
-			this.pulsadoGenerarCasoFraude = false;
+		crearCasoFraude({recordId: this.recordId})
+			.then(resultado => {
+				this.pulsadoGenerarCasoFraude = false;
 				if (resultado.casoYaDerivado) {
-				//this.toast('error', 'No se puede derivar', this.PhisingSmishingMalware3);
-				this.handleModalToast(this.PhisingSmishingMalware3);
+					//this.toast('error', 'No se puede derivar', this.PhisingSmishingMalware3);
+					this.handleModalToast(this.PhisingSmishingMalware3);
 				} else {
-				//this.toast('success', 'Caso derivado con éxito.', this.PhisingSmishingMalware2);
-				this.handleModalToast(this.PhisingSmishingMalware2);
-			}
-		})
-		.catch(error => {
-			this.pulsadoGenerarCasoFraude = false;
-			//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
-			this.handleModalToast(error.body.message);
-		}).finally(() => {
-			this.showSpinner = false;
-			//this.cerrarModal();
-		});
+					//this.toast('success', 'Caso derivado con éxito.', this.PhisingSmishingMalware2);
+					this.handleModalToast(this.PhisingSmishingMalware2);
+				}
+			})
+			.catch(error => {
+				this.pulsadoGenerarCasoFraude = false;
+				//this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
+				this.handleModalToast(error.body.message);
+			}).finally(() => {
+				this.showSpinner = false;
+				//this.cerrarModal();
+			});
 	}
 
 	handleNoPregunta() {
@@ -2838,7 +2998,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.mostrarPregunta = false;
 		this.mostrarPhisingSmishingMalware5 = false;
 		this.mostrarPhisingSmishingMalware4 = false;//(variable a resetear)
-		;
+
 		//this.toast('warning', 'Atención', PhisingSmishingMalware4);
 		this.handleModalToast(this.PhisingSmishingMalware4);
 	}
@@ -2855,19 +3015,19 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	}
 
 	handledetallesConsultaChange(event) {
-    	this.detallesConsulta = event.target.value;
+		this.detallesConsulta = event.target.value;
 	}
 
 	handleNombreComercioChange(event) {
-    	this.nombreComercio = event.target.value;
+		this.nombreComercio = event.target.value;
 	}
 
 	handleIdClienteChange(event) {
-    	this.idCliente = event.target.value;
+		this.idCliente = event.target.value;
 	}
 
 	handleFechaCompraChange(event) {
-    	this.fechaCompra = event.target.value;
+		this.fechaCompra = event.target.value;
 	}
 
 	continuarCashBack() {
@@ -2875,22 +3035,22 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			this.toast('error', 'Campos vacíos', 'Por favor, informa todos los campos requeridos');
 			return;
 		}
-		actualizarDatosCashBack({ recordId: this.recordId, detallesConsulta: this.detallesConsulta, idCliente: this.idCliente, nombreComercio: this.nombreComercio, fechaCompra: this.fechaCompra })
-		.then(() => {
-			this.toast('success', 'Información', 'Se han guardado los datos correctamente'); 
-			//Traslado a grupo colaborador Cashback
-			let datosAdicionales = '';
-			let origen = 'operativaDerivar';
-			let destino = 'realizartrasladocolaborador';
-			this.cerrarModal();
-			this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
-		})
-		.catch(error => {
-			this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
-		}).finally(() => {
-			this.showSpinner = false;
-			//this.cerrarModal();
-		});
+		actualizarDatosCashBack({recordId: this.recordId, detallesConsulta: this.detallesConsulta, idCliente: this.idCliente, nombreComercio: this.nombreComercio, fechaCompra: this.fechaCompra})
+			.then(() => {
+				this.toast('success', 'Información', 'Se han guardado los datos correctamente');
+				//Traslado a grupo colaborador Cashback
+				let datosAdicionales = '';
+				let origen = 'operativaDerivar';
+				let destino = 'realizartrasladocolaborador';
+				this.cerrarModal();
+				this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
+			})
+			.catch(error => {
+				this.toast('error', 'Problema al derivar el caso a fraude', error.body.message);
+			}).finally(() => {
+				this.showSpinner = false;
+				//this.cerrarModal();
+			});
 	}
 	//CashBack
 
@@ -2906,47 +3066,47 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		}
 		this.siguienteDeshabilitado = true;
 		this.numerosContratos = this.contratos.map(contrato => contrato.label).join(', ');
-		guardarContratos({ recordId: this.recordId, numerosContratos: this.numerosContratos })
-		.then(result => {
-			const params = {
-				recordId: this.recordId,
-				asunto: 'Refinanciación Deudas',
-				fechaActividad: new Date().toISOString().split('T')[0],
-				comentarios: this.numerosContratos,
-				crearTareaCitaGestor: true,
+		guardarContratos({recordId: this.recordId, numerosContratos: this.numerosContratos})
+			.then(result => {
+				const params = {
+					recordId: this.recordId,
+					asunto: 'Refinanciación Deudas',
+					fechaActividad: new Date().toISOString().split('T')[0],
+					comentarios: this.numerosContratos,
+					crearTareaCitaGestor: true,
 
-				oficinaDestino: this.lookupOficinaResultadoSeleccionado.Id,
-				enviarTareaOficinaCliente: true,
-				gestorSeleccionadoBuscador: this.lookupGestorResultadoSeleccionado,
+					oficinaDestino: this.lookupOficinaResultadoSeleccionado.Id,
+					enviarTareaOficinaCliente: true,
+					gestorSeleccionadoBuscador: this.lookupGestorResultadoSeleccionado,
 					otpDerivar: true
-			};
-			return crearTareaMGT(params);
-		})
-		.then(result => {
-			let mensaje;
-			let promise;
-			if (result && result.existeTareaCitaCreada) { 
-				mensaje = 'No se crearon las tareas: Este caso ya tiene tareas de "Refinanciación Deudas"';
-				promise = this.handleModalToast(mensaje);
-			} else {
-				mensaje = 'Tareas creadas: A la mayor brevedad posible se pondrán en contacto con el cliente';
-				promise = this.handleModalToastMGT(mensaje).then(() => {
-					if (!result.existeTareaCitaCreada) {
-						this.RefinanciacionDeudas1 = null;
-						return procesarOrigin({ recordId: this.recordId });
-					}
-				});
-			}
-			return promise;
-		})
-		.then(result => {
-			if (result) {
-				this.handleModalToast(result);
-			}
-		})
-		.catch(error => {
-			this.toast('error', 'Problema', error.message || 'Error desconocido');
-		});
+				};
+				return crearTareaMGT(params);
+			})
+			.then(result => {
+				let mensaje;
+				let promise;
+				if (result && result.existeTareaCitaCreada) {
+					mensaje = 'No se crearon las tareas: Este caso ya tiene tareas de "Refinanciación Deudas"';
+					promise = this.handleModalToast(mensaje);
+				} else {
+					mensaje = 'Tareas creadas: A la mayor brevedad posible se pondrán en contacto con el cliente';
+					promise = this.handleModalToastMGT(mensaje).then(() => {
+						if (!result.existeTareaCitaCreada) {
+							this.RefinanciacionDeudas1 = null;
+							return procesarOrigin({recordId: this.recordId});
+						}
+					});
+				}
+				return promise;
+			})
+			.then(result => {
+				if (result) {
+					this.handleModalToast(result);
+				}
+			})
+			.catch(error => {
+				this.toast('error', 'Problema', error.message || 'Error desconocido');
+			});
 	}
 
 	handleModalToastMGT(mensajeMostrarModalToast) {
@@ -2969,27 +3129,27 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	}
 
 	agregarContrato() {
-        if (this.nuevoContrato) {
-            this.contratos = [...this.contratos, { 
+		if (this.nuevoContrato) {
+			this.contratos = [...this.contratos, {
 				type: 'icon',
-				label: this.nuevoContrato, 
-				name: this.nuevoContrato,				
+				label: this.nuevoContrato,
+				name: this.nuevoContrato,
 				iconName: 'standard:account',
 				// iconName: 'doctype:attachment',
-            	alternativeText: 'Contrato'
+				alternativeText: 'Contrato'
 			}];
-            this.nuevoContrato = '';
-        }
-    }
+			this.nuevoContrato = '';
+		}
+	}
 
 	borrarContratos() {
 		this.contratos = [];
 	}
 
 	handleRemovePill(event) {
-        const name = event.detail.item.name;
-        this.contratos = this.contratos.filter(contrato => contrato.name !== name);
-    }
+		const name = event.detail.item.name;
+		this.contratos = this.contratos.filter(contrato => contrato.name !== name);
+	}
 	//Refinanciación Deudas
 
 	//Derivaciones sin cliente asociado
@@ -2999,39 +3159,42 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	buscarCliente() {
 		if (!this.dni) {
-			this.toast('error', 'Campos vacíos', 'Por favor, informa el DNI');
 			return;
 		}
 		this.siguienteDeshabilitado = true;
-		identificarCliente({ sTipoBusqueda: 'DOC', sBusqueda: this.dni })
+		identificarCliente({sTipoBusqueda: 'DOC', sBusqueda: this.dni})
 			.then(resultado => {
 				if (resultado) {
 					// Actualizar el caso con los datos del cliente encontrado
-					if (resultado.CUENTAS && resultado.CUENTAS.length > 0) {
+					if (resultado.CUENTAS && resultado.CUENTAS.length) {
 						const cuentaId = resultado.CUENTAS[0].Id;
-						actualizarCasoMGT({ recordId: this.recordId, cuentaId: resultado.CUENTAS[0].Id })
+						actualizarCasoMGT({recordId: this.recordId, cuentaId: resultado.CUENTAS[0].Id})
 							.then(() => {
-								// this.toast('success', 'DNI encontrado', resultado.CUENTAS[0].Id);
+							// this.toast('success', 'DNI encontrado', resultado.CUENTAS[0].Id);
 								this.toast('success', 'DNI encontrado', resultado.CUENTAS[0].Name);
-								this.casoActual = { ...this.casoActual, AccountId: cuentaId };
-								this.dispatchEvent(new RefreshEvent());
+								// this.casoActual = {...this.casoActual, AccountId: cuentaId};
+								// this.dispatchEvent(new RefreshEvent());
 
-								refreshApex(this._wiredDatosResult);
-								//Simular que se pulsa de nuevo el botón derivar
-								let origen = 'operativaDerivar';
-								let destino = 'derivarBotonera';
-								this.cerrarModal();
-								this.publicarMensajeDerivarInteraccion(origen, destino, '');
-							})
+								// refreshApex(this.wiredCase);
+
+								this.reset();
+
+							/*
+							//Simular que se pulsa de nuevo el botón derivar
+							let origen = 'operativaDerivar';
+							let destino = 'derivarBotonera';
+							this.cerrarModal();
+							this.publicarMensajeDerivarInteraccion(origen, destino, '');
+							*/
+							}).catch(error => {
+								console.error(error);
+								this.toast('error', 'Ha habido un problema  un proble', error.body.message || 'Error desconocido');
+							});
 					} else {
 						this.toast('warning', 'DNI no encontrado', 'No se encontró un cliente con ese DNI');
-						recuperarMensajeDerivacionesSinCuenta({ numero: 4 })
-							.then(mensaje => {
-								this.derivacionesSinClienteAsociado4 = mensaje;
-							})
-							.catch(error => {
-								console.error('Error al recuperar mensaje:', error);
-							});
+						recuperarMensajeDerivacionesSinCuenta({numero: 4})
+							.then(mensaje => this.derivacionesSinClienteAsociado4 = mensaje)
+							.catch(error => console.error('Error al recuperar mensaje:', error));
 						this.mostrarModalDNI = false;
 						// this.mostrarModalDatosContacto = true;
 						this.mostrarModalTipoCuenta = true;
@@ -3048,7 +3211,13 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	handleTipoCuentaFicticiaParticular() {
 		this.tipoCuentaFicticia = 'F';
-		recuperarMensajeDerivacionesSinCuenta({ numero: 2 })
+		this.datosClienteNoEncontrado = [
+			{label: 'Nombre', value: '', type: 'text'},
+			{label: 'Apellidos', value: '', type: 'text'},
+			{label: 'Teléfono de contacto', value: '', type: 'tel'},
+			{label: 'Correo electrónico de contacto', value: '', type: 'email'}
+		];
+		recuperarMensajeDerivacionesSinCuenta({numero: 2})
 			.then(mensaje => {
 				this.derivacionesSinClienteAsociado2 = mensaje;
 			})
@@ -3061,7 +3230,14 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	handleTipoCuentaFicticiaEmpresa() {
 		this.tipoCuentaFicticia = 'J';
-		recuperarMensajeDerivacionesSinCuenta({ numero: 2 })
+		this.datosClienteNoEncontrado = [
+			{label: 'Nombre de la empresa', value: '', type: 'text'},
+			{label: 'Nombre', value: '', type: 'text'},
+			{label: 'Apellidos', value: '', type: 'text'},
+			{label: 'Teléfono de contacto', value: '', type: 'tel'},
+			{label: 'Correo electrónico de contacto', value: '', type: 'email'}
+		];
+		recuperarMensajeDerivacionesSinCuenta({numero: 2})
 			.then(mensaje => {
 				this.derivacionesSinClienteAsociado2 = mensaje;
 			})
@@ -3109,7 +3285,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 				cuentaFicticia: this.tipoCuentaFicticia
 			};
 			this.siguienteDeshabilitado = true;
-			buscarTareaSinCliente({ recordId: this.recordId })
+			buscarTareaSinCliente({recordId: this.recordId})
 				.then(existeTarea => {
 					if (existeTarea) {
 						const mensaje = 'No se crearon las tareas: Este caso ya tiene tareas de "Derivaciones sin cliente asociado"';
@@ -3118,7 +3294,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 						return crearTareaDerivacionesSinCliente(params)
 							.then(result => {
 								this.mostrarModalCreacionTareaMGT = false;
-								return recuperarMensajeDerivacionesSinCuenta({ numero: 3 })
+								return recuperarMensajeDerivacionesSinCuenta({numero: 3})
 									.then(mensaje => {
 										this.derivacionesSinClienteAsociado3 = mensaje;
 										return this.handleModalToast(mensaje);
@@ -3145,7 +3321,12 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	}
 
 	get comentarios() {
-		return `DNI: ${this.dni}, Nombre: ${this.nombre}, Apellidos: ${this.apellidos}, Teléfono: ${this.telefono}, Correo: ${this.correo}`;
+		let comentario = '';
+		if (this.tipoCuentaFicticia === 'J') {
+			comentario = `Empresa: ${this.empresa}, `;
+		}
+		comentario += `DNI: ${this.dni}, Nombre: ${this.nombre}, Apellidos: ${this.apellidos}, Teléfono: ${this.telefono}, Correo: ${this.correo}`;
+		return comentario;
 	}
 
 	get nombre() {
@@ -3163,8 +3344,13 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	get correo() {
 		return this.datosClienteNoEncontrado.find(datoCliente => datoCliente.label === 'Correo electrónico de contacto').value;
 	}
+
+	get empresa() {
+		const campoEmpresa = this.datosClienteNoEncontrado.find(dato => dato.label === 'Nombre de la empresa');
+		return campoEmpresa ? campoEmpresa.value : '';
+	}
 	//Derivaciones sin cliente asociado
-	
+
 	//CSBD Telefono
 	handleTelefonoCorrecto() {
 		this.preguntaTelefonoCSBD = null;
@@ -3177,18 +3363,18 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	handleTelefonoIncorrecto() {
 		this.botonDesabilitado = true;
-		crearActividadCSBDTelefonoNoCoincidente({ recordId: this.recordId })
-		.then(resultado => {
-			this.ambitoCSBD = false;
-			this.preguntaTelefonoCSBD = null;
-			this.toast('warning', 'Teléfono no coincidente', this.preguntaTelefonoCSBDNoEncontrado);
-			
-			
-		})
-		.catch(error => {
-			console.error(error);
-			this.cerrarModal();
-		});
+		crearActividadCSBDTelefonoNoCoincidente({recordId: this.recordId})
+			.then(resultado => {
+				this.ambitoCSBD = false;
+				this.preguntaTelefonoCSBD = null;
+				this.toast('warning', 'Teléfono no coincidente', this.preguntaTelefonoCSBDNoEncontrado);
+
+
+			})
+			.catch(error => {
+				console.error(error);
+				this.cerrarModal();
+			});
 	}
 	//CSBD Telefono
 
@@ -3199,7 +3385,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	//Accionistas
 
 	//MECANISMO FIRMA
-	
+
 	handleMFClienteEnElExtranjero() {
 		this.preguntaMecanismoFirma = false;
 	}
@@ -3228,7 +3414,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 				this.cerrarModal();
 			});
 		});
-		
+
 	}*/
 
 	handleMFDatosConfirmar() {
@@ -3255,33 +3441,33 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	handleMFIdentificadorBloqueado() {
 		//this.cerrarModal();
 		this.handleModalToast(this.toastMecanismoFirmaIdentificadorBloqueado);
-		crearActividadIdentificadorBloqueado({ recordId: this.recordId })
-		.then()
-		.catch(error => {
-			console.error(error);
-			this.cerrarModal();
-		});
+		crearActividadIdentificadorBloqueado({recordId: this.recordId})
+			.then()
+			.catch(error => {
+				console.error(error);
+				this.cerrarModal();
+			});
 		//this.toast('warning', 'Identificador bloqueado', this.toastMecanismoFirmaIdentificadorBloqueado);
 
 	}
 
 	handleMFIdentificadorSinBloquear() {
-		comprobarCasoCreadoMecanismoFirma({ recordId: this.recordId })
-		.then(resultado => {
+		comprobarCasoCreadoMecanismoFirma({recordId: this.recordId})
+			.then(resultado => {
 				if (resultado) {
-				this.handleModalToast(this.toastMecanismoFirmaCasoCreado);
-				//this.toast('warning', 'Atención', this.toastMecanismoFirmaCasoCreado);
+					this.handleModalToast(this.toastMecanismoFirmaCasoCreado);
+					//this.toast('warning', 'Atención', this.toastMecanismoFirmaCasoCreado);
 				} else {
-				this.handleModalToast(this.toastMecanismoFirmaIdentificadorSinBloquear);
-				//this.toast('warning', 'Identificador sin bloquear', this.toastMecanismoFirmaIdentificadorSinBloquear);
-				this.deshabilitadoIdentificadorMF = true;
-					crearCasoMecanismoFirma({ recordId: this.recordId, clienteExtranjero: true });
-			}
-			//this.cerrarModal();
-		}).catch(error => {
-			console.error(error);
-			this.cerrarModal();
-		});
+					this.handleModalToast(this.toastMecanismoFirmaIdentificadorSinBloquear);
+					//this.toast('warning', 'Identificador sin bloquear', this.toastMecanismoFirmaIdentificadorSinBloquear);
+					this.deshabilitadoIdentificadorMF = true;
+					crearCasoMecanismoFirma({recordId: this.recordId, clienteExtranjero: true});
+				}
+				//this.cerrarModal();
+			}).catch(error => {
+				console.error(error);
+				this.cerrarModal();
+			});
 	}
 
 	handleChangeMF(event) {
@@ -3292,7 +3478,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 			// Verifica si la clave ya existe en respuestasMecanismoFirmaDatos
 			if (!this.respuestasMecanismoFirmaDatos.some(item => item.key === name)) {
-				this.respuestasMecanismoFirmaDatos.push({ key: name, value: value });
+				this.respuestasMecanismoFirmaDatos.push({key: name, value: value});
 			} else {
 				for (let item of this.respuestasMecanismoFirmaDatos) {
 					if (item.key === name) {
@@ -3344,27 +3530,27 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		let denied;
 		let restricted;
 
-		recuperarArgosDenied({ recordId: this.recordId })
-		.then(isDenied => {
-			denied = isDenied;
-				recuperarArgosRestricted({ recordId: this.recordId })
-			.then(isRestricted => {
-				restricted = isRestricted;
+		recuperarArgosDenied({recordId: this.recordId})
+			.then(isDenied => {
+				denied = isDenied;
+				recuperarArgosRestricted({recordId: this.recordId})
+					.then(isRestricted => {
+						restricted = isRestricted;
 						if (denied) {
-					let datosAdicionales = this.cybersocMF;
-					let origen = 'operativaDerivar';
-					let destino = 'realizartrasladocolaborador';
-					this.cerrarModal();
-					this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
+							let datosAdicionales = this.cybersocMF;
+							let origen = 'operativaDerivar';
+							let destino = 'realizartrasladocolaborador';
+							this.cerrarModal();
+							this.publicarMensajeDerivarInteraccion(origen, destino, datosAdicionales);
 						} else if (restricted) {
-					this.handleModalToast(this.toastMecanismoFirmaAsuntoEnvioCodigo);
-				}
+							this.handleModalToast(this.toastMecanismoFirmaAsuntoEnvioCodigo);
+						}
+					});
 			})
-		})
-		.catch(error => {
-			console.error(error);
-			this.cerrarModal();
-		});
+			.catch(error => {
+				console.error(error);
+				this.cerrarModal();
+			});
 	}
 
 	handleMFNull() {
@@ -3375,35 +3561,31 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.preguntaMecanismoFirmaClienteAutenticado = false;
 		this.preguntaIdentificadorSigueBloqueado = false;
 	}
-		
+
 	//MECANISMO FIRMA
 
 	//CBP
 
 	handleRespuestaClienteCBP() {
-
-		emailResponderClienteCBP(
-			{
-
-				caso: this.casoActual,
-				grupoCol: this.grupoCol,
-				nombrePlantilla: this.nombrePlantilla,
-				parametrizacionesMensaje: this.parametrizacionesMensaje,
-				ambito: this.ambitoMotivo,
-				nameOWA:this.nameOWA
-			}
-		).then (_retorno =>{
+		emailResponderClienteCBP({
+			caso: this.casoActual,
+			grupoCol: this.grupoCol,
+			nombrePlantilla: this.nombrePlantilla,
+			parametrizacionesMensaje: this.parametrizacionesMensaje,
+			ambito: this.ambitoMotivo,
+			nameOWA: this.nameOWA
+		}).then(_retorno => {
 			//this.handleModalToast(this.emailSuccess);
-		}).catch(error =>{
+		}).catch(error => {
 			this.toast('error', 'Error en la creación de emails', error.body.message);
-		}).finally(() =>{
+		}).finally(() => {
 			this.parametrizacionesMensaje = null;
 		});
 	}
 
 	handleCBP() {
-	this.mostrarModalCreacionTareaMGT = false;
-	this.mostrarModalCBP = true;
+		this.mostrarModalCreacionTareaMGT = false;
+		this.mostrarModalCBP = true;
 	}
 
 	//Boton "Si o No lo sabe CBP"
@@ -3411,45 +3593,45 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 		this.RefinanciacionDeudas1 = false;
 		this.showSpinner = true;
-    	if (this.esIntouch) {
+		if (this.esIntouch) {
 			this.handleRemitir();
 
-   		} else {
-	
-		this.mostrarModalCBP = false;
-		this.mostrarModalCreacionTarea = true;		
-        this.showSpinner = false;
+		} else {
 
-		}	
+			this.mostrarModalCBP = false;
+			this.mostrarModalCreacionTarea = true;
+			this.showSpinner = false;
+
+		}
 	}
 
-		//Botón "No" CBP
-		handleCBPNo() {
+	//Botón "No" CBP
+	handleCBPNo() {
 		this.mostrarModalCBP = false;
 		this.preguntaCBP = false;
-		}
+	}
 
 	//CBP
 
 	//Oficina sin tarea
 	handleOficinaSinTarea() {
-		
-		getUrlNumeroOficinaApex({ recordId: this.oficinaPrincipal })
-		.then(resultado => {
-			if (resultado.url) {
-				this.urlOficina = resultado.url;
-				this.numeroOficina = resultado.numeroOficina;
-				this.mostrarModalToast = false;
 
-				this.handleModalToastUrl(this.mensajeOficinaSinTarea);
-			}
-		});
+		getUrlNumeroOficinaApex({recordId: this.oficinaPrincipal})
+			.then(resultado => {
+				if (resultado.url) {
+					this.urlOficina = resultado.url;
+					this.numeroOficina = resultado.numeroOficina;
+					this.mostrarModalToast = false;
 
-		crearActividadOficinaSinTarea({ recordId: this.recordId })
-		.catch(error => {
-			console.error(error);
-			this.cerrarModal();
-		});
+					this.handleModalToastUrl(this.mensajeOficinaSinTarea);
+				}
+			});
+
+		crearActividadOficinaSinTarea({recordId: this.recordId})
+			.catch(error => {
+				console.error(error);
+				this.cerrarModal();
+			});
 
 	}
 
@@ -3462,54 +3644,54 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	}
 	//Colectivos vulnerables*/
-	
+
 	//Derivar a SAC
 	handleDerivarSAC() {
 		this.activarSpinner();
-		derivarSACApex({ casoContactCenter: this.casoActual, motivo: 'Asignación de caso al SAC' })
-		.then(() => {
-			this.desactivarSpinner();
-			this.handleModalToast(this.mensajeDerivarAlSACSuccess);
-        
-        })
-		.catch(error => {
-			console.error(error);
-			this.desactivarSpinner();
-			this.cerrarModal();
-		});
-	}
-	//Fin Derivar a SAC
-
-	//Devolver a SAC
-	handleDevolverSAC() {
-		if (this.motivoSAC === '' || this.motivoSAC === null || this.motivoSAC === undefined) {
-            //Mostrar toast de advertencia si el motivo está vacío
-            this.toast('warning', 'Advertencia', 'Por favor, rellene el motivo antes de continuar');
-        } else {
-			this.activarSpinner();
-			devolverSACApex({ motivo: this.motivoSAC, casoContactCenter: this.casoActual })
+		derivarSACApex({casoContactCenter: this.casoActual, motivo: 'Asignación de caso al SAC'})
 			.then(() => {
 				this.desactivarSpinner();
-				this.handleModalToast(this.mensajeDevolverAlSACSuccess);
-				
+				this.handleModalToast(this.mensajeDerivarAlSACSuccess);
+
 			})
 			.catch(error => {
 				console.error(error);
 				this.desactivarSpinner();
 				this.cerrarModal();
 			});
+	}
+	//Fin Derivar a SAC
+
+	//Devolver a SAC
+	handleDevolverSAC() {
+		if (this.motivoSAC === '' || this.motivoSAC === null || this.motivoSAC === undefined) {
+			//Mostrar toast de advertencia si el motivo está vacío
+			this.toast('warning', 'Advertencia', 'Por favor, rellene el motivo antes de continuar');
+		} else {
+			this.activarSpinner();
+			devolverSACApex({motivo: this.motivoSAC, casoContactCenter: this.casoActual})
+				.then(() => {
+					this.desactivarSpinner();
+					this.handleModalToast(this.mensajeDevolverAlSACSuccess);
+
+				})
+				.catch(error => {
+					console.error(error);
+					this.desactivarSpinner();
+					this.cerrarModal();
+				});
 		}
 	}
 
 	handleMotivoSACChange(event) {
-        this.motivoSAC = event.target.value;
-    }
+		this.motivoSAC = event.target.value;
+	}
 	//Fin Devolver a SAC
 
 	//Onboarding/Desistir
 	handleOnboarding() {
 		this.activarSpinner();
-		envioCorreoOnboarding({ recordId: this.recordId })
+		envioCorreoOnboarding({recordId: this.recordId})
 			.then(() => {
 				this.desactivarSpinner();
 				this.handleModalToast(this.textoCorreoEnviado);
@@ -3517,16 +3699,16 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			.catch(error => {
 				this.desactivarSpinner();
 			}).finally(() => {
-				this.dispatchEvent(new CustomEvent('refrescartab', { detail: {} }));
+				this.dispatchEvent(new CustomEvent('refrescartab', {detail: {}}));
 			});
 	}
 
 	cerrarCasoOnboarding() {
-		cerrarCasoOnboarding({ recordId: this.recordId })
+		cerrarCasoOnboarding({recordId: this.recordId})
 			.then(() => {
 				this.cerrarModal(this.textoCasoCerrado);
 			}).finally(() => {
-				this.dispatchEvent(new CustomEvent('refrescartab', { detail: {} }));
+				this.dispatchEvent(new CustomEvent('refrescartab', {detail: {}}));
 			});
 	}
 	//Fin Onboarding/Desistir
@@ -3534,9 +3716,8 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 
 	//Colectivo vulnerable
 	crearTareaYRemitidoColectivoVulnerable() {
-	console.log('Entrada en crearTareaYRemitidoColectivoVulnerable 0');
-	this.showSpinner = true;
-	this.preguntaColectivosVulnerables = false;
+		this.showSpinner = true;
+		this.preguntaColectivosVulnerables = false;
 		crearTareaColectivosVulnerables({
 			recordId: this.recordId,
 			asunto: 'Solicitud contacto gestor (Contact Center)',
@@ -3547,35 +3728,29 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 			gestorSeleccionadoBuscador: null,
 			otpDerivar: this.otpDerivar,
 			comentarios: this.mensajeColectivosVulnerables
-		}).then((retorno)=> {
+		}).then((retorno) => {
 			this.modalFinalizarColectivosVulnerables = retorno.mensaje;
-			console.log('retorno.mensaje: ' + retorno.mensaje);
-			console.log('this.modalFinalizarColectivosVulnerables: ' + this.modalFinalizarColectivosVulnerables);
 
-			console.log('Entrada en crearTareaColectivosVulnerables 1');
 			if (retorno.existeTareaCitaCreada) {
 				this.handleModalToast(retorno.textoTareaCitaCreada);
 			} else {
-				console.log('Entrada en crearTareaColectivosVulnerables 2');
 				this.parametrizacionesMensaje = Object.fromEntries([
 					['[NumOficina]', this.numOficina]
-				]);				
+				]);
 				emailRemitirColaboradorColectivoVulnerable({
 					caso: this.casoActual,
 					grupoCol: this.grupoCol,
 					nombrePlantilla: this.nombrePlantilla,
 					parametrizacionesMensaje: this.parametrizacionesMensaje,
 					ambito: this.ambitoMotivo,
-					nameOWA:this.nameOWA
+					nameOWA: this.nameOWA
 				}
-				).then (_retorno =>{
-					console.log('Entrada en emailRemitirColaboradorColectivoVulnerable');
+				).then(_retorno => {
 					//Mensaje de que todo ha salido bien
-					console.log('this.modalFinalizarColectivosVulnerables 2: ' + this.modalFinalizarColectivosVulnerables);
 					this.handleModalToast(retorno.mensaje);
-				}).catch(error =>{
+				}).catch(error => {
 					this.toast('error', 'Error en la creación de emails', error.body.message);
-				}).finally(() =>{
+				}).finally(() => {
 					this.parametrizacionesMensaje = null;
 				});
 			}
@@ -3587,6 +3762,31 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	}
 
 	//Colectivo vulnerable
+
+	//Transferencia llamadas
+
+	handleTransLlamFra() {
+		crearActividadTransferirLLamadaFraude({recordId: this.recordId})
+			.then(resultado => {
+			// En la condicion hay que hacer esto(true solucion temporal):
+			// Validar que existe una llamada en fraude con el mismo conn id de la llamada recibida en contact, para asegurarnos de que realmente se ha transferido la llamada online.
+				let condicion = false;
+				if (condicion) {
+					this.handleModalToast(this.mensajeTransLlamFra);
+				} else {
+					this.mostrarPreguntaTransLlamFra = false;
+					this.mostrarModalPreguntaRealizarRemitido = false;
+					this.mostrarPreguntaSenal = true;
+				}
+			})
+			.catch(error => {
+				console.error(error);
+				this.cerrarModal();
+			});
+	}
+
+	//Transferencia llamadas
+
 	activarSpinner() {
 		this.showSpinner = true;
 	}
@@ -3599,7 +3799,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 		this.mostrarTareaModalCitaGestor = true;
 	}
 
-	activarModalCita() {
+	desactivarModalCita() {
 		this.mostrarTareaModalCitaGestor = false;
 	}
 
@@ -3614,7 +3814,7 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	valorFechaCitaRapida(event) {
 		this.fechaSeleccionada = event.detail;
 	}
-	
+
 	valorFranjaCitaRapida(event) {
 		this.franjaSeleccionada = event.detail;
 	}
@@ -3630,4 +3830,23 @@ this.dispatchEvent(new CustomEvent('desactivarspinner', { bubbles: true, detail:
 	get archivosLength() {
 		return this.archivos ? this.archivos.length : 0;
 	}
+
+	inputDniOnkeydown(event) {
+		if (event.key === 'Enter') {
+			this.buscarCliente();
+		}
+	}
+
+	reset() {
+		this.showSpinner = true;
+		this.casoActual = null;
+		this.mostrarModalDNI = false;
+		this.mostrarModalCreacionTareaMGT = false;
+		this.caso = null;
+		this.dni = null;
+		this.siguienteDeshabilitado = false;
+		this.refrescarDataService = true;
+		this.getRecordTimestamp = new Date().getTime();
+	}
+
 }

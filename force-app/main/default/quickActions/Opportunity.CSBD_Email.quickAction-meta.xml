@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldOverrides>
+        <field>ValidatedFromAddress</field>
+        <formula>IF(
+  ISPICKVAL(Opportunity.CSBD_Familia_Producto__c, &apos;Alta digital de menores&apos;),
+  $Setup.CSBD_Remitente_Enviar_Correo__c.CSBD_Buzon_Alta_digital_de_menores__c,
+  IF(
+    ISPICKVAL(Opportunity.CSBD_Empresa_Proveedora__c, &apos;imaginBank&apos;),
+    $Setup.CSBD_Remitente_Enviar_Correo__c.CSBD_Buzon_ImaginBank__c,
+    $Setup.CSBD_Remitente_Enviar_Correo__c.CSBD_Buzon_CaixaBank__c
+  )
+)</formula>
+    </fieldOverrides>
+    <optionsCreateFeedItem>true</optionsCreateFeedItem>
+    <quickActionLayout>
+        <layoutSectionStyle>TwoColumnsLeftToRight</layoutSectionStyle>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>ValidatedFromAddress</field>
+                <uiBehavior>Required</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>ToAddress</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CcAddress</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>BccAddress</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>Subject</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>HtmlBody</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+        <quickActionLayoutColumns/>
+    </quickActionLayout>
+    <standardLabel>SendEmail</standardLabel>
+    <targetObject>OutgoingEmail</targetObject>
+    <targetParentField>RelatedTo</targetParentField>
+    <type>SendEmail</type>
+</QuickAction>

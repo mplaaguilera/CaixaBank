@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Acción para desasociar cuenta de los centros manipuladores</description>
+    <fieldOverrides>
+        <field>OS_Centro_Manipulador__c</field>
+        <formula>null</formula>
+    </fieldOverrides>
+    <label>Modificar</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <quickActionLayout>
+        <layoutSectionStyle>TwoColumnsLeftToRight</layoutSectionStyle>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>OS_Centro_Manipulador__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+        <quickActionLayoutColumns/>
+    </quickActionLayout>
+    <successMessage>Cuenta desasociada</successMessage>
+    <type>Update</type>
+</QuickAction>

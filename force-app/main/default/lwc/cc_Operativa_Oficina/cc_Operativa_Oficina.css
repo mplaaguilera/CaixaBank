@@ -38,3 +38,28 @@ div.slds-dropdown {
 .oculto {
     display: none !important;
 }
+
+/* Open lookup results above the search input */
+.lookupOficina {
+	position: relative;
+}
+
+.lookupOficina .slds-dropdown {
+	top: auto !important;
+	/* Place results right above the input, compensating the label height */
+	bottom: calc(100% - 1.25rem);
+	z-index: 2;
+}
+
+.citaGestorBody {
+	opacity: 0;
+    animation: fadeIn 220ms ease-in-out;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+    padding: 0 10px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

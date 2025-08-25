@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldOverrides>
+        <field>ValidatedFromAddress</field>
+        <formula>IF(
+    OR(
+        Case.RecordType.DeveloperName == &apos;CC_Empleado&apos;, 
+        ISPICKVAL(Case.CC_Canal_Procedencia__c, &apos;Emisiones PromoCaixa&apos;)
+    ),
+    IF(
+        OR(
+            ISPICKVAL(Case.CC_Canal_Procedencia__c, &apos;Emisiones PromoCaixa&apos;),
+            ISPICKVAL(Case.CC_Canal_Procedencia__c, &apos;Postventa CompraEstrella&apos;),
+            ISPICKVAL(Case.CC_Canal_Procedencia__c, &apos;Soporte Clientes CompraEstrella&apos;),
+            ISPICKVAL(Case.CC_Canal_Procedencia__c, &apos;Soporte Empleados CompraEstrella&apos;)
+        ),
+        IF (
+                NOT(ISBLANK(Case.CC_Buzon_Salida__c)),
+                Case.CC_Buzon_Salida__c,
+                $Setup.CC_Email_Respuesta_Empleados__c.CC_CAS__c
+        ),
+        IF(
+            Case.CC_En_Tercer_Nivel__c,
+            $Setup.CC_Email_Respuesta_Empleados_3N__c.CC_CAS__c,
+            IF (
+                NOT(ISBLANK(Case.CC_Buzon_Salida__c)),
+                Case.CC_Buzon_Salida__c,
+                $Setup.CC_Email_Respuesta_Empleados__c.CC_CAS__c
+            )
+        )
+    )
+    ,
+    IF(
+        Case.RecordType.DeveloperName == &apos;CC_CSI_Bankia&apos;,
+        $Setup.CC_Email_Respuesta_Empleados_CSI_Bankia__c.CC_CAS__c,
+        IF(
+            OR(
+                Case.CC_Ultima_Operativa_Correo__c == &apos;trasladar&apos;, 
+                Case.CC_Ultima_Operativa_Correo__c == &apos;remitir&apos;
+            ),
+            IF(
+                ISPICKVAL(Case.CC_Idioma__c, &apos;ca&apos;),
+                $Setup.Email_Respuesta__c.CAT__c,
+                IF (
+                    ISPICKVAL(Case.CC_Idioma__c, &apos;en&apos;),
+                    $Setup.Email_Respuesta__c.ENG__c,
+                    $Setup.Email_Respuesta__c.CAS__c
+                )
+            ),
+            IF (
+                NOT(ISBLANK(Case.CC_Buzon_Salida__c)),
+                Case.CC_Buzon_Salida__c,
+                IF(
+                    ISPICKVAL(Case.CC_Idioma__c, &apos;ca&apos;),
+                    $Setup.Email_Respuesta__c.CAT__c,
+                    IF (
+                        ISPICKVAL(Case.CC_Idioma__c, &apos;en&apos;),
+                        $Setup.Email_Respuesta__c.ENG__c,
+                        $Setup.Email_Respuesta__c.CAS__c
+                    )
+                )
+            )
+        )
+    )
+)</formula>
+    </fieldOverrides>
+    <label>Enviar correo</label>
+    <optionsCreateFeedItem>true</optionsCreateFeedItem>
+    <quickActionLayout>
+        <layoutSectionStyle>TwoColumnsLeftToRight</layoutSectionStyle>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CC_Grupo_Colab__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CC_Plantilla__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>ValidatedFromAddress</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>ToAddress</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CcAddress</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>BccAddress</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>Subject</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>HtmlBody</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CC_Procedencia__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CC_Segunda_Oficina__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+    </quickActionLayout>
+    <quickActionSendEmailOptions>
+        <ignoreDefaultEmailTemplateSubject>false</ignoreDefaultEmailTemplateSubject>
+    </quickActionSendEmailOptions>
+    <targetObject>EmailMessage</targetObject>
+    <targetParentField>Parent</targetParentField>
+    <type>SendEmail</type>
+</QuickAction>

@@ -17,6 +17,7 @@ export default class ccRemitirColaboradorQuickAction extends LightningElement {
                 destino: 'remitirColaboradorBotonera',
                 datosAdicionales: ''
             });
+            setTimeout(() => this.template.host.offsetWidth, 100); // Force re-render
         }
     }
 }

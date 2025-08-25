@@ -37,8 +37,8 @@ public with sharing class CC_FAQ {
             String sSalida = '';
 
             try {
-                request.setTimeOut(Integer.valueOf(oConfig.CC_TimeOut__c));   
-                request.setMethod(oConfig.CC_TipoPeticion__c);   
+                request.setTimeOut(Integer.valueOf(oConfig.CC_TimeOut__c));
+                request.setMethod(oConfig.CC_TipoPeticion__c);
                 request.setHeader('Content-Type', oConfig.CC_ContentType__c);
 
                 if (!Test.isRunningTest())
@@ -69,7 +69,7 @@ public with sharing class CC_FAQ {
                     // Lanzar el batch, frente a una carga puntual de una aplicación.
                     if (bLanzarBatch)
                     {
-                        //Si el metadato está activo o no hay registro se planifica con el framework	
+                        //Si el metadato está activo o no hay registro se planifica con el framework
                         List<CBK_Framework_Batch_Apex__mdt> oConf = [Select Id from CBK_Framework_Batch_Apex__mdt where developername ='CC_FAQ_Batch' and Activo__c=false LIMIT 1];
                         if ((oConf.isEmpty())&&(!Test.isRunningTest())){
                             map<String,Object> params = New map<String,Object>();
@@ -77,8 +77,8 @@ public with sharing class CC_FAQ {
                             CBK_BatchJob.executeBatch('CC_FAQ_Batch', 1, params,0);
                         } else {
                             CC_FAQ_Batch batch = new CC_FAQ_Batch(String.valueOf(oId));
-                            Database.executeBatch(batch,1);                
-                        }        
+                            Database.executeBatch(batch,1);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -119,7 +119,7 @@ public with sharing class CC_FAQ {
         {
             return;
         }
-        	
+
         CC_AppFAQ_JSON datos = CC_AppFAQ_JSON.parse(sJSONData);
 
         // Actualizar datos de la aplicación.
@@ -296,8 +296,8 @@ public with sharing class CC_FAQ {
             String sSalida = '';
 
             try {
-                request.setTimeOut(Integer.valueOf(oConfig.CC_TimeOut__c));   
-                request.setMethod(oConfig.CC_TipoPeticion__c);   
+                request.setTimeOut(Integer.valueOf(oConfig.CC_TimeOut__c));
+                request.setMethod(oConfig.CC_TipoPeticion__c);
                 request.setHeader('Content-Type', oConfig.CC_ContentType__c);
 
                 if (!Test.isRunningTest())
@@ -350,25 +350,25 @@ public with sharing class CC_FAQ {
     }
 
     static public String cargarRespuestaEspacios (ID oId, String sJSONData)
-    {      
-        String sPrimerError = '';  	
+    {
+        String sPrimerError = '';
         CC_FAQ_JSON datos = CC_FAQ_JSON.parse(sJSONData);
-        
+
         List<CC_FAQ_JSON.Faqs> faqsEntrada = (List<CC_FAQ_JSON.Faqs>)datos.faqs;
         List<CC_FAQ_JSON.Topics> categorias = (List<CC_FAQ_JSON.Topics>)datos.topics;
         CC_FAQ_JSON.Espacio espacioCognitive = datos.Espacio;
-        
+
         List<CC_FAQ__c> espaciosToUpsert = new List<CC_FAQ__c>();
 
         Id recordTypeIdEspacio = Schema.SObjectType.CC_FAQ__c.getRecordTypeInfosByDeveloperName().get('CC_Espacios').getRecordTypeId();
-        List<CC_FAQ__c> espacios = [SELECT Id, Name,CC_FAQ_Id__c, CC_Lookup_App__r.CC_Id_App__c, CC_Descripcion_ca__c, 
+        List<CC_FAQ__c> espacios = [SELECT Id, Name,CC_FAQ_Id__c, CC_Lookup_App__r.CC_Id_App__c, CC_Descripcion_ca__c,
                                     CC_Descripcion_es__c, CC_Id_Espacio__c, CC_Version__c, CC_Lookup_App__r.Id,
-                                    CC_VersionActualizando__c, CC_ListaIDsGlobales__c 
+                                    CC_VersionActualizando__c, CC_ListaIDsGlobales__c
                                     FROM CC_FAQ__c
-                                    WHERE Id = :oId]; 
+                                    WHERE Id = :oId];
 
         Integer iVersion = 0;
-		
+
         for(CC_FAQ__c espacio : espacios)
         {
             if(espacioCognitive != null)
@@ -387,7 +387,7 @@ public with sharing class CC_FAQ {
                 espaciosToUpsert.add(espacio);
             }
         }
-        
+
         if(!espaciosToUpsert.isEmpty())
         {
             upsert espaciosToUpsert;
@@ -399,14 +399,14 @@ public with sharing class CC_FAQ {
         // Preparar objeto espacio para utilizar en la carga de categorias y FAQs.
         CC_FAQ__c espacioUpsert = espaciosToUpsert[0];
         String appId = espaciosToUpsert[0].CC_Lookup_App__r.CC_Id_App__c;
-        
+
         Map<String, String> nombresCategorias = new Map<String, String>();
         List<CC_FAQ__c> categoriasToUpsert = new List<CC_FAQ__c>();
 
 
         for (CC_FAQ_JSON.Topics c : categorias) {
             nombresCategorias.put(c.idTopic, c.topic);
-            
+
             CC_FAQ__c categoriaUpsert = new CC_FAQ__c();
             if(espacioUpsert != null)
             {
@@ -435,7 +435,7 @@ public with sharing class CC_FAQ {
 
             categoriasToUpsert.add(categoriaUpsert);
         }
-        
+
         if(!categoriasToUpsert.isEmpty())
         {
             upsert categoriasToUpsert CC_FAQ_Id__c;
@@ -452,12 +452,12 @@ public with sharing class CC_FAQ {
         List<CC_FAQ__c> carga_faq_cust = new List<CC_FAQ__c>();
         List<CC_Intent__c> carga_intents = new List<CC_Intent__c>();
         List<CC_Intent__c> carga_intents_cust = new List<CC_Intent__c>();
-        
+
         Id recordTypeFaq = Schema.SObjectType.CC_FAQ__c.getRecordTypeInfosByDeveloperName().get('CC_FAQ').getRecordTypeId();
         Id recordTypeFaqCust = Schema.SObjectType.CC_FAQ__c.getRecordTypeInfosByDeveloperName().get('CC_FAQ_Custom').getRecordTypeId();
         Id recordTypeIntent = Schema.SObjectType.CC_Intent__c.getRecordTypeInfosByDeveloperName().get('CC_Intent').getRecordTypeId();
         Id recordTypeIntentCust = Schema.SObjectType.CC_Intent__c.getRecordTypeInfosByDeveloperName().get('CC_Intent_Custom').getRecordTypeId();
-        
+
         for (CC_FAQ_JSON.Faqs oFaq : faqsEntrada)
         {
             // Preparar el registro de FAQ a cargar.
@@ -473,7 +473,7 @@ public with sharing class CC_FAQ {
             oNewFaq.CC_FAQ_Id__c = sClaveFAQ;
             oNewFaq.CC_FAQ_Ident__c = oFaq.idFaq;
             oNewFaq.RecordTypeId = recordTypeFaq;
-            
+
             // Indicar la versión de la FAQ.
             oNewFaq.CC_Version__c = iVersion;
 
@@ -518,7 +518,7 @@ public with sharing class CC_FAQ {
                     oNewFaq.CC_Pregunta_CAT__c = oFaq.textoParaUsuarioCa;
                 }
             }
-            
+
             if(oFaq.idFaqSiebel == 'null' || oFaq.idFaqSiebel == null)
             {
                 oFaq.idFaqSiebel = '';
@@ -606,7 +606,7 @@ public with sharing class CC_FAQ {
                             faqCust.CC_Pregunta_CAT__c = oFaq.textoParaUsuarioCa;
                         }
                     }
-                    
+
                     if(oFaq.idFaqSiebel == 'null' || oFaq.idFaqSiebel == null)
                     {
                         oFaq.idFaqSiebel = '';
@@ -671,7 +671,7 @@ public with sharing class CC_FAQ {
                         oNewIntent.CC_Respuesta_ESP__c = oInt.respuestaCortaCa;
                     }
                 }
-                
+
                 carga_intents.add(oNewIntent) ;
 
                 if (oInt.customsIntent != null)
@@ -746,7 +746,7 @@ public with sharing class CC_FAQ {
                 }
             }
         }
-        
+
         /*upsert carga_faqs CC_FAQ__c.Fields.CC_FAQ_Id__c;
         upsert carga_faq_cust CC_FAQ__c.Fields.CC_FAQ_Id__c;
         upsert carga_intents CC_Intent__c.Fields.CC_IntentIdExt__c;
@@ -829,7 +829,7 @@ public with sharing class CC_FAQ {
         String sServicio = '';
         CC_TrazaInt__c oTraza;
         String sDescError = '';
-        String sDetalleError = ''; 
+        String sDetalleError = '';
 
         CC_InterfaceSettings__mdt oConfig = CC_MetodosUtiles.getInterfazConfigBody ('CC_Int_FAQ_Perfil');
 
@@ -859,8 +859,8 @@ public with sharing class CC_FAQ {
             String sSalida = '';
 
             try {
-                request.setTimeOut(Integer.valueOf(oConfig.CC_TimeOut__c));   
-                request.setMethod(oConfig.CC_TipoPeticion__c);   
+                request.setTimeOut(Integer.valueOf(oConfig.CC_TimeOut__c));
+                request.setMethod(oConfig.CC_TipoPeticion__c);
                 request.setHeader('Content-Type', oConfig.CC_ContentType__c);
 
                 if (!Test.isRunningTest())
@@ -952,7 +952,7 @@ public with sharing class CC_FAQ {
 
         return sFakeRespuesta;
     }
-*/    
+*/
     static public String RespuestaFakeEspacio()
     {
         String sRespuesta = '';

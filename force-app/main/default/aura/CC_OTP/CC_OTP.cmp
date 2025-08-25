@@ -3,15 +3,11 @@
     <!-- Atributos -->
     <aura:attribute name="recordId" type="Id"/>
     <aura:attribute name="columnasOTPCliente" type="List"/>
-    <!--<aura:attribute name="columnasOTPHistoricoCliente" type="List"/>-->
     <aura:attribute name="otpCliente" type="Object"/>
-
     <aura:attribute name="autenticacionesRecientes" type="Object" />
     <aura:attribute name="historicoAutenticacionesAntiguas" type="Object" />
     <aura:attribute name="columnasAutenticacionesRecientes" type="List" />
     <aura:attribute name="columnasHistoricoAutenticacionesAntiguas" type="List" />
-
-    <!--<aura:attribute name="historicoOtpCliente" type="Object"/>-->
     <aura:attribute name="pendienteEnvio" type="Boolean" default="false"/>
     <aura:attribute name="pendienteValidar" type="Boolean" default="false"/>
     <aura:attribute name="preguntasBasicas" type="Object"/>
@@ -38,6 +34,7 @@
     <aura:attribute name="llamadas" type="String"/>
     <aura:attribute name="mostrarError" type="Boolean" default="false"/>
     <aura:attribute name="clienteBloqueado" type="Boolean" default="false"/>
+    <aura:attribute name="tipoBloqueoCliente" type="String"/>
     <aura:attribute name="nuevoIntento" type="Boolean" default="false"/>
 
 
@@ -91,13 +88,13 @@
     <aura:attribute name="circuitoAutenticacion" type="Boolean" default="false"/>
     <aura:attribute name="impedirNivel2" type="Boolean" default="false"/>
     <aura:attribute name="impedirClienteDigital" type="Boolean" default="false"/>
-    
+
     <aura:attribute name="nuevaLogicaAut" type="Boolean" default="false"/>
 
     <aura:attribute name="record" type="Object" />
     <aura:attribute name="simpleRecord" type="Object" />
 
-    
+
     <aura:attribute name="renderModales" type="Boolean" default="false" />
     <aura:attribute name="mostrarModalOficina" type="Boolean" default="false" description="Cierto si hace click en la operativa Oficina"/>
     <aura:attribute name="mostrarModalTrasladoRemitido" type="Boolean" default="false" description="Cierto si hace click en la operativa Oficina"/>
@@ -109,18 +106,18 @@
     <aura:attribute name="otpDerivar" type="Boolean" default="true" />
     <aura:attribute name="menorDe65" type="Boolean" default="false" />
     <aura:attribute name="mccVacio" type="Boolean" default="true" />
-    <aura:attribute name="nivelDosAUTTerceros" type="Boolean" default="false" />
-    <aura:attribute name="settingIntegracionNivelDos" type="Boolean" default="false" />
 
     <aura:attribute name="listaCuentas" type="String" />
     <aura:attribute name="listaTarjetas" type="String" />
 
     <aura:attribute name="ambitoMotivoCaixa" type="String"/>
     <aura:attribute name="ambitoMotivoImagin" type="String"/>
-    
+
+    <aura:attribute name="columnasOTPHistoricoCliente" type="List"/>
+
     <aura:handler name="oSelectedAccountEvent" event="c:CC_SelectedAccountEvent" action="{!c.handleComponentEvent}" />
     <lightning:messageChannel type="CC_DerivarInteraccionChannel__c" onMessage="{!c.onDerivarInteraccionChannel}" scope="APPLICATION" aura:id="derivarInteraccionChannelOTP"/>
-    
+
     <lightning:quickActionAPI aura:id="quickActionAPI" />
     <lightning:workspaceAPI aura:id="workspace"/>
     <lightning:navigation aura:id="navigationService" />
@@ -129,7 +126,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
     <aura:unescapedHtml value="{!v.cssStyle}"/>
-    
+
     <aura:if isTrue="{!v.spinnerActivado}">
         <div><lightning:spinner size="medium" /></div>
     </aura:if>
@@ -260,7 +257,7 @@
             <aura:if isTrue="{!!v.autenticacionesRecientes.length > 0}">
 
                 Sin autenticaciones recientes en las últimas 24 horas.
-            
+
             </aura:if>
         </article>
     </div>
@@ -453,21 +450,21 @@
                 <!-- Título -->
                 <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="margin: 0;">{!v.tituloNuevaValidacion}</h2>
             </header>
-            
+
             <!-- Contenido del modal -->
             <div class="slds-modal__content slds-is-relative slds-p-around_medium" id="modal-content-id-1" style="padding: 1rem;">
                 <div class="slds-section slds-is-open">
                     <h3 class="slds-section__title slds-theme_shade slds-align_absolute-center">
                         <span class="slds-p-horizontal_small">{!v.mensajeNuevaValidacion}</span>
                     </h3>
-                    
+
                     <div class="slds-m-top_medium slds-align_absolute-center">
                         <lightning:button class="slds-button slds-button_neutral slds-m-right_small" aura:id="Nivel 2" label="Nivel 2" title="Nivel 2" onclick="{!c.segundoNivelAut}" disabled="{!v.disabledBotones}"/>
                         <lightning:button class="slds-button slds-button_neutral" aura:id="Cliente Digital" label="Cliente Digital" title="Cliente Digital" onclick="{!c.clienteDigitalAut}" disabled="{!v.disabledBotones}"/>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Pie del modal -->
             <footer class="slds-modal__footer" style="background-color: #f4f6f9; padding: 1rem; border-top: 1px solid #d8dde6;">
                 <lightning:button class="slds-button slds-button_brand" label="Cerrar" onclick="{!c.cerrarModalValidarDos}"/>
@@ -488,20 +485,20 @@
                 <!-- Título -->
                 <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="margin: 0;">{!v.tituloModalMecanismo}</h2>
             </header>
-            
+
             <!-- Contenido del modal -->
             <div class="slds-modal__content slds-is-relative slds-p-around_medium" id="modal-content-id-1" style="padding: 1rem;">
                 <div class="slds-section slds-is-open">
                     <h3 class="slds-section__title slds-align_absolute-center">
                         <span class="slds-p-horizontal_small">{!v.cuerpoModalMecanismo}</span>
                     </h3>
-                    
+
                     <div class="slds-m-top_medium slds-align_absolute-center">
                         <aura:if isTrue="{!v.impedirNivel2}">
                             <lightning:button class="slds-button slds-button_neutral slds-m-right_small" aura:id="Derivar" label="Derivar" title="Derivar" onclick="{!c.handleModalOficinaAbierto}" disabled="{!v.disabledBotones}"/>
                         </aura:if>
                         <aura:if isTrue="{!!v.impedirNivel2}">
-                            <lightning:button class="slds-button slds-button_neutral slds-m-right_small" aura:id="Nivel 2" label="Nivel 2" title="Nivel 2" onclick="{!c.segundoNivelAut}" disabled="{!v.disabledBotones}"/>                        
+                            <lightning:button class="slds-button slds-button_neutral slds-m-right_small" aura:id="Nivel 2" label="Nivel 2" title="Nivel 2" onclick="{!c.segundoNivelAut}" disabled="{!v.disabledBotones}"/>
                         </aura:if>
                         <aura:if isTrue="{!!v.impedirClienteDigital}">
                             <lightning:button class="slds-button slds-button_neutral" aura:id="Cliente Digital" label="Cliente Digital" title="Cliente Digital" onclick="{!c.clienteDigitalAut}" disabled="{!v.disabledBotones}"/>
@@ -509,7 +506,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Pie del modal -->
             <footer class="slds-modal__footer" style="background-color: #f4f6f9; padding: 1rem; border-top: 1px solid #d8dde6;">
                 <lightning:button class="slds-button slds-button_brand" label="Cerrar" onclick="{!c.cerrarModalMecanismoAutenticacion}"/>

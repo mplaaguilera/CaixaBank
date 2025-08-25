@@ -7,7 +7,14 @@
             if(component.get("v.llamadas") === false){
                 recuperarMensajes = "SIN_LLAMADAS";
             }else if(component.get("v.clienteBloqueado") === true){
+                let tipoBloqueo = component.get("v.tipoBloqueoCliente");
+                if(tipoBloqueo && (tipoBloqueo === 'CLIENTE_BLOQUEADO_REJECTED' || 
+                                tipoBloqueo === 'CLIENTE_BLOQUEADO_DENIED' || 
+                                tipoBloqueo === 'CLIENTE_BLOQUEADO_INTENTOS_FALLIDOS')) {
+                    recuperarMensajes = tipoBloqueo;
+                } else {
                 recuperarMensajes = "CLIENTE_BLOQUEADO";
+                }
             }else if(component.get("v.idCliente") === undefined && component.get("v.idContacto") === undefined){
                 recuperarMensajes = "SIN_CUENTA_CONTACTO";
             }else if(component.get("v.idCliente") === undefined){
@@ -101,10 +108,8 @@
                                 component.set("v.ambitoMotivoImagin", respuestaDatos[key]);
                             } else if (key === "mccVacio") {
                                 component.set("v.mccVacio", respuestaDatos[key]);
-                            } else if (key === "NivelDosAUTTerceros") {
-                                component.set("v.nivelDosAUTTerceros", respuestaDatos[key]);
-                            } else if (key === "SettingIntegracionNivelDos") {
-                                component.set("v.settingIntegracionNivelDos", respuestaDatos[key]);
+                            } else if (key === "TipoBloqueoCliente") {
+                                component.set("v.tipoBloqueoCliente", respuestaDatos[key]);
                             }
                         }
                         let obtenerOTPCliente = component.get("c.obtenerOTPCliente");
@@ -260,7 +265,7 @@
             }else{
                 console.error("Error en alguna pregunta");
             }
-        } else {
+                }else{
             $A.enqueueAction(component.get("c.enviarNivelDos")); 
         }
         
@@ -326,7 +331,16 @@
 
                     } else if (resultado === "NOK") {
                         this.recuperarMensajeToast(component, "error", "SIN_LLAMADAS");
+                    } else if (resultado === "CLIENTE_BLOQUEADO_REJECTED" || 
+                               resultado === "CLIENTE_BLOQUEADO_DENIED" || 
+                               resultado === "CLIENTE_BLOQUEADO_INTENTOS_FALLIDOS") {
+                                
+                        this.recuperarMensajeToast(component, "error", resultado);
+                        $A.enqueueAction(component.get("c.doInit"));
+                        component.set("v.disabledBotones", false);
                     } else if (resultado === "Cliente Bloqueado") {
+                        // Mantener compatibilidad con el valor genérico
+                        
                         this.recuperarMensajeToast(component, "error", "CLIENTE_BLOQUEADO");
                         $A.enqueueAction(component.get("c.doInit"));
                         component.set("v.disabledBotones", false);

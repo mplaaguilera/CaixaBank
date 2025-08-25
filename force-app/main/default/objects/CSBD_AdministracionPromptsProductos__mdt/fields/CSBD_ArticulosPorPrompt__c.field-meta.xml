@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_ArticulosPorPrompt__c</fullName>
+    <description>Número de artículos por prompt en caso de que se paralelice la búsqueda de información para el chat.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Poner el número de artículos en el caso de querer paralelizar. En caso de no querer paralelizar dejar vacío el campo.</inlineHelpText>
+    <label>Articulos Por Prompt</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

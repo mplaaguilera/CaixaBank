@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldOverrides>
+        <field>CC_Estado__c</field>
+        <literalValue>Cerrado</literalValue>
+    </fieldOverrides>
+    <fieldOverrides>
+        <field>CC_Fecha_Cierre__c</field>
+        <formula>NOW()</formula>
+    </fieldOverrides>
+    <label>Cerrar</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <quickActionLayout>
+        <layoutSectionStyle>TwoColumnsLeftToRight</layoutSectionStyle>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CC_Fecha_Cierre__c</field>
+                <uiBehavior>Required</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CC_Notificar_Clientes__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+        <quickActionLayoutColumns/>
+    </quickActionLayout>
+    <successMessage>Cierre de agrupador iniciado. Refresque la página en unos instantes para ver los cambios.</successMessage>
+    <type>Update</type>
+</QuickAction>

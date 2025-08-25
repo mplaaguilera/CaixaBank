@@ -9,7 +9,7 @@ public with sharing class CC_EmailSendController {
                 Account.AV_OficinaPrincipal__r.Name, Account.PersonEmail, Account.RecordType.DeveloperName, Account.RecordTypeId,
                 Account.CC_MarcaSenior__c, CC_Tipo_Cliente__c, CC_Canal_Procedencia__c, Contact.Phone, CC_Tipo_Cliente_Formula__c,
                 CC_MCC_Motivo__c, Origin, Status, Subject, CreatedDate, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, CC_Grupo_3N__c,
-                CC_No_Identificado__c, CC_En_Segundo_Nivel__c, CC_Traslado_2N__c, CC_En_Tercer_Nivel__c, CC_Canal_Operativo__c, 
+                CC_No_Identificado__c, CC_En_Segundo_Nivel__c, CC_Traslado_2N__c, CC_En_Tercer_Nivel__c, CC_Canal_Operativo__c,
                 CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c,CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c , CC_MCC_Causa__c,
                 CC_MCC_Solucion__c, CC_Oportunidad_creada__c,CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c,ParentId, Parent.RecordType.DeveloperName, CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_Representante__c
                 FROM Case WHERE Id = :recordId];
@@ -290,7 +290,7 @@ public with sharing class CC_EmailSendController {
                     sAuxMail = casos[0].CC_MailTelfNotif__c;
                 }else {
                     sAuxMail = casos[0].Contact.Email;
-                } 
+                }
             } else {
                 sAuxMail = casos[0].Contact.Email;
             }
@@ -1018,8 +1018,8 @@ public with sharing class CC_EmailSendController {
                 if(grupoColaboradorDerivarFraude != '' && grupoColaboradorDerivarFraude != null){
                     grupos = [SELECT CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
                     FROM CC_MCC_Grupo_Colaborador__c
-                    WHERE CC_MCC__c IN :idsMCC 
-                    AND CC_Grupo_Colaborador__r.RecordtypeId != :recordTypeIdGrupo 
+                    WHERE CC_MCC__c IN :idsMCC
+                    AND CC_Grupo_Colaborador__r.RecordtypeId != :recordTypeIdGrupo
                     AND CC_Grupo_Colaborador__r.CC_Tipo__c IN :trasladarORemitir AND CC_Grupo_Colaborador__r.Name =: grupoColaboradorDerivarFraude
                     ORDER BY Name ASC];
                 } else {
@@ -1135,7 +1135,7 @@ public with sharing class CC_EmailSendController {
                         caso.CC_URL_Encuesta_Formulario__c = encuesta.get(idCaso);
                 }else if (casoRef[0].RecordTypeId == rtCaseEmpleado && casoRef[0].CC_Canal_Procedencia__c != 'Formulario Consultas Operativas'){
                     caso.CC_URL_Encuesta_3N__c = encuesta.get(idCaso);
-    
+
                 }
             }
             update caso;
@@ -1858,13 +1858,13 @@ public with sharing class CC_EmailSendController {
         }
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static Map<String,Boolean> comprobarVisibilidadBotonTareaCitaGestor() {
-        Map<String,Boolean> resultado = new Map<String,Boolean>();
         CC_Settings__c visibilidadBotones = CC_Settings__c.getValues('CC_VisibilidadCitaTareaGestor');
-        resultado.put('botonCita', Boolean.valueOf(visibilidadBotones.CC_Configuracion_1__c));
-        resultado.put('botonTarea', Boolean.valueOf(visibilidadBotones.CC_Configuracion_2__c));
-        return resultado;
+        return new Map<String, Boolean>{
+            'botonCita' => Boolean.valueOf(visibilidadBotones.CC_Configuracion_1__c),
+            'botonTarea' => Boolean.valueOf(visibilidadBotones.CC_Configuracion_2__c)
+        };
     }
 
     /*@AuraEnabled(cacheable=true)
@@ -1952,10 +1952,10 @@ public with sharing class CC_EmailSendController {
         return motivo.CC_Link__c;
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static Boolean getPSGestorDocumentos() {
         List<PermissionSetAssignment> permiso = [SELECT Id FROM PermissionSetAssignment WHERE Assignee.Id = :UserInfo.getUserId() AND PermissionSet.Name = 'CC_Sdocs' LIMIT 1];
-        return (!permiso.isEmpty()) ? true : false;
+        return !permiso.isEmpty();
     }
 
     // @AuraEnabled

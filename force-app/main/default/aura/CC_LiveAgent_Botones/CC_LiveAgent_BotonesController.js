@@ -250,7 +250,7 @@
 						$A.enqueueAction(a);
 					}
 				}
-	
+
 			});
 			$A.enqueueAction(getLiveChatTranscript);
 
@@ -834,7 +834,7 @@
 		$A.util.removeClass(component.find('ModalboxReclasificar'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('backdrop'), 'slds-backdrop--open');
 	},
-        
+
         reclasificar: function (component) {
 		let recordId = component.get('v.recordId');
 		let categoria = component.get('v.categoria');
@@ -851,7 +851,7 @@
         let enviarEvento = true;
         let transferAPP = component.get('v.transferAPP');
        // console.log('transferAPP: '+transferAPP);
-       
+
 		let action = component.get('c.actualizarLiveChat');
 		action.setParams({
 			recordId: recordId,
@@ -896,7 +896,7 @@
 							}
 						}
 					//}
-                     
+
 					let conversationKit = component.find('conversationKit');
 					recordId = recordId.substring(0, 15);
 					//var msg = '<auto>Este chat se va a transferir';
@@ -931,9 +931,9 @@
                                     'space': espacio,
                                     'descriptionSpace': descripcionEspacio
                                 }
-                            };    
+                            };
                         }else{
-                            
+
                             data2 = {
                                 'responseType': 'TRANSFER',
                                 'noDisconnect': desconectar,
@@ -949,8 +949,8 @@
                         }
 					}
 					//window.setTimeout($A.getCallback(() => {
-			
-					
+
+
 					if (desconectar === 1) {
 						component.set('v.mostrarMensaje', true);
 						let toastEvent = $A.get('e.force:showToast');
@@ -991,14 +991,14 @@
                             }, () => {
                                 //console.log('KO');
                             });
-                            
+
                             $A.get('e.force:refreshView').fire();
-                            
+
                         }else{
                             $A.util.addClass(component.find('ModalboxReclasificar'), 'slds-fade-in-open');
-                            $A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');    
+                            $A.util.addClass(component.find('backdrop'), 'slds-backdrop--open');
                         }
-                    
+
                         //}), 600);
                     }
 				});
@@ -1010,7 +1010,7 @@
 		$A.enqueueAction(action);
 
 	},
-        
+
     transferAPP: function (component) {
         let recordId = component.get('v.recordId');
         let categoria = component.get('v.categoria');
@@ -1027,8 +1027,8 @@
         let enviarEvento = true;
         let transferAPP = component.get('v.transferAPP');
         //console.log('transferAPP1: '+transferAPP);
-        
-        
+
+
         //Obtenemos campos de Live Chat Transcript
         let getLiveChatTranscript = component.get('c.datosLiveChatTranscriptTransfer');
         getLiveChatTranscript.setParams({
@@ -1039,7 +1039,7 @@
             'tipoChat': tipoChat,
             'actualizar': false
         });
-        
+
         getLiveChatTranscript.setCallback(this, function (response) {
             if (response.getState() === 'SUCCESS') {
                 //console.log('datosLiveChatTranscriptTransfer');
@@ -1064,7 +1064,7 @@
                             }
                         }
                         //}
-                        
+
                         let conversationKit = component.find('conversationKit');
                         recordId = recordId.substring(0, 15);
                         //var msg = '<auto>Este chat se va a transferir';
@@ -1072,7 +1072,7 @@
                         let type = 'AGENT_ACTION';
                         let data2;
                         if (categoria == null || categoria == '') {
-                            
+
                             data2 = {
                                 'responseType': 'TRANSFER',
                                 'noDisconnect': desconectar,
@@ -1085,7 +1085,7 @@
                                 }
                             };
                         } else {
-                            
+
                             if(doFind){
                                 data2 = {
                                     'responseType': 'TRANSFER',
@@ -1098,9 +1098,9 @@
                                         'space': espacio,
                                         'descriptionSpace': descripcionEspacio
                                     }
-                                };    
+                                };
                             }else{
-                                
+
                                 data2 = {
                                     'responseType': 'TRANSFER',
                                     'noDisconnect': desconectar,
@@ -1115,9 +1115,9 @@
                                 };
                             }
                         }
-                        
-                        
-                        
+
+
+
                         //console.log('senCustom1');
                         let data = JSON.stringify(data2);
                         conversationKit.sendCustomEvent({
@@ -1129,18 +1129,18 @@
                         }, () => {
                             //console.log('KO');
                         });
-                        
+
                         $A.get('e.force:refreshView').fire();
-                        
+
                     }
-                    
+
                 });
         $A.enqueueAction(getLiveChatTranscript);
-        
+
         $A.enqueueAction(component.get('c.cerrarModalReclasificar'));
-    
+
 	},
-	
+
 
 	handleEspacioSeleccionado: function (component, event, helper) {
 		let actualOption
@@ -1149,7 +1149,7 @@
 		}else{
 			actualOption = component.find('firstOptionEspacios').get('v.value');
 		}
-		
+
 		component.set('v.espacio', actualOption);
 		component.set('v.selectedFirstOption', actualOption);
 
@@ -1279,7 +1279,7 @@
 		let omniAPI = cmp.find('omniToolkit');
 		let recordId = evt.getParam('recordId');
 		let recordId2 = cmp.get('v.recordId');
-        
+
 		recordId2 = recordId2.substring(0, 15);
 		let works = '';
 		if (recordId === recordId2) {
@@ -1507,7 +1507,7 @@
 
 	onAgentSend: function( component, event, helper ) {
 		let eventRecordId = event.getParam( "recordId" );
-		let checkCurrentChat = helper.checkRecordId( component, eventRecordId );			
+		let checkCurrentChat = helper.checkRecordId( component, eventRecordId );
 			if ( checkCurrentChat ) {
 				helper.contadorFunction( component, helper);
 			}
@@ -1515,20 +1515,20 @@
 
 	onNewMessage: function( component, event, helper ) {
 		let eventRecordId = event.getParam( "recordId" );
-		let checkCurrentChat = helper.checkRecordId( component, eventRecordId );			
+		let checkCurrentChat = helper.checkRecordId( component, eventRecordId );
 			if ( checkCurrentChat ) {
          		helper.contadorFunction( component, helper );
 			}
-		 
+
     },
 	onChatEnded: function( component, event, helper ) {
 		let eventRecordId = event.getParam( "recordId" );
-		let checkCurrentChat = helper.checkRecordId( component, eventRecordId );			
+		let checkCurrentChat = helper.checkRecordId( component, eventRecordId );
 			if ( checkCurrentChat ) {
 				helper.clearAgentTimer( component );
 				component.set( "v.agentTimer", "" );
 			}
 		}
 
-	
+
 });

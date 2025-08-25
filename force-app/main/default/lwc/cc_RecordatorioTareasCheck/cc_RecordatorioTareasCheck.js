@@ -1,7 +1,5 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement} from 'lwc';
 
 export default class Cc_RecordatorioTareasCheck extends LightningElement {
-    @api recordId;
 
-    
 }

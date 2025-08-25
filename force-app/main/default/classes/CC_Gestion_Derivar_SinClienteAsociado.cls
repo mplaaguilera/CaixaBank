@@ -4,17 +4,14 @@ public with sharing class CC_Gestion_Derivar_SinClienteAsociado {
     public static Map<String, Object> identificarCliente(String sTipoBusqueda, String sBusqueda) {
         return CC_IdentCliente_Future.IdentificarPersALFSync(sTipoBusqueda, sBusqueda);
     }
-    
+
     @AuraEnabled
     public static void actualizarCasoMGT(Id recordId, Id cuentaId) {
         try {
-            Case caso = [SELECT Id, AccountId FROM Case WHERE Id = :recordId];
-            if (caso != null) {
-                caso.AccountId = cuentaId;
-                update caso;
-            } else {
-                throw new AuraHandledException('No se encontró el caso con el Id proporcionado');
-            }
+            Case caso = new Case(Id = recordId);
+            caso.AccountId = cuentaId;
+            caso.CC_No_Identificado__c = false;
+            update caso;
         } catch (Exception e) {
             throw new AuraHandledException('Error al actualizar el caso: ' + e.getMessage());
         }

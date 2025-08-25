@@ -1,0 +1,172 @@
+const globals = require('globals');
+const js = require('@eslint/js');
+const {FlatCompat} = require('@eslint/eslintrc');
+const path = require('path');
+
+// Translate ESLintRC-style configs into flat configs.
+const compat = new FlatCompat({
+	baseDirectory: __dirname
+});
+
+module.exports = [
+	// ESLint recommended config
+	js.configs.recommended,
+
+	// Base configuration
+	{
+		languageOptions: {
+			ecmaVersion: 2022,
+			sourceType: 'module',
+			globals: {
+				...globals.browser,
+				...globals.node
+			}
+		}
+	},
+
+	// LWC specific configuration
+	{
+		files: ['force-app/main/default/lwc/**/*.js'],
+		languageOptions: {
+			parser: require('@babel/eslint-parser'),
+			parserOptions: {
+				ecmaVersion: 2022,
+				sourceType: 'module',
+				requireConfigFile: false,
+				babelOptions: {
+					presets: ['@babel/preset-env'],
+					plugins: [
+						['@babel/plugin-proposal-decorators', {legacy: true}],
+						['@babel/plugin-proposal-class-properties', {loose: false}]
+					]
+				}
+			},
+			globals: {
+				...globals.browser
+			}
+		},
+		plugins: {
+			'@lwc/eslint-plugin-lwc': require('@lwc/eslint-plugin-lwc')
+		},
+		rules: {
+			...require('@salesforce/eslint-config-lwc/recommended').rules
+		}
+	},
+
+	// Aura specific configuration
+	{
+		files: ['force-app/main/default/aura/**/*.js'],
+		languageOptions: {
+			parser: require('@babel/eslint-parser'),
+			parserOptions: {
+				ecmaVersion: 2022,
+				sourceType: 'module',
+				requireConfigFile: false,
+				babelOptions: {
+					presets: ['@babel/preset-env'],
+					plugins: [
+						['@babel/plugin-proposal-decorators', {legacy: true}],
+						['@babel/plugin-proposal-class-properties', {loose: false}]
+					]
+				}
+			},
+			globals: {
+				...globals.browser
+			}
+		},
+		plugins: {
+			'@salesforce/eslint-plugin-aura': require('@salesforce/eslint-plugin-aura')
+		},
+		rules: {
+			...require('@salesforce/eslint-plugin-aura').configs.recommended.rules,
+			...require('@salesforce/eslint-plugin-aura').configs.locker.rules
+		}
+	},
+
+	// Main rules
+	{
+		rules: {
+			'no-console': ['error', {allow: ['error']}],
+			'no-debugger': 'warn',
+			'no-dupe-args': 'error',
+			'no-dupe-keys': 'error',
+			'no-duplicate-case': 'error',
+			'no-empty': 'error',
+			'no-extra-boolean-cast': 'error',
+			'no-extra-semi': 'error',
+			'no-unreachable': 'error',
+
+			// Best Practices
+			'curly': ['error', 'all'],
+			'eqeqeq': ['error', 'smart'],
+			'no-empty-function': 'error',
+			'no-eval': 'error',
+			'no-self-compare': 'error',
+			'no-useless-return': 'error',
+
+			// Variables
+			'no-shadow': 'error',
+			'no-unused-vars': 'warn',
+			'no-use-before-define': ['error', {'functions': false}],
+
+			// Stylistic Issues
+			'array-bracket-spacing': ['error', 'never'],
+			'block-spacing': ['error', 'always'],
+			'brace-style': ['error', '1tbs', {'allowSingleLine': true}],
+			'comma-dangle': ['error', 'never'],
+			'comma-spacing': ['error', {'before': false, 'after': true}],
+			'indent': ['error', 'tab', {'SwitchCase': 1}],
+			'key-spacing': ['error', {'beforeColon': false, 'afterColon': true}],
+			'keyword-spacing': ['error', {'before': true, 'after': true}],
+			'linebreak-style': ['error', 'unix'],
+			'max-len': ['warn', {
+				'code': 300,
+				'ignoreTemplateLiterals': true,
+				'ignoreUrls': true,
+				'ignoreStrings': true
+			}],
+			'no-mixed-spaces-and-tabs': 'error',
+			'no-trailing-spaces': 'warn',
+			'object-curly-spacing': ['error', 'never'],
+			'quotes': ['error', 'single', {'avoidEscape': true}],
+			'semi': ['error', 'always'],
+			'space-before-blocks': ['error', 'always'],
+			'space-before-function-paren': ['error', {
+				'anonymous': 'always',
+				'named': 'never',
+				'asyncArrow': 'always'
+			}],
+			'space-in-parens': ['error', 'never'],
+			'space-infix-ops': 'error'
+		}
+	},
+
+	// Special rules for dev files
+	{
+		files: ['dev/**/*.{js,mjs,cjs}'],
+		rules: {
+			'no-console': 'off',
+			'max-len': ['warn', {
+				'code': 300,
+				'ignoreTemplateLiterals': true,
+				'ignoreUrls': true,
+				'ignoreStrings': true
+			}]
+		}
+	},
+
+	// Ignore patterns for non-JavaScript files and directories
+	{
+		ignores: [
+			'venv/**',
+			'node_modules/**',
+			'notebooks/**',
+			'*.py',
+			'*.pyc',
+			'__pycache__/**',
+			'.venv/**',
+			'env/**',
+			'.env/**'
+		]
+	}
+];

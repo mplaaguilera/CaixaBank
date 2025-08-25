@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Para la nueva gestion</description>
+    <fieldOverrides>
+        <field>GRR_Case_Gestion__c</field>
+        <formula>Case.Id</formula>
+    </fieldOverrides>
+    <label>Nueva Gestion</label>
+    <optionsCreateFeedItem>true</optionsCreateFeedItem>
+    <quickActionLayout>
+        <layoutSectionStyle>TwoColumnsLeftToRight</layoutSectionStyle>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>GRR_Numero_Contrato__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>GRR_Fecha_Antiguedad_Deuda__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>GRR_Importe_Deuda_Vencida__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+        <quickActionLayoutColumns/>
+    </quickActionLayout>
+    <targetObject>GRR_Gestion__c</targetObject>
+    <targetParentField>GRR_Case_Gestion__c</targetParentField>
+    <targetRecordType>GRR_Gestion__c.GRR_Gestion</targetRecordType>
+    <type>Create</type>
+</QuickAction>

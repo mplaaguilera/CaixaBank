@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_BusquedaEnDosPasos__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Si esta marcado en el asistente interactivo de Einstein se buscará la respuesta a las preguntas en dos pasos, primero mirando la ficha del producto y en el segundo todo lo demas del producto en llamadas en paralelo.
+Si esta desmarcado, la búsqueda se hará directamente con todos los artículos.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Busqueda en dos pasos</label>
+    <type>Checkbox</type>
+</CustomField>

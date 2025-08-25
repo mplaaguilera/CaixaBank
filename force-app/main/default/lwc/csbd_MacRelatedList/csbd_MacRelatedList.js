@@ -10,17 +10,17 @@ import crearTareaVinculacionApex from '@salesforce/apex/CSBD_MacRelatedListApex.
 import OPP_PARENT_ID from '@salesforce/schema/Opportunity.CSBD_Parent_Id__c';
 import OPP_TELEFONO from '@salesforce/schema/Opportunity.CSBD_Telefono_Solicitud__c';
 
-//eslint-disable-next-line new-cap
 export default class csbdMacRelatedList extends NavigationMixin(LightningElement) {
 	@api recordId;
 
 	spinner = false;
 
 	datatableColumnas = [
-		{label: 'Fecha', fieldName: 'CreatedDate', type: 'date', initialWidth: 111, sortable: true, hideDefaultActions: true,
+		{label: 'Modificada', fieldName: 'LastModifiedDate', type: 'date', initialWidth: 111, sortable: true, hideDefaultActions: true,
 			typeAttributes: {year: '2-digit', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit'}},
 		{label: 'Oportunidad', fieldName: '_oportunidadUrl', type: 'url', initialWidth: 109, hideDefaultActions: true,
 			typeAttributes: {label: {fieldName: 'CSBD_Identificador__c'}}},
+		{label: 'Estado', fieldName: 'CSBD_Estado__c', initialWidth: 90, hideDefaultActions: true},
 		{label: 'Producto', fieldName: 'CSBD_Producto__c', initialWidth: 90, hideDefaultActions: true},
 		{label: 'Propietario', fieldName: '_ownerUrl', type: 'url', hideDefaultActions: true,
 			typeAttributes: {label: {fieldName: '_ownerName'}}},

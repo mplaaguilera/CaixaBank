@@ -176,6 +176,11 @@
                         }else if(component.get("v.datosVacios") === "CLIENTE BLOQUEADO") {
                             helper.recuperarMensajeToast(component, "error", "CLIENTE_BLOQUEADO");
                             component.set("v.disabledBotones", false);
+                        }else if(component.get("v.datosVacios") === "CLIENTE_BLOQUEADO_REJECTED" || 
+                                 component.get("v.datosVacios") === "CLIENTE_BLOQUEADO_DENIED" || 
+                                 component.get("v.datosVacios") === "CLIENTE_BLOQUEADO_INTENTOS_FALLIDOS") {
+                            helper.recuperarMensajeToast(component, "error", component.get("v.datosVacios"));
+                            component.set("v.disabledBotones", false);
                         }else if(component.get("v.datosVacios") === "SIN LLAMADAS") {
                             helper.recuperarMensajeToast(component, "error", "SIN_LLAMADAS");
                             component.set("v.disabledBotones", false);
@@ -239,16 +244,12 @@
     accionRegistroController: function (component, event, helper) {
         var id = event.getParam("row").recordId;
         var actionName = event.getParam("row").nombreBoton;
-        console.log("::: id: " + id);
-        console.log("::: actionName: " + actionName);
+        var nivel = component.get("v.nivel");
         let enviarRegistro;
         if (actionName === "Enviar") {
-            if (component.get("v.settingIntegracionNivelDos") === true || (component.get("v.settingIntegracionNivelDos") === false && component.get("v.nivelDosAUTTerceros"))) {
-                enviarRegistro = component.get("c.enviarAutorizacion");
-                enviarRegistro.setParams({ "recordId": component.get("v.recordIdPdteValidar"), "casoId": component.get("v.recordId"), "tipoAutenticacion": "Nivel2" });
-            } else {enviarRegistro = component.get("c.enviarRegistro");
+            enviarRegistro = component.get("c.enviarRegistro");
                 enviarRegistro.setParams({ "recordId": id });
-            }
+
             enviarRegistro.setCallback(this, function (response) {
                 if (response.getState() === "SUCCESS") {
                     component.set("v.validarRegistro", true);
@@ -281,7 +282,13 @@
                 if (response.getReturnValue() === "KO") {
                     helper.mostrarToast("error", "Operativa no disponible", "Existe un bloqueo por reintentos.");
                 }else if (response.getReturnValue() === "Cliente Bloqueado"){
+                    
                     helper.recuperarMensajeToast(component, "error", "CLIENTE_BLOQUEADO");
+                }else if (response.getReturnValue() === "CLIENTE_BLOQUEADO_REJECTED" || 
+                          response.getReturnValue() === "CLIENTE_BLOQUEADO_DENIED" || 
+                          response.getReturnValue() === "CLIENTE_BLOQUEADO_INTENTOS_FALLIDOS"){
+                            
+                    helper.recuperarMensajeToast(component, "error", response.getReturnValue());
                 } else {
                     $A.util.addClass(component.find("ModalboxValidar"), "slds-fade-in-open");
                     $A.util.addClass(component.find("ModalBackdropValidar"), "slds-backdrop--open");
@@ -342,10 +349,35 @@
                     });
                     toastEvent.fire();
                     component.set("v.disabledBotonValidar", false);
+
                 } else if (resultado === "Se identifica riesgo alto de fraude (NO se permite nuevo intento)") {
+                    
                     helper.recuperarMensajeToast(component, "error", "DERIVAR_DENIED");
                     $A.enqueueAction(component.get("c.cerrarModalValidar"));
                     $A.enqueueAction(component.get("c.handleModalOficinaAbierto"));
+                    
+                    // Activar backdrop después de que se abra el modal de derivar
+                    window.setTimeout($A.getCallback(() => {
+                        let backdrop = component.find("Derivar");
+                        if (backdrop) {
+                            $A.util.addClass(backdrop, "slds-backdrop--open");
+                        }
+                    }), 300);
+                   
+                } else if (resultado === "La autorización ha sido rechazada por el cliente") {
+                    
+                    helper.recuperarMensajeToast(component, "error", "DERIVAR_REJECTED");
+                    $A.enqueueAction(component.get("c.cerrarModalValidar"));
+                    $A.enqueueAction(component.get("c.handleModalOficinaAbierto"));
+                    
+                    // Activar backdrop después de que se abra el modal de derivar
+                    window.setTimeout($A.getCallback(() => {
+                        let backdrop = component.find("Derivar");
+                        if (backdrop) {
+                            $A.util.addClass(backdrop, "slds-backdrop--open");
+                        }
+                    }), 300);
+                    
                 } else if (resultado === 'La autorización ha expirado (se permite un nuevo intento)') {
                     $A.enqueueAction(component.get("c.doInit"));
                     window.setTimeout($A.getCallback(() => {
@@ -526,25 +558,12 @@
                                     if (canalValido) {
                                         helper.generarComunicacionNivelDos(component, event, helper).then(() => {
                                             if ((component.get("v.validacionPregunta1") === true && component.get("v.validacionPregunta2") === true) || component.get("v.omitirPreguntasNvl2") === 'true') {
-                                                if(component.get("v.OmitirSMSNvl2") === false) {
-                                                    console.log("::: Enviando SMS Nivel 2");
+                                                if(component.get("v.OmitirSMSNvl2") === false){
                                                     let id = component.get("v.recordIdPdteValidar");
-                                                    // let enviarRegistro = component.get("c.enviarRegistro");
-                                                    let enviarRegistro;
-                                                    console.log("::: settingIntegracionNivelDos: " + component.get("v.settingIntegracionNivelDos"));
-                                                    console.log("::: nivelDosAUTTerceros: " + component.get("v.nivelDosAUTTerceros"));
-                                                    if (component.get("v.settingIntegracionNivelDos") === true || (component.get("v.settingIntegracionNivelDos") === false && component.get("v.nivelDosAUTTerceros"))) {
-                                                        console.log("::: dentro if");
-                                                        enviarRegistro = component.get("c.enviarAutorizacion");
-                                                        enviarRegistro.setParams({ "recordId": component.get("v.recordIdPdteValidar"), "casoId": component.get("v.recordId"), "tipoAutenticacion": "Nivel2" });
-                                                    } else {
-                                                        console.log("::: dentro else");
-                                                        enviarRegistro = component.get("c.enviarRegistro");
+                                                    let enviarRegistro = component.get("c.enviarRegistro");
                                                         enviarRegistro.setParams({ "recordId": id });
-                                                    }
                                                     enviarRegistro.setCallback(this, function (response) {
                                                         if (response.getState() === "SUCCESS") {
-                                                            console.log("::: SUCCESS");
                                                             component.set("v.validarRegistro", true);            
                                                             $A.enqueueAction(component.get("c.abrirModalValidarRegistro"));
                                                         }
@@ -628,7 +647,7 @@
                 component.set("v.recordIdPdteValidar", response.getReturnValue());
             }
             enviarRegistro = component.get("c.enviarAutorizacion");
-            enviarRegistro.setParams({ "recordId": component.get("v.recordIdPdteValidar"), "casoId": component.get("v.recordId"), "tipoAutenticacion": "ClienteDigital" });
+            enviarRegistro.setParams({ "recordId": component.get("v.recordIdPdteValidar"), "casoId": component.get("v.recordId") });
             enviarRegistro.setCallback(this, function (response) {
                 if (response.getState() === "SUCCESS") {
                     if (response.getReturnValue() === "KO") {

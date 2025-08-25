@@ -1,16 +1,7 @@
 public with sharing class CSBD_SIR {
 
     public static Map<String, Object> sirCalcLimites(String numperso, String presolicitud) {
-        CC_InterfaceSettings__mdt parametrosInterfaz = obtenerParametrosIntegracion('CSBD_SIR_CalcLimites');
-        if (parametrosInterfaz == null) {
-            return new Map<String, Integer>();
-        } else {
-            HttpRequest req = new HttpRequest();
-            req.setEndpoint(parametrosInterfaz.CC_EndPoint__c);
-            req.setClientCertificateName(parametrosInterfaz.CC_Certificado__c);
-            req.setMethod(parametrosInterfaz.CC_TipoPeticion__c);
-            req.setHeader('Content-Type', parametrosInterfaz.CC_ContentType__c);
-
+       
             String cuerpo = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sir="http://sircalclimites.riesgocalclimites.mca.si.absis.lacaixa.es/">';
             cuerpo += '<soapenv:Header/><soapenv:Body><sir:CalcLim><externalInputTO>';
             cuerpo += '<aplicacionInvocante>OCE</aplicacionInvocante>';
@@ -24,68 +15,44 @@ public with sharing class CSBD_SIR {
             cuerpo += '<tipoLimite>1</tipoLimite>';
             cuerpo += '</externalInputTO></sir:CalcLim></soapenv:Body>';
             cuerpo += '</soapenv:Envelope>';
-            req.setBody(cuerpo);
 
-            HttpResponse response = new Http().send(req);
+            // --- INICIO TRAZA ---
+                CC_TrazaInt__c oTraza = new CC_TrazaInt__c();
+                oTraza.Name = 'SIR_CalcLimites';
+                oTraza.CC_FechaInicio__c = datetime.now();
+                oTraza.CC_Identificador__c = numperso + (presolicitud != null ? '|' + presolicitud : '');
+                oTraza.CC_MensajeEntrada__c = cuerpo;
+               /*  insert oTraza; */
+                
+            // --- FIN TRAZA ---
+
+            // Header nuevo con la integracion de SIR
+            Map<String, String> mHeaders = new Map<String, String>();
+            mHeaders.put('Content-Type', 'application/xml; charset=UTF-8');
+
+            //Int Setting
+            String intSetting = 'CSBD_SIR';
+
+            //creamos el wrapper para la petición
+            CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
+            requestWrp.body = cuerpo;
+            requestWrp.intSetting = intSetting;
+            requestWrp.mHeaders = mHeaders;
+
+            // Obtenemos la petición HTTP
+            HttpRequest req = CBK_HttpServiceIntegration.getRequest(requestWrp);
+
+            // Usar CallHttpService, ya que solo se hace una unica llamada al servicio 
+            HttpResponse response = CBK_HttpServiceIntegration.callHttpService( req, intSetting, intSetting);
+
+            // Guardamos la respuesta en la traza antes de devolver el resultado
+            oTraza.CC_MensajeSalida__c = response.getBody();
+            oTraza.CC_DetalleError__c = response.getStatusCode() + ':' + response.getBody();
+            insert oTraza;
+
             return parsearRespuestaSirCalcLimites(response.getBody());
-        }
     }
-
-    /* Finalmente no es necesario invocar el servicio de SIR
-    public static Map<String, Integer> sirConsultaScorings(String numperso) {
-        CC_InterfaceSettings__mdt parametrosInterfaz = obtenerParametrosIntegracion('CSBD_SIR_ConsultaScorings');
-        if (parametrosInterfaz == null) {
-            return new Map<String, Integer>();
-        } else {
-            Map<String, Integer> retorno = new Map<String, Integer>();
-
-            HttpRequest req = new HttpRequest();
-            req.setEndpoint(parametrosInterfaz.CC_EndPoint__c);
-            req.setClientCertificateName(parametrosInterfaz.CC_Certificado__c);
-            req.setMethod(parametrosInterfaz.CC_TipoPeticion__c);
-            req.setHeader('Content-Type', parametrosInterfaz.CC_ContentType__c);
-
-            String ticketSIR = numperso.leftPad(10, '0'); //falta fecha (9) y hora (9)
-
-            String cuerpo = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sir="http://sircalclimites.riesgocalclimites.mca.si.absis.lacaixa.es/">';
-            cuerpo += '<soapenv:Header/>';
-            cuerpo += '<soapenv:Body>';
-            cuerpo += '<sir:obDatTitulares>';
-            cuerpo += '<Version>00</Version>';
-            cuerpo += '<Opcion>00</Opcion>';
-            cuerpo += '<Codapl>OCE</Codapl>';
-            cuerpo += '<Empresa>00</Empresa>';
-            cuerpo += '<Centrope>00</Centrope>';
-            cuerpo += '<ListaTitulares>';
-            cuerpo += '<ListaTitularesItem>';
-            cuerpo += '<TicketSIR>' + ticketSIR + '<TicketSIR>';
-            cuerpo += '</ListaTitularesItem>';
-            cuerpo += '</ListaTitulares>';
-            cuerpo += '</sir:obDatTitulares>';
-            cuerpo += '</soapenv:Body>';
-            cuerpo += '</soapenv:Envelope>';
-            req.setBody(cuerpo);
-
-            Http http = new Http();
-            //HTTPResponse respuesta = http.send(req);
-            //System.debug(respuesta.getBody());
-
-            return retorno;
-        }
-    }
-    */
-
-    @TestVisible
-    private static CC_InterfaceSettings__mdt obtenerParametrosIntegracion(String interfazDevName) {
-        List<CC_InterfaceSettings__mdt> parametrosInterfaz = [SELECT DeveloperName, CC_Certificado__c, CC_Endpoint__c, CC_TipoPeticion__c, CC_ContentType__c
-                                                                FROM CC_InterfaceSettings__mdt WHERE DeveloperName = :interfazDevName AND CC_Activa__c = true LIMIT 1];
-        if (!parametrosInterfaz.isEmpty()) {
-            return parametrosInterfaz[0];
-        } else {
-            return null;
-        }
-    }
-
+   
     private static Map<String, Object> parsearRespuestaSirCalcLimites(String respuesta) {
         Map<String, Object> resultado = new Map<String, Object>();
         DOM.Document docXML = new DOM.Document();
@@ -116,6 +83,7 @@ public with sharing class CSBD_SIR {
                             }
                         }
                     }
+                    
                 }
                 break;
             }

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldOverrides>
+        <field>CC_Canal_Procedencia__c</field>
+        <formula>CASE( GRR_UR__c.GRR_Region__c , 
+					&apos;ÁLAVA&apos;, &apos;DT Norte&apos;,
+					&apos;ALBACETE&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;,
+					&apos;ALICANTE&apos;, &apos;DT Comunidad Valenciana&apos;, 
+					&apos;ALMERÍA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;ASTURIAS&apos;, &apos;DT Norte&apos;, 
+					&apos;ÁVILA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;BADAJOZ&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;,
+					&apos;BALEARES&apos;, &apos;DT Balears&apos;, 
+					&apos;BARCELONA&apos;, &apos;DT Barcelona&apos;, 
+					&apos;BURGOS&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;CÁCERES&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;,
+					&apos;CÁDIZ&apos;, &apos;DT Andalucía Occidental&apos;, 
+					&apos;CANTABRIA&apos;, &apos;DT Norte&apos;,
+					&apos;CASTELLÓN&apos;, &apos;DT Comunidad Valenciana&apos;, 
+					&apos;CEUTA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;CIUDAD REAL&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;, 
+					&apos;CÓRDOBA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;CUENCA&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;, 
+					&apos;GERONA&apos;, &apos;DT Catalunya&apos;,
+					&apos;GRANADA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;GUADALAJARA&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;, 
+					&apos;GUIPÚZCOA&apos;, &apos;DT Norte&apos;, 
+					&apos;HUELVA&apos;, &apos;DT Andalucía Occidental&apos;, 
+					&apos;HUESCA&apos;, &apos;DT Ebro&apos;,
+					&apos;JAÉN&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;LA CORUÑA&apos;, &apos;DT Norte&apos;, 
+					&apos;LA RIOJA&apos;, &apos;DT Ebro&apos;, 
+					&apos;LAS PALMAS&apos;, &apos;DT Canarias&apos;, 
+					&apos;LEÓN&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;LÉRIDA&apos;, &apos;DT Catalunya&apos;, 
+					&apos;LUGO&apos;, &apos;DT Norte&apos;,
+					&apos;MADRID&apos;, &apos;DT Madrid&apos;,
+					&apos;MÁLAGA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;MELILLA&apos;, &apos;DT Andalucía Oriental&apos;, 
+					&apos;MURCIA&apos;, &apos;DT Murcia&apos;, 
+					&apos;NAVARRA&apos;, &apos;DT Ebro&apos;,
+					&apos;ORENSE&apos;, &apos;DT Norte&apos;, 
+					&apos;PALENCIA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;PONTEVEDRA&apos;, &apos;DT Norte&apos;, 
+					&apos;SALAMANCA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;SANTA CRUZ DE TENERIFE&apos;, &apos;DT Canarias&apos;, 
+					&apos;SEGOVIA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;SEVILLA&apos;, &apos;DT Andalucía Occidental&apos;, 
+					&apos;SORIA&apos;, &apos;DT Castilla y León&apos;,
+					&apos;TARRAGONA&apos;, &apos;DT Catalunya&apos;, 
+					&apos;TERUEL&apos;, &apos;DT Ebro&apos;, 
+					&apos;TOLEDO&apos;, &apos;DT Castilla la Mancha-Extremadura&apos;, 
+					&apos;VALENCIA&apos;, &apos;DT Comunidad Valenciana&apos;, 
+					&apos;VALLADOLID&apos;, &apos;DT Castilla y León&apos;,
+					&apos;VIZCAYA&apos;, &apos;DT Norte&apos;,
+					&apos;ZAMORA&apos;, &apos;DT Castilla y León&apos;, 
+					&apos;ZARAGOZA&apos;, &apos;DT Ebro&apos;, 
+					&apos;&apos;)</formula>
+    </fieldOverrides>
+    <fieldOverrides>
+        <field>GRR_UR_Relacionada__c</field>
+        <formula>GRR_UR__c.Id</formula>
+    </fieldOverrides>
+    <fieldOverrides>
+        <field>Status</field>
+        <literalValue>Activo</literalValue>
+    </fieldOverrides>
+    <label>Nuevo Caso</label>
+    <optionsCreateFeedItem>true</optionsCreateFeedItem>
+    <quickActionLayout>
+        <layoutSectionStyle>TwoColumnsLeftToRight</layoutSectionStyle>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>Subject</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>Description</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>GRR_UR_Relacionada__c</field>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+        <quickActionLayoutColumns>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>Origin</field>
+                <uiBehavior>Required</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>false</emptySpace>
+                <field>CC_Canal_Procedencia__c</field>
+                <uiBehavior>Required</uiBehavior>
+            </quickActionLayoutItems>
+            <quickActionLayoutItems>
+                <emptySpace>true</emptySpace>
+                <uiBehavior>Edit</uiBehavior>
+            </quickActionLayoutItems>
+        </quickActionLayoutColumns>
+    </quickActionLayout>
+    <targetObject>Case</targetObject>
+    <targetParentField>GRR_UR_Relacionada__c</targetParentField>
+    <targetRecordType>Case.GRR_Cliente</targetRecordType>
+    <type>Create</type>
+</QuickAction>

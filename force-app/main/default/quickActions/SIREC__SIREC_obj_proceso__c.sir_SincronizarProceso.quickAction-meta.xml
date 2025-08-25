@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <description>Botón que llamará al lwc para sincronizar proceso y tarea, en Mis Clientes Soluciones y en Mis Clientes Soluciones Empresas</description>
+    <label>Sincronizar Proceso</label>
+    <lightningWebComponent>sir_lwc_sincronizarProceso</lightningWebComponent>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>LightningWebComponent</type>
+</QuickAction>

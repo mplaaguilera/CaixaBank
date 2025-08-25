@@ -1,6 +1,6 @@
 public with sharing class CC_Operativa_Oficina_Controller {
 
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static Map<String, Object> getDatos(Id recordId, Boolean otpDerivar) {
         return CC_Gestion_Derivar_Inicializar.getDatos(recordId, otpDerivar);
     }
@@ -15,11 +15,11 @@ public with sharing class CC_Operativa_Oficina_Controller {
         }
         return false;
     }
-    
+
     @AuraEnabled
     public static void realizarTraslado3N(String recordId) {
         Id recordTypeIdGrupo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador__c', 'CC_Grupo_Tercer_Nivel');
-        List <CC_MCC_Grupo_Colaborador__c> grupoColaborador = [SELECT CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.RecordtypeId, 
+        List <CC_MCC_Grupo_Colaborador__c> grupoColaborador = [SELECT CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.RecordtypeId,
         CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.CC_Queue_Traslado__c
         FROM CC_MCC_Grupo_Colaborador__c
         WHERE CC_Grupo_Colaborador__r.CC_Queue_Traslado__c = 'Cola_3N_CSBD'
@@ -38,7 +38,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
 
     /************* Gestion de Oportunidades *********/
     @AuraEnabled
-    public static Map<String, Object> crearOportunidad(String recordId) {     
+    public static Map<String, Object> crearOportunidad(String recordId) {
         return CC_Gestion_Derivar_CSBD.crearOportunidad(recordId);
     }
 
@@ -48,15 +48,15 @@ public with sharing class CC_Operativa_Oficina_Controller {
     }
 
       //metodo que se llama desde CSBD
-    public static void devolverCasoCSBD(Map<String, Object> respuesta) {     
+    public static void devolverCasoCSBD(Map<String, Object> respuesta) {
         CC_Gestion_Derivar_CSBD.devolverCasoCSBD(respuesta);
     }
    /************* Gestion de Oportunidades *********/
 
-    
+
     @AuraEnabled
     public static Map<String, Object> crearTarea(String recordId, String asunto, String fechaActividad, String comentarios, List<String> archivos, Id oficinaDestino, Boolean enviarTareaOficinaCliente, Boolean crearTareaCitaGestor, Contact gestorSeleccionadoBuscador, Boolean otpDerivar) {
-      
+
        Map<String, Object> retorno = new Map<String, Object>();
        Map<String, Object> datos = new Map<String, Object>();
        datos.put('recordId', recordId);
@@ -77,7 +77,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
 
       // return CC_Crear_Tarea_OLD.crearTarea(recordId, asunto, fechaActividad, comentarios, archivos, oficinaDestino, enviarTareaOficinaCliente, crearTareaCitaGestor, gestorSeleccionadoBuscador, otpDerivar);
     }
-    
+
     @AuraEnabled
     public static Map<Object, Object> esClienteDigital(String recordId, String tipoActividad) {
         try {
@@ -87,7 +87,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
             throw new AuraHandledException(e.getMessage());
         }
     }
-    
+
     @AuraEnabled(cacheable=true)
     public static Map<String, String> getUrlNumeroOficina(Id recordId) {
         String hostnameEntero = String.valueOf(System.Url.getOrgDomainUrl());
@@ -97,7 +97,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
         String url = hostnameLimpio + '/lightning/r/Account/' + cuenta.Id + '/view';
         return new Map<String, String>{'numeroOficina' => cuenta.CC_Numero_Oficina__c, 'url' => url};
     }
-    
+
     @AuraEnabled
     public static List<OT_Picklist.Item> obtenerGestoresBackup(String recordId, String employeeId, String gestorElegidoId, String eventType) {
         try {
@@ -107,7 +107,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
             throw new AuraHandledException(e.getMessage());
         }
     }
-    
+
     @AuraEnabled
     public static List<OT_Picklist.Item> obtenerFechasDisponiblidadGestor(String recordId, String employeeId, String gestorElegidoId, String eventType) {
         try {
@@ -117,7 +117,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
             throw new AuraHandledException(e.getMessage());
         }
     }
-    
+
     @AuraEnabled
     public static List<OT_Picklist.Item> obtenerHorasDisponiblidadGestor(String recordId, String employeeId, String gestorElegidoId, String eventType, String fechaElegida) {
         try {
@@ -127,7 +127,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
             throw new AuraHandledException(e.getMessage());
         }
     }
-    
+
     @AuraEnabled
     public static Map<String, String> altaCitaGestor(String recordId, String empleadoEx, String nombreGestor, String centroEx, String asunto, String fecContacto, String horaIni, String medio) {
         try {
@@ -137,7 +137,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
             throw new AuraHandledException(e.getMessage());
         }
     }
-    
+
     @AuraEnabled(cacheable=true)
     public static List<Account> buscarOficinas(String cadenaBusqueda) {
         if (Schema.SObjectType.Account.isAccessible()) {
@@ -155,7 +155,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
             throw new AuraHandledException('Permisos insuficientes');
         }
     }
-    
+
     @AuraEnabled(cacheable=true)
     public static List<Contact> buscarGestoresGlobal(String cadenaBusqueda) {
         if (Schema.SObjectType.Contact.isAccessible()) {
@@ -164,30 +164,30 @@ public with sharing class CC_Operativa_Oficina_Controller {
             throw new AuraHandledException('Permisos insuficientes');
         }
     }
-    
+
     @AuraEnabled
     public static Boolean recuperarCampoDerivar(Id recordId) {
         Boolean campoDerivar = [SELECT CC_Derivar__c FROM Case WHERE Id = :recordId LIMIT 1].CC_Derivar__c;
         return campoDerivar;
     }
-    
+
     @AuraEnabled
     public static void dniTestamentaria(String dni, String recordId){
         Case caso = [SELECT Id, CC_DNI_Difunto__c FROM Case WHERE Id = :recordId LIMIT 1];
         caso.CC_DNI_Difunto__c = dni;
         update caso;
     }
-    
+
     @AuraEnabled
     public static Map<String, Object> recuperarDatosEntradaFlow(String recordId){
-        try {   
+        try {
             Case caso = [SELECT Id, accountId, contactId, CC_Oficina__c,CC_Oficina_afectada__c, AssetId FROM Case WHERE Id = :recordId LIMIT 1];
             Map<String, Object> datos = new Map<String, Object>();
             if(caso != null){
                 datos.put('recordId', caso.Id);
                 datos.put('currentCase', caso);
             }
-            return datos;          
+            return datos;
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
@@ -239,12 +239,16 @@ public with sharing class CC_Operativa_Oficina_Controller {
     public static void gestionarDevolucionAContact(List<CC_DevolverCaso__e> reabrirEvents) {
         List<CC_DevolverCaso__e> reabrirEventsCsbd = new List<CC_DevolverCaso__e>();
         List<CC_DevolverCaso__e> reabrirFraude = new List<CC_DevolverCaso__e>();
+        List<CC_DevolverCaso__e> reabrirCCO_HDT = new List<CC_DevolverCaso__e>();
+
         for(CC_DevolverCaso__e reabrirEvent : reabrirEvents){
             String origen = String.isNotBlank(reabrirEvent.CC_Origen__c) ? reabrirEvent.CC_Origen__c : 'CSBD';
             if(origen == 'CSBD'){
                 reabrirEventsCsbd.add(reabrirEvent);
             } else if(origen == 'Fraude'){
                 reabrirFraude.add(reabrirEvent);
+            } else if(origen == 'CCO' || origen == 'HDT'){
+                reabrirCCO_HDT.add(reabrirEvent);
             }
         }
 
@@ -255,7 +259,15 @@ public with sharing class CC_Operativa_Oficina_Controller {
         if(!reabrirFraude.isEmpty()){
             CC_Gestion_Derivar_Fraude.reabrirCasoFraude(reabrirFraude);
         }
-     
+
+        if(!reabrirCCO_HDT.isEmpty()){
+            Map<String,CC_DevolverCaso__e> reabrirCCO_HDTMap = new Map<String,CC_DevolverCaso__e>();
+            for(CC_DevolverCaso__e reabrirEvent : reabrirCCO_HDT){
+                reabrirCCO_HDTMap.put(reabrirEvent.CC_Origen__c, reabrirEvent);
+            }
+            System.debug('reabrirCCO_HDTMap: ' + JSON.serialize(reabrirCCO_HDTMap));
+            CC_CaseTransfer.reabrirCasosHDTCCO(reabrirCCO_HDTMap);
+        }
     }
     /************* Gestion del Platform Evento de intercambio entre aplicaciones  *********/
 
