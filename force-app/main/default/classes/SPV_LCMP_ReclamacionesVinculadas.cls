@@ -204,7 +204,7 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas {
         casoVinculado.SPV_CasoPadre__c = idCasoActual;
         casoVinculado.SPV_CasoVinculado__c = idCasoVinculado;
         casoVinculado.RecordTypeId = RECTYPECASORELACIONADOSPV;
-
+        
         if(Schema.sObjectType.CBK_CaseToCaseRelationship__c.isCreateable()){
             SPV_DatabaseDML.insertDML(casoVinculado, true);   
         }          
@@ -212,10 +212,22 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas {
             // Obtener extensiones de ambos casos
         // List<Id> idsCasos = new List<Id>{ idCasoActual, idCasoVinculado };
 
-        List<CBK_Case_Extension__c> caseExt = [SELECT Id, SPV_TieneCasosVinculados__c FROM CBK_Case_Extension__c WHERE RecordTypeId = :RECTYPERECLAMACIONEXTENSION AND Case_Id__c = :idCasoVinculado];
-
+        List<CBK_Case_Extension__c> caseExt = [SELECT Id, SPV_TieneCasosVinculados__c, Case_Id__r.RecordTypeId FROM CBK_Case_Extension__c WHERE RecordTypeId = :RECTYPERECLAMACIONEXTENSION AND Case_Id__c = :idCasoVinculado];
+        
         if(!caseExt.isEmpty() && !caseExt[0].SPV_TieneCasosVinculados__c){
             caseExt[0].SPV_TieneCasosVinculados__c = true;
+            if(caseExt[0].Case_Id__r.RecordTypeId == RECTYPERECLAMACIONSAC) {
+                case casoActual = new case();
+                casoActual.id = idCasoActual;
+                casoActual.CC_CasoRelacionado__c = idCasoVinculado;
+                SPV_DatabaseDML.updateDML(casoActual, true);
+            } else if(caseExt[0].Case_Id__r.RecordTypeId == RECTYPERECLAMACIONSPV) {
+                List<CBK_Case_Extension__c> caseExtCasoActual = [SELECT Id, SPV_TieneCasosVinculados__c FROM CBK_Case_Extension__c WHERE RecordTypeId = :RECTYPERECLAMACIONEXTENSION AND Case_Id__c = :idCasoActual];
+                CBK_Case_Extension__c casoVinculadoSPV = new CBK_Case_Extension__c();
+                casoVinculadoSPV.id = caseExtCasoActual[0].id;
+                casoVinculadoSPV.SPV_CasoRelacionadoSPV__c = idCasoVinculado;
+                caseExt.add(casoVinculadoSPV);
+            }
         }
 
         // Marcar los casos que aún no tienen el flag activado
@@ -232,22 +244,10 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas {
         }   
     }
 
-
-    /*****************************************************************
-     * @description Desvincular una reclamación SAC de la reclamción de SPV
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR         DATE         Description
-     * 1.0             US934229      Raúl Santos   04/06/2024        Creación
-     * 1.1             US1208255     Raúl Santos   23/05/2025        Modificación: múltiple vinculación
-     *****************************************************************/
     @AuraEnabled
     public static void desvincularReclamacion(String idCasoVinculado, String idCasoActual){
 
-        List<CBK_CaseToCaseRelationship__c> listCasoVinculado = [SELECT Id, SPV_CasoPadre__c, SPV_CasoVinculado__c FROM CBK_CaseToCaseRelationship__c WHERE RecordTypeId = :RECTYPECASORELACIONADOSPV AND SPV_CasoVinculado__c = :idCasoVinculado]; //SPV_CasoPadre__c = :idCasoActual
-        // List<CBK_CaseToCaseRelationship__c> listCasoVinculadoDelVinculado = [SELECT Id, SPV_CasoPadre__c, SPV_CasoVinculado__c FROM CBK_CaseToCaseRelationship__c WHERE RecordTypeId = :RECTYPECASORELACIONADOSPV AND SPV_CasoPadre__c = :idCasoVinculado];
-
+        List<CBK_CaseToCaseRelationship__c> listCasoVinculado = [ SELECT Id, SPV_CasoPadre__c, SPV_CasoVinculado__c FROM CBK_CaseToCaseRelationship__c WHERE RecordTypeId = :RECTYPECASORELACIONADOSPV AND SPV_CasoVinculado__c = :idCasoVinculado ];
 
         if(!listCasoVinculado.isEmpty()){
 
@@ -255,7 +255,7 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas {
             Integer contador = 0;
 
             for(CBK_CaseToCaseRelationship__c relacionado : listCasoVinculado){
-                if(relacionado.SPV_CasoPadre__c == idCasoActual){ //   if(relacionado.SPV_CasoVinculado__c == idCasoVinculado){
+                if (relacionado.SPV_CasoPadre__c == idCasoActual) {
                     vinculacionEliminar.add(relacionado);
                 }
                 contador++;
@@ -264,31 +264,51 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas {
             if(!vinculacionEliminar.isEmpty()){
                 SPV_DatabaseDML.deleteListDML(vinculacionEliminar, true);
 
+                // === NUEVO: limpiar campos espejo en el CASO ACTUAL ===
+                try {
+                    // CASE
+                    Case casoActual = [ SELECT Id, CC_CasoRelacionado__c FROM Case WHERE Id = :idCasoActual LIMIT 1 ];
+                    Boolean hayCambioCase = false;
+                    if (casoActual.CC_CasoRelacionado__c == idCasoVinculado) {
+                        casoActual.CC_CasoRelacionado__c = null;
+                        hayCambioCase = true;
+                    }
+                    if (hayCambioCase && Schema.sObjectType.Case.isUpdateable()) {
+                        SPV_DatabaseDML.updateDML(casoActual, true);
+                    }
+
+                    // EXTENSIÓN DEL CASO ACTUAL (SPV_CasoRelacionadoSPV__c)
+                    List<CBK_Case_Extension__c> extActualList = [ SELECT Id, SPV_CasoRelacionadoSPV__c FROM CBK_Case_Extension__c WHERE RecordTypeId = :RECTYPERECLAMACIONEXTENSION AND Case_Id__c = :idCasoActual LIMIT 1 ];
+                    if (!extActualList.isEmpty()) {
+                        CBK_Case_Extension__c extActual = extActualList[0];
+                        Boolean hayCambioExt = false;
+                        if (extActual.SPV_CasoRelacionadoSPV__c == idCasoVinculado) {
+                            extActual.SPV_CasoRelacionadoSPV__c = null;
+                            hayCambioExt = true;
+                        }
+                        if (hayCambioExt && Schema.sObjectType.CBK_Case_Extension__c.isUpdateable()) {
+                            SPV_DatabaseDML.updateDML(extActual, true);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.debug('Error limpiando espejos en desvincularReclamacion: ' + e.getMessage());
+                }
+                // === FIN NUEVO ===
+
+                // Si era el único vínculo del CASO VINCULADO, desmarca el flag en su extensión
                 if(contador == 1){
-                    //Actualizar caso (no vinculadas)
-                    List<CBK_Case_Extension__c> caseExt = [SELECT Id, SPV_TieneCasosVinculados__c FROM CBK_Case_Extension__c WHERE RecordTypeId = :RECTYPERECLAMACIONEXTENSION AND Case_Id__c = :idCasoVinculado LIMIT 1];
+                    List<CBK_Case_Extension__c> caseExt = [ SELECT Id, SPV_TieneCasosVinculados__c FROM CBK_Case_Extension__c WHERE RecordTypeId = :RECTYPERECLAMACIONEXTENSION AND Case_Id__c = :idCasoVinculado LIMIT 1 ];
                     if(!caseExt.isEmpty()){
                         caseExt[0].SPV_TieneCasosVinculados__c = false;
-
                         if(Schema.sObjectType.CBK_Case_Extension__c.isUpdateable()){
                             SPV_DatabaseDML.updateListDML(caseExt, true);   
                         }        
                     }       
                 }
             }
-        }  
-        // if(listCasoVinculadoDelVinculado.isEmpty()){
-        //     // Si no hay vínculos en el caso vinculado, se actualiza el estado del caso
-        //     List<CBK_Case_Extension__c> caseExt = [SELECT Id, SPV_TieneCasosVinculados__c FROM CBK_Case_Extension__c WHERE RecordTypeId = :RECTYPERECLAMACIONEXTENSION AND Case_Id__c = :idCasoVinculado LIMIT 1];
-        //     if(!caseExt.isEmpty()){
-        //         caseExt[0].SPV_TieneCasosVinculados__c = false;
-
-        //         if(Schema.sObjectType.CBK_Case_Extension__c.isUpdateable()){
-        //             SPV_DatabaseDML.updateListDML(caseExt, true);
-        //         }
-        //     }
-        // }
+        }
     }
+
 
     /*****************************************************************
      * @description Comprobar si un usuario tiene permisos para vincualr o desvincular reclamaciones SAC/SPV desde la reclamacion de SPV.

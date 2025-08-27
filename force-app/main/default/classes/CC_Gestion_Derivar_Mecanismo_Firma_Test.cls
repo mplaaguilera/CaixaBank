@@ -157,6 +157,12 @@ public class CC_Gestion_Derivar_Mecanismo_Firma_Test {
             );
             insert configuracion;
 
+            CC_Settings__c configuracion2 = new CC_Settings__c(
+                Name = 'CC_MecanismoFirmaCola',
+                CC_Activa__c = true,
+                CC_Configuracion_1__c = 'Videollamada_Enrollment_Caixabank_Sign'
+            );
+            insert configuracion2;
 
         }
     }

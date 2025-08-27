@@ -1811,8 +1811,8 @@ public without sharing class SAC_Reclamacion {
     public static void crearCaseHistoryReclamacionCerrada(Map<Id, Case> mapOldObj, List<Case> listNewObj) {
         List<CBK_CaseHistory__c> caseHistoryRecords = new List<CBK_CaseHistory__c>();
 
-        SObjectType caseFields = Schema.getGlobalDescribe().get('Case');
-        Map<String,Schema.SObjectField> mfields = caseFields.getDescribe().fields.getMap();
+        Map<String,Schema.SObjectField> mfields = Schema.SObjectType.Case.fields.getMap();
+
         Schema.DescribeFieldResult fieldDescribe;
         
         for (Case newCase : listNewObj) {
@@ -1852,8 +1852,7 @@ public without sharing class SAC_Reclamacion {
     public static void crearCaseExtensionHistoryReclamacionCerrada(Map<Id, CBK_Case_Extension__c> mapOldObj, List<CBK_Case_Extension__c> listNewObj) {
         List<CBK_CaseHistory__c> caseHistoryRecords = new List<CBK_CaseHistory__c>();
 
-        SObjectType caseExtensionFields = Schema.getGlobalDescribe().get('CBK_Case_Extension__c');
-        Map<String,Schema.SObjectField> mfields = caseExtensionFields.getDescribe().fields.getMap();
+        Map<String,Schema.SObjectField> mfields = Schema.SObjectType.CBK_Case_Extension__c.fields.getMap();
         Schema.DescribeFieldResult fieldDescribe;
         for (CBK_Case_Extension__c newCaseExtension : listNewObj) {
             CBK_Case_Extension__c oldCaseExtension = mapOldObj.get(newCaseExtension.Id);

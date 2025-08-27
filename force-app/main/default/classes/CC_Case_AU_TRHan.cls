@@ -74,6 +74,7 @@ public without sharing class CC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         if(!casesCC.isEmpty()){
             filtrarCasosAccountActualizada(casesCC, mapOldObj);
             CC_CaseTriggerHelper.crearActividadCobrowsing(casesCC, mapOldObj);
+            CC_CaseTriggerHelper.devolucionCasosCCOHDT(casesCC, mapOldObj);
         }
 
         //envioCorreoConsultasOperativasAsignarPropietario(mapOldObj, listNewObj, idsCAM);

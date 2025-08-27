@@ -1138,7 +1138,22 @@ public with sharing class CC_Activity_Test {
         }
         
     }
+    
+    @isTest
+    public static void crearActividadGestionCitasTest(){
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearActividadGestionCitas(caso.Id);
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
 
+    }
     
     @isTest
     public static void crearActividadCobrowsingTest() {
@@ -1173,4 +1188,37 @@ public with sharing class CC_Activity_Test {
         }
 
     }
+
+    @isTest
+    public static void crearActividadTransferirLLamadaFraudeTest(){
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0112345' AND IsActive=true LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearActividadTransferirLLamadaFraude(caso.Id);
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+
+    }
+
+    @isTest
+    public static void crearActividadTransferirLLamadaICPTest(){
+        List<User> usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01112345' AND IsActive=true LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'casoGenerico' LIMIT 1];
+        if (!usuario.isEmpty()) {
+            System.runAs(usuario[0]) {
+                Test.startTest();
+                CC_Activity.crearActividadTransferirLLamadaICP(caso.Id);
+                Test.stopTest();
+    
+                System.assertEquals(1, [SELECT COUNT() FROM Task WHERE WhatId = :caso.Id]);
+            }
+        }
+
+    }
+
 }

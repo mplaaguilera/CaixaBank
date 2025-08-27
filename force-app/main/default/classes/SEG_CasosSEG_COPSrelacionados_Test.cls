@@ -384,7 +384,7 @@ public with sharing class SEG_CasosSEG_COPSrelacionados_Test {
         lstCase.add(caso3);
 		insert lstCase;
         
-        SEG_CasosSEG_COPSrelacionados job = new SEG_CasosSEG_COPSrelacionados(correo.Id, correo.htmlBody, correo.subject);
+        SEG_CasosSEG_COPSrelacionados job = new SEG_CasosSEG_COPSrelacionados(correo.Id, correo.htmlBody, correo.subject, 'idNoExistente');
         System.runAs (usuarioAdmin) {
 
             AsyncOptions options = new AsyncOptions();
@@ -412,4 +412,162 @@ public with sharing class SEG_CasosSEG_COPSrelacionados_Test {
             System.assertEquals( 3, countCases, 'Los casos actuales son 3');
         }   
     }
+
+    @IsTest
+    public static void emailCOPSaSEG() {
+        User usuarioAdmin = OS_Usuarios.usuarioAdmin();
+
+        // Crear EmailMessage
+        EmailMessage correo = new EmailMessage();
+        correo.Subject = 'pruebaCOPS';
+        correo.Incoming = true;
+        correo.TextBody = 'cuerpoCOPS';
+        correo.FromAddress = 'testcops@mail.com';
+        insert correo;
+
+        // Datos base
+        Contact contacto = [SELECT Id, AccountId FROM Contact WHERE Email = 'correo@prueba.com' LIMIT 1];
+        CC_MCC__c mccs = [SELECT Id, CC_Producto_Servicio__c, CC_Tematica__c FROM CC_MCC__c WHERE CC_Codigo_Externo__c = 'MOC-000001' LIMIT 1];
+        Id recordTypeOs = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+
+        // Crear caso COPS
+        Case casoCOPS = new Case(
+            RecordTypeId = recordTypeOs,
+            Subject = 'Caso COPS',
+            Origin = 'Email',
+            Status = 'Activo',
+            AccountId = contacto.AccountId,
+            ContactId = contacto.Id,
+            CC_Idioma__c = 'es',
+            CC_Detalles_Consulta__c = 'Detalles consulta',
+            CC_Detalles_Solucion__c = 'Detalles solución',
+            CC_MCC_Tematica__c = mccs.CC_Tematica__c,
+            CC_MCC_ProdServ__c = mccs.CC_Producto_Servicio__c,
+            CC_MCC_Motivo__c = mccs.Id,
+            CC_Canal_Procedencia__c = 'Buzón CCI Holabank',
+            CC_Tipo_Contacto__c = 'Asesoramiento'
+
+            //Este campo se rellenaría llamando al método de relación
+            //SEG_Id_Related_Mail__c = correo.Id
+        );
+        insert casoCOPS;
+
+        // Crear caso SEG
+        Id recordTypeSeg = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
+        Case casoSEG = new Case(
+            RecordTypeId = recordTypeSeg,
+            Subject = 'Caso SEG',
+            Origin = 'Email',
+            Status = 'Activo',
+            AccountId = contacto.AccountId,
+            ContactId = contacto.Id,
+
+            SEG_Id_Related_Mail__c = correo.Id
+        );
+        insert casoSEG;
+
+        // Vinculación: COPS → SEG
+        SEG_CasosSEG_COPSrelacionados job = new SEG_CasosSEG_COPSrelacionados(correo.Id, correo.TextBody, correo.Subject, casoCOPS.Id);
+        System.runAs(usuarioAdmin) {
+
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+            .addId(usuarioAdmin.Id)
+            .addString('testRelatedCase')
+            .build();
+
+            Id id;
+            Test.startTest();
+                try {
+                    id= System.enqueueJob(job, options);
+                } catch (DuplicateMessageException ex) {
+                    //Exception is thrown if there is already an enqueued job with the same signature
+                    CBK_Log.error(ex);
+                }
+            Test.stopTest();
+
+            // Verificar que el caso SEG está vinculado al caso COPS
+            Case casoSegReload = [SELECT CC_CasoRelacionado__c FROM Case WHERE Id = :casoSEG.Id];
+            System.assertEquals(casoCOPS.Id, casoSegReload.CC_CasoRelacionado__c, 'El caso SEG debe estar vinculado al caso COPS');
+        }
+    }
+
+    @IsTest
+    public static void emailSEGaCOPS() {
+        User usuarioAdmin = OS_Usuarios.usuarioAdmin();
+
+        // Crear EmailMessage
+        EmailMessage correo = new EmailMessage();
+        correo.Subject = 'pruebaSEG';
+        correo.Incoming = true;
+        correo.TextBody = 'cuerpoSEG';
+        correo.FromAddress = 'testseg@mail.com';
+        insert correo;
+
+        // Datos base
+        Contact contacto = [SELECT Id, AccountId FROM Contact WHERE Email = 'correo@prueba.com' LIMIT 1];
+        CC_MCC__c mccs = [SELECT Id, CC_Producto_Servicio__c, CC_Tematica__c FROM CC_MCC__c WHERE CC_Codigo_Externo__c = 'MOC-000001' LIMIT 1];
+        Id recordTypeSeg = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
+
+        // Crear caso SEG
+        Case casoSEG = new Case(
+            RecordTypeId = recordTypeSeg,
+            Subject = 'Caso SEG',
+            Origin = 'Email',
+            Status = 'Activo',
+            AccountId = contacto.AccountId,
+            ContactId = contacto.Id
+
+            //Este campo se rellenaría llamando al método de relación
+            //SEG_Id_Related_Mail__c = correo.Id
+        );
+        insert casoSEG;
+
+        // Crear caso COPS
+        Id recordTypeOs = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+        Case casoCOPS = new Case(
+            RecordTypeId = recordTypeOs,
+            Subject = 'Caso COPS',
+            Origin = 'Email',
+            Status = 'Activo',
+            AccountId = contacto.AccountId,
+            ContactId = contacto.Id,
+            CC_Idioma__c = 'es',
+            CC_Detalles_Consulta__c = 'Detalles consulta',
+            CC_Detalles_Solucion__c = 'Detalles solución',
+            CC_MCC_Tematica__c = mccs.CC_Tematica__c,
+            CC_MCC_ProdServ__c = mccs.CC_Producto_Servicio__c,
+            CC_MCC_Motivo__c = mccs.Id,
+            CC_Canal_Procedencia__c = 'Buzón CCI Holabank',
+            CC_Tipo_Contacto__c = 'Asesoramiento',
+            SEG_Id_Related_Mail__c = correo.Id
+        );
+        insert casoCOPS;
+
+        // Vinculación: SEG → COPS
+        SEG_CasosSEG_COPSrelacionados job = new SEG_CasosSEG_COPSrelacionados(correo.Id, correo.TextBody, correo.Subject, casoSEG.Id);
+        System.runAs(usuarioAdmin) {
+
+            AsyncOptions options = new AsyncOptions();
+            options.DuplicateSignature = QueueableDuplicateSignature.Builder()
+            .addId(usuarioAdmin.Id)
+            .addString('testRelatedCase')
+            .build();
+
+            Id id;
+            Test.startTest();
+                try {
+                    id= System.enqueueJob(job, options);
+                } catch (DuplicateMessageException ex) {
+                    //Exception is thrown if there is already an enqueued job with the same signature
+                    CBK_Log.error(ex);
+                }
+            Test.stopTest();
+
+            // Verificar que el caso COPS está vinculado al caso SEG
+            Case casoCopsReload = [SELECT CC_CasoRelacionado__c FROM Case WHERE Id = :casoCOPS.Id];
+            System.assertEquals(casoSEG.Id, casoCopsReload.CC_CasoRelacionado__c, 'El caso COPS debe estar vinculado al caso SEG');
+        }
+    }
+
 }

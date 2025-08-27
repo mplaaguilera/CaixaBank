@@ -420,30 +420,51 @@ public with sharing class CC_GDPR {
 	}
 
 	@AuraEnabled
-	public static void crearTareaGDPR(Id idCaso, String derechoEjercido) {
+	public static void crearTareaGDPR(List<CC_Derecho__c> derechoEjercido) {
 		try {
-			// Obtener información del caso
-			Case caso = [SELECT Id, CaseNumber, Subject, Account.Name, Contact.Name 
+			// Filtrar derechos con casos válidos y crear Set de IDs
+			Set<Id> casosIds = new Set<Id>();
+			for (CC_Derecho__c derecho : derechoEjercido) {
+				if (derecho.CC_Caso__c != null) {
+					casosIds.add(derecho.CC_Caso__c);
+				}
+			}
+			
+			if (casosIds.isEmpty()) return;
+			
+			// Query optimizada con mapa directo
+			Map<Id, Case> mapaCasos = new Map<Id, Case>([SELECT Id, CaseNumber, Subject, Account.Name, Contact.Name 
 						 FROM Case 
-						 WHERE Id = :idCaso];
-			
-			// Crear nueva tarea
-			Task nuevaTarea = new Task();
-			nuevaTarea.WhatId = idCaso; // Asociar al caso
-			nuevaTarea.Subject = 'GDPR';
-			nuevaTarea.Type = 'GDPR';
-			nuevaTarea.Description = 'Se ha iniciado el proceso de ejercicio de derecho GDPR para el caso ' + caso.CaseNumber + 
-									'\nCliente: ' + (caso.Account.Name != null ? caso.Account.Name : 'N/A') +
-									'\nContacto: ' + (caso.Contact.Name != null ? caso.Contact.Name : 'N/A') +
-									'\nAsunto: ' + (caso.Subject != null ? caso.Subject : 'N/A') +
-									'\nDerecho ejercido: ' + derechoEjercido +
-									'\nFecha de creación: ' + Datetime.now().format('dd/MM/yyyy HH:mm:ss');
-			nuevaTarea.Status = 'Completed';
-			nuevaTarea.Priority = 'Normal';
-			nuevaTarea.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
-			
-			insert nuevaTarea;
-			
+						 WHERE Id IN :casosIds]);
+
+			// Crear tareas directamente sin mapa intermedio
+			List<Task> tareas = new List<Task>();
+			String recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+			for (CC_Derecho__c derecho : derechoEjercido) {
+				Case caso = mapaCasos.get(derecho.CC_Caso__c);
+				if (caso != null) {
+					// Obtener el nombre del Record Type usando el método existente
+					String nombreRecordType = CC_MetodosUtiles.getRecordTypeNameFromId('CC_Derecho__c', derecho.RecordTypeId);
+					tareas.add(new Task(
+						WhatId = caso.Id,
+						Subject = 'GDPR',
+						Type = 'GDPR',
+						Description = 'Se ha iniciado el proceso de ejercicio de derecho GDPR para el caso ' + caso.CaseNumber + 
+									'\nCliente: ' + (caso.Account.Name ?? 'N/A') +
+									'\nContacto: ' + (caso.Contact.Name ?? 'N/A') +
+									'\nAsunto: ' + (caso.Subject ?? 'N/A') +
+									'\nDerecho ejercido: ' + (nombreRecordType ?? 'N/A'),
+						Status = 'Completed',
+						Priority = 'Normal',
+						RecordTypeId = recordTypeId
+					));
+				}
+			}
+
+			if (!tareas.isEmpty()) {
+				insert tareas;
+			}
+
 		} catch (Exception e) {
 			// Log del error pero no fallar la operación principal
 			CBK_Log.error(e, 'CC_GDPR - crearTareaGDPR - Error al crear tarea GDPR');

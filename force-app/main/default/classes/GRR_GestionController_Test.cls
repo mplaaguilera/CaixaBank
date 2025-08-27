@@ -33,6 +33,8 @@ public with sharing class GRR_GestionController_Test {
 
     @isTest
     static void testgetGestionesByCaseId() {
+         System.runAs(GRR_TestDataFactory.usuarioPruebasGRR()) {
+
        
          User usuario = [SELECT Id FROM User WHERE FirstName = 'GRR Prueba Clases Test' LIMIT 1];
 
@@ -64,7 +66,7 @@ public with sharing class GRR_GestionController_Test {
             )
         };
         insert gestiones;
-          System.runAs(usuario) {
+          //System.runAs(usuario) {
 
             Test.startTest();
             List<GRR_Gestion__c> result = GRR_GestionController.getGestionesByCaseId(caso.Id, 'GRR_Cirbe');
@@ -74,8 +76,8 @@ public with sharing class GRR_GestionController_Test {
         
             // Verificaciones
             System.assertEquals(2, result.size(), 'Debe devolver 2 gestiones');
+        //}
         }
-
     }
 
 

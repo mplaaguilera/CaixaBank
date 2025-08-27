@@ -12,9 +12,9 @@ public class AM_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
                 if(String.valueOf(emailMessage.ParentId.getSobjectType()) == 'Case'){
                     parentIdCaseSet.add(emailMessage.ParentId);
                 }
-          else if(OT_Proyectos.registroProyecto(emailMessage.ParentId) == 'AM'){
+                else if(OT_Proyectos.registroProyecto(emailMessage.ParentId) == 'AM'){
                     newList.add(emailMessage);
-                }
+                }                
             }
         }
         Set<Id> casesAMId = new Set<Id>();
@@ -36,9 +36,9 @@ public class AM_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
     }
 
     private void process(List<EmailMessage> listNewObj, Map<Id, EmailMessage> mapNewObj) {
-
+        
         System.debug('Entro en AM_EmailMessage_AI_TRHan');
-
+        
         List<EmailMessage> newList = filtrarEmailMessageNoCAM(listNewObj);
 
         validarBuzonSalida(newList);
@@ -84,7 +84,7 @@ public class AM_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
 
         //Ejecución de las inserciones de las nuevas actividades de traslado
         insert actividadesTraslado;
-
+    
         List<Id> idActividesCorreo = new List<Id>();
         for (EmailMessage correo : newList) {
             //Actualización de las actividades existentes de correo para relacionarlas con las de traslado
@@ -95,9 +95,8 @@ public class AM_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
     private static void envioTrasladoColaborador(EmailMessage correo, List<Case> casos, List<Task> actividadesTraslado) {
         //CORREO SALIENTE
         //Cambio de estado del caso
-        Case casoPrincipal = [SELECT CC_Ultima_Interaccion__c, CC_Fecha_Ultima_Interaccion__c, CC_Referencia_Correo_Saliente__c, CC_Cambio_Estado_Pendiente_Externo__c, Status, Origin,
-                              FROM CC_Fecha_1a_Respuesta_Twitter__c, CC_Fecha_Respuesta_Stores__c
-                              FROM Case WHERE Id = :correo.ParentId];
+        Case caso = [SELECT CC_Ultima_Interaccion__c, CC_Fecha_Ultima_Interaccion__c, CC_Referencia_Correo_Saliente__c, CC_Cambio_Estado_Pendiente_Externo__c, Status, Origin,
+                    CC_Fecha_1a_Respuesta_Twitter__c, CC_Fecha_Respuesta_Stores__c FROM Case WHERE Id = :correo.ParentId];
 
         //caso.CC_Cambio_Estado_Pendiente_Externo__c = true;
         caso.Status = 'Pendiente Colaborador';
@@ -105,7 +104,7 @@ public class AM_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
         caso.CC_Fecha_Ultima_Interaccion__c = System.now();
         caso.CC_Fecha_Traslado_Colaborador__c = Datetime.valueOf(System.now());
         //Si es Twitter o Stores informamos fecha respuesta para SLA reports, cuenta como gestión
-
+        
         //Nueva actividad de tipo "Trasladar Colaborador"
         Task actividadTraslado = new Task();
         actividadTraslado.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'AM_Task');
@@ -130,7 +129,7 @@ public class AM_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
 
     private static void envioResponderCliente(EmailMessage correo, List<Case> casos, List<Task> actividadesTraslado) {
         //CORREO SALIENTE
-
+        
         Case caso = [SELECT CC_Ultima_Interaccion__c, CC_Fecha_Ultima_Interaccion__c, CC_Referencia_Correo_Saliente__c, Status, OS_Cerrado_Operativa__c FROM Case WHERE Id = :correo.ParentId];
 
         Task actividadTraslado = new Task();
@@ -149,16 +148,16 @@ public class AM_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
         caso.CC_Referencia_Correo_Saliente__c = '';
         caso.CC_Ultima_Interaccion__c = 'Nuevo';
         caso.CC_Fecha_Ultima_Interaccion__c = System.now();
-
+        
         ///OS_Cerrado_Operativa__c = true EN OS_Case_Operativas_Controller
        if (caso.OS_Cerrado_Operativa__c) {
             caso = AM_Case.responderCerrar(caso);
-        }
+        }  
         casos.add(caso);
     }
 
     private static void envioRemitirColaborador(EmailMessage correo, List<Case> casos, List<Task> actividadesTraslado) {
-
+        
         //CORREO SALIENTE
         Case caso = [SELECT CC_Referencia_Correo_Saliente__c, CC_Ultima_Interaccion__c, CC_Fecha_Ultima_Interaccion__c, Status, CC_Ultima_Operativa_Correo__c FROM Case WHERE Id = :correo.ParentId];
 
@@ -187,7 +186,7 @@ public class AM_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
         //Recuperamos el plazo que tendrá cliente/empleado para responder al mail de Sol. Inf. para asignarlo al caso y tarea
         //Posteriormente habrá un PB que cerrará el caso y enviará un mail en el momento que cumpla el plazo
         Datetime fechaFinPlazo = null;
-
+        
         //Cambio de estado del caso
         Case caso = [SELECT CC_Fecha_Ultima_Interaccion__c, CC_Canal_Procedencia__c, CC_Ultima_Interaccion__c, CC_Referencia_Correo_Saliente__c, Status, RecordType.DeveloperName FROM Case WHERE Id = :correo.ParentId];
         // El caso se cierra automáticamente tras x tiempo solo para valores
@@ -212,13 +211,13 @@ public class AM_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
         actividadTraslado.CC_Referencia_Correo_Saliente__c = caso.CC_Referencia_Correo_Saliente__c;
         actividadTraslado.ActivityDate = System.today();
         actividadesTraslado.add(actividadTraslado);
-
+        
         caso.CC_Referencia_Correo_Saliente__c = ''; //Se vacía la referencia de correo saliente del caso para evitar que se reuse por error
         casos.add(caso);
     }
 
     private void comprobarAnexosPermitidos(List<EmailMessage> listNewObj, Map<Id, EmailMessage> mapNewObj) {
-
+        
         if (!listNewObj.isEmpty()) {
             //Se obtienen las extensiones permitidas para un anexo
             List<String> extensionesPermitidas = new List<String>();

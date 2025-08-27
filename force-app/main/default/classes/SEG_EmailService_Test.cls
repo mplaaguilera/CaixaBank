@@ -1939,7 +1939,7 @@ public class SEG_EmailService_Test{
         }           
    }
    
-   @IsTest
+    @IsTest
      public static void subjectMoreThan255() {
 
         User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
@@ -1966,4 +1966,55 @@ public class SEG_EmailService_Test{
             System.assert(header.value != null,'El resultado ha sido el correcto');
         }
     }
+
+    @IsTest
+    public static void testPrepararEncoladoMailsRelacionadosException() {
+        User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+
+        Id recordTypeSeg = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SEG_Cliente').getRecordTypeId();
+        Id recordTypeCOPS = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('OS_Cliente').getRecordTypeId();
+
+        Case casoSEG = new Case(
+            RecordTypeId = recordTypeSeg,
+            Subject = 'Caso SEG Test',
+            Status = 'Activo'
+        );
+        insert casoSEG;
+
+        Case casoCOPS = new Case(
+            RecordTypeId = recordTypeCOPS,
+            Subject = 'Caso COPS',
+            Origin = 'Email',
+            Status = 'Activo',
+            CC_Idioma__c = 'es',
+            CC_Detalles_Consulta__c = 'Detalles consulta',
+            CC_Detalles_Solucion__c = 'Detalles solución',
+            CC_Canal_Procedencia__c = 'Buzón CCI Holabank',
+            CC_Tipo_Contacto__c = 'Asesoramiento'
+        );
+        insert casoCOPS;
+
+        String messageId = 'test-message-id';
+        String htmlBody = '<html><body>Test body</body></html>';
+        String subject = 'Test Subject';
+
+        Boolean exceptionThrown = false;
+        System.runAs(usuarioTest) {
+            Test.startTest();
+            try {
+                SEG_EmailService.prepararEncoladoMailsRelacionados(
+                    casoSEG.Id,
+                    messageId,
+                    htmlBody,
+                    subject,
+                    casoCOPS.Id
+                );
+            } catch (Exception e) {
+                exceptionThrown = true;
+            }
+            Test.stopTest();
+        }
+        System.assertEquals(exceptionThrown, false, 'No debe lanzarse ninguna excepción durante el encolado');
+    }
+
 }

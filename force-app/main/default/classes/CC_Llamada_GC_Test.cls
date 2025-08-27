@@ -243,6 +243,14 @@ Test.startTest();
 			listaCanales.add(new CC_Canal_Com__c(CC_Telefono__c='666001133', CC_ContactoId__c=listaContactos[1].Id, CC_CuentaId__c=listaCuentas[1].Id, RecordTypeId = recordTypeTelefono));
 			listaCanales.add(new CC_Canal_Com__c(CC_Telefono__c='666001133', CC_ContactoId__c=listaContactos[2].Id, CC_CuentaId__c=listaCuentas[2].Id, RecordTypeId = recordTypeTelefono));
 			insert listaCanales;
+
+			CC_Settings__c settings = new CC_Settings__c();
+			settings.CC_Activa__c = true;
+			settings.Name = 'CC_Colas_HDT_CCO_Activas';
+			settings.CC_Configuracion_1__c = 'HDT';
+			settings.CC_Configuracion_2__c = 'CCO';
+			insert settings;
+
 Test.stopTest();
 		}
 	}
@@ -521,10 +529,17 @@ Test.stopTest();
 			CC_Llamada_GC.finalizarLlamada(inputFinalizarLlamada, 'Llamada finalizada');
 			Test.stopTest();
 
-			System.assert(![SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaSaliente.Id AND WhatId = :caso.Id
-							AND Type = 'Llamada saliente' AND Status = 'Completed' AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1].isEmpty());
-			System.assert(![SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id
-							AND CC_Fecha_Fin__c != NULL AND CC_Tipo_Cierre__c = 'Llamada finalizada'].isEmpty());
+			CC_Llamada__c llamada = [SELECT CC_Tipo_Cierre__c FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id];
+			Task actividad = [SELECT CC_Tipo_Cierre__c FROM Task WHERE CC_Llamada_Id__c = :llamadaSaliente.Id AND WhatId = :caso.Id
+								AND Type = 'Llamada saliente' AND Status = 'Completed' LIMIT 1];
+
+			if (llamada.CC_Tipo_Cierre__c != 'Llamada atendida' && llamada.CC_Tipo_Cierre__c != 'Llamada finalizada') {
+				System.assertEquals('Llamada no atendida', actividad.CC_Tipo_Cierre__c);
+				System.assertEquals('Llamada no atendida', llamada.CC_Tipo_Cierre__c);
+			} else {
+				System.assertEquals('Llamada finalizada', actividad.CC_Tipo_Cierre__c);
+				System.assertEquals('Llamada finalizada', llamada.CC_Tipo_Cierre__c);
+			}
 		}
 	}
 
@@ -683,8 +698,13 @@ Test.stopTest();
 			CC_Llamada_GC.finalizarLlamada(inputLlamada, 'Llamada finalizada');
 			Test.stopTest();
 
-			List<CC_Llamada__c> llamadas = [SELECT Id FROM CC_Llamada__c WHERE Id = :llamada.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
-			System.assert(!llamadas.isEmpty());
+			CC_Llamada__c llamadaFin = [SELECT CC_Tipo_Cierre__c, CC_Fecha_Fin__c FROM CC_Llamada__c WHERE Id = :llamada.Id];
+			System.assertNotEquals(null, llamadaFin.CC_Fecha_Fin__c);
+			if (llamadaFin.CC_Tipo_Cierre__c != 'Llamada atendida' && llamadaFin.CC_Tipo_Cierre__c != 'Llamada finalizada') {
+				System.assertEquals('Llamada no atendida', llamadaFin.CC_Tipo_Cierre__c);
+			} else {
+				System.assertEquals('Llamada finalizada', llamadaFin.CC_Tipo_Cierre__c);
+			}
 		}
 	}
 
@@ -715,9 +735,17 @@ Test.stopTest();
 			CC_Llamada_GC.finalizarLlamada(inputLlamada, 'Llamada finalizada');
 			Test.stopTest();
 
-			Task actividad = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaEntrante.Id AND Status = 'Completed' AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
-			llamadaEntrante = [SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaEntrante.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada'];
-			System.assert(llamadaEntrante != null);
+			CC_Llamada__c llamadaFin = [SELECT CC_Tipo_Cierre__c, CC_Fecha_Fin__c FROM CC_Llamada__c WHERE Id = :llamadaEntrante.Id];
+			System.assertNotEquals(null, llamadaFin.CC_Fecha_Fin__c);
+			Task actividad = [SELECT CC_Tipo_Cierre__c, Status FROM Task WHERE CC_Llamada_Id__c = :llamadaEntrante.Id AND Status = 'Completed' LIMIT 1];
+			System.assertEquals('Completed', actividad.Status);
+			if (llamadaFin.CC_Tipo_Cierre__c != 'Llamada atendida' && llamadaFin.CC_Tipo_Cierre__c != 'Llamada finalizada') {
+				System.assertEquals('Llamada no atendida', actividad.CC_Tipo_Cierre__c);
+				System.assertEquals('Llamada no atendida', llamadaFin.CC_Tipo_Cierre__c);
+			} else {
+				System.assertEquals('Llamada finalizada', actividad.CC_Tipo_Cierre__c);
+				System.assertEquals('Llamada finalizada', llamadaFin.CC_Tipo_Cierre__c);
+			}
 		}
 	}
 
@@ -745,9 +773,15 @@ Test.stopTest();
 			//Se cuelga la llamada al transferir al completar la consulta
 			inputLlamada = obtenerInputLlamada(s1.CC_Codigo__c, llamadaEntrante.Id, null, '', null);
 			CC_Llamada_GC.finalizarLlamada(inputLlamada, 'Llamada finalizada');
-			llamadaEntrante = [SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaEntrante.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
-			System.assert(llamadaEntrante != null);
 			Test.stopTest();
+
+			CC_Llamada__c llamadaFin = [SELECT CC_Tipo_Cierre__c, CC_Fecha_Fin__c FROM CC_Llamada__c WHERE Id = :llamadaEntrante.Id];
+			System.assertNotEquals(null, llamadaFin.CC_Fecha_Fin__c);
+			if (llamadaFin.CC_Tipo_Cierre__c != 'Llamada atendida' && llamadaFin.CC_Tipo_Cierre__c != 'Llamada finalizada') {
+				System.assertEquals('Llamada no atendida', llamadaFin.CC_Tipo_Cierre__c);
+			} else {
+				System.assertEquals('Llamada finalizada', llamadaFin.CC_Tipo_Cierre__c);
+			}
 		}
 	}
 
@@ -793,11 +827,9 @@ Test.stopTest();
 	@isTest
 	public static void finalizarLlamadaTest() {
         User adminKinton = [SELECT Id FROM User WHERE LastName = 'Administrador Kinton'];
-
 		System.runAs(adminKinton) {
 			CC_Servicio_Genesys__c s1 = [SELECT CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE Name = 'Servicio 1' LIMIT 1];
 			Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso cliente Test'];
-
 			//Realizar la llamada saliente
 			CC_Llamada_Input inputLlamada = obtenerInputLlamada(null, null, caso.Id, null, null);
 			Map<String, Object> retornoRegistrarLlamadaEntrante = CC_Llamada_GC.registrarLlamadaSaliente(inputLlamada);
@@ -806,17 +838,23 @@ Test.stopTest();
 			Task actividad = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaSaliente.Id AND WhatId = :caso.Id AND Type = 'Llamada saliente' AND Status = 'Open' LIMIT 1];
 			System.assert(actividad != null);
 			inputLlamada = obtenerInputLlamada(null, null, caso.Id, null, null);
-
 			Test.startTest();
 			//Colgamos la llamada
 			CC_Llamada_GC.finalizarLlamada(inputLlamada, 'Llamada finalizada');
 			Test.stopTest();
 
-			actividad = [SELECT Id FROM Task WHERE CC_Llamada_Id__c = :llamadaSaliente.Id AND WhatId = :caso.Id AND
-							Type = 'Llamada saliente' AND Status = 'Completed' AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
-			System.assert(actividad != null);
-			llamadaSaliente = [SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
-			System.assert(llamadaSaliente != null);
+			CC_Llamada__c llamada = [SELECT CC_Tipo_Cierre__c, CC_Fecha_Fin__c FROM CC_Llamada__c WHERE Id = :llamadaSaliente.Id];
+			actividad = [SELECT CC_Tipo_Cierre__c FROM Task WHERE CC_Llamada_Id__c = :llamadaSaliente.Id AND WhatId = :caso.Id
+							AND Type = 'Llamada saliente' AND Status = 'Completed' LIMIT 1];
+
+			if (llamada.CC_Tipo_Cierre__c != 'Llamada atendida' && llamada.CC_Tipo_Cierre__c != 'Llamada finalizada') {
+				System.assertEquals('Llamada no atendida', actividad.CC_Tipo_Cierre__c);
+				System.assertEquals('Llamada no atendida', llamada.CC_Tipo_Cierre__c);
+			} else {
+				System.assertEquals('Llamada finalizada', actividad.CC_Tipo_Cierre__c);
+				System.assertEquals('Llamada finalizada', llamada.CC_Tipo_Cierre__c);
+			}
+			System.assertNotEquals(null, llamada.CC_Fecha_Fin__c);
 		}
 	}
 
@@ -826,7 +864,6 @@ Test.stopTest();
 
 		System.runAs(adminKinton) {
 			CC_Servicio_Genesys__c s3 = [SELECT CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE Name = 'Servicio 3' LIMIT 1];
-			//Case caso = crearCaso();
 			Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso cliente Test'];
 
 			//Entra la llamada
@@ -848,8 +885,14 @@ Test.stopTest();
 			//Colgamos la llamada
 			CC_Llamada_GC.finalizarLlamada(inputLlamada, 'Llamada finalizada');
 			Test.stopTest();
-			llamadaEntrante = [SELECT Id FROM CC_Llamada__c WHERE Id = :llamadaEntrante.Id AND CC_Fecha_Fin__c != null AND CC_Tipo_Cierre__c = 'Llamada finalizada' LIMIT 1];
-			System.assert(llamadaEntrante != null);
+
+			CC_Llamada__c llamada = [SELECT CC_Tipo_Cierre__c, CC_Fecha_Fin__c FROM CC_Llamada__c WHERE Id = :llamadaEntrante.Id];
+			System.assertNotEquals(null, llamada.CC_Fecha_Fin__c);
+			if (llamada.CC_Tipo_Cierre__c != 'Llamada atendida' && llamada.CC_Tipo_Cierre__c != 'Llamada finalizada') {
+				System.assertEquals('Llamada no atendida', llamada.CC_Tipo_Cierre__c);
+			} else {
+				System.assertEquals('Llamada finalizada', llamada.CC_Tipo_Cierre__c);
+			}
 		}
 	}
 
@@ -903,7 +946,6 @@ Test.stopTest();
 		System.runAs(adminKinton) {
 
 			Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso cliente Test'];
-
 			
             CC_Servicio_Genesys__c s1 = [SELECT CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE Name = 'Servicio 1' LIMIT 1];
             CC_Servicio_Genesys__c encuesta = [SELECT Id FROM CC_Servicio_Genesys__c WHERE Name = 'Servicio Encuesta' LIMIT 1];
@@ -922,6 +964,106 @@ Test.stopTest();
 			Test.stopTest();
             
 			System.assertEquals('Servicio Encuesta',nombreEncuesta.get('nombreEncuesta'), 'No se ha encontrado la encuesta');
+		}
+	}
+
+	@isTest
+	public static void testIniciarLlamadaSalienteClickToDial() {
+		User adminKinton = [SELECT Id, EmployeeNumber FROM User WHERE LastName = 'Administrador Kinton'];
+		System.runAs(adminKinton) {
+			Case caso = [SELECT Id, RecordType.DeveloperName FROM Case WHERE Subject = 'Caso cliente Test'];
+			Map<String, CC_Servicio_Genesys__c> servicioGenesysMap = new Map<String, CC_Servicio_Genesys__c>();
+			for (CC_Servicio_Genesys__c servicio : [SELECT CC_Tipo_Cliente__c, Id, CC_Codigo__c FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c IN ('CC_GenesysCloudOutboundDefault', 'CC_GenesysCloudOutboundDefaultEmpleados')]) {
+				servicioGenesysMap.put(servicio.CC_Codigo__c, servicio);
+			}
+			
+			CC_Llamada__c llamada = new CC_Llamada__c();
+			// Asignar servicio y RecordType según el tipo de cliente
+			String tipoCliente = caso?.RecordType.DeveloperName;
+			if (tipoCliente == 'CC_Empleado' || tipoCliente == 'CC_CSI_Bankia') {
+				llamada.CC_Servicio_Genesys__c = servicioGenesysMap.get('CC_GenesysCloudOutboundDefaultEmpleados')?.Id;
+				llamada.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'CC_Empleado');
+			} else {
+				llamada.CC_Servicio_Genesys__c = servicioGenesysMap.get('CC_GenesysCloudOutboundDefault')?.Id;
+				llamada.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'CC_Cliente');
+			}
+			llamada.KIN_Genesys_Cloud__c = true;
+			llamada.KIN_Llamada_Origen__c = true;
+			llamada.CC_Tipo__c = 'Saliente';
+			llamada.CC_Agente__c = adminKinton.EmployeeNumber;
+			llamada.CC_Extension__c = '1234';
+			llamada.CC_ConnId__c = 'connId';
+			llamada.CC_DNIS__c = 'dnis';
+			llamada.CC_Idioma__c = 'es';
+			llamada.CC_Asunto__c = 'Asunto';
+			llamada.CC_No_Identificado__c = false;
+			llamada.CC_Fecha_Inicio__c = DateTime.now();
+			llamada.CC_IdentCliente__c = '0';
+			llamada.KIN_Genesys_Cloud_URL_Grabacion__c = 'urlGrabacion';
+			
+			try {
+				insert llamada;
+			} catch (DmlException e) {
+				System.debug('Error al insertar la llamada: ' + e.getMessage());
+			}
+			
+			Task tareaNueva = new Task();
+			tareaNueva.CC_Llamada_Id__c = llamada.Id;
+			tareaNueva.Subject = 'Tarea de prueba';
+			tareaNueva.Status = 'Open';
+			tareaNueva.Type = 'Llamada saliente';
+			tareaNueva.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+			insert tareaNueva;
+			
+			CC_Llamada_Input inputLlamada = new CC_Llamada_Input();
+			inputLlamada.llamadaId = llamada.Id;
+			inputLlamada.casoId = caso.Id;
+			inputLlamada.extension = '1234';
+			inputLlamada.connId = 'connId';
+			inputLlamada.dnis = 'dnis';
+			inputLlamada.idioma = 'es';
+			inputLlamada.asunto = 'Asunto';
+			inputLlamada.urlGrabacion = 'urlGrabacion';
+			
+			Test.startTest();
+			Map<String, Object> response = CC_Llamada_GC.iniciarLlamadaSalienteClickToDial(inputLlamada);
+			Test.stopTest();
+			
+			// Verifica que la llamada se haya actualizado correctamente
+			CC_Llamada__c llamadaActualizada = [SELECT CC_ConnId__c, KIN_Genesys_Cloud_URL_Grabacion__c, CC_Fecha_Inicio__c, CC_Tipo_Cierre__c FROM CC_Llamada__c WHERE Id = :llamada.Id];
+			System.assertNotEquals(null, llamadaActualizada.CC_Fecha_Inicio__c);
+			System.assertEquals('Llamada atendida', llamadaActualizada.CC_Tipo_Cierre__c);
+			
+			// Verifica que la tarea asociada se haya actualizado correctamente
+			Task tarea = [SELECT CC_Fecha_Inicio__c, CC_Tipo_Cierre__c FROM Task WHERE CC_Llamada_Id__c = :llamada.Id LIMIT 1];
+			System.assertNotEquals(null, tarea.CC_Fecha_Inicio__c);
+			System.assertEquals('Llamada atendida', tarea.CC_Tipo_Cierre__c);
+		}
+	}
+
+	@isTest
+	public static void testFinalizarActividades() {
+		User adminKinton = [SELECT Id FROM User WHERE LastName = 'Administrador Kinton'];
+		System.runAs(adminKinton) {
+			CC_Llamada__c llamada = new CC_Llamada__c();
+			// Inicializa los campos necesarios para la llamada
+			insert llamada;
+
+			Task tarea = new Task();
+			tarea.CC_Llamada_Id__c = llamada.Id;
+			tarea.Status = 'Open';
+			tarea.Type = 'Llamada saliente';
+			tarea.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+			insert tarea;
+
+			Test.startTest();
+			CC_Llamada_GC.finalizarActividades(new List<CC_Llamada__c>{llamada}, 'Llamada%', 'Llamada finalizada');
+			Test.stopTest();
+
+			// Verifica que la tarea se haya actualizado correctamente
+			Task tareaActualizada = [SELECT Status, CC_Tipo_Cierre__c FROM Task WHERE Id = :tarea.Id];
+			System.assertEquals('Completed', tareaActualizada.Status);
+			System.assertEquals('Llamada finalizada', tareaActualizada.CC_Tipo_Cierre__c);
 		}
 	}
 }

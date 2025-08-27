@@ -1104,9 +1104,10 @@ public with sharing class CC_MetodosUtiles {
             textoCuerpo += 'Por favor, mantenga las siguientes referencias al responder a este correo electrónico: #@' + caso.CC_Referencia_Correo_Saliente__c + '#.';
         } else if (frasesSemilla.isEmpty() && operativa == 'Responder Cliente') {
             textoCuerpo += 'Por favor, no responder a este correo electrónico: #@' + caso.CC_Referencia_Correo_Saliente__c + '#.';
+        } else {
+            textoCuerpo += '#@' + caso.CC_Referencia_Correo_Saliente__c + '#.';
         }
         textoCuerpo += '</font>';
-
         String textoTotal = textoCuerpo + historicoCorreos;
 
         if (textoTotal.length() >= 131072) {
@@ -1186,5 +1187,37 @@ public with sharing class CC_MetodosUtiles {
             throw new AuraHandledException('Error recuperando la jerarquía de carpetas para la plantilla "' + plantilla.DeveloperName + '"');
         }
     }
-   
+
+    public static Map<String, String> getValoresCliente(Case caso) {
+        String numPerso;
+        String numTelefono;
+        Map<String, String> mapaCamposValores = new Map<String, String>();
+        mapaCamposValores.put('numPerso', '');
+        mapaCamposValores.put('numTelefono', '');
+        if (caso.CC_Representante__c != null) {
+            // Si hay representante, se toma el NumPerso del representante Menosres de edad
+            numPerso = !String.isEmpty(caso.CC_Representante__r?.CC_Representante__r.AV_NumPerso__c) ? caso.CC_Representante__r?.CC_Representante__r.AV_NumPerso__c : !String.isEmpty(caso.CC_Representante__r?.CC_Representante__r.CC_NumPerso__c) ? caso.CC_Representante__r?.CC_Representante__r.CC_NumPerso__c : '';
+            numTelefono = !String.isEmpty(caso.CC_Representante__r?.CC_Representante__r?.PersonMobilePhone) ? caso.CC_Representante__r?.CC_Representante__r?.PersonMobilePhone : '';
+        } else if (caso.Account.RecordType.DeveloperName == 'CC_Cliente' && caso.Contact.RecordType.DeveloperName == 'CIBE_Apoderado') {
+            // Si es cliente jurídico con apoderado
+            numPerso = !String.isEmpty(caso.Contact?.CIBE_NumPerso__c) ? caso.Contact?.CIBE_NumPerso__c : !String.isEmpty(caso.Contact?.AV_NumPerso__c) ? caso.Contact?.AV_NumPerso__c : !String.isEmpty(caso.Contact?.CC_NumPerso__c) ? caso.Contact?.CC_NumPerso__c : '';
+            numTelefono = !String.isEmpty(caso.Contact?.CIBE_Telefono1__c) ? caso.Contact?.CIBE_Telefono1__c : '';
+        } else {
+            // Para otros casos, se toma el NumPerso de la cuenta
+            numPerso = !String.isEmpty(caso.Account?.AV_NumPerso__c) ? caso.Account?.AV_NumPerso__c : !String.isEmpty(caso.Account?.CC_NumPerso__c) ? caso.Account?.CC_NumPerso__c  : '';
+            numTelefono = !String.isEmpty(caso.Account?.PersonMobilePhone) ? caso.Account?.PersonMobilePhone : '';
+        }
+        mapaCamposValores.put('numPerso', numPerso != null ? numPerso : '');
+        mapaCamposValores.put('numTelefono', numTelefono != null ? numTelefono : '');
+        return mapaCamposValores;
+    }
+    
+    //Metodo para la US983197, aplica para 6 proyectos
+    //Contact Center, HDT, SACH, CAM, GRR y Fraude
+    public static List<Task> volcarValorTipo(List<Task> listNewObj) {
+     	for(Task tarea : listNewObj){
+     		tarea.AV_Type__c = tarea.Type;
+     	}
+        return listNewObj;
+    }
 }

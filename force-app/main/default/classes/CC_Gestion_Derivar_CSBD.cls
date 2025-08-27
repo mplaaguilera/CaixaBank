@@ -309,15 +309,10 @@ public with sharing class CC_Gestion_Derivar_CSBD {
         return respuesta; 
     }
 
-    public static List<Opportunity> buscarOportunidadesExistentes(Case caso){
-
-        Account cuenta = [SELECT Id, PersonContactId FROM Account WHERE Id = :caso.AccountId];
-
-        Contact contact = [SELECT Id, CC_Numero_Documento__c FROM Contact WHERE Id = :cuenta.PersonContactId];
-
+    public static List<Opportunity> buscarOportunidadesExistentes(Case caso){ 
         Map<String, Object> bindParams = new Map<String, Object>{
             'dias' => (Integer)getOportunidadCreadaNDays(),
-            'numeroDocumento' => contact.CC_Numero_Documento__c,
+            'numeroDocumento' => caso.Account.CC_Numero_Documento__c,
             'tematica' => caso.CC_MCC_Tematica__c
         };       
         String query = 'SELECT Id, OwnerId, CSBD_Contact__c, Name, StageName, IsClosed, Description, CSBD_FeedbackCliente__c, CSBD_CasoOrigen__c, CSBD_CasoOrigen__r.CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c ' +
@@ -345,4 +340,5 @@ public with sharing class CC_Gestion_Derivar_CSBD {
             update caseExtensions;
         }
     }
+
 }

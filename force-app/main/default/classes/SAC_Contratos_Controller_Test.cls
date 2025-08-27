@@ -170,7 +170,7 @@ public class SAC_Contratos_Controller_Test {
     	   
 		System.runAs(usuario) { 
             Test.startTest();
-            SAC_Contratos_Controller.linkarContrato(pretension.id, 'NameProductTest', '1231513213', 'DescripcionProductTest', String.valueOf(system.today()), String.valueOf(system.today()));
+            SAC_Contratos_Controller.linkarContrato(pretension.id, 'NameProductTest', '123151321315169', 'DescripcionProductTest', String.valueOf(system.today()), String.valueOf(system.today()));
             Test.stopTest();
 		}   
         SAC_ProductCase__c producto = [SELECT SAC_Pretension__c, SAC_Tipo__c, N_Contrato__c, SAC_Descripcion__c FROM SAC_ProductCase__c WHERE  SAC_Tipo__c = 'NameProductTest'];

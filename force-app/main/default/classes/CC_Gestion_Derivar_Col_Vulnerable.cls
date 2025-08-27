@@ -33,15 +33,18 @@ public with sharing class CC_Gestion_Derivar_Col_Vulnerable {
         List<Case> casos = [SELECT Id, Subject, ContactId, AccountId, OwnerId FROM Case WHERE Id = :caso.Id LIMIT 1];
 
         List<String> grupos = new List<String>{grupoCol};
-        String[] emailGrupoCol = CC_Gestion_Derivar_Emails_Auto.sendEmailGrupoCol(grupos);
+        Map<String, List<String>> emailGrupoCol = CC_Gestion_Derivar_Emails_Auto.sendEmailGrupoCol(grupos);
         if(emailGrupoCol == null || emailGrupoCol.isEmpty()) {
             throw new AuraHandledException('No se encontraron emails para el grupo colaborador.');
         }
+
+        String[] para = emailGrupoCol.get('Para') != null ? emailGrupoCol.get('Para') : new List<String>();
+        String[] cc = emailGrupoCol.get('CC') != null ? emailGrupoCol.get('CC') : new List<String>();
         
         CC_Gestion_Derivar_Emails_Auto.createEmail(
             casos[0],
-            emailGrupoCol,
-            null,
+            para,
+            cc,
             null,
             nombrePlantilla,
             grupoCol,

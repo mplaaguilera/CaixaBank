@@ -212,16 +212,12 @@ public with sharing class CC_Task_AU_TRHan extends CC_TriggerHandlerBase {
                         crearOportunidadTrigger = caseExtensionsMap.get(tarea.WhatId).CC_CrearOportunidadTrigger__c;
                     }
                     
-                    // Verificar si se puede crear oportunidad si el campo está a True
                     if(crearOportunidadTrigger) {
                         // Verificar si se puede crear oportunidad
                         Map<String, Object> validacion = CC_Gestion_Derivar_CSBD.crearOportunidad(tarea.WhatId);
-                        
                         if((Boolean)validacion.get('validacionCrearOportunidad')) {
                             tareasParaCrearOportunidad.add(tarea);
                         }
-                    } else {
-                        System.debug('No se creará oportunidad para el caso ' + tarea.WhatId + ' porque CC_CrearOportunidadTrigger__c no está activo');
                     }
                 }
             }
@@ -229,19 +225,29 @@ public with sharing class CC_Task_AU_TRHan extends CC_TriggerHandlerBase {
         
         // Crear oportunidades para las tareas válidas
         if(!tareasParaCrearOportunidad.isEmpty()) {
+            List<CBK_Case_Extension__c> extensionesParaActualizar = new List<CBK_Case_Extension__c>();
+            
             for(Task tarea : tareasParaCrearOportunidad) {
                 try {
                     Map<String, Object> resultado = CC_Gestion_Derivar_CSBD.crearOportunidadCSBD(tarea.WhatId);
                     
-                    if((Boolean)resultado.get('oppCreada')) {
-                        // Oportunidad creada exitosamente
-                        System.debug('Oportunidad creada exitosamente para el caso: ' + tarea.WhatId + ' desde tarea: ' + tarea.Id);
-                    } else if(resultado.containsKey('oportunidadSiExiste') && (Boolean)resultado.get('oportunidadSiExiste')) {
-                        // Ya existe una oportunidad similar
-                        System.debug('Oportunidad similar ya existe para el caso: ' + tarea.WhatId + ' - Mensaje: ' + resultado.get('mensaje'));
+                    // Marcar el campo CC_CrearOportunidadTrigger__c como false después de crear la oportunidad
+                    if(caseExtensionsMap.containsKey(tarea.WhatId)) {
+                        CBK_Case_Extension__c extension = caseExtensionsMap.get(tarea.WhatId);
+                        extension.CC_CrearOportunidadTrigger__c = false;
+                        extensionesParaActualizar.add(extension);
                     }
                 } catch (Exception e) {
-                    System.debug('Error al crear oportunidad para el caso ' + tarea.WhatId + ' desde tarea ' + tarea.Id + ': ' + e.getMessage());
+                    CBK_Log.error('Error al crear oportunidad para el caso ' + tarea.WhatId + ' desde tarea ' + tarea.Id + ': ' + e.getMessage());
+                }
+            }
+            
+            // Actualizar las extensiones de casos para poner CC_CrearOportunidadTrigger__c a false
+            if(!extensionesParaActualizar.isEmpty()) {
+                try {
+                    update extensionesParaActualizar;
+                } catch (Exception e) {
+                    CBK_Log.error('Error al actualizar extensiones de casos: ' + e.getMessage());
                 }
             }
         }

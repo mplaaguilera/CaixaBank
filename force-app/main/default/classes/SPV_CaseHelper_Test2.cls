@@ -28,7 +28,10 @@ public with sharing class SPV_CaseHelper_Test2 {
         Id recTypeMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
         Id recTypeDetalle = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
         Id recTypeCasoRelacionadoSPV = Schema.SObjectType.CBK_CaseToCaseRelationship__c.getRecordTypeInfosByDeveloperName().get('SPV_CasoRelacionado').getRecordTypeId();
-        
+        Id recTypeGrupoLetrado = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('SPV_GrupoLetrado').getRecordTypeId();
+
+
+
         Account cuenta = SPV_TestDataFactory.crearCuentas(1)[0];
         SPV_DatabaseDML.insertDML(cuenta, false);
 
@@ -66,6 +69,8 @@ public with sharing class SPV_CaseHelper_Test2 {
 		gruposLetrados[0].SAC_PorcentajeAsignacion__c = 100;
 		gruposLetrados[0].SAC_MaximoCasosDiarios__c = 1;
 		gruposLetrados[0].SAC_Sensible__c = true;
+        gruposLetrados[0].SAC_DeveloperName__c = 'SPV_FYRLEGALLETRADO';
+        gruposLetrados[0].recordTypeId = recTypeGrupoLetrado;
 		listaGrupos.add(gruposLetrados[0]);
 
 		gruposLetrados[1].SAC_PorcentajeAsignacion__c = 0;
@@ -393,6 +398,19 @@ public with sharing class SPV_CaseHelper_Test2 {
 
 		SPV_DatabaseDML.insertListDML(listMarcas, false);
 
+        //Parametrizacion balanceo
+        List<SAC_MaestroTemas__c> parametrizacion = new List<SAC_MaestroTemas__c>();
+        SAC_MaestroTemas__c maestroTemaParametrizacion = new SAC_MaestroTemas__c(
+        Name = 'CNMV',
+        RecordTypeId = Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName().get('SPV_ParametrizacionOrganismo').getRecordTypeId(),
+        SPV_Organismo__c = 'SPV_CNMV',
+        SPV_PorcentajeAsignacion__c = 100,
+        SAC_GrupoLetrado__c = gruposLetrados[0].Id
+        );
+        parametrizacion.add(maestroTemaParametrizacion);
+
+		SPV_DatabaseDML.insertListDML(parametrizacion, false);
+
         //Oficinas afectadas
         List<SAC_ImagenDocumento__c> listaOficinasAfectadas = new List<SAC_ImagenDocumento__c>();
         SAC_ImagenDocumento__c objIntermedio1 = new SAC_ImagenDocumento__c();
@@ -417,7 +435,7 @@ public with sharing class SPV_CaseHelper_Test2 {
 
         SPV_DatabaseDML.insertListDML(listaOficinasAfectadas, true);
 
-        
+
         //Relaciones Case to Case
         List<CBK_CaseToCaseRelationship__c> listCaseToCase = new List<CBK_CaseToCaseRelationship__c>();
         CBK_CaseToCaseRelationship__c caseToCase1 = new CBK_CaseToCaseRelationship__c();
@@ -429,6 +447,31 @@ public with sharing class SPV_CaseHelper_Test2 {
         SPV_DatabaseDML.insertListDML(listCaseToCase, true);
 
         Test.stopTest();
+    }
+
+    private static User getOrCreateUserByProfile(String profileName) {
+        Profile p = [SELECT Id, Name FROM Profile WHERE Name = :profileName LIMIT 1];
+
+        // Si ya hay un usuario activo con ese perfil, úsalo y evita DML
+        List<User> us = [SELECT Id FROM User WHERE IsActive = true AND ProfileId = :p.Id LIMIT 1];
+        if (!us.isEmpty()) return us[0];
+
+        // Si no hay, crea uno nuevo con TODOS los campos obligatorios
+        String uniq = String.valueOf(CBK_UtilsDate.nowDT().getTime());
+        User u = new User(
+            ProfileId = p.Id,
+            Alias = ('u' + uniq).substring(0, 8),
+            Email = 'u' + uniq + '@test.com',
+            Username = 'u' + uniq + '@example.test', // único global
+            LastName = 'Test',
+            TimeZoneSidKey = 'Europe/Madrid',
+            LocaleSidKey = 'es_ES',
+            EmailEncodingKey = 'UTF-8',
+            LanguageLocaleKey = 'es',
+            CommunityNickname = 'nick' + uniq
+        );
+        insert u;
+        return u;
     }
 
 
@@ -487,6 +530,23 @@ public with sharing class SPV_CaseHelper_Test2 {
 
         System.runAs(usuario){
             reclamacion.SPV_Organismo__c = 'SPV_BDE';
+            reclamacion.Status = 'SPV_AnalisisDecision';
+            SPV_DatabaseDML.updateDML(reclamacion, true);
+        }
+
+        Case pretension = [SELECT Id, OwnerId, SEG_Grupo__c, Status FROM Case WHERE SuppliedCompany = 'pruebaPretension1' Limit 1];
+        System.assertNotEquals(pretension.SEG_Grupo__c, null, 'El balanceo no ha funcionado');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void balanceoPorGrupoTest(){
+        Test.startTest();
+        User usuario = [SELECT Id, Name FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, OwnerId, AccountId, Status FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
+
+        System.runAs(usuario){
+            reclamacion.SPV_Organismo__c = 'SPV_CNMV';
             reclamacion.Status = 'SPV_AnalisisDecision';
             SPV_DatabaseDML.updateDML(reclamacion, true);
         }
@@ -676,6 +736,40 @@ public with sharing class SPV_CaseHelper_Test2 {
         }
 
         Assert.areEqual(resultadoSLARecepcionResolucion.CompletionDate, null, 'No se han reabierto los SLAs correctamente');
+        Test.stopTest();
+    }
+
+    @isTest
+    static void reabrirSLAsAlta(){
+        Test.StartTest();
+        User usuario = [SELECT Id, Name FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND IsActive = true LIMIT 1];
+        Case reclamacion = [SELECT Id, OwnerId, AccountId, contactId FROM Case WHERE Subject = 'TestRec2' LIMIT 1];
+        CaseMilestone resultadoSLAAlta = new CaseMilestone();
+
+        System.runAs(usuario){
+            List<Case> listaCasosActualizar = new List<Case>();
+
+            //Casos para testear reabrirSLAs
+            reclamacion.Status = 'SPV_AnalisisDecision';
+            listaCasosActualizar.add(reclamacion);
+            SPV_DatabaseDML.updateListDML(listaCasosActualizar, true);
+            listaCasosActualizar.clear();
+
+            //reclamacion.SAC_SentidoResolucion__c = 'SAC_001';
+            reclamacion.Status = 'SAC_001';
+            listaCasosActualizar.add(reclamacion);
+            SPV_DatabaseDML.updateListDML(listaCasosActualizar, true);
+            listaCasosActualizar.clear();
+
+            /*reclamacion.Status = 'SPV_AnalisisDecision';
+            listaCasosActualizar.add(reclamacion);
+            SPV_DatabaseDML.updateListDML(listaCasosActualizar, true);
+            listaCasosActualizar.clear();*/
+        
+            resultadoSLAAlta = [SELECT caseid, startdate, IsCompleted, CompletionDate, MilestoneType.Name FROM CaseMilestone WHERE caseId = :reclamacion.Id AND MilestoneType.Name = 'SLA Alta'];
+        }
+
+        Assert.areEqual(resultadoSLAAlta.CompletionDate, null, 'No se han reabierto los SLAs correctamente');
         Test.stopTest();
     }
 

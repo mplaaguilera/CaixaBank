@@ -1,8 +1,5 @@
 public with sharing class CC_Gestion_Derivar_Amenazas {
 
-    /**
-     * Envía un email de amenazas, diferenciando entre empleados y suicidios.
-     */
     @AuraEnabled
     public static void operativasEmail(
         Id recordId, 
@@ -13,27 +10,31 @@ public with sharing class CC_Gestion_Derivar_Amenazas {
         String ambito, 
         String nameOWA
     ) {
+        // Validación de parámetros obligatorios
         if (recordId == null || String.isBlank(grupoCol) || String.isBlank(nombrePlantilla) || String.isBlank(nameOWA)) {
             throw new AuraHandledException('Parámetros obligatorios no informados.');
         }
+        
         Case caso = [
-            SELECT Id, ContactId, Account.CC_Direccion_Territorial__c, 
-                   Account.CC_Direccion_Territorial__r.CC_Numero_Oficina__c, 
-                   CC_Referencia_Correo_Saliente__c, AccountId 
+            SELECT Id, ContactId,
+                    CC_Referencia_Correo_Saliente__c,
+                    AccountId,
+                    Account.AV_OficinaPrincipal__c,
+                    Account.AV_OficinaPrincipal__r.Parent.Parent.Parent.ParentId
             FROM Case 
             WHERE Id = :recordId 
             LIMIT 1
         ];
+        
         if (tipo) {
+            // Amenaza a empleados
             emailAmenazasEmpleados(caso, grupoCol, nombrePlantilla, parametrizacionesMensaje, nameOWA);
         } else {
+            // Amenaza por suicidio
             emailAmenazasSuicidios(caso, grupoCol, nombrePlantilla, parametrizacionesMensaje, nameOWA);
         }
     }
 
-    /**
-     * Envía un email de amenazas a empleados.
-     */
     @AuraEnabled
     public static void emailAmenazasEmpleados(
         Case caso, 
@@ -43,21 +44,25 @@ public with sharing class CC_Gestion_Derivar_Amenazas {
         String nameOWA
     ) {
         List<String> grupos = new List<String>{grupoCol};
-        String[] destinatarios = obtenerDestinatariosGrupoCol(grupos);
-        if (destinatarios == null || destinatarios.isEmpty()) {
+        Map<String, List<String>> destinatariosMap = obtenerDestinatariosGrupoCol(grupos);
+        
+        if (destinatariosMap == null || destinatariosMap.isEmpty()) {
             throw new AuraHandledException('No se encontraron emails para el grupo colaborador.');
         }
-        // Añadir URL de llamada si existe
+        
+        String[] destinatarios = destinatariosMap.get('Para') != null ? destinatariosMap.get('Para') : new List<String>();
+        
+        if (destinatarios.isEmpty()) {
+            throw new AuraHandledException('No se encontraron emails para el grupo colaborador.');
+        }
+        
         if (parametrizacionesMensaje != null) {
             String url = obtenerUrlLlamadaEntrante(caso.Id);
             parametrizacionesMensaje.put('[URL de la llamada]', url);
         }
+        
         enviarEmail(caso, destinatarios, null, null, nombrePlantilla, grupoCol, parametrizacionesMensaje, nameOWA);
     }
-
-    /**
-     * Envía un email de amenazas por suicidio.
-     */
     @AuraEnabled
     public static void emailAmenazasSuicidios(
         Case caso, 
@@ -67,22 +72,32 @@ public with sharing class CC_Gestion_Derivar_Amenazas {
         String nameOWA
     ) {
         String[] destinatariosRisk;
-        String[] destinatarios = obtenerDestinatariosGrupoCol(new List<String>{grupoCol});
-        String numOficina = (caso.Account != null && caso.Account.CC_Direccion_Territorial__r != null)
-            ? caso.Account.CC_Direccion_Territorial__r.CC_Numero_Oficina__c
-            : null;
+        Map<String, List<String>> destinatarios = obtenerDestinatariosGrupoCol(new List<String>{grupoCol});
 
-        destinatariosRisk = obtenerDestinatariosRiesgoReputacional(numOficina);
-       
+        List<CC_Riesgo_Reputacional_Derivar__mdt> centros = obtenerCentroRiesgoReputacional(caso);
+        destinatariosRisk = obtenerDestinatariosRiesgoReputacional(centros);
 
+        String[] para = destinatariosRisk != null ? destinatariosRisk : 
+                       (destinatarios.get('Para') != null ? destinatarios.get('Para') : new List<String>());
+        
+        String[] cc;
+        if(destinatariosRisk != null){
+            List<String> ccList = new List<String>();
+            if(destinatarios.get('Para') != null) {
+                ccList.addAll(destinatarios.get('Para'));
+            }
+            if(destinatarios.get('CC') != null) {
+                ccList.addAll(destinatarios.get('CC'));
+            }
+            cc = ccList;
+        } else {
+            cc = destinatarios.get('CC') != null ? destinatarios.get('CC') : null;
+        }
 
-        enviarEmail(caso, destinatarios, null, destinatariosRisk, nombrePlantilla, grupoCol, parametrizacionesMensaje, nameOWA);
+        enviarEmail(caso, para, null, cc, nombrePlantilla, grupoCol, parametrizacionesMensaje, nameOWA);
     }
 
-    /**
-     * Obtiene los destinatarios de un grupo colaborador.
-     */
-    private static String[] obtenerDestinatariosGrupoCol(List<String> grupos) {
+    private static Map<String, List<String>> obtenerDestinatariosGrupoCol(List<String> grupos) {
         try {
             return CC_Gestion_Derivar_Emails_Auto.sendEmailGrupoCol(grupos);
         } catch (Exception e) {
@@ -90,23 +105,76 @@ public with sharing class CC_Gestion_Derivar_Amenazas {
         }
     }
 
-    /**
-     * Obtiene los destinatarios de riesgo reputacional.
-     */
-    @TestVisible
-    private static String[] obtenerDestinatariosRiesgoReputacional(String denominacionTerritorial) {
-        if (String.isBlank(denominacionTerritorial)) {
-            denominacionTerritorial = CC_Settings__c.getValues('CC_Centro_Riesgo_Reputacional_Default').CC_Configuracion_1__c != null ? CC_Settings__c.getValues('CC_Centro_Riesgo_Reputacional_Default').CC_Configuracion_1__c : null;
+    private static List<CC_Riesgo_Reputacional_Derivar__mdt> obtenerCentroRiesgoReputacional(Case caso) {
+        if (caso.Account.AV_OficinaPrincipal__c == null) return null;
+        
+        String numeroOficinaDT = buscarNumeroOficinaDT(caso.Account.AV_OficinaPrincipal__c, 5);
+        if (String.isNotBlank(numeroOficinaDT)) {
+            return buscarCentroRiesgoReputacional(numeroOficinaDT);
         }
-        List<CC_Riesgo_Reputacional_Derivar__mdt> centros = [
-            SELECT CC_Numero_centro_riesgo_reputacional__c
-            FROM CC_Riesgo_Reputacional_Derivar__mdt
-            WHERE CC_Numero_direccion_territorial__c = :denominacionTerritorial
+        
+        List<Account> cuentaNivel5 = [SELECT Id FROM Account WHERE Id = :caso.Account.AV_OficinaPrincipal__r.Parent.Parent.Parent.ParentId LIMIT 1];
+        if (!cuentaNivel5.isEmpty() && cuentaNivel5[0].Id != null) {
+            numeroOficinaDT = buscarNumeroOficinaDT(cuentaNivel5[0].Id, 5);
+            if (String.isNotBlank(numeroOficinaDT)) {
+                return buscarCentroRiesgoReputacional(numeroOficinaDT);
+            }
+        }
+        return null;
+    }
+
+    private static String buscarNumeroOficinaDT(Id cuentaId, Integer niveles) {
+        List<Account> jerarquia = [
+            SELECT Id, CC_Tipo_Centro__c, CC_Numero_Oficina__c,
+                   Parent.CC_Tipo_Centro__c, Parent.CC_Numero_Oficina__c,
+                   Parent.Parent.CC_Tipo_Centro__c, Parent.Parent.CC_Numero_Oficina__c,
+                   Parent.Parent.Parent.CC_Tipo_Centro__c, Parent.Parent.Parent.CC_Numero_Oficina__c,
+                   Parent.Parent.Parent.Parent.CC_Tipo_Centro__c, Parent.Parent.Parent.Parent.CC_Numero_Oficina__c,
+                   Parent.Parent.Parent.Parent.Parent.CC_Tipo_Centro__c, Parent.Parent.Parent.Parent.Parent.CC_Numero_Oficina__c
+            FROM Account 
+            WHERE Id = :cuentaId 
             LIMIT 1
         ];
+        
+        if (jerarquia.isEmpty()) return null;
+        
+        Account cuenta = jerarquia[0];
+        
+        if (cuenta.CC_Tipo_Centro__c == 'DT' && String.isNotBlank(cuenta.CC_Numero_Oficina__c)) {
+            return cuenta.CC_Numero_Oficina__c;
+        }
+        else if (cuenta.Parent?.CC_Tipo_Centro__c == 'DT' && String.isNotBlank(cuenta.Parent.CC_Numero_Oficina__c)) {
+            return cuenta.Parent.CC_Numero_Oficina__c;
+        }
+        else if (cuenta.Parent?.Parent?.CC_Tipo_Centro__c == 'DT' && String.isNotBlank(cuenta.Parent.Parent.CC_Numero_Oficina__c)) {
+            return cuenta.Parent.Parent.CC_Numero_Oficina__c;
+        }
+        else if (cuenta.Parent?.Parent?.Parent?.CC_Tipo_Centro__c == 'DT' && String.isNotBlank(cuenta.Parent.Parent.Parent.CC_Numero_Oficina__c)) {
+            return cuenta.Parent.Parent.Parent.CC_Numero_Oficina__c;
+        }
+        else if (cuenta.Parent?.Parent?.Parent?.Parent?.CC_Tipo_Centro__c == 'DT' && String.isNotBlank(cuenta.Parent.Parent.Parent.Parent.CC_Numero_Oficina__c)) {
+            return cuenta.Parent.Parent.Parent.Parent.CC_Numero_Oficina__c;
+        }
+        
+        return null;
+    }
 
-        if (centros.isEmpty() || String.isBlank(centros[0].CC_Numero_centro_riesgo_reputacional__c) || String.isBlank(denominacionTerritorial)) {
-            throw new AuraHandledException('Centro de Riesgo Reputacional no encontrado para la territorial: ' + denominacionTerritorial);
+    private static List<CC_Riesgo_Reputacional_Derivar__mdt> buscarCentroRiesgoReputacional(String numeroOficinaDT) {
+
+        List<CC_Riesgo_Reputacional_Derivar__mdt> centros = [
+            SELECT CC_Numero_centro_riesgo_reputacional__c, CC_Numero_direccion_territorial__c
+            FROM CC_Riesgo_Reputacional_Derivar__mdt
+            WHERE CC_Numero_direccion_territorial__c = :numeroOficinaDT 
+            LIMIT 1
+        ];
+        return (centros.isEmpty() || String.isBlank(centros[0].CC_Numero_centro_riesgo_reputacional__c)) ? null : centros;
+    }
+
+
+    @TestVisible
+    private static String[] obtenerDestinatariosRiesgoReputacional(List<CC_Riesgo_Reputacional_Derivar__mdt> centros) {
+        if (centros == null || centros.isEmpty() || String.isBlank(centros[0].CC_Numero_centro_riesgo_reputacional__c)) {
+            return null;
         }
         
         List<Contact> empleados = [
@@ -117,18 +185,20 @@ public with sharing class CC_Gestion_Derivar_Amenazas {
         ];
 
         if (empleados.isEmpty()) {
-            throw new AuraHandledException('No se encontraron empleados con email en el centro de Riesgo Reputacional ' + centros[0].CC_Numero_centro_riesgo_reputacional__c);
+            return null;
         }
-        List<String> emailsEmpleados = new List<String>();
+        
+        Set<String> emailsUnicos = new Set<String>();
         for (Contact empleado : empleados) {
-            emailsEmpleados.add(empleado.Email);
+            if (String.isNotBlank(empleado.Email)) {
+                emailsUnicos.add(empleado.Email.toLowerCase().trim());
+            }
         }
+        
+        List<String> emailsEmpleados = new List<String>(emailsUnicos);
         return emailsEmpleados;
     }
 
-    /**
-     * Obtiene la URL de la llamada entrante asociada al caso.
-     */
     private static String obtenerUrlLlamadaEntrante(Id casoId) {
         List<Task> tareas = [
             SELECT CC_Llamada_Id__r.KIN_Genesys_Cloud_URL_Grabacion__c 
@@ -136,15 +206,13 @@ public with sharing class CC_Gestion_Derivar_Amenazas {
             WHERE WhatId = :casoId AND Type = 'Llamada entrante' 
             LIMIT 1
         ];
+        
         if (!tareas.isEmpty() && tareas[0].CC_Llamada_Id__r.KIN_Genesys_Cloud_URL_Grabacion__c != null) {
             return tareas[0].CC_Llamada_Id__r.KIN_Genesys_Cloud_URL_Grabacion__c;
         }
         return 'Llamada no encontrada';
     }
 
-    /**
-     * Llama a la lógica de envío de email.
-     */
     private static void enviarEmail(
         Case caso, 
         String[] toAddress,
@@ -156,7 +224,7 @@ public with sharing class CC_Gestion_Derivar_Amenazas {
         String nameOWA
     ) {
         CC_Gestion_Derivar_Emails_Auto.createEmail(
-            caso, // caso
+            caso, 
             toAddress, //toAddress
             bccAddress, //bccAddress
             ccAddress, //ccAddress

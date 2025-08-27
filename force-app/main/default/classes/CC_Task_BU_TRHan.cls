@@ -35,6 +35,8 @@ public class CC_Task_BU_TRHan extends CC_TriggerHandlerBase{
         }
 
         if (!listaTaskCC.isEmpty()) {
+            //Metodo para la US983197
+            listaTaskCC = CC_MetodosUtiles.volcarValorTipo(listaTaskCC);
             casoGestionTareasNoTiempo(listaTaskCC);
         }
     }

@@ -89,6 +89,18 @@ public with sharing class SAC_Validaciones_Test {
         Case casoReclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl3);
         listaReclamaciones.add(casoReclamacion3);
 
+        // Reclamacion 4
+        Map<String, Object> camposRecl4 = new Map<String, Object>();
+        camposRecl4.put('Subject', 'TestRec4');
+        camposRecl4.put('Origin', 'Backoffice');
+        camposRecl4.put('Status', 'SAC_001');
+        camposRecl4.put('OwnerId', usuarioGeneral.id);
+        camposRecl4.put('AccountId', a.id);
+        camposRecl4.put('SAC_TipoConsumidor__c', 'Si');
+
+        Case casoReclamacion4 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl4);
+        listaReclamaciones.add(casoReclamacion4);
+        
         // Reclamacion GGH
         Map<String, Object> camposReclGGH = new Map<String, Object>();
         camposReclGGH.put('Subject', 'GGH');
@@ -484,11 +496,10 @@ public with sharing class SAC_Validaciones_Test {
         @isTest
     static void validarAltaAnalisisRechazarTest(){
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
-        Case caso = [SELECT id, subject, Status FROM Case WHERE subject = 'TestRec2' limit 1];
+        Case caso = [SELECT id, subject, Status FROM Case WHERE subject = 'TestRec4' limit 1];
         caso.Status = 'Rechazado';
         caso.SAC_StatusAuxiliar__c = 'Rechazado';
         caso.SAC_MotivoRechazo__c = 'Spam';
-        caso.CC_Importe_Abonado__c = 0;
 
         Test.startTest();
         System.runAs(usuario){
@@ -496,7 +507,7 @@ public with sharing class SAC_Validaciones_Test {
         }
         Test.stopTest();
 
-        Case casoResult = [SELECT id, subject, Status, SAC_CasoEspecial__c FROM Case WHERE subject = 'TestRec2' limit 1];
+        Case casoResult = [SELECT id, subject, Status, SAC_CasoEspecial__c FROM Case WHERE subject = 'TestRec4' limit 1];
         Assert.areEqual('Rechazado', casoResult.Status, 'No se ha podido actualizar el estado');
     }
 

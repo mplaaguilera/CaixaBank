@@ -37,40 +37,58 @@ public with sharing class CSBD_CMN_Comdata {
 
     @future(callout=true)
     public static void enviarCMNComdata(String jsonInput) {
-
-        Input input = (Input)JSON.deserialize(jsonInput, Input.class);
-        CSBD_CMN_Comdata_Mensaje mensaje = inputToMensaje(input);
-
-        //Se recuperan los parámetros para la integración
-        CC_InterfaceSettings__mdt parametrosInterfaz = obtenerParametrosIntegracion('CSBD_CMN_Comdata');
-
-        //Envío del mensaje
-        HttpRequest req = new HttpRequest();
-        req.setEndpoint(parametrosInterfaz.CC_EndPoint__c);
-        req.setClientCertificateName(parametrosInterfaz.CC_Certificado__c);
-        req.setMethod(parametrosInterfaz.CC_TipoPeticion__c);
-        req.setHeader('Content-Type', parametrosInterfaz.CC_ContentType__c);
-        req.setBody(JSON.serialize(mensaje));
-
-        Http http = new Http();
-        if (!Test.isRunningTest()) {
-            HTTPResponse httpResponse = http.send(req);
-            CSBD_CMN_Comdata_Respuesta respuesta = (CSBD_CMN_Comdata_Respuesta)JSON.deserialize(httpResponse.getBody(), CSBD_CMN_Comdata_Respuesta.class);
         
-            //Creación de la tarea de la oportunidad
-            if (!Test.isRunningTest()) {
-                if (String.isNotBlank(input.recordId)) {
-                    String asuntoTarea;
-                    if (respuesta.ok == 'true') {
-                        asuntoTarea = 'Externalización de CMN a Comdata';
-                    } else {
-                        asuntoTarea = 'Externalización de CMN a Comdata (ERROR)';
-                    }
-                    CSBD_Activity.crearActividad( input.recordId, asuntoTarea, 'Completed', asuntoTarea, JSON.serialize(mensaje) + '\n\n\n' + httpResponse.getBody(), null);
-                }
+        try{
+            Input input = (Input) JSON.deserialize(jsonInput, Input.class);
+
+            CSBD_CMN_Comdata_Mensaje mensaje = inputToMensaje(input); // Convertir el input a mensaje
+
+            String intSetting = 'CSBD_CMN_Comdata';
+
+            // Creamos el header
+            Map<String, String> mHeaders = new Map<String, String>();
+            mHeaders.put('Content-Type', 'application/json; charset=UTF-8');
+
+            //creamos el wrapper para la petición
+            CBK_HttpServiceIntegration.RequestWapper requestWrp = new CBK_HttpServiceIntegration.RequestWapper();
+                requestWrp.body = JSON.serialize(mensaje); // Convertir el mensaje a JSON
+                requestWrp.intSetting = intSetting;
+                requestWrp.mHeaders = mHeaders;
+
+            //Creamos la traza
+            CC_TrazaInt__c comdataTraza = new CC_TrazaInt__c();
+            comdataTraza.Name = 'ComDataTraza';
+            comdataTraza.CC_FechaInicio__c = Datetime.now();
+            comdataTraza.CC_MensajeEntrada__c = requestWrp.body;
+            insert comdataTraza;
+
+            //Fin de la traza
+
+            HttpRequest request = CBK_HttpServiceIntegration.getRequest(requestWrp);
+            HttpResponse respuesta = CBK_HttpServiceIntegration.callHttpService(
+                request,
+                intSetting,
+                intSetting
+            );
+
+            //guardamos la respuesta en la traza
+            comdataTraza.CC_MensajeSalida__c = respuesta.getBody();
+            comdataTraza.CC_DetalleError__c = respuesta.getStatusCode() + ':' + respuesta.getBody();
+            insert comdataTraza;
+
+            if(respuesta.getStatusCode() != 200) {
+                CBK_Log.error('Error al enviar mensaje a Comdata: ' + respuesta.getBody());
+                ComdataTraza.CC_DetalleError__c = respuesta.getStatusCode() + ':' + respuesta.getBody();
+            } else {
+                CSBD_CMN_Comdata_Respuesta resp = (CSBD_CMN_Comdata_Respuesta)JSON.deserialize(respuesta.getBody(), CSBD_CMN_Comdata_Respuesta.class);
+                ComdataTraza.CC_MensajeSalida__c = respuesta.getBody();
             }
+            update ComdataTraza;
+        } catch (Exception e) {
+            CBK_Log.error(e);
         }
     }
+
 
     private static CSBD_CMN_Comdata_Mensaje inputToMensaje(Input input) {
         //Descartar prefijo internacional de España
@@ -88,13 +106,5 @@ public with sharing class CSBD_CMN_Comdata {
         return mensaje;
     }
 
-    private static CC_InterfaceSettings__mdt obtenerParametrosIntegracion(String interfazDevName) {
-        List<CC_InterfaceSettings__mdt> parametrosInterfaz = [SELECT DeveloperName, CC_Certificado__c, CC_Endpoint__c, CC_TipoPeticion__c, CC_ContentType__c
-                                                                FROM CC_InterfaceSettings__mdt WHERE DeveloperName = :interfazDevName AND CC_Activa__c = true];
-        CC_InterfaceSettings__mdt resultado = null;
-        if (!parametrosInterfaz.isEmpty()) {
-            resultado = parametrosInterfaz[0];
-        }
-        return resultado;
-    }
+    
 }

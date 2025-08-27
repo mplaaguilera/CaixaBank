@@ -11,8 +11,10 @@ public with sharing class CC_EmailSendController {
                 CC_MCC_Motivo__c, Origin, Status, Subject, CreatedDate, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, CC_Grupo_3N__c,
                 CC_No_Identificado__c, CC_En_Segundo_Nivel__c, CC_Traslado_2N__c, CC_En_Tercer_Nivel__c, CC_Canal_Operativo__c,
                 CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c,CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c , CC_MCC_Causa__c,
-                CC_MCC_Solucion__c, CC_Oportunidad_creada__c,CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c,ParentId, Parent.RecordType.DeveloperName, CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_Representante__c
-                FROM Case WHERE Id = :recordId];
+                CC_MCC_Solucion__c, CC_Oportunidad_creada__c,CBK_Case_Extension_Id__r.CC_Oportunidad_Relacionada_Lookup__c,ParentId, Parent.RecordType.DeveloperName,
+                CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_Representante__c, Account.AV_IndicadoresClientes__c
+            FROM Case WHERE Id = :recordId];
+
     }
 
     @AuraEnabled(cacheable=true)
@@ -256,8 +258,12 @@ public with sharing class CC_EmailSendController {
     public static List<CC_Grupo_Colaborador__c> buscarGrupos3N(String cadenaBusqueda) {
         Id recordTypeId = Schema.getGlobalDescribe().get('CC_Grupo_Colaborador__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Grupo_Tercer_Nivel').getRecordTypeId();
 
-        return [SELECT Id, Name, CC_Queue_Traslado__c FROM CC_Grupo_Colaborador__c
-                WHERE Name LIKE :('%' + cadenaBusqueda + '%') AND RecordTypeId = :recordTypeId AND CC_Queue_Traslado__c != null];
+        return [SELECT Id, Name, CC_Queue_Traslado__c, CC_Tipo__c FROM CC_Grupo_Colaborador__c
+                WHERE Name LIKE :('%' + cadenaBusqueda + '%') 
+                AND RecordTypeId = :recordTypeId 
+                AND CC_Queue_Traslado__c != null
+                AND CC_Tipo__c != null 
+                AND CC_Tipo__c != ''];
     }
 
     @AuraEnabled(cacheable=true)
@@ -586,11 +592,21 @@ public with sharing class CC_EmailSendController {
         @AuraEnabled
         public String idRegistro {get; set;}
 
+        @AuraEnabled
+        public String ccTipo {get; set;}
+
 
         public PickListWrapperTraslados(String label, String value, String idRegistro) {
             this.label = label;
             this.value = value;
             this.idRegistro = idRegistro;
+        }
+
+        public PickListWrapperTraslados(String label, String value, String idRegistro, String ccTipo) {
+            this.label = label;
+            this.value = value;
+            this.idRegistro = idRegistro;
+            this.ccTipo = ccTipo;
         }
     }
 
@@ -638,6 +654,58 @@ public with sharing class CC_EmailSendController {
         }
         return retorno;
     }
+
+
+    @AuraEnabled(cacheable=true)
+    public static Map<String, String> obtenerIdiomasNotificacion() {
+        Map<String, String> pickListValues = new Map<String, String>();
+        Schema.DescribeFieldResult pickList = CC_PlantillasNotificacionSetting__mdt.CC_Idioma__c.getDescribe();
+        
+        for (Schema.PicklistEntry pickVal : pickList.getPicklistValues()) {
+            pickListValues.put(pickVal.getValue(), pickVal.getLabel()); // Clave: API Name, Valor: label
+        }
+        
+        return pickListValues;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static Map<String, String> obtenerPlantillas(String idioma, String indicadorCliente) {
+        String entidad = String.isNotBlank(indicadorCliente) && indicadorCliente.contains('28') ? 'Imagin' : 'CaixaBank';
+        List<NotificacionWrapper> listaWrappers = new List<NotificacionWrapper>();
+        List<CC_PlantillasNotificacionSetting__mdt> listaMetadata = [SELECT DeveloperName, CC_CodigoEnvio__c, CC_CodigoIdioma__c, CC_Entidad__c, CC_Idioma__c, CC_Plantilla__c, CC_Tipologia__c
+                                                                    FROM CC_PlantillasNotificacionSetting__mdt WHERE CC_Idioma__c = :idioma AND CC_Entidad__c = :entidad];
+        
+        List<String> listaPlantillasDevName = new List<String>();
+        for (CC_PlantillasNotificacionSetting__mdt datoConfig : listaMetadata) {
+            if (String.isNotBlank(datoConfig.CC_Plantilla__c)) {
+                listaPlantillasDevName.add(datoConfig.CC_Plantilla__c);
+            }
+        }
+
+        Map<String, String> plantillas = new Map<String, String>();
+        if (!listaPlantillasDevName.isEmpty()) {
+            List<EmailTemplate> templates = [SELECT Name, HtmlValue, DeveloperName FROM EmailTemplate WHERE developerName IN :listaPlantillasDevName];
+
+            for (EmailTemplate template : templates) {
+                plantillas.put(template.DeveloperName, template.Name); // API Name
+            }
+        }
+        return plantillas;
+    }
+
+    public class NotificacionWrapper{
+        @AuraEnabled public String metadataDevName {get; set;}
+        @AuraEnabled public String emailtamplateName {get; set;}
+        @AuraEnabled public String emailtamplateDevName {get; set;}
+        
+        public NotificacionWrapper(String metadataDevNameC, String emailtamplateNameC, String emailtamplateDevNameC)
+        {
+            metadataDevName = metadataDevNameC;
+            emailtamplateName = emailtamplateNameC;
+            emailtamplateDevName = emailtamplateDevNameC;
+        }
+    }
+
 
     @AuraEnabled(cacheable=true)
     public static List<EmailTemplate> plantillas(String rutaDevName) {
@@ -942,7 +1010,7 @@ public with sharing class CC_EmailSendController {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<PickListWrapperTraslados> getMCCGrupoList(String recordId, String tipoGrupo, Boolean remitir, String grupoColaboradorDerivarFraude) {
+    public static List<PickListWrapperTraslados> getMCCGrupoList(String recordId, String tipoGrupo, Boolean remitir, String grupoColaboradorDerivarFraude, Boolean verTodosLosGrupos) {
         List<Case> casos = [SELECT CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Motivo__c, CC_Canal_Operativo__c, RecordTypeId FROM Case WHERE Id = :recordId LIMIT 1];
         String tematica;
         String prodServicio;
@@ -986,14 +1054,29 @@ public with sharing class CC_EmailSendController {
         List<String> nombreGrupo = new List<String>();
 
         if(tipoGrupo == '3N'){
+
+            if(recordTypecaso != null && recordTypecaso == recordTypeIdCliente){
         	grupos = [SELECT CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c
                       FROM CC_MCC_Grupo_Colaborador__c
                       WHERE CC_MCC__c IN :idsMCC
                       AND CC_Grupo_Colaborador__r.RecordtypeId = :recordTypeIdGrupo
+                      AND CC_Grupo_Colaborador__r.CC_Tipo__c = 'Traslados 3N'
+                      AND CC_Grupo_Colaborador__r.CC_Tipo__c != null 
+                      AND CC_Grupo_Colaborador__r.CC_Tipo__c != ''
                       ORDER BY Name ASC];
+            
+            }else {
+               grupos = [SELECT CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.CC_Tipo__c 
+                         FROM CC_MCC_Grupo_Colaborador__c 
+                         WHERE CC_MCC__c IN :idsMCC 
+                         AND CC_Grupo_Colaborador__r.RecordtypeId = :recordTypeIdGrupo 
+                         AND CC_Grupo_Colaborador__r.CC_Tipo__c != null 
+                         AND CC_Grupo_Colaborador__r.CC_Tipo__c != ''
+                         ORDER BY Name ASC];
+            }
 
             for (CC_MCC_Grupo_Colaborador__c grupo : grupos) {
-                PickListWrapperTraslados wrap = new PickListWrapperTraslados(grupo.CC_Grupo_Colaborador__r.Name, grupo.CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, grupo.CC_Grupo_Colaborador__r.Id);
+                PickListWrapperTraslados wrap = new PickListWrapperTraslados(grupo.CC_Grupo_Colaborador__r.Name, grupo.CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, grupo.CC_Grupo_Colaborador__r.Id, grupo.CC_Grupo_Colaborador__r.CC_Tipo__c);
                 if (!nombreGrupo.contains(grupo.CC_Grupo_Colaborador__r.Name)) {
                     nombreGrupo.add(grupo.CC_Grupo_Colaborador__r.Name);
                     optionsGrupos.add(wrap);
@@ -1257,8 +1340,8 @@ public with sharing class CC_EmailSendController {
     }
 
     @AuraEnabled
-    public static String enviarNotificacinPushSMS(Id sObjectId, String destinatario, String texto) {
-        return CC_Push_SMS.enviarNotificacionPush(sObjectId, destinatario, texto);
+    public static String enviarNotificacinPushSMS(Id sObjectId, String plantillaDevName, String idioma, String entidad) {
+        return CC_WS_PushSMS.enviarNotificacionPush(sObjectId, plantillaDevName, idioma, entidad);
     }
 
 

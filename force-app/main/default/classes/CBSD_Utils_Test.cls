@@ -1,5 +1,5 @@
 @isTest
-public class TEST_ApexClass {
+public class CBSD_Utils_Test {
 
 	@isTest
 	private static void test1() {

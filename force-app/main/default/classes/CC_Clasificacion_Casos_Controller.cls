@@ -256,6 +256,8 @@ public with sharing class CC_Clasificacion_Casos_Controller {
 
         resultado.put('tieneActividad',tieneActividad);
         resultado.put('cambiarStatusAuto', cambiarStatusAuto);
+
+        System.debug('resultado: ' + JSON.serialize(resultado));
         return resultado;
     }
     

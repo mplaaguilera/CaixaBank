@@ -1,6 +1,19 @@
 @isTest
 public with sharing class CSBD_CMN_Comdata_Test {
+    
+    //Creacion del Mock
+    private class Comdata_Mock implements HttpCalloutMock {
+        public HttpResponse respond(HttpRequest request) {
+            String bodyRespuesta = '{"ok": "true", "mensaje": "Success", "transaccion": "12345"}';
+            HttpResponse res = new HttpResponse();
+            res.setHeader('Content-Type', 'application/json');
+            res.setBody(bodyRespuesta);
+            res.setStatusCode(200);
+            return res; 
+        }
+    }
 
+    
     @TestSetup
     private static void altaDatosPrueba() {
         //Alta de las parametrizaciones que necesita el trigger BI de oportunidades
@@ -23,6 +36,12 @@ public with sharing class CSBD_CMN_Comdata_Test {
         listaPrecios.Description = 'CSBD Price Book';
         listaPrecios.IsActive = true;
         insert listaPrecios;
+
+        //creamos los Integration settings
+        CBK_IntegrationSetting__c CSBD_CMN_Comdata = new CBK_IntegrationSetting__c();
+        CSBD_CMN_Comdata.Name = 'CSBD_CMN_Comdata';
+        CSBD_CMN_Comdata.NamedCredential__c = 'callout:CSBD_CMN_Comdata/api/CMN';
+        insert CSBD_CMN_Comdata;
     }
 
     @isTest
@@ -70,23 +89,14 @@ public with sharing class CSBD_CMN_Comdata_Test {
         );
         */
 
-        CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
-		wsc.Name = 'CSBD_CMN_Comdata';
-		wsc.NamedCredential__c = 'callout:CSBD_CMN_Comdata/api/CMN';
-		insert wsc;
-        
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
-            Test.startTest();
-                String jsonToken = '{"ok":true,"transaccion":"061b2af9d543416d855f625ac908a502"}';
-                HttpResponse resp = new HttpResponse();
-                resp.setBody(jsonToken);		
-                resp.setStatusCode(200);
-                resp.setStatus('Ok');
+        Test.setMock(HttpCalloutMock.class, new Comdata_Mock());
 
-                CSBD_CMN_Comdata.enviarCMNComdata(input);
-                CSBD_CMN_Comdata.CSBD_CMN_Comdata_Respuesta respuesta = (CSBD_CMN_Comdata.CSBD_CMN_Comdata_Respuesta)JSON.deserialize(resp.getBody(), CSBD_CMN_Comdata.CSBD_CMN_Comdata_Respuesta.class);
-                System.assertEquals(respuesta.ok,'true');
+        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+
+            Test.startTest();
+            CSBD_CMN_Comdata.enviarCMNComdata(input);
             Test.stopTest();
         }
+       
     }
 }

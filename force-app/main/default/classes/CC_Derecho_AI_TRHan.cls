@@ -14,6 +14,7 @@ public with sharing class CC_Derecho_AI_TRHan extends CC_TriggerHandlerBase {
         if (!idsDerechos.isEmpty()) {
             System.debug(':::idsDerechos: ' + idsDerechos);
             CC_GDPR.altaSolicitud(idsDerechos);
+            CC_GDPR.crearTareaGDPR(derechos);
         }
 	}
 

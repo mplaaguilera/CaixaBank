@@ -10,7 +10,7 @@ public with sharing class CC_Gestion_Derivar_SinClienteAsociado {
         try {
             Case caso = new Case(Id = recordId);
             caso.AccountId = cuentaId;
-            caso.CC_No_Identificado__c = false;
+            // caso.CC_No_Identificado__c = false;
             update caso;
         } catch (Exception e) {
             throw new AuraHandledException('Error al actualizar el caso: ' + e.getMessage());
@@ -62,6 +62,19 @@ public with sharing class CC_Gestion_Derivar_SinClienteAsociado {
             return !tareas.isEmpty();
         } catch (QueryException e) {
             throw new AuraHandledException('Error al consultar el caso o las tareas');
+        }
+    }
+
+    @AuraEnabled
+    public static boolean casoNoSeIdentifica(Id recordId) {
+        try {
+            Case caso = [SELECT Id, CC_No_Identificado__c FROM Case WHERE Id = :recordId LIMIT 1];
+            if (caso == null) {
+                throw new AuraHandledException('No se encontró el caso con el Id proporcionado');
+            }
+            return caso.CC_No_Identificado__c;
+        } catch (QueryException e) {
+            throw new AuraHandledException('Error al consultar el caso');
         }
     }
 }

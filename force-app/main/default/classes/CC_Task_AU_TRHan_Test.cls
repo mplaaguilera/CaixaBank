@@ -9,9 +9,7 @@ public class CC_Task_AU_TRHan_Test
         Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
         
         List<User> userList = new List<User>();
-        
         User usuarioAdmin = new User();
-        
         usuarioAdmin.profileId = profileAdmin;
         usuarioAdmin.UserRoleId = roleCC;
         usuarioAdmin.FirstName = '';
@@ -26,9 +24,7 @@ public class CC_Task_AU_TRHan_Test
         usuarioAdmin.LanguageLocaleKey = 'es';
         usuarioAdmin.LocaleSidKey = 'es_ES';
 		userList.add(usuarioAdmin);
-        //insert usuarioAdmin;
         
-
         User usuario1 = new User();
         usuario1.ProfileId = profileId;
         usuario1.FirstName = 'Usuario Supervisor';
@@ -43,7 +39,6 @@ public class CC_Task_AU_TRHan_Test
         usuario1.LanguageLocaleKey = 'es';
         usuario1.LocaleSidKey = 'es_ES';
         usuario1.UserRoleId = roleCC;
-
         userList.add(usuario1);
         insert userList; 
         
@@ -77,8 +72,27 @@ public class CC_Task_AU_TRHan_Test
             tareaReadOnly.WhatId = csReadOnly.Id;
             insert tareaReadOnly;
 
+            Account cuenta = new Account();
+            cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
+            cuenta.FirstName = 'Cuenta';
+            cuenta.LastName = 'Test';
+            cuenta.CC_Email__c = 'cuenta@test.com';
+            cuenta.PersonMobilePhone = '+34 123456789';
+            cuenta.PersonBirthdate = CBK_UtilsDate.todayDT().addYears(-24);
+            cuenta.CC_NumPerso__c = '206';
+            insert cuenta;
+
+            Contact contacto = new Contact();
+            contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
+            contacto.FirstName = 'Contacto';
+            contacto.LastName = 'Test';
+            contacto.CC_Idioma__c = 'es';
+            contacto.Email = 'contacto@test.com';
+            insert contacto;
+
+            List<Case> casos = new List<Case>();
             Case caso = new Case();
-            caso.recordTypeId = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+            caso.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             caso.CC_Idioma__c = 'es';
             caso.Subject = 'Asunto';
             caso.Description = 'Descripción';
@@ -90,8 +104,48 @@ public class CC_Task_AU_TRHan_Test
             caso.Status = 'Inactivo ';
             caso.CC_Detalles_Consulta__c = 'Detalles Consulta';
             caso.CC_Detalles_Solucion__c = 'Detalles Solución';
-            insert caso;
+            casos.add(caso);
 
+            Case caso2 = new Case();
+            caso2.recordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            caso2.AccountId = cuenta.Id;
+            caso2.ContactId = contacto.Id;
+            caso2.CC_Idioma__c = 'es';
+            caso2.Subject = 'Caso para prueba de oportunidad';
+            caso2.Description = 'Descripción del caso';
+            caso2.CC_Tipo_Contacto__c = 'Consulta';
+            caso2.CC_Canal_Procedencia__c = 'Accionista';
+            caso2.CC_Canal_Resolucion__c = 'Accionista';
+            caso2.CC_Canal_Operativo__c = 'App CaixaBankPay';
+            caso2.Origin = 'Email';
+            caso2.Status = 'Activo';
+            caso2.CC_Detalles_Consulta__c = 'Detalles Consulta';
+            caso2.CC_Detalles_Solucion__c = 'Detalles Solución';
+            casos.add(caso2);
+            insert casos;
+
+            CBK_Case_Extension__c caseExtension = new CBK_Case_Extension__c();
+            caseExtension.Case_Id__c = caso2.Id;
+            caseExtension.CC_CrearOportunidadTrigger__c = true;
+            insert caseExtension;
+
+            caso2.CBK_Case_Extension_Id__c = caseExtension.Id;
+            update caso2;
+
+            CC_Llamada__c llamada = new CC_Llamada__c();
+            llamada.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'CC_Cliente');
+            llamada.CC_Case_Consulta__c = caso2.Id;
+            llamada.CC_Id_Cognitivo__c = '1234567890';
+            llamada.CC_Tipo__c = 'Entrante';
+            llamada.CC_ConnId__c = '1234567890';
+            llamada.CC_Idioma__c = 'es';
+            llamada.CC_Asunto__c = 'Asunto';
+            llamada.CC_Datos_Genesys__c = 'Datos Genesys';
+            llamada.CC_ConnId_Cognitivo__c = '1234567890';
+            llamada.CC_NumPerso__c = '1234567890';
+            insert llamada;
+
+            List<Task> tareas = new List<Task>();
             Task tareaNoTiempo = new Task();
             tareaNoTiempo.type = 'Otros';
             tareaNoTiempo.Status = 'Pendiente no localizado';
@@ -99,8 +153,25 @@ public class CC_Task_AU_TRHan_Test
             tareaNoTiempo.Subject = 'Reclamación';
             tareaNoTiempo.RecordTypeId = tareaNoTiempo.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
             tareaNoTiempo.WhatId = caso.Id;
-            
-            insert tareaNoTiempo;
+            tareas.add(tareaNoTiempo);
+
+            Task tareaOportunidad = new Task();
+            tareaOportunidad.Subject = 'Tarea para generar oportunidad';
+            tareaOportunidad.Status = 'Open';
+            tareaOportunidad.Type = 'Llamada';
+            tareaOportunidad.CC_Tipo_Cierre__c = 'Llamada finalizada';
+            tareaOportunidad.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+            tareaOportunidad.CC_Llamada_Id__c = llamada.Id;
+            tareaOportunidad.WhatId = caso2.Id;
+            tareas.add(tareaOportunidad);
+            insert tareas;
+
+            CC_Lista_Valores__c listaOportunidadTareaExistente = new CC_Lista_Valores__c();
+            listaOportunidadTareaExistente.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+            listaOportunidadTareaExistente.CC_Activa__c = true;
+            listaOportunidadTareaExistente.Name = 'Texto oportunidad tarea existente';
+            listaOportunidadTareaExistente.CC_Mensajes_Mostrar__c = 'No es posible crear una oportunidad porque ya existe una cita o tarea creada';
+            insert listaOportunidadTareaExistente;
         }
     }
 
@@ -110,8 +181,8 @@ public class CC_Task_AU_TRHan_Test
         tarea.RecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId();
         tarea.Subject = 'Tarea para ver si se actualiza el campo última actualización';
         tarea.Status = 'Completed';
-         User supervisor = [SELECT Id FROM User WHERE LastName LIKE 'last211053Supervisor' AND IsActive=true AND UserRole.DeveloperName = 'Contact_Center' LIMIT 1];
-        System.runAs(supervisor){
+        User supervisor = [SELECT Id FROM User WHERE LastName LIKE 'last211053Supervisor' AND IsActive=true AND UserRole.DeveloperName = 'Contact_Center' LIMIT 1];
+        System.runAs(supervisor) {
         Test.startTest();
             insert tarea;   
         Test.stopTest();
@@ -245,6 +316,26 @@ public class CC_Task_AU_TRHan_Test
 
 
             Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void generarOportunidadLlamadaFinalizadaTest() {
+        User administrador = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso para prueba de oportunidad' LIMIT 1];
+        Task tarea = [SELECT Status FROM Task WHERE WhatId = :caso.Id AND Subject = 'Tarea para generar oportunidad' LIMIT 1];
+        
+        Test.startTest();
+        tarea.Status = 'Completed';
+        update tarea;
+        Test.stopTest();
+        
+        Task tareaActualizada = [SELECT Status, CC_Tipo_Cierre__c FROM Task WHERE Id = :tarea.Id];
+        CBK_Case_Extension__c caseExtensionAct = [SELECT CC_CrearOportunidadTrigger__c FROM CBK_Case_Extension__c WHERE Case_Id__c = :caso.Id LIMIT 1];
+        System.runAs(administrador) {
+            System.assertEquals('Completed', tareaActualizada.Status, 'La tarea no se actualizó correctamente');
+            System.assertEquals('Llamada finalizada', tareaActualizada.CC_Tipo_Cierre__c, 'El tipo de cierre no es correcto');
+            System.assertEquals(false, caseExtensionAct.CC_CrearOportunidadTrigger__c, 'El campo no se ha actualizado correctamente');
         }
     }
 }

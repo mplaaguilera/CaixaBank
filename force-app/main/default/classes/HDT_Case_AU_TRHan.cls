@@ -33,6 +33,7 @@ public with sharing class HDT_Case_AU_TRHan extends CC_TriggerHandlerBase {
             HDT_CaseTriggerHelper.cierreCasoAU(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.cierreCasoHDT2N(lstCasesCC, mapOldObj);
             HDT_CaseTriggerHelper.asociarAssetaCuenta(lstCasesCC, mapOldObj);
+            HDT_CaseTriggerHelper.devolucionCasosHDTCCO(lstCasesCC, mapOldObj);
         }
     }
 

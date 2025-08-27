@@ -13,6 +13,7 @@ public with sharing class CC_Knowledge_AI_TRHan extends CC_TriggerHandlerBase {
         Id idRtCCArbol = Schema.SObjectType.Knowledge__kav.getRecordTypeInfosByDeveloperName().get('CC_Arbol_Decision').getRecordTypeId();
         Id idRtCCFicha = Schema.SObjectType.Knowledge__kav.getRecordTypeInfosByDeveloperName().get('CC_Ficha_Producto').getRecordTypeId();
         Id idRtCCPregunta = Schema.SObjectType.Knowledge__kav.getRecordTypeInfosByDeveloperName().get('CC_Pregunta_Respuesta').getRecordTypeId();
+        Id idRtCCVideo = Schema.SObjectType.Knowledge__kav.getRecordTypeInfosByDeveloperName().get('CC_Video').getRecordTypeId();
         List<Id>listaCC = new List<Id>();
         List<Id>listaArticulos = new List<Id>();
         List<Knowledge__kav>listaKnowledge = new List<Knowledge__kav>();
@@ -21,6 +22,7 @@ public with sharing class CC_Knowledge_AI_TRHan extends CC_TriggerHandlerBase {
         listaCC.add(idRtCCArbol);
         listaCC.add(idRtCCFicha);
         listaCC.add(idRtCCPregunta);
+        listaCC.add(idRtCCVideo);
 
     //Procedemos a asignar como propietario de los knowledge la cola para que los agregados a la cola tengan permisos de editar por código
         for(Knowledge__kav l : listNewObj){

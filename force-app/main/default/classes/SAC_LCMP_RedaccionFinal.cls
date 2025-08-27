@@ -512,12 +512,20 @@ public without sharing class SAC_LCMP_RedaccionFinal {
     }
 
 
+    /*****************************************************************
+    * Proposito: Obtener los reclamantes asociados al caso
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0            US1279726      Kevin Gòmez      05/08/25     Creación
+    *****************************************************************/ 
     @AuraEnabled
     public static List<SAC_CaseReclamante__c> recuperarReclamantes (String idCaso){
         try{
 
             List<SAC_CaseReclamante__c> listaReclamantes = [SELECT Id, SAC_Account__c, SAC_Case__c, SAC_Account__r.Name, SAC_ReclamantePrincipal__c, SAC_Pretension__c, SAC_Empleado__c,
-                                                            SAC_Account__r.AV_EAPGestor__c, SAC_Account__r.CC_OficinaGestoraId__c, SAC_Account__r.AV_OfficeManager__c,
+                                                            SAC_Account__r.AV_EAPGestor__c, SAC_Account__r.CC_OficinaGestoraId__c, SAC_Account__r.AV_OfficeManager__c, 
                                                             SAC_TelefonoNoAlf__c, SAC_EmailNoAlf__c, SAC_DireccionNoAlf__c, SAC_TieneDatosNoAlf__c, SAC_Case__r.RecordTypeId, SAC_Case__r.RecordType.DeveloperName
                                                             FROM SAC_CaseReclamante__c 
                                                             WHERE SAC_Case__c = :idCaso];
@@ -529,6 +537,15 @@ public without sharing class SAC_LCMP_RedaccionFinal {
             throw new AuraHandledException(e.getMessage());
         }
     }
+
+    /*****************************************************************
+    * Proposito: Obtener los reclamantes asociados al caso
+    *
+    * Historial
+    * -------
+    * VERSION        USER_STORY       AUTHOR         DATE         Description
+    * 1.0            US1279726      Kevin Gòmez      07/08/25     Creación
+    *****************************************************************/ 
 
     @AuraEnabled
     public static void cambiarContactoReclamante (String reclamanteId, String idCaso){
@@ -544,16 +561,6 @@ public without sharing class SAC_LCMP_RedaccionFinal {
                                                             WHERE Case_Id__c  = :idCaso
                                                             LIMIT 1];
 
-            Case casoActual = new Case();
-            casoActual.CC_Idioma__c = reclamante.SAC_Account__r.CC_Idioma__pc;
-            casoActual.CC_Oficina__c = reclamante.SAC_Account__r.AV_OfficeManager__c;           
-            casoActual.Id = idCaso;
-            casoActual.AccountId = reclamante.SAC_Account__c;
-            casoActual.ContactId = reclamante.SAC_Contact__c;
-
-
-            SAC_DatabaseDML.updateDML(casoActual, false);
-
             if(reclamante.SAC_ReclamantePrincipal__c && caseExtension.SPV_ReclamantePrincipalEmail__c){
                 caseExtension.SPV_ReclamantePrincipalEmail__c = false;
             }else if(!reclamante.SAC_ReclamantePrincipal__c){
@@ -561,6 +568,15 @@ public without sharing class SAC_LCMP_RedaccionFinal {
             }
 
             SAC_DatabaseDML.updateDML(caseExtension, false);
+
+            Case casoActual = new Case();          
+            casoActual.Id = idCaso;
+            casoActual.AccountId = reclamante.SAC_Account__c;
+            casoActual.ContactId = reclamante.SAC_Contact__c;
+
+
+            SAC_DatabaseDML.updateDML(casoActual, false);
+            
 
         }catch (Exception e) {
             throw new AuraHandledException(e.getMessage());

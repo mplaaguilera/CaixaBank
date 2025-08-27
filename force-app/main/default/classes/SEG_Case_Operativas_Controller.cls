@@ -170,16 +170,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 				];
 				groups = searchResults[0];
 			}
-			/*
-			for (CC_Grupo_Colaborador__c gp : groups) {
-				String estaDisponible = gp.Id;
-				for (String disponible : gruposDispobibles) {
-					if(gp.Id == disponible){
-						mapGroups.put(gp.Id, gp);
-					}
-				}
-			}
-			*/
 			for (CC_Grupo_Colaborador__c gp : groups) {
 				mapGroups.put(gp.Id, gp);
 			}
@@ -256,15 +246,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 
 	@AuraEnabled
 	static public String cerrarCasoResultado(Id caseId, String resultado, Integer numOperacionesCaso) {
-		//Recuperar el valor del resultado a partir del índice en la picklist
-		/* OLD. Gestión antigua sin API NAME.
-		List<String> valores = new List<String>();
-		for (Schema.PicklistEntry pickListVal : Case.SEG_Resultado__c.getDescribe().getPicklistValues()) {
-			valores.add(pickListVal.getLabel());
-		}
-		String resul = resultado == null ? null : valores[resultado];
-		*/
-
 		String resul = resultado; // Mantener compatibilidad con lo antiguo.
 		String envio = '';
 		String criterioImputacion = '';
@@ -542,13 +523,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 				}
 
 				if (String.isNotBlank(plantillaIdioma)) {
-					/*EmailTemplate emailTemplate = [SELECT Subject, Description, HtmlValue, DeveloperName, Body
-													FROM EmailTemplate WHERE Id = :plantillaIdioma];*/
 					if(emails != null && resultado == 'Respuesta a peticionario'){
-						/*if(emails?.get(0)?.FromAddress != null){
-							adresses.add(emails[0].FromAddress);
-						}*/
-						//Sustituimos el if anterior por el siguiente, de manera que solo accede a FromAddress si el primer elemento existe y no es null.
 						if (!emails.isEmpty() && emails.get(0).FromAddress != null) {
     						adresses.add(emails.get(0).FromAddress);
 						}
@@ -572,13 +547,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 						
 						//Contact contactoPeticion = [SELECT Id, Name, Email, CC_Idioma__c FROM contact WHERE Email = :emails[0].FromAddress LIMIT 1];
 						Id contactoMail = (String.isNotBlank(contactoCasoId)) ? Id.valueOf(contactoCasoId) : null;
-						/*if (contactoMail == null)
-						{
-							if (String.isNotBlank(emails?.get(0)?.FromAddress))
-							{
-								Contact contactoPeticion = [SELECT Id, Name, Email, CC_Idioma__c FROM contact WHERE Email = :emails[0].FromAddress LIMIT 1];
-							}
-						} */
 
 						Messaging.SingleEmailMessage email = Messaging.renderStoredEmailTemplate(plantillaIdioma, contactoMail, caso.Id);
 						//message.setSenderDisplayName('Segmentos CaixaBank - TO CHANGE');
@@ -650,61 +618,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 							}
 						}
 
-						// NO HAY DIFERENCIA. if(resultado == 'Reenvío al contacto del caso'){
-							/*
-							if(emails != null){
-								if(canal != null){
-									for(CC_Canal_Com__c e : canal){
-										adresses.add(e.CC_Email__c);
-									}
-								}
-								adresses.add(contacto.Email);
-							}
-							message.setTargetObjectId(contacto.id);
-							message.setToAddresses(adresses);
-							*/
-						// NO HAY DIFERENCIA. }else if(resultado == 'Envíado justificantes al cliente'){
-							/*
-							if(emails != null){
-								if(canal != null){
-									for(CC_Canal_Com__c e : canal){
-
-										adresses.add(e.CC_Email__c);
-									}
-								}
-								adresses.add(contacto.Email);
-							}
-							message.setTargetObjectId(contacto.id);
-							message.setToAddresses(adresses);
-							*/
-						// NO HAY DIFERENCIA. }else if(resultado == 'Operaciones gestionadas pte envío justificante'){
-							/*
-							if(emails != null){
-								if(canal != null){
-									for(CC_Canal_Com__c e : canal){
-										adresses.add(e.CC_Email__c);
-									}
-								}
-								adresses.add(contacto.Email);
-							}
-							message.setTargetObjectId(contacto.id);
-							message.setToAddresses(adresses);
-							*/
-						// NO HAY DIFERENCIA. }else if(resultado == 'Operaciones gestionadas sin envío justificante'){
-							/*
-							if(emails != null){
-								if(canal != null){
-									for(CC_Canal_Com__c e : canal){
-										adresses.add(e.CC_Email__c);
-									}
-								}
-								adresses.add(contacto.Email);
-							}
-							message.setTargetObjectId(contacto.id);
-							message.setToAddresses(adresses);
-							*/
-						// NO HAY DIFERENCIA. }
-
 						Messaging.SingleEmailMessage email = Messaging.renderStoredEmailTemplate(plantillaIdioma, lstContacto[0].Id, caso.Id);
 						//message.setSenderDisplayName('Segmentos CaixaBank - TO CHANGE');
 						//message.setReplyTo('test@test.com');
@@ -740,10 +653,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 	/**
 	 * @description Método para enviar un correo automático utilizando la configuración de plantillas de Segmentos.
 	 */
-	/*TO_DO. REEMPLAZAR ESTE MÉTODO EN LA OPERATIVA DE CIERRE DE CASOS. CAMBIOS A REALIZAR EN LA FUNCIÓN DE LLAMADA.
-			-> CONTROLAR QUE EXISTA UN CONTACTO ID PARA NO EJECUTAR LA FUNCIÓN.
-			-> CONVERTIR LOS CÓDIGOS DE ERROR A LOS MENSAJES ACTUALES DE RETORNO.
-	*/
 	public static Map<String,String> enviarCorreoAutoOperativa (Map<String,String> datosCaso, Map<String,String> configuracion, List<String> emailDestinatariosBackup, List<String> ficherosAdjuntos)
 	{
 		Map<String,String> retorno = new Map<String,String>();
@@ -1116,38 +1025,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 		}
 		insert feed;
 	}
-
-	/* Jaime: OLD
-	@AuraEnabled
-	static public void postOnChatter(Id caseId, String observaciones, String operativa, String notaTipificada) {
-		if(String.isNotBlank(operativa) && String.isNotBlank(observaciones) )
-		{
-			createNotes(caseId, operativa, observaciones);
-		}
-
-		FeedItem feed = new FeedItem();
-		feed.ParentId = caseId;
-		feed.isRichText = true;
-		feed.Type = 'TextPost';
-		if (String.isBlank(observaciones)){
-			observaciones = 'Sin Comentarios';
-		}
-		if(String.isBlank(notaTipificada)){
-			notaTipificada = 'Sin notas';
-		}
-
-		// Escapar el contenido HTML.
-		//observaciones = observaciones.escapeHtml4();
-
-		if (String.isNotBlank(notaTipificada) && notaTipificada != 'Sin notas') {
-			String nombreNotaTipificada = [SELECT Name FROM SEG_NotasTipificadas__c WHERE Id = :notaTipificada].Name;
-			feed.Body = 'Comentarios publicados en ' + operativa + ': <b>' + observaciones + '</b>. Nota tipificada: <b>' + nombreNotaTipificada + '</b>';
-		} else {
-			feed.Body = 'Comentarios publicados en ' + operativa + ': <b>' + observaciones + '</b>. Nota tipificada: <b>' + notaTipificada + '</b>';
-		}
-		insert feed;
-	}
- 	*/
 
 	@AuraEnabled
 	static public void createNotes(Id caseId, String titulo, String texto) {
@@ -1798,82 +1675,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 		return retorno;
 	}
 
-	/*
-	@future
-	public static void enviarCorreoAutoasignacion (ID caseId)
-	{
-		// Código movido del autoasignar, para descargar la transacción.
-
-		if (caseId != null)
-		{
-			// Recuperar datos del caso.
-			Case listadoCasosData[0];
-			List<Case> listadoCasos = [SELECT Id, AccountId, ContactId FROM Case WHERE Id = :caseId];
-			if (listadoCasos.isEmpty())
-			{
-				// No encontramos el caso, salir.
-				return;
-			}
-			listadoCasosData[0] = listadoCasos[0];
-
-			//Envío plantilla genérica
-			List<Case> casoPlantilla = new List<Case>();
-			casoPlantilla.add(listadoCasosData[0]);
-
-			Map<Id, List<SEG_Plantilla__c>> plantillas = SEG_PlantillasHandler.determinarPlantillas(casoPlantilla, 'Autoasignación', null);
-
-			List<Contact> contacto = [SELECT id, Name, CC_Idioma__C, Email FROM Contact WHERE id = :listadoCasosData[0].ContactId LIMIT 1];
-			List<Account> acc = [SELECT id, SEG_EnviarAcuse__c, SEG_No_enviar_Acuse_Recibo_Empresa__c FROM Account WHERE id = :listadoCasosData[0].AccountId LIMIT 1];
-
-			String plantillaIdioma;
-			SEG_Plantilla__c plantillaCierre;
-			List<SEG_Plantilla__c> plantilla = new List<SEG_Plantilla__c>();
-
-			if(plantillas.size() == 1){
-
-				for(List<SEG_Plantilla__c> lP : plantillas.values()){
-
-					for(SEG_Plantilla__c p : lP){
-
-						plantilla.add(p);
-					}
-
-				}
-
-				plantillaCierre = plantilla[0];
-
-
-				if(contacto[0].CC_Idioma__c != null){
-
-					if(contacto[0].CC_Idioma__c =='ga'){
-						plantillaIdioma=plantillaCierre.SEG_PlantillaGalegoID__c;
-					}
-					else if(contacto[0].CC_Idioma__c =='ca'){
-						plantillaIdioma=plantillaCierre.SEG_PlantillaCatalanID__c;
-					}
-					else if(contacto[0].CC_Idioma__c =='en'){
-						plantillaIdioma=plantillaCierre.SEG_PlantillaInglesID__c;
-					}
-					else if(contacto[0].CC_Idioma__c =='eu'){
-						plantillaIdioma=plantillaCierre.SEG_PlantillaEuskeraID__c;
-					}
-					else {
-						plantillaIdioma=plantillaCierre.SEG_PlantillaCastellanoID__c;
-					}
-
-				}else{
-
-					plantillaIdioma=plantillaCierre.SEG_PlantillaCastellanoID__c;
-
-				}
-
-				//SEG_MetodosComunes.enviarCorreoAcuseBool(plantillaIdioma, listadoCasosData[0].Id, contacto[0], acc[0]);
-				SEG_MetodosComunes.enviarCorreoAcuse(plantillaIdioma, listadoCasosData[0].Id, contacto[0]);
-			}
-		}
-	}
-	*/
-
 	public static Map<String,Integer> identificarExcepciones(Id caseId)
 	{
 		Map<String,Integer> retornoExcepcionesCalculadas = new Map<String,Integer>();
@@ -1938,9 +1739,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 			throw new AuraHandledException('No puedes tomar en propiedad este caso ya que es propiedad de otro compañero en este momento');
 		}
 		else {
-			/*SEG_Case_BU_TRHan.procesado = true;
-			SEG_Modificadores_Trigger.desactivarModificador('SEG_Case_BU_TRHan: reejecutar lógica');
-			SEG_Modificadores_Trigger.activarModificador('SEG_Case_AU_TRHan: bypass');*/
 			caso.OwnerId = ownerId;
 			caso.Status = 'Activo';
 			caso.SEG_Subestado__c = 'En curso';
@@ -1951,34 +1749,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 			{
 				throw new AuraHandledException(e.getMessage());
 			}
-
-			//VFR 11/21 - Toast excepciones
-			//Evaluar que las excepciones siguen aplicando
-			//30/06/2022 Optimizando, se mueve para que se ejecute en future y los usuarios puedan ir haciendo sus cosas
-			/*Map<String, Object> retornoExcepciones = SEG_ExcepcionesHandler.calcularExcepcionesCasosYContratos(2, new List<Id>{caseId}, false, null);
-			Map<Id, List<SEG_Excepciones__c>> mapExcepciones = (Map<Id, List<SEG_Excepciones__c>>)retornoExcepciones.get('EXCEPCIONES');
-			List<SEG_Excepciones__c> lstExcepciones = mapExcepciones.get(caseId);
-
-			List<Id> lstIdsExcepciones = new List<Id>();
-			if (lstExcepciones != null) {
-				for (SEG_Excepciones__c e : lstExcepciones) {
-					lstIdsExcepciones.add(e.id);
-				}
-			}
-
-			//Excepciones del caso y comparar
-			Id recordText = Schema.SObjectType.SEG_Excepciones__c.getRecordTypeInfosByDeveloperName().get('SEG_Texto').getRecordTypeId();
-			List<SEG_Excepciones_Caso__c> lstExCase = new List<SEG_Excepciones_Caso__c>();
-			for (SEG_Excepciones_Caso__c exc : [SELECT SEG_PopUp__c, SEG_Excepciones__c
-												FROM SEG_Excepciones_Caso__c WHERE SEG_Case__c = :caseId
-												AND SEG_Excepciones__r.RecordTypeId = :recordText
-												AND SEG_Excepciones__r.SEG_Activa__c = TRUE]) {
-				if (lstIdsExcepciones != null && lstIdsExcepciones.contains(exc.SEG_Excepciones__c)) {
-					exc.SEG_PopUp__c = String.valueOfGmt(Datetime.now());
-					lstExCase.add(exc);
-				}
-			}
-			update lstExCase;*/
+	
 			excepcionesTomarpropiedad(caseId);
 		}
 	}
@@ -2011,25 +1782,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 			}
 			update lstExCase;
 	}
-	/*
-	@AuraEnabled
-	public static void tomarPropiedadCaso(Id idCaso) {
-		String nombrePerfil = [SELECT Name FROM Profile WHERE Id = :UserInfo.getProfileId()].Name;
-		Case caso = [SELECT SEG_Grupo__c FROM Case WHERE Id = :idCaso];
-		List<CC_Grupo_Colaborador_Contact__c> colaborador = [SELECT Id FROM CC_Grupo_Colaborador_Contact__c
-																WHERE CC_Grupo_Colaborador__c = :caso.SEG_Grupo__c
-																AND CC_Usuario__c = :UserInfo.getUserId() LIMIT 1];
 
-		if (nombrePerfil != 'System Administrator' && nombrePerfil != 'Administrador del Sistema' && colaborador.isEmpty()) {
-			throw new AuraHandledException('No tienes permisos para tomar la propiedad del caso');
-		}
-		try {
-			SEG_Case.tomarPropiedad(new List<Id>{idCaso});
-		} catch (Exception e) {
-			throw new AuraHandledException(e.getMessage());
-		}
-	}
-	*/
 	@AuraEnabled(cacheable=true)
 	public static String buscarGrupoColaborador(Id idGrupo) {
 
@@ -2237,11 +1990,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 				//posición 1 List String: CaseNumber o KO
 				//posición 2 List String: Clasificación Rápida
 				//posición 3 List String: Grupo Asignado
-				/*casoCreado.add(newCase.CaseNumber);
-				casoCreado.add(newCase.SEG_ClasificacionRapida__r.Name);
-				casoCreado.add(casoOrigen.SEG_Grupo__r.Name);
-				casoCreado.add(newCase.id);
-				casoCreado.add(newCase.SEG_SemillaId__c);*/
 
 				casoCreado.put('estado','OK');
 				casoCreado.put('casoId',newCase.id);
@@ -2874,9 +2622,6 @@ public without sharing class SEG_Case_Operativas_Controller {
         retorno.put('noexistemotivo', 'N');
 		retorno.put('enviarcanal','N');
 		if(casoMotiv.CC_MCC_Motivo__c != null){
-			/*OLD: if (listaFicheros != null && !listaFicheros.isEmpty()){
-
-			}*/
 
 			Case caso = new Case(Id = caseId);
 			String resultadoBPO = SEG_BPO_WS.enviarCaso(caseId,'alta',notasCif,listaFicheros);
@@ -2946,23 +2691,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 		insert operacion;
 	}
 
-	/*
-	@AuraEnabled
-	public static Boolean controlarAccount(Id caseId) {
-		return ![SELECT Id FROM Case WHERE Id = :caseId AND Account.Name = 'CUENTA PENDIENTE ASOCIAR'].isEmpty();
-	}
-
-	@AuraEnabled
-	public static Boolean controlarAccountYContact(Id caseId) {
-		return ![SELECT Id FROM Case WHERE Id = :caseId AND (AccountId = NULL OR ContactId = NULL)].isEmpty();
-	}
-
-	@AuraEnabled
-	public static Boolean controlarValijaSinEmail(Id caseId) {
-		return ![SELECT Id FROM Case WHERE Id = :caseId AND Contact.Email = NULL].isEmpty();
-	}
-	*/
-
 	@AuraEnabled
 	public static Map<String, Boolean> comprobarClienteCasoApex(Id recordId) {
 		Case caso = [SELECT AccountId, Account.Name, ContactId, Contact.Email FROM Case WHERE Id = :recordId];
@@ -2972,35 +2700,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 			'emailNoInformadoValija' => caso.Contact.Email == null
 		};
 	}
-
-	/*@AuraEnabled
-	public static Boolean controlarValijaSinCentro (Id caseId) {
-		Boolean isDisabled = false;
-
-		Case caso = [SELECT Id, Status, SEG_Subestado__c, SEG_Organizacion__c, SEG_Zona__c, AccountId, SEG_Numero_de_centro__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Tematica__c, SEG_Detalle__c FROM Case WHERE id = :caseId LIMIT 1];
-
-		Map<String,String> retornoAsignacion = SEG_MetodosComunes.asignarGrupoCaso(caso.SEG_Detalle__c, caso.CC_MCC_Motivo__c, caso.CC_MCC_ProdServ__c, caso.CC_MCC_Tematica__c, caso.AccountId, caso.SEG_Zona__c, caso.SEG_Organizacion__c, true, caso.Id);
-		String grupoId = retornoAsignacion.get('grupoCol');
-
-		Set<String> mccsCaso = new Set<String>();
-		mccsCaso.add(caso.CC_MCC_Motivo__c);
-		mccsCaso.add(caso.CC_MCC_ProdServ__c);
-		mccsCaso.add(caso.CC_MCC_Tematica__c);
-		mccsCaso.add(caso.SEG_Detalle__c);
-
-		Map<String,String> retornoColaborador = SEG_MetodosComunes.recuperarColaboradorExterno (caso.SEG_Organizacion__c, caso.SEG_Zona__c, grupoId, mccsCaso, caso.AccountId, true, caso.Id);
-
-		if (retornoColaborador.get('error') != '5' && retornoColaborador.get('esExterno') == 'Y'){
-			String tipoColaboradorWS = retornoColaborador.get('tipoColaboradorWS');
-			if (tipoColaboradorWS == 'VALIJA' && caso.SEG_Numero_de_centro__c == null){
-				isDisabled = true;
-			}
-		}
-
-		return isDisabled;
-	}*/
-
-
 
 	//US174856 Cierre de SRs hijas y madres.
 	/**
@@ -3086,9 +2785,6 @@ public without sharing class SEG_Case_Operativas_Controller {
 								casos.get(idCasoPadre).SEG_Subestado__c = null;
 								casos.get(idCasoPadre).CC_Detalles_Consulta__c = 'Caso cerrado';
 								String datosCasosPadre = JSON.serialize(casos);
-								/*List<Id> listadoCasos = new List<Id>();
-								listadoCasos.add(casos.get(idCasoPadre).id);
-								SEG_Case_BU_TRHan.enviarMailAlCierreCasoPadre(listadoCasos,datosCasosPadre);*/
 								casosAUpdatear.add(casos.get(idCasoPadre));
 
 							}
@@ -3125,76 +2821,7 @@ public without sharing class SEG_Case_Operativas_Controller {
 				CBK_Log.debug('No se ha podido actualizar el caso');
 			}
 		}
-
 	}
-
-
-		/*
-		// Buscar si existe algún caso hijo al caso que se está cerrando, para comprobar si existe alguno abierto.
-		Set<Id> setCasosHijosAbiertos = new Set<Id>();
-		if (!listadoCasosCierre.isEmpty())
-		{
-			for (Case casoHijo : [SELECT Status, ParentId FROM Case WHERE Status != 'Cerrado' AND ParentId IN :listadoCasosCierre])
-			{
-				setCasosHijosAbiertos.add(casoHijo.ParentId);
-			}
-		}
-
-		// Buscar si el caso Padre contiene algún caso Hijo abierto, diferente a la transacción de cierre.
-		Map<Id, Case> mapaCasosPadreCierre = new Map<Id, Case>();
-		if (!listadoCasosPadre.isEmpty())
-		{
-			mapaCasosPadreCierre = new Map<Id,Case>(
-				[SELECT Status, SEG_Subestado__c, SEG_Resultado__c,ParentId, CC_Detalles_Consulta__c, SEG_ClasificacionRapida__c,
-					SEG_Grupo__c, SEG_Grupo_Empresa__c, SEG_Organizacion__c, SEG_Zona__c, SEG_Numero_de_centro__c,
-					Contact.SEG_No_enviar_Acuse_Recibo__c, Account.SEG_No_enviar_Acuse_Recibo_Empresa__c, SEG_Idioma__c, ContactId,
-					CC_AcuseRecibo__c, ContactEmail, SEG_Estado_Contacto__c, SEG_No_AR_Account__c, SEG_No_AR_Contact__c
-					FROM Case WHERE Status != 'Cerrado' and Id IN :listadoCasosPadre]
-			);
-
-			// Buscar todos los casos hijos de los padres encontrados y que son diferentes al cierre.
-			for (Case casoHijoParent : [SELECT ParentId, Status FROM Case WHERE Status != 'Cerrado' AND ParentId IN :listadoCasosPadre AND Id NOT IN :listadoCasosCierre]){
-				// Eliminar el caso padre para cerrar, ya que tiene otros hijos por cerrar.
-				mapaCasosPadreCierre.remove(casoHijoParent.ParentId);
-			}
-		}
-
-		// Recorrer y gestionar los casos en cierre.
-		for (Id casoId : listadoCasosCierre)
-		{
-			Case casoUpdate = mapNewObj.get(casoId);
-
-			// Si el caso contiene algún caso hijo abierto, cambio de estado.
-			if (setCasosHijosAbiertos.contains(casoId))
-			{
-				casoUpdate.Status = 'Pendiente';
-				casoUpdate.SEG_Subestado__c = 'Casos vinculados pendientes';
-				casoUpdate.CC_Detalles_Consulta__c = 'Caso cerrado';
-			}
-		}
-
-		// Gestionar los casos padre al cerrar el último hijo.
-		List<Id> casosPadre = new List<Id>();
-		List<Case> listaCasosPadreUpdate = new List<Case>();
-		for (Id casoPadreId : mapaCasosPadreCierre.keySet())
-		{
-			Case casoUpdate = mapaCasosPadreCierre.get(casoPadreId);
-			casoUpdate.Status = 'Cerrado';
-			casoUpdate.SEG_Subestado__c = null;
-			casoUpdate.CC_Detalles_Consulta__c = 'Caso cerrado';
-			casosPadre.add(casoPadreId);
-			listaCasosPadreUpdate.add(casoUpdate);
-		}
-
-		if (!listaCasosPadreUpdate.isEmpty())
-		{
-			String datosCasosPadre = JSON.serialize(mapaCasosPadreCierre);
-			SEG_Case_BU_TRHan.enviarMailAlCierreCasoPadre(casosPadre, datosCasosPadre);
-
-			Database.update(listaCasosPadreUpdate);
-		}
-	}
-	*/
 
 	/* Clase para el botón AOR (Eric) */
 	private static final String BASE64CHARS = '' +

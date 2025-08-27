@@ -398,6 +398,7 @@ public class CC_EmailSendController_Test {
         CC_Grupo_Colaborador__c grupo3N = new CC_Grupo_Colaborador__c(
             Name = '3N de CaixaBank Now',
             CC_Queue_Traslado__c = 'CC_3N_CaixaBank_Now',
+            CC_Tipo__c = 'Traslados 3N',
             RecordTypeId = recordTypeId
         );
         
@@ -1097,8 +1098,16 @@ public class CC_EmailSendController_Test {
         insert caso;
 
         //Comprobamos que obtenemos una lista con los tres grupos
-        List<CC_EmailSendController.picklistWrapperTraslados> listaGrupos = CC_EmailSendController.getMCCGrupoList(caso.Id, '', true, null);
+        List<CC_EmailSendController.picklistWrapperTraslados> listaGrupos = CC_EmailSendController.getMCCGrupoList(caso.Id, '', true, null, false);
         System.assertEquals(3, listaGrupos.size());
+        
+        // Test adicional para cubrir el nuevo constructor con ccTipo
+        CC_EmailSendController.PickListWrapperTraslados wrapperConTipo = new CC_EmailSendController.PickListWrapperTraslados('Test Label', 'Test Value', 'Test ID', 'Traslados 3N');
+        System.assertEquals('Test Label', wrapperConTipo.label);
+        System.assertEquals('Test Value', wrapperConTipo.value);
+        System.assertEquals('Test ID', wrapperConTipo.idRegistro);
+        System.assertEquals('Traslados 3N', wrapperConTipo.ccTipo);
+        
         Test.stopTest();
     }
     //Test para el método vaciarPlantilla
@@ -2841,6 +2850,148 @@ public class CC_EmailSendController_Test {
             System.assertEquals(permiso, false);
             Test.stopTest();
         }
+    }
+
+    @isTest
+    public static void obtenerIdiomasNotificacionTest() {
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)){
+            Test.startTest();
+            // Crear un caso de prueba
+            Case caso = new Case(
+                Status = 'Activo',
+                Origin = 'Email',
+                CC_Idioma__c = 'es'
+            );
+            insert caso;
+            
+            String idioma = CC_EmailSendController.obtenerIdioma(caso.Id);
+            System.assertEquals('es', idioma);
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void obtenerPlantillasTest() {
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)){
+            Test.startTest();
+            // Crear un caso de prueba con clasificación MCC
+            Case caso = new Case(
+                Status = 'Activo',
+                Origin = 'Email',
+                CC_Idioma__c = 'es'
+            );
+            insert caso;
+            
+            List<CC_EmailSendController.pickListWrapper> plantillas = CC_EmailSendController.getPlantillasResponder(caso.Id, 'CC_Responder_es');
+            System.assertNotEquals(null, plantillas);
+            Test.stopTest();
+        }
+    }
+
+    
+    // Test para el método getAccountFromClient
+    @isTest
+    public static void testGetAccountFromClient() {
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)){
+            Test.startTest();
+            
+            // Test con clienteId null
+            CC_EmailSendController.WrapperGrupoColabPara resultado1 = CC_EmailSendController.getAccountFromClient(null);
+            System.assertEquals(null, resultado1);
+            
+            // Crear Account con oficina principal
+            Account oficinaPrincipal = new Account(
+                Name = 'Oficina Principal Test',
+                CC_Email__c = 'oficina@test.com',
+                RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId()
+            );
+            insert oficinaPrincipal;
+            
+            Account clienteAccount = new Account(
+                Name = 'Cliente Test Account',
+                AV_OficinaPrincipal__c = oficinaPrincipal.Id,
+                RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId()
+            );
+            insert clienteAccount;
+            
+            Contact cliente = new Contact(
+                FirstName = 'Cliente',
+                LastName = 'Test',
+                AccountId = clienteAccount.Id,
+                Email = 'cliente@test.com'
+            );
+            insert cliente;
+            
+            // Test con cliente que tiene oficina principal
+            CC_EmailSendController.WrapperGrupoColabPara resultado2 = CC_EmailSendController.getAccountFromClient(cliente.Id);
+            System.assertNotEquals(null, resultado2);
+            System.assertEquals('oficina@test.com', resultado2.paraEmail);
+            System.assertEquals('Oficina Principal Test', resultado2.grupoColab);
+            
+            // Test con cliente sin oficina principal
+            Account clienteAccount2 = new Account(
+                Name = 'Cliente Test Account 2',
+                RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId()
+            );
+            insert clienteAccount2;
+            
+            Contact cliente2 = new Contact(
+                FirstName = 'Cliente',
+                LastName = 'Test 2',
+                AccountId = clienteAccount2.Id,
+                Email = 'cliente2@test.com'
+            );
+            insert cliente2;
+            
+            CC_EmailSendController.WrapperGrupoColabPara resultado3 = CC_EmailSendController.getAccountFromClient(cliente2.Id);
+            System.assertNotEquals(null, resultado3);
+            System.assertEquals('', resultado3.paraEmail);
+            System.assertEquals('', resultado3.grupoColab);
+            
+            Test.stopTest();
+        }
+    }
+
+    // Test para el método getAccountFromClient2
+    @isTest
+    public static void testGetAccountFromClient2() {
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)){
+            Test.startTest();
+            
+            // Test con clienteId null
+            CC_EmailSendController.WrapperGrupoColabPara resultado1 = CC_EmailSendController.getAccountFromClient2(null);
+            System.assertEquals(null, resultado1);
+            
+            // Crear contacto válido
+            Contact cliente = new Contact(
+                FirstName = 'Cliente',
+                LastName = 'Test',
+                Email = 'cliente@test.com'
+            );
+            insert cliente;
+            
+            // Test con cliente válido
+            CC_EmailSendController.WrapperGrupoColabPara resultado2 = CC_EmailSendController.getAccountFromClient2(cliente.Id);
+            System.assertNotEquals(null, resultado2);
+            System.assertEquals('cliente@test.com', resultado2.paraEmail);
+            System.assertEquals('Cliente Test', resultado2.grupoColab);
+            
+            Test.stopTest();
+        }
+    }
+
+    // Test para el constructor de WrapperGrupoColabPara
+    @isTest
+    public static void testWrapperGrupoColabPara() {
+        Test.startTest();
+        
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id)) {
+            CC_EmailSendController.WrapperGrupoColabPara wrapper = new CC_EmailSendController.WrapperGrupoColabPara('test@email.com', 'Grupo Test');
+            System.assertEquals('test@email.com', wrapper.paraEmail);
+            System.assertEquals('Grupo Test', wrapper.grupoColab);
+        }
+        
+        Test.stopTest();
     }
 
 }

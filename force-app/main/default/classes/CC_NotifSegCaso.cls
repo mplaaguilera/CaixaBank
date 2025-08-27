@@ -1256,8 +1256,8 @@ public with sharing class CC_NotifSegCaso {
                 }
                 
             }catch (Exception e) {
-                System.debug('Excepcion: ' + e);
-                System.debug('Excepcion (enviarMensajesTwitter): ' + e.getMessage());
+                CBK_Log.debug('Excepcion: ' + e);
+                CBK_Log.debug('Excepcion (enviarMensajesTwitter): ' + e.getMessage());
             }
             
             
@@ -1290,7 +1290,6 @@ public with sharing class CC_NotifSegCaso {
         */
         static private List<Case> enviarMensajesMail (Map<String,Map<String,String>> oMensajes, Map<String,Map<String,String>> oCfg, String sProceso)
         {
-            system.debug('3333333' + oMensajes);
             List<Messaging.SingleEmailmessage> oListMail = new List<Messaging.SingleEmailmessage>();
             List<Case> oUpdCasos = new List<Case>();
             Map<String, Id> mapIdIdiomaPlantillaHDT = new Map<String, Id>();
@@ -1495,14 +1494,11 @@ public with sharing class CC_NotifSegCaso {
                                         if(sIdioma == 'ca' && caseComprobarEncuesta3N != null)
                                         {
                                             oMail.setTemplateId(mapIdIdiomaPlantilla.get('ca')); 
-                                            System.debug('MMC templateId ca: ' + mapIdIdiomaPlantilla.get('ca'));
                                         }else if (sIdioma == 'es' && caseComprobarEncuesta3N != null){//nuevo
                                             oMail.setTemplateId(mapIdIdiomaPlantilla.get('es'));
-                                            System.debug('MMC templateId es: ' + mapIdIdiomaPlantilla.get('es'));
                                         }else{
                                             //Mantenemos la plantilla de envio de notificaciones predefinida
                                             oMail.setTemplateId(sPlantillaId);
-                                            System.debug('MMC templateId default: ' + sPlantillaId);
                                         }   
                                     }else if(sRecordTypeName == 'Empleado (HDT)' && Schema.SObjectType.CC_Agrupador__c.getRecordTypeInfosById().get(oMapa.get('RecordTypeId.AgrupadorId')).getDeveloperName().startsWith('CC_Incidencia'))
                                     {
@@ -1525,14 +1521,11 @@ public with sharing class CC_NotifSegCaso {
                                     
                                     oMail.setSaveAsActivity(true);
                                     String[] toAddresses = new String[] {sDest};
-                                    System.debug('MMC sCasoId: ' + sCasoId);
                                     oMail.setWhatId(sCasoId);
-                                    if (sRemitenteId != ''){
-                                        oMail.setOrgWideEmailAddressId(sRemitenteId);
-                                    }
-                                    else{
-                                        oMail.setSenderDisplayName(sRemitenteNombre);
-                                    }
+                                    if (sRemitenteId != '')
+                                    oMail.setOrgWideEmailAddressId(sRemitenteId);
+                                    else
+                                    oMail.setSenderDisplayName(sRemitenteNombre);
                                     oMail.setTargetObjectId(sContactId);
                                     if (String.isNotBlank(sListaCC))
                                     {
@@ -1614,8 +1607,8 @@ public with sharing class CC_NotifSegCaso {
                     }
                 }  
             }catch (Exception e) {
-                System.debug('Excepcion: ' + e);
-                System.debug('Excepcion (enviarMensajesMail): ' + e.getMessage());
+                CBK_Log.debug('Excepcion: ' + e);
+                CBK_Log.debug('Excepcion (enviarMensajesMail): ' + e.getMessage());
             }
             return oUpdCasos;
         }
@@ -1742,8 +1735,8 @@ public with sharing class CC_NotifSegCaso {
                     CC_Push_SMS.enviarNotificacionPush(oListSMS);
                 }
             } catch (Exception e) {
-                System.debug('Excepcion: ' + e);
-                System.debug('Excepcion (enviarMensajesSMS): ' + e.getMessage());
+                CBK_Log.debug('Excepcion: ' + e);
+                CBK_Log.debug('Excepcion (enviarMensajesSMS): ' + e.getMessage());
             }
             
             return oUpdCasos;

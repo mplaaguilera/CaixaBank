@@ -378,32 +378,27 @@ public class SEG_Case_Operativas_Controller_Test implements HttpCalloutMock{
 		emails.add(msg2);
         insert emails;
 
+        User thisUser;
         System.runAs ( new User(Id = UserInfo.getUserId()) ) {
-            Profile perfil = [SELECT Id FROM Profile WHERE Name='SEG_Usuario_CaixaBank'];
+            Profile perfil = [SELECT Id FROM Profile WHERE Name='System Administrator'];
             UserRole rol = [SELECT Id FROM UserRole WHERE Name='Segmentos + FFEE'];
-            User thisUser = new User(alias = 'tsegmen', email='testSEGBI@acme.com', 
-                    emailencodingkey='UTF-8', lastname='Smith', 
-                    languagelocalekey='en_US', 
-                    localesidkey='en_US', profileid = perfil.Id, userroleid = rol.Id,
-                    timezonesidkey='America/Los_Angeles', 
-                    username='testSEGBI@acme.com');
+            thisUser = new User(alias = 'tsegmen', email='testSEGBI@acme.com',
+                emailencodingkey='UTF-8', lastname='Smith',
+                languagelocalekey='en_US',
+                localesidkey='en_US', profileid = perfil.Id, userroleid = rol.Id,
+                timezonesidkey='America/Los_Angeles',
+                username='testSEGBI@acme.com');
             insert thisUser;
-            
-            PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SEG_Operativo'];
-            PermissionSet ps2 = [SELECT Id FROM PermissionSet WHERE Name = 'SEG_Supervisor'];
             List<PermissionSetAssignment> listPermissionSetAssignment = new List<PermissionSetAssignment>();
-
-            PermissionSetAssignment psAssign = new PermissionSetAssignment();
-            psAssign.AssigneeId = thisUser.id;
-            psAssign.PermissionSetId = ps.Id;
-            listPermissionSetAssignment.add(psAssign);
-
-            PermissionSetAssignment psAssign2 = new PermissionSetAssignment();
-            psAssign2.AssigneeId = thisUser.id;
-            psAssign2.PermissionSetId = ps2.Id;
-            listPermissionSetAssignment.add(psAssign2);
-
-            insert listPermissionSetAssignment;
+            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('SEG_Operativo','SEG_Supervisor')]){
+                PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
+                nuevoPermiso.PermissionSetId = permisoUnitario.PermissionSetId;
+                nuevoPermiso.AssigneeId = thisUser.id;
+                listPermissionSetAssignment.add(nuevoPermiso);
+            }
+            if (listPermissionSetAssignment.isEmpty()){
+                insert listPermissionSetAssignment;
+            }
         }
     }
     //TODO_ Cambiar valores por el api name
@@ -945,6 +940,141 @@ public class SEG_Case_Operativas_Controller_Test implements HttpCalloutMock{
             Test.stopTest();
             Case caso1 = [SELECT id, SEG_N_operaciones_del_caso__c FROM Case WHERE Subject = 'test 1' LIMIT 1];
             System.assertEquals(caso1.SEG_N_operaciones_del_caso__c, 2, 'No se ha actualizado el num operaciones');
+        }
+    }
+    
+    @isTest
+    public static void enviarCorreoAutoOperativaSinCasoTest(){
+        User supervisor = [SELECT Id FROM User WHERE Profile.Name = 'SEG_Usuario_CaixaBank' AND IsActive = true AND FirstName = 'IBM' AND LastName = 'Segmentos' LIMIT 1];
+
+        //Se indican datos pero vacíos para forzar un mensaje de error en la respuesta.
+		Map<String,String> datosCaso = new Map<String,String>();
+        datosCaso.put('caseId','');
+        datosCaso.put('caseAccountId','');
+        datosCaso.put('caseContactId','');
+        datosCaso.put('caseOrganizacion','');
+        datosCaso.put('caseZona','');
+        datosCaso.put('caseIdioma','');
+        
+        //Se rellena con valor para evitar un null pointer
+		Map<String,String> configuracion = new Map<String,String>();
+        configuracion.put('operativa','operativa');
+		configuracion.put('resultadoCaso','Respuesta a peticionario');
+		configuracion.put('primerCorreo','0');
+        
+        System.runAs(supervisor) {
+            Test.startTest();	
+                Map<String,String> retorno = SEG_Case_Operativas_Controller.enviarCorreoAutoOperativa(datosCaso, configuracion, null, null);
+            Test.stopTest();
+            System.assertEquals(retorno.get('detalle'), 'No se ha informado un caso asociado al envío automático', 'La comprobación de ID de caso no es correcta.');
+        }
+    }
+    
+    @isTest
+    public static void enviarCorreoAutoOperativaSinContactoTest(){
+        User supervisor = [SELECT Id FROM User WHERE Profile.Name = 'SEG_Usuario_CaixaBank' AND IsActive = true AND FirstName = 'IBM' AND LastName = 'Segmentos' LIMIT 1];
+
+        //Se indican datos pero vacíos para forzar un mensaje de error en la respuesta.
+		Map<String,String> datosCaso = new Map<String,String>();
+        datosCaso.put('caseId','caseId');
+        datosCaso.put('caseAccountId','');
+        datosCaso.put('caseContactId','caseContactId');
+        datosCaso.put('caseOrganizacion','');
+        datosCaso.put('caseZona','');
+        datosCaso.put('caseIdioma','');
+        
+        //Se rellena con valor para evitar un null pointer
+		Map<String,String> configuracion = new Map<String,String>();
+        configuracion.put('operativa','operativa');
+		configuracion.put('resultadoCaso','Respuesta a peticionario');
+		configuracion.put('primerCorreo','0');
+        
+        System.runAs(supervisor) {
+            Test.startTest();	
+                Map<String,String> retorno = SEG_Case_Operativas_Controller.enviarCorreoAutoOperativa(datosCaso, configuracion, null, null);
+            Test.stopTest();
+            System.assertEquals(retorno.get('detalle'), 'No hay ningún destinatario a remitir el correo', 'La comprobación de contacto de caso no es correcta.');
+        }
+    }
+    
+    @isTest
+    public static void enviarCanalAORRITMExistente(){
+        User usuarioTest = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+        Case caso = [SELECT id FROM Case WHERE Subject = 'test 1' LIMIT 1];
+        
+        ContentVersion archivo = new ContentVersion();
+        archivo.ContentLocation = 'S';
+        archivo.PathOnClient = 'test.txt';
+        archivo.Title = 'Test File';
+        archivo.VersionData = Blob.valueOf('Test Content');
+        insert archivo;
+        
+        List<ContentDocument> documents = [
+            SELECT Id, Title, LatestPublishedVersionId 
+            FROM ContentDocument
+			WHERE LatestPublishedVersionId = :archivo.Id
+        ];
+        
+        EmailServicesAddress headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'SEG_%' LIMIT 1];
+        String headerValueStr = headerValue.LocalPart + '@' + headerValue.EmailDomainName;
+        EmailMessage emailbpo = new EmailMessage();
+        emailbpo.FromName = 'bpoName';
+        emailbpo.subject = 'Subject Bpo';
+        emailbpo.HtmlBody = 'Buenas tardes bpo test class';
+        emailbpo.ParentId = caso.Id;
+        emailbpo.fromAddress = 'tstsmailbpo@mailtest.com';
+        emailbpo.RelatedToId = caso.id;
+        emailbpo.incoming = true;
+        emailbpo.Headers = '[{"value": "' + headerValueStr + '", "name": "X-SFDC-Original-RCPT"}]';
+        insert emailbpo;
+        
+        ContentDocumentLink cdl = New ContentDocumentLink();
+        cdl.LinkedEntityId = emailbpo.Id;
+        cdl.ContentDocumentId = documents[0].Id;
+        cdl.shareType = 'V';
+        insert cdl;
+        
+        List<Id> adjuntos = new List<Id>();
+        adjuntos.add(cdl.ContentDocumentId);
+        
+        System.runAs(usuarioTest) {
+            Test.startTest();	
+                Map<String,String> retorno = SEG_Case_Operativas_Controller.enviarCanalAOR(caso.Id, null, null, null, 'comentario', adjuntos, 'creado');
+            Test.stopTest();
+            System.assertEquals(retorno.get('enviarcanal'), 'N', 'RITM no correcto');
+        }
+    }
+    
+    @isTest
+    public static void calcularTipoOperacionporNIFTest(){
+        User supervisor = [SELECT Id FROM User WHERE Profile.Name = 'SEG_Usuario_CaixaBank' AND IsActive = true AND FirstName = 'IBM' AND LastName = 'Segmentos' LIMIT 1];
+
+        List<Account> cuentas = new List<Account>();
+        
+        Account cuentaSEG1 = new Account();
+        cuentaSEG1.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        cuentaSEG1.Name = 'Cliente segmentos';
+        cuentaSEG1.CC_Numero_Documento__c = '27670870F';
+        cuentas.add(cuentaSEG1);
+        
+        Account cuentaSEG2 = new Account();
+        cuentaSEG2.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
+        cuentaSEG2.FirstName = 'Empresa';
+        cuentaSEG2.LastName = 'segmentos';
+        cuentaSEG2.CC_Numero_Documento__c = '89071359H';
+        cuentas.add(cuentaSEG2);
+        
+        insert cuentas;
+        
+        System.runAs(supervisor) {
+            Test.startTest();	
+                Map<String,String> retorno = SEG_Case_Operativas_Controller.calcularTipoOperacionporNIF('54875062Y', false);
+                Map<String,String> retornoDos = SEG_Case_Operativas_Controller.calcularTipoOperacionporNIF('27670870F', false);
+                Map<String,String> retornoTres = SEG_Case_Operativas_Controller.calcularTipoOperacionporNIF('89071359H', false);
+            Test.stopTest();
+            System.assertEquals(retorno.get('nombreTitular'), 'No encontrado', 'Se ha encontrado un Nif cuando no debería.');
+            System.assertEquals(retornoDos.get('nombreTitular'), cuentaSEG1.Name, 'No se ha encontrado un Nif cuando debería.');
+            System.assertEquals(retornoTres.get('tipoAccount'), '1-Particular', 'No se ha identificado correctamente el tipo de Cliente.');
         }
     }
 }

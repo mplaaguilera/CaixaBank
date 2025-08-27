@@ -194,10 +194,22 @@ public with sharing class HDT_Llamada_GC {
 
 	public static Map<String, Object> registrarConsulta(CC_Llamada_Input inputConsulta) {
 		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
-		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :inputConsulta.servicio LIMIT 1];
+		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c, CC_Canal_Procedencia__c FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :inputConsulta.servicio LIMIT 1];
 		CC_Llamada__c llamada = [SELECT CC_Idioma__c, CC_Contacto__c, CC_Cuenta__c, CC_Cuenta__r.CC_OficinaGestoraId__c, CC_No_Identificado__c, OwnerId, CC_IdentCliente__c, RecordTypeId
 									FROM CC_Llamada__c WHERE Id = :inputConsulta.salesforceParentId];
-		Case caso = [SELECT Subject, CC_Idioma__c, AccountId, ContactId FROM Case WHERE Id = :inputConsulta.casoId];
+		Case caso = [SELECT Subject, CC_Idioma__c, AccountId, ContactId, CC_MCC_Motivo__c, CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_Canal_Operativo__c, CC_Canal_Procedencia__c, CC_Tipo_Contacto__c, CC_Causa__c FROM Case WHERE Id = :inputConsulta.casoId];
+
+		if((caso == null && (servicioGenesys.CC_Canal_Procedencia__c == 'CCO' && servicioGenesys.CC_Tipo_Cliente__c == 'Empleado' && servicioGenesys.CC_Tipo__c == 'Tranferencias CCO HDT'))
+		|| caso.CC_MCC_Motivo__c == null || caso.CC_MCC_Tematica__c == null || caso.CC_MCC_ProdServ__c == null 
+		|| caso.CC_Canal_Operativo__c == null || caso.CC_Canal_Procedencia__c == null
+		|| caso.CC_Idioma__c == null || caso.CC_Tipo_Contacto__c == null || caso.CC_Causa__c == null
+		|| llamada.CC_Servicio_Genesys__r.CC_Canal_de_Entrada__c == null) {
+			throw new AuraHandledException('Debes informar los campos Canal de entrada, Canal de procedencia, Idioma, Tipo de contacto, Canal operativo y MCC para poder transferir el caso.');
+		} else if (caso.AccountId == null || caso.ContactId == null 
+		|| (caso == null  && (servicioGenesys.CC_Canal_Procedencia__c == 'CCO' && servicioGenesys.CC_Tipo_Cliente__c == 'Empleado' && servicioGenesys.CC_Tipo__c == 'Tranferencias CCO HDT'))){
+			throw new AuraHandledException('Debes informar los campos Account, Contacto y Caso para poder transferir el caso.');
+		}
+
 		String agente = inputConsulta?.usuario;
 		if (String.isBlank(agente)) {
 			agente = [SELECT EmployeeNumber FROM User WHERE Id = :UserInfo.getUserId()].EmployeeNumber;
@@ -409,14 +421,22 @@ public with sharing class HDT_Llamada_GC {
 	}
 
 	public static void completarConsulta(String connIdConsulta, Id idNuevoOwner) {
+		
+		CC_Settings__c settings = CC_Settings__c.getValues('CC_Colas_HDT_CCO_Activas');
+
 		CC_Llamada__c consulta = [SELECT CC_ConnId_Consulta__c, CC_Llamada_Padre__c, CC_Case_Consulta__c,
-									OwnerId, CC_Servicio_Genesys__r.Name, CC_Servicio_Genesys__r.CC_Tipo__c,
-									CC_Servicio_Genesys__r.CC_Activo_Salesforce__c, CC_Servicio_Genesys__r.CC_Canal_Procedencia__c
-									FROM CC_Llamada__c WHERE RecordType.DeveloperName = 'HDT_Empleado'
+									OwnerId, CC_Servicio_Genesys__r.Name, CC_Servicio_Genesys__r.CC_Tipo__c, CC_Cuenta__r.Name, CC_Cuenta__r.Phone,
+									CC_Servicio_Genesys__r.CC_Tipo_Cliente__c, CC_Case_Consulta__r.ContactId, CC_Cuenta__c, CC_Contacto__c, CC_ANI__c, 
+									CC_Servicio_Genesys__r.CC_Activo_Salesforce__c, CC_Servicio_Genesys__r.CC_Canal_Procedencia__c, RecordTypeId,
+									Id, CC_Asunto__c, CC_Idioma__c, CC_Representante__c, CC_IdentCliente__c, CC_Canal_del_Empleado__c, CC_Id_Cognitivo__c,
+									CC_Cuenta__r.PersonMobilePhone, CC_Servicio_Genesys__r.CC_Canal_de_Entrada__c, CC_Servicio_Genesys__r.CC_Grupo__c,
+									CC_Servicio_Genesys__r.CBK_Negocio__c
+									FROM CC_Llamada__c WHERE (RecordType.DeveloperName = 'HDT_Empleado' OR RecordType.DeveloperName = 'CC_Empleado')
 									AND CC_ConnId_Consulta__c = :connIdConsulta AND CC_Fecha_Fin__c = NULL
 									AND OwnerId = :idNuevoOwner AND KIN_Consulta__c = TRUE];
 		consulta.CC_ConnId__c = consulta.CC_ConnId_Consulta__c;
 		update consulta;
+		
 		finalizarActividadesLlamada(consulta, 'Consulta%', 'Consulta completada');
 
 		CC_Llamada__c llamadaCliente = [SELECT CC_Servicio_Genesys__r.Name FROM CC_Llamada__c WHERE Id = :consulta.CC_Llamada_Padre__c];
@@ -428,7 +448,12 @@ public with sharing class HDT_Llamada_GC {
 			if (consulta.CC_Servicio_Genesys__r.CC_Tipo__c.equals('Servicio')) {
 				//El canal de resolución sólo se actualiza para transferencias entre servicios normales
 				actualizarCaso(consulta.CC_Case_Consulta__c, idNuevoOwner, consulta.CC_Servicio_Genesys__r.CC_Canal_Procedencia__c);
-			} else {
+			} else if(settings.CC_Activa__c && (consulta.CC_Servicio_Genesys__r.CC_Canal_Procedencia__c == 'CCO' && consulta.CC_Servicio_Genesys__r.CC_Tipo_Cliente__c == 'Empleado' && consulta.CC_Servicio_Genesys__r.CC_Tipo__c == 'Tranferencias CCO HDT')) {
+				finalizarLlamadaActividades(llamadaCliente, 'Llamada%', 'Llamada finalizada');
+				CC_Transferir_HDT_CCO transfer = new CC_Transferir_HDT_CCO(consulta.CC_Case_Consulta__c, idNuevoOwner, consulta, 'HDT');
+                Case caso = transfer.transferEmpleado();
+			}
+			else {
 				actualizarCaso(consulta.CC_Case_Consulta__c, idNuevoOwner);
 			}
 		}
@@ -805,7 +830,7 @@ public with sharing class HDT_Llamada_GC {
 	}
 
 	private static void finalizarLlamadasActividadesAbiertas(Id userId) {
-		List<CC_Llamada__c> llamadas = [SELECT Id FROM CC_Llamada__c WHERE RecordType.DeveloperName = 'HDT_Empleado'
+		List<CC_Llamada__c> llamadas = [SELECT Id FROM CC_Llamada__c WHERE (RecordType.DeveloperName = 'HDT_Empleado' OR RecordType.DeveloperName = 'CC_Empleado')
 										AND CC_Fecha_Fin__c = NULL AND OwnerId = :userId];
 		finalizarLlamadas(llamadas, 'Llamada finalizada');
 		finalizarActividadesNew(llamadas);

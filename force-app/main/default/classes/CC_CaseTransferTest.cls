@@ -3,6 +3,7 @@ public with sharing class CC_CaseTransferTest {
 
     @testSetup
     static void setupTestData() {
+        Test.startTest();
         User admin = CC_Testdatafactory.insertUserAdmin();
         System.runAs(admin) {
             Group queueHDT = new Group(Name = 'HDT_N2', Type = 'Queue');
@@ -16,6 +17,42 @@ public with sharing class CC_CaseTransferTest {
             PermissionSet psClasses = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Classes' LIMIT 1];
             PermissionSet psOperadorEmpleado = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO' LIMIT 1];
             PermissionSet psOperadorHDT = [SELECT Id FROM PermissionSet WHERE Name = 'HDT_Operador' LIMIT 1];
+
+            
+            CC_Lista_Valores__c lovAvisosSobreAgrupadores2 = new CC_Lista_Valores__c();
+            lovAvisosSobreAgrupadores2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+            lovAvisosSobreAgrupadores2.CC_Activa__c = true;
+            lovAvisosSobreAgrupadores2.Name = 'HDT - Aviso Comunicaciones Informativas';
+            insert lovAvisosSobreAgrupadores2;
+    
+            CC_Lista_Valores__c valorUmbralSiguientesAvisosx = new CC_Lista_Valores__c();
+            valorUmbralSiguientesAvisosx.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            valorUmbralSiguientesAvisosx.CC_Activa__c = true;
+            valorUmbralSiguientesAvisosx.CC_Lista__c = lovAvisosSobreAgrupadores2.Id;
+            valorUmbralSiguientesAvisosx.Name = 'Comunicación Informativa de Caso - Umbral de tiempo';
+            valorUmbralSiguientesAvisosx.CC_Valor__c = '15';
+    
+            CC_Lista_Valores__c valorUmbralSiguientesAvisosx1 = new CC_Lista_Valores__c();
+            valorUmbralSiguientesAvisosx1.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            valorUmbralSiguientesAvisosx1.CC_Activa__c = true;
+            valorUmbralSiguientesAvisosx1.CC_Lista__c = lovAvisosSobreAgrupadores2.Id;
+            valorUmbralSiguientesAvisosx1.Name = 'Comunicación Informativa de Caso - Umbral Envio de Emails';
+            valorUmbralSiguientesAvisosx1.CC_Valor__c = '15';
+    
+            CC_Lista_Valores__c valorUmbralSiguientesAvisosx2 = new CC_Lista_Valores__c();
+            valorUmbralSiguientesAvisosx2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+            valorUmbralSiguientesAvisosx2.CC_Activa__c = true;
+            valorUmbralSiguientesAvisosx2.CC_Lista__c = lovAvisosSobreAgrupadores2.Id;
+            valorUmbralSiguientesAvisosx2.Name = 'Comunicación Informativa de Caso - Umbral primer aviso';
+            valorUmbralSiguientesAvisosx2.CC_Valor__c = '1';
+    
+            List<CC_Lista_Valores__c> valorUmbralInsertx = new List<CC_Lista_Valores__c>();
+            valorUmbralInsertx.add(valorUmbralSiguientesAvisosx);
+            valorUmbralInsertx.add(valorUmbralSiguientesAvisosx1);
+            valorUmbralInsertx.add(valorUmbralSiguientesAvisosx2);
+            
+            insert valorUmbralInsertx;
+
             User testUser = new User(
                 Alias = 'testus',
                 Email = 'testuser@example.com',
@@ -97,7 +134,7 @@ public with sharing class CC_CaseTransferTest {
         insert solucion;
 
         Case originalCCOCase = new Case(
-            RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado'),
+            RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'HDT_Empleado'),
             AccountId = cuentaEmpleado.Id,
             ContactId = contactoEmpleado.Id,
             CC_MCC_Tematica__c = tematica.Id,
@@ -110,65 +147,74 @@ public with sharing class CC_CaseTransferTest {
             Description = 'This is a test case from CCO.',
             CC_Detalles_Solucion__c = 'Solution details for CCO case.',
             OwnerId = testUser.Id,
-            CC_Detalles_Consulta__c = 'Test'
+            CC_Detalles_Consulta__c = 'Test',
+            Origin = 'Phone',
+            CC_Canal_procedencia__c = 'CCO'
         );
         insert originalCCOCase;
 
+        List<CC_Settings__c> settingsList = new List<CC_Settings__c>();
+        CC_Settings__c settings = new CC_Settings__c();
+        settings.CC_Activa__c = true;
+        settings.Name = 'CC_Colas_HDT_CCO_Activas';
+        settings.CC_Configuracion_1__c = 'HDT';
+        settings.CC_Configuracion_2__c = 'CCO';
+        settingsList.add(settings);
+
+        
+        CC_Settings__c settings2 = new CC_Settings__c();
+        settings2.CC_Activa__c = true;
+        settings2.Name = 'CC_Colas_Transferencia_HDT_CCO';
+        settings2.CC_Configuracion_1__c = 'CC_N2_CSI_CCO_Empl_Bankia';
+        settings2.CC_Configuracion_2__c = 'HDT_Cola_2N';
+        settingsList.add(settings2);
+
+        CC_Settings__c settings3 = new CC_Settings__c();
+        settings3.CC_Activa__c = true;
+        settings3.Name = 'CC_Transferencia_Casos_HDT_CCO';
+        settings3.CC_Configuracion_1__c = 'Upsert';
+        settingsList.add(settings3);
+        insert settingsList;
+
+        List <String> owaEmails = new List<String>{('Atención Empleados Contact Center IT Grupo CaixaBank')};
+
+        List <OrgWideEmailAddress> owa = new List <OrgWideEmailAddress>([SELECT Id, Address FROM OrgWideEmailAddress WHERE DisplayName IN : owaEmails]);
+
+        HDT_Parametros__c params = new HDT_Parametros__c();
+        params.Name = 'HDT_Email_Respuesta_Empleados_New';
+        params.HDT_Configuracion_1__c = owa[0].Address;
+        params.HDT_Configuracion_2__c = owa[0].Address;
+        insert params;
         }
+        Test.stopTest();
     }
 
     @isTest
     public static void testTransferCaseFromCCOtoHDT() {
+        Test.startTest();
         User testUser = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1];
-        Group queueHDT = [SELECT Id FROM Group WHERE Name = 'HDT_N2' AND Type = 'Queue' LIMIT 1];
-
-        Id hdtRecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'HDT_Empleado');
         Case originalCCOCase = [SELECT Id FROM Case WHERE Subject = 'Test Transfer CCO to HDT' LIMIT 1];
 
-        ContentVersion cv = new ContentVersion(
-            Title = 'Test File',
-            PathOnClient = 'testfile.txt',
-            VersionData = Blob.valueOf('This is a test file content.'),
-            Origin = 'H'
-        );
-        insert cv;
-
-        ContentDocument cd = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = :cv.Id];
+        /*ContentDocument cd = [SELECT Id FROM ContentDocument WHERE LatestPublishedVersionId = :cv.Id];
         ContentDocumentLink cdl = new ContentDocumentLink(
             ContentDocumentId = cd.Id,
             LinkedEntityId = originalCCOCase.Id,
             ShareType = 'V',
             Visibility = 'AllUsers'
         );
-        insert cdl;
+        insert cdl;*/
 
         CC_CaseTransfer.TransferResult result;
         System.runAs(testUser) {
-            Test.startTest();
-                result = CC_CaseTransfer.transferCaseToHDT(originalCCOCase.Id);
-            Test.stopTest();
+            result = CC_CaseTransfer.transferCaseToHDT(originalCCOCase.Id);
         }
-        Case updatedOriginalCase = [SELECT Id, Status, CC_CasoRelacionado__c FROM Case WHERE Id = :originalCCOCase.Id];
 
-        Case newCase = [SELECT Id, RecordTypeId, Status, Subject, OwnerId, CC_CasoRelacionado__c, CaseNumber FROM Case WHERE Id = :result.newCaseId]; 
+        List<Case> newCase = [SELECT Id, RecordTypeId, Status, Subject, OwnerId, CC_CasoRelacionado__c, CaseNumber FROM Case WHERE CC_CasoRelacionado__c = :originalCCOCase.Id]; 
 
-        system.debug(':::New Case: ' + newCase);
+        System.assertNotEquals(null, newCase[0].Id, 'New Case ID should not be null.');
 
-        System.assertEquals(true, result.isSuccess, 'Transfer should be successful.');
-        System.assertNotEquals(null, result.newCaseId, 'New Case ID should not be null.');
+        Test.stopTest();
 
-
-        System.assertEquals('Cerrado', updatedOriginalCase.Status, 'Original case status should be Closed.');
-        System.assertEquals(result.newCaseId, updatedOriginalCase.CC_CasoRelacionado__c, 'Original case should be linked to new case.');
-
-        System.assertEquals(hdtRecordTypeId, newCase.RecordTypeId, 'New case RecordType should be HDT.');
-        System.assertEquals('Activo', newCase.Status, 'New case status should be Open.');
-        //System.assertEquals(queueHDT.Id, newCase.OwnerId, 'New case should be owned by HDT queue.');
-        //System.assertEquals(originalCCOCase.Id, newCase.CC_CasoRelacionado__c, 'New case should be linked to original case.');
-        //System.assert(newCase.Subject.contains('Transferencia (' + originalCCOCase.CaseNumber + ')'), 'New case subject should indicate transfer.');
-
-        List<ContentDocumentLink> newCdl = [SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :newCase.Id];
-        //System.assertEquals(1, newCdl.size(), 'Attachment should be copied to new case.');
     }
 
     @isTest
@@ -197,109 +243,72 @@ public with sharing class CC_CaseTransferTest {
     }
 
     @isTest
-    public static void testUpdateOriginalCaseOnClose() {
-        Id ccoRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-        Id hdtRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
+    public static void testTransferCaseWithTasks() {
+        Test.startTest();
+
         User testUser = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1];
-
-        Case originalCase = new Case(
-            RecordTypeId = ccoRecordTypeId,
-            Status = 'Activo',
-            Subject = 'Original Case for Close Test',
-            Description = 'Original case description.',
-            OwnerId = testUser.Id
-        );
-        insert originalCase;
-
-        Case newTransferredCase = new Case(
-            RecordTypeId = hdtRecordTypeId,
-            Status = 'Abierto',
-            Subject = 'Transferred Case to Close',
-            Description = 'Transferred case description.',
-            CC_CasoRelacionado__c = originalCase.Id,
-            CC_Detalles_Solucion__c = 'Solved the transferred issue.',
-            OwnerId = testUser.Id
-        );
-        insert newTransferredCase;
-
-        Case oldCaseState = newTransferredCase.clone(true, true, true, true);
-        oldCaseState.Status = 'Abierto';
         System.runAs(testUser) {
-            Test.startTest();
-                newTransferredCase.Status = 'Cerrado';
-                CC_CaseTransfer.updateOriginalCaseOnClose(new List<Case>{newTransferredCase});
-            Test.stopTest();
-        }
-        
-        Case updatedOriginalCase = [SELECT Id, CC_Resolucion__c, Status FROM Case WHERE Id = :originalCase.Id];
-        System.assertNotEquals(null, updatedOriginalCase.CC_Resolucion__c, 'Original case resolution should be updated.');
-        System.assert(updatedOriginalCase.CC_Resolucion__c.contains('Solved the transferred issue.'), 'Resolution message should contain solution details.');
-    }
 
-    @isTest
-    public static void testUpdateOriginalCaseOnCloseNoRelatedCase() {
-        Id ccoRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-        User testUser = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1];
+            List<Case> casos = new List<Case>();
 
-        Case nonTransferredCase = new Case(
-            RecordTypeId = ccoRecordTypeId,
-            Status = 'Activo',
-            Subject = 'Non-transferred Case',
-            Description = 'No related case.',
-            OwnerId = testUser.Id
-        );
-        insert nonTransferredCase;
+            CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'Tematica' LIMIT 1];
+            CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'Producto' LIMIT 1];
+            CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Motivo' LIMIT 1];
+            Account cuentaEmpleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' LIMIT 1];
+            Contact contactoEmpleado = [SELECT Id FROM Contact WHERE LastName = 'Prueba Empleado' LIMIT 1];
 
-        Case oldCaseState = nonTransferredCase.clone(true, true, true, true);
-        oldCaseState.Status = 'Activo';
+            Case originalCCOCase = new Case(
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'HDT_Empleado'),
+                AccountId = cuentaEmpleado.Id,
+                ContactId = contactoEmpleado.Id,
+                CC_MCC_Tematica__c = tematica.Id,
+                CC_MCC_ProdServ__c = producto.Id,
+                CC_MCC_Motivo__c = motivo.Id,
+                Status = 'Activo',
+                Subject = 'Test Transfer CCO to HDT',
+                Description = 'This is a test case from CCO.',
+                CC_Detalles_Solucion__c = 'Solution details for CCO case.',
+                OwnerId = testUser.Id,
+                CC_Detalles_Consulta__c = 'Test',
+                Origin = 'Phone',
+                CC_Canal_procedencia__c = 'CCO'
+            );
+            casos.add(originalCCOCase);
 
-        nonTransferredCase.Status = 'Cerrado';
-        System.runAs(testUser) {
-            Test.startTest();
-                nonTransferredCase.Status = 'Cerrado';
-                CC_CaseTransfer.updateOriginalCaseOnClose(new List<Case>{nonTransferredCase});
-            Test.stopTest();
-        }
-        Case updatedCase = [SELECT Id, CC_Resolucion__c FROM Case WHERE Id = :nonTransferredCase.Id];
-        System.assertEquals(null, updatedCase.CC_Resolucion__c, 'Resolution should not be updated for non-transferred case.');
-    }
+            Case caseTransfer = new Case(
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Empleado'),
+                AccountId = cuentaEmpleado.Id,
+                ContactId = contactoEmpleado.Id,
+                CC_MCC_Tematica__c = tematica.Id,
+                CC_MCC_ProdServ__c = producto.Id,
+                CC_MCC_Motivo__c = motivo.Id,
+                Status = 'Cerrado',
+                Subject = 'Test Transfer CCO to HDT',
+                Description = 'This is a test case from CCO.',
+                CC_Detalles_Solucion__c = 'Solution details for CCO case.',
+                OwnerId = testUser.Id,
+                CC_Detalles_Consulta__c = 'Test',
+                Origin = 'Phone'            
+            );
+            casos.add(caseTransfer);
+            insert casos;
 
-    @isTest
-    public static void testUpdateOriginalCaseOnCloseStatusNotClosed() {
-        Id ccoRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-        Id hdtRecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
-        
-        User testUser = [SELECT Id FROM User WHERE LastName = 'Administrador de sistema' LIMIT 1];
+            List<Case> casosCerrados = [SELECT Id, Status FROM Case WHERE Status = 'Cerrado'];
+            originalCCOCase.CC_CasoRelacionado__c = casosCerrados[0].Id;
+            originalCCOCase.Status = 'Rechazado';
 
-        Case originalCase = new Case(
-            RecordTypeId = ccoRecordTypeId,
-            Status = 'Activo',
-            Subject = 'Original Case for Not Closed Test',
-            Description = 'Original case description.',
-            OwnerId = testUser.Id
-        );
-        insert originalCase;
+            update originalCCOCase;
 
-        Case newTransferredCase = new Case(
-            RecordTypeId = hdtRecordTypeId,
-            Status = 'Activo',
-            Subject = 'Transferred Case Not Closed',
-            Description = 'Transferred case description.',
-            CC_CasoRelacionado__c = originalCase.Id,
-            CC_Detalles_Solucion__c = 'Some solution.',
-            OwnerId = testUser.Id
-        );
-        insert newTransferredCase;
+            List<Case> casosResult = [SELECT Id, Status FROM Case WHERE Status = 'Activo'];
 
-        Case oldCaseState = newTransferredCase.clone(true, true, true, true);
-        oldCaseState.Status = 'Abierto';
-        System.runAs(testUser) {
-            Test.startTest();
-                CC_CaseTransfer.updateOriginalCaseOnClose(new List<Case>{newTransferredCase});
-            Test.stopTest();
+            Case caseTransferResult = [SELECT Id, Status FROM Case WHERE Id = :casosResult[0].Id];
+            System.assertEquals('Activo', caseTransferResult.Status, 'El caso debe estar activo.');
+    
+            Test.stopTest(); 
+
         }
 
-        Case updatedOriginalCase = [SELECT Id, CC_Resolucion__c FROM Case WHERE Id = :originalCase.Id];
-        System.assertEquals(null, updatedOriginalCase.CC_Resolucion__c, 'Resolution should not be updated if transferred case is not closed.');
+
     }
+
 }

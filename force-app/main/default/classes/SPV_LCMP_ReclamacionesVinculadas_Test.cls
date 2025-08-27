@@ -185,21 +185,64 @@ public with sharing class SPV_LCMP_ReclamacionesVinculadas_Test {
     }
 
     @isTest
-    static void vincularReclamacionTest(){
+    static void vincularReclamacion_TEST_SAC() {
+        User u = [SELECT Id FROM User WHERE Username='useradmintest0@test.com.testSetup' LIMIT 1];
+        Case recSPV = [SELECT Id FROM Case WHERE Subject='TestRec'  LIMIT 1];
+        Case recSAC = [SELECT Id, RecordTypeId FROM Case WHERE Subject='TestRec2' LIMIT 1];
 
-        User usuario1 = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
-        Case reclamacionSPV = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec'];
-        Case reclamacionSAC = [SELECT id, Ownerid FROM Case WHERE Subject = 'TestRec2'];
+        // Asegurar RT SAC
+        Id rtCaseSAC = [SELECT Id FROM RecordType WHERE SObjectType='Case' AND DeveloperName='SAC_Reclamacion' LIMIT 1].Id;
+        if (recSAC.RecordTypeId != rtCaseSAC) update new Case(Id=recSAC.Id, RecordTypeId=rtCaseSAC);
 
-        System.runAs(usuario1){
+        // RecordType correcto de CBK_Case_Extension__c
+        Id rtExt = [SELECT Id FROM RecordType WHERE SObjectType='CBK_Case_Extension__c' AND DeveloperName='SPV_ReclamacionCaseExt' LIMIT 1].Id;
+
+        insert new CBK_Case_Extension__c(RecordTypeId = rtExt, Case_Id__c = recSAC.Id, SPV_TieneCasosVinculados__c = false);
+
+        System.runAs(u){
             Test.startTest();
-            SPV_LCMP_ReclamacionesVinculadas.vincularReclamacion(reclamacionSAC.Id, reclamacionSPV.Id);
-
-            List<CBK_CaseToCaseRelationship__c> listCasosVinculados = [SELECT Id FROM CBK_CaseToCaseRelationship__c WHERE SPV_CasoPadre__c =: reclamacionSPV.Id AND SPV_CasoVinculado__c = :reclamacionSAC.Id LIMIT 1];
-            Assert.areNotEqual(false, !listCasosVinculados.isEmpty(), 'No se ha vinculado la reclamacion correctamente');
+            SPV_LCMP_ReclamacionesVinculadas.vincularReclamacion(recSAC.Id, recSPV.Id);
             Test.stopTest();
         }
+
+        List<CBK_CaseToCaseRelationship__c> listCasosVinculados = [SELECT Id FROM CBK_CaseToCaseRelationship__c WHERE SPV_CasoPadre__c = :recSPV.Id AND SPV_CasoVinculado__c = :recSAC.Id];
+        Assert.areEqual(false, listCasosVinculados.isEmpty(), 'No se ha vinculado la reclamación correctamente');
     }
+
+    @isTest
+    static void vincularReclamacion_TEST_SPV() {
+        User u = [SELECT Id FROM User WHERE Username='useradmintest0@test.com.testSetup' LIMIT 1];
+        Case recSPV = [SELECT Id, RecordTypeId FROM Case WHERE Subject='TestRec'  LIMIT 1];
+        Case recSAC = [SELECT Id FROM Case WHERE Subject='TestRec2' LIMIT 1];
+
+        // --- Aseguramos que el caso vinculado es de RT SPV ---
+        Id rtCaseSPV = [SELECT Id FROM RecordType WHERE SObjectType='Case' AND DeveloperName='SPV_Reclamacion' LIMIT 1].Id;
+        if (recSPV.RecordTypeId != rtCaseSPV) {
+            update new Case(Id = recSPV.Id, RecordTypeId = rtCaseSPV);
+        }
+
+        // --- RecordType correcto de la extensión ---
+        Id rtExt = [SELECT Id FROM RecordType WHERE SObjectType='CBK_Case_Extension__c' AND DeveloperName='SPV_ReclamacionCaseExt' LIMIT 1].Id;
+
+        // Extensión del caso VINCULADO (SPV) con flag en false -> activará la rama SPV
+        insert new CBK_Case_Extension__c(RecordTypeId = rtExt, Case_Id__c = recSPV.Id, SPV_TieneCasosVinculados__c = false);
+
+        // Extensión del caso ACTUAL (SAC) para que el método lo encuentre en su query
+        insert new CBK_Case_Extension__c(RecordTypeId = rtExt, Case_Id__c = recSAC.Id, SPV_TieneCasosVinculados__c = false);
+
+        System.runAs(u){
+            Test.startTest();
+            // Ahora: idCasoVinculado = recSPV, idCasoActual = recSAC
+            SPV_LCMP_ReclamacionesVinculadas.vincularReclamacion(recSPV.Id, recSAC.Id);
+            Test.stopTest();
+        }
+
+        // --- Assert estilo original ---
+        List<CBK_CaseToCaseRelationship__c> listCasosVinculados = [SELECT Id FROM CBK_CaseToCaseRelationship__c WHERE SPV_CasoPadre__c = :recSAC.Id AND SPV_CasoVinculado__c = :recSPV.Id];
+        Assert.areEqual(false, listCasosVinculados.isEmpty(), 'No se ha vinculado la reclamación SPV correctamente');
+    }
+
+
 
     @isTest
     static void desvincularReclamacionTest(){

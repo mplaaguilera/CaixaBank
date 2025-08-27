@@ -259,11 +259,12 @@ public without sharing class SAC_LCMP_InsertarReescalado {
                 SAC_CloneDocuments.cloneDocuments(listaDocumentos);
     
                 //Update del escalado de nivel 2
+                System.debug('Objeto escalado nivel 2: '+escaladoNv2);
                 if (escaladoNv2.SAC_Estado__c == 'SAC_PendienteRespuesta') {
                     escaladoNv2.SAC_Estado__c = 'SAC_Reescalada';
                     escaladoNv2.SPV_SLAFinalizado__c = true;
                     escaladoNv2.SAC_EscaladoNV3__c = escaladoNv3.Id;
-    
+                    System.debug('Objeto escalado nivel 2 dentro del if: '+escaladoNv2);
                     try {
                         SAC_DatabaseDML.updateDML(escaladoNv2, false);
                         //Database.update(escaladoNv2);

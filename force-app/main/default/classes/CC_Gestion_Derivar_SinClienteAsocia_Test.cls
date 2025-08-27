@@ -327,4 +327,18 @@ public with sharing class CC_Gestion_Derivar_SinClienteAsocia_Test {
         }
         Test.stopTest();
     }
+
+    @isTest
+    public static void testCasoNoSeIdentifica() {
+        Test.startTest();
+        System.runAs(new User(Id = [SELECT Id FROM User Where LastName = 'Operador Cliente' LIMIT 1].Id)) {
+            // Crear caso
+            Case caso = [SELECT Id FROM Case WHERE Subject = 'Test Case' LIMIT 1];
+            
+            // Verificar que no existe tarea
+            Boolean respuesta = CC_Gestion_Derivar_SinClienteAsociado.casoNoSeIdentifica(caso.Id);
+            System.assertEquals(false, respuesta);
+        }
+        Test.stopTest();
+    }
 }

@@ -11,12 +11,15 @@ public with sharing class CC_Knowledge_BU_TRHan extends CC_TriggerHandlerBase{
         Id idRtCCArbol = Schema.SObjectType.Knowledge__kav.getRecordTypeInfosByDeveloperName().get('CC_Arbol_Decision').getRecordTypeId();
         Id idRtCCFicha = Schema.SObjectType.Knowledge__kav.getRecordTypeInfosByDeveloperName().get('CC_Ficha_Producto').getRecordTypeId();
         Id idRtCCPregunta = Schema.SObjectType.Knowledge__kav.getRecordTypeInfosByDeveloperName().get('CC_Pregunta_Respuesta').getRecordTypeId();
+        Id idRtCCVideo = Schema.SObjectType.Knowledge__kav.getRecordTypeInfosByDeveloperName().get('CC_Video').getRecordTypeId();
+
         List<Id>listaCC = new List<Id>();
         listaCC.add(idRtInformacionGeneral);
         listaCC.add(idRtCCArbol);
         listaCC.add(idRtCCProcedimiento);
         listaCC.add(idRtCCFicha);
         listaCC.add(idRtCCPregunta);
+        listaCC.add(idRtCCVideo);
 
     //Procedemos a asignar como propietario de los knowledge la cola para que los agregados a la cola tengan permisos de editar por código
     List<Group> colasKnowledge = [SELECT id, DeveloperName  FROM Group WHERE DeveloperName IN ('CC_Knowledge_Cliente','CC_Knowledge_Empleado') and Type = 'Queue'];

@@ -357,6 +357,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             valor28.RecordTypeId = recordTypeValor;
             valor28.CC_Lista__c = listaDerivar.Id;
             valor28.CC_Mensajes_Mostrar__c = '¿Estaba intentando realizar alguna inversión/compra de criptomonedas?';
+            valor28.CC_Valor__c = 'test';
             valores.add(valor28);
 
             CC_Lista_Valores__c valor29 = new CC_Lista_Valores__c();
@@ -364,6 +365,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             valor29.RecordTypeId = recordTypeValor;
             valor29.CC_Lista__c = listaDerivar.Id;
             valor29.CC_Mensajes_Mostrar__c = '¿Le ha solicitado la operación algún amigo o familiar por WhatsApp indicando alguna emergencia?';
+            valor29.CC_Valor__c = 'test';
             valores.add(valor29);
 
             CC_Lista_Valores__c valor30 = new CC_Lista_Valores__c();
@@ -371,6 +373,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             valor30.RecordTypeId = recordTypeValor;
             valor30.CC_Lista__c = listaDerivar.Id;
             valor30.CC_Mensajes_Mostrar__c = '¿Le ha contactado algún gestor de banca y le ha pedido que realice la operativa?';
+            valor30.CC_Valor__c = 'test';
             valores.add(valor30);
 
             CC_Lista_Valores__c valor31 = new CC_Lista_Valores__c();
@@ -378,6 +381,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             valor31.RecordTypeId = recordTypeValor;
             valor31.CC_Lista__c = listaDerivar.Id;
             valor31.CC_Mensajes_Mostrar__c = '¿Estaba intentando pagar alguna factura?';
+            valor31.CC_Valor__c = 'test';
             valores.add(valor31);
 
             CC_Lista_Valores__c valor32 = new CC_Lista_Valores__c();
@@ -385,6 +389,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             valor32.RecordTypeId = recordTypeValor;
             valor32.CC_Lista__c = listaDerivar.Id;
             valor32.CC_Mensajes_Mostrar__c = '¿Estaba intentando comprar/vender algún producto/viaje?';
+            valor32.CC_Valor__c = 'test';
             valores.add(valor32);
 
             CC_Lista_Valores__c valor33 = new CC_Lista_Valores__c();
@@ -392,6 +397,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             valor33.RecordTypeId = recordTypeValor;
             valor33.CC_Lista__c = listaDerivar.Id;
             valor33.CC_Mensajes_Mostrar__c = 'Pregunta Operacion MFA Argos';
+            valor33.CC_Valor__c = 'test';
             valores.add(valor33);
 
             CC_Lista_Valores__c valor34 = new CC_Lista_Valores__c();
@@ -1395,29 +1401,7 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
             Map<String, Object> resultadoNoImaginPruebaNoCliente = CC_Gestion_Derivar_Inicializar.getDatos(casoNoImaginNoClientesPrueba.Id, null);
             System.assertEquals(resultadoNoImaginPruebaNoCliente.get('cambioOficina'), true, 'Error en caso 5');
             
-            Case cajeros = [SELECT Id FROM Case WHERE Subject = 'Cajeros'];
-            Map<String, Object> resultadoCajeros = CC_Gestion_Derivar_Inicializar.getDatos(cajeros.Id, null);
-            System.assertNotEquals(resultadoCajeros.get('preguntaCajeros'), null, 'Error en caso cajeros');
-            
-            Case fraude = [SELECT Id FROM Case WHERE Subject = 'Fraude'];
-            Map<String, Object> resultadoFraude = CC_Gestion_Derivar_Inicializar.getDatos(fraude.Id, false);
-            System.assertNotEquals(resultadoFraude.get('preguntaRealizarRemitido'), 'true', 'Error en caso fraude');
-            
-            Case testamentaria = [SELECT Id FROM Case WHERE Subject = 'casoImaginTestamentaria'];
-            Map<String, Object> resultadoTestamentaria = CC_Gestion_Derivar_Inicializar.getDatos(testamentaria.Id, null);
-            System.assertEquals(resultadoTestamentaria.get('mostrarModalDNITestamentaria'), true);
-
-            Case oficinaFisica = [SELECT Id FROM Case WHERE Subject = 'casoImaginOficinaFisica'];
-            Map<String, Object> resultadoOficinaFisica = CC_Gestion_Derivar_Inicializar.getDatos(oficinaFisica.Id, null);
-            System.assertEquals(resultadoOficinaFisica.get('oficinaFisica'), true);
-
-            Case documentacion = [SELECT Id FROM Case WHERE Subject = 'casoImaginDocumentacion'];
-            Map<String, Object> resultadoDocumentacion = CC_Gestion_Derivar_Inicializar.getDatos(documentacion.Id, null);
-            System.assertEquals(resultadoDocumentacion.get('hubGestion'), true);
-
-            Case onboarding = [SELECT Id FROM Case WHERE Subject = 'casoImaginOnboarding'];
-            Map<String, Object> resultadoOnboarding = CC_Gestion_Derivar_Inicializar.getDatos(onboarding.Id, null);
-            System.assertEquals(resultadoOnboarding.get('ambitoMotivo'), 'Onboarding');
+           
         }
         Test.stopTest();
     }
@@ -1443,6 +1427,42 @@ public with sharing class CC_Gestion_Derivar_Inicializar_Test {
                 Map<String, Object> resultadoCSBDNoContratar = CC_Gestion_Derivar_Inicializar.getDatos(csbdNoContratar.Id, null);
                 System.assertEquals(resultadoCSBDNoContratar.get('ambitoVentas'), true);
             }
+        Test.stopTest();
+    }
+
+    @isTest
+    public static void getDatosTest5() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            Case casoImagin2 = [SELECT Id FROM Case WHERE CC_Motivo__c LIKE 'Cambio de Oficina' AND Account.AV_IndicadoresClientes__c = '28'];
+
+            Map<String, Object> resultadoImagin = CC_Gestion_Derivar_Inicializar.getDatos(casoImagin2.Id, null);
+            System.assertEquals(resultadoImagin.get('mostrarModalCreacionTarea'), true, 'Error en caso Imagin');
+            
+            Case cajeros = [SELECT Id FROM Case WHERE Subject = 'Cajeros'];
+            Map<String, Object> resultadoCajeros = CC_Gestion_Derivar_Inicializar.getDatos(cajeros.Id, null);
+            System.assertNotEquals(resultadoCajeros.get('preguntaCajeros'), null, 'Error en caso cajeros');
+            
+            Case fraude = [SELECT Id FROM Case WHERE Subject = 'Fraude'];
+            Map<String, Object> resultadoFraude = CC_Gestion_Derivar_Inicializar.getDatos(fraude.Id, false);
+            System.assertNotEquals(resultadoFraude.get('preguntaRealizarRemitido'), 'true', 'Error en caso fraude');
+            
+            Case testamentaria = [SELECT Id FROM Case WHERE Subject = 'casoImaginTestamentaria'];
+            Map<String, Object> resultadoTestamentaria = CC_Gestion_Derivar_Inicializar.getDatos(testamentaria.Id, null);
+            System.assertEquals(resultadoTestamentaria.get('mostrarModalDNITestamentaria'), true);
+
+            Case oficinaFisica = [SELECT Id FROM Case WHERE Subject = 'casoImaginOficinaFisica'];
+            Map<String, Object> resultadoOficinaFisica = CC_Gestion_Derivar_Inicializar.getDatos(oficinaFisica.Id, null);
+            System.assertEquals(resultadoOficinaFisica.get('oficinaFisica'), true);
+
+            Case documentacion = [SELECT Id FROM Case WHERE Subject = 'casoImaginDocumentacion'];
+            Map<String, Object> resultadoDocumentacion = CC_Gestion_Derivar_Inicializar.getDatos(documentacion.Id, null);
+            System.assertEquals(resultadoDocumentacion.get('hubGestion'), true);
+
+            Case onboarding = [SELECT Id FROM Case WHERE Subject = 'casoImaginOnboarding'];
+            Map<String, Object> resultadoOnboarding = CC_Gestion_Derivar_Inicializar.getDatos(onboarding.Id, null);
+            System.assertEquals(resultadoOnboarding.get('ambitoMotivo'), 'Onboarding');
+        }
         Test.stopTest();
     }
 

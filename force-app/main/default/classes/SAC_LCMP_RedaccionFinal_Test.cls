@@ -341,7 +341,11 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         pretensiones.add(pretension5);
         SAC_DatabaseDML.insertListDML(pretensiones, false);
         //Database.insert(pretensiones);
-        
+
+        SAC_CaseReclamante__c reclamante = SAC_TestDataFactory.crearReclamante(true, reclamacion, cuentas.get(0).Id );
+        reclamante.SAC_ReclamantePrincipal__c = false;
+        reclamante.SAC_Contact__c = contacto.Id;
+        SAC_DatabaseDML.insertDML(reclamante, false);
         
         SAC_ProductCase__c producto  = new SAC_ProductCase__c();
         producto.SAC_Pretension__c = pretension.Id;
@@ -616,11 +620,6 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
 
         System.assertNotEquals(result, null, 'La creacion del objeto wrapper ha fallado');
     }
-
-
-
-
-
 
 
     @isTest
@@ -939,7 +938,7 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
     @isTest
     static void comprobrarRecordTypeTest() {
         Case reclamacion = [SELECT Id, OwnerId, RecordTypeId FROM Case WHERE Subject = 'TestRec8' LIMIT 1];
-        Boolean resultado;
+        String resultado;
         User usuarioGeneral = [SELECT Id FROM User WHERE Username = 'usergeneral@test.com' AND isActive = true LIMIT 1];
         
         System.runAs(usuarioGeneral){
@@ -947,7 +946,7 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
                 resultado = SAC_LCMP_RedaccionFinal.comprobrarRecordType(reclamacion.Id);
             Test.stopTest();
         }
-        System.assertEquals(true, resultado, 'No se ha podido recuperar el recordType');
+        System.assertEquals('SAC', resultado, 'No se ha podido recuperar el recordType');
     }
 
     @isTest
@@ -1112,4 +1111,38 @@ public with sharing class SAC_LCMP_RedaccionFinal_Test {
         }
         Assert.areNotEqual(documento, false, 'El método que comprueba si existen documentos de redaccion ha fallado.');
     }
+
+    @isTest
+    static void recuperarReclamantesTest(){
+        List<SAC_CaseReclamante__c> reclamantes = new List<SAC_CaseReclamante__c>();
+        Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+        
+
+        User usuarioGeneral = [SELECT Id FROM User WHERE Username = 'usergeneral@test.com' AND isActive = true LIMIT 1];
+        System.runAs(usuarioGeneral){
+            Test.startTest();
+            reclamantes = SAC_LCMP_RedaccionFinal.recuperarReclamantes(reclamacion.Id);
+            Test.stopTest();
+        }
+        System.assertNotEquals(null, reclamantes, 'No se han podido recuperar los reclamantes');
+    }
+
+    @isTest
+    static void cambiarContactoReclamanteTest(){
+        List<SAC_CaseReclamante__c> reclamantes = new List<SAC_CaseReclamante__c>();
+        Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+        SAC_CaseReclamante__c reclamante = [SELECT Id FROM SAC_CaseReclamante__c LIMIT 1];
+        
+
+        User usuarioGeneral = [SELECT Id FROM User WHERE Username = 'usergeneral@test.com' AND isActive = true LIMIT 1];
+        System.runAs(usuarioGeneral){
+            Test.startTest();
+            SAC_LCMP_RedaccionFinal.cambiarContactoReclamante(reclamante.Id, reclamacion.Id);
+            //Case reclamacion2 = [SELECT Id FROM Case WHERE Subject = 'TestRec' LIMIT 1];
+            Test.stopTest();
+            System.assertNotEquals(null, reclamacion, 'No se ha podido cambiar el contacto y la cuenta');
+        }
+        
+    }
+
 }

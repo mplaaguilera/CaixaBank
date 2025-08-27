@@ -9,7 +9,7 @@ public with sharing class SAC_FormulariosGGHFraude {
 	private static String varYes = 'Sí';
     private static String varNo = 'No';
     private static String varOriginFormulario = 'SAC_Formulario';
-    private static String varIntUser = 'SAC Integración';
+    private static String varIntProfile = 'CBK_MinimumAccessApiOnly';
     private static final Id RECTYPEPRETENSION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
     private static final Id RECTYPEFORMGGH = Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SAC_Formulario_GGH').getRecordTypeId();
     private static final Id RECTYPEFORMFRAUDE = Schema.SObjectType.SPV_Formulario__c.getRecordTypeInfosByDeveloperName().get('SAC_Formulario_Fraude').getRecordTypeId();
@@ -45,7 +45,7 @@ public with sharing class SAC_FormulariosGGHFraude {
                               WHERE RecordTypeId =: RECTYPEPRETENSION 
                               AND SAC_Reclamacion__c =: reclamacion.Id
                               AND Origin =: varOriginFormulario
-                              AND CreatedBy.Name =: varIntUser
+                              AND CreatedBy.Profile.Name =: varIntProfile
                               AND SAC_GenialEstado__c = null]){
             if(!mapPretensiones.containsKey(pretension.SAC_Reclamacion__c)){
                 List<Case> pretensionList = new List<Case>();

@@ -357,7 +357,7 @@ public with sharing class OS_Metodos_EmailServices {
                 cdLinkEmail.ShareType = 'V';
                 listaContentDocumentLink.add(cdLinkEmail);
             }
-            insert listaContentDocumentLink;
+            CBK_DMLUtility.insertRecords(listaContentDocumentLink);
         }
     }
   }

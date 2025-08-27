@@ -3,7 +3,7 @@ public with sharing class SPV_LCMP_GeneracionDocumento_Test {
 
     @TestSetup
     static void makeData(){
-    
+        
         Test.startTest();
 
         User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
@@ -18,14 +18,34 @@ public with sharing class SPV_LCMP_GeneracionDocumento_Test {
 
         Test.stopTest();
 
-        //Reclamacion
+        // ===== Crear datos previos requeridos por el trigger =====
+        Account acc = new Account(Name = 'Cuenta Test');
+        insert acc;
+
+        Contact con = new Contact(LastName = 'Reclamante Test', AccountId = acc.Id, Email = 't@t.com');
+        insert con;
+
+        Id rtReclamacion = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName()
+                            .get('SAC_Reclamacion').getRecordTypeId();
+
+        // ===== Reclamacion =====
         List<Case> listaReclamaciones = new List<Case>();
         Map<String, Object> camposReclamacion = new Map<String, Object>();
+
         camposReclamacion.put('Subject', 'TestRecCrearRec1');
-        // camposReclamacion.put('SPV_Organismo__c', 'SPV_CNMV');
+        camposReclamacion.put('SPV_Organismo__c', 'SPV_CNMV');
         camposReclamacion.put('Status', 'SAC_003');
         camposReclamacion.put('OwnerId', listUsuarios[0].Id);
         camposReclamacion.put('SAC_StatusAuxiliar__c', 'SAC_003');
+
+        // Clave para que no falle el helper:
+        camposReclamacion.put('RecordTypeId', rtReclamacion);
+        camposReclamacion.put('AccountId', acc.Id);
+        camposReclamacion.put('ContactId', con.Id);
+
+        // Recomendable si hay validaciones de estos campos:
+        camposReclamacion.put('Origin', 'Web');
+        camposReclamacion.put('Priority', 'Medium');
 
         Case casoReclamacion = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion);
         listaReclamaciones.add(casoReclamacion);
@@ -40,46 +60,47 @@ public with sharing class SPV_LCMP_GeneracionDocumento_Test {
         SPV_DatabaseDML.insertDML(documento, false); 
     }
 
-    @isTest
-    static void getRutaTest(){
-        String ruta;
 
-        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
-        System.runAs(usuario){
-            Test.startTest();
-            ruta = SPV_LCMP_GeneracionDocumento.getRuta();
-            Test.stopTest();
+        @isTest
+        static void getRutaTest(){
+            String ruta;
+
+            User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+            System.runAs(usuario){
+                Test.startTest();
+                ruta = SPV_LCMP_GeneracionDocumento.getRuta();
+                Test.stopTest();
+            }
+            Assert.areNotEqual(ruta, null, 'El método que trae la ruta ha fallado.');
         }
-        Assert.areNotEqual(ruta, null, 'El método que trae la ruta ha fallado.');
-    }
 
-    @isTest
-    static void getRutaVSTest(){
-        String ruta;
+        @isTest
+        static void getRutaVSTest(){
+            String ruta;
 
-        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
-        System.runAs(usuario){
-            Test.startTest();
-            ruta = SPV_LCMP_GeneracionDocumento.getRutaVS();
-            Test.stopTest();
+            User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+            System.runAs(usuario){
+                Test.startTest();
+                ruta = SPV_LCMP_GeneracionDocumento.getRutaVS();
+                Test.stopTest();
+            }
+            Assert.areNotEqual(ruta, null, 'El método que trae la ruta ha fallado.');
         }
-        Assert.areNotEqual(ruta, null, 'El método que trae la ruta ha fallado.');
-    }
 
-    @isTest
-    static void insertarimagenTest(){
-        String imagenInsertada;
+        @isTest
+        static void insertarimagenTest(){
+            String imagenInsertada;
 
-        User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
-        Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRecCrearRec1' LIMIT 1];
+            User usuario = [SELECT Id FROM User WHERE Username = 'usertest0@testSPV.com.testSetup' AND IsActive = true LIMIT 1];
+            Case reclamacion = [SELECT Id FROM Case WHERE Subject = 'TestRecCrearRec1' LIMIT 1];
 
-        System.runAs(usuario){
-            Test.startTest();
-            imagenInsertada = SPV_LCMP_GeneracionDocumento.insertarimagen(reclamacion.id, '<p><img></img></p>');
-            Test.stopTest();
+            System.runAs(usuario){
+                Test.startTest();
+                imagenInsertada = SPV_LCMP_GeneracionDocumento.insertarimagen(reclamacion.id, '<p><img></img></p>');
+                Test.stopTest();
+            }
+            Assert.areNotEqual(imagenInsertada, null, 'La creación del registro que almacena la imagen ha fallado.');
         }
-        Assert.areNotEqual(imagenInsertada, null, 'La creación del registro que almacena la imagen ha fallado.');
-    }
 
     @isTest
     static void generarDocumentoTest(){

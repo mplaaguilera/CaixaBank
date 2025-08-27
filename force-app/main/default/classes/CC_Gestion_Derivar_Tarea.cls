@@ -70,6 +70,7 @@ public with sharing class CC_Gestion_Derivar_Tarea {
         // Boolean crearTareaVentas = chequearAmbitoVentas(ambitoMotivo, imagin, ambitoCSBD);
         
         Task tareaGestorCaso = crearTareaGestorCaso();
+        tareaGestorCaso.AV_OrigenAct__c = '';
         Task tareaGestorAccount;
         
         // Si el caso no tiene cuenta: US1182624: Derivar - Derivaciones sin cliente asociado
@@ -79,11 +80,13 @@ public with sharing class CC_Gestion_Derivar_Tarea {
             if (this.cuentaFicticia == 'F') {
                 recordType = 'AV_AlertaComercial';
                 tareaGestorAccount = crearTareaGestorAccountCasoSinCuenta(recordType);
+                tareaGestorCaso.AV_OrigenAct__c = '';
                 numpersoGenerico = (String) textosMap.get('Cuenta genérica F');
                 tareaGestorAccount.WhatId = [SELECT Id FROM Account WHERE AV_NumPerso__c = :numpersoGenerico AND CC_Inactivo__c = FALSE LIMIT 1]?.Id;
             } else if (this.cuentaFicticia == 'J') {
                 recordType = 'CIBE_AlertaComercialEMP';
                 tareaGestorAccount = crearTareaGestorAccountCasoSinCuenta(recordType);
+                tareaGestorCaso.AV_OrigenAct__c = '';
                 numpersoGenerico = (String) textosMap.get('Cuenta genérica J');
                 tareaGestorAccount.WhatId = [SELECT Id FROM Account WHERE AV_NumPerso__c = :numpersoGenerico AND CC_Inactivo__c = FALSE LIMIT 1]?.Id;
             }
@@ -223,6 +226,7 @@ public with sharing class CC_Gestion_Derivar_Tarea {
                     tareasCreadasId.add(tarea.Id);
                 }
             } else {
+                tareaGestorAccount.AV_OrigenAct__c = '';
                 lstTask.add(tareaGestorAccount);
             }
             

@@ -273,6 +273,13 @@ public class HDT_Llamada_GC_Test {
          Asset asset = new Asset(Name = 'Test Asset', AccountId = oficina.Id);
          insert asset;
 
+		CC_Settings__c settings = new CC_Settings__c();
+		settings.CC_Activa__c = true;
+		settings.Name = 'CC_Colas_HDT_CCO_Activas';
+		settings.CC_Configuracion_1__c = 'HDT';
+		settings.CC_Configuracion_2__c = 'CCO';
+		insert settings;
+
 
 	}
 

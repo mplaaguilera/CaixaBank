@@ -5,7 +5,7 @@ public with sharing class SPV_CaseHelper {
     
     public class SPVException extends Exception {}
 
-    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'CC_Grupo_Colaborador__c','SAC_Interaccion__c', 'Account', 'SAC_ImagenDocumento__c', 'CBK_Case_Extension__c'};
+    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'CC_Grupo_Colaborador__c','SAC_Interaccion__c', 'Account', 'SAC_ImagenDocumento__c', 'CBK_Case_Extension__c','SAC_MaestroTemas__c'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
@@ -18,6 +18,8 @@ public with sharing class SPV_CaseHelper {
     private static final Id RECTYPECONSULTA = mapRTsObjects.get('SAC_Interaccion__c').get('SPV_Consulta').getRecordTypeId();
     private static final Id RECTYPECASEEXTENSION = mapRTsObjects.get('CBK_Case_Extension__c').get('SPV_ReclamacionCaseExt').getRecordTypeId();
     private static final Id SACRECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
+    private static final Id RECTYPEPARAMETRIZACION = mapRTsObjects.get('SAC_MaestroTemas__c').get('SPV_ParametrizacionOrganismo').getRecordTypeId();   
+
 
     //Obtener el record type de los no clientes
     private static final Id RECTYPENOCLIENTE = mapRTsObjects.get('Account').get('SAC_NoCliente_PA').getRecordTypeId();
@@ -29,6 +31,7 @@ public with sharing class SPV_CaseHelper {
     private static final String ORIGEN_DGS = 'SPV_DGS';
     private static final String ORIGEN_CONSUMO = 'SPV_Consumo'; 
     private static final String ORIGEN_BDE = 'SPV_BDE'; 
+    private static final String ORIGEN_DEFENSORPARTICIPE = 'SPV_DefensorParticipe'; 
     private static final String GRUPOLET_FYRLEGAL = 'SPV_FYRLEGALLETRADO'; 
     private static final String GRUPOLET_INDRA = 'SPV_INDRALETRADO'; 
     
@@ -98,6 +101,7 @@ public with sharing class SPV_CaseHelper {
 		Map<String, Id> mapReclamantes = new Map<String, Id> ();
 
         for(Case caso :listNewObj){
+            
             if((mapOldObj == null && caso.AccountId != null) || 
                 (mapOldObj != null && mapOldObj.containsKey(caso.Id) && caso.AccountId != mapOldObj.get(caso.Id).AccountId)){
                 listaCasosReclamante.add(caso);
@@ -110,7 +114,7 @@ public with sharing class SPV_CaseHelper {
                 return;
             }
 
-            List<SAC_CaseReclamante__c> reclamantesTotal = [SELECT Id, SAC_Case__c, SAC_Account__c, SAC_Contact__c FROM SAC_CaseReclamante__c WHERE SAC_Case__c in(SELECT Id FROM Case WHERE Id IN :listaCasosReclamante)];
+            List<SAC_CaseReclamante__c> reclamantesTotal = [SELECT Id, SAC_Case__c, SAC_Account__c, SAC_Account__r.Name,  SAC_Contact__c, SAC_ReclamantePrincipal__c FROM SAC_CaseReclamante__c WHERE SAC_Case__c in(SELECT Id FROM Case WHERE Id IN :listaCasosReclamante)];
             for (SAC_CaseReclamante__c tReclamantes : reclamantesTotal) {
                 mapReclamantes.put(String.valueOf(tReclamantes.SAC_Case__c) + String.valueOf(tReclamantes.SAC_Account__c) + String.valueOf(tReclamantes.SAC_Contact__c), tReclamantes.Id);
             }
@@ -131,14 +135,37 @@ public with sharing class SPV_CaseHelper {
                     }
                 }
             }else if (!listaCasosReclamante.isEmpty() && mapOldObj != null) {//Si el mapa no viene a nulo, estamos en un update
+                Set<Id> caseExtensionIds = new Set<Id>();
+                for (Case c : listaCasosReclamante) {
+                    if (c.CBK_Case_Extension_Id__c != null) {
+                        caseExtensionIds.add(c.CBK_Case_Extension_Id__c);
+                    }
+                }
+
+                Map<Id, CBK_Case_Extension__c> mapExtensiones = new Map<Id, CBK_Case_Extension__c>(
+                    [SELECT Id, SPV_ReclamantePrincipalEmail__c
+                    FROM CBK_Case_Extension__c
+                    WHERE Id IN :caseExtensionIds]
+                );
+                
                 for (Case casoNuevo : listaCasosReclamante) {
+
+                    Boolean nuevoCheckEmail = mapExtensiones.containsKey(casoNuevo.CBK_Case_Extension_Id__c)
+                                                ? mapExtensiones.get(casoNuevo.CBK_Case_Extension_Id__c).SPV_ReclamantePrincipalEmail__c
+                                                : false;                                                    
+
+                    Boolean viejoCheckEmail = mapOldObj.containsKey(casoNuevo.Id)
+                                                ? mapOldObj.get(casoNuevo.Id).CBK_Case_Extension_Id__r.SPV_ReclamantePrincipalEmail__c
+                                                : false;
+
                     Boolean cuentaInformada = String.isNotBlank(casoNuevo.AccountId);
-                    if ((casoNuevo.RecordTypeId == RECTYPERECLAMACION)&& cuentaInformada && mapOldObj.get(casoNuevo.Id).AccountId != casoNuevo.AccountId) {
+                    if ((casoNuevo.RecordTypeId == RECTYPERECLAMACION)&& cuentaInformada && mapOldObj.get(casoNuevo.Id).AccountId != casoNuevo.AccountId && nuevoCheckEmail == viejoCheckEmail) {
                         SAC_CaseReclamante__c reclamante = new SAC_CaseReclamante__c(SAC_Account__c = casoNuevo.AccountId,
                                                                                     SAC_Contact__c = casoNuevo.ContactId,
                                                                                     SAC_Case__c = casoNuevo.Id,
                                                                                     SAC_ReclamantePrincipal__c = true,
                                                                                     Id = mapReclamantes.get(String.valueOf(casoNuevo.Id) + String.valueOf(casoNuevo.AccountId) + String.valueOf(casoNuevo.ContactId)));
+                        
                         reclamantesAInsertar.add(reclamante);
                         sCasos.add(casoNuevo.Id);
                     }
@@ -146,7 +173,7 @@ public with sharing class SPV_CaseHelper {
             }
 
             List<SAC_CaseReclamante__c> reclamantes = new List<SAC_CaseReclamante__c>();
-            List<SAC_CaseReclamante__c> reclamantesAModificar = [SELECT Id, SAC_Account__c, SAC_Contact__c, SAC_ReclamantePrincipal__c FROM SAC_CaseReclamante__c WHERE SAC_ReclamantePrincipal__c = true AND SAC_Case__c in :sCasos AND Id not in :reclamantesAInsertar];
+            List<SAC_CaseReclamante__c> reclamantesAModificar = [SELECT Id, SAC_Account__c,SAC_Account__r.Name, SAC_Contact__c, SAC_ReclamantePrincipal__c FROM SAC_CaseReclamante__c WHERE SAC_ReclamantePrincipal__c = true AND SAC_Case__c in :sCasos AND Id not in :reclamantesAInsertar];
             for (SAC_CaseReclamante__c reclamante : reclamantesAModificar) {
                 reclamante.SAC_ReclamantePrincipal__c = false;
             }
@@ -155,6 +182,7 @@ public with sharing class SPV_CaseHelper {
             reclamantes.addAll(reclamantesAInsertar);
             
             if (!reclamantes.isEmpty()) {
+                
                 SPV_DatabaseDML.upsertListDML(reclamantes, false);
             }
         
@@ -1965,7 +1993,6 @@ public with sharing class SPV_CaseHelper {
      * @param cola
      */
     public static void balanceoLetrado(List<Case> listSelect, List<Case> listReclamaciones, Map<Id, Case> mapaDatosCasosActualizar, Group cola) {
-
         Map<Id, Case> mapaReclamaciones = new Map<Id, Case>(listReclamaciones);
         List<Case> listPretensiones = new List<Case>();
         Case reclamacion = new Case();
@@ -1983,12 +2010,15 @@ public with sharing class SPV_CaseHelper {
 
         // COMENTADO DESPUES DE BATERÏA DE PRUEBAS 09/07/25
         //Si ha vuelto de análisis a alta, el campo SPV_VueltaAlta valdrá true, y no hay que balancear
-        //if(!listPretensiones.isEmpty() && reclamacion.SPV_VueltaAlta__c != true){
-        if(!listPretensiones.isEmpty()){
-            if((reclamacion.SPV_Organismo__c == ORIGEN_CNMV || reclamacion.SPV_Organismo__c == ORIGEN_DGS || reclamacion.SPV_Organismo__c == ORIGEN_CONSUMO) && Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()){
-                //Si el origen de la reclamacion es CNMV o DGS se hace el balanceo al grupo FyR Legal
-                CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE RecordTypeId = :RECTYPEGRUPOLETRADO AND SAC_DeveloperName__c = :GRUPOLET_FYRLEGAL LIMIT 1];
-                balancearPretensiones(listPretensiones, mapaDatosCasosActualizar, grupo.Id, cola);
+        if(!listPretensiones.isEmpty() && reclamacion.SPV_VueltaAlta__c != true){
+            if((reclamacion.SPV_Organismo__c == ORIGEN_CNMV || reclamacion.SPV_Organismo__c == ORIGEN_DGS || reclamacion.SPV_Organismo__c == ORIGEN_CONSUMO || reclamacion.SPV_Organismo__c == ORIGEN_DEFENSORPARTICIPE) && Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()){
+                String grupoId = balanceoGruposLetrado(listPretensiones, mapaDatosCasosActualizar, cola);
+                if(String.isNotBlank(grupoId)) {
+                    balancearPretensiones(listPretensiones, mapaDatosCasosActualizar, grupoId, cola);
+                } else {
+                    CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE RecordTypeId = :RECTYPEGRUPOLETRADO AND SAC_DeveloperName__c = :GRUPOLET_FYRLEGAL LIMIT 1];
+                    balancearPretensiones(listPretensiones, mapaDatosCasosActualizar, grupo.Id, cola);
+                }
 
             }else if(reclamacion.SPV_Organismo__c == ORIGEN_BDE){
                 //Si el origen de la reclamación es BDE, evaluamos otras condiciones 
@@ -2341,6 +2371,129 @@ public with sharing class SPV_CaseHelper {
             balanceoPorMCC(reclamacion, listaPretensiones, mapaDatosCasosActualizar, cola);
         }
 
+    }
+
+    /***********************************************************************************************************
+     * Proposito: Balancea las pretensiones al grupo designado según el porcentaje de asignación parametrizado
+     * 
+     * Historial
+     * -------
+     * VERSION        USER_STORY       AUTHOR          DATE         Description
+     * 1.0            US1279702      Sergio Martín   08/08/25        Creado
+    **********************************************************************************************************/ 
+    public static String balanceoGruposLetrado(List<Case> listaPretensiones, Map<Id, Case> mapaDatosCasosActualizar, Group cola){ 
+        String idGrupoAsignado = null;
+        List<SAC_MaestroTemas__c> listaParametrizacion = new List<SAC_MaestroTemas__c>();
+        
+        // Agrupar los casos por su reclamación padre
+        Map<Id, List<Case>> mapPretensionesReclamacion = new Map<Id, List<Case>>();
+        for (Case pretension : listaPretensiones) {
+            if (pretension.SAC_Reclamacion__c != null) {
+                if (!mapPretensionesReclamacion.containsKey(pretension.SAC_Reclamacion__c)) {
+                    mapPretensionesReclamacion.put(pretension.SAC_Reclamacion__c, new List<Case>());
+                }
+                mapPretensionesReclamacion.get(pretension.SAC_Reclamacion__c).add(pretension);
+            }
+        }
+
+        // Obtener los organismos de los registros de Case
+        Set<String> setOrganismosPretensiones = new Set<String>();
+        for (Case pretension : listaPretensiones) {
+            if (pretension.SPV_Organismo__c != null) {
+                setOrganismosPretensiones.add(pretension.SPV_Organismo__c);
+            }
+        }
+
+        if (Schema.sObjectType.CC_Grupo_Colaborador__c.isAccessible()) {
+            listaParametrizacion = [SELECT SAC_GrupoLetrado__c, SPV_PorcentajeAsignacion__c, SPV_Organismo__c FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPEPARAMETRIZACION AND SPV_Organismo__c IN :setOrganismosPretensiones];
+        }
+
+        // Si no hay parametrizaciones para ese organismo se devuelve para que se balancee a FYRLEGAL por defecto
+        if (listaParametrizacion.isEmpty()) {
+            return idGrupoAsignado;
+        }
+
+        // Agrupar las configuraciones por organismo
+        Map<String, List<SAC_MaestroTemas__c>> mapOrganismoParametrizacion = new Map<String, List<SAC_MaestroTemas__c>>();
+        for (SAC_MaestroTemas__c tema : listaParametrizacion) {
+            if (!mapOrganismoParametrizacion.containsKey(tema.SPV_Organismo__c)) {
+                mapOrganismoParametrizacion.put(tema.SPV_Organismo__c, new List<SAC_MaestroTemas__c>());
+            }
+            mapOrganismoParametrizacion.get(tema.SPV_Organismo__c).add(tema);
+        }
+
+        // Validar que las configuraciones de cada organismo sumen 100%
+        for (String organismo : mapOrganismoParametrizacion.keySet()) {
+            Integer acumulado = 0;
+            for (SAC_MaestroTemas__c tema : mapOrganismoParametrizacion.get(organismo)) {
+                acumulado += tema.SPV_PorcentajeAsignacion__c.intValue();
+            }
+            // Si la parametrizacion para ese organismo no está configurada se devuelve para que se balancee a FYRLEGAL por defecto
+            if (acumulado != 100) {
+                return idGrupoAsignado;
+            }
+        }
+
+        // Obtener los casos asignados hoy y agruparlos por grupo y organismo
+        Map<String, Map<String, Integer>> mapGrupoContadorPorOrganismo = new Map<String, Map<String, Integer>>();
+        List<AggregateResult> listaPretensionesAgrupadas = [SELECT SEG_Grupo__c, SPV_Organismo__c, COUNT(Id) total FROM Case WHERE RecordTypeId = :RECTYPEPRETENSION AND CreatedDate = TODAY AND SPV_Organismo__c IN :setOrganismosPretensiones GROUP BY SEG_Grupo__c, SPV_Organismo__c];
+
+        for (AggregateResult result : listaPretensionesAgrupadas) {
+            String organismo = (String) result.get('SPV_Organismo__c');
+            String grupo = (String) result.get('SEG_Grupo__c');
+            Integer total = (Integer) result.get('total');
+
+            if (!mapGrupoContadorPorOrganismo.containsKey(organismo)) {
+                mapGrupoContadorPorOrganismo.put(organismo, new Map<String, Integer>());
+            }
+            mapGrupoContadorPorOrganismo.get(organismo).put(grupo, total);
+        }
+
+        // Asignar los nuevos casos respetando los porcentajes configurados
+        for (Id reclamacionId : mapPretensionesReclamacion.keySet()) {
+            List<Case> listaPretensionesReclamacion = mapPretensionesReclamacion.get(reclamacionId);
+            String organismo = listaPretensionesReclamacion[0].SPV_Organismo__c; 
+            List<SAC_MaestroTemas__c> listaTemasOrganismo = mapOrganismoParametrizacion.get(organismo);
+
+            // Calcular cuantos casos deben asignarse a cada grupo hoy
+            Map<String, Integer> grupoContador = mapGrupoContadorPorOrganismo.get(organismo);
+            if (grupoContador == null) {
+                grupoContador = new Map<String, Integer>();
+            }
+
+            Integer totalCasosHoy = 0;
+            for (Integer count : grupoContador.values()) {
+                totalCasosHoy += count;
+            }
+
+            // Determinar el grupo con el menor porcentaje cumplido
+            Double menorDiferencia = 1000000;
+            for (SAC_MaestroTemas__c tema : listaTemasOrganismo) {
+                String grupo = tema.SAC_GrupoLetrado__c;
+                Integer porcentajeEsperado = tema.SPV_PorcentajeAsignacion__c.intValue();
+                Integer asignadosActuales = grupoContador.containsKey(grupo) ? grupoContador.get(grupo) : 0;
+
+                // Calcular el porcentaje actual
+                Double porcentajeActual = totalCasosHoy > 0 ? (asignadosActuales * 100.0) / totalCasosHoy : 0.0;
+
+                // Verificar la diferencia entre el porcentaje esperado y el actual
+                Double diferencia = porcentajeEsperado - porcentajeActual;
+
+                if (diferencia > 0 && diferencia < menorDiferencia) {
+                    menorDiferencia = diferencia;
+                    idGrupoAsignado = grupo;
+                }
+            }
+
+            // Actualizar el contador para reflejar el nuevo caso asignado
+            if (!grupoContador.containsKey(idGrupoAsignado)) {
+                grupoContador.put(idGrupoAsignado, 0);
+            }
+            grupoContador.put(idGrupoAsignado, grupoContador.get(idGrupoAsignado) + 1);
+            mapGrupoContadorPorOrganismo.put(organismo, grupoContador);
+        }
+
+        return idGrupoAsignado;
     }
 
 

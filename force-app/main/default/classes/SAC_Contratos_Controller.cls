@@ -180,7 +180,6 @@ public with sharing class SAC_Contratos_Controller {
                     List<SAC_Contratos_Integration.ClsProducts> lstProducts = responseData.data.Products;
 
                     for(SAC_Contratos_Integration.ClsProducts product : lstProducts){
-                        system.debug('***product '+product);
                         List<DetallesContratosProducto> lstContracts = new List<DetallesContratosProducto>();
                         CustomerProduct prod = new CustomerProduct();
                         if(product.productId != 0){
@@ -207,7 +206,6 @@ public with sharing class SAC_Contratos_Controller {
                                 lstContracts.add(detallesContrato);
                             }
                             prod.lstContratos = lstContracts;
-                            system.debug('***prod '+prod);
                             lstProductsMostrar.add(prod);    
                         }
                         
@@ -250,7 +248,6 @@ public with sharing class SAC_Contratos_Controller {
             response.statusCode = responseIntegration.statusCode;
             
             if(responseIntegration.statusCode.equalsIgnoreCase('200')){
-                system.debug('***response '+response);
                 //Integración devuelve un 200, extraemos los contratos
                 response.description = responseIntegration.data.description;
                 response.state = responseIntegration.data.state.value;

@@ -35,7 +35,7 @@ public with sharing class SAC_Genial_ErrorProcesoIABatch implements Database.Bat
         }
         if(!casesToUpdate.isEmpty()){
             try {
-                update casesToUpdate;
+                CBK_DMLUtility.updateRecords(casesToUpdate);
             } catch (Exception e){
                 CBK_Log.error('Error en SAC_Genial_ErrorProcesoIABatch: ' + e.getMessage());
             }

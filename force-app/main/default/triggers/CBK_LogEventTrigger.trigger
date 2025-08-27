@@ -52,6 +52,6 @@ trigger CBK_LogEventTrigger on CBK_LogEvent__e (after insert) {
     
     //Envío de mails generados en el trigger
     for (Messaging.SingleEmailMessage msg : lstmail){
-        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { msg });
+        //Messaging.sendEmail(new Messaging.SingleEmailMessage[] { msg });
     }	
 }

@@ -32,7 +32,7 @@ public with sharing class SPV_LCMP_PaginaDetalles {
         }
 
         try {
-            SPV_DatabaseDML.updateListDML(recordsToUpdate, false);
+            SPV_DatabaseDML.updateListDML(recordsToUpdate, true);
         } catch (DmlException e) {
             throw new AuraHandledException('Error al actualizar los registros: ' + e.getMessage());
         }

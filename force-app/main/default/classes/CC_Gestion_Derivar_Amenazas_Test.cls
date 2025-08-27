@@ -8,47 +8,183 @@ private class CC_Gestion_Derivar_Amenazas_Test {
         User operador = CC_TestDataFactory.insertUserOperadorCliente('000001');
 
         System.runAs(admin){
-
+            // Crear todas las cuentas en una sola operación
+            
             Id rtEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
             Id rtClientePA = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
             Id recordTypeCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             Id rtCentroId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
+            List<Account> allAccounts = new List<Account>();
+            
+            // Centro principal
+            Account centro = new Account(
+                Name = 'Centro Caixabank 001',
+                CC_Email__c = 'test@test.com',
+                CC_Numero_Oficina_Empresa__c = '000-14141',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Numero_Empresa__c = '001',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Numero_Oficina__c = '16987',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centro);
 
-            //Numero centro riesgo reputacional	16987	 
-            //Nombre centro riesgo reputacional	Riesgo Reputacional Andalucia	 
-            //Numero direccion territorial	09917	 
-            //Nombre direccion territorial	Territorial Andalucia
+            // Jerarquía de centros (niveles 6-10)
+            Account centroNivel10 = new Account(
+                Name = 'Centro Nivel 10',
+                CC_Email__c = 'test10@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'DT',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel10);
 
-            //Account con gestion reputacional = 09917 - ANDALUCIA
-            Account centro = new Account();
-            centro.Name = 'Centro Caixabank 001';
-            centro.CC_Email__c = 'test@test.com';
-            centro.CC_Numero_Oficina_Empresa__c = '000-14141';
-            centro.CC_Tipo_Oficina__c = 'I';
-            centro.CC_Numero_Empresa__c  = '001';
-            centro.CC_Tipo_Centro__c = 'OF';
-            centro.CC_Numero_Oficina__c = '16987';
-            centro.RecordtypeId = rtCentroId;
-            insert centro;
+            Account centroNivel9 = new Account(
+                Name = 'Centro Nivel 9',
+                CC_Email__c = 'test9@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'DT',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel9);
 
-            Account centroDireccionTerritorial = new Account();
-            centroDireccionTerritorial.Name = 'Centro Caixabank 002';
-            centroDireccionTerritorial.CC_Email__c = 'test@test.com';
-            centroDireccionTerritorial.CC_Tipo_Oficina__c = 'I';
-            centroDireccionTerritorial.CC_Tipo_Centro__c = 'OF';
-            centroDireccionTerritorial.CC_Numero_Oficina__c = '09917';
-            centroDireccionTerritorial.RecordtypeId = rtCentroId;
-            insert centroDireccionTerritorial;
+            Account centroNivel8 = new Account(
+                Name = 'Centro Nivel 8',
+                CC_Email__c = 'test8@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel8);
 
-            Id recordTypeGrupoColaborador =  Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId();
+            Account centroNivel7 = new Account(
+                Name = 'Centro Nivel 7',
+                CC_Email__c = 'test7@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel7);
+            
+            Account centroNivel6 = new Account(
+                Name = 'Centro Nivel 6',
+                CC_Email__c = 'test6@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel6);
 
-            CC_Grupo_Colaborador__c grupoColaborador  = new CC_Grupo_Colaborador__c();
-            grupoColaborador.RecordTypeId = recordTypeGrupoColaborador;
-            grupoColaborador.Name = 'Amenazas empleados';
-            grupoColaborador.OS_Negocio__c = 'CC';
+            // Jerarquía de centros (niveles 1-5)
+            Account centroNivel5 = new Account(
+                Name = 'Centro Nivel 5',
+                CC_Email__c = 'test5@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel5);
+
+            Account centroNivel4 = new Account(
+                Name = 'Centro Nivel 4',
+                CC_Email__c = 'test4@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel4);
+
+            Account centroNivel3 = new Account(
+                Name = 'Centro Nivel 3',
+                CC_Email__c = 'test3@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel3);
+
+            Account centroNivel2 = new Account(
+                Name = 'Centro Nivel 2',
+                CC_Email__c = 'test2@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel2);
+
+            Account centroNivel1 = new Account(
+                Name = 'Centro Nivel 1',
+                CC_Email__c = 'test1@test.com',
+                CC_Tipo_Oficina__c = 'I',
+                CC_Tipo_Centro__c = 'OF',
+                CC_Numero_Oficina__c = '09917',
+                RecordtypeId = rtCentroId
+            );
+            allAccounts.add(centroNivel1);
+
+            // Cuentas de cliente
+            Account cuentaImagin1 = new Account(
+                FirstName = 'Cuenta Test',
+                LastName = 'test',
+                CC_Email__c = 'cuenta@test.com',
+                AV_IndicadoresClientes__c = '28',
+                CC_Numero_Documento__c = '45729937A',
+                AV_Cliente__c = true,
+                AV_NumPerso__c = '214622853',
+                PersonMobilePhone = '666666666',
+                RecordtypeId = rtClientePA,
+                CC_Numero_Oficina__c = '09917'
+            );
+            allAccounts.add(cuentaImagin1);
+
+            Account cuentaImagin = new Account(
+                FirstName = 'Cuenta Test direccion territorial',
+                LastName = 'test',
+                CC_Email__c = 'cuenta2@test.com',
+                AV_IndicadoresClientes__c = '28',
+                CC_Numero_Documento__c = '45720937A',
+                AV_Cliente__c = true,
+                PersonMobilePhone = '666966666',
+                RecordtypeId = rtClientePA,
+                CC_Numero_Oficina__c = '09917'
+            );
+            allAccounts.add(cuentaImagin);
+
+            // Insertar todas las cuentas
+            insert allAccounts;
+
+            // Establecer jerarquía
+            centroNivel1.ParentId = centroNivel2.Id;
+            centroNivel2.ParentId = centroNivel3.Id;
+            centroNivel3.ParentId = centroNivel4.Id;
+            centroNivel4.ParentId = centroNivel5.Id;
+            centroNivel5.ParentId = centroNivel6.Id;
+            centroNivel6.ParentId = centroNivel7.Id;
+            centroNivel7.ParentId = centroNivel8.Id;
+            centroNivel8.ParentId = centroNivel9.Id;
+            centroNivel9.ParentId = centroNivel10.Id;
+            cuentaImagin.AV_OficinaPrincipal__c = centroNivel1.Id;
+            
+            update new List<Account>{centroNivel1, centroNivel2, centroNivel3, centroNivel4, centroNivel5, centroNivel6, centroNivel7, centroNivel8, centroNivel9, centroNivel10, cuentaImagin};
+
+            // Crear grupo colaborador
+            CC_Grupo_Colaborador__c grupoColaborador = new CC_Grupo_Colaborador__c(
+                RecordTypeId = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_Grupo_Colaborador').getRecordTypeId(),
+                Name = 'Amenazas empleados',
+                OS_Negocio__c = 'CC'
+            );
             insert grupoColaborador;
 
-            // Crear contactos en bulk
+            // Crear contactos
             List<Contact> contactos = new List<Contact>{
                 new Contact(
                     LastName = 'Contacto empleado',
@@ -82,37 +218,7 @@ private class CC_Gestion_Derivar_Amenazas_Test {
             );
             insert contacto;
 
-
-            Account cuentaImagin1 = new Account(
-                FirstName = 'Cuenta Test',
-                LastName = 'test',
-                CC_Email__c = 'cuenta@test.com',
-                AV_IndicadoresClientes__c = '28',
-                CC_Numero_Documento__c = '45729937A',
-                AV_Cliente__c = true,
-                AV_NumPerso__c = '214622853',
-                PersonMobilePhone = '666666666',
-                RecordtypeId =  rtClientePA,
-                CC_Numero_Oficina__c = '09917'
-                );
-            insert cuentaImagin1;
-
-            //Account con direccion territorial = 16987 - ANDALUCIA
-            Account cuentaImagin = new Account(
-                FirstName = 'Cuenta Test direccion territorial',
-                LastName = 'test',
-                CC_Email__c = 'cuenta2@test.com',
-                AV_IndicadoresClientes__c = '28',
-                CC_Numero_Documento__c = '45720937A',
-                AV_Cliente__c = true,
-                PersonMobilePhone = '666966666',
-                RecordtypeId =  rtClientePA,
-                CC_Numero_Oficina__c = '09917',
-                CC_Direccion_Territorial__c = centroDireccionTerritorial.Id
-                );
-            insert cuentaImagin;
-
-            //Caso de prueba
+            // Crear caso
             Case testCase = new Case(
                 Subject='Test Case',
                 recordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente'),
@@ -125,8 +231,15 @@ private class CC_Gestion_Derivar_Amenazas_Test {
             );
             insert testCase;
 
-            // Obtener datos de configuración en una sola query
-            List<CC_Buzones_Por_Defecto__mdt> owaPorDefecto = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano' AND CC_Activo__c = true LIMIT 1];
+            // Obtener configuración OWA
+            List<CC_Buzones_Por_Defecto__mdt> owaPorDefecto = [
+                SELECT CC_Direccion_Correo__c 
+                FROM CC_Buzones_Por_Defecto__mdt 
+                WHERE CC_Canal_Procedencia__c = 'Por defecto' 
+                AND CC_Idioma__c = 'Castellano' 
+                AND CC_Activo__c = true 
+                LIMIT 1
+            ];
             String emailCorreoEntrante = owaPorDefecto[0].CC_Direccion_Correo__c;
 
             // Crear lista de valores en bulk
@@ -162,13 +275,12 @@ private class CC_Gestion_Derivar_Amenazas_Test {
             };
             insert valores;
 
-            // Crear Account Share y Contact Share para el operador
-            List<AccountShare> accountShares = new List<AccountShare>();
-            List<ContactShare> contactShares = new List<ContactShare>();
+            // Crear todos los shares en una sola operación
+            List<SObject> allShares = new List<SObject>();
             
-            // Configurar Account Shares
-            for(Account acc : new List<Account>{centro, centroDireccionTerritorial, cuentaImagin1, cuentaImagin}) {
-                accountShares.add(new AccountShare(
+            // Account Shares
+            for(Account acc : allAccounts) {
+                allShares.add(new AccountShare(
                     AccountId = acc.Id,
                     UserOrGroupId = operador.Id,
                     AccountAccessLevel = 'Read',
@@ -178,30 +290,24 @@ private class CC_Gestion_Derivar_Amenazas_Test {
                 ));
             }
             
-            // Configurar Contact Shares
+            // Contact Shares
             for(Contact con : contactos) {
-                contactShares.add(new ContactShare(
+                allShares.add(new ContactShare(
                     ContactId = con.Id,
                     UserOrGroupId = operador.Id,
                     ContactAccessLevel = 'Read'
                 ));
             }
             
-            insert accountShares;
-            insert contactShares;
-
-            // Crear Group Share para CC_Grupo_Colaborador__c
-            List<CC_Grupo_Colaborador__Share> grupoShares = new List<CC_Grupo_Colaborador__Share>();
-            
-            CC_Grupo_Colaborador__Share grupoShare = new CC_Grupo_Colaborador__Share(
+            // Grupo Share
+            allShares.add(new CC_Grupo_Colaborador__Share(
                 ParentId = grupoColaborador.Id,
                 UserOrGroupId = operador.Id,
                 AccessLevel = 'Read',
                 RowCause = 'Manual'
-            );
-            grupoShares.add(grupoShare);
+            ));
             
-            insert grupoShares;
+            insert allShares;
         }
     }
 
@@ -279,22 +385,4 @@ private class CC_Gestion_Derivar_Amenazas_Test {
         Test.stopTest();
     }
 
-    @isTest
-    static void testObtenerDestinatariosRiesgoReputacional() {
-        Test.startTest();
-        System.runAs(CC_TestDataFactory.getUserOperadorCliente()){
-            // Ejecutar método directamente
-            String[] destinatarios = CC_Gestion_Derivar_Amenazas.obtenerDestinatariosRiesgoReputacional('09917');
-            
-            // Verificaciones básicas
-            System.assertNotEquals(null, destinatarios, 'Los destinatarios no deben ser nulos');
-            System.assertNotEquals(0, destinatarios.size(), 'Debe haber al menos un destinatario');
-            
-            // Verificar formato de email
-            for (String email : destinatarios) {
-                System.assert(email.contains('@'), 'El email debe contener @');
-            }
-        }
-        Test.stopTest();
-    }
 }

@@ -210,7 +210,7 @@ public with sharing class CC_Gestion_Derivar_Global {
             }
         }
         
-        if(caso.CC_MCC_Solucion__r.CC_AmbitoTareas__c == 'Fraude' && otpDerivar == null) {
+        if(caso.CC_MCC_Solucion__r.CC_AmbitoTareas__c == 'Fraude' && otpDerivar == false) {
             ambitoFraude = true;
         } 
         if(ambitoMotivo == 'Bizum Fraude'){
@@ -243,14 +243,14 @@ public with sharing class CC_Gestion_Derivar_Global {
             retorno.put('alerta', caso.CC_MCC_Motivo__r.CC_Alerta_Caixa__c);
         }
 
-        if(otpDerivar != null) {         
+        if(otpDerivar == true) {         
             retorno.put('alerta', null);            
         }
     }
 
     public static void rellenarDatosFraudeSolucion(Map<String, Object> retorno, Map<String, Object> textosMap) {
         retorno.put('preguntaSenalAntigua', textosMap.get('Pregunta señal Antigua'));
-        retorno.put('preguntaRealizarRemitido', textosMap.get('Pregunta realizar remitido'));
+        //retorno.put('preguntaRealizarRemitido', textosMap.get('Pregunta realizar remitido'));
         retorno.put('toastRemitir', textosMap.get('Toast remitir'));
         retorno.put('fraudeANivelDeMotivo', false);
     }
@@ -260,23 +260,26 @@ public with sharing class CC_Gestion_Derivar_Global {
         retorno.put('fraudeANivelDeMotivo', true);
 
         if(ambitoMotivo == 'Caso a Fraude'){
-            
             /*
             List<Task> tareaIntentoTransferencia = [SELECT Id, Subject FROM Task WHERE WhatId = :caso.Id AND Type = 'Intento de transferencia' LIMIT 1];
             
-            if (caso.Origin != 'Teléfono' || !tareaIntentoTransferencia.isEmpty()) {
+            if (caso.Origin != 'Phone' || !tareaIntentoTransferencia.isEmpty()) {
                 retorno.put('intentoTranseferenciaLlamadaFraude', true);
-            }else if(caso.Origin == 'Teléfono' && tareaIntentoTransferencia.isEmpty()) {
+            }else if(caso.Origin == 'Phone' && tareaIntentoTransferencia.isEmpty()) {
                 retorno.put('intentoTranseferenciaLlamadaFraude', false);
-            }*/
+            }
+            */
 
             retorno.put('preguntaSenal', textosMap.get('Pregunta señal'));
             retorno.put('preguntaMotivoFraude', textosMap.get('Pregunta motivo fraude'));
             retorno.put('toastRemitir', textosMap.get('Toast remitir'));
+
             /*
             retorno.put('preguntaTransLlamFra', (String) textosMap.get('Pregunta transferencia llamada fraude'));
             retorno.put('modalTransLlamFra', (String) textosMap.get('Modal transferencia llamada fraude'));
-            retorno.put('mensajeTransLlamFra', (String) textosMap.get('Mensaje transferencia llamada fraude'));*/
+            retorno.put('mensajeTransLlamFra', (String) textosMap.get('Mensaje transferencia llamada fraude'));
+            */
+
         } else if (ambitoMotivo == 'Bizum Fraude'){
             retorno.put('motivoDevolucionTemaFraude', textosMap.get('Pregunta motivo devolucion tema fraude'));
             CC_Settings__c configuracion = CC_Settings__c.getValues('CC_GruposColaboradoresFraude');
@@ -285,6 +288,7 @@ public with sharing class CC_Gestion_Derivar_Global {
         }
 
     }
+
     public static void rellenarDatosGrupoColaborador(List<CC_MCC_Grupo_Colaborador__c> listaGrupoColaborador, Map<String, Object> retorno, Map<String, Object> textosMap){
         retorno.put('preguntaGrupoColaborador', textosMap.get('Pregunta traslado colaborador'));
         retorno.put('toastTrasladarDesdeDerivar', textosMap.get('Toast trasladar desde guardar'));
@@ -649,13 +653,30 @@ public with sharing class CC_Gestion_Derivar_Global {
     public static void rellenarDatosArgosGeneral(Map<String, Object> retorno, Map<String, Object> textosMap){
         retorno.put('diarioMFAArgos', textosMap.get('Pregunta Diario MFA Argos'));
         retorno.put('cabeceraPreguntasMFAArgos', textosMap.get('Cabecera Preguntas MFA Argos'));
-        List<String> preguntasArgos = new List<String>{
-            textosMap.get('Pregunta Inversion Argos').toString(),
-            textosMap.get('Pregunta WhatsApp Emergencia Argos').toString(),
-            textosMap.get('Pregunta Contacto Gestor Argos').toString(),
-            textosMap.get('Pregunta Factura Argos').toString(),
-            textosMap.get('Pregunta CompraVenta Argos').toString()
+        Map<String, Object> textosMapEjemplos = CC_MetodosUtiles.getLOVNameValue(new List<String>{'Textos operativa Derivar'}, 'CC_Valor__c');          
+        List<Map<String, String>> preguntasArgos = new List<Map<String, String>>{
+            new Map<String, String>{
+                'pregunta' => textosMap.get('Pregunta Inversion Argos').toString(),
+                'ejemplo' => textosMapEjemplos.get('Pregunta Inversion Argos').toString()
+            },
+            new Map<String, String>{
+                'pregunta' => textosMap.get('Pregunta WhatsApp Emergencia Argos').toString(),
+                'ejemplo' => textosMapEjemplos.get('Pregunta WhatsApp Emergencia Argos').toString()
+            },
+            new Map<String, String>{
+                'pregunta' => textosMap.get('Pregunta Contacto Gestor Argos').toString(),
+                'ejemplo' => textosMapEjemplos.get('Pregunta Contacto Gestor Argos').toString()
+            },
+            new Map<String, String>{
+                'pregunta' => textosMap.get('Pregunta Factura Argos').toString(),
+                'ejemplo' => textosMapEjemplos.get('Pregunta Factura Argos').toString()
+            },
+            new Map<String, String>{
+                'pregunta' => textosMap.get('Pregunta CompraVenta Argos').toString(),
+                'ejemplo' => textosMapEjemplos.get('Pregunta CompraVenta Argos').toString()
+            }
         };
+        System.debug('preguntasArgos: ' + preguntasArgos);
         retorno.put('preguntasArgos', preguntasArgos);
         retorno.put('preguntaConfirmacionArgos', textosMap.get('Pregunta Confirmacion Argos'));
         CC_Settings__c configuracion = CC_Settings__c.getValues('CC_GruposColaboradoresFraude');
@@ -685,13 +706,27 @@ public with sharing class CC_Gestion_Derivar_Global {
     
 
     //MGT
-    public static void rellenarDatosPhisingSmishingMalware(Map<String, Object> retorno, Map<String, Object> textosMap){
+    public static void rellenarDatosPhisingSmishingMalware(/*Case caso,*/Map<String, Object> retorno, Map<String, Object> textosMap){
+        /*List<Task> tareaIntentoTransferencia = [SELECT Id, Subject FROM Task WHERE WhatId = :caso.Id AND Type = 'Intento de transferencia' LIMIT 1];
+            
+        if (caso.Origin != 'Phone' || !tareaIntentoTransferencia.isEmpty()) {
+            retorno.put('intentoTranseferenciaLlamadaFraude', true);
+        }else if(caso.Origin == 'Phone' && tareaIntentoTransferencia.isEmpty()) {
+            retorno.put('intentoTranseferenciaLlamadaFraude', false);
+        }*/
+
         retorno.put('PhisingSmishingMalware1', textosMap.get('Phising/Smishing/Malware 1'));
         retorno.put('PhisingSmishingMalware2', textosMap.get('Phising/Smishing/Malware 2'));
         retorno.put('PhisingSmishingMalware3', textosMap.get('Phising/Smishing/Malware 3'));
         retorno.put('toastRemitir', textosMap.get('Toast remitir'));
         retorno.put('PhisingSmishingMalware5', textosMap.get('Phising/Smishing/Malware 5'));
         retorno.put('PhisingSmishingMalware6', textosMap.get('Phising/Smishing/Malware 6'));
+
+        /*
+        retorno.put('preguntaTransLlamFra', (String) textosMap.get('Pregunta transferencia llamada fraude'));
+        retorno.put('modalTransLlamFra', (String) textosMap.get('Modal transferencia llamada fraude'));
+        retorno.put('mensajeTransLlamFra', (String) textosMap.get('Mensaje transferencia llamada fraude'));
+        */
     }
     //MGT
     public static void rellenarDatosMecanismoFirma(Case caso, Map<String, Object> retorno, Map<String, Object> textosMap){
@@ -861,15 +896,18 @@ public with sharing class CC_Gestion_Derivar_Global {
         Boolean argos = denied || restricted;
 
         // Extraer AccountId y ContactId de CC_Detalles_Solucion__c
-        String detallesSolucion = tareasArgos[0].CC_Detalles_Solucion__c;
+        
         Boolean idsCoinciden = false;
-        if (String.isNotBlank(detallesSolucion) && detallesSolucion.contains('-')) {
-            List<String> partes = detallesSolucion.split('-');
-            if (partes.size() == 2) {
-                String accountIdDetalle = partes[0].trim();
-                String contactIdDetalle = partes[1].trim();
-                if (accountIdDetalle == caso.AccountId.toString() && contactIdDetalle == caso.ContactId.toString() ) {
-                    idsCoinciden = true;
+        if (!tareasArgos.isEmpty()) {
+            String detallesSolucion = tareasArgos[0].CC_Detalles_Solucion__c;
+            if (String.isNotBlank(detallesSolucion) && detallesSolucion.contains('-')) {
+                List<String> partes = detallesSolucion.split('-');
+                if (partes.size() == 2) {
+                    String accountIdDetalle = partes[0].trim();
+                    String contactIdDetalle = partes[1].trim();
+                    if (accountIdDetalle == caso.AccountId.toString() && contactIdDetalle == caso.ContactId.toString() ) {
+                        idsCoinciden = true;
+                    }
                 }
             }
         }

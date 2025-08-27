@@ -509,7 +509,10 @@ public with sharing class CC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase
             } else if (caso.CC_En_Tercer_Nivel__c && caso.CC_Grupo_3N__c != null) {
                 //Se devuelve el caso a la cola de 3N y se pasa a Activo
                 //caso.OwnerId = [SELECT Id FROM Group WHERE Name = :caso.CC_Grupo_3N__c].Id;
-                caso.Status = 'Pendiente Interno';
+                //caso.Status = 'Pendiente Interno';
+
+                //Se vuelve a poner el caso a Activo para el propietario del caso
+                caso.Status = 'Activo';
             } else if (caso.CC_Cola_Procedencia__c != null) {
                 //Se devuelve el caso a la cola de procedencia y se pasa a Activo
                 caso.Status = 'Activo';

@@ -94,7 +94,6 @@ public with sharing class SPV_LCMP_GeneracionDocumento {
         }
     }
 
-
     public static void adjuntarPDFaCaso(String url, Id parentId, String procedencia, String nombreDocumentoParametro){
         Case caso = [SELECT CaseNumber, CC_Idioma__c, recordType.DeveloperName FROM Case WHERE id =: parentId LIMIT 1];
         //String numCaso = caso.CaseNumber;

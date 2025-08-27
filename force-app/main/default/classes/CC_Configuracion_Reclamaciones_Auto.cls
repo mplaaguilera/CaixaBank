@@ -289,8 +289,15 @@ public with sharing class CC_Configuracion_Reclamaciones_Auto {
                                 listaFromAddress.add(email.FromAddress);
                             }
                             
-                            List <OrgWideEmailAddress> owa = [SELECT DisplayName, Address FROM OrgWideEmailAddress WHERE Address IN :listaFromAddress LIMIT 1];
+                            List <OrgWideEmailAddress> owa = [SELECT DisplayName, Address FROM OrgWideEmailAddress WHERE Address IN :listaFromAddress];
                             
+                            //Correctivo para la incidencia IN1317449
+                            Map<String, Id> owas = new Map<String, Id>();
+							for(OrgWideEmailAddress o : owa){
+     							owas.put(o.Address, o.Id);
+								}
+                            //Fin correctivo
+
                             Map<String, Id> buzonesSalidaCliente = new Map<String, Id>();
                             for (OrgWideEmailAddress correoOwa : [SELECT Address FROM OrgWideEmailAddress]) {
                                 buzonesSalidaCliente.put(correoOwa.Address, correoOwa.Id);
@@ -497,9 +504,10 @@ public with sharing class CC_Configuracion_Reclamaciones_Auto {
                                         email.setTreatBodiesAsTemplate(true);
                                         email.setWhatId(caso.Id); 
                                         email.setTargetObjectId(caso.ContactId);
-                                        email.setTreatTargetObjectAsRecipient(false);                        
-                                        if (!owa.isEmpty()){
-                                            email.setOrgWideEmailAddressId(owa[0].Id);
+                                        email.setTreatTargetObjectAsRecipient(false); 
+                                        //Correctivo para la incidencia IN1317449
+                                        if (owas.containskey(emailAnterior.FromAddress)){
+                                            	email.setOrgWideEmailAddressId(owas.get(emailAnterior.FromAddress));
                                         }                    
                                         email.subject = plantillaColaborador.Subject;
                                         

@@ -157,6 +157,7 @@ public with sharing class CC_OTP_Test {
             mcc2.CC_Codigo_Externo__c = 'MO-000001';
             mcc2.CC_ImpedirNivel2__c = true;
             mcc2.CC_ImpedirClienteDigital__c = false;
+            mcc2.CC_Motivo_OmitirSMSNivel2__c = true;
             insert mcc2;
 
             CC_MCC__c mcc3 = new CC_MCC__c();
@@ -198,7 +199,7 @@ public with sharing class CC_OTP_Test {
             caso1.CC_MCC_Causa__c = mcc3.Id;
             caso1.CC_MCC_Solucion__c = mcc4.Id;
             caseInsertLst.add(caso1);
-            
+
             //Caso cuenta menor
             Case caso3 = new Case();
             caso3.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
@@ -230,6 +231,26 @@ public with sharing class CC_OTP_Test {
             caso4.CC_MCC_Causa__c = mcc3.Id;
             caso4.CC_MCC_Solucion__c = mcc4.Id;
             caseInsertLst.add(caso4);
+
+            Case caso5 = new Case();
+            caso5.OwnerId = supervisor.Id;
+            caso5.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            caso5.Subject = 'Caso Test 5';
+            caso5.Status = 'Activo';
+            caso5.CC_Canal_Procedencia__c = 'Accionista';
+            caso5.CC_Canal_Respuesta__c = 'Email';
+            caso5.CC_Idioma__c = 'es';
+            caso5.Origin = 'Phone';
+            caso5.OwnerId = supervisor.Id;
+            caso5.AccountId = cuenta.Id;
+            caso5.ContactId = contacto.Id;
+            caso5.CC_MailTelfNotif__c  = 'contacto@test.com';
+            caso5.CC_MCC_Tematica__c = mcc.Id;
+            caso5.CC_MCC_ProdServ__c = mcc1.Id;
+            caso5.CC_MCC_Motivo__c = mcc2.Id;
+            caso5.CC_MCC_Causa__c = mcc3.Id;
+            caso5.CC_MCC_Solucion__c = mcc4.Id;
+            caseInsertLst.add(caso5);
 
             insert caseInsertLst;
             
@@ -336,15 +357,18 @@ public with sharing class CC_OTP_Test {
             comunicacion1.CC_Cliente__c = cuenta.Id;
             comunicacion1.CC_Ticket__c = '123456789';
             comunicacion1.CC_Mensaje_Error__c = 'ERROR';
+            comunicacion1.CC_Fecha_Envio__c = CBK_UtilsDate.nowDT().addHours(-1);
             comInsertLst.add(comunicacion1);
             CC_Comunicaciones__c comunicacion2 =  new CC_Comunicaciones__c();
             comunicacion2.CC_Case__c = caseInsertLst[1].Id;
             comunicacion2.CC_Estado__c = 'Pdte. Validar';
             comunicacion2.RecordTypeId = recordTypeIdOTP;
+            comunicacion2.CC_Nivel__c = 'Nivel 2';
             comunicacion2.CC_Cliente__c = cuenta.Id;
             comunicacion1.CC_Ticket__c = '123456789';
             comunicacion2.CC_Mensaje_Error__c = 'ERROR';
             comInsertLst.add(comunicacion2);
+            comunicacion2.CC_Fecha_Envio__c = CBK_UtilsDate.nowDT().addHours(-12);
             CC_Comunicaciones__c comunicacion3 =  new CC_Comunicaciones__c();
             comunicacion3.CC_Case__c = caseInsertLst[2].Id;
             comunicacion3.CC_Nivel__c = 'Nivel 2';
@@ -353,7 +377,7 @@ public with sharing class CC_OTP_Test {
             comunicacion3.CC_Cliente__c = cuenta.Id;
             comunicacion1.CC_Ticket__c = '123456789';
             comunicacion3.CC_Mensaje_Error__c = 'ERROR';
-
+            comunicacion3.CC_Fecha_Envio__c = CBK_UtilsDate.nowDT().addDays(-2);
             comInsertLst.add(comunicacion3);
             insert comInsertLst;
 
@@ -603,12 +627,13 @@ public with sharing class CC_OTP_Test {
     public static void testOTP() {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+
         CC_Comunicaciones__c comunicacion = [SELECT Id, CC_Mensaje_Error__c FROM CC_Comunicaciones__c WHERE CC_Case__c = :caso.Id LIMIT 1];
         
         System.runAs(supervisor){
             Test.startTest();
                 CC_OTP.reiniciarDerivar(caso.Id);
-                List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');    
+                List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');
                 System.assert(preguntas.size() > = 2, '');
                 String clienteId = caso.AccountId;   
         List<CC_OTP.OTPWrapper> wrapperOTP = CC_OTP.obtenerOTPCliente(caso.Id, clienteId);
@@ -619,8 +644,12 @@ public with sharing class CC_OTP_Test {
                 Map<string, string> resultadoSegundoNivelOK = CC_OTP.segundoNivel(caso.Id, true, 'Nivel 2',  'Edad del cliente', 'Teléfono asociado a CaixaBank del cliente', '20', '123456789', 'OK', 'OK', true, true, false);
                 Map<string, string> resultadoSegundoNivelKO = CC_OTP.segundoNivel(caso.Id, false, 'Nivel 2', 'Edad del cliente', 'Teléfono asociado a CaixaBank del cliente', '20', '123456789', 'OK', 'OK', true, true, false);
 
-                List<CC_OTP.OTPWrapper> wrapperOTPHistorico = CC_OTP.obtenerHistoricoOTPCliente(caso.Id, clienteId);
-                System.assert(wrapperOTPHistorico.size() > 1, '');  
+                CC_OTP.HistoricoOTPResponse resultadoHistorico = CC_OTP.obtenerHistoricoOTPClienteDividido(caso.Id, clienteId);
+                System.debug('Tamaño de autenticacionesRecientes: ' + resultadoHistorico.autenticacionesRecientes.size());
+                System.debug('Tamaño de historicoAutenticaciones: ' + resultadoHistorico.historicoAutenticaciones.size());
+
+                System.assertEquals(2, resultadoHistorico.autenticacionesRecientes.size(), 'Se esperaban 2 autenticaciones reciente.');
+                System.assertEquals(1, resultadoHistorico.historicoAutenticaciones.size(), 'Se esperaba 1 autenticacion en el historico.');
                             
                 string resultadoIntentos = CC_OTP.comprobarIntentos(caso.Id, clienteId);
                 System.assertEquals('OK', resultadoIntentos, '');
@@ -1098,17 +1127,16 @@ public with sharing class CC_OTP_Test {
     public static void comprobarCaracteristicasClienteTest() {
         Case caso = [SELECT AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-
         CC_Caracteristica__c caracteristicaCuenta = [SELECT Id FROM CC_Caracteristica__c WHERE Name = 'Característica Cuenta' LIMIT 1];
         CC_Caracteristica_Detalle__c caracteristicaDetalle = new CC_Caracteristica_Detalle__c();
         caracteristicaDetalle.CC_Cuenta__c = caso.AccountId;
         caracteristicaDetalle.CC_Caracteristica__c = caracteristicaCuenta.Id;
         insert caracteristicaDetalle;
-        
+        String resultado = CC_OTP.comprobarCaracteristicasCliente(caso.Id);
+
         System.runAs(supervisor) {
             Test.startTest();
-                String resultado = CC_OTP.comprobarCaracteristicasCliente(caso.Id);
-                System.assertEquals('restriccion_total', resultado, '');
+            System.assertEquals('restriccion_total', resultado, '');
             Test.stopTest();
         }
     }
@@ -1123,6 +1151,85 @@ public with sharing class CC_OTP_Test {
                 String resultado = CC_OTP.comprobarCaracteristicasCliente(caso.Id);
                 System.assertEquals('autenticar', resultado, '');
             Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void testComprobarIntentosClienteBloqueadoDenied() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        Account cliente = [SELECT Id FROM Account WHERE CC_NumPerso__c = '206' LIMIT 1];
+        Case caso = [SELECT Id, Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 5' LIMIT 1];
+        
+        
+        System.runAs(supervisor) {
+            Test.startTest();
+            
+            CC_Comunicaciones__c comunicacionDenegada =  new CC_Comunicaciones__c();
+            comunicacionDenegada.CC_Case__c = caso.Id;
+            comunicacionDenegada.CC_Estado__c = 'Denegado';
+            comunicacionDenegada.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Comunicaciones__c', 'CC_OTPSMS');
+            comunicacionDenegada.CC_Nivel__c = 'Cliente Digital';
+            comunicacionDenegada.CC_Cliente__c = cliente.Id;
+            comunicacionDenegada.CC_Ticket__c = '123456789';
+            comunicacionDenegada.CC_Mensaje_Error__c = 'ERROR';
+            comunicacionDenegada.CC_Fecha_Envio__c = CBK_UtilsDate.nowDT().addDays(-4);
+            insert comunicacionDenegada;
+            String resultado = CC_OTP.comprobarIntentos(caso.Id, cliente.Id);
+            
+            Test.stopTest();
+            
+            
+            System.assertEquals('CLIENTE_BLOQUEADO_DENIED', resultado, 'El cliente debería estar bloqueado por estado Denegado');
+            
+            
+            Id recordTypeIdBloqueo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Comunicaciones__c', 'CC_Bloqueo');
+            List<CC_Comunicaciones__c> comunicacionesBloqueo = [SELECT Id, CC_Detalle__c, CC_Estado__c, RecordTypeId 
+                                                                FROM CC_Comunicaciones__c 
+                                                                WHERE CC_Cliente__c = :cliente.Id 
+                                                                AND RecordTypeId = :recordTypeIdBloqueo];
+            
+            System.assertEquals('CLIENTE_BLOQUEADO_DENIED', comunicacionesBloqueo[0].CC_Detalle__c, 'El detalle del bloqueo debería ser correcto');
+            System.assertEquals('Cerrado', comunicacionesBloqueo[0].CC_Estado__c, 'El estado del bloqueo debería ser Cerrado');
+        }
+    }
+
+    @isTest
+    public static void testComprobarIntentosClienteBloqueadoRechazado() {
+        User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+        Account cliente = [SELECT Id FROM Account WHERE CC_NumPerso__c = '206' LIMIT 1];
+        Case caso = [SELECT Id, Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
+        
+        
+        System.runAs(supervisor) {
+            Test.startTest();
+            
+            CC_Comunicaciones__c comunicacionRechazada =  new CC_Comunicaciones__c();
+            comunicacionRechazada.CC_Case__c = caso.Id;
+            comunicacionRechazada.CC_Estado__c = 'Rechazado';
+            comunicacionRechazada.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Comunicaciones__c', 'CC_OTPSMS');
+            comunicacionRechazada.CC_Nivel__c = 'Cliente Digital';
+            comunicacionRechazada.CC_Cliente__c = cliente.Id;
+            comunicacionRechazada.CC_Ticket__c = '123456789';
+            comunicacionRechazada.CC_Mensaje_Error__c = 'ERROR';
+            comunicacionRechazada.CC_Fecha_Envio__c = CBK_UtilsDate.nowDT().addDays(-3);
+            insert comunicacionRechazada;
+            
+            String resultado = CC_OTP.comprobarIntentos(caso.Id, cliente.Id);
+            
+            Test.stopTest();
+            
+            
+            System.assertEquals('CLIENTE_BLOQUEADO_REJECTED', resultado, 'El cliente debería estar bloqueado por estado Rechazado');
+            
+            
+            Id recordTypeIdBloqueo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Comunicaciones__c', 'CC_Bloqueo');
+            List<CC_Comunicaciones__c> comunicacionesBloqueo = [SELECT Id, CC_Detalle__c, CC_Estado__c, RecordTypeId 
+                                                                FROM CC_Comunicaciones__c 
+                                                                WHERE CC_Cliente__c = :cliente.Id 
+                                                                AND RecordTypeId = :recordTypeIdBloqueo];
+   
+            System.assertEquals('CLIENTE_BLOQUEADO_REJECTED', comunicacionesBloqueo[0].CC_Detalle__c, 'El detalle del bloqueo debería ser correcto');
+            System.assertEquals('Cerrado', comunicacionesBloqueo[0].CC_Estado__c, 'El estado del bloqueo debería ser Cerrado');
         }
     }
 

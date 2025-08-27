@@ -66,14 +66,17 @@ global with sharing class HDT_WS_AltaLlamada_Desborde extends CBK_HttpServiceInt
 		} else if (!formatoFechaValido(input.fechaInicio) || !formatoFechaValido(input.fechaFin)) {
 			throw new DefaultException('Error: El formato válido para las fechas es "yyyy-MM-dd HH:mm:ss"');
 		} else {
-			List<CC_Servicio_Genesys__c> servicioGenesys = [SELECT Id FROM CC_Servicio_Genesys__c WHERE CBK_Negocio__c = 'HDT'
-															AND CC_Codigo__c = :input.servicio LIMIT 1];
+			List<CC_Servicio_Genesys__c> servicioGenesys = [SELECT Id, CBK_Negocio__c, Name, CC_Canal_Procedencia__c, CC_Canal_de_Entrada__c, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c
+															 FROM CC_Servicio_Genesys__c WHERE CBK_Negocio__c IN ( 'HDT','CC')
+															AND CC_Codigo__c = :input.servicio AND CC_Tipo_Cliente__c = 'Empleado' LIMIT 1];
 			if (servicioGenesys.isEmpty()) {
 				throw new DefaultException('Error: servicio no registrado en Salesforce');
 			} else {
 				CC_Llamada__c llamadaDesborde = new CC_Llamada__c();
+				String proyecto = servicioGenesys[0].CBK_Negocio__c;
+				String recordTypeId = proyecto=='HDT'? Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId() : Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 				try {
-					llamadaDesborde.RecordTypeId = Schema.SObjectType.CC_Llamada__c.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
+					llamadaDesborde.RecordTypeId = recordTypeId;
 					llamadaDesborde.KIN_Genesys_Cloud__c = true;
 					llamadaDesborde.KIN_Llamada_Origen__c = true;
 					//llamadaDesborde.KIN_Genesys_Cloud_URL_Grabacion__c = urlGrabacion(input.connId);
@@ -98,8 +101,12 @@ global with sharing class HDT_WS_AltaLlamada_Desborde extends CBK_HttpServiceInt
 					llamadaDesborde.CC_Perfil__c = input.perfil;
 					llamadaDesborde.CC_Fecha_Inicio__c = Datetime.valueOf(input.fechaInicio.normalizeSpace());
 					llamadaDesborde.CC_Fecha_Fin__c = Datetime.valueOf(input.fechaFin.normalizeSpace());
-
-					identificarPorTelefono(llamadaDesborde, input.ani);
+					if(proyecto == 'HDT') {
+						identificarPorTelefono(llamadaDesborde, input.ani);
+					}else {
+						identificarPorTelefonoCC(llamadaDesborde, input.ani);
+					}
+					
 					/*
 					if (String.isEmpty(input.casoId) && !String.isEmpty(llamadaDesborde.CC_Id_Cognitivo__c)) {
 						//Buscamos el caso correspondiente al Id de cognitivo. Si no lo encuentra, lo crea con la información de la llamada y el chat obtenido de cognitivo
@@ -111,8 +118,12 @@ global with sharing class HDT_WS_AltaLlamada_Desborde extends CBK_HttpServiceInt
 					//Moficaciones para la US : US1133185 : Creación de caso en la API de agente de desborde 
 					// Obtener el Id de la cola por nombre
 					//Creamos el caso de la llamada entrante de desborde
+					if(proyecto == 'HDT') {
+						HDT_Llamada_GC.crearVincularCasoDesborde(llamadaDesborde);
+					}else{
+						CC_Llamada_GC.crearVincularCasoDesborde(llamadaDesborde, servicioGenesys[0]);
+					}
 					
-					HDT_Llamada_GC.crearVincularCasoDesborde(llamadaDesborde);
 					/*
 					if (caso != null) {
 						insert caso;
@@ -160,6 +171,24 @@ global with sharing class HDT_WS_AltaLlamada_Desborde extends CBK_HttpServiceInt
                 }
 
             }
+		}
+	}
+
+	private static void identificarPorTelefonoCC(CC_Llamada__c llamada, String telefono) {    
+        
+		if (!String.isEmpty(telefono)) {
+            telefono = telefono.replace('+3400', '');
+            telefono = telefono.replace('+34', '');
+            
+			List<CC_Canal_Com__c> telefonos = [SELECT CC_ContactoId__c, CC_ContactoId__r.AccountId FROM CC_Canal_Com__c
+												WHERE CC_Telefono__c =:telefono AND RecordType.DeveloperName = 'CC_Telefono'
+												AND CC_ContactoId__r.RecordType.DeveloperName = 'CC_Empleado' LIMIT 2];
+			if(!telefonos.isEmpty()) {
+				if (telefonos.size() == 1 ) {
+					llamada.CC_Cuenta__c = telefonos[0].CC_ContactoId__r.AccountId;
+					llamada.CC_Contacto__c = telefonos[0].CC_ContactoId__c;
+				}
+			}
 		}
 	}
 

@@ -11,11 +11,12 @@ public with sharing class CC_Gestion_Derivar_Mecanismo_Firma {
             List<Task> nuevasTareas = new List<Task>();
             List<EmailMessage> nuevosEmailMessages = new List<EmailMessage>();
             Boolean circuitoCasoNuevo = CC_Settings__c.getValues('CC_MecanismoFirmaCircuitoCaso').CC_Activa__c;
+            String cola = CC_Settings__c.getValues('CC_MecanismoFirmaCola').CC_Configuracion_1__c;
                 try{
                     if(circuitoCasoNuevo){
                         nuevoCaso = casoOrigen.clone(false, true);
                         nuevoCaso.CC_CasoRelacionado__c = casoOrigen.Id;
-                        nuevoCaso.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'Videollamada_Enrollment_Caixabank_Sign' LIMIT 1].Id;
+                        nuevoCaso.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = :cola LIMIT 1].Id;
                         nuevoCaso.Subject = 'Mecanismo de firma';
 
                         insert nuevoCaso;
@@ -67,7 +68,7 @@ public with sharing class CC_Gestion_Derivar_Mecanismo_Firma {
                     }else{
                         CC_Activity.crearActividadMecanismoFirma(casoOrigen, casoOrigen.OwnerId);                    
 
-                        casoOrigen.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'Videollamada_Enrollment_Caixabank_Sign' LIMIT 1].Id;
+                        casoOrigen.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = :cola LIMIT 1].Id;
                         List<CBK_Case_Extension__c> caseExtension = [ SELECT Id, CC_MecanismoFirma__c FROM CBK_Case_Extension__c WHERE Case_Id__c = :casoOrigen.Id LIMIT 1];
                         if (!caseExtension.isEmpty()) {
                             // Reutilizar y actualizar

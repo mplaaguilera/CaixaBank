@@ -813,6 +813,25 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             );
             insertCase.add(casoCBP);
 
+            Case casoColectivoVulnerable = new Case(
+                Description = 'casoColectivoVulnerable',
+                Subject = 'casoColectivoVulnerable',
+                Origin = 'Email',
+                Status = 'Activo',
+                accountId = cuentaImagin.Id,
+                CC_Idioma__c = 'es',
+                CC_MCC_Tematica__c = tematica.Id, 
+                CC_MCC_ProdServ__c = producto.Id,
+                CC_MCC_Motivo__c = motivoCBP.Id,
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Código de Buenas Prácticas',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                RecordTypeId = recordTypeCaso
+            );
+            insertCase.add(casoColectivoVulnerable);
+
             insert insertCase;
             
             List<CC_Settings__c > listCustomSetting= new List<CC_Settings__c >();
@@ -1431,6 +1450,24 @@ public with sharing class CC_Gestion_Derivar_Tarea_Test {
             Case casoCBP = [SELECT Id, Account.AV_EAPGestor__c from Case where Subject = 'casoCBP' LIMIT 1];
             //Caso gestor no imagin
             CC_Operativa_Oficina_Controller.crearTarea(casoCBP.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
+            Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
+            System.assert(!tarea.isEmpty(), true);
+        }
+        Test.stopTest();
+    }
+
+        @isTest
+    public static void crearTareaTestColectivoVulnerable() {
+        Test.startTest();
+        System.runAs(CC_TestDataFactory.getUserAdmin()) {
+            String asunto = 'Prueba';
+            String fechaActividad = date.today().toString();
+            String comentarios = 'Prueba';
+            Contact contacto = [SELECT Id from Contact where CC_Matricula__c = 'U0124112' LIMIT 1];
+            Account centro = [SELECT Id from Account where CC_Numero_Oficina_Empresa__c = '000-14141' LIMIT 1];
+            Case casoColectivo = [SELECT Id, Account.AV_EAPGestor__c from Case where Subject = 'casoColectivoVulnerable' LIMIT 1];
+            //Caso gestor no imagin
+            CC_Operativa_Oficina_Controller.crearTarea(casoColectivo.Id.toString() , asunto, fechaActividad, comentarios, null, centro.Id, true, true, contacto, null);
             Task[] tarea = [SELECT Id FROM Task WHERE Subject = 'Prueba'];
             System.assert(!tarea.isEmpty(), true);
         }

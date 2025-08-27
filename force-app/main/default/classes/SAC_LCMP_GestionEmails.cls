@@ -125,14 +125,6 @@ public without sharing class SAC_LCMP_GestionEmails {
     */ 
     @AuraEnabled
     public static void enviarEmail(Id id, String para, String copia, String copiaOculta, String cuerpo, String asunto, String idAdjuntos, String tipoEnvio){
-        System.System.debug('Kevin id: ' + id);
-        System.System.debug('Kevin para: ' + para);
-        System.System.debug('Kevin copia: ' + copia);
-        System.System.debug('Kevin copiaoculta: ' + copiaOculta);
-        System.System.debug('Kevin cuerpo: ' + cuerpo);
-        System.System.debug('Kevin asunto: ' + asunto);
-        System.System.debug('Kevin idadjuntos ' + idAdjuntos);
-        System.System.debug('Kevin tipoEnvio ' + tipoEnvio);
         Schema.SObjectType expectedCase = Schema.Case.getSObjectType();
         Schema.SObjectType expectedInteraccion = Schema.SAC_Interaccion__c.getSObjectType();
         Schema.SObjectType expectedAccion = Schema.SAC_Accion__c.getSObjectType();
@@ -167,8 +159,8 @@ public without sharing class SAC_LCMP_GestionEmails {
                                             WHERE SAC_ReclamantePrincipal__c = true AND SAC_Case__c = :id 
                                             LIMIT 1];
 
-                    caso.CC_Idioma__c = reclamantePrincipal.SAC_Account__r.CC_Idioma__pc;
-                    caso.CC_Oficina__c = reclamantePrincipal.SAC_Account__r.AV_OfficeManager__c;         
+                    //caso.CC_Idioma__c = reclamantePrincipal.SAC_Account__r.CC_Idioma__pc;
+                    //caso.CC_Oficina__c = reclamantePrincipal.SAC_Account__r.AV_OfficeManager__c;         
                     caso.AccountId = reclamantePrincipal.SAC_Account__c;
                     caso.ContactId = reclamantePrincipal.SAC_Contact__c;
 

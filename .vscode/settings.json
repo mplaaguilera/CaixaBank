@@ -103,6 +103,12 @@
 			"description": "",
 			"type": "link",
 			"groupId": "lightning-design-system"
+		},
+		{
+			"name": "Repositori de Github",
+			"path": "https://github.com/mplaaguilera/CaixaBank",
+			"description": "",
+			"type": "link"
 		}
 	],
 	"salesforce.einsteinForDevelopers.enableAutocompletionsByFileType": {
@@ -170,5 +176,5 @@
 	"github.copilot.chat.reviewSelection.instructions": [],
 	"github.copilot.chat.codeGeneration.useInstructionFiles": false,
 	"github.copilot.chat.commitMessageGeneration.instructions": [],
-	"salesforcedx-vscode-apex.java.home": "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home"
+	"salesforcedx-vscode-apex.java.home": "/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home"
 }

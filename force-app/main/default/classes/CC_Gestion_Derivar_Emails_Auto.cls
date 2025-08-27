@@ -28,7 +28,6 @@ public with sharing class CC_Gestion_Derivar_Emails_Auto {
         }
         // Eliminar lógica de grupo colaborador en BCC
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(plantilla.Id, caso.ContactId, caso.Id);
 
         mail.setToAddresses(toAddress);
         if (bccAddress != null && !bccAddress.isEmpty()) mail.setBccAddresses(bccAddress);
@@ -38,6 +37,12 @@ public with sharing class CC_Gestion_Derivar_Emails_Auto {
         caso.CC_Referencia_Correo_Saliente__c = referencia;
         caso.CC_Grupo_Colaborador__c = grupoColaborador;
 
+        Messaging.SingleEmailMessage renderStored = Messaging.renderStoredEmailTemplate(plantilla.Id, caso.ContactId, caso.Id);
+
+        // Sincronizar el HTML renderizado con la plantilla en memoria para que inicializarCuerpoCorreo
+        // añada la referencia sobre el HTML final (con merges ya aplicados)
+        plantilla.HtmlValue = renderStored.getHtmlBody();
+
         Map<String, String> datosPlantilla = CC_MetodosUtiles.inicializarCuerpoCorreo(plantilla, caso);
 
         caso.CC_Ultima_Operativa_Correo__c = datosPlantilla.get('operativa');
@@ -46,12 +51,12 @@ public with sharing class CC_Gestion_Derivar_Emails_Auto {
 
         mail.setSaveAsActivity(true);
         mail.setTemplateId(plantilla.Id);
-        mail.setHtmlBody(renderStored.getHtmlBody());
+        mail.setHtmlBody(plantilla.HtmlValue);
         mail.setSubject(renderStored.getSubject());
         mail.setWhatId(caso.Id);
         mail.setTargetObjectId(caso.ContactId);
         mail.setTreatTargetObjectAsRecipient(false);
-        String htmlMail = asignacionPlantillas(renderStored.getHtmlBody(), parametrizacionesMensaje);
+        String htmlMail = asignacionPlantillas(plantilla.HtmlValue, parametrizacionesMensaje);
         if(String.isNotBlank(htmlMail)){
             mail.setHtmlBody(htmlMail);
         }
@@ -80,20 +85,30 @@ public with sharing class CC_Gestion_Derivar_Emails_Auto {
         }
     }
 
-    public static List<String> sendEmailGrupoCol(List<String> grupoColaborador){
+    public static Map<String, List<String>> sendEmailGrupoCol(List<String> grupoColaborador){
         if(grupoColaborador == null || grupoColaborador.isEmpty()){
             throw new AuraHandledException('Error en la búsqueda del grupo colaborador asociado');
         }
         try{
-            List<CC_Grupo_Colaborador_Contact__c> colaboradores = [SELECT Id, CC_Nombre__c, CC_Email__c FROM CC_Grupo_Colaborador_Contact__c 
+            List<CC_Grupo_Colaborador_Contact__c> colaboradores = [SELECT Id, CC_Nombre__c, CC_Email__c, CC_Para_CC__c FROM CC_Grupo_Colaborador_Contact__c 
                 WHERE CC_Grupo_Colaborador__r.Name IN :grupoColaborador];
             List<String> emails = new List<String>();
+            List<String> emailsCC = new List<String>();
+            Map<String, List<String>> emailsMap = new Map<String, List<String>>();
             for(CC_Grupo_Colaborador_Contact__c colaborador : colaboradores){
                 if(!String.isBlank(colaborador.CC_Email__c)){
-                    emails.add(colaborador.CC_Email__c);
+                    if(colaborador.CC_Para_CC__c == 'CC'){
+                        emailsCC.add(colaborador.CC_Email__c);
+                    } else if (colaborador.CC_Para_CC__c == 'Para'){
+                        emails.add(colaborador.CC_Email__c);
+                    }
                 }
             }
-            return emails;
+            
+            emailsMap.put('Para', emails);
+            emailsMap.put('CC', emailsCC);
+
+            return emailsMap;
         } catch (Exception e){
             throw new AuraHandledException('Error en la búsqueda del grupo colaborador asociado: ' + e.getMessage());
         }

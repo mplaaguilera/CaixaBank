@@ -686,6 +686,25 @@ public class SEG_Case_Operativas_Controller_2_Test {
         Case caso2 = [SELECT id,SEG_Grupo__c FROM Case WHERE Subject = 'test 1' LIMIT 1];
         System.assertEquals(caso.SEG_Grupo__c, caso2.SEG_Grupo__c, 'El grupo no ha cambiado');
     }
+    
+    @isTest
+    public static void autoAsignarGrupo2ConCentroTest(){
+        User usuarioTest = [SELECT Id FROM User WHERE Username = 'testSEGBI@acme.com' LIMIT 1];
+        CC_Grupo_Colaborador__c grupoUpdate = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'Grupo Colaborador Externo' LIMIT 1];
+        grupoUpdate.SEG_TipoColaboradorWS__c = 'VALIJA';
+        update grupoUpdate;
+
+        Case caso = [SELECT id, SEG_Grupo__c FROM Case WHERE Subject = 'test 1' LIMIT 1];
+        caso.SEG_Numero_centro__c = '0008';
+        update caso;
+        Test.startTest();
+        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+            SEG_Case_Operativas_Controller.autoAsignarGrupo(caso.id);
+        }
+        Test.stopTest();
+        Case caso2 = [SELECT id,SEG_Grupo__c FROM Case WHERE Subject = 'test 1' LIMIT 1];
+        System.assertEquals(caso.SEG_Grupo__c, caso2.SEG_Grupo__c, 'El grupo no ha cambiado');
+    }
 
     @isTest
     public static void autoasignarGrupoPaqueteriaTest(){

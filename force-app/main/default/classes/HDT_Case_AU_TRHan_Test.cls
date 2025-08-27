@@ -705,7 +705,7 @@ public class HDT_Case_AU_TRHan_Test {
         
         Test.stopTest();
         Integer taskCount = [SELECT COUNT() FROM Task WHERE WhatId = :caso1.Id];
-        System.assertEquals(0, taskCount);
+        System.assertEquals(2, taskCount);
 
 
         //System.assertEquals(0, [SELECT Id FROM Task WHERE WhatId = :caso1.Id].size());

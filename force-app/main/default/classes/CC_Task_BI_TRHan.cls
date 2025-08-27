@@ -59,6 +59,8 @@ public class CC_Task_BI_TRHan extends CC_TriggerHandlerBase {
         }
         //Funciones Task con RT CC_Task
         if (!listCCTask.isEmpty()) {
+            //Metodo para la US983197
+            listCCTask = CC_MetodosUtiles.volcarValorTipo(listCCTask);
             completarTask(listCCTask); //Si la task que se esta insertando lo está haciendo con type Actividad manual y subject Otros, debe pasar su status a Completed.
             tareasNoTiempo(lisTCCTask);
         }

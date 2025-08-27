@@ -479,100 +479,6 @@ public with sharing class CC_Activity {
 		}
 	}
 	//Cajeros
-
-	//KPI
-	public static void rellenarCalculoKPITareas(Case caso){
-		// if(caso != null){
-		// 	//Recogemos el ambito que necesitamos dependiendo de si es imagin o no
-		// 	String ambitoActivo = caso.Account.AV_IndicadoresClientes__c != null && caso.Account.AV_IndicadoresClientes__c.contains('28') ? caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c : caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;
-		// 	Case casoRell = rellenarKPI(caso, ambitoActivo);
-		// 	casoRell.SAC_EnvioParcial__c = false;
-		// 	update casoRell;
-		// } else {
-		// 	CC_CustomException.throwCustomException('No se encuentra el caso');
-		// }
-	}
-
-	//KPI
-	@AuraEnabled
-	public static void rellenarCalculoKPITareas(Id recordId){
-		// if(recordId != null){
-		// 	//Recogemos el caso con sus ambitos
-		// 	List<Case> caso = [SELECT id, OwnerId, Account.AV_IndicadoresClientes__c, CC_Motivo_Derivacion__c , ContactId, 
-		// 						CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, SAC_EnvioParcial__c 
-		// 						FROM Case 
-		// 						WHERE Id = :recordId 
-		// 						LIMIT 1];
-		// 	if(!caso.isEmpty()){
-		// 		//Recogemos el ambito que necesitamos dependiendo de si es imagin o no
-		// 		String ambitoActivo = caso[0].Account.AV_IndicadoresClientes__c != null && caso[0].Account.AV_IndicadoresClientes__c.contains('28') ? caso[0].CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c : caso[0].CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;
-		// 		Case casoRell = rellenarKPI(caso[0], ambitoActivo);
-		// 		casoRell.SAC_EnvioParcial__c = false;
-		// 		update casoRell;
-		// 	} else {
-		// 		throw new AuraHandledException('No se encuentra el caso');
-		// 	}
-		// } else {
-		// 	throw new AuraHandledException('El recordId del caso no puede ser nulo');
-		// }
-	}
-
-	public static void rellenarKPI(Case caso, String ambitoActivo){
-		// String resultadoTareas = '';
-		// //Listas de claves, valores y Mapa para parametrizarlos
-		// List<String> claves = new List<String>();
-		// List<String> valoresSplit = new List<String>();
-		// Map <String, String> ambitosResultado = new Map <String, String>();
-		// //Recogemos los valores de ámbito nulo y los del ambito activo del MCC
-		// List<CC_Lista_Valores__c> valores = [SELECT Id, Name, CC_Valor__c, CC_Valor2__c, CC_Lista__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Ámbitos cálculo KPI' AND (Name =:ambitoActivo OR Name = 'Nulo/Ventas/Oficina')];
-		// //recoge las claves y los valores en las listas
-		// if (!valores.isEmpty()) {
-		// 	for(CC_Lista_Valores__c registro : valores){
-		// 		claves.addAll(registro.CC_Valor__c != null ? registro.CC_Valor__c.split(';') : new List<String>());
-		// 		valoresSplit.addAll(registro.CC_Valor2__c != null ? registro.CC_Valor2__c.split(';') : new List<String>());
-		// 	}
-		// 	if(claves.size() == valoresSplit.size()){
-		// 		for (Integer i = 0; i < claves.size(); i++) {
-		// 			//Mapea cada clave con su valor
-		// 			ambitosResultado.put(claves[i].trim(), valoresSplit[i].trim());
-		// 		}
-		// 		//buscamos las tareas y recogemos la última de ellas y se asigna el valor, si no se ha encontrado se asigna no encontrado
-		// 		resultadoTareas = buscadorTareas(new List<String>(ambitosResultado.keySet()), caso.Id);
-		// 		if(resultadoTareas != 'no encontrado'){
-		// 			caso.CC_Motivo_Derivacion__c = ambitosResultado.get(resultadoTareas);
-		// 		}
-		// 	} else {
-		// 		throw new AuraHandledException('Los valores de la LOV no coinciden con los resultados');
-		// 	}
-		// }
-		// return caso;
-	}
-
-	public static void buscadorTareas(List<String> tipo, Id recordId){
-		// List<Task> tareas = [SELECT Id, Subject, Status, Type FROM Task WHERE WhatId = :recordId AND (Type IN :tipo OR Subject IN :tipo) AND createdDate = TODAY  Order by CreatedDate DESC LIMIT 1];
-		// if(!tareas.isEmpty()){
-		// 	List<CBK_Activity_Extension__c> extension = [SELECT Id, CC_Tarea_Derivar__c FROM CBK_Activity_Extension__c WHERE AV_ActivityId__c = :tareas[0].Id LIMIT 1];
-		// 	if (extension.isEmpty()){
-		// 		CBK_Activity_Extension__c ex = new CBK_Activity_Extension__c(
-		// 			AV_ActivityId__c = tareas[0].Id,
-		// 			CC_Tarea_Derivar__c = CBK_UtilsDate.todaySYS()
-		// 		);
-		// 		extension.add(ex);
-		// 	} else {
-		// 		if (extension[0].CC_Tarea_Derivar__c != null){
-		// 			return 'no encontrado';
-		// 		} else {
-		// 			extension[0].CC_Tarea_Derivar__c = CBK_UtilsDate.todaySYS();
-		// 		}
-		// 	}
-		// 	upsert extension;
-		// 	return tareas[0].Type;
-		// } else {
-		// 	return 'no encontrado';
-		// }
-	}
-
-	//KPI 
 	
 	//Mecanismo firma
 	public static void crearActividadMecanismoFirma(Case caso, Id ownerId) {
@@ -688,7 +594,7 @@ public with sharing class CC_Activity {
 
 		List<Task> tareas = new List<Task>();
 		String urlUnblu  = CC_Settings__c.getValues('CC_Url_Unblu').CC_Configuracion_1__c;
-		List<Case> casosCrearTarea = [SELECT id, OwnerId, unblusuite__Conversation_Id__c
+		List<Case> casosCrearTarea = [SELECT id, OwnerId,Origin, unblusuite__Conversation_Id__c
 		FROM Case 
 		WHERE Id IN :casos];
 		
@@ -721,12 +627,21 @@ public with sharing class CC_Activity {
 					CBK_Activity_Extension__c extension = new CBK_Activity_Extension__c();
 					extension.AV_ActivityId__c = tarea.Id;
 					
-					// Obtener el caso relacionado usando el mapa
+					// SI es de tipo Chat obtiene el identificador de objeto LiveChatTranscript
+					if(casosMap.get(tarea.WhatId).Origin == 'Chat'){
+						if(tarea.WhatId != null && casosMap.containsKey(tarea.WhatId)){
+							List<LiveChatTranscript> liveChats = [SELECT Id, unblusuite__Conversation_Id__c FROM LiveChatTranscript WHERE CaseId = :tarea.WhatId and unblusuite__Conversation_Id__c != null];
+							if(!liveChats.isEmpty()){
+								extension.CC_Grabacion_Unblu__c = urlUnblu + liveChats[0].unblusuite__Conversation_Id__c;
+							}
+						}
+					}else{ // Si no es de tipo Chat obtiene el identificador de objeto Case
 					if(tarea.WhatId != null && casosMap.containsKey(tarea.WhatId)){
 						Case casoRelacionado = casosMap.get(tarea.WhatId);
 						if(casoRelacionado.unblusuite__Conversation_Id__c != null){
 							extension.CC_Grabacion_Unblu__c = urlUnblu + casoRelacionado.unblusuite__Conversation_Id__c;
 						}
+					}
 					}
 					
 					extensiones.add(extension);
@@ -770,12 +685,21 @@ public with sharing class CC_Activity {
 					CBK_Activity_Extension__c extension = new CBK_Activity_Extension__c();
 					extension.AV_ActivityId__c = tarea.Id;
 					
-					// Obtener el caso relacionado usando el mapa
+					// Si es de tipo Chat obtiene el identificador de objeto LiveChatTranscript
+					if(casosMap.get(tarea.WhatId).Origin == 'Chat'){
+						if(tarea.WhatId != null && casosMap.containsKey(tarea.WhatId)){
+							List<LiveChatTranscript> liveChats = [SELECT Id, unblusuite__Conversation_Id__c FROM LiveChatTranscript WHERE CaseId = :tarea.WhatId and unblusuite__Conversation_Id__c != null];
+							if(!liveChats.isEmpty()){
+								extension.CC_Grabacion_Unblu__c = urlUnblu + liveChats[0].unblusuite__Conversation_Id__c;
+							}
+						}
+					}else{ // Si no es de tipo Chat obtiene el identificador de objeto Case
 					if(tarea.WhatId != null && casosMap.containsKey(tarea.WhatId)){
 						Case casoRelacionado = casosMap.get(tarea.WhatId);
 						if(casoRelacionado.unblusuite__Conversation_Id__c != null){
 							extension.CC_Grabacion_Unblu__c = urlUnblu + casoRelacionado.unblusuite__Conversation_Id__c;
 						}
+					}
 					}
 					
 					extensiones.add(extension);
@@ -787,4 +711,85 @@ public with sharing class CC_Activity {
 		}
 	}
 
+	@AuraEnabled
+	public static void crearActividadGestionCitas(Id recordId) {
+		Case caso = [SELECT OwnerId FROM Case WHERE Id = :recordId LIMIT 1];
+		List<Task> tareas = new List<Task>();
+		
+		if (caso != null) {
+			Task tarea = new Task();
+			Map<String, Object> fields = new Map<String, Object>{
+				'Subject' => 'Gestión de citas', 
+				'Status' => 'Completed',
+				'Priority' => 'Normal',
+				'AV_OrigenAct__c' => 'Contact Center',
+				'WhatId' => caso.Id,
+				'OwnerId' => caso.OwnerId,			
+				'Type' => 'Gestión de citas',
+				'AV_Case__c' => caso.Id
+			};
+			tarea = getActividad(tarea,fields);	
+			tareas.add(tarea);
+		}
+		if(!tareas.isEmpty()){
+			insert tareas;
+		}
+	}
+	
+
+	//Llamada transferida
+	/*
+	@AuraEnabled
+	public static void crearActividadTransferirLLamadaFraude(Id recordId){
+		Case caso = [SELECT id, OwnerId, ContactId
+			FROM Case 
+			WHERE Id = :recordId 
+			LIMIT 1];
+		List<Task> tareaExistente = [SELECT Id FROM Task WHERE WhatId = :caso.Id AND Subject = 'Llamada transferida online a Fraude' LIMIT 1];
+		if (tareaExistente.isEmpty()) {
+			Task tarea = new Task();
+			Map<String, Object> fields = new Map<String, Object>{
+				'Subject' => 'Llamada transferida online a Fraude', 
+				'Status' => 'Completed',
+				'Priority' => 'Normal',
+				'AV_OrigenAct__c' => 'Contact Center',
+				'WhatId' => caso.Id,
+				'OwnerId' => caso.OwnerId,			
+				'WhoId' => caso.ContactId,
+				'Type' => 'Llamada transferida online a Fraude',
+				'Description' => 'Llamada transferida online a Fraude',
+				'AV_Case__c' => caso.Id
+			};		
+			tarea = getActividad(tarea,fields);	
+			insert tarea;
+		}
+	}
+
+	@AuraEnabled
+	public static void crearActividadTransferirLLamadaICP(Id recordId){
+		Case caso = [SELECT id, OwnerId, ContactId
+			FROM Case 
+			WHERE Id = :recordId 
+			LIMIT 1];
+		List<Task> tareaExistente = [SELECT Id FROM Task WHERE WhatId = :caso.Id AND Subject = 'Llamada transferida online a ICP' LIMIT 1];
+		if (tareaExistente.isEmpty()) {
+			Task tarea = new Task();
+			Map<String, Object> fields = new Map<String, Object>{
+				'Subject' => 'Llamada transferida online a ICP', 
+				'Status' => 'Completed',
+				'Priority' => 'Normal',
+				'AV_OrigenAct__c' => 'Contact Center',
+				'WhatId' => caso.Id,
+				'OwnerId' => caso.OwnerId,			
+				'WhoId' => caso.ContactId,
+				'Type' => 'Llamada transferida online a ICP',
+				'Description' => 'Llamada transferida online a ICP',
+				'AV_Case__c' => caso.Id
+			};		
+			tarea = getActividad(tarea,fields);	
+			insert tarea;
+		}
+	}
+	*/
+	//Llamada transferida
 }

@@ -2,7 +2,7 @@ public without sharing class CC_CaseTriggerHelperNoSharing {
     public static void creacionCasoAI(String jsonCasos) {
         List<Case> lstCasos = (List<Case>)JSON.deserialize(jsonCasos, List<Case>.class);
         List<Case> lstCasosUpdt = new List<Case>();
-        for (Case caso : lstCasos) {
+        for (Case caso : lstCasos) {          
             if (caso.CC_Admin__c) {
                 caso.CC_Admin__c = false;
                 lstCasosUpdt.add(caso);
@@ -10,7 +10,7 @@ public without sharing class CC_CaseTriggerHelperNoSharing {
         }
 
         if (!lstCasosUpdt.isEmpty()) {
-            update lstCasosUpdt;
+            update lstCasosUpdt;          
         }
     }
 

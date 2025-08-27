@@ -41,6 +41,8 @@ public with sharing class KIN_Genesys_Cloud_Eventos_Controller {
 			return CSBD_Llamada_GC.iniciarLlamadaSalienteClickToDial(input);
 		}else if (prefijoRecordType == 'HDT') { 
 			return HDT_Llamada_GC.iniciarLlamadaSalienteClickToDial(input);
+		} else if (prefijoRecordType == 'CC') { 
+			return CC_Llamada_GC.iniciarLlamadaSalienteClickToDial(input);
 		}else {
 			return null;
 		}

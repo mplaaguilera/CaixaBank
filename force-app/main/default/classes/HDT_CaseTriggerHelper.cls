@@ -2142,4 +2142,46 @@ public with sharing class HDT_CaseTriggerHelper {
 
     }
 
+    public static void devolucionCasosHDTCCO(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
+        Id rtEmpleadoCCO = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id rtEmpleadoHDT = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();        
+        
+        Map<Id, String> casosRelacionadosParaReabrir = new Map<Id, String>();
+        
+        for (Case caso : lstCasos) {
+            if(caso.RecordTypeId == rtEmpleadoHDT //Casos de empleado
+                && caso.CC_Canal_Procedencia__c == 'CCO' //Canal de procedencia CCO
+                && (caso.CC_CasoRelacionado__c != null //Caso relacionado rellenado
+                    )) {  // && caso.CC_CasoRelacionado__r.recordTypeId == rtEmpleadoHDT //Caso relacionado de empleado HDT
+                if((caso.Status == 'Rechazado' && mapOldObj.get(caso.Id).Status != caso.Status) //Caso hijo rechazado (CCO)
+                //&& caso.CC_CasoRelacionado__r.Status == 'Cerrado' //Caso padre cerrado (HDT)
+                ){
+                    casosRelacionadosParaReabrir.put(caso.CC_CasoRelacionado__c, caso.Comments);
+                }
+            }
+        }
+        
+        if(!casosRelacionadosParaReabrir.isEmpty()){
+            reabrirCasosRelacionadosFuture(casosRelacionadosParaReabrir);
+        }
+    }
+    
+    public static void reabrirCasosRelacionadosFuture(Map<Id, String> casosRelacionadosIds) {
+        try {
+            Map<String, Map<String, String>> casosParaActualizar = new Map<String, Map<String, String>>();
+            Integer contador = 1;
+            for(Id casoId : casosRelacionadosIds.keySet()) {
+                casosParaActualizar.put('caso' + contador, new Map<String, String>{
+                    'casoId' => String.valueOf(casoId), 
+                    'motivo' => casosRelacionadosIds.get(casoId)});
+                contador++;
+            }
+
+            if(!casosParaActualizar.isEmpty()) {
+                CC_CaseTransfer.devolverCasoHDTCCO(casosParaActualizar, 'HDT');
+            }
+        } catch(Exception e) {
+            CBK_Log.error('Error en reabrirCasosRelacionadosFuture: ' + e.getMessage());
+        }
+    }
 }

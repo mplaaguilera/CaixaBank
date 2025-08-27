@@ -9,7 +9,7 @@ global with sharing class SEG_wsMockTrasladoValijaKO implements HttpCalloutMock 
         HttpResponse res = new HttpResponse();
         res.setHeader('Content-Type', 'application/json');
         res.setBody(mockString);
-        res.setStatusCode(200);
+        res.setStatusCode(400);
         return res;
     }
 }

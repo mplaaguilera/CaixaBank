@@ -158,7 +158,9 @@ public without sharing class SAC_Case_BI_TRHan extends CC_TriggerHandlerBase {
                 }
             }
         }
+        system.debug('***listaCasos '+listaCasos);
         if(!listaCasos.isEmpty()){
+            system.debug('***listaCasos no empty ');
             asignarEntitlement(listaCasos);
             rellenarStatusAuxiliar(listaCasos);
             informarImporteReclamado(listaCasos); 
@@ -199,10 +201,14 @@ public without sharing class SAC_Case_BI_TRHan extends CC_TriggerHandlerBase {
      * 1.0            US200213         Carlos Solis   22/04/21     Creación
     *****************************************************************/
     public static void asignarEntitlement(List<Case> listNewCase) {
+        system.debug('***asignarEntitlement ');
         if (Schema.sObjectType.Entitlement.isAccessible()) {
-            List <Entitlement> entls = [SELECT id, SlaProcess.name FROM Entitlement WHERE SlaProcess.name = 'SAC_Process' ORDER BY LastModifiedDate desc limit 1];                         
+            List <Entitlement> entls = [SELECT id, SlaProcess.name FROM Entitlement WHERE SlaProcess.name = 'SAC_Process' ORDER BY LastModifiedDate desc limit 1];   
+            system.debug('***entls ');
             for (Case newCase : listNewCase) {
+                system.debug('***newCase ' + newCase);
                 if (String.isBlank(newCase.SAC_CasoRelacionado__c)) { //Si SAC_CasoRelacionado__c está lleno, significa que viene de una copia y la fecha de recepción ya viene rellena
+                    system.debug('***asignar fecha recepción ');
                     newCase.SAC_FechaRecepcion__c = system.now();
                 }
                 if (!entls.isEmpty()) {

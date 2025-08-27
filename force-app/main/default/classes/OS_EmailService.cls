@@ -14,7 +14,7 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
         return resultado;
     }
 
-    public Messaging.InboundEmailResult procesarCorreoEntrante(Messaging.InboundEmail email, Messaging.InboundEnvelope envelope, Map<String, Integer> reintentos) {
+    public Messaging.InboundEmailResult procesarCorreoEntrante (Messaging.InboundEmail email, Messaging.InboundEnvelope envelope, Map<String, Integer> reintentos) {
 
         Messaging.InboundEmailResult result = new Messaging.InboundEmailResult();
         result.success=false;
@@ -39,7 +39,9 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
                                                         WHERE OS_Email__c = :envelope.toAddress 
                                                         LIMIT 1];
 
-            Boolean segMailRelated = false;
+            Boolean segMailRelated = false; //True si el correo entrante también se envía a SEGMENTOS
+            
+            Boolean mailFromSEG = false;
 
             if (!correoDependencia.isEmpty() && (correoDependencia[0].OS_Canal_Procedencia__c == 'Buzón UAFE' || correoDependencia[0].OS_Canal_Procedencia__c == 'Buzón UAFE Express')) {
                 //List<SEG_Buzon__mdt> buzonesSEG = SEG_Buzon__mdt.getAll().values();
@@ -47,11 +49,18 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
                 List<SEG_Buzon__mdt> buzonesSEG = [SELECT Id, DeveloperName, Label, SEG_Correo_de_procedencia__c, SEG_Email_SF__c, SEG_Grupo_MCC__c, SEG_Organizacion__c, SEG_Zona__c FROM SEG_Buzon__mdt WHERE SEG_Organizacion__c IN('Centro Empresas', 'Instituciones','Banca Corporativa')];
 
                 List<String> direccionesSEG = new List<String>();
-                for (SEG_Buzon__mdt buzon : buzonesSEG) {direccionesSEG.add(buzon.SEG_Correo_de_procedencia__c);
+                for (SEG_Buzon__mdt buzon : buzonesSEG) {
+                    direccionesSEG.add(buzon.SEG_Correo_de_procedencia__c);
                 }
 
                 for (String address : direccionesSEG){ 
-                    if((email.toAddresses!=null && !email.toAddresses.isEmpty() && email.toAddresses.contains(address)) || (email.ccAddresses!=null && !email.ccAddresses.isEmpty() && email.ccAddresses.contains(address))) {segMailRelated = true; }
+                    if((email.toAddresses!=null && !email.toAddresses.isEmpty() && email.toAddresses.contains(address)) || (email.ccAddresses!=null && !email.ccAddresses.isEmpty() && email.ccAddresses.contains(address))) {
+                        segMailRelated = true; 
+                    }
+
+                    if (email.fromAddress.contains(address)) {
+                        mailFromSEG = true;
+                    }
                 }
             }
 
@@ -115,10 +124,6 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
                                         OS_Alerta_Fecha__c, ContactId, CC_Cola_Procedencia__c, RecordTypeId, CC_Numero_Documento__c, CC_Idioma__c, AccountId
                                         FROM Case 
                                         WHERE Id=:casesTareaIdSet];
-
-                    
-
-                    
 
                     if(!casoOrigenList.isEmpty()) {
                         Boolean origenPhone = false;
@@ -313,15 +318,17 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
                 if(recordTypeCasoDefecto != '') {
                     caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', recordTypeCasoDefecto);
                 }
-                else if(recordTypeEmpleado) { caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'OS_Empleado');
+                else if(recordTypeEmpleado) { 
+                    caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'OS_Empleado');
                 } 
-                else { caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'OS_Cliente');
+                else { 
+                    caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'OS_Cliente');
                 }
 
                 if(segMailRelated){
-
                     caso.SEG_Id_Related_Mail__c = email.messageId;
                 }
+
                 caso.Origin = 'Email';
                 caso.Subject = email.Subject.left(255);
                 caso.Description = body.left(32000);
@@ -350,6 +357,7 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
                                                                         OR CC_Lista__r.Name = 'COPS: Relación Tipo de Contacto y Canal de Procedencia') 
                                                                         AND Name = :procedenciaEntrante) 
                                                                         OR  (CC_Lista__r.Name = 'COPS: Acuse de recibo por Buzones' AND CC_Activa__c = TRUE)];
+
                 if (!correoDependencia.isEmpty()) {
                     caso.CC_Canal_Procedencia__c = correoDependencia[0].OS_Canal_Procedencia__c;
                     if (caso.OS_ReglaUtilizada__c == null) {
@@ -389,9 +397,33 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
                     }
                 }
 
-                
+                List<Case> casosPorSubjectSEG = procesarReferencias(email.subject);
+
+                //Jaime: correo nuevo que implica relacionarlo con el caso que estamos creando
+                if(segMailRelated || (mailFromSEG && !casosPorSubjectSEG.isEmpty())){
+                    caso.SEG_Id_Related_Mail__c = email.messageId;
+                }
+
                 //Aquí hay que meter el try-catch para controlar el UNABLE_TO_LOCK_ROW
                 insert caso;
+                
+                if(caso.Id != null && mailFromSEG && !casosPorSubjectSEG.isEmpty()){
+                    SEG_Settings__c delay = SEG_Settings__c.getValues('SEG_DelaySEGCOPS');//.getAll().values();
+                    Integer tiempo = delay != null ? Integer.valueOf(delay.SEG_Delay__c) : 1;
+                    DateTime dt = DateTime.now();
+                    Long dateInMilliseconds = dt.getTime();
+
+                    AsyncOptions options = new AsyncOptions();
+                    options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(caso.Id).addString(String.valueOf(dateInMilliseconds)).build();
+                    options.MinimumQueueableDelayInMinutes = Integer.valueOf(tiempo);
+    
+                    try {
+                        //Jaime: cuarto parametro
+                        ID jobID = System.enqueueJob(new SEG_CasosSEG_COPSrelacionados(email.messageId, email.htmlBody, email.subject, casosPorSubjectSEG[0].Id), options);
+                    } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);  }
+                } 
+
+                /* OLD:
                 
                 if(caso.SEG_Id_Related_Mail__c != null && caso.Id != null){
                     SEG_Settings__c delay = SEG_Settings__c.getValues('SEG_DelaySEGCOPS');//.getAll().values();
@@ -403,13 +435,11 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
                     options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(caso.Id).addString(String.valueOf(dateInMilliseconds)).build();
                     options.MinimumQueueableDelayInMinutes = Integer.valueOf(tiempo);
     
-                    
                     try {
-                        ID jobID = System.enqueueJob(new SEG_CasosSEG_COPSrelacionados(email.messageId, email.htmlBody, email.subject), options);
-                          
+                        //Jaime: cuarto parametro
+                        ID jobID = System.enqueueJob(new SEG_CasosSEG_COPSrelacionados(email.messageId, email.htmlBody, email.subject, 'idEjemplo'), options);
                     } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);  }
-                }
-                
+                } */
                 
                 if ((caso.CC_Canal_Procedencia__c == 'Buzón UAFE' || caso.CC_Canal_Procedencia__c == 'Buzón UAFE Express') && caso.OS_ViaClasificacion__c != 'Regla Clasificación') {
                     //al no encontrar clasificación rapida en SF llamamos a Cognitive
@@ -435,10 +465,10 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
                 List<CC_Lista_Valores__c> buzonesActivos = new List<CC_Lista_Valores__c>();
                 for(CC_Lista_Valores__c valorClasificacion: clasificacionesListaValores) {
                     if(valorClasificacion.CC_Lista__r.Name == 'COPS: Acuse de recibo por Buzones' && valorClasificacion.Name == caso.CC_Canal_Procedencia__c && valorClasificacion.CC_Activa__c == true) {buzonesActivos.add(valorClasificacion);}
-                    
                 }
-                if (buzonesActivos.size() > 0) {isAcuse = true;
-                                }
+                if (buzonesActivos.size() > 0) {
+                    isAcuse = true;
+                }
                 //DETECTAR IDIOMA POR COGNITIVE Y ENVIAR ACUSE DE RECIBO
                 List<Id> casoId = new List<Id>{caso.Id};
                 OS_Detector_Idioma.setIdiomaCaso(casoId, email.fromAddress, correoDependencia[0].OS_Correo__c, correoDependencia[0].OS_Canal_Procedencia__c, email.htmlBody, isAcuse);
@@ -489,6 +519,32 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
         }
     }
 
+    public static List<Case> procesarReferencias(String inboundEmailSubject) {
+
+        List<Case> casosPorSubjectSEG = new List<Case>();
+
+        String subjectAcortado = '';
+
+        if(inboundEmailSubject.length() > 3000){
+            subjectAcortado = inboundEmailSubject.left(3000);
+        }else{
+            subjectAcortado = inboundEmailSubject;
+        }
+
+        List<String> subjectNumbers = SEG_EmailService.identificarsrNumber(subjectAcortado);
+
+        //Se obtiene el caso de SEG con el caseNumber del Subject del Email y que no esté ya relacionado a un caso de COPS.
+        casosPorSubjectSEG = new List<Case> ([SELECT id, CC_CasoRelacionado__c, CC_CasoRelacionado__r.SEG_Case_Owner__c,CC_CasoRelacionado__r.SEG_OldSubStatus__c,CC_CasoRelacionado__r.Priority,CC_CasoRelacionado__r.SEG_OldStatus__c,CC_CasoRelacionado__r.SEG_Subestado__c,CC_CasoRelacionado__r.CreatedDate,CC_CasoRelacionado__r.CaseNumber,CC_CasoRelacionado__r.SEG_Detalle__c,CC_CasoRelacionado__r.CC_MCC_Motivo__c,CC_CasoRelacionado__r.CC_MCC_ProdServ__c,CC_CasoRelacionado__r.CC_MCC_Tematica__c,CC_CasoRelacionado__r.AccountId,CC_CasoRelacionado__r.SEG_Zona__c,CC_CasoRelacionado__r.SEG_Organizacion__c,CC_CasoRelacionado__r.SEG_Grupo__c,CC_CasoRelacionado__r.SEG_Grupo_colaborador_Externo__c,CC_CasoRelacionado__r.Status, recordTypeId, SEG_Case_Owner__c, SEG_OldSubStatus__c, Priority, SEG_OldStatus__c, SEG_Subestado__c, CreatedDate, CaseNumber, SEG_Detalle__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Tematica__c, AccountId, SEG_Zona__c, SEG_Organizacion__c, SEG_Grupo__c, SEG_Grupo_colaborador_Externo__c, Status 
+        FROM Case 
+        WHERE (CreatedDate = LAST_N_MONTHS:6 OR CreatedDate = THIS_MONTH OR CreatedDate = TODAY) 
+        AND RecordType.DeveloperName IN ('SEG_Cliente','SEG_Seguimiento')
+        AND CC_CasoRelacionado__c = NULL 
+        AND Casenumber IN :subjectNumbers
+        ORDER BY createdDate DESC LIMIT 1]);
+
+        return casosPorSubjectSEG;
+    }
+
     public static EmailMessage crearEmailMessage(Messaging.InboundEmail email, String toAddress, Id idCaso, Id contactId, String body, String nuevoHtmlBody) {
         Messaging.InboundEmailResult result = new Messaging.InboundEmailresult();
         result.success = false;
@@ -502,7 +558,7 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
         tarea.Description = body.left(32000);
         tarea.WhatId = idCaso;
         tarea.WhoId = contactId;
-        insert tarea;
+        CBK_DMLUtility.insertRecords(new List<Task>{tarea});
 
         Datetime parsedDatetime;
 
@@ -578,7 +634,7 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
         } else {
             correo.ToAddress = toAddress;
         }
-        insert correo;
+        CBK_DMLUtility.insertRecords(new List<EmailMessage>{correo});
         return correo;
     }
 

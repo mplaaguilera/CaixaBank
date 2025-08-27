@@ -104,7 +104,7 @@ public with sharing class SAC_LCMP_ProductosPretension_Test {
         
         System.runAs(usuario) {
             test.startTest();
-            SAC_LCMP_ProductosPretension.createProductCase('Descripción', '12345', 'Dental', System.today(), System.today(), pretension.Id, 10, 10, null, null, null, null);
+            SAC_LCMP_ProductosPretension.createProductCase('Descripción', '12345', 'Dental', System.today(), System.today(), pretension.Id, 10, 10, null, null, null, null, null, null, null, null, true);
             test.stopTest();
             List<SAC_ProductCase__c> productos = [SELECT Id FROM SAC_ProductCase__c WHERE N_Contrato__c = '12345' LIMIT 1];
             System.assertEquals(productos.isEmpty(), false, 'Se ha generado el producto');
@@ -118,7 +118,7 @@ public with sharing class SAC_LCMP_ProductosPretension_Test {
         SAC_ProductCase__c product = [SELECT Id FROM SAC_ProductCase__c WHERE SAC_Pretension__c =: pretension.Id];
         System.runAs(usuario) {
             test.startTest();
-            SAC_LCMP_ProductosPretension.editProductCase(product.Id, 'Descripción Edit', '67890', 'Dental', System.today(), System.today(), pretension.Id, 10, 10, null, null, null, null);
+            SAC_LCMP_ProductosPretension.editProductCase(product.Id, 'Descripción Edit', '67890', 'Dental', System.today(), System.today(), pretension.Id, 10, 10, null, null, null, null, null, null, null, null, true);
             test.stopTest();
             List<SAC_ProductCase__c> productos = [SELECT Id FROM SAC_ProductCase__c WHERE N_Contrato__c = '67890' LIMIT 1];
             System.assertEquals(productos.isEmpty(), false, 'Se ha generado el producto');

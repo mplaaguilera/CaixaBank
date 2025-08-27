@@ -99,22 +99,26 @@ public with sharing class CC_QueueablePush2sms_Test {
             insert valoresInsertar;
 
             Account cuenta = new Account();
-            cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
-            cuenta.Name = 'Cuenta Prueba';
+            cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
+            cuenta.FirstName = 'Cuenta Prueba';
+            cuenta.LastName = 'Cuenta Prueba';
             cuenta.CC_Numero_Oficina__c = '222';
+            cuenta.AV_IndicadoresClientes__c = '1';
+            cuenta.AV_NumPerso__c = '222';
+            cuenta.PersonMobilePhone = '666666666';
             insert cuenta;
 
-            Contact contacto = new Contact();
-            contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
-            contacto.AccountId = cuenta.Id;
-            contacto.FirstName = 'Test';
-            contacto.LastName = 'Contacto Prueba';
-            contacto.CC_NumPerso__c = '25345569';
-            contacto.CC_Idioma__c = 'ca';
-            contacto.Email = 'correo@gmail.com';
-            contacto.Phone = '973242323';
-            contacto.MobilePhone = '666';
-            insert contacto;
+            // Contact contacto = new Contact();
+            // contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
+            // contacto.AccountId = cuenta.Id;
+            // contacto.FirstName = 'Test';
+            // contacto.LastName = 'Contacto Prueba';
+            // contacto.CC_NumPerso__c = '25345569';
+            // contacto.CC_Idioma__c = 'ca';
+            // contacto.Email = 'correo@gmail.com';
+            // contacto.Phone = '973242323';
+            // contacto.MobilePhone = '666';
+            // insert contacto;
 
             Id recordTem = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
             Id recordProd = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
@@ -150,8 +154,7 @@ public with sharing class CC_QueueablePush2sms_Test {
 
             CC_Settings__c configuracion = new CC_Settings__c(
                 Name = 'CC_RespuestaArgosPushSMS',
-                CC_Configuracion_1__c = 'CC_ConsultasOperativasCanalFormulario_Traslado_CAS',
-                CC_Configuracion_2__c = 'CC_ConsultasOperativasCanalFormulario_Traslado_CAT'
+                CC_Configuracion_1__c = 'Respuesta negativa Argos'
             );
             insert configuracion;
 
@@ -159,7 +162,7 @@ public with sharing class CC_QueueablePush2sms_Test {
 
             Case caso3 = new Case();
             caso3.AccountId = cuenta.Id;
-            caso3.ContactId = contacto.Id;
+            //caso3.ContactId = contacto.Id;
             caso3.Subject = 'Caso Cliente 3';
             caso3.Status = 'Activo';
             caso3.Origin = 'Email';
@@ -172,6 +175,7 @@ public with sharing class CC_QueueablePush2sms_Test {
             caso3.CC_Detalles_Consulta__c = 'Test';
             caso3.CC_Detalles_Solucion__c = 'Test';
             caso3.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
+            caso3.CC_Idioma__c = 'es';
             casos.add(caso3);
 
             insert casos;

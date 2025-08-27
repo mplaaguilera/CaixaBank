@@ -51,10 +51,17 @@ public with sharing class CC_WS_Autenticacion {
 				integracion.mHeaders = getRequestHeaders();
 				HttpRequest requestt = CBK_HttpServiceIntegration.getRequest(integracion);
 				response = CBK_HttpServiceIntegration.callHttpService(requestt, autenticacionId, 'CC_Autenticacion_Robusta');
-				
-				Request reqInfo = Request.getCurrent();
-				String currentRequestId = reqInfo.getRequestId();
-				System.debug('::: request id: ' + currentRequestId);
+					
+				// Capturar headers de respuesta
+				Map<String, String> responseHeaders = new Map<String, String>();
+				if (response != null) {
+					for (String headerKey : response.getHeaderKeys()) {
+						String headerValue = response.getHeader(headerKey);
+						responseHeaders.put(headerKey, headerValue);
+						System.debug('::: Header de respuesta - ' + headerKey + ': ' + headerValue);
+					}
+					System.debug('::: absis: ' + responseHeaders.get('X-absis-request-id'));
+				}
 
 				// response.setStatusCode(200); //Solo TEST
 
@@ -274,9 +281,9 @@ public with sharing class CC_WS_Autenticacion {
 			request.setEndpoint(request.getEndpoint().replace('{authorizationId}', autenticacion.CC_AuthorizationId__c ?? ''));
 
 			HttpResponse responseConsulta = CBK_HttpServiceIntegration.callHttpService(request, idAutenticacion, 'CC_Autenticacion_Robusta_Estado');
-			// responseConsulta.setStatusCode(200); //Solo TEST
-			// String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"APPROVED"}'; //Solo TEST
-			// responseConsulta.setBody(body); //Solo TEST
+			//  responseConsulta.setStatusCode(200); //Solo TEST
+			//  String body =  '{"authorizationId":"SK_0120240216093456720001004000000000CBCCSF000000000000000DEFzd4i5Di9AQVO5CL9Ieq","status":"DENIED"}'; //Solo TEST
+			//  responseConsulta.setBody(body); //Solo TEST
 
 			if (tipoObjeto == 'Case') {
 				caso = new Case(Id = recordId);
@@ -383,5 +390,67 @@ public with sharing class CC_WS_Autenticacion {
 		}
         system.debug('::: headers' + headers);
 		return headers;
+	}
+	
+	/**
+	 * Obtiene los headers de respuesta de una integración HTTP
+	 * @param response HttpResponse de la integración
+	 * @return Map<String, String> con los headers de respuesta
+	 */
+	public static Map<String, String> getResponseHeaders(HttpResponse response) {
+		Map<String, String> responseHeaders = new Map<String, String>();
+		if (response != null) {
+			for (String headerKey : response.getHeaderKeys()) {
+				String headerValue = response.getHeader(headerKey);
+				responseHeaders.put(headerKey, headerValue);
+				System.debug('::: Header de respuesta - ' + headerKey + ': ' + headerValue);
+			}
+		}
+		return responseHeaders;
+	}
+	
+	/**
+	 * Obtiene los headers de respuesta de la integración CC_Autenticacion_Robusta
+	 * @param autenticacionId Id de la autenticación
+	 * @param recordId Id del registro relacionado
+	 * @return Map<String, String> con los headers de respuesta
+	 */
+	public static Map<String, String> getHeadersAutenticacionRobusta(Id autenticacionId, Id recordId) {
+		Map<String, String> responseHeaders = new Map<String, String>();
+		
+		try {
+			// Obtener datos necesarios para la integración
+			Map<String, Object> retorno = getDatos(recordId, autenticacionId, 'ClienteDigital');
+			Map<String, Object> datos = (Map<String, Object>)retorno.get('datos');
+			
+			// Construir el body de la petición
+			Datetime fechaCaducidad = Datetime.valueOf(datos.get('fechaCaducidad'));
+			String body = '{"operationKey": "' + String.valueOf(datos.get('operationKey')) + '",';
+			body += '"taskData":{"telephone": "' + String.valueOf(datos.get('telefono')) + '","language": "' + String.valueOf(datos.get('idioma')) + '", "casoId":"' + String.valueOf(datos.get('casoId')) + '", "casoUso":"' + String.valueOf(datos.get('casoUso')) + '"},';
+			body += '"expirationDate": "' + String.valueOf(fechaCaducidad.date()) + '",';
+			body += '"expirationTime": "' + String.valueOf(fechaCaducidad.time()).substring(0, 5) + '",';
+			body += '"customerInternalId": "' + CC_MetodosUtiles.encriptarSHA('SHA-512', String.valueOf(datos.get('numperso'))).toLowerCase() + '",';
+			body += '"personType": "' + String.valueOf(datos.get('tipoPersona')) + '", "appName": "' + String.valueOf(datos.get('app')) + '",';
+			body += '"visualizationData": {"tickets": [{"datum": "' + String.valueOf(datos.get('telefono')) + '","ticketvalue": "' + String.valueOf(datos.get('ticketvalue')) + '"}]},';
+			body += '"customerId" : "' + String.valueOf(datos.get('documento')) + '"}';
+			
+			// Realizar la petición HTTP
+			CBK_HttpServiceIntegration.RequestWapper integracion = new CBK_HttpServiceIntegration.RequestWapper();
+			integracion.method = 'POST';
+			integracion.intSetting = 'CC_Autenticacion_Robusta';
+			integracion.body = body;
+			integracion.mHeaders = getRequestHeaders();
+			
+			HttpRequest request = CBK_HttpServiceIntegration.getRequest(integracion);
+			HttpResponse response = CBK_HttpServiceIntegration.callHttpService(request, autenticacionId, 'CC_Autenticacion_Robusta');
+			
+			// Obtener headers de respuesta
+			responseHeaders = getResponseHeaders(response);
+			
+		} catch (Exception e) {
+			System.debug('Error al obtener headers de autenticación robusta: ' + e.getMessage());
+		}
+		
+		return responseHeaders;
 	}
 }

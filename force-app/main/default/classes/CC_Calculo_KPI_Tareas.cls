@@ -61,8 +61,6 @@ public with sharing class CC_Calculo_KPI_Tareas {
             }
         }
 
-        System.debug('valores: ' + valores);
-
         //ESTRUCURA DE KPI - OPCION 1 - LOV
         //lISTA PRINCIPAL CON 2 LISTAS DE VALORES (VALORES DERIVAR Y VALORES OTRAS OPERATIVAS)
         //lISTA VALORES DERIVAR: CONTIENE LOS VALORES DE KPI RELACIONADOS CON EL AMBITO DE DERIVAR - ES NECESARIO QUE SE FIJE EN EL AMBITO TAREAS 
@@ -71,17 +69,6 @@ public with sharing class CC_Calculo_KPI_Tareas {
 
         //Recuperamos los valores de los KPI
         Map<Case, Task> casos = recuperarDatosCalculoKPI(tareas, tipoTareas);
-                
-        //ESTRUCURA DE KPI - OPCION 2 - CUSTOM SETTINGS - CUSTOM METADATA
-        //LOS VALORES DEL KPI SE ALMACENAN EN UN CUSTOM SETTING DE TIPO JERARQUICO O CUSTOM METADATA
-        //3 CAMPOS:
-        //1. Operativa del KPI
-        //2. Valor del KPI (valor a asignar)
-        //3. Tipo de KPI (tipo de la tarea)
-
-        //List<CC_KPI_Tareas__mdt> kpiSettings = [SELECT Id, CC_Operativa__c, CC_Valor__c, CC_Tipo_Tarea__c, CC_AmbitoNull__c FROM CC_KPI_Tareas__mdt];
-
-        //List<Task> tareasAMarcar = new List<Task>();
 
         if(casos != null && !casos.isEmpty()){
             for(Case caso : casos.keySet()){
@@ -92,6 +79,7 @@ public with sharing class CC_Calculo_KPI_Tareas {
                     caso.SAC_EnvioParcial__c = false;
                 } else if (!caso.SAC_EnvioParcial__c){
                     String valorKPI = getLOV('Otras Operativas', null, valoresOtrasOperativas, casos.get(caso).Type);
+                    valorKPI = trasladoCSBD(casos.get(caso).Type, casos.get(caso), valorKPI);
                     caso.CC_Motivo_Derivacion__c = valorKPI != null && valorKPI != '' ? valorKPI : caso.CC_Motivo_Derivacion__c; 
                 }
                 //if(caso.CC_Motivo_Derivacion__c != null){
@@ -102,7 +90,6 @@ public with sharing class CC_Calculo_KPI_Tareas {
             /*if(!tareasAMarcar.isEmpty()){
                 marcarTareaKPI(tareasAMarcar);
             }*/
-            System.debug('caso motivo derivacion: ' + JSON.serializePretty(casos.keySet()));
             update new List<Case>(casos.keySet());
         }
     }
@@ -137,39 +124,11 @@ public with sharing class CC_Calculo_KPI_Tareas {
         return null;
     }
 
-    //Creo que ya no es necesario marcar la tarea, ya que la tarea se rellena al crearse directamente y siempre será la ultima aunque no se complete la operativa
-    /*private static void marcarTareaKPI(List<Task> tareas){
-        // Recuperar extensiones existentes para todas las tareas
-        Map<Id, CBK_Activity_Extension__c> extensiones = new Map<Id, CBK_Activity_Extension__c>();
-        for(CBK_Activity_Extension__c ext : [SELECT Id, AV_ActivityId__c, CC_Tarea_Derivar__c 
-                                            FROM CBK_Activity_Extension__c 
-                                            WHERE AV_ActivityId__c IN :tareas]){
-            extensiones.put(ext.AV_ActivityId__c, ext);
+    private static String trasladoCSBD(String tipoTarea, Task tarea, String valorKPI){
+        if(tipoTarea == 'Traslado Tercer Nivel' && tarea.Subject.contains('3N de CSBD')){
+            valorKPI = 'CSBD';
         }
-        
-        // Lista para almacenar extensiones a crear/actualizar
-        List<CBK_Activity_Extension__c> paraUpsert = new List<CBK_Activity_Extension__c>();
-        
-        // Procesar cada tarea
-        for(Task tarea : tareas){
-            // Si la tarea ya tiene extensión
-            if(extensiones.containsKey(tarea.Id)){
-                CBK_Activity_Extension__c ext = extensiones.get(tarea.Id);
-                // Solo actualizar si no tiene fecha asignada
-                if(ext.CC_Tarea_Derivar__c == null){
-                    ext.CC_Tarea_Derivar__c = CBK_UtilsDate.todaySYS();
-                    paraUpsert.add(ext);
-                }
-            } else {
-                // Crear nueva extensión si no existe
-                paraUpsert.add(new CBK_Activity_Extension__c(
-                    AV_ActivityId__c = tarea.Id,
-                    CC_Tarea_Derivar__c = CBK_UtilsDate.todaySYS()
-                ));
-            }
-        }
-        
-        // Ejecutar upsert si hay registros para procesar
-        if(!paraUpsert.isEmpty()) upsert paraUpsert;
-    }*/
+        return valorKPI;
+    }
+
 }

@@ -108,23 +108,47 @@ public with sharing class SPV_LCMP_Reclamantes {
     @AuraEnabled
     public static void cambiarReclaPrincipal(String reclamanteId){
         try {
-            
+            Set<String> caseExtensionSet = new Set<String>();
             SAC_CaseReclamante__c reclamanteActualizar = [SELECT Id, SAC_ReclamantePrincipal__c, SAC_Pretension__c, SAC_Case__c, SAC_Account__c, SAC_Contact__c, SAC_Account__r.CC_Idioma__pc, SAC_Account__r.AV_OfficeManager__c  FROM SAC_CaseReclamante__c WHERE Id = :reclamanteId LIMIT 1];
             
             reclamanteActualizar.SAC_ReclamantePrincipal__c = true;
 
             SPV_DatabaseDML.updateDML(reclamanteActualizar, true); 
 
-            List<Case> casos = [SELECT Id, AccountId, ContactId, RecordTypeId FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND (SAC_Reclamacion__c =: reclamanteActualizar.SAC_Case__c OR Id =: reclamanteActualizar.SAC_Case__c)];
+            List<Case> casos = [SELECT Id, AccountId, ContactId,CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SPV_ReclamantePrincipalEmail__c, RecordTypeId FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND (SAC_Reclamacion__c =: reclamanteActualizar.SAC_Case__c OR Id =: reclamanteActualizar.SAC_Case__c)];
+            System.debug('Kevin : total casos ' + casos.size());
             for(Case caso : casos) {
+                System.debug('Kevin : checl del email: ' + caso.CBK_Case_Extension_Id__r.SPV_ReclamantePrincipalEmail__c);
                 if(caso.RecordTypeId == RECTYPEPRETENSION) {
+                    System.debug('Kevin : pretension ');
                     caso.AccountId = reclamanteActualizar.SAC_Account__c;
                     caso.ContactId = reclamanteActualizar.SAC_Contact__c;
                 } else if(caso.RecordTypeId == RECTYPERECLAMACION) {
+                    System.debug('Kevin :  reclamacin ');
                     caso.CC_Idioma__c = reclamanteActualizar.SAC_Account__r.CC_Idioma__pc;
                     caso.CC_Oficina__c = reclamanteActualizar.SAC_Account__r.AV_OfficeManager__c;
                 }
+
+                System.debug('Kevin :  aso.CBK_Case_Extension_Id__r.SPV_ReclamantePrincipalEmail__c ' + caso.CBK_Case_Extension_Id__r.SPV_ReclamantePrincipalEmail__c);
+                System.debug('Kevin :  aso.CBK_Case_Extension_Id__c ' + caso.CBK_Case_Extension_Id__c);
+                if(caso.CBK_Case_Extension_Id__r.SPV_ReclamantePrincipalEmail__c){
+                    caseExtensionSet.add(caso.CBK_Case_Extension_Id__c);
+                }
             }
+
+            List<CBK_Case_Extension__c> casesExtension = new List<CBK_Case_Extension__c>();
+            if(!caseExtensionSet.isEmpty()){
+                casesExtension = [SELECT Id FROM CBK_Case_Extension__c WHERE Id IN :caseExtensionSet];
+
+                for(CBK_Case_Extension__c caseExt: casesExtension ){
+                    caseExt.SPV_ReclamantePrincipalEmail__c = false;
+                }
+
+                SPV_DatabaseDML.updateListDML(casesExtension, true);
+            }
+
+
+           
             SPV_DatabaseDML.updateListDML(casos, true);
 
             List<SAC_CaseReclamante__c> reclamantesAModificar = [SELECT Id, SAC_Account__c, SAC_Contact__c, SAC_ReclamantePrincipal__c FROM SAC_CaseReclamante__c WHERE SAC_ReclamantePrincipal__c = true AND SAC_Case__c in :casos AND Id != :reclamanteId];
@@ -181,6 +205,7 @@ public with sharing class SPV_LCMP_Reclamantes {
     *****************************************************************/
     @AuraEnabled
     public static void eliminarYCambiarPrincipal(String caseId, String accountId, String idReclamanteCambiarAPrincipal) {
+        Set<String> caseExtensionSet = new Set<String>();
         //Recupero los reclamantes
         List<SAC_CaseReclamante__c> listReclamantes = [SELECT Id, SAC_Case__c, SAC_Pretension__c, SAC_Account__c, SAC_TieneDatosNoAlf__c FROM SAC_CaseReclamante__c WHERE SAC_Case__c = :caseId];
 
@@ -202,9 +227,11 @@ public with sharing class SPV_LCMP_Reclamantes {
         }
 
         //Updateo el nuevo reclamante principal
-        SAC_CaseReclamante__c reclamanteUpdatear = new SAC_CaseReclamante__c();
+        //SAC_CaseReclamante__c reclamanteUpdatear = new SAC_CaseReclamante__c();
 
-        reclamanteUpdatear.Id = idReclamanteCambiarAPrincipal;
+        SAC_CaseReclamante__c reclamanteUpdatear = [SELECT Id, SAC_ReclamantePrincipal__c, SAC_Pretension__c, SAC_Case__c, SAC_Account__c, SAC_Contact__c, SAC_Account__r.CC_Idioma__pc, SAC_Account__r.AV_OfficeManager__c  FROM SAC_CaseReclamante__c WHERE Id = :idReclamanteCambiarAPrincipal LIMIT 1];
+            
+        //reclamanteUpdatear.Id = idReclamanteCambiarAPrincipal;
 
         reclamanteUpdatear.SAC_ReclamantePrincipal__c = true;
         SPV_DatabaseDML.updateDML(reclamanteUpdatear, true);
@@ -213,7 +240,7 @@ public with sharing class SPV_LCMP_Reclamantes {
 
         SAC_CaseReclamante__c reclamanteActualizar = [SELECT Id, SAC_Account__c, SAC_Contact__c, SAC_Account__r.CC_Idioma__pc, SAC_Account__r.AV_OfficeManager__c FROM SAC_CaseReclamante__c WHERE Id = :idReclamanteCambiarAPrincipal LIMIT 1];
 
-        List<Case> casos = [SELECT Id, AccountId, ContactId, RecordTypeId FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND (SAC_Reclamacion__c =: caseId OR Id =: caseId)];
+        List<Case> casos = [SELECT Id, AccountId, ContactId, CBK_Case_Extension_Id__c, CBK_Case_Extension_Id__r.SPV_ReclamantePrincipalEmail__c, RecordTypeId FROM Case WHERE RecordTypeId IN (:RECTYPERECLAMACION, :RECTYPEPRETENSION) AND (SAC_Reclamacion__c =: caseId OR Id =: caseId)];
         for(Case caso : casos) {
             if(caso.RecordTypeId == RECTYPEPRETENSION) {
                 caso.AccountId = reclamanteActualizar.SAC_Account__c;
@@ -226,9 +253,30 @@ public with sharing class SPV_LCMP_Reclamantes {
                     caso.SAC_ReclamantesConDatosNoAlf__c = false;
                 }
             }
+
+            if(caso.CBK_Case_Extension_Id__r.SPV_ReclamantePrincipalEmail__c){
+                caseExtensionSet.add(caso.CBK_Case_Extension_Id__c);
+            }
         }
 
         SPV_DatabaseDML.updateListDML(casos, true);
+
+        List<CBK_Case_Extension__c> casesExtension = new List<CBK_Case_Extension__c>();
+        if(!caseExtensionSet.isEmpty()){
+            casesExtension = [SELECT Id FROM CBK_Case_Extension__c WHERE Id IN :caseExtensionSet];
+
+            for(CBK_Case_Extension__c caseExt: casesExtension ){
+                caseExt.SPV_ReclamantePrincipalEmail__c = false;
+            }
+
+            SPV_DatabaseDML.updateListDML(casesExtension, true);
+        }
+
+        List<SAC_CaseReclamante__c> reclamantesAModificar = [SELECT Id, SAC_Account__c, SAC_Contact__c, SAC_ReclamantePrincipal__c FROM SAC_CaseReclamante__c WHERE SAC_ReclamantePrincipal__c = true AND SAC_Case__c in :casos AND Id != :idReclamanteCambiarAPrincipal];
+            for (SAC_CaseReclamante__c reclamante : reclamantesAModificar) {
+                reclamante.SAC_ReclamantePrincipal__c = false;
+            }
+            SPV_DatabaseDML.updateListDML(reclamantesAModificar, true);
 
         //Elimino los reclamantes recuperados anteriormente
         SPV_DatabaseDML.deleteListDML(listaReclaEliminar, true);

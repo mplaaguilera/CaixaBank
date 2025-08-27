@@ -724,7 +724,7 @@ public class SEG_trasladoColaboradorWS_Test {
 
     
     @isTest
-    public static void generarJSONValija_Operacion01_Test() {
+    public static void generarJSONValijaOperacion01Test() {
         SEG_trasladoColaboradorWS.SEG_DataTrasladoValija datosValija = new SEG_trasladoColaboradorWS.SEG_DataTrasladoValija();
         datosValija.procesoValija = '01';
         datosValija.tipoOperacion = 'TIPO1';
@@ -743,15 +743,17 @@ public class SEG_trasladoColaboradorWS_Test {
         datosValija.telefono = '600123123';
         datosValija.prestamoICO = 'NO';
         datosValija.idEER = 'EER001';
-        String json = SEG_trasladoColaboradorWS.generarJSONValija(datosValija);
-        System.debug(json);
-        System.assert(!String.isBlank(json), 'El JSON generado no debe estar vacío');
-        System.assertEquals(true, json.contains('"operationId":"01"'), 'El JSON debe contener la operación 01');
-        System.assertEquals(true, json.contains('"Metadatas":[{"value":"TIPO1","key":"TIPO_OPERACION"},{"value":"EXP123","key":"NUM_EXPEDIENTE"},{"value":"A12345678","key":"CIF_NIF"},{"value":"Titular Principal","key":"NOMBRE_TITULAR"},{"value":"B87654321","key":"CIF_NIF_2"},{"value":"Titular Secundario","key":"NOMBRE_TITULAR2"},{"value":"C33333333","key":"CIF_NIF_3"},{"value":"Titular Tercero","key":"NOMBRE_TITULAR3"},{"value":"D44444444","key":"CIF_NIF_4"},{"value":"Titular Cuarto","key":"NOMBRE_TITULAR4"},{"value":"E55555555","key":"CIF_NIF_5"},{"value":"Titular Quinto","key":"NOMBRE_TITULAR5"},{"value":"Persona Contacto","key":"CONTACTO"},{"value":"600123123","key":"TELEFONO"},{"value":"NO","key":"PRESTAMO_ICO"},{"value":"EER001","key":"ID_EER"}]'), 'El JSON debe contener la Metadata introducida');
+        User usuarioTest = [SELECT Id FROM User WHERE Email = 'testSEGBI@acme.com' LIMIT 1];
+        System.runAs(usuarioTest) {
+            String json = SEG_trasladoColaboradorWS.generarJSONValija(datosValija);
+            System.assert(!String.isBlank(json), 'El JSON generado no debe estar vacío');
+            System.assertEquals(true, json.contains('"operationId":"01"'), 'El JSON debe contener la operación 01');
+            System.assertEquals(true, json.contains('"Metadatas":[{"value":"TIPO1","key":"TIPO_OPERACION"},{"value":"EXP123","key":"NUM_EXPEDIENTE"},{"value":"A12345678","key":"CIF_NIF"},{"value":"Titular Principal","key":"NOMBRE_TITULAR"},{"value":"B87654321","key":"CIF_NIF_2"},{"value":"Titular Secundario","key":"NOMBRE_TITULAR2"},{"value":"C33333333","key":"CIF_NIF_3"},{"value":"Titular Tercero","key":"NOMBRE_TITULAR3"},{"value":"D44444444","key":"CIF_NIF_4"},{"value":"Titular Cuarto","key":"NOMBRE_TITULAR4"},{"value":"E55555555","key":"CIF_NIF_5"},{"value":"Titular Quinto","key":"NOMBRE_TITULAR5"},{"value":"Persona Contacto","key":"CONTACTO"},{"value":"600123123","key":"TELEFONO"},{"value":"NO","key":"PRESTAMO_ICO"},{"value":"EER001","key":"ID_EER"}]'), 'El JSON debe contener la Metadata introducida');
+        }
     }
 
     @isTest
-    public static void generarJSONValija_Operacion06_Test() {
+    public static void generarJSONValijaOperacion06Test() {
         SEG_trasladoColaboradorWS.SEG_DataTrasladoValija datosValija = new SEG_trasladoColaboradorWS.SEG_DataTrasladoValija();
         datosValija.procesoValija = '06';
         datosValija.cifOrdenante = '12345678Z';
@@ -760,15 +762,18 @@ public class SEG_trasladoColaboradorWS_Test {
         datosValija.telefono = '600987654';
         datosValija.numPer = '123456';
         datosValija.prestamoICO = 'NO';
-        String json = SEG_trasladoColaboradorWS.generarJSONValija(datosValija);
-        System.debug(json);
-        System.assert(!String.isBlank(json), 'El JSON generado no debe estar vacío');
-        System.assertEquals(true, json.contains('"Metadatas":[{"value":"12345678Z","key":"CIF_NIF"},{"value":"Persona Física","key":"NOMBRE_TITULAR"},{"value":"Contacto PF","key":"CONTACTO"},{"value":"600987654","key":"TELEFONO"},{"value":"123456","key":"NUMPER"},{"value":"NO","key":"PRESTAMO_ICO"}]'), 'El JSON debe contener la Metadata introducida');
+        User usuarioTest = [SELECT Id FROM User WHERE Email = 'testSEGBI@acme.com' LIMIT 1];
+        System.runAs(usuarioTest) {
+            String json = SEG_trasladoColaboradorWS.generarJSONValija(datosValija);
+            System.debug(json);
+            System.assert(!String.isBlank(json), 'El JSON generado no debe estar vacío');
+            System.assertEquals(true, json.contains('"Metadatas":[{"value":"12345678Z","key":"CIF_NIF"},{"value":"Persona Física","key":"NOMBRE_TITULAR"},{"value":"Contacto PF","key":"CONTACTO"},{"value":"600987654","key":"TELEFONO"},{"value":"123456","key":"NUMPER"},{"value":"NO","key":"PRESTAMO_ICO"}]'), 'El JSON debe contener la Metadata introducida');
+        }
     }
     
     
     @isTest
-    public static void actualizarCasoDerivadoValija_OK_Test()
+    public static void actualizarCasoDerivadoValijaOKTest()
     {
         Case caso = [SELECT Id FROM Case WHERE Subject = 'SEG_trasladoColaboradorWS_2'];
         CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'MCC 0029'];
@@ -810,7 +815,7 @@ public class SEG_trasladoColaboradorWS_Test {
     }
     
     @isTest
-    public static void actualizarCasoDerivadoValija_KO_Test()
+    public static void actualizarCasoDerivadoValijaKOTest()
     {
         Case caso = [SELECT Id FROM Case WHERE Subject = 'SEG_trasladoColaboradorWS_2'];
         CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'MCC 0029'];
@@ -868,7 +873,7 @@ public class SEG_trasladoColaboradorWS_Test {
      * 1.0   2025-07-21  Jaime Villarón   Initial Version
      */
     @isTest
-    public static void realizarTrasladoValija_Operacion01_Test() {
+    public static void realizarTrasladoValijaOperacion01Test() {
         Case caso = [SELECT Id FROM Case WHERE Subject = 'SEG_trasladoColaboradorWS_1'];
         CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'MCC 0029'];
         CC_Grupo_Colaborador__c grupoValija = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'Grupo Colaborador Valija'];
@@ -938,7 +943,7 @@ public class SEG_trasladoColaboradorWS_Test {
      * 1.0   2025-07-21  Jaime Villarón   Initial Version
      */
     @isTest
-    public static void realizarTrasladoValija_Operacion06_Test() {
+    public static void realizarTrasladoValijaOperacion06Test() {
         Case caso = [SELECT Id FROM Case WHERE Subject = 'SEG_trasladoColaboradorWS_1'];
         CC_Grupo_Colaborador__c grupo = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'MCC 0029'];
         CC_Grupo_Colaborador__c grupoValija = [SELECT Id FROM CC_Grupo_Colaborador__c WHERE Name = 'Grupo Colaborador Valija'];

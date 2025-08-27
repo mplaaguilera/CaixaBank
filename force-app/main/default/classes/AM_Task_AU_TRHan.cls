@@ -16,6 +16,8 @@ public with sharing class AM_Task_AU_TRHan extends CC_TriggerHandlerBase {
 
         if (!listTasks.isEmpty()) {
             rechazoActividadTraslado(listTasks);
+            //Metodo para la US983197
+            listTasks = CC_MetodosUtiles.volcarValorTipo(listTasks);
         }
         
 	}

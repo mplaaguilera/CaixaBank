@@ -255,7 +255,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         SPV_Formulario__c formulario = new SPV_Formulario__c();
         formulario.RecordTypeId = RECTYPEFORMULARIOSUBSANACION;
         formulario.SPV_Caso__c = casoPorActualizar.Id;
-        formulario.SAC_FechaSubsanacion__c = System.now();
+        formulario.SAC_FechaSubsanacion__c = CBK_UtilsDate.nowSYS();
         formulario.SAC_Subsanador__c = UserInfo.getUserId();
         formulario.SAC_GrupoSubsanador__c = casoPorActualizar.SEG_Grupo__c;
         SAC_DatabaseDML.insertDML(formulario, false);
@@ -330,7 +330,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                 SPV_Formulario__c formulario = new SPV_Formulario__c();
                 formulario.RecordTypeId = RECTYPEFORMULARIOSUBSANACION;
                 formulario.SPV_Caso__c = casoPorActualizar.Id;
-                formulario.SAC_FechaSubsanacion__c = System.now();
+                formulario.SAC_FechaSubsanacion__c = CBK_UtilsDate.nowSYS();
                 formulario.SAC_Subsanador__c = UserInfo.getUserId();
                 formulario.SAC_GrupoSubsanador__c = casoPorActualizar.SEG_Grupo__c;
                 SAC_DatabaseDML.insertDML(formulario, false);

@@ -1218,7 +1218,9 @@ public with sharing class CC_CaseTriggerHelper {
         }
 
         for (Case caso : listaCasosUpdate) {
+            if(caso.CC_Canal_Procedencia__c != 'Call Me Back'){ //Evitar que se sobreescriba el owner de la cola CMB.
             caso.CC_Admin__c = true;
+            }
             caso.CC_Tramo_TRZ__c = 'Recibida - En evaluacion';
             caso.CC_CanalNotifCli__c = 'Email';
             caso.CC_Canal_Respuesta__c = caso.Origin;
@@ -1536,7 +1538,7 @@ public with sharing class CC_CaseTriggerHelper {
         Set<Id> setIdContacto = new Set<Id>();
         List<Case> casosEncuesta = new List<Case>();
         List<Id> idsCasos = new List<Id>();
-
+        lstCasos = filtrarEncuestaCasosCMB(lstCasos, mapOldObj);
         for (Case caso : lstCasos) {
             if (caso.Status == 'Cerrado' && caso.Status != mapOldObj.get(caso.Id).Status) {
                 if(!setIdContacto.contains(caso.CC_Agrupador_Id__c)){
@@ -1559,6 +1561,56 @@ public with sharing class CC_CaseTriggerHelper {
                 CC_Envio_Encuestas_3N.enviarEncuesta(idsCasos);
             }
         }
+    }
+
+    public static List<Case> filtrarEncuestaCasosCMB(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
+        List<Case> casosCMB = new List<Case>();
+        List<Id> idsCasosCMB = new List<Id>();
+        Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        for (Case caso : lstCasos) {
+            if (caso.RecordtypeId == rtEmpleado && 
+                caso.CC_Canal_Procedencia__c == 'Call Me Back' && 
+                caso.Status == 'Cerrado' && 
+                caso.Status != mapOldObj.get(caso.Id).Status) {
+                    idsCasosCMB.add(caso.Id);
+            }
+        }
+        if(idsCasosCMB.isEmpty()){
+            return lstCasos;
+        }
+        //Buscar Tareas de tipo Llamada CMB
+        List<Task> tareasCMB = [
+            SELECT Id, WhatId, CC_Tipo_Cierre__c
+            FROM Task 
+            WHERE WhatId IN :idsCasosCMB 
+            AND Type = 'Llamada CMB' 
+            AND CC_Tipo_Cierre__c = 'Llamada finalizada'
+            AND Status = 'Completed'
+            ORDER BY CreatedDate DESC
+        ];
+
+        // Crear un Set con los IDs de casos que tienen tareas CMB completadas
+        Set<Id> casosConTareasCMBCompletadas = new Set<Id>();
+        for(Task tarea : tareasCMB) {
+            casosConTareasCMBCompletadas.add(tarea.WhatId);
+        }
+
+        // Filtrar la lista original para excluir casos CMB sin tareas completadas
+        List<Case> lstCasosFiltrados = new List<Case>();
+        for(Case caso : lstCasos) {
+            // Si es un caso CMB, solo incluirlo si tiene tareas completadas
+            if(idsCasosCMB.contains(caso.Id)) {
+                if(casosConTareasCMBCompletadas.contains(caso.Id)) {
+                    lstCasosFiltrados.add(caso);
+                }
+                // Si no tiene tareas completadas, no se incluye en la lista filtrada
+            } else {
+                // Si no es un caso CMB, incluirlo normalmente
+                lstCasosFiltrados.add(caso);
+            }
+        }
+
+        return lstCasosFiltrados;
     }
 
     public static void informarAltaGestorAU(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
@@ -2367,71 +2419,78 @@ public with sharing class CC_CaseTriggerHelper {
                         if((Boolean)validacion.get('validacionCrearOportunidad')) {
                             casosParaCrearOportunidad.add(caso);
                         }
-                    } else {
-                        System.debug('No se creará oportunidad para el caso ' + caso.Id + ' porque CC_CrearOportunidadTrigger__c no está activo');
                     }
                 }
             }
             
             // Crear oportunidades para los casos válidos
             if(!casosParaCrearOportunidad.isEmpty()) {
+                List<CBK_Case_Extension__c> extensionesParaActualizar = new List<CBK_Case_Extension__c>();
+                
                 for(Case caso : casosParaCrearOportunidad) {
                     try {
                         Map<String, Object> resultado = CC_Gestion_Derivar_CSBD.crearOportunidadCSBD(caso.Id);
                         
-                        if((Boolean)resultado.get('oppCreada')) {
-                            // Oportunidad creada exitosamente
-                            System.debug('Oportunidad creada exitosamente para el caso: ' + caso.Id);
-                        } else if(resultado.containsKey('oportunidadSiExiste') && (Boolean)resultado.get('oportunidadSiExiste')) {
-                            // Ya existe una oportunidad similar
-                            System.debug('Oportunidad similar ya existe para el caso: ' + caso.Id + ' - Mensaje: ' + resultado.get('mensaje'));
+                        // Marcar el campo CC_CrearOportunidadTrigger__c como false después de crear la oportunidad
+                        if(caseExtensionsMap.containsKey(caso.Id)) {
+                            CBK_Case_Extension__c extension = caseExtensionsMap.get(caso.Id);
+                            extension.CC_CrearOportunidadTrigger__c = false;
+                            extensionesParaActualizar.add(extension);
                         }
                     } catch (Exception e) {
-                        System.debug('Error al crear oportunidad para el caso ' + caso.Id + ': ' + e.getMessage());
+                        CBK_Log.error('Error al crear oportunidad para el caso ' + caso.Id + ': ' + e.getMessage());
+                    }
+                }
+                
+                // Actualizar las extensiones de casos para poner CC_CrearOportunidadTrigger__c a false
+                if(!extensionesParaActualizar.isEmpty()) {
+                    try {
+                        update extensionesParaActualizar;
+                    } catch (Exception e) {
+                        CBK_Log.error('Error al actualizar extensiones de casos: ' + e.getMessage());
                     }
                 }
             }
         }
     }
 
-    public static void devolucionCasosCCO_HDT(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
+    public static void devolucionCasosCCOHDT(List<Case> lstCasos, Map<Id, Case> mapOldObj) {
         Id rtEmpleadoCCO = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-        Id rtEmpleadoHDT = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
+        Id rtEmpleadoHDT = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();        
         
-        Set<Id> casosRelacionadosParaReabrir = new Set<Id>();
+        Map<Id, String> casosRelacionadosParaReabrir = new Map<Id, String>();
         
         for (Case caso : lstCasos) {
             if(caso.RecordTypeId == rtEmpleadoCCO //Casos de empleado
                 && caso.CC_Canal_Procedencia__c == 'CCO' //Canal de procedencia CCO
                 && (caso.CC_CasoRelacionado__c != null //Caso relacionado rellenado
-                && caso.CC_CasoRelacionado__r.recordTypeId == rtEmpleadoHDT)) { //Caso relacionado de empleado HDT
-                
+                    )) {  // && caso.CC_CasoRelacionado__r.recordTypeId == rtEmpleadoHDT //Caso relacionado de empleado HDT
                 if((caso.Status == 'Rechazado' && mapOldObj.get(caso.Id).Status != caso.Status) //Caso hijo rechazado (CCO)
-                && caso.CC_CasoRelacionado__r.Status == 'Cerrado' //Caso padre cerrado (HDT)
+                //&& caso.CC_CasoRelacionado__r.Status == 'Cerrado' //Caso padre cerrado (HDT)
                 ){
-                    casosRelacionadosParaReabrir.add(caso.CC_CasoRelacionado__c);
+                    casosRelacionadosParaReabrir.put(caso.CC_CasoRelacionado__c, caso.Comments);
                 }
             }
         }
         
-        // Usar Future para evitar problemas de contexto del trigger
         if(!casosRelacionadosParaReabrir.isEmpty()){
-            reabrirCasosRelacionadosFuture(new List<Id>(casosRelacionadosParaReabrir));
+            reabrirCasosRelacionadosFuture(casosRelacionadosParaReabrir);
         }
     }
     
-    public static void reabrirCasosRelacionadosFuture(List<Id> casosRelacionadosIds) {
+    public static void reabrirCasosRelacionadosFuture(Map<Id, String> casosRelacionadosIds) {
         try {
-            List<Case> casosParaActualizar = new List<Case>();
-            for(Id casoId : casosRelacionadosIds) {
-                casosParaActualizar.add(new Case(
-                    Id = casoId,
-                    Status = 'Abierto'
-                ));
+            Map<String, Map<String, String>> casosParaActualizar = new Map<String, Map<String, String>>();
+            Integer contador = 1;
+            for(Id casoId : casosRelacionadosIds.keySet()) {
+                casosParaActualizar.put('caso' + contador, new Map<String, String>{
+                    'casoId' => String.valueOf(casoId), 
+                    'motivo' => casosRelacionadosIds.get(casoId)});
+                contador++;
             }
-            
+
             if(!casosParaActualizar.isEmpty()) {
-                update casosParaActualizar;
+                CC_CaseTransfer.devolverCasoHDTCCO(casosParaActualizar, 'CCO');
             }
         } catch(Exception e) {
             CBK_Log.error('Error en reabrirCasosRelacionadosFuture: ' + e.getMessage());

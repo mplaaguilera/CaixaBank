@@ -35,7 +35,33 @@ private class CC_Gestion_Derivar_Global_Test {
     static void testRellenarDatosFraude() {
         System.runAs(CC_TestDataFactory.getUserOperadorCliente()){
             // Create test data
+            /*
+            Account cuentaCaixa = new Account();
+            cuentaCaixa.LastName = 'Cliente Senior';
+            cuentaCaixa.CC_NumPerso__c = '0000015';
+            cuentaCaixa.RecordtypeId =  CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
+            cuentaCaixa.CC_Numero_Documento__c = '45729937A';
+            cuentaCaixa.AV_Cliente__c = false;
+            insert cuentaCaixa;
 
+            Case caso = new Case(
+                Description = 'resticted',
+                Subject = 'resticted',
+                Origin = 'Email',
+                Status = 'Activo',
+                CC_Idioma__c = 'es',
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Motivo__c = 'resticted',
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Accionista',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente'),
+                AccountId = cuentaCaixa.Id
+            );
+
+            insert caso;
+            */
             CC_Settings__c setting = new CC_Settings__c();
             setting.Name = 'CC_GruposColaboradoresFraude';
             setting.CC_Configuracion_1__c = 'true';
@@ -49,12 +75,15 @@ private class CC_Gestion_Derivar_Global_Test {
             textosMap.put('Pregunta realizar remitido', 'Pregunta realizar remitido');
             textosMap.put('Toast remitir', 'Toast remitir');
             textosMap.put('Pregunta motivo devolucion tema fraude', 'Pregunta motivo devolucion tema fraude');
+            /*textosMap.put('Pregunta transferencia llamada fraude', 'Pregunta transferencia llamada fraude');
+            textosMap.put('Modal transferencia llamada fraude', 'Modal transferencia llamada fraude');
+            textosMap.put('Mensaje transferencia llamada fraude', 'Mensaje transferencia llamada fraude');*/
 
             // Set ambitoMotivo to 'Caso a Fraude'
             retorno.put('ambitoMotivo', 'Caso a Fraude');
             Test.startTest();
                 // Run the method under test
-                CC_Gestion_Derivar_Global.rellenarDatosFraude(retorno, textosMap);
+                CC_Gestion_Derivar_Global.rellenarDatosFraude(/*caso,*/ retorno, textosMap);
 
                 // Verify the results
                 // System.assertEquals('Toast remitir desde guardar', retorno.get('toastTrasladarDesdeDerivar'), 'Toast remitir desde guardar should be set');
@@ -66,7 +95,7 @@ private class CC_Gestion_Derivar_Global_Test {
                 retorno.put('ambitoMotivo', 'Bizum Fraude');
 
                 // Run the method under test
-                CC_Gestion_Derivar_Global.rellenarDatosFraude(retorno, textosMap);
+                CC_Gestion_Derivar_Global.rellenarDatosFraude(/*caso,*/ retorno, textosMap);
 
                 // Verify the results
                 System.assertEquals('Pregunta motivo devolucion tema fraude', retorno.get('motivoDevolucionTemaFraude'), 'Pregunta motivo devolucion tema fraude should be set');
@@ -477,7 +506,7 @@ private class CC_Gestion_Derivar_Global_Test {
             grupo.name = '3N de CSBD';
             grupo.OS_Negocio__c = 'CC';
             grupo.CC_Queue_Traslado__c = 'Cola_3N_CSBD';
-            grupo.CC_Tipo__c = 'Traslados';
+            grupo.CC_Tipo__c = 'Traslados 3N';
             insert grupo;
 
             CC_MCC_Grupo_Colaborador__c grupoColaboradorMCC = new CC_MCC_Grupo_Colaborador__c();
@@ -993,8 +1022,68 @@ private class CC_Gestion_Derivar_Global_Test {
 
             CC_Gestion_Derivar_Global.rellenarDatosCBP(caso, retorno, textosMap);
 
-            String detallesSolucion = [SELECT CC_Detalles_Solucion__c FROM Case WHERE Id = :caso.Id LIMIT 1].CC_Detalles_Solucion__c;
             System.assertEquals('Texto', textosMap.get('Pregunta CBP'));
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    static void testRellenarDatosColectivoVulnerable() {
+         System.runAs(CC_TestDataFactory.getUserOperadorCliente()){
+            Test.startTest();
+            Id rtCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
+            Map<String, Object> retorno = new Map<String, Object>();
+            Map<String, Object> textosMap = new Map<String, Object>();
+            textosMap.put('mensajeColectivosVulnerables', 'Texto');
+            textosMap.put('preguntaColectivosVulnerables', 'Texto');
+
+            Account cuentaCaixa = new Account();
+            cuentaCaixa.Name = 'Cliente Senior';
+            cuentaCaixa.CC_NumPerso__c = '0000015';
+            cuentaCaixa.RecordtypeId =  rtCliente;
+            cuentaCaixa.CC_Numero_Documento__c = '45729937A';
+            cuentaCaixa.AV_Cliente__c = false;
+            insert cuentaCaixa;
+
+
+            Case caso = new Case(
+                Description = 'resticted',
+                Subject = 'resticted',
+                Origin = 'Email',
+                Status = 'Activo',
+                CC_Idioma__c = 'es',
+                CC_Canal_Respuesta__c = 'Email',
+                CC_Motivo__c = 'resticted',
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Tipo_Contacto__c = 'Consulta',
+                CC_Canal_Procedencia__c = 'Accionista',
+                CC_Detalles_Consulta__c = 'Caso de Contact Center',
+                RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente'),
+                AccountId = cuentaCaixa.Id
+                );
+
+            insert caso;
+
+            List<CC_Settings__c> settings = new List<CC_Settings__c>();
+
+            CC_Settings__c setting = new CC_Settings__c(
+                Name = 'CC_OWA_Por_Defecto_Email_Automatico',
+                CC_Configuracion_3__c = 'contactcenter.devservice@gmail.com'
+            );
+            settings.add(setting);
+
+            CC_Settings__c setting2 = new CC_Settings__c(
+                Name = 'CC_GruposColaboradoresColVulnerable',
+                CC_Configuracion_1__c = 'Atención al cliente',
+                CC_Configuracion_2__c = 'TEXTO REMITIDO ATENCION AL CLIENTE​'
+            );
+            settings.add(setting2);
+
+            insert settings;
+
+            CC_Gestion_Derivar_Global.rellenarDatosColectivosVulnerables(retorno, textosMap);
+
+            System.assertEquals('Texto', textosMap.get('preguntaColectivosVulnerables'));
             Test.stopTest();
         }
     }

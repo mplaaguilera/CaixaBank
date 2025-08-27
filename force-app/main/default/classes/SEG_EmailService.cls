@@ -12,6 +12,8 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
     private static Id recordTypeClienteSeg;
     private static Id recordTypesCentroCaixaBank;
     private static Id recordTypesClientePA;
+    private static Boolean mailFromCOPS = false;
+    private static List<Case> lstCasosCOPS = new List<Case>();
 
     /**
      *  @description Clase que recibe email 
@@ -21,7 +23,7 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
      */
 
     public Messaging.InboundEmailResult handleInboundEmail(Messaging.InboundEmail email, Messaging.InboundEnvelope envelope) {
-        
+
         String messageId = null;
         String parentMessageId = null;
         String foundBuzon;
@@ -90,18 +92,16 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                 direccionesOS.add(buzon.OS_Correo__c);
             }
             Boolean oSMailRelated =false;
-
-            //Jaime: si el mail entrante viene de COPS o no 
-            Boolean oSMailRelatedFrom = false;
+            mailFromCOPS = false; //Si el mail entrante viene de COPS o no 
 
             for (String address : direccionesOS){
                 if((email.toAddresses!=null && !email.toAddresses.isEmpty() && email.toAddresses.contains(address)) || (email.ccAddresses!=null && !email.ccAddresses.isEmpty() && email.ccAddresses.contains(address))) {
                     oSMailRelated = true;    
                 }
 
-                //Jaime: Con que 1 de las direcciones en el FROM del mail entrante coincida con uno de los buzones de COPS, se considera que es un mail entrante de COPS
+                //Con que 1 de las direcciones en el FROM del mail entrante coincida con uno de los buzones de COPS, se considera que es un mail entrante de COPS
                 if (email.fromAddress.contains(address)) {
-                    oSMailRelatedFrom = true;
+                    mailFromCOPS = true;
                 }
             }
 
@@ -150,7 +150,6 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
             numCentroIden = identificarNumCentro(email.toAddresses);
             List<Case> casosEncontrados = new List<Case>();
             List<Case> lstCasosReferenciados = new List<Case>();
-            List<Case> lstCasosCOPS = new List<Case>();
 
             //Registros de casos con las semillas y caseNumbers del correo
             Map<String,List<Case>> mapCasosProcesados = procesarReferencias(semillaId, srNumbers, organizacionBuzon, zonaBuzon);
@@ -163,34 +162,12 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                 lstCasosReferenciados = mapCasosProcesados.get('casosReferenciados');
             }
 
-            //cops
-            //Jaime: No existe un caso relacionado, por lo que se crea el de SEG y se actualiza el de COPS
+            //COPS
+            //No existe un caso relacionado, por lo que se crea el de SEG y se actualiza el de COPS
             if (mapCasosProcesados.containsKey('casosCOPS')) {
                 lstCasosCOPS = mapCasosProcesados.get('casosCOPS');
             }
 
-
-            //Alejandro:
-            /* if (mapCasosProcesados.containsKey('casosCOPS')) {
-                lstCasosReferenciados = mapCasosProcesados.get('casosCOPS');
-            } */
-
-            
-            //Arnau:
-            /*
-            if (mapCasosProcesados.containsKey('casosCOPS')) {
-                lstCasosReferenciados = mapCasosProcesados.get('casosCOPS');
-            } */
-
-            //Jaime:
-            /* if (!mapCasosProcesados.containsKey('casosCOPS')) {
-                //No existe un caso relacionado, por lo que se crea el de SEG y se actualiza el de COPS
-                //Y para poder actualizar el de COPS la query de procesarReferencias debe devolver un Caso, y actualmente sólo lo hace al estar relacionados
-            } */
-
-            /*  Jaime: ¿esta comprobacion de casosEncontrados se pisa con la de casosCOPS? Es la que decide si el caso es nuevo o una respuesta
-                Más adelante estamos informando SEG_Id_Related_Mail__c
-            */
             //Comprobamos si el email es una repuesta o un caso nuevo
             if (!casosEncontrados.isEmpty() || (semillaId.size() > 0 && checkmailad(semillaId, buzonCaixa))) {
                 //El correo es una respuesta a uno previo
@@ -230,13 +207,7 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                     List<String> stats = identificarEmailSaliente(emailfrom, caso);
                     caso.Status = stats[0];
                     caso.SEG_Subestado__c = stats[1];
-                    caso.SEG_Fecha_planificaci_n__c = null;
-
-                    //Jaime: En el caso ENCONTRADO se informa el id del mail origen
-                    if(oSMailRelated){
-                        caso.SEG_Id_Related_Mail__c = email.messageId;
-                    }
-                    
+                    caso.SEG_Fecha_planificaci_n__c = null;   
                 }
 
                 String objCnt;
@@ -691,13 +662,8 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                 foundContact = contactId;
                 foundCR = clasificacionRapida;
 
-                //Jaime: El correo no es una respuesta, se debe crear un nuevo Caso
+                //El correo no es una respuesta, se debe crear un nuevo Caso
                 Case caso = new Case();
-
-
-                
-
-
                 caso.RecordTypeId = recordTypeSEG;
                 caso.Origin = 'Email';
                 caso.Subject = subjectAcortadoCaso;
@@ -805,10 +771,9 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                 caso.SEG_Email_Generador__c = emailfrom?.left(200);
 
 
-                /* Jaime: El correo va a un buzón de COPS (UAFE/EXPRESS), se informa el id del mail origen, ya se hacía
-                OR El correo viene de COPS y su caso no está relacionado
-                Indico el messageId en el campo SEG_Id_Related_Mail__c del caso que voy a crear. - Se hace */
-                if(oSMailRelated || (oSMailRelatedFrom && lstCasosCOPS.size() > 0)){
+                /*  -El correo va también a un buzón de COPS (UAFE/EXPRESS), ya se informa el id del mail origen
+                    -El correo viene de COPS y su caso no está relacionado: Indico el messageId en el campo SEG_Id_Related_Mail__c del caso que voy a crear*/
+                if(oSMailRelated || (mailFromCOPS && lstCasosCOPS != null && !lstCasosCOPS.isEmpty())){
                     caso.SEG_Id_Related_Mail__c = email.messageId;
                 }
 
@@ -816,35 +781,14 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                     if(Test.isRunningTest() && subjectAcortado == 'TESTCATCHMETHOD'){
                         Case casoTest = new Case();
                         casoTest.Id = '54654654654654';
-
-                        //Jaime: la nueva llamada a SEG_CasosSEG_COPSrelacionados cómo afecta a los test?
                         insert(casoTest);
-                    }else{
+                    } else {
                         insert(caso);
                         casoCreado = true;
 
-                        //Jaime: DESPUÉS de insertar el Caso se añade la preparación del encolado de Relacionados ya existente en OS_EmailService.procesarCorreoEntrante()
-                        if(caso.SEG_Id_Related_Mail__c != null && caso.Id != null)
-                        {
-                            SEG_Settings__c delay = SEG_Settings__c.getValues('SEG_DelaySEGCOPS');//.getAll().values();
-                            Integer tiempo = delay != null ? Integer.valueOf(delay.SEG_Delay__c) : 1;
-                            DateTime dt = DateTime.now();
-                            Long dateInMilliseconds = dt.getTime();
-
-                            AsyncOptions options = new AsyncOptions();
-                            options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(caso.Id).addString(String.valueOf(dateInMilliseconds)).build();
-                            options.MinimumQueueableDelayInMinutes = Integer.valueOf(tiempo);
-            
-                            lstCasosCOPS[0].SEG_Id_Related_Mail__c = email.messageId;
-                            update lstCasosCOPS[0];
-
-                            try {
-                                //Jaime: si no añadimos el cuarto parámetro idCasoExistente no tendremos forma de encontrar el caso de COPS en la BD, además evitamos tener que hacer un UPDATE sobre el caso de COPS de su SEG_Id_Related_Mail__c
-                                ID jobID = System.enqueueJob(new SEG_CasosSEG_COPSrelacionados(email.messageId, email.htmlBody, email.subject), options);
-                                
-                            } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);  }
+                        if(caso != null && caso.Id != null && mailFromCOPS && lstCasosCOPS != null && !lstCasosCOPS.isEmpty()){
+                            prepararEncoladoMailsRelacionados(caso.Id, email.messageId, email.htmlBody, email.subject, lstCasosCOPS[0].Id);
                         }
-                        
                     }
                 }catch(Exception ex){
                     if(!casoCreado){
@@ -889,6 +833,10 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                         caso.SEG_Email_Generador__c = emailfrom?.left(200);
                         insert(caso);
                         casoCreadoError = true;
+
+                        if(caso != null && caso.Id != null && mailFromCOPS && lstCasosCOPS != null && !lstCasosCOPS.isEmpty()){
+                            prepararEncoladoMailsRelacionados(caso.Id, email.messageId, email.htmlBody, email.subject, lstCasosCOPS[0].Id);
+                        }
                         
                         // DS1365 - Se corrige la creación de casos con cuentas y contactos en blanco
                         if(caso.Id != null && ex.getMessage().contains('UNABLE_TO_LOCK_ROW') || Test.isRunningTest()){
@@ -1095,6 +1043,10 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
                 }
                 nuevoCaso.SEG_Email_Generador__c = email.fromAddress?.left(200);
                 insert nuevoCaso; 
+
+                if(nuevoCaso != null && nuevoCaso.Id != null && mailFromCOPS && lstCasosCOPS != null && !lstCasosCOPS.isEmpty()){
+                    prepararEncoladoMailsRelacionados(nuevoCaso.Id, email.messageId, email.htmlBody, email.subject, lstCasosCOPS[0].Id);
+                }
                 
                 // DS1365 - Se corrige la creación de casos con cuentas y contactos en blanco
                 if(nuevoCaso.Id != null && e.getMessage().contains('UNABLE_TO_LOCK_ROW') || Test.isRunningTest()){
@@ -1146,6 +1098,37 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
         }
     }
 
+    /**
+     * @description       : Llama al encolado de relación de casos en mails relacionados de SEG y COPS
+     * @param casoId      : Id del caso de SEG que se crea
+     * @param messageId   : Id del mensaje del mail
+     * @param htmlBody    : Cuerpo HTML del mail
+     * @param subject     : Asunto del mail
+     * @param idCasoCOPSExistente : Id del caso de COPS del que proviene el mail
+     * @author            : Jaime Villarón
+     * @group             : 
+     * @last modified on  : 2025-08-13
+     * @last modified by  : Jaime Villarón
+     * Modifications Log 
+     * Ver   Date         Author             Modification
+     * 1.0   2025-08-13  Jaime Villarón   Initial Version
+     */
+    public static void prepararEncoladoMailsRelacionados(Id casoId, String messageId, String htmlBody, String subject, Id idCasoCOPSExistente){
+        SEG_Settings__c delay = SEG_Settings__c.getValues('SEG_DelaySEGCOPS');//.getAll().values();
+        Integer tiempo = delay != null ? Integer.valueOf(delay.SEG_Delay__c) : 1;
+        DateTime dt = DateTime.now();
+        Long dateInMilliseconds = dt.getTime();
+
+        AsyncOptions options = new AsyncOptions();
+        options.DuplicateSignature = QueueableDuplicateSignature.Builder().addId(casoId).addString(String.valueOf(dateInMilliseconds)).build();
+        options.MinimumQueueableDelayInMinutes = Integer.valueOf(tiempo);
+
+        try {
+            ID jobID = System.enqueueJob(new SEG_CasosSEG_COPSrelacionados(messageId, htmlBody, subject, idCasoCOPSExistente), options);
+        } catch (DuplicateMessageException ex) {  CBK_Log.error(ex);  }
+    }
+    
+
     public static boolean checkmailad(String[] semillas, string buzonCaixa) {
         //Comprobamos si el email (Organizacion y Zona) al que se envia la respuesta al caso concuerda con el caso
         List<Case> caso = [SELECT SEG_Zona__c, SEG_Organizacion__c FROM case WHERE (CreatedDate = LAST_N_MONTHS:6 OR CreatedDate = THIS_MONTH OR CreatedDate = TODAY) AND  SEG_semillaId__c = :semillas[0] LIMIT 1];
@@ -1189,16 +1172,7 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
         AND CC_CasoRelacionado__c != NULL)) 
         ORDER BY createdDate DESC LIMIT 1]);
 
-        //Alejandro: Se obtiene el caso con el casenumber más reciente de COPS que esté relacionado a un caso de Segmentos
-
-        /* List<Case> casosNumberCOPS = new List<Case> ([SELECT id, CC_CasoRelacionado__c, CC_CasoRelacionado__r.SEG_Case_Owner__c,CC_CasoRelacionado__r.SEG_OldSubStatus__c,CC_CasoRelacionado__r.Priority,CC_CasoRelacionado__r.SEG_OldStatus__c,CC_CasoRelacionado__r.SEG_Subestado__c,CC_CasoRelacionado__r.CreatedDate,CC_CasoRelacionado__r.CaseNumber,CC_CasoRelacionado__r.SEG_Detalle__c,CC_CasoRelacionado__r.CC_MCC_Motivo__c,CC_CasoRelacionado__r.CC_MCC_ProdServ__c,CC_CasoRelacionado__r.CC_MCC_Tematica__c,CC_CasoRelacionado__r.AccountId,CC_CasoRelacionado__r.SEG_Zona__c,CC_CasoRelacionado__r.SEG_Organizacion__c,CC_CasoRelacionado__r.SEG_Grupo__c,CC_CasoRelacionado__r.SEG_Grupo_colaborador_Externo__c,CC_CasoRelacionado__r.Status, recordTypeId, SEG_Case_Owner__c, SEG_OldSubStatus__c, Priority, SEG_OldStatus__c, SEG_Subestado__c, CreatedDate, CaseNumber, SEG_Detalle__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Tematica__c, AccountId, SEG_Zona__c, SEG_Organizacion__c, SEG_Grupo__c, SEG_Grupo_colaborador_Externo__c, Status 
-        FROM Case 
-        WHERE (CreatedDate = LAST_N_MONTHS:6 OR CreatedDate = THIS_MONTH OR CreatedDate = TODAY) 
-        AND RecordType.DeveloperName IN ('OS_Cliente','OS_Empleado')
-        AND (CC_CasoRelacionado__c != NULL OR Casenumber IN :sNumbers)
-        ORDER BY createdDate DESC LIMIT 1]); */
-
-        //Jaime: Se obtiene el caso de COPS con el caseNumber del Subject del Email y que no esté ya relacionado a un caso de Segmentos.
+        //Se obtiene el caso de COPS con el caseNumber del Subject del Email y que no esté ya relacionado a un caso de Segmentos.
         List<Case> casosNumberCOPS = new List<Case> ([SELECT id, CC_CasoRelacionado__c, CC_CasoRelacionado__r.SEG_Case_Owner__c,CC_CasoRelacionado__r.SEG_OldSubStatus__c,CC_CasoRelacionado__r.Priority,CC_CasoRelacionado__r.SEG_OldStatus__c,CC_CasoRelacionado__r.SEG_Subestado__c,CC_CasoRelacionado__r.CreatedDate,CC_CasoRelacionado__r.CaseNumber,CC_CasoRelacionado__r.SEG_Detalle__c,CC_CasoRelacionado__r.CC_MCC_Motivo__c,CC_CasoRelacionado__r.CC_MCC_ProdServ__c,CC_CasoRelacionado__r.CC_MCC_Tematica__c,CC_CasoRelacionado__r.AccountId,CC_CasoRelacionado__r.SEG_Zona__c,CC_CasoRelacionado__r.SEG_Organizacion__c,CC_CasoRelacionado__r.SEG_Grupo__c,CC_CasoRelacionado__r.SEG_Grupo_colaborador_Externo__c,CC_CasoRelacionado__r.Status, recordTypeId, SEG_Case_Owner__c, SEG_OldSubStatus__c, Priority, SEG_OldStatus__c, SEG_Subestado__c, CreatedDate, CaseNumber, SEG_Detalle__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c, CC_MCC_Tematica__c, AccountId, SEG_Zona__c, SEG_Organizacion__c, SEG_Grupo__c, SEG_Grupo_colaborador_Externo__c, Status 
         FROM Case 
         WHERE (CreatedDate = LAST_N_MONTHS:6 OR CreatedDate = THIS_MONTH OR CreatedDate = TODAY) 
@@ -1237,10 +1211,7 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
 
         respuestaReferencias.put('casoReciente', caseUpdate);
         respuestaReferencias.put('casosReferenciados', lstCasereferenciados);
-        /* Alejandro:
-         respuestaReferencias.put('casosCOPS', lstCasereferenciados); */
 
-        //Jaime:
         if(!casosNumberCOPS.isEmpty()){
             respuestaReferencias.put('casosCOPS', casosNumberCOPS);
         }
